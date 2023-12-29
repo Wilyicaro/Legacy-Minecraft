@@ -1,0 +1,38 @@
+{
+  "required": true,
+  "package": "wily.legacy.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "AbstractContainerScreenMixin",
+    "ClientPacketListenerMixin",
+    "CycleableValueSet",
+    "GLStateManagerMixin",
+    "GlyphInfoMixin",
+    "GuiGraphicsMixin",
+    "GuiMixin",
+    "ItemRendererMixin",
+    "MinecraftMixin",
+    "OptionsMixin",
+    "PlayerModelInjector",
+    "SliderableValueSetMixin"
+  ],
+  "mixins": [
+    "BarrelBlockEntityMixin",
+    "BlastFurnaceBlockEntityMixin",
+    "ChestBlockEntityMixin",
+    "ChestBlockMixin",
+    "ChestBoatMixin",
+    "CraftingTableBlockMixin",
+    "DispenserBlockEntityMixin",
+    "EnderChestBlockMixin",
+    "FurnaceBlockEntityMixin",
+    "HopperBlockEntityMixin",
+    "MinecartChestMixin",
+    "MinecartHopperMixin",
+    "ShulkerBoxBlockEntityMixin",
+    "SmokerBlockEntityMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

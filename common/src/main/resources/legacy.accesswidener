@@ -1,0 +1,51 @@
+accessWidener   v2  named
+accessible class net/minecraft/client/OptionInstance$SliderableValueSet
+accessible class net/minecraft/client/OptionInstance$CycleableValueSet
+accessible method net/minecraft/client/OptionInstance$OptionInstanceSliderButton <init> (Lnet/minecraft/client/Options;IIIILnet/minecraft/client/OptionInstance;Lnet/minecraft/client/OptionInstance$SliderableValueSet;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Ljava/util/function/Consumer;)V
+accessible field net/minecraft/client/OptionInstance toString Ljava/util/function/Function;
+accessible field net/minecraft/client/OptionInstance value Ljava/lang/Object;
+accessible field net/minecraft/client/OptionInstance caption Lnet/minecraft/network/chat/Component;
+accessible method net/minecraft/client/gui/components/CycleButton <init> (IIIILnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/Component;ILjava/lang/Object;Lnet/minecraft/client/gui/components/CycleButton$ValueListSupplier;Ljava/util/function/Function;Ljava/util/function/Function;Lnet/minecraft/client/gui/components/CycleButton$OnValueChange;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Z)V
+mutable field net/minecraft/client/Minecraft options Lnet/minecraft/client/Options;
+accessible class net/minecraft/client/gui/screens/worldselection/SwitchGrid
+accessible method net/minecraft/client/gui/screens/worldselection/WorldCreationUiState tryUpdateDataConfiguration (Lnet/minecraft/world/level/WorldDataConfiguration;)Z
+accessible method net/minecraft/client/gui/screens/worldselection/CreateWorldScreen <init> (Lnet/minecraft/client/Minecraft;Lnet/minecraft/client/gui/screens/Screen;Lnet/minecraft/client/gui/screens/worldselection/WorldCreationContext;Ljava/util/Optional;Ljava/util/OptionalLong;)V
+accessible field net/minecraft/client/gui/screens/worldselection/CreateWorldScreen packValidator Lnet/minecraft/world/level/validation/DirectoryValidator;
+accessible field net/minecraft/client/gui/screens/worldselection/CreateWorldScreen tempDataPackDir Ljava/nio/file/Path;
+accessible field net/minecraft/client/gui/screens/worldselection/CreateWorldScreen tempDataPackRepository Lnet/minecraft/server/packs/repository/PackRepository;
+accessible field net/minecraft/client/gui/screens/worldselection/CreateWorldScreen bottomButtons Lnet/minecraft/client/gui/layouts/GridLayout;
+accessible field net/minecraft/client/gui/screens/worldselection/CreateWorldScreen tabNavigationBar Lnet/minecraft/client/gui/components/tabs/TabNavigationBar;
+accessible field net/minecraft/client/gui/screens/Screen renderables Ljava/util/List;
+accessible field net/minecraft/client/gui/components/AbstractSliderButton canChangeValue Z
+accessible method net/minecraft/client/gui/components/AbstractSliderButton setValue (D)V
+accessible field net/minecraft/client/gui/components/AbstractSelectionList hovered Lnet/minecraft/client/gui/components/AbstractSelectionList$Entry;
+accessible field net/minecraft/client/gui/screens/Screen children Ljava/util/List;
+accessible field net/minecraft/client/gui/screens/Screen narratables Ljava/util/List;
+accessible field net/minecraft/client/server/IntegratedServer publishedPort I
+accessible field net/minecraft/client/server/IntegratedServer lanPinger Lnet/minecraft/client/server/LanServerPinger;
+accessible field net/minecraft/client/server/IntegratedServer publishedGameType Lnet/minecraft/world/level/GameType;
+accessible field net/minecraft/client/gui/screens/LevelLoadingScreen lastNarration J
+accessible field net/minecraft/client/gui/screens/LevelLoadingScreen progressListener Lnet/minecraft/server/level/progress/StoringChunkProgressListener;
+accessible field net/minecraft/client/gui/screens/ProgressScreen progress I
+accessible field net/minecraft/client/gui/screens/ProgressScreen header Lnet/minecraft/network/chat/Component;
+accessible field net/minecraft/client/gui/screens/ProgressScreen stage Lnet/minecraft/network/chat/Component;
+accessible method net/minecraft/client/gui/screens/Screen repositionElements ()V
+accessible field net/minecraft/client/gui/Gui autosaveIndicatorValue F
+accessible method net/minecraft/client/gui/Gui renderSavingIndicator (Lnet/minecraft/client/gui/GuiGraphics;)V
+accessible field net/minecraft/client/gui/screens/ProgressScreen clearScreenAfterStop Z
+accessible field net/minecraft/client/gui/screens/ProgressScreen stop Z
+accessible class net/minecraft/client/Options$FieldAccess
+accessible field net/minecraft/world/inventory/InventoryMenu resultSlots Lnet/minecraft/world/inventory/ResultContainer;
+accessible class net/minecraft/client/OptionInstance$ValueSet
+accessible field net/minecraft/client/gui/Gui toolHighlightTimer I
+accessible field net/minecraft/world/item/ItemStack count I
+accessible field net/minecraft/world/level/levelgen/flat/FlatLevelGeneratorSettings biome Lnet/minecraft/core/Holder;
+mutable field net/minecraft/world/level/levelgen/flat/FlatLevelGeneratorSettings biome Lnet/minecraft/core/Holder;
+accessible field net/minecraft/world/level/levelgen/flat/FlatLevelGeneratorSettings structureOverrides Ljava/util/Optional;
+mutable field net/minecraft/world/level/levelgen/flat/FlatLevelGeneratorSettings structureOverrides Ljava/util/Optional;
+accessible field net/minecraft/world/level/levelgen/flat/FlatLevelGeneratorSettings addLakes Z
+mutable field net/minecraft/world/level/levelgen/flat/FlatLevelGeneratorSettings addLakes Z
+accessible field net/minecraft/world/level/levelgen/flat/FlatLevelGeneratorSettings decoration Z
+mutable field net/minecraft/world/level/levelgen/flat/FlatLevelGeneratorSettings decoration Z
+accessible field net/minecraft/client/gui/screens/DeathScreen hardcore Z
+accessible field net/minecraft/client/gui/screens/DeathScreen causeOfDeath Lnet/minecraft/network/chat/Component;

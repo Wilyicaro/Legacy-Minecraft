@@ -1,0 +1,117 @@
+package wily.legacy.fabric.mixin;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.PlayerRideableJumping;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.LegacyMinecraft;
+import wily.legacy.init.LegacyOptions;
+import wily.legacy.util.ScreenUtil;
+
+import java.util.List;
+
+@Mixin(Gui.class)
+
+public abstract class GuiMixin {
+    @Shadow @Final protected Minecraft minecraft;
+
+    @Shadow protected int screenHeight;
+
+    @Shadow public abstract Font getFont();
+
+    @Shadow protected int screenWidth;
+
+    @Shadow protected int toolHighlightTimer;
+
+    @Shadow protected ItemStack lastToolHighlight;
+
+    @Inject(method = "renderVehicleHealth", at = @At("HEAD"), cancellable = true)
+    public void renderVehicleHealth(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (minecraft.screen != null){
+            ci.cancel();
+            return;
+        }
+        guiGraphics.setColor(1.0f,1.0f,1.0f, (float) Math.max(Math.min(255f,toolHighlightTimer * 38.4f)/ 255f, ((LegacyOptions)minecraft.options).hudOpacity().get()));
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(0.0F,((LegacyOptions)minecraft.options).hudDistance().value *-22.5F,0.0F);
+    }
+    @Inject(method = "renderVehicleHealth", at = @At("RETURN"))
+    public void renderVehicleHealthTail(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (minecraft.screen != null)
+            return;
+        guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
+        guiGraphics.pose().popPose();
+    }
+    @Inject(method = "renderPlayerHealth", at = @At("HEAD"), cancellable = true)
+    public void renderPlayerHealth(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (minecraft.screen != null){
+            ci.cancel();
+            return;
+        }
+        guiGraphics.setColor(1.0f,1.0f,1.0f, (float) Math.max(Math.min(255f,toolHighlightTimer * 38.4f)/ 255f, ((LegacyOptions)minecraft.options).hudOpacity().get()));
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(0.0F,((LegacyOptions)minecraft.options).hudDistance().value *-22.5F,0.0F);
+    }
+    @Inject(method = "renderPlayerHealth", at = @At("RETURN"))
+    public void renderPlayerHealthTail(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (minecraft.screen != null)
+            return;
+        guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
+        guiGraphics.pose().popPose();
+    }
+    @Inject(method = "renderSelectedItemName", at = @At("HEAD"), cancellable = true)
+    public void renderSelectedItemName(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (minecraft.screen != null){
+            ci.cancel();
+            return;
+        }
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(0.0F,((LegacyOptions)minecraft.options).hudDistance().value *-22.5F,0.0F);
+        this.minecraft.getProfiler().push("selectedItemName");
+        if (this.toolHighlightTimer > 0 && !this.lastToolHighlight.isEmpty()) {
+            List<Component> tooltipLines = this.lastToolHighlight.getTooltipLines(null, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).toList();
+            for (int i = 0; i < tooltipLines.size(); i++) {
+                int l;
+                Component mutableComponent = tooltipLines.get(i);
+                if (this.lastToolHighlight.hasCustomHoverName()) {
+                    mutableComponent.copy().withStyle(ChatFormatting.ITALIC);
+                }
+                int width = this.getFont().width(mutableComponent);
+                int j = (this.screenWidth - width) / 2;
+                int k = this.screenHeight - 59 - getFont().lineHeight * (tooltipLines.size() - 1 - i);
+                if (!this.minecraft.gameMode.canHurtPlayer()) {
+                    k += 14;
+                }
+                if ((l = (int)((float)this.toolHighlightTimer * 256.0f / 10.0f)) > 255) {
+                    l = 255;
+                }
+                if (l > 0) {
+                    guiGraphics.fill(j - 2, k - 2, j + width + 2, k + this.getFont().lineHeight + 2, this.minecraft.options.getBackgroundColor(0));
+                    guiGraphics.drawString(this.getFont(), mutableComponent, j, k, 0xFFFFFF + (l << 24));
+                }
+            }
+        }
+        this.minecraft.getProfiler().pop();
+        guiGraphics.pose().popPose();
+        ci.cancel();
+    }
+
+}

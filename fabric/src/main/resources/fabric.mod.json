@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "This mod is a remake of the outdated mod from 1.7.10 for fabric, Better Furnaces, presenting the concept used in the original mod",
+  "authors": [
+    "${mod_authors}"
+  ],
+  "contributors": [
+    "${mod_credits}"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/better-furnaces-reforged/",
+    "sources": "${mod_source}"
+  },
+  "license": "${mod_license}",
+  "icon": "logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "wily.legacy.fabric.LegacyMinecraftFabric"
+    ],
+    "client": [
+      "wily.legacy.fabric.LegacyMinecraftFabricClient"
+    ]
+  },
+  "mixins": [
+    "legacy.mixins.json",
+    "legacy-common.mixins.json"
+  ],
+  "depends": {
+    "fabric": "*",
+    "minecraft": ">=1.20.2",
+    "architectury": ">=${architectury_version}"
+  }
+}
