@@ -131,7 +131,7 @@ subprojects {
     unifiedPublishing {
         project {
             def isFabric = project.name ==  "fabric"
-            displayName = "BFR [$modPlatformName] $project.version"
+            displayName = "Legacy Minecraft [$modPlatformName] $project.version"
             releaseType = "$stage"
             changelog = releaseChangelog()
             gameVersions = ["$minecraft_version"]
@@ -148,7 +148,6 @@ subprojects {
                     relations{
                         depends "architectury-api"
                         if (isFabric) depends "fabric-api"
-                        depends "factory-api"
                     }
                 }
             }
@@ -163,7 +162,6 @@ subprojects {
                     relations{
                         depends "architectury-api"
                         if (isFabric) depends "fabric-api"
-                        depends "factory-api"
                     }
                 }
             }
