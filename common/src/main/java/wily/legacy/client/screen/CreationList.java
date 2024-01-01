@@ -26,13 +26,15 @@ public class CreationList extends SlotButtonList<CreationList.CreationListEntry>
     static final Logger LOGGER = LogUtils.getLogger();
     private final PlayGameScreen screen;
 
-    public CreationList(PlayGameScreen playGameScreen, Minecraft minecraft, int i, int j, int k, int l, int m) {
-        super(()->playGameScreen.tabList.selectedTab == 1,minecraft, i, j, k, l, m);
+    public CreationList(PlayGameScreen playGameScreen, Minecraft minecraft, int i, int j, int k, int l) {
+        super(()->playGameScreen.tabList.selectedTab == 1,minecraft, i, j, k, l);
         this.screen = playGameScreen;
         addEntry(new CreationListEntry(this,new ResourceLocation(LegacyMinecraft.MOD_ID,"creation_list/create_world"),Component.translatable("legacy.menu.create_world"),c-> LegacyCreateWorldScreen.openFresh(this.minecraft, screen)));
         addEntry(new CreationListEntry(this,new ResourceLocation(LegacyMinecraft.MOD_ID,"creation_list/tutorial"),Component.translatable("legacy.menu.play_tutorial"),c-> {
             try {
-                minecraft.createWorldOpenFlows().loadLevel(screen,LegacyMinecraftClient.importSaveFile(minecraft,minecraft.getResourceManager().getResourceOrThrow(new ResourceLocation(LegacyMinecraft.MOD_ID,"tutorial/tutorial.mcsave")).open(),TUTORIAL_FOLDER_NAME));
+                minecraft.createWorldOpenFlows().checkForBackupAndLoad(LegacyMinecraftClient.importSaveFile(minecraft,minecraft.getResourceManager().getResourceOrThrow(new ResourceLocation(LegacyMinecraft.MOD_ID,"tutorial/tutorial.mcsave")).open(),TUTORIAL_FOLDER_NAME),()->{
+                    this.minecraft.setScreen(this.screen);
+                });
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

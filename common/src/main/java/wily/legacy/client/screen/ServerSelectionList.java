@@ -71,8 +71,8 @@ public class ServerSelectionList extends SlotButtonList<ServerSelectionList.Entr
     private final Entry lanHeader = new ServerSelectionList.LANHeader();
     private final List<ServerSelectionList.NetworkServerEntry> networkServers = Lists.newArrayList();
 
-    public ServerSelectionList(PlayGameScreen playGameScreen, Minecraft minecraft, int i, int j, int k, int l, int m) {
-        super(()->playGameScreen.tabList.selectedTab == 2,minecraft, i, j, k, l, m);
+    public ServerSelectionList(PlayGameScreen playGameScreen, Minecraft minecraft, int i, int j, int k, int l) {
+        super(()->playGameScreen.tabList.selectedTab == 2,minecraft, i, j, k, l);
         this.screen = playGameScreen;
         setRenderBackground(false);
     }
@@ -110,7 +110,7 @@ public class ServerSelectionList extends SlotButtonList<ServerSelectionList.Entr
             int k = j - this.networkServers.size() + this.children().size();
             int l = this.getRowTop(k);
             int m = this.getRowBottom(k);
-            if (m < this.y0 || l > this.y1) continue;
+            if (m < this.getY() || l > this.getBottom()) continue;
             this.minecraft.getNarrator().say(Component.translatable("multiplayer.lan.server_found", networkServerEntry.getServerNarration()));
         }
     }

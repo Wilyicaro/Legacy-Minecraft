@@ -10,5 +10,6 @@ public class LegacyMinecraftFabricClient implements ClientModInitializer {
         LegacyMinecraftClient.init();
         LegacyMinecraftClient.enqueueInit();
         ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, out) -> LegacyMinecraftClient.registerExtraModels(out));
+
     }
 }

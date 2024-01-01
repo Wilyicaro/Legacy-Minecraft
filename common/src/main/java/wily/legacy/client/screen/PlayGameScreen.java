@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.screens.*;
 import net.minecraft.client.gui.screens.LevelLoadingScreen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.multiplayer.ServerStatusPinger;
@@ -62,9 +63,9 @@ public class PlayGameScreen extends PanelBackgroundScreen{
             this.servers = new ServerList(this.minecraft);
             this.servers.load();
             this.lanServerList = new LanServerDetection.LanServerList();
-            this.serverSelectionList = new ServerSelectionList(this, this.minecraft, this.width, this.height, panel.y + 12, panel.y + panel.height - 12, 30);
+            this.serverSelectionList = new ServerSelectionList(this, this.minecraft, this.width, panel.height - 12, panel.y + 12, 30);
             this.serverSelectionList.updateOnlineServers(this.servers);
-            this.creationList = new CreationList(this, this.minecraft, this.width, this.height, panel.y + 12, panel.y + panel.height - 12, 30);
+            this.creationList = new CreationList(this, this.minecraft, this.width, panel.height - 12, panel.y + 12, 30);
         }
         try {
             this.lanServerDetector = new LanServerDetection.LanServerDetector(this.lanServerList);
@@ -72,9 +73,9 @@ public class PlayGameScreen extends PanelBackgroundScreen{
         } catch (Exception exception) {
             LegacyMinecraft.LOGGER.warn("Unable to start LAN server detection: {}", exception.getMessage());
         }
-        this.addRenderableWidget(this.serverSelectionList).updateSize(this.width, this.height, panel.y + 12, panel.y + panel.height - 12);
-        this.addRenderableWidget(this.saveSelectionList = new SaveSelectionList(this, this.minecraft, this.width, this.height, panel.y + 12, panel.y + panel.height - 12, 30, "", this.saveSelectionList));
-        this.addRenderableWidget(this.creationList).updateSize(this.width, this.height, panel.y + 12, panel.y + panel.height - 12);
+        this.addRenderableWidget(this.serverSelectionList).setRectangle(this.width, panel.height - 12, 0, panel.y + 12);
+        this.addRenderableWidget(this.saveSelectionList = new SaveSelectionList(this, this.minecraft, this.width, panel.height - 12, panel.y + 12, 30, "", this.saveSelectionList));
+        this.addRenderableWidget(this.creationList).setRectangle(this.width, panel.height - 12, 0, panel.y + 12);
         tabList.init(panel.x,panel.y - 24,panel.width);
     }
 
@@ -199,21 +200,6 @@ public class PlayGameScreen extends PanelBackgroundScreen{
                 minecraft.setScreen(this);
                 saveSelectionList.reloadWorldList();
             }));
-        }
-    }
-    private /* synthetic */ void method_35739(Button button) {
-        try {
-            SaveSelectionList.WorldListEntry worldListEntry;
-            SaveSelectionList.Entry entry;
-            String string = "DEBUG world";
-            if (!this.saveSelectionList.children().isEmpty() && (entry = this.saveSelectionList.children().get(0)) instanceof SaveSelectionList.WorldListEntry && (worldListEntry = (SaveSelectionList.WorldListEntry)entry).getLevelName().equals("DEBUG world")) {
-                worldListEntry.doDeleteWorld();
-            }
-            LevelSettings levelSettings = new LevelSettings("DEBUG world", GameType.SPECTATOR, false, Difficulty.NORMAL, true, new GameRules(), WorldDataConfiguration.DEFAULT);
-            String string2 = FileUtil.findAvailableName(this.minecraft.getLevelSource().getBaseDir(), "DEBUG world", "");
-            this.minecraft.createWorldOpenFlows().createFreshLevel(string2, levelSettings, TEST_OPTIONS, WorldPresets::createNormalWorldDimensions);
-        } catch (IOException iOException) {
-            LegacyMinecraft.LOGGER.error("Failed to recreate the debug world", iOException);
         }
     }
 }

@@ -279,7 +279,7 @@ public class LegacyCreateWorldScreen extends PanelBackgroundScreen{
 
                 });
             }, minecraft);
-            server.getConnection().startTcpServerListener((InetAddress)null, i);
+            server.getConnection().startTcpServerListener(null, i);
             LOGGER.info("Started serving on {}", i);
             server.publishedPort = i;
             server.lanPinger = new LanServerPinger(server.getMotd(), "" + i);

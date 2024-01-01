@@ -64,8 +64,8 @@ public abstract class AbstractContainerScreenMixin {
         LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(slot);
         int width = holder.getWidth();
         int height = holder.getHeight();
-        double xCorner = holder.getXCorner();
-        double yCorner = holder.getYCorner();
+        double xCorner = holder.getXCorner() + (holder.translation != null ? holder.translation.x : 0);
+        double yCorner = holder.getYCorner() + (holder.translation != null ? holder.translation.y : 0);
         cir.setReturnValue((d -= leftPos) >= xCorner && d < (xCorner + width) && (e -= topPos) >= yCorner && e < (yCorner + height));
     }
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
@@ -74,8 +74,11 @@ public abstract class AbstractContainerScreenMixin {
         Minecraft minecraft = Minecraft.getInstance();
         graphics.pose().pushPose();
         LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(slot);
-        if (slot instanceof LegacySlotWrapper)
-            holder.render(graphics,0,0,0);
+        if (slot instanceof LegacySlotWrapper wrapper) {
+            if (wrapper.hasIconHolder())
+                holder.render(graphics, 0, 0, 0);
+            holder.applyTranslation(graphics);
+        }
         graphics.pose().translate(slot.x,slot.y,0);
         graphics.pose().scale(holder.getSelectableWidth() / 16f,holder.getSelectableHeight() / 16f,holder.getSelectableHeight() / 16f);
         Pair<ResourceLocation, ResourceLocation> pair;

@@ -22,9 +22,9 @@ public abstract class AbstractContainerScreenMixin {
     private void renderSlotHightlight(GuiGraphics graphics, int i, int j, int k, int color) {
         graphics.pose().pushPose();
         LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(hoveredSlot);
-        graphics.pose().translate(-leftPos,-topPos,0);
+        graphics.pose().translate(i,j,0);
+        holder.applyTranslation(graphics);
         graphics.pose().scale(holder.getSelectableWidth() / 16f,holder.getSelectableHeight() / 16f,holder.getSelectableHeight() / 16f);
-        graphics.pose().translate((leftPos + i) * 16f / holder.getSelectableWidth() ,(topPos + j) * 16f / holder.getSelectableHeight(),0);
         graphics.fillGradient(RenderType.guiOverlay(), 0, 0, 16,16, color, color, k);
         graphics.pose().popPose();
     }
