@@ -8,9 +8,10 @@ import net.minecraft.world.entity.player.Inventory;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.inventory.ClassicCraftingMenu;
 
+import static wily.legacy.LegacyMinecraftClient.ARROW_SPRITE;
+
 public class ClassicCraftingScreen extends AbstractContainerScreen<ClassicCraftingMenu> {
     protected final Panel panel = Panel.centered(this,215,202);
-    public static final ResourceLocation ARROW_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/arrow");
     public ClassicCraftingScreen(ClassicCraftingMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
     }

@@ -19,12 +19,12 @@ public class ExitConfirmationScreen extends ConfirmationScreen{
         addRenderableWidget(Button.builder(Component.translatable("legacy.menu.exit_without_save"),b-> exitToTitleScreen(minecraft,false)).bounds(panel.x + 15, panel.y + panel.height - 30,200,20).build());
     }
     public static void exitToTitleScreen(Minecraft minecraft, boolean save) {
+        if (save && minecraft.hasSingleplayerServer())
+            minecraft.getSingleplayerServer().saveEverything(false,false,false);
         if (minecraft.level != null) {
             minecraft.level.disconnect();
         }
         minecraft.disconnect(new LegacyLoadingScreen(Component.translatable("menu.savingLevel"),Component.empty()));
-        if (save && minecraft.hasSingleplayerServer())
-            minecraft.getSingleplayerServer().saveEverything(false,false,false);
         ServerData serverData = minecraft.getCurrentServer();
         MainMenuScreen mainMenuScreen = new MainMenuScreen(false);
         if (serverData != null && serverData.isRealm()) {

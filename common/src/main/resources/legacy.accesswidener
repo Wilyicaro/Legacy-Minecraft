@@ -49,3 +49,7 @@ accessible field net/minecraft/world/level/levelgen/flat/FlatLevelGeneratorSetti
 mutable field net/minecraft/world/level/levelgen/flat/FlatLevelGeneratorSettings decoration Z
 accessible field net/minecraft/client/gui/screens/DeathScreen hardcore Z
 accessible field net/minecraft/client/gui/screens/DeathScreen causeOfDeath Lnet/minecraft/network/chat/Component;
+accessible field net/minecraft/server/MinecraftServer metricsRecorder Lnet/minecraft/util/profiling/metrics/profiling/MetricsRecorder;
+accessible field net/minecraft/server/MinecraftServer resources Lnet/minecraft/server/MinecraftServer$ReloadableResources;
+accessible field net/minecraft/server/MinecraftServer storageSource Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;
+accessible class net/minecraft/server/MinecraftServer$ReloadableResources

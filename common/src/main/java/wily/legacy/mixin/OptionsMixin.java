@@ -17,6 +17,8 @@ import wily.legacy.init.LegacyOptions;
 
 import java.io.File;
 
+import static net.minecraft.client.Options.genericValueLabel;
+
 @Mixin(Options.class)
 public abstract class OptionsMixin implements LegacyOptions {
     @Shadow public boolean hideGui;
@@ -25,9 +27,16 @@ public abstract class OptionsMixin implements LegacyOptions {
 
     @Shadow public abstract void load();
 
+
+    @Shadow
+    public static Component genericValueLabel(Component arg, Component arg2) {
+        return null;
+    }
+
     private OptionInstance<Double> hudDistance;
 
     private OptionInstance<Double> hudOpacity;
+    private OptionInstance<Integer> autoSaveInterval;
 
     private OptionInstance<Boolean> legacyCreativeTab;
 
@@ -36,6 +45,8 @@ public abstract class OptionsMixin implements LegacyOptions {
     private OptionInstance<Boolean> animatedCharacter;
 
     private OptionInstance<Boolean> classicCrafting;
+    private OptionInstance<Boolean> autoSaveWhenPause;
+
     @Redirect(method = "<init>", at = @At( value = "INVOKE", target = "Lnet/minecraft/client/Options;load()V"))
     protected void init(Options instance) {
 
@@ -46,6 +57,8 @@ public abstract class OptionsMixin implements LegacyOptions {
         classicCrafting = OptionInstance.createBoolean("legacy.options.classicCrafting",false);
         displayHUD = OptionInstance.createBoolean("legacy.options.displayHud",!hideGui, b-> hideGui = !b);
         legacyCreativeTab = OptionInstance.createBoolean("legacy.options.creativeTab", true);
+        autoSaveWhenPause = OptionInstance.createBoolean("legacy.options.autoSaveWhenPause", false);
+        autoSaveInterval = new OptionInstance<>("legacy.options.autoSaveInterval", OptionInstance.noTooltip(), (c,i)-> i == 0 ? genericValueLabel(c,Component.translatable("options.off")) :Component.translatable( "legacy.options.mins_value",c, i * 5), new OptionInstance.IntRange(0,24), 1, d -> {});
         hudOpacity = new OptionInstance<>("legacy.options.hudOpacity", OptionInstance.noTooltip(), (c, d) -> Component.translatable("options.percent_value", c, (int) (d * 100.0)), OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
         hudDistance = new OptionInstance<>("legacy.options.hudDistance", OptionInstance.noTooltip(), (c, d) -> Component.translatable("options.percent_value", c, (int) (d * 100.0)), OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
         if(LegacyMinecraftClient.canLoadVanillaOptions)
@@ -55,6 +68,7 @@ public abstract class OptionsMixin implements LegacyOptions {
     private void processOptions(Options.FieldAccess fieldAccess, CallbackInfo ci){
         fieldAccess.process("hudDistance", this.hudDistance);
         fieldAccess.process("hudOpacity", this.hudOpacity);
+        fieldAccess.process("autoSaveWhenPause", this.autoSaveWhenPause);
         fieldAccess.process("displayHUD", displayHUD);
         fieldAccess.process("legacyCreativeTab", this.legacyCreativeTab);
         fieldAccess.process("animatedCharacter", animatedCharacter);
@@ -75,4 +89,8 @@ public abstract class OptionsMixin implements LegacyOptions {
         return animatedCharacter;
     }
     public OptionInstance<Boolean> classicCrafting() {return classicCrafting;}
+    public OptionInstance<Boolean> autoSaveWhenPause() {return autoSaveWhenPause;}
+    public OptionInstance<Integer> autoSaveInterval() {
+        return autoSaveInterval;
+    }
 }

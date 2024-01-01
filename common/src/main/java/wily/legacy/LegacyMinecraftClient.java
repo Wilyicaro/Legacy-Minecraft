@@ -1,7 +1,9 @@
 package wily.legacy;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.systems.RenderSystem;
 import dev.architectury.event.CompoundEventResult;
+import dev.architectury.event.EventResult;
 import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
@@ -11,31 +13,41 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.screens.*;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.MenuType;
+import net.minecraft.util.FastColor;
+import org.lwjgl.opengl.GL11;
 import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacyOptions;
 import wily.legacy.network.ServerOpenClientMenu;
 
+import java.awt.*;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static com.mojang.blaze3d.platform.GlConst.GL_DST_COLOR;
+import static com.mojang.blaze3d.platform.GlConst.GL_ONE;
 import static wily.legacy.LegacyMinecraft.MOD_ID;
 import static wily.legacy.init.LegacyMenuTypes.*;
 
 
 public class LegacyMinecraftClient {
-
+    public static final ResourceLocation BREWING_SLOTS_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/brewing_slots");
+    public static final ResourceLocation BREWING_COIL_FLAME_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/brewing_coil_flame");
+    public static final ResourceLocation BREWING_FUEL_SLOT_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/brewing_fuel_slot");
+    public static final ResourceLocation ERROR_CROSS_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/error_cross");
+    public static final ResourceLocation ANVIL_HAMMER_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/anvil_hammer");
+    public static final ResourceLocation SMITHING_HAMMER_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/smithing_hammer");
+    public static final ResourceLocation COMBINER_PLUS_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/combiner_plus");
+    public static final ResourceLocation ARROW_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/arrow");
     public static float FONT_SHADOW_OFFSET = 1.0F;
     public static boolean canLoadVanillaOptions = true;
     public static final Map<Component, Component> OPTION_BOOLEAN_CAPTION = Map.of(Component.translatable("key.sprint"),Component.translatable("options.key.toggleSprint"),Component.translatable("key.sneak"),Component.translatable("options.key.toggleSneak"));
     public static LegacyLoadingScreen legacyLoadingScreen = new LegacyLoadingScreen();
     public static void init() {
-        KeyMappingRegistry.register(playerInventoryKey);
+        KeyMappingRegistry.register(legacyKeyInventory);
     }
     public static void enqueueInit() {
         MenuRegistry.registerScreenFactory(STORAGE_5X1.get(), LegacyChestScreen::new);
@@ -86,7 +98,7 @@ public class LegacyMinecraftClient {
             }
         });
         ClientTickEvent.CLIENT_POST.register(minecraft -> {
-            while (playerInventoryKey.consumeClick()) {
+            while (legacyKeyInventory.consumeClick()) {
                 if (minecraft.gameMode.isServerControlledInventory()) {
                     minecraft.player.sendOpenInventory();
                     continue;
@@ -97,7 +109,7 @@ public class LegacyMinecraftClient {
         });
 
     }
-    public static final KeyMapping playerInventoryKey = new KeyMapping( MOD_ID +".key.inventory", InputConstants.KEY_I, "key.categories.inventory");
+    public static final KeyMapping legacyKeyInventory = new KeyMapping( MOD_ID +".key.inventory", InputConstants.KEY_I, "key.categories.inventory");
     public static void resetVanillaOptions(Minecraft minecraft){
         canLoadVanillaOptions = false;
         minecraft.options = new Options(minecraft,minecraft.gameDirectory);

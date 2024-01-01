@@ -6,6 +6,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class LegacySlotWrapper extends Slot {
@@ -14,7 +15,10 @@ public class LegacySlotWrapper extends Slot {
         this(new Slot(container,i,j,k));
     }
     public LegacySlotWrapper(Slot slot) {
-        super(slot.container, slot.index, slot.x, slot.y);
+        this(slot,slot.container, slot.getContainerSlot(), slot.x, slot.y);
+    }
+    public LegacySlotWrapper(Slot slot,Container container, int i, int j, int k) {
+        super(container, i, j, k);
         this.target = slot;
     }
     public int getWidth(){
@@ -90,5 +94,13 @@ public class LegacySlotWrapper extends Slot {
     @Override
     public boolean mayPickup(Player player) {
         return this.target.mayPickup(player);
+    }
+
+    public boolean hasIconHolder() {
+        return true;
+    }
+
+    public Vec3 getTranslation() {
+        return null;
     }
 }

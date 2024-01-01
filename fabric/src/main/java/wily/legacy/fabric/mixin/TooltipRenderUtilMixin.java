@@ -1,5 +1,6 @@
 package wily.legacy.fabric.mixin;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,6 +14,7 @@ public class TooltipRenderUtilMixin {
     @Inject(method = "renderTooltipBackground", at = @At("HEAD"), cancellable = true)
     private static void renderTooltipBackground(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, CallbackInfo ci){
         ScreenUtil.renderPointerPanel(guiGraphics,i - 3,j - 3,k + 6,l + 6);
+        RenderSystem.disableDepthTest();
         ci.cancel();
     }
 }

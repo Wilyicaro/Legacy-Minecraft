@@ -118,7 +118,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
                 guiGraphics.blitSprite(RenderableVList.SCROLL_UP, 0, -11, 13, 7);
         }else guiGraphics.setColor(1.0f,1.0f,1.0f,0.5f);
         RenderSystem.enableBlend();
-        guiGraphics.blitSprite(LegacyIconHolder.SIZEABLE_ICON_HOLDER, 0, 0,13,135);
+        ScreenUtil.renderSquareRecessedPanel(guiGraphics, 0, 0,13,135,2f);
         guiGraphics.pose().translate(-2f, -1f + (scroll.max > 0 ? scroll.get() * 121.5f / scroll.max : 0), 0f);
         ScreenUtil.renderPanel(guiGraphics,0,0, 16,16,3f);
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);

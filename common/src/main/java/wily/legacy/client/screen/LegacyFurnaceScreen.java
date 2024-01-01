@@ -12,6 +12,8 @@ import wily.legacy.inventory.ClassicCraftingMenu;
 import wily.legacy.inventory.LegacyFurnaceMenu;
 import wily.legacy.inventory.LegacyInventoryMenu;
 
+import static wily.legacy.LegacyMinecraftClient.ARROW_SPRITE;
+
 public class LegacyFurnaceScreen extends AbstractContainerScreen<LegacyFurnaceMenu> {
     protected final Panel panel = Panel.centered(this,214,215);
     public final ResourceLocation FULL_ARROW_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/full_arrow");
@@ -66,7 +68,7 @@ public class LegacyFurnaceScreen extends AbstractContainerScreen<LegacyFurnaceMe
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 114,topPos + 48,0);
         guiGraphics.pose().scale(1.5f,1.5f,1.0f);
-        guiGraphics.blitSprite(ClassicCraftingScreen.ARROW_SPRITE,0,0,22,15);
+        guiGraphics.blitSprite(ARROW_SPRITE,0,0,22,15);
         guiGraphics.pose().popPose();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 114,topPos + 46.5,0);
