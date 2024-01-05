@@ -15,7 +15,7 @@ import wily.legacy.util.ScreenUtil;
 public abstract class AbstractContainerScreenMixin {
     @Shadow protected Slot hoveredSlot;
 
-    @Redirect(method = "render", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlight(Lnet/minecraft/client/gui/GuiGraphics;III)V",remap = false))
+    @Redirect(method = "render", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlight(Lnet/minecraft/client/gui/GuiGraphics;III)V"))
     private void renderSlotHightlight(GuiGraphics graphics, int i, int j, int k) {
         graphics.pose().pushPose();
         LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(hoveredSlot);

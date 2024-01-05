@@ -128,19 +128,14 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen {
         super.render(guiGraphics, i, j, f);
         setHoveredSlot(null);
         slots.forEach(s-> {
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(panel.x, panel.y,0);
-            LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(s);
-            holder.render(guiGraphics,i,j,f);
-            guiGraphics.pose().translate(s.x, s.y,0);
-            guiGraphics.pose().scale(holder.getSelectableWidth() / 16f,holder.getSelectableHeight() / 16f,holder.getSelectableHeight() / 16f);
+            LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(panel.x, panel.y, s);
             if (!s.getItem().isEmpty())
-                guiGraphics.renderItem(s.getItem(), 0, 0, s.x + s.y * panel.width);
-            if (i >= panel.x + s.x && i < panel.x + s.x + holder.getSelectableWidth() && j >= panel.y + s.y && j < panel.y + s.y + holder.getSelectableHeight()) {
-                if (s.isHighlightable()) AbstractContainerScreen.renderSlotHighlight(guiGraphics, 0, 0, 0);
+                holder.itemIcon = s.getItem();
+            holder.render(guiGraphics,i,j,f);
+            if (holder.isHovered) {
+                if (s.isHighlightable()) holder.renderHighlight(guiGraphics);
                 setHoveredSlot(s);
             }
-            guiGraphics.pose().popPose();
         });
         if (hoveredSlot != null && !hoveredSlot.getItem().isEmpty())
             guiGraphics.renderTooltip(font, hoveredSlot.getItem(), i, j);
@@ -174,7 +169,7 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen {
                 guiGraphics.blitSprite(RenderableVList.SCROLL_UP, 0, -11, 13, 7);
         }else guiGraphics.setColor(1.0f,1.0f,1.0f,0.5f);
         RenderSystem.enableBlend();
-        guiGraphics.blitSprite(LegacyIconHolder.SIZEABLE_ICON_HOLDER, 0, 0,13,135);
+        ScreenUtil.renderSquareRecessedPanel(guiGraphics,0, 0,13,135,2f);
         guiGraphics.pose().translate(-2f, -1f + (scrolledList.max > 0 ? scrolledList.get() * 121.5f / scrolledList.max : 0), 0f);
         ScreenUtil.renderPanel(guiGraphics,0,0, 16,16,3f);
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);

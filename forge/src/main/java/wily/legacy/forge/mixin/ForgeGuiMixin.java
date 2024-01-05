@@ -8,14 +8,14 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.init.LegacyOptions;
+import wily.legacy.client.LegacyOptions;
+import wily.legacy.util.ScreenUtil;
 
 @Mixin(ForgeGui.class)
 public abstract class ForgeGuiMixin {
-    @Shadow(remap = false) public abstract Minecraft getMinecraft();
 
     @Inject(method = "setupOverlayRenderState", at = @At("RETURN"),remap = false)
     private void setupOverlayRenderState(boolean blend, boolean depthTest, CallbackInfo ci) {
-        RenderSystem.setShaderColor(1.0f,1.0f,1.0f, (float) Math.max(Math.min(255f,((ForgeGui)(Object)this).toolHighlightTimer * 38.4f)/ 255f, ((LegacyOptions)getMinecraft().options).hudOpacity().get()));
+        RenderSystem.setShaderColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
     }
 }

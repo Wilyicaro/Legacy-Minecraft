@@ -111,7 +111,7 @@ public abstract class AbstractContainerScreenMixin {
         }
         graphics.pose().pushPose();
         graphics.pose().translate(0.0f, 0.0f, 100.0f);
-        if (itemStack.isEmpty() && slot.isActive() && (pair = slot.getNoItemIcon()) != null) {
+        if (itemStack.isEmpty() && (pair = slot.getNoItemIcon()) != null) {
             TextureAtlasSprite textureAtlasSprite = minecraft.getTextureAtlas(pair.getFirst()).apply(pair.getSecond());
             graphics.blit(0, 0, 0, 16, 16, textureAtlasSprite);
             bl2 = true;

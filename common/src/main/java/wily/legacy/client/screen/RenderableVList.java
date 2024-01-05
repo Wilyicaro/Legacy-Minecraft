@@ -21,8 +21,7 @@ public class RenderableVList {
     protected static ResourceLocation SCROLL_DOWN = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/scroll_down");
     protected static ResourceLocation SCROLL_UP = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/scroll_up");
     protected final Stocker.Sizeable scrolledList = new Stocker.Sizeable(0);
-    protected boolean canScroll = false;
-    protected int panelOptionsCount = 0;
+    protected boolean canScrollDown = false;
     protected final List<Renderable> vRenderables = new ArrayList<>();
     public Runnable repositionElements = ()->{};
 
@@ -48,13 +47,12 @@ public class RenderableVList {
         repositionElements = screen::repositionElements;
         boolean allowScroll = listHeight > 0;
         if (allowScroll) screen.renderables.add(((guiGraphics, i, j, f) -> {
-            if (canScroll) {
-                if (scrolledList.get() > 0)
-                    guiGraphics.blitSprite(SCROLL_UP, leftPos + listWidth - 40, topPos + listHeight - 27, 13, 7);
-                if (scrolledList.get() < scrolledList.max)
-                    guiGraphics.blitSprite(SCROLL_DOWN, leftPos+ listWidth - 24, topPos + listHeight - 27, 13, 7);
-            }
+            if (scrolledList.get() > 0)
+                guiGraphics.blitSprite(SCROLL_UP, leftPos + listWidth - 40, topPos + listHeight - 27, 13, 7);
+            if (canScrollDown)
+                guiGraphics.blitSprite(SCROLL_DOWN, leftPos+ listWidth - 24, topPos + listHeight - 27, 13, 7);
         }));
+        canScrollDown = false;
         int yDiff = 0;
         int optionsCount = 0;
         for (int i = scrolledList.get(); i < vRenderables.size(); i++) {
@@ -75,13 +73,12 @@ public class RenderableVList {
                     screen.narratables.add(e);
                 screen.renderables.add(r);
             }else {
-                canScroll = true;
+                canScrollDown = true;
                 break;
             }
         }
-        if (allowScroll && scrolledList.get() == 0 && optionsCount > 0) {
-            panelOptionsCount = optionsCount;
-            scrolledList.max = (vRenderables.size() / panelOptionsCount - 1) * panelOptionsCount + vRenderables.size() % panelOptionsCount;
+        if (allowScroll && optionsCount > 0) {
+            scrolledList.max = (vRenderables.size() / optionsCount - 1) * optionsCount + vRenderables.size() % optionsCount;
         }
     }
 
@@ -89,10 +86,10 @@ public class RenderableVList {
 
     public void mouseScrolled(double d, double e, double f, double g) {
         int scroll = (int) -Math.signum(g);
-        if (canScroll){
-            int lastScrolled = scrolledList.get();
-            scrolledList.set(Math.max(0,Math.min(scrolledList.get() + scroll,scrolledList.max)));
-            if (lastScrolled != scrolledList.get()) {
+        if ((canScrollDown && scroll > 0) || (scrolledList.get() > 0 && scroll < 0)){
+            int setScroll = Math.max(0,Math.min(scrolledList.get() + scroll,scrolledList.max));
+            if (setScroll != scrolledList.get()) {
+                scrolledList.set(setScroll);
                 repositionElements.run();
             }
         }

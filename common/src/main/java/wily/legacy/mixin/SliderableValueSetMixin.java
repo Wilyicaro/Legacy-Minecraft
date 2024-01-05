@@ -14,6 +14,10 @@ import java.util.function.Function;
 
 @Mixin(OptionInstance.SliderableValueSet.class)
 public interface SliderableValueSetMixin<T> extends OptionInstance.ValueSet<T> {
+    /**
+     * @author Wilyicaro
+     * @reason Legacy Edition Accuracy
+     */
     @Overwrite
     default Function<OptionInstance<T>, AbstractWidget> createButton(OptionInstance.TooltipSupplier<T> tooltipSupplier, Options options, int i, int j, int k, Consumer<T> consumer) {
         return optionInstance -> new OptionInstance.OptionInstanceSliderButton(options, i, j, k, 16, optionInstance, (OptionInstance.SliderableValueSet) this, tooltipSupplier, consumer);

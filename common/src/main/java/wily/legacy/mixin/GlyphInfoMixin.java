@@ -7,6 +7,10 @@ import wily.legacy.LegacyMinecraftClient;
 
 @Mixin(GlyphInfo.class)
 public interface GlyphInfoMixin {
+    /**
+     * @author Wilyicaro
+     * @reason Legacy Edition Accuracy
+     */
     @Overwrite
     default float getShadowOffset() {
         return LegacyMinecraftClient.FONT_SHADOW_OFFSET;

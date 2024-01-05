@@ -1,4 +1,4 @@
-# Legacy4J ![https://legacy.curseforge.com/minecraft/mc-mods/legacy-minecraft/files](https://cf.way2muchnoise.eu/395653.svg) ![https://beta.curseforge.com/minecraft/mc-mods/better-furnaces-reforged/files](https://cf.way2muchnoise.eu/versions/For%20MC_395653_all.svg)
+# Legacy4J ![https://legacy.curseforge.com/minecraft/mc-mods/legacy-minecraft/files](https://cf.way2muchnoise.eu/955526.svg) ![https://legacy.curseforge.com/minecraft/mc-mods/legacy-minecraft/files](https://cf.way2muchnoise.eu/versions/For%20MC_955526_all.svg)
 ## Resume
 
 **Legacy4J is a mod about nostalgia, of the old 4J Studios Minecraft Legacy Edition UI and its unique resources.**  

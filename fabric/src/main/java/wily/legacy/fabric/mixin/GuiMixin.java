@@ -5,25 +5,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.PlayerRideableJumping;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.phys.Vec3;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.init.LegacyOptions;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
@@ -42,14 +33,30 @@ public abstract class GuiMixin {
     @Shadow protected int toolHighlightTimer;
 
     @Shadow protected ItemStack lastToolHighlight;
-
+    @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
+    public void renderCrosshair(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (minecraft.screen != null){
+            ci.cancel();
+            return;
+        }
+        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(0.0F,((LegacyOptions)minecraft.options).hudDistance().value *-22.5F,0.0F);
+    }
+    @Inject(method = "renderCrosshair", at = @At("RETURN"))
+    public void renderCrosshairReturn(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (minecraft.screen != null)
+            return;
+        guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
+        guiGraphics.pose().popPose();
+    }
     @Inject(method = "renderVehicleHealth", at = @At("HEAD"), cancellable = true)
     public void renderVehicleHealth(GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null){
             ci.cancel();
             return;
         }
-        guiGraphics.setColor(1.0f,1.0f,1.0f, (float) Math.max(Math.min(255f,toolHighlightTimer * 38.4f)/ 255f, ((LegacyOptions)minecraft.options).hudOpacity().get()));
+        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F,((LegacyOptions)minecraft.options).hudDistance().value *-22.5F,0.0F);
     }
@@ -66,7 +73,7 @@ public abstract class GuiMixin {
             ci.cancel();
             return;
         }
-        guiGraphics.setColor(1.0f,1.0f,1.0f, (float) Math.max(Math.min(255f,toolHighlightTimer * 38.4f)/ 255f, ((LegacyOptions)minecraft.options).hudOpacity().get()));
+        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F,((LegacyOptions)minecraft.options).hudDistance().value *-22.5F,0.0F);
     }

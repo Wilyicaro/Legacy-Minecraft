@@ -7,7 +7,7 @@ import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import wily.legacy.LegacyMinecraft;
-import wily.legacy.init.LegacyOptions;
+import wily.legacy.client.LegacyOptions;
 
 import java.util.List;
 @Mod(LegacyMinecraft.MOD_ID)

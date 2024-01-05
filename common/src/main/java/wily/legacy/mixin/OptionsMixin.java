@@ -1,11 +1,9 @@
 package wily.legacy.mixin;
 
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
 import net.minecraft.network.chat.Component;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraftClient;
-import wily.legacy.init.LegacyOptions;
+import wily.legacy.client.LegacyOptions;
 
 import java.io.File;
 
@@ -46,6 +44,7 @@ public abstract class OptionsMixin implements LegacyOptions {
 
     private OptionInstance<Boolean> classicCrafting;
     private OptionInstance<Boolean> autoSaveWhenPause;
+    private OptionInstance<Boolean> showVanillaRecipeBook;
 
     @Redirect(method = "<init>", at = @At( value = "INVOKE", target = "Lnet/minecraft/client/Options;load()V"))
     protected void init(Options instance) {
@@ -54,11 +53,12 @@ public abstract class OptionsMixin implements LegacyOptions {
     @Inject(method = "<init>", at = @At( "RETURN"))
     protected void init(Minecraft minecraft, File file, CallbackInfo ci) {
         animatedCharacter = OptionInstance.createBoolean("legacy.options.animatedCharacter",true);
-        classicCrafting = OptionInstance.createBoolean("legacy.options.classicCrafting",false);
+        classicCrafting = OptionInstance.createBoolean("legacy.options.classicCrafting",true);
         displayHUD = OptionInstance.createBoolean("legacy.options.displayHud",!hideGui, b-> hideGui = !b);
         legacyCreativeTab = OptionInstance.createBoolean("legacy.options.creativeTab", true);
         autoSaveWhenPause = OptionInstance.createBoolean("legacy.options.autoSaveWhenPause", false);
         autoSaveInterval = new OptionInstance<>("legacy.options.autoSaveInterval", OptionInstance.noTooltip(), (c,i)-> i == 0 ? genericValueLabel(c,Component.translatable("options.off")) :Component.translatable( "legacy.options.mins_value",c, i * 5), new OptionInstance.IntRange(0,24), 1, d -> {});
+        showVanillaRecipeBook = OptionInstance.createBoolean("legacy.options.showVanillaRecipeBook", false);
         hudOpacity = new OptionInstance<>("legacy.options.hudOpacity", OptionInstance.noTooltip(), (c, d) -> Component.translatable("options.percent_value", c, (int) (d * 100.0)), OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
         hudDistance = new OptionInstance<>("legacy.options.hudDistance", OptionInstance.noTooltip(), (c, d) -> Component.translatable("options.percent_value", c, (int) (d * 100.0)), OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
         if(LegacyMinecraftClient.canLoadVanillaOptions)
@@ -69,6 +69,8 @@ public abstract class OptionsMixin implements LegacyOptions {
         fieldAccess.process("hudDistance", this.hudDistance);
         fieldAccess.process("hudOpacity", this.hudOpacity);
         fieldAccess.process("autoSaveWhenPause", this.autoSaveWhenPause);
+        fieldAccess.process("autoSaveInterval", this.autoSaveInterval);
+        fieldAccess.process("showVanillaRecipeBook", this.showVanillaRecipeBook);
         fieldAccess.process("displayHUD", displayHUD);
         fieldAccess.process("legacyCreativeTab", this.legacyCreativeTab);
         fieldAccess.process("animatedCharacter", animatedCharacter);
@@ -92,5 +94,8 @@ public abstract class OptionsMixin implements LegacyOptions {
     public OptionInstance<Boolean> autoSaveWhenPause() {return autoSaveWhenPause;}
     public OptionInstance<Integer> autoSaveInterval() {
         return autoSaveInterval;
+    }
+    public OptionInstance<Boolean> showVanillaRecipeBook() {
+        return showVanillaRecipeBook;
     }
 }

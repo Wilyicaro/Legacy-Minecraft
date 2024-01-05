@@ -6,11 +6,10 @@ import dev.architectury.platform.Platform;
 import dev.architectury.registry.registries.RegistrarManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Mob;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import wily.legacy.init.LegacyMenuTypes;
 import wily.legacy.network.CommonPacket;
-import wily.legacy.network.ServerOpenClientMenu;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -33,8 +32,7 @@ public class LegacyMinecraft
 
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     public static void init(){
-        registerCommonPacket(ServerOpenClientMenu.class,ServerOpenClientMenu::new);
-        LegacyMenuTypes.init();
+
     }
     public static <T extends CommonPacket> void  registerCommonPacket(Class<T> packet, Function<FriendlyByteBuf,T> decode){
         NETWORK.register(packet,CommonPacket::encode,decode,CommonPacket::apply);

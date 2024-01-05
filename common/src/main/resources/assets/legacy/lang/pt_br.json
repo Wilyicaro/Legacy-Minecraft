@@ -47,6 +47,7 @@
   "menu.options": "Ajuda e Opções",
   "legacy.options.displayHud": "Exibir HUD",
   "legacy.options.autoSaveInterval" : "Intervalo do Salvamento Automático",
+  "legacy.options.showVanillaRecipeBook": "Exibir Livro de Receitas",
   "options.autosaveIndicator": "Exibir Ícone de Salvamento",
   "legacy.options.animatedCharacter": "Personagem Animado",
   "legacy.options.hudDistance": "Distância do HUD",

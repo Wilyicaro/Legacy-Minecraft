@@ -9,6 +9,7 @@ import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyIconHolder;
 
 public class ScreenUtil {
@@ -110,6 +111,12 @@ public class ScreenUtil {
                 }
             }
         }
+    }
+    public static boolean isMouseOver(double x, double y, int width, int height,double mouseX, double mouseY){
+        return mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height;
+    }
+    public static float getHUDOpacity(){
+        return (float) Math.max(Math.min(255f,mc.gui.toolHighlightTimer * 38.4f)/ 255f, ((LegacyOptions)mc.options).hudOpacity().get());
     }
 
 }

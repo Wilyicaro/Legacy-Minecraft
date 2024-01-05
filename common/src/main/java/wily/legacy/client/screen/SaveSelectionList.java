@@ -250,6 +250,9 @@ public class SaveSelectionList extends SlotButtonList<SaveSelectionList.Entry> {
             int s = q + this.minecraft.font.lineHeight;
             guiGraphics.drawString(this.minecraft.font, string, r, s, -8355712, false);
         }
+        public boolean hasSlotBackground() {
+            return false;
+        }
 
         @Override
         public Component getNarration() {

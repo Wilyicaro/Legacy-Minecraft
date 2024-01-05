@@ -63,9 +63,9 @@ public class PlayGameScreen extends PanelBackgroundScreen{
             this.servers = new ServerList(this.minecraft);
             this.servers.load();
             this.lanServerList = new LanServerDetection.LanServerList();
-            this.serverSelectionList = new ServerSelectionList(this, this.minecraft, this.width, panel.height - 12, panel.y + 12, 30);
+            this.serverSelectionList = new ServerSelectionList(this, this.minecraft, this.width, panel.height - 24, panel.y + 12, 30);
             this.serverSelectionList.updateOnlineServers(this.servers);
-            this.creationList = new CreationList(this, this.minecraft, this.width, panel.height - 12, panel.y + 12, 30);
+            this.creationList = new CreationList(this, this.minecraft, this.width, panel.height - 24, panel.y + 12, 30);
         }
         try {
             this.lanServerDetector = new LanServerDetection.LanServerDetector(this.lanServerList);
@@ -73,9 +73,9 @@ public class PlayGameScreen extends PanelBackgroundScreen{
         } catch (Exception exception) {
             LegacyMinecraft.LOGGER.warn("Unable to start LAN server detection: {}", exception.getMessage());
         }
-        this.addRenderableWidget(this.serverSelectionList).setRectangle(this.width, panel.height - 12, 0, panel.y + 12);
-        this.addRenderableWidget(this.saveSelectionList = new SaveSelectionList(this, this.minecraft, this.width, panel.height - 12, panel.y + 12, 30, "", this.saveSelectionList));
-        this.addRenderableWidget(this.creationList).setRectangle(this.width, panel.height - 12, 0, panel.y + 12);
+        this.addRenderableWidget(this.serverSelectionList).setRectangle(this.width, panel.height - 24, 0, panel.y + 12);
+        this.addRenderableWidget(this.saveSelectionList = new SaveSelectionList(this, this.minecraft, this.width, panel.height - 24, panel.y + 12, 30, "", this.saveSelectionList));
+        this.addRenderableWidget(this.creationList).setRectangle(this.width, panel.height - 24, 0, panel.y + 12);
         tabList.init(panel.x,panel.y - 24,panel.width);
     }
 

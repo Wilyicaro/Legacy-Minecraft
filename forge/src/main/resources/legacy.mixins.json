@@ -11,6 +11,7 @@
     "TooltipRenderUtilMixin"
   ],
   "mixins": [
+    "ItemBlockRenderTypesMixin"
   ],
   "injectors": {
     "defaultRequire": 1

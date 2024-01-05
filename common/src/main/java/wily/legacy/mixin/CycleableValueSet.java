@@ -28,7 +28,10 @@ public interface CycleableValueSet<T> extends OptionInstance.ValueSet<T> {
     @Shadow CycleButton.ValueListSupplier<T> valueListSupplier();
 
     @Shadow OptionInstance.CycleableValueSet.ValueSetter<T> valueSetter();
-
+    /**
+     * @author Wilyicaro
+     * @reason Legacy Edition Accuracy
+     */
     @Overwrite
     default Function<OptionInstance<T>, AbstractWidget> createButton(OptionInstance.TooltipSupplier<T> tooltipSupplier, Options options, int i, int j, int k, Consumer<T> consumer){
         return optionInstance -> {

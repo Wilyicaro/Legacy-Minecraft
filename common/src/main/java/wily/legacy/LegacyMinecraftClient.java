@@ -1,9 +1,7 @@
 package wily.legacy;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import dev.architectury.event.CompoundEventResult;
-import dev.architectury.event.EventResult;
 import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
@@ -13,27 +11,38 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.screens.*;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
-import org.lwjgl.opengl.GL11;
 import wily.legacy.client.screen.*;
-import wily.legacy.init.LegacyOptions;
-import wily.legacy.network.ServerOpenClientMenu;
+import wily.legacy.client.LegacyOptions;
 
-import java.awt.*;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static com.mojang.blaze3d.platform.GlConst.GL_DST_COLOR;
-import static com.mojang.blaze3d.platform.GlConst.GL_ONE;
 import static wily.legacy.LegacyMinecraft.MOD_ID;
-import static wily.legacy.init.LegacyMenuTypes.*;
 
 
 public class LegacyMinecraftClient {
+    public static final ResourceLocation SADDLE_SLOT_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/saddle_slot");
+    public static final ResourceLocation LLAMA_ARMOR_SLOT_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/llama_armor_slot");
+    public static final ResourceLocation ARMOR_SLOT_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/armor_slot");
+    public static final ResourceLocation EXPERIENCE_BAR_BACKGROUND_SPRITE = new ResourceLocation("hud/experience_bar_background");
+    public static final ResourceLocation EXPERIENCE_BAR_CURRENT_SPRITE = new ResourceLocation("hud/experience_bar_progress");
+    public static final ResourceLocation EXPERIENCE_BAR_RESULT_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/experience_bar_result");
+    public static final ResourceLocation PADLOCK_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/padlock");
+    public static final ResourceLocation BEACON_1_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/beacon_1");
+    public static final ResourceLocation BEACON_2_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/beacon_2");
+    public static final ResourceLocation BEACON_3_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/beacon_3");
+    public static final ResourceLocation BEACON_4_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/beacon_4");
+    public static final ResourceLocation SHIELD_SLOT_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/shield_slot");
+    public static final ResourceLocation FULL_ARROW_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/full_arrow");
+    public static final ResourceLocation SMALL_ARROW_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/small_arrow");
+    public static final ResourceLocation LIT = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/lit");
+    public static final ResourceLocation LIT_PROGRESS = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/lit_progress");
     public static final ResourceLocation BREWING_SLOTS_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/brewing_slots");
     public static final ResourceLocation BREWING_COIL_FLAME_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/brewing_coil_flame");
     public static final ResourceLocation BREWING_FUEL_SLOT_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/brewing_fuel_slot");
@@ -46,21 +55,12 @@ public class LegacyMinecraftClient {
     public static boolean canLoadVanillaOptions = true;
     public static final Map<Component, Component> OPTION_BOOLEAN_CAPTION = Map.of(Component.translatable("key.sprint"),Component.translatable("options.key.toggleSprint"),Component.translatable("key.sneak"),Component.translatable("options.key.toggleSneak"));
     public static LegacyLoadingScreen legacyLoadingScreen = new LegacyLoadingScreen();
+    public static RenderType itemRenderTypeOverride = null;
+    public static RenderType blockItemRenderTypeOverride = null;
     public static void init() {
         KeyMappingRegistry.register(legacyKeyInventory);
     }
     public static void enqueueInit() {
-        MenuRegistry.registerScreenFactory(STORAGE_5X1.get(), LegacyChestScreen::new);
-        MenuRegistry.registerScreenFactory(STORAGE_3X3.get(), LegacyChestScreen::new);
-        MenuRegistry.registerScreenFactory(BAG_MENU.get(), LegacyChestScreen::new);
-        MenuRegistry.registerScreenFactory(CHEST_MENU.get(), LegacyChestScreen::new);
-        MenuRegistry.registerScreenFactory(LARGE_CHEST_MENU.get(), LegacyChestScreen::new);
-        MenuRegistry.registerScreenFactory(LEGACY_INVENTORY_MENU.get(), LegacyInventoryScreen::new);
-        MenuRegistry.registerScreenFactory(LEGACY_INVENTORY_MENU_CRAFTING.get(), LegacyInventoryScreen::new);
-        MenuRegistry.registerScreenFactory(CLASSIC_CRAFTING_MENU.get(), ClassicCraftingScreen::new);
-        MenuRegistry.registerScreenFactory(LEGACY_FURNACE_MENU.get(), LegacyFurnaceScreen::new);
-        MenuRegistry.registerScreenFactory(LEGACY_BLAST_FURNACE_MENU.get(), LegacyFurnaceScreen::new);
-        MenuRegistry.registerScreenFactory(LEGACY_SMOKER_MENU.get(), LegacyFurnaceScreen::new);
         ClientGuiEvent.SET_SCREEN.register((screen) -> {
             Minecraft minecraft = Minecraft.getInstance();
             if (screen instanceof TitleScreen t)
@@ -94,7 +94,10 @@ public class LegacyMinecraftClient {
                     progress = lastLoadingHeader == Component.translatable("connect.joining") ?  100 : p.progress;
                 }
                 legacyLoadingScreen.prepareRender(minecraft,screen.width, screen.height,lastLoadingHeader,lastLoadingStage,progress);
+                graphics.pose().pushPose();
+                graphics.pose().translate(0,0,400f);
                 legacyLoadingScreen.render(graphics,i,j,f);
+                graphics.pose().popPose();
             }
         });
         ClientTickEvent.CLIENT_POST.register(minecraft -> {
@@ -104,7 +107,9 @@ public class LegacyMinecraftClient {
                     continue;
                 }
                 minecraft.getTutorial().onOpenInventory();
-                LegacyMinecraft.NETWORK.sendToServer(new ServerOpenClientMenu(((LegacyOptions)minecraft.options).classicCrafting().get() ? 1 : 0));
+                InventoryScreen inventoryScreen = new InventoryScreen(minecraft.player);
+                ((ReplaceableScreen)inventoryScreen).setCanReplace(false);
+                minecraft.setScreen(inventoryScreen);
             }
         });
 

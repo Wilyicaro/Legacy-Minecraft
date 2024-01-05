@@ -1,36 +1,30 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.PlayerRideableJumping;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraft;
-import wily.legacy.init.LegacyOptions;
+import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.ScreenUtil;
-
-import java.util.List;
 
 @Mixin(Gui.class)
 
@@ -53,15 +47,13 @@ public abstract class GuiMixin {
 
     @Shadow protected abstract Player getCameraPlayer();
 
-    @Shadow protected int toolHighlightTimer;
-
     @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
     public void renderHotbar(float f, GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null) {
             ci.cancel();
             return;
         }
-        guiGraphics.setColor(1.0f,1.0f,1.0f, (float) Math.max(Math.min(255f,toolHighlightTimer * 38.4f)/ 255f, ((LegacyOptions)minecraft.options).hudOpacity().get()));
+        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F,  ((LegacyOptions)minecraft.options).hudDistance().get() * -22.5F,0.0F);
         Player player = this.getCameraPlayer();
@@ -69,11 +61,19 @@ public abstract class GuiMixin {
             return;
         }
         guiGraphics.blitSprite(new ResourceLocation(LegacyMinecraft.MOD_ID,"hud/hotbar_selection"), this.screenWidth / 2 - 91 - 1 + player.getInventory().selected * 20, this.screenHeight - 22 - 1, 24, 24);
+        if (ScreenUtil.getHUDOpacity() < 1.0) {
+            LegacyMinecraftClient.itemRenderTypeOverride = Sheets.translucentItemSheet();
+            LegacyMinecraftClient.blockItemRenderTypeOverride = Sheets.translucentCullBlockSheet();
+        }
     }
     @Inject(method = "renderHotbar", at = @At("RETURN"))
     public void renderHotbarTail(float f, GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null)
             return;
+
+        LegacyMinecraftClient.itemRenderTypeOverride = null;
+        LegacyMinecraftClient.blockItemRenderTypeOverride = null;
+
         Player player = this.getCameraPlayer();
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
         if (((LegacyOptions)minecraft.options).animatedCharacter().get() && (player.isSprinting() || player.isShiftKeyDown() || player.isCrouching() || player.getAbilities().flying || player.isFallFlying())) {
@@ -109,7 +109,7 @@ public abstract class GuiMixin {
             ci.cancel();
             return;
         }
-        guiGraphics.setColor(1.0f,1.0f,1.0f, (float) Math.max(Math.min(255f,toolHighlightTimer * 38.4f)/ 255f, ((LegacyOptions)minecraft.options).hudOpacity().get()));
+        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
         RenderSystem.enableBlend();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F,((LegacyOptions)minecraft.options).hudDistance().value *-22.5F,0.0F);
@@ -128,7 +128,7 @@ public abstract class GuiMixin {
             ci.cancel();
             return;
         }
-        guiGraphics.setColor(1.0f,1.0f,1.0f, (float) Math.max(Math.min(255f,toolHighlightTimer * 38.4f)/ 255f, ((LegacyOptions)minecraft.options).hudOpacity().get()));
+        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F,((LegacyOptions)minecraft.options).hudDistance().value *-22.5F,0.0F);
         int m;

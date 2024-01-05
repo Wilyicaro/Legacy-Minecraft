@@ -25,14 +25,14 @@ public abstract class PlayerModelInjector {
     @Shadow public boolean crouching;
     @Inject(method = ("setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V"), at = @At("HEAD"))
     private void setupAnimHead(LivingEntity livingEntity, float f, float g, float h, float i, float j, CallbackInfo info){
-        if (livingEntity.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA) && this.rightArmPose != HumanoidModel.ArmPose.SPYGLASS && livingEntity.isCrouching()) {
+        if (this.rightArmPose != HumanoidModel.ArmPose.SPYGLASS && livingEntity.isCrouching() && livingEntity.isFallFlying()) {
             crouching = false;
         }
     }
     @Inject(method = ("setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V"), at = @At("TAIL"))
     private void setupAnim(LivingEntity livingEntity, float f, float g, float h, float i, float j, CallbackInfo info){
-        if (livingEntity.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA) && this.rightArmPose != HumanoidModel.ArmPose.SPYGLASS && livingEntity.isCrouching()) {
-            this.rightArm.xRot = livingEntity.isFallFlying() ? Mth.clamp(this.head.xRot - 2.5F, -2.4F, 2.0F) : -1.05F;
+        if (this.rightArmPose != HumanoidModel.ArmPose.SPYGLASS && livingEntity.isCrouching() && livingEntity.isFallFlying()) {
+            this.rightArm.xRot = Mth.clamp(this.head.xRot - 2.5F, -2.4F, 2.0F);
             AnimationUtils.bobModelPart(this.rightArm, h + 0.2F, 1.0F);
         }
     }

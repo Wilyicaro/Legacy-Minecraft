@@ -1,7 +1,6 @@
 package wily.legacy.forge;
 
 import dev.architectury.platform.forge.EventBuses;
-import net.minecraft.client.Options;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;

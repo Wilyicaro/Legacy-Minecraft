@@ -14,9 +14,11 @@ public class ExitConfirmationScreen extends ConfirmationScreen{
 
     @Override
     protected void initButtons() {
-        addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b-> this.onClose()).bounds(panel.x + 15, panel.y + panel.height - 74,200,20).build());
-        addRenderableWidget(Button.builder(Component.translatable("legacy.menu.exit_and_save"),b-> exitToTitleScreen(minecraft,true)).bounds(panel.x + 15, panel.y + panel.height - 52,200,20).build());
-        addRenderableWidget(Button.builder(Component.translatable("legacy.menu.exit_without_save"),b-> exitToTitleScreen(minecraft,false)).bounds(panel.x + 15, panel.y + panel.height - 30,200,20).build());
+        if (minecraft.hasSingleplayerServer())
+            addRenderableWidget(Button.builder(Component.translatable("legacy.menu.exit_and_save"),b-> exitToTitleScreen(minecraft,true)).bounds(panel.x + 15, panel.y + panel.height -52,200,20).build());
+        else panel.height-=22;
+        addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b-> this.onClose()).bounds(panel.x + 15, panel.y + panel.height - (minecraft.hasSingleplayerServer() ? 74 : 52),200,20).build());
+        addRenderableWidget(Button.builder(Component.translatable(minecraft.hasSingleplayerServer() ? "legacy.menu.exit_without_save" : "menu.quit"),b-> exitToTitleScreen(minecraft,false)).bounds(panel.x + 15, panel.y + panel.height - 30,200,20).build());
     }
     public static void exitToTitleScreen(Minecraft minecraft, boolean save) {
         if (save && minecraft.hasSingleplayerServer())
@@ -24,7 +26,8 @@ public class ExitConfirmationScreen extends ConfirmationScreen{
         if (minecraft.level != null) {
             minecraft.level.disconnect();
         }
-        minecraft.disconnect(new LegacyLoadingScreen(Component.translatable("menu.savingLevel"),Component.empty()));
+
+        minecraft.disconnect(new LegacyLoadingScreen( Component.translatable(save ? "menu.savingLevel": "disconnect.quitting"),Component.empty()));
         ServerData serverData = minecraft.getCurrentServer();
         MainMenuScreen mainMenuScreen = new MainMenuScreen(false);
         if (serverData != null && serverData.isRealm()) {

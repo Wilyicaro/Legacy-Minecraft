@@ -62,3 +62,13 @@ accessible field net/minecraft/world/item/CreativeModeTabs INGREDIENTS Lnet/mine
 accessible field net/minecraft/world/item/CreativeModeTabs COMBAT Lnet/minecraft/resources/ResourceKey;
 accessible field net/minecraft/world/item/CreativeModeTabs TOOLS_AND_UTILITIES Lnet/minecraft/resources/ResourceKey;
 accessible field net/minecraft/world/item/CreativeModeTabs FOOD_AND_DRINKS Lnet/minecraft/resources/ResourceKey;
+accessible class net/minecraft/client/gui/screens/inventory/BeaconScreen$BeaconConfirmButton
+accessible class net/minecraft/client/gui/screens/inventory/BeaconScreen$BeaconPowerButton
+accessible class net/minecraft/client/gui/screens/inventory/BeaconScreen$BeaconUpgradePowerButton
+accessible class net/minecraft/client/gui/screens/inventory/BeaconScreen$BeaconButton
+accessible field net/minecraft/client/gui/screens/recipebook/GhostRecipe ingredients Ljava/util/List;
+accessible field net/minecraft/client/gui/screens/recipebook/GhostRecipe time F
+accessible method net/minecraft/client/Minecraft selectMainFont (Z)V
+accessible method net/minecraft/world/item/trading/MerchantOffers <init> (I)V
+accessible method net/minecraft/world/item/trading/MerchantOffer isRequiredItem (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z
+accessible method net/minecraft/world/inventory/AbstractContainerMenu moveItemStackTo (Lnet/minecraft/world/item/ItemStack;IIZ)Z
