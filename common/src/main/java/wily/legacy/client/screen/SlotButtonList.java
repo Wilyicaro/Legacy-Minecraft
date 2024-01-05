@@ -23,13 +23,13 @@ public class SlotButtonList <E extends SlotButtonList.SlotEntry<E>> extends Obje
     protected final Supplier<Boolean> active;
 
 
-    public SlotButtonList(Supplier<Boolean> active, Minecraft minecraft, int i, int j, int k, int l) {
-        super(minecraft, i, j, k, l);
+    public SlotButtonList(Supplier<Boolean> active, Minecraft minecraft, int i, int j, int k, int l, int m) {
+        super(minecraft, i, j, k, l, m);
         this.active = active;
     }
 
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         if (!active.get()) return;
         this.hovered = this.isMouseOver(i, j) ? this.getEntryAtPosition(i, j) : null;
         this.enableScissor(guiGraphics);
@@ -40,17 +40,11 @@ public class SlotButtonList <E extends SlotButtonList.SlotEntry<E>> extends Obje
 
     }
     public int getRowLeft() {
-        return getX() + (this.width - this.getRowWidth())/ 2;
+        return this.x0 + (this.width - this.getRowWidth())/ 2;
     }
     @Override
     protected void renderSelection(GuiGraphics guiGraphics, int i, int j, int k, int l, int m) {
 
-    }
-
-    @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (!active.get()) return false;
-        return super.keyPressed(i, j, k);
     }
 
     @Override
@@ -78,7 +72,10 @@ public class SlotButtonList <E extends SlotButtonList.SlotEntry<E>> extends Obje
         super.renderItem(guiGraphics, i, j, f, k, l, m, n, o);
     }
 
+    @Override
+    public void updateNarration(NarrationElementOutput narrationElementOutput) {
 
+    }
     public abstract static class SlotEntry<E extends SlotEntry<E>> extends Entry<E>{
         public boolean hasSlotBackground(){
             return true;

@@ -2,7 +2,6 @@ package wily.legacy.client.screen;
 
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
@@ -71,8 +70,8 @@ public class ServerSelectionList extends SlotButtonList<ServerSelectionList.Entr
     private final Entry lanHeader = new ServerSelectionList.LANHeader();
     private final List<ServerSelectionList.NetworkServerEntry> networkServers = Lists.newArrayList();
 
-    public ServerSelectionList(PlayGameScreen playGameScreen, Minecraft minecraft, int i, int j, int k, int l) {
-        super(()->playGameScreen.tabList.selectedTab == 2,minecraft, i, j, k, l);
+    public ServerSelectionList(PlayGameScreen playGameScreen, Minecraft minecraft, int i, int j, int k, int l, int m) {
+        super(()->playGameScreen.tabList.selectedTab == 2,minecraft, i, j, k, l, m);
         this.screen = playGameScreen;
         setRenderBackground(false);
     }
@@ -110,7 +109,7 @@ public class ServerSelectionList extends SlotButtonList<ServerSelectionList.Entr
             int k = j - this.networkServers.size() + this.children().size();
             int l = this.getRowTop(k);
             int m = this.getRowBottom(k);
-            if (m < this.getY() || l > this.getBottom()) continue;
+            if (m < this.y0 || l > this.y1) continue;
             this.minecraft.getNarrator().say(Component.translatable("multiplayer.lan.server_found", networkServerEntry.getServerNarration()));
         }
     }
@@ -324,10 +323,6 @@ public class ServerSelectionList extends SlotButtonList<ServerSelectionList.Entr
                     this.swap(l, i == 264 ? l + 1 : l - 1);
                     return true;
                 }
-            }
-            if (i == InputConstants.KEY_E) {
-                minecraft.setScreen(new ServerOptionsScreen(screen,serverData));
-                return true;
             }
             return super.keyPressed(i, j, k);
         }

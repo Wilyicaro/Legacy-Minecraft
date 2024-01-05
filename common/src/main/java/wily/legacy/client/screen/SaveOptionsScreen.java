@@ -39,7 +39,7 @@ public class SaveOptionsScreen extends ConfirmationScreen{
                 parent.saveSelectionList.reloadWorldList();
             } catch (ContentValidationException contentValidationException) {
                 LegacyMinecraft.LOGGER.warn("{}", contentValidationException.getMessage());
-                this.minecraft.setScreen(NoticeWithLinkScreen.createWorldSymlinkWarningScreen(()-> minecraft.setScreen(parent)));
+                this.minecraft.setScreen(NoticeWithLinkScreen.createWorldSymlinkWarningScreen(parent));
             }
         }){
             @Override

@@ -131,9 +131,9 @@ public class MainMenuScreen extends RenderableVListScreen {
         boolean bl = this.checkDemoWorldPresence();
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.playdemo"), (button) -> {
             if (bl) {
-                this.minecraft.createWorldOpenFlows().checkForBackupAndLoad("Demo_World", ()-> this.minecraft.setScreen(this));
+                this.minecraft.createWorldOpenFlows().loadLevel(this, "Demo_World");
             } else {
-                this.minecraft.createWorldOpenFlows().createFreshLevel("Demo_World", MinecraftServer.DEMO_SETTINGS, WorldOptions.DEMO_OPTIONS, WorldPresets::createNormalWorldDimensions, this);
+                this.minecraft.createWorldOpenFlows().createFreshLevel("Demo_World", MinecraftServer.DEMO_SETTINGS, WorldOptions.DEMO_OPTIONS, WorldPresets::createNormalWorldDimensions);
             }
 
         }).build());
@@ -144,8 +144,9 @@ public class MainMenuScreen extends RenderableVListScreen {
                 LevelStorageSource.LevelStorageAccess levelStorageAccess = levelStorageSource.createAccess("Demo_World");
 
                 try {
-                    if (levelStorageAccess.hasWorldData()) {
-                        this.minecraft.setScreen(new ConfirmScreen(this::confirmDemo, Component.translatable("selectWorld.deleteQuestion"), Component.translatable("selectWorld.deleteWarning", new Object[]{MinecraftServer.DEMO_SETTINGS.levelName()}), Component.translatable("selectWorld.deleteButton"), CommonComponents.GUI_CANCEL));
+                    LevelSummary levelSummary = levelStorageAccess.getSummary();
+                    if (levelSummary != null) {
+                        this.minecraft.setScreen(new ConfirmScreen(this::confirmDemo, Component.translatable("selectWorld.deleteQuestion"), Component.translatable("selectWorld.deleteWarning", new Object[]{levelSummary.getLevelName()}), Component.translatable("selectWorld.deleteButton"), CommonComponents.GUI_CANCEL));
                     }
                 } catch (Throwable var7) {
                     if (levelStorageAccess != null) {
@@ -177,7 +178,7 @@ public class MainMenuScreen extends RenderableVListScreen {
 
             boolean var2;
             try {
-                var2 = levelStorageAccess.hasWorldData();
+                var2 = levelStorageAccess.getSummary() != null;
             } catch (Throwable var5) {
                 if (levelStorageAccess != null) {
                     try {
