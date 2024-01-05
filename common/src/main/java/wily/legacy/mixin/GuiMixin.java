@@ -1,5 +1,6 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -20,6 +21,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
@@ -46,7 +48,25 @@ public abstract class GuiMixin {
     @Shadow protected float lastAutosaveIndicatorValue;
 
     @Shadow protected abstract Player getCameraPlayer();
-
+    @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
+    public void renderCrosshair(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (minecraft.screen != null){
+            ci.cancel();
+        }
+    }
+    @Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;)V"))
+    public void renderCrosshairBlendFunc(GlStateManager.SourceFactor sourceFactor, GlStateManager.DestFactor destFactor, GlStateManager.SourceFactor sourceFactor2, GlStateManager.DestFactor destFactor2, GuiGraphics guiGraphics) {
+        if (ScreenUtil.getHUDOpacity() < 1.0) {
+            guiGraphics.setColor(1.0f, 1.0f, 1.0f, ScreenUtil.getHUDOpacity());
+            RenderSystem.enableBlend();
+        } else RenderSystem.blendFuncSeparate(sourceFactor,destFactor,sourceFactor2,destFactor2);
+    }
+    @Inject(method = "renderCrosshair", at = @At("RETURN"))
+    public void renderCrosshairReturn(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (minecraft.screen != null)
+            return;
+        guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
+    }
     @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
     public void renderHotbar(float f, GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null) {

@@ -47,6 +47,7 @@ public class CreationList extends SlotButtonList<CreationList.CreationListEntry>
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
+        if (!active.get()) return false;
         Optional<CreationListEntry> optional;
         if (CommonInputs.selected(i) && (optional = this.getSelectedOpt()).isPresent()) {
             optional.get().onPress.accept(optional.get());
@@ -114,7 +115,7 @@ public class CreationList extends SlotButtonList<CreationList.CreationListEntry>
 
         @Override
         public boolean mouseClicked(double d, double e, int i) {
-            if (screen.tabList.selectedTab != 1) return false;
+            if (!active.get()) return false;
             CreationList.this.setSelected(this);
             if (d - (double) CreationList.this.getRowLeft() <= 32.0) {
                 onPress.accept(this);
