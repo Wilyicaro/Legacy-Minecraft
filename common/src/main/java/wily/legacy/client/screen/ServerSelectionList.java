@@ -85,6 +85,7 @@ public class ServerSelectionList extends SlotButtonList<ServerSelectionList.Entr
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
+        if (!active.get()) return false;
         Entry entry = this.getSelected();
         return entry != null && entry.keyPressed(i, j, k) || super.keyPressed(i, j, k);
     }
@@ -337,7 +338,7 @@ public class ServerSelectionList extends SlotButtonList<ServerSelectionList.Entr
 
         @Override
         public boolean mouseClicked(double d, double e, int i) {
-            if (screen.tabList.selectedTab != 2) return false;
+            if (!active.get()) return false;
             double f = d - (double) ServerSelectionList.this.getRowLeft();
             double g = e - (double) ServerSelectionList.this.getRowTop(ServerSelectionList.this.children().indexOf(this));
             if (f <= 32.0) {

@@ -1,5 +1,7 @@
 package wily.legacy.fabric.mixin;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -13,6 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.ScreenUtil;
@@ -33,23 +36,6 @@ public abstract class GuiMixin {
     @Shadow protected int toolHighlightTimer;
 
     @Shadow protected ItemStack lastToolHighlight;
-    @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
-    public void renderCrosshair(GuiGraphics guiGraphics, CallbackInfo ci) {
-        if (minecraft.screen != null){
-            ci.cancel();
-            return;
-        }
-        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0F,((LegacyOptions)minecraft.options).hudDistance().value *-22.5F,0.0F);
-    }
-    @Inject(method = "renderCrosshair", at = @At("RETURN"))
-    public void renderCrosshairReturn(GuiGraphics guiGraphics, CallbackInfo ci) {
-        if (minecraft.screen != null)
-            return;
-        guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
-        guiGraphics.pose().popPose();
-    }
     @Inject(method = "renderVehicleHealth", at = @At("HEAD"), cancellable = true)
     public void renderVehicleHealth(GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null){

@@ -108,6 +108,7 @@ public class SaveSelectionList extends SlotButtonList<SaveSelectionList.Entry> {
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
+        if (!active.get()) return false;
         Optional<WorldListEntry> optional;
         if (CommonInputs.selected(i) && (optional = this.getSelectedOpt()).isPresent()) {
             optional.get().joinWorld();
@@ -380,7 +381,7 @@ public class SaveSelectionList extends SlotButtonList<SaveSelectionList.Entry> {
 
         @Override
         public boolean mouseClicked(double d, double e, int i) {
-            if (screen.tabList.selectedTab != 0) return false;
+            if (!active.get()) return false;
             if (this.summary.isDisabled()) {
                 return true;
             }
