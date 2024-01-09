@@ -379,7 +379,7 @@ public class LegacyCreateWorldScreen extends PanelBackgroundScreen{
     private void applyNewPackConfig(PackRepository packRepository, WorldDataConfiguration worldDataConfiguration, Consumer<WorldDataConfiguration> consumer) {
         this.minecraft.forceSetScreen(new GenericDirtMessageScreen(Component.translatable("dataPack.validation.working")));
         WorldLoader.InitConfig initConfig = LegacyCreateWorldScreen.createDefaultLoadConfig(packRepository, worldDataConfiguration);
-        ((CompletableFuture)WorldLoader.load(initConfig, dataLoadContext -> {
+        WorldLoader.load(initConfig, dataLoadContext -> {
             if (dataLoadContext.datapackWorldgen().registryOrThrow(Registries.WORLD_PRESET).size() == 0) {
                 throw new IllegalStateException("Needs at least one world preset to continue");
             }
@@ -390,12 +390,12 @@ public class LegacyCreateWorldScreen extends PanelBackgroundScreen{
             RegistryOps<JsonElement> dynamicOps = RegistryOps.create(JsonOps.INSTANCE, worldCreationContext.worldgenLoadContext());
             DataResult<JsonElement> dataResult = WorldGenSettings.encode(dynamicOps, worldCreationContext.options(), worldCreationContext.selectedDimensions()).setLifecycle(Lifecycle.stable());
             RegistryOps<JsonElement> dynamicOps2 = RegistryOps.create(JsonOps.INSTANCE, dataLoadContext.datapackWorldgen());
-            WorldGenSettings worldGenSettings = (WorldGenSettings)dataResult.flatMap(jsonElement -> WorldGenSettings.CODEC.parse(dynamicOps2, jsonElement)).getOrThrow(false, Util.prefix("Error parsing worldgen settings after loading data packs: ", LOGGER::error));
-            return new WorldLoader.DataLoadOutput<LegacyCreateWorldScreen.DataPackReloadCookie>(new LegacyCreateWorldScreen.DataPackReloadCookie(worldGenSettings, dataLoadContext.dataConfiguration()), dataLoadContext.datapackDimensions());
+            WorldGenSettings worldGenSettings = dataResult.flatMap(jsonElement -> WorldGenSettings.CODEC.parse(dynamicOps2, jsonElement)).getOrThrow(false, Util.prefix("Error parsing worldgen settings after loading data packs: ", LOGGER::error));
+            return new WorldLoader.DataLoadOutput<>(new LegacyCreateWorldScreen.DataPackReloadCookie(worldGenSettings, dataLoadContext.dataConfiguration()), dataLoadContext.datapackDimensions());
         }, (closeableResourceManager, reloadableServerResources, layeredRegistryAccess, dataPackReloadCookie) -> {
             closeableResourceManager.close();
             return new WorldCreationContext(dataPackReloadCookie.worldGenSettings(), layeredRegistryAccess, reloadableServerResources, dataPackReloadCookie.dataConfiguration());
-        }, Util.backgroundExecutor(), this.minecraft).thenAcceptAsync(this.getUiState()::setSettings, (Executor)this.minecraft)).handle((void_, throwable) -> {
+        }, Util.backgroundExecutor(), this.minecraft).thenAcceptAsync(this.getUiState()::setSettings, this.minecraft).handle((void_, throwable) -> {
             if (throwable != null) {
                 LOGGER.warn("Failed to validate datapack", (Throwable)throwable);
                 this.minecraft.setScreen(new ConfirmScreen(bl -> {

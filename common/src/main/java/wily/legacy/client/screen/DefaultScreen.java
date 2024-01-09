@@ -3,6 +3,7 @@ package wily.legacy.client.screen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.util.ScreenUtil;
 
 public class DefaultScreen extends Screen {
@@ -19,6 +20,7 @@ public class DefaultScreen extends Screen {
     }
     @Override
     public void onClose() {
+        ScreenUtil.playSimpleUISound(LegacySoundEvents.BACK.get(),1.0f);
         this.minecraft.setScreen(parent);
     }
 }

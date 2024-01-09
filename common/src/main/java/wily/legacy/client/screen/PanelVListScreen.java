@@ -36,4 +36,9 @@ public class PanelVListScreen extends PanelBackgroundScreen{
         return super.mouseScrolled(d, e, f, g);
     }
 
+    @Override
+    public boolean keyPressed(int i, int j, int k) {
+        if (getRenderableVList().keyPressed(i,j,k)) return true;
+        return super.keyPressed(i, j, k);
+    }
 }

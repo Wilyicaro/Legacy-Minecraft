@@ -25,9 +25,7 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen{
         presetGetter.listElements().forEach(holder->{
             Set<Block> set = (holder.value()).settings().getLayersInfo().stream().map((flatLayerInfo) -> flatLayerInfo.getBlockState().getBlock()).filter((block) -> !block.isEnabled(enabledFeatures)).collect(Collectors.toSet());
             if (!set.isEmpty()) {
-                LegacyMinecraft.LOGGER.info("Discarding flat world preset {} since it contains experimental blocks {}", holder.unwrapKey().map((resourceKey) -> {
-                    return resourceKey.location().toString();
-                }).orElse("<unknown>"), set);
+                LegacyMinecraft.LOGGER.info("Discarding flat world preset {} since it contains experimental blocks {}", holder.unwrapKey().map((resourceKey) -> resourceKey.location().toString()).orElse("<unknown>"), set);
             } else {
                 FlatLevelGeneratorPreset preset = holder.value();
                 renderableVList.addRenderable(new AbstractButton(0,0,263,30,Component.translatable(holder.key().location().toLanguageKey("flat_world_preset"))) {

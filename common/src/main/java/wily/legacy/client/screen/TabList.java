@@ -11,6 +11,8 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import wily.legacy.init.LegacySoundEvents;
+import wily.legacy.util.ScreenUtil;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -88,15 +90,20 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
     public boolean keyPressed(int i, int j, int k) {
         return !tabButtons.stream().filter(t-> t.isHoveredOrFocused() && t.keyPressed(i,j,k)).toList().isEmpty();
     }
-    public boolean controlTab(int i, int j, int k){
-        if (i == InputConstants.KEY_LEFT) {
+    public void controlTab(int i, int j, int k){
+        if (i == InputConstants.KEY_LBRACKET) {
             tabButtons.get((selectedTab <= 0 ? tabButtons.size() : selectedTab) - 1).onPress();
-            return true;
-        } else if (i == InputConstants.KEY_RIGHT) {
+            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f);
+        } else if (i == InputConstants.KEY_RBRACKET) {
             tabButtons.get(selectedTab >= tabButtons.size() - 1 ? 0 : selectedTab + 1).onPress();
-            return true;
+            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f);
         }
-        return false;
+    }
+    public void numberControlTab(int i){
+        if (i <= 57 && i > 48 && i - 49 < tabButtons.size()) {
+            tabButtons.get(i - 49).onPress();
+            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f);
+        }
     }
     @Override
     public boolean mouseClicked(double d, double e, int i) {

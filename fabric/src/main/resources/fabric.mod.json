@@ -3,7 +3,7 @@
   "id": "${mod_id}",
   "version": "${version}",
   "name": "${mod_name}",
-  "description": "This mod is a remake of the outdated mod from 1.7.10 for fabric, Better Furnaces, presenting the concept used in the original mod",
+  "description": "${mod_description}",
   "authors": [
     "${mod_authors}"
   ],

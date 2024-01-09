@@ -1,6 +1,5 @@
 package wily.legacy.client.screen;
 
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
@@ -13,14 +12,21 @@ import net.minecraft.DefaultUncaughtExceptionHandler;
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.FaviconTexture;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
+import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.client.server.LanServer;
+import net.minecraft.client.server.LanServerDetection;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
@@ -29,6 +35,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import wily.legacy.LegacyMinecraft;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -37,7 +44,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
-public class ServerSelectionList extends SlotButtonList<ServerSelectionList.Entry> {
+public class ServerSelectionList extends RenderableVList {
     static final ResourceLocation INCOMPATIBLE_SPRITE = new ResourceLocation("server_list/incompatible");
     static final ResourceLocation UNREACHABLE_SPRITE = new ResourceLocation("server_list/unreachable");
     static final ResourceLocation PING_1_SPRITE = new ResourceLocation("server_list/ping_1");
@@ -66,398 +73,314 @@ public class ServerSelectionList extends SlotButtonList<ServerSelectionList.Entr
     static final Component NO_CONNECTION_STATUS = Component.translatable("multiplayer.status.no_connection");
     static final Component PINGING_STATUS = Component.translatable("multiplayer.status.pinging");
     static final Component ONLINE_STATUS = Component.translatable("multiplayer.status.online");
-    private final PlayGameScreen screen;
-    private final List<ServerSelectionList.OnlineServerEntry> onlineServers = Lists.newArrayList();
-    private final Entry lanHeader = new ServerSelectionList.LANHeader();
-    private final List<ServerSelectionList.NetworkServerEntry> networkServers = Lists.newArrayList();
+    private static final Component LAN_SERVER_HEADER = Component.translatable("lanServer.title");
+    private static final Component HIDDEN_ADDRESS_TEXT = Component.translatable("selectServer.hiddenAddress");
+    private PlayGameScreen screen;
+    private final Minecraft minecraft;
 
-    public ServerSelectionList(PlayGameScreen playGameScreen, Minecraft minecraft, int i, int j, int k, int l) {
-        super(()->playGameScreen.tabList.selectedTab == 2,minecraft, i, j, k, l);
-        this.screen = playGameScreen;
-        setRenderBackground(false);
+    public final ServerList servers;
+    @Nullable
+    public LanServerDetection.LanServerDetector lanServerDetector;
+    public final LanServerDetection.LanServerList lanServerList;
+    public List<LanServer> lanServers;
+
+    public ServerSelectionList() {
+        layoutSpacing(l->0);
+        minecraft = Minecraft.getInstance();
+        servers = new ServerList(minecraft);
+        servers.load();
+        lanServerList = new LanServerDetection.LanServerList();
+        updateServers();
     }
-    private void refreshEntries() {
-        this.clearEntries();
-        this.onlineServers.forEach(this::addEntry);
-        this.addEntry(this.lanHeader);
-        this.networkServers.forEach(this::addEntry);
-    }
-
-
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (!active.get()) return false;
-        Entry entry = this.getSelected();
-        return entry != null && entry.keyPressed(i, j, k) || super.keyPressed(i, j, k);
+    public void init(Screen screen, int leftPos, int topPos, int listWidth, int listHeight) {
+        if (screen instanceof PlayGameScreen s) this.screen = s;
+        try {
+            this.lanServerDetector = new LanServerDetection.LanServerDetector(this.lanServerList);
+            this.lanServerDetector.start();
+        } catch (Exception exception) {
+            LegacyMinecraft.LOGGER.warn("Unable to start LAN server detection: {}", exception.getMessage());
+        }
+        super.init(screen, leftPos, topPos, listWidth, listHeight);
     }
 
-    public void updateOnlineServers(ServerList serverList) {
-        this.onlineServers.clear();
-        for (int i = 0; i < serverList.size(); ++i) {
-            this.onlineServers.add(new ServerSelectionList.OnlineServerEntry(this.screen, serverList.get(i)));
+    public void updateServers(){
+        renderables.clear();
+        for (int i = 0; i < servers.size(); i++) {
+            int index = i;
+            ServerData server = servers.get(i);
+            FaviconTexture icon = FaviconTexture.forServer(this.minecraft.getTextureManager(), server.ip);
+            addRenderable(new AbstractButton(0,0,270,30,Component.literal(server.name)) {
+                private byte @Nullable [] lastIconBytes;
+                @Override
+                protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+                    super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+                    List<Component> list2;
+                    Component component2;
+                    ResourceLocation resourceLocation;
+                    if (!server.pinged) {
+                        server.pinged = true;
+                        server.ping = -2L;
+                        server.motd = CommonComponents.EMPTY;
+                        server.status = CommonComponents.EMPTY;
+                        THREAD_POOL.submit(() -> {
+                            try {
+                                screen.getPinger().pingServer(server, () -> minecraft.execute(this::updateServerList));
+                            } catch (UnknownHostException unknownHostException) {
+                                server.ping = -1L;
+                                server.motd = CANT_RESOLVE_TEXT;
+                            } catch (Exception exception) {
+                                server.ping = -1L;
+                                server.motd = CANT_CONNECT_TEXT;
+                            }
+                        });
+                    }
+                    boolean bl2 = !this.isCompatible();
+                    guiGraphics.drawString(minecraft.font, getMessage(), getX() + 32 + 3, getY() + 1, 0xFFFFFF);
+                    List<FormattedCharSequence> list = minecraft.font.split(server.motd, 236);
+                    for (int p = 0; p < Math.min(list.size(), 2); ++p) {
+                        guiGraphics.drawString(minecraft.font, list.get(p), getX() + 32 + 3, getY() + 12 + minecraft.font.lineHeight * p, -8355712, false);
+                    }
+                    Component component = bl2 ? server.version.copy().withStyle(ChatFormatting.RED) : server.status;
+                    int q = minecraft.font.width(component);
+                    guiGraphics.drawString(minecraft.font, component, getX() + 270 - q - 15 - 2, getY() + 1, -8355712, false);
+                    if (bl2) {
+                        resourceLocation = INCOMPATIBLE_SPRITE;
+                        component2 = INCOMPATIBLE_STATUS;
+                        list2 = server.playerList;
+                    } else if (this.pingCompleted()) {
+                        resourceLocation = server.ping < 0L ? UNREACHABLE_SPRITE : (server.ping < 150L ? PING_5_SPRITE : (server.ping < 300L ? PING_4_SPRITE : (server.ping < 600L ? PING_3_SPRITE : (server.ping < 1000L ? PING_2_SPRITE : PING_1_SPRITE))));
+                        if (server.ping < 0L) {
+                            component2 = NO_CONNECTION_STATUS;
+                            list2 = Collections.emptyList();
+                        } else {
+                            component2 = Component.translatable("multiplayer.status.ping", server.ping);
+                            list2 = server.playerList;
+                        }
+                    } else {
+                        int r = (int)(Util.getMillis() / 100L + (long)(index * 2) & 7L);
+                        if (r > 4) {
+                            r = 8 - r;
+                        }
+                        resourceLocation = switch (r) {
+                            default -> PINGING_1_SPRITE;
+                            case 1 -> PINGING_2_SPRITE;
+                            case 2 -> PINGING_3_SPRITE;
+                            case 3 -> PINGING_4_SPRITE;
+                            case 4 -> PINGING_5_SPRITE;
+                        };
+                        component2 = PINGING_STATUS;
+                        list2 = Collections.emptyList();
+                    }
+                    guiGraphics.blitSprite(resourceLocation, getX() + width - 15, getY(), 10, 8);
+                    byte[] bs = server.getIconBytes();
+                    if (!Arrays.equals(bs, this.lastIconBytes)) {
+                        if (this.uploadServerIcon(bs)) {
+                            this.lastIconBytes = bs;
+                        } else {
+                            server.setIconBytes(null);
+                            this.updateServerList();
+                        }
+                    }
+                    this.drawIcon(guiGraphics, getX(), getY(), icon.textureLocation());
+                    int s = mouseX - getX();
+                    int t = mouseY - getY();
+                    if (s >= width - 15 && s <= width - 5 && t >= 0 && t <= 8) {
+                        guiGraphics.renderTooltip(minecraft.font,component2, mouseX,mouseY);
+                    } else if (s >= width - q - 15 - 2 && s <= width - 15 - 2 && t >= 0 && t <= 8) {
+                        guiGraphics.renderComponentTooltip(minecraft.font,list2, mouseX,mouseY);
+                    }
+                    if (minecraft.options.touchscreen().get().booleanValue() || isHovered) {
+                        guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
+                        int u = mouseX - getX();
+                        int v = mouseY - getY();
+                        if (u < 32 && u > 16) {
+                            guiGraphics.blitSprite(JOIN_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                        } else {
+                            guiGraphics.blitSprite(JOIN_SPRITE, getX(), getY(), 32, 32);
+                        }
+                        if (index > 0) {
+                            if (u < 16 && v < 16) {
+                                guiGraphics.blitSprite(MOVE_UP_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                            } else {
+                                guiGraphics.blitSprite(MOVE_UP_SPRITE, getX(), getY(), 32, 32);
+                            }
+                        }
+                        if (index < screen.getServers().size() - 1) {
+                            if (u < 16 && v > 16) {
+                                guiGraphics.blitSprite(MOVE_DOWN_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                            } else {
+                                guiGraphics.blitSprite(MOVE_DOWN_SPRITE, getX(), getY(), 32, 32);
+                            }
+                        }
+                    }
+                }
+                private boolean pingCompleted() {
+                    return server.pinged && server.ping != -2L;
+                }
+
+                private boolean isCompatible() {
+                    return server.protocol == SharedConstants.getCurrentVersion().getProtocolVersion();
+                }
+
+                public void updateServerList() {
+                    screen.getServers().save();
+                }
+
+                protected void drawIcon(GuiGraphics guiGraphics, int i, int j, ResourceLocation resourceLocation) {
+                    RenderSystem.enableBlend();
+                    guiGraphics.blit(resourceLocation, i + 5, j + 5, 0.0f, 0.0f, 20, 20, 20, 20);
+                    RenderSystem.disableBlend();
+                }
+
+                private boolean uploadServerIcon(@Nullable byte[] bs) {
+                    if (bs == null) {
+                        icon.clear();
+                    } else {
+                        try {
+                            icon.upload(NativeImage.read(bs));
+                        } catch (Throwable throwable) {
+                            LOGGER.error("Invalid icon for server {} ({})", server.name, server.ip, throwable);
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+                }
+
+                @Override
+                public void onClick(double d, double e) {
+                    double f = d - (double) getX();
+                    double g = e - (double) getY();
+                    if (f <= 32.0) {
+                        if (f < 16.0 && g < 16.0 && index > 0) {
+                            this.swap(index, index - 1);
+                            return;
+                        }
+                        if (f < 16.0 && g > 16.0 && index < servers.size() - 1) {
+                            this.swap(index, index + 1);
+                            return;
+                        }
+                        join(server);
+                    }else {
+                        super.onClick(d,e);
+                    }
+                }
+
+                @Override
+                public void onPress() {
+                    if (isFocused()) join(server);
+                }
+                private void swap(int i, int j) {
+                    servers.swap(i, j);
+                    updateServers();
+                    screen.repositionElements();
+                    if (j < renderables.size() && renderables.get(j) instanceof GuiEventListener l) screen.setFocused(l);
+                }
+                public boolean keyPressed(int i, int j, int k) {
+                    if (Screen.hasShiftDown()) {
+                        if (i == 264 && index < servers.size() - 1 || i == 265 && index > 0) {
+                            this.swap(index, i == 264 ? index + 1 : index - 1);
+                            return true;
+                        }
+                    }
+                    if (i == InputConstants.KEY_E) {
+                        minecraft.setScreen(new ServerOptionsScreen(screen,server));
+                        screen.setFocused(this);
+                        return true;
+                    }
+                    return super.keyPressed(i, j, k);
+                }
+
+                @Override
+                protected MutableComponent createNarrationMessage() {
+                    MutableComponent mutableComponent = Component.empty();
+                    mutableComponent.append(Component.translatable("narrator.select", server.name));
+                    mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
+                    if (!this.isCompatible()) {
+                        mutableComponent.append(INCOMPATIBLE_STATUS);
+                        mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
+                        mutableComponent.append(Component.translatable("multiplayer.status.version.narration", server.version));
+                        mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
+                        mutableComponent.append(Component.translatable("multiplayer.status.motd.narration", server.motd));
+                    } else if (server.ping < 0L) {
+                        mutableComponent.append(NO_CONNECTION_STATUS);
+                    } else if (!this.pingCompleted()) {
+                        mutableComponent.append(PINGING_STATUS);
+                    } else {
+                        mutableComponent.append(ONLINE_STATUS);
+                        mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
+                        mutableComponent.append(Component.translatable("multiplayer.status.ping.narration", server.ping));
+                        mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
+                            mutableComponent.append(Component.translatable("multiplayer.status.motd.narration", server.motd));
+                        if (server.players != null) {
+                            mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
+                            mutableComponent.append(Component.translatable("multiplayer.status.player_count.narration", server.players.online(), server.players.max()));
+                            mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
+                            mutableComponent.append(ComponentUtils.formatList(server.playerList, Component.literal(", ")));
+                        }
+                    }
+                    return mutableComponent;
+                }
+
+                @Override
+                protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+                    defaultButtonNarrationText(narrationElementOutput);
+                }
+            });
         }
-        this.refreshEntries();
-    }
+        if (lanServers != null){
+            for (LanServer lanServer : lanServers) {
+                AbstractButton lanButton;
+                addRenderable(lanButton = new AbstractButton(0,0,270,30,Component.literal(lanServer.getMotd())) {
+                    @Override
+                    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+                        guiGraphics.drawString(minecraft.font, LAN_SERVER_HEADER, getX() + 32 + 3, getY() + 1, 0xFFFFFF, false);
+                        guiGraphics.drawString(minecraft.font, lanServer.getMotd(), getX() + 32 + 3, getY() + 12, -8355712, false);
+                        if (minecraft.options.hideServerAddress) {
+                            guiGraphics.drawString(minecraft.font, HIDDEN_ADDRESS_TEXT, getX() + 32 + 3,getY() + 12 + 11, 0x303030, false);
+                        } else {
+                            guiGraphics.drawString(minecraft.font, lanServer.getAddress(), getX() + 32 + 3, getY() + 12 + 11, 0x303030, false);
+                        }
+                    }
 
-    public void updateNetworkServers(List<LanServer> list) {
-        int i = list.size() - this.networkServers.size();
-        this.networkServers.clear();
-        for (LanServer lanServer : list) {
-            this.networkServers.add(new ServerSelectionList.NetworkServerEntry(this.screen, lanServer));
-        }
-        this.refreshEntries();
-        for (int j = this.networkServers.size() - i; j < this.networkServers.size(); ++j) {
-            ServerSelectionList.NetworkServerEntry networkServerEntry = this.networkServers.get(j);
-            int k = j - this.networkServers.size() + this.children().size();
-            int l = this.getRowTop(k);
-            int m = this.getRowBottom(k);
-            if (m < this.getY() || l > this.getBottom()) continue;
-            this.minecraft.getNarrator().say(Component.translatable("multiplayer.lan.server_found", networkServerEntry.getServerNarration()));
-        }
-    }
+                    @Override
+                    public void onPress() {
+                        if (isFocused()) joinLanServer(lanServer);
+                    }
 
-    @Override
-    protected int getScrollbarPosition() {
-        return super.getScrollbarPosition() + 30;
-    }
-
-    public void removed() {
-    }
-
-    @Environment(value= EnvType.CLIENT)
-    public static class LANHeader
-            extends Entry {
-        private final Minecraft minecraft = Minecraft.getInstance();
-
-        @Override
-        public void render(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-            int p = j + m / 2 - this.minecraft.font.lineHeight / 2;
-            guiGraphics.drawString(this.minecraft.font, SCANNING_LABEL, this.minecraft.screen.width / 2 - this.minecraft.font.width(SCANNING_LABEL) / 2, p, 0xFFFFFF, false);
-            String string = LoadingDotsText.get(Util.getMillis());
-            guiGraphics.drawString(this.minecraft.font, string, this.minecraft.screen.width / 2 - this.minecraft.font.width(string) / 2, p + this.minecraft.font.lineHeight, -8355712, false);
-        }
-
-        @Override
-        public boolean hasSlotBackground() {
-            return false;
-        }
-
-        @Override
-        public Component getNarration() {
-            return SCANNING_LABEL;
-        }
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public static abstract class Entry extends SlotButtonList.SlotEntry<Entry> implements AutoCloseable {
-        @Override
-        public void close() {
-        }
-    }
-
-    @Environment(value=EnvType.CLIENT)
-    public class OnlineServerEntry extends Entry {
-        private final PlayGameScreen screen;
-        private final Minecraft minecraft;
-        private final ServerData serverData;
-        private final FaviconTexture icon;
-        @Nullable
-        private byte[] lastIconBytes;
-        private long lastClickTime;
-
-        protected OnlineServerEntry(PlayGameScreen joinMultiplayerScreen, ServerData serverData) {
-            this.screen = joinMultiplayerScreen;
-            this.serverData = serverData;
-            this.minecraft = Minecraft.getInstance();
-            this.icon = FaviconTexture.forServer(this.minecraft.getTextureManager(), serverData.ip);
-        }
-
-        @Override
-        public void render(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-            List<Component> list2;
-            Component component2;
-            ResourceLocation resourceLocation;
-            if (!this.serverData.pinged) {
-                this.serverData.pinged = true;
-                this.serverData.ping = -2L;
-                this.serverData.motd = CommonComponents.EMPTY;
-                this.serverData.status = CommonComponents.EMPTY;
-                THREAD_POOL.submit(() -> {
-                    try {
-                        this.screen.getPinger().pingServer(this.serverData, () -> this.minecraft.execute(this::updateServerList));
-                    } catch (UnknownHostException unknownHostException) {
-                        this.serverData.ping = -1L;
-                        this.serverData.motd = CANT_RESOLVE_TEXT;
-                    } catch (Exception exception) {
-                        this.serverData.ping = -1L;
-                        this.serverData.motd = CANT_CONNECT_TEXT;
+                    @Override
+                    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+                        defaultButtonNarrationText(narrationElementOutput);
                     }
                 });
+                if (screen.children.contains(lanButton))
+                    this.minecraft.getNarrator().say(Component.translatable("multiplayer.lan.server_found", Component.empty().append(LAN_SERVER_HEADER).append(CommonComponents.SPACE).append(lanServer.getMotd())));
             }
-            boolean bl2 = !this.isCompatible();
-            guiGraphics.drawString(this.minecraft.font, this.serverData.name, k + 32 + 3, j + 1, 0xFFFFFF, false);
-            List<FormattedCharSequence> list = this.minecraft.font.split(this.serverData.motd, l - 32 - 2);
-            for (int p = 0; p < Math.min(list.size(), 2); ++p) {
-                guiGraphics.drawString(this.minecraft.font, list.get(p), k + 32 + 3, j + 12 + this.minecraft.font.lineHeight * p, -8355712, false);
-            }
-            Component component = bl2 ? this.serverData.version.copy().withStyle(ChatFormatting.RED) : this.serverData.status;
-            int q = this.minecraft.font.width(component);
-            guiGraphics.drawString(this.minecraft.font, component, k + l - q - 15 - 2, j + 1, -8355712, false);
-            if (bl2) {
-                resourceLocation = INCOMPATIBLE_SPRITE;
-                component2 = INCOMPATIBLE_STATUS;
-                list2 = this.serverData.playerList;
-            } else if (this.pingCompleted()) {
-                resourceLocation = this.serverData.ping < 0L ? UNREACHABLE_SPRITE : (this.serverData.ping < 150L ? PING_5_SPRITE : (this.serverData.ping < 300L ? PING_4_SPRITE : (this.serverData.ping < 600L ? PING_3_SPRITE : (this.serverData.ping < 1000L ? PING_2_SPRITE : PING_1_SPRITE))));
-                if (this.serverData.ping < 0L) {
-                    component2 = NO_CONNECTION_STATUS;
-                    list2 = Collections.emptyList();
-                } else {
-                    component2 = Component.translatable("multiplayer.status.ping", this.serverData.ping);
-                    list2 = this.serverData.playerList;
-                }
-            } else {
-                int r = (int)(Util.getMillis() / 100L + (long)(i * 2) & 7L);
-                if (r > 4) {
-                    r = 8 - r;
-                }
-                resourceLocation = switch (r) {
-                    default -> PINGING_1_SPRITE;
-                    case 1 -> PINGING_2_SPRITE;
-                    case 2 -> PINGING_3_SPRITE;
-                    case 3 -> PINGING_4_SPRITE;
-                    case 4 -> PINGING_5_SPRITE;
-                };
-                component2 = PINGING_STATUS;
-                list2 = Collections.emptyList();
-            }
-            guiGraphics.blitSprite(resourceLocation, k + l - 15, j, 10, 8);
-            byte[] bs = this.serverData.getIconBytes();
-            if (!Arrays.equals(bs, this.lastIconBytes)) {
-                if (this.uploadServerIcon(bs)) {
-                    this.lastIconBytes = bs;
-                } else {
-                    this.serverData.setIconBytes(null);
-                    this.updateServerList();
-                }
-            }
-            this.drawIcon(guiGraphics, k, j, this.icon.textureLocation());
-            int s = n - k;
-            int t = o - j;
-            if (s >= l - 15 && s <= l - 5 && t >= 0 && t <= 8) {
-                guiGraphics.renderTooltip(minecraft.font,component2, n,o);
-            } else if (s >= l - q - 15 - 2 && s <= l - 15 - 2 && t >= 0 && t <= 8) {
-                guiGraphics.renderComponentTooltip(minecraft.font,list2, n,o);
-            }
-            if (this.minecraft.options.touchscreen().get().booleanValue() || bl) {
-                guiGraphics.fill(k + 5, j + 5, k + 25, j + 25, -1601138544);
-                int u = n - k;
-                int v = o - j;
-                if (this.canJoin()) {
-                    if (u < 32 && u > 16) {
-                        guiGraphics.blitSprite(JOIN_HIGHLIGHTED_SPRITE, k, j, 32, 32);
-                    } else {
-                        guiGraphics.blitSprite(JOIN_SPRITE, k, j, 32, 32);
-                    }
-                }
-                if (i > 0) {
-                    if (u < 16 && v < 16) {
-                        guiGraphics.blitSprite(MOVE_UP_HIGHLIGHTED_SPRITE, k, j, 32, 32);
-                    } else {
-                        guiGraphics.blitSprite(MOVE_UP_SPRITE, k, j, 32, 32);
-                    }
-                }
-                if (i < this.screen.getServers().size() - 1) {
-                    if (u < 16 && v > 16) {
-                        guiGraphics.blitSprite(MOVE_DOWN_HIGHLIGHTED_SPRITE, k, j, 32, 32);
-                    } else {
-                        guiGraphics.blitSprite(MOVE_DOWN_SPRITE, k, j, 32, 32);
-                    }
-                }
-            }
-        }
-
-        private boolean pingCompleted() {
-            return this.serverData.pinged && this.serverData.ping != -2L;
-        }
-
-        private boolean isCompatible() {
-            return this.serverData.protocol == SharedConstants.getCurrentVersion().getProtocolVersion();
-        }
-
-        public void updateServerList() {
-            this.screen.getServers().save();
-        }
-
-        protected void drawIcon(GuiGraphics guiGraphics, int i, int j, ResourceLocation resourceLocation) {
-            RenderSystem.enableBlend();
-            guiGraphics.blit(resourceLocation, i + 5, j + 5, 0.0f, 0.0f, 20, 20, 20, 20);
-            RenderSystem.disableBlend();
-        }
-
-        private boolean canJoin() {
-            return true;
-        }
-
-        private boolean uploadServerIcon(@Nullable byte[] bs) {
-            if (bs == null) {
-                this.icon.clear();
-            } else {
-                try {
-                    this.icon.upload(NativeImage.read(bs));
-                } catch (Throwable throwable) {
-                    LOGGER.error("Invalid icon for server {} ({})", this.serverData.name, this.serverData.ip, throwable);
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        @Override
-        public boolean keyPressed(int i, int j, int k) {
-            if (Screen.hasShiftDown()) {
-                ServerSelectionList serverSelectionList = this.screen.serverSelectionList;
-                int l = serverSelectionList.children().indexOf(this);
-                if (l == -1) {
-                    return true;
-                }
-                if (i == 264 && l < this.screen.getServers().size() - 1 || i == 265 && l > 0) {
-                    this.swap(l, i == 264 ? l + 1 : l - 1);
-                    return true;
-                }
-            }
-            if (i == InputConstants.KEY_E) {
-                minecraft.setScreen(new ServerOptionsScreen(screen,serverData));
-                return true;
-            }
-            return super.keyPressed(i, j, k);
-        }
-
-        private void swap(int i, int j) {
-            this.screen.getServers().swap(i, j);
-            this.screen.serverSelectionList.updateOnlineServers(this.screen.getServers());
-            Entry entry = this.screen.serverSelectionList.children().get(j);
-            this.screen.serverSelectionList.setSelected(entry);
-            ServerSelectionList.this.ensureVisible(entry);
-        }
-
-        @Override
-        public boolean mouseClicked(double d, double e, int i) {
-            if (!active.get()) return false;
-            double f = d - (double) ServerSelectionList.this.getRowLeft();
-            double g = e - (double) ServerSelectionList.this.getRowTop(ServerSelectionList.this.children().indexOf(this));
-            if (f <= 32.0) {
-                if (f < 32.0 && f > 16.0 && this.canJoin()) {
-                    this.screen.setSelected(this);
-                    this.screen.joinSelectedServer();
-                    return true;
-                }
-                int j = this.screen.serverSelectionList.children().indexOf(this);
-                if (f < 16.0 && g < 16.0 && j > 0) {
-                    this.swap(j, j - 1);
-                    return true;
-                }
-                if (f < 16.0 && g > 16.0 && j < this.screen.getServers().size() - 1) {
-                    this.swap(j, j + 1);
-                    return true;
-                }
-            }
-            this.screen.setSelected(this);
-            if (Util.getMillis() - this.lastClickTime < 250L) {
-                this.screen.joinSelectedServer();
-            }
-            this.lastClickTime = Util.getMillis();
-            return true;
-        }
-
-        public ServerData getServerData() {
-            return this.serverData;
-        }
-
-        @Override
-        public Component getNarration() {
-            MutableComponent mutableComponent = Component.empty();
-            mutableComponent.append(Component.translatable("narrator.select", this.serverData.name));
-            mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
-            if (!this.isCompatible()) {
-                mutableComponent.append(INCOMPATIBLE_STATUS);
-                mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
-                mutableComponent.append(Component.translatable("multiplayer.status.version.narration", this.serverData.version));
-                mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
-                mutableComponent.append(Component.translatable("multiplayer.status.motd.narration", this.serverData.motd));
-            } else if (this.serverData.ping < 0L) {
-                mutableComponent.append(NO_CONNECTION_STATUS);
-            } else if (!this.pingCompleted()) {
-                mutableComponent.append(PINGING_STATUS);
-            } else {
-                mutableComponent.append(ONLINE_STATUS);
-                mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
-                mutableComponent.append(Component.translatable("multiplayer.status.ping.narration", this.serverData.ping));
-                mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
-                mutableComponent.append(Component.translatable("multiplayer.status.motd.narration", this.serverData.motd));
-                if (this.serverData.players != null) {
-                    mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
-                    mutableComponent.append(Component.translatable("multiplayer.status.player_count.narration", this.serverData.players.online(), this.serverData.players.max()));
-                    mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
-                    mutableComponent.append(ComponentUtils.formatList(this.serverData.playerList, Component.literal(", ")));
-                }
-            }
-            return mutableComponent;
-        }
-
-        @Override
-        public void close() {
-            this.icon.close();
+        }else {
+            addRenderable(SimpleLayoutRenderable.create(270,30,(r)-> ((guiGraphics, i, j, f) -> {
+                int p = r.y + (r.height - minecraft.font.lineHeight) / 2;
+                guiGraphics.drawString(this.minecraft.font, SCANNING_LABEL, this.minecraft.screen.width / 2 - this.minecraft.font.width(SCANNING_LABEL) / 2, p, 0xFFFFFF, false);
+                String string = LoadingDotsText.get(Util.getMillis());
+                guiGraphics.drawString(this.minecraft.font, string, this.minecraft.screen.width / 2 - this.minecraft.font.width(string) / 2, p + this.minecraft.font.lineHeight, -8355712, false);
+            })));
         }
     }
-
-    @Environment(value=EnvType.CLIENT)
-    public static class NetworkServerEntry extends Entry {
-        private static final Component LAN_SERVER_HEADER = Component.translatable("lanServer.title");
-        private static final Component HIDDEN_ADDRESS_TEXT = Component.translatable("selectServer.hiddenAddress");
-        private final PlayGameScreen screen;
-        protected final Minecraft minecraft;
-        protected final LanServer serverData;
-        private long lastClickTime;
-
-        protected NetworkServerEntry(PlayGameScreen joinMultiplayerScreen, LanServer lanServer) {
-            this.screen = joinMultiplayerScreen;
-            this.serverData = lanServer;
-            this.minecraft = Minecraft.getInstance();
-        }
-
-        @Override
-        public void render(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, int n, int o, boolean bl, float f) {
-            guiGraphics.drawString(this.minecraft.font, LAN_SERVER_HEADER, k + 32 + 3, j + 1, 0xFFFFFF, false);
-            guiGraphics.drawString(this.minecraft.font, this.serverData.getMotd(), k + 32 + 3, j + 12, -8355712, false);
-            if (this.minecraft.options.hideServerAddress) {
-                guiGraphics.drawString(this.minecraft.font, HIDDEN_ADDRESS_TEXT, k + 32 + 3, j + 12 + 11, 0x303030, false);
-            } else {
-                guiGraphics.drawString(this.minecraft.font, this.serverData.getAddress(), k + 32 + 3, j + 12 + 11, 0x303030, false);
-            }
-        }
-
-        @Override
-        public boolean mouseClicked(double d, double e, int i) {
-            this.screen.setSelected(this);
-            if (Util.getMillis() - this.lastClickTime < 250L) {
-                this.screen.joinSelectedServer();
-            }
-            this.lastClickTime = Util.getMillis();
-            return false;
-        }
-
-        public LanServer getServerData() {
-            return this.serverData;
-        }
-
-        @Override
-        public Component getNarration() {
-            return Component.translatable("narrator.select", this.getServerNarration());
-        }
-
-        public Component getServerNarration() {
-            return Component.empty().append(LAN_SERVER_HEADER).append(CommonComponents.SPACE).append(this.serverData.getMotd());
+    public void joinSelectedServer() {
+        int i;
+        if (screen.getFocused() instanceof Renderable r && (i = renderables.indexOf(r)) > 0){
+            if (servers.size() > i){
+                join(servers.get(i));
+            }else if (lanServers != null)
+                joinLanServer(lanServers.get(i - servers.size()));
         }
     }
+    private void joinLanServer(LanServer lanServer) {
+        join(new ServerData(lanServer.getMotd(),lanServer.getAddress(),ServerData.Type.LAN));
+    }
+    private void join(ServerData serverData) {
+        ConnectScreen.startConnecting(screen, this.minecraft, ServerAddress.parseString(serverData.ip), serverData, false);
+    }
+
 }

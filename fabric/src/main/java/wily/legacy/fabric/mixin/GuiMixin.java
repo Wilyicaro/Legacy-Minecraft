@@ -33,23 +33,6 @@ public abstract class GuiMixin {
     @Shadow protected int toolHighlightTimer;
 
     @Shadow protected ItemStack lastToolHighlight;
-    @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
-    public void renderCrosshair(GuiGraphics guiGraphics, CallbackInfo ci) {
-        if (minecraft.screen != null){
-            ci.cancel();
-            return;
-        }
-        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0F,((LegacyOptions)minecraft.options).hudDistance().value *-22.5F,0.0F);
-    }
-    @Inject(method = "renderCrosshair", at = @At("RETURN"))
-    public void renderCrosshairReturn(GuiGraphics guiGraphics, CallbackInfo ci) {
-        if (minecraft.screen != null)
-            return;
-        guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
-        guiGraphics.pose().popPose();
-    }
     @Inject(method = "renderVehicleHealth", at = @At("HEAD"), cancellable = true)
     public void renderVehicleHealth(GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null){

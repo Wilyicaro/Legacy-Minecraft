@@ -6,9 +6,9 @@ import dev.architectury.platform.Platform;
 import dev.architectury.registry.registries.RegistrarManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Mob;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.network.CommonPacket;
 
 import java.io.File;
@@ -26,13 +26,13 @@ public class LegacyMinecraft
 
     public static final String MOD_ID = "legacy";
     public static final Supplier<String> VERSION =  Platform.getMod(MOD_ID)::getVersion;
-    public static final String MC_VERSION = "1.20.2";
+    public static final String MC_VERSION = "1.20.4";
     public static final NetworkChannel NETWORK = NetworkChannel.create(new ResourceLocation(MOD_ID, "main"));
     public static final Supplier<RegistrarManager> REGISTRIES = Suppliers.memoize(() -> RegistrarManager.get(MOD_ID));
 
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     public static void init(){
-
+        LegacySoundEvents.register();
     }
     public static <T extends CommonPacket> void  registerCommonPacket(Class<T> packet, Function<FriendlyByteBuf,T> decode){
         NETWORK.register(packet,CommonPacket::encode,decode,CommonPacket::apply);

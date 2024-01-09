@@ -6,8 +6,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyIconHolder;
@@ -16,6 +22,7 @@ public class ScreenUtil {
     private static final Minecraft mc = Minecraft.getInstance();
     protected static LogoRenderer logoRenderer = new LogoRenderer(false);
     public static LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
+    public static final ResourceLocation LOADING_BLOCK_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/loading_block");
     public static final ResourceLocation POINTER_PANEL_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"tiles/pointer_panel");
     public static final ResourceLocation PANEL_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"tiles/panel");
     public static final ResourceLocation PANEL_RECESS_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"tiles/panel_recess");
@@ -117,6 +124,31 @@ public class ScreenUtil {
     }
     public static float getHUDOpacity(){
         return (float) Math.max(Math.min(255f,mc.gui.toolHighlightTimer * 38.4f)/ 255f, ((LegacyOptions)mc.options).hudOpacity().get());
+    }
+    public static void playSimpleUISound(SoundEvent sound, float grave){
+        mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave));
+    }
+    public static Component getDescription(Item item){
+        return Component.translatable(item.getDescriptionId() + ".description");
+    }
+    public static Component getDescription(ResourceLocation location){
+        return Component.translatable(location.toLanguageKey("description"));
+    }
+
+    public static void drawGenericLoading(GuiGraphics graphics,int x, int y) {
+        RenderSystem.enableBlend();
+        for (int i = 0; i < 8; i++) {
+            int v = (i + 1) * 100;
+            int n = (i + 3) * 100;
+            float l = (Util.getMillis() / 4f) % 1000;
+            float alpha = l >= v - 100  ? (l <= v ? l / v: (n - l) / 200f) : 0;
+            if (alpha > 0) {
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
+                graphics.blitSprite(LOADING_BLOCK_SPRITE, x+ (i <= 2 ? i : i >= 4 ? i == 7 ? 0 : 6 - i : 2) * 27, y + (i <= 2 ? 0 : i == 3 || i == 7 ? 1 : 2)* 27, 21, 21);
+            }
+        }
+        RenderSystem.disableBlend();
+        RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
     }
 
 }
