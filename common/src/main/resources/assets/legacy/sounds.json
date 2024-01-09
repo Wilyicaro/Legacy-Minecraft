@@ -1,2 +1,16 @@
 {
+  "random.focus": {
+    "sounds": [
+      {
+        "name": "legacy:focus"
+      }
+    ]
+  },
+  "random.back": {
+    "sounds": [
+      {
+        "name": "legacy:back"
+      }
+    ]
+  }
 }

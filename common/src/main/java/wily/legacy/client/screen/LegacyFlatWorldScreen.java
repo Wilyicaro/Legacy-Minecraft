@@ -28,7 +28,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 @Environment(value=EnvType.CLIENT)
-public class LegacyFlatWorldScreen extends PanelBackgroundScreen {
+public class LegacyFlatWorldScreen extends PanelVListScreen {
     public static int DEFAULT_MAX_WORLD_HEIGHT = 384;
     private final Consumer<FlatLevelGeneratorSettings> applySettings;
     protected final WorldCreationUiState uiState;
@@ -41,9 +41,8 @@ public class LegacyFlatWorldScreen extends PanelBackgroundScreen {
     protected final List<Holder<StructureSet>> structuresOverrides;
 
     public LegacyFlatWorldScreen(Screen screen, WorldCreationUiState uiState, HolderLookup.RegistryLookup<Biome> biomeGetter, HolderLookup.RegistryLookup<StructureSet> structureGetter, Consumer<FlatLevelGeneratorSettings> consumer, FlatLevelGeneratorSettings flatLevelGeneratorSettings) {
-        super(282,248,Component.translatable("createWorld.customize.flat.title"));
+        super(screen,282,248,Component.translatable("createWorld.customize.flat.title"));
         this.uiState = uiState;
-        parent = screen;
         this.applySettings = consumer;
         this.generator = flatLevelGeneratorSettings;
         structuresOverrides = new ArrayList<>(generator.structureOverrides().orElse(HolderSet.direct()).stream().toList());
@@ -93,7 +92,7 @@ public class LegacyFlatWorldScreen extends PanelBackgroundScreen {
         addLayer(flatLayerInfo,index,true);
     }
     public void addLayer(FlatLayerInfo flatLayerInfo, int index,boolean update){
-        displayLayers.vRenderables.add(index,new AbstractButton(0,0,260,30,flatLayerInfo.getBlockState().getBlock().getName()) {
+        displayLayers.renderables.add(index,new AbstractButton(0,0,260,30,flatLayerInfo.getBlockState().getBlock().getName()) {
             @Override
             protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                 super.renderWidget(guiGraphics, i, j, f);
@@ -113,7 +112,7 @@ public class LegacyFlatWorldScreen extends PanelBackgroundScreen {
             @Override
             public void onPress() {
                 int allHeight = getAllLayersHeight();
-                int layerIndex = displayLayers.vRenderables.indexOf(this);
+                int layerIndex = displayLayers.renderables.indexOf(this);
                 minecraft.setScreen(new ConfirmationScreen(LegacyFlatWorldScreen.this,Component.translatable("legacy.menu.create_flat_world.layer_options"), Component.translatable("legacy.menu.create_flat_world.layer_message"),b->{}){
                     @Override
                     protected void initButtons() {
@@ -141,7 +140,7 @@ public class LegacyFlatWorldScreen extends PanelBackgroundScreen {
             }
         });
         if (update)
-            generator.getLayersInfo().add(displayLayers.vRenderables.size() - 1 - index,flatLayerInfo);
+            generator.getLayersInfo().add(displayLayers.renderables.size() - 1 - index,flatLayerInfo);
     }
     public int getAllLayersHeight(){
         int height = 0;
@@ -151,7 +150,7 @@ public class LegacyFlatWorldScreen extends PanelBackgroundScreen {
         return height;
     }
     public void removeLayer(int index){
-        displayLayers.vRenderables.remove(index);
+        displayLayers.renderables.remove(index);
         generator.getLayersInfo().remove(generator.getLayersInfo().size() - 1 - index);
     }
 
@@ -161,7 +160,7 @@ public class LegacyFlatWorldScreen extends PanelBackgroundScreen {
 
     public void setPreset(FlatLevelGeneratorSettings flatLevelGeneratorSettings) {
         generator = flatLevelGeneratorSettings;
-        displayLayers.vRenderables.clear();
+        displayLayers.renderables.clear();
         generator.getLayersInfo().forEach(this::addLayer);
     }
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
@@ -171,13 +170,14 @@ public class LegacyFlatWorldScreen extends PanelBackgroundScreen {
     protected void init() {
         addRenderableWidget(tabList);
         panel.height = Math.min(height - 48,248);
-        super.init();
+        addRenderableOnly(panel);
+        panel.init();
         addRenderableOnly(((guiGraphics, i, j, f) -> ScreenUtil.renderPanelRecess(guiGraphics, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14, 2)));
         getRenderableVList().init(this,panel.x + 11,panel.y + 11,260, panel.height - 5);
         tabList.init(panel.x,panel.y - 24, panel.width);
         this.generator.updateLayers();
     }
-    protected RenderableVList getRenderableVList(){
+    public RenderableVList getRenderableVList(){
         if (tabList.selectedTab == 2) return displayProperties;
         if (tabList.selectedTab == 1) return displayBiomes;
         return displayLayers;
@@ -191,14 +191,14 @@ public class LegacyFlatWorldScreen extends PanelBackgroundScreen {
     @Override
     public boolean keyPressed(int i, int j, int k) {
         tabList.controlTab(i,j,k);
-        if (i == InputConstants.KEY_E)
+        if (i == InputConstants.KEY_E && tabList.selectedTab == 0)
             minecraft.setScreen(new LegacyFlatPresetsScreen(this,uiState.getSettings().worldgenLoadContext().lookupOrThrow(Registries.FLAT_LEVEL_GENERATOR_PRESET),uiState.getSettings().dataConfiguration().enabledFeatures(), f-> setPreset(f.value().settings())));
         return super.keyPressed(i, j, k);
     }
 
     @Override
     public void onClose() {
-        this.minecraft.setScreen(this.parent);
+        super.onClose();
         this.generator.updateLayers();
         applySettings.accept(generator);
         generator.structureOverrides = Optional.of(HolderSet.direct(structuresOverrides));

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dev.architectury.event.CompoundEventResult;
 import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
+import dev.architectury.registry.ReloadListenerRegistry;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.client.KeyMapping;
@@ -15,6 +16,9 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.world.level.Level;
+import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.*;
 import wily.legacy.client.LegacyOptions;
 
@@ -27,6 +31,8 @@ import static wily.legacy.LegacyMinecraft.MOD_ID;
 
 
 public class LegacyMinecraftClient {
+    public static final ResourceLocation LOADING_BACKGROUND_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/loading_background");
+    public static final ResourceLocation LOADING_BAR_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/loading_bar");
     public static final ResourceLocation SADDLE_SLOT_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/saddle_slot");
     public static final ResourceLocation LLAMA_ARMOR_SLOT_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/llama_armor_slot");
     public static final ResourceLocation ARMOR_SLOT_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/armor_slot");
@@ -57,7 +63,10 @@ public class LegacyMinecraftClient {
     public static LegacyLoadingScreen legacyLoadingScreen = new LegacyLoadingScreen();
     public static RenderType itemRenderTypeOverride = null;
     public static RenderType blockItemRenderTypeOverride = null;
+
+    public static final LegacyTipManager legacyTipManager = new LegacyTipManager();
     public static void init() {
+        ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES,legacyTipManager);
         KeyMappingRegistry.register(legacyKeyInventory);
     }
     public static void enqueueInit() {
@@ -65,8 +74,6 @@ public class LegacyMinecraftClient {
             Minecraft minecraft = Minecraft.getInstance();
             if (screen instanceof TitleScreen t)
                 return CompoundEventResult.interruptTrue(new MainMenuScreen(false));
-            if (screen instanceof PauseScreen p)
-                return CompoundEventResult.interruptTrue(new LegacyPauseScreen(p.showsPauseMenu()));
             if (screen instanceof DeathScreen d)
                 return CompoundEventResult.interruptTrue(new LegacyDeathScreen(d.causeOfDeath,d.hardcore));
             if (((LegacyOptions)minecraft.options).legacyCreativeTab().get() && screen instanceof CreativeModeInventoryScreen c) {
@@ -74,31 +81,6 @@ public class LegacyMinecraftClient {
                 return CompoundEventResult.interruptTrue(new CreativeModeScreen(Minecraft.getInstance().player));
             }
             return CompoundEventResult.interruptDefault(screen);
-        });
-        ClientGuiEvent.RENDER_POST.register((screen,graphics,i,j,f) -> {
-            if (screen instanceof LevelLoadingScreen || screen instanceof  ProgressScreen || screen instanceof GenericDirtMessageScreen || screen instanceof ReceivingLevelScreen) {
-                Minecraft minecraft = Minecraft.getInstance();
-                Component lastLoadingHeader = null;
-                Component lastLoadingStage = null;
-                int progress = 0;
-                if (screen instanceof LevelLoadingScreen loading) {
-                    lastLoadingHeader = Component.translatable("connect.connecting");
-                    lastLoadingStage = Component.translatable("legacy.loading_spawn_area");
-                    progress = loading.progressListener.getProgress();
-                }
-                if (screen instanceof GenericDirtMessageScreen p)
-                    lastLoadingHeader = p.getTitle();
-                if (screen instanceof ProgressScreen p) {
-                    lastLoadingHeader = p.header;
-                    lastLoadingStage = p.stage;
-                    progress = lastLoadingHeader == Component.translatable("connect.joining") ?  100 : p.progress;
-                }
-                legacyLoadingScreen.prepareRender(minecraft,screen.width, screen.height,lastLoadingHeader,lastLoadingStage,progress);
-                graphics.pose().pushPose();
-                graphics.pose().translate(0,0,400f);
-                legacyLoadingScreen.render(graphics,i,j,f);
-                graphics.pose().popPose();
-            }
         });
         ClientTickEvent.CLIENT_POST.register(minecraft -> {
             while (legacyKeyInventory.consumeClick()) {

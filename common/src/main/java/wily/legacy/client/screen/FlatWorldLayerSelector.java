@@ -68,18 +68,19 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen {
         return new FlatLayerInfo(selectedLayer.count, selectedLayer.getItem() instanceof BlockItem b ? b.getBlock() : selectedLayer.getItem() instanceof BucketItem bucket ? bucket.arch$getFluid().defaultFluidState().createLegacyBlock().getBlock(): Blocks.AIR);
     }
 
-
-    public void removed() {
-
-    }
-    public void tick() {
-    }
-
     @Override
     public void onClose() {
         minecraft.setScreen(parent);
     }
-
+    public void updateCreativeGridScroll(double d, double e, int i){
+        float x = panel.x + 299.5f;
+        float y = panel.y + 23.5f;
+        if (i == 0 && d >= x && d < x + 11 && e >= y && e < y + 133){
+            int lastScroll = scrolledList.get();
+            scrolledList.set((int) Math.round(scrolledList.max * (e - y) / 133));
+            if (lastScroll != scrolledList.get()) fillLayerGrid();
+        }
+    }
     @Override
     protected void init() {
         panel.init();
@@ -111,12 +112,19 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen {
 
     @Override
     public boolean mouseClicked(double d, double e, int i) {
+        updateCreativeGridScroll(d,e,i);
         if (hoveredSlot != null) {
             int layerCount = selectedLayer.count;
             selectedLayer = hoveredSlot.getItem().copy();
             selectedLayer.setCount(layerCount);
         }
         return super.mouseClicked(d, e, i);
+    }
+
+    @Override
+    public boolean mouseDragged(double d, double e, int i, double f, double g) {
+        updateCreativeGridScroll(d,e,i);
+        return super.mouseDragged(d, e, i, f, g);
     }
 
     public void setHoveredSlot(LegacySlotWrapper hoveredSlot) {

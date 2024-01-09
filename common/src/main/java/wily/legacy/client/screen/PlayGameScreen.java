@@ -1,137 +1,96 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.FileUtil;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.navigation.CommonInputs;
-import net.minecraft.client.gui.screens.*;
-import net.minecraft.client.gui.screens.LevelLoadingScreen;
-import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.multiplayer.ServerStatusPinger;
-import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.client.server.LanServer;
-import net.minecraft.client.server.LanServerDetection;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Difficulty;
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.LevelSettings;
-import net.minecraft.world.level.WorldDataConfiguration;
-import net.minecraft.world.level.levelgen.WorldOptions;
-import net.minecraft.world.level.levelgen.presets.WorldPresets;
+import net.minecraft.world.level.storage.LevelSummary;
 import org.apache.commons.compress.utils.FileNameUtils;
-import org.jetbrains.annotations.Nullable;
-import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PlayGameScreen extends PanelBackgroundScreen{
+public class PlayGameScreen extends PanelVListScreen{
     protected PlayGameScreen(Screen parent) {
-        super(300,256,Component.translatable("legacy.menu.play_game"));
-        this.parent = parent;
-
+        super(parent,300,256,Component.translatable("legacy.menu.play_game"));
     }
-    public static final WorldOptions TEST_OPTIONS = new WorldOptions("test1".hashCode(), true, false);
-    private LanServerDetection.LanServerList lanServerList;
+    protected final TabList tabList = new TabList().addTabButton(30,0,Component.translatable("legacy.menu.load"),b-> repositionElements()).addTabButton(30,1,Component.translatable("legacy.menu.create"), b-> repositionElements()).addTabButton(30,2,Component.translatable("legacy.menu.join"), b-> repositionElements());
+    public boolean isLoading = false;
     private final ServerStatusPinger pinger = new ServerStatusPinger();
-    protected ServerSelectionList serverSelectionList;
-    private ServerList servers;
-    @Nullable
-    private LanServerDetection.LanServerDetector lanServerDetector;
-    public SaveSelectionList saveSelectionList;
-    private CreationList creationList;
-    protected final TabList tabList = new TabList().addTabButton(30,0,Component.translatable("legacy.menu.load"),b->{}).addTabButton(30,1,Component.translatable("legacy.menu.create"),b->{}).addTabButton(30,2,Component.translatable("legacy.menu.join"),b->{});
-    public boolean init = false;
+    protected final ServerSelectionList serverSelectionList = new ServerSelectionList();
+    public final SaveSelectionList saveSelectionList = new SaveSelectionList(this);
+    private final CreationList creationList = new CreationList();
+
 
     @Override
     protected void init() {
         panel.height = Math.min(256,height-52);
         addRenderableWidget(tabList);
-        super.init();
-        addRenderableOnly(((guiGraphics, i, j, f) -> ScreenUtil.renderPanelRecess(guiGraphics, panel.x + 9, panel.y + 9, panel.width - 18, panel.height - 18, 2)));
-        if (!init) {
-            init = true;
-            this.servers = new ServerList(this.minecraft);
-            this.servers.load();
-            this.lanServerList = new LanServerDetection.LanServerList();
-            this.serverSelectionList = new ServerSelectionList(this, this.minecraft, this.width, this.height, panel.y + 12, panel.y + panel.height - 12, 30);
-            this.serverSelectionList.updateOnlineServers(this.servers);
-            this.creationList = new CreationList(this, this.minecraft, this.width, this.height, panel.y + 12, panel.y + panel.height - 12, 30);
-        }
-        try {
-            this.lanServerDetector = new LanServerDetection.LanServerDetector(this.lanServerList);
-            this.lanServerDetector.start();
-        } catch (Exception exception) {
-            LegacyMinecraft.LOGGER.warn("Unable to start LAN server detection: {}", exception.getMessage());
-        }
-        this.addRenderableWidget(this.serverSelectionList).updateSize(this.width, this.height, panel.y + 12, panel.y + panel.height - 12);
-        this.addRenderableWidget(this.saveSelectionList = new SaveSelectionList(this, this.minecraft, this.width, this.height, panel.y + 12, panel.y + panel.height - 12, 30, "", this.saveSelectionList));
-        this.addRenderableWidget(this.creationList).updateSize(this.width, this.height, panel.y + 12, panel.y + panel.height - 12);
+        panel.init();
+        addRenderableOnly(panel);
+        addRenderableOnly(((guiGraphics, i, j, f) -> {
+            ScreenUtil.renderPanelRecess(guiGraphics, panel.x + 9, panel.y + 9, panel.width - 18, panel.height - 18, 2);
+            if (isLoading)
+                ScreenUtil.drawGenericLoading(guiGraphics, panel.x + 112 , panel.y + 66);
+        }));
+        getRenderableVList().init(this,panel.x + 15,panel.y + 15,270, panel.height - 10);
         tabList.init(panel.x,panel.y - 24,panel.width);
     }
 
-    @Override
-    public boolean mouseScrolled(double d, double e, double f, double g) {
-        children().forEach(c->{
-            if (c.isMouseOver(d,e))c.mouseScrolled(d,e,f,g);
-        });
-        return false;
-    }
-
-
 
     @Override
-    public boolean charTyped(char c, int i) {
-        return super.charTyped(c, i);
+    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+        ScreenUtil.renderDefaultBackground(guiGraphics,false);
     }
 
-
-
+    @Override
+    public RenderableVList getRenderableVList() {
+        if (tabList.selectedTab == 2) return serverSelectionList;
+        else if (tabList.selectedTab == 1) return creationList;
+        return saveSelectionList;
+    }
 
     @Override
     public void removed() {
         if (this.saveSelectionList != null) {
-            this.saveSelectionList.children().forEach(SaveSelectionList.Entry::close);
+            this.saveSelectionList.iconCache.asMap().forEach((s,i)-> i.close());
+            saveSelectionList.iconCache.invalidateAll();
         }
-        if (this.lanServerDetector != null) {
-            this.lanServerDetector.interrupt();
-            this.lanServerDetector = null;
+        if (serverSelectionList.lanServerDetector != null) {
+            serverSelectionList.lanServerDetector.interrupt();
+            serverSelectionList.lanServerDetector = null;
         }
         this.pinger.removeAll();
-        this.serverSelectionList.removed();
     }
     @Override
     public void tick() {
         super.tick();
-        List<LanServer> list = this.lanServerList.takeDirtyServers();
+        List<LevelSummary> summaries = saveSelectionList.pollLevelsIgnoreErrors();
+        if (summaries != saveSelectionList.currentlyDisplayedLevels) {
+            saveSelectionList.fillLevels("",summaries);
+            repositionElements();
+        }
+        List<LanServer> list = serverSelectionList.lanServerList.takeDirtyServers();
         if (list != null) {
-            this.serverSelectionList.updateNetworkServers(list);
+            if (serverSelectionList.lanServers == null || !new HashSet<>(serverSelectionList.lanServers).containsAll(list)) {
+                serverSelectionList.lanServers = list;
+                serverSelectionList.updateServers();
+                rebuildWidgets();
+            }
         }
         this.pinger.tick();
     }
-    
 
-    private void refreshServerList() {
-        rebuildWidgets();
-    }
 
-    private void deleteCallback(boolean bl) {
-        ServerSelectionList.Entry entry = this.serverSelectionList.getSelected();
-        if (bl && entry instanceof ServerSelectionList.OnlineServerEntry) {
-            this.servers.remove(((ServerSelectionList.OnlineServerEntry)entry).getServerData());
-            this.servers.save();
-            this.serverSelectionList.setSelected(null);
-            this.serverSelectionList.updateOnlineServers(this.servers);
-        }
-        this.minecraft.setScreen(this);
-    }
+
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
@@ -140,34 +99,15 @@ public class PlayGameScreen extends PanelBackgroundScreen{
             return true;
         }
         if (i == 294) {
-            this.refreshServerList();
+            if (tabList.selectedTab == 0) {
+                saveSelectionList.reloadSaveList();
+            } else if (tabList.selectedTab == 2) {
+                serverSelectionList.updateServers();
+            }
+            this.rebuildWidgets();
             return true;
         }
-        if (this.serverSelectionList.getSelected() != null) {
-            if (CommonInputs.selected(i)) {
-                this.joinSelectedServer();
-                return true;
-            }
-            return this.serverSelectionList.keyPressed(i, j, k);
-        }
         return false;
-    }
-    public void joinSelectedServer() {
-        ServerSelectionList.Entry entry = this.serverSelectionList.getSelected();
-        if (entry instanceof ServerSelectionList.OnlineServerEntry) {
-            this.join(((ServerSelectionList.OnlineServerEntry)entry).getServerData());
-        } else if (entry instanceof ServerSelectionList.NetworkServerEntry) {
-            LanServer lanServer = ((ServerSelectionList.NetworkServerEntry)entry).getServerData();
-            this.join(new ServerData(lanServer.getMotd(), lanServer.getAddress(), ServerData.Type.LAN));
-        }
-    }
-
-    private void join(ServerData serverData) {
-        ConnectScreen.startConnecting(this, this.minecraft, ServerAddress.parseString(serverData.ip), serverData, false);
-    }
-
-    public void setSelected(ServerSelectionList.Entry entry) {
-        this.serverSelectionList.setSelected(entry);
     }
 
     public ServerStatusPinger getPinger() {
@@ -175,7 +115,7 @@ public class PlayGameScreen extends PanelBackgroundScreen{
     }
 
     public ServerList getServers() {
-        return servers;
+        return serverSelectionList.servers;
     }
     public void onFilesDrop(List<Path> list) {
         if (tabList.selectedTab == 0) {
@@ -193,23 +133,8 @@ public class PlayGameScreen extends PanelBackgroundScreen{
 
                 });
                 minecraft.setScreen(this);
-                saveSelectionList.reloadWorldList();
+                saveSelectionList.reloadSaveList();
             }));
-        }
-    }
-    private /* synthetic */ void method_35739(Button button) {
-        try {
-            SaveSelectionList.WorldListEntry worldListEntry;
-            SaveSelectionList.Entry entry;
-            String string = "DEBUG world";
-            if (!this.saveSelectionList.children().isEmpty() && (entry = this.saveSelectionList.children().get(0)) instanceof SaveSelectionList.WorldListEntry && (worldListEntry = (SaveSelectionList.WorldListEntry)entry).getLevelName().equals("DEBUG world")) {
-                worldListEntry.doDeleteWorld();
-            }
-            LevelSettings levelSettings = new LevelSettings("DEBUG world", GameType.SPECTATOR, false, Difficulty.NORMAL, true, new GameRules(), WorldDataConfiguration.DEFAULT);
-            String string2 = FileUtil.findAvailableName(this.minecraft.getLevelSource().getBaseDir(), "DEBUG world", "");
-            this.minecraft.createWorldOpenFlows().createFreshLevel(string2, levelSettings, TEST_OPTIONS, WorldPresets::createNormalWorldDimensions);
-        } catch (IOException iOException) {
-            LegacyMinecraft.LOGGER.error("Failed to recreate the debug world", iOException);
         }
     }
 }

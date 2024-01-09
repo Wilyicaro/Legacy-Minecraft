@@ -40,7 +40,7 @@ public class ConfirmationScreen extends PanelBackgroundScreen{
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         guiGraphics.pose().translate(0,0,-800);
-        parent.render(guiGraphics,i,j,f);
+        parent.render(guiGraphics,0,0,f);
         guiGraphics.pose().translate(0,0,800);
         renderTransparentBackground(guiGraphics);
     }

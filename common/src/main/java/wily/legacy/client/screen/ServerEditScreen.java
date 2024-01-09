@@ -29,8 +29,7 @@ public class ServerEditScreen extends ConfirmationScreen{
                 }
             }
             parent.getServers().save();
-            parent.serverSelectionList.setSelected(null);
-            parent.serverSelectionList.updateOnlineServers(parent.getServers());
+            parent.serverSelectionList.updateServers();
             minecraft.setScreen(parent);
         };
     }

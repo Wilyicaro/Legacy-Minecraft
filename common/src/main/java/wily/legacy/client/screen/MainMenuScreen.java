@@ -27,6 +27,7 @@ import net.minecraft.world.level.storage.LevelSummary;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -52,7 +53,7 @@ public class MainMenuScreen extends RenderableVListScreen {
         this.fading = bl;
         minecraft = Minecraft.getInstance();
         secondButtonActive = minecraft.isDemo() ? createDemoMenuOptions() : this.createNormalMenuOptions();
-        renderableVList.addRenderable(openScreenButton(Component.translatable("options.language"), () -> new LanguageSelectScreen(this, this.minecraft.options, this.minecraft.getLanguageManager())).build());
+        renderableVList.addRenderable(openScreenButton(Component.translatable("options.language"), () -> new LegacyLanguageScreen(this, this.minecraft.getLanguageManager())).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("menu.options"), () -> new HelpOptionsScreen(this)).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> this.minecraft.stop()).build());
     }
@@ -131,7 +132,7 @@ public class MainMenuScreen extends RenderableVListScreen {
         boolean bl = this.checkDemoWorldPresence();
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.playdemo"), (button) -> {
             if (bl) {
-                this.minecraft.createWorldOpenFlows().loadLevel(this, "Demo_World");
+                this.minecraft.createWorldOpenFlows().loadLevel(this,"Demo_World");
             } else {
                 this.minecraft.createWorldOpenFlows().createFreshLevel("Demo_World", MinecraftServer.DEMO_SETTINGS, WorldOptions.DEMO_OPTIONS, WorldPresets::createNormalWorldDimensions);
             }
@@ -211,7 +212,6 @@ public class MainMenuScreen extends RenderableVListScreen {
         if (this.fadeInStart == 0L && this.fading) {
             this.fadeInStart = Util.getMillis();
         }
-
         float g = this.fading ? (float)(Util.getMillis() - this.fadeInStart) / 1000.0F : 1.0F;
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         renderDefaultBackground(guiGraphics,i,j,f);

@@ -22,6 +22,13 @@ public class RenderableVListScreen extends DefaultScreen{
     public Button.Builder openScreenButton(Component component, Supplier<Screen> supplier) {
         return Button.builder(component, button -> this.minecraft.setScreen(supplier.get()));
     }
+
+    @Override
+    public boolean keyPressed(int i, int j, int k) {
+        if (renderableVList.keyPressed(i,j,k)) return true;
+        return super.keyPressed(i, j, k);
+    }
+
     @Override
     protected void init() {
         renderableVList.init(this,width / 2 - 112,this.height / 3 + 10,225,0);

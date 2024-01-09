@@ -75,7 +75,8 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
     }
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        tabList.controlTab(i,j,k);
+        if (!(renderableVList.renderables.get(0) instanceof EditBox b) || !b.isFocused())
+            tabList.controlTab(i,j,k);
         return super.keyPressed(i, j, k);
     }
 
