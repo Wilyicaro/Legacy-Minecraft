@@ -31,6 +31,10 @@ import static wily.legacy.LegacyMinecraft.MOD_ID;
 
 
 public class LegacyMinecraftClient {
+    public static final ResourceLocation SCROLL_DOWN = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/scroll_down");
+    public static final ResourceLocation SCROLL_UP = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/scroll_up");
+    public static final ResourceLocation SCROLL_RIGHT = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/scroll_right");
+    public static final ResourceLocation SCROLL_LEFT = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/scroll_left");
     public static final ResourceLocation LOADING_BACKGROUND_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/loading_background");
     public static final ResourceLocation LOADING_BAR_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/loading_bar");
     public static final ResourceLocation SADDLE_SLOT_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/saddle_slot");

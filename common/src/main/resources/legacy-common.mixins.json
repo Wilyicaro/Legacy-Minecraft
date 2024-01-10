@@ -15,6 +15,7 @@
     "CycleableValueSet",
     "CyclingSlotBackgroundMixin",
     "EnchantmentScreenMixin",
+    "GameRendererMixin",
     "GLStateManagerMixin",
     "GlyphInfoMixin",
     "GrindstoneScreenMixin",

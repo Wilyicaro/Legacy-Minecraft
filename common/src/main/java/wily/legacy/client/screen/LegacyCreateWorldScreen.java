@@ -15,13 +15,18 @@ import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
-import net.minecraft.client.gui.screens.worldselection.*;
+import net.minecraft.client.gui.screens.worldselection.ConfirmExperimentalFeaturesScreen;
+import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
+import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.client.server.LanServerPinger;
@@ -37,7 +42,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.WorldLoader;
 import net.minecraft.server.commands.PublishCommand;
-import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.ServerPacksSource;
 import net.minecraft.util.HttpUtil;
@@ -53,24 +57,18 @@ import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.PrimaryLevelData;
-import net.minecraft.world.level.validation.DirectoryValidator;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import wily.legacy.LegacyMinecraft;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.net.InetAddress;
-import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Environment(value=EnvType.CLIENT)
@@ -83,7 +81,7 @@ public class LegacyCreateWorldScreen extends PanelBackgroundScreen{
     private boolean recreated;
     protected boolean onlineOnStart = false;
     private int port = HttpUtil.getAvailablePort();
-    protected ResourcePackSelector resourcePackSelector = new ResourcePackSelector(panel.x + 13, panel.y + 115, 220,36);
+    protected PackSelector resourcePackSelector = PackSelector.resources(panel.x + 13, panel.y + 106, 220,45);
 
     protected final boolean onlyLoad;
     private Path tempDataPackDir;
@@ -95,7 +93,7 @@ public class LegacyCreateWorldScreen extends PanelBackgroundScreen{
         PackRepository packRepository = new PackRepository(new ServerPacksSource(minecraft.directoryValidator()));
         WorldLoader.InitConfig initConfig = LegacyCreateWorldScreen.createDefaultLoadConfig(packRepository, WorldDataConfiguration.DEFAULT);
 
-        CompletableFuture<WorldCreationContext> completableFuture = WorldLoader.load(initConfig, dataLoadContext -> new WorldLoader.DataLoadOutput<>(new LegacyCreateWorldScreen.DataPackReloadCookie(new WorldGenSettings(WorldOptions.defaultWithRandomSeed(), WorldPresets.createNormalWorldDimensions(dataLoadContext.datapackWorldgen())), dataLoadContext.dataConfiguration()), dataLoadContext.datapackDimensions()), (closeableResourceManager, reloadableServerResources, layeredRegistryAccess, dataPackReloadCookie) -> {
+        CompletableFuture<WorldCreationContext> completableFuture = WorldLoader.load(initConfig, dataLoadContext -> new WorldLoader.DataLoadOutput<>(new DataPackReloadCookie(new WorldGenSettings(WorldOptions.defaultWithRandomSeed(), WorldPresets.createNormalWorldDimensions(dataLoadContext.datapackWorldgen())), dataLoadContext.dataConfiguration()), dataLoadContext.datapackDimensions()), (closeableResourceManager, reloadableServerResources, layeredRegistryAccess, dataPackReloadCookie) -> {
             closeableResourceManager.close();
             return new WorldCreationContext(dataPackReloadCookie.worldGenSettings(), layeredRegistryAccess, reloadableServerResources, dataPackReloadCookie.dataConfiguration());
         }, Util.backgroundExecutor(), minecraft);
@@ -131,7 +129,7 @@ public class LegacyCreateWorldScreen extends PanelBackgroundScreen{
     }
 
 
-    private LegacyCreateWorldScreen(Minecraft minecraft, @Nullable Screen screen,@Nullable WorldCreationContext worldCreationContext, Optional<ResourceKey<WorldPreset>> optional, OptionalLong optionalLong, boolean onlyLoad) {
+    private LegacyCreateWorldScreen(Minecraft minecraft, @Nullable Screen screen, @Nullable WorldCreationContext worldCreationContext, Optional<ResourceKey<WorldPreset>> optional, OptionalLong optionalLong, boolean onlyLoad) {
         super(245,228,Component.translatable("selectWorld.create"));
         this.onlyLoad = false;
         this.uiState = new WorldCreationUiState(minecraft.getLevelSource().getBaseDir(), worldCreationContext, optional, optionalLong);
@@ -200,7 +198,7 @@ public class LegacyCreateWorldScreen extends PanelBackgroundScreen{
             }
         });
         resourcePackSelector.setX(panel.x + 13);
-        resourcePackSelector.setY(panel.y + 115);
+        resourcePackSelector.setY(panel.y + 106);
         addRenderableWidget(resourcePackSelector);
         this.getUiState().onChanged();
     }
@@ -238,11 +236,7 @@ public class LegacyCreateWorldScreen extends PanelBackgroundScreen{
                 this.minecraft.gui.getChat().addMessage(component);
             }
         }
-        if (resourcePackSelector.hasChanged) {
-            List<String> list = resourcePackSelector.selectedPacks.stream().map(Pack::getId).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {Collections.reverse(l); return l; }));
-            minecraft.getResourcePackRepository().setSelected(list);
-            minecraft.options.updateResourcePacks(minecraft.getResourcePackRepository());
-        }
+        resourcePackSelector.applyChanges(true);
     }
     public static void confirmWorldCreation(Minecraft minecraft, LegacyCreateWorldScreen createWorldScreen, Lifecycle lifecycle, Runnable runnable, boolean bl2) {
         if (bl2 || lifecycle == Lifecycle.stable()) {
@@ -391,7 +385,7 @@ public class LegacyCreateWorldScreen extends PanelBackgroundScreen{
             DataResult<JsonElement> dataResult = WorldGenSettings.encode(dynamicOps, worldCreationContext.options(), worldCreationContext.selectedDimensions()).setLifecycle(Lifecycle.stable());
             RegistryOps<JsonElement> dynamicOps2 = RegistryOps.create(JsonOps.INSTANCE, dataLoadContext.datapackWorldgen());
             WorldGenSettings worldGenSettings = dataResult.flatMap(jsonElement -> WorldGenSettings.CODEC.parse(dynamicOps2, jsonElement)).getOrThrow(false, Util.prefix("Error parsing worldgen settings after loading data packs: ", LOGGER::error));
-            return new WorldLoader.DataLoadOutput<>(new LegacyCreateWorldScreen.DataPackReloadCookie(worldGenSettings, dataLoadContext.dataConfiguration()), dataLoadContext.datapackDimensions());
+            return new WorldLoader.DataLoadOutput<>(new DataPackReloadCookie(worldGenSettings, dataLoadContext.dataConfiguration()), dataLoadContext.datapackDimensions());
         }, (closeableResourceManager, reloadableServerResources, layeredRegistryAccess, dataPackReloadCookie) -> {
             closeableResourceManager.close();
             return new WorldCreationContext(dataPackReloadCookie.worldGenSettings(), layeredRegistryAccess, reloadableServerResources, dataPackReloadCookie.dataConfiguration());

@@ -7,13 +7,10 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyIconHolder;
@@ -92,7 +89,7 @@ public class ScreenUtil {
         if (mc.screen != null) {
             guiGraphics.pose().pushPose();
             guiGraphics.pose().scale(mc.screen.width / 256F, mc.screen.height / 144F, 1.0F);
-            guiGraphics.pose().translate(-820 + (mc.options.panoramaSpeed().get() * Util.getMillis() / 80D) % 820, 0, 0);
+            guiGraphics.pose().translate(- (mc.options.panoramaSpeed().get() * Util.getMillis() / 160D) % 820, 0, 0);
         }
         RenderSystem.depthMask(false);
         ResourceLocation panorama = new ResourceLocation(LegacyMinecraft.MOD_ID,"/textures/gui/title/panorama_"+ (isNight ? "night" : "day") + ".png");

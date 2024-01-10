@@ -29,6 +29,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static wily.legacy.LegacyMinecraftClient.SCROLL_DOWN;
+import static wily.legacy.LegacyMinecraftClient.SCROLL_UP;
+
 public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeModeScreen.CreativeModeMenu> {
     public final String[] legacyCreativeTabNames = new String[]{"structures","decoration","redstone_and_transport","materials","food","tools","brewing","misc"};
     protected final TabList tabList = new TabList();
@@ -113,9 +116,9 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
         Stocker.Sizeable scroll = creativeModeTabScrolls.get(tabList.selectedTab);
         if (scroll.max > 0) {
             if (scroll.get() != scroll.max)
-                guiGraphics.blitSprite(RenderableVList.SCROLL_DOWN, 0, 139, 13, 7);
+                guiGraphics.blitSprite(SCROLL_DOWN, 0, 139, 13, 7);
             if (scroll.get() > 0)
-                guiGraphics.blitSprite(RenderableVList.SCROLL_UP, 0, -11, 13, 7);
+                guiGraphics.blitSprite(SCROLL_UP, 0, -11, 13, 7);
         }else guiGraphics.setColor(1.0f,1.0f,1.0f,0.5f);
         RenderSystem.enableBlend();
         ScreenUtil.renderSquareRecessedPanel(guiGraphics, 0, 0,13,135,2f);

@@ -20,9 +20,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+import static wily.legacy.LegacyMinecraftClient.SCROLL_DOWN;
+import static wily.legacy.LegacyMinecraftClient.SCROLL_UP;
+
 public class RenderableVList {
-    protected static ResourceLocation SCROLL_DOWN = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/scroll_down");
-    protected static ResourceLocation SCROLL_UP = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/scroll_up");
     protected final Stocker.Sizeable scrolledList = new Stocker.Sizeable(0);
     protected boolean canScrollDown = false;
     protected final List<Renderable> renderables = new ArrayList<>();

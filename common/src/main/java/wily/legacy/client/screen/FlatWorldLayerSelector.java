@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
+import static wily.legacy.LegacyMinecraftClient.SCROLL_DOWN;
+import static wily.legacy.LegacyMinecraftClient.SCROLL_UP;
+
 public class FlatWorldLayerSelector extends PanelBackgroundScreen {
     public static final Container layerSelectionGrid = new SimpleContainer(50);
     public final List<ItemStack> layerItems = new ArrayList<>();
@@ -172,9 +175,9 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen {
         guiGraphics.pose().translate(panel.x + 299.5, panel.y + 23, 0f);
         if (scrolledList.max > 0) {
             if (scrolledList.get() != scrolledList.max)
-                guiGraphics.blitSprite(RenderableVList.SCROLL_DOWN, 0, 139, 13, 7);
+                guiGraphics.blitSprite(SCROLL_DOWN, 0, 139, 13, 7);
             if (scrolledList.get() > 0)
-                guiGraphics.blitSprite(RenderableVList.SCROLL_UP, 0, -11, 13, 7);
+                guiGraphics.blitSprite(SCROLL_UP, 0, -11, 13, 7);
         }else guiGraphics.setColor(1.0f,1.0f,1.0f,0.5f);
         RenderSystem.enableBlend();
         ScreenUtil.renderSquareRecessedPanel(guiGraphics,0, 0,13,135,2f);

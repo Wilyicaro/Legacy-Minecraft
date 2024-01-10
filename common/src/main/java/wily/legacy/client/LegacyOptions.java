@@ -1,8 +1,6 @@
 package wily.legacy.client;
 
 import net.minecraft.client.OptionInstance;
-import net.minecraft.network.chat.Component;
-import org.spongepowered.asm.mixin.Unique;
 
 public interface LegacyOptions {
 
@@ -15,4 +13,5 @@ public interface LegacyOptions {
     OptionInstance<Boolean> classicCrafting();
     OptionInstance<Boolean> autoSaveWhenPause();
     OptionInstance<Boolean> showVanillaRecipeBook();
+    OptionInstance<Boolean> legacyGamma();
 }

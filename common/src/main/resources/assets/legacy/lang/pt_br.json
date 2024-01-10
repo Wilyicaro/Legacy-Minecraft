@@ -58,6 +58,7 @@
   "legacy.options.hudDistance": "Distância do HUD",
   "legacy.options.hudOpacity": "Opacidade da Interface",
   "legacy.options.creativeTab": "Interface do Criativo Legacy",
+  "legacy.options.gamma": "Brilho Legacy",
   "legacy.options.classicCrafting": "Fabricação Clássica",
   "legacy.options.autoSaveWhenPause": "Salvamento Automático ao Pausar",
   "selectWorld.create" : "Criar Novo Mundo",

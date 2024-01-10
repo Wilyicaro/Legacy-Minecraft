@@ -30,6 +30,7 @@
  "legacy.options.hudOpacity": "HUD Opacity",
  "legacy.options.animatedCharacter": "Animated Character",
  "legacy.options.creativeTab": "Legacy Creative Tab",
+ "legacy.options.gamma": "Legacy Gamma",
  "legacy.options.classicCrafting": "Classic Crafting",
  "legacy.options.autoSaveWhenPause": "Autosave When Pausing",
  "legacy.menu.save_options": "Save Options",
