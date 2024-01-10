@@ -27,7 +27,7 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
     }
 
     public LegacySliderButton(int i, int j, int k, int l, Function<LegacySliderButton<T>,Component> messageGetter, Supplier<Tooltip> tooltipSupplier, T initialValue, Supplier<List<T>> values, Consumer<LegacySliderButton<T>>  onChange) {
-        this(i, j, k, l, messageGetter, tooltipSupplier, (double) values.get().indexOf(initialValue)/ (values.get().size() - 1),values,onChange);
+        this(i, j, k, l, messageGetter, tooltipSupplier, (double) Math.max(0,values.get().indexOf(initialValue))/ (values.get().size() - 1),values,onChange);
         objectValue = initialValue;
     }
     public Component getDefaultMessage(Component caption, Component visibleValue){

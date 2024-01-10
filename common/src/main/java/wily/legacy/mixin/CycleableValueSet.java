@@ -42,7 +42,7 @@ public interface CycleableValueSet<T> extends OptionInstance.ValueSet<T> {
                     options.save();
                 });
             }else {
-                return new LegacySliderButton<>(i,j,k,16, (b)-> b.getDefaultMessage(optionInstance.caption,optionInstance.toString.apply(optionInstance.value)),()->tooltipSupplier.apply(optionInstance.value),optionInstance.value,()->values,s->{
+                return new LegacySliderButton<>(i,j,k,16, (b)-> b.getDefaultMessage(optionInstance.caption,optionInstance.toString.apply(optionInstance.value)),()->tooltipSupplier.apply(optionInstance.value),optionInstance.value,()->valueListSupplier().getSelectedList(),s->{
                     if (optionInstance.value != s.objectValue) {
                         valueSetter().set(optionInstance, s.objectValue);
                         options.save();
