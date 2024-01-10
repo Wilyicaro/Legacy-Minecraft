@@ -31,7 +31,7 @@ public class GameRendererMixin {
             graphics.pose().translate(0, 0, 4400f);
             float fixedGamma;
             if (gamma> 0.5) {
-                fixedGamma = (gamma - 0.5f) / 4f;
+                fixedGamma = (gamma - 0.5f) / 6f;
                 RenderSystem.blendFunc(GlStateManager.SourceFactor.DST_COLOR, GlStateManager.DestFactor.ONE);
             }else {
                 fixedGamma = 1 - (0.5f- gamma);
@@ -39,7 +39,7 @@ public class GameRendererMixin {
             }
             RenderSystem.setShaderColor(fixedGamma, fixedGamma, fixedGamma, 1.0f);
             graphics.blit(new ResourceLocation(LegacyMinecraft.MOD_ID, "textures/gui/gamma.png"), 0, 0, 0, 0, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
-            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, (gamma > 0.5f ? gamma - 0.5f : 0.5f - gamma) / 4f);
+            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, (gamma > 0.5f ? gamma - 0.5f : 0.5f - gamma) / 2f);
             RenderSystem.defaultBlendFunc();
             graphics.blit(new ResourceLocation(LegacyMinecraft.MOD_ID, "textures/gui/gamma.png"), 0, 0, 0, 0, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
             graphics.pose().popPose();
