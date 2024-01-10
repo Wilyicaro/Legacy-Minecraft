@@ -25,6 +25,7 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
         this.tooltipSupplier = tooltipSupplier;
         updateMessage();
     }
+
     public LegacySliderButton(int i, int j, int k, int l, Function<LegacySliderButton<T>,Component> messageGetter, Supplier<Tooltip> tooltipSupplier, T initialValue, Supplier<List<T>> values, Consumer<LegacySliderButton<T>>  onChange) {
         this(i, j, k, l, messageGetter, tooltipSupplier, (double) values.get().indexOf(initialValue)/ (values.get().size() - 1),values,onChange);
         objectValue = initialValue;
@@ -39,11 +40,6 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
     @Override
     protected void updateMessage() {
         setMessage(messageGetter.apply(this));
-    }
-
-    @Override
-    public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.renderWidget(guiGraphics, i, j, f);
         setTooltip(tooltipSupplier.get());
     }
     @Override

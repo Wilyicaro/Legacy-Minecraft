@@ -92,7 +92,7 @@ public class ScreenUtil {
         if (mc.screen != null) {
             guiGraphics.pose().pushPose();
             guiGraphics.pose().scale(mc.screen.width / 256F, mc.screen.height / 144F, 1.0F);
-            guiGraphics.pose().translate(-820 + (mc.options.panoramaSpeed().get() * Util.getMillis() / 80D) % 820, 0, 0);
+            guiGraphics.pose().translate(- (mc.options.panoramaSpeed().get() * Util.getMillis() / 160D) % 820, 0, 0);
         }
         RenderSystem.depthMask(false);
         ResourceLocation panorama = new ResourceLocation(LegacyMinecraft.MOD_ID,"/textures/gui/title/panorama_"+ (isNight ? "night" : "day") + ".png");

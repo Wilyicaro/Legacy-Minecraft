@@ -31,6 +31,7 @@ public class TickBox extends AbstractButton {
         this.message = message;
         this.tooltip = tooltip;
         this.onPress = onPress;
+        setTooltip(tooltip.apply(selected));
     }
     public TickBox(int i, int j,int width, boolean initialState,Function<Boolean, Component> message,Function<Boolean, Tooltip> tooltip, Consumer<TickBox> onPress){
         this(i,j,width,12,initialState,message,tooltip,onPress);
@@ -42,12 +43,12 @@ public class TickBox extends AbstractButton {
     public void onPress() {
         selected = !selected;
         onPress.accept(this);
+        setTooltip(tooltip.apply(selected));
     }
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
         setAlpha(active ? 1.0F : 0.5F);
-        setTooltip(tooltip.apply(selected));
         Minecraft minecraft = Minecraft.getInstance();
         guiGraphics.setColor(1.0f, 1.0f, 1.0f, this.alpha);
         RenderSystem.enableBlend();
@@ -58,6 +59,7 @@ public class TickBox extends AbstractButton {
         guiGraphics.setColor(1.0f, 1.0f, 1.0f, 1.0F);
         this.renderString(guiGraphics, minecraft.font, k);
     }
+
 
     @Override
     public Component getMessage() {

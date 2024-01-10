@@ -1,5 +1,6 @@
 package wily.legacy.client;
 
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.MultiLineLabel;
@@ -28,13 +29,14 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
 
     protected Minecraft minecraft = Minecraft.getInstance();
 
-    public int disappearTime = -1;
+    public long disappearTime = -1;
+    public long createdTime = Util.getMillis();
     public Supplier<Boolean> canRemove = ()->false;
 
     public LegacyIconHolder holder = null;
     public LegacyTip(Component tip){
         this(tip,400,55);
-        disappearTime = tip.getString().toCharArray().length * 2;
+        disappearTime = tip.getString().toCharArray().length * 80L;
     }
     public LegacyTip(Component tip, int width, int height){
         super(width, height);
@@ -56,7 +58,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
         this.title = title;
         return this;
     }
-    public LegacyTip disappearTime(int disappearTime){
+    public LegacyTip disappearTime(long disappearTime){
         this.disappearTime = disappearTime;
         return this;
     }
@@ -81,14 +83,18 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
 
     @Override
     public Visibility render(GuiGraphics guiGraphics, ToastComponent toastComponent, long l) {
-        render(guiGraphics,0,0,0);
+        if (l >= disappearTime) visibility = Visibility.HIDE;
+        renderTip(guiGraphics,0,0,0);
         return visibility;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        if (disappearTime > 0) disappearTime--;
-        if (disappearTime == 0 || canRemove.get()) visibility = Visibility.HIDE;
+        if (Util.getMillis() - createdTime >= disappearTime) visibility = Visibility.HIDE;
+        renderTip(guiGraphics, i, j, f);
+    }
+    public void renderTip(GuiGraphics guiGraphics, int i, int j, float f) {
+        if (canRemove.get()) visibility = Visibility.HIDE;
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(getX(),getY(),0);
         ScreenUtil.renderPointerPanel(guiGraphics,0,0,getWidth(),getHeight());

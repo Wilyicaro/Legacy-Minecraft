@@ -15,7 +15,9 @@ public class Stocker<T> implements Supplier<T> {
         object = obj;
     }
     public static<T> Stocker<T> of(T obj){return new Stocker<>(obj);}
-
+    public static int cyclic(int min, int i, int max){
+        return i >= max ? min : i < min ? max - 1 : i;
+    }
     public static class Sizeable extends Stocker<Integer>{
         public int max = 0;
         public int min = 0;
@@ -24,7 +26,10 @@ public class Stocker<T> implements Supplier<T> {
             super(i);
         }
         public void set(Integer obj) {
-            super.set(Math.max(min,Math.min(obj,max)));
+            set(obj,false);
+        }
+        public void set(int i, boolean cyclic){
+            super.set(cyclic ? cyclic(min,i,max + 1) : Math.max(min,Math.min(i,max)));
         }
         public int add(int value){
             int oldValue = get();

@@ -45,6 +45,7 @@ public abstract class OptionsMixin implements LegacyOptions {
     private OptionInstance<Boolean> classicCrafting;
     private OptionInstance<Boolean> autoSaveWhenPause;
     private OptionInstance<Boolean> showVanillaRecipeBook;
+    private OptionInstance<Boolean> legacyGamma;
 
     @Redirect(method = "<init>", at = @At( value = "INVOKE", target = "Lnet/minecraft/client/Options;load()V"))
     protected void init(Options instance) {
@@ -54,6 +55,7 @@ public abstract class OptionsMixin implements LegacyOptions {
     protected void init(Minecraft minecraft, File file, CallbackInfo ci) {
         animatedCharacter = OptionInstance.createBoolean("legacy.options.animatedCharacter",true);
         classicCrafting = OptionInstance.createBoolean("legacy.options.classicCrafting",true);
+        legacyGamma = OptionInstance.createBoolean("legacy.options.gamma",true);
         displayHUD = OptionInstance.createBoolean("legacy.options.displayHud",!hideGui, b-> hideGui = !b);
         legacyCreativeTab = OptionInstance.createBoolean("legacy.options.creativeTab", true);
         autoSaveWhenPause = OptionInstance.createBoolean("legacy.options.autoSaveWhenPause", false);
@@ -75,6 +77,7 @@ public abstract class OptionsMixin implements LegacyOptions {
         fieldAccess.process("legacyCreativeTab", this.legacyCreativeTab);
         fieldAccess.process("animatedCharacter", animatedCharacter);
         fieldAccess.process("classicCrafting", classicCrafting);
+        fieldAccess.process("legacyGamma", legacyGamma);
         hideGui = !displayHUD.get();
     }
 
@@ -98,4 +101,5 @@ public abstract class OptionsMixin implements LegacyOptions {
     public OptionInstance<Boolean> showVanillaRecipeBook() {
         return showVanillaRecipeBook;
     }
+    public OptionInstance<Boolean> legacyGamma() {return legacyGamma;}
 }

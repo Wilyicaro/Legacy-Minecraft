@@ -15,4 +15,5 @@ public interface LegacyOptions {
     OptionInstance<Boolean> classicCrafting();
     OptionInstance<Boolean> autoSaveWhenPause();
     OptionInstance<Boolean> showVanillaRecipeBook();
+    OptionInstance<Boolean> legacyGamma();
 }
