@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
@@ -24,6 +25,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
     public Component title = Component.empty();
 
     protected Minecraft minecraft = Minecraft.getInstance();
+    protected Screen initScreen = minecraft.screen;
 
     public long disappearTime = -1;
     public long createdTime = Util.getMillis();
@@ -32,18 +34,22 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
     public LegacyIconHolder holder = null;
     public LegacyTip(Component tip){
         this(tip,400,55);
-        disappearTime = tip.getString().toCharArray().length * 80L;
     }
     public LegacyTip(Component tip, int width, int height){
         super(width, height);
         this.tipLines = minecraft.font.split(tip,width - 26);
+        disappearTime = tip.getString().toCharArray().length * 80L;
+    }
+    public LegacyTip(Component title, Component tip){
+        this(tip, 250,0);
+        height = 26 + tipLines.size() * 12;
+        title(title);
+        setY(25);
+        canRemove(()-> initScreen != minecraft.screen);
     }
     public LegacyTip(ItemStack stack){
-        this(ScreenUtil.getDescription(stack.getItem()), 250,0);
-        height = 26 + tipLines.size() * 12;
-        title(stack.getDisplayName());
+        this(Component.translatable(stack.getDescriptionId()),ScreenUtil.getTip(stack));
         itemStack(stack);
-        disappearTime(2000);
     }
     public LegacyTip canRemove(Supplier<Boolean> canRemove){
         this.canRemove = canRemove;
@@ -63,18 +69,19 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
         if (holder == null){
             holder = new LegacyIconHolder(32,32);
             holder.setX((width - 32 )/ 2);
-            holder.setY(13 + tipLines.size() * (12 + (title.getString().isEmpty() ? 0 : 1)));
+            holder.setY(13 + (tipLines.size() + (title.getString().isEmpty() ? 0 : 1)) * 12);
+            holder.allowItemDecorations = false;
         }
         holder.itemIcon = itemStack;
         return this;
     }
 
     public int width() {
-        return getWidth();
+        return getWidth() + 30;
     }
 
     public int height() {
-        return getHeight();
+        return getHeight() + y;
     }
 
     @Override

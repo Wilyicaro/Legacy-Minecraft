@@ -2,7 +2,6 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -48,7 +47,7 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
                 }
                 @Override
                 public void onPress() {
-                    if (Screen.hasShiftDown()) minecraft.options.setKey(keyMapping, keyMapping.getDefaultKey());
+                    if (Screen.hasShiftDown()) setAndUpdateKey(keyMapping, keyMapping.getDefaultKey());
                     else selectedKey = keyMapping;
                 }
                 @Override
@@ -66,17 +65,21 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
     @Override
     public boolean mouseClicked(double d, double e, int i) {
         if (selectedKey != null) {
-            minecraft.options.setKey(selectedKey, InputConstants.Type.MOUSE.getOrCreate(i));
+            setAndUpdateKey(selectedKey, InputConstants.Type.MOUSE.getOrCreate(i));
             selectedKey = null;
             return true;
         }
         return super.mouseClicked(d, e, i);
     }
+    public void setAndUpdateKey(KeyMapping key, InputConstants.Key input){
+        minecraft.options.setKey(key,input);
+        KeyMapping.resetMapping();
+    }
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (selectedKey != null){
-            minecraft.options.setKey(selectedKey,i == 256 ? InputConstants.UNKNOWN : InputConstants.getKey(i, j));
+            setAndUpdateKey(selectedKey,i == 256 ? InputConstants.UNKNOWN : InputConstants.getKey(i, j));
             selectedKey = null;
             return true;
         }

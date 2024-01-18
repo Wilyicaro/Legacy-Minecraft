@@ -12,6 +12,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.CommonInputs;
+import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -37,9 +38,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static wily.legacy.LegacyMinecraftClient.SCROLL_LEFT;
-import static wily.legacy.LegacyMinecraftClient.SCROLL_RIGHT;
-
 public class PackSelector extends AbstractWidget {
     public static final ResourceLocation DEFAULT_ICON = new ResourceLocation("textures/misc/unknown_pack.png");
     public static final ResourceLocation PACK_HIGHLIGHTED = new ResourceLocation(LegacyMinecraft.MOD_ID, "widget/pack_highlighted");
@@ -54,6 +52,8 @@ public class PackSelector extends AbstractWidget {
     public boolean hasChanged = false;
     private final PackRepository packRepository;
     private final Minecraft minecraft;
+
+    protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     public static PackSelector resources(int i, int j, int k, int l) {
         return new PackSelector(i,j,k,l, Component.translatable("options.resourcepack"), Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), PackSelector::reloadResourcesChanges);
     }
@@ -197,8 +197,8 @@ public class PackSelector extends AbstractWidget {
         }
         guiGraphics.drawString(font,getMessage(),getX() + 1,getY(),isHoveredOrFocused() ? 0xFFFFFF : 0x404040,isHoveredOrFocused());
         if (scrolledList.max > 0){
-            if (scrolledList.get() < scrolledList.max) guiGraphics.blitSprite(SCROLL_RIGHT,getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2, 6, 11);
-            if (scrolledList.get() > 0) guiGraphics.blitSprite(SCROLL_LEFT,getX() + 8, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2, 6, 11);
+            if (scrolledList.get() < scrolledList.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
+            if (scrolledList.get() > 0) scrollRenderer.renderScroll(guiGraphics,ScreenDirection.LEFT,getX() + 8, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
         }
     }
     private ResourceLocation loadPackIcon(TextureManager textureManager, Pack pack) {

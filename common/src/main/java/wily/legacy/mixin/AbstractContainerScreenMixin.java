@@ -1,14 +1,19 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.toasts.Toast;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
@@ -16,9 +21,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.client.LegacyTip;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.inventory.LegacySlotWrapper;
 import wily.legacy.util.ScreenUtil;
@@ -26,7 +31,7 @@ import wily.legacy.util.ScreenUtil;
 import java.util.Set;
 
 @Mixin(AbstractContainerScreen.class)
-public abstract class AbstractContainerScreenMixin {
+public abstract class AbstractContainerScreenMixin extends Screen {
     @Shadow protected int leftPos;
 
     @Shadow protected int topPos;
@@ -45,10 +50,28 @@ public abstract class AbstractContainerScreenMixin {
 
     @Shadow private int quickCraftingType;
 
+    protected AbstractContainerScreenMixin(Component component) {
+        super(component);
+    }
+
     @Shadow protected abstract void recalculateQuickCraftRemaining();
 
     @Shadow protected int imageWidth;
 
+    @Shadow protected Slot hoveredSlot;
+
+    @Inject(method = "keyPressed", at = @At("HEAD"))
+    private void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
+        if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && ScreenUtil.hasTip(hoveredSlot.getItem())) {
+            if (minecraft.getToasts().getToast(LegacyTip.class, Toast.NO_TOKEN) == null)
+                minecraft.getToasts().addToast(new LegacyTip(hoveredSlot.getItem()));
+        }
+    }
+    @Inject(method = "slotClicked", at = @At("HEAD"))
+    private void slotClicked(Slot slot, int i, int j, ClickType clickType, CallbackInfo ci) {
+        if (slot != null)
+            ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+    }
     @Inject(method = "renderFloatingItem", at = @At(value = "HEAD"), cancellable = true)
     private void renderFloatingItem(GuiGraphics guiGraphics, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
         guiGraphics.pose().pushPose();

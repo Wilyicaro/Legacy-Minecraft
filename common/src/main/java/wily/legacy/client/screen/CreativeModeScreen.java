@@ -1,13 +1,13 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.CreativeInventoryListener;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
@@ -17,54 +17,51 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.client.LegacyCreativeTabListing;
 import wily.legacy.inventory.LegacySlotWrapper;
 import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-
-import static wily.legacy.LegacyMinecraftClient.SCROLL_DOWN;
-import static wily.legacy.LegacyMinecraftClient.SCROLL_UP;
+import java.util.stream.Stream;
 
 public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeModeScreen.CreativeModeMenu> {
-    public final String[] legacyCreativeTabNames = new String[]{"structures","decoration","redstone_and_transport","materials","food","tools","brewing","misc"};
     protected final TabList tabList = new TabList();
     protected final Panel panel;
     public static final Container creativeModeGrid = new SimpleContainer(50);
     private CreativeInventoryListener listener;
     protected boolean hasClickedOutside;
-    public static final List<List<ResourceKey<CreativeModeTab>>> java4legacyTabs = List.of(List.of(CreativeModeTabs.BUILDING_BLOCKS),List.of(CreativeModeTabs.NATURAL_BLOCKS,CreativeModeTabs.COLORED_BLOCKS),List.of(CreativeModeTabs.REDSTONE_BLOCKS),List.of(CreativeModeTabs.INGREDIENTS),List.of(),List.of(CreativeModeTabs.COMBAT,CreativeModeTabs.TOOLS_AND_UTILITIES));
-    public final List<List<ItemStack>> creativeModeTabItems = new ArrayList<>();
-    public final List<Stocker.Sizeable> creativeModeTabScrolls = new ArrayList<>();
+    public final List<Stocker.Sizeable> tabsScrolledList = new ArrayList<>();
+    protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
+
+    protected static final List<LegacyCreativeTabListing> java4LegacyListing = CreativeModeTabs.tabs().stream().filter(c->c.getType() == CreativeModeTab.Type.CATEGORY).map(c->new LegacyCreativeTabListing(c.getDisplayName(), BuiltInRegistries.ITEM.getKey(c.getIconItem().getItem()),new ArrayList<>(c.getDisplayItems()))).toList();
+
+    protected final List<LegacyCreativeTabListing> displayListing = Stream.concat(LegacyCreativeTabListing.list.stream(), java4LegacyListing.stream()).toList();
+    protected Stocker.Sizeable page = new Stocker.Sizeable(0);
     public CreativeModeScreen(Player player) {
         super(new CreativeModeMenu(player), player.getInventory(), Component.empty());
         player.containerMenu = this.menu;
         panel = new Panel(p-> (width - p.width) / 2, p-> Math.max(33,(height - 179)/ 2) ,321, 212);
-        for (int i = 0; i < legacyCreativeTabNames.length; i++) {
-            String tab = legacyCreativeTabNames[i];
-            tabList.addTabButton(39,i == 0 ? 0 : i >= legacyCreativeTabNames.length - 1 ? 2 : 1,new ResourceLocation(LegacyMinecraft.MOD_ID,"icon/" + tab),Component.translatable("legacy.container.creative_tab." + tab),b-> fillCreativeGrid());
-        }
-        for (int i = 0; i < tabList.tabButtons.size(); i++) {
-            creativeModeTabItems.add(new ArrayList<>());
-            List<ItemStack> tabItemList = creativeModeTabItems.get(i);
-            if (java4legacyTabs.size() > i)
-                for (ResourceKey<CreativeModeTab> creativeModeTabResourceKey : java4legacyTabs.get(i))
-                    tabItemList.addAll(BuiltInRegistries.CREATIVE_MODE_TAB.getOrThrow(creativeModeTabResourceKey).getDisplayItems());
-            if (i == 4) tabItemList.addAll(BuiltInRegistries.CREATIVE_MODE_TAB.getOrThrow(CreativeModeTabs.FOOD_AND_DRINKS).getDisplayItems().stream().filter(item-> !(item.getItem() instanceof PotionItem)).toList());
-            else if (i == 6) tabItemList.addAll(BuiltInRegistries.CREATIVE_MODE_TAB.getOrThrow(CreativeModeTabs.FOOD_AND_DRINKS).getDisplayItems().stream().filter(item-> item.getItem() instanceof PotionItem).toList());
-            else if (i == 7) {
-                List<ResourceKey<CreativeModeTab>> displayedTabs = java4legacyTabs.stream().flatMap(Collection::stream).toList();
-                CreativeModeTabs.tabs().stream().filter(c-> c.getType() == CreativeModeTab.Type.CATEGORY && !displayedTabs.contains(BuiltInRegistries.CREATIVE_MODE_TAB.getResourceKey(c).get()) && CreativeModeTabs.FOOD_AND_DRINKS != BuiltInRegistries.CREATIVE_MODE_TAB.getResourceKey(c).get()).forEach(c->tabItemList.addAll(c.getDisplayItems()));
-            }
+        displayListing.forEach(t->{
             Stocker.Sizeable scroll = new Stocker.Sizeable(0);
-            scroll.max = tabItemList.size() <= creativeModeGrid.getContainerSize() ? 0 : tabItemList.size() / creativeModeGrid.getContainerSize();
-            creativeModeTabScrolls.add(scroll);
+            scroll.max = t.displayItems().size() <= creativeModeGrid.getContainerSize() ? 0 : t.displayItems().size() / creativeModeGrid.getContainerSize();
+            tabsScrolledList.add(scroll);
+        });
+        page.max = (int) Math.ceil(displayListing.size() / 8f);
+        initPagedTabs();
+    }
+    public void initPagedTabs(){
+        tabList.tabButtons.clear();
+        tabList.selectedTab = 0;
+        int t = 0;
+        for (int i = page.get() * 8; i < displayListing.size(); i++) {
+            t++;
+            LegacyCreativeTabListing tab = displayListing.get(i);
+            tabList.addTabButton(39,t == 1 ? 0 : t >= 8 ? 2 : 1,tab.icon(),tab.name(),b-> fillCreativeGrid());
+            if (t == 8) break;
         }
     }
     public void removed() {
@@ -97,9 +94,10 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
         fillCreativeGrid();
     }
     public void fillCreativeGrid(){
-        List<ItemStack> list = creativeModeTabItems.get(tabList.selectedTab);
+        if (displayListing.isEmpty()) return;
+        List<ItemStack> list = displayListing.get(page.get() * 8 + tabList.selectedTab).displayItems();
         for (int i = 0; i < creativeModeGrid.getContainerSize(); i++) {
-            int index = creativeModeTabScrolls.get(tabList.selectedTab).get() * 50 + i;
+            int index = tabsScrolledList.get(page.get() * 8 + tabList.selectedTab).get() * 50 + i;
             creativeModeGrid.setItem(i,list.size() > index ?  list.get(index) : ItemStack.EMPTY);
         }
     }
@@ -113,12 +111,12 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
         super.render(guiGraphics, i, j, f);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 296.5f, topPos + 27.5f, 0f);
-        Stocker.Sizeable scroll = creativeModeTabScrolls.get(tabList.selectedTab);
+        Stocker.Sizeable scroll = tabsScrolledList.get(page.get() * 8 + tabList.selectedTab);
         if (scroll.max > 0) {
             if (scroll.get() != scroll.max)
-                guiGraphics.blitSprite(SCROLL_DOWN, 0, 139, 13, 7);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN,0, 139);
             if (scroll.get() > 0)
-                guiGraphics.blitSprite(SCROLL_UP, 0, -11, 13, 7);
+                scrollRenderer.renderScroll(guiGraphics,ScreenDirection.UP, 0, -11);
         }else guiGraphics.setColor(1.0f,1.0f,1.0f,0.5f);
         RenderSystem.enableBlend();
         ScreenUtil.renderSquareRecessedPanel(guiGraphics, 0, 0,13,135,2f);
@@ -144,11 +142,12 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     @Override
     public boolean mouseScrolled(double d, double e, double f, double g) {
         int i = (int) -Math.signum(g);
-        Stocker.Sizeable scroll = creativeModeTabScrolls.get(tabList.selectedTab);
+        Stocker.Sizeable scroll = tabsScrolledList.get(page.get() * 8 + tabList.selectedTab);
         if (scroll.max > 0 || scroll.get() > 0){
             int lastScrolled = scroll.get();
             scroll.set(Math.max(0,Math.min(scroll.get() + i,scroll.max)));
             if (lastScrolled != scroll.get()) {
+                scrollRenderer.updateScroll(i > 0 ? ScreenDirection.DOWN : ScreenDirection.UP);
                 fillCreativeGrid();
             }
         }
@@ -171,16 +170,31 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
         float x = leftPos + 297.5f;
         float y = topPos + 28.5f;
         if (i == 0 && d >= x && d < x + 11 && e >= y && e < y + 133){
-            Stocker.Sizeable scroll = creativeModeTabScrolls.get(tabList.selectedTab);
-            int lastScroll = scroll.get();
-            scroll.set((int) Math.round(scroll.max * (e - y) / 133));
-            if (lastScroll != scroll.get()) fillCreativeGrid();
+            Stocker.Sizeable scrolledList = tabsScrolledList.get(page.get() * 8 + tabList.selectedTab);
+            int lastScroll = scrolledList.get();
+            scrolledList.set((int) Math.round(scrolledList.max * (e - y) / 133));
+            if (lastScroll != scrolledList.get()) {
+                scrollRenderer.updateScroll(scrolledList.get() - lastScroll > 0 ? ScreenDirection.DOWN : ScreenDirection.UP);
+                fillCreativeGrid();
+            }
         }
     }
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
         tabList.controlTab(i,j,k);
+        if ((i == 262 || i == 263) && page.max > 0){
+            int lastPage = page.get();
+            page.set(Math.min(page.max - 1, page.get() + (i == 262 ? 1 : -1)));
+            if (lastPage != page.get()){
+                initPagedTabs();
+                rebuildWidgets();
+            }
+        }
+        if (i == InputConstants.KEY_X) {
+            for (int n = 36; n < 45; ++n)
+                this.minecraft.gameMode.handleCreativeModeItemAdd(ItemStack.EMPTY, n);
+        }
         return super.keyPressed(i, j, k);
     }
     protected void slotClicked(@Nullable Slot slot, int i, int j, ClickType clickType) {

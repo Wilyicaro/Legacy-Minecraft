@@ -34,7 +34,7 @@ public class GameRendererMixin {
                 fixedGamma = (gamma - 0.5f) / 6f;
                 RenderSystem.blendFunc(GlStateManager.SourceFactor.DST_COLOR, GlStateManager.DestFactor.ONE);
             }else {
-                fixedGamma = 1 - (0.5f- gamma);
+                fixedGamma = 0.5f+ gamma;
                 RenderSystem.blendFunc(GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.SRC_COLOR);
             }
             RenderSystem.setShaderColor(fixedGamma, fixedGamma, fixedGamma, 1.0f);

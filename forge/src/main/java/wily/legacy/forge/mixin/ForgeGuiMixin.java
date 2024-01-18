@@ -16,6 +16,6 @@ public abstract class ForgeGuiMixin {
 
     @Inject(method = "setupOverlayRenderState", at = @At("RETURN"),remap = false)
     private void setupOverlayRenderState(boolean blend, boolean depthTest, CallbackInfo ci) {
-        RenderSystem.setShaderColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
+        RenderSystem.setShaderColor(1.0f,1.0f,1.0f, ScreenUtil.getInterfaceOpacity());
     }
 }

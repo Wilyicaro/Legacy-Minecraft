@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import wily.legacy.client.screen.LegacyLoadingScreen;
 
@@ -35,4 +36,8 @@ public abstract class MinecraftMixin {
         return level != null && level.dimension() !=Level.OVERWORLD;
     }
 
+    @ModifyArg(method = "resizeDisplay",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/Window;setGuiScale(D)V"))
+    public double resizeDisplay(double d) {
+        return d * 2/3;
+    }
 }

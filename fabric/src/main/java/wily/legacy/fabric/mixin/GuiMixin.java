@@ -1,7 +1,5 @@
 package wily.legacy.fabric.mixin;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -15,9 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
@@ -35,22 +31,25 @@ public abstract class GuiMixin {
 
     @Shadow protected int toolHighlightTimer;
 
-    @Shadow protected ItemStack lastToolHighlight;
+    @Shadow
+    private ItemStack lastToolHighlight;
     @Inject(method = "renderVehicleHealth", at = @At("HEAD"), cancellable = true)
     public void renderVehicleHealth(GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null){
             ci.cancel();
             return;
         }
-        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
+        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getInterfaceOpacity());
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0F,((LegacyOptions)minecraft.options).hudDistance().value *-22.5F,0.0F);
+        guiGraphics.pose().translate(0.0F,ScreenUtil.getHUDDistance(),0.0F);
+        ScreenUtil.applyHUDScale(guiGraphics,i-> screenWidth = i,i-> screenHeight = i);
     }
     @Inject(method = "renderVehicleHealth", at = @At("RETURN"))
     public void renderVehicleHealthTail(GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null)
             return;
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
+        ScreenUtil.resetHUDScale(guiGraphics, i-> screenWidth = i, i-> screenHeight = i);
         guiGraphics.pose().popPose();
     }
     @Inject(method = "renderPlayerHealth", at = @At("HEAD"), cancellable = true)
@@ -59,15 +58,17 @@ public abstract class GuiMixin {
             ci.cancel();
             return;
         }
-        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
+        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getInterfaceOpacity());
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0F,((LegacyOptions)minecraft.options).hudDistance().value *-22.5F,0.0F);
+        guiGraphics.pose().translate(0.0F,ScreenUtil.getHUDDistance(),0.0F);
+        ScreenUtil.applyHUDScale(guiGraphics,i-> screenWidth = i,i-> screenHeight = i);
     }
     @Inject(method = "renderPlayerHealth", at = @At("RETURN"))
     public void renderPlayerHealthTail(GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null)
             return;
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
+        ScreenUtil.resetHUDScale(guiGraphics, i-> screenWidth = i, i-> screenHeight = i);
         guiGraphics.pose().popPose();
     }
     @Inject(method = "renderSelectedItemName", at = @At("HEAD"), cancellable = true)
@@ -77,7 +78,7 @@ public abstract class GuiMixin {
             return;
         }
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0F,((LegacyOptions)minecraft.options).hudDistance().value *-22.5F,0.0F);
+        guiGraphics.pose().translate(0.0F,ScreenUtil.getHUDDistance(),0.0F);
         this.minecraft.getProfiler().push("selectedItemName");
         if (this.toolHighlightTimer > 0 && !this.lastToolHighlight.isEmpty()) {
             List<Component> tooltipLines = this.lastToolHighlight.getTooltipLines(null, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).toList();
@@ -89,7 +90,7 @@ public abstract class GuiMixin {
                 }
                 int width = this.getFont().width(mutableComponent);
                 int j = (this.screenWidth - width) / 2;
-                int k = this.screenHeight - 59 - getFont().lineHeight * (tooltipLines.size() - 1 - i);
+                int k = this.screenHeight - 80 - getFont().lineHeight * (tooltipLines.size() - 1 - i);
                 if (!this.minecraft.gameMode.canHurtPlayer()) {
                     k += 14;
                 }

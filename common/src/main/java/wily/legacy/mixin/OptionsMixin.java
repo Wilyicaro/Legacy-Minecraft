@@ -44,6 +44,7 @@ public abstract class OptionsMixin implements LegacyOptions {
     private OptionInstance<Boolean> autoSaveWhenPause;
     private OptionInstance<Boolean> showVanillaRecipeBook;
     private OptionInstance<Boolean> legacyGamma;
+    private OptionInstance<Boolean> inGameTooltips;
 
     @Redirect(method = "<init>", at = @At( value = "INVOKE", target = "Lnet/minecraft/client/Options;load()V"))
     protected void init(Options instance) {
@@ -57,6 +58,7 @@ public abstract class OptionsMixin implements LegacyOptions {
         displayHUD = OptionInstance.createBoolean("legacy.options.displayHud",!hideGui, b-> hideGui = !b);
         legacyCreativeTab = OptionInstance.createBoolean("legacy.options.creativeTab", true);
         autoSaveWhenPause = OptionInstance.createBoolean("legacy.options.autoSaveWhenPause", false);
+        inGameTooltips = OptionInstance.createBoolean("legacy.options.gameTooltips", true);
         autoSaveInterval = new OptionInstance<>("legacy.options.autoSaveInterval", OptionInstance.noTooltip(), (c,i)-> i == 0 ? genericValueLabel(c,Component.translatable("options.off")) :Component.translatable( "legacy.options.mins_value",c, i * 5), new OptionInstance.IntRange(0,24), 1, d -> {});
         showVanillaRecipeBook = OptionInstance.createBoolean("legacy.options.showVanillaRecipeBook", false);
         hudOpacity = new OptionInstance<>("legacy.options.hudOpacity", OptionInstance.noTooltip(), (c, d) -> Component.translatable("options.percent_value", c, (int) (d * 100.0)), OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
@@ -66,13 +68,14 @@ public abstract class OptionsMixin implements LegacyOptions {
     }
     @Inject(method = "processOptions",at = @At("HEAD"))
     private void processOptions(Options.FieldAccess fieldAccess, CallbackInfo ci){
-        fieldAccess.process("hudDistance", this.hudDistance);
-        fieldAccess.process("hudOpacity", this.hudOpacity);
-        fieldAccess.process("autoSaveWhenPause", this.autoSaveWhenPause);
-        fieldAccess.process("autoSaveInterval", this.autoSaveInterval);
-        fieldAccess.process("showVanillaRecipeBook", this.showVanillaRecipeBook);
+        fieldAccess.process("hudDistance", hudDistance);
+        fieldAccess.process("hudOpacity", hudOpacity);
+        fieldAccess.process("autoSaveWhenPause", autoSaveWhenPause);
+        fieldAccess.process("gameTooltips", inGameTooltips);
+        fieldAccess.process("autoSaveInterval", autoSaveInterval);
+        fieldAccess.process("showVanillaRecipeBook", showVanillaRecipeBook);
         fieldAccess.process("displayHUD", displayHUD);
-        fieldAccess.process("legacyCreativeTab", this.legacyCreativeTab);
+        fieldAccess.process("legacyCreativeTab", legacyCreativeTab);
         fieldAccess.process("animatedCharacter", animatedCharacter);
         fieldAccess.process("classicCrafting", classicCrafting);
         fieldAccess.process("legacyGamma", legacyGamma);
@@ -100,4 +103,7 @@ public abstract class OptionsMixin implements LegacyOptions {
         return showVanillaRecipeBook;
     }
     public OptionInstance<Boolean> legacyGamma() {return legacyGamma;}
+    public OptionInstance<Boolean> inGameTooltips() {
+        return inGameTooltips;
+    }
 }

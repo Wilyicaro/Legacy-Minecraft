@@ -1,5 +1,9 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.platform.Monitor;
+import com.mojang.blaze3d.platform.VideoMode;
+import net.minecraft.client.OptionInstance;
+import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
@@ -13,6 +17,7 @@ import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyOptions;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 public class SettingsScreen extends RenderableVListScreen {
 
@@ -24,10 +29,25 @@ public class SettingsScreen extends RenderableVListScreen {
             else screen.renderableVList.addRenderable(Button.builder(Component.translatable("options.online"), button -> this.minecraft.setScreen(OnlineOptionsScreen.createOnlineOptionsScreen(this.minecraft, this, minecraft.options))).build());
             return screen;
         }).build());
-        renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.sound"),()->new PanelVListScreen(this,250,218,Component.translatable("legacy.menu.sound"), Arrays.stream(SoundSource.values()).map(s-> minecraft.options.getSoundSourceOptionInstance(s).createButton(minecraft.options,0,0,0)).toArray(AbstractWidget[]::new))).build());
+        renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.audio"),()->new PanelVListScreen(this,250,218,Component.translatable("legacy.menu.audio"), Arrays.stream(SoundSource.values()).map(s-> minecraft.options.getSoundSourceOptionInstance(s).createButton(minecraft.options,0,0,0)).toArray(AbstractWidget[]::new))).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.graphics"),()-> {
+            Monitor monitor = minecraft.getWindow().findBestMonitor();
+            int j = monitor == null ? -1: minecraft.getWindow().getPreferredFullscreenVideoMode().map(monitor::getVideoModeIndex).orElse(-1);
+            OptionInstance<Integer> optionInstance = new OptionInstance<Integer>("options.fullscreen.resolution", OptionInstance.noTooltip(), (component, integer) -> {
+                if (monitor == null)
+                    return Component.translatable("options.fullscreen.unavailable");
+                if (integer == -1) {
+                    return Options.genericValueLabel(component, Component.translatable("options.fullscreen.current"));
+                }
+                VideoMode videoMode = monitor.getMode(integer);
+                return Options.genericValueLabel(component, Component.translatable("options.fullscreen.entry", videoMode.getWidth(), videoMode.getHeight(), videoMode.getRefreshRate(), videoMode.getRedBits() + videoMode.getGreenBits() + videoMode.getBlueBits()));
+            }, new OptionInstance.IntRange(-1, monitor != null ? monitor.getModeCount() - 1 : -1), j, integer -> {
+                if (monitor == null)
+                    return;
+                minecraft.getWindow().setPreferredFullscreenVideoMode(integer == -1 ? Optional.empty() : Optional.of(monitor.getMode(integer)));
+            });
             PackSelector selector = PackSelector.resources(0,0,230,45);
-            PanelVListScreen  s = new PanelVListScreen(this,250,215,Component.translatable("legacy.menu.graphics"),minecraft.options.graphicsMode(), minecraft.options.renderDistance(), minecraft.options.prioritizeChunkUpdates(), minecraft.options.simulationDistance(), minecraft.options.ambientOcclusion(), minecraft.options.framerateLimit(), minecraft.options.enableVsync(), minecraft.options.bobView(), minecraft.options.gamma(), ((LegacyOptions)minecraft.options).legacyGamma(),minecraft.options.cloudStatus(), minecraft.options.fullscreen(), minecraft.options.particles(), minecraft.options.mipmapLevels(), minecraft.options.entityShadows(), minecraft.options.screenEffectScale(), minecraft.options.entityDistanceScaling(), minecraft.options.fov(),minecraft.options.fovEffectScale(),minecraft.options.glintSpeed(), minecraft.options.glintStrength()){
+            PanelVListScreen  s = new PanelVListScreen(this,250,215,Component.translatable("legacy.menu.graphics"),optionInstance,minecraft.options.graphicsMode(), minecraft.options.renderDistance(), minecraft.options.prioritizeChunkUpdates(), minecraft.options.simulationDistance(), minecraft.options.ambientOcclusion(), minecraft.options.framerateLimit(), minecraft.options.enableVsync(), minecraft.options.bobView(), minecraft.options.gamma(), ((LegacyOptions)minecraft.options).legacyGamma(),minecraft.options.cloudStatus(), minecraft.options.fullscreen(), minecraft.options.particles(), minecraft.options.mipmapLevels(), minecraft.options.entityShadows(), minecraft.options.screenEffectScale(), minecraft.options.entityDistanceScaling(), minecraft.options.fov(),minecraft.options.fovEffectScale(),minecraft.options.glintSpeed(), minecraft.options.glintStrength()){
                 public void onClose() {
                     super.onClose();
                     selector.applyChanges(true);
@@ -36,7 +56,7 @@ public class SettingsScreen extends RenderableVListScreen {
             s.renderableVList.addRenderable(selector);
             return s;
         }).build());
-        renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.user_interface"),()-> new PanelVListScreen(this,250,200,Component.translatable("legacy.menu.user_interface"), ((LegacyOptions)minecraft.options).displayHUD(),minecraft.options.showAutosaveIndicator(),((LegacyOptions)minecraft.options).showVanillaRecipeBook(),minecraft.options.attackIndicator(), minecraft.options.guiScale(),((LegacyOptions)minecraft.options).hudDistance(),((LegacyOptions)minecraft.options).hudOpacity(),((LegacyOptions)minecraft.options).legacyCreativeTab(),((LegacyOptions)minecraft.options).animatedCharacter(),((LegacyOptions)minecraft.options).classicCrafting(), minecraft.options.operatorItemsTab(), minecraft.options.narrator(), minecraft.options.showSubtitles(), minecraft.options.highContrast(), minecraft.options.textBackgroundOpacity(), minecraft.options.backgroundForChatOnly(), minecraft.options.chatOpacity(), minecraft.options.chatLineSpacing(), minecraft.options.chatDelay(), minecraft.options.notificationDisplayTime(), minecraft.options.screenEffectScale(), minecraft.options.fovEffectScale(), minecraft.options.darknessEffectScale(), minecraft.options.damageTiltStrength(), minecraft.options.glintSpeed(), minecraft.options.glintStrength(), minecraft.options.hideLightningFlash(), minecraft.options.darkMojangStudiosBackground(), minecraft.options.panoramaSpeed(), minecraft.options.narratorHotkey())).build());
+        renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.user_interface"),()-> new PanelVListScreen(this,250,200,Component.translatable("legacy.menu.user_interface"), ((LegacyOptions)minecraft.options).displayHUD(),minecraft.options.showAutosaveIndicator(),((LegacyOptions)minecraft.options).showVanillaRecipeBook(),minecraft.options.attackIndicator(), minecraft.options.guiScale(),((LegacyOptions)minecraft.options).hudDistance(),((LegacyOptions)minecraft.options).hudOpacity(),((LegacyOptions)minecraft.options).inGameTooltips(),((LegacyOptions)minecraft.options).legacyCreativeTab(),((LegacyOptions)minecraft.options).animatedCharacter(),((LegacyOptions)minecraft.options).classicCrafting(), minecraft.options.operatorItemsTab(), minecraft.options.narrator(), minecraft.options.showSubtitles(), minecraft.options.highContrast(), minecraft.options.notificationDisplayTime(), minecraft.options.screenEffectScale(), minecraft.options.fovEffectScale(), minecraft.options.darknessEffectScale(), minecraft.options.damageTiltStrength(), minecraft.options.glintSpeed(), minecraft.options.glintStrength(), minecraft.options.hideLightningFlash(), minecraft.options.darkMojangStudiosBackground(), minecraft.options.panoramaSpeed(), minecraft.options.narratorHotkey(),minecraft.options.chatVisibility(), minecraft.options.chatColors(), minecraft.options.chatLinks(), minecraft.options.chatLinksPrompt(), minecraft.options.chatOpacity(), minecraft.options.textBackgroundOpacity(), minecraft.options.chatScale(), minecraft.options.chatLineSpacing(), minecraft.options.chatDelay(), minecraft.options.chatWidth(), minecraft.options.chatHeightFocused(), minecraft.options.chatHeightUnfocused(), minecraft.options.narrator(), minecraft.options.autoSuggestions(), minecraft.options.hideMatchedNames(), minecraft.options.reducedDebugInfo(), minecraft.options.onlyShowSecureChat())).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.reset_defaults"),()->new ConfirmationScreen(this,Component.translatable("legacy.menu.reset_settings"),Component.translatable("legacy.menu.reset_message"), b1->{
             LegacyMinecraftClient.resetVanillaOptions(minecraft);
             minecraft.setScreen(this);

@@ -2,6 +2,7 @@ package wily.legacy.forge;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelEvent;
+import net.minecraftforge.client.event.RegisterPresetEditorsEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -17,5 +18,9 @@ public class LegacyMinecraftForgeClient {
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void clientInit(ModelEvent.RegisterAdditional event){
         LegacyMinecraftClient.registerExtraModels(event::register);
+    }
+    @SubscribeEvent
+    public static void overlayModify(RegisterPresetEditorsEvent event){
+        LegacyMinecraftClient.VANILLA_PRESET_EDITORS.forEach(((o, presetEditor) -> o.ifPresent(worldPresetResourceKey -> event.register(worldPresetResourceKey, presetEditor))));
     }
 }
