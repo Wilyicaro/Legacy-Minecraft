@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -42,6 +43,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
 
     public LegacyFlatWorldScreen(Screen screen, WorldCreationUiState uiState, HolderLookup.RegistryLookup<Biome> biomeGetter, HolderLookup.RegistryLookup<StructureSet> structureGetter, Consumer<FlatLevelGeneratorSettings> consumer, FlatLevelGeneratorSettings flatLevelGeneratorSettings) {
         super(screen,282,248,Component.translatable("createWorld.customize.flat.title"));
+        parent = Minecraft.getInstance().screen instanceof WorldMoreOptionsScreen s ? s : screen;
         this.uiState = uiState;
         this.applySettings = consumer;
         this.generator = flatLevelGeneratorSettings;

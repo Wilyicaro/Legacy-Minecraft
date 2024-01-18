@@ -7,16 +7,17 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.core.Holder;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyIconHolder;
+
+import java.util.function.Consumer;
 
 public class ScreenUtil {
     private static final Minecraft mc = Minecraft.getInstance();
@@ -95,7 +96,7 @@ public class ScreenUtil {
             guiGraphics.pose().translate(- (mc.options.panoramaSpeed().get() * Util.getMillis() / 160D) % 820, 0, 0);
         }
         RenderSystem.depthMask(false);
-        ResourceLocation panorama = new ResourceLocation(LegacyMinecraft.MOD_ID,"/textures/gui/title/panorama_"+ (isNight ? "night" : "day") + ".png");
+        ResourceLocation panorama = new ResourceLocation(LegacyMinecraft.MOD_ID,"textures/gui/title/panorama_"+ (isNight ? "night" : "day") + ".png");
         Minecraft.getInstance().getTextureManager().getTexture(panorama).setFilter(true,false);
         guiGraphics.blit(panorama,0,0,0,0,1640,144,820,144);
         RenderSystem.depthMask(true);
@@ -104,6 +105,7 @@ public class ScreenUtil {
     public static void drawOutlinedString(GuiGraphics graphics, Font font, Component component, int x, int y, int color, int outlineColor, float outline) {
         drawStringOutline(graphics,font,component,x,y,outlineColor,outline);
         graphics.drawString(font,component, x, y, color,false);
+
     }
     public static void drawStringOutline(GuiGraphics graphics, Font font, Component component, int x, int y, int outlineColor, float outline) {
         outline/=2;
@@ -122,18 +124,44 @@ public class ScreenUtil {
     public static boolean isMouseOver(double x, double y, int width, int height,double mouseX, double mouseY){
         return mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height;
     }
-    public static float getHUDOpacity(){
+    public static void applyHUDScale(GuiGraphics graphics, Consumer<Integer> applyWidth, Consumer<Integer> applyHeight){
+        graphics.pose().scale(1.5f,1.5f,1.5f);
+        applyHeight.accept(mc.getWindow().getGuiScaledHeight() * 2/3);
+        applyWidth.accept(mc.getWindow().getGuiScaledWidth() * 2/3);
+    }
+    public static void resetHUDScale(GuiGraphics graphics, Consumer<Integer> applyWidth, Consumer<Integer> applyHeight){
+        graphics.pose().scale(2/3f,2/3f,2/3f);
+        applyHeight.accept(mc.getWindow().getGuiScaledHeight());
+        applyWidth.accept(mc.getWindow().getGuiScaledWidth());
+    }
+    public static double getHUDDistance(){
+        return -((LegacyOptions)mc.options).hudDistance().value*(22.5D + (((LegacyOptions)mc.options).inGameTooltips().get() ? 17.5D : 0));
+    }
+    public static float getInterfaceOpacity(){
         return (float) Math.max(Math.min(255f,mc.gui.toolHighlightTimer * 38.4f)/ 255f, ((LegacyOptions)mc.options).hudOpacity().get());
     }
     public static void playSimpleUISound(SoundEvent sound, float grave){
         mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave));
     }
-    public static Component getDescription(Item item){
-        return Component.translatable(item.getDescriptionId() + ".description");
+    public static Component getTip(ItemStack item){
+        return Component.translatable(getTipId(item));
     }
-    public static Component getDescription(ResourceLocation location){
-        return Component.translatable(location.toLanguageKey("description"));
+    public static boolean hasTip(ItemStack item){
+        return hasTip(getTipId(item));
     }
+    public static boolean hasTip(String s){
+        return Language.getInstance().has(s);
+    }
+    public static String getTipId(ItemStack item){
+        return item.getDescriptionId() + ".tip";
+    }
+    public static String getTipId(EntityType<?> item){
+        return item.getDescriptionId() + ".tip";
+    }
+    public static Component getTip(ResourceLocation location){
+        return Component.translatable(location.toLanguageKey() +".tip");
+    }
+
 
     public static void drawGenericLoading(GuiGraphics graphics,int x, int y) {
         RenderSystem.enableBlend();

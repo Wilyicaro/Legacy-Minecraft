@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -25,7 +26,7 @@ public class CreationList extends RenderableVList{
     public CreationList() {
         layoutSpacing(l->0);
         minecraft = Minecraft.getInstance();
-        addCreationButton(new ResourceLocation(LegacyMinecraft.MOD_ID,"creation_list/create_world"),Component.translatable("legacy.menu.create_world"),c-> LegacyCreateWorldScreen.openFresh(this.minecraft, screen));
+        addCreationButton(new ResourceLocation(LegacyMinecraft.MOD_ID,"creation_list/create_world"),Component.translatable("legacy.menu.create_world"),c-> CreateWorldScreen.openFresh(this.minecraft, screen));
         addCreationButton(new ResourceLocation(LegacyMinecraft.MOD_ID,"creation_list/tutorial"),Component.translatable("legacy.menu.play_tutorial"),c-> {
             try {
                 minecraft.createWorldOpenFlows().checkForBackupAndLoad(LegacyMinecraftClient.importSaveFile(minecraft,minecraft.getResourceManager().getResourceOrThrow(new ResourceLocation(LegacyMinecraft.MOD_ID,"tutorial/tutorial.mcsave")).open(),TUTORIAL_FOLDER_NAME),()->{

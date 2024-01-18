@@ -6,6 +6,7 @@
     "AbstractContainerScreenMixin",
     "GuiGraphicsMixin",
     "GuiMixin",
+    "PresetEditorMixin",
     "TooltipRenderUtilMixin"
   ],
   "mixins": [

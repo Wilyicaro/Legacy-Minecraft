@@ -50,7 +50,7 @@ public class CraftingScreenMixin extends AbstractContainerScreen<CraftingMenu> {
             this.setInitialFocus(this.recipeBookComponent);
             if (recipeBookComponent.isVisible()) recipeButton.setFocused(true);
         }
-        else if (recipeBookComponent.isVisible())recipeBookComponent.toggleVisibility();
+        else if (recipeBookComponent.isVisible()) recipeBookComponent.toggleVisibility();
     }
 
     @Override

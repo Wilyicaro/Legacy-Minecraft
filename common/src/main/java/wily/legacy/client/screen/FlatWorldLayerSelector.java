@@ -3,8 +3,8 @@ package wily.legacy.client.screen;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
@@ -22,9 +22,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
-import static wily.legacy.LegacyMinecraftClient.SCROLL_DOWN;
-import static wily.legacy.LegacyMinecraftClient.SCROLL_UP;
-
 public class FlatWorldLayerSelector extends PanelBackgroundScreen {
     public static final Container layerSelectionGrid = new SimpleContainer(50);
     public final List<ItemStack> layerItems = new ArrayList<>();
@@ -36,6 +33,7 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen {
     protected Screen parent;
     protected final List<LegacySlotWrapper> slots = new ArrayList<>();
     protected LegacySlotWrapper hoveredSlot = null;
+    protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
 
     public FlatWorldLayerSelector(Screen parent, Consumer<FlatWorldLayerSelector> applyLayer, int maxLayerHeight, Component component) {
         super(325,245, component);
@@ -81,7 +79,10 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen {
         if (i == 0 && d >= x && d < x + 11 && e >= y && e < y + 133){
             int lastScroll = scrolledList.get();
             scrolledList.set((int) Math.round(scrolledList.max * (e - y) / 133));
-            if (lastScroll != scrolledList.get()) fillLayerGrid();
+            if (lastScroll != scrolledList.get()) {
+                scrollRenderer.updateScroll(scrolledList.get() - lastScroll > 0 ? ScreenDirection.DOWN : ScreenDirection.UP);
+                fillLayerGrid();
+            }
         }
     }
     @Override
@@ -107,6 +108,7 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen {
             int lastScrolled = scrolledList.get();
             scrolledList.set(Math.max(0,Math.min(scrolledList.get() + scroll, scrolledList.max)));
             if (lastScrolled != scrolledList.get()) {
+                scrollRenderer.updateScroll(scroll > 0 ? ScreenDirection.DOWN : ScreenDirection.UP);
                 fillLayerGrid();
             }
         }
@@ -175,9 +177,9 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen {
         guiGraphics.pose().translate(panel.x + 299.5, panel.y + 23, 0f);
         if (scrolledList.max > 0) {
             if (scrolledList.get() != scrolledList.max)
-                guiGraphics.blitSprite(SCROLL_DOWN, 0, 139, 13, 7);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, 0, 139);
             if (scrolledList.get() > 0)
-                guiGraphics.blitSprite(SCROLL_UP, 0, -11, 13, 7);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP,0,-11);
         }else guiGraphics.setColor(1.0f,1.0f,1.0f,0.5f);
         RenderSystem.enableBlend();
         ScreenUtil.renderSquareRecessedPanel(guiGraphics,0, 0,13,135,2f);

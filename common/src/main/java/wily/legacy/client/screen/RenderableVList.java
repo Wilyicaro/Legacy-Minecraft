@@ -8,6 +8,7 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import wily.legacy.LegacyMinecraft;
@@ -29,6 +30,7 @@ public class RenderableVList {
     protected final List<Renderable> renderables = new ArrayList<>();
     public Screen screen;
     protected int vRenderablesCount;
+    protected LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
 
     protected Function<LayoutElement,Integer> layoutSeparation = w-> 3;
 
@@ -53,9 +55,9 @@ public class RenderableVList {
         boolean allowScroll = listHeight > 0;
         if (allowScroll) screen.renderables.add(((guiGraphics, i, j, f) -> {
             if (scrolledList.get() > 0)
-                guiGraphics.blitSprite(SCROLL_UP, leftPos + listWidth - 40, topPos + listHeight - 27, 13, 7);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, leftPos + listWidth - 40, topPos + listHeight - 27);
             if (canScrollDown)
-                guiGraphics.blitSprite(SCROLL_DOWN, leftPos+ listWidth - 24, topPos + listHeight - 27, 13, 7);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN,leftPos+ listWidth - 24, topPos + listHeight - 27);
         }));
         canScrollDown = false;
         int yDiff = 0;
@@ -94,6 +96,7 @@ public class RenderableVList {
         if ((canScrollDown && scroll > 0) || (scrolledList.get() > 0 && scroll < 0)){
             int setScroll = Math.max(0,Math.min(scrolledList.get() + scroll,scrolledList.max));
             if (setScroll != scrolledList.get()) {
+                scrollRenderer.updateScroll(scroll > 0 ? ScreenDirection.DOWN : ScreenDirection.UP);
                 scrolledList.set(setScroll);
                 int focused =  screen.getFocused() instanceof Renderable r ? renderables.indexOf(r) : -1;
                 screen.repositionElements();

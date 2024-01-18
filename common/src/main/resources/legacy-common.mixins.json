@@ -10,8 +10,10 @@
     "AnvilScreenMixin",
     "BeaconScreenMixin",
     "BrewingStandScreenMixin",
+    "ChatComponentMixin",
     "ContainerScreenMixin",
     "CraftingScreenMixin",
+    "CreateWorldScreenMixin",
     "CycleableValueSet",
     "CyclingSlotBackgroundMixin",
     "EnchantmentScreenMixin",
@@ -56,6 +58,7 @@
     "MerchantOfferMixin",
     "MerchantOffersMixin",
     "MerchantScreenMixin",
+    "MusicsMixin",
     "ShulkerBoxMenuMixin",
     "SmithingMenuMixin",
     "VillagerMixin"

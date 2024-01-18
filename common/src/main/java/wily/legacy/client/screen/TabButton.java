@@ -8,9 +8,11 @@ import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -23,6 +25,7 @@ import java.util.function.Function;
 public class TabButton extends AbstractButton {
     public static final ResourceLocation[][] SPRITES = new ResourceLocation[][]{new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_tab_left"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_tab_left")}, new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_tab_middle"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_tab_middle")}, new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_tab_right"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_tab_right")}};
     public final ResourceLocation icon;
+    public ItemStack itemIcon;
     private final Consumer<TabButton> onPress;
     public boolean selected;
     protected int type;
@@ -37,6 +40,9 @@ public class TabButton extends AbstractButton {
         this.onPress = onPress;
         this.type = type;
         icon = iconSprite;
+        if (itemIcon == null)
+            if (BuiltInRegistries.ITEM.containsKey(icon))
+                itemIcon = BuiltInRegistries.ITEM.get(icon).getDefaultInstance();
     }
     public TabButton(int i, int j,int width, int height,  int type, Component text, Tooltip tooltip, Consumer<TabButton> onPress) {
         this(i, j, width, height, type,null,text,tooltip,onPress);
@@ -65,9 +71,20 @@ public class TabButton extends AbstractButton {
         ScreenUtil.renderTiles(SPRITES[type][selected ? 0 : 1],guiGraphics,this.getX(), this.getY(), this.getWidth(), this.getHeight(),2);
         int k = this.active ? 0x404040 : 0xA0A0A0;
         if (icon == null) this.renderString(guiGraphics, minecraft.font, k | Mth.ceil(this.alpha * 255.0f) << 24);
-        else guiGraphics.blitSprite(icon,getX() + width / 2 - 12,getY() + height / 2 - 12,24,24);
+        else {
+            if (itemIcon == null)
+                guiGraphics.blitSprite(icon,getX() + width / 2 - 12,getY() + height / 2 - 12,24,24);
+            else {
+                guiGraphics.pose().pushPose();
+                guiGraphics.pose().translate(getX() + width / 2f - 12, getY() + height / 2f - 12, 0);
+                guiGraphics.pose().scale(1.5f, 1.5f, 1.5f);
+                guiGraphics.renderItem(itemIcon, 0, 0);
+                guiGraphics.pose().popPose();
+            }
+        }
         guiGraphics.pose().popPose();
     }
+
     public boolean isMouseOver(double d, double e) {
         Vec3 translate = translocation.apply(this);
         double x =  getX() + (translate.equals(Vec3.ZERO) ? 0 : translate.x);

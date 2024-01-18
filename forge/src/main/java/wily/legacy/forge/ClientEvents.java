@@ -2,12 +2,15 @@ package wily.legacy.forge;
 
 
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.client.event.RegisterPresetEditorsEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
 @Mod(LegacyMinecraft.MOD_ID)
@@ -23,7 +26,8 @@ public class ClientEvents {
                 return;
             }
             event.getGuiGraphics().pose().pushPose();
-            event.getGuiGraphics().pose().translate(0.0F,((LegacyOptions)minecraft.options).hudDistance().value *-22.5F,0.0F);
+            event.getGuiGraphics().pose().translate(0.0F, ScreenUtil.getHUDDistance(),0.0F);
+            ScreenUtil.applyHUDScale(event.getGuiGraphics(),i-> minecraft.gui.screenWidth = i,i-> minecraft.gui.screenHeight = i);
         }
     }
     @SubscribeEvent
@@ -33,6 +37,7 @@ public class ClientEvents {
             if (minecraft.screen != null){
                 return;
             }
+            ScreenUtil.resetHUDScale(event.getGuiGraphics(),i-> minecraft.gui.screenWidth = i,i-> minecraft.gui.screenHeight = i);
             event.getGuiGraphics().pose().popPose();
             event.getGuiGraphics().setColor(1.0f,1.0f,1.0f, 1.0f);
         }
