@@ -167,6 +167,7 @@ public abstract class GuiMixin {
             return;
         }
         guiGraphics.setColor(1.0f, 1.0f, 1.0f, ScreenUtil.getInterfaceOpacity());
+        RenderSystem.enableBlend();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F, ScreenUtil.getHUDDistance(), 0.0F);
         ScreenUtil.applyHUDScale(guiGraphics,w-> screenWidth = w,h-> screenHeight = h);

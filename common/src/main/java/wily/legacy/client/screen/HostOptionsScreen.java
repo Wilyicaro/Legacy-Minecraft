@@ -38,6 +38,7 @@ public class HostOptionsScreen extends PanelVListScreen{
     public static final Component PLAYERS_INVITE = Component.translatable("legacy.menu.players_invite");
     protected final Component title;
     protected float alpha = getDefaultOpacity();
+    protected boolean shouldFade = false;
 
     public static final List<GameRules.Key<GameRules.BooleanValue>> WORLD_RULES = List.of(GameRules.RULE_DOFIRETICK,GameRules.RULE_DAYLIGHT,GameRules.RULE_KEEPINVENTORY,GameRules.RULE_DOMOBSPAWNING,GameRules.RULE_MOBGRIEFING, LegacyGameRules.GLOBAL_MAP_PLAYER_ICON);
     public static final List<GameRules.Key<GameRules.BooleanValue>> OTHER_RULES = List.of(GameRules.RULE_WEATHER_CYCLE,GameRules.RULE_DOMOBLOOT,GameRules.RULE_DOBLOCKDROPS,GameRules.RULE_NATURAL_REGENERATION);
@@ -121,7 +122,7 @@ public class HostOptionsScreen extends PanelVListScreen{
             renderableVList.addRenderable(new AbstractButton(0,0, 230, 30,Component.literal(profile.getName())) {
                 @Override
                 protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                    if (isHoveredOrFocused()) HostOptionsScreen.this.alpha = Math.min(1.0f, HostOptionsScreen.this.alpha + 0.006f);
+                    if (isHoveredOrFocused()) shouldFade = true;
                     super.renderWidget(guiGraphics, i, j, f);
                     drawPlayerIcon(profile, guiGraphics,getX() + 6, getY() + 5);
                 }
@@ -230,12 +231,22 @@ public class HostOptionsScreen extends PanelVListScreen{
     }
 
     @Override
+    public void tick() {
+        super.tick();
+        if (shouldFade) {
+            HostOptionsScreen.this.alpha = Math.min(1.0f, HostOptionsScreen.this.alpha + 0.01f);
+            shouldFade = false;
+        }else {
+            if (alpha > getDefaultOpacity()) alpha -= 0.01f;
+        }
+    }
+
+    @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f, alpha);
         panel.render(guiGraphics,i,j,f);
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
         guiGraphics.drawString(font,title,panel.x + 11, panel.y + 8, 0x404040, false);
-        if (alpha > getDefaultOpacity()) alpha -= 0.003f;
     }
 
     protected static float getDefaultOpacity() {
