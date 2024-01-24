@@ -25,7 +25,7 @@ public class RenderableVListScreen extends DefaultScreen{
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (renderableVList.keyPressed(i,j,k)) return true;
+        if (renderableVList.keyPressed(i,true)) return true;
         return super.keyPressed(i, j, k);
     }
 

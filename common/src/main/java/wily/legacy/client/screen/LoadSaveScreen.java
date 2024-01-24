@@ -1,0 +1,216 @@
+package wily.legacy.client.screen;
+
+import com.mojang.datafixers.util.Pair;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.commands.PublishCommand;
+import net.minecraft.util.HttpUtil;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraft.world.level.storage.LevelSummary;
+import org.jetbrains.annotations.Nullable;
+import wily.legacy.LegacyMinecraft;
+import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.client.LegacyWorldSettings;
+import wily.legacy.util.ScreenUtil;
+
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.BiConsumer;
+
+import static wily.legacy.LegacyMinecraftClient.publishUnloadedServer;
+
+public class LoadSaveScreen extends PanelBackgroundScreen{
+    public static final Component GAME_MODEL_LABEL = Component.translatable("selectWorld.gameMode");
+    private final boolean deleteOnClose;
+    public BiConsumer<GameRules, MinecraftServer> applyGameRules = (r,s)-> {};
+    protected final LevelStorageSource.LevelStorageAccess access;
+    public boolean trustPlayers;
+    public boolean allowCheats;
+    public boolean resetNether = false;
+    public boolean resetEnd = false;
+    public Difficulty difficulty;
+    public GameType gameType;
+    public final LevelSummary summary;
+    protected boolean onlineOnStart = false;
+    private int port = HttpUtil.getAvailablePort();
+    protected PackSelector resourcePackSelector = PackSelector.resources(panel.x + 13, panel.y + 112, 220,45);
+    public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean deleteOnClose) {
+        super(s-> new Panel(p-> (s.width - p.width) / 2, p-> (s.height - p.height) / 2 + 20,245,233), Component.translatable("legacy.menu.load_save.load"));
+        this.deleteOnClose = deleteOnClose;
+        this.parent = screen;
+        this.summary = summary;
+        this.access = access;
+        difficulty = summary.getSettings().difficulty();
+        gameType = summary.getSettings().gameType();
+        allowCheats = summary.hasCheats();
+        trustPlayers = ((LegacyWorldSettings)(Object)summary.getSettings()).trustPlayers();
+
+    }
+    public LoadSaveScreen(Screen screen, LevelSummary summary) {
+        this(screen,summary, getSummaryAccess(summary),false);
+    }
+    public static LevelStorageSource.LevelStorageAccess getSummaryAccess(LevelSummary summary){
+        try {
+            return Minecraft.getInstance().getLevelSource().createAccess(summary.getLevelId());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+        List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
+        addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 65, 220,16, b -> b.getDefaultMessage(GAME_MODEL_LABEL,b.getValue().getLongDisplayName()),()->Tooltip.create(Component.translatable("selectWorld.gameMode."+gameType.getName()+ ".info")),gameType,()->gameTypes, b->gameType =b.objectValue));
+        addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 90, 220,16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getValue().getDisplayName()),()->Tooltip.create(difficulty.getInfo()), difficulty,()-> Arrays.asList(Difficulty.values()), b-> difficulty = b.objectValue)).active = !((LegacyWorldSettings)(Object)summary.getSettings()).isDifficultyLocked();
+        EditBox portEdit = addRenderableWidget(new EditBox(minecraft.font, panel.x + 124, panel.y + 157,100,20,Component.translatable("lanServer.port")));
+        portEdit.visible = onlineOnStart;
+
+        portEdit.setHint(Component.literal("" + this.port).withStyle(ChatFormatting.DARK_GRAY));
+        addRenderableWidget(Button.builder(Component.translatable( "createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(this))).bounds(panel.x + 13, panel.y + 178,220,20).build());
+        Button loadButton = addRenderableWidget(Button.builder(Component.translatable("legacy.menu.load_save.load"), button -> {
+            try {
+                this.onLoad();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).bounds(panel.x + 13, panel.y + 203,220,20).build());
+        addRenderableWidget(new TickBox(panel.x+ 14, panel.y+161,100,onlineOnStart, b-> Component.translatable("menu.shareToLan"), b->null, button -> {
+            if (!(portEdit.visible = onlineOnStart = button.selected)) {
+                loadButton.active = true;
+                portEdit.setValue("");
+            }
+        }));
+        portEdit.setResponder(string -> {
+            Pair<Integer,Component> p = LegacyMinecraftClient.tryParsePort(string);
+            if(p.getFirst() != null) port = p.getFirst();
+            portEdit.setHint(Component.literal("" + this.port).withStyle(ChatFormatting.DARK_GRAY));
+            if (p.getSecond() == null) {
+                portEdit.setTextColor(0xE0E0E0);
+                portEdit.setTooltip(null);
+                loadButton.active = true;
+            } else {
+                portEdit.setTextColor(0xFF5555);
+                portEdit.setTooltip(Tooltip.create(p.getSecond()));
+                loadButton.active = false;
+            }
+        });
+        resourcePackSelector.setX(panel.x + 13);
+        resourcePackSelector.setY(panel.y + 112);
+        addRenderableWidget(resourcePackSelector);
+    }
+
+    private void onLoad() throws IOException {
+        access.close();
+        if (resetNether) deleteLevelDimension(access,Level.NETHER);
+        if (resetEnd) deleteLevelDimension(access,Level.END);
+        LegacyMinecraftClient.enterWorldGameType = gameType;
+        loadWorld(this,minecraft,summary);
+        if (minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer().isReady()){
+            minecraft.getSingleplayerServer().setDefaultGameType(gameType);
+            minecraft.getSingleplayerServer().setDifficulty(difficulty, false);
+            applyGameRules.accept(minecraft.getSingleplayerServer().getGameRules(), minecraft.getSingleplayerServer());
+            if (onlineOnStart) {
+                MutableComponent component = publishUnloadedServer(minecraft, gameType, allowCheats && trustPlayers, this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed");
+                this.minecraft.gui.getChat().addMessage(component);
+            }
+            ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setAllowCommands(allowCheats);
+            ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setTrustPlayers(trustPlayers);
+        }
+        resourcePackSelector.applyChanges(true);
+    }
+
+    @Override
+    public void onClose() {
+        try {
+            access.deleteLevel();
+            if (deleteOnClose) access.close();
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        super.onClose();
+    }
+
+    public static void deleteLevelDimension(LevelStorageSource.LevelStorageAccess access, ResourceKey<Level> dimension) throws IOException {
+        Path path = access.getDimensionPath(dimension);
+        LegacyMinecraft.LOGGER.info("Deleting dimension {}", dimension);
+        int i = 1;
+
+        while(i <= 5) {
+            LegacyMinecraft.LOGGER.info("Attempt {}...", i);
+            try {
+                Files.walkFileTree(path,new SimpleFileVisitor<>(){
+                    public FileVisitResult visitFile(Path pathx, BasicFileAttributes basicFileAttributes) throws IOException {
+                        LegacyMinecraft.LOGGER.debug("Deleting {}", pathx);
+                        Files.delete(pathx);
+                        return FileVisitResult.CONTINUE;
+                    }
+                    public FileVisitResult postVisitDirectory(Path pathx, @Nullable IOException iOException) throws IOException {
+                        if (iOException != null) {
+                            throw iOException;
+                        } else {
+                            Files.delete(pathx);
+                            return FileVisitResult.CONTINUE;
+                        }
+                    }
+                });
+                break;
+            } catch (IOException var6) {
+                if (i >= 5) {
+                    throw var6;
+                }
+                LegacyMinecraft.LOGGER.warn("Failed to delete {}", path, var6);
+                try {
+                    Thread.sleep(500L);
+                } catch (InterruptedException var5) {
+                }
+                ++i;
+            }
+        }
+
+    }
+    @Override
+    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        super.render(guiGraphics, i, j, f);
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(0.5f,0,0);
+        ScreenUtil.renderSquareEntityPanel(guiGraphics,panel.x + 12, panel.y + 9, 32,32,2f);
+        guiGraphics.pose().popPose();
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(0,0.5f,0);
+        guiGraphics.blit(SaveSelectionList.iconCache.getUnchecked(summary).textureLocation(),panel.x + 14, panel.y + 10, 0,0,29,29,29,29);
+        guiGraphics.drawString(font,summary.getLevelName(),panel.x + 48, panel.y + 12, 0x404040,false);
+        guiGraphics.drawString(font,Component.translatable("legacy.menu.load_save.created_in", (summary.hasCheats() ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()),panel.x + 48, panel.y + 29, 0x404040,false);
+        guiGraphics.pose().popPose();
+        guiGraphics.drawString(font,Component.translatable("commands.seed.success",((LegacyWorldSettings)(Object)summary.getSettings()).getDisplaySeed()),panel.x + 13, panel.y + 49, 0x404040,false);
+    }
+
+    public static void loadWorld(Screen screen, Minecraft minecraft, LevelSummary summary) {
+        SaveSelectionList.resetIconCache();
+        if (minecraft.getLevelSource().levelExists(summary.getLevelId())) {
+            minecraft.forceSetScreen(new GenericDirtMessageScreen(Component.translatable("selectWorld.data_read")));
+            minecraft.createWorldOpenFlows().loadLevel(screen, summary.getLevelId());
+        }
+    }
+}

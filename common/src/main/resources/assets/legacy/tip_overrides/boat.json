@@ -1,0 +1,14 @@
+{
+  "overrides": [
+    {
+      "item": "#minecraft:boats",
+      "entity_type": "minecraft:boat",
+      "tip": "item.minecraft.boat.tip"
+    },
+    {
+      "item": "#minecraft:chest_boats",
+      "entity_type": "minecraft:chest_boat",
+      "tip": "item.minecraft.chest_boat.tip"
+    }
+  ]
+}

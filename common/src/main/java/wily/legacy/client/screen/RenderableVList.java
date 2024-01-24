@@ -109,7 +109,7 @@ public class RenderableVList {
             if (renderables.get(scrolledList.get() + i) instanceof GuiEventListener l) return l;
         return null;
     }
-    public boolean keyPressed(int i, int j, int k){
+    public boolean keyPressed(int i, boolean cyclic){
         if (vRenderablesCount > 0) {
             if (i == InputConstants.KEY_DOWN) {
                 if (screen.getFocused() == getLastFocusable()) {
@@ -118,7 +118,8 @@ public class RenderableVList {
                         GuiEventListener l = getLastFocusable();
                         if (l != null)
                             screen.setFocused(l);
-                    } else {
+                        return true;
+                    } else if (cyclic) {
                         if (scrolledList.get() > 0) {
                             scrolledList.set(0);
                             screen.repositionElements();
@@ -126,9 +127,9 @@ public class RenderableVList {
                         GuiEventListener l = getFirstFocusable();
                         if (l != null)
                             screen.setFocused(l);
+                        return true;
                     }
                     ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
-                    return true;
                 }
             }
             if (i == InputConstants.KEY_UP) {
@@ -138,15 +139,16 @@ public class RenderableVList {
                         GuiEventListener l = getFirstFocusable();
                         if (l != null)
                             screen.setFocused(l);
-                    } else {
+                        return true;
+                    } else if (cyclic){
                         while (canScrollDown)
                             mouseScrolled(0, 0, 0, -1);
                         GuiEventListener l = getLastFocusable();
                         if (l != null)
                             screen.setFocused(l);
+                        return true;
                     }
                     ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
-                    return true;
                 }
             }
         }

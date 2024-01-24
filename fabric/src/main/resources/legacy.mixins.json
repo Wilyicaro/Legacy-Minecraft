@@ -6,10 +6,12 @@
     "AbstractContainerScreenMixin",
     "GuiGraphicsMixin",
     "GuiMixin",
+    "LiquidBlockRendererMixin",
     "PresetEditorMixin",
     "TooltipRenderUtilMixin"
   ],
   "mixins": [
+    "ItemStackMixin"
   ],
   "injectors": {
     "defaultRequire": 1

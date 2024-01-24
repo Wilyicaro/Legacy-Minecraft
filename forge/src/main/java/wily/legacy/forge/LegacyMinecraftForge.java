@@ -5,6 +5,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
 
@@ -14,6 +15,6 @@ public class LegacyMinecraftForge {
     public LegacyMinecraftForge() {
         EventBuses.registerModEventBus(LegacyMinecraft.MOD_ID, FMLJavaModLoadingContext.get().getModEventBus());
         LegacyMinecraft.init();
-        DistExecutor.safeRunWhenOn(Dist.CLIENT,()-> LegacyMinecraftClient::init);
+        if (FMLEnvironment.dist == Dist.CLIENT) LegacyMinecraftClient.init();
     }
 }

@@ -5,8 +5,13 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+import java.util.function.Function;
+
 public class PanelVListScreen extends PanelBackgroundScreen{
     protected final RenderableVList renderableVList = new RenderableVList();
+    public PanelVListScreen(Function<Screen,Panel> panelConstructor, Component component) {
+        super(panelConstructor, component);
+    }
     public PanelVListScreen(Screen parent, int imageWidth, int imageHeight, Component component) {
         super(imageWidth, imageHeight, component);
         this.parent = parent;
@@ -35,10 +40,13 @@ public class PanelVListScreen extends PanelBackgroundScreen{
         getRenderableVList().mouseScrolled(d,e,f,g);
         return super.mouseScrolled(d, e, f, g);
     }
+    public boolean renderableKeyPressed(int i){
+        return getRenderableVList().keyPressed(i, true);
+    }
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (getRenderableVList().keyPressed(i,j,k)) return true;
+        if (renderableKeyPressed(i)) return true;
         return super.keyPressed(i, j, k);
     }
 }

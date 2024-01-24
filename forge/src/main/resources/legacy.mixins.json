@@ -7,11 +7,13 @@
     "ForgeGuiMixin",
     "GuiGraphicsMixin",
     "GuiMixin",
+    "LiquidBlockRendererMixin",
     "TitleScreenMixin",
     "TooltipRenderUtilMixin"
   ],
   "mixins": [
-    "ItemBlockRenderTypesMixin"
+    "ItemBlockRenderTypesMixin",
+    "ItemStackMixin"
   ],
   "injectors": {
     "defaultRequire": 1

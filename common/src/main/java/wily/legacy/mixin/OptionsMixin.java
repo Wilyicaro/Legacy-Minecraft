@@ -1,9 +1,10 @@
 package wily.legacy.mixin;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.OptionInstance;
-import net.minecraft.client.Options;
+import com.mojang.serialization.Codec;
+import net.minecraft.client.*;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Difficulty;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,6 +15,7 @@ import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyOptions;
 
 import java.io.File;
+import java.util.Arrays;
 
 @Mixin(Options.class)
 public abstract class OptionsMixin implements LegacyOptions {
@@ -30,21 +32,23 @@ public abstract class OptionsMixin implements LegacyOptions {
     }
 
     private OptionInstance<Double> hudDistance;
-
     private OptionInstance<Double> hudOpacity;
     private OptionInstance<Integer> autoSaveInterval;
-
     private OptionInstance<Boolean> legacyCreativeTab;
-
     private OptionInstance<Boolean> displayHUD;
-
     private OptionInstance<Boolean> animatedCharacter;
-
     private OptionInstance<Boolean> classicCrafting;
     private OptionInstance<Boolean> autoSaveWhenPause;
     private OptionInstance<Boolean> showVanillaRecipeBook;
     private OptionInstance<Boolean> legacyGamma;
     private OptionInstance<Boolean> inGameTooltips;
+    private OptionInstance<Boolean> hints;
+    private OptionInstance<Boolean> directSaveLoad;
+    private OptionInstance<Boolean> vignette;
+    private OptionInstance<Boolean> caveSounds;
+    private OptionInstance<Boolean> minecartSounds;
+    private OptionInstance<Difficulty> createWorldDifficulty;
+
 
     @Redirect(method = "<init>", at = @At( value = "INVOKE", target = "Lnet/minecraft/client/Options;load()V"))
     protected void init(Options instance) {
@@ -59,10 +63,16 @@ public abstract class OptionsMixin implements LegacyOptions {
         legacyCreativeTab = OptionInstance.createBoolean("legacy.options.creativeTab", true);
         autoSaveWhenPause = OptionInstance.createBoolean("legacy.options.autoSaveWhenPause", false);
         inGameTooltips = OptionInstance.createBoolean("legacy.options.gameTooltips", true);
+        hints = OptionInstance.createBoolean("legacy.options.hints", true);
+        directSaveLoad = OptionInstance.createBoolean("legacy.options.directSaveLoad", false);
+        vignette = OptionInstance.createBoolean("legacy.options.vignette", false);
+        minecartSounds = OptionInstance.createBoolean("legacy.options.minecartSounds", true);
+        caveSounds = OptionInstance.createBoolean("legacy.options.caveSounds", true);
         autoSaveInterval = new OptionInstance<>("legacy.options.autoSaveInterval", OptionInstance.noTooltip(), (c,i)-> i == 0 ? genericValueLabel(c,Component.translatable("options.off")) :Component.translatable( "legacy.options.mins_value",c, i * 5), new OptionInstance.IntRange(0,24), 1, d -> {});
         showVanillaRecipeBook = OptionInstance.createBoolean("legacy.options.showVanillaRecipeBook", false);
         hudOpacity = new OptionInstance<>("legacy.options.hudOpacity", OptionInstance.noTooltip(), (c, d) -> Component.translatable("options.percent_value", c, (int) (d * 100.0)), OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
         hudDistance = new OptionInstance<>("legacy.options.hudDistance", OptionInstance.noTooltip(), (c, d) -> Component.translatable("options.percent_value", c, (int) (d * 100.0)), OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
+        createWorldDifficulty = new OptionInstance<>("options.difficulty", d->Tooltip.create(d.getInfo()), (c, d) -> d.getDisplayName(), new OptionInstance.Enum<>(Arrays.asList(Difficulty.values()), Codec.INT.xmap(Difficulty::byId, Difficulty::getId)), Difficulty.NORMAL, d -> {});
         if(LegacyMinecraftClient.canLoadVanillaOptions)
             load();
     }
@@ -72,6 +82,12 @@ public abstract class OptionsMixin implements LegacyOptions {
         fieldAccess.process("hudOpacity", hudOpacity);
         fieldAccess.process("autoSaveWhenPause", autoSaveWhenPause);
         fieldAccess.process("gameTooltips", inGameTooltips);
+        fieldAccess.process("hints", hints);
+        fieldAccess.process("directSaveLoad", directSaveLoad);
+        fieldAccess.process("vignette", vignette);
+        fieldAccess.process("caveSounds", caveSounds);
+        fieldAccess.process("minecartSounds", minecartSounds);
+        fieldAccess.process("createWorldDifficulty", createWorldDifficulty);
         fieldAccess.process("autoSaveInterval", autoSaveInterval);
         fieldAccess.process("showVanillaRecipeBook", showVanillaRecipeBook);
         fieldAccess.process("displayHUD", displayHUD);
@@ -105,5 +121,21 @@ public abstract class OptionsMixin implements LegacyOptions {
     public OptionInstance<Boolean> legacyGamma() {return legacyGamma;}
     public OptionInstance<Boolean> inGameTooltips() {
         return inGameTooltips;
+    }
+    public OptionInstance<Boolean> hints() {
+        return hints;
+    }
+    public OptionInstance<Boolean> directSaveLoad() {
+        return directSaveLoad;
+    }
+    public OptionInstance<Difficulty> createWorldDifficulty() {return createWorldDifficulty;}
+    public OptionInstance<Boolean> vignette() {
+        return vignette;
+    }
+    public OptionInstance<Boolean> minecartSounds() {
+        return minecartSounds;
+    }
+    public OptionInstance<Boolean> caveSounds() {
+        return caveSounds;
     }
 }

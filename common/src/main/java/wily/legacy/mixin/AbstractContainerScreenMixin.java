@@ -63,8 +63,7 @@ public abstract class AbstractContainerScreenMixin extends Screen {
     @Inject(method = "keyPressed", at = @At("HEAD"))
     private void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
         if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && ScreenUtil.hasTip(hoveredSlot.getItem())) {
-            if (minecraft.getToasts().getToast(LegacyTip.class, Toast.NO_TOKEN) == null)
-                minecraft.getToasts().addToast(new LegacyTip(hoveredSlot.getItem()));
+            if (minecraft.getToasts().getToast(LegacyTip.class, Toast.NO_TOKEN) == null) ScreenUtil.addTip(hoveredSlot.getItem());
         }
     }
     @Inject(method = "slotClicked", at = @At("HEAD"))

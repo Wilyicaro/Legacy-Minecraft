@@ -9,6 +9,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import wily.legacy.init.LegacySoundEvents;
@@ -30,24 +31,27 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
         tabButtons.add(button);
         return this;
     }
-    public TabList addTabButton(int x, int y, int width, int height, int type, ResourceLocation icon, Component message, Tooltip tooltip, Consumer<TabButton> onPress){
-        return this.addTabButton(new TabButton(x,y,width,height,type,icon,message,tooltip,t-> {if (selectedTab != tabButtons.indexOf(t)) {
+    public TabList addTabButton(int x, int y, int width, int height, int type, ResourceLocation icon, CompoundTag itemIconTag, Component message, Tooltip tooltip, Consumer<TabButton> onPress){
+        return this.addTabButton(new TabButton(x,y,width,height,type,icon,itemIconTag,message,tooltip,t-> {if (selectedTab != tabButtons.indexOf(t)) {
             selectedTab = tabButtons.indexOf(t);
             onPress.accept(t);
         }}));
     }
 
     public TabList addTabButton(int x, int y, int width, int height, int type, Component message, Consumer<TabButton> onPress){
-        return addTabButton(x,y,width,height,type,null,message,null,onPress);
+        return addTabButton(x,y,width,height,type,null,null,message,null,onPress);
     }
     public TabList addTabButton(int x, int y, int height, int type, Component message, Consumer<TabButton> onPress){
-        return addTabButton(x,y,0,height,type,null,message,null,onPress);
+        return addTabButton(x,y,0,height,type,null,null,message,null,onPress);
     }
     public TabList addTabButton(int height, int type, Component message, Consumer<TabButton> onPress){
-        return addTabButton(0,0,0,height,type,null,message,null,onPress);
+        return addTabButton(0,0,0,height,type,null,null,message,null,onPress);
+    }
+    public TabList addTabButton(int height, int type, ResourceLocation icon, CompoundTag itemIconTag, Component component, Consumer<TabButton> onPress){
+        return addTabButton(0,0,0,height,type,icon, itemIconTag,component, null,onPress);
     }
     public TabList addTabButton(int height, int type, ResourceLocation icon, Component component, Consumer<TabButton> onPress){
-        return addTabButton(0,0,0,height,type,icon,component, null,onPress);
+        return addTabButton(0,0,0,height,type,icon, null,component, null,onPress);
     }
     public void init(int leftPos, int topPos, int width){
         init(leftPos,topPos,width,(t,i)->{});
@@ -115,7 +119,7 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
 
     @Override
     public NarrationPriority narrationPriority() {
-        return this.tabButtons.stream().map(AbstractWidget::narrationPriority).max(Comparator.naturalOrder()).orElse(NarratableEntry.NarrationPriority.NONE);
+        return this.tabButtons.stream().map(AbstractWidget::narrationPriority).max(Comparator.naturalOrder()).orElse(NarrationPriority.NONE);
     }
 
     @Override

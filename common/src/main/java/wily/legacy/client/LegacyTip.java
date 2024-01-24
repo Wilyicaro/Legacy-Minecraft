@@ -3,23 +3,21 @@ package wily.legacy.client;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.SimpleLayoutRenderable;
 import wily.legacy.util.ScreenUtil;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
 
-    private final List<FormattedCharSequence> tipLines;
-
+    private final MultiLineLabel multiLineLabel;
     public Visibility visibility = Visibility.SHOW;
 
     public Component title = Component.empty();
@@ -37,12 +35,12 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
     }
     public LegacyTip(Component tip, int width, int height){
         super(width, height);
-        this.tipLines = minecraft.font.split(tip,width - 26);
+        multiLineLabel = MultiLineLabel.create(minecraft.font,tip,width-26);
         disappearTime = tip.getString().toCharArray().length * 80L;
     }
     public LegacyTip(Component title, Component tip){
         this(tip, 250,0);
-        height = 26 + tipLines.size() * 12;
+        height = 26 + multiLineLabel.getLineCount() * 12;
         title(title);
         setY(25);
         canRemove(()-> initScreen != minecraft.screen);
@@ -69,7 +67,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
         if (holder == null){
             holder = new LegacyIconHolder(32,32);
             holder.setX((width - 32 )/ 2);
-            holder.setY(13 + (tipLines.size() + (title.getString().isEmpty() ? 0 : 1)) * 12);
+            holder.setY(13 + (multiLineLabel.getLineCount() + (title.getString().isEmpty() ? 0 : 1)) * 12);
             holder.allowItemDecorations = false;
         }
         holder.itemIcon = itemStack;
@@ -92,6 +90,11 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
     }
 
     @Override
+    public int slotCount() {
+        return Math.min(5,Toast.super.slotCount());
+    }
+
+    @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         if (Util.getMillis() - createdTime >= disappearTime) visibility = Visibility.HIDE;
         renderTip(guiGraphics, i, j, f);
@@ -103,12 +106,9 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
         ScreenUtil.renderPointerPanel(guiGraphics,0,0,getWidth(),getHeight());
         if (!title.getString().isEmpty()) {
             guiGraphics.drawString(minecraft.font,title,13,13,0xFFFFFF);
-            for (FormattedCharSequence tipLine : tipLines)
-                guiGraphics.drawString(minecraft.font,tipLine,13,13 + (1 + tipLines.indexOf(tipLine)) * 12,0xFFFFFF,false);
-        }else{
-            for (FormattedCharSequence tipLine : tipLines)
-                guiGraphics.drawString(minecraft.font,tipLine,(width - minecraft.font.width(tipLine)) / 2,13 + tipLines.indexOf(tipLine) * 12,0xFFFFFF);
-        }
+            multiLineLabel.renderLeftAlignedNoShadow(guiGraphics,13,25, 12,0xFFFFFF);
+        }else
+            multiLineLabel.renderCentered(guiGraphics,width / 2,13);
         if (holder != null) holder.render(guiGraphics,i,j,f);
         guiGraphics.pose().popPose();
     }

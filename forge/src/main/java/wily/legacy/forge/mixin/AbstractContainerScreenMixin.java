@@ -13,19 +13,10 @@ import wily.legacy.util.ScreenUtil;
 
 @Mixin(AbstractContainerScreen.class)
 public abstract class AbstractContainerScreenMixin {
-    @Shadow protected int leftPos;
-
-    @Shadow protected int topPos;
     @Shadow protected Slot hoveredSlot;
 
     @Redirect(method = "render", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlight(Lnet/minecraft/client/gui/GuiGraphics;IIII)V",remap = false))
     private void renderSlotHightlight(GuiGraphics graphics, int i, int j, int k, int color) {
-        graphics.pose().pushPose();
-        LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(hoveredSlot);
-        graphics.pose().translate(i,j,0);
-        holder.applyTranslation(graphics);
-        graphics.pose().scale(holder.getSelectableWidth() / 16f,holder.getSelectableHeight() / 16f,holder.getSelectableHeight() / 16f);
-        graphics.fillGradient(RenderType.guiOverlay(), 0, 0, 16,16, color, color, k);
-        graphics.pose().popPose();
+        ScreenUtil.iconHolderRenderer.slotBounds(hoveredSlot).renderHighlight(graphics, color, k);
     }
 }

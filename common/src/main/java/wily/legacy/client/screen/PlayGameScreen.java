@@ -19,8 +19,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class PlayGameScreen extends PanelVListScreen{
-    protected PlayGameScreen(Screen parent) {
+    public PlayGameScreen(Screen parent, int initialTab) {
         super(parent,300,256,Component.translatable("legacy.menu.play_game"));
+    }
+    public PlayGameScreen(Screen parent) {
+        this(parent,0);
     }
     protected final TabList tabList = new TabList().addTabButton(30,0,Component.translatable("legacy.menu.load"),b-> repositionElements()).addTabButton(30,1,Component.translatable("legacy.menu.create"), b-> repositionElements()).addTabButton(30,2,Component.translatable("legacy.menu.join"), b-> repositionElements());
     public boolean isLoading = false;
@@ -45,7 +48,6 @@ public class PlayGameScreen extends PanelVListScreen{
         tabList.init(panel.x,panel.y - 24,panel.width);
     }
 
-
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         ScreenUtil.renderDefaultBackground(guiGraphics,false);
@@ -61,8 +63,7 @@ public class PlayGameScreen extends PanelVListScreen{
     @Override
     public void removed() {
         if (this.saveSelectionList != null) {
-            this.saveSelectionList.iconCache.asMap().forEach((s,i)-> i.close());
-            saveSelectionList.iconCache.invalidateAll();
+            SaveSelectionList.resetIconCache();
         }
         if (serverSelectionList.lanServerDetector != null) {
             serverSelectionList.lanServerDetector.interrupt();

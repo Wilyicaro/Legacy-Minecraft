@@ -1,6 +1,7 @@
 package wily.legacy.client;
 
 import net.minecraft.client.OptionInstance;
+import net.minecraft.world.Difficulty;
 
 public interface LegacyOptions {
 
@@ -15,4 +16,10 @@ public interface LegacyOptions {
     OptionInstance<Boolean> showVanillaRecipeBook();
     OptionInstance<Boolean> legacyGamma();
     OptionInstance<Boolean> inGameTooltips();
+    OptionInstance<Boolean> hints();
+    OptionInstance<Boolean> directSaveLoad();
+    OptionInstance<Boolean> vignette();
+    OptionInstance<Boolean> caveSounds();
+    OptionInstance<Boolean> minecartSounds();
+    OptionInstance<Difficulty> createWorldDifficulty();
 }

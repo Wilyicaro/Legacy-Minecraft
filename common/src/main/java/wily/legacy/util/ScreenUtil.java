@@ -9,12 +9,16 @@ import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacyTip;
+import wily.legacy.client.LegacyTipOverride;
 import wily.legacy.client.screen.LegacyIconHolder;
 
 import java.util.function.Consumer;
@@ -90,17 +94,11 @@ public class ScreenUtil {
             logoRenderer.renderLogo(guiGraphics,mc.screen == null ?  0: mc.screen.width,1.0F);
     }
     public static void renderPanoramaBackground(GuiGraphics guiGraphics, boolean isNight){
-        if (mc.screen != null) {
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().scale(mc.screen.width / 256F, mc.screen.height / 144F, 1.0F);
-            guiGraphics.pose().translate(- (mc.options.panoramaSpeed().get() * Util.getMillis() / 160D) % 820, 0, 0);
-        }
         RenderSystem.depthMask(false);
-        ResourceLocation panorama = new ResourceLocation(LegacyMinecraft.MOD_ID,"textures/gui/title/panorama_"+ (isNight ? "night" : "day") + ".png");
-        Minecraft.getInstance().getTextureManager().getTexture(panorama).setFilter(true,false);
-        guiGraphics.blit(panorama,0,0,0,0,1640,144,820,144);
+        ResourceLocation panorama = new ResourceLocation(LegacyMinecraft.MOD_ID, "textures/gui/title/panorama_" + (isNight ? "night" : "day") + ".png");
+        Minecraft.getInstance().getTextureManager().getTexture(panorama).setFilter(true, false);
+        guiGraphics.blit(panorama, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() / 80f, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiHeight() * 820/144, guiGraphics.guiHeight());
         RenderSystem.depthMask(true);
-        guiGraphics.pose().popPose();
     }
     public static void drawOutlinedString(GuiGraphics graphics, Font font, Component component, int x, int y, int color, int outlineColor, float outline) {
         drawStringOutline(graphics,font,component,x,y,outlineColor,outline);
@@ -143,14 +141,33 @@ public class ScreenUtil {
     public static void playSimpleUISound(SoundEvent sound, float grave){
         mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave));
     }
+    public static void addTip(Entity entity){
+        if (hasTip(entity.getType())) mc.getToasts().addToast(new LegacyTip(entity.getType().getDescription(), ScreenUtil.getTip(entity.getType())));
+        else if (hasTip(entity.getPickResult())) addTip(entity.getPickResult());
+    }
+    public static void addTip(ItemStack stack){
+        if (hasTip(stack)) mc.getToasts().addToast(new LegacyTip(stack));
+    }
     public static Component getTip(ItemStack item){
-        return Component.translatable(getTipId(item));
+        return hasValidTipOverride(item) ? LegacyTipOverride.getOverride(item) : Component.translatable(getTipId(item));
+    }
+    public static Component getTip(EntityType<?> type){
+        return hasValidTipOverride(type) ? LegacyTipOverride.getOverride(type) : Component.translatable(getTipId(type));
     }
     public static boolean hasTip(ItemStack item){
-        return hasTip(getTipId(item));
+        return hasTip(getTipId(item)) || hasValidTipOverride(item);
+    }
+    public static boolean hasValidTipOverride(ItemStack item){
+        return !LegacyTipOverride.getOverride(item).getString().isEmpty() && hasTip(((TranslatableContents)LegacyTipOverride.getOverride(item).getContents()).getKey());
+    }
+    public static boolean hasValidTipOverride(EntityType<?> type){
+        return !LegacyTipOverride.getOverride(type).getString().isEmpty() && hasTip(((TranslatableContents)LegacyTipOverride.getOverride(type).getContents()).getKey());
     }
     public static boolean hasTip(String s){
         return Language.getInstance().has(s);
+    }
+    public static boolean hasTip(EntityType<?> s){
+        return hasTip(getTipId(s)) || hasValidTipOverride(s);
     }
     public static String getTipId(ItemStack item){
         return item.getDescriptionId() + ".tip";

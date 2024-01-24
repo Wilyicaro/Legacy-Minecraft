@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.util.ScreenUtil;
 
@@ -33,6 +34,18 @@ public abstract class GuiMixin {
 
     @Shadow
     private ItemStack lastToolHighlight;
+
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)I"))
+    public int renderActionBar(GuiGraphics instance, Font arg, Component arg2, int i, int j, int k) {
+        if (minecraft.screen != null) return 0;
+        instance.pose().pushPose();
+        instance.pose().translate(0,ScreenUtil.getHUDDistance(),0);
+        instance.setColor(1.0f,1.0f,1.0f,ScreenUtil.getInterfaceOpacity());
+        int r = instance.drawString(arg,arg2,i,j - 10 - (lastToolHighlight.isEmpty() ? 0 : (lastToolHighlight.getTooltipLines(null, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum() - 1) * 9),k);
+        instance.pose().popPose();
+        instance.setColor(1.0f,1.0f,1.0f,1.0f);
+        return r;
+    }
     @Inject(method = "renderVehicleHealth", at = @At("HEAD"), cancellable = true)
     public void renderVehicleHealth(GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null){

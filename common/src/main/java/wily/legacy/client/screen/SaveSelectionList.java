@@ -34,6 +34,7 @@ import net.minecraft.world.level.validation.ForbiddenSymlinkInfo;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
@@ -57,7 +58,6 @@ public class SaveSelectionList extends RenderableVList {
     static final ResourceLocation JOIN_HIGHLIGHTED_SPRITE = new ResourceLocation("world_list/join_highlighted");
     static final ResourceLocation JOIN_SPRITE = new ResourceLocation("world_list/join");
     static final Logger LOGGER = LogUtils.getLogger();
-    static final DateFormat DATE_FORMAT = new SimpleDateFormat();
     static final Component FROM_NEWER_TOOLTIP_1 = Component.translatable("selectWorld.tooltip.fromNewerVersion1").withStyle(ChatFormatting.RED);
     static final Component FROM_NEWER_TOOLTIP_2 = Component.translatable("selectWorld.tooltip.fromNewerVersion2").withStyle(ChatFormatting.RED);
     static final Component SNAPSHOT_TOOLTIP_1 = Component.translatable("selectWorld.tooltip.snapshot1").withStyle(ChatFormatting.GOLD);
@@ -72,14 +72,14 @@ public class SaveSelectionList extends RenderableVList {
     @Nullable
     public List<LevelSummary> currentlyDisplayedLevels;
     private String filter;
-    LoadingCache<LevelSummary, FaviconTexture> iconCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
+    public static LoadingCache<LevelSummary, FaviconTexture> iconCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
         @Override
         public FaviconTexture load(LevelSummary key) {
             Path iconFile = key.getIcon();
             try {
                 BasicFileAttributes basicFileAttributes = Files.readAttributes(iconFile, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
                 if (basicFileAttributes.isSymbolicLink()) {
-                    List<ForbiddenSymlinkInfo> list = minecraft.directoryValidator().validateSymlink(iconFile);
+                    List<ForbiddenSymlinkInfo> list = Minecraft.getInstance().directoryValidator().validateSymlink(iconFile);
                     if (!list.isEmpty()) {
                         LegacyMinecraft.LOGGER.warn("{}", ContentValidationException.getMessage(iconFile, list));
                         iconFile = null;
@@ -96,7 +96,7 @@ public class SaveSelectionList extends RenderableVList {
                 LegacyMinecraft.LOGGER.error("could not validate symlink", iOException);
                 iconFile = null;
             }
-            FaviconTexture icon = FaviconTexture.forWorld(minecraft.getTextureManager(), key.getLevelId());
+            FaviconTexture icon = FaviconTexture.forWorld(Minecraft.getInstance().getTextureManager(), key.getLevelId());
             boolean bl = iconFile != null && Files.isRegularFile(iconFile);
             if (bl) {
                 try (InputStream inputStream = Files.newInputStream(iconFile)) {
@@ -117,6 +117,11 @@ public class SaveSelectionList extends RenderableVList {
         this.minecraft = Minecraft.getInstance();
         this.filter = "";
         reloadSaveList();
+    }
+
+    public static void resetIconCache(){
+        SaveSelectionList.iconCache.asMap().forEach((s, i)-> i.close());
+        SaveSelectionList.iconCache.invalidateAll();
     }
 
 
@@ -338,14 +343,13 @@ public class SaveSelectionList extends RenderableVList {
                 }
             }, Component.translatable("selectWorld.versionQuestion"), Component.translatable("selectWorld.versionWarning", summary.getWorldVersionName()), Component.translatable("selectWorld.versionJoinButton"), CommonComponents.GUI_CANCEL));
         } else {
-            this.loadWorld(summary);
+            loadWorld(summary);
         }
     }
     private void loadWorld(LevelSummary summary) {
-        if (this.minecraft.getLevelSource().levelExists(summary.getLevelId())) {
-            this.minecraft.forceSetScreen(new GenericDirtMessageScreen(Component.translatable("selectWorld.data_read")));
-            this.minecraft.createWorldOpenFlows().loadLevel(this.screen, summary.getLevelId());
-        }
+        if (((LegacyOptions)minecraft.options).directSaveLoad().get())
+            LoadSaveScreen.loadWorld(screen,minecraft,summary);
+        else minecraft.setScreen(new LoadSaveScreen(screen, summary));
     }
 
     public void deleteSave(LevelSummary summary) {

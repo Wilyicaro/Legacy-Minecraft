@@ -1,8 +1,10 @@
 package wily.legacy;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.datafixers.util.Pair;
 import dev.architectury.event.CompoundEventResult;
 import dev.architectury.event.events.client.ClientGuiEvent;
+import dev.architectury.event.events.client.ClientLifecycleEvent;
 import dev.architectury.event.events.client.ClientPlayerEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.registry.ReloadListenerRegistry;
@@ -15,6 +17,7 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.RenderType;
@@ -28,6 +31,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.HttpUtil;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.GameType;
@@ -47,20 +52,20 @@ import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.*;
+import wily.legacy.network.ServerDisplayInfoSync;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static wily.legacy.LegacyMinecraft.MOD_ID;
 
 
 public class LegacyMinecraftClient {
+    public static final ResourceLocation MAP_PLAYER_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"icon/map/player");
     public static final ResourceLocation SCROLL_DOWN = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/scroll_down");
     public static final ResourceLocation SCROLL_UP = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/scroll_up");
     public static final ResourceLocation SCROLL_RIGHT = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/scroll_right");
@@ -99,8 +104,30 @@ public class LegacyMinecraftClient {
     public static RenderType blockItemRenderTypeOverride = null;
     public static final LegacyTipManager legacyTipManager = new LegacyTipManager();
     public static final LegacyCreativeTabListing.Manager legacyCreativeListingManager = new LegacyCreativeTabListing.Manager();
+    public static final LegacyBiomeOverride.Manager legacyBiomeOverrides = new LegacyBiomeOverride.Manager();
+    public static final LegacyWorldTemplate.Manager legacyWorldTemplateManager = new LegacyWorldTemplate.Manager();
+    public static final LegacyTipOverride.Manager legacyTipOverridesManager = new LegacyTipOverride.Manager();
     public static KnownListing<Block> knownBlocks;
     public static KnownListing<EntityType<?>> knownEntities;
+    public static GameType enterWorldGameType;
+
+    public static int[] MAP_PLAYER_COLORS = new int[]{0xFFFFFF,0x00FF4C,0xFF2119,0x6385FF,0xFF63D9,0xFF9C00,0xFFFB19,0x63FFE4};
+
+    public static float[] getVisualPlayerColor(int i){
+        i = Math.abs(i);
+        int baseColor = MAP_PLAYER_COLORS[i % MAP_PLAYER_COLORS.length];
+        if (i < MAP_PLAYER_COLORS.length) return new float[]{(baseColor >> 16 & 255) / 255f,(baseColor >> 8 & 255) / 255f,(baseColor & 255) / 255f};
+        float f = ((i - MAP_PLAYER_COLORS.length) % 101) / 250f;
+        float r = ((baseColor >> 16 & 255) * (0.8f + f)) / 255f;
+        float g = ((baseColor >> 8 & 255) * (0.8f +(f * 1.2f))) / 255f;
+        float b = ((baseColor & 255) * (0.8f +(f / 2f))) / 255f;
+        return new float[]{r,g,b};
+    }
+    public static int[] getVisualPlayerColor(String s){
+        float[] c = getVisualPlayerColor(LegacyMinecraft.playerVisualIds.getOrDefault(s,s.hashCode()));
+        return new int[]{(int) (c[0] * 255), (int) (c[1] * 255), (int) (c[2] * 255)};
+    }
+
 
     public static final Map<Optional<ResourceKey<WorldPreset>>,PresetEditor> VANILLA_PRESET_EDITORS = new HashMap<>(Map.of(Optional.of(WorldPresets.FLAT), (createWorldScreen, settings) -> {
         ChunkGenerator chunkGenerator = settings.selectedDimensions().overworld();
@@ -114,15 +141,27 @@ public class LegacyMinecraftClient {
     public static void init() {
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyTipManager);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyCreativeListingManager);
+        ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyWorldTemplateManager);
+        ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyTipOverridesManager);
+        ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyBiomeOverrides);
         KeyMappingRegistry.register(legacyKeyInventory);
+        KeyMappingRegistry.register(keyHostOptions);
         knownBlocks = new KnownListing<>(Registries.BLOCK,Minecraft.getInstance().gameDirectory.toPath());
         knownEntities = new KnownListing<>(Registries.ENTITY_TYPE,Minecraft.getInstance().gameDirectory.toPath());
+    }
+    public static void onClientPlayerInfoChange(){
+        Minecraft minecraft = Minecraft.getInstance();
+        if (!minecraft.hasSingleplayerServer() && minecraft.level != null && minecraft.player != null)
+            LegacyMinecraft.NETWORK.sendToServer(new ServerDisplayInfoSync(0));
+        if (minecraft.screen instanceof HostOptionsScreen s) s.reloadPlayerButtons();
     }
     public static void enqueueInit() {
         ClientGuiEvent.SET_SCREEN.register((screen) -> {
             Minecraft minecraft = Minecraft.getInstance();
             if (screen instanceof TitleScreen t)
                 return CompoundEventResult.interruptTrue(new MainMenuScreen(false));
+            if (screen instanceof JoinMultiplayerScreen)
+                return CompoundEventResult.interruptTrue(new PlayGameScreen(new MainMenuScreen(false),2));
             if (screen instanceof DeathScreen d)
                 return CompoundEventResult.interruptTrue(new LegacyDeathScreen(d.causeOfDeath,d.hardcore));
             if (((LegacyOptions)minecraft.options).legacyCreativeTab().get() && screen instanceof CreativeModeInventoryScreen c) {
@@ -143,29 +182,36 @@ public class LegacyMinecraftClient {
                 ((ReplaceableScreen)inventoryScreen).setCanReplace(false);
                 minecraft.setScreen(inventoryScreen);
             }
+            while (keyHostOptions.consumeClick()) {
+                minecraft.setScreen(new HostOptionsScreen());
+            }
         });
-        ClientPlayerEvent.CLIENT_PLAYER_QUIT.register(p-> {
+        ClientLifecycleEvent.CLIENT_STOPPING.register(p-> {
             knownBlocks.save();
             knownEntities.save();
         });
+        ClientPlayerEvent.CLIENT_PLAYER_JOIN.register(p-> {
+            Minecraft minecraft = Minecraft.getInstance();
+        if (enterWorldGameType != null && minecraft.hasSingleplayerServer()){
+            minecraft.getSingleplayerServer().getPlayerList().getPlayer(p.getUUID()).setGameMode(enterWorldGameType);
+            enterWorldGameType = null;
+        }
+        });
         ClientTickEvent.CLIENT_LEVEL_POST.register((level)->{
             Minecraft minecraft = Minecraft.getInstance();
-            if (level != null && minecraft.screen == null && ((LegacyOptions)minecraft.options).inGameTooltips().get()) {
+            if (level != null && minecraft.screen == null && ((LegacyOptions)minecraft.options).hints().get()) {
                 HitResult hit = minecraft.hitResult;
                 if (hit instanceof BlockHitResult blockHitResult) {
                     BlockState state = level.getBlockState(blockHitResult.getBlockPos());
                     if (!state.isAir()) {
-                        if (ScreenUtil.hasTip(state.getBlock().asItem().getDefaultInstance()) && !knownBlocks.contains(state.getBlock()))
-                            minecraft.getToasts().addToast(new LegacyTip(state.getBlock().asItem().getDefaultInstance()));
+                        if (!knownBlocks.contains(state.getBlock())) ScreenUtil.addTip(state.getBlock().asItem().getDefaultInstance());
                         knownBlocks.add(state.getBlock());
 
                     }
                 } else if (hit instanceof EntityHitResult r){
-                    if (r.getEntity() instanceof LivingEntity e){
-                        if (ScreenUtil.hasTip(ScreenUtil.getTipId(e.getType())) && !knownEntities.contains(e.getType()))
-                            minecraft.getToasts().addToast(new LegacyTip(e.getDisplayName(),Component.translatable(ScreenUtil.getTipId(e.getType()))));
-                        knownEntities.add(e.getType());
-                    }
+                    Entity e = r.getEntity();
+                    if (!knownEntities.contains(e.getType())) ScreenUtil.addTip(e);
+                    knownEntities.add(e.getType());
                 }
             }
         });
@@ -173,6 +219,7 @@ public class LegacyMinecraftClient {
     }
 
     public static final KeyMapping legacyKeyInventory = new KeyMapping( MOD_ID +".key.inventory", InputConstants.KEY_I, "key.categories.inventory");
+    public static final KeyMapping keyHostOptions = new KeyMapping( MOD_ID +".key.host_options", InputConstants.KEY_H, "key.categories.misc");
     public static void resetVanillaOptions(Minecraft minecraft){
         canLoadVanillaOptions = false;
         minecraft.options = new Options(minecraft,minecraft.gameDirectory);
@@ -191,6 +238,22 @@ public class LegacyMinecraftClient {
     }
     public static void registerExtraModels(Consumer<ResourceLocation> register){
 
+    }
+    public static Pair<Integer,Component> tryParsePort(String string) {
+        if (string.isBlank())
+            return Pair.of(HttpUtil.getAvailablePort(),null);
+        try {
+            int port = Integer.parseInt(string);
+            if (port < 1024 || port > 65535) {
+                return Pair.of(port,Component.translatable("lanServer.port.invalid.new", 1024, 65535));
+            }
+            if (!HttpUtil.isPortAvailable(port)) {
+                Pair.of(port,Component.translatable("lanServer.port.unavailable.new", 1024, 65535));
+            }
+            return Pair.of(null,null);
+        } catch (NumberFormatException numberFormatException) {
+            return  Pair.of(HttpUtil.getAvailablePort(),Component.translatable("lanServer.port.invalid.new", 1024, 65535));
+        }
     }
     public static boolean publishUnloadedServer(Minecraft minecraft, @Nullable GameType gameType, boolean bl, int i) {
         IntegratedServer server = minecraft.getSingleplayerServer();
