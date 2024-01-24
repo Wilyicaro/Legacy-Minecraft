@@ -166,6 +166,7 @@ public abstract class GuiMixin {
             ci.cancel();
             return;
         }
+        RenderSystem.enableBlend();
         guiGraphics.setColor(1.0f, 1.0f, 1.0f, ScreenUtil.getInterfaceOpacity());
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F, ScreenUtil.getHUDDistance(), 0.0F);

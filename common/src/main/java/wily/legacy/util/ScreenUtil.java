@@ -97,7 +97,7 @@ public class ScreenUtil {
         RenderSystem.depthMask(false);
         ResourceLocation panorama = new ResourceLocation(LegacyMinecraft.MOD_ID, "textures/gui/title/panorama_" + (isNight ? "night" : "day") + ".png");
         Minecraft.getInstance().getTextureManager().getTexture(panorama).setFilter(true, false);
-        guiGraphics.blit(panorama, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() / 80f, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiHeight() * 820/144, guiGraphics.guiHeight());
+        guiGraphics.blit(panorama, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() / 66.32f, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiHeight() * 820/144, guiGraphics.guiHeight());
         RenderSystem.depthMask(true);
     }
     public static void drawOutlinedString(GuiGraphics graphics, Font font, Component component, int x, int y, int color, int outlineColor, float outline) {

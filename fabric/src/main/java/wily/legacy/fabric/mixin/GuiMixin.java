@@ -1,5 +1,6 @@
 package wily.legacy.fabric.mixin;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -38,12 +39,14 @@ public abstract class GuiMixin {
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)I"))
     public int renderActionBar(GuiGraphics instance, Font arg, Component arg2, int i, int j, int k) {
         if (minecraft.screen != null) return 0;
+        RenderSystem.enableBlend();
         instance.pose().pushPose();
         instance.pose().translate(0,ScreenUtil.getHUDDistance(),0);
         instance.setColor(1.0f,1.0f,1.0f,ScreenUtil.getInterfaceOpacity());
         int r = instance.drawString(arg,arg2,i,j - 10 - (lastToolHighlight.isEmpty() ? 0 : (lastToolHighlight.getTooltipLines(null, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum() - 1) * 9),k);
         instance.pose().popPose();
         instance.setColor(1.0f,1.0f,1.0f,1.0f);
+        RenderSystem.disableBlend();
         return r;
     }
     @Inject(method = "renderVehicleHealth", at = @At("HEAD"), cancellable = true)
@@ -52,6 +55,7 @@ public abstract class GuiMixin {
             ci.cancel();
             return;
         }
+        RenderSystem.enableBlend();
         guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getInterfaceOpacity());
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F,ScreenUtil.getHUDDistance(),0.0F);
@@ -61,6 +65,7 @@ public abstract class GuiMixin {
     public void renderVehicleHealthTail(GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null)
             return;
+        RenderSystem.disableBlend();
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
         ScreenUtil.resetHUDScale(guiGraphics, i-> screenWidth = i, i-> screenHeight = i);
         guiGraphics.pose().popPose();
@@ -71,6 +76,7 @@ public abstract class GuiMixin {
             ci.cancel();
             return;
         }
+        RenderSystem.enableBlend();
         guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getInterfaceOpacity());
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F,ScreenUtil.getHUDDistance(),0.0F);
@@ -80,6 +86,7 @@ public abstract class GuiMixin {
     public void renderPlayerHealthTail(GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null)
             return;
+        RenderSystem.disableBlend();
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
         ScreenUtil.resetHUDScale(guiGraphics, i-> screenWidth = i, i-> screenHeight = i);
         guiGraphics.pose().popPose();
@@ -90,6 +97,7 @@ public abstract class GuiMixin {
             ci.cancel();
             return;
         }
+        RenderSystem.enableBlend();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F,ScreenUtil.getHUDDistance(),0.0F);
         this.minecraft.getProfiler().push("selectedItemName");
@@ -116,6 +124,7 @@ public abstract class GuiMixin {
                 }
             }
         }
+        RenderSystem.disableBlend();
         this.minecraft.getProfiler().pop();
         guiGraphics.pose().popPose();
         ci.cancel();
