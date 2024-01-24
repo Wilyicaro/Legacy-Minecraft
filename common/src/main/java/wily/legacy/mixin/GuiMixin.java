@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.Sheets;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PlayerRideableJumping;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -20,7 +21,10 @@ import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
@@ -31,10 +35,6 @@ import wily.legacy.util.ScreenUtil;
 
 public abstract class GuiMixin {
     @Shadow @Final protected Minecraft minecraft;
-
-    @Shadow @Final protected static ResourceLocation EXPERIENCE_BAR_BACKGROUND_SPRITE;
-
-    @Shadow @Final protected static ResourceLocation EXPERIENCE_BAR_PROGRESS_SPRITE;
 
     @Shadow protected int screenHeight;
 
@@ -47,6 +47,11 @@ public abstract class GuiMixin {
     @Shadow protected float lastAutosaveIndicatorValue;
 
     @Shadow protected abstract Player getCameraPlayer();
+    @Inject(method = "renderVignette", at = @At("HEAD"), cancellable = true)
+    public void renderVignette(GuiGraphics guiGraphics, Entity entity, CallbackInfo ci) {
+        if (minecraft.screen != null || !((LegacyOptions)minecraft.options).vignette().get())
+            ci.cancel();
+    }
     @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
     public void renderCrosshair(GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null){
@@ -57,7 +62,7 @@ public abstract class GuiMixin {
     }
     @Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;)V"))
     public void renderCrosshairBlendFunc(GlStateManager.SourceFactor sourceFactor, GlStateManager.DestFactor destFactor, GlStateManager.SourceFactor sourceFactor2, GlStateManager.DestFactor destFactor2, GuiGraphics guiGraphics) {
-        if (ScreenUtil.getInterfaceOpacity() < 1.0) {
+        if (((LegacyOptions)minecraft.options).hudOpacity().get() < 1.0) {
             guiGraphics.setColor(1.0f, 1.0f, 1.0f, ScreenUtil.getInterfaceOpacity());
             RenderSystem.enableBlend();
         } else RenderSystem.blendFuncSeparate(sourceFactor,destFactor,sourceFactor2,destFactor2);

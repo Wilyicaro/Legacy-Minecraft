@@ -42,7 +42,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     public final List<Stocker.Sizeable> tabsScrolledList = new ArrayList<>();
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
 
-    protected static final List<LegacyCreativeTabListing> java4LegacyListing = CreativeModeTabs.tabs().stream().filter(c->c.getType() == CreativeModeTab.Type.CATEGORY).map(c->new LegacyCreativeTabListing(c.getDisplayName(), BuiltInRegistries.ITEM.getKey(c.getIconItem().getItem()),new ArrayList<>(c.getDisplayItems()))).toList();
+    protected static final List<LegacyCreativeTabListing> java4LegacyListing = CreativeModeTabs.tabs().stream().filter(c->c.getType() == CreativeModeTab.Type.CATEGORY).map(c->new LegacyCreativeTabListing(c.getDisplayName(), BuiltInRegistries.ITEM.getKey(c.getIconItem().getItem()), c.getIconItem().getTag(),new ArrayList<>(c.getDisplayItems()))).toList();
 
     protected final List<LegacyCreativeTabListing> displayListing = Stream.concat(LegacyCreativeTabListing.list.stream(), java4LegacyListing.stream()).toList();
     protected Stocker.Sizeable page = new Stocker.Sizeable(0);
@@ -65,7 +65,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
         for (int i = page.get() * 8; i < displayListing.size(); i++) {
             t++;
             LegacyCreativeTabListing tab = displayListing.get(i);
-            tabList.addTabButton(39,t == 1 ? 0 : t >= 8 ? 2 : 1,tab.icon(),tab.name(),b-> fillCreativeGrid());
+            tabList.addTabButton(39,t == 1 ? 0 : t >= 8 ? 2 : 1,tab.icon(), tab.itemIconTag(),tab.name(),b-> fillCreativeGrid());
             if (t == 8) break;
         }
     }
@@ -254,7 +254,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
                     int l = bl ? itemStack2.getMaxStackSize() : itemStack2.getCount();
                     menu.setCarried(itemStack2.copyWithCount(l));
                 }
-            } else if (this.menu != null) {
+            } else {
                 ItemStack itemStack = slot == null ? ItemStack.EMPTY : menu.getSlot(slot.index).getItem();
                 menu.clicked(slot == null ? i : slot.index, j, clickType, this.minecraft.player);
                 if (AbstractContainerMenu.getQuickcraftHeader(j) == 2) {
@@ -264,7 +264,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
                 } else if (slot != null) {
                     ItemStack itemStack2 = menu.getSlot(slot.index).getItem();
                     this.minecraft.gameMode.handleCreativeModeItemAdd(itemStack2, slot.index - menu.slots.size() + 9 + 36);
-                    int l = 45 + j;
+                    int l = 50 + j;
                     if (clickType == ClickType.SWAP) {
                         this.minecraft.gameMode.handleCreativeModeItemAdd(itemStack, l - menu.slots.size() + 9 + 36);
                     } else if (clickType == ClickType.THROW && !itemStack.isEmpty()) {

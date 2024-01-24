@@ -1,0 +1,12 @@
+{
+  "overrides": [
+    {
+      "items": ["#c:glass_blocks", "!minecraft:glass", "!minecraft:tinted_glass"],
+      "tip": "block.minecraft.stained_glass.tip"
+    },
+    {
+      "items": ["#c:glass_panes", "!minecraft:glass_pane"],
+      "tip": "block.minecraft.stained_glass_pane.tip"
+    }
+  ]
+}

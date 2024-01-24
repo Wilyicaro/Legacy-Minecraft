@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 
 public class ExitConfirmationScreen extends ConfirmationScreen{
     public ExitConfirmationScreen(Screen parent) {
-        super(parent, 230, 156, Component.translatable("menu.quit"), Component.translatable("legacy.menu.exit_message"), b-> {});
+        super(parent, 230, 156, Component.translatable("menu.quit"), Minecraft.getInstance().hasSingleplayerServer() ? Component.translatable("legacy.menu.exit_message") : Component.translatable("legacy.menu.server_exit_message"), b-> {});
     }
 
     @Override

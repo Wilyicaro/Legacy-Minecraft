@@ -31,6 +31,7 @@ import net.minecraft.world.level.validation.ForbiddenSymlinkInfo;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
@@ -69,14 +70,14 @@ public class SaveSelectionList extends RenderableVList {
     @Nullable
     public List<LevelSummary> currentlyDisplayedLevels;
     private String filter;
-    LoadingCache<LevelSummary, FaviconTexture> iconCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
+    public static LoadingCache<LevelSummary, FaviconTexture> iconCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
         @Override
         public FaviconTexture load(LevelSummary key) {
             Path iconFile = key.getIcon();
             try {
                 BasicFileAttributes basicFileAttributes = Files.readAttributes(iconFile, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
                 if (basicFileAttributes.isSymbolicLink()) {
-                    List<ForbiddenSymlinkInfo> list = minecraft.directoryValidator().validateSymlink(iconFile);
+                    List<ForbiddenSymlinkInfo> list = Minecraft.getInstance().directoryValidator().validateSymlink(iconFile);
                     if (!list.isEmpty()) {
                         LegacyMinecraft.LOGGER.warn("{}", ContentValidationException.getMessage(iconFile, list));
                         iconFile = null;
@@ -93,7 +94,7 @@ public class SaveSelectionList extends RenderableVList {
                 LegacyMinecraft.LOGGER.error("could not validate symlink", iOException);
                 iconFile = null;
             }
-            FaviconTexture icon = FaviconTexture.forWorld(minecraft.getTextureManager(), key.getLevelId());
+            FaviconTexture icon = FaviconTexture.forWorld(Minecraft.getInstance().getTextureManager(), key.getLevelId());
             boolean bl = iconFile != null && Files.isRegularFile(iconFile);
             if (bl) {
                 try (InputStream inputStream = Files.newInputStream(iconFile)) {
@@ -107,7 +108,10 @@ public class SaveSelectionList extends RenderableVList {
             return icon;
         }
     });
-
+    public static void resetIconCache(){
+        SaveSelectionList.iconCache.asMap().forEach((s, i)-> i.close());
+        SaveSelectionList.iconCache.invalidateAll();
+    }
     public SaveSelectionList(PlayGameScreen playGameScreen) {
         screen = playGameScreen;
         layoutSpacing(l->0);
@@ -301,10 +305,10 @@ public class SaveSelectionList extends RenderableVList {
                     this.minecraft.setScreen(this.screen);
                 }));
             } else {
-                this.minecraft.createWorldOpenFlows().checkForBackupAndLoad(summary.getLevelId(), () -> {
-                    SaveSelectionList.this.reloadSaveList();
-                    this.minecraft.setScreen(this.screen);
-                });
+                SaveSelectionList.this.reloadSaveList();
+                if (((LegacyOptions)minecraft.options).directSaveLoad().get())
+                    LoadSaveScreen.loadWorld(screen,minecraft,summary);
+                else minecraft.setScreen(new LoadSaveScreen(screen, summary));
             }
         }
     }

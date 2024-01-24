@@ -1,13 +1,9 @@
 package wily.legacy.client.screen;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.Screen;
 import wily.legacy.util.ScreenUtil;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Panel extends SimpleLayoutRenderable {
@@ -24,7 +20,10 @@ public class Panel extends SimpleLayoutRenderable {
         this.updatedY = topPosGetter;
     }
     public static Panel centered(Screen screen, int imageWidth, int imageHeight){
-        return new Panel(g-> (screen.width - g.width) / 2, g-> (screen.height - g.height) / 2, imageWidth, imageHeight);
+        return centered(screen,imageWidth,imageHeight,0,0);
+    }
+    public static Panel centered(Screen screen, int imageWidth, int imageHeight, int xOffset, int yOffset){
+        return new Panel(g-> (screen.width - g.width) / 2 + xOffset, g-> (screen.height - g.height) / 2 + yOffset, imageWidth, imageHeight);
     }
     public void init(){
         setX(updatedX.apply(this));

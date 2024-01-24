@@ -9,6 +9,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -34,18 +35,15 @@ public class TabButton extends AbstractButton {
      return Vec3.ZERO;
     };
 
-    public TabButton(int i, int j,int width, int height, int type,ResourceLocation iconSprite, Component text,Tooltip tooltip, Consumer<TabButton> onPress) {
+    public TabButton(int i, int j, int width, int height, int type, ResourceLocation iconSprite, CompoundTag itemIconTag, Component text, Tooltip tooltip, Consumer<TabButton> onPress) {
         super(i, j, width, height, text);
         setTooltip(tooltip);
         this.onPress = onPress;
         this.type = type;
         icon = iconSprite;
-        if (itemIcon == null)
+        if (itemIcon == null && icon != null)
             if (BuiltInRegistries.ITEM.containsKey(icon))
-                itemIcon = BuiltInRegistries.ITEM.get(icon).getDefaultInstance();
-    }
-    public TabButton(int i, int j,int width, int height,  int type, Component text, Tooltip tooltip, Consumer<TabButton> onPress) {
-        this(i, j, width, height, type,null,text,tooltip,onPress);
+                (itemIcon = BuiltInRegistries.ITEM.get(icon).getDefaultInstance()).setTag(itemIconTag);
     }
 
     @Override

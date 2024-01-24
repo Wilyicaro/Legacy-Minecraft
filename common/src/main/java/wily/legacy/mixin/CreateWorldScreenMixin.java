@@ -1,8 +1,6 @@
 package wily.legacy.mixin;
 
-import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.logging.LogUtils;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.ChatFormatting;
 import net.minecraft.FileUtil;
@@ -17,24 +15,20 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
-import net.minecraft.client.gui.screens.worldselection.ConfirmExperimentalFeaturesScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
-import net.minecraft.commands.Commands;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.RegistryLayer;
-import net.minecraft.server.WorldLoader;
 import net.minecraft.server.commands.PublishCommand;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.flag.FeatureFlags;
-import net.minecraft.world.level.*;
+import net.minecraft.world.level.LevelSettings;
+import net.minecraft.world.level.WorldDataConfiguration;
 import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -43,7 +37,12 @@ import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import wily.legacy.client.LegacyTip;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacyWorldSettings;
 import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.util.ScreenUtil;
@@ -52,10 +51,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -63,7 +59,6 @@ import static wily.legacy.LegacyMinecraftClient.publishUnloadedServer;
 
 @Mixin(CreateWorldScreen.class)
 public abstract class CreateWorldScreenMixin extends Screen{
-    @Shadow protected abstract Pair<Path, PackRepository> getDataPackSelectionSettings(WorldDataConfiguration arg);
 
     @Shadow protected abstract void applyNewPackConfig(PackRepository arg, WorldDataConfiguration arg2, Consumer<WorldDataConfiguration> consumer);
 
@@ -76,13 +71,16 @@ public abstract class CreateWorldScreenMixin extends Screen{
 
     @Shadow abstract void openExperimentsScreen(WorldDataConfiguration arg);
 
+    @Shadow protected abstract LevelSettings createLevelSettings(boolean bl);
+
     private boolean recreated;
+    protected boolean trustPlayers;
     protected boolean onlineOnStart = false;
     private int port = HttpUtil.getAvailablePort();
     protected final Panel panel = Panel.centered(this,245,228);
 
     protected PackSelector resourcePackSelector = PackSelector.resources(panel.x + 13, panel.y + 106, 220,45);
-    protected boolean onlyLoad;
+
     private Path tempDataPackDir;
 
     protected CreateWorldScreenMixin(Component component) {
@@ -91,26 +89,11 @@ public abstract class CreateWorldScreenMixin extends Screen{
     private CreateWorldScreen self(){
         return (CreateWorldScreen) (Object) this;
     }
-    private Component tryParsePort(String string) {
-        if (string.isBlank()) {
-            this.port = HttpUtil.getAvailablePort();
-            return null;
-        }
-        try {
-            this.port = Integer.parseInt(string);
-            if (this.port < 1024 || this.port > 65535) {
-                return  Component.translatable("lanServer.port.invalid.new", 1024, 65535);
-            }
-            if (!HttpUtil.isPortAvailable(this.port)) {
-                return Component.translatable("lanServer.port.unavailable.new", 1024, 65535);
-            }
-            return null;
-        } catch (NumberFormatException numberFormatException) {
-            this.port = HttpUtil.getAvailablePort();
-            return  Component.translatable("lanServer.port.invalid.new", 1024, 65535);
-        }
-    }
 
+    @Inject(method = "<init>",at = @At("RETURN"))
+    public void initReturn(Minecraft minecraft, Screen screen, WorldCreationContext worldCreationContext, Optional optional, OptionalLong optionalLong, CallbackInfo ci){
+        uiState.setDifficulty(((LegacyOptions)minecraft.options).createWorldDifficulty().get());
+    }
     @Override
     public void init() {
         panel.init();
@@ -131,7 +114,7 @@ public abstract class CreateWorldScreenMixin extends Screen{
         portEdit.visible = onlineOnStart;
 
         portEdit.setHint(Component.literal("" + this.port).withStyle(ChatFormatting.DARK_GRAY));
-        addRenderableWidget(Button.builder(Component.translatable( "createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self()))).bounds(panel.x + 13, panel.y + 172,220,20).build());
+        addRenderableWidget(Button.builder(Component.translatable( "createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), b-> trustPlayers = b))).bounds(panel.x + 13, panel.y + 172,220,20).build());
         Button createButton = addRenderableWidget(Button.builder(Component.translatable("selectWorld.create"), button -> this.onCreate()).bounds(panel.x + 13, panel.y + 197,220,20).build());
         addRenderableWidget(new TickBox(panel.x+ 14, panel.y+155,100,onlineOnStart, b-> Component.translatable("menu.shareToLan"), b->null, button -> {
             if (!(portEdit.visible = onlineOnStart = button.selected)) {
@@ -140,15 +123,16 @@ public abstract class CreateWorldScreenMixin extends Screen{
             }
         }));
         portEdit.setResponder(string -> {
-            Component component = tryParsePort(string);
+            Pair<Integer,Component> p = LegacyMinecraftClient.tryParsePort(string);
+            if(p.getFirst() != null) port = p.getFirst();
             portEdit.setHint(Component.literal("" + this.port).withStyle(ChatFormatting.DARK_GRAY));
-            if (component == null) {
+            if (p.getSecond() == null) {
                 portEdit.setTextColor(0xE0E0E0);
                 portEdit.setTooltip(null);
                 createButton.active = true;
             } else {
                 portEdit.setTextColor(0xFF5555);
-                portEdit.setTooltip(Tooltip.create(component));
+                portEdit.setTooltip(Tooltip.create(p.getSecond()));
                 createButton.active = false;
             }
         });
@@ -184,7 +168,8 @@ public abstract class CreateWorldScreenMixin extends Screen{
     private void onLoad() {
         if (minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer().isReady()){
             if (onlineOnStart) {
-                MutableComponent component = publishUnloadedServer(minecraft, uiState.getGameMode().gameType, uiState.isAllowCheats(), this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed");
+                MutableComponent component = publishUnloadedServer(minecraft, uiState.getGameMode().gameType, trustPlayers && uiState.isAllowCheats(), this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed");
+                ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setTrustPlayers(trustPlayers);
                 this.minecraft.gui.getChat().addMessage(component);
             }
         }
@@ -224,16 +209,6 @@ public abstract class CreateWorldScreenMixin extends Screen{
         guiGraphics.drawString(font,NAME_LABEL, panel.x + 14, panel.y + 15, 0x404040,false);
     }
 
-    private LevelSettings createLevelSettings(boolean bl) {
-        String string = this.uiState.getName().trim();
-        if (bl) {
-            GameRules gameRules = new GameRules();
-            gameRules.getRule(GameRules.RULE_DAYLIGHT).set(false, null);
-            return new LevelSettings(string, GameType.SPECTATOR, false, Difficulty.PEACEFUL, true, gameRules, WorldDataConfiguration.DEFAULT);
-        }
-        return new LevelSettings(string, this.uiState.getGameMode().gameType, this.uiState.isHardcore(), this.uiState.getDifficulty(), this.uiState.isAllowCheats(), this.uiState.getGameRules(), this.uiState.getSettings().dataConfiguration());
-    }
-
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (super.keyPressed(i, j, k)) {
@@ -244,35 +219,6 @@ public abstract class CreateWorldScreenMixin extends Screen{
             return true;
         }
         return false;
-    }
-
-
-
-    public void tryApplyNewDataPacks(PackRepository packRepository, boolean bl2, Consumer<WorldDataConfiguration> consumer) {
-        ImmutableList<String> list = ImmutableList.copyOf(packRepository.getSelectedIds());
-        WorldDataConfiguration worldDataConfiguration = new WorldDataConfiguration(new DataPackConfig(list, (List)packRepository.getAvailableIds().stream().filter(string -> !list.contains(string)).collect(ImmutableList.toImmutableList())), this.uiState.getSettings().dataConfiguration().enabledFeatures());
-        if (this.uiState.tryUpdateDataConfiguration(worldDataConfiguration)) {
-            this.minecraft.setScreen(this);
-            return;
-        }
-        FeatureFlagSet featureFlagSet = packRepository.getRequestedFeatureFlags();
-        if (FeatureFlags.isExperimental(featureFlagSet) && bl2) {
-            this.minecraft.setScreen(new ConfirmExperimentalFeaturesScreen(packRepository.getSelectedPacks(), bl -> {
-                if (bl) {
-                    this.applyNewPackConfig(packRepository, worldDataConfiguration, consumer);
-                } else {
-                    consumer.accept(this.uiState.getSettings().dataConfiguration());
-                }
-            }));
-        } else {
-            this.applyNewPackConfig(packRepository, worldDataConfiguration, consumer);
-        }
-    }
-
-
-    private static WorldLoader.InitConfig createDefaultLoadConfig(PackRepository packRepository, WorldDataConfiguration worldDataConfiguration) {
-        WorldLoader.PackConfig packConfig = new WorldLoader.PackConfig(packRepository, worldDataConfiguration, false, true);
-        return new WorldLoader.InitConfig(packConfig, Commands.CommandSelection.INTEGRATED, 2);
     }
 
     private void removeTempDataPackDir() {

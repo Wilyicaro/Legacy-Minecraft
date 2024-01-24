@@ -77,3 +77,8 @@ accessible method net/minecraft/client/gui/screens/worldselection/PresetEditor f
 accessible method net/minecraft/client/gui/screens/worldselection/PresetEditor fixedBiomeConfigurator (Lnet/minecraft/core/Holder;)Lnet/minecraft/client/gui/screens/worldselection/WorldCreationContext$DimensionsUpdater;
 accessible field net/minecraft/client/gui/Gui screenWidth I
 accessible field net/minecraft/client/gui/Gui screenHeight I
+accessible method net/minecraft/world/level/GameRules register (Ljava/lang/String;Lnet/minecraft/world/level/GameRules$Category;Lnet/minecraft/world/level/GameRules$Type;)Lnet/minecraft/world/level/GameRules$Key;
+accessible method net/minecraft/world/level/GameRules$BooleanValue create (Z)Lnet/minecraft/world/level/GameRules$Type;
+accessible class net/minecraft/client/gui/MapRenderer$MapInstance
+accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData$HoldingPlayer <init> (Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData;Lnet/minecraft/world/entity/player/Player;)V
+accessible field net/minecraft/client/renderer/chunk/RenderChunkRegion level Lnet/minecraft/world/level/Level;

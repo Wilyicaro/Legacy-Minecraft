@@ -2,13 +2,12 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -17,15 +16,13 @@ import wily.legacy.LegacyMinecraft;
 import wily.legacy.inventory.LegacySlotWrapper;
 import wily.legacy.util.ScreenUtil;
 
-import java.util.function.BiConsumer;
-
 public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEventListener, NarratableEntry {
-    public static ResourceLocation ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/icon_holder");
-    public static ResourceLocation SIZEABLE_ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/sizeable_icon_holder");
-    public static ResourceLocation SELECT_ICON_HIGHLIGHT = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/select_icon_highlight");
-    public static ResourceLocation RED_ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/red_icon_holder");
-    public static ResourceLocation GRAY_ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/gray_icon_holder");
-    public static ResourceLocation WARNING_ICON = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/icon_warning");
+    public static final ResourceLocation ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/icon_holder");
+    public static final ResourceLocation SIZEABLE_ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/sizeable_icon_holder");
+    public static final ResourceLocation SELECT_ICON_HIGHLIGHT = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/select_icon_highlight");
+    public static final ResourceLocation RED_ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/red_icon_holder");
+    public static final ResourceLocation GRAY_ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/gray_icon_holder");
+    public static final ResourceLocation WARNING_ICON = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/icon_warning");
 
     public Vec3 translation = null;
     public ResourceLocation iconSprite = null;
@@ -41,7 +38,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     public LegacyIconHolder(Slot slot){
         slotBounds(slot);
     }
-    public LegacyIconHolder(int leftPos, int topPos,Slot slot){
+    public LegacyIconHolder(int leftPos, int topPos, Slot slot){
         slotBounds(leftPos, topPos, slot);
     }
     public LegacyIconHolder(int width, int height){
@@ -144,13 +141,19 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         graphics.blitSprite(SELECT_ICON_HIGHLIGHT,0,0,36,36);
         graphics.pose().popPose();
     }
-    public void renderHighlight(GuiGraphics graphics){
+    public void renderHighlight(GuiGraphics graphics, int color, int h){
         graphics.pose().pushPose();
         graphics.pose().translate(getX(),getY(),0);
         applyTranslation(graphics);
         graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
-        AbstractContainerScreen.renderSlotHighlight(graphics, 0, 0, 0);
+        graphics.fillGradient(RenderType.gui(), 0, 0, 16,16, color, color, h);
         graphics.pose().popPose();
+    }
+    public void renderHighlight(GuiGraphics graphics, int h){
+        renderHighlight(graphics,-2130706433,h);
+    }
+    public void renderHighlight(GuiGraphics graphics){
+        renderHighlight(graphics,0);
     }
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics, int i, int j){
         if (isHovered && !itemIcon.isEmpty()) {
@@ -176,12 +179,12 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     @Override
     public NarrationPriority narrationPriority() {
         if (this.isFocused()) {
-            return NarratableEntry.NarrationPriority.FOCUSED;
+            return NarrationPriority.FOCUSED;
         }
         if (this.isHovered) {
-            return NarratableEntry.NarrationPriority.HOVERED;
+            return NarrationPriority.HOVERED;
         }
-        return NarratableEntry.NarrationPriority.NONE;
+        return NarrationPriority.NONE;
     }
 
     @Override

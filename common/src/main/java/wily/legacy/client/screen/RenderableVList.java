@@ -10,8 +10,6 @@ import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.resources.ResourceLocation;
-import wily.legacy.LegacyMinecraft;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
@@ -20,9 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
-
-import static wily.legacy.LegacyMinecraftClient.SCROLL_DOWN;
-import static wily.legacy.LegacyMinecraftClient.SCROLL_UP;
 
 public class RenderableVList {
     protected final Stocker.Sizeable scrolledList = new Stocker.Sizeable(0);
@@ -114,7 +109,7 @@ public class RenderableVList {
             if (renderables.get(scrolledList.get() + i) instanceof GuiEventListener l) return l;
         return null;
     }
-    public boolean keyPressed(int i, int j, int k){
+    public boolean keyPressed(int i, boolean cyclic){
         if (vRenderablesCount > 0) {
             if (i == InputConstants.KEY_DOWN) {
                 if (screen.getFocused() == getLastFocusable()) {
@@ -123,7 +118,8 @@ public class RenderableVList {
                         GuiEventListener l = getLastFocusable();
                         if (l != null)
                             screen.setFocused(l);
-                    } else {
+                        return true;
+                    } else if (cyclic) {
                         if (scrolledList.get() > 0) {
                             scrolledList.set(0);
                             screen.repositionElements();
@@ -131,9 +127,9 @@ public class RenderableVList {
                         GuiEventListener l = getFirstFocusable();
                         if (l != null)
                             screen.setFocused(l);
+                        return true;
                     }
                     ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
-                    return true;
                 }
             }
             if (i == InputConstants.KEY_UP) {
@@ -143,15 +139,16 @@ public class RenderableVList {
                         GuiEventListener l = getFirstFocusable();
                         if (l != null)
                             screen.setFocused(l);
-                    } else {
+                        return true;
+                    } else if (cyclic){
                         while (canScrollDown)
                             mouseScrolled(0, 0, 0, -1);
                         GuiEventListener l = getLastFocusable();
                         if (l != null)
                             screen.setFocused(l);
+                        return true;
                     }
                     ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
-                    return true;
                 }
             }
         }
