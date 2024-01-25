@@ -51,6 +51,7 @@ public class LegacyTipManager extends SimplePreparableReloadListener<List<Suppli
     protected void apply(List<Supplier<LegacyTip>> object, ResourceManager resourceManager, ProfilerFiller profilerFiller) {
         loadingTips.clear();
         loadingTips.addAll(object);
+        LegacyLoadingScreen.usingLoadingTips.clear();
         LegacyLoadingScreen.actualLoadingTip = null;
     }
 }

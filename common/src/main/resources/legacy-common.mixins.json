@@ -10,6 +10,7 @@
     "AnvilScreenMixin",
     "BeaconScreenMixin",
     "BiomeAmbientSoundsHandlerMixin",
+    "BossHealthOverlayMixin",
     "BrewingStandScreenMixin",
     "ChatComponentMixin",
     "ClientLevelMixin",
@@ -56,6 +57,7 @@
     "CraftingMenuMixin",
     "DispenserMenuMixin",
     "EnchantmentMenuMixin",
+    "EndDragonFightMixin",
     "FogRendererMixin",
     "GrindstoneMenuMixin",
     "HopperMenuMixin",
@@ -72,7 +74,8 @@
     "MusicsMixin",
     "ShulkerBoxMenuMixin",
     "SmithingMenuMixin",
-    "VillagerMixin"
+    "VillagerMixin",
+    "WitherBossMixin"
   ],
   "injectors": {
     "defaultRequire": 1

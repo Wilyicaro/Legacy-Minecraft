@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import static wily.legacy.LegacyMinecraftClient.legacyLoadingScreen;
 
-@Mixin({LevelLoadingScreen.class, ProgressScreen.class, GenericDirtMessageScreen.class, ReceivingLevelScreen.class})
+@Mixin({LevelLoadingScreen.class, ProgressScreen.class, GenericDirtMessageScreen.class, ReceivingLevelScreen.class, ConnectScreen.class})
 public class LegacyLoadingScreenMixin extends Screen {
     protected LegacyLoadingScreenMixin(Component component) {
         super(component);
@@ -31,7 +31,7 @@ public class LegacyLoadingScreenMixin extends Screen {
         int progress = 0;
         if (obj() instanceof ReceivingLevelScreen) progress = -1;
         if (obj() instanceof LevelLoadingScreen loading) {
-            lastLoadingHeader = Component.translatable("connect.connecting");
+            lastLoadingHeader = Component.translatable("legacy.connect.initializing");
             lastLoadingStage = Component.translatable("legacy.loading_spawn_area");
             progress = loading.progressListener.getProgress();
         }
@@ -43,6 +43,9 @@ public class LegacyLoadingScreenMixin extends Screen {
             if (minecraft.level != null && minecraft.level.dimension() != Level.OVERWORLD){
                 genericLoading = true;
             }
+        }
+        if (obj() instanceof ConnectScreen p) {
+            lastLoadingHeader = p.status;
         }
         legacyLoadingScreen.prepareRender(minecraft,width, height,lastLoadingHeader,lastLoadingStage,progress,genericLoading);
         legacyLoadingScreen.render(guiGraphics,i,j,f);

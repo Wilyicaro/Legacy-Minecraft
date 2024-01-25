@@ -22,7 +22,7 @@ import static wily.legacy.LegacyMinecraftClient.LOADING_BACKGROUND_SPRITE;
 import static wily.legacy.LegacyMinecraftClient.LOADING_BAR_SPRITE;
 
 public class LegacyLoadingScreen extends DefaultScreen{
-    protected static final List<Supplier<LegacyTip>> usingLoadingTips = new ArrayList<>(LegacyTipManager.loadingTips);
+    public static final List<Supplier<LegacyTip>> usingLoadingTips = new ArrayList<>(LegacyTipManager.loadingTips);
     public static LegacyTip actualLoadingTip;
     protected int progress;
     protected Component lastLoadingHeader;

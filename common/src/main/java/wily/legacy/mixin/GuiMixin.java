@@ -63,7 +63,7 @@ public abstract class GuiMixin {
     @Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;)V"))
     public void renderCrosshairBlendFunc(GlStateManager.SourceFactor sourceFactor, GlStateManager.DestFactor destFactor, GlStateManager.SourceFactor sourceFactor2, GlStateManager.DestFactor destFactor2, GuiGraphics guiGraphics) {
         if (((LegacyOptions)minecraft.options).hudOpacity().get() < 1.0) {
-            guiGraphics.setColor(1.0f, 1.0f, 1.0f, ScreenUtil.getInterfaceOpacity());
+            guiGraphics.setColor(1.0f, 1.0f, 1.0f, ScreenUtil.getHUDOpacity());
             RenderSystem.enableBlend();
         } else RenderSystem.blendFuncSeparate(sourceFactor,destFactor,sourceFactor2,destFactor2);
     }
@@ -80,7 +80,7 @@ public abstract class GuiMixin {
             ci.cancel();
             return;
         }
-        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getInterfaceOpacity());
+        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F,  ScreenUtil.getHUDDistance(),0.0F);
         ScreenUtil.applyHUDScale(guiGraphics,i-> screenWidth = i,i-> screenHeight = i);
@@ -89,7 +89,7 @@ public abstract class GuiMixin {
             return;
         }
         guiGraphics.blitSprite(new ResourceLocation(LegacyMinecraft.MOD_ID,"hud/hotbar_selection"), this.screenWidth / 2 - 91 - 1 + player.getInventory().selected * 20, this.screenHeight - 22 - 1, 24, 24);
-        if (ScreenUtil.getInterfaceOpacity() < 1.0) {
+        if (ScreenUtil.getHUDOpacity() < 1.0) {
             LegacyMinecraftClient.itemRenderTypeOverride = Sheets.translucentItemSheet();
             LegacyMinecraftClient.blockItemRenderTypeOverride = Sheets.translucentCullBlockSheet();
         }
@@ -141,7 +141,7 @@ public abstract class GuiMixin {
             ci.cancel();
             return;
         }
-        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getInterfaceOpacity());
+        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
         RenderSystem.enableBlend();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F,ScreenUtil.getHUDDistance(),0.0F);
@@ -166,7 +166,7 @@ public abstract class GuiMixin {
             ci.cancel();
             return;
         }
-        guiGraphics.setColor(1.0f, 1.0f, 1.0f, ScreenUtil.getInterfaceOpacity());
+        guiGraphics.setColor(1.0f, 1.0f, 1.0f, ScreenUtil.getHUDOpacity());
         RenderSystem.enableBlend();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F, ScreenUtil.getHUDDistance(), 0.0F);

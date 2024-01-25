@@ -82,3 +82,4 @@ accessible method net/minecraft/world/level/GameRules$BooleanValue create (Z)Lne
 accessible class net/minecraft/client/gui/MapRenderer$MapInstance
 accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData$HoldingPlayer <init> (Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData;Lnet/minecraft/world/entity/player/Player;)V
 accessible field net/minecraft/client/renderer/chunk/RenderChunkRegion level Lnet/minecraft/world/level/Level;
+accessible field net/minecraft/client/gui/screens/ConnectScreen status Lnet/minecraft/network/chat/Component;
