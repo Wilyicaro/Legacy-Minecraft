@@ -135,15 +135,18 @@ public class ScreenUtil {
     public static double getHUDDistance(){
         return -((LegacyOptions)mc.options).hudDistance().value*(22.5D + (((LegacyOptions)mc.options).inGameTooltips().get() ? 17.5D : 0));
     }
+    public static float getHUDOpacity(){
+        return Math.max(Math.min(255f,mc.gui.toolHighlightTimer * 38.4f)/ 255f, getInterfaceOpacity());
+    }
     public static float getInterfaceOpacity(){
-        return (float) Math.max(Math.min(255f,mc.gui.toolHighlightTimer * 38.4f)/ 255f, ((LegacyOptions)mc.options).hudOpacity().get());
+        return ((LegacyOptions)mc.options).hudOpacity().get().floatValue();
     }
     public static void playSimpleUISound(SoundEvent sound, float grave){
         mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave));
     }
     public static void addTip(Entity entity){
         if (hasTip(entity.getType())) mc.getToasts().addToast(new LegacyTip(entity.getType().getDescription(), ScreenUtil.getTip(entity.getType())));
-        else if (hasTip(entity.getPickResult())) addTip(entity.getPickResult());
+        else if (entity.getPickResult() != null && !entity.getPickResult().isEmpty() && hasTip(entity.getPickResult())) addTip(entity.getPickResult());
     }
     public static void addTip(ItemStack stack){
         if (hasTip(stack)) mc.getToasts().addToast(new LegacyTip(stack));

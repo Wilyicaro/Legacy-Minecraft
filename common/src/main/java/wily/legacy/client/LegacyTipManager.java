@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -17,7 +16,6 @@ import wily.legacy.client.screen.LegacyLoadingScreen;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -53,6 +51,7 @@ public class LegacyTipManager extends SimplePreparableReloadListener<List<Suppli
     protected void apply(List<Supplier<LegacyTip>> object, ResourceManager resourceManager, ProfilerFiller profilerFiller) {
         loadingTips.clear();
         loadingTips.addAll(object);
+        LegacyLoadingScreen.usingLoadingTips.clear();
         LegacyLoadingScreen.actualLoadingTip = null;
     }
 }
