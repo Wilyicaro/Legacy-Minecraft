@@ -54,6 +54,7 @@ public class MainMenuScreen extends RenderableVListScreen {
         this.fading = bl;
         minecraft = Minecraft.getInstance();
         secondButtonActive = minecraft.isDemo() ? createDemoMenuOptions() : this.createNormalMenuOptions();
+        renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.mods"), () -> new ModsScreen(this)).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("options.language"), () -> new LegacyLanguageScreen(this, this.minecraft.getLanguageManager())).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("menu.options"), () -> new HelpOptionsScreen(this)).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> this.minecraft.stop()).build());

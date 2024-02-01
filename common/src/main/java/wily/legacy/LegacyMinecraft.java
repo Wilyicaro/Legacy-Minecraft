@@ -10,10 +10,9 @@ import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundMapItemDataPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.saveddata.maps.MapDecoration;
+import net.minecraft.server.packs.repository.Pack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import wily.legacy.init.LegacyGameRules;
@@ -25,7 +24,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
@@ -37,7 +35,6 @@ public class LegacyMinecraft
 
     public static final String MOD_ID = "legacy";
     public static final Supplier<String> VERSION =  Platform.getMod(MOD_ID)::getVersion;
-    public static final String MC_VERSION = "1.20.4";
     public static final NetworkChannel NETWORK = NetworkChannel.create(new ResourceLocation(MOD_ID, "main"));
     public static final Supplier<RegistrarManager> REGISTRIES = Suppliers.memoize(() -> RegistrarManager.get(MOD_ID));
 
@@ -57,6 +54,21 @@ public class LegacyMinecraft
             updateDisplayPlayersMap(p,false);
         });
         LifecycleEvent.SERVER_STOPPED.register(l-> playerVisualIds.clear());
+    }
+    @FunctionalInterface
+    public interface PackRegistry {
+        void register(String path, String name, Component translation, Pack.Position position, boolean enabledByDefault);
+        default void register(String path, String name, boolean enabledByDefault){
+            register(path,name,Component.translatable(MOD_ID + ".builtin." + name), Pack.Position.TOP,enabledByDefault);
+        }
+        default void register(String pathName, boolean enabledByDefault){
+            register("resourcepacks/"+pathName,pathName,enabledByDefault);
+        }
+    }
+    public static void registerBuiltInPacks(PackRegistry registry){
+        registry.register("legacy_waters",true);
+        registry.register("console_aspects",false);
+        if (Platform.isForgeLike()) registry.register("programmer_art","programmer_art", Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP,false);
     }
     public static void updateDisplayPlayersMap(ServerPlayer p, boolean addRemove){
         if (p.getServer() == null) return;

@@ -13,9 +13,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import wily.legacy.client.LegacySprites;
 import wily.legacy.inventory.LegacySlotWrapper;
-
-import static wily.legacy.LegacyMinecraftClient.*;
 
 @Mixin(HorseInventoryMenu.class)
 public class HorseInventoryMenuMixin {
@@ -26,7 +25,7 @@ public class HorseInventoryMenuMixin {
         return new LegacySlotWrapper(originalSlot, originalSlot.container,originalSlot.getContainerSlot(), 14, 21){
             @Override
             public ResourceLocation getIconSprite() {
-                return getItem().isEmpty() ? SADDLE_SLOT_SPRITE : null;
+                return getItem().isEmpty() ? LegacySprites.SADDLE_SLOT_SPRITE : null;
             }
 
             public @Nullable Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
@@ -39,7 +38,7 @@ public class HorseInventoryMenuMixin {
         return new LegacySlotWrapper(originalSlot, originalSlot.container,originalSlot.getContainerSlot(), 14, 42){
             @Override
             public ResourceLocation getIconSprite() {
-                return getItem().isEmpty() ? horse instanceof Llama ? LLAMA_ARMOR_SLOT_SPRITE : ARMOR_SLOT_SPRITE : null;
+                return getItem().isEmpty() ? horse instanceof Llama ? LegacySprites.LLAMA_ARMOR_SLOT_SPRITE : LegacySprites.ARMOR_SLOT_SPRITE : null;
             }
         };
     }

@@ -7,7 +7,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -53,9 +52,9 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
     public final LevelSummary summary;
     protected boolean onlineOnStart = false;
     private int port = HttpUtil.getAvailablePort();
-    protected PackSelector resourcePackSelector = PackSelector.resources(panel.x + 13, panel.y + 112, 220,45);
+    protected PackSelector resourcePackSelector = PackSelector.resources(panel.x + 13, panel.y + 112, 220,45, !ScreenUtil.hasTooltipBoxes());
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean deleteOnClose) {
-        super(s-> new Panel(p-> (s.width - p.width) / 2, p-> (s.height - p.height) / 2 + 20,245,233), Component.translatable("legacy.menu.load_save.load"));
+        super(s-> new Panel(p-> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 120 : 0))) / 2, p-> (s.height - p.height) / 2 + 20,245,233), Component.translatable("legacy.menu.load_save.load"));
         this.deleteOnClose = deleteOnClose;
         this.parent = screen;
         this.summary = summary;
@@ -79,7 +78,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
 
     @Override
     protected void init() {
-        super.init();
+        panel.init();
         List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
         addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 65, 220,16, b -> b.getDefaultMessage(GAME_MODEL_LABEL,b.getValue().getLongDisplayName()),()->Tooltip.create(Component.translatable("selectWorld.gameMode."+gameType.getName()+ ".info")),gameType,()->gameTypes, b->gameType =b.objectValue));
         addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 90, 220,16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getValue().getDisplayName()),()->Tooltip.create(difficulty.getInfo()), difficulty,()-> Arrays.asList(Difficulty.values()), b-> difficulty = b.objectValue)).active = !((LegacyWorldSettings)(Object)summary.getSettings()).isDifficultyLocked();
@@ -191,9 +190,18 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
         }
 
     }
+
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public boolean mouseScrolled(double d, double e, double f, double g) {
+        if (resourcePackSelector.scrollableRenderer.mouseScrolled(g)) return true;
+        return super.mouseScrolled(d, e, f, g);
+    }
+
+    @Override
+    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+        super.renderBackground(guiGraphics, i, j, f);
+        resourcePackSelector.renderTooltipBox(guiGraphics,panel);
+        panel.render(guiGraphics,i,j,f);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.5f,0,0);
         ScreenUtil.renderSquareEntityPanel(guiGraphics,panel.x + 12, panel.y + 9, 32,32,2f);

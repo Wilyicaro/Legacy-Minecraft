@@ -93,7 +93,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
     @Override
     public void render(GuiGraphics graphics, int i, int j, float f) {
-        isHovered = ScreenUtil.isMouseOver(getXCorner(), getYCorner(), width, height, i, j);
+        isHovered = ScreenUtil.isMouseOver(i, j, getXCorner(), getYCorner(), width, height);
         graphics.pose().pushPose();
         graphics.pose().translate(getXCorner(),getYCorner(),0);
         applyTranslation(graphics);

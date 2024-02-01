@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import wily.legacy.inventory.LegacySlotWrapper;
 
-import static wily.legacy.LegacyMinecraftClient.BREWING_FUEL_SLOT_SPRITE;
+import static wily.legacy.client.LegacySprites.BREWING_FUEL_SLOT_SPRITE;
 
 @Mixin(BrewingStandMenu.class)
 public class BrewingStandMenuMixin {

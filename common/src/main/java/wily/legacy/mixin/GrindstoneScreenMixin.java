@@ -9,8 +9,8 @@ import net.minecraft.world.inventory.GrindstoneMenu;
 import org.spongepowered.asm.mixin.Mixin;
 import wily.legacy.util.ScreenUtil;
 
-import static wily.legacy.LegacyMinecraftClient.ARROW_SPRITE;
-import static wily.legacy.LegacyMinecraftClient.ERROR_CROSS_SPRITE;
+import static wily.legacy.client.LegacySprites.ARROW_SPRITE;
+import static wily.legacy.client.LegacySprites.ERROR_CROSS_SPRITE;
 
 @Mixin(GrindstoneScreen.class)
 public class GrindstoneScreenMixin extends AbstractContainerScreen<GrindstoneMenu> {

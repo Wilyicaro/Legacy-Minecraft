@@ -23,8 +23,6 @@ public abstract class MinecraftMixin {
 
     @Shadow @Nullable public ClientLevel level;
 
-    @Shadow public abstract DirectoryValidator directoryValidator();
-
     @Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;isServerControlledInventory()Z"))
     private boolean handleKeybinds(MultiPlayerGameMode instance){
         return false;

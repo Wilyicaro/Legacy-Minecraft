@@ -18,7 +18,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.ReplaceableScreen;
 import wily.legacy.util.ScreenUtil;
 
-import static wily.legacy.LegacyMinecraftClient.SMALL_ARROW_SPRITE;
+import static wily.legacy.client.LegacySprites.SMALL_ARROW_SPRITE;
 
 @Mixin(InventoryScreen.class)
 public class InventoryScreenMixin extends AbstractContainerScreen<InventoryMenu> implements ReplaceableScreen {

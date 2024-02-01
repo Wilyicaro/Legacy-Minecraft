@@ -12,6 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
@@ -35,9 +36,11 @@ public class ScreenUtil {
     public static final ResourceLocation SQUARE_RECESSED_PANEL = new ResourceLocation(LegacyMinecraft.MOD_ID,"tiles/square_recessed_panel");
     public static final ResourceLocation SQUARE_ENTITY_PANEL = new ResourceLocation(LegacyMinecraft.MOD_ID,"tiles/square_entity_panel");
     public static void renderPointerPanel(GuiGraphics graphics, int x, int y, int width, int height){
+        RenderSystem.enableBlend();
         RenderSystem.disableDepthTest();
         renderTiles(POINTER_PANEL_SPRITE,graphics,x,y,width,height,2);
         RenderSystem.enableDepthTest();
+        RenderSystem.disableBlend();
     }
     public static void renderPanel(GuiGraphics graphics, int x, int y, int width, int height, float dp){
       renderTiles(PANEL_SPRITE,graphics,x,y,width,height,dp);
@@ -57,14 +60,12 @@ public class ScreenUtil {
     public static void renderTiles(ResourceLocation location,GuiGraphics graphics, int x, int y, int width, int height, float dp){
         //TextureAtlasSprite sprite = mc.getGuiSprites().getSprite(location);
         //mc.getTextureManager().getTexture(sprite.atlasLocation()).setFilter(true,false);
-        RenderSystem.enableBlend();
         graphics.pose().pushPose();
         if (dp != 1.0)
             graphics.pose().scale(1/dp,1/dp,1/dp);
         graphics.pose().translate(dp* x,dp * y,0);
         graphics.blitSprite(location,0,0, (int) (width * dp), (int) (height * dp));
         graphics.pose().popPose();
-        RenderSystem.disableBlend();
     }
     public static void drawAutoSavingIcon(GuiGraphics graphics,int x, int y) {
         graphics.pose().pushPose();
@@ -119,18 +120,21 @@ public class ScreenUtil {
             }
         }
     }
-    public static boolean isMouseOver(double x, double y, int width, int height,double mouseX, double mouseY){
+    public static boolean isMouseOver(double mouseX, double mouseY, double x, double y, int width, int height){
         return mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height;
     }
     public static void applyHUDScale(GuiGraphics graphics, Consumer<Integer> applyWidth, Consumer<Integer> applyHeight){
-        graphics.pose().scale(1.5f,1.5f,1.5f);
-        applyHeight.accept(mc.getWindow().getGuiScaledHeight() * 2/3);
-        applyWidth.accept(mc.getWindow().getGuiScaledWidth() * 2/3);
+        graphics.pose().scale(3f / getHUDScale(), 3f / getHUDScale() ,3f / getHUDScale());
+        applyHeight.accept((int) (mc.getWindow().getGuiScaledHeight() * getHUDScale()/3));
+        applyWidth.accept((int) (mc.getWindow().getGuiScaledWidth() * getHUDScale()/3));
     }
     public static void resetHUDScale(GuiGraphics graphics, Consumer<Integer> applyWidth, Consumer<Integer> applyHeight){
-        graphics.pose().scale(2/3f,2/3f,2/3f);
+        graphics.pose().scale(getHUDScale()/3f,getHUDScale()/3f,getHUDScale()/3f);
         applyHeight.accept(mc.getWindow().getGuiScaledHeight());
         applyWidth.accept(mc.getWindow().getGuiScaledWidth());
+    }
+    public static float getHUDScale(){
+        return Math.max(1.5f,4 - ((LegacyOptions)mc.options).hudScale().get());
     }
     public static double getHUDDistance(){
         return -((LegacyOptions)mc.options).hudDistance().value*(22.5D + (((LegacyOptions)mc.options).inGameTooltips().get() ? 17.5D : 0));
@@ -138,8 +142,20 @@ public class ScreenUtil {
     public static float getHUDOpacity(){
         return Math.max(Math.min(255f,mc.gui.toolHighlightTimer * 38.4f)/ 255f, getInterfaceOpacity());
     }
+    public static boolean hasTooltipBoxes(){
+        return ((LegacyOptions)mc.options).tooltipBoxes().get();
+    }
     public static float getInterfaceOpacity(){
         return ((LegacyOptions)mc.options).hudOpacity().get().floatValue();
+    }
+    public static int getDefaultTextColor(boolean forceWhite){
+        return hasProgrammerArt() && !forceWhite ? 0xFFFF00 : 0xFFFFFF;
+    }
+    public static int getDefaultTextColor(){
+        return getDefaultTextColor(false);
+    }
+    public static boolean hasProgrammerArt(){
+        return mc.getResourcePackRepository().getSelectedPacks().stream().anyMatch(p->p.getId().equals("programmer_art"));
     }
     public static void playSimpleUISound(SoundEvent sound, float grave){
         mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave));
@@ -199,4 +215,21 @@ public class ScreenUtil {
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
     }
 
+    public static void renderScrollingString(GuiGraphics guiGraphics, Font font, Component component, int j, int k, int l, int m, int n, boolean shadow) {
+        int o = font.width(component);
+        int p = (k + m - font.lineHeight) / 2 + 1;
+        int q = l - j;
+        if (o > q) {
+            int r = o - q;
+            double d = (double) Util.getMillis() / 1000.0;
+            double e = Math.max((double)r * 0.5, 3.0);
+            double f = Math.sin(1.5707963267948966 * Math.cos(Math.PI * 2 * d / e)) / 2.0 + 0.5;
+            double g = Mth.lerp(f, 0.0, r);
+            guiGraphics.enableScissor(j, k, l, m);
+            guiGraphics.drawString(font, component, j - (int)g, p, n,shadow);
+            guiGraphics.disableScissor();
+        } else {
+            guiGraphics.drawString(font, component, j, p, n,shadow);
+        }
+    }
 }

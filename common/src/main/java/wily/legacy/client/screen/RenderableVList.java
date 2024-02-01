@@ -22,7 +22,7 @@ import java.util.function.Function;
 public class RenderableVList {
     protected final Stocker.Sizeable scrolledList = new Stocker.Sizeable(0);
     protected boolean canScrollDown = false;
-    protected final List<Renderable> renderables = new ArrayList<>();
+    public final List<Renderable> renderables = new ArrayList<>();
     public Screen screen;
     protected int vRenderablesCount;
     protected LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
@@ -110,6 +110,7 @@ public class RenderableVList {
         return null;
     }
     public boolean keyPressed(int i, boolean cyclic){
+        boolean clicked = false;
         if (vRenderablesCount > 0) {
             if (i == InputConstants.KEY_DOWN) {
                 if (screen.getFocused() == getLastFocusable()) {
@@ -118,7 +119,7 @@ public class RenderableVList {
                         GuiEventListener l = getLastFocusable();
                         if (l != null)
                             screen.setFocused(l);
-                        return true;
+                        clicked = true;
                     } else if (cyclic) {
                         if (scrolledList.get() > 0) {
                             scrolledList.set(0);
@@ -127,9 +128,8 @@ public class RenderableVList {
                         GuiEventListener l = getFirstFocusable();
                         if (l != null)
                             screen.setFocused(l);
-                        return true;
+                        clicked = true;
                     }
-                    ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
                 }
             }
             if (i == InputConstants.KEY_UP) {
@@ -139,20 +139,20 @@ public class RenderableVList {
                         GuiEventListener l = getFirstFocusable();
                         if (l != null)
                             screen.setFocused(l);
-                        return true;
+                        clicked = true;
                     } else if (cyclic){
                         while (canScrollDown)
                             mouseScrolled(0, 0, 0, -1);
                         GuiEventListener l = getLastFocusable();
                         if (l != null)
                             screen.setFocused(l);
-                        return true;
+                        clicked = true;
                     }
-                    ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
                 }
             }
         }
-        return false;
+        if (clicked) ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
+        return clicked;
     }
 
 }

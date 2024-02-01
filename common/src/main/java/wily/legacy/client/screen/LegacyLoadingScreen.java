@@ -5,11 +5,8 @@ import net.minecraft.client.GameNarrator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
-import net.minecraft.client.gui.screens.LevelLoadingScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
-import wily.legacy.LegacyMinecraft;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.util.ScreenUtil;
@@ -18,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static wily.legacy.LegacyMinecraftClient.LOADING_BACKGROUND_SPRITE;
-import static wily.legacy.LegacyMinecraftClient.LOADING_BAR_SPRITE;
+import static wily.legacy.client.LegacySprites.LOADING_BACKGROUND_SPRITE;
+import static wily.legacy.client.LegacySprites.LOADING_BAR_SPRITE;
 
 public class LegacyLoadingScreen extends DefaultScreen{
     public static final List<Supplier<LegacyTip>> usingLoadingTips = new ArrayList<>(LegacyTipManager.loadingTips);

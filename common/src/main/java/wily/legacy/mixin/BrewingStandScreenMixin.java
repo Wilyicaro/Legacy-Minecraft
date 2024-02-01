@@ -11,9 +11,8 @@ import net.minecraft.world.inventory.BrewingStandMenu;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import wily.legacy.client.LegacySprites;
 import wily.legacy.util.ScreenUtil;
-
-import static wily.legacy.LegacyMinecraftClient.*;
 
 @Mixin(BrewingStandScreen.class)
 public class BrewingStandScreenMixin extends AbstractContainerScreen<BrewingStandMenu> {
@@ -47,7 +46,7 @@ public class BrewingStandScreenMixin extends AbstractContainerScreen<BrewingStan
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         super.renderLabels(guiGraphics, i, j);
-        guiGraphics.blitSprite(BREWING_COIL_FLAME_SPRITE, 43, 42,51, 33);
+        guiGraphics.blitSprite(LegacySprites.BREWING_COIL_FLAME_SPRITE, 43, 42,51, 33);
         int fuel = this.menu.getFuel();
         int n = Mth.clamp((27 * fuel + 20 - 1) / 20, 0, 27);
         guiGraphics.pose().pushPose();
@@ -63,7 +62,7 @@ public class BrewingStandScreenMixin extends AbstractContainerScreen<BrewingStan
         ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 58.5f,topPos + 22.5, 0f);
-        guiGraphics.blitSprite(BREWING_SLOTS_SPRITE, 0, 0,96, 96);
+        guiGraphics.blitSprite(LegacySprites.BREWING_SLOTS_SPRITE, 0, 0,96, 96);
         guiGraphics.pose().popPose();
         int o;
         if ((o = this.menu.getBrewingTicks()) > 0) {

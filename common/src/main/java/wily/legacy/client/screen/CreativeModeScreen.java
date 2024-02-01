@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.CreativeInventoryListener;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -71,13 +72,17 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     }
     public void removed() {
         super.removed();
-        if (this.minecraft.player != null && this.minecraft.player.getInventory() != null) {
+        if (this.minecraft.player != null) {
             this.minecraft.player.inventoryMenu.removeSlotListener(this.listener);
         }
     }
 
     @Override
     protected void init() {
+        if (!this.minecraft.gameMode.hasInfiniteItems()) {
+            minecraft.setScreen(new InventoryScreen(minecraft.player));
+            return;
+        }
         addRenderableWidget(tabList);
         addRenderableOnly(panel);
         panel.init();

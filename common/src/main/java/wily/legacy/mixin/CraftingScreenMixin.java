@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.ScreenUtil;
 
-import static wily.legacy.LegacyMinecraftClient.ARROW_SPRITE;
+import static wily.legacy.client.LegacySprites.ARROW_SPRITE;
 
 @Mixin(CraftingScreen.class)
 public class CraftingScreenMixin extends AbstractContainerScreen<CraftingMenu> {

@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.screen.ExitConfirmationScreen;
 import wily.legacy.client.screen.HelpOptionsScreen;
 import wily.legacy.client.screen.RenderableVList;
@@ -44,7 +45,7 @@ public class PauseScreenMixin extends Screen {
         minecraft = Minecraft.getInstance();
         if (minecraft.level != null && minecraft.hasSingleplayerServer())
             renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.save"), button -> {
-                minecraft.getSingleplayerServer().saveEverything(false,false,false);
+                LegacyMinecraftClient.manualSave = true;
                 updateAutoSaveIndicator = true;
             }).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), button -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
