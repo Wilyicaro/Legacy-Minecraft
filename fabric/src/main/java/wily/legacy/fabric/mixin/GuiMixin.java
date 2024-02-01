@@ -43,7 +43,7 @@ public abstract class GuiMixin {
         instance.pose().pushPose();
         instance.pose().translate(0,ScreenUtil.getHUDDistance(),0);
         instance.setColor(1.0f,1.0f,1.0f,ScreenUtil.getHUDOpacity());
-        int r = instance.drawString(arg,arg2,i,j - 10 - (lastToolHighlight.isEmpty() ? 0 : (lastToolHighlight.getTooltipLines(null, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum() - 1) * 9),k);
+        int r = instance.drawString(arg,arg2,i,j - (int)(3f / ScreenUtil.getHUDScale()* 40 - 40) - (lastToolHighlight.isEmpty() ? 0 : (lastToolHighlight.getTooltipLines(null, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum() - 1) * 9),k);
         instance.pose().popPose();
         instance.setColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
@@ -111,7 +111,7 @@ public abstract class GuiMixin {
                 }
                 int width = this.getFont().width(mutableComponent);
                 int j = (this.screenWidth - width) / 2;
-                int k = this.screenHeight - 80 - getFont().lineHeight * (tooltipLines.size() - 1 - i);
+                int k = this.screenHeight - (int)(3f / ScreenUtil.getHUDScale()* 40) - 20 - getFont().lineHeight * (tooltipLines.size() - 1 - i);
                 if (!this.minecraft.gameMode.canHurtPlayer()) {
                     k += 14;
                 }

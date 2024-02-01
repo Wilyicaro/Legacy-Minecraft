@@ -17,6 +17,7 @@ import net.minecraft.world.level.storage.LevelSummary;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyWorldTemplate;
+import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -67,7 +68,7 @@ public class CreationList extends RenderableVList{
             protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                 int k = this.getX() + 35;
                 int l = this.getX() + this.getWidth();
-                TickBox.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j, true);
+                ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j, true);
             }
             @Override
             public void onPress() {

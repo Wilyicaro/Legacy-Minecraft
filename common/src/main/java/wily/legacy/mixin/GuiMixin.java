@@ -58,6 +58,7 @@ public abstract class GuiMixin {
             ci.cancel();
             return;
         }
+        guiGraphics.pose().pushPose();
         ScreenUtil.applyHUDScale(guiGraphics,i-> screenWidth = i,i-> screenHeight = i);
     }
     @Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;)V"))
@@ -73,6 +74,7 @@ public abstract class GuiMixin {
             return;
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
         ScreenUtil.resetHUDScale(guiGraphics,i-> screenWidth = i,i-> screenHeight = i);
+        guiGraphics.pose().popPose();
     }
     @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
     public void renderHotbar(float f, GuiGraphics guiGraphics, CallbackInfo ci) {
@@ -132,7 +134,7 @@ public abstract class GuiMixin {
     }
     @ModifyVariable(method = "renderJumpMeter", at = @At(value="HEAD", ordinal = 0), argsOnly = true)
     public int modifyJumpMeterX(int value) {
-        return screenWidth * 2 / 3 / 2 - 91;
+        return (int) (screenWidth * ScreenUtil.getHUDScale() / 3 / 2 - 91);
     }
 
     @Inject(method = "renderJumpMeter", at = @At("HEAD"), cancellable = true)
@@ -158,7 +160,7 @@ public abstract class GuiMixin {
     }
     @ModifyVariable(method = "renderExperienceBar", at = @At(value="HEAD", ordinal = 0), argsOnly = true)
     public int modifyExperienceBarX(int value) {
-        return screenWidth * 2 / 3 / 2 - 91;
+        return (int) (screenWidth * ScreenUtil.getHUDScale() / 3 / 2 - 91);
     }
     @Inject(method = "renderExperienceBar", at = @At("HEAD"), cancellable = true)
     public void renderExperienceBar(GuiGraphics guiGraphics, int i, CallbackInfo ci) {

@@ -11,7 +11,6 @@
     "${mod_credits}"
   ],
   "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/better-furnaces-reforged/",
     "sources": "${mod_source}"
   },
   "license": "${mod_license}",

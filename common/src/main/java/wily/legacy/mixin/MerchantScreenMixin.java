@@ -10,23 +10,24 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.*;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerListener;
+import net.minecraft.world.inventory.MerchantMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.MerchantOffer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.client.LegacySprites;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.inventory.LegacyMerchantOffer;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static wily.legacy.LegacyMinecraftClient.*;
 
 @Mixin(MerchantScreen.class)
 public abstract class MerchantScreenMixin extends AbstractContainerScreen<MerchantMenu> {
@@ -93,7 +94,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                 super.render(graphics, i, j, f);
                 if (isValidIndex() && ((LegacyMerchantOffer)menu.getOffers().get(index)).getRequiredLevel() > menu.getTraderLevel()) {
                     RenderSystem.disableDepthTest();
-                    renderIcon(PADLOCK_SPRITE, graphics, false, 16, 16);
+                    renderIcon(LegacySprites.PADLOCK_SPRITE, graphics, false, 16, 16);
                     RenderSystem.enableDepthTest();
                 }
             }
@@ -224,18 +225,18 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 25,topPos + 28,0);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        guiGraphics.blitSprite(EXPERIENCE_BAR_BACKGROUND_SPRITE, 0, 0, 0, 161, 4);
+        guiGraphics.blitSprite(LegacySprites.EXPERIENCE_BAR_BACKGROUND_SPRITE, 0, 0, 0, 161, 4);
         int m = VillagerData.getMinXpPerLevel(k);
         if (l < m || !VillagerData.canLevelUp(k)) {
             return;
         }
         float f = 161.0f / (float)(VillagerData.getMaxXpPerLevel(k) - m);
         int o = Math.min(Mth.floor(f * (float)(l - m)), 161);
-        guiGraphics.blitSprite(EXPERIENCE_BAR_CURRENT_SPRITE, 161, 4, 0, 0, 0, 0, 0, o, 4);
+        guiGraphics.blitSprite(LegacySprites.EXPERIENCE_BAR_CURRENT_SPRITE, 161, 4, 0, 0, 0, 0, 0, o, 4);
         int p = this.menu.getFutureTraderXp() > 0 ? menu.getFutureTraderXp() :  getSelectedMerchantOffer() != null ? getSelectedMerchantOffer().getXp() : 0;
         if (p > 0) {
             int q = Math.min(Mth.floor((float)p * f), 161 - o);
-            guiGraphics.blitSprite(EXPERIENCE_BAR_RESULT_SPRITE, 161, 4, o, 0, o, 0, 0, q, 4);
+            guiGraphics.blitSprite(LegacySprites.EXPERIENCE_BAR_RESULT_SPRITE, 161, 4, o, 0, o, 0, 0, q, 4);
         }
         guiGraphics.pose().popPose();
     }
@@ -266,12 +267,12 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 47,topPos + 131,0);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        guiGraphics.blitSprite(ARROW_SPRITE,0,0,22,15);
+        guiGraphics.blitSprite(LegacySprites.ARROW_SPRITE,0,0,22,15);
         if (getSelectedMerchantOffer() != null && getSelectedMerchantOffer().isOutOfStock())
-            guiGraphics.blitSprite(ERROR_CROSS_SPRITE, 4, 0, 15, 15);
+            guiGraphics.blitSprite(LegacySprites.ERROR_CROSS_SPRITE, 4, 0, 15, 15);
         guiGraphics.pose().popPose();
         if (getSelectedMerchantOffer() instanceof LegacyMerchantOffer o && o.getRequiredLevel() > menu.getTraderLevel())
-            guiGraphics.blitSprite(PADLOCK_SPRITE, leftPos + 56,  topPos + 134, 16, 16);
+            guiGraphics.blitSprite(LegacySprites.PADLOCK_SPRITE, leftPos + 56,  topPos + 134, 16, 16);
         if (menu.showProgressBar())
             renderProgressBar(guiGraphics,leftPos,topPos);
     }

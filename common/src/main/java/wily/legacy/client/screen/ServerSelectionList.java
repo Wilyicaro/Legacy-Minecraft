@@ -5,8 +5,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.DefaultUncaughtExceptionHandler;
 import net.minecraft.SharedConstants;
@@ -37,6 +35,7 @@ import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.client.LegacySprites;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
@@ -60,12 +59,6 @@ public class ServerSelectionList extends RenderableVList {
     static final ResourceLocation PINGING_3_SPRITE = new ResourceLocation("server_list/pinging_3");
     static final ResourceLocation PINGING_4_SPRITE = new ResourceLocation("server_list/pinging_4");
     static final ResourceLocation PINGING_5_SPRITE = new ResourceLocation("server_list/pinging_5");
-    static final ResourceLocation JOIN_HIGHLIGHTED_SPRITE = new ResourceLocation("server_list/join_highlighted");
-    static final ResourceLocation JOIN_SPRITE = new ResourceLocation("server_list/join");
-    static final ResourceLocation MOVE_UP_HIGHLIGHTED_SPRITE = new ResourceLocation("server_list/move_up_highlighted");
-    static final ResourceLocation MOVE_UP_SPRITE = new ResourceLocation("server_list/move_up");
-    static final ResourceLocation MOVE_DOWN_HIGHLIGHTED_SPRITE = new ResourceLocation("server_list/move_down_highlighted");
-    static final ResourceLocation MOVE_DOWN_SPRITE = new ResourceLocation("server_list/move_down");
     static final Logger LOGGER = LogUtils.getLogger();
     static final ThreadPoolExecutor THREAD_POOL = new ScheduledThreadPoolExecutor(5, new ThreadFactoryBuilder().setNameFormat("Server Pinger #%d").setDaemon(true).setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(LOGGER)).build());
     private static final ResourceLocation ICON_MISSING = new ResourceLocation("textures/misc/unknown_server.png");
@@ -201,22 +194,22 @@ public class ServerSelectionList extends RenderableVList {
                         int u = mouseX - getX();
                         int v = mouseY - getY();
                         if (u < 32 && u > 16) {
-                            guiGraphics.blitSprite(JOIN_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                            guiGraphics.blitSprite(LegacySprites.JOIN_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
                         } else {
-                            guiGraphics.blitSprite(JOIN_SPRITE, getX(), getY(), 32, 32);
+                            guiGraphics.blitSprite(LegacySprites.JOIN_SPRITE, getX(), getY(), 32, 32);
                         }
                         if (index > 0) {
                             if (u < 16 && v < 16) {
-                                guiGraphics.blitSprite(MOVE_UP_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                                guiGraphics.blitSprite(LegacySprites.MOVE_UP_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
                             } else {
-                                guiGraphics.blitSprite(MOVE_UP_SPRITE, getX(), getY(), 32, 32);
+                                guiGraphics.blitSprite(LegacySprites.MOVE_UP_SPRITE, getX(), getY(), 32, 32);
                             }
                         }
                         if (index < screen.getServers().size() - 1) {
                             if (u < 16 && v > 16) {
-                                guiGraphics.blitSprite(MOVE_DOWN_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                                guiGraphics.blitSprite(LegacySprites.MOVE_DOWN_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
                             } else {
-                                guiGraphics.blitSprite(MOVE_DOWN_SPRITE, getX(), getY(), 32, 32);
+                                guiGraphics.blitSprite(LegacySprites.MOVE_DOWN_SPRITE, getX(), getY(), 32, 32);
                             }
                         }
                     }

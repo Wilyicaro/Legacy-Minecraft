@@ -2,13 +2,11 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
@@ -17,8 +15,6 @@ import net.minecraft.world.phys.Vec3;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.inventory.LegacySlotWrapper;
 import wily.legacy.util.ScreenUtil;
-
-import java.util.function.BiConsumer;
 
 public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEventListener, NarratableEntry {
     public static final ResourceLocation ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/icon_holder");
@@ -42,7 +38,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     public LegacyIconHolder(Slot slot){
         slotBounds(slot);
     }
-    public LegacyIconHolder(int leftPos, int topPos,Slot slot){
+    public LegacyIconHolder(int leftPos, int topPos, Slot slot){
         slotBounds(leftPos, topPos, slot);
     }
     public LegacyIconHolder(int width, int height){
@@ -97,7 +93,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
     @Override
     public void render(GuiGraphics graphics, int i, int j, float f) {
-        isHovered = ScreenUtil.isMouseOver(getXCorner(), getYCorner(), width, height, i, j);
+        isHovered = ScreenUtil.isMouseOver(i, j, getXCorner(), getYCorner(), width, height);
         graphics.pose().pushPose();
         graphics.pose().translate(getXCorner(),getYCorner(),0);
         applyTranslation(graphics);
@@ -183,12 +179,12 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     @Override
     public NarrationPriority narrationPriority() {
         if (this.isFocused()) {
-            return NarratableEntry.NarrationPriority.FOCUSED;
+            return NarrationPriority.FOCUSED;
         }
         if (this.isHovered) {
-            return NarratableEntry.NarrationPriority.HOVERED;
+            return NarrationPriority.HOVERED;
         }
-        return NarratableEntry.NarrationPriority.NONE;
+        return NarrationPriority.NONE;
     }
 
     @Override

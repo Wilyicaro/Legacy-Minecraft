@@ -1,7 +1,9 @@
 package wily.legacy.mixin;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.client.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.OptionInstance;
+import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Difficulty;
@@ -31,6 +33,11 @@ public abstract class OptionsMixin implements LegacyOptions {
         return null;
     }
 
+    @Shadow
+    public static Component genericValueLabel(Component arg, int i) {
+        return null;
+    }
+
     private OptionInstance<Double> hudDistance;
     private OptionInstance<Double> hudOpacity;
     private OptionInstance<Integer> autoSaveInterval;
@@ -39,9 +46,11 @@ public abstract class OptionsMixin implements LegacyOptions {
     private OptionInstance<Boolean> animatedCharacter;
     private OptionInstance<Boolean> classicCrafting;
     private OptionInstance<Boolean> autoSaveWhenPause;
+    private OptionInstance<Integer> hudScale;
     private OptionInstance<Boolean> showVanillaRecipeBook;
     private OptionInstance<Boolean> legacyGamma;
     private OptionInstance<Boolean> inGameTooltips;
+    private OptionInstance<Boolean> tooltipBoxes;
     private OptionInstance<Boolean> hints;
     private OptionInstance<Boolean> directSaveLoad;
     private OptionInstance<Boolean> vignette;
@@ -63,6 +72,7 @@ public abstract class OptionsMixin implements LegacyOptions {
         legacyCreativeTab = OptionInstance.createBoolean("legacy.options.creativeTab", true);
         autoSaveWhenPause = OptionInstance.createBoolean("legacy.options.autoSaveWhenPause", false);
         inGameTooltips = OptionInstance.createBoolean("legacy.options.gameTooltips", true);
+        tooltipBoxes = OptionInstance.createBoolean("legacy.options.tooltipBoxes", true);
         hints = OptionInstance.createBoolean("legacy.options.hints", true);
         directSaveLoad = OptionInstance.createBoolean("legacy.options.directSaveLoad", false);
         vignette = OptionInstance.createBoolean("legacy.options.vignette", false);
@@ -70,6 +80,7 @@ public abstract class OptionsMixin implements LegacyOptions {
         caveSounds = OptionInstance.createBoolean("legacy.options.caveSounds", true);
         autoSaveInterval = new OptionInstance<>("legacy.options.autoSaveInterval", OptionInstance.noTooltip(), (c,i)-> i == 0 ? genericValueLabel(c,Component.translatable("options.off")) :Component.translatable( "legacy.options.mins_value",c, i * 5), new OptionInstance.IntRange(0,24), 1, d -> {});
         showVanillaRecipeBook = OptionInstance.createBoolean("legacy.options.showVanillaRecipeBook", false);
+        hudScale = new OptionInstance<>("legacy.options.hudScale", OptionInstance.noTooltip(), OptionsMixin::genericValueLabel,  new OptionInstance.IntRange(1,3), 2, d -> {});
         hudOpacity = new OptionInstance<>("legacy.options.hudOpacity", OptionInstance.noTooltip(), (c, d) -> Component.translatable("options.percent_value", c, (int) (d * 100.0)), OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
         hudDistance = new OptionInstance<>("legacy.options.hudDistance", OptionInstance.noTooltip(), (c, d) -> Component.translatable("options.percent_value", c, (int) (d * 100.0)), OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
         createWorldDifficulty = new OptionInstance<>("options.difficulty", d->Tooltip.create(d.getInfo()), (c, d) -> d.getDisplayName(), new OptionInstance.Enum<>(Arrays.asList(Difficulty.values()), Codec.INT.xmap(Difficulty::byId, Difficulty::getId)), Difficulty.NORMAL, d -> {});
@@ -82,6 +93,7 @@ public abstract class OptionsMixin implements LegacyOptions {
         fieldAccess.process("hudOpacity", hudOpacity);
         fieldAccess.process("autoSaveWhenPause", autoSaveWhenPause);
         fieldAccess.process("gameTooltips", inGameTooltips);
+        fieldAccess.process("tooltipBoxes", tooltipBoxes);
         fieldAccess.process("hints", hints);
         fieldAccess.process("directSaveLoad", directSaveLoad);
         fieldAccess.process("vignette", vignette);
@@ -91,6 +103,7 @@ public abstract class OptionsMixin implements LegacyOptions {
         fieldAccess.process("autoSaveInterval", autoSaveInterval);
         fieldAccess.process("showVanillaRecipeBook", showVanillaRecipeBook);
         fieldAccess.process("displayHUD", displayHUD);
+        fieldAccess.process("hudScale", hudScale);
         fieldAccess.process("legacyCreativeTab", legacyCreativeTab);
         fieldAccess.process("animatedCharacter", animatedCharacter);
         fieldAccess.process("classicCrafting", classicCrafting);
@@ -122,6 +135,9 @@ public abstract class OptionsMixin implements LegacyOptions {
     public OptionInstance<Boolean> inGameTooltips() {
         return inGameTooltips;
     }
+    public OptionInstance<Boolean> tooltipBoxes() {
+        return tooltipBoxes;
+    }
     public OptionInstance<Boolean> hints() {
         return hints;
     }
@@ -137,5 +153,8 @@ public abstract class OptionsMixin implements LegacyOptions {
     }
     public OptionInstance<Boolean> caveSounds() {
         return caveSounds;
+    }
+    public OptionInstance<Integer> hudScale() {
+        return hudScale;
     }
 }

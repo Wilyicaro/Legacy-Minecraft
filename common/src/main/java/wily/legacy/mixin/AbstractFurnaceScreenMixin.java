@@ -13,11 +13,11 @@ import net.minecraft.world.inventory.AbstractFurnaceMenu;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
-import static wily.legacy.LegacyMinecraftClient.ARROW_SPRITE;
+import static wily.legacy.client.LegacySprites.ARROW_SPRITE;
 
 @Mixin(AbstractFurnaceScreen.class)
 public class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends AbstractContainerScreen<T> {
@@ -71,14 +71,14 @@ public class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends A
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 77,topPos + 48,0);
         guiGraphics.pose().scale(19/13f,19/13f,1.0f);
-        guiGraphics.blitSprite(LegacyMinecraftClient.LIT,0,0, 13, 13);
+        guiGraphics.blitSprite(LegacySprites.LIT,0,0, 13, 13);
         guiGraphics.pose().popPose();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 75.5,topPos + 46.5,0);
         guiGraphics.pose().scale(19/39f,19/39f,1.0f);
         if (menu.isLit()) {
             int n = Mth.ceil(menu.getLitProgress() * 39.0f) + 1;
-            guiGraphics.blitSprite(LegacyMinecraftClient.LIT_PROGRESS, 42, 42, 0, 42 - n, 0, 42 - n, 42, n);
+            guiGraphics.blitSprite(LegacySprites.LIT_PROGRESS, 42, 42, 0, 42 - n, 0, 42 - n, 42, n);
         }
         guiGraphics.pose().popPose();
         guiGraphics.pose().pushPose();
@@ -89,7 +89,7 @@ public class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends A
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 114,topPos + 46.5,0);
         guiGraphics.pose().scale(0.5f,0.5f,1.0f);
-        guiGraphics.blitSprite(LegacyMinecraftClient.FULL_ARROW_SPRITE,66,48,0,0,0,0,2, (int) Math.ceil(menu.getBurnProgress() * 66), 48);
+        guiGraphics.blitSprite(LegacySprites.FULL_ARROW_SPRITE,66,48,0,0,0,0,2, (int) Math.ceil(menu.getBurnProgress() * 66), 48);
         guiGraphics.pose().popPose();
         if (!recipeBookComponent.isVisible() && recipeButton != null && !recipeButton.isHovered()) recipeButton.setFocused(false);
     }

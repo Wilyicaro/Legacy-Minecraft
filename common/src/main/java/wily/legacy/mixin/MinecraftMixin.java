@@ -7,7 +7,6 @@ import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.validation.DirectoryValidator;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,8 +21,6 @@ public abstract class MinecraftMixin {
     @Shadow protected abstract void updateScreenAndTick(Screen screen);
 
     @Shadow @Nullable public ClientLevel level;
-
-    @Shadow public abstract DirectoryValidator directoryValidator();
 
     @Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;isServerControlledInventory()Z"))
     private boolean handleKeybinds(MultiPlayerGameMode instance){

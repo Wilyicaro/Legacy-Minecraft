@@ -22,8 +22,6 @@ import java.util.Optional;
 public record LegacyBiomeOverride(Integer waterColor, Integer waterFogColor, float waterTransparency) {
     public static final Map<ResourceLocation,LegacyBiomeOverride> map = new HashMap<>();
     private static final String BIOME_OVERRIDES = "biome_overrides.json";
-    public static Integer DEFAULT_WATER_COLOR;
-
     public static final LegacyBiomeOverride EMPTY = new LegacyBiomeOverride(null,null,1.0f);
 
     public static LegacyBiomeOverride getOrDefault(Optional<ResourceKey<Biome>> optionalKey){
@@ -43,7 +41,6 @@ public record LegacyBiomeOverride(Integer waterColor, Integer waterFogColor, flo
         protected Map<ResourceLocation,LegacyBiomeOverride> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
             Map<ResourceLocation,LegacyBiomeOverride> overrides = new HashMap<>();
             ResourceManager manager = Minecraft.getInstance().getResourceManager();
-            DEFAULT_WATER_COLOR = null;
             manager.getNamespaces().forEach(name->manager.getResource(new ResourceLocation(name,BIOME_OVERRIDES)).ifPresent(r->{
                 try {
                     BufferedReader bufferedReader = r.openAsReader();

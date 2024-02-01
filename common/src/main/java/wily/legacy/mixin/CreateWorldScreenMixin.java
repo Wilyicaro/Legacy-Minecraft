@@ -1,11 +1,9 @@
 package wily.legacy.mixin;
 
-import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.ChatFormatting;
 import net.minecraft.FileUtil;
-import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,23 +14,19 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.worldselection.ConfirmExperimentalFeaturesScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
-import net.minecraft.commands.Commands;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.RegistryLayer;
-import net.minecraft.server.WorldLoader;
 import net.minecraft.server.commands.PublishCommand;
-import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.flag.FeatureFlags;
-import net.minecraft.world.level.*;
+import net.minecraft.world.level.LevelSettings;
+import net.minecraft.world.level.WorldDataConfiguration;
 import net.minecraft.world.level.levelgen.WorldDimensions;
 import net.minecraft.world.level.storage.LevelResource;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -56,15 +50,12 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static wily.legacy.LegacyMinecraftClient.publishUnloadedServer;
 
 @Mixin(CreateWorldScreen.class)
 public abstract class CreateWorldScreenMixin extends Screen{
-
-    @Shadow protected abstract void applyNewPackConfig(PackRepository arg, WorldDataConfiguration arg2, Consumer<WorldDataConfiguration> consumer);
 
     @Shadow @Final private Screen lastScreen;
     @Shadow @Final private WorldCreationUiState uiState;
@@ -77,13 +68,12 @@ public abstract class CreateWorldScreenMixin extends Screen{
 
     @Shadow protected abstract LevelSettings createLevelSettings(boolean bl);
 
-    private boolean recreated;
     protected boolean trustPlayers;
     protected boolean onlineOnStart = false;
     private int port = HttpUtil.getAvailablePort();
-    protected final Panel panel = Panel.centered(this,245,228);
+    protected Panel panel;
 
-    protected PackSelector resourcePackSelector = PackSelector.resources(panel.x + 13, panel.y + 106, 220,45);
+    protected PackSelector resourcePackSelector;
 
     private Path tempDataPackDir;
 
@@ -97,6 +87,8 @@ public abstract class CreateWorldScreenMixin extends Screen{
     @Inject(method = "<init>",at = @At("RETURN"))
     public void initReturn(Minecraft minecraft, Screen screen, WorldCreationContext worldCreationContext, Optional optional, OptionalLong optionalLong, CallbackInfo ci){
         uiState.setDifficulty(((LegacyOptions)minecraft.options).createWorldDifficulty().get());
+        panel = new Panel(p-> (width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 120 : 0))) / 2, p-> (height - p.height) / 2 + 20,245,228);
+        resourcePackSelector = PackSelector.resources(panel.x + 13, panel.y + 106, 220,45, !ScreenUtil.hasTooltipBoxes());
     }
     @Override
     public void init() {
@@ -112,8 +104,6 @@ public abstract class CreateWorldScreenMixin extends Screen{
         uiState.addListener(worldCreationUiState -> gameModeButton.active = !worldCreationUiState.isDebug());
         LegacySliderButton<Difficulty> difficultyButton = addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 77, 220,16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getValue().getDisplayName()),()->Tooltip.create(uiState.getDifficulty().getInfo()),uiState.getDifficulty(),()-> Arrays.asList(Difficulty.values()), b->uiState.setDifficulty(b.objectValue)));
         uiState.addListener(worldCreationUiState -> difficultyButton.active = !uiState.isHardcore());
-        if (!SharedConstants.getCurrentVersion().isStable())
-            addRenderableWidget(Button.builder(ExperimentsScreen.EXPERIMENTS_LABEL, button -> openExperimentsScreen(uiState.getSettings().dataConfiguration())).bounds(panel.x + 13, panel.y + 129,220,20).build());
         EditBox portEdit = addRenderableWidget(new EditBox(minecraft.font, panel.x + 124, panel.y + 151,100,20,Component.translatable("lanServer.port")));
         portEdit.visible = onlineOnStart;
 
@@ -158,7 +148,7 @@ public abstract class CreateWorldScreenMixin extends Screen{
         Lifecycle lifecycle = FeatureFlags.isExperimental(worldCreationContext.dataConfiguration().enabledFeatures()) ? Lifecycle.experimental() : Lifecycle.stable();
         Lifecycle lifecycle2 = layeredRegistryAccess.compositeAccess().allRegistriesLifecycle();
         Lifecycle lifecycle3 = lifecycle2.add(lifecycle);
-        boolean bl = !this.recreated && lifecycle2 == Lifecycle.stable();
+        boolean bl = lifecycle2 == Lifecycle.stable();
         confirmWorldCreation(this.minecraft, self(), lifecycle3, () -> {
             try {
                 this.createNewWorld(complete.specialWorldProperty(), layeredRegistryAccess, lifecycle3);
@@ -205,6 +195,12 @@ public abstract class CreateWorldScreenMixin extends Screen{
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         ScreenUtil.renderDefaultBackground(guiGraphics,false);
+        resourcePackSelector.renderTooltipBox(guiGraphics,panel);
+    }
+    @Override
+    public boolean mouseScrolled(double d, double e, double f, double g) {
+        if (resourcePackSelector.scrollableRenderer.mouseScrolled(g)) return true;
+        return super.mouseScrolled(d, e, f, g);
     }
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         this.renderBackground(guiGraphics, i, j, f);

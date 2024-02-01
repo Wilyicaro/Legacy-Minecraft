@@ -15,7 +15,6 @@ import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.ConfirmScreen;
-import net.minecraft.client.gui.screens.LanguageSelectScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -27,13 +26,10 @@ import net.minecraft.world.level.storage.LevelSummary;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import wily.legacy.LegacyMinecraftClient;
-import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Objects;
-
-import static wily.legacy.util.ScreenUtil.renderDefaultBackground;
 
 public class MainMenuScreen extends RenderableVListScreen {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -53,6 +49,7 @@ public class MainMenuScreen extends RenderableVListScreen {
         this.fading = bl;
         minecraft = Minecraft.getInstance();
         secondButtonActive = minecraft.isDemo() ? createDemoMenuOptions() : this.createNormalMenuOptions();
+        renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.mods"), () -> new ModsScreen(this)).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("options.language"), () -> new LegacyLanguageScreen(this, this.minecraft.getLanguageManager())).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("menu.options"), () -> new HelpOptionsScreen(this)).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> this.minecraft.stop()).build());
@@ -150,20 +147,16 @@ public class MainMenuScreen extends RenderableVListScreen {
                         this.minecraft.setScreen(new ConfirmScreen(this::confirmDemo, Component.translatable("selectWorld.deleteQuestion"), Component.translatable("selectWorld.deleteWarning", new Object[]{levelSummary.getLevelName()}), Component.translatable("selectWorld.deleteButton"), CommonComponents.GUI_CANCEL));
                     }
                 } catch (Throwable var7) {
-                    if (levelStorageAccess != null) {
-                        try {
-                            levelStorageAccess.close();
-                        } catch (Throwable var6) {
-                            var7.addSuppressed(var6);
-                        }
+                    try {
+                        levelStorageAccess.close();
+                    } catch (Throwable var6) {
+                        var7.addSuppressed(var6);
                     }
 
                     throw var7;
                 }
 
-                if (levelStorageAccess != null) {
-                    levelStorageAccess.close();
-                }
+                levelStorageAccess.close();
             } catch (IOException var8) {
                 SystemToast.onWorldAccessFailure(this.minecraft, "Demo_World");
                 LOGGER.warn("Failed to access demo world", var8);

@@ -4,36 +4,48 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.WorldDataConfiguration;
 import wily.legacy.util.ScreenUtil;
-import wily.legacy.util.Stocker;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class WorldMoreOptionsScreen extends PanelVListScreen {
+    protected MultiLineLabel tooltipBoxLabel;
+    protected ScrollableRenderer scrollableRenderer =  new ScrollableRenderer(new LegacyScrollRenderer());
+
     protected final TabList tabList = new TabList().addTabButton(29,0,Component.translatable("createWorld.tab.world.title"),t-> rebuildWidgets()).addTabButton(29,2,Component.translatable("legacy.menu.game_options"), t-> rebuildWidgets());
 
     protected final RenderableVList gameRenderables = new RenderableVList();
 
     protected List<GameRules.Key<?>> worldOptionsRules = List.of(GameRules.RULE_MOBGRIEFING, GameRules.RULE_DOFIRETICK, GameRules.RULE_WATER_SOURCE_CONVERSION, GameRules.RULE_LAVA_SOURCE_CONVERSION);
 
+    protected Runnable onClose = ()->{};
+    public WorldMoreOptionsScreen(Screen parent) {
+        super(s -> new Panel(p -> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 188 : 0))) / 2, p -> (s.height - p.height) / 2, 244, 199), Component.translatable("createWorld.tab.more.title"));
+        this.parent = parent;
+    }
     public WorldMoreOptionsScreen(CreateWorldScreen parent, Consumer<Boolean> setTrustPlayers) {
-        super(parent, 244, 199, Component.translatable( "createWorld.tab.more.title"), SimpleLayoutRenderable.create(0,9,r-> ((guiGraphics, i, j, f) -> guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("selectWorld.enterSeed"),r.x + 1,r.y + 2,0x404040,false))));
-       EditBox editBox = new EditBox(Minecraft.getInstance().font, 308, 20, Component.translatable("selectWorld.enterSeed")){
+        this(parent);
+       renderableVList.addRenderable(SimpleLayoutRenderable.create(0,9,r-> ((guiGraphics, i, j, f) -> guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("selectWorld.enterSeed"),r.x + 1,r.y + 2,0x404040,false))));
+        EditBox editBox = new EditBox(Minecraft.getInstance().font, 308, 20, Component.translatable("selectWorld.enterSeed")){
            protected MutableComponent createNarrationMessage() {
                return super.createNarrationMessage().append(CommonComponents.NARRATION_SEPARATOR).append(Component.translatable("selectWorld.seedInfo"));
            }
@@ -52,13 +64,32 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
         }).build();
         parent.getUiState().addListener( s->customizeButton.active = !s.isDebug() && s.getPresetEditor() != null);
         renderableVList.addRenderable(customizeButton);
+        SimpleLayoutRenderable.create(0,9,r-> ((guiGraphics, i, j, f) -> {}));
         TickBox cheatsButton = new TickBox(0,0,parent.getUiState().isAllowCheats(),b->Component.translatable("selectWorld.allowCommands"),b->Tooltip.create(Component.translatable("selectWorld.allowCommands.info")),b->parent.getUiState().setAllowCheats(b.selected));
         parent.getUiState().addListener(s-> cheatsButton.active = !s.isDebug() && !s.isHardcore());
         GameRules gameRules = parent.getUiState().getGameRules();
+        Pair<Path,PackRepository> pair = parent.getDataPackSelectionSettings(parent.getUiState().getSettings().dataConfiguration());
+        if (pair != null){
+            renderableVList.addRenderable(SimpleLayoutRenderable.create(0,9,r-> ((guiGraphics, i, j, f) -> guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("selectWorld.experiments"),r.x + 1,r.y + 2,0x404040,false))));
+            PackRepository dataRepository = pair.getSecond();
+            List<String> selectedExperiments = new ArrayList<>(dataRepository.getSelectedIds());
+            dataRepository.getAvailablePacks().forEach(p->{
+                if (p.getPackSource()!= PackSource.FEATURE) return;
+                String id = "dataPack." + p.getId() + ".name";
+                Component name = Language.getInstance().has(id) ? Component.translatable(id) : p.getTitle();
+                renderableVList.addRenderable(new TickBox(0,0,selectedExperiments.contains(p.getId()),b-> name,b->new MultilineTooltip(178,p.getDescription()),b->{
+                    if (b.selected && !selectedExperiments.contains(p.getId())) selectedExperiments.add(p.getId());
+                    else if (!b.selected) selectedExperiments.remove(p.getId());
+                }));
+            });
+            onClose = ()->{
+                dataRepository.setSelected(selectedExperiments);
+                parent.tryApplyNewDataPacks(dataRepository, false,w-> minecraft.setScreen(this));
+            };
+        }
+        renderableVList.addRenderable(Button.builder(Component.translatable("selectWorld.dataPacks"), button -> openDataPackSelectionScreen(parent, parent.getUiState().getSettings().dataConfiguration())).build());
         renderableVList.addRenderable(new TickBox(0,0,parent.getUiState().isAllowCheats(), b-> Component.translatable("legacy.menu.selectWorld.trust_players"),b-> null,t-> setTrustPlayers.accept(t.selected)));
         addGameRulesOptions(renderableVList,gameRules, worldOptionsRules::contains);
-        gameRenderables.addRenderable(Button.builder(ExperimentsScreen.EXPERIMENTS_LABEL, button -> openExperimentsScreen(parent, parent.getUiState().getSettings().dataConfiguration())).build());
-        gameRenderables.addRenderable(Button.builder(Component.translatable("selectWorld.dataPacks"), button -> openDataPackSelectionScreen(parent, parent.getUiState().getSettings().dataConfiguration())).build());
         gameRenderables.addRenderable(cheatsButton);
         addGameRulesOptions(gameRenderables,gameRules, k -> !worldOptionsRules.contains(k));
         parent.getUiState().onChanged();
@@ -71,7 +102,9 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
                 if (!allowGamerule.test(key)) return;
                 GameRules.BooleanValue value = gameRules.getRule(key);
                 GameRules.BooleanValue defaultValue = type.createRule();
-                list.addRenderable(new TickBox(0,0,gameRules.getRule(key).get(),b-> Component.translatable(key.getDescriptionId()),b-> Tooltip.create(Component.translatable("editGamerule.default", defaultValue.serialize()).withStyle(ChatFormatting.GRAY)), b->value.set(b.selected,null)));
+                Component tooltip = Component.translatable(key.getDescriptionId() + ".description");
+                Component valueTooltip = Component.translatable("editGamerule.default", defaultValue.serialize()).withStyle(ChatFormatting.GRAY);
+                list.addRenderable(new TickBox(0,0,gameRules.getRule(key).get(),b-> Component.translatable(key.getDescriptionId()),b-> new MultilineTooltip(178, tooltip, valueTooltip), b->value.set(b.selected,null)));
             }
 
             @Override
@@ -79,8 +112,10 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
                 if (!allowGamerule.test(key)) return;
                 GameRules.IntegerValue value = gameRules.getRule(key);
                 GameRules.IntegerValue defaultValue = type.createRule();
+                Component tooltip = Component.translatable(key.getDescriptionId() + ".description");
+                Component valueTooltip = Component.translatable("editGamerule.default", defaultValue.serialize()).withStyle(ChatFormatting.GRAY);
                 EditBox integerEdit = new EditBox(Minecraft.getInstance().font,220,20,Component.translatable(key.getDescriptionId()));
-                integerEdit.setTooltip(Tooltip.create(Component.translatable("editGamerule.default", defaultValue.serialize()).withStyle(ChatFormatting.GRAY)));
+                integerEdit.setTooltip(new MultilineTooltip(178,tooltip,valueTooltip));
                 integerEdit.setValue(Integer.toString(value.get()));
                 integerEdit.setFilter(value::tryDeserialize);
                 integerEdit.setResponder(string -> value.set(Integer.parseInt(string),null));
@@ -89,8 +124,22 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
             }
         });
     }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+        onClose.run();
+    }
+
+    @Override
+    public void setTooltipForNextRenderPass(Tooltip tooltip, ClientTooltipPositioner clientTooltipPositioner, boolean bl) {
+        if (ScreenUtil.hasTooltipBoxes())
+            tooltipBoxLabel =  MultiLineLabel.createFixed(font, tooltip.toCharSequence(minecraft).stream().map(formattedCharSequence -> new MultiLineLabel.TextWithWidth((FormattedCharSequence)formattedCharSequence, font.width(formattedCharSequence))).toList());
+        else super.setTooltipForNextRenderPass(tooltip, clientTooltipPositioner, bl);
+    }
+
     public WorldMoreOptionsScreen(LoadSaveScreen parent) {
-        super(parent, 244, 199, Component.translatable("createWorld.tab.more.title"));
+        this((Screen) parent);
         tabList.selectedTab = 1;
         GameRules gameRules = parent.summary.getSettings().gameRules();
         renderableVList.addRenderable(new TickBox(0,0,parent.resetNether, b-> Component.translatable("legacy.menu.load_save.reset_nether"),b-> null,t-> parent.resetNether = t.selected));
@@ -106,6 +155,11 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
     }
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         ScreenUtil.renderDefaultBackground(guiGraphics,false);
+        if (ScreenUtil.hasTooltipBoxes()) {
+            if (tooltipBoxLabel != null && getChildAt(i,j).map(g-> g instanceof AbstractWidget w ? w.getTooltip() : null).isEmpty() && (!(getFocused() instanceof AbstractWidget w) || w.getTooltip() == null)) tooltipBoxLabel = null;
+            ScreenUtil.renderPointerPanel(guiGraphics,panel.x + panel.width - 2, panel.y + 5,188,panel.height - 10);
+            if (tooltipBoxLabel != null) tooltipBoxLabel.renderLeftAligned(guiGraphics, panel.x + panel.width + 3, panel.y + 13,12,0xFFFFFF);
+        }
     }
     @Override
     public boolean keyPressed(int i, int j, int k) {
@@ -128,16 +182,11 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
         if (tabList.selectedTab == 0 && parent instanceof LoadSaveScreen) panel.height = 122;
 
     }
-    void openExperimentsScreen(CreateWorldScreen screen, WorldDataConfiguration worldDataConfiguration) {
-        Pair<Path, PackRepository> pair = screen.getDataPackSelectionSettings(worldDataConfiguration);
-        if (pair != null)
-            this.minecraft.setScreen(new ExperimentsScreen(this, pair.getSecond(), packRepository -> screen.tryApplyNewDataPacks((PackRepository)packRepository, false, (d)->openExperimentsScreen(screen,d))));
-    }
 
     void openDataPackSelectionScreen(CreateWorldScreen screen, WorldDataConfiguration worldDataConfiguration) {
         Pair<Path, PackRepository> pair = screen.getDataPackSelectionSettings(worldDataConfiguration);
         if (pair != null) {
-            this.minecraft.setScreen(new PackSelectionScreen(pair.getSecond(), packRepository -> screen.tryApplyNewDataPacks((PackRepository)packRepository, true, d-> openDataPackSelectionScreen(screen,d)), pair.getFirst(), Component.translatable("dataPack.title")));
+            this.minecraft.setScreen(new PackSelectionScreen(pair.getSecond(), packRepository -> screen.tryApplyNewDataPacks(packRepository, true, d-> openDataPackSelectionScreen(screen,d)), pair.getFirst(), Component.translatable("dataPack.title")));
         }
     }
 }

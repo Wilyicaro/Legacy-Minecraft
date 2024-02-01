@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static wily.legacy.LegacyMinecraftClient.LOADING_BACKGROUND_SPRITE;
-import static wily.legacy.LegacyMinecraftClient.LOADING_BAR_SPRITE;
+import static wily.legacy.client.LegacySprites.LOADING_BACKGROUND_SPRITE;
+import static wily.legacy.client.LegacySprites.LOADING_BAR_SPRITE;
 
 public class LegacyLoadingScreen extends DefaultScreen{
     public static final List<Supplier<LegacyTip>> usingLoadingTips = new ArrayList<>(LegacyTipManager.loadingTips);

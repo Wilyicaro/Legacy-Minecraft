@@ -30,7 +30,7 @@ public class ServerEditScreen extends ConfirmationScreen{
             }
             parent.getServers().save();
             parent.serverSelectionList.updateServers();
-            minecraft.setScreen(parent);
+            return true;
         };
     }
     @Override
@@ -44,10 +44,11 @@ public class ServerEditScreen extends ConfirmationScreen{
     @Override
     protected void initButtons() {
         super.initButtons();
-        nameBox = new EditBox(font, width / 2 - 100,panel.y + 47,200, 20, message);
+        nameBox = new EditBox(font, width / 2 - 100,panel.y + 47,200, 20, Component.empty());
         ipBox = new EditBox(font, width / 2 - 100,panel.y + 87,200, 20, Component.translatable("addServer.enterIp"));
         nameBox.setValue(serverData.name);
         ipBox.setValue(serverData.ip);
+        ipBox.setMaxLength(128);
         nameBox.setResponder(s-> updateAddButtonStatus());
         ipBox.setResponder(s-> updateAddButtonStatus());
         addRenderableWidget(nameBox);

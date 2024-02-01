@@ -181,7 +181,7 @@ public class SaveSelectionList extends RenderableVList {
                     @Override
                     public void onClick(double d, double e) {
                         if (summary.isDisabled()) return;
-                        boolean hoverIcon = ScreenUtil.isMouseOver(getX() + 5, getY() + 5, 20, height, d, e);
+                        boolean hoverIcon = ScreenUtil.isMouseOver(d, e, getX() + 5, getY() + 5, 20, height);
                         if (hoverIcon || isFocused()) onPress();
                     }
 
@@ -216,7 +216,7 @@ public class SaveSelectionList extends RenderableVList {
                         if (minecraft.options.touchscreen().get().booleanValue() || isHovered) {
                             guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
 
-                            boolean hoverIcon = ScreenUtil.isMouseOver(getX() + 5, getY() + 5, 20, height, i, j);
+                            boolean hoverIcon = ScreenUtil.isMouseOver(i, j, getX() + 5, getY() + 5, 20, height);
                             ResourceLocation resourceLocation = hoverIcon ? JOIN_HIGHLIGHTED_SPRITE : JOIN_SPRITE;
                             ResourceLocation resourceLocation2 = hoverIcon ? WARNING_HIGHLIGHTED_SPRITE : WARNING_SPRITE;
                             ResourceLocation resourceLocation3 = hoverIcon ? ERROR_HIGHLIGHTED_SPRITE : ERROR_SPRITE;
@@ -259,7 +259,7 @@ public class SaveSelectionList extends RenderableVList {
                     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                         int k = this.getX() + 35;
                         int l = this.getX() + this.getWidth();
-                        TickBox.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j, true);
+                        ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j, true);
                     }
 
                     @Override

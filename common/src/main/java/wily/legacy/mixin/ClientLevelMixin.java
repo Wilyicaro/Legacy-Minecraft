@@ -3,6 +3,7 @@ package wily.legacy.mixin;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.biome.Biome;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,6 +20,6 @@ public class ClientLevelMixin {
     public int calculateBlockTint(ColorResolver instance, Biome biome, double x, double z, BlockPos pos) {
         BlockPos.MutableBlockPos m = pos.mutable();
         LegacyBiomeOverride o = LegacyBiomeOverride.getOrDefault(self().getBiome(m.setX((int) x).setZ((int) z)).unwrapKey());
-        return instance != BiomeColors.WATER_COLOR_RESOLVER || o.waterColor() == null  ? instance.getColor(biome,x,z) : o.waterColor();
+        return instance == BiomeColors.WATER_COLOR_RESOLVER && self().getFluidState(m).is(FluidTags.WATER) && o.waterColor() != null  ? o.waterColor() : instance.getColor(biome,x,z);
     }
 }

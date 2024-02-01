@@ -53,7 +53,7 @@ public abstract class GuiMixin {
                 }
                 int width = this.getFont().width(mutableComponent);
                 int j = (this.screenWidth - width) / 2;
-                int k = this.screenHeight - Math.max(80,shift) - getFont().lineHeight * (tooltipLines.size() - 1 - i);
+                int k = this.screenHeight - Math.max((int)(3f / ScreenUtil.getHUDScale()* 40) - 20,shift) - getFont().lineHeight * (tooltipLines.size() - 1 - i);
                 if (!this.minecraft.gameMode.canHurtPlayer()) {
                     k += 14;
                 }

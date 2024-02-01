@@ -21,8 +21,10 @@ import net.minecraft.world.level.GameType;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacySprites;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.network.ServerDisplayInfoSync;
+import wily.legacy.util.ScreenUtil;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -63,7 +65,7 @@ public class HostOptionsScreen extends PanelVListScreen{
         float[] color = LegacyMinecraftClient.getVisualPlayerColor(LegacyMinecraft.playerVisualIds.getOrDefault(profile.getName(), profile.getName().hashCode()));
         guiGraphics.setColor(color[0],color[1],color[2],1.0f);
         RenderSystem.enableBlend();
-        guiGraphics.blitSprite(LegacyMinecraftClient.MAP_PLAYER_SPRITE,x,y, 20,20);
+        guiGraphics.blitSprite(LegacySprites.MAP_PLAYER_SPRITE,x,y, 20,20);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
     }
@@ -128,7 +130,7 @@ public class HostOptionsScreen extends PanelVListScreen{
                 }
                 @Override
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                    TickBox.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 68, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j,true);
+                    ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 68, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j,true);
                 }
                 @Override
                 public void onPress() {
@@ -234,10 +236,10 @@ public class HostOptionsScreen extends PanelVListScreen{
     public void tick() {
         super.tick();
         if (shouldFade) {
-            HostOptionsScreen.this.alpha = Math.min(1.0f, HostOptionsScreen.this.alpha + 0.01f);
+            alpha = Math.min(1.0f, alpha * 1.04f);
             shouldFade = false;
         }else {
-            if (alpha > getDefaultOpacity()) alpha -= 0.01f;
+            if (alpha > getDefaultOpacity())  alpha = Math.max(getDefaultOpacity(), alpha / 1.04f);
         }
     }
 

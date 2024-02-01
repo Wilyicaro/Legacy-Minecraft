@@ -8,6 +8,7 @@ public interface LegacyOptions {
     OptionInstance<Double> hudDistance();
     OptionInstance<Double> hudOpacity();
     OptionInstance<Integer> autoSaveInterval();
+    OptionInstance<Integer> hudScale();
     OptionInstance<Boolean> legacyCreativeTab();
     OptionInstance<Boolean> displayHUD();
     OptionInstance<Boolean> animatedCharacter();
@@ -16,6 +17,7 @@ public interface LegacyOptions {
     OptionInstance<Boolean> showVanillaRecipeBook();
     OptionInstance<Boolean> legacyGamma();
     OptionInstance<Boolean> inGameTooltips();
+    OptionInstance<Boolean> tooltipBoxes();
     OptionInstance<Boolean> hints();
     OptionInstance<Boolean> directSaveLoad();
     OptionInstance<Boolean> vignette();

@@ -48,7 +48,7 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
             protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                 int k = this.getX() + 54;
                 int l = this.getX() + this.getWidth();
-                TickBox.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true);
+                ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true);
             }
             @Override
             protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -67,11 +67,6 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
         panel.init();
         addRenderableOnly(((guiGraphics, i, j, f) -> ScreenUtil.renderPanelRecess(guiGraphics, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14, 2)));
         getRenderableVList().init(this,panel.x + 11,panel.y + 11,260, panel.height - 5);
-    }
-    @Override
-    public boolean mouseScrolled(double d, double e, double f, double g) {
-        getRenderableVList().mouseScrolled(d,e,f,g);
-        return super.mouseScrolled(d, e, f, g);
     }
 
     @Override

@@ -19,11 +19,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.client.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
-
-import static wily.legacy.LegacyMinecraftClient.*;
 
 @Mixin(BeaconScreen.class)
 public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMenu> {
@@ -104,10 +103,10 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
         ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
         ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 8,topPos + 9,120, 115,2f);
         ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 132,topPos + 9,120, 115,2f);
-        guiGraphics.blitSprite(BEACON_1_SPRITE,leftPos + 32, topPos + 39, 20, 19);
-        guiGraphics.blitSprite(BEACON_2_SPRITE,leftPos + 32, topPos + 69, 20, 19);
-        guiGraphics.blitSprite(BEACON_3_SPRITE,leftPos + 32, topPos + 97, 20, 19);
-        guiGraphics.blitSprite(BEACON_4_SPRITE,leftPos + 180, topPos + 42, 20, 19);
+        guiGraphics.blitSprite(LegacySprites.BEACON_1_SPRITE,leftPos + 32, topPos + 39, 20, 19);
+        guiGraphics.blitSprite(LegacySprites.BEACON_2_SPRITE,leftPos + 32, topPos + 69, 20, 19);
+        guiGraphics.blitSprite(LegacySprites.BEACON_3_SPRITE,leftPos + 32, topPos + 97, 20, 19);
+        guiGraphics.blitSprite(LegacySprites.BEACON_4_SPRITE,leftPos + 180, topPos + 42, 20, 19);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 15, topPos + 129, 100.0F);
         guiGraphics.pose().scale(7/6f, 7/6f,7/6f);

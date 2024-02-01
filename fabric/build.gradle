@@ -27,6 +27,8 @@ dependencies {
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
     modApi "dev.architectury:architectury-fabric:${rootProject.architectury_version}"
+
+    modCompileOnly "maven.modrinth:sodium:mc1.20.3-0.5.5"
     //modCompileOnly "mezz.jei:jei-${jei_minecraft_version}-fabric-api:${jei_version}"
     //modRuntimeOnly "mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}"
 

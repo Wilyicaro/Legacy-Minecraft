@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.chat.Component;
+import wily.legacy.LegacyMinecraftClient;
 
 public class ExitConfirmationScreen extends ConfirmationScreen{
     public ExitConfirmationScreen(Screen parent) {
@@ -21,8 +22,8 @@ public class ExitConfirmationScreen extends ConfirmationScreen{
         addRenderableWidget(Button.builder(Component.translatable(minecraft.hasSingleplayerServer() ? "legacy.menu.exit_without_save" : "menu.quit"),b-> exitToTitleScreen(minecraft,false)).bounds(panel.x + 15, panel.y + panel.height - 30,200,20).build());
     }
     public static void exitToTitleScreen(Minecraft minecraft, boolean save) {
-        if (save && minecraft.hasSingleplayerServer())
-            minecraft.getSingleplayerServer().saveEverything(false,false,false);
+        if (save) LegacyMinecraftClient.manualSave = true;
+
         if (minecraft.level != null) {
             minecraft.level.disconnect();
         }

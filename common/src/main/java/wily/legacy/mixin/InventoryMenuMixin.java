@@ -17,7 +17,7 @@ import wily.legacy.LegacyMinecraft;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.inventory.LegacySlotWrapper;
 
-import static wily.legacy.LegacyMinecraftClient.SHIELD_SLOT_SPRITE;
+import static wily.legacy.client.LegacySprites.SHIELD_SLOT_SPRITE;
 
 @Mixin(InventoryMenu.class)
 public class InventoryMenuMixin {
