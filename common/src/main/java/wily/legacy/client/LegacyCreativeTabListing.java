@@ -13,6 +13,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.ItemStack;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.util.CompoundTagUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -35,13 +36,7 @@ public record LegacyCreativeTabListing(Component name, ResourceLocation icon, Co
                             if (element instanceof JsonObject tabObj) {
                                 CompoundTag tag = new CompoundTag();
                                 ResourceLocation tabIcon = new ResourceLocation(GsonHelper.getAsString(tabObj,"icon"));
-                                if (BuiltInRegistries.ITEM.containsKey(tabIcon) && tabObj.get("itemIconTag") instanceof JsonPrimitive p && p.isString()) {
-                                    try {
-                                        tag = TagParser.parseTag(p.getAsString());
-                                    } catch (CommandSyntaxException ex) {
-                                        throw new JsonSyntaxException("Invalid nbt tag: " + ex.getMessage());
-                                    }
-                                }
+                                if (BuiltInRegistries.ITEM.containsKey(tabIcon) && tabObj.get("nbt") instanceof JsonPrimitive p && p.isString()) tag = CompoundTagUtil.parseCompoundTag(p.getAsString());
                                 LegacyCreativeTabListing l = new LegacyCreativeTabListing(Component.translatable(s),new ResourceLocation(GsonHelper.getAsString(tabObj,"icon")), tag, new ArrayList<>());
                                 if (tabObj.get("listing") instanceof JsonArray a) {
                                     a.forEach(e -> {
@@ -51,11 +46,7 @@ public record LegacyCreativeTabListing(Component name, ResourceLocation icon, Co
                                             ItemStack i = new ItemStack(BuiltInRegistries.ITEM.get(new ResourceLocation(j.getAsString())));
                                             l.displayItems.add(i);
                                             if (e instanceof JsonObject o && o.get("nbt") instanceof JsonPrimitive p && p.isString()) {
-                                                try {
-                                                    i.setTag(TagParser.parseTag(p.getAsString()));
-                                                } catch (CommandSyntaxException ex) {
-                                                    throw new JsonSyntaxException("Invalid nbt tag: " + ex.getMessage());
-                                                }
+                                                i.setTag(CompoundTagUtil.parseCompoundTag(p.getAsString()));
                                             }
                                         }
                                     });

@@ -1,5 +1,5 @@
 {
-  "legacy.container.creative_tab.structures": {
+  "legacy.container.tab.building_blocks": {
     "icon": "legacy:icon/structures",
     "listing": [
       "minecraft:stone", "minecraft:deepslate", "minecraft:basalt", "minecraft:blackstone", "minecraft:grass_block", "minecraft:dirt_path", "minecraft:dirt", "minecraft:cobblestone", "minecraft:cobbled_deepslate", "minecraft:smooth_stone",
@@ -44,14 +44,14 @@
       "minecraft:light_gray_terracotta", "minecraft:gray_terracotta", "minecraft:sculk", "minecraft:sculk_catalyst"
     ]
   },
-  "legacy.container.creative_tab.decoration": {
+  "legacy.container.tab.decoration": {
     "icon": "legacy:icon/decoration",
     "listing": [
       "minecraft:skeleton_skull", "minecraft:wither_skeleton_skull", "minecraft:zombie_head", "minecraft:player_head", "minecraft:creeper_head", "minecraft:piglin_head", "minecraft:dragon_head", "minecraft:sponge", "minecraft:wet_sponge", "minecraft:melon",
       "minecraft:pumpkin", "minecraft:carved_pumpkin", "minecraft:jack_o_lantern", "minecraft:bamboo", "minecraft:oak_sapling", "minecraft:spruce_sapling", "minecraft:birch_sapling", "minecraft:jungle_sapling", "minecraft:acacia_sapling", "minecraft:dark_oak_sapling",
       "minecraft:cherry_sapling", "minecraft:mangrove_propagule", "minecraft:oak_leaves", "minecraft:spruce_leaves", "minecraft:birch_leaves", "minecraft:jungle_leaves", "minecraft:acacia_leaves", "minecraft:dark_oak_leaves", "minecraft:cherry_leaves", "minecraft:mangrove_leaves",
       "minecraft:azalea_leaves", "minecraft:flowering_azalea_leaves", "minecraft:azalea", "minecraft:flowering_azalea", "minecraft:moss_block", "minecraft:moss_carpet", "minecraft:spore_blossom", "minecraft:big_dripleaf", "minecraft:small_dripleaf", "minecraft:hanging_roots",
-      "minecraft:glow_lichen", "minecraft:vine", "minecraft:lily_pad", "minecraft:torch", "minecraft:soul_torch", "minecraft:lantern", "minecraft:soul_lantern", "minecraft:grass", "minecraft:fern", "minecraft:dead_bush", "minecraft:flower_pot",
+      "minecraft:glow_lichen", "minecraft:vine", "minecraft:lily_pad", "minecraft:torch", "minecraft:soul_torch", "minecraft:lantern", "minecraft:soul_lantern", "minecraft:short_grass", "minecraft:fern", "minecraft:dead_bush", "minecraft:flower_pot",
       "minecraft:dandelion", "minecraft:poppy", "minecraft:blue_orchid", "minecraft:allium", "minecraft:azure_bluet", "minecraft:red_tulip", "minecraft:orange_tulip", "minecraft:white_tulip", "minecraft:pink_tulip", "minecraft:oxeye_daisy",
       "minecraft:cornflower", "minecraft:lily_of_the_valley", "minecraft:sunflower", "minecraft:lilac", "minecraft:tall_grass", "minecraft:large_fern", "minecraft:rose_bush", "minecraft:peony", "minecraft:pink_petals", "minecraft:torchflower",
       "minecraft:pitcher_plant", "minecraft:wither_rose", "minecraft:honeycomb_block", "minecraft:brown_mushroom", "minecraft:red_mushroom", "minecraft:crimson_fungus", "minecraft:warped_fungus", "minecraft:crimson_roots", "minecraft:warped_roots", "minecraft:nether_sprouts",
@@ -82,7 +82,7 @@
       "minecraft:dead_horn_coral_block"
     ]
   },
-  "legacy.container.creative_tab.redstone_and_transport": {
+  "legacy.container.tab.redstone_and_transport": {
     "icon": "legacy:icon/redstone_and_transport",
     "listing": [
       "minecraft:rail", "minecraft:powered_rail", "minecraft:detector_rail", "minecraft:activator_rail", "minecraft:ladder", "minecraft:minecart", "minecraft:chest_minecart", "minecraft:furnace_minecart", "minecraft:hopper_minecart", "minecraft:tnt_minecart",
@@ -96,7 +96,7 @@
       "minecraft:hopper", "minecraft:comparator", "minecraft:trapped_chest", "minecraft:heavy_weighted_pressure_plate", "minecraft:light_weighted_pressure_plate", "minecraft:observer", "minecraft:target", "minecraft:sculk_sensor", "minecraft:calibrated_sculk_sensor"
     ]
   },
-  "legacy.container.creative_tab.materials": {
+  "legacy.container.tab.materials": {
     "icon": "legacy:icon/materials",
     "listing": [
       "minecraft:coal", "minecraft:charcoal", "minecraft:diamond", "minecraft:emerald", "minecraft:raw_copper", "minecraft:copper_ingot", "minecraft:raw_iron", "minecraft:iron_ingot", "minecraft:raw_gold", "minecraft:gold_ingot",
@@ -110,7 +110,7 @@
       "minecraft:magenta_dye", "minecraft:purple_dye", "minecraft:red_dye", "minecraft:cocoa_beans", "minecraft:orange_dye", "minecraft:yellow_dye", "minecraft:bone_meal", "minecraft:light_gray_dye", "minecraft:gray_dye", "minecraft:black_dye", "minecraft:blue_dye", "minecraft:brown_dye", "minecraft:white_dye"
     ]
   },
-  "legacy.container.creative_tab.food": {
+  "legacy.container.tab.food": {
     "icon": "legacy:icon/food",
     "listing": [
       "minecraft:apple", "minecraft:golden_apple", "minecraft:enchanted_golden_apple", "minecraft:melon_slice", "minecraft:mushroom_stew", "minecraft:rabbit_stew", "minecraft:beetroot_soup", "minecraft:bread", "minecraft:cake", "minecraft:cookie",
@@ -119,7 +119,7 @@
       "minecraft:poisonous_potato", "minecraft:carrot", "minecraft:golden_carrot", "minecraft:pumpkin_pie", "minecraft:beetroot", "minecraft:chorus_fruit", "minecraft:dried_kelp", "minecraft:sweet_berries", "minecraft:glow_berries", "minecraft:honey_bottle"
     ]
   },
-  "legacy.container.creative_tab.tools": {
+  "legacy.container.tab.tools_and_armour": {
     "icon": "legacy:icon/tools",
     "listing": [
       "minecraft:compass", "minecraft:leather_helmet", "minecraft:leather_chestplate", "minecraft:leather_leggings", "minecraft:leather_boots", "minecraft:wooden_sword", "minecraft:wooden_shovel", "minecraft:wooden_pickaxe", "minecraft:wooden_axe", "minecraft:wooden_hoe",
@@ -142,7 +142,7 @@
       {"item": "minecraft:enchanted_book", "nbt": "{\"StoredEnchantments\": [{\"lvl\": 1s, \"id\": \"minecraft:multishot\"}]}"},{"item": "minecraft:enchanted_book", "nbt": "{\"StoredEnchantments\": [{\"lvl\": 3s, \"id\": \"minecraft:sweeping\"}]}"},{"item": "minecraft:enchanted_book", "nbt": "{\"StoredEnchantments\": [{\"lvl\": 3s, \"id\": \"minecraft:swift_sneak\"}]}"},{"item": "minecraft:enchanted_book", "nbt": "{\"StoredEnchantments\": [{\"lvl\": 3s, \"id\": \"minecraft:soul_speed\"}]}"}
     ]
   },
-  "legacy.container.creative_tab.brewing": {
+  "legacy.container.tab.brewing": {
     "icon": "legacy:icon/brewing",
     "listing": [
       "minecraft:experience_bottle", "minecraft:dragon_breath", "minecraft:ghast_tear", "minecraft:fermented_spider_eye", "minecraft:blaze_powder", "minecraft:magma_cream", "minecraft:glistering_melon_slice", "minecraft:rabbit_foot", "minecraft:phantom_membrane", "minecraft:glass_bottle",
@@ -161,7 +161,7 @@
       {"item": "minecraft:lingering_potion", "nbt": "{\"Potion\": \"minecraft:strong_harming\"}"}, {"item": "minecraft:lingering_potion", "nbt": "{\"Potion\": \"minecraft:strong_poison\"}"}, {"item": "minecraft:lingering_potion", "nbt": "{\"Potion\": \"minecraft:strong_regeneration\"}"}, {"item": "minecraft:lingering_potion", "nbt": "{\"Potion\": \"minecraft:strong_strength\"}"}, {"item": "minecraft:lingering_potion", "nbt": "{\"Potion\": \"minecraft:strong_turtle_master\"}"}
     ]
   },
-  "legacy.container.creative_tab.misc": {
+  "legacy.container.tab.misc": {
     "icon": "legacy:icon/misc",
     "listing": [
       "minecraft:chest", "minecraft:ender_chest", "minecraft:crafting_table", "minecraft:furnace", "minecraft:brewing_stand", "minecraft:enchanting_table", "minecraft:beacon", "minecraft:conduit", "minecraft:barrel", "minecraft:cartography_table",

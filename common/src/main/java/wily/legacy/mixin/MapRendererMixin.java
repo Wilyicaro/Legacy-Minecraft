@@ -71,7 +71,7 @@ public abstract class MapRendererMixin {
             float m = (float)(b % 16 + 1) / 16.0f;
             float n = (float)(b / 16 + 1) / 16.0f;
             Matrix4f matrix4f2 = poseStack.last().pose();
-            int[] color = LegacyMinecraftClient.getVisualPlayerColor(mapDecoration.name().getString());
+            int[] color =  mapDecoration.name() == null ? new int[]{255,255,255} : LegacyMinecraftClient.getVisualPlayerColor(mapDecoration.name().getString());
             VertexConsumer vertexConsumer2 = multiBufferSource.getBuffer(MAP_ICONS);
             vertexConsumer2.vertex(matrix4f2, -1.0f, 1.0f, (float)l * -0.001f).color(color[0], color[1], color[2], 255).uv(g, h).uv2(i).endVertex();
             vertexConsumer2.vertex(matrix4f2, 1.0f, 1.0f, (float)l * -0.001f).color(color[0], color[1], color[2], 255).uv(m, h).uv2(i).endVertex();

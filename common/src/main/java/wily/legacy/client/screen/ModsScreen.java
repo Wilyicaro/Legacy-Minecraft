@@ -49,9 +49,8 @@ public class ModsScreen extends PanelVListScreen{
             key.getHomepage().ifPresent(s-> components.add(Component.translatable("legacy.menu.mods.homepage",s)));
             key.getIssueTracker().ifPresent(s-> components.add(Component.translatable("legacy.menu.mods.issues",s)));
             key.getSources().ifPresent(s-> components.add(Component.translatable("legacy.menu.mods.sources",s)));
+            if (key.getLicense() != null && !key.getLicense().isEmpty()) components.add(Component.translatable("legacy.menu.mods.license", String.join(", ", key.getLicense())));
             components.add(Component.literal(key.getDescription()));
-            if (key.getLicense() != null && !key.getLicense().isEmpty())
-                components.add(Component.translatable("legacy.menu.mods.license", String.join(", ", key.getLicense())));
             MultilineTooltip tooltip = new MultilineTooltip(components,176);
             return MultiLineLabel.createFixed(font, tooltip.toCharSequence(minecraft).stream().map(formattedCharSequence -> new MultiLineLabel.TextWithWidth((FormattedCharSequence)formattedCharSequence, font.width(formattedCharSequence))).toList());
         }
@@ -117,8 +116,8 @@ public class ModsScreen extends PanelVListScreen{
                 if (logo != null)
                     guiGraphics.blit(logo.location, panel.x + panel.width + 5, panel.y + 10, 0.0f, 0.0f, logo.getScaledWidth(28), 28, logo.getScaledWidth(28), 28);
                 if (logo == null || logo.getScaledWidth(28) < 120) {
-                    ScreenUtil.renderScrollingString(guiGraphics, font, Component.literal(focusedMod.getName()), x, panel.y + 12, panel.x + panel.width + 185, panel.y + 24, 0xFFFFFF, true);
-                    ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.id", focusedMod.getModId()), x, panel.y + 24, panel.x + panel.width + 185, panel.y + 36, 0xFFFFFF, true);
+                    ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.id", focusedMod.getModId()), x, panel.y + 12, panel.x + panel.width + 185, panel.y + 24, 0xFFFFFF, true);
+                    ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.version",focusedMod.getVersion()), x, panel.y + 24, panel.x + panel.width + 185, panel.y + 36, 0xFFFFFF, true);
                 }
                 scrollableRenderer.render(guiGraphics, panel.x + panel.width + 5, panel.y + 38, 178, panel.height - 54, () -> modLabelsCache.getUnchecked(focusedMod).renderLeftAligned(guiGraphics, panel.x + panel.width + 5, panel.y + 41, 12, 0xFFFFFF));
             }

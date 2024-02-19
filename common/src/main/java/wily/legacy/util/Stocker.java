@@ -25,16 +25,23 @@ public class Stocker<T> implements Supplier<T> {
         public Sizeable(Integer i) {
             super(i);
         }
+        public Sizeable(Integer i, int max) {
+            super(i);
+            this.max = max;
+        }
         public void set(Integer obj) {
             set(obj,false);
         }
         public void set(int i, boolean cyclic){
             super.set(cyclic ? cyclic(min,i,max + 1) : Math.max(min,Math.min(i,max)));
         }
-        public int add(int value){
+        public int add(int value, boolean cyclic){
             int oldValue = get();
-            set(get() + value);
+            set(get() + value,cyclic);
             return get() - oldValue;
+        }
+        public int add(int value){
+            return add(value,false);
         }
         public int shrink(int value){
             return add(-value);

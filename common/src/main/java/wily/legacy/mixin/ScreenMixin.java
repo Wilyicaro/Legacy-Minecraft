@@ -13,7 +13,7 @@ import wily.legacy.util.ScreenUtil;
 public abstract class ScreenMixin {
     @Inject(method = "changeFocus",at = @At("HEAD"))
     private void render(ComponentPath componentPath, CallbackInfo ci){
-        ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f);
+        ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f,1.0f);
     }
     @Inject(method = "onClose",at = @At("HEAD"))
     private void onClose(CallbackInfo ci){

@@ -23,5 +23,7 @@ public interface LegacyOptions {
     OptionInstance<Boolean> vignette();
     OptionInstance<Boolean> caveSounds();
     OptionInstance<Boolean> minecartSounds();
+    OptionInstance<Boolean> vanillaTabs();
+    OptionInstance<Boolean> forceYellowText();
     OptionInstance<Difficulty> createWorldDifficulty();
 }

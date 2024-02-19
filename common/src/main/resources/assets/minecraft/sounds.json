@@ -8,35 +8,5 @@
       "mob/horse/idle4"
     ],
     "subtitle": "subtitles.entity.horse.ambient"
-  },
-  "ui.press": {
-    "sounds": [
-      "ui/press"
-    ]
-  },
-  "ui.back": {
-    "sounds": [
-      "ui/back"
-    ]
-  },
-  "ui.focus": {
-    "sounds": [
-      "ui/focus"
-    ]
-  },
-  "ui.scroll": {
-    "sounds": [
-      "ui/scroll"
-    ]
-  },
-  "ui.craft": {
-    "sounds": [
-      "ui/craft"
-    ]
-  },
-  "ui.craft_fail": {
-    "sounds": [
-      "ui/craftfail"
-    ]
   }
 }

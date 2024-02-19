@@ -16,9 +16,12 @@ import net.minecraft.server.packs.repository.Pack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import wily.legacy.init.LegacyGameRules;
+import wily.legacy.init.LegacyMenuTypes;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.network.CommonPacket;
 import wily.legacy.network.ServerDisplayInfoSync;
+import wily.legacy.network.ServerInventoryCraftPacket;
+import wily.legacy.network.ServerOpenClientMenu;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,9 +46,12 @@ public class LegacyMinecraft
     public static final Object2IntMap<String> playerVisualIds = new Object2IntArrayMap<>();
     public static void init(){
         LegacySoundEvents.register();
+        LegacyMenuTypes.register();
         LegacyGameRules.init();
         registerCommonPacket(ServerDisplayInfoSync.class,ServerDisplayInfoSync::new);
         registerCommonPacket(ServerDisplayInfoSync.HostOptions.class,ServerDisplayInfoSync.HostOptions::new);
+        registerCommonPacket(ServerOpenClientMenu.class,ServerOpenClientMenu::new);
+        registerCommonPacket(ServerInventoryCraftPacket.class, ServerInventoryCraftPacket::new);
         LifecycleEvent.SERVER_STARTED.register(l-> playerVisualIds.clear());
         PlayerEvent.PLAYER_JOIN.register(p->{
             updateDisplayPlayersMap(p,true);

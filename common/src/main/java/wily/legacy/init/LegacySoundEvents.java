@@ -13,6 +13,9 @@ public class LegacySoundEvents {
 
     public static final RegistrySupplier<SoundEvent> FOCUS = SOUND_EVENT_REGISTER.register("random.focus",()->SoundEvent.createVariableRangeEvent(new ResourceLocation(LegacyMinecraft.MOD_ID,"random.focus")));
     public static final RegistrySupplier<SoundEvent> BACK = SOUND_EVENT_REGISTER.register("random.back",()->SoundEvent.createVariableRangeEvent(new ResourceLocation(LegacyMinecraft.MOD_ID,"random.back")));
+    public static final RegistrySupplier<SoundEvent> CRAFT = SOUND_EVENT_REGISTER.register("random.craft",()->SoundEvent.createVariableRangeEvent(new ResourceLocation(LegacyMinecraft.MOD_ID,"random.craft")));
+    public static final RegistrySupplier<SoundEvent> CRAFT_FAIL = SOUND_EVENT_REGISTER.register("random.craft_fail",()->SoundEvent.createVariableRangeEvent(new ResourceLocation(LegacyMinecraft.MOD_ID,"random.craft_fail")));
+
 
     public static void register(){
         SOUND_EVENT_REGISTER.register();

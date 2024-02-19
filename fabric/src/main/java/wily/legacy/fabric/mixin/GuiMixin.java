@@ -41,9 +41,10 @@ public abstract class GuiMixin {
         if (minecraft.screen != null) return 0;
         RenderSystem.enableBlend();
         instance.pose().pushPose();
-        instance.pose().translate(0,ScreenUtil.getHUDDistance(),0);
+        instance.pose().translate(0,ScreenUtil.getHUDDistance() - ScreenUtil.getHUDSize(),0);
         instance.setColor(1.0f,1.0f,1.0f,ScreenUtil.getHUDOpacity());
-        int r = instance.drawString(arg,arg2,i,j - (int)(3f / ScreenUtil.getHUDScale()* 40 - 40) - (lastToolHighlight.isEmpty() ? 0 : (lastToolHighlight.getTooltipLines(null, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum() - 1) * 9),k);
+
+        int r = instance.drawString(arg,arg2,i,j + 63 - (lastToolHighlight.isEmpty() || this.toolHighlightTimer <= 0 ? 0 : (lastToolHighlight.getTooltipLines(null, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum() - 1) * 9),k);
         instance.pose().popPose();
         instance.setColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
@@ -97,24 +98,22 @@ public abstract class GuiMixin {
             ci.cancel();
             return;
         }
+
         RenderSystem.enableBlend();
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0F,ScreenUtil.getHUDDistance(),0.0F);
+        guiGraphics.pose().translate(0.0F,ScreenUtil.getHUDDistance() - ScreenUtil.getHUDSize(),0.0F);
         this.minecraft.getProfiler().push("selectedItemName");
         if (this.toolHighlightTimer > 0 && !this.lastToolHighlight.isEmpty()) {
-            List<Component> tooltipLines = this.lastToolHighlight.getTooltipLines(null, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).toList();
+            List<Component> tooltipLines = this.lastToolHighlight.getTooltipLines(minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).toList();
             for (int i = 0; i < tooltipLines.size(); i++) {
                 int l;
                 Component mutableComponent = tooltipLines.get(i);
                 if (this.lastToolHighlight.hasCustomHoverName()) {
-                    mutableComponent.copy().withStyle(ChatFormatting.ITALIC);
+                    mutableComponent.copy().withStyle(ChatFormatting.GOLD);
                 }
                 int width = this.getFont().width(mutableComponent);
                 int j = (this.screenWidth - width) / 2;
-                int k = this.screenHeight - (int)(3f / ScreenUtil.getHUDScale()* 40) - 20 - getFont().lineHeight * (tooltipLines.size() - 1 - i);
-                if (!this.minecraft.gameMode.canHurtPlayer()) {
-                    k += 14;
-                }
+                int k = this.screenHeight - getFont().lineHeight * (tooltipLines.size() - 1 - i);
                 if ((l = (int)((float)this.toolHighlightTimer * 256.0f / 10.0f)) > 255) {
                     l = 255;
                 }

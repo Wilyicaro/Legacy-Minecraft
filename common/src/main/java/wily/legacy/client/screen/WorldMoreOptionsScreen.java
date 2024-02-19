@@ -14,11 +14,9 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.WorldDataConfiguration;
 import wily.legacy.util.ScreenUtil;
@@ -33,7 +31,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
     protected MultiLineLabel tooltipBoxLabel;
     protected ScrollableRenderer scrollableRenderer =  new ScrollableRenderer(new LegacyScrollRenderer());
 
-    protected final TabList tabList = new TabList().addTabButton(29,0,Component.translatable("createWorld.tab.world.title"),t-> rebuildWidgets()).addTabButton(29,2,Component.translatable("legacy.menu.game_options"), t-> rebuildWidgets());
+    protected final TabList tabList = new TabList().add(29,0,Component.translatable("createWorld.tab.world.title"), t-> rebuildWidgets()).add(29,2,Component.translatable("legacy.menu.game_options"), t-> rebuildWidgets());
 
     protected final RenderableVList gameRenderables = new RenderableVList();
 

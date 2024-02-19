@@ -9,9 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.Difficulty;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyOptions;
@@ -45,6 +43,7 @@ public abstract class OptionsMixin implements LegacyOptions {
     private OptionInstance<Boolean> displayHUD;
     private OptionInstance<Boolean> animatedCharacter;
     private OptionInstance<Boolean> classicCrafting;
+    private OptionInstance<Boolean> vanillaTabs;
     private OptionInstance<Boolean> autoSaveWhenPause;
     private OptionInstance<Integer> hudScale;
     private OptionInstance<Boolean> showVanillaRecipeBook;
@@ -54,11 +53,15 @@ public abstract class OptionsMixin implements LegacyOptions {
     private OptionInstance<Boolean> hints;
     private OptionInstance<Boolean> directSaveLoad;
     private OptionInstance<Boolean> vignette;
+    private OptionInstance<Boolean> forceYellowText;
     private OptionInstance<Boolean> caveSounds;
     private OptionInstance<Boolean> minecartSounds;
     private OptionInstance<Difficulty> createWorldDifficulty;
 
-
+    @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;<init>(Ljava/lang/String;ILjava/lang/String;)V", ordinal = 5),index = 0)
+    protected String initKeyCrafting(String string) {
+        return "key.crafting";
+    }
     @Redirect(method = "<init>", at = @At( value = "INVOKE", target = "Lnet/minecraft/client/Options;load()V"))
     protected void init(Options instance) {
 
@@ -66,7 +69,8 @@ public abstract class OptionsMixin implements LegacyOptions {
     @Inject(method = "<init>", at = @At( "RETURN"))
     protected void init(Minecraft minecraft, File file, CallbackInfo ci) {
         animatedCharacter = OptionInstance.createBoolean("legacy.options.animatedCharacter",true);
-        classicCrafting = OptionInstance.createBoolean("legacy.options.classicCrafting",true);
+        classicCrafting = OptionInstance.createBoolean("legacy.options.classicCrafting",false);
+        vanillaTabs = OptionInstance.createBoolean("legacy.options.vanillaTabs",OptionInstance.cachedConstantTooltip(Component.translatable("legacy.options.vanillaTabs.description")),false);
         legacyGamma = OptionInstance.createBoolean("legacy.options.gamma",true);
         displayHUD = OptionInstance.createBoolean("legacy.options.displayHud",!hideGui, b-> hideGui = !b);
         legacyCreativeTab = OptionInstance.createBoolean("legacy.options.creativeTab", true);
@@ -80,6 +84,7 @@ public abstract class OptionsMixin implements LegacyOptions {
         caveSounds = OptionInstance.createBoolean("legacy.options.caveSounds", true);
         autoSaveInterval = new OptionInstance<>("legacy.options.autoSaveInterval", OptionInstance.noTooltip(), (c,i)-> i == 0 ? genericValueLabel(c,Component.translatable("options.off")) :Component.translatable( "legacy.options.mins_value",c, i * 5), new OptionInstance.IntRange(0,24), 1, d -> {});
         showVanillaRecipeBook = OptionInstance.createBoolean("legacy.options.showVanillaRecipeBook", false);
+        forceYellowText =  OptionInstance.createBoolean("legacy.options.forceYellowText", false);
         hudScale = new OptionInstance<>("legacy.options.hudScale", OptionInstance.noTooltip(), OptionsMixin::genericValueLabel,  new OptionInstance.IntRange(1,3), 2, d -> {});
         hudOpacity = new OptionInstance<>("legacy.options.hudOpacity", OptionInstance.noTooltip(), (c, d) -> Component.translatable("options.percent_value", c, (int) (d * 100.0)), OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
         hudDistance = new OptionInstance<>("legacy.options.hudDistance", OptionInstance.noTooltip(), (c, d) -> Component.translatable("options.percent_value", c, (int) (d * 100.0)), OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
@@ -102,11 +107,13 @@ public abstract class OptionsMixin implements LegacyOptions {
         fieldAccess.process("createWorldDifficulty", createWorldDifficulty);
         fieldAccess.process("autoSaveInterval", autoSaveInterval);
         fieldAccess.process("showVanillaRecipeBook", showVanillaRecipeBook);
+        fieldAccess.process("forceYellowText", forceYellowText);
         fieldAccess.process("displayHUD", displayHUD);
         fieldAccess.process("hudScale", hudScale);
         fieldAccess.process("legacyCreativeTab", legacyCreativeTab);
         fieldAccess.process("animatedCharacter", animatedCharacter);
         fieldAccess.process("classicCrafting", classicCrafting);
+        fieldAccess.process("vanillaTabs", vanillaTabs);
         fieldAccess.process("legacyGamma", legacyGamma);
         hideGui = !displayHUD.get();
     }
@@ -156,5 +163,11 @@ public abstract class OptionsMixin implements LegacyOptions {
     }
     public OptionInstance<Integer> hudScale() {
         return hudScale;
+    }
+    public OptionInstance<Boolean> vanillaTabs() {
+        return vanillaTabs;
+    }
+    public OptionInstance<Boolean> forceYellowText() {
+        return forceYellowText;
     }
 }

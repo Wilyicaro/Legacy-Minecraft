@@ -14,10 +14,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.Vec3;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.client.Offset;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.function.Consumer;
@@ -30,9 +28,9 @@ public class TabButton extends AbstractButton {
     private final Consumer<TabButton> onPress;
     public boolean selected;
     protected int type;
-    public Function<TabButton, Vec3> translocation = (t)-> {
-     if (!t.selected) return new Vec3(0,4,0);
-     return Vec3.ZERO;
+    public Function<TabButton, Offset> offset = (t)-> {
+     if (!t.selected) return new Offset(0,4,0);
+     return Offset.ZERO;
     };
 
     public TabButton(int i, int j, int width, int height, int type, ResourceLocation iconSprite, CompoundTag itemIconTag, Component text, Tooltip tooltip, Consumer<TabButton> onPress) {
@@ -59,9 +57,9 @@ public class TabButton extends AbstractButton {
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
         guiGraphics.pose().pushPose();
-        Vec3 translate = translocation.apply(this);
-        if (!translate.equals(Vec3.ZERO)) {
-            guiGraphics.pose().translate(translate.x,translate.y,translate.z);
+        Offset translate = offset.apply(this);
+        if (!translate.equals(Offset.ZERO)) {
+            translate.apply(guiGraphics.pose());
             isHovered = isMouseOver(i,j);
         }
         if (selected) guiGraphics.pose().translate(0F,0f,1F);
@@ -84,9 +82,9 @@ public class TabButton extends AbstractButton {
     }
 
     public boolean isMouseOver(double d, double e) {
-        Vec3 translate = translocation.apply(this);
-        double x =  getX() + (translate.equals(Vec3.ZERO) ? 0 : translate.x);
-        double y =  getY() + (translate.equals(Vec3.ZERO) ? 0 : translate.y);
+        Offset translate = offset.apply(this);
+        double x =  getX() + (translate.equals(Offset.ZERO) ? 0 : translate.x());
+        double y =  getY() + (translate.equals(Offset.ZERO) ? 0 : translate.y());
         return this.active && this.visible && d >= x && e >= y && d < (x + this.width) && e < (y + this.height);
     }
     @Override

@@ -5,10 +5,12 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.packs.PackSelectionModel;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,6 +42,10 @@ public abstract class PackSelectionScreenMixin extends Screen {
     @Shadow @Final private PackSelectionModel model;
     @Shadow protected abstract void reload();
 
+    @Shadow private Button doneButton;
+
+    @Shadow protected abstract void closeWatcher();
+
     private Panel panel = Panel.centered(this,410,240);
     private RenderableVList selectedPacksList = new RenderableVList().layoutSpacing(l->0);
     private RenderableVList unselectedPacksList = new RenderableVList().layoutSpacing(l->0);
@@ -56,6 +62,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
         panel.init();
         unselectedPacksList.init(this,panel.x + 15, panel.y + 30, 180, 210);
         selectedPacksList.init(this,panel.x + 215, panel.y + 30, 180, 210);
+        this.doneButton = Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).build();
     }
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
@@ -85,7 +92,8 @@ public abstract class PackSelectionScreenMixin extends Screen {
     }
     @Inject(method = "onClose", at = @At("RETURN"))
     public void onClose(CallbackInfo info){
-        ScreenUtil.playSimpleUISound(LegacySoundEvents.BACK.get(),1.0f);
+        this.model.commit();
+        this.closeWatcher();
     }
     private void addPacks(RenderableVList list,Stream<PackSelectionModel.Entry> stream){
         list.renderables.clear();
