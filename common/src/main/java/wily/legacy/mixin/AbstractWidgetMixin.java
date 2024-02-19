@@ -21,7 +21,7 @@ public abstract class AbstractWidgetMixin {
     private void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci){
         if (isHovered) {
             if (!alreadyHovered){
-                ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f);
+                ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f,1.0f);
                 alreadyHovered = true;
             }
         }else alreadyHovered = false;

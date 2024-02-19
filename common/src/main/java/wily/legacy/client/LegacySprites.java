@@ -6,6 +6,8 @@ import wily.legacy.LegacyMinecraft;
 public class LegacySprites {
     public static final ResourceLocation UNSELECT_HIGHLIGHTED_SPRITE = new ResourceLocation("transferable_list/unselect_highlighted");
     public static final ResourceLocation UNSELECT_SPRITE = new ResourceLocation("transferable_list/unselect");
+    public static final ResourceLocation CRAFTING_2_SLOTS_SELECTION_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/crafting_2_slots_selection");
+    public static final ResourceLocation CRAFTING_SELECTION_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/crafting_selection");
     public static final ResourceLocation PACK_HIGHLIGHTED_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/pack_highlighted");
     public static final ResourceLocation PACK_SELECTED_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID, "widget/pack_selected");
     public static final ResourceLocation MAP_PLAYER_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"icon/map/player");

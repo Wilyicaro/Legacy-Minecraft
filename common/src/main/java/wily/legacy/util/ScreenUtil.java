@@ -15,8 +15,11 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.client.BufferSourceWrapper;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipOverride;
@@ -58,7 +61,7 @@ public class ScreenUtil {
         renderTiles(SQUARE_RECESSED_PANEL,graphics,x,y,width,height,dp);
     }
     public static void renderTiles(ResourceLocation location,GuiGraphics graphics, int x, int y, int width, int height, float dp){
-        //TextureAtlasSprite sprite = mc.getGuiSprites().getSprite(location);
+        //TextureAtlasSprite sprite = mc.getGuiSprites().getSprite(id);
         //mc.getTextureManager().getTexture(sprite.atlasLocation()).setFilter(true,false);
         graphics.pose().pushPose();
         if (dp != 1.0)
@@ -133,23 +136,29 @@ public class ScreenUtil {
         applyHeight.accept(mc.getWindow().getGuiScaledHeight());
         applyWidth.accept(mc.getWindow().getGuiScaledWidth());
     }
+    public static boolean hasClassicCrafting(){
+        return getLegacyOptions().classicCrafting().get();
+    }
     public static float getHUDScale(){
-        return Math.max(1.5f,4 - ((LegacyOptions)mc.options).hudScale().get());
+        return Math.max(1.5f,4 - getLegacyOptions().hudScale().get());
+    }
+    public static float getHUDSize(){
+        return 3f / ScreenUtil.getHUDScale()* (mc.gameMode.canHurtPlayer() ? 68 : 41);
     }
     public static double getHUDDistance(){
-        return -((LegacyOptions)mc.options).hudDistance().value*(22.5D + (((LegacyOptions)mc.options).inGameTooltips().get() ? 17.5D : 0));
+        return -getLegacyOptions().hudDistance().value*(22.5D + (getLegacyOptions().inGameTooltips().get() ? 17.5D : 0));
     }
     public static float getHUDOpacity(){
         return Math.max(Math.min(255f,mc.gui.toolHighlightTimer * 38.4f)/ 255f, getInterfaceOpacity());
     }
     public static boolean hasTooltipBoxes(){
-        return ((LegacyOptions)mc.options).tooltipBoxes().get();
+        return getLegacyOptions().tooltipBoxes().get();
     }
     public static float getInterfaceOpacity(){
-        return ((LegacyOptions)mc.options).hudOpacity().get().floatValue();
+        return getLegacyOptions().hudOpacity().get().floatValue();
     }
     public static int getDefaultTextColor(boolean forceWhite){
-        return hasProgrammerArt() && !forceWhite ? 0xFFFF00 : 0xFFFFFF;
+        return (getLegacyOptions().forceYellowText().get() || hasProgrammerArt()) && !forceWhite ? 0xFFFF00 : 0xFFFFFF;
     }
     public static int getDefaultTextColor(){
         return getDefaultTextColor(false);
@@ -157,8 +166,11 @@ public class ScreenUtil {
     public static boolean hasProgrammerArt(){
         return mc.getResourcePackRepository().getSelectedPacks().stream().anyMatch(p->p.getId().equals("programmer_art"));
     }
+    public static void playSimpleUISound(SoundEvent sound, float grave, float volume){
+        mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave, volume));
+    }
     public static void playSimpleUISound(SoundEvent sound, float grave){
-        mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave));
+        playSimpleUISound(sound,grave,0.25f);
     }
     public static void addTip(Entity entity){
         if (hasTip(entity.getType())) mc.getToasts().addToast(new LegacyTip(entity.getType().getDescription(), ScreenUtil.getTip(entity.getType())));
@@ -197,7 +209,9 @@ public class ScreenUtil {
     public static Component getTip(ResourceLocation location){
         return Component.translatable(location.toLanguageKey() +".tip");
     }
-
+    public static LegacyOptions getLegacyOptions(){
+        return (LegacyOptions) mc.options;
+    }
 
     public static void drawGenericLoading(GuiGraphics graphics,int x, int y) {
         RenderSystem.enableBlend();
@@ -231,5 +245,26 @@ public class ScreenUtil {
         } else {
             guiGraphics.drawString(font, component, j, p, n,shadow);
         }
+    }
+    public static void secureTranslucentRender(GuiGraphics graphics, boolean translucent, float alpha, Runnable render){
+        if (translucent){
+            LegacyMinecraftClient.guiBufferSourceOverride = BufferSourceWrapper.translucent(graphics.bufferSource());
+            graphics.setColor(1.0f, 1.0f, 1.0f, alpha);
+            RenderSystem.enableBlend();
+        }
+        render.run();
+        if (translucent){
+            RenderSystem.disableBlend();
+            graphics.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+            LegacyMinecraftClient.guiBufferSourceOverride = null;
+        }
+    }
+    public static boolean isHovering(Slot slot,int leftPos, int topPos,  double d, double e) {
+        LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(slot);
+        int width = holder.getWidth();
+        int height = holder.getHeight();
+        double xCorner = holder.getXCorner() + (holder.offset != null ? holder.offset.x() : 0);
+        double yCorner = holder.getYCorner() + (holder.offset != null ? holder.offset.y() : 0);
+        return (d -= leftPos) >= xCorner && d < (xCorner + width) && (e -= topPos) >= yCorner && e < (yCorner + height);
     }
 }

@@ -53,7 +53,7 @@ public class ServerEditScreen extends ConfirmationScreen{
         ipBox.setResponder(s-> updateAddButtonStatus());
         addRenderableWidget(nameBox);
         addRenderableWidget(ipBox);
-        this.addRenderableWidget(new LegacySliderButton<>(this.width / 2 - 100, panel.y + 112, 200, 16, b-> b.getDefaultMessage(Component.translatable("addServer.resourcePack"),b.getValue().getName()),()-> null,this.serverData.getResourcePackStatus(), ()->Arrays.stream(ServerData.ServerPackStatus.values()).toList(), b->this.serverData.setResourcePackStatus(b.objectValue)));
+        this.addRenderableWidget(new LegacySliderButton<>(this.width / 2 - 100, panel.y + 112, 200, 16, b-> b.getDefaultMessage(Component.translatable("addServer.resourcePack"),b.getObjectValue().getName()),()-> null,this.serverData.getResourcePackStatus(), ()->Arrays.stream(ServerData.ServerPackStatus.values()).toList(), b->this.serverData.setResourcePackStatus(b.objectValue)));
         this.setInitialFocus(this.nameBox);
         updateAddButtonStatus();
     }

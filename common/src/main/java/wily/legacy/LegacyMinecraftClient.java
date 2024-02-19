@@ -9,6 +9,7 @@ import dev.architectury.event.events.client.ClientPlayerEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.registry.ReloadListenerRegistry;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
+import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -21,7 +22,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.client.server.LanServerPinger;
 import net.minecraft.core.HolderLookup;
@@ -52,6 +53,7 @@ import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.*;
+import wily.legacy.init.LegacyMenuTypes;
 import wily.legacy.network.ServerDisplayInfoSync;
 import wily.legacy.util.ScreenUtil;
 
@@ -72,14 +74,15 @@ public class LegacyMinecraftClient {
     public static boolean manualSave = false;
     public static final Map<Component, Component> OPTION_BOOLEAN_CAPTION = Map.of(Component.translatable("key.sprint"),Component.translatable("options.key.toggleSprint"),Component.translatable("key.sneak"),Component.translatable("options.key.toggleSneak"));
     public static LegacyLoadingScreen legacyLoadingScreen = new LegacyLoadingScreen();
-    public static RenderType itemRenderTypeOverride = null;
-    public static RenderType blockItemRenderTypeOverride = null;
+    public static MultiBufferSource.BufferSource guiBufferSourceOverride = null;
     public static final LegacyTipManager legacyTipManager = new LegacyTipManager();
     public static final LegacyCreativeTabListing.Manager legacyCreativeListingManager = new LegacyCreativeTabListing.Manager();
+    public static final LegacyCraftingTabListing.Manager legacyCraftingListingManager = new LegacyCraftingTabListing.Manager();
     public static final LegacyBiomeOverride.Manager legacyBiomeOverrides = new LegacyBiomeOverride.Manager();
     public static final LegacyWorldTemplate.Manager legacyWorldTemplateManager = new LegacyWorldTemplate.Manager();
     public static final LegacyTipOverride.Manager legacyTipOverridesManager = new LegacyTipOverride.Manager();
     public static final LegacyResourceManager legacyResourceManager = new LegacyResourceManager();
+    public static final StoneCuttingGroupManager stoneCuttingGroupManager = new StoneCuttingGroupManager();
     public static KnownListing<Block> knownBlocks;
     public static KnownListing<EntityType<?>> knownEntities;
     public static GameType enterWorldGameType;
@@ -114,10 +117,12 @@ public class LegacyMinecraftClient {
     public static void init() {
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyTipManager);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyCreativeListingManager);
+        ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyCraftingListingManager);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyWorldTemplateManager);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyTipOverridesManager);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyBiomeOverrides);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyResourceManager);
+        ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, stoneCuttingGroupManager);
         KeyMappingRegistry.register(legacyKeyInventory);
         KeyMappingRegistry.register(keyHostOptions);
         knownBlocks = new KnownListing<>(Registries.BLOCK,Minecraft.getInstance().gameDirectory.toPath());
@@ -130,6 +135,8 @@ public class LegacyMinecraftClient {
         if (minecraft.screen instanceof HostOptionsScreen s) s.reloadPlayerButtons();
     }
     public static void enqueueInit() {
+        MenuRegistry.registerScreenFactory(LegacyMenuTypes.CRAFTING_PANEL_MENU.get(),LegacyCraftingScreen::craftingScreen);
+        MenuRegistry.registerScreenFactory(LegacyMenuTypes.PLAYER_CRAFTING_PANEL_MENU.get(),LegacyCraftingScreen::playerCraftingScreen);
         ClientGuiEvent.SET_SCREEN.register((screen) -> {
             Minecraft minecraft = Minecraft.getInstance();
             if (screen instanceof TitleScreen)
@@ -144,7 +151,7 @@ public class LegacyMinecraftClient {
                 c.init(minecraft,0,0);
                 return CompoundEventResult.interruptTrue(new CreativeModeScreen(Minecraft.getInstance().player));
             }
-            if (screen instanceof AbstractContainerScreen<?>) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+            if (screen instanceof AbstractContainerScreen<?>) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f,1.0f);
             return CompoundEventResult.interruptDefault(screen);
         });
         ClientTickEvent.CLIENT_POST.register(minecraft -> {
@@ -194,7 +201,7 @@ public class LegacyMinecraftClient {
 
     }
 
-    public static final KeyMapping legacyKeyInventory = new KeyMapping( MOD_ID +".key.inventory", InputConstants.KEY_I, "key.categories.inventory");
+    public static final KeyMapping legacyKeyInventory = new KeyMapping( "key.inventory", InputConstants.KEY_I, "key.categories.inventory");
     public static final KeyMapping keyHostOptions = new KeyMapping( MOD_ID +".key.host_options", InputConstants.KEY_H, "key.categories.misc");
     public static void resetVanillaOptions(Minecraft minecraft){
         canLoadVanillaOptions = false;

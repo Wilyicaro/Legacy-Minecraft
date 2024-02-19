@@ -6,7 +6,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.Offset;
 import wily.legacy.inventory.LegacySlotWrapper;
 
 import static wily.legacy.client.LegacySprites.SHIELD_SLOT_SPRITE;
@@ -25,7 +25,7 @@ public class InventoryMenuMixin {
     private boolean hasClassicCrafting(){
         return ((LegacyOptions)Minecraft.getInstance().options).classicCrafting().get();
     }
-    private static final Vec3 EQUIP_SLOT_TRANSLATION = new Vec3(50,0,0);
+    private static final Offset EQUIP_SLOT_OFFSET = new Offset(50,0,0);
 
     @ModifyArg(method = "<init>",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/InventoryMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 0))
     private Slot addSlotFirst(Slot originalSlot){
@@ -53,8 +53,8 @@ public class InventoryMenuMixin {
             public ResourceLocation getIconSprite() {
                 return getItem().isEmpty() ? new ResourceLocation(LegacyMinecraft.MOD_ID,"container/"+ SLOT_IDS[i].getName()+ "_slot") : null;
             }
-            public Vec3 getTranslation() {
-                return hasClassicCrafting() ? null : EQUIP_SLOT_TRANSLATION;
+            public Offset getOffset() {
+                return hasClassicCrafting() ? null : EQUIP_SLOT_OFFSET;
             }
         };
     }
@@ -64,13 +64,13 @@ public class InventoryMenuMixin {
     }
     @ModifyArg(method = "<init>",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/InventoryMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 4))
     private Slot addHotbarSlots(Slot originalSlot){
-        return new LegacySlotWrapper(originalSlot, originalSlot.container,originalSlot.getContainerSlot(), 14 + originalSlot.getContainerSlot() * 21,181);
+        return new LegacySlotWrapper(originalSlot, originalSlot.container,originalSlot.getContainerSlot(), 14 + originalSlot.getContainerSlot() * 21,186);
     }
     @ModifyArg(method = "<init>",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/InventoryMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 5))
     private Slot addSlotSixth(Slot originalSlot){
         return new LegacySlotWrapper(originalSlot, originalSlot.container,originalSlot.getContainerSlot(),111, 77){
-            public Vec3 getTranslation() {
-                return hasClassicCrafting() ? null : EQUIP_SLOT_TRANSLATION;
+            public Offset getOffset() {
+                return hasClassicCrafting() ? null : EQUIP_SLOT_OFFSET;
             }
             public ResourceLocation getIconSprite() {
                 return getItem().isEmpty() ? SHIELD_SLOT_SPRITE : null;

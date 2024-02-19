@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.inventory.LegacySlotWrapper;
@@ -60,8 +61,12 @@ public abstract class AbstractContainerScreenMixin extends Screen {
 
     @Shadow protected Slot hoveredSlot;
 
-    @Inject(method = "keyPressed", at = @At("HEAD"))
+    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
+        if (LegacyMinecraftClient.legacyKeyInventory.matches(i, j)) {
+            this.onClose();
+            cir.setReturnValue(true);
+        }
         if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && ScreenUtil.hasTip(hoveredSlot.getItem())) {
             if (minecraft.getToasts().getToast(LegacyTip.class, Toast.NO_TOKEN) == null) ScreenUtil.addTip(hoveredSlot.getItem());
         }
@@ -83,12 +88,7 @@ public abstract class AbstractContainerScreenMixin extends Screen {
     }
     @Inject(method = "isHovering(Lnet/minecraft/world/inventory/Slot;DD)Z", at = @At("HEAD"), cancellable = true)
     private void isHovering(Slot slot, double d, double e, CallbackInfoReturnable<Boolean> cir) {
-        LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(slot);
-        int width = holder.getWidth();
-        int height = holder.getHeight();
-        double xCorner = holder.getXCorner() + (holder.translation != null ? holder.translation.x : 0);
-        double yCorner = holder.getYCorner() + (holder.translation != null ? holder.translation.y : 0);
-        cir.setReturnValue((d -= leftPos) >= xCorner && d < (xCorner + width) && (e -= topPos) >= yCorner && e < (yCorner + height));
+        cir.setReturnValue(ScreenUtil.isHovering(slot,leftPos,topPos,d,e));
     }
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
     private void renderSlot(GuiGraphics graphics, Slot slot, CallbackInfo ci) {

@@ -2,7 +2,6 @@ package wily.legacy.client;
 
 import com.google.gson.*;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
@@ -14,11 +13,11 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.ItemStack;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.util.CompoundTagUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public record LegacyCreativeTabListing(Component name, ResourceLocation icon, CompoundTag itemIconTag, List<ItemStack> displayItems) {
@@ -37,13 +36,7 @@ public record LegacyCreativeTabListing(Component name, ResourceLocation icon, Co
                             if (element instanceof JsonObject tabObj) {
                                 CompoundTag tag = new CompoundTag();
                                 ResourceLocation tabIcon = new ResourceLocation(GsonHelper.getAsString(tabObj,"icon"));
-                                if (BuiltInRegistries.ITEM.containsKey(tabIcon) && tabObj.get("itemIconTag") instanceof JsonPrimitive p && p.isString()) {
-                                    try {
-                                        tag = TagParser.parseTag(p.getAsString());
-                                    } catch (CommandSyntaxException ex) {
-                                        throw new JsonSyntaxException("Invalid nbt tag: " + ex.getMessage());
-                                    }
-                                }
+                                if (BuiltInRegistries.ITEM.containsKey(tabIcon) && tabObj.get("nbt") instanceof JsonPrimitive p && p.isString()) tag = CompoundTagUtil.parseCompoundTag(p.getAsString());
                                 LegacyCreativeTabListing l = new LegacyCreativeTabListing(Component.translatable(s),new ResourceLocation(GsonHelper.getAsString(tabObj,"icon")), tag, new ArrayList<>());
                                 if (tabObj.get("listing") instanceof JsonArray a) {
                                     a.forEach(e -> {
@@ -53,11 +46,7 @@ public record LegacyCreativeTabListing(Component name, ResourceLocation icon, Co
                                             ItemStack i = new ItemStack(BuiltInRegistries.ITEM.get(new ResourceLocation(j.getAsString())));
                                             l.displayItems.add(i);
                                             if (e instanceof JsonObject o && o.get("nbt") instanceof JsonPrimitive p && p.isString()) {
-                                                try {
-                                                    i.setTag(TagParser.parseTag(p.getAsString()));
-                                                } catch (CommandSyntaxException ex) {
-                                                    throw new JsonSyntaxException("Invalid nbt tag: " + ex.getMessage());
-                                                }
+                                                i.setTag(CompoundTagUtil.parseCompoundTag(p.getAsString()));
                                             }
                                         }
                                     });
@@ -68,7 +57,7 @@ public record LegacyCreativeTabListing(Component name, ResourceLocation icon, Co
 
                         bufferedReader.close();
                     } catch (IOException var8) {
-                        LegacyMinecraft.LOGGER.warn(var8.getMessage());
+                        LegacyMinecraft.LOGGER.warn(var8);
                     }
                 });
             });

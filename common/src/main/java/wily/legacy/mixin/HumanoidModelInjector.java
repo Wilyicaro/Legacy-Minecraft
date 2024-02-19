@@ -26,29 +26,29 @@ public abstract class HumanoidModelInjector {
     @Shadow @Final public ModelPart head;
 
     @Shadow @Final public ModelPart leftArm;
-    float lastXRot = 0;
+
 
     @Inject(method = ("setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V"), at = @At("TAIL"))
     private void setupAnim(LivingEntity livingEntity, float f, float g, float h, float i, float j, CallbackInfo info){
         if (!livingEntity.hasItemInSlot(EquipmentSlot.MAINHAND) && livingEntity.isShiftKeyDown() && livingEntity.isFallFlying()) {
             (livingEntity.getMainArm() == HumanoidArm.RIGHT ? this.rightArm : leftArm).xRot = (float) (Math.PI);
-            AnimationUtils.bobModelPart(this.rightArm, h + 0.2F, 1.0F);
+            AnimationUtils.bobModelPart((livingEntity.getMainArm() == HumanoidArm.RIGHT ? this.rightArm : leftArm), h + 0.2F, 1.0F);
         }
         applyEatTransform(livingEntity, InteractionHand.MAIN_HAND, livingEntity.getMainHandItem(), h, livingEntity.getMainArm());
         applyEatTransform(livingEntity, InteractionHand.OFF_HAND, livingEntity.getOffhandItem(), h, livingEntity.getMainArm());
     }
 
-    private void applyEatTransform(LivingEntity livingEntity, InteractionHand hand, ItemStack itemStack, float partialTicks, HumanoidArm arm){
+    private boolean applyEatTransform(LivingEntity livingEntity, InteractionHand hand, ItemStack itemStack, float partialTicks, HumanoidArm mainArm){
         if(isEatingWithHand(livingEntity,hand,itemStack)){
-            ModelPart armModel = arm == HumanoidArm.RIGHT ? rightArm : leftArm;
-            if(livingEntity.getUseItemRemainingTicks() == 1){
-                lastXRot = 0;
-            }
-            lastXRot = Mth.lerp(0.15f, lastXRot, 2.8f);
-            armModel.xRot = Mth.lerp(0.35f,armModel.xRot, -lastXRot + (Mth.cos(partialTicks*1.5f) *0.15f));
-            armModel.yRot = Mth.lerp(0.18f,armModel.yRot,  -2f);
-            armModel.zRot =  Mth.lerp(0.12f,armModel.zRot, 0.6f);
+            boolean isRightHand = mainArm == HumanoidArm.RIGHT && hand == InteractionHand.MAIN_HAND;
+            ModelPart armModel = isRightHand ? rightArm : leftArm;
+            float r = Math.min(1,(1 - livingEntity.getUseItemRemainingTicks() / (float)itemStack.getUseDuration()) * 4);
+            armModel.xRot =  r * -1.4f + (r > 0.8f ? (Mth.cos(partialTicks*1.5f) *0.15f) : 0);
+            armModel.yRot =  (isRightHand ? -0.45f : 0.45f) * r;
+
+            return true;
         }
+        return false;
     }
     private boolean isEatingWithHand(LivingEntity livingEntity, InteractionHand hand, ItemStack itemStack){
         return livingEntity.getUseItemRemainingTicks() > 0 && livingEntity.getUsedItemHand() == hand && (itemStack.getUseAnimation() == UseAnim.EAT || itemStack.getUseAnimation() == UseAnim.DRINK);

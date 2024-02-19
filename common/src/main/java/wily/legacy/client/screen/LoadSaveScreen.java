@@ -55,7 +55,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
     private int port = HttpUtil.getAvailablePort();
     protected PackSelector resourcePackSelector = PackSelector.resources(panel.x + 13, panel.y + 112, 220,45, !ScreenUtil.hasTooltipBoxes());
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean deleteOnClose) {
-        super(s-> new Panel(p-> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 120 : 0))) / 2, p-> (s.height - p.height) / 2 + 20,245,233), Component.translatable("legacy.menu.load_save.load"));
+        super(s-> new Panel(p-> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 160 : 0))) / 2, p-> (s.height - p.height) / 2 + 20,245,233), Component.translatable("legacy.menu.load_save.load"));
         this.deleteOnClose = deleteOnClose;
         this.parent = screen;
         this.summary = summary;
@@ -81,8 +81,8 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
     protected void init() {
         panel.init();
         List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
-        addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 65, 220,16, b -> b.getDefaultMessage(GAME_MODEL_LABEL,b.getValue().getLongDisplayName()),()->Tooltip.create(Component.translatable("selectWorld.gameMode."+gameType.getName()+ ".info")),gameType,()->gameTypes, b->gameType =b.objectValue));
-        addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 90, 220,16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getValue().getDisplayName()),()->Tooltip.create(difficulty.getInfo()), difficulty,()-> Arrays.asList(Difficulty.values()), b-> difficulty = b.objectValue)).active = !((LegacyWorldSettings)(Object)summary.getSettings()).isDifficultyLocked();
+        addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 65, 220,16, b -> b.getDefaultMessage(GAME_MODEL_LABEL,b.getObjectValue().getLongDisplayName()),()->Tooltip.create(Component.translatable("selectWorld.gameMode."+gameType.getName()+ ".info")),gameType,()->gameTypes, b->gameType =b.objectValue));
+        addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 90, 220,16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getObjectValue().getDisplayName()),()->Tooltip.create(difficulty.getInfo()), difficulty,()-> Arrays.asList(Difficulty.values()), b-> difficulty = b.objectValue)).active = !((LegacyWorldSettings)(Object)summary.getSettings()).isDifficultyLocked();
         EditBox portEdit = addRenderableWidget(new EditBox(minecraft.font, panel.x + 124, panel.y + 157,100,20,Component.translatable("lanServer.port")));
         portEdit.visible = onlineOnStart;
 

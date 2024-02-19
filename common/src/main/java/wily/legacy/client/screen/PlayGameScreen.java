@@ -25,7 +25,7 @@ public class PlayGameScreen extends PanelVListScreen{
     public PlayGameScreen(Screen parent) {
         this(parent,0);
     }
-    protected final TabList tabList = new TabList().addTabButton(30,0,Component.translatable("legacy.menu.load"),b-> repositionElements()).addTabButton(30,1,Component.translatable("legacy.menu.create"), b-> repositionElements()).addTabButton(30,2,Component.translatable("legacy.menu.join"), b-> repositionElements());
+    protected final TabList tabList = new TabList().add(30,0,Component.translatable("legacy.menu.load"), b-> repositionElements()).add(30,1,Component.translatable("legacy.menu.create"), b-> repositionElements()).add(30,2,Component.translatable("legacy.menu.join"), b-> repositionElements());
     public boolean isLoading = false;
     private final ServerStatusPinger pinger = new ServerStatusPinger();
     protected final ServerSelectionList serverSelectionList = new ServerSelectionList();

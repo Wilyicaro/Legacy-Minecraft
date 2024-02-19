@@ -32,5 +32,12 @@
     "fabric": "*",
     "minecraft": ">=1.20.2",
     "architectury": ">=${architectury_version}"
+  },
+  "breaks": {
+    "bedrockwaters": "*",
+    "forcecloseworldloadingscreen": "*"
+  },
+  "conflicts": {
+    "lemclienthelper": "*"
   }
 }

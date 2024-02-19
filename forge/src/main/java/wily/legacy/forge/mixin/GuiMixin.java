@@ -41,7 +41,7 @@ public abstract class GuiMixin {
             return;
         }
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0F, ScreenUtil.getHUDDistance(),0.0F);
+        guiGraphics.pose().translate(0,ScreenUtil.getHUDDistance() - Math.max(shift, ScreenUtil.getHUDSize()),0);
         this.minecraft.getProfiler().push("selectedItemName");
         if (this.toolHighlightTimer > 0 && !this.lastToolHighlight.isEmpty()) {
             List<Component> tooltipLines = this.lastToolHighlight.getTooltipLines(null, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).toList();
@@ -53,10 +53,7 @@ public abstract class GuiMixin {
                 }
                 int width = this.getFont().width(mutableComponent);
                 int j = (this.screenWidth - width) / 2;
-                int k = this.screenHeight - Math.max((int)(3f / ScreenUtil.getHUDScale()* 40) - 20,shift) - getFont().lineHeight * (tooltipLines.size() - 1 - i);
-                if (!this.minecraft.gameMode.canHurtPlayer()) {
-                    k += 14;
-                }
+                int k = this.screenHeight - getFont().lineHeight * (tooltipLines.size() - 1 - i);
                 if ((l = (int)((float)this.toolHighlightTimer * 256.0f / 10.0f)) > 255) {
                     l = 255;
                 }

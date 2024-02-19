@@ -1,6 +1,7 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
@@ -15,18 +16,23 @@ import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.trading.MerchantOffer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.LegacyMinecraft;
 import wily.legacy.client.LegacySprites;
 import wily.legacy.client.screen.LegacyIconHolder;
+import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.inventory.LegacyMerchantOffer;
+import wily.legacy.network.ServerInventoryCraftPacket;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Mixin(MerchantScreen.class)
@@ -34,7 +40,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Shadow private int shopItem;
     @Shadow protected abstract void postButtonClick();
 
-
+    private int lastFocused = -1;
     protected boolean[] displaySlotsWarning;
 
     protected List<LegacyIconHolder> villagerTradeButtons;
@@ -50,7 +56,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
             }
         };
-        displaySlotsWarning = new boolean[]{false,false,false};
+        displaySlotsWarning = new boolean[3];
         villagerTradeButtons = new ArrayList<>();
         for (int index = 0; index < 10; index++)
             addTradeButton(index);
@@ -98,6 +104,55 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                     RenderSystem.enableDepthTest();
                 }
             }
+
+            @Override
+            public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
+                MerchantOffer offer = getSelectedMerchantOffer();
+                if (offer != null) {
+                    if (hasAutoCrafting()) {
+                        for (int index = 0; index < 3; index++) {
+                            Slot s = menu.slots.get(index);
+                            if (s.hasItem()) break;
+                            LegacyIconHolder iconHolder = ScreenUtil.iconHolderRenderer.slotBounds(leftPos, topPos, s);
+                            iconHolder.itemIcon = index == 0 ? offer.getCostA() : index == 1 ? offer.getCostB() : offer.getResult();
+                            iconHolder.setWarning(displaySlotsWarning[index]);
+                            iconHolder.render(graphics, i, j, f);
+                        }
+                    }
+                }
+                super.renderSelection(graphics, i, j, f);
+            }
+
+            @Override
+            public void renderTooltip(Minecraft minecraft, GuiGraphics graphics, int i, int j) {
+                super.renderTooltip(minecraft, graphics, i, j);
+                MerchantOffer offer = getSelectedMerchantOffer();
+                if (offer != null && hasAutoCrafting())
+                    for (int index = 0; index < 3; index++) {
+                        Slot s = menu.slots.get(index);
+                        if (ScreenUtil.isHovering(s,leftPos,topPos,i,j)) renderTooltip(minecraft,graphics,index == 0 ? offer.getCostA() : index == 1 ? offer.getCostB() : offer.getResult(), i, j);
+                    }
+            }
+
+            @Override
+            public boolean keyPressed(int i, int j, int k) {
+                if ((i == 263 && index == 0) || (i == 262 && index == villagerTradeButtons.size() - 1)){
+                    MerchantScreenMixin.this.setFocused(villagerTradeButtons.get(i == 263 ? villagerTradeButtons.size() - 1 : 0));
+                    ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f,1.0f);
+                    return true;
+                }
+                return super.keyPressed(i, j, k);
+            }
+
+            @Override
+            public void setFocused(boolean bl) {
+                if (bl){
+                    shopItem = index;
+                    updateSlotsDisplay();
+                }
+                super.setFocused(bl);
+            }
+
             @Override
             public ResourceLocation getIconHolderSprite() {
                 return isValidIndex() && ((LegacyMerchantOffer)menu.getOffers().get(index)).getRequiredLevel() > menu.getTraderLevel() ? LegacyIconHolder.GRAY_ICON_HOLDER : super.getIconHolderSprite();
@@ -112,40 +167,40 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             }
 
             @Override
-            public boolean mouseClicked(double d, double e, int i) {
-                if (isHovered && i == 0){
-                    if (isValidIndex()) {
-                        tryEmptyMerchantSlots();
-                        if (index == shopItem && ((LegacyMerchantOffer)menu.getOffers().get(index)).getRequiredLevel() <= menu.getTraderLevel()) {
+            public void onPress() {
+                if (isValidIndex() && isFocused() && index == shopItem) {
+                    MerchantOffer offer = menu.getOffers().get(index);
+                    if (((LegacyMerchantOffer)offer).getRequiredLevel() <= menu.getTraderLevel() && !offer.isOutOfStock() && !displaySlotsWarning[2]) {
+                        if (hasAutoCrafting()) {
+                            LegacyMinecraft.NETWORK.sendToServer(new ServerInventoryCraftPacket(ingredientsFromStacks(offer.getCostA(),offer.getCostB()),offer.getResult(),index, 3, 39));
+                        } else {
                             postButtonClick();
                         }
-                    }
-                    shopItem = index;
-                    updateSlotsDisplay();
-                    return true;
+                    }else ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT_FAIL.get(),1.0f);
                 }
-                return false;
             }
         });
     }
-    private void tryEmptyMerchantSlots(){
-        ItemStack fmItem = menu.slots.get(0).getItem();
-        if (!fmItem.isEmpty()) {
-            if (!menu.moveItemStackTo(fmItem, 3, 39, true))
-                return;
-            menu.slots.get(0).set(fmItem);
-        }
-        ItemStack smItem = menu.slots.get(1).getItem();
-        if (!smItem.isEmpty()) {
-            if (!menu.moveItemStackTo(smItem, 3, 39, true))
-                return;
-            menu.slots.get(1).set(fmItem);
-        }
+    private boolean hasAutoCrafting(){
+        return !menu.getSlot(0).hasItem() && !menu.getSlot(1).hasItem();
     }
 
+    private List<Ingredient> ingredientsFromStacks(ItemStack... s){
+        if (s.length == 0) return Collections.emptyList();
+        List<Ingredient> ings = new ArrayList<>();
+        for (ItemStack stack : s) {
+            for (int i = 0; i < stack.getCount(); i++)
+                ings.add(Ingredient.of(stack));
+        }
+        return ings;
+    }
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
+    }
+    public void repositionElements() {
+        lastFocused = getFocused() instanceof LegacyIconHolder h ? villagerTradeButtons.indexOf(h) : -1;
+        super.repositionElements();
     }
     public void init() {
         imageWidth = 291;
@@ -155,13 +210,15 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         inventoryLabelX = 125 + (153 - font.width(playerInventoryTitle))/2;
         inventoryLabelY = 87;
         super.init();
+        updateSlotsDisplay();
+        if (lastFocused >= 0 && lastFocused < villagerTradeButtons.size()) setInitialFocus(villagerTradeButtons.get(lastFocused));
+        else setInitialFocus(villagerTradeButtons.get(0));
         villagerTradeButtons.forEach(holder->{
             int i = villagerTradeButtons.indexOf(holder);
             holder.setX(leftPos + 13 + 27*i);
             holder.setY(topPos + 44);
             addRenderableWidget(holder);
         });
-        updateSlotsDisplay();
         menu.addSlotListener(listener);
     }
 
@@ -188,23 +245,9 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
-        renderTooltip(guiGraphics,i,j);
-        MerchantOffer offer = getSelectedMerchantOffer();
-        if (offer != null) {
-            if (!menu.slots.get(0).hasItem() && !menu.slots.get(1).hasItem()) {
-                for (int index = 0; index < 3; index++) {
-                    Slot s = menu.slots.get(index);
-                    if (s.hasItem()) break;
-                    LegacyIconHolder iconHolder = ScreenUtil.iconHolderRenderer.slotBounds(leftPos, topPos, s);
-                    iconHolder.itemIcon = new ItemStack[]{offer.getCostA(), offer.getCostB(), offer.getResult()}[index];
-                    iconHolder.setWarning(displaySlotsWarning[index]);
-                    iconHolder.render(guiGraphics, i, j, f);
-                    iconHolder.renderTooltip(minecraft, guiGraphics, i, j);
-                }
-            }
-        }
-        villagerTradeButtons.get(shopItem).renderSelection(guiGraphics);
+        villagerTradeButtons.get(shopItem).renderSelection(guiGraphics,i,j,f);
         villagerTradeButtons.forEach(b-> b.renderTooltip(minecraft,guiGraphics,i,j));
+        renderTooltip(guiGraphics,i,j);
     }
 
     @Override

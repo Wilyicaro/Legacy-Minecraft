@@ -8,7 +8,6 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.Sheets;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -28,6 +27,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.client.BufferSourceWrapper;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.ScreenUtil;
 
@@ -47,6 +47,9 @@ public abstract class GuiMixin {
     @Shadow protected float lastAutosaveIndicatorValue;
 
     @Shadow protected abstract Player getCameraPlayer();
+
+    @Shadow public abstract void render(GuiGraphics guiGraphics, float f);
+
     @Inject(method = "renderVignette", at = @At("HEAD"), cancellable = true)
     public void renderVignette(GuiGraphics guiGraphics, Entity entity, CallbackInfo ci) {
         if (minecraft.screen != null || !((LegacyOptions)minecraft.options).vignette().get())
@@ -92,8 +95,7 @@ public abstract class GuiMixin {
         }
         guiGraphics.blitSprite(new ResourceLocation(LegacyMinecraft.MOD_ID,"hud/hotbar_selection"), this.screenWidth / 2 - 91 - 1 + player.getInventory().selected * 20, this.screenHeight - 22 - 1, 24, 24);
         if (ScreenUtil.getHUDOpacity() < 1.0) {
-            LegacyMinecraftClient.itemRenderTypeOverride = Sheets.translucentItemSheet();
-            LegacyMinecraftClient.blockItemRenderTypeOverride = Sheets.translucentCullBlockSheet();
+            LegacyMinecraftClient.guiBufferSourceOverride = BufferSourceWrapper.translucent(guiGraphics.bufferSource());
         }
     }
     @Inject(method = "renderHotbar", at = @At("RETURN"))
@@ -101,12 +103,12 @@ public abstract class GuiMixin {
         if (minecraft.screen != null)
             return;
 
-        LegacyMinecraftClient.itemRenderTypeOverride = null;
-        LegacyMinecraftClient.blockItemRenderTypeOverride = null;
+        LegacyMinecraftClient.guiBufferSourceOverride = null;
         ScreenUtil.resetHUDScale(guiGraphics,i-> screenWidth = i,i-> screenHeight = i);
         guiGraphics.pose().popPose();
-        Player player = this.getCameraPlayer();
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
+        Player player = this.getCameraPlayer();
+        if (player == null) return;
         if (((LegacyOptions)minecraft.options).animatedCharacter().get() && (player.isSprinting() || player.isShiftKeyDown() || player.isCrouching() || player.getAbilities().flying || player.isFallFlying())) {
             Vec3 deltaMove = player.getDeltaMovement();
             float bodyRot = player.yBodyRot;

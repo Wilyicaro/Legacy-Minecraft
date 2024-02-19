@@ -1,17 +1,32 @@
 package wily.legacy.mixin;
 
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.trading.Merchant;
+import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraft.world.item.trading.MerchantOffers;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import wily.legacy.inventory.LegacySlotWrapper;
 
 @Mixin(MerchantMenu.class)
 public abstract class MerchantMenuMixin extends AbstractContainerMenu {
+    @Shadow @Final private Merchant trader;
+
+    @Shadow public abstract MerchantOffers getOffers();
+
+    @Shadow public abstract int getTraderXp();
+
     protected MerchantMenuMixin(@Nullable MenuType<?> menuType, int i) {
         super(menuType, i);
     }
@@ -108,4 +123,19 @@ public abstract class MerchantMenuMixin extends AbstractContainerMenu {
 
         };
     }
+
+    @Override
+    public boolean clickMenuButton(Player player, int i) {
+        if (player instanceof ServerPlayer && i >= 0 && i < getOffers().size() && !getOffers().isEmpty()){
+            MerchantOffer offer = getOffers().get(i);
+            offer.getResult().onCraftedBy(player.level(),player,1);
+            this.trader.notifyTrade(offer);
+            player.awardStat(Stats.TRADED_WITH_VILLAGER);
+            this.trader.overrideXp(this.trader.getVillagerXp() + offer.getXp());
+            player.sendMerchantOffers(containerId, getOffers(), trader instanceof Villager v ? v.getVillagerData().getLevel() : 0, getTraderXp(), trader.showProgressBar(), trader.canRestock());
+            return true;
+        }
+        return false;
+    }
+
 }

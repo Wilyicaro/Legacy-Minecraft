@@ -12,7 +12,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.saveddata.maps.MapDecoration;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.joml.Matrix4f;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -27,7 +26,7 @@ import java.util.stream.StreamSupport;
 
 @Mixin(MapRenderer.MapInstance.class)
 public abstract class MapRendererMixin {
-    @Shadow private MapItemSavedData data;
+   @Shadow private MapItemSavedData data;
     @Unique
     private static final RenderType MAP_ICONS = RenderType.text(new ResourceLocation("textures/map/map_icons.png"));
 
@@ -71,7 +70,7 @@ public abstract class MapRendererMixin {
             float m = (float)(b % 16 + 1) / 16.0f;
             float n = (float)(b / 16 + 1) / 16.0f;
             Matrix4f matrix4f2 = poseStack.last().pose();
-            int[] color = LegacyMinecraftClient.getVisualPlayerColor(mapDecoration.name().getString());
+            int[] color =  mapDecoration.name() == null ? new int[]{255,255,255} : LegacyMinecraftClient.getVisualPlayerColor(mapDecoration.name().getString());
             VertexConsumer vertexConsumer2 = multiBufferSource.getBuffer(MAP_ICONS);
             vertexConsumer2.vertex(matrix4f2, -1.0f, 1.0f, (float)l * -0.001f).color(color[0], color[1], color[2], 255).uv(g, h).uv2(i).endVertex();
             vertexConsumer2.vertex(matrix4f2, 1.0f, 1.0f, (float)l * -0.001f).color(color[0], color[1], color[2], 255).uv(m, h).uv2(i).endVertex();

@@ -31,7 +31,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
     protected MultiLineLabel tooltipBoxLabel;
     protected ScrollableRenderer scrollableRenderer =  new ScrollableRenderer(new LegacyScrollRenderer());
 
-    protected final TabList tabList = new TabList().addTabButton(29,0,Component.translatable("createWorld.tab.world.title"),t-> rebuildWidgets()).addTabButton(29,2,Component.translatable("legacy.menu.game_options"), t-> rebuildWidgets());
+    protected final TabList tabList = new TabList().add(29,0,Component.translatable("createWorld.tab.world.title"), t-> rebuildWidgets()).add(29,2,Component.translatable("legacy.menu.game_options"), t-> rebuildWidgets());
 
     protected final RenderableVList gameRenderables = new RenderableVList();
 

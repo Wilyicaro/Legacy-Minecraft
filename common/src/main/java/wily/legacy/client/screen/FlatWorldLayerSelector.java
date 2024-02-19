@@ -90,7 +90,7 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen {
         panel.init();
         fillLayerGrid();
         List<Integer> layers = IntStream.rangeClosed(1,maxLayerHeight).boxed().toList();
-        addRenderableWidget(new LegacySliderButton<>(panel.x + 21, panel.y + 167, 271, 16, (b)-> Component.translatable("legacy.menu.create_flat_world.layer_height"),()-> null,(Integer) selectedLayer.count, ()-> layers, b-> selectedLayer.setCount(b.getValue())));
+        addRenderableWidget(new LegacySliderButton<>(panel.x + 21, panel.y + 167, 271, 16, (b)-> Component.translatable("legacy.menu.create_flat_world.layer_height"),()-> null,(Integer) selectedLayer.count, ()-> layers, b-> selectedLayer.setCount(b.getObjectValue())));
         addRenderableWidget(Button.builder(Component.translatable("gui.ok"), b-> {
             applyLayer.accept(this);
             onClose();

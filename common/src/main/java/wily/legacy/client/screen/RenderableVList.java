@@ -151,7 +151,7 @@ public class RenderableVList {
                 }
             }
         }
-        if (clicked) ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
+        if (clicked) ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f,1.0f);
         return clicked;
     }
 

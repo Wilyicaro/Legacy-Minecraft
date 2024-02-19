@@ -2,15 +2,21 @@ package wily.legacy.mixin;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.LegacyMinecraftClient;
 
 @Mixin(GuiGraphics.class)
 public class GuiGraphicsMixin {
+    @Inject(method = "bufferSource", at = @At("HEAD"), cancellable = true)
+    private void bufferSource(CallbackInfoReturnable<MultiBufferSource.BufferSource> cir){
+        if (LegacyMinecraftClient.guiBufferSourceOverride != null) cir.setReturnValue(LegacyMinecraftClient.guiBufferSourceOverride);
+    }
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("HEAD"))
     private void renderItemDecorationsHead(Font font, ItemStack itemStack, int i, int j, String string, CallbackInfo ci){
         LegacyMinecraftClient.FONT_SHADOW_OFFSET = 1.0F;

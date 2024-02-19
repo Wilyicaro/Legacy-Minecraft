@@ -1,7 +1,7 @@
 {
   "overrides": {
     "default": {
-      "water_transparency": 0.8
+      "water_transparency": 1.0
     },
     "bamboo_jungle": {
       "water_color": "#14A2C5"
@@ -224,7 +224,7 @@
     "warm_ocean": {
       "water_color": "#02B0E5",
       "water_fog_color": "#0289d5",
-      "water_transparency": 0.8
+      "water_transparency": 1.0
     },
     "warped_forest": {
       "water_color": "#5FB5A9"

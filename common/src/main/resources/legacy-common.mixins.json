@@ -39,7 +39,6 @@
     "HumanoidModelInjector",
     "IntegratedServerMixin",
     "InventoryMenuMixin",
-    "ItemBlockRenderTypesMixin",
     "LegacyLoadingScreenMixin",
     "LocalPlayerMixin",
     "MinecartSoundIntanceMixin",
@@ -50,7 +49,8 @@
     "RecipeBookComponentMixin",
     "ScreenMixin",
     "SliderableValueSetMixin",
-    "SmithingScreenMixin"
+    "SmithingScreenMixin",
+    "StonecutterScreenMixin"
   ],
   "mixins": [
     "AbstractButtonMixin",
@@ -60,6 +60,7 @@
     "BrewingStandMenuMixin",
     "ChestMenuMixin",
     "CraftingMenuMixin",
+    "CraftingTableBlockMixin",
     "DispenserMenuMixin",
     "EnchantmentMenuMixin",
     "EndDragonFightMixin",
@@ -79,6 +80,7 @@
     "MusicsMixin",
     "ShulkerBoxMenuMixin",
     "SmithingMenuMixin",
+    "StonecutterMenuMixin",
     "VillagerMixin",
     "WitherBossMixin"
   ],

@@ -2,6 +2,7 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.CreativeInventoryListener;
@@ -9,6 +10,7 @@ import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
@@ -18,10 +20,11 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.client.LegacyCreativeTabListing;
+import wily.legacy.client.Offset;
 import wily.legacy.inventory.LegacySlotWrapper;
+import wily.legacy.util.PagedList;
 import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
 
@@ -30,18 +33,16 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeModeScreen.CreativeModeMenu> {
-    protected final TabList tabList = new TabList();
+    protected Stocker.Sizeable page = new Stocker.Sizeable(0);
+    protected final TabList tabList = new TabList(new PagedList<>(page,8));
     protected final Panel panel;
     public static final Container creativeModeGrid = new SimpleContainer(50);
     private CreativeInventoryListener listener;
     protected boolean hasClickedOutside;
     public final List<Stocker.Sizeable> tabsScrolledList = new ArrayList<>();
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
+    protected final List<LegacyCreativeTabListing> displayListing = Stream.concat(LegacyCreativeTabListing.list.stream(), BuiltInRegistries.CREATIVE_MODE_TAB.stream().filter(CreativeModeScreen::canDisplayVanillaCreativeTab).map(c->new LegacyCreativeTabListing(c.getDisplayName(), BuiltInRegistries.ITEM.getKey(c.getIconItem().getItem()), c.getIconItem().getTag(),new ArrayList<>(c.getDisplayItems())))).toList();
 
-    protected static final List<LegacyCreativeTabListing> java4LegacyListing = CreativeModeTabs.tabs().stream().filter(c->c.getType() == CreativeModeTab.Type.CATEGORY).map(c->new LegacyCreativeTabListing(c.getDisplayName(), BuiltInRegistries.ITEM.getKey(c.getIconItem().getItem()), c.getIconItem().getTag(),new ArrayList<>(c.getDisplayItems()))).toList();
-
-    protected final List<LegacyCreativeTabListing> displayListing = Stream.concat(LegacyCreativeTabListing.list.stream(), java4LegacyListing.stream()).toList();
-    protected Stocker.Sizeable page = new Stocker.Sizeable(0);
     public CreativeModeScreen(Player player) {
         super(new CreativeModeMenu(player), player.getInventory(), Component.empty());
         player.containerMenu = this.menu;
@@ -51,19 +52,9 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
             scroll.max = t.displayItems().size() <= creativeModeGrid.getContainerSize() ? 0 : t.displayItems().size() / creativeModeGrid.getContainerSize();
             tabsScrolledList.add(scroll);
         });
-        page.max = (int) Math.ceil(displayListing.size() / 8f);
-        initPagedTabs();
-    }
-    public void initPagedTabs(){
-        tabList.tabButtons.clear();
-        tabList.selectedTab = 0;
-        int t = 0;
-        for (int i = page.get() * 8; i < displayListing.size(); i++) {
-            t++;
-            LegacyCreativeTabListing tab = displayListing.get(i);
-            tabList.addTabButton(39,t == 1 ? 0 : t >= 8 ? 2 : 1,tab.icon(), tab.itemIconTag(),tab.name(),b-> fillCreativeGrid());
-            if (t == 8) break;
-        }
+
+        for (LegacyCreativeTabListing tab : displayListing)
+            tabList.addTabButton(39, 0, tab.icon(), tab.itemIconTag(), tab.name(), b -> fillCreativeGrid());
     }
     public void removed() {
         super.removed();
@@ -71,9 +62,14 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
             this.minecraft.player.inventoryMenu.removeSlotListener(this.listener);
         }
     }
+    public static boolean canDisplayVanillaCreativeTab(CreativeModeTab c){
+        ResourceLocation location = BuiltInRegistries.CREATIVE_MODE_TAB.getKey(c);
+        return c.shouldDisplay() && c.getType() == CreativeModeTab.Type.CATEGORY && location != null && (ScreenUtil.getLegacyOptions().vanillaTabs().get() || !location.getNamespace().equals("minecraft") || location.equals(CreativeModeTabs.OP_BLOCKS.location()));
+    }
 
     @Override
     protected void init() {
+        tabList.selectedTab = 0;
         if (!this.minecraft.gameMode.hasInfiniteItems()) {
             minecraft.setScreen(new InventoryScreen(minecraft.player));
             return;
@@ -89,9 +85,11 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
         this.listener = new CreativeInventoryListener(this.minecraft);
         this.minecraft.player.inventoryMenu.addSlotListener(this.listener);
         tabList.init(panel.x,panel.y - 33, panel.width,(t,i)->{
-            t.translocation = (b)-> {
-                if (!t.selected) return new Vec3(0,1.5,0);
-                return Vec3.ZERO;
+            int index = tabList.tabButtons.indexOf(t);
+            t.type = index == 0 ? 0 : index >= 7 ? 2 : 1;
+            t.offset = (b)-> {
+                if (!t.selected) return new Offset(0,1.5,0);
+                return Offset.ZERO;
             };
             t.setWidth(41);
             t.setX(t.getX() - tabList.tabButtons.indexOf(t));
@@ -190,11 +188,9 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
         tabList.controlTab(i,j,k);
         if ((i == 262 || i == 263) && page.max > 0){
             int lastPage = page.get();
-            page.set(Math.min(page.max - 1, page.get() + (i == 262 ? 1 : -1)));
-            if (lastPage != page.get()){
-                initPagedTabs();
+            page.add( i == 262 ? 1 : -1);
+            if (lastPage != page.get())
                 rebuildWidgets();
-            }
         }
         if (i == InputConstants.KEY_X) {
             for (int n = 36; n < 45; ++n)

@@ -13,7 +13,6 @@
     "TooltipRenderUtilMixin"
   ],
   "mixins": [
-    "ItemBlockRenderTypesMixin",
     "ItemStackMixin"
   ],
   "injectors": {
