@@ -1,8 +1,8 @@
 package wily.legacy.mixin;
 
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -17,10 +17,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.LegacyMinecraft;
 import wily.legacy.inventory.LegacySlotWrapper;
 
 @Mixin(MerchantMenu.class)
@@ -30,6 +27,8 @@ public abstract class MerchantMenuMixin extends AbstractContainerMenu {
     @Shadow public abstract MerchantOffers getOffers();
 
     @Shadow public abstract int getTraderXp();
+
+    @Shadow protected abstract void playTradeSound();
 
     protected MerchantMenuMixin(@Nullable MenuType<?> menuType, int i) {
         super(menuType, i);
@@ -45,11 +44,9 @@ public abstract class MerchantMenuMixin extends AbstractContainerMenu {
             public int getHeight() {
                 return 27;
             }
-
-            @Override
             public void setChanged() {
                 super.setChanged();
-                slotsChanged(container);
+                MerchantMenuMixin.super.slotsChanged(container);
             }
         };
     }
@@ -64,10 +61,9 @@ public abstract class MerchantMenuMixin extends AbstractContainerMenu {
             public int getHeight() {
                 return 27;
             }
-            @Override
             public void setChanged() {
                 super.setChanged();
-                slotsChanged(container);
+                MerchantMenuMixin.super.slotsChanged(container);
             }
         };
     }
@@ -82,10 +78,9 @@ public abstract class MerchantMenuMixin extends AbstractContainerMenu {
             public int getHeight() {
                 return 27;
             }
-            @Override
             public void setChanged() {
                 super.setChanged();
-                slotsChanged(container);
+                MerchantMenuMixin.super.slotsChanged(container);
             }
         };
     }
@@ -103,7 +98,7 @@ public abstract class MerchantMenuMixin extends AbstractContainerMenu {
             @Override
             public void setChanged() {
                 super.setChanged();
-                slotsChanged(container);
+                MerchantMenuMixin.super.slotsChanged(container);
             }
 
         };
@@ -122,7 +117,7 @@ public abstract class MerchantMenuMixin extends AbstractContainerMenu {
             @Override
             public void setChanged() {
                 super.setChanged();
-                slotsChanged(container);
+                MerchantMenuMixin.super.slotsChanged(container);
             }
 
         };
@@ -133,6 +128,7 @@ public abstract class MerchantMenuMixin extends AbstractContainerMenu {
         if (player instanceof ServerPlayer && i >= 0 && i < getOffers().size() && !getOffers().isEmpty()){
             MerchantOffer offer = getOffers().get(i);
             offer.getResult().onCraftedBy(player.level(),player,1);
+            if (trader instanceof LivingEntity e) e.playSound(trader.getNotifyTradeSound(), 1.0f, e.getVoicePitch());
             this.trader.notifyTrade(offer);
             player.awardStat(Stats.TRADED_WITH_VILLAGER);
             this.trader.overrideXp(this.trader.getVillagerXp() + offer.getXp());

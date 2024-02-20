@@ -73,6 +73,7 @@ public class LegacyMinecraftClient {
     public static float FONT_SHADOW_OFFSET = 1.0F;
     public static boolean canLoadVanillaOptions = true;
     public static boolean manualSave = false;
+    public static boolean retakeWorldIcon = false;
     public static final Map<Component, Component> OPTION_BOOLEAN_CAPTION = Map.of(Component.translatable("key.sprint"),Component.translatable("options.key.toggleSprint"),Component.translatable("key.sneak"),Component.translatable("options.key.toggleSneak"));
     public static LegacyLoadingScreen legacyLoadingScreen = new LegacyLoadingScreen();
     public static MultiBufferSource.BufferSource guiBufferSourceOverride = null;
@@ -152,7 +153,7 @@ public class LegacyMinecraftClient {
                 c.init(minecraft,0,0);
                 return CompoundEventResult.interruptTrue(new CreativeModeScreen(Minecraft.getInstance().player));
             }
-            if (screen instanceof AbstractContainerScreen<?>) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f,1.0f);
+            if (screen instanceof AbstractContainerScreen<?>) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
             return CompoundEventResult.interruptDefault(screen);
         });
         ClientTickEvent.CLIENT_POST.register(minecraft -> {

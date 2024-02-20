@@ -170,7 +170,7 @@ public class ScreenUtil {
         mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave, volume));
     }
     public static void playSimpleUISound(SoundEvent sound, float grave){
-        playSimpleUISound(sound,grave,0.25f);
+        mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave));
     }
     public static void addTip(Entity entity){
         if (hasTip(entity.getType())) mc.getToasts().addToast(new LegacyTip(entity.getType().getDescription(), ScreenUtil.getTip(entity.getType())));

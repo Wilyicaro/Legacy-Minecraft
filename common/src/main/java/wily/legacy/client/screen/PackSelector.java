@@ -54,7 +54,6 @@ public class PackSelector extends AbstractWidget {
     private final boolean hasTooltip;
     public int selectedIndex = -1;
     public Pack selectedPack;
-    public boolean hasChanged = false;
     private final PackRepository packRepository;
     private final Minecraft minecraft;
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
@@ -143,7 +142,6 @@ public class PackSelector extends AbstractWidget {
     public void tryChangePackState(int index){
         Pack p = getDisplayPacks().get(index);
         if (p.isRequired()) return;
-        hasChanged = true;
         if (selectedPacks.contains(p)){
             selectedPacks.remove(p);
             availablePacks.add(p);
@@ -152,12 +150,18 @@ public class PackSelector extends AbstractWidget {
             selectedPacks.add(0,p);
         }
     }
+    public List<String> getSelectedIds(){
+        return selectedPacks.stream().map(Pack::getId).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
+            Collections.reverse(l);
+            return l;
+        }));
+    }
+    public boolean hasChanged(){
+        return !getSelectedIds().equals(packRepository.getSelectedIds());
+    }
     public void applyChanges(boolean reload){
-        if (hasChanged) {
-            List<String> list = selectedPacks.stream().map(Pack::getId).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
-                Collections.reverse(l);
-                return l;
-            }));
+        List<String> list = getSelectedIds();
+        if (!list.equals(packRepository.getSelectedIds())) {
             packRepository.setSelected(list);
             if (reload)
                 reloadChanges.accept(this);

@@ -58,7 +58,7 @@ public record ServerInventoryCraftPacket(List<Ingredient> ingredients, ItemStack
                         break;
                     }
                 });
-                if (!sp.containerMenu.moveItemStackTo(result, minSlot, maxSlot, true)) sp.drop(result, true);
+                sp.getInventory().placeItemBackInInventory(result);
                 sp.containerMenu.clickMenuButton(sp,button);
             }
         }

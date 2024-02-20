@@ -254,7 +254,7 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
                             scrollRenderer.updateScroll(i == 263 ? ScreenDirection.LEFT : ScreenDirection.RIGHT);
                             focusedRecipes = null;
                         }
-                        ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f,1.0f);
+                        ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
                         return true;
                     }
                     if ((i == 265 || i == 264) && isValidIndex()) {
@@ -263,7 +263,7 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
                         if (i == InputConstants.KEY_DOWN && getRecipes().size() >= 2)
                             selectionOffset = Math.min(selectionOffset + 1, 1);
                         if (oldSelection != selectionOffset || canScroll()) {
-                            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f,1.0f);
+                            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
                             if (oldSelection == selectionOffset && selectionOffset != 0)
                                 Collections.rotate(getFocusedRecipes(), -selectionOffset);
                             updateIngredient(getFocusedRecipe());

@@ -2,6 +2,9 @@ package wily.legacy.mixin;
 
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import org.spongepowered.asm.mixin.Mixin;
@@ -10,6 +13,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyWorldSettings;
+
+import java.util.List;
 
 @Mixin(PrimaryLevelData.class)
 public abstract class ClientPrimaryLevelDataMixin implements LegacyWorldSettings {
@@ -45,6 +50,9 @@ public abstract class ClientPrimaryLevelDataMixin implements LegacyWorldSettings
     @Inject(method = "setTagData",at = @At("TAIL"))
     private void setTagData(RegistryAccess registryAccess, CompoundTag compoundTag, CompoundTag compoundTag2, CallbackInfo ci) {
         compoundTag.putBoolean("TrustPlayers",trustPlayers());
+        ListTag packs = new ListTag();
+        getSelectedResourcePacks().forEach(p-> packs.add(StringTag.valueOf(p)));
+        compoundTag.put("SelectedResourcePacks",packs);
     }
     public long getDisplaySeed() {
         return ((LegacyWorldSettings)(Object)settings).getDisplaySeed();
@@ -53,5 +61,15 @@ public abstract class ClientPrimaryLevelDataMixin implements LegacyWorldSettings
     @Override
     public void setDisplaySeed(long s) {
         ((LegacyWorldSettings)(Object)settings).setDisplaySeed(s);
+    }
+
+    @Override
+    public List<String> getSelectedResourcePacks() {
+        return ((LegacyWorldSettings)(Object)settings).getSelectedResourcePacks();
+    }
+
+    @Override
+    public void setSelectedResourcePacks(List<String> packs) {
+        ((LegacyWorldSettings)(Object)settings).setSelectedResourcePacks(packs);
     }
 }

@@ -1,5 +1,9 @@
 package wily.legacy.client;
 
+import net.minecraft.resources.ResourceLocation;
+
+import java.util.List;
+
 public interface LegacyWorldSettings {
     long getDisplaySeed();
     void setDisplaySeed(long s);
@@ -8,4 +12,6 @@ public interface LegacyWorldSettings {
     boolean isDifficultyLocked();
     void setDifficultyLocked(boolean locked);
     void setAllowCommands(boolean allow);
+    void setSelectedResourcePacks(List<String> packs);
+    List<String> getSelectedResourcePacks();
 }

@@ -7,17 +7,30 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyOptions;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Optional;
+import java.util.function.Consumer;
+
 @Mixin(GameRenderer.class)
-public class GameRendererMixin {
+public abstract class GameRendererMixin {
     @Shadow @Final private Minecraft minecraft;
+
+    @Shadow private boolean hasWorldScreenshot;
+
+    @Shadow protected abstract void takeAutoScreenshot(Path path);
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/toasts/ToastComponent;render(Lnet/minecraft/client/gui/GuiGraphics;)V"))
     private void render(ToastComponent instance, GuiGraphics graphics){
@@ -48,4 +61,21 @@ public class GameRendererMixin {
             RenderSystem.disableBlend();
         }
     }
+    @Redirect(method = "tryTakeScreenshotIfNeeded",at = @At(value = "FIELD", opcode = Opcodes.GETFIELD, target = "Lnet/minecraft/client/renderer/GameRenderer;hasWorldScreenshot:Z"))
+    private boolean canTakeWorldIcon(GameRenderer instance) {
+        return hasWorldScreenshot && !LegacyMinecraftClient.retakeWorldIcon;
+    }
+    @Redirect(method = "tryTakeScreenshotIfNeeded",at = @At(value = "INVOKE", target = "Ljava/util/Optional;ifPresent(Ljava/util/function/Consumer;)V"))
+    private void tryTakeScreenshotIfNeeded(Optional<Path> instance, Consumer<? super Path> action) {
+        instance.ifPresent(path->{
+                    if (!LegacyMinecraftClient.retakeWorldIcon && Files.isRegularFile(path)) {
+                        this.hasWorldScreenshot = true;
+                    } else {
+                        this.takeAutoScreenshot(path);
+                        LegacyMinecraftClient.retakeWorldIcon = false;
+                    }
+                }
+        );
+    }
+
 }

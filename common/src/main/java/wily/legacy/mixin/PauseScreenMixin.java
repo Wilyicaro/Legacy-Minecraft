@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.achievement.StatsScreen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -16,6 +17,7 @@ import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.screen.ExitConfirmationScreen;
 import wily.legacy.client.screen.HelpOptionsScreen;
 import wily.legacy.client.screen.RenderableVList;
+import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(PauseScreen.class)
@@ -25,6 +27,7 @@ public class PauseScreenMixin extends Screen {
     }
     protected RenderableVList renderableVList;
     protected boolean updateAutoSaveIndicator;
+    private boolean inited = false;
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
@@ -44,10 +47,7 @@ public class PauseScreenMixin extends Screen {
         );
         minecraft = Minecraft.getInstance();
         if (minecraft.level != null && minecraft.hasSingleplayerServer())
-            renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.save"), button -> {
-                LegacyMinecraftClient.manualSave = true;
-                updateAutoSaveIndicator = true;
-            }).build());
+            renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.save"), button -> LegacyMinecraftClient.manualSave = LegacyMinecraftClient.retakeWorldIcon = updateAutoSaveIndicator = true).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), button -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
     }
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
@@ -57,6 +57,10 @@ public class PauseScreenMixin extends Screen {
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
+        if (!inited){
+            ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+            inited = true;
+        }
         if (updateAutoSaveIndicator){
             updateAutoSaveIndicator = false;
             minecraft.gui.autosaveIndicatorValue = 1.0F;

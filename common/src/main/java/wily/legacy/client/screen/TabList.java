@@ -106,16 +106,16 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
     public void controlTab(int i, int j, int k){
         if (i == InputConstants.KEY_LBRACKET) {
             tabButtons.get((selectedTab <= 0 ? tabButtons.size() : selectedTab) - 1).onPress();
-            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f,1.0f);
+            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f);
         } else if (i == InputConstants.KEY_RBRACKET) {
             tabButtons.get(selectedTab >= tabButtons.size() - 1 ? 0 : selectedTab + 1).onPress();
-            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f,1.0f);
+            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f);
         }
     }
     public void numberControlTab(int i){
         if (i <= 57 && i > 48 && i - 49 < tabButtons.size()) {
             tabButtons.get(i - 49).onPress();
-            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f,1.0f);
+            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f);
         }
     }
     @Override

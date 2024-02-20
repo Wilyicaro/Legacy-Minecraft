@@ -11,6 +11,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
@@ -199,6 +200,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
         return super.keyPressed(i, j, k);
     }
     protected void slotClicked(@Nullable Slot slot, int i, int j, ClickType clickType) {
+        if(slot != null) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
         boolean bl = clickType == ClickType.QUICK_MOVE;
        clickType = i == -999 && clickType == ClickType.PICKUP ? ClickType.THROW : clickType;
         if (slot != null || clickType == ClickType.QUICK_CRAFT) {

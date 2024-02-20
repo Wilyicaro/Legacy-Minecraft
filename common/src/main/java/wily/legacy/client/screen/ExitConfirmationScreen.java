@@ -22,7 +22,10 @@ public class ExitConfirmationScreen extends ConfirmationScreen{
         addRenderableWidget(Button.builder(Component.translatable(minecraft.hasSingleplayerServer() ? "legacy.menu.exit_without_save" : "menu.quit"),b-> exitToTitleScreen(minecraft,false)).bounds(panel.x + 15, panel.y + panel.height - 30,200,20).build());
     }
     public static void exitToTitleScreen(Minecraft minecraft, boolean save) {
-        if (save) LegacyMinecraftClient.manualSave = true;
+        if (save) {
+            LegacyMinecraftClient.manualSave = true;
+            LegacyMinecraftClient.retakeWorldIcon = true;
+        }
 
         if (minecraft.level != null) {
             minecraft.level.disconnect();
