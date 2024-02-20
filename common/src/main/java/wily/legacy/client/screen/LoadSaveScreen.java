@@ -14,6 +14,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.PublishCommand;
+import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.GameRules;
@@ -34,8 +35,10 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import static wily.legacy.LegacyMinecraftClient.publishUnloadedServer;
 
@@ -53,7 +56,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
     public final LevelSummary summary;
     protected boolean onlineOnStart = false;
     private int port = HttpUtil.getAvailablePort();
-    protected PackSelector resourcePackSelector = PackSelector.resources(panel.x + 13, panel.y + 112, 220,45, !ScreenUtil.hasTooltipBoxes());
+    protected final PackSelector resourcePackSelector;
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean deleteOnClose) {
         super(s-> new Panel(p-> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 160 : 0))) / 2, p-> (s.height - p.height) / 2 + 20,245,233), Component.translatable("legacy.menu.load_save.load"));
         this.deleteOnClose = deleteOnClose;
@@ -64,6 +67,9 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
         gameType = summary.getSettings().gameType();
         allowCheats = summary.hasCheats();
         trustPlayers = ((LegacyWorldSettings)(Object)summary.getSettings()).trustPlayers();
+        List<String> packs = ((LegacyWorldSettings)(Object)summary.getSettings()).getSelectedResourcePacks();
+        if (!packs.isEmpty()) Minecraft.getInstance().getResourcePackRepository().setSelected(packs);
+        resourcePackSelector = PackSelector.resources(panel.x + 13, panel.y + 112, 220,45, !ScreenUtil.hasTooltipBoxes());
 
     }
     public LoadSaveScreen(Screen screen, LevelSummary summary) {
@@ -135,7 +141,10 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
                 this.minecraft.gui.getChat().addMessage(component);
             }
             ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setAllowCommands(allowCheats);
-            ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setTrustPlayers(trustPlayers);
+            if (resourcePackSelector.hasChanged()) ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setSelectedResourcePacks(resourcePackSelector.selectedPacks.stream().map(Pack::getId).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
+                Collections.reverse(l);
+                return l;
+            })));
         }
         resourcePackSelector.applyChanges(true);
     }

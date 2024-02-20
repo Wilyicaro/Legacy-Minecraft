@@ -238,7 +238,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                             scrollRenderer.updateScroll(i == 263 ? ScreenDirection.LEFT : ScreenDirection.RIGHT);
                             focusedRecipes = null;
                         }
-                        ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f,1.0f);
+                        ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
                         return true;
                     }
                     if ((i == 265 || i == 264) && isValidIndex()) {
@@ -247,7 +247,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                         if (i == InputConstants.KEY_DOWN && getRecipes().size() >= 2)
                             selectionOffset = Math.min(selectionOffset + 1, 1);
                         if (oldSelection != selectionOffset || canScroll()) {
-                            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f,1.0f);
+                            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
                             if (oldSelection == selectionOffset && selectionOffset != 0)
                                 Collections.rotate(getFocusedRecipes(), -selectionOffset);
                             updateIngredientGrid(getFocusedRecipe());
@@ -374,7 +374,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (tabList.keyPressed(i,j,k)) return true;
+        tabList.controlTab(i,j,k);
         if (page.max > 0 && hasShiftDown() && (i == 262 || i == 263)){
             int oldPage = page.get();
             page.add(i == 262 ? 1 : -1);

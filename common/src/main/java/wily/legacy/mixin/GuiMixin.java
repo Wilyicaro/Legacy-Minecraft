@@ -124,7 +124,10 @@ public abstract class GuiMixin {
             player.setXRot(player.isFallFlying() ? xRot : 0);
             player.yHeadRot = 180 + (player.isFallFlying() ? 0 : yHeadRot - bodyRot);
             player.yHeadRotO = player.yHeadRot;
-            InventoryScreen.renderEntityInInventory(guiGraphics, 40, 60f, 15, new Vector3f(), new Quaternionf().rotationXYZ(0.0f, -0.43633232f, (float) Math.PI), null, player);
+            guiGraphics.pose().pushPose();
+            ScreenUtil.applyHUDScale(guiGraphics,w->{},h->{});
+            InventoryScreen.renderEntityInInventory(guiGraphics, 28f, 50f,13, new Vector3f(), new Quaternionf().rotationXYZ(0.0f, -0.43633232f, (float) Math.PI), null, player);
+            guiGraphics.pose().popPose();
             player.setDeltaMovement(deltaMove);
             player.yBodyRot = bodyRot;
             player.setXRot(xRot);

@@ -138,7 +138,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             public boolean keyPressed(int i, int j, int k) {
                 if ((i == 263 && index == 0) || (i == 262 && index == villagerTradeButtons.size() - 1)){
                     MerchantScreenMixin.this.setFocused(villagerTradeButtons.get(i == 263 ? villagerTradeButtons.size() - 1 : 0));
-                    ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f,1.0f);
+                    ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
                     return true;
                 }
                 return super.keyPressed(i, j, k);

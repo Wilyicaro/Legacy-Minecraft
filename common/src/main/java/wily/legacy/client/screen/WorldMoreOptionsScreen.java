@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class WorldMoreOptionsScreen extends PanelVListScreen {
@@ -35,15 +36,16 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
 
     protected final RenderableVList gameRenderables = new RenderableVList();
 
-    protected List<GameRules.Key<?>> worldOptionsRules = List.of(GameRules.RULE_MOBGRIEFING, GameRules.RULE_DOFIRETICK, GameRules.RULE_WATER_SOURCE_CONVERSION, GameRules.RULE_LAVA_SOURCE_CONVERSION);
+    //protected List<GameRules.Key<?>> worldOptionsRules = List.of(GameRules.RULE_MOBGRIEFING, GameRules.RULE_DOFIRETICK, GameRules.RULE_WATER_SOURCE_CONVERSION, GameRules.RULE_LAVA_SOURCE_CONVERSION);
+    //protected List<GameRules.Key<?>> gameOptionsRules = List.of(GameRules.RULE_DAYLIGHT,GameRules.RULE_WEATHER_CYCLE,GameRules.RULE_KEEPINVENTORY,GameRules.RULE_LIMITED_CRAFTING,GameRules.RULE_DO_IMMEDIATE_RESPAWN,GameRules.RULE_NATURAL_REGENERATION,GameRules.RULE_DROWNING_DAMAGE,GameRules.RULE_FALL_DAMAGE,GameRules.RULE_FIRE_DAMAGE,GameRules.RULE_FREEZE_DAMAGE,GameRules.RULE_DOMOBSPAWNING, GameRules.RULE_DO_PATROL_SPAWNING);
 
     protected Runnable onClose = ()->{};
-    public WorldMoreOptionsScreen(Screen parent) {
-        super(s -> new Panel(p -> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 188 : 0))) / 2, p -> (s.height - p.height) / 2, 244, 199), Component.translatable("createWorld.tab.more.title"));
+    protected WorldMoreOptionsScreen(Screen parent, Function<Panel,Integer> posHeight) {
+        super(s -> new Panel(p -> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 188 : 0))) / 2, p -> (s.height - posHeight.apply(p)) / 2, 244, 199), Component.translatable("createWorld.tab.more.title"));
         this.parent = parent;
     }
     public WorldMoreOptionsScreen(CreateWorldScreen parent, Consumer<Boolean> setTrustPlayers) {
-        this(parent);
+        this(parent, p-> p.height);
        renderableVList.addRenderable(SimpleLayoutRenderable.create(0,9,r-> ((guiGraphics, i, j, f) -> guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("selectWorld.enterSeed"),r.x + 1,r.y + 2,0x404040,false))));
         EditBox editBox = new EditBox(Minecraft.getInstance().font, 308, 20, Component.translatable("selectWorld.enterSeed")){
            protected MutableComponent createNarrationMessage() {
@@ -65,8 +67,8 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
         parent.getUiState().addListener( s->customizeButton.active = !s.isDebug() && s.getPresetEditor() != null);
         renderableVList.addRenderable(customizeButton);
         SimpleLayoutRenderable.create(0,9,r-> ((guiGraphics, i, j, f) -> {}));
-        TickBox cheatsButton = new TickBox(0,0,parent.getUiState().isAllowCheats(),b->Component.translatable("selectWorld.allowCommands"),b->Tooltip.create(Component.translatable("selectWorld.allowCommands.info")),b->parent.getUiState().setAllowCheats(b.selected));
-        parent.getUiState().addListener(s-> cheatsButton.active = !s.isDebug() && !s.isHardcore());
+        TickBox hostPrivilleges = new TickBox(0,0,parent.getUiState().isAllowCheats(),b->Component.translatable("selectWorld.allowCommands"),b->Tooltip.create(Component.translatable("selectWorld.allowCommands.info")),b->parent.getUiState().setAllowCheats(b.selected));
+        parent.getUiState().addListener(s-> hostPrivilleges.active = !s.isDebug() && !s.isHardcore());
         GameRules gameRules = parent.getUiState().getGameRules();
         Pair<Path,PackRepository> pair = parent.getDataPackSelectionSettings(parent.getUiState().getSettings().dataConfiguration());
         if (pair != null){
@@ -89,9 +91,12 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
         }
         renderableVList.addRenderable(Button.builder(Component.translatable("selectWorld.dataPacks"), button -> openDataPackSelectionScreen(parent, parent.getUiState().getSettings().dataConfiguration())).build());
         renderableVList.addRenderable(new TickBox(0,0,parent.getUiState().isAllowCheats(), b-> Component.translatable("legacy.menu.selectWorld.trust_players"),b-> null,t-> setTrustPlayers.accept(t.selected)));
-        addGameRulesOptions(renderableVList,gameRules, worldOptionsRules::contains);
-        gameRenderables.addRenderable(cheatsButton);
-        addGameRulesOptions(gameRenderables,gameRules, k -> !worldOptionsRules.contains(k));
+        addGameRulesOptions(renderableVList,gameRules, k-> k.getCategory() == GameRules.Category.UPDATES);
+        gameRenderables.addRenderable(hostPrivilleges);
+        for (GameRules.Category value : GameRules.Category.values()) {
+            if (value == GameRules.Category.UPDATES) continue;
+            addGameRulesOptions(gameRenderables,gameRules, k-> k.getCategory() == value);
+        }
         parent.getUiState().onChanged();
     }
     public void addGameRulesOptions(RenderableVList list, GameRules gameRules, Predicate<GameRules.Key<?>> allowGamerule){
@@ -139,16 +144,18 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
     }
 
     public WorldMoreOptionsScreen(LoadSaveScreen parent) {
-        this((Screen) parent);
+        this(parent, p-> 199);
         tabList.selectedTab = 1;
         GameRules gameRules = parent.summary.getSettings().gameRules();
         renderableVList.addRenderable(new TickBox(0,0,parent.resetNether, b-> Component.translatable("legacy.menu.load_save.reset_nether"),b-> null,t-> parent.resetNether = t.selected));
         renderableVList.addRenderable(new TickBox(0,0,parent.resetEnd, b-> Component.translatable("legacy.menu.load_save.reset_end"),b-> null,t-> parent.resetEnd = t.selected));
         renderableVList.addRenderable(new TickBox(0,0,parent.trustPlayers, b-> Component.translatable("legacy.menu.selectWorld.trust_players"),b-> null,t-> parent.trustPlayers = t.selected));
-        addGameRulesOptions(renderableVList,gameRules, worldOptionsRules::contains);
+        addGameRulesOptions(renderableVList,gameRules, k-> k.getCategory() == GameRules.Category.UPDATES);
         gameRenderables.addRenderable(new TickBox(0,0,parent.allowCheats,b->Component.translatable("selectWorld.allowCommands"),b->Tooltip.create(Component.translatable("selectWorld.allowCommands.info")),b->parent.allowCheats = b.selected));
-        addGameRulesOptions(gameRenderables,gameRules, k-> !worldOptionsRules.contains(k));
-
+        for (GameRules.Category value : GameRules.Category.values()) {
+            if (value == GameRules.Category.UPDATES) continue;
+            addGameRulesOptions(gameRenderables,gameRules, k-> k.getCategory() == value);
+        }
         parent.applyGameRules = (g,s)->{
           if (!g.equals(gameRules)) g.assignFrom(gameRules,s);
         };
@@ -175,12 +182,10 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
 
     @Override
     protected void init() {
-        panel.height = 199;
+        panel.height = tabList.selectedTab == 0 && parent instanceof LoadSaveScreen ? 122 : 199;
         addRenderableWidget(tabList);
         super.init();
         tabList.init(panel.x,panel.y - 23,panel.width);
-        if (tabList.selectedTab == 0 && parent instanceof LoadSaveScreen) panel.height = 122;
-
     }
 
     void openDataPackSelectionScreen(CreateWorldScreen screen, WorldDataConfiguration worldDataConfiguration) {

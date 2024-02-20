@@ -14,6 +14,7 @@ import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundChangeDifficultyPacket;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
@@ -51,6 +52,7 @@ public class HostOptionsScreen extends PanelVListScreen{
         addPlayerButtons();
         renderableVList.layoutSpacing(l->0);
         panel.dp = 3f;
+        ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
     }
     public HostOptionsScreen() {
         this(PLAYERS_INVITE);

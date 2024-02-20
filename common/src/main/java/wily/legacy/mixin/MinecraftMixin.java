@@ -69,6 +69,6 @@ public abstract class MinecraftMixin {
 
     @ModifyArg(method = "resizeDisplay",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/Window;setGuiScale(D)V"))
     public double resizeDisplay(double d) {
-        return d * 2/3;
+        return d * 2/6;
     }
 }

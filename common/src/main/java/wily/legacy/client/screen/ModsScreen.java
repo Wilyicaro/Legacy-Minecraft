@@ -16,7 +16,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
 import wily.legacy.LegacyMinecraftPlatform;
 import wily.legacy.util.ScreenUtil;
 
@@ -41,8 +40,8 @@ public class ModsScreen extends PanelVListScreen{
             List<Component> components = new ArrayList<>();
             SizedLocation logo = modLogosCache.get(key);
             if (logo != null && logo.getScaledWidth(28) >= 120){
+                components.add(Component.literal(focusedMod.getName()));
                 components.add(Component.translatable("legacy.menu.mods.id", focusedMod.getModId()));
-                components.add(Component.translatable("legacy.menu.mods.version",focusedMod.getVersion()));
             }
             if (!key.getAuthors().isEmpty())
                 components.add(Component.translatable("legacy.menu.mods.authors", String.join(", ", key.getAuthors())));
@@ -52,7 +51,7 @@ public class ModsScreen extends PanelVListScreen{
             if (key.getLicense() != null && !key.getLicense().isEmpty()) components.add(Component.translatable("legacy.menu.mods.license", String.join(", ", key.getLicense())));
             components.add(Component.literal(key.getDescription()));
             MultilineTooltip tooltip = new MultilineTooltip(components,176);
-            return MultiLineLabel.createFixed(font, tooltip.toCharSequence(minecraft).stream().map(formattedCharSequence -> new MultiLineLabel.TextWithWidth((FormattedCharSequence)formattedCharSequence, font.width(formattedCharSequence))).toList());
+            return MultiLineLabel.createFixed(font, tooltip.toCharSequence(minecraft).stream().map(formattedCharSequence -> new MultiLineLabel.TextWithWidth(formattedCharSequence, font.width(formattedCharSequence))).toList());
         }
     });
     public ModsScreen(Screen parent) {
