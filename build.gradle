@@ -101,7 +101,7 @@ subprojects {
             def time = dateFormat.format(new Date())
             def changes = new StringBuilder()
             changes << "## " + stage.capitalize() + " $version  \nUpdated at **$time**.  \n**Changelog**  "
-            def proc = "git log --max-count=30 --pretty=format:%s".execute()
+            def proc = "git log --max-count=4 --pretty=format:%s".execute()
             proc.in.eachLine { line ->
                 def processedLine = line.toString()
                 if (!processedLine.contains("New translations") && !processedLine.contains("Merge") && !processedLine.contains("branch")) {
