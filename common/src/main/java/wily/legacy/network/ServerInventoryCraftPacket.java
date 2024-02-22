@@ -3,8 +3,10 @@ package wily.legacy.network;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
@@ -33,12 +35,12 @@ public record ServerInventoryCraftPacket(List<Ingredient> ingredients, ItemStack
     }
     public static boolean canCraft(List<Ingredient> ingredients, Inventory inventory){
         boolean canCraft = true;
-        for (int i1 = 0; i1 < ingredients.size(); i1++) {
-            Ingredient ing = ingredients.get(i1);
+        for (int i = 0; i < ingredients.size(); i++) {
+            Ingredient ing = ingredients.get(i);
             if (ing.isEmpty()) continue;
             int itemCount = inventory.items.stream().filter(ing).mapToInt(ItemStack::getCount).sum();
-            long ingCount = ingredients.stream().filter(i-> i == ing).count();
-            if (itemCount < ingCount && PagedList.occurrenceOf(ingredients,ing,i1) >= itemCount) {
+            long ingCount = ingredients.stream().filter(ingredient-> ingredient == ing).count();
+            if (itemCount < ingCount && PagedList.occurrenceOf(ingredients,ing,i) >= itemCount) {
                 canCraft = false;
                 break;
             }
@@ -50,11 +52,11 @@ public record ServerInventoryCraftPacket(List<Ingredient> ingredients, ItemStack
         if (ctx.get().getPlayer() instanceof ServerPlayer sp){
             if (canCraft(ingredients, sp.getInventory())) {
                 ingredients.forEach(ing -> {
-                    for (int i1 = 0; i1 < sp.containerMenu.slots.size(); i1++) {
-                        ItemStack s = sp.containerMenu.slots.get(i1).getItem();
-                        if (s.isEmpty() || !ing.test(s)) continue;
-                        s.shrink(1);
-                        sp.containerMenu.slots.get(i1).set(s);
+                    for (int i = 0; i < sp.containerMenu.slots.size(); i++) {
+                        Slot slot = sp.containerMenu.slots.get(i);
+                        if (slot.container != sp.getInventory() || !slot.hasItem() || !ing.test(slot.getItem())) continue;
+                        sp.getInventory().getItem(slot.getContainerSlot()).shrink(1);
+                        //sp.connection.send(new ClientboundContainerSetSlotPacket(sp.containerMenu.containerId, sp.containerMenu.incrementStateId(), slot.index, s));
                         break;
                     }
                 });

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import wily.legacy.client.Offset;
 
 public class LegacySlotWrapper extends Slot {
+    protected ItemStack lastItemStack;
     protected final Slot target;
     public LegacySlotWrapper(Container container, int i, int j, int k) {
         this(new Slot(container,i,j,k));
@@ -20,6 +21,7 @@ public class LegacySlotWrapper extends Slot {
     public LegacySlotWrapper(Slot slot,Container container, int i, int j, int k) {
         super(container, i, j, k);
         this.target = slot;
+        lastItemStack = target.getItem();
     }
     public int getWidth(){
         return 21;
@@ -42,7 +44,12 @@ public class LegacySlotWrapper extends Slot {
 
     @Override
     public ItemStack getItem() {
-        return this.target.getItem();
+        ItemStack s = this.target.getItem();
+        if (s != lastItemStack){
+            lastItemStack = s;
+            setChanged();
+        }
+        return s;
     }
 
     @Override

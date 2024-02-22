@@ -45,7 +45,7 @@ public abstract class GuiMixin {
         guiGraphics.pose().translate(0,ScreenUtil.getHUDDistance() - Math.max(shift, ScreenUtil.getHUDSize()),0);
         this.minecraft.getProfiler().push("selectedItemName");
         if (this.toolHighlightTimer > 0 && !this.lastToolHighlight.isEmpty()) {
-            List<Component> tooltipLines = this.lastToolHighlight.getTooltipLines(null, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).toList();
+            List<Component> tooltipLines = this.lastToolHighlight.getTooltipLines(minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).toList();
             for (int i = 0; i < tooltipLines.size(); i++) {
                 int l;
                 Component mutableComponent = tooltipLines.get(i);

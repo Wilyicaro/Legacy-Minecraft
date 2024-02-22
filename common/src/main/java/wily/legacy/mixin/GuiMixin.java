@@ -2,18 +2,12 @@ package wily.legacy.mixin;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.blockentity.ChestRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -63,10 +57,11 @@ public abstract class GuiMixin {
     }
     @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
     public void renderCrosshair(GuiGraphics guiGraphics, CallbackInfo ci) {
-        if (minecraft.screen != null){
+        if (minecraft.screen != null) {
             ci.cancel();
             return;
         }
+
         guiGraphics.pose().pushPose();
         ScreenUtil.applyHUDScale(guiGraphics,i-> screenWidth = i,i-> screenHeight = i);
     }

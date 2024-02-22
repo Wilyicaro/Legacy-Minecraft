@@ -1,11 +1,13 @@
 package wily.legacy.util;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
@@ -61,14 +63,16 @@ public class ScreenUtil {
         renderTiles(SQUARE_RECESSED_PANEL,graphics,x,y,width,height,dp);
     }
     public static void renderTiles(ResourceLocation location,GuiGraphics graphics, int x, int y, int width, int height, float dp){
-        //TextureAtlasSprite sprite = mc.getGuiSprites().getSprite(id);
-        //mc.getTextureManager().getTexture(sprite.atlasLocation()).setFilter(true,false);
+        mc.getTextureManager().getTexture(new ResourceLocation("textures/atlas/gui.png")).bind();
+        GlStateManager._texParameter(3553, 10241, 9729);
+        //GlStateManager._texParameter(3553, 10240, 9729);
         graphics.pose().pushPose();
+        graphics.pose().translate(x,y,0);
         if (dp != 1.0)
             graphics.pose().scale(1/dp,1/dp,1/dp);
-        graphics.pose().translate(dp* x,dp * y,0);
         graphics.blitSprite(location,0,0, (int) (width * dp), (int) (height * dp));
         graphics.pose().popPose();
+        GlStateManager._texParameter(3553, 10241, 9728);
     }
     public static void drawAutoSavingIcon(GuiGraphics graphics,int x, int y) {
         graphics.pose().pushPose();

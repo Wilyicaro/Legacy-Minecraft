@@ -15,7 +15,7 @@ public class WindowMixin {
     @Inject(method = "calculateScale", at = @At("HEAD"), cancellable = true)
     public void calculateScale(int i, boolean bl, CallbackInfoReturnable<Integer> cir) {
         int j;
-        for (j = 1; j != i && j < this.framebufferWidth && j < this.framebufferHeight && this.framebufferWidth / (j + 1) >= 160 && this.framebufferHeight / (j + 1) >= 120; ++j) {
+        for (j = 1; j != i && j < this.framebufferWidth && j < this.framebufferHeight && this.framebufferWidth / (j + 1) >= 320 && this.framebufferHeight / (j + 1) >= 180; ++j) {
         }
         if (bl && j % 2 != 0) {
             ++j;
