@@ -31,7 +31,8 @@
       "sword": ["wooden_sword","stone_sword","iron_sword","diamond_sword","golden_sword"],
       "container": ["bucket","bowl","glass_bottle","cauldron"],
       "lighting": ["torch","glowstone","sea_lantern","fire_charge","jack_o_lantern","end_rod"],
-      "location": ["clock","ender_eye","lead","compass","map"]
+      "location": ["clock","ender_eye","lead","compass","map"],
+      "": ["shield"]
     }
   },
   "food": {

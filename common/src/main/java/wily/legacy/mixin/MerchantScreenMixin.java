@@ -126,6 +126,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             @Override
             public void renderTooltip(Minecraft minecraft, GuiGraphics graphics, int i, int j) {
                 super.renderTooltip(minecraft, graphics, i, j);
+                if (!isFocused()) return;
                 MerchantOffer offer = getSelectedMerchantOffer();
                 if (offer != null && hasAutoCrafting())
                     for (int index = 0; index < 3; index++) {

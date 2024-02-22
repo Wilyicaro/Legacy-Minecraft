@@ -57,10 +57,11 @@ public abstract class GuiMixin {
     }
     @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
     public void renderCrosshair(GuiGraphics guiGraphics, CallbackInfo ci) {
-        if (minecraft.screen != null){
+        if (minecraft.screen != null) {
             ci.cancel();
             return;
         }
+
         guiGraphics.pose().pushPose();
         ScreenUtil.applyHUDScale(guiGraphics,i-> screenWidth = i,i-> screenHeight = i);
     }

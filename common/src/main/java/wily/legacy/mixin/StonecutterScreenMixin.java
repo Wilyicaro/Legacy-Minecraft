@@ -159,7 +159,10 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
                 private boolean warningInputSlot = false;
                 @Override
                 public void render(GuiGraphics graphics, int i, int j, float f) {
-                    if (isFocused()) selectedCraftingButton = index;
+                    if (isFocused()){
+                        selectedCraftingButton = index;
+                        updateIngredient(getFocusedRecipe());
+                    }
                     isHoveredTop = isFocused() && getFocusedRecipes().size() > 2 && isMouseOver(i,j,-1);
                     isHoveredBottom = isFocused() && getFocusedRecipes().size() >= 2 && isMouseOver(i,j,1);
                     itemIcon = isValidIndex() ? getFocusedRecipes().get(0).getResultItem(minecraft.level.registryAccess()) : ItemStack.EMPTY;
@@ -212,7 +215,6 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
                     if (bl){
                         updateResultSlot();
                         selectionOffset = 0;
-                        updateIngredient();
                     }
                     super.setFocused(bl);
                 }
@@ -233,9 +235,6 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
                 private ItemStack getFocusedResult(){
                     return getFocusedRecipe() == null ? ItemStack.EMPTY : getFocusedRecipe().getResultItem(minecraft.level.registryAccess()) ;
                 }
-                private void updateIngredient(){
-                    updateIngredient(getFocusedRecipe());
-                }
 
                 @Override
                 public boolean keyPressed(int i, int j, int k) {
@@ -243,7 +242,6 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
                         onlyCraftableRecipes = !onlyCraftableRecipes;
                         listener.slotChanged(menu,0,ItemStack.EMPTY);
                         focusedRecipes = null;
-                        updateIngredient();
                         return true;
                     }
                     int oldSelection = selectionOffset;
@@ -319,7 +317,6 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
                 public boolean mouseScrolled(double d, double e, double f, double g) {
                     if (isFocused() && canScroll()){
                         Collections.rotate(getFocusedRecipes(),(int)Math.signum(g));
-                        updateIngredient();
                         return true;
                     }
                     return false;
@@ -337,8 +334,7 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
                 public void onClick(double d, double e) {
                     int oldSelection = selectionOffset;
                     selectionOffset = isHoveredTop ? -1 : isHoveredBottom ? 1 : 0;
-                    if (oldSelection != selectionOffset) updateIngredient();
-                    else super.onClick(d, e);
+                    if (oldSelection == selectionOffset) super.onClick(d, e);
                 }
 
                 @Override
