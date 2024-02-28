@@ -98,7 +98,7 @@ public class ControllerHandler {
                 }
             }
             if (!wasScreen)
-                KeyMapping.MAP.entrySet().stream().filter(k -> state.component.matches(k.getValue())).forEach(e -> {
+                KeyMapping.ALL.entrySet().stream().filter(k -> state.component.matches(k.getValue())).forEach(e -> {
                     Screen screen;
                     if (this.minecraft.screen == null || (screen = this.minecraft.screen) instanceof PauseScreen && !((PauseScreen) screen).showsPauseMenu()) {
                         if (controllerState.start) {
@@ -107,7 +107,7 @@ public class ControllerHandler {
                             if (state.pressed) {
                                 boolean valid = state.component.validKey.test(e.getValue(), controllerState);
                                 if (state.canPress()) e.getValue().setDown(valid);
-                                if (state.canPress() && valid) KeyMapping.click(e.getKey());
+                                if (state.canPress() && valid) KeyMapping.click(InputConstants.getKey(e.getValue().saveString()));
                             } else if (state.released) e.getValue().setDown(false);
                         }
                     }
