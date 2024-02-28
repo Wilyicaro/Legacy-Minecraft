@@ -7,17 +7,17 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
+import org.lwjgl.glfw.GLFW;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacySprites;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,6 +35,16 @@ public abstract class GameRendererMixin {
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/toasts/ToastComponent;render(Lnet/minecraft/client/gui/GuiGraphics;)V"))
     private void render(ToastComponent instance, GuiGraphics graphics){
         instance.render(graphics);
+        if (GLFW.glfwGetInputMode(minecraft.getWindow().getWindow(),GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !LegacyMinecraftClient.controllerHandler.isCursorDisabled) {
+            RenderSystem.disableDepthTest();
+            RenderSystem.enableBlend();
+            graphics.pose().pushPose();
+            graphics.pose().translate(LegacyMinecraftClient.controllerHandler.getPointerX(),LegacyMinecraftClient.controllerHandler.getPointerY(), 0);
+            graphics.blitSprite(LegacySprites.POINTER, -8, -8, 16, 16);
+            graphics.pose().popPose();
+            RenderSystem.disableBlend();
+            RenderSystem.enableDepthTest();
+        }
         if (!((LegacyOptions)minecraft.options).legacyGamma().get()) return;
         float gamma = minecraft.options.gamma().get().floatValue();
         if (gamma != 0.5) {

@@ -187,7 +187,7 @@ public class SaveSelectionList extends RenderableVList {
 
                     @Override
                     public boolean keyPressed(int i, int j, int k) {
-                        if (i == InputConstants.KEY_E) {
+                        if (i == InputConstants.KEY_O) {
                             minecraft.setScreen(new SaveOptionsScreen(screen, summary));
                             screen.setFocused(this);
                             return true;

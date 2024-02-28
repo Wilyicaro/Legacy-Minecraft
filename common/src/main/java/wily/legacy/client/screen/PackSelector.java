@@ -29,15 +29,14 @@ import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.resources.IoSupplier;
 import org.joml.Math;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
 
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -119,6 +118,10 @@ public class PackSelector extends AbstractWidget {
                 tryChangePackState(selectedIndex);
                 return true;
             }
+            if (i == 88) {
+                openPackSelectionScreen();
+                return true;
+            }
             if (i == 263) {
                 if (selectedIndex == scrolledList.get()) updateScroll(-1);
                 setSelectedPack(selectedIndex - 1);
@@ -173,16 +176,21 @@ public class PackSelector extends AbstractWidget {
     public static void reloadResourcesChanges(PackSelector selector){
         selector.minecraft.options.updateResourcePacks(selector.packRepository);
     }
-    @Override
-    public void onClick(double d, double e) {
-        if (Screen.hasShiftDown() && minecraft.screen != null) {
+    public void openPackSelectionScreen(){
+        if (minecraft.screen != null) {
             Screen screen = minecraft.screen;
             applyChanges(false);
-            minecraft.setScreen(new PackSelectionScreen(packRepository,p-> {
+            minecraft.setScreen(new PackSelectionScreen(packRepository, p -> {
                 reloadChanges.accept(this);
                 updatePacks();
                 minecraft.setScreen(screen);
-            },packPath, getMessage()));
+            }, packPath, getMessage()));
+        }
+    }
+    @Override
+    public void onClick(double d, double e) {
+        if ((Screen.hasShiftDown())) {
+            openPackSelectionScreen();
             return;
         }
         int visibleCount = 0;

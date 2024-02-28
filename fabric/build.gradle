@@ -31,6 +31,8 @@ dependencies {
     modCompileOnly "maven.modrinth:sodium:mc1.20.3-0.5.5"
     //modCompileOnly "mezz.jei:jei-${jei_minecraft_version}-fabric-api:${jei_version}"
     //modRuntimeOnly "mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}"
+    include modApi('com.github.WilliamAHartman:Jamepad:1.4.0')
+    include modApi('uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.4')
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }

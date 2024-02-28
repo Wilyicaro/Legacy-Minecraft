@@ -19,10 +19,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacySprites;
+import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.MultilineTooltip;
 import wily.legacy.client.screen.Panel;
 import wily.legacy.client.screen.RenderableVList;
+import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.ArrayList;
@@ -93,6 +95,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
     public void onClose(CallbackInfo info){
         this.model.commit();
         this.closeWatcher();
+        ScreenUtil.playSimpleUISound(LegacySoundEvents.BACK.get(),1.0f);
     }
     private void addPacks(RenderableVList list,Stream<PackSelectionModel.Entry> stream){
         list.renderables.clear();
@@ -190,7 +193,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
                     }));
                 }
                 public boolean keyPressed(int i, int j, int k) {
-                    if (Screen.hasShiftDown()) {
+                    if (Screen.hasShiftDown() || ControllerComponent.LEFT_BUTTON.componentState.pressed) {
                         switch (i) {
                             case 265 -> {
                                 if (e.canMoveUp()) e.moveUp();

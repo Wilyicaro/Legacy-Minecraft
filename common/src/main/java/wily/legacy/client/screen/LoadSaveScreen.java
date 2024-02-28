@@ -84,6 +84,18 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
     }
 
     @Override
+    public void removed() {
+        try {
+            if (deleteOnClose)
+                access.deleteLevel();
+            access.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        super.removed();
+    }
+
+    @Override
     protected void init() {
         panel.init();
         List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
@@ -127,7 +139,6 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
     }
 
     private void onLoad() throws IOException {
-        access.close();
         if (resetNether) deleteLevelDimension(access,Level.NETHER);
         if (resetEnd) deleteLevelDimension(access,Level.END);
         LegacyMinecraftClient.enterWorldGameType = gameType;
@@ -149,17 +160,6 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
         resourcePackSelector.applyChanges(true);
     }
 
-    @Override
-    public void onClose() {
-        if (deleteOnClose) {
-            try {
-                access.deleteLevel();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        super.onClose();
-    }
 
     public static void deleteLevelDimension(LevelStorageSource.LevelStorageAccess access, ResourceKey<Level> dimension) throws IOException {
         Path path = access.getDimensionPath(dimension);

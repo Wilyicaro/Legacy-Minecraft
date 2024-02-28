@@ -284,7 +284,7 @@ public class ServerSelectionList extends RenderableVList {
                             return true;
                         }
                     }
-                    if (i == InputConstants.KEY_E) {
+                    if (i == InputConstants.KEY_O) {
                         minecraft.setScreen(new ServerOptionsScreen(screen,server));
                         screen.setFocused(this);
                         return true;

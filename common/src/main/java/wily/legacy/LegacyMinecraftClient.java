@@ -3,6 +3,7 @@ package wily.legacy;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.datafixers.util.Pair;
 import dev.architectury.event.CompoundEventResult;
+import dev.architectury.event.EventResult;
 import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientLifecycleEvent;
 import dev.architectury.event.events.client.ClientPlayerEvent;
@@ -13,6 +14,9 @@ import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
+import net.minecraft.client.gui.ComponentPath;
+import net.minecraft.client.gui.navigation.FocusNavigationEvent;
+import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.client.gui.screens.DisconnectedScreen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -52,6 +56,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.client.*;
+import wily.legacy.client.controller.ControllerHandler;
 import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacyMenuTypes;
 import wily.legacy.network.ServerDisplayInfoSync;
@@ -84,6 +89,8 @@ public class LegacyMinecraftClient {
     public static final LegacyTipOverride.Manager legacyTipOverridesManager = new LegacyTipOverride.Manager();
     public static final LegacyResourceManager legacyResourceManager = new LegacyResourceManager();
     public static final StoneCuttingGroupManager stoneCuttingGroupManager = new StoneCuttingGroupManager();
+
+    public static ControllerHandler controllerHandler;
     public static KnownListing<Block> knownBlocks;
     public static KnownListing<EntityType<?>> knownEntities;
     public static GameType enterWorldGameType;
@@ -116,6 +123,7 @@ public class LegacyMinecraftClient {
     }, Optional.of(WorldPresets.SINGLE_BIOME_SURFACE), (createWorldScreen, settings) -> new LegacyBuffetWorldScreen(createWorldScreen, settings.worldgenLoadContext().lookupOrThrow(Registries.BIOME), holder -> createWorldScreen.getUiState().updateDimensions(PresetEditor.fixedBiomeConfigurator(holder)))));
 
     public static void init() {
+        controllerHandler = new ControllerHandler(Minecraft.getInstance());
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyTipManager);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyCreativeListingManager);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyCraftingListingManager);
@@ -124,8 +132,9 @@ public class LegacyMinecraftClient {
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyBiomeOverrides);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyResourceManager);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, stoneCuttingGroupManager);
-        KeyMappingRegistry.register(legacyKeyInventory);
-        KeyMappingRegistry.register(keyHostOptions);
+
+        KeyMappingRegistry.register(legacyKeyInventory = new KeyMapping( "key.inventory", InputConstants.KEY_I, "key.categories.inventory"));
+        KeyMappingRegistry.register(keyHostOptions = new KeyMapping( MOD_ID +".key.host_options", InputConstants.KEY_H, "key.categories.misc"));
         knownBlocks = new KnownListing<>(Registries.BLOCK,Minecraft.getInstance().gameDirectory.toPath());
         knownEntities = new KnownListing<>(Registries.ENTITY_TYPE,Minecraft.getInstance().gameDirectory.toPath());
     }
@@ -155,7 +164,17 @@ public class LegacyMinecraftClient {
             if (screen instanceof AbstractContainerScreen<?>) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
             return CompoundEventResult.interruptDefault(screen);
         });
-        ClientTickEvent.CLIENT_POST.register(minecraft -> {
+        ClientGuiEvent.INIT_POST.register((screen,access) -> {
+            if (!controllerHandler.connectedController.isEmpty()) {
+                if (!(screen instanceof AbstractContainerScreen<?>) || screen.children().stream().anyMatch(g-> g instanceof LegacyIconHolder)) controllerHandler.disableCursor();
+                if (screen.getFocused() == null || !screen.getFocused().isFocused()) {
+                    ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(ScreenDirection.DOWN));;
+                    if (path != null) path.applyFocus(true);
+                }
+            }
+        });
+        ClientLifecycleEvent.CLIENT_STARTED.register(m-> controllerHandler.setup());
+        ClientTickEvent.CLIENT_PRE.register(minecraft -> {
             while (legacyKeyInventory.consumeClick()) {
                 if (minecraft.gameMode.isServerControlledInventory()) {
                     minecraft.player.sendOpenInventory();
@@ -202,8 +221,8 @@ public class LegacyMinecraftClient {
 
     }
 
-    public static final KeyMapping legacyKeyInventory = new KeyMapping( "key.inventory", InputConstants.KEY_I, "key.categories.inventory");
-    public static final KeyMapping keyHostOptions = new KeyMapping( MOD_ID +".key.host_options", InputConstants.KEY_H, "key.categories.misc");
+    public static KeyMapping legacyKeyInventory;
+    public static KeyMapping keyHostOptions;
     public static void resetVanillaOptions(Minecraft minecraft){
         canLoadVanillaOptions = false;
         minecraft.options = new Options(minecraft,minecraft.gameDirectory);

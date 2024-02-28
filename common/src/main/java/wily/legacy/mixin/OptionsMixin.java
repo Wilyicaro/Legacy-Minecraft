@@ -1,6 +1,7 @@
 package wily.legacy.mixin;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
@@ -16,6 +17,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.controller.ControllerHandler;
+import wily.legacy.client.controller.LegacyKeyMapping;
 
 import java.io.File;
 import java.util.Arrays;

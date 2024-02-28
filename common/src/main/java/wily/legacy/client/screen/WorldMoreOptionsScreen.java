@@ -170,7 +170,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
     }
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        tabList.controlTab(i,j,k);
+        tabList.controlTab(i);
         return super.keyPressed(i, j, k);
     }
 

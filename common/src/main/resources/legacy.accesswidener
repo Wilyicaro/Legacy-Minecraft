@@ -93,3 +93,7 @@ accessible field net/minecraft/client/renderer/RenderStateShard$TextureStateShar
 accessible field net/minecraft/client/renderer/RenderType$CompositeState textureState Lnet/minecraft/client/renderer/RenderStateShard$EmptyTextureStateShard;
 accessible field net/minecraft/client/renderer/MultiBufferSource$BufferSource builder Lcom/mojang/blaze3d/vertex/BufferBuilder;
 accessible field net/minecraft/client/renderer/MultiBufferSource$BufferSource fixedBuffers Ljava/util/Map;
+accessible field net/minecraft/client/KeyMapping MAP Ljava/util/Map;
+accessible field net/minecraft/client/MouseHandler xpos D
+accessible field net/minecraft/client/MouseHandler ypos D
+accessible field net/minecraft/client/MouseHandler mouseGrabbed Z

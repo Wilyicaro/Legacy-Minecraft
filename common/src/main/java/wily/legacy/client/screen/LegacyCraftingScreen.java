@@ -19,6 +19,7 @@ import wily.legacy.LegacyMinecraft;
 import wily.legacy.client.LegacyCraftingTabListing;
 import wily.legacy.client.LegacySprites;
 import wily.legacy.client.Offset;
+import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.network.ServerInventoryCraftPacket;
@@ -374,8 +375,8 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        tabList.controlTab(i,j,k);
-        if (page.max > 0 && hasShiftDown() && (i == 262 || i == 263)){
+        tabList.controlTab(i);
+        if (page.max > 0 && (hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed) && (i == 262 || i == 263)){
             int oldPage = page.get();
             page.add(i == 262 ? 1 : -1);
             if (oldPage != page.get()) {

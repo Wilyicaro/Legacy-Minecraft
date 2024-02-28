@@ -30,7 +30,7 @@
       "archery": ["bow","arrow"],
       "sword": ["wooden_sword","stone_sword","iron_sword","diamond_sword","golden_sword"],
       "container": ["bucket","bowl","glass_bottle","cauldron"],
-      "lighting": ["torch","glowstone","sea_lantern","fire_charge","jack_o_lantern","end_rod"],
+      "lighting": ["torch","glowstone","sea_lantern","fire_charge","jack_o_lantern","end_rod","lantern","soul_lantern"],
       "location": ["clock","ender_eye","lead","compass","map"],
       "": ["shield"]
     }
@@ -98,8 +98,8 @@
       "wool": ["dye_orange_wool","dye_magenta_wool","dye_light_blue_wool","dye_yellow_wool","dye_lime_wool","dye_pink_wool","dye_gray_wool","dye_light_gray_wool","dye_cyan_wool","dye_purple_wool","dye_blue_wool","dye_brown_wool","dye_green_wool","dye_red_wool","dye_black_wool","dye_white_wool","white_wool_from_string"],
       "dye": ["yellow_dye_from_dandelion","yellow_dye_from_sunflower","red_dye_from_poppy","red_dye_from_rose_bush","red_dye_from_tulip","red_dye_from_tulip","red_dye_from_beetroot","white_dye","white_dye_from_lily_of_the_valley","bone_meal","bone_meal_from_bone_block","pink_dye_from_red_white_dye","pink_dye_from_peony","pink_dye_from_pink_petals","pink_dye_from_pink_tulip","orange_dye","lime_dye","gray_dye","light_gray_dye_from_gray_white_dye","light_gray_dye_from_black_white_dye","light_gray_dye_from_azure_bluet","light_gray_dye_from_oxeye_daisy","light_gray_dye_from_white_tulip","light_blue_dye_from_blue_white_dye","light_blue_dye_from_blue_orchid","cyan_dye","cyan_dye_from_pitcher_plant","purple_dye","magenta_dye_from_purple_and_pink","magenta_dye_from_blue_red_pink","magenta_dye_from_blue_red_white_dye","magenta_dye_from_alium","magenta_dye_from_lilac","light_blue_dye_from_blue_white_dye"],
       "carpet": ["white_carpet","orange_carpet","magenta_carpet","light_blue_carpet","yellow_carpet","lime_carpet","pink_carpet","gray_carpet","light_gray_carpet","cyan_carpet","purple_carpet","blue_carpet","brown_carpet","green_carpet","red_carpet","black_carpet"],
-      "misc": ["flower_pot","jukebox","leather"],
-      "utility": ["armor_stand","painting","item_frame","glow_item_frame","oak_sign","birch_sign","spruce_sign","jungle_sign","acacia_sign","dark_oak_sign","mangrove_sign","bamboo_sign","cherry_sign","crimson_sign","warped_sign"],
+      "misc": ["flower_pot","jukebox","chain"],
+      "utility": ["armor_stand","painting","item_frame","glow_item_frame","oak_sign","birch_sign","spruce_sign","jungle_sign","acacia_sign","dark_oak_sign","mangrove_sign","bamboo_sign","cherry_sign","crimson_sign","warped_sign","oak_hanging_sign","birch_hanging_sign","spruce_hanging_sign","jungle_hanging_sign","acacia_hanging_sign","dark_oak_hanging_sign","mangrove_hanging_sign","bamboo_hanging_sign","cherry_hanging_sign","crimson_hanging_sign","warped_hanging_sign"],
       "library": ["paper","book","writable_book","bookshelf","chiseled_bookshelf","lectern","leather"],
       "unboxing": ["dried_kelp","gold_ingot","iron_ingot","diamond","emerald","redstone","coal","netherite_ingot","wheat","slimeball","legacy:string","gold_nugget","iron_nugget"]
     }
