@@ -151,7 +151,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
     }
 
     @Override
-    public void onClose() {
+    public void removed() {
         if (deleteOnClose) {
             try {
                 access.deleteLevel();
@@ -160,8 +160,9 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
             }
         }
         access.safeClose();
-        super.onClose();
+        super.removed();
     }
+
 
     public static void deleteLevelDimension(LevelStorageSource.LevelStorageAccess access, ResourceKey<Level> dimension) throws IOException {
         Path path = access.getDimensionPath(dimension);

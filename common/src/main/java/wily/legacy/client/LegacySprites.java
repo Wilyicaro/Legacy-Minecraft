@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import wily.legacy.LegacyMinecraft;
 
 public class LegacySprites {
+    public static final ResourceLocation POINTER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/pointer");
     public static final ResourceLocation UNSELECT_HIGHLIGHTED_SPRITE = new ResourceLocation("transferable_list/unselect_highlighted");
     public static final ResourceLocation UNSELECT_SPRITE = new ResourceLocation("transferable_list/unselect");
     public static final ResourceLocation CRAFTING_2_SLOTS_SELECTION_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/crafting_2_slots_selection");

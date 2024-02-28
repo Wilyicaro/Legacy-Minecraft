@@ -192,7 +192,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        tabList.controlTab(i,j,k);
+        tabList.controlTab(i);
         if (i == InputConstants.KEY_E && tabList.selectedTab == 0)
             minecraft.setScreen(new LegacyFlatPresetsScreen(this,uiState.getSettings().worldgenLoadContext().lookupOrThrow(Registries.FLAT_LEVEL_GENERATOR_PRESET),uiState.getSettings().dataConfiguration().enabledFeatures(), f-> setPreset(f.value().settings())));
         return super.keyPressed(i, j, k);

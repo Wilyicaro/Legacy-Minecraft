@@ -95,7 +95,8 @@ public class PlayGameScreen extends PanelVListScreen{
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        tabList.controlTab(i,j,k);
+        tabList.controlTab(i);
+        tabList.directionalControlTab(i);
         if (super.keyPressed(i, j, k)) {
             return true;
         }

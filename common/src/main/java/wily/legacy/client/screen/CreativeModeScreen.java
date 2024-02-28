@@ -2,7 +2,6 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.CreativeInventoryListener;
@@ -24,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.client.LegacyCreativeTabListing;
 import wily.legacy.client.Offset;
+import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.inventory.LegacySlotWrapper;
 import wily.legacy.util.PagedList;
 import wily.legacy.util.ScreenUtil;
@@ -186,8 +186,8 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        tabList.controlTab(i,j,k);
-        if ((i == 262 || i == 263) && page.max > 0){
+        tabList.controlTab(i);
+        if ((i == 262 || i == 263) && page.max > 0 && (hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed)){
             int lastPage = page.get();
             page.add( i == 262 ? 1 : -1);
             if (lastPage != page.get())

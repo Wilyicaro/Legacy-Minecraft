@@ -21,10 +21,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyTip;
+import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.inventory.LegacySlotWrapper;
 import wily.legacy.util.ScreenUtil;
@@ -148,5 +150,16 @@ public abstract class AbstractContainerScreenMixin extends Screen {
         graphics.pose().popPose();
         graphics.pose().popPose();
     }
-
+    @Redirect(method = "mouseClicked",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;isKeyDown(JI)Z"))
+    public boolean mouseClicked(long l, int i) {
+        return InputConstants.isKeyDown(l,i) || LegacyMinecraftClient.controllerHandler.getButtonState(ControllerComponent.UP_BUTTON).pressed;
+    }
+    @Redirect(method = "mouseReleased",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;hasShiftDown()Z"))
+    public boolean mouseReleased(double d, double e, int i) {
+        return hasShiftDown() || LegacyMinecraftClient.controllerHandler.getButtonState(ControllerComponent.UP_BUTTON).released;
+    }
+    @Redirect(method = "mouseReleased",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;isKeyDown(JI)Z"))
+    public boolean mouseReleased(long l, int i) {
+        return InputConstants.isKeyDown(l,i) || LegacyMinecraftClient.controllerHandler.getButtonState(ControllerComponent.UP_BUTTON).released;
+    }
 }

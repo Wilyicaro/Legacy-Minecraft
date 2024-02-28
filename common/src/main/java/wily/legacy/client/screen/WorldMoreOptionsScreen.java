@@ -3,7 +3,6 @@ package wily.legacy.client.screen;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.Screen;
@@ -17,7 +16,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.WorldDataConfiguration;
@@ -29,7 +27,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 public class WorldMoreOptionsScreen extends PanelVListScreen {
     protected MultiLineLabel tooltipBoxLabel;
@@ -46,7 +43,6 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
     protected WorldMoreOptionsScreen(Screen parent, Function<Panel,Integer> posHeight) {
         super(s -> new Panel(p -> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 188 : 0))) / 2, p -> (s.height - posHeight.apply(p)) / 2, 244, 199), Component.translatable("createWorld.tab.more.title"));
         this.parent = parent;
-
     }
     public WorldMoreOptionsScreen(CreateWorldScreen parent, Consumer<Boolean> setTrustPlayers) {
         this(parent, p-> p.height);
@@ -174,7 +170,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
     }
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        tabList.controlTab(i,j,k);
+        tabList.controlTab(i);
         return super.keyPressed(i, j, k);
     }
 

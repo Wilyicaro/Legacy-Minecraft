@@ -19,6 +19,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.*;
+import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -36,11 +37,14 @@ import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -55,7 +59,6 @@ public class SaveSelectionList extends RenderableVList {
     static final ResourceLocation JOIN_HIGHLIGHTED_SPRITE = new ResourceLocation("world_list/join_highlighted");
     static final ResourceLocation JOIN_SPRITE = new ResourceLocation("world_list/join");
     static final Logger LOGGER = LogUtils.getLogger();
-    static final DateFormat DATE_FORMAT = new SimpleDateFormat();
     static final Component FROM_NEWER_TOOLTIP_1 = Component.translatable("selectWorld.tooltip.fromNewerVersion1").withStyle(ChatFormatting.RED);
     static final Component FROM_NEWER_TOOLTIP_2 = Component.translatable("selectWorld.tooltip.fromNewerVersion2").withStyle(ChatFormatting.RED);
     static final Component SNAPSHOT_TOOLTIP_1 = Component.translatable("selectWorld.tooltip.snapshot1").withStyle(ChatFormatting.GOLD);
@@ -108,16 +111,18 @@ public class SaveSelectionList extends RenderableVList {
             return icon;
         }
     });
-    public static void resetIconCache(){
-        SaveSelectionList.iconCache.asMap().forEach((s, i)-> i.close());
-        SaveSelectionList.iconCache.invalidateAll();
-    }
+
     public SaveSelectionList(PlayGameScreen playGameScreen) {
         screen = playGameScreen;
         layoutSpacing(l->0);
         this.minecraft = Minecraft.getInstance();
         this.filter = "";
         reloadSaveList();
+    }
+
+    public static void resetIconCache(){
+        SaveSelectionList.iconCache.asMap().forEach((s, i)-> i.close());
+        SaveSelectionList.iconCache.invalidateAll();
     }
 
 
@@ -183,7 +188,7 @@ public class SaveSelectionList extends RenderableVList {
 
                     @Override
                     public boolean keyPressed(int i, int j, int k) {
-                        if (i == InputConstants.KEY_E) {
+                        if (i == InputConstants.KEY_O) {
                             minecraft.setScreen(new SaveOptionsScreen(screen, summary));
                             screen.setFocused(this);
                             return true;
