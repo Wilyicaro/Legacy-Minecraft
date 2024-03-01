@@ -34,7 +34,7 @@ public class DisplayRecipe extends GhostRecipe {
             LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(ingredientSlots.get(k));
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(ghostIngredient.getX() + leftPos, ghostIngredient.getY() + topPos, 0);
-            holder.applyTranslation(guiGraphics);
+            holder.applyOffset(guiGraphics);
             guiGraphics.pose().scale(holder.getSelectableWidth() / 16f,holder.getSelectableHeight() / 16f,holder.getSelectableHeight() / 16f);
 
             guiGraphics.fill(0, 0, 16, 16, 0x30FF0000);

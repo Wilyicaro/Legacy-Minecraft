@@ -267,8 +267,8 @@ public class ScreenUtil {
         LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(slot);
         int width = holder.getWidth();
         int height = holder.getHeight();
-        double xCorner = holder.getXCorner() + (holder.offset != null ? holder.offset.x() : 0);
-        double yCorner = holder.getYCorner() + (holder.offset != null ? holder.offset.y() : 0);
+        double xCorner = holder.getXCorner() + holder.offset.x();
+        double yCorner = holder.getYCorner() + holder.offset.y();
         return (d -= leftPos) >= xCorner && d < (xCorner + width) && (e -= topPos) >= yCorner && e < (yCorner + height);
     }
 }

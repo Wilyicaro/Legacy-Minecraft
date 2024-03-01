@@ -12,8 +12,6 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modCompileOnly "mezz.jei:jei-${jei_minecraft_version}-common-api:${jei_version}"
 
-    modCompileOnly 'com.github.WilliamAHartman:Jamepad:1.4.0'
-    modCompileOnly 'uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.4'
     // Remove the next line if you don't want to depend on the API
     modApi "dev.architectury:architectury:${rootProject.architectury_version}"
 }

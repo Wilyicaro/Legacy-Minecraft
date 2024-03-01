@@ -22,6 +22,7 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -165,7 +166,7 @@ public class LegacyMinecraftClient {
         });
         ClientGuiEvent.INIT_POST.register((screen,access) -> {
             if (!controllerHandler.connectedController.isEmpty()) {
-                if (!(screen instanceof AbstractContainerScreen<?>) || screen.children().stream().anyMatch(g-> g instanceof LegacyIconHolder)) controllerHandler.disableCursor();
+                if (!(screen instanceof MenuAccess<?>) || screen.children().stream().anyMatch(g-> g instanceof LegacyIconHolder)) controllerHandler.disableCursor();
                 if (screen.getFocused() == null || !screen.getFocused().isFocused()) {
                     ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(ScreenDirection.DOWN));;
                     if (path != null) path.applyFocus(true);

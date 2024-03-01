@@ -29,7 +29,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     public static final ResourceLocation GRAY_ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/gray_icon_holder");
     public static final ResourceLocation WARNING_ICON = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/icon_warning");
 
-    public Offset offset = null;
+    public Offset offset = Offset.ZERO;
     public ResourceLocation iconSprite = null;
     @NotNull
     public ItemStack itemIcon = ItemStack.EMPTY;
@@ -63,7 +63,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
     public LegacyIconHolder slotBounds(int leftPos, int topPos, Slot slot){
         iconSprite = slot instanceof LegacySlotWrapper s ? s.getIconSprite() : null;
-        return itemHolder(leftPos + slot.x,topPos + slot.y,slot instanceof LegacySlotWrapper s ? s.getWidth() : 18,slot instanceof LegacySlotWrapper s ? s.getHeight() : 18,ItemStack.EMPTY,false,slot instanceof LegacySlotWrapper s ? s.getOffset() : null);
+        return itemHolder(leftPos + slot.x,topPos + slot.y,slot instanceof LegacySlotWrapper s ? s.getWidth() : 18,slot instanceof LegacySlotWrapper s ? s.getHeight() : 18,ItemStack.EMPTY,false,slot instanceof LegacySlotWrapper s ? s.getOffset() : Offset.ZERO);
     }
     public LegacyIconHolder itemHolder(ItemStack itemIcon, boolean isWarning){
         this.itemIcon = itemIcon;
@@ -82,6 +82,12 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
     public LegacyIconHolder slotBounds(Slot slot){
         return slotBounds(0,0,slot);
+    }
+    public double getMiddleX(){
+        return getXCorner() + offset.x() + getWidth() / 2f;
+    }
+    public double getMiddleY(){
+        return getYCorner() + offset.y() + getHeight() / 2f;
     }
     public float getXCorner(){
         return getX() - (isSizeable() ?  1 : getWidth() / 20f);
@@ -102,8 +108,8 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         return Math.min(getWidth(),getHeight()) > 21;
     }
 
-    public void applyTranslation(GuiGraphics graphics){
-        if (offset != null) offset.apply(graphics.pose());
+    public void applyOffset(GuiGraphics graphics){
+        if (!offset.equals(Offset.ZERO)) offset.apply(graphics.pose());
     }
     protected boolean isWarning(){
         return isWarning;
@@ -120,7 +126,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         isHovered = ScreenUtil.isMouseOver(i, j, getXCorner(), getYCorner(), width, height);
         graphics.pose().pushPose();
         graphics.pose().translate(getXCorner(),getYCorner(),0);
-        applyTranslation(graphics);
+        applyOffset(graphics);
         graphics.blitSprite(getIconHolderSprite(), 0, 0, getWidth(), getHeight());
         graphics.pose().popPose();
         if (iconSprite != null) {
@@ -131,7 +137,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     public void renderIcon(ResourceLocation location,GuiGraphics graphics, boolean scaled, int width, int height){
         graphics.pose().pushPose();
         graphics.pose().translate(getX(), getY(),0);
-        applyTranslation(graphics);
+        applyOffset(graphics);
         if (scaled) {
             graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
         }else graphics.pose().translate((getSelectableWidth() - 16) / 2,(getSelectableHeight() - 16) / 2,0);
@@ -145,7 +151,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         if (!item.isEmpty()){
             graphics.pose().pushPose();
             graphics.pose().translate(x,y,0);
-            applyTranslation(graphics);
+            applyOffset(graphics);
             graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
             graphics.renderFakeItem(item, 0,0);
             if (allowItemDecorations)
@@ -154,7 +160,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             if (isWarning) {
                 RenderSystem.disableDepthTest();
                 graphics.pose().pushPose();
-                applyTranslation(graphics);
+                applyOffset(graphics);
                 graphics.blitSprite(WARNING_ICON,x,y,8,8);
                 graphics.pose().popPose();
                 RenderSystem.enableDepthTest();
@@ -164,7 +170,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     public void renderSelection(GuiGraphics graphics, int i, int j, float f){;
         graphics.pose().pushPose();
         graphics.pose().translate(getXCorner() - 4.5f, getYCorner() - 4.5f, 0f);
-        applyTranslation(graphics);
+        applyOffset(graphics);
         RenderSystem.disableDepthTest();
         graphics.blitSprite(SELECT_ICON_HIGHLIGHT,0,0,36,36);
         RenderSystem.enableDepthTest();
@@ -173,7 +179,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     public void renderHighlight(GuiGraphics graphics, int color, int h){
         graphics.pose().pushPose();
         graphics.pose().translate(getX(),getY(),0);
-        applyTranslation(graphics);
+        applyOffset(graphics);
         graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
         graphics.fillGradient(RenderType.gui(), 0, 0, 16,16, color, color, h);
         graphics.pose().popPose();
@@ -257,5 +263,9 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
     public ScreenRectangle getRectangle() {
         return new ScreenRectangle((int)getXCorner(),(int)getYCorner(),getWidth(),getHeight());
+    }
+
+    public int getMinSize() {
+        return Math.min(getWidth(),getHeight());
     }
 }

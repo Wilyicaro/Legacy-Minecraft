@@ -108,6 +108,6 @@ public class LegacySlotWrapper extends Slot {
     }
 
     public Offset getOffset() {
-        return null;
+        return Offset.ZERO;
     }
 }
