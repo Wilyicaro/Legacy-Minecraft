@@ -27,12 +27,12 @@
       "hoe": ["wooden_hoe","stone_hoe","iron_hoe","diamond_hoe","golden_hoe"],
       "misc": ["shears","tnt","flint_and_steel"],
       "rod": ["fishing_rod","carrot_on_a_stick","warped_fungus_on_a_stick"],
-      "archery": ["bow","arrow"],
+      "archery": ["bow","crossbow","arrow"],
       "sword": ["wooden_sword","stone_sword","iron_sword","diamond_sword","golden_sword"],
-      "container": ["bucket","bowl","glass_bottle","cauldron"],
+      "": ["shield"],
+      "container": ["bucket","bowl","glass_bottle","cauldron","composter"],
       "lighting": ["torch","glowstone","sea_lantern","fire_charge","jack_o_lantern","end_rod","lantern","soul_lantern"],
-      "location": ["clock","ender_eye","lead","compass","map"],
-      "": ["shield"]
+      "location": ["clock","ender_eye","lead","compass","map"]
     }
   },
   "food": {

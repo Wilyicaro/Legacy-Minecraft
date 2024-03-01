@@ -289,7 +289,7 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
                         ScreenUtil.renderScrollingString(graphics,font,resultName,leftPos + 11 + Math.max(163 - font.width(resultName),0) / 2,topPos + 114, leftPos + 170, topPos + 125,4210752, false);
                         graphics.pose().pushPose();
                         graphics.pose().translate(getXCorner() - 4.5f, getYCorner(), 0f);
-                        applyTranslation(graphics);
+                        applyOffset(graphics);
                         RenderSystem.disableDepthTest();
                         if (getFocusedRecipes().size() == 2) {
                             graphics.blitSprite(LegacySprites.CRAFTING_2_SLOTS_SELECTION_SPRITE, 0, -12, 36, 78);

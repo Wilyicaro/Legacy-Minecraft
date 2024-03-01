@@ -258,6 +258,7 @@
  "selectWorld.allowCommands": "Host Privileges",
  "selectWorld.allowCommands.info": "When enabled, the host can execute commands.",
  "legacy.createWorld.customize.custom.useDecorations": "Decorations",
+ "legacy.controller.detected": "Detected Controller",
  "legacy.loadingTip.hoe": "Use a hoe to prepare areas of ground for planting.",
  "legacy.loadingTip.spawnPoint": "You can change your game spawn point and skip to dawn by sleeping in a bed.",
  "legacy.loadingTip.famousNotch": "Notch has over three million followers on twitter!",

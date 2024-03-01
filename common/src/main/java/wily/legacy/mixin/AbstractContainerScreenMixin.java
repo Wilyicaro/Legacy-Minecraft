@@ -6,6 +6,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -28,13 +29,14 @@ import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.client.screen.LegacyIconHolder;
+import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.inventory.LegacySlotWrapper;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Set;
 
 @Mixin(AbstractContainerScreen.class)
-public abstract class AbstractContainerScreenMixin extends Screen {
+public abstract class AbstractContainerScreenMixin extends Screen implements LegacyMenuAccess {
     @Shadow protected int leftPos;
 
     @Shadow protected int topPos;
@@ -101,7 +103,7 @@ public abstract class AbstractContainerScreenMixin extends Screen {
         if (slot instanceof LegacySlotWrapper wrapper) {
             if (wrapper.hasIconHolder())
                 holder.render(graphics, 0, 0, 0);
-            holder.applyTranslation(graphics);
+            holder.applyOffset(graphics);
         }
         graphics.pose().translate(slot.x,slot.y,0);
         graphics.pose().scale(holder.getSelectableWidth() / 16f,holder.getSelectableHeight() / 16f,holder.getSelectableHeight() / 16f);
@@ -162,4 +164,15 @@ public abstract class AbstractContainerScreenMixin extends Screen {
     public boolean mouseReleased(long l, int i) {
         return InputConstants.isKeyDown(l,i) || LegacyMinecraftClient.controllerHandler.getButtonState(ControllerComponent.UP_BUTTON).released;
     }
+
+    @Override
+    public Slot getHoveredSlot() {
+        return hoveredSlot;
+    }
+
+    @Override
+    public ScreenRectangle getMenuRectangle() {
+        return new ScreenRectangle(leftPos,topPos,width,height);
+    }
+
 }

@@ -32,11 +32,6 @@ dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
     // Remove the next line if you don't want to depend on the API
     modApi "dev.architectury:architectury-forge:${rootProject.architectury_version}"
-    include 'com.github.WilliamAHartman:Jamepad:1.4.0'
-    include 'uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.4'
-    include modApi("com.badlogicgames.gdx:gdx-jnigen:1.9.10")
-    include modApi("com.badlogicgames.gdx:gdx:1.9.9")
-    include modApi("com.badlogicgames.gdx:gdx-controllers:1.9.9")
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }

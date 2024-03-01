@@ -4,11 +4,15 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.navigation.ScreenDirection;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
@@ -22,7 +26,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
-public class FlatWorldLayerSelector extends PanelBackgroundScreen {
+public class FlatWorldLayerSelector extends PanelBackgroundScreen implements LegacyMenuAccess<AbstractContainerMenu> {
     public static final Container layerSelectionGrid = new SimpleContainer(50);
     public final List<ItemStack> layerItems = new ArrayList<>();
     protected final Stocker.Sizeable scrolledList = new Stocker.Sizeable(0);
@@ -31,8 +35,8 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen {
     protected ItemStack selectedLayer = Items.AIR.getDefaultInstance();
 
     protected Screen parent;
-    protected final List<LegacySlotWrapper> slots = new ArrayList<>();
-    protected LegacySlotWrapper hoveredSlot = null;
+    protected final AbstractContainerMenu menu;
+    protected Slot hoveredSlot = null;
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
 
     public FlatWorldLayerSelector(Screen parent, Consumer<FlatWorldLayerSelector> applyLayer, int maxLayerHeight, Component component) {
@@ -40,8 +44,20 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen {
         this.parent = parent;
         this.applyLayer = applyLayer;
         this.maxLayerHeight = maxLayerHeight;
+        menu = new AbstractContainerMenu(null,-1) {
+
+            @Override
+            public ItemStack quickMoveStack(Player player, int i) {
+                return null;
+            }
+
+            @Override
+            public boolean stillValid(Player player) {
+                return false;
+            }
+        };
         for (int i = 0; i < layerSelectionGrid.getContainerSize(); i++) {
-            slots.add(new LegacySlotWrapper(layerSelectionGrid,i,23 + i % 10 * 27, 24 + i / 10 * 27){
+            menu.slots.add(new LegacySlotWrapper(layerSelectionGrid,i,23 + i % 10 * 27, 24 + i / 10 * 27){
                 public int getWidth() {
                     return 27;
                 }
@@ -132,7 +148,7 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen {
         return super.mouseDragged(d, e, i, f, g);
     }
 
-    public void setHoveredSlot(LegacySlotWrapper hoveredSlot) {
+    public void setHoveredSlot(Slot hoveredSlot) {
         this.hoveredSlot = hoveredSlot;
     }
 
@@ -140,7 +156,7 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen {
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
         setHoveredSlot(null);
-        slots.forEach(s-> {
+        menu.slots.forEach(s-> {
             LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(panel.x, panel.y, s);
             if (!s.getItem().isEmpty())
                 holder.itemIcon = s.getItem();
@@ -190,4 +206,18 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen {
         guiGraphics.pose().popPose();
     }
 
+    @Override
+    public AbstractContainerMenu getMenu() {
+        return menu;
+    }
+
+    @Override
+    public ScreenRectangle getMenuRectangle() {
+        return new ScreenRectangle(panel.x,panel.y,panel.width,panel.height);
+    }
+
+    @Override
+    public Slot getHoveredSlot() {
+        return hoveredSlot;
+    }
 }
