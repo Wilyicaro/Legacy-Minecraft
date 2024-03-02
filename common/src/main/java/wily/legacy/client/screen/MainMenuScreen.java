@@ -1,17 +1,17 @@
 package wily.legacy.client.screen;
 
-import com.mojang.authlib.minecraft.BanDetails;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
-import com.mojang.realmsclient.RealmsMainScreen;
-import com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.MultiLineLabel;
+import net.minecraft.client.gui.components.SplashRenderer;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.ConfirmScreen;
@@ -35,36 +35,21 @@ public class MainMenuScreen extends RenderableVListScreen {
     private static final Logger LOGGER = LogUtils.getLogger();
     @Nullable
     private SplashRenderer splash;
-    @Nullable
-    private RealmsNotificationsScreen realmsNotificationsScreen;
     private final boolean fading;
     private long fadeInStart;
     @Nullable
     private WarningLabel warningLabel;
 
-    protected final boolean secondButtonActive;
-
     public MainMenuScreen(boolean bl) {
         super(Component.translatable("narrator.screen.title"), b->{});
         this.fading = bl;
         minecraft = Minecraft.getInstance();
-        secondButtonActive = minecraft.isDemo() ? createDemoMenuOptions() : this.createNormalMenuOptions();
+        if (minecraft.isDemo()) createDemoMenuOptions();
+        else this.createNormalMenuOptions();
         renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.mods"), () -> new ModsScreen(this)).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("options.language"), () -> new LegacyLanguageScreen(this, this.minecraft.getLanguageManager())).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("menu.options"), () -> new HelpOptionsScreen(this)).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> this.minecraft.stop()).build());
-    }
-
-    private boolean realmsNotificationsEnabled() {
-        return this.realmsNotificationsScreen != null;
-    }
-
-    public void tick() {
-        if (this.realmsNotificationsEnabled()) {
-            this.realmsNotificationsScreen.tick();
-        }
-
-        this.minecraft.getRealms32BitWarningStatus().showRealms32BitWarningIfNeeded(this);
     }
 
     public boolean isPauseScreen() {
@@ -82,50 +67,19 @@ public class MainMenuScreen extends RenderableVListScreen {
         int l = this.height / 4 + 48;
 
         super.init();
-        if (children().get(1) instanceof  Button b) b.active = secondButtonActive;
-        if (this.realmsNotificationsScreen == null) {
-            this.realmsNotificationsScreen = new RealmsNotificationsScreen();
-        }
-
-        if (this.realmsNotificationsEnabled()) {
-            this.realmsNotificationsScreen.init(this.minecraft, this.width, this.height);
-        }
 
         if (!this.minecraft.is64Bit()) {
             this.warningLabel = new WarningLabel(this.font, MultiLineLabel.create(this.font, Component.translatable("title.32bit.deprecation"), 350, 2), this.width / 2, l - 24);
         }
     }
 
-    private boolean createNormalMenuOptions() {
+    private void createNormalMenuOptions() {
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.play_game"), (button) -> {
             this.minecraft.setScreen(new PlayGameScreen(this));
         }).build());
-        Component component = this.getMultiplayerDisabledReason();
-        Tooltip tooltip = component != null ? Tooltip.create(component) : null;
-        renderableVList.addRenderable(Button.builder(Component.translatable("menu.online"), (button) -> {
-            this.realmsButtonClicked();
-        }).tooltip(tooltip).build());
-        return component == null;
-
     }
 
-    @Nullable
-    private Component getMultiplayerDisabledReason() {
-        if (this.minecraft.allowsMultiplayer()) {
-            return null;
-        } else if (this.minecraft.isNameBanned()) {
-            return Component.translatable("title.multiplayer.disabled.banned.name");
-        } else {
-            BanDetails banDetails = this.minecraft.multiplayerBan();
-            if (banDetails != null) {
-                return banDetails.expires() != null ? Component.translatable("title.multiplayer.disabled.banned.temporary") : Component.translatable("title.multiplayer.disabled.banned.permanent");
-            } else {
-                return Component.translatable("title.multiplayer.disabled");
-            }
-        }
-    }
-
-    private boolean createDemoMenuOptions() {
+    private void createDemoMenuOptions() {
         boolean bl = this.checkDemoWorldPresence();
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.playdemo"), (button) -> {
             if (bl) {
@@ -135,7 +89,8 @@ public class MainMenuScreen extends RenderableVListScreen {
             }
 
         }).build());
-        renderableVList.addRenderable(Button.builder(Component.translatable("menu.resetdemo"), (button) -> {
+        Button secondButton;
+        renderableVList.addRenderable(secondButton = Button.builder(Component.translatable("menu.resetdemo"), (button) -> {
             LevelStorageSource levelStorageSource = this.minecraft.getLevelSource();
 
             try {
@@ -156,14 +111,16 @@ public class MainMenuScreen extends RenderableVListScreen {
                     throw var7;
                 }
 
-                levelStorageAccess.close();
+                if (levelStorageAccess != null) {
+                    levelStorageAccess.close();
+                }
             } catch (IOException var8) {
                 SystemToast.onWorldAccessFailure(this.minecraft, "Demo_World");
                 LOGGER.warn("Failed to access demo world", var8);
             }
 
         }).build());
-        return bl;
+        secondButton.active = bl;
     }
 
     private boolean checkDemoWorldPresence() {
@@ -197,9 +154,6 @@ public class MainMenuScreen extends RenderableVListScreen {
         }
     }
 
-    private void realmsButtonClicked() {
-        this.minecraft.setScreen(new RealmsMainScreen(this));
-    }
 
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         if (this.fadeInStart == 0L && this.fading) {
@@ -233,39 +187,12 @@ public class MainMenuScreen extends RenderableVListScreen {
             }
 
             super.render(guiGraphics, i, j, f);
-            if (this.realmsNotificationsEnabled() && h >= 1.0F) {
-                RenderSystem.enableDepthTest();
-                this.realmsNotificationsScreen.render(guiGraphics, i, j, f);
-            }
-
         }
     }
 
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
     }
 
-    public boolean mouseClicked(double d, double e, int i) {
-        if (super.mouseClicked(d, e, i)) {
-            return true;
-        } else {
-            return this.realmsNotificationsEnabled() && this.realmsNotificationsScreen.mouseClicked(d, e, i);
-        }
-    }
-
-    public void removed() {
-        if (this.realmsNotificationsScreen != null) {
-            this.realmsNotificationsScreen.removed();
-        }
-
-    }
-
-    public void added() {
-        super.added();
-        if (this.realmsNotificationsScreen != null) {
-            this.realmsNotificationsScreen.added();
-        }
-
-    }
 
     private void confirmDemo(boolean bl) {
         if (bl) {

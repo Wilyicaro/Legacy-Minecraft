@@ -142,6 +142,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
         if (resetNether) deleteLevelDimension(access,Level.NETHER);
         if (resetEnd) deleteLevelDimension(access,Level.END);
         LegacyMinecraftClient.enterWorldGameType = gameType;
+        resourcePackSelector.applyChanges(true);
         loadWorld(this,minecraft,summary);
         if (minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer().isReady()){
             minecraft.getSingleplayerServer().setDefaultGameType(gameType);
@@ -152,12 +153,8 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
                 this.minecraft.gui.getChat().addMessage(component);
             }
             ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setAllowCommands(allowCheats);
-            if (resourcePackSelector.hasChanged()) ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setSelectedResourcePacks(resourcePackSelector.selectedPacks.stream().map(Pack::getId).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
-                Collections.reverse(l);
-                return l;
-            })));
+            if (resourcePackSelector.hasChanged()) ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setSelectedResourcePacks(resourcePackSelector.getSelectedIds());
         }
-        resourcePackSelector.applyChanges(true);
     }
 
 

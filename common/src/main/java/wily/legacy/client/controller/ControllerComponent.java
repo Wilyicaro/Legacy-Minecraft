@@ -15,6 +15,7 @@ import java.util.function.Function;
 
 import static wily.legacy.client.controller.ControllerHandler.DEFAULT_CONTROLLER_BUTTONS_BY_KEY;
 
+
 public enum ControllerComponent {
     DOWN_BUTTON(GLFW.GLFW_GAMEPAD_BUTTON_A, InputConstants.KEY_SPACE),
     RIGHT_BUTTON(GLFW.GLFW_GAMEPAD_BUTTON_B, InputConstants.KEY_Q),
@@ -70,7 +71,7 @@ public enum ControllerComponent {
         Minecraft minecraft = Minecraft.getInstance();
         stick.update(stick.getMagnitude() > 0.2);
         if (!minecraft.mouseHandler.isMouseGrabbed() || !minecraft.isWindowActive() || !stick.pressed || minecraft.player == null) return;
-        double f = Math.pow(minecraft.options.sensitivity().get() * (double)0.6f + (double)0.2f,3) * minecraft.getDeltaFrameTime() * 400;
+        double f = Math.pow(minecraft.options.sensitivity().get() * (double)0.6f + (double)0.2f,3) * 14;
         minecraft.player.turn( stick.x * f,stick.y * f * (minecraft.options.invertYMouse().get() ? -1 : 1));
     }
     public static void init() {

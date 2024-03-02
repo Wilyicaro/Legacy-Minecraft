@@ -17,6 +17,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.material.FlowingFluid;
+import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.inventory.LegacySlotWrapper;
 import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
@@ -41,6 +42,7 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
 
     public FlatWorldLayerSelector(Screen parent, Consumer<FlatWorldLayerSelector> applyLayer, int maxLayerHeight, Component component) {
         super(325,245, component);
+        LegacyMinecraftClient.controllerHandler.enableCursor();
         this.parent = parent;
         this.applyLayer = applyLayer;
         this.maxLayerHeight = maxLayerHeight;

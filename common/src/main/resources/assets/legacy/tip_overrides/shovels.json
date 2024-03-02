@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "item": "#shovels",
+    "tip": "item.minecraft.shovel.tip"
+  }
+}

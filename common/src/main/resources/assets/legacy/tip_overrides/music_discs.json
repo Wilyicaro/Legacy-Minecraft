@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "item": "#minecraft:creeper_drop_music_discs",
+    "tip": "item.minecraft.music_disc_generic.tip"
+  }
+}

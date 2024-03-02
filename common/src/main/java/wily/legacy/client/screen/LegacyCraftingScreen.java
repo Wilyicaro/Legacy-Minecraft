@@ -19,6 +19,7 @@ import wily.legacy.LegacyMinecraft;
 import wily.legacy.client.LegacyCraftingTabListing;
 import wily.legacy.client.LegacySprites;
 import wily.legacy.client.Offset;
+import wily.legacy.client.controller.ComponentState;
 import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.inventory.LegacyCraftingMenu;
@@ -376,18 +377,22 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     @Override
     public boolean keyPressed(int i, int j, int k) {
         tabList.controlTab(i);
-        if (page.max > 0 && (hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed) && (i == 262 || i == 263)){
-            int oldPage = page.get();
-            page.add(i == 262 ? 1 : -1);
-            if (oldPage != page.get()) {
-                tabList.selectedTab = -1;
-                tabList.tabButtons.get(0).onPress();
-                return true;
-            }
-        }
+        if (hasShiftDown()) controlPage(i == 262 , i == 263);
         return super.keyPressed(i, j, k);
     }
-
+    protected void controlPage(boolean left, boolean right){
+        if ((left|| right) && page.max > 0){
+            int lastPage = page.get();
+            page.add( left ? 1 : -1);
+            if (lastPage != page.get())
+                rebuildWidgets();
+        }
+    }
+    @Override
+    protected void containerTick() {
+        super.containerTick();
+        if (ControllerComponent.RIGHT_STICK.componentState instanceof ComponentState.Stick s && s.pressed) controlPage(s.x > 0 && s.x > Math.abs(s.y),s.x < 0 && -s.x > Math.abs(s.y));
+    }
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBackground(guiGraphics, i, j, f);

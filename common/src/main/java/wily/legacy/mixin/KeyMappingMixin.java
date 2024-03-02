@@ -1,7 +1,6 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.studiohartman.jamepad.ControllerButton;
 import net.minecraft.client.KeyMapping;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,8 +11,6 @@ import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.client.controller.ControllerHandler;
 import wily.legacy.client.controller.LegacyKeyMapping;
 
-import java.util.function.Function;
-
 @Mixin(KeyMapping.class)
 public abstract class KeyMappingMixin implements LegacyKeyMapping {
     @Shadow public abstract InputConstants.Key getDefaultKey();
@@ -22,7 +19,7 @@ public abstract class KeyMappingMixin implements LegacyKeyMapping {
     private ControllerComponent button;
     @Inject(method = "<init>(Ljava/lang/String;Lcom/mojang/blaze3d/platform/InputConstants$Type;ILjava/lang/String;)V",at = @At("RETURN"))
     private void init(String string, InputConstants.Type type, int i, String string2, CallbackInfo ci){
-        ControllerComponent b = ControllerHandler.DEFAULT_CONTROLLER_BUTTONS_BY_KEY.get(i);
+        ControllerComponent b = ControllerHandler.getDefaultKeyMappingComponent(i);
         setDefaultButton(b);
         setButton(b);
     }

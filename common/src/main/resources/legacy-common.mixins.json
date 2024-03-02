@@ -43,6 +43,7 @@
     "KeyboardControllerInputMixin",
     "KeyMappingMixin",
     "LegacyLoadingScreenMixin",
+    "LoadingOverlayMixin",
     "LocalPlayerMixin",
     "MinecartSoundIntanceMixin",
     "MinecraftMixin",

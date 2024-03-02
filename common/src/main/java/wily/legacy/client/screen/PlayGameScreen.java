@@ -87,6 +87,7 @@ public class PlayGameScreen extends PanelVListScreen{
                 rebuildWidgets();
             }
         }
+        if (tabList.selectedTab == 2) minecraft.getRealms32BitWarningStatus().showRealms32BitWarningIfNeeded(this);
         this.pinger.tick();
     }
 

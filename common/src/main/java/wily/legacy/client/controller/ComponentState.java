@@ -1,6 +1,5 @@
 package wily.legacy.client.controller;
 
-import net.minecraft.client.Minecraft;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
 
@@ -22,18 +21,21 @@ public class ComponentState {
         this.pressed = pressed;
     }
     public boolean canClick(){
-        return (timePressed == 0 || timePressed >= 5 * getClickDelay()) && timePressed % getClickDelay() == 0;
+        return canClick(getDefaultDelay());
+    }
+    public boolean canClick(int delay){
+        return (timePressed == 0 || timePressed >= 5 * delay) && timePressed % delay == 0;
     }
     public boolean onceClick(int timeDelay){
         int lastTimePressed = timePressed;
         if (timePressed == 0) timePressed = timeDelay;
         return lastTimePressed == 0;
     }
-    public int getClickDelay(){
-        return Math.max(1,Minecraft.getInstance().getFps() / 6);
+    public int getDefaultDelay(){
+        return 100;
     }
     public boolean onceClick(boolean block){
-        return onceClick(block ? Integer.MIN_VALUE : -(justPressed ? 5 : 1) * getClickDelay());
+        return onceClick(block ? Integer.MIN_VALUE : -(justPressed ? 5 : 1) * getDefaultDelay());
     }
     public void update(GLFWGamepadState state){
         component.updateState.accept(this,state);

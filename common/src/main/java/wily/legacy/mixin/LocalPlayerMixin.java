@@ -28,4 +28,8 @@ public abstract class LocalPlayerMixin extends LivingEntity {
     public void aiStepCrouching(LocalPlayer instance, boolean value) {
         crouching = value && !isFallFlying();
     }
+    @Redirect(method = "aiStep", at = @At(value = "FIELD",target = "Lnet/minecraft/client/player/LocalPlayer;horizontalCollision:Z"))
+    public boolean aiStepSprinting(LocalPlayer instance) {
+        return false;
+    }
 }

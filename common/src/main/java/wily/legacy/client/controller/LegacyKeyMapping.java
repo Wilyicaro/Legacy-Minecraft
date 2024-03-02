@@ -1,7 +1,6 @@
 package wily.legacy.client.controller;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.studiohartman.jamepad.ControllerButton;
 import net.minecraft.client.KeyMapping;
 
 import java.util.function.Function;

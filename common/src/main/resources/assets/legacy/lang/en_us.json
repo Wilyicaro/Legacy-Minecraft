@@ -8,6 +8,7 @@
  "legacy.menu.audio": "Audio",
  "legacy.menu.graphics": "Graphics",
  "legacy.menu.user_interface": "User Interface",
+ "legacy.menu.autoSave_message": "This game has a level autosave feature. When you see the icon above displayed, the game is saving your data.\n\nPlease do not turn off your device while this icon is on-screen.",
  "legacy.menu.reset_defaults": "Reset to Defaults",
  "legacy.menu.reset_settings": "Reset Settings",
  "legacy.menu.reset_message": "Are you sure you would like to reset your settings to their default values?",

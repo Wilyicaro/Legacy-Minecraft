@@ -8,6 +8,7 @@
   "legacy.menu.audio": "Áudio",
   "legacy.menu.graphics": "Gráficos",
   "legacy.menu.user_interface": "Interface do Usuário",
+  "legacy.menu.autoSave_message": "Este jogo tem um recurso para salvar o nível automaticamente. Quando o ícone acima for exibido, o jogo está salvando seus dados.\n\nNão desligue seu dispositivo enquanto este ícone estiver na tela.",
   "legacy.menu.reset_defaults": "Restaurar Padrões",
   "legacy.menu.reset_settings": "Restaurar Configurações",
   "legacy.menu.reset_message": "Tem certeza de que deseja redefinir suas configurações para os valores padrão?",
