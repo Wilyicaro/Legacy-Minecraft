@@ -5,6 +5,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 import com.google.common.hash.Hashing;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
@@ -18,6 +19,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.packs.PackSelectionModel;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -29,8 +31,6 @@ import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.resources.IoSupplier;
 import org.joml.Math;
 import wily.legacy.LegacyMinecraft;
-import wily.legacy.LegacyMinecraftClient;
-import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
 
@@ -46,8 +46,7 @@ import static wily.legacy.client.LegacySprites.PACK_SELECTED_SPRITE;
 
 public class PackSelector extends AbstractWidget {
     public static final ResourceLocation DEFAULT_ICON = new ResourceLocation("textures/misc/unknown_pack.png");
-    public List<Pack> availablePacks;
-    public List<Pack> selectedPacks;
+    public final PackSelectionModel model;
     private final Map<String, ResourceLocation> packIcons = Maps.newHashMap();
     private final Map<String, ResourceLocation> packBackgrounds = Maps.newHashMap();
     public final Stocker.Sizeable scrolledList;
@@ -76,7 +75,7 @@ public class PackSelector extends AbstractWidget {
         this.hasTooltip = hasTooltip;
         minecraft = Minecraft.getInstance();
         this.packRepository = packRepository;
-        updatePacks();
+        model = new PackSelectionModel(()->{},this::getPackIcon,packRepository,r-> reloadChanges.accept(this));
         scrolledList = new Stocker.Sizeable(0);
         List<Pack> displayPacks = getDisplayPacks();
         int s = displayPacks.size();
@@ -85,13 +84,8 @@ public class PackSelector extends AbstractWidget {
         setSelectedPack(0);
         updateTooltip();
     }
-    public void updatePacks(){
-        selectedPacks = new ArrayList<>(packRepository.getSelectedPacks());
-        Collections.reverse(selectedPacks);
-        availablePacks = new ArrayList<>(packRepository.getAvailablePacks().stream().filter(p->!selectedPacks.contains(p)).toList());
-    }
     public List<Pack> getDisplayPacks(){
-        return Stream.concat(selectedPacks.stream(),availablePacks.stream()).toList();
+        return Stream.concat(model.selected.stream(),model.unselected.stream()).toList();
     }
     public void updateTooltip(){
         if (hasTooltip) setTooltip(Tooltip.create(selectedPack.getDescription(), selectedPack.getTitle()));
@@ -114,12 +108,12 @@ public class PackSelector extends AbstractWidget {
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (isHoveredOrFocused()) {
-            if (CommonInputs.selected(i)) {
-                tryChangePackState(selectedIndex);
+            if (i == InputConstants.KEY_X){
+                openPackSelectionScreen();
                 return true;
             }
-            if (i == 88) {
-                openPackSelectionScreen();
+            if (CommonInputs.selected(i)) {
+                tryChangePackState(selectedIndex);
                 return true;
             }
             if (i == 263) {
@@ -148,29 +142,28 @@ public class PackSelector extends AbstractWidget {
     public void tryChangePackState(int index){
         Pack p = getDisplayPacks().get(index);
         if (p.isRequired()) return;
-        if (selectedPacks.contains(p)){
-            selectedPacks.remove(p);
-            availablePacks.add(p);
+        if (model.selected.contains(p)){
+            model.selected.remove(p);
+            model.unselected.add(p);
         }else{
-            availablePacks.remove(p);
-            selectedPacks.add(0,p);
+            model.unselected.remove(p);
+            model.selected.add(0,p);
         }
     }
     public List<String> getSelectedIds(){
-        return selectedPacks.stream().map(Pack::getId).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
+        return model.selected.stream().map(Pack::getId).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
             Collections.reverse(l);
             return l;
         }));
     }
     public boolean hasChanged(){
-        return !getSelectedIds().equals(packRepository.getSelectedIds());
+        List<Pack> displayPacks = getDisplayPacks();
+        return !getSelectedIds().equals(packRepository.getSelectedIds().stream().filter(s-> displayPacks.contains(packRepository.getPack(s))).toList());
     }
     public void applyChanges(boolean reload){
-        List<String> list = getSelectedIds();
-        if (!list.equals(packRepository.getSelectedIds())) {
-            packRepository.setSelected(list);
-            if (reload)
-                reloadChanges.accept(this);
+        if (hasChanged()) {
+            if (reload) model.commit();
+            else packRepository.setSelected(getSelectedIds());
         }
     }
     public static void reloadResourcesChanges(PackSelector selector){
@@ -182,7 +175,7 @@ public class PackSelector extends AbstractWidget {
             applyChanges(false);
             minecraft.setScreen(new PackSelectionScreen(packRepository, p -> {
                 reloadChanges.accept(this);
-                updatePacks();
+                model.findNewPacks();
                 minecraft.setScreen(screen);
             }, packPath, getMessage()));
         }
@@ -234,7 +227,7 @@ public class PackSelector extends AbstractWidget {
         for (int index = 0; index < displayPacks.size(); index++) {
             if (visibleCount>=getMaxPacks()) break;
             guiGraphics.blit(getPackIcon(displayPacks.get(scrolledList.get() + index)), getX() + 21 + 30 * index,getY() + font.lineHeight + 4,0.0f, 0.0f, 28, 28, 28, 28);
-            if (selectedPacks.contains(displayPacks.get(scrolledList.get() + index)))  guiGraphics.blitSprite(PACK_SELECTED_SPRITE, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
+            if (model.selected.contains(displayPacks.get(scrolledList.get() + index)))  guiGraphics.blitSprite(PACK_SELECTED_SPRITE, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
             if (scrolledList.get() + index == selectedIndex)
                 guiGraphics.blitSprite(PACK_HIGHLIGHTED_SPRITE, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
             visibleCount++;

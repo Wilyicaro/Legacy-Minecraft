@@ -23,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.client.LegacyCreativeTabListing;
 import wily.legacy.client.Offset;
+import wily.legacy.client.controller.ComponentState;
 import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.inventory.LegacySlotWrapper;
 import wily.legacy.util.PagedList;
@@ -183,21 +184,29 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
             }
         }
     }
+    protected void controlPage(boolean left, boolean right){
+        if ((left|| right) && page.max > 0){
+            int lastPage = page.get();
+            page.add( left ? 1 : -1);
+            if (lastPage != page.get())
+                rebuildWidgets();
+        }
+    }
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
         tabList.controlTab(i);
-        if ((i == 262 || i == 263) && page.max > 0 && (hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed)){
-            int lastPage = page.get();
-            page.add( i == 262 ? 1 : -1);
-            if (lastPage != page.get())
-                rebuildWidgets();
-        }
+        if (hasShiftDown()) controlPage(i == 262 , i == 263);
         if (i == InputConstants.KEY_X) {
             for (int n = 36; n < 45; ++n)
                 this.minecraft.gameMode.handleCreativeModeItemAdd(ItemStack.EMPTY, n);
         }
         return super.keyPressed(i, j, k);
+    }
+    @Override
+    protected void containerTick() {
+        super.containerTick();
+        if (ControllerComponent.RIGHT_STICK.componentState instanceof ComponentState.Stick s && s.pressed) controlPage(s.x > 0 && s.x > Math.abs(s.y),s.x < 0 && -s.x > Math.abs(s.y));
     }
     protected void slotClicked(@Nullable Slot slot, int i, int j, ClickType clickType) {
         if(slot != null) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);

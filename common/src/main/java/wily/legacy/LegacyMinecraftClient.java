@@ -137,16 +137,7 @@ public class LegacyMinecraftClient {
         KeyMappingRegistry.register(keyHostOptions = new KeyMapping( MOD_ID +".key.host_options", InputConstants.KEY_H, "key.categories.misc"));
         knownBlocks = new KnownListing<>(Registries.BLOCK,Minecraft.getInstance().gameDirectory.toPath());
         knownEntities = new KnownListing<>(Registries.ENTITY_TYPE,Minecraft.getInstance().gameDirectory.toPath());
-    }
-    public static void onClientPlayerInfoChange(){
-        Minecraft minecraft = Minecraft.getInstance();
-        if (!minecraft.hasSingleplayerServer() && minecraft.level != null && minecraft.player != null)
-            LegacyMinecraft.NETWORK.sendToServer(new ServerDisplayInfoSync(0));
-        if (minecraft.screen instanceof HostOptionsScreen s) s.reloadPlayerButtons();
-    }
-    public static void enqueueInit() {
-        MenuRegistry.registerScreenFactory(LegacyMenuTypes.CRAFTING_PANEL_MENU.get(),LegacyCraftingScreen::craftingScreen);
-        MenuRegistry.registerScreenFactory(LegacyMenuTypes.PLAYER_CRAFTING_PANEL_MENU.get(),LegacyCraftingScreen::playerCraftingScreen);
+
         ClientGuiEvent.SET_SCREEN.register((screen) -> {
             Minecraft minecraft = Minecraft.getInstance();
             if (screen instanceof TitleScreen)
@@ -195,10 +186,10 @@ public class LegacyMinecraftClient {
         });
         ClientPlayerEvent.CLIENT_PLAYER_JOIN.register(p-> {
             Minecraft minecraft = Minecraft.getInstance();
-        if (enterWorldGameType != null && minecraft.hasSingleplayerServer()){
-            minecraft.getSingleplayerServer().getPlayerList().getPlayer(p.getUUID()).setGameMode(enterWorldGameType);
-            enterWorldGameType = null;
-        }
+            if (enterWorldGameType != null && minecraft.hasSingleplayerServer()){
+                minecraft.getSingleplayerServer().getPlayerList().getPlayer(p.getUUID()).setGameMode(enterWorldGameType);
+                enterWorldGameType = null;
+            }
         });
         ClientTickEvent.CLIENT_LEVEL_POST.register((level)->{
             Minecraft minecraft = Minecraft.getInstance();
@@ -218,6 +209,17 @@ public class LegacyMinecraftClient {
                 }
             }
         });
+    }
+    public static void onClientPlayerInfoChange(){
+        Minecraft minecraft = Minecraft.getInstance();
+        if (!minecraft.hasSingleplayerServer() && minecraft.level != null && minecraft.player != null)
+            LegacyMinecraft.NETWORK.sendToServer(new ServerDisplayInfoSync(0));
+        if (minecraft.screen instanceof HostOptionsScreen s) s.reloadPlayerButtons();
+
+    }
+    public static void enqueueInit() {
+        MenuRegistry.registerScreenFactory(LegacyMenuTypes.CRAFTING_PANEL_MENU.get(),LegacyCraftingScreen::craftingScreen);
+        MenuRegistry.registerScreenFactory(LegacyMenuTypes.PLAYER_CRAFTING_PANEL_MENU.get(),LegacyCraftingScreen::playerCraftingScreen);
 
     }
 

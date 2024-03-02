@@ -5,6 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
@@ -28,8 +29,8 @@ public class CreationList extends RenderableVList{
     public CreationList() {
         layoutSpacing(l->0);
         minecraft = Minecraft.getInstance();
-        addCreationButton(this,new ResourceLocation(LegacyMinecraft.MOD_ID,"creation_list/create_world"),Component.translatable("legacy.menu.create_world"),c-> CreateWorldScreen.openFresh(this.minecraft, screen));
-        LegacyWorldTemplate.list.forEach(t-> addCreationButton(this,t.icon(),t.buttonName(), c-> {
+        addIconButton(this,new ResourceLocation(LegacyMinecraft.MOD_ID,"creation_list/create_world"),Component.translatable("legacy.menu.create_world"), c-> CreateWorldScreen.openFresh(this.minecraft, screen));
+        LegacyWorldTemplate.list.forEach(t-> addIconButton(this,t.icon(),t.buttonName(), c-> {
             try {
                 String name = LegacyMinecraftClient.importSaveFile(minecraft,minecraft.getResourceManager().getResourceOrThrow(t.worldTemplate()).open(),t.folderName());
                 if (t.directJoin()) minecraft.createWorldOpenFlows().checkForBackupAndLoad(name, ()-> minecraft.setScreen(screen));
@@ -49,9 +50,12 @@ public class CreationList extends RenderableVList{
         if (screen instanceof PlayGameScreen s) this.screen = s;
         super.init(screen, leftPos, topPos, listWidth, listHeight);
     }
-
-    public static void addCreationButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress){
-        list.addRenderable(new AbstractButton(0,0,270,30,message) {
+    public static void addIconButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress){
+        addIconButton(list,iconSprite,message,onPress,null);
+    }
+    public static void addIconButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress, Tooltip tooltip){
+        AbstractButton button;
+        list.addRenderable(button = new AbstractButton(0,0,270,30,message) {
             @Override
             protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                 super.renderWidget(guiGraphics, i, j, f);
@@ -78,6 +82,7 @@ public class CreationList extends RenderableVList{
                 defaultButtonNarrationText(narrationElementOutput);
             }
         });
+        button.setTooltip(tooltip);
     }
 
     public PlayGameScreen getScreen() {

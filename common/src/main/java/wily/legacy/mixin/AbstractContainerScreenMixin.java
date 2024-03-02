@@ -72,7 +72,9 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
             cir.setReturnValue(true);
         }
         if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && ScreenUtil.hasTip(hoveredSlot.getItem())) {
-            if (minecraft.getToasts().getToast(LegacyTip.class, Toast.NO_TOKEN) == null) ScreenUtil.addTip(hoveredSlot.getItem());
+            LegacyTip oldTip = minecraft.getToasts().getToast(LegacyTip.class, Toast.NO_TOKEN);
+            if (oldTip == null) ScreenUtil.addTip(hoveredSlot.getItem());
+            else oldTip.tip(ScreenUtil.getTip(hoveredSlot.getItem())).autoHeight().title(Component.translatable(hoveredSlot.getItem().getDescriptionId())).itemStack(hoveredSlot.getItem());
         }
     }
     @Inject(method = "slotClicked", at = @At("HEAD"))

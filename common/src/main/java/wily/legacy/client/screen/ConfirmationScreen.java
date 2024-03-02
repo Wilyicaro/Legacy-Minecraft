@@ -14,12 +14,15 @@ public class ConfirmationScreen extends PanelBackgroundScreen{
     protected final MultiLineLabel messageLabel;
     protected Predicate<Button> okAction;
     public Button okButton;
+    protected int messageYOffset;
+    protected boolean transparentBackground = true;
 
     public ConfirmationScreen(Screen parent, int imageWidth, int imageHeight, Component title, MultiLineLabel messageLabel, Predicate<Button> okAction) {
         super(imageWidth, imageHeight, title);
         this.messageLabel = messageLabel;
         this.okAction = okAction;
         this.parent = parent;
+        messageYOffset = title.getString().isEmpty() ? 15 : 35;
     }
     public ConfirmationScreen(Screen parent, int imageWidth, int imageHeight, Component title, Component message, Consumer<Button> okAction) {
         this(parent, imageWidth, imageHeight, title, MultiLineLabel.create(Minecraft.getInstance().font,message,imageWidth - 30), b-> {okAction.accept(b);return false;});
@@ -42,11 +45,11 @@ public class ConfirmationScreen extends PanelBackgroundScreen{
     protected void init() {
         super.init();
         initButtons();
-        parent.resize(minecraft,width,height);
+        parent.init(minecraft,width,height);
     }
     protected void initButtons(){
-        addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b-> this.onClose()).bounds(panel.x + 15, panel.y + panel.height - 52,200,20).build());
-        okButton = addRenderableWidget(Button.builder(Component.translatable("gui.ok"),b-> {if (okAction.test(b)) onClose();}).bounds(panel.x + 15, panel.y + panel.height - 30,200,20).build());
+        addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b-> this.onClose()).bounds(panel.x + (panel.width - 200) / 2, panel.y + panel.height - 52,200,20).build());
+        okButton = addRenderableWidget(Button.builder(Component.translatable("gui.ok"),b-> {if (okAction.test(b)) onClose();}).bounds(panel.x + (panel.width - 200) / 2, panel.y + panel.height - 30,200,20).build());
     }
 
     @Override
@@ -54,13 +57,12 @@ public class ConfirmationScreen extends PanelBackgroundScreen{
         guiGraphics.pose().translate(0,0,-800);
         parent.render(guiGraphics,0,0,f);
         guiGraphics.pose().translate(0,0,800);
-        renderTransparentBackground(guiGraphics);
+        if (transparentBackground) renderTransparentBackground(guiGraphics);
     }
-
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
         guiGraphics.drawString(font,title,panel.x+ 15,panel.y+ 15, 4210752,false);
-        messageLabel.renderLeftAlignedNoShadow(guiGraphics,panel.x + 15, panel.y + 35, 12, 4210752);
+        messageLabel.renderLeftAlignedNoShadow(guiGraphics,panel.x + 15, panel.y + messageYOffset, 12, 4210752);
     }
 }

@@ -80,7 +80,7 @@ public class ScreenUtil {
         graphics.blitSprite(new ResourceLocation(LegacyMinecraft.MOD_ID,"hud/save_chest"),x * 2,y * 2,48,48);
         graphics.pose().popPose();
         graphics.pose().pushPose();
-        double heightAnim = (Util.getMillis() / 80D) % 11;
+        double heightAnim = (Util.getMillis() / 50D) % 11;
         graphics.pose().translate(x + 5.5,y - 8 - (heightAnim > 5 ? 10 - heightAnim : heightAnim),0);
         graphics.blitSprite(new ResourceLocation(LegacyMinecraft.MOD_ID,"hud/save_arrow"),0,0,13,16);
         graphics.pose().popPose();

@@ -30,7 +30,35 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
             if (movePointerToSlotIn(positive,horizontal,horizontal ? width : height, i, (int)pointerX, (int)pointerY,part)) return;
         for (int i = 0; i >= (horizontal ? -pointerY : -pointerX); i-=part)
             if (movePointerToSlotIn(positive,horizontal,horizontal ? width : height, i, (int)pointerX, (int)pointerY,part)) return;
+        for (int i = 0; i < (horizontal ? height - pointerY : width - pointerX); i+=part)
+            if (movePointerToSlotInReverse(positive,horizontal,horizontal ? width : height, i, (int)pointerX, (int)pointerY,part)) return;
+        for (int i = 0; i >= (horizontal ? -pointerY : -pointerX); i-=part)
+            if (movePointerToSlotInReverse(positive,horizontal,horizontal ? width : height, i, (int)pointerX, (int)pointerY,part)) return;
 
+    }
+    default boolean movePointerToSlotIn(boolean positive, boolean horizontal, int size, int pos, int pointerX, int pointerY, int part){
+        if (positive) {
+            for (int j = part * 2; j < size - (horizontal ? pointerX : pointerY); j+=part) if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)),false)) return true;
+        } else {
+            for (int j = -part * 2; j >= -(horizontal ? pointerX : pointerY); j-=part) if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)),false)) return true;
+        } return false;
+    }
+    default boolean movePointerToSlotInReverse(boolean positive, boolean horizontal, int size, int pos, int pointerX, int pointerY, int part){
+        if (positive) {
+            for (int j = -(horizontal ? pointerX : pointerY) + part * 2; j < 0; j+=part) if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)),false)) return true;
+        } else {
+            for (int j = size -(horizontal ? pointerX : pointerY) - part * 2; j >= 0; j-=part) if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)),false)) return true;
+        } return false;
+    }
+    default boolean movePointerToSlot(Slot s){
+        return movePointerToSlot(s,true);
+    }
+    default boolean movePointerToSlot(Slot s, boolean allowHovered){
+        if (s == null || (s == getHoveredSlot() && !allowHovered) || !s.isActive()) return false;
+        Minecraft minecraft = Minecraft.getInstance();
+        LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(getMenuRectangle().left(), getMenuRectangle().top(), s);
+        LegacyMinecraftClient.controllerHandler.setPointerPos(holder.getMiddleX() * ((double)minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth()), holder.getMiddleY() * ((double)minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()));
+        return true;
     }
     default void movePointerToNextSlot(){
         if (getMenu().slots.isEmpty() || LegacyMinecraftClient.controllerHandler.isCursorDisabled || getHoveredSlot() == null) return;
@@ -43,25 +71,6 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
             double deltaY = pointerY - holder.getMiddleY();
             return (int) (deltaX *deltaX + deltaY * deltaY);
         })).ifPresent(this::movePointerToSlot);
-    }
-    default boolean movePointerToSlotIn(boolean positive, boolean horizontal, int size, int pos, int pointerX, int pointerY, int part){
-        if (positive) {
-            for (int j = part; j < size - (horizontal ? pointerX : pointerY); j+=part) if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)),false)) return true;
-            for (int j = -(horizontal ? pointerX : pointerY); j < 0; j+=part) if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)),false)) return true;
-        } else {
-            for (int j = -part; j >= -(horizontal ? pointerX : pointerY); j-=part) if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)),false)) return true;
-            for (int j = size -(horizontal ? pointerX : pointerY); j >= 0; j-=part) if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)),false)) return true;
-        } return false;
-    }
-    default boolean movePointerToSlot(Slot s){
-        return movePointerToSlot(s,true);
-    }
-    default boolean movePointerToSlot(Slot s, boolean allowHovered){
-        if (s == null || (s == getHoveredSlot() && !allowHovered) || !s.isActive()) return false;
-        Minecraft minecraft = Minecraft.getInstance();
-        LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(getMenuRectangle().left(), getMenuRectangle().top(), s);
-        GLFW.glfwSetCursorPos(minecraft.getWindow().getWindow(), holder.getMiddleX() * ((double)minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth()), holder.getMiddleY() * ((double)minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()));
-        return true;
     }
     ScreenRectangle getMenuRectangle();
     Slot getHoveredSlot();

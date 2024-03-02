@@ -54,7 +54,7 @@ public class InventoryMenuMixin {
                 return getItem().isEmpty() ? new ResourceLocation(LegacyMinecraft.MOD_ID,"container/"+ SLOT_IDS[i].getName()+ "_slot") : null;
             }
             public Offset getOffset() {
-                return hasClassicCrafting() ? null : EQUIP_SLOT_OFFSET;
+                return hasClassicCrafting() ? Offset.ZERO : EQUIP_SLOT_OFFSET;
             }
         };
     }
@@ -70,7 +70,7 @@ public class InventoryMenuMixin {
     private Slot addSlotSixth(Slot originalSlot){
         return new LegacySlotWrapper(originalSlot, originalSlot.container,originalSlot.getContainerSlot(),111, 77){
             public Offset getOffset() {
-                return hasClassicCrafting() ? null : EQUIP_SLOT_OFFSET;
+                return hasClassicCrafting() ? Offset.ZERO : EQUIP_SLOT_OFFSET;
             }
             public ResourceLocation getIconSprite() {
                 return getItem().isEmpty() ? SHIELD_SLOT_SPRITE : null;

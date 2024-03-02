@@ -8,19 +8,16 @@ import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.PotionItem;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.SimpleLayoutRenderable;
 import wily.legacy.util.ScreenUtil;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
 
-    private final MultiLineLabel multiLineLabel;
+    private MultiLineLabel tipLabel;
     public Visibility visibility = Visibility.SHOW;
 
     public Component title = Component.empty();
@@ -38,12 +35,11 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
     }
     public LegacyTip(Component tip, int width, int height){
         super(width, height);
-        multiLineLabel = MultiLineLabel.create(minecraft.font,tip,width-26);
-        disappearTime = tip.getString().toCharArray().length * 80L;
+        tip(tip);
     }
     public LegacyTip(Component title, Component tip){
         this(tip, 250,0);
-        height = 26 + multiLineLabel.getLineCount() * 12;
+        autoHeight();
         title(title);
         setY(25);
         canRemove(()-> initScreen != minecraft.screen);
@@ -57,22 +53,31 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
         return this;
     }
     public LegacyTip title(Component title){
-        if (!title.getString().isEmpty()) height += 12;
+        height += 12;
         this.title = title;
         return this;
     }
+    public LegacyTip autoHeight(){
+        height = 26 + tipLabel.getLineCount() * 12;
+        return this;
+    }
+    public LegacyTip tip(Component tip){
+        tipLabel = MultiLineLabel.create(minecraft.font,tip,width-26);
+        return disappearTime(tip.getString().toCharArray().length * 80L);
+    }
     public LegacyTip disappearTime(long disappearTime){
+        createdTime = Util.getMillis();
         this.disappearTime = disappearTime;
         return this;
     }
     public LegacyTip itemStack(ItemStack itemStack){
-        if (itemStack != null) height += 32;
+        height += 32;
         if (holder == null){
             holder = new LegacyIconHolder(32,32);
-            holder.setX((width - 32 )/ 2);
-            holder.setY(13 + (multiLineLabel.getLineCount() + (title.getString().isEmpty() ? 0 : 1)) * 12);
             holder.allowItemDecorations = false;
         }
+        holder.setX((width - 32 )/ 2);
+        holder.setY(13 + (tipLabel.getLineCount() + (title.getString().isEmpty() ? 0 : 1)) * 12);
         holder.itemIcon = itemStack;
         return this;
     }
@@ -87,7 +92,6 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
 
     @Override
     public Visibility render(GuiGraphics guiGraphics, ToastComponent toastComponent, long l) {
-        if (l >= disappearTime) visibility = Visibility.HIDE;
         renderTip(guiGraphics,0,0,0);
         return visibility;
     }
@@ -99,19 +103,18 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        if (Util.getMillis() - createdTime >= disappearTime) visibility = Visibility.HIDE;
         renderTip(guiGraphics, i, j, f);
     }
     public void renderTip(GuiGraphics guiGraphics, int i, int j, float f) {
-        if (canRemove.get()) visibility = Visibility.HIDE;
+        if (canRemove.get() || Util.getMillis() - createdTime >= disappearTime) visibility = Visibility.HIDE;
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(getX(),getY(),0);
         ScreenUtil.renderPointerPanel(guiGraphics,0,0,getWidth(),getHeight());
         if (!title.getString().isEmpty()) {
             guiGraphics.drawString(minecraft.font,title,13,13,0xFFFFFF);
-            multiLineLabel.renderLeftAlignedNoShadow(guiGraphics,13,25, 12,0xFFFFFF);
+            tipLabel.renderLeftAlignedNoShadow(guiGraphics,13,25, 12,0xFFFFFF);
         }else
-            multiLineLabel.renderCentered(guiGraphics,width / 2,13);
+            tipLabel.renderCentered(guiGraphics,width / 2,13);
         if (holder != null) holder.render(guiGraphics,i,j,f);
         guiGraphics.pose().popPose();
     }

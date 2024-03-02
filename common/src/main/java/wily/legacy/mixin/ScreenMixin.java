@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.util.ScreenUtil;
@@ -25,9 +26,12 @@ public abstract class ScreenMixin {
     private void onClose(CallbackInfo ci){
         ScreenUtil.playSimpleUISound(LegacySoundEvents.BACK.get(),1.0f);
     }
-    @Inject(method = "renderTransparentBackground",at = @At("HEAD"), cancellable = true)
-    public void renderTransparentBackground(GuiGraphics guiGraphics, CallbackInfo ci) {
-        guiGraphics.fillGradient(0, 0, this.width, this.height, -1073741824, -805306368);
-        ci.cancel();
+    @Redirect(method = "renderTransparentBackground",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fillGradient(IIIIII)V"))
+    public void renderTransparentBackground(GuiGraphics graphics, int i, int j, int k, int l, int m, int n) {
+        graphics.fillGradient(i,j,k,l, -1073741824, -805306368);
+    }
+    @Redirect(method = "renderBackground",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderDirtBackground(Lnet/minecraft/client/gui/GuiGraphics;)V"))
+    public void renderBackground(Screen instance, GuiGraphics guiGraphics) {
+        ScreenUtil.renderDefaultBackground(guiGraphics,true,true);
     }
 }

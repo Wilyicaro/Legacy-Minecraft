@@ -1,10 +1,12 @@
 package wily.legacy.client.screen;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.mojang.authlib.minecraft.BanDetails;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
+import com.mojang.realmsclient.RealmsMainScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.DefaultUncaughtExceptionHandler;
 import net.minecraft.SharedConstants;
@@ -13,7 +15,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.ConnectScreen;
@@ -44,7 +48,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
-import static wily.legacy.client.screen.CreationList.addCreationButton;
+import static wily.legacy.client.screen.CreationList.addIconButton;
 
 public class ServerSelectionList extends RenderableVList {
     static final ResourceLocation INCOMPATIBLE_SPRITE = new ResourceLocation("server_list/incompatible");
@@ -99,12 +103,26 @@ public class ServerSelectionList extends RenderableVList {
         }
         super.init(screen, leftPos, topPos, listWidth, listHeight);
     }
-
+    private Component getMultiplayerDisabledReason() {
+        if (this.minecraft.allowsMultiplayer()) {
+            return null;
+        } else if (this.minecraft.isNameBanned()) {
+            return Component.translatable("title.multiplayer.disabled.banned.name");
+        } else {
+            BanDetails banDetails = this.minecraft.multiplayerBan();
+            if (banDetails != null) {
+                return banDetails.expires() != null ? Component.translatable("title.multiplayer.disabled.banned.temporary") : Component.translatable("title.multiplayer.disabled.banned.permanent");
+            } else {
+                return Component.translatable("title.multiplayer.disabled");
+            }
+        }
+    }
     public void updateServers(){
         renderables.clear();
-        addCreationButton(this,new ResourceLocation(LegacyMinecraft.MOD_ID,"creation_list/add_server"),Component.translatable("legacy.menu.add_server"),c-> {
-            this.minecraft.setScreen(new ServerEditScreen(screen, new ServerData(I18n.get("selectServer.defaultName"), "", ServerData.Type.OTHER), true));
-        });
+        addIconButton(this,new ResourceLocation(LegacyMinecraft.MOD_ID,"creation_list/add_server"),Component.translatable("legacy.menu.add_server"), c-> this.minecraft.setScreen(new ServerEditScreen(screen, new ServerData(I18n.get("selectServer.defaultName"), "", ServerData.Type.OTHER), true)));
+        Component component = this.getMultiplayerDisabledReason();
+        Tooltip tooltip = component != null ? Tooltip.create(component) : null;
+        addIconButton(this,new ResourceLocation(LegacyMinecraft.MOD_ID,"creation_list/realms"), Component.translatable("title.multiplayer.realms"), b-> minecraft.setScreen(new RealmsMainScreen(screen)),tooltip);
         for (int i = 0; i < servers.size(); i++) {
             int index = i;
             ServerData server = servers.get(i);

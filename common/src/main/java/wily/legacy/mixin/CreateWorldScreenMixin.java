@@ -162,18 +162,15 @@ public abstract class CreateWorldScreenMixin extends Screen{
 
     }
     private void onLoad() {
+        minecraft.execute(()-> resourcePackSelector.applyChanges(true));
         if (minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer().isReady()){
             if (onlineOnStart) {
                 MutableComponent component = publishUnloadedServer(minecraft, uiState.getGameMode().gameType, trustPlayers && uiState.isAllowCheats(), this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed");
                 ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setTrustPlayers(trustPlayers);
-                if (resourcePackSelector.hasChanged()) ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setSelectedResourcePacks(resourcePackSelector.selectedPacks.stream().map(Pack::getId).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
-                    Collections.reverse(l);
-                    return l;
-                })));
+                if (resourcePackSelector.hasChanged()) ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setSelectedResourcePacks(resourcePackSelector.getSelectedIds());
                 this.minecraft.gui.getChat().addMessage(component);
             }
         }
-        resourcePackSelector.applyChanges(true);
     }
     
     private static void confirmWorldCreation(Minecraft minecraft, CreateWorldScreen createWorldScreen, Lifecycle lifecycle, Runnable runnable, boolean bl2) {

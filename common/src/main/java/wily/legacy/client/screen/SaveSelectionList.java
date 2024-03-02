@@ -222,7 +222,7 @@ public class SaveSelectionList extends RenderableVList {
                             ResourceLocation resourceLocation2 = hoverIcon ? WARNING_HIGHLIGHTED_SPRITE : WARNING_SPRITE;
                             ResourceLocation resourceLocation3 = hoverIcon ? ERROR_HIGHLIGHTED_SPRITE : ERROR_SPRITE;
                             ResourceLocation resourceLocation4 = hoverIcon ? MARKED_JOIN_HIGHLIGHTED_SPRITE : MARKED_JOIN_SPRITE;
-                            if (summary instanceof LevelSummary.SymlinkLevelSummary) {
+                            if (summary instanceof LevelSummary.SymlinkLevelSummary || summary instanceof LevelSummary.CorruptedLevelSummary) {
                                 guiGraphics.blitSprite(resourceLocation3, getX(), getY(), 32, 32);
                                 guiGraphics.blitSprite(resourceLocation4, getX(), getY(), 32, 32);
                                 return;
