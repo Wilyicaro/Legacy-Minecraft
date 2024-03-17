@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.ExitConfirmationScreen;
 import wily.legacy.client.screen.HelpOptionsScreen;
 import wily.legacy.client.screen.RenderableVList;
@@ -28,6 +29,7 @@ public class PauseScreenMixin extends Screen {
     protected RenderableVList renderableVList;
     protected boolean updateAutoSaveIndicator;
     private boolean inited = false;
+    private ControlTooltip.Renderer controlTooltipRenderer = ControlTooltip.defaultScreen(this);
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
@@ -52,6 +54,7 @@ public class PauseScreenMixin extends Screen {
     }
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         ScreenUtil.renderDefaultBackground(guiGraphics);
+        controlTooltipRenderer.render(guiGraphics, i, j, f);
     }
 
     @Override

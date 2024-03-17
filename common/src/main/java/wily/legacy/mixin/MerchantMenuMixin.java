@@ -28,8 +28,6 @@ public abstract class MerchantMenuMixin extends AbstractContainerMenu {
 
     @Shadow public abstract int getTraderXp();
 
-    @Shadow protected abstract void playTradeSound();
-
     protected MerchantMenuMixin(@Nullable MenuType<?> menuType, int i) {
         super(menuType, i);
     }
@@ -61,10 +59,6 @@ public abstract class MerchantMenuMixin extends AbstractContainerMenu {
             public int getHeight() {
                 return 27;
             }
-            public void setChanged() {
-                super.setChanged();
-                MerchantMenuMixin.super.slotsChanged(container);
-            }
         };
     }
     @ModifyArg(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/item/trading/Merchant;)V",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/MerchantMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 2))
@@ -78,10 +72,7 @@ public abstract class MerchantMenuMixin extends AbstractContainerMenu {
             public int getHeight() {
                 return 27;
             }
-            public void setChanged() {
-                super.setChanged();
-                MerchantMenuMixin.super.slotsChanged(container);
-            }
+
         };
     }
     @ModifyArg(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/item/trading/Merchant;)V",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/MerchantMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 3))

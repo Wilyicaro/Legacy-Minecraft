@@ -21,6 +21,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
+import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.ArrayList;
@@ -43,6 +44,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
 
     public LegacyFlatWorldScreen(Screen screen, WorldCreationUiState uiState, HolderLookup.RegistryLookup<Biome> biomeGetter, HolderLookup.RegistryLookup<StructureSet> structureGetter, Consumer<FlatLevelGeneratorSettings> consumer, FlatLevelGeneratorSettings flatLevelGeneratorSettings) {
         super(screen,282,248,Component.translatable("createWorld.customize.flat.title"));
+        controlTooltipRenderer.tooltips.set(0,ControlTooltip.create(()-> ControllerComponent.DOWN_BUTTON.componentState.getIcon(true),()->tabList.selectedTab == 0 ? ControlTooltip.CONTROL_ACTION_CACHE.getUnchecked("legacy.menu.create_flat_world.layer_options") : null));
         parent = Minecraft.getInstance().screen instanceof WorldMoreOptionsScreen s ? s : screen;
         this.uiState = uiState;
         this.applySettings = consumer;
@@ -165,9 +167,12 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
         displayLayers.renderables.clear();
         generator.getLayersInfo().forEach(this::addLayer);
     }
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+
+    @Override
+    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         ScreenUtil.renderDefaultBackground(guiGraphics,false);
     }
+
     @Override
     protected void init() {
         addRenderableWidget(tabList);

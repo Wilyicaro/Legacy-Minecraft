@@ -8,7 +8,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.common.crafting.ingredients.PartialNBTIngredient;
+import net.minecraftforge.common.crafting.ingredients.StrictNBTIngredient;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -16,6 +21,7 @@ import net.minecraftforge.fml.loading.LoadingModList;
 import org.checkerframework.checker.units.qual.C;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Optional;
 
 public class LegacyMinecraftPlatformImpl {
@@ -37,5 +43,12 @@ public class LegacyMinecraftPlatformImpl {
 
     public static boolean isLoadingMod(String modId) {
         return LoadingModList.get().getModFileById(modId) != null;
+    }
+
+    public static Ingredient getNBTIngredient(ItemStack... stacks) {
+        return PartialNBTIngredient.of(stacks[0].getTag(), Arrays.stream(stacks).map(ItemStack::getItem).toArray(ItemLike[]::new));
+    }
+    public static Ingredient getStrictNBTIngredient(ItemStack stack) {
+        return StrictNBTIngredient.of(stack);
     }
 }

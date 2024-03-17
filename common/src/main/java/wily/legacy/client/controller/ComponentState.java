@@ -1,7 +1,9 @@
 package wily.legacy.client.controller;
 
+import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
+import wily.legacy.client.screen.ControlTooltip;
 
 public class ComponentState {
 
@@ -19,6 +21,15 @@ public class ComponentState {
         if (pressed && timePressed > Integer.MIN_VALUE) timePressed++;
         this.justPressed = pressed && !this.pressed;
         this.pressed = pressed;
+    }
+    public char getChar(){
+        return component.icon.getChars()[0];
+    }
+    public char getPressedChar(){
+        return component.icon.getChars().length > 1 ? component.icon.getChars().length == 2 ? component.icon.getChars()[1] : component.icon.getChars()[1 + (Math.min(4, timePressed / (getDefaultDelay() * 2)) % component.icon.getChars().length - 1)] : getChar();
+    }
+    public Component getIcon(boolean allowPressed){
+        return ControlTooltip.getControlIcon(String.valueOf(allowPressed && component.componentState.pressed ? getPressedChar() : getChar()),ControlTooltip.getActiveControllerType());
     }
     public boolean canClick(){
         return canClick(getDefaultDelay());
@@ -43,6 +54,14 @@ public class ComponentState {
     public boolean is(ControllerComponent b){
         return component == b;
     }
+    public void block(){
+        timePressed = Integer.MIN_VALUE;
+    }
+
+    public boolean isBlocked() {
+        return timePressed == Integer.MIN_VALUE;
+    }
+
     public static class Stick extends ComponentState{
         public float y;
         public float x;

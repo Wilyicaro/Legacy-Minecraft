@@ -46,7 +46,7 @@ import static wily.legacy.client.LegacySprites.PACK_SELECTED_SPRITE;
 
 public class PackSelector extends AbstractWidget {
     public static final ResourceLocation DEFAULT_ICON = new ResourceLocation("textures/misc/unknown_pack.png");
-    public final PackSelectionModel model;
+    public PackSelectionModel model;
     private final Map<String, ResourceLocation> packIcons = Maps.newHashMap();
     private final Map<String, ResourceLocation> packBackgrounds = Maps.newHashMap();
     public final Stocker.Sizeable scrolledList;
@@ -75,7 +75,7 @@ public class PackSelector extends AbstractWidget {
         this.hasTooltip = hasTooltip;
         minecraft = Minecraft.getInstance();
         this.packRepository = packRepository;
-        model = new PackSelectionModel(()->{},this::getPackIcon,packRepository,r-> reloadChanges.accept(this));
+        updatePackModel();
         scrolledList = new Stocker.Sizeable(0);
         List<Pack> displayPacks = getDisplayPacks();
         int s = displayPacks.size();
@@ -83,6 +83,9 @@ public class PackSelector extends AbstractWidget {
             scrolledList.max = displayPacks.size() - getMaxPacks();
         setSelectedPack(0);
         updateTooltip();
+    }
+    private void updatePackModel(){
+        model = new PackSelectionModel(()->{},this::getPackIcon,packRepository,r-> reloadChanges.accept(this));
     }
     public List<Pack> getDisplayPacks(){
         return Stream.concat(model.selected.stream(),model.unselected.stream()).toList();
@@ -175,7 +178,7 @@ public class PackSelector extends AbstractWidget {
             applyChanges(false);
             minecraft.setScreen(new PackSelectionScreen(packRepository, p -> {
                 reloadChanges.accept(this);
-                model.findNewPacks();
+                updatePackModel();
                 minecraft.setScreen(screen);
             }, packPath, getMessage()));
         }

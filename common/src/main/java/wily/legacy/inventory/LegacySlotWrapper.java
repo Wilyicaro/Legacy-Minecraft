@@ -45,7 +45,7 @@ public class LegacySlotWrapper extends Slot {
     @Override
     public ItemStack getItem() {
         ItemStack s = this.target.getItem();
-        if (s != lastItemStack){
+        if (!s.equals(lastItemStack)){
             lastItemStack = s;
             setChanged();
         }

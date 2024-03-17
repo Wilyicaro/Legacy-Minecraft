@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 import static wily.legacy.client.LegacySprites.LOADING_BACKGROUND_SPRITE;
 import static wily.legacy.client.LegacySprites.LOADING_BAR_SPRITE;
 
-public class LegacyLoadingScreen extends DefaultScreen{
+public class LegacyLoadingScreen extends LegacyScreen {
     public static final List<Supplier<LegacyTip>> usingLoadingTips = new ArrayList<>(LegacyTipManager.loadingTips);
     public static LegacyTip actualLoadingTip;
     protected int progress;
@@ -29,6 +29,7 @@ public class LegacyLoadingScreen extends DefaultScreen{
     protected RandomSource random = RandomSource.create();
     public LegacyLoadingScreen() {
         super(GameNarrator.NO_TITLE);
+        controlTooltipRenderer.tooltips.clear();
     }
     public LegacyLoadingScreen(Component loadingHeader, Component loadingStage) {
         this();

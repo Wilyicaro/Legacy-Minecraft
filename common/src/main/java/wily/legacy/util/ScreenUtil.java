@@ -1,24 +1,31 @@
 package wily.legacy.util;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.BufferSourceWrapper;
@@ -30,9 +37,13 @@ import wily.legacy.client.screen.LegacyIconHolder;
 import java.util.function.Consumer;
 
 public class ScreenUtil {
+    public static final ResourceLocation GUI_ATLAS = new ResourceLocation("textures/atlas/gui.png");
     private static final Minecraft mc = Minecraft.getInstance();
+    public static long lastHotbarSelectionChange = -1;
     protected static LogoRenderer logoRenderer = new LogoRenderer(false);
     public static LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
+    public static final ResourceLocation SAVE_CHEST_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"hud/save_chest");
+    public static final ResourceLocation SAVE_ARROW_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"hud/save_arrow");
     public static final ResourceLocation LOADING_BLOCK_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/loading_block");
     public static final ResourceLocation POINTER_PANEL_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"tiles/pointer_panel");
     public static final ResourceLocation PANEL_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"tiles/panel");
@@ -43,7 +54,7 @@ public class ScreenUtil {
     public static void renderPointerPanel(GuiGraphics graphics, int x, int y, int width, int height){
         RenderSystem.enableBlend();
         RenderSystem.disableDepthTest();
-        renderTiles(POINTER_PANEL_SPRITE,graphics,x,y,width,height,2);
+        graphics.blitSprite(POINTER_PANEL_SPRITE,x,y,width,height);
         RenderSystem.enableDepthTest();
         RenderSystem.disableBlend();
     }
@@ -63,7 +74,7 @@ public class ScreenUtil {
         renderTiles(SQUARE_RECESSED_PANEL,graphics,x,y,width,height,dp);
     }
     public static void renderTiles(ResourceLocation location,GuiGraphics graphics, int x, int y, int width, int height, float dp){
-        mc.getTextureManager().getTexture(new ResourceLocation("textures/atlas/gui.png")).bind();
+        mc.getTextureManager().getTexture(GUI_ATLAS).bind();
         GlStateManager._texParameter(3553, 10241, 9729);
         //GlStateManager._texParameter(3553, 10240, 9729);
         graphics.pose().pushPose();
@@ -77,12 +88,12 @@ public class ScreenUtil {
     public static void drawAutoSavingIcon(GuiGraphics graphics,int x, int y) {
         graphics.pose().pushPose();
         graphics.pose().scale(0.5F,0.5F,1);
-        graphics.blitSprite(new ResourceLocation(LegacyMinecraft.MOD_ID,"hud/save_chest"),x * 2,y * 2,48,48);
+        graphics.blitSprite(SAVE_CHEST_SPRITE,x * 2,y * 2,48,48);
         graphics.pose().popPose();
         graphics.pose().pushPose();
         double heightAnim = (Util.getMillis() / 50D) % 11;
         graphics.pose().translate(x + 5.5,y - 8 - (heightAnim > 5 ? 10 - heightAnim : heightAnim),0);
-        graphics.blitSprite(new ResourceLocation(LegacyMinecraft.MOD_ID,"hud/save_arrow"),0,0,13,16);
+        graphics.blitSprite(SAVE_ARROW_SPRITE,0,0,13,16);
         graphics.pose().popPose();
     }
     public static void renderDefaultBackground(GuiGraphics guiGraphics){
@@ -153,7 +164,8 @@ public class ScreenUtil {
         return -getLegacyOptions().hudDistance().value*(22.5D + (getLegacyOptions().inGameTooltips().get() ? 17.5D : 0));
     }
     public static float getHUDOpacity(){
-        return Math.max(Math.min(255f,mc.gui.toolHighlightTimer * 38.4f)/ 255f, getInterfaceOpacity());
+        float f = (Util.getMillis() - lastHotbarSelectionChange)/ 1200f;
+        return getInterfaceOpacity() <= 0.8f ?Math.min(0.8f,getInterfaceOpacity() + (1 -getInterfaceOpacity()) * (f >= 3f ? Math.max(4 - f,0) : 1)) : getInterfaceOpacity();
     }
     public static boolean hasTooltipBoxes(){
         return getLegacyOptions().tooltipBoxes().get();
@@ -179,6 +191,12 @@ public class ScreenUtil {
     public static void addTip(Entity entity){
         if (hasTip(entity.getType())) mc.getToasts().addToast(new LegacyTip(entity.getType().getDescription(), ScreenUtil.getTip(entity.getType())));
         else if (entity.getPickResult() != null && !entity.getPickResult().isEmpty() && hasTip(entity.getPickResult())) addTip(entity.getPickResult());
+    }
+    public static void addTip(EntityType<?> entityType){
+        if (hasTip(entityType)) mc.getToasts().addToast(new LegacyTip(entityType.getDescription(), ScreenUtil.getTip(entityType)));
+    }
+    public static void addCustomTip(Component title, Component tip, ItemStack stack, long time){
+        mc.getToasts().addToast((title.getString().isEmpty() && tip.getString().isEmpty() && !stack.isEmpty() ?  new LegacyTip(stack) : new LegacyTip(title,tip).itemStack(stack)).disappearTime(time));
     }
     public static void addTip(ItemStack stack){
         if (hasTip(stack)) mc.getToasts().addToast(new LegacyTip(stack));
@@ -232,9 +250,11 @@ public class ScreenUtil {
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
     }
-
     public static void renderScrollingString(GuiGraphics guiGraphics, Font font, Component component, int j, int k, int l, int m, int n, boolean shadow) {
-        int o = font.width(component);
+        renderScrollingString(guiGraphics,font,component.getVisualOrderText(),j,k,l,m,n,shadow);
+    }
+    public static void renderScrollingString(GuiGraphics guiGraphics, Font font, FormattedCharSequence charSequence, int j, int k, int l, int m, int n, boolean shadow) {
+        int o = font.width(charSequence);
         int p = (k + m - font.lineHeight) / 2 + 1;
         int q = l - j;
         if (o > q) {
@@ -244,24 +264,24 @@ public class ScreenUtil {
             double f = Math.sin(1.5707963267948966 * Math.cos(Math.PI * 2 * d / e)) / 2.0 + 0.5;
             double g = Mth.lerp(f, 0.0, r);
             guiGraphics.enableScissor(j, k, l, m);
-            guiGraphics.drawString(font, component, j - (int)g, p, n,shadow);
+            guiGraphics.drawString(font, charSequence, j - (int)g, p, n,shadow);
             guiGraphics.disableScissor();
         } else {
-            guiGraphics.drawString(font, component, j, p, n,shadow);
+            guiGraphics.drawString(font, charSequence, j, p, n,shadow);
         }
     }
     public static void secureTranslucentRender(GuiGraphics graphics, boolean translucent, float alpha, Runnable render){
-        if (translucent){
-            LegacyMinecraftClient.guiBufferSourceOverride = BufferSourceWrapper.translucent(graphics.bufferSource());
-            graphics.setColor(1.0f, 1.0f, 1.0f, alpha);
-            RenderSystem.enableBlend();
+        if (!translucent){
+            render.run();
+            return;
         }
+        LegacyMinecraftClient.guiBufferSourceOverride = BufferSourceWrapper.translucent(graphics.bufferSource());
+        graphics.setColor(1.0f, 1.0f, 1.0f, alpha);
+        RenderSystem.enableBlend();
         render.run();
-        if (translucent){
-            RenderSystem.disableBlend();
-            graphics.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-            LegacyMinecraftClient.guiBufferSourceOverride = null;
-        }
+        RenderSystem.disableBlend();
+        graphics.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+        LegacyMinecraftClient.guiBufferSourceOverride = null;
     }
     public static boolean isHovering(Slot slot,int leftPos, int topPos,  double d, double e) {
         LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(slot);
@@ -271,4 +291,24 @@ public class ScreenUtil {
         double yCorner = holder.getYCorner() + holder.offset.y();
         return (d -= leftPos) >= xCorner && d < (xCorner + width) && (e -= topPos) >= yCorner && e < (yCorner + height);
     }
+    public static void renderEntity(GuiGraphics guiGraphics, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, LivingEntity livingEntity) {
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(x, y, 50.0);
+        guiGraphics.pose().mulPoseMatrix(new Matrix4f().scaling(size, size, -size));
+        guiGraphics.pose().translate(vector3f.x, vector3f.y, vector3f.z);
+        guiGraphics.pose().mulPose(quaternionf);
+        Lighting.setupForEntityInInventory();
+        EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+        if (quaternionf2 != null) {
+            quaternionf2.conjugate();
+            entityRenderDispatcher.overrideCameraOrientation(quaternionf2);
+        }
+        entityRenderDispatcher.setRenderShadow(false);
+        RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(livingEntity, 0.0, 0.0, 0.0, 0.0f, partialTicks, guiGraphics.pose(), guiGraphics.bufferSource(), 0xF000F0));
+        guiGraphics.flush();
+        entityRenderDispatcher.setRenderShadow(true);
+        guiGraphics.pose().popPose();
+        Lighting.setupFor3DItems();
+    }
+
 }

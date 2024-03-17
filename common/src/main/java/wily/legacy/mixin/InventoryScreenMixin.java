@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.client.screen.ReplaceableScreen;
 import wily.legacy.util.ScreenUtil;
 
@@ -96,6 +97,6 @@ public class InventoryScreenMixin extends AbstractContainerScreen<InventoryMenu>
     }
 
     public Screen getReplacement() {
-        return new CreativeModeInventoryScreen(this.minecraft.player, this.minecraft.player.connection.enabledFeatures(), (Boolean)this.minecraft.options.operatorItemsTab().get());
+        return CreativeModeScreen.getActualCreativeScreenInstance(minecraft);
     }
 }

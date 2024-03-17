@@ -1,5 +1,6 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -23,7 +24,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.client.LegacySprites;
+import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.client.screen.LegacyIconHolder;
+import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.inventory.LegacyMerchantOffer;
 import wily.legacy.network.ServerInventoryCraftPacket;
@@ -32,6 +35,9 @@ import wily.legacy.util.ScreenUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static wily.legacy.client.screen.ControlTooltip.*;
+import static wily.legacy.client.screen.ControlTooltip.CONTROL_ACTION_CACHE;
 
 @Mixin(MerchantScreen.class)
 public abstract class MerchantScreenMixin extends AbstractContainerScreen<MerchantMenu> {
@@ -46,6 +52,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     private ContainerListener listener;
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(CallbackInfo ci){
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().tooltips.set(0,create(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_RETURN,true) : ControllerComponent.DOWN_BUTTON.componentState.getIcon(true),()->getFocused() instanceof LegacyIconHolder && !displaySlotsWarning[2] ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.trade") : null));
         listener = new ContainerListener() {
             public void slotChanged(AbstractContainerMenu abstractContainerMenu, int i, ItemStack itemStack) {
                 updateSlotsDisplay();
@@ -69,6 +76,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             compactList.stream().filter(i->ItemStack.isSameItemSameTags(i,item)).findFirst().ifPresentOrElse(i-> i.grow(item.getCount()), ()-> compactList.add(item.copy()));
         }
         villagerTradeButtons.forEach(b->{
+            b.allowFocusedItemTooltip = true;
             int i =villagerTradeButtons.indexOf(b);
             boolean warning = false;
             if (i < menu.getOffers().size()) {
@@ -157,7 +165,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                 return isValidIndex() && ((LegacyMerchantOffer)menu.getOffers().get(index)).getRequiredLevel() > menu.getTraderLevel() ? LegacyIconHolder.GRAY_ICON_HOLDER : super.getIconHolderSprite();
             }
             @Override
-            protected boolean isWarning() {
+            public boolean isWarning() {
                 return super.isWarning() && ((LegacyMerchantOffer)menu.getOffers().get(index)).getRequiredLevel() <= menu.getTraderLevel();
             }
 
@@ -171,7 +179,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                     MerchantOffer offer = menu.getOffers().get(index);
                     if (((LegacyMerchantOffer)offer).getRequiredLevel() <= menu.getTraderLevel() && !offer.isOutOfStock() && !displaySlotsWarning[2]) {
                         if (hasAutoCrafting()) {
-                            LegacyMinecraft.NETWORK.sendToServer(new ServerInventoryCraftPacket(ingredientsFromStacks(offer.getCostA(),offer.getCostB()),offer.getResult(),index, 3, 39));
+                            LegacyMinecraft.NETWORK.sendToServer(new ServerInventoryCraftPacket(ingredientsFromStacks(offer.getCostA(),offer.getCostB()),offer.getResult(),index,hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
                         } else {
                             postButtonClick();
                         }

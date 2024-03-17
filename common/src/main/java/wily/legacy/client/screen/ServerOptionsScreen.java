@@ -20,7 +20,7 @@ public class ServerOptionsScreen extends ConfirmationScreen{
         addRenderableWidget(Button.builder(Component.translatable("selectWorld.delete"),b-> minecraft.setScreen(new ConfirmationScreen(parent,230,120, Component.translatable("selectWorld.delete"), Component.translatable("selectServer.deleteQuestion"), b1-> {
             parent.getServers().remove(serverData);
             parent.getServers().save();
-            parent.serverSelectionList.updateServers();
+            parent.serverRenderableList.updateServers();
             minecraft.setScreen(parent);
         }))).bounds(panel.x + 15, panel.getRectangle().bottom() - 30,200,20).build());
     }

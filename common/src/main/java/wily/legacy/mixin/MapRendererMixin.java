@@ -49,11 +49,11 @@ public abstract class MapRendererMixin {
             font.drawInBatch("X:%s,Y:%s,Z:%s".formatted((int) minecraft.player.getX(), (int) minecraft.player.getY(), (int) minecraft.player.getZ()), 0.0f, 0.0f, 0, false, poseStack.last().pose(), multiBufferSource, Font.DisplayMode.NORMAL, 0, i);
             poseStack.popPose();
         }
-        poseStack.pushPose();
-        if (!bl) {
-            poseStack.translate(10, 11, 0);
-            poseStack.scale(98 / 116f, 98 / 116f, 1);
-        }
+        //poseStack.pushPose();
+        //if (!bl) {
+        //    poseStack.translate(10, 11, 0);
+        //    poseStack.scale(98 / 116f, 98 / 116f, 1);
+        //}
     }
     @Inject(method = "draw", at = @At("RETURN"))
     void drawReturn(PoseStack poseStack, MultiBufferSource multiBufferSource, boolean bl, int i, CallbackInfo ci) {
@@ -80,6 +80,6 @@ public abstract class MapRendererMixin {
             poseStack.popPose();
             ++l;
         }
-        poseStack.popPose();
+        //poseStack.popPose();
     }
 }

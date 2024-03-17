@@ -6,7 +6,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
@@ -173,11 +172,14 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
             guiGraphics.renderTooltip(font, hoveredSlot.getItem(), i, j);
     }
 
-
+    @Override
+    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+        ScreenUtil.renderDefaultBackground(guiGraphics,false);
+    }
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(guiGraphics,false);
+        super.renderBackground(guiGraphics, i, j, f);
         panel.render(guiGraphics, i, j, f);
         ScreenUtil.renderPanelRecess(guiGraphics,panel.x + 20, panel. y + 187, 275, 27,2f);
 
@@ -222,5 +224,10 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
     @Override
     public Slot getHoveredSlot() {
         return hoveredSlot;
+    }
+
+    @Override
+    public ControlTooltip.Renderer getControlTooltipRenderer() {
+        return controlTooltipRenderer;
     }
 }

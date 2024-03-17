@@ -11,6 +11,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.lwjgl.glfw.GLFW;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.client.controller.ControllerHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,16 +38,7 @@ public class LegacyResourceManager implements PreparableReloadListener {
             }
             resourceManager.getResource(GAMEPAD_MAPPINGS).ifPresent(r->{
                 try {
-                    BufferedReader bufferedReader = r.openAsReader();
-                    String s = bufferedReader.lines().collect(Collectors.joining());
-                    byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
-                    ByteBuffer mappingsBuffer = ByteBuffer.allocateDirect(bytes.length + 1);
-                    mappingsBuffer.put(bytes);
-                    mappingsBuffer.rewind();
-                    GLFW.glfwUpdateGamepadMappings(mappingsBuffer);
-                    mappingsBuffer.clear();
-                    bufferedReader.close();
-
+                    ControllerHandler.applyGamePadMappingsFromBuffer(r.openAsReader());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

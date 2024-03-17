@@ -99,3 +99,11 @@ accessible field net/minecraft/client/MouseHandler ypos D
 accessible field net/minecraft/client/MouseHandler mouseGrabbed Z
 accessible field net/minecraft/client/gui/screens/packs/PackSelectionModel selected Ljava/util/List;
 accessible field net/minecraft/client/gui/screens/packs/PackSelectionModel unselected Ljava/util/List;
+accessible field net/minecraft/world/item/HoeItem TILLABLES Ljava/util/Map;
+accessible method net/minecraft/world/item/BlockItem getPlacementState (Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;
+accessible method net/minecraft/world/entity/Entity canAddPassenger (Lnet/minecraft/world/entity/Entity;)Z
+accessible method net/minecraft/world/entity/Entity canRide (Lnet/minecraft/world/entity/Entity;)Z
+accessible method net/minecraft/world/item/Item getPlayerPOVHitResult (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/level/ClipContext$Fluid;)Lnet/minecraft/world/phys/BlockHitResult;
+accessible field net/minecraft/world/item/AxeItem STRIPPABLES Ljava/util/Map;
+accessible field net/minecraft/world/item/ShovelItem FLATTENABLES Ljava/util/Map;
+accessible field net/minecraft/world/item/FoodOnAStickItem canInteractWith Lnet/minecraft/world/entity/EntityType;

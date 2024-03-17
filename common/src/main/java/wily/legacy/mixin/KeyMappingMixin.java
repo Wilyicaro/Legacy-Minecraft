@@ -13,15 +13,15 @@ import wily.legacy.client.controller.LegacyKeyMapping;
 
 @Mixin(KeyMapping.class)
 public abstract class KeyMappingMixin implements LegacyKeyMapping {
-    @Shadow public abstract InputConstants.Key getDefaultKey();
 
+    @Shadow private InputConstants.Key key;
     private ControllerComponent defaultButton;
     private ControllerComponent button;
     @Inject(method = "<init>(Ljava/lang/String;Lcom/mojang/blaze3d/platform/InputConstants$Type;ILjava/lang/String;)V",at = @At("RETURN"))
     private void init(String string, InputConstants.Type type, int i, String string2, CallbackInfo ci){
         ControllerComponent b = ControllerHandler.getDefaultKeyMappingComponent(i);
-        setDefaultButton(b);
-        setButton(b);
+        setDefaultComponent(b);
+        setComponent(b);
     }
 
     @Override
@@ -35,12 +35,17 @@ public abstract class KeyMappingMixin implements LegacyKeyMapping {
     }
 
     @Override
-    public void setButton(ControllerComponent button) {
+    public void setComponent(ControllerComponent button) {
         this.button = button;
     }
 
     @Override
-    public void setDefaultButton(ControllerComponent defaultButton) {
+    public void setDefaultComponent(ControllerComponent defaultButton) {
         this.defaultButton = defaultButton;
+    }
+
+    @Override
+    public InputConstants.Key getKey() {
+        return key;
     }
 }

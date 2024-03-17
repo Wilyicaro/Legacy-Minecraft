@@ -15,23 +15,22 @@ import wily.legacy.util.PagedList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public record ServerInventoryCraftPacket(List<Ingredient> ingredients, ItemStack result, int button, int minSlot, int maxSlot) implements CommonPacket{
+public record ServerInventoryCraftPacket(List<Ingredient> ingredients, ItemStack result, int button, boolean max) implements CommonPacket{
     public ServerInventoryCraftPacket(FriendlyByteBuf buf){
-        this(buf.readList(Ingredient::fromNetwork), buf.readItem(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt());
+        this(buf.readList(Ingredient::fromNetwork), buf.readItem(), buf.readVarInt(), buf.readBoolean());
     }
-    public ServerInventoryCraftPacket(Recipe<?> rcp, int button, int minSlot, int maxSlot){
-        this(rcp.getIngredients(),rcp.getResultItem(RegistryAccess.EMPTY),button, minSlot, maxSlot);
+    public ServerInventoryCraftPacket(Recipe<?> rcp, int button, boolean max){
+        this(rcp.getIngredients(),rcp.getResultItem(RegistryAccess.EMPTY),button, max);
     }
-    public ServerInventoryCraftPacket(Recipe<?> rcp, int minSlot, int maxSlot){
-        this(rcp,-1,minSlot,maxSlot);
+    public ServerInventoryCraftPacket(Recipe<?> rcp, boolean max){
+        this(rcp,-1,max);
     }
     @Override
     public void encode(FriendlyByteBuf buf) {
         buf.writeCollection(ingredients,(r,i)->i.toNetwork(r));
         buf.writeItem(result);
         buf.writeVarInt(button);
-        buf.writeVarInt(minSlot);
-        buf.writeVarInt(maxSlot);
+        buf.writeBoolean(max);
     }
     public static boolean canCraft(List<Ingredient> ingredients, Inventory inventory){
         boolean canCraft = true;
@@ -50,7 +49,10 @@ public record ServerInventoryCraftPacket(List<Ingredient> ingredients, ItemStack
     @Override
     public void apply(Supplier<NetworkManager.PacketContext> ctx) {
         if (ctx.get().getPlayer() instanceof ServerPlayer sp){
-            if (canCraft(ingredients, sp.getInventory())) {
+            int tries = 0;
+            if (ingredients.isEmpty()) return;
+            while (canCraft(ingredients, sp.getInventory()) && ((max && tries <= result.getMaxStackSize() * 100) || tries == 0)) {
+                tries++;
                 ingredients.forEach(ing -> {
                     for (int i = 0; i < sp.containerMenu.slots.size(); i++) {
                         Slot slot = sp.containerMenu.slots.get(i);
@@ -60,7 +62,7 @@ public record ServerInventoryCraftPacket(List<Ingredient> ingredients, ItemStack
                         break;
                     }
                 });
-                sp.getInventory().placeItemBackInInventory(result);
+                sp.getInventory().placeItemBackInInventory(result.copy());
                 sp.containerMenu.clickMenuButton(sp,button);
             }
         }

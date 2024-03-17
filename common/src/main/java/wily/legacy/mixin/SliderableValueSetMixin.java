@@ -23,8 +23,9 @@ public interface SliderableValueSetMixin<T> extends OptionInstance.ValueSet<T> {
      */
     @Overwrite
     default Function<OptionInstance<T>, AbstractWidget> createButton(OptionInstance.TooltipSupplier<T> tooltipSupplier, Options options, int i, int j, int k, Consumer<T> consumer) {
-        return optionInstance -> new LegacySliderButton<T>(i,j,k,16,l-> optionInstance.toString.apply(l.getObjectValue()),()->tooltipSupplier.apply(optionInstance.get()),optionInstance.get(),b->fromSliderValue(b.getValue()), this::toSliderValue, b->{
+        return optionInstance -> new LegacySliderButton<T>(i,j,k,16,l-> optionInstance.toString.apply(optionInstance.get()),()->tooltipSupplier.apply(optionInstance.get()),optionInstance.get(),b->fromSliderValue(b.getValue()), this::toSliderValue, b->{
             optionInstance.set(b.getObjectValue());
+            options.save();
             consumer.accept(b.getObjectValue());
         });
     }

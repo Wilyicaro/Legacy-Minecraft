@@ -19,7 +19,8 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyWorldSettings;
 
 @Mixin(MinecraftServer.class)
-public abstract class ClientMinecraftServerMixin {
+public abstract class
+ClientMinecraftServerMixin {
 
     @Shadow public abstract boolean isSingleplayerOwner(GameProfile gameProfile);
 

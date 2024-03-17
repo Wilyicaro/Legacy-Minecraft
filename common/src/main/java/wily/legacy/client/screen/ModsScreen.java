@@ -106,7 +106,9 @@ public class ModsScreen extends PanelVListScreen{
     public boolean isMouseOverTooltipBox(double d, double e){
         return ScreenUtil.isMouseOver(d,e,panel.x + panel.width - 2, panel.y + 5,192, panel.height - 10);
     }
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+
+    @Override
+    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         ScreenUtil.renderDefaultBackground(guiGraphics);
         if (ScreenUtil.hasTooltipBoxes()) {
             ScreenUtil.renderPointerPanel(guiGraphics,panel.x + panel.width - 2, panel.y + 5,192,panel.height - 10);

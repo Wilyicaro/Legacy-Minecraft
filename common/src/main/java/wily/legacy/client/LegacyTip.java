@@ -53,7 +53,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
         return this;
     }
     public LegacyTip title(Component title){
-        height += 12;
+        if (!title.getString().isEmpty()) height += 12;
         this.title = title;
         return this;
     }
@@ -66,19 +66,23 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
         return disappearTime(tip.getString().toCharArray().length * 80L);
     }
     public LegacyTip disappearTime(long disappearTime){
-        createdTime = Util.getMillis();
-        this.disappearTime = disappearTime;
+        if (disappearTime > 0) {
+            createdTime = Util.getMillis();
+            this.disappearTime = disappearTime;
+        }
         return this;
     }
     public LegacyTip itemStack(ItemStack itemStack){
-        height += 32;
-        if (holder == null){
-            holder = new LegacyIconHolder(32,32);
-            holder.allowItemDecorations = false;
+        if (!itemStack.isEmpty()) {
+            height += 32;
+            if (holder == null) {
+                holder = new LegacyIconHolder(32, 32);
+                holder.allowItemDecorations = false;
+            }
+            holder.setX((width - 32) / 2);
+            holder.setY(13 + (tipLabel.getLineCount() + (title.getString().isEmpty() ? 0 : 1)) * 12);
+            holder.itemIcon = itemStack;
         }
-        holder.setX((width - 32 )/ 2);
-        holder.setY(13 + (tipLabel.getLineCount() + (title.getString().isEmpty() ? 0 : 1)) * 12);
-        holder.itemIcon = itemStack;
         return this;
     }
 

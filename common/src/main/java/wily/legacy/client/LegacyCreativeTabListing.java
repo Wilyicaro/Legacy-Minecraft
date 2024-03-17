@@ -1,19 +1,20 @@
 package wily.legacy.client;
 
 import com.google.gson.*;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.util.CompoundTagUtil;
+import wily.legacy.util.ScreenUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,6 +24,9 @@ import java.util.List;
 public record LegacyCreativeTabListing(Component name, ResourceLocation icon, CompoundTag itemIconTag, List<ItemStack> displayItems) {
     public static final List<LegacyCreativeTabListing> list = new ArrayList<>();
     private static final String LISTING = "creative_tab_listing.json";
+    public static void rebuildVanillaCreativeTabsItems(Minecraft minecraft){
+        if (minecraft.player != null) CreativeModeTabs.tryRebuildTabContents(minecraft.player.connection.enabledFeatures(), minecraft.options.operatorItemsTab().get(), minecraft.player.level().registryAccess());
+    }
     public static class Manager extends SimplePreparableReloadListener<List<LegacyCreativeTabListing>> {
         @Override
         protected List<LegacyCreativeTabListing> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
@@ -67,7 +71,7 @@ public record LegacyCreativeTabListing(Component name, ResourceLocation icon, Co
         @Override
         protected void apply(List<LegacyCreativeTabListing> object, ResourceManager resourceManager, ProfilerFiller profilerFiller) {
             list.clear();
-            list.addAll(object);;
+            list.addAll(object);
         }
     }
 }

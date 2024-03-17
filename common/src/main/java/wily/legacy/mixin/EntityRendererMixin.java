@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.util.ScreenUtil;
 
 @Mixin(EntityRenderer.class)
 public abstract class EntityRendererMixin {
@@ -25,12 +26,12 @@ public abstract class EntityRendererMixin {
 
     @Inject(method = "renderNameTag", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;scale(FFF)V", shift = At.Shift.AFTER))
     protected void renderNameTag(Entity entity, Component component, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci) {
-        if (!component.equals(entity.getDisplayName()) || !(entity instanceof AbstractClientPlayer)) return;
+        if (!component.equals(entity.getDisplayName()) || !ScreenUtil.getLegacyOptions().displayNameTagBorder().get()) return;
         String name = component.getString();
         int j = "deadmau5".equals(name) ? -10 : 0;
         int h = (int) (-font.width(component) / 2f);
         int p = LegacyMinecraft.playerVisualIds.getOrDefault(name, name.hashCode());
-        float[] color = p == 0 ?  new float[]{0,0,0} : LegacyMinecraftClient.getVisualPlayerColor(p);
+        float[] color = p == 0 || !(entity instanceof AbstractClientPlayer) ?  new float[]{0,0,0} : LegacyMinecraftClient.getVisualPlayerColor(p);
         poseStack.pushPose();
         fill(RenderType.debugLineStrip(1.0),multiBufferSource, poseStack, h - 1, j - 1, h + font.width(component) + 1,j + 9, color[0],color[1],color[2],1.0f);
         poseStack.translate(0, 8,0);

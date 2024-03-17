@@ -1,6 +1,6 @@
 package wily.legacy.mixin;
 
-import net.minecraft.client.KeyMapping;
+import com.mojang.serialization.Codec;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.Font;
@@ -15,8 +15,8 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.validation.DirectoryValidator;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,11 +27,10 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraft;
-import wily.legacy.LegacyMinecraftClient;
-import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.LegacyLoadingScreen;
 import wily.legacy.client.screen.MainMenuScreen;
+import wily.legacy.client.screen.ReplaceableScreen;
 import wily.legacy.network.ServerOpenClientMenu;
 import wily.legacy.util.ScreenUtil;
 
@@ -46,25 +45,16 @@ public abstract class MinecraftMixin {
 
     @Shadow public Options options;
 
-    @Shadow @Final private Tutorial tutorial;
-
     @Shadow public abstract void setScreen(@Nullable Screen screen);
 
     @Shadow @Nullable public LocalPlayer player;
 
-    @Shadow @Nullable public MultiPlayerGameMode gameMode;
-
     @Shadow @Final public Font font;
 
-    @Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z", ordinal = 4))
-    private boolean handleKeybinds(KeyMapping instance){
-        while (instance.consumeClick()){
-            if (ScreenUtil.hasClassicCrafting() || gameMode.hasInfiniteItems()) {
-                if (!gameMode.hasInfiniteItems()) this.tutorial.onOpenInventory();
-                this.setScreen(new InventoryScreen(this.player));
-            }else LegacyMinecraft.NETWORK.sendToServer(new ServerOpenClientMenu(2));
-        }
-        return false;
+    @Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", ordinal = 1))
+    private void handleKeybinds(Minecraft instance, Screen screen){
+        if (screen instanceof ReplaceableScreen s) s.setCanReplace(false);
+        setScreen(screen);
     }
     @Redirect(method = "setLevel",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/Minecraft;updateScreenAndTick(Lnet/minecraft/client/gui/screens/Screen;)V"))
     public void setLevelLoadingScreen(Minecraft instance, Screen screen, ClientLevel level) {
@@ -85,11 +75,11 @@ public abstract class MinecraftMixin {
 
     @ModifyArg(method = "resizeDisplay",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/Window;setGuiScale(D)V"))
     public double resizeDisplay(double d) {
-        return d / 2;
+        return d * (0.625 - (ScreenUtil.getLegacyOptions().interfaceResolution().get()) / 4);
     }
     @Inject(method = "addInitialScreens", at = @At("HEAD"))
     private void addInitialScreens(List<Function<Runnable, Screen>> list, CallbackInfo ci) {
-        list.add(r-> new ConfirmationScreen(new MainMenuScreen(false),275,190,Component.empty(), MultiLineLabel.create(font,Component.translatable("legacy.menu.autoSave_message"),243),b-> true){
+        list.add(r-> new ConfirmationScreen(new MainMenuScreen(),275,190,Component.empty(), MultiLineLabel.create(font,Component.translatable("legacy.menu.autoSave_message"),243),b-> true){
             protected void initButtons() {
                 messageYOffset = 68;
                 transparentBackground = false;

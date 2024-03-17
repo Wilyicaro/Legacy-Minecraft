@@ -88,6 +88,12 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
             tabButton.render(graphics,i, j, f);
         }
     }
+    public void resetSelectedTab(){
+        if (!tabButtons.isEmpty()){
+            selectedTab = -1;
+            tabButtons.get(0).onPress();
+        }
+    }
 
     @Override
     public void setFocused(boolean bl) {
