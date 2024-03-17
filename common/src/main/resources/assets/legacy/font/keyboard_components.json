@@ -1,0 +1,501 @@
+{
+    "providers":[
+        {
+            "type": "bitmap",
+            "file": "legacy:component/key_base.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uC000"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/key_base_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uC001"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/mouse_base.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uC002"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/mouse_base_focused.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uC003"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/space_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0032"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/space_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1032"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/q_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0081"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/q_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1081"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/e_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0069"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/e_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1069"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/i_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0073"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/i_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1073"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/w_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0087"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/w_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1087"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/a_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0065"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/a_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1065"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/s_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0083"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/s_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1083"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/d_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0068"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/d_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1068"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/up_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0265"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/up_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1265"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/left_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0263"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/left_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1263"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/down_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0264"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/down_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1264"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/right_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0262"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/right_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1262"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/e_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0069"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/e_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1069"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/f_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0070"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/f_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1070"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/h_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0072"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/h_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1072"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/o_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0079"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/o_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1079"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/p_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0080"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/p_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1080"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/x_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0088"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/x_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1088"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/esc_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0256"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/esc_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1256"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/return_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0257"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/return_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1257"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/tab_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0258"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/tab_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1258"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/f5_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0294"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/f5_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1294"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/f11_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0300"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/f11_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1300"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/left_mouse.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uD000"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/left_mouse_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE000"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/right_mouse.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uD001"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/right_mouse_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE001"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/mouse_scroll.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uA000"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/mouse_scroll_up.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uA001"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/mouse_scroll_up.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uA002"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/mouse_scroll_button.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uD002"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/mouse_scroll_button_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE002"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/left_shift_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0340"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/left_shift_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1340"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/right_shift_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0344"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/right_shift_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1344"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/left_bracket_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0091"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/left_bracket_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1091"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/right_bracket_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0093"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/right_bracket_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1093"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/pg_down_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0267"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/pg_down_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1267"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/pg_up_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0266"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/pg_up_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1266"]
+        }
+    ]    
+}
