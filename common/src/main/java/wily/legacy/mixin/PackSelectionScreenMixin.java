@@ -18,12 +18,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacySprites;
 import wily.legacy.client.controller.ControllerComponent;
-import wily.legacy.client.screen.ConfirmationScreen;
-import wily.legacy.client.screen.MultilineTooltip;
-import wily.legacy.client.screen.Panel;
-import wily.legacy.client.screen.RenderableVList;
+import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.util.ScreenUtil;
 
@@ -40,12 +38,12 @@ public abstract class PackSelectionScreenMixin extends Screen {
     private static final Component INCOMPATIBLE_CONFIRM_TITLE = Component.translatable("pack.incompatible.confirm.title");
     private static final Component AVAILABLE_PACK = Component.translatable("pack.selected.title");
     private static final Component SELECTED_PACK = Component.translatable("pack.available.title");
+    protected int lastFocused = -1;
     @Shadow @Final private PackSelectionModel model;
     @Shadow protected abstract void reload();
 
     @Shadow private Button doneButton;
-
-    @Shadow protected abstract void closeWatcher();
+    public ControlTooltip.Renderer controlTooltipRenderer = ControlTooltip.defaultScreen(this);
 
     private Panel panel = Panel.centered(this,410,240);
     private RenderableVList selectedPacksList = new RenderableVList().layoutSpacing(l->0);
@@ -56,7 +54,16 @@ public abstract class PackSelectionScreenMixin extends Screen {
     private PackSelectionScreen self(){
         return(PackSelectionScreen)(Object) this;
     }
+    public void clearFocus() {
+        if (lastFocused >= 0 && LegacyMinecraftClient.controllerHandler.isCursorDisabled) return;
+        lastFocused = -1;
+        super.clearFocus();
+    }
 
+    public void repositionElements() {
+        lastFocused = getFocused() != null ? children().indexOf(getFocused()) : -1;
+        super.repositionElements();
+    }
     @Override
     public void init() {
         super.init();
@@ -64,6 +71,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
         unselectedPacksList.init(this,panel.x + 15, panel.y + 30, 180, 210);
         selectedPacksList.init(this,panel.x + 215, panel.y + 30, 180, 210);
         this.doneButton = Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).build();
+        if (lastFocused >= 0 && lastFocused < children.size()) setInitialFocus(children.get(lastFocused));
     }
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
@@ -77,6 +85,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
         ScreenUtil.renderPanelRecess(guiGraphics,panel.x + 210, panel.y + 10, 190, 220,2f);
         guiGraphics.drawString(this.font, SELECTED_PACK, panel.x + 10 + (190 - font.width(SELECTED_PACK)) / 2, panel.y + 18, 0x404040,false);
         guiGraphics.drawString(this.font, AVAILABLE_PACK, panel.x + 210 + (190 - font.width(AVAILABLE_PACK)) / 2, panel.y + 18, 0x404040, false);
+        controlTooltipRenderer.render(guiGraphics, i, j, f);
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
@@ -89,12 +98,10 @@ public abstract class PackSelectionScreenMixin extends Screen {
         ci.cancel();
         addPacks(unselectedPacksList,model.getUnselected());
         addPacks(selectedPacksList,model.getSelected());
-        rebuildWidgets();
+        repositionElements();
     }
     @Inject(method = "onClose", at = @At("RETURN"))
     public void onClose(CallbackInfo info){
-        this.model.commit();
-        this.closeWatcher();
         ScreenUtil.playSimpleUISound(LegacySoundEvents.BACK.get(),1.0f);
     }
     private void addPacks(RenderableVList list,Stream<PackSelectionModel.Entry> stream){

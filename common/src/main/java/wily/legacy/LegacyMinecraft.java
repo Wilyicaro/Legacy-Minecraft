@@ -1,6 +1,7 @@
 package wily.legacy;
 
 import com.google.common.base.Suppliers;
+import dev.architectury.event.events.common.CommandRegistrationEvent;
 import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.networking.NetworkChannel;
@@ -18,10 +19,7 @@ import org.apache.logging.log4j.Logger;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.init.LegacyMenuTypes;
 import wily.legacy.init.LegacySoundEvents;
-import wily.legacy.network.CommonPacket;
-import wily.legacy.network.ServerDisplayInfoSync;
-import wily.legacy.network.ServerInventoryCraftPacket;
-import wily.legacy.network.ServerOpenClientMenu;
+import wily.legacy.network.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -52,6 +50,8 @@ public class LegacyMinecraft
         registerCommonPacket(ServerDisplayInfoSync.HostOptions.class,ServerDisplayInfoSync.HostOptions::new);
         registerCommonPacket(ServerOpenClientMenu.class,ServerOpenClientMenu::new);
         registerCommonPacket(ServerInventoryCraftPacket.class, ServerInventoryCraftPacket::new);
+        registerCommonPacket(TipCommand.Packet.class, TipCommand.Packet::decode);
+        registerCommonPacket(TipCommand.EntityPacket.class, TipCommand.EntityPacket::new);
         LifecycleEvent.SERVER_STARTED.register(l-> playerVisualIds.clear());
         PlayerEvent.PLAYER_JOIN.register(p->{
             updateDisplayPlayersMap(p,true);
@@ -60,6 +60,9 @@ public class LegacyMinecraft
             updateDisplayPlayersMap(p,false);
         });
         LifecycleEvent.SERVER_STOPPED.register(l-> playerVisualIds.clear());
+        CommandRegistrationEvent.EVENT.register((s,c,e)->{
+            TipCommand.register(s,c);
+        });
     }
     @FunctionalInterface
     public interface PackRegistry {

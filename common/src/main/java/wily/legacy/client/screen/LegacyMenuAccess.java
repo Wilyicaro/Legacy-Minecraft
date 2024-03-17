@@ -24,14 +24,16 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
         boolean positive = direction.isPositive();
         if (getMenu().slots.size() == 1 && movePointerToSlot(getMenu().slots.get(0),false)) return;
         int part = getMenu().slots.stream().map(s->Math.round(ScreenUtil.iconHolderRenderer.slotBounds(s).getMinSize() / 2f)).sorted().findFirst().orElse(9);
-        for (int i = 0; i < (horizontal ? height - pointerY : width - pointerX); i+=part)
-            if (movePointerToSlotIn(positive,horizontal,horizontal ? width : height, i, (int)pointerX, (int)pointerY,part)) return;
-        for (int i = 0; i >= (horizontal ? -pointerY : -pointerX); i-=part)
-            if (movePointerToSlotIn(positive,horizontal,horizontal ? width : height, i, (int)pointerX, (int)pointerY,part)) return;
-        for (int i = 0; i < (horizontal ? height - pointerY : width - pointerX); i+=part)
-            if (movePointerToSlotInReverse(positive,horizontal,horizontal ? width : height, i, (int)pointerX, (int)pointerY,part)) return;
-        for (int i = 0; i >= (horizontal ? -pointerY : -pointerX); i-=part)
-            if (movePointerToSlotInReverse(positive,horizontal,horizontal ? width : height, i, (int)pointerX, (int)pointerY,part)) return;
+        double r = horizontal ? height - pointerY : width - pointerX;
+        double l = (horizontal ? pointerY : pointerX);
+        for (int i = 0; i < Math.max(r,l); i+=part) {
+            if (i <= r && movePointerToSlotIn(positive, horizontal, horizontal ? width : height, i, (int) pointerX, (int) pointerY, part)) return;
+            if (i <= l && movePointerToSlotIn(positive, horizontal, horizontal ? width : height, -i, (int) pointerX, (int) pointerY, part)) return;
+        }
+        for (int i = 0; i < Math.max(r,l); i+=part) {
+            if (i <= r && movePointerToSlotInReverse(positive, horizontal, horizontal ? width : height, i, (int) pointerX, (int) pointerY, part)) return;
+            if (i <= l && movePointerToSlotInReverse(positive, horizontal, horizontal ? width : height, -i, (int) pointerX, (int) pointerY, part)) return;
+        }
 
     }
     default boolean movePointerToSlotIn(boolean positive, boolean horizontal, int size, int pos, int pointerX, int pointerY, int part){
@@ -72,6 +74,7 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
     }
     ScreenRectangle getMenuRectangle();
     Slot getHoveredSlot();
+    ControlTooltip.Renderer getControlTooltipRenderer();
     default Slot findSlotAt(double d, double e){
         for (Slot slot : getMenu().slots)
             if (ScreenUtil.isHovering(slot,getMenuRectangle().left(), getMenuRectangle().top(),d,e)) return slot;

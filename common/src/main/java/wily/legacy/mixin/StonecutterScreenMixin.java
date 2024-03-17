@@ -9,6 +9,7 @@ import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
@@ -28,7 +29,9 @@ import wily.legacy.LegacyMinecraft;
 import wily.legacy.client.LegacySprites;
 import wily.legacy.client.Offset;
 import wily.legacy.client.StoneCuttingGroupManager;
+import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.client.screen.LegacyIconHolder;
+import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.network.ServerInventoryCraftPacket;
@@ -41,6 +44,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static wily.legacy.client.LegacySprites.ARROW_SPRITE;
+import static wily.legacy.client.screen.ControlTooltip.*;
 
 @Mixin(StonecutterScreen.class)
 public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterMenu> {
@@ -70,6 +74,8 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
     }
     @Inject(method = "<init>",at = @At("RETURN"))
     private void init(StonecutterMenu stonecutterMenu, Inventory inventory, Component component, CallbackInfo ci) {
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().tooltips.add(0,create(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_RETURN,true) : ControllerComponent.DOWN_BUTTON.componentState.getIcon(true),()->getFocused() instanceof LegacyIconHolder h && !h.isWarning()? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.create") : null));
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_O,true) : ControllerComponent.UP_BUTTON.componentState.getIcon(true), ()-> CONTROL_ACTION_CACHE.getUnchecked(onlyCraftableRecipes ? "legacy.action.all_recipes" : "legacy.action.show_craftable_recipes"));
         RecipeManager manager = Minecraft.getInstance().level.getRecipeManager();
         StoneCuttingGroupManager.list.values().forEach(l->{
             List<StonecutterRecipe> group = new ArrayList<>();
@@ -171,9 +177,11 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
                 @Override
                 public void renderItem(GuiGraphics graphics, int i, int j, float f) {
                     if (!isValidIndex()) return;
-                    ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(0)),0.5f, ()->super.renderItem(graphics, i, j, f));
+                    ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(0)),0.5f, ()->renderItem(graphics,itemIcon,getX(),getY(),false));
                 }
-
+                public ResourceLocation getIconHolderSprite(){
+                    return ICON_HOLDER;
+                }
                 private boolean canCraft(StonecutterRecipe rcp){
                     if (rcp == null || onlyCraftableRecipes) return true;
                     boolean focusedRcp = isFocused() && getFocusedRecipe() == rcp;
@@ -238,10 +246,11 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
 
                 @Override
                 public boolean keyPressed(int i, int j, int k) {
-                    if (i == InputConstants.KEY_X) {
+                    if (i == InputConstants.KEY_O) {
                         onlyCraftableRecipes = !onlyCraftableRecipes;
                         listener.slotChanged(menu,0,ItemStack.EMPTY);
                         focusedRecipes = null;
+                        updateIngredient(getFocusedRecipe());
                         return true;
                     }
                     int oldSelection = selectionOffset;
@@ -271,7 +280,9 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
                     }
                     return super.keyPressed(i, j, k);
                 }
-
+                public boolean isWarning() {
+                    return getFocusedRecipe() == null || !canCraft(getFocusedRecipe());
+                }
                 private void updateIngredient(StonecutterRecipe rcp) {
                     ingredientSlot = rcp == null ? Collections.emptyList() : rcp.getIngredients();
                 }
@@ -347,7 +358,7 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
                     if (isValidIndex()) {
                         if (isFocused()) {
                             if (hasAutoCrafting() && canCraft(getFocusedRecipe())) {
-                                LegacyMinecraft.NETWORK.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), -Item.getId(getFocusedResult().getItem()), 2, 38));
+                                LegacyMinecraft.NETWORK.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), -Item.getId(getFocusedResult().getItem()),hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
                             } else ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT_FAIL.get(), 1.0f);
                         }
                         updateResultSlot();

@@ -5,10 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.storage.WorldData;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
@@ -22,7 +19,8 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyWorldSettings;
 
 @Mixin(MinecraftServer.class)
-public abstract class ClientMinecraftServerMixin {
+public abstract class
+ClientMinecraftServerMixin {
 
     @Shadow public abstract boolean isSingleplayerOwner(GameProfile gameProfile);
 

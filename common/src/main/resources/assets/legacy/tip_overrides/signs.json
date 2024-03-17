@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "item": "#signs",
+    "tip": "block.minecraft.sign.tip"
+  }
+}

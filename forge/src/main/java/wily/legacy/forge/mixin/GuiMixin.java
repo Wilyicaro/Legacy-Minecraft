@@ -1,6 +1,5 @@
 package wily.legacy.forge.mixin;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
@@ -48,9 +47,6 @@ public abstract class GuiMixin {
             for (int i = 0; i < tooltipLines.size(); i++) {
                 int l;
                 Component mutableComponent = tooltipLines.get(i);
-                if (this.lastToolHighlight.hasCustomHoverName()) {
-                    mutableComponent.copy().withStyle(ChatFormatting.ITALIC);
-                }
                 int width = this.getFont().width(mutableComponent);
                 int j = (this.screenWidth - width) / 2;
                 int k = this.screenHeight - getFont().lineHeight * (tooltipLines.size() - 1 - i);

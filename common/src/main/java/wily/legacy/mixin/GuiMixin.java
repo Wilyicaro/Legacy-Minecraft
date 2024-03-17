@@ -2,6 +2,7 @@ package wily.legacy.mixin;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
@@ -29,6 +30,7 @@ import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.BufferSourceWrapper;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(Gui.class)
@@ -45,6 +47,8 @@ public abstract class GuiMixin {
     @Shadow protected float autosaveIndicatorValue;
 
     @Shadow protected float lastAutosaveIndicatorValue;
+
+    private int lastHotbarSelection = -1;
 
     @Shadow protected abstract Player getCameraPlayer();
 
@@ -86,6 +90,10 @@ public abstract class GuiMixin {
             ci.cancel();
             return;
         }
+        int newSelection = minecraft.player != null ? minecraft.player.getInventory().selected : -1;
+        if (lastHotbarSelection >= 0 && lastHotbarSelection != newSelection) ScreenUtil.lastHotbarSelectionChange = Util.getMillis();
+        lastHotbarSelection = newSelection;
+
         guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F,  ScreenUtil.getHUDDistance(),0.0F);
@@ -110,6 +118,7 @@ public abstract class GuiMixin {
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
         Player player = this.getCameraPlayer();
         if (player == null) return;
+        ControlTooltip.guiControlRenderer.render(guiGraphics,0,0,f);
         if (((LegacyOptions)minecraft.options).animatedCharacter().get() && (player.isSprinting() || player.isShiftKeyDown() || player.isCrouching() || player.getAbilities().flying || player.isFallFlying())) {
             Vec3 deltaMove = player.getDeltaMovement();
             float bodyRot = player.yBodyRot;

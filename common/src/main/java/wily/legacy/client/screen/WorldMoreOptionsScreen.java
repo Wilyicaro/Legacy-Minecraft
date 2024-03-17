@@ -1,5 +1,6 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -16,9 +17,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.WorldDataConfiguration;
+import wily.legacy.LegacyMinecraft;
+import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.util.ScreenUtil;
 
 import java.nio.file.Path;
@@ -28,6 +30,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static wily.legacy.client.screen.ControlTooltip.CONTROL_ACTION_CACHE;
+
 public class WorldMoreOptionsScreen extends PanelVListScreen {
     protected MultiLineLabel tooltipBoxLabel;
     protected ScrollableRenderer scrollableRenderer =  new ScrollableRenderer(new LegacyScrollRenderer());
@@ -36,13 +40,11 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
 
     protected final RenderableVList gameRenderables = new RenderableVList();
 
-    //protected List<GameRules.Key<?>> worldOptionsRules = List.of(GameRules.RULE_MOBGRIEFING, GameRules.RULE_DOFIRETICK, GameRules.RULE_WATER_SOURCE_CONVERSION, GameRules.RULE_LAVA_SOURCE_CONVERSION);
-    //protected List<GameRules.Key<?>> gameOptionsRules = List.of(GameRules.RULE_DAYLIGHT,GameRules.RULE_WEATHER_CYCLE,GameRules.RULE_KEEPINVENTORY,GameRules.RULE_LIMITED_CRAFTING,GameRules.RULE_DO_IMMEDIATE_RESPAWN,GameRules.RULE_NATURAL_REGENERATION,GameRules.RULE_DROWNING_DAMAGE,GameRules.RULE_FALL_DAMAGE,GameRules.RULE_FIRE_DAMAGE,GameRules.RULE_FREEZE_DAMAGE,GameRules.RULE_DOMOBSPAWNING, GameRules.RULE_DO_PATROL_SPAWNING);
-
     protected Runnable onClose = ()->{};
     protected WorldMoreOptionsScreen(Screen parent, Function<Panel,Integer> posHeight) {
         super(s -> new Panel(p -> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 188 : 0))) / 2, p -> (s.height - posHeight.apply(p)) / 2, 244, 199), Component.translatable("createWorld.tab.more.title"));
         this.parent = parent;
+        controlTooltipRenderer.addCompound(()-> new Component[]{ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true) : ControllerComponent.LEFT_BUMPER.componentState.getIcon(true),ControlTooltip.SPACE,ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true) : ControllerComponent.RIGHT_BUMPER.componentState.getIcon(true)},()->CONTROL_ACTION_CACHE.getUnchecked(tabList.selectedTab == 0 ?  "legacy.menu.game_options" : "createWorld.tab.world.title"));
     }
     public WorldMoreOptionsScreen(CreateWorldScreen parent, Consumer<Boolean> setTrustPlayers) {
         this(parent, p-> p.height);
@@ -85,8 +87,10 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
                 }));
             });
             onClose = ()->{
-                dataRepository.setSelected(selectedExperiments);
-                parent.tryApplyNewDataPacks(dataRepository, false,w-> minecraft.setScreen(this));
+                if (!dataRepository.getSelectedIds().equals(selectedExperiments)) {
+                    dataRepository.setSelected(selectedExperiments);
+                    parent.tryApplyNewDataPacks(dataRepository, false, w -> minecraft.setScreen(this));
+                }
             };
         }
         renderableVList.addRenderable(Button.builder(Component.translatable("selectWorld.dataPacks"), button -> openDataPackSelectionScreen(parent, parent.getUiState().getSettings().dataConfiguration())).build());
@@ -139,7 +143,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
     @Override
     public void setTooltipForNextRenderPass(Tooltip tooltip, ClientTooltipPositioner clientTooltipPositioner, boolean bl) {
         if (ScreenUtil.hasTooltipBoxes())
-            tooltipBoxLabel =  MultiLineLabel.createFixed(font, tooltip.toCharSequence(minecraft).stream().map(formattedCharSequence -> new MultiLineLabel.TextWithWidth((FormattedCharSequence)formattedCharSequence, font.width(formattedCharSequence))).toList());
+            tooltipBoxLabel =  MultiLineLabel.createFixed(font, tooltip.toCharSequence(minecraft).stream().map(formattedCharSequence -> new MultiLineLabel.TextWithWidth(formattedCharSequence, font.width(formattedCharSequence))).toList());
         else super.setTooltipForNextRenderPass(tooltip, clientTooltipPositioner, bl);
     }
 
@@ -151,7 +155,10 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
         renderableVList.addRenderable(new TickBox(0,0,parent.resetEnd, b-> Component.translatable("legacy.menu.load_save.reset_end"),b-> null,t-> parent.resetEnd = t.selected));
         renderableVList.addRenderable(new TickBox(0,0,parent.trustPlayers, b-> Component.translatable("legacy.menu.selectWorld.trust_players"),b-> null,t-> parent.trustPlayers = t.selected));
         addGameRulesOptions(renderableVList,gameRules, k-> k.getCategory() == GameRules.Category.UPDATES);
-        gameRenderables.addRenderable(new TickBox(0,0,parent.allowCheats,b->Component.translatable("selectWorld.allowCommands"),b->Tooltip.create(Component.translatable("selectWorld.allowCommands.info")),b->parent.allowCheats = b.selected));
+        gameRenderables.addRenderable(new TickBox(0,0,parent.allowCheats,b->Component.translatable("selectWorld.allowCommands"),b->Tooltip.create(Component.translatable("selectWorld.allowCommands.info")),b->{
+            parent.allowCheats = b.selected;
+            LegacyMinecraft.LOGGER.warn(parent.allowCheats);
+        }));
         for (GameRules.Category value : GameRules.Category.values()) {
             if (value == GameRules.Category.UPDATES) continue;
             addGameRulesOptions(gameRenderables,gameRules, k-> k.getCategory() == value);
@@ -160,7 +167,9 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
           if (!g.equals(gameRules)) g.assignFrom(gameRules,s);
         };
     }
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+
+    @Override
+    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         ScreenUtil.renderDefaultBackground(guiGraphics,false);
         if (ScreenUtil.hasTooltipBoxes()) {
             if (tooltipBoxLabel != null && getChildAt(i,j).map(g-> g instanceof AbstractWidget w ? w.getTooltip() : null).isEmpty() && (!(getFocused() instanceof AbstractWidget w) || w.getTooltip() == null)) tooltipBoxLabel = null;
@@ -168,6 +177,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
             if (tooltipBoxLabel != null) tooltipBoxLabel.renderLeftAligned(guiGraphics, panel.x + panel.width + 3, panel.y + 13,12,0xFFFFFF);
         }
     }
+
     @Override
     public boolean keyPressed(int i, int j, int k) {
         tabList.controlTab(i);

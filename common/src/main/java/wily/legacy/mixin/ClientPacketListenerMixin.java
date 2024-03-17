@@ -1,7 +1,9 @@
 package wily.legacy.mixin;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -37,5 +39,9 @@ public class ClientPacketListenerMixin {
         }else{
             instance.setItem(i,j,itemStack);
         }
+    }
+    @Redirect(method = "handleSetEntityPassengersPacket", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;setOverlayMessage(Lnet/minecraft/network/chat/Component;Z)V"))
+    public void handleSetEntityPassengersPacket(Gui instance, Component component, boolean bl) {
+
     }
 }

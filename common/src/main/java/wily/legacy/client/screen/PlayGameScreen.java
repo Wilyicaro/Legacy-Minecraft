@@ -1,6 +1,8 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.multiplayer.ServerStatusPinger;
@@ -9,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.storage.LevelSummary;
 import org.apache.commons.compress.utils.FileNameUtils;
 import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.FileInputStream;
@@ -16,11 +19,18 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static wily.legacy.client.screen.ControlTooltip.CONTROL_ACTION_CACHE;
 
 public class PlayGameScreen extends PanelVListScreen{
     public PlayGameScreen(Screen parent, int initialTab) {
         super(parent,300,256,Component.translatable("legacy.menu.play_game"));
+        tabList.selectedTab = -1;
+        tabList.tabButtons.get(initialTab).onPress();
+        Supplier<Boolean> saveOptions = ()-> saveRenderableList.renderables.stream().anyMatch(r-> r instanceof GuiEventListener l && l.isFocused());
+        controlTooltipRenderer.add(()->ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O,true) : ControllerComponent.UP_BUTTON.componentState.getIcon(true),()->saveOptions.get() || serverRenderableList.renderables.stream().anyMatch(r-> serverRenderableList.renderables.indexOf(r) > 1 && r instanceof GuiEventListener l && l.isFocused()) ? CONTROL_ACTION_CACHE.getUnchecked(saveOptions.get() ? "legacy.menu.save_options" : "legacy.menu.server_options") : null);
     }
     public PlayGameScreen(Screen parent) {
         this(parent,0);
@@ -28,8 +38,8 @@ public class PlayGameScreen extends PanelVListScreen{
     protected final TabList tabList = new TabList().add(30,0,Component.translatable("legacy.menu.load"), b-> repositionElements()).add(30,1,Component.translatable("legacy.menu.create"), b-> repositionElements()).add(30,2,Component.translatable("legacy.menu.join"), b-> repositionElements());
     public boolean isLoading = false;
     private final ServerStatusPinger pinger = new ServerStatusPinger();
-    protected final ServerSelectionList serverSelectionList = new ServerSelectionList();
-    public final SaveSelectionList saveSelectionList = new SaveSelectionList(this);
+    protected final ServerRenderableList serverRenderableList = new ServerRenderableList();
+    public final SaveRenderableList saveRenderableList = new SaveRenderableList(this);
     private final CreationList creationList = new CreationList();
 
 
@@ -55,35 +65,35 @@ public class PlayGameScreen extends PanelVListScreen{
 
     @Override
     public RenderableVList getRenderableVList() {
-        if (tabList.selectedTab == 2) return serverSelectionList;
+        if (tabList.selectedTab == 2) return serverRenderableList;
         else if (tabList.selectedTab == 1) return creationList;
-        return saveSelectionList;
+        return saveRenderableList;
     }
 
     @Override
     public void removed() {
-        if (this.saveSelectionList != null) {
-            SaveSelectionList.resetIconCache();
+        if (this.saveRenderableList != null) {
+            SaveRenderableList.resetIconCache();
         }
-        if (serverSelectionList.lanServerDetector != null) {
-            serverSelectionList.lanServerDetector.interrupt();
-            serverSelectionList.lanServerDetector = null;
+        if (serverRenderableList.lanServerDetector != null) {
+            serverRenderableList.lanServerDetector.interrupt();
+            serverRenderableList.lanServerDetector = null;
         }
         this.pinger.removeAll();
     }
     @Override
     public void tick() {
         super.tick();
-        List<LevelSummary> summaries = saveSelectionList.pollLevelsIgnoreErrors();
-        if (summaries != saveSelectionList.currentlyDisplayedLevels) {
-            saveSelectionList.fillLevels("",summaries);
+        List<LevelSummary> summaries = saveRenderableList.pollLevelsIgnoreErrors();
+        if (summaries != saveRenderableList.currentlyDisplayedLevels) {
+            saveRenderableList.fillLevels("",summaries);
             repositionElements();
         }
-        List<LanServer> list = serverSelectionList.lanServerList.takeDirtyServers();
+        List<LanServer> list = serverRenderableList.lanServerList.takeDirtyServers();
         if (list != null) {
-            if (serverSelectionList.lanServers == null || !new HashSet<>(serverSelectionList.lanServers).containsAll(list)) {
-                serverSelectionList.lanServers = list;
-                serverSelectionList.updateServers();
+            if (serverRenderableList.lanServers == null || !new HashSet<>(serverRenderableList.lanServers).containsAll(list)) {
+                serverRenderableList.lanServers = list;
+                serverRenderableList.updateServers();
                 rebuildWidgets();
             }
         }
@@ -103,9 +113,9 @@ public class PlayGameScreen extends PanelVListScreen{
         }
         if (i == 294) {
             if (tabList.selectedTab == 0) {
-                saveSelectionList.reloadSaveList();
+                saveRenderableList.reloadSaveList();
             } else if (tabList.selectedTab == 2) {
-                serverSelectionList.updateServers();
+                serverRenderableList.updateServers();
             }
             this.rebuildWidgets();
             return true;
@@ -118,7 +128,7 @@ public class PlayGameScreen extends PanelVListScreen{
     }
 
     public ServerList getServers() {
-        return serverSelectionList.servers;
+        return serverRenderableList.servers;
     }
     public void onFilesDrop(List<Path> list) {
         if (tabList.selectedTab == 0) {
@@ -136,7 +146,7 @@ public class PlayGameScreen extends PanelVListScreen{
 
                 });
                 minecraft.setScreen(this);
-                saveSelectionList.reloadSaveList();
+                saveRenderableList.reloadSaveList();
             }));
         }
     }

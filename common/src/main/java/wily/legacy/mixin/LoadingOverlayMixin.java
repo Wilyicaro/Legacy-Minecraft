@@ -36,7 +36,7 @@ public class LoadingOverlayMixin extends Overlay {
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         float timer = (Util.getMillis() - initTime) / 3200f;
-        if (!finishedIntro && timer % INTROS.length >= INTROS.length - 0.01f) finishedIntro = true;
+        if (!finishedIntro && timer % INTROS.length >= INTROS.length - 0.01f && reload.isDone()) finishedIntro = true;
         if (!finishedIntro) {
             if ((InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_RETURN) || ControllerComponent.DOWN_BUTTON.componentState.pressed) && reload.isDone())
                 finishedIntro = true;
@@ -52,9 +52,6 @@ public class LoadingOverlayMixin extends Overlay {
         }
 
         if (finishedIntro) {
-            if (this.minecraft.screen != null) {
-                this.minecraft.screen.render(guiGraphics, 0, 0, f);
-            }
             if (timer >= 1) minecraft.setOverlay(null);
             if (reload.isDone()) {
                 try {
@@ -63,6 +60,10 @@ public class LoadingOverlayMixin extends Overlay {
                 } catch (Throwable throwable) {
                     this.onFinish.accept(Optional.of(throwable));
                 }
+                if (minecraft.screen != null)  this.minecraft.screen.init(this.minecraft, guiGraphics.guiWidth(), guiGraphics.guiHeight());
+            }
+            if (this.minecraft.screen != null) {
+                this.minecraft.screen.render(guiGraphics, 0, 0, f);
             }
         }
     }

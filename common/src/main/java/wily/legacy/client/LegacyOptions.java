@@ -7,6 +7,8 @@ public interface LegacyOptions {
 
     OptionInstance<Double> hudDistance();
     OptionInstance<Double> hudOpacity();
+    OptionInstance<Double> interfaceResolution();
+    OptionInstance<Double> interfaceSensitivity();
     OptionInstance<Integer> autoSaveInterval();
     OptionInstance<Integer> hudScale();
     OptionInstance<Boolean> legacyCreativeTab();
@@ -25,5 +27,9 @@ public interface LegacyOptions {
     OptionInstance<Boolean> minecartSounds();
     OptionInstance<Boolean> vanillaTabs();
     OptionInstance<Boolean> forceYellowText();
+    OptionInstance<Boolean> displayNameTagBorder();
+    OptionInstance<Boolean> invertYController();
+    OptionInstance<Boolean> invertControllerButtons();
+    OptionInstance<Integer> controllerIcons();
     OptionInstance<Difficulty> createWorldDifficulty();
 }

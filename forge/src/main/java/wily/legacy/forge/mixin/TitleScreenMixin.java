@@ -16,6 +16,6 @@ public class TitleScreenMixin {
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     private void init(CallbackInfo ci){
         ci.cancel();
-        ((TitleScreen)(Object) this).getMinecraft().setScreen(new MainMenuScreen(fading));
+        ((TitleScreen)(Object) this).getMinecraft().setScreen(new MainMenuScreen());
     }
 }

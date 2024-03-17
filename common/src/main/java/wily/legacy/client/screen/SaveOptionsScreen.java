@@ -32,11 +32,11 @@ public class SaveOptionsScreen extends ConfirmationScreen{
                 LevelStorageSource.LevelStorageAccess levelStorageAccess = this.minecraft.getLevelSource().validateAndCreateAccess(id);
                 levelStorageAccess.renameLevel(renameBox.getValue());
                 levelStorageAccess.close();
-                parent.saveSelectionList.reloadSaveList();
+                parent.saveRenderableList.reloadSaveList();
                 minecraft.setScreen(parent);
             } catch (IOException iOException) {
                 SystemToast.onWorldAccessFailure(this.minecraft, id);
-                parent.saveSelectionList.reloadSaveList();
+                parent.saveRenderableList.reloadSaveList();
             } catch (ContentValidationException contentValidationException) {
                 LegacyMinecraft.LOGGER.warn("{}", contentValidationException.getMessage());
                 this.minecraft.setScreen(NoticeWithLinkScreen.createWorldSymlinkWarningScreen(parent));
@@ -51,6 +51,6 @@ public class SaveOptionsScreen extends ConfirmationScreen{
                 addRenderableWidget(renameBox);
             }
         })).bounds(panel.x + 15, panel.getRectangle().bottom() - 52,200,20).build());
-        addRenderableWidget(Button.builder(Component.translatable("selectWorld.delete"),b-> minecraft.setScreen(new ConfirmationScreen(parent,230,120, Component.translatable("selectWorld.delete"), Component.translatable("selectWorld.deleteQuestion"), b1->parent.saveSelectionList.deleteSave(summary)))).bounds(panel.x + 15, panel.getRectangle().bottom() - 30,200,20).build());
+        addRenderableWidget(Button.builder(Component.translatable("selectWorld.delete"),b-> minecraft.setScreen(new ConfirmationScreen(parent,230,120, Component.translatable("selectWorld.delete"), Component.translatable("selectWorld.deleteQuestion"), b1->parent.saveRenderableList.deleteSave(summary)))).bounds(panel.x + 15, panel.getRectangle().bottom() - 30,200,20).build());
     }
 }

@@ -18,7 +18,7 @@ public class LegacySlotWrapper extends Slot {
     public LegacySlotWrapper(Slot slot) {
         this(slot,slot.container, slot.getContainerSlot(), slot.x, slot.y);
     }
-    public LegacySlotWrapper(Slot slot, Container container, int i, int j, int k) {
+    public LegacySlotWrapper(Slot slot,Container container, int i, int j, int k) {
         super(container, i, j, k);
         this.target = slot;
         lastItemStack = target.getItem();
@@ -45,7 +45,7 @@ public class LegacySlotWrapper extends Slot {
     @Override
     public ItemStack getItem() {
         ItemStack s = this.target.getItem();
-        if (s != lastItemStack){
+        if (!s.equals(lastItemStack)){
             lastItemStack = s;
             setChanged();
         }

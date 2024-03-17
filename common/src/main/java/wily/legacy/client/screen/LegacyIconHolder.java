@@ -35,6 +35,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     public ItemStack itemIcon = ItemStack.EMPTY;
 
     public boolean allowItemDecorations = true;
+    public boolean allowFocusedItemTooltip = false;
     private boolean isWarning = false;
     public boolean isHovered;
     private boolean focused = false;
@@ -111,7 +112,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     public void applyOffset(GuiGraphics graphics){
         if (!offset.equals(Offset.ZERO)) offset.apply(graphics.pose());
     }
-    protected boolean isWarning(){
+    public boolean isWarning(){
         return isWarning;
     }
     public void setWarning(boolean warning){
@@ -167,7 +168,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             }
         }
     }
-    public void renderSelection(GuiGraphics graphics, int i, int j, float f){;
+    public void renderSelection(GuiGraphics graphics, int i, int j, float f){
         graphics.pose().pushPose();
         graphics.pose().translate(getXCorner() - 4.5f, getYCorner() - 4.5f, 0f);
         applyOffset(graphics);
@@ -191,7 +192,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         renderHighlight(graphics,0);
     }
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics,int i, int j){
-        if (isHovered) renderTooltip(minecraft,graphics,itemIcon,i,j);
+        if (isHovered || (allowFocusedItemTooltip && isFocused())) renderTooltip(minecraft,graphics,itemIcon, !isHovered ? (int) getMiddleX() : i,!isHovered ? (int) getMiddleY() : j);
     }
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics,ItemStack stack, int i, int j){
         if (!stack.isEmpty()) {

@@ -29,7 +29,7 @@ public class ServerEditScreen extends ConfirmationScreen{
                 }
             }
             parent.getServers().save();
-            parent.serverSelectionList.updateServers();
+            parent.serverRenderableList.updateServers();
             return true;
         };
     }

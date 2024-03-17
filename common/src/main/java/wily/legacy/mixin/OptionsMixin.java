@@ -8,6 +8,7 @@ import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Difficulty;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,8 +18,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.controller.ControllerHandler;
+import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.client.controller.LegacyKeyMapping;
+import wily.legacy.client.screen.ControlTooltip;
 
 import java.io.File;
 import java.util.Arrays;
@@ -31,7 +33,6 @@ public abstract class OptionsMixin implements LegacyOptions {
 
     @Shadow public abstract void load();
 
-
     @Shadow
     public static Component genericValueLabel(Component arg, Component arg2) {
         return null;
@@ -42,8 +43,16 @@ public abstract class OptionsMixin implements LegacyOptions {
         return null;
     }
 
+    @Shadow
+    protected static Component percentValueLabel(Component component, double d) {
+        return null;
+    }
+
+    @Shadow @Final public KeyMapping[] keyMappings;
     private OptionInstance<Double> hudDistance;
     private OptionInstance<Double> hudOpacity;
+    private OptionInstance<Double> interfaceResolution;
+    private OptionInstance<Double> interfaceSensitivity;
     private OptionInstance<Integer> autoSaveInterval;
     private OptionInstance<Boolean> legacyCreativeTab;
     private OptionInstance<Boolean> displayHUD;
@@ -60,13 +69,21 @@ public abstract class OptionsMixin implements LegacyOptions {
     private OptionInstance<Boolean> directSaveLoad;
     private OptionInstance<Boolean> vignette;
     private OptionInstance<Boolean> forceYellowText;
+    private OptionInstance<Boolean> displayNameTagBorder;
     private OptionInstance<Boolean> caveSounds;
     private OptionInstance<Boolean> minecartSounds;
+    private OptionInstance<Boolean> invertYController;
+    private OptionInstance<Boolean> invertControllerButtons;
+    private OptionInstance<Integer> controllerIcons;
     private OptionInstance<Difficulty> createWorldDifficulty;
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;<init>(Ljava/lang/String;ILjava/lang/String;)V", ordinal = 5),index = 0)
-    protected String initKeyCrafting(String string) {
-        return "key.crafting";
+    protected String initKeyCraftingName(String string) {
+        return "legacy.key.inventory";
+    }
+    @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;<init>(Ljava/lang/String;ILjava/lang/String;)V", ordinal = 5),index = 1)
+    protected int initKeyCrafting(int i) {
+        return 73;
     }
     @Redirect(method = "<init>", at = @At( value = "INVOKE", target = "Lnet/minecraft/client/Options;load()V"))
     protected void init(Options instance) {
@@ -90,10 +107,16 @@ public abstract class OptionsMixin implements LegacyOptions {
         caveSounds = OptionInstance.createBoolean("legacy.options.caveSounds", true);
         autoSaveInterval = new OptionInstance<>("legacy.options.autoSaveInterval", OptionInstance.noTooltip(), (c,i)-> i == 0 ? genericValueLabel(c,Component.translatable("options.off")) :Component.translatable( "legacy.options.mins_value",c, i * 5), new OptionInstance.IntRange(0,24), 1, d -> {});
         showVanillaRecipeBook = OptionInstance.createBoolean("legacy.options.showVanillaRecipeBook", false);
-        forceYellowText =  OptionInstance.createBoolean("legacy.options.forceYellowText", false);
+        forceYellowText = OptionInstance.createBoolean("legacy.options.forceYellowText", false);
+        displayNameTagBorder = OptionInstance.createBoolean("legacy.options.displayNameTagBorder", true);
+        invertYController = OptionInstance.createBoolean("legacy.options.invertYController", false);
+        invertControllerButtons = OptionInstance.createBoolean("legacy.options.invertControllerButtons", false, (b)-> ControllerComponent.RIGHT_BUTTON.componentState.block());
         hudScale = new OptionInstance<>("legacy.options.hudScale", OptionInstance.noTooltip(), OptionsMixin::genericValueLabel,  new OptionInstance.IntRange(1,3), 2, d -> {});
-        hudOpacity = new OptionInstance<>("legacy.options.hudOpacity", OptionInstance.noTooltip(), (c, d) -> Component.translatable("options.percent_value", c, (int) (d * 100.0)), OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
-        hudDistance = new OptionInstance<>("legacy.options.hudDistance", OptionInstance.noTooltip(), (c, d) -> Component.translatable("options.percent_value", c, (int) (d * 100.0)), OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
+        hudOpacity = new OptionInstance<>("legacy.options.hudOpacity", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
+        hudDistance = new OptionInstance<>("legacy.options.hudDistance", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
+        interfaceResolution = new OptionInstance<>("legacy.options.interfaceResolution", OptionInstance.noTooltip(), (c, d) -> percentValueLabel(c, 0.75 + d / 2), OptionInstance.UnitDouble.INSTANCE, 0.5, d -> minecraft.resizeDisplay());
+        interfaceSensitivity = new OptionInstance<>("legacy.options.interfaceSensitivity", OptionInstance.noTooltip(), (c, d) -> percentValueLabel(c, d*2), OptionInstance.UnitDouble.INSTANCE, 0.5, d -> {});
+        controllerIcons = new OptionInstance<>("legacy.options.controllerIcons", OptionInstance.noTooltip(), (c, i)-> Component.translatable("options.generic_value",c,i == 0? Component.translatable("legacy.options.auto_value", ControlTooltip.getActiveControllerType().displayName) : ControlTooltip.Type.values()[i].displayName),  new OptionInstance.IntRange(0, ControlTooltip.Type.values().length - 1), 0, d -> {});
         createWorldDifficulty = new OptionInstance<>("options.difficulty", d->Tooltip.create(d.getInfo()), (c, d) -> d.getDisplayName(), new OptionInstance.Enum<>(Arrays.asList(Difficulty.values()), Codec.INT.xmap(Difficulty::byId, Difficulty::getId)), Difficulty.NORMAL, d -> {});
         if(LegacyMinecraftClient.canLoadVanillaOptions)
             load();
@@ -102,6 +125,8 @@ public abstract class OptionsMixin implements LegacyOptions {
     private void processOptions(Options.FieldAccess fieldAccess, CallbackInfo ci){
         fieldAccess.process("hudDistance", hudDistance);
         fieldAccess.process("hudOpacity", hudOpacity);
+        fieldAccess.process("interfaceResolution", interfaceResolution);
+        fieldAccess.process("interfaceSensitivity", interfaceSensitivity);
         fieldAccess.process("autoSaveWhenPause", autoSaveWhenPause);
         fieldAccess.process("gameTooltips", inGameTooltips);
         fieldAccess.process("tooltipBoxes", tooltipBoxes);
@@ -114,19 +139,29 @@ public abstract class OptionsMixin implements LegacyOptions {
         fieldAccess.process("autoSaveInterval", autoSaveInterval);
         fieldAccess.process("showVanillaRecipeBook", showVanillaRecipeBook);
         fieldAccess.process("forceYellowText", forceYellowText);
+        fieldAccess.process("displayNameTagBorder", displayNameTagBorder);
         fieldAccess.process("displayHUD", displayHUD);
+        fieldAccess.process("invertYController", invertYController);
+        fieldAccess.process("invertControllerButtons", invertControllerButtons);
         fieldAccess.process("hudScale", hudScale);
+        fieldAccess.process("controllerIcons", controllerIcons);
         fieldAccess.process("legacyCreativeTab", legacyCreativeTab);
         fieldAccess.process("animatedCharacter", animatedCharacter);
         fieldAccess.process("classicCrafting", classicCrafting);
         fieldAccess.process("vanillaTabs", vanillaTabs);
         fieldAccess.process("legacyGamma", legacyGamma);
         hideGui = !displayHUD.get();
+        for (KeyMapping keyMapping : keyMappings) {
+            LegacyKeyMapping mapping = (LegacyKeyMapping) keyMapping;
+            int i = fieldAccess.process("component_" + keyMapping.getName(), mapping.getComponent() == null ? -1 : mapping.getComponent().ordinal());
+            if ((mapping.getComponent() == null && i >= 0) || (mapping.getComponent() != null && mapping.getComponent().ordinal() != i))
+                mapping.setComponent(i < 0 ? null : ControllerComponent.values()[i]);
+        }
     }
-
 
     public OptionInstance<Double> hudDistance() {return hudDistance;}
     public OptionInstance<Double> hudOpacity() {return hudOpacity;}
+    public OptionInstance<Double> interfaceResolution() {return interfaceResolution;}
     public OptionInstance<Boolean> legacyCreativeTab() {
         return legacyCreativeTab;
     }
@@ -175,5 +210,20 @@ public abstract class OptionsMixin implements LegacyOptions {
     }
     public OptionInstance<Boolean> forceYellowText() {
         return forceYellowText;
+    }
+    public OptionInstance<Boolean> displayNameTagBorder() {
+        return displayNameTagBorder;
+    }
+    public OptionInstance<Boolean> invertYController() {
+        return invertYController;
+    }
+    public OptionInstance<Integer> controllerIcons() {
+        return controllerIcons;
+    }
+    public OptionInstance<Double> interfaceSensitivity() {
+        return interfaceSensitivity;
+    }
+    public OptionInstance<Boolean> invertControllerButtons() {
+        return invertControllerButtons;
     }
 }

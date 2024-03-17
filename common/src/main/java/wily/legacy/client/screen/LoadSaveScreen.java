@@ -1,5 +1,6 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -14,7 +15,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.PublishCommand;
-import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.GameRules;
@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyWorldSettings;
+import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
@@ -35,12 +36,14 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 import static wily.legacy.LegacyMinecraftClient.publishUnloadedServer;
+import static wily.legacy.client.screen.ControlTooltip.*;
+import static wily.legacy.client.screen.ControlTooltip.CONTROL_ACTION_CACHE;
 
 public class LoadSaveScreen extends PanelBackgroundScreen{
     public static final Component GAME_MODEL_LABEL = Component.translatable("selectWorld.gameMode");
@@ -57,6 +60,8 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
     protected boolean onlineOnStart = false;
     private int port = HttpUtil.getAvailablePort();
     protected final PackSelector resourcePackSelector;
+    protected Collection<String> originalSelectedPacks = Collections.emptyList();
+
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean deleteOnClose) {
         super(s-> new Panel(p-> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 160 : 0))) / 2, p-> (s.height - p.height) / 2 + 20,245,233), Component.translatable("legacy.menu.load_save.load"));
         this.deleteOnClose = deleteOnClose;
@@ -68,8 +73,13 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
         allowCheats = summary.hasCheats();
         trustPlayers = ((LegacyWorldSettings)(Object)summary.getSettings()).trustPlayers();
         List<String> packs = ((LegacyWorldSettings)(Object)summary.getSettings()).getSelectedResourcePacks();
-        if (!packs.isEmpty()) Minecraft.getInstance().getResourcePackRepository().setSelected(packs);
+        if (!packs.isEmpty()){
+            originalSelectedPacks = Minecraft.getInstance().getResourcePackRepository().getSelectedIds();
+            Minecraft.getInstance().getResourcePackRepository().setSelected(packs);
+        }
         resourcePackSelector = PackSelector.resources(panel.x + 13, panel.y + 112, 220,45, !ScreenUtil.hasTooltipBoxes());
+        controlTooltipRenderer.add(()-> getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{getKeyIcon(InputConstants.KEY_LSHIFT,true), PLUS,getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true)}) : ControllerComponent.LEFT_BUTTON.componentState.getIcon(true), ()-> getFocused() == resourcePackSelector ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.resource_packs_screen") : null);
+        if (!originalSelectedPacks.isEmpty()) Minecraft.getInstance().getResourcePackRepository().setSelected(originalSelectedPacks);
 
     }
     public LoadSaveScreen(Screen screen, LevelSummary summary) {
@@ -84,23 +94,11 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
     }
 
     @Override
-    public void removed() {
-        try {
-            if (deleteOnClose)
-                access.deleteLevel();
-            access.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        super.removed();
-    }
-
-    @Override
     protected void init() {
         panel.init();
         List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
         addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 65, 220,16, b -> b.getDefaultMessage(GAME_MODEL_LABEL,b.getObjectValue().getLongDisplayName()),()->Tooltip.create(Component.translatable("selectWorld.gameMode."+gameType.getName()+ ".info")),gameType,()->gameTypes, b->gameType =b.objectValue));
-        addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 90, 220,16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getObjectValue().getDisplayName()),()->Tooltip.create(difficulty.getInfo()), difficulty,()-> Arrays.asList(Difficulty.values()), b-> difficulty = b.objectValue)).active = !((LegacyWorldSettings)(Object)summary.getSettings()).isDifficultyLocked();
+        addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 90, 220,16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getObjectValue().getDisplayName()),()->Tooltip.create(difficulty.getInfo()), difficulty,()-> Arrays.asList(Difficulty.values()), b-> difficulty = b.objectValue)).active = !((LegacyWorldSettings)(Object)summary.getSettings()).isDifficultyLocked() && !summary.isHardcore();
         EditBox portEdit = addRenderableWidget(new EditBox(minecraft.font, panel.x + 124, panel.y + 157,100,20,Component.translatable("lanServer.port")));
         portEdit.visible = onlineOnStart;
 
@@ -139,11 +137,16 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
     }
 
     private void onLoad() throws IOException {
+        access.close();
         if (resetNether) deleteLevelDimension(access,Level.NETHER);
         if (resetEnd) deleteLevelDimension(access,Level.END);
+        minecraft.execute(()-> {
+            resourcePackSelector.applyChanges(true);
+            if (!originalSelectedPacks.isEmpty()) Minecraft.getInstance().getResourcePackRepository().setSelected(originalSelectedPacks);
+        });
         LegacyMinecraftClient.enterWorldGameType = gameType;
-        resourcePackSelector.applyChanges(true);
         loadWorld(this,minecraft,summary);
+        minecraft.execute(()-> {
         if (minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer().isReady()){
             minecraft.getSingleplayerServer().setDefaultGameType(gameType);
             minecraft.getSingleplayerServer().setDifficulty(difficulty, false);
@@ -154,7 +157,19 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
             }
             ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setAllowCommands(allowCheats);
             if (resourcePackSelector.hasChanged()) ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setSelectedResourcePacks(resourcePackSelector.getSelectedIds());
+        }});
+    }
+
+    @Override
+    public void removed() {
+        try {
+            if (deleteOnClose)
+                access.deleteLevel();
+            access.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+        super.removed();
     }
 
 
@@ -214,7 +229,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
         guiGraphics.pose().popPose();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0,0.5f,0);
-        guiGraphics.blit(SaveSelectionList.iconCache.getUnchecked(summary).textureLocation(),panel.x + 14, panel.y + 10, 0,0,29,29,29,29);
+        guiGraphics.blit(SaveRenderableList.iconCache.getUnchecked(summary).textureLocation(),panel.x + 14, panel.y + 10, 0,0,29,29,29,29);
         guiGraphics.drawString(font,summary.getLevelName(),panel.x + 48, panel.y + 12, 0x404040,false);
         guiGraphics.drawString(font,Component.translatable("legacy.menu.load_save.created_in", (summary.hasCheats() ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()),panel.x + 48, panel.y + 29, 0x404040,false);
         guiGraphics.pose().popPose();
@@ -222,7 +237,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
     }
 
     public static void loadWorld(Screen screen, Minecraft minecraft, LevelSummary summary) {
-        SaveSelectionList.resetIconCache();
+        SaveRenderableList.resetIconCache();
         if (minecraft.getLevelSource().levelExists(summary.getLevelId())) {
             minecraft.forceSetScreen(new GenericDirtMessageScreen(Component.translatable("selectWorld.data_read")));
             minecraft.createWorldOpenFlows().loadLevel(screen, summary.getLevelId());

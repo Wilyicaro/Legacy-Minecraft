@@ -1,23 +1,25 @@
 package wily.legacy.client.screen;
 
+import com.mojang.authlib.minecraft.BanDetails;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
+import com.mojang.realmsclient.RealmsMainScreen;
+import com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.MultiLineLabel;
-import net.minecraft.client.gui.components.SplashRenderer;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.ConfirmScreen;
+import net.minecraft.client.gui.screens.LanguageSelectScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
@@ -26,23 +28,24 @@ import net.minecraft.world.level.storage.LevelSummary;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Objects;
 
+import static wily.legacy.util.ScreenUtil.renderDefaultBackground;
+
 public class MainMenuScreen extends RenderableVListScreen {
     private static final Logger LOGGER = LogUtils.getLogger();
     @Nullable
     private SplashRenderer splash;
-    private final boolean fading;
-    private long fadeInStart;
     @Nullable
     private WarningLabel warningLabel;
 
-    public MainMenuScreen(boolean bl) {
+    public MainMenuScreen() {
         super(Component.translatable("narrator.screen.title"), b->{});
-        this.fading = bl;
+        controlTooltipRenderer.tooltips.remove(1);
         minecraft = Minecraft.getInstance();
         if (minecraft.isDemo()) createDemoMenuOptions();
         else this.createNormalMenuOptions();
@@ -156,41 +159,17 @@ public class MainMenuScreen extends RenderableVListScreen {
 
 
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        if (this.fadeInStart == 0L && this.fading) {
-            this.fadeInStart = Util.getMillis();
+        super.render(guiGraphics, i, j, f);
+
+        if (this.warningLabel != null)
+            this.warningLabel.render(guiGraphics, 255 << 24);
+
+
+        if (this.splash != null) {
+            LegacyMinecraftClient.FONT_SHADOW_OFFSET = 1.0F;
+            this.splash.render(guiGraphics, this.width, this.font, 255 << 24);
+            LegacyMinecraftClient.FONT_SHADOW_OFFSET = 0.5F;
         }
-        float g = this.fading ? (float)(Util.getMillis() - this.fadeInStart) / 1000.0F : 1.0F;
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        renderDefaultBackground(guiGraphics,i,j,f);
-        RenderSystem.enableBlend();
-
-        float h = this.fading ? Mth.clamp(g - 1.0F, 0.0F, 1.0F) : 1.0F;
-        int k = Mth.ceil(h * 255.0F) << 24;
-        if ((k & -67108864) != 0) {
-            if (this.warningLabel != null) {
-                this.warningLabel.render(guiGraphics, k);
-            }
-
-            if (this.splash != null) {
-                LegacyMinecraftClient.FONT_SHADOW_OFFSET = 1.0F;
-                this.splash.render(guiGraphics, this.width, this.font, k);
-                LegacyMinecraftClient.FONT_SHADOW_OFFSET = 0.5F;
-            }
-
-            Iterator var9 = this.children().iterator();
-
-            while(var9.hasNext()) {
-                GuiEventListener guiEventListener = (GuiEventListener)var9.next();
-                if (guiEventListener instanceof AbstractWidget) {
-                    ((AbstractWidget)guiEventListener).setAlpha(h);
-                }
-            }
-
-            super.render(guiGraphics, i, j, f);
-        }
-    }
-
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
     }
 
 

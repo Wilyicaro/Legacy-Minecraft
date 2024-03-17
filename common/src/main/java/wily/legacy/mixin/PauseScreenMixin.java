@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.ExitConfirmationScreen;
 import wily.legacy.client.screen.HelpOptionsScreen;
 import wily.legacy.client.screen.RenderableVList;
@@ -27,6 +28,7 @@ public class PauseScreenMixin extends Screen {
     protected RenderableVList renderableVList;
     protected boolean updateAutoSaveIndicator;
     private boolean inited = false;
+    private ControlTooltip.Renderer controlTooltipRenderer = ControlTooltip.defaultScreen(this);
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
@@ -46,14 +48,12 @@ public class PauseScreenMixin extends Screen {
         );
         minecraft = Minecraft.getInstance();
         if (minecraft.level != null && minecraft.hasSingleplayerServer())
-            renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.save"), button -> {
-                LegacyMinecraftClient.manualSave = true;
-                updateAutoSaveIndicator = true;
-            }).build());
+            renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.save"), button -> LegacyMinecraftClient.manualSave = LegacyMinecraftClient.retakeWorldIcon = updateAutoSaveIndicator = true).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), button -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
     }
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         ScreenUtil.renderDefaultBackground(guiGraphics);
+        controlTooltipRenderer.render(guiGraphics, i, j, f);
     }
 
     @Override

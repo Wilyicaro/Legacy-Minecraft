@@ -1,0 +1,10 @@
+{
+  "tooltips": [
+    {
+      "keyMapping": "key.attack",
+      "action": "legacy.action.hit",
+      "hitEntity": true,
+      "hitBlock": false
+    }
+  ]
+}

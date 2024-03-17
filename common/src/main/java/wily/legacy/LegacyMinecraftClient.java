@@ -20,7 +20,6 @@ import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.client.gui.screens.DisconnectedScreen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
@@ -60,6 +59,7 @@ import wily.legacy.client.controller.ControllerHandler;
 import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacyMenuTypes;
 import wily.legacy.network.ServerDisplayInfoSync;
+import wily.legacy.network.ServerOpenClientMenu;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.File;
@@ -89,6 +89,7 @@ public class LegacyMinecraftClient {
     public static final LegacyTipOverride.Manager legacyTipOverridesManager = new LegacyTipOverride.Manager();
     public static final LegacyResourceManager legacyResourceManager = new LegacyResourceManager();
     public static final StoneCuttingGroupManager stoneCuttingGroupManager = new StoneCuttingGroupManager();
+    public static final ControlTooltip.GuiManager controlTooltipGuiManager = new ControlTooltip.GuiManager();
 
     public static ControllerHandler controllerHandler;
     public static KnownListing<Block> knownBlocks;
@@ -132,52 +133,56 @@ public class LegacyMinecraftClient {
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyBiomeOverrides);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyResourceManager);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, stoneCuttingGroupManager);
+        ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, controlTooltipGuiManager);
 
-        KeyMappingRegistry.register(legacyKeyInventory = new KeyMapping( "key.inventory", InputConstants.KEY_I, "key.categories.inventory"));
-        KeyMappingRegistry.register(keyHostOptions = new KeyMapping( MOD_ID +".key.host_options", InputConstants.KEY_H, "key.categories.misc"));
+        KeyMappingRegistry.register(keyCrafting);
+        KeyMappingRegistry.register(keyHostOptions);
+        KeyMappingRegistry.register(keyCycleHeldLeft);
+        KeyMappingRegistry.register(keyCycleHeldRight);
         knownBlocks = new KnownListing<>(Registries.BLOCK,Minecraft.getInstance().gameDirectory.toPath());
         knownEntities = new KnownListing<>(Registries.ENTITY_TYPE,Minecraft.getInstance().gameDirectory.toPath());
+
         ClientGuiEvent.SET_SCREEN.register((screen) -> {
-            Minecraft minecraft = Minecraft.getInstance();
             if (screen instanceof TitleScreen)
-                return CompoundEventResult.interruptTrue(new MainMenuScreen(false));
+                return CompoundEventResult.interruptTrue(new MainMenuScreen());
             if (screen instanceof JoinMultiplayerScreen)
-                return CompoundEventResult.interruptTrue(new PlayGameScreen(new MainMenuScreen(false),2));
+                return CompoundEventResult.interruptTrue(new PlayGameScreen(new MainMenuScreen(),2));
             if (screen instanceof DisconnectedScreen s)
                 return CompoundEventResult.interruptTrue(ConfirmationScreen.createInfoScreen( s.parent, s.getTitle(),s.reason));
             if (screen instanceof DeathScreen d)
                 return CompoundEventResult.interruptTrue(new LegacyDeathScreen(d.causeOfDeath,d.hardcore));
-            if (((LegacyOptions)minecraft.options).legacyCreativeTab().get() && screen instanceof CreativeModeInventoryScreen c) {
-                c.init(minecraft,0,0);
-                return CompoundEventResult.interruptTrue(new CreativeModeScreen(Minecraft.getInstance().player));
-            }
             if (screen instanceof AbstractContainerScreen<?>) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
             return CompoundEventResult.interruptDefault(screen);
         });
         ClientGuiEvent.INIT_POST.register((screen,access) -> {
-            if (!controllerHandler.connectedController.isEmpty()) {
+            if (controllerHandler.connectedController != null) {
                 if (!(screen instanceof MenuAccess<?>) || screen.children().stream().anyMatch(g-> g instanceof LegacyIconHolder)) controllerHandler.disableCursor();
                 if (screen.getFocused() == null || !screen.getFocused().isFocused()) {
-                    ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(ScreenDirection.DOWN));;
+                    ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(ScreenDirection.DOWN));
                     if (path != null) path.applyFocus(true);
                 }
             }
         });
         ClientLifecycleEvent.CLIENT_STARTED.register(m-> controllerHandler.setup());
         ClientTickEvent.CLIENT_PRE.register(minecraft -> {
-            while (legacyKeyInventory.consumeClick()) {
-                if (minecraft.gameMode.isServerControlledInventory()) {
-                    minecraft.player.sendOpenInventory();
+            while (keyCrafting.consumeClick()){
+                if (minecraft.gameMode != null && minecraft.gameMode.hasInfiniteItems()) {
+                    minecraft.setScreen(CreativeModeScreen.getActualCreativeScreenInstance(minecraft));
                     continue;
                 }
-                minecraft.getTutorial().onOpenInventory();
-                InventoryScreen inventoryScreen = new InventoryScreen(minecraft.player);
-                ((ReplaceableScreen)inventoryScreen).setCanReplace(false);
-                minecraft.setScreen(inventoryScreen);
+                if (ScreenUtil.hasClassicCrafting()) {
+                    minecraft.getTutorial().onOpenInventory();
+                    minecraft.setScreen(new InventoryScreen(minecraft.player));
+                }else LegacyMinecraft.NETWORK.sendToServer(new ServerOpenClientMenu(2));
             }
             while (keyHostOptions.consumeClick()) {
                 minecraft.setScreen(new HostOptionsScreen());
             }
+            boolean left;
+            while ((left=keyCycleHeldLeft.consumeClick()) || keyCycleHeldRight.consumeClick()){
+                if (minecraft.player != null)  minecraft.player.getInventory().swapPaint(left ? 1 : -1);
+            }
+
         });
         ClientLifecycleEvent.CLIENT_STOPPING.register(p-> {
             knownBlocks.save();
@@ -185,6 +190,7 @@ public class LegacyMinecraftClient {
         });
         ClientPlayerEvent.CLIENT_PLAYER_JOIN.register(p-> {
             Minecraft minecraft = Minecraft.getInstance();
+            LegacyCreativeTabListing.rebuildVanillaCreativeTabsItems(minecraft);
             if (enterWorldGameType != null && minecraft.hasSingleplayerServer()){
                 minecraft.getSingleplayerServer().getPlayerList().getPlayer(p.getUUID()).setGameMode(enterWorldGameType);
                 enterWorldGameType = null;
@@ -214,15 +220,16 @@ public class LegacyMinecraftClient {
         if (!minecraft.hasSingleplayerServer() && minecraft.level != null && minecraft.player != null)
             LegacyMinecraft.NETWORK.sendToServer(new ServerDisplayInfoSync(0));
         if (minecraft.screen instanceof HostOptionsScreen s) s.reloadPlayerButtons();
+
     }
     public static void enqueueInit() {
         MenuRegistry.registerScreenFactory(LegacyMenuTypes.CRAFTING_PANEL_MENU.get(),LegacyCraftingScreen::craftingScreen);
         MenuRegistry.registerScreenFactory(LegacyMenuTypes.PLAYER_CRAFTING_PANEL_MENU.get(),LegacyCraftingScreen::playerCraftingScreen);
-
     }
-
-    public static KeyMapping legacyKeyInventory;
-    public static KeyMapping keyHostOptions;
+    public static final KeyMapping keyCrafting = new KeyMapping("legacy.key.crafting", InputConstants.KEY_E, "key.categories.inventory");
+    public static final KeyMapping keyCycleHeldLeft = new KeyMapping("legacy.key.cycleHeldLeft", InputConstants.KEY_PAGEDOWN, "key.categories.inventory");
+    public static final KeyMapping keyCycleHeldRight = new KeyMapping("legacy.key.cycleHeldRight", InputConstants.KEY_PAGEUP, "key.categories.inventory");
+    public static KeyMapping keyHostOptions = new KeyMapping( MOD_ID +".key.host_options", InputConstants.KEY_H, "key.categories.misc");
     public static void resetVanillaOptions(Minecraft minecraft){
         canLoadVanillaOptions = false;
         minecraft.options = new Options(minecraft,minecraft.gameDirectory);

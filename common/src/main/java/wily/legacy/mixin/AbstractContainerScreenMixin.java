@@ -35,6 +35,8 @@ import wily.legacy.util.ScreenUtil;
 
 import java.util.Set;
 
+import static wily.legacy.client.screen.ControlTooltip.*;
+
 @Mixin(AbstractContainerScreen.class)
 public abstract class AbstractContainerScreenMixin extends Screen implements LegacyMenuAccess {
     @Shadow protected int leftPos;
@@ -64,23 +66,32 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Shadow protected int imageWidth;
 
     @Shadow protected Slot hoveredSlot;
+    private Renderer controlTooltipRenderer = new Renderer(this).add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true) : ControllerComponent.DOWN_BUTTON.componentState.getIcon(true),()->getHoveredSlot() != null && (getHoveredSlot().hasItem() || !menu.getCarried().isEmpty()) ? CONTROL_ACTION_CACHE.getUnchecked(getHoveredSlot().hasItem() && !getHoveredSlot().getItem().is(menu.getCarried().getItem()) ? menu.getCarried().isEmpty() ? "legacy.action.take" : "legacy.action.swap" : "legacy.action.place") : null).
+            add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_ESCAPE,true) : ControllerComponent.RIGHT_BUTTON.componentState.getIcon(true),()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.exit")).
+            add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.MOUSE_BUTTON_RIGHT,true) : ControllerComponent.LEFT_BUTTON.componentState.getIcon(true),()->getHoveredSlot() != null && getHoveredSlot().getItem().getCount() > 1 ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.take_half") : null ).
+            add(()->getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true),PLUS,getKeyIcon(InputConstants.KEY_LSHIFT,true)}) : ControllerComponent.UP_BUTTON.componentState.getIcon(true),()-> getHoveredSlot() != null && getHoveredSlot().hasItem() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.quick_move") : null).
+            add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_W,true) : ControllerComponent.RIGHT_TRIGGER.componentState.getIcon(true),()->getHoveredSlot() != null && getHoveredSlot().hasItem() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.whats_this") : null);
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
-        if (LegacyMinecraftClient.legacyKeyInventory.matches(i, j)) {
+        if (LegacyMinecraftClient.keyCrafting.matches(i, j)) {
             this.onClose();
             cir.setReturnValue(true);
         }
         if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && ScreenUtil.hasTip(hoveredSlot.getItem())) {
+            ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
             LegacyTip oldTip = minecraft.getToasts().getToast(LegacyTip.class, Toast.NO_TOKEN);
-            if (oldTip == null) ScreenUtil.addTip(hoveredSlot.getItem());
-            else oldTip.tip(ScreenUtil.getTip(hoveredSlot.getItem())).autoHeight().title(Component.translatable(hoveredSlot.getItem().getDescriptionId())).itemStack(hoveredSlot.getItem());
+            if (oldTip == null) ScreenUtil.addTip(hoveredSlot.getItem().copy());
+            else oldTip.tip(ScreenUtil.getTip(hoveredSlot.getItem())).autoHeight().title(Component.translatable(hoveredSlot.getItem().getDescriptionId())).itemStack(hoveredSlot.getItem().copy());
         }
     }
     @Inject(method = "slotClicked", at = @At("HEAD"))
     private void slotClicked(Slot slot, int i, int j, ClickType clickType, CallbackInfo ci) {
-        if (slot != null)
-            ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+        ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+    }
+    @Inject(method = "render", at = @At(value = "HEAD"))
+    private void renderBackground(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        controlTooltipRenderer.render(guiGraphics, i, j, f);
     }
     @Inject(method = "renderFloatingItem", at = @At(value = "HEAD"), cancellable = true)
     private void renderFloatingItem(GuiGraphics guiGraphics, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
@@ -175,6 +186,9 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Override
     public ScreenRectangle getMenuRectangle() {
         return new ScreenRectangle(leftPos,topPos,width,height);
+    }
+    public Renderer getControlTooltipRenderer() {
+        return controlTooltipRenderer;
     }
 
 }

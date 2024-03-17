@@ -4,6 +4,8 @@ import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.network.chat.Component;
+import wily.legacy.LegacyMinecraft;
+import wily.legacy.LegacyMinecraftClient;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -17,6 +19,7 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
     private final Function<T, Double> valueSetter;
     private final Consumer<LegacySliderButton<T>> onChange;
     private final Supplier<Tooltip> tooltipSupplier;
+    private int slidingTime = 1;
     public T objectValue;
     public LegacySliderButton(int i, int j, int k, int l, Function<LegacySliderButton<T>,Component> messageGetter, Supplier<Tooltip> tooltipSupplier, T initialValue, Function<LegacySliderButton<T>,T> valueGetter, Function<T, Double> valueSetter, Consumer<LegacySliderButton<T>>  onChange) {
         super(i, j, k, l, Component.empty(), valueSetter.apply(initialValue));
@@ -48,24 +51,33 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
         setMessage(messageGetter.apply(this));
         setTooltip(tooltipSupplier.get());
     }
+    public void setFocused(boolean bl) {
+        super.setFocused(bl);
+        if (bl) canChangeValue = LegacyMinecraftClient.controllerHandler.canChangeSlidersValue;
+    }
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (CommonInputs.selected(i)) {
-            this.canChangeValue = !this.canChangeValue;
+            LegacyMinecraftClient.controllerHandler.canChangeSlidersValue = this.canChangeValue = !this.canChangeValue;
             return true;
         }
         if (this.canChangeValue) {
             boolean bl = i == 263;
-            if ((bl && value > 0) || (i == 262 && value < 1)) {
-                double part = 1d / width;
+            if ((bl && value > 0) || (i == 262 && value < 1.0)) {
+                double part = 1d / (width - 8) * slidingTime;
                 T v = getObjectValue();
-                while (v == getObjectValue() && part <= 1) {
+                while (v.equals(getObjectValue()) && part <= 1) {
                     setValue(this.value + (bl ? -part : part));
                     part*=2;
                 }
+                slidingTime++;
                 return true;
             }
         }
+        return false;
+    }
+    public boolean keyReleased(int i, int j, int k) {
+        if (this.canChangeValue && (i == 263 || i== 262)) slidingTime = 1;
         return false;
     }
     @Override

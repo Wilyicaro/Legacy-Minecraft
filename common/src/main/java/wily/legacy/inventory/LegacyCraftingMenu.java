@@ -44,6 +44,12 @@ public class LegacyCraftingMenu extends AbstractContainerMenu {
         for (int j = 0; j < rows; j++) {
             for (int k = 0; k < 9; k++) {
                 addSlot(new LegacySlotWrapper(container,startIndex +  j * 9 + k,x + k * 16,y + j * 16){
+                    @Override
+                    public void setChanged() {
+                        super.setChanged();
+                        slotsChanged(container);
+                    }
+
                     public Offset getOffset() {
                         return new Offset(0.5,0.5,0);
                     }
