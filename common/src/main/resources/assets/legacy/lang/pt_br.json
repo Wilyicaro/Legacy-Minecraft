@@ -38,6 +38,8 @@
   "legacy.menu.mods.homepage": "Página: %s",
   "legacy.menu.mods.sources": "Fontes: %s",
   "legacy.menu.mods.license": "Licença: %s",
+  "legacy.controls.controller": "Controle",
+  "legacy.controls.none": "NENHUM",
   "legacy.weather_state.clear": "Limpo",
   "legacy.weather_state.rain": "Chuva",
   "legacy.weather_state.thunder": "Trovão",
