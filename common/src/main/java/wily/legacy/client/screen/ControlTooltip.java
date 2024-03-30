@@ -291,7 +291,7 @@ public interface ControlTooltip {
     static Component getPickAction(Minecraft minecraft){
         if (minecraft.player.getAbilities().instabuild){
             BlockState b;
-            if (minecraft.hitResult instanceof EntityHitResult r && !r.getEntity().getPickResult().isEmpty() || minecraft.hitResult instanceof BlockHitResult h && h.getType() != HitResult.Type.MISS && !(b = minecraft.level.getBlockState(h.getBlockPos())).getBlock().getCloneItemStack(minecraft.level,h.getBlockPos(),b).isEmpty())
+            if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity().getPickResult() != null && !r.getEntity().getPickResult().isEmpty() || minecraft.hitResult instanceof BlockHitResult h && h.getType() != HitResult.Type.MISS && !(b = minecraft.level.getBlockState(h.getBlockPos())).getBlock().getCloneItemStack(minecraft.level,h.getBlockPos(),b).isEmpty())
                 return minecraft.hitResult instanceof EntityHitResult ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.pick_entity") : ((LegacyKeyMapping) minecraft.options.keyPickItem).getDisplayName();
         }
         return null;
