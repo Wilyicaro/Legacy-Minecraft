@@ -20,7 +20,6 @@ import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.client.gui.screens.DisconnectedScreen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
@@ -59,8 +58,9 @@ import wily.legacy.client.*;
 import wily.legacy.client.controller.ControllerHandler;
 import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacyMenuTypes;
-import wily.legacy.network.ServerDisplayInfoSync;
+import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.network.ServerOpenClientMenu;
+import wily.legacy.player.LegacyPlayerInfo;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.File;
@@ -69,6 +69,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 import static wily.legacy.LegacyMinecraft.MOD_ID;
@@ -98,7 +99,9 @@ public class LegacyMinecraftClient {
     public static GameType enterWorldGameType;
 
     public static int[] MAP_PLAYER_COLORS = new int[]{0xFFFFFF,0x00FF4C,0xFF2119,0x6385FF,0xFF63D9,0xFF9C00,0xFFFB19,0x63FFE4};
-
+    public static float[] getVisualPlayerColor(LegacyPlayerInfo info){
+        return getVisualPlayerColor(info.getPosition() >= 0 ? info.getPosition() : info.getProfile().getId().hashCode());
+    }
     public static float[] getVisualPlayerColor(int i){
         i = Math.abs(i);
         int baseColor = MAP_PLAYER_COLORS[i % MAP_PLAYER_COLORS.length];
@@ -109,9 +112,12 @@ public class LegacyMinecraftClient {
         float b = ((baseColor & 255) * (0.8f +(f / 2f))) / 255f;
         return new float[]{r,g,b};
     }
-    public static int[] getVisualPlayerColor(String s){
-        float[] c = getVisualPlayerColor(LegacyMinecraft.playerVisualIds.getOrDefault(s,s.hashCode()));
-        return new int[]{(int) (c[0] * 255), (int) (c[1] * 255), (int) (c[2] * 255)};
+    public static void updateLegacyPlayerInfos(Map<UUID, LegacyPlayerInfo> map){
+        map.forEach((s,i)->{
+            Minecraft minecraft = Minecraft.getInstance();
+            if (minecraft.getConnection() != null && minecraft.getConnection().getPlayerInfo(s) instanceof LegacyPlayerInfo info)
+                info.copyFrom(i);
+        });
     }
 
 
@@ -140,6 +146,7 @@ public class LegacyMinecraftClient {
         KeyMappingRegistry.register(keyHostOptions);
         KeyMappingRegistry.register(keyCycleHeldLeft);
         KeyMappingRegistry.register(keyCycleHeldRight);
+        KeyMappingRegistry.register(keyToggleCursor);
         knownBlocks = new KnownListing<>(Registries.BLOCK,Minecraft.getInstance().gameDirectory.toPath());
         knownEntities = new KnownListing<>(Registries.ENTITY_TYPE,Minecraft.getInstance().gameDirectory.toPath());
 
@@ -149,7 +156,7 @@ public class LegacyMinecraftClient {
             if (screen instanceof JoinMultiplayerScreen)
                 return CompoundEventResult.interruptTrue(new PlayGameScreen(new MainMenuScreen(),2));
             if (screen instanceof DisconnectedScreen s)
-                return CompoundEventResult.interruptTrue(ConfirmationScreen.createInfoScreen( s.parent, s.getTitle(),s.reason));
+                return CompoundEventResult.interruptTrue(ConfirmationScreen.createInfoScreen(s.parent, s.getTitle(),s.reason));
             if (screen instanceof DeathScreen d)
                 return CompoundEventResult.interruptTrue(new LegacyDeathScreen(d.causeOfDeath,d.hardcore));
             if (screen instanceof AbstractContainerScreen<?>) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
@@ -218,8 +225,8 @@ public class LegacyMinecraftClient {
     }
     public static void onClientPlayerInfoChange(){
         Minecraft minecraft = Minecraft.getInstance();
-        if (!minecraft.hasSingleplayerServer() && minecraft.level != null && minecraft.player != null)
-            LegacyMinecraft.NETWORK.sendToServer(new ServerDisplayInfoSync(0));
+        if (minecraft.level != null && minecraft.player != null)
+            LegacyMinecraft.NETWORK.sendToServer(new PlayerInfoSync(0, minecraft.player));
         if (minecraft.screen instanceof HostOptionsScreen s) s.reloadPlayerButtons();
 
     }
@@ -230,6 +237,7 @@ public class LegacyMinecraftClient {
     public static final KeyMapping keyCrafting = new KeyMapping("legacy.key.crafting", InputConstants.KEY_E, "key.categories.inventory");
     public static final KeyMapping keyCycleHeldLeft = new KeyMapping("legacy.key.cycleHeldLeft", InputConstants.KEY_PAGEDOWN, "key.categories.inventory");
     public static final KeyMapping keyCycleHeldRight = new KeyMapping("legacy.key.cycleHeldRight", InputConstants.KEY_PAGEUP, "key.categories.inventory");
+    public static final KeyMapping keyToggleCursor = new KeyMapping("legacy.key.toggleCursor", -1, "key.categories.misc");
     public static KeyMapping keyHostOptions = new KeyMapping( MOD_ID +".key.host_options", InputConstants.KEY_H, "key.categories.misc");
     public static void resetVanillaOptions(Minecraft minecraft){
         canLoadVanillaOptions = false;

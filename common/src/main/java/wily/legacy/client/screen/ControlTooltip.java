@@ -32,6 +32,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.Sheep;
 import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
@@ -209,34 +210,84 @@ public interface ControlTooltip {
             case InputConstants.MOUSE_BUTTON_LEFT -> c = isKeyDown ? '\uE000' : '\uD000';
             case InputConstants.MOUSE_BUTTON_RIGHT -> c = isKeyDown ? '\uE001' : '\uD001';
             case InputConstants.MOUSE_BUTTON_MIDDLE -> c = isKeyDown ? '\uE002' : '\uD002';
-            case InputConstants.KEY_RETURN -> c = isKeyDown ? '\u1257' : '\u0257';
             case InputConstants.KEY_SPACE -> c = isKeyDown ? '\u1032' : '\u0032';
-            case InputConstants.KEY_Q -> c = isKeyDown ? '\u1081' : '\u0081';
-            case InputConstants.KEY_E -> c = isKeyDown ? '\u1069' : '\u0069';
-            case InputConstants.KEY_I -> c = isKeyDown ? '\u1073' : '\u0073';
-            case InputConstants.KEY_W -> c = isKeyDown ? '\u1087' : '\u0087';
+            case InputConstants.KEY_COMMA -> c = isKeyDown ? '\u1044' : '\u0044';
+            case InputConstants.KEY_MINUS-> c = isKeyDown ? '\u1045' : '\u0045';
+            case InputConstants.KEY_PERIOD -> c = isKeyDown ? '\u1046' : '\u0046';
+            case InputConstants.KEY_SLASH -> c = isKeyDown ? '\u1047' : '\u0047';
+            case InputConstants.KEY_SEMICOLON -> c = isKeyDown ? '\u1059' : '\u0059';
+            case InputConstants.KEY_EQUALS -> c = isKeyDown ? '\u1061' : '\u0061';
+            case InputConstants.KEY_0 -> c = isKeyDown ? '\u1048' : '\u0048';
+            case InputConstants.KEY_1 -> c = isKeyDown ? '\u1049' : '\u0049';
+            case InputConstants.KEY_2 -> c = isKeyDown ? '\u1050' : '\u0050';
+            case InputConstants.KEY_3 -> c = isKeyDown ? '\u1051' : '\u0051';
+            case InputConstants.KEY_4 -> c = isKeyDown ? '\u1052' : '\u0052';
+            case InputConstants.KEY_5 -> c = isKeyDown ? '\u1053' : '\u0053';
+            case InputConstants.KEY_6 -> c = isKeyDown ? '\u1054' : '\u0054';
+            case InputConstants.KEY_7 -> c = isKeyDown ? '\u1055' : '\u0055';
+            case InputConstants.KEY_8 -> c = isKeyDown ? '\u1056' : '\u0056';
+            case InputConstants.KEY_9 -> c = isKeyDown ? '\u1057' : '\u0057';
             case InputConstants.KEY_A -> c = isKeyDown ? '\u1065' : '\u0065';
-            case InputConstants.KEY_S -> c = isKeyDown ? '\u1083' : '\u0083';
+            case InputConstants.KEY_B -> c = isKeyDown ? '\u1066' : '\u0066';
+            case InputConstants.KEY_C -> c = isKeyDown ? '\u1067' : '\u0067';
             case InputConstants.KEY_D -> c = isKeyDown ? '\u1068' : '\u0068';
+            case InputConstants.KEY_E -> c = isKeyDown ? '\u1069' : '\u0069';
+            case InputConstants.KEY_F -> c = isKeyDown ? '\u1070' : '\u0070';
+            case InputConstants.KEY_G -> c = isKeyDown ? '\u1071' : '\u0071';
+            case InputConstants.KEY_H -> c = isKeyDown ? '\u1072' : '\u0072';
+            case InputConstants.KEY_I -> c = isKeyDown ? '\u1073' : '\u0073';
+            case InputConstants.KEY_J -> c = isKeyDown ? '\u1074' : '\u0074';
+            case InputConstants.KEY_K -> c = isKeyDown ? '\u1075' : '\u0075';
+            case InputConstants.KEY_L -> c = isKeyDown ? '\u1076' : '\u0076';
+            case InputConstants.KEY_M -> c = isKeyDown ? '\u1077' : '\u0077';
+            case InputConstants.KEY_N -> c = isKeyDown ? '\u1078' : '\u0078';
+            case InputConstants.KEY_O -> c = isKeyDown ? '\u1079' : '\u0079';
+            case InputConstants.KEY_P -> c = isKeyDown ? '\u1080' : '\u0080';
+            case InputConstants.KEY_Q -> c = isKeyDown ? '\u1081' : '\u0081';
+            case InputConstants.KEY_R -> c = isKeyDown ? '\u1082' : '\u0082';
+            case InputConstants.KEY_S -> c = isKeyDown ? '\u1083' : '\u0083';
+            case InputConstants.KEY_T -> c = isKeyDown ? '\u1084' : '\u0084';
+            case InputConstants.KEY_U -> c = isKeyDown ? '\u1085' : '\u0085';
+            case InputConstants.KEY_V -> c = isKeyDown ? '\u1086' : '\u0086';
+            case InputConstants.KEY_W -> c = isKeyDown ? '\u1087' : '\u0087';
+            case InputConstants.KEY_X -> c = isKeyDown ? '\u1088' : '\u0088';
+            case InputConstants.KEY_Y -> c = isKeyDown ? '\u1089' : '\u0089';
+            case InputConstants.KEY_Z -> c = isKeyDown ? '\u1090' : '\u0090';
+            case InputConstants.KEY_LBRACKET -> c = isKeyDown ? '\u1091' : '\u0091';
+            case InputConstants.KEY_RBRACKET -> c = isKeyDown ? '\u1093' : '\u0093';
+            case InputConstants.KEY_GRAVE-> c = isKeyDown ? '\u1096' : '\u0096';
+            case InputConstants.KEY_ESCAPE -> c = isKeyDown ? '\u1256' : '\u0256';
+            case InputConstants.KEY_RETURN -> c = isKeyDown ? '\u1257' : '\u0257';
+            case InputConstants.KEY_TAB -> c = isKeyDown ? '\u1258' : '\u0258';
+            case InputConstants.KEY_INSERT -> c = isKeyDown ? '\u1260' : '\u0260';
+            case InputConstants.KEY_DELETE -> c = isKeyDown ? '\u1261' : '\u0261';
             case InputConstants.KEY_UP -> c = isKeyDown ? '\u1265' : '\u0265';
             case InputConstants.KEY_DOWN -> c = isKeyDown ? '\u1264' : '\u0264';
             case InputConstants.KEY_LEFT -> c = isKeyDown ? '\u1263' : '\u0263';
             case InputConstants.KEY_RIGHT -> c = isKeyDown ? '\u1262' : '\u0262';
-            case InputConstants.KEY_H -> c = isKeyDown ? '\u1072' : '\u0072';
-            case InputConstants.KEY_F -> c = isKeyDown ? '\u1070' : '\u0070';
-            case InputConstants.KEY_O -> c = isKeyDown ? '\u1079' : '\u0079';
-            case InputConstants.KEY_P -> c = isKeyDown ? '\u1080' : '\u0080';
-            case InputConstants.KEY_X -> c = isKeyDown ? '\u1088' : '\u0088';
-            case InputConstants.KEY_ESCAPE -> c = isKeyDown ? '\u1256' : '\u0256';
-            case InputConstants.KEY_TAB -> c = isKeyDown ? '\u1258' : '\u0258';
-            case InputConstants.KEY_F5 -> c = isKeyDown ? '\u1294' : '\u0294';
-            case InputConstants.KEY_F11 -> c = isKeyDown ? '\u1300' : '\u0300';
-            case InputConstants.KEY_LSHIFT -> c = isKeyDown ? '\u1340' : '\u0340';
-            case InputConstants.KEY_RSHIFT -> c = isKeyDown ? '\u1344' : '\u0344';
-            case InputConstants.KEY_LBRACKET -> c = isKeyDown ? '\u1091' : '\u0091';
-            case InputConstants.KEY_RBRACKET -> c = isKeyDown ? '\u1093' : '\u0093';
             case InputConstants.KEY_PAGEDOWN -> c = isKeyDown ? '\u1267' : '\u0267';
             case InputConstants.KEY_PAGEUP -> c = isKeyDown ? '\u1266' : '\u0266';
+            case InputConstants.KEY_HOME -> c = isKeyDown ? '\u1268' : '\u0268';
+            case InputConstants.KEY_END -> c = isKeyDown ? '\u1269' : '\u0269';
+            case InputConstants.KEY_CAPSLOCK -> c = isKeyDown ? '\u1280' : '\u0280';
+            case InputConstants.KEY_F1 -> c = isKeyDown ? '\u1290' : '\u0290';
+            case InputConstants.KEY_F2 -> c = isKeyDown ? '\u1291' : '\u0291';
+            case InputConstants.KEY_F3 -> c = isKeyDown ? '\u1292' : '\u0292';
+            case InputConstants.KEY_F4 -> c = isKeyDown ? '\u1293' : '\u0293';
+            case InputConstants.KEY_F5 -> c = isKeyDown ? '\u1294' : '\u0294';
+            case InputConstants.KEY_F6 -> c = isKeyDown ? '\u1295' : '\u0295';
+            case InputConstants.KEY_F7 -> c = isKeyDown ? '\u1296' : '\u0296';
+            case InputConstants.KEY_F8 -> c = isKeyDown ? '\u1297' : '\u0297';
+            case InputConstants.KEY_F9 -> c = isKeyDown ? '\u1298' : '\u0298';
+            case InputConstants.KEY_F10 -> c = isKeyDown ? '\u1299' : '\u0299';
+            case InputConstants.KEY_F11 -> c = isKeyDown ? '\u1300' : '\u0300';
+            case InputConstants.KEY_F12 -> c = isKeyDown ? '\u1301' : '\u0301';
+            case InputConstants.KEY_LSHIFT -> c = isKeyDown ? '\u1340' : '\u0340';
+            case InputConstants.KEY_LCONTROL -> c = isKeyDown ? '\u1341' : '\u0341';
+            case InputConstants.KEY_LALT -> c = isKeyDown ? '\u1342' : '\u0342';
+            case InputConstants.KEY_RSHIFT -> c = isKeyDown ? '\u1344' : '\u0344';
+            case InputConstants.KEY_RCONTROL -> c = isKeyDown ? '\u1345' : '\u0345';
+            case InputConstants.KEY_RALT -> c = isKeyDown ? '\u1346' : '\u0346';
             default -> {
                 return type.getOrCreate(i).getDisplayName().copy().append(allowPressed && isKeyDown ? KEY_PRESSED_ICON : KEY_ICON);
             }
@@ -289,15 +340,19 @@ public interface ControlTooltip {
         }
     }
     static Component getPickAction(Minecraft minecraft){
-        if (minecraft.player.getAbilities().instabuild){
-            BlockState b;
-            if (minecraft.hitResult instanceof EntityHitResult r && !r.getEntity().getPickResult().isEmpty() || minecraft.hitResult instanceof BlockHitResult h && h.getType() != HitResult.Type.MISS && !(b = minecraft.level.getBlockState(h.getBlockPos())).getBlock().getCloneItemStack(minecraft.level,h.getBlockPos(),b).isEmpty())
-                return minecraft.hitResult instanceof EntityHitResult ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.pick_entity") : ((LegacyKeyMapping) minecraft.options.keyPickItem).getDisplayName();
-        }
+        ItemStack result;
+        BlockState b;
+        if ((minecraft.hitResult instanceof EntityHitResult r &&  (result = r.getEntity().getPickResult()) != null || minecraft.hitResult instanceof BlockHitResult h && h.getType() != HitResult.Type.MISS && !(result = (b = minecraft.level.getBlockState(h.getBlockPos())).getBlock().getCloneItemStack(minecraft.level,h.getBlockPos(),b)).isEmpty()) && (minecraft.gameMode.hasInfiniteItems() || minecraft.player.getInventory().findSlotMatchingItem(result) != -1))
+            return minecraft.hitResult instanceof EntityHitResult ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.pick_entity") : ((LegacyKeyMapping) minecraft.options.keyPickItem).getDisplayName();
+
         return null;
     }
     static Component getMainAction(Minecraft minecraft){
-        if (minecraft.hitResult instanceof BlockHitResult r && r.getType() != HitResult.Type.MISS && (minecraft.player.getAbilities().instabuild || minecraft.level.getBlockState(r.getBlockPos()).getBlock().defaultDestroyTime() >= 0 && !minecraft.player.blockActionRestricted(minecraft.level,r.getBlockPos(),minecraft.gameMode.getPlayerMode()))) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.mine");
+        if (minecraft.hitResult instanceof BlockHitResult r && r.getType() != HitResult.Type.MISS){
+            BlockState state = minecraft.level.getBlockState(r.getBlockPos());
+            if (state.getBlock() instanceof NoteBlock && !minecraft.player.getAbilities().instabuild) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.play");
+            else if ((minecraft.player.getAbilities().instabuild || state.getBlock().defaultDestroyTime() >= 0 && !minecraft.player.blockActionRestricted(minecraft.level,r.getBlockPos(),minecraft.gameMode.getPlayerMode()))) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.mine");
+        }
         return null;
     }
     static Component getActualUse(Minecraft minecraft){
@@ -309,10 +364,11 @@ public interface ControlTooltip {
             if (minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof BedBlock) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.sleep");
             if (canPlace(minecraft, hand)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.place");
             if (canFeedAbstractHorse(minecraft, hand)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.feed");
+            if ( actualItem.is(Items.IRON_INGOT) && minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof IronGolem g  && g.getHealth() < g.getMaxHealth()) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.repair");
             if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof TamableAnimal a && a.isTame() && a.isFood(actualItem) && a.getHealth() < a.getMaxHealth()) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.heal");
-            if (canSetLoveMode(minecraft,hand)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.love_mode");
             if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof TamableAnimal a && a.isTame() && a.isOwnedBy(minecraft.player)) return CONTROL_ACTION_CACHE.getUnchecked(a.isInSittingPose() ? "legacy.action.follow_me" : "legacy.action.sit" );
             if (canTame(minecraft, hand)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.tame");
+            if (canSetLoveMode(minecraft,hand)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.love_mode");
             if (minecraft.hitResult instanceof BlockHitResult r && actualItem.getItem() instanceof BoneMealItem && (blockState = minecraft.level.getBlockState(r.getBlockPos())).getBlock() instanceof BonemealableBlock b && b.isValidBonemealTarget(minecraft.level,r.getBlockPos(),blockState)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.grow");
             if (minecraft.hitResult instanceof BlockHitResult r && (blockState = minecraft.level.getBlockState(r.getBlockPos())).getBlock() instanceof ComposterBlock){
                 if (blockState.getValue(ComposterBlock.LEVEL) == 8) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.collect");
@@ -323,7 +379,10 @@ public interface ControlTooltip {
             if (actualItem.getItem() instanceof Equipable) return CONTROL_ACTION_CACHE.getUnchecked(actualItem.getItem() instanceof ShieldItem ? "legacy.action.block" : "legacy.action.equip");
             if (actualItem.getItem() instanceof EmptyMapItem || actualItem.getItem() instanceof FishingRodItem) return CONTROL_ACTION_CACHE.getUnchecked("key.use");
             if (actualItem.getItem() instanceof FireworkRocketItem && (minecraft.player.isFallFlying() || minecraft.hitResult instanceof BlockHitResult && minecraft.hitResult.getType() != HitResult.Type.MISS)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.launch");
-            if (actualItem.getItem() instanceof ShearsItem && minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Sheep s && !s.isSheared()) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.shear");
+            if (actualItem.getItem() instanceof ShearsItem ){
+                if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Sheep s && !s.isSheared()) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.shear");
+                else if (minecraft.hitResult instanceof BlockHitResult r && r.getType() != HitResult.Type.MISS && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof PumpkinBlock) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.carve");
+            }
             if (minecraft.hitResult instanceof BlockHitResult r && minecraft.hitResult.getType() != HitResult.Type.MISS && (blockState = minecraft.level.getBlockState(r.getBlockPos())).getBlock() instanceof JukeboxBlock && blockState.getValue(HAS_RECORD)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.eject");
             if (minecraft.hitResult instanceof BlockHitResult r && minecraft.hitResult.getType() != HitResult.Type.MISS && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof NoteBlock) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.change_pitch");
             if (actualItem.getItem() instanceof FoodOnAStickItem<?> i && minecraft.player.getControlledVehicle() instanceof ItemSteerable && minecraft.player.getControlledVehicle().getType() == i.canInteractWith) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.boost");
@@ -345,8 +404,8 @@ public interface ControlTooltip {
             }
             HitResult bucketHitResult;
             if (actualItem.getItem() instanceof BucketItem i && mayInteractItemAt(minecraft,actualItem,bucketHitResult = (FluidBucketHooks.getFluid(i) == Fluids.EMPTY ? Item.getPlayerPOVHitResult(minecraft.level, minecraft.player,ClipContext.Fluid.SOURCE_ONLY) : minecraft.hitResult))){
-                if (FluidBucketHooks.getFluid(i) != Fluids.EMPTY) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.empty");
-                    else if (minecraft.level.getBlockState(((BlockHitResult)bucketHitResult).getBlockPos()).getBlock() instanceof BucketPickup) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.collect");
+                if (FluidBucketHooks.getFluid(i) != Fluids.EMPTY) return CONTROL_ACTION_CACHE.getUnchecked(minecraft.level.getBlockState(((BlockHitResult)bucketHitResult).getBlockPos()).isAir() ? "legacy.action.empty" : "legacy.action.fill");
+                else if (minecraft.level.getBlockState(((BlockHitResult)bucketHitResult).getBlockPos()).getBlock() instanceof BucketPickup) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.collect");
             }
             if (minecraft.player.getItemInHand(hand).getItem() instanceof SaddleItem && minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Saddleable s && s.isSaddleable() && !s.isSaddled()) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.saddle");
             if ((actualItem.isEdible() && minecraft.player.canEat(false)) || actualItem.getItem() instanceof PotionItem) return CONTROL_ACTION_CACHE.getUnchecked(actualItem.getUseAnimation() == UseAnim.DRINK ? "legacy.action.drink" : "legacy.action.eat");
@@ -354,6 +413,7 @@ public interface ControlTooltip {
             if (minecraft.player.getItemInHand(hand).getItem() instanceof AxeItem && minecraft.hitResult instanceof BlockHitResult r && AxeItem.STRIPPABLES.get(minecraft.level.getBlockState(r.getBlockPos()).getBlock()) != null) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.strip");
             if (minecraft.player.getItemInHand(hand).getItem() instanceof ShovelItem && minecraft.hitResult instanceof BlockHitResult r && ShovelItem.FLATTENABLES.get(minecraft.level.getBlockState(r.getBlockPos()).getBlock()) != null) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.dig_path");
         }
+        if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof AbstractHorse h && h.isTamed() && minecraft.player.isSecondaryUseActive()) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.open");
         if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity().canAddPassenger(minecraft.player) && minecraft.player.canRide(r.getEntity())){
             if (r.getEntity() instanceof Boat) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.sail");
             else if (r.getEntity() instanceof AbstractMinecart m && m.getMinecartType() == AbstractMinecart.Type.RIDEABLE) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.ride");
@@ -387,7 +447,7 @@ public interface ControlTooltip {
     }
     static boolean canTame(Minecraft minecraft, InteractionHand hand){
         ItemStack usedItem = minecraft.player.getItemInHand(hand);
-        return minecraft.hitResult != null && minecraft.hitResult instanceof EntityHitResult e && ((e.getEntity() instanceof TamableAnimal t && !t.isTame() && ((t instanceof Wolf && usedItem.is(Items.BONE)) || (!(t instanceof Wolf) && t.isFood(usedItem)))) || (hand == InteractionHand.MAIN_HAND && e.getEntity() instanceof AbstractHorse h && !h.isTamed() && usedItem.isEmpty()));
+        return minecraft.hitResult != null && minecraft.hitResult instanceof EntityHitResult e && ((e.getEntity() instanceof TamableAnimal t && !t.isTame() && ((t instanceof Wolf && usedItem.is(Items.BONE)) || (!(t instanceof Wolf) && t.isFood(usedItem)))) || (hand == InteractionHand.MAIN_HAND && e.getEntity() instanceof AbstractHorse h && !h.isTamed() && !minecraft.player.isSecondaryUseActive() && usedItem.isEmpty()));
     }
 
 }

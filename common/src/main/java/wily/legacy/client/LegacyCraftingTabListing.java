@@ -9,12 +9,11 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.Container;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.Recipe;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.util.CompoundTagUtil;
+import wily.legacy.util.JsonUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -58,10 +57,10 @@ public class LegacyCraftingTabListing {
                                 ifJsonStringNotNull(go,"displayName", Component::translatable, n-> l.displayName = n);
                                 ifJsonStringNotNull(go,"icon", ResourceLocation::new, n-> l.icon = n);
                                 ifJsonStringNotNull(go,"nbt", CompoundTagUtil::parseCompoundTag, n-> l.itemIconTag = n);
-                                addGroupedRecipeValuesFromJson(l.craftings,listingElement);
+                                JsonUtil.addGroupedRecipeValuesFromJson(l.craftings,listingElement);
                             }, ()->{
                                 LegacyCraftingTabListing listing = new LegacyCraftingTabListing(c,getJsonStringOrNull(go,"displayName",Component::translatable),getJsonStringOrNull(go,"icon",ResourceLocation::new), getJsonStringOrNull(go,"nbt",CompoundTagUtil::parseCompoundTag));
-                                addGroupedRecipeValuesFromJson(listing.craftings,listingElement);
+                                JsonUtil.addGroupedRecipeValuesFromJson(listing.craftings,listingElement);
                                 listings.add(listing);
                             });
                         }
@@ -72,25 +71,6 @@ public class LegacyCraftingTabListing {
                 }
             }));
             return listings;
-        }
-        public static <K,V> void addMapListEntry(Map<K,List<V>> map, K key, V entry){
-            map.computeIfAbsent(key,k-> new ArrayList<>()).add(entry);
-        }
-        public static <C extends Container, T extends Recipe<C>> void addRecipeValue(Map<String,List<RecipeValue<C, T>>> map, String key, String recipeString){
-            addMapListEntry(map,key.isEmpty() ? recipeString : key, RecipeValue.create(recipeString));
-        }
-        public static <C extends Container, T extends Recipe<C>> void addGroupedRecipeValuesFromJson(Map<String,List<RecipeValue<C,T>>> groups, JsonElement element){
-            if (element instanceof JsonArray a) a.forEach(e->{
-                if (e instanceof JsonPrimitive p && p.isString()) addRecipeValue(groups,p.getAsString(),p.getAsString());
-                else if(e instanceof JsonObject obj && obj.get("recipes") instanceof JsonArray rcps) rcps.forEach(r-> {
-                    if (r instanceof JsonPrimitive p && p.isString())  addRecipeValue(groups,GsonHelper.getAsString(obj,"group",p.getAsString()), p.getAsString());
-                });
-            });
-            else if (element instanceof JsonObject obj) obj.asMap().forEach((g,ge)->{
-                if (ge instanceof JsonArray a) a.forEach(e-> {
-                    if (e instanceof JsonPrimitive p && p.isString())  addRecipeValue(groups,g, p.getAsString());
-                });
-            });
         }
 
 

@@ -10,6 +10,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.StonecutterRecipe;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.util.JsonUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,7 +27,7 @@ public class StoneCuttingGroupManager extends SimplePreparableReloadListener<Map
             try {
                 BufferedReader bufferedReader = r.openAsReader();
                 JsonObject obj = GsonHelper.parse(bufferedReader);
-                if (obj.has("groups")) LegacyCraftingTabListing.Manager.addGroupedRecipeValuesFromJson(groups,obj.get("groups"));
+                if (obj.has("groups")) JsonUtil.addGroupedRecipeValuesFromJson(groups,obj.get("groups"));
                 bufferedReader.close();
             } catch (IOException exception) {
                 LegacyMinecraft.LOGGER.warn(exception.getMessage());

@@ -1,6 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -21,19 +22,20 @@ import wily.legacy.util.ScreenUtil;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class TabButton extends AbstractButton {
-    public static final ResourceLocation[][] SPRITES = new ResourceLocation[][]{new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_tab_left"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_tab_left")}, new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_tab_middle"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_tab_middle")}, new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_tab_right"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_tab_right")}};
+public class LegacyTabButton extends AbstractButton {
+    public static final ResourceLocation[][] SPRITES = new ResourceLocation[][]{new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_tab_left"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_tab_left")}, new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_tab_middle"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_tab_middle")}, new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_tab_right"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_tab_right")},
+                                                                                new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_vert_tab_up"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_vert_tab_up")}, new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_vert_tab_middle"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_vert_tab_middle")}, new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_vert_tab_down"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_vert_tab_down")}};
     public final ResourceLocation icon;
     public ItemStack itemIcon;
-    private final Consumer<TabButton> onPress;
+    private final Consumer<LegacyTabButton> onPress;
     public boolean selected;
     protected int type;
-    public Function<TabButton, Offset> offset = (t)-> {
+    public Function<LegacyTabButton, Offset> offset = (t)-> {
      if (!t.selected) return new Offset(0,4,0);
      return Offset.ZERO;
     };
 
-    public TabButton(int i, int j, int width, int height, int type, ResourceLocation iconSprite, CompoundTag itemIconTag, Component text, Tooltip tooltip, Consumer<TabButton> onPress) {
+    public LegacyTabButton(int i, int j, int width, int height, int type, ResourceLocation iconSprite, CompoundTag itemIconTag, Component text, Tooltip tooltip, Consumer<LegacyTabButton> onPress) {
         super(i, j, width, height, text);
         setTooltip(tooltip);
         this.onPress = onPress;
@@ -63,8 +65,7 @@ public class TabButton extends AbstractButton {
             isHovered = isMouseOver(i,j);
         }
         if (selected) guiGraphics.pose().translate(0F,0f,1F);
-
-        ScreenUtil.renderTiles(SPRITES[type][selected ? 0 : 1],guiGraphics,this.getX(), this.getY(), this.getWidth(), this.getHeight(),2);
+        ScreenUtil.renderTiles(SPRITES[type][selected ? 0 : 1],guiGraphics, getX(), getY(), getWidth(), this.getHeight(),2);
         int k = this.active ? 0x404040 : 0xA0A0A0;
         if (icon == null) this.renderString(guiGraphics, minecraft.font, k | Mth.ceil(this.alpha * 255.0f) << 24);
         else {

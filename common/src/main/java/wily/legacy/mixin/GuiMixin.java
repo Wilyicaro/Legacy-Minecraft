@@ -1,5 +1,7 @@
 package wily.legacy.mixin;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
@@ -7,12 +9,18 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.MobEffectTextureManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PlayerRideableJumping;
 import net.minecraft.world.entity.player.Player;
@@ -37,6 +45,9 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.util.ScreenUtil;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 @Mixin(Gui.class)
 
@@ -89,6 +100,47 @@ public abstract class GuiMixin {
         ScreenUtil.resetHUDScale(guiGraphics,i-> screenWidth = i,i-> screenHeight = i);
         guiGraphics.pose().popPose();
     }
+    @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
+    public void renderEffects(GuiGraphics guiGraphics, CallbackInfo ci) {
+        ci.cancel();
+        Collection<MobEffectInstance> collection = this.minecraft.player.getActiveEffects();
+        if (minecraft.screen != null || collection.isEmpty()) {
+            return;
+        }
+        int i = 0;
+        int j = 0;
+        float backAlpha = ScreenUtil.getHUDOpacity();
+        MobEffectTextureManager mobEffectTextureManager = this.minecraft.getMobEffectTextures();
+        for (MobEffectInstance mobEffectInstance : Ordering.natural().reverse().sortedCopy(collection)) {
+            MobEffect mobEffect = mobEffectInstance.getEffect();
+            if (!mobEffectInstance.showIcon()) continue;
+            int k = this.screenWidth - 55;
+            int l = 18;
+            if (this.minecraft.isDemo()) {
+                l += 15;
+            }
+            if (mobEffect.isBeneficial()) {
+                k -= 24 * ++i;
+            } else {
+                k -= 24 * ++j;
+                l += 24;
+            }
+            float f = 1.0f;
+            guiGraphics.setColor(1.0f, 1.0f, 1.0f, backAlpha);
+            ScreenUtil.renderPointerPanel(guiGraphics, k, l, 24, 24);
+            if (!mobEffectInstance.isAmbient() && mobEffectInstance.endsWithin(200)){
+                int m = mobEffectInstance.getDuration();
+                f = Mth.clamp((float)m / 10.0f / 5.0f * 0.5f, 0.0f, 0.5f) + Mth.cos((float)m * (float)Math.PI / 5.0f) * Mth.clamp((10 - m / 20) / 10.0f * 0.25f, 0.0f, 0.25f);
+            }
+            RenderSystem.enableBlend();
+            TextureAtlasSprite textureAtlasSprite = mobEffectTextureManager.get(mobEffect);
+            guiGraphics.setColor(1.0f, 1.0f, 1.0f, f * backAlpha);
+            guiGraphics.blit(k + 3, l + 3, 0, 18, 18, textureAtlasSprite);
+            RenderSystem.disableBlend();
+        }
+        guiGraphics.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
     @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
     public void renderHotbar(float f, GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null) {

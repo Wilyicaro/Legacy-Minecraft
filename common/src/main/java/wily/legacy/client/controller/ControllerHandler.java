@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.util.ScreenUtil;
@@ -108,7 +109,7 @@ public class ControllerHandler {
             state.update(gamepadState);
             if (minecraft.screen != null && !isCursorDisabled) {
                 if (state.is(ControllerComponent.LEFT_STICK) && state instanceof ComponentState.Stick stick && state.pressed)
-                    setPointerPos(minecraft.mouseHandler.xpos = (minecraft.mouseHandler.xpos() + stick.x * ((double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth()) * Math.pow(ScreenUtil.getLegacyOptions().interfaceSensitivity().get() * 0.9 + 0.3, 4.5)), minecraft.mouseHandler.ypos = (minecraft.mouseHandler.ypos() + stick.y * ((double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()) * Math.pow(minecraft.options.sensitivity().get() * 0.9 + 0.3, 4.5)));
+                    setPointerPos(minecraft.mouseHandler.xpos = (minecraft.mouseHandler.xpos() + stick.x * ((double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth()) * Math.pow(ScreenUtil.getLegacyOptions().interfaceSensitivity().get() * 0.9 + 0.3, 4.5)), minecraft.mouseHandler.ypos = (minecraft.mouseHandler.ypos() + stick.y * ((double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()) * Math.pow(ScreenUtil.getLegacyOptions().interfaceSensitivity().get() * 0.9 + 0.3, 4.5)));
 
                 if (state.is(ControllerComponent.DOWN_BUTTON) || state.is(ControllerComponent.UP_BUTTON) || state.is(ControllerComponent.LEFT_BUTTON)) {
                     if (state.pressed && state.canClick())
@@ -127,13 +128,15 @@ public class ControllerHandler {
                     this.minecraft.setLastInputType(InputType.KEYBOARD_ARROW);
                     minecraft.screen.afterKeyboardAction();
                 }
+                ControllerComponent cursorComponent = ((LegacyKeyMapping)LegacyMinecraftClient.keyToggleCursor).getComponent();
+                if (cursorComponent != null && state.is(cursorComponent) && state.canClick()) toggleCursor();
                 if (isCursorDisabled) simulateKeyAction(s-> state.is(ControllerComponent.DOWN_BUTTON) && state.onceClick(false),InputConstants.KEY_RETURN, state);
                 simulateKeyAction(s-> s.is(ControllerComponent.RIGHT_BUTTON) && state.onceClick(true),InputConstants.KEY_ESCAPE, state);
                 simulateKeyAction(s-> s.is(ControllerComponent.LEFT_BUTTON),InputConstants.KEY_X, state);
                 simulateKeyAction(s->s.is(ControllerComponent.UP_BUTTON),InputConstants.KEY_O, state);
                 simulateKeyAction(s->s.is(ControllerComponent.RIGHT_TRIGGER),InputConstants.KEY_W, state);
                 simulateKeyAction(s->s.is(ControllerComponent.RIGHT_BUMPER),InputConstants.KEY_RBRACKET, state);
-                simulateKeyAction(s->state.is(ControllerComponent.LEFT_BUMPER),InputConstants.KEY_LBRACKET, state);
+                simulateKeyAction(s->s.is(ControllerComponent.LEFT_BUMPER),InputConstants.KEY_LBRACKET, state);
                 if (state.is(ControllerComponent.RIGHT_STICK) && state instanceof ComponentState.Stick stick && Math.abs(stick.y) > Math.abs(stick.x) && state.pressed && state.canClick())
                     minecraft.screen.mouseScrolled(getPointerX(), getPointerY(), 0, Math.signum(-stick.y));
                 Predicate<Predicate<ComponentState.Stick>> isStickAnd = s -> state.is(ControllerComponent.LEFT_STICK) && state instanceof ComponentState.Stick stick && s.test(stick);
@@ -216,5 +219,9 @@ public class ControllerHandler {
         minecraft.mouseHandler.xpos = minecraft.getWindow().getScreenWidth() / 2d;
         minecraft.mouseHandler.ypos = minecraft.getWindow().getScreenHeight() / 2d;
         isCursorDisabled = false;
+    }
+    public void toggleCursor(){
+        if (isCursorDisabled) enableCursor();
+        else disableCursor();
     }
 }

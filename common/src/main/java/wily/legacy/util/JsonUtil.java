@@ -1,9 +1,6 @@
 package wily.legacy.util;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import dev.architectury.registry.registries.Registrar;
 import net.minecraft.core.Registry;
@@ -14,11 +11,16 @@ import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Recipe;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.client.RecipeValue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -64,5 +66,27 @@ public class JsonUtil {
         } else tag = null;
         Predicate<Item> p = registryMatches(Registries.ITEM,o);
         return (item, t) -> p.test(item) && NbtUtils.compareNbt(tag, t, true);
+    }
+
+    public static <C extends Container, T extends Recipe<C>> void addGroupedRecipeValuesFromJson(Map<String,List<RecipeValue<C,T>>> groups, JsonElement element){
+        if (element instanceof JsonArray a) a.forEach(e->{
+            if (e instanceof JsonPrimitive p && p.isString()) addRecipeValue(groups,p.getAsString(),p.getAsString());
+            else if(e instanceof JsonObject obj && obj.get("recipes") instanceof JsonArray rcps) rcps.forEach(r-> {
+                if (r instanceof JsonPrimitive p && p.isString())  addRecipeValue(groups, GsonHelper.getAsString(obj,"group",p.getAsString()), p.getAsString());
+            });
+        });
+        else if (element instanceof JsonObject obj) obj.asMap().forEach((g,ge)->{
+            if (ge instanceof JsonArray a) a.forEach(e-> {
+                if (e instanceof JsonPrimitive p && p.isString())  addRecipeValue(groups,g, p.getAsString());
+            });
+        });
+    }
+
+    public static <C extends Container, T extends Recipe<C>> void addRecipeValue(Map<String,List<RecipeValue<C, T>>> map, String key, String recipeString){
+        addMapListEntry(map,key.isEmpty() ? recipeString : key, RecipeValue.create(recipeString));
+    }
+
+    public static <K,V> void addMapListEntry(Map<K,List<V>> map, K key, V entry){
+        map.computeIfAbsent(key,k-> new ArrayList<>()).add(entry);
     }
 }

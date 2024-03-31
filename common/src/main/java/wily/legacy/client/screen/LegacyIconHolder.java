@@ -149,23 +149,26 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         renderItem(graphics,itemIcon,getX(),getY(),isWarning());
     }
     public void renderItem(GuiGraphics graphics, ItemStack item, int x, int y, boolean isWarning){
-        if (!item.isEmpty()){
-            graphics.pose().pushPose();
-            graphics.pose().translate(x,y,0);
-            applyOffset(graphics);
-            graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
+        if (!item.isEmpty()) renderItem(graphics,()->{
             graphics.renderFakeItem(item, 0,0);
             if (allowItemDecorations)
                 graphics.renderItemDecorations(Minecraft.getInstance().font, item,0,0);
+        },x,y,isWarning);
+    }
+    public void renderItem(GuiGraphics graphics, Runnable itemRender, int x, int y, boolean isWarning){
+        graphics.pose().pushPose();
+        graphics.pose().translate(x,y,0);
+        applyOffset(graphics);
+        graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
+        itemRender.run();
+        graphics.pose().popPose();
+        if (isWarning) {
+            RenderSystem.disableDepthTest();
+            graphics.pose().pushPose();
+            applyOffset(graphics);
+            graphics.blitSprite(WARNING_ICON,x,y,8,8);
             graphics.pose().popPose();
-            if (isWarning) {
-                RenderSystem.disableDepthTest();
-                graphics.pose().pushPose();
-                applyOffset(graphics);
-                graphics.blitSprite(WARNING_ICON,x,y,8,8);
-                graphics.pose().popPose();
-                RenderSystem.enableDepthTest();
-            }
+            RenderSystem.enableDepthTest();
         }
     }
     public void renderSelection(GuiGraphics graphics, int i, int j, float f){
@@ -195,11 +198,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         if (isHovered || (allowFocusedItemTooltip && isFocused())) renderTooltip(minecraft,graphics,itemIcon, !isHovered ? (int) getMiddleX() : i,!isHovered ? (int) getMiddleY() : j);
     }
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics,ItemStack stack, int i, int j){
-        if (!stack.isEmpty()) {
-            minecraft.selectMainFont(true);
-            graphics.renderTooltip(minecraft.font, stack, i, j);
-            minecraft.selectMainFont(false);
-        }
+        if (!stack.isEmpty()) graphics.renderTooltip(minecraft.font, stack, i, j);
     }
     public boolean isHoveredOrFocused(){
         return isHovered || isFocused();

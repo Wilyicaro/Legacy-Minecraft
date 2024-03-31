@@ -88,7 +88,11 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (i == InputConstants.KEY_ESCAPE && ControlTooltip.getActiveType().isKeyboard()) selectedKey = null;
+        if (i == InputConstants.KEY_ESCAPE && selectedKey != null) {
+            selectedKey.setComponent(null);
+            selectedKey = null;
+            return true;
+        }
         if (selectedKey != null) return false;
         return super.keyPressed(i, j, k);
     }
@@ -100,12 +104,11 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
         addRenderableOnly(panel);
         getRenderableVList().init(this,panel.x + 7,panel.y + 6,panel.width - 14,panel.height);
     }
-
     @Override
     public void componentTick(ComponentState state) {
         if (selectedKey != null) {
             if (!state.canClick()) return;
-            if (!state.is(ControllerComponent.BACK) || selectedKey.self() == LegacyMinecraftClient.keyHostOptions) selectedKey.setComponent(state.component);
+            selectedKey.setComponent(!state.is(ControllerComponent.BACK) || selectedKey.self() == LegacyMinecraftClient.keyHostOptions ? state.component : null);
             selectedKey = null;
             state.block();
         }

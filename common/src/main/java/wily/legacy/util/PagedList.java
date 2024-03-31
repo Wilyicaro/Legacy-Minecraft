@@ -1,8 +1,6 @@
 package wily.legacy.util;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.jetbrains.annotations.NotNull;
-import wily.legacy.client.screen.TabButton;
 
 import java.util.*;
 
@@ -59,7 +57,7 @@ public class PagedList<T> extends AbstractList<T> {
     public static <T> int occurrenceOf(List<T> list, T object, int index){
         int o = 0;
         for (int i = 0; i < list.size(); i++) {
-            if (object == list.get(i)){
+            if (object.equals(list.get(i))){
                 if (i == index) return o;
                 else o++;
             }

@@ -17,6 +17,7 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.trading.MerchantOffer;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -44,6 +45,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Shadow private int shopItem;
     @Shadow protected abstract void postButtonClick();
 
+    @Shadow @Final private static ResourceLocation DISCOUNT_STRIKETHRUOGH_SPRITE;
     private int lastFocused = -1;
     protected boolean[] displaySlotsWarning;
 
@@ -108,7 +110,17 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                     RenderSystem.disableDepthTest();
                     renderIcon(LegacySprites.PADLOCK_SPRITE, graphics, false, 16, 16);
                     RenderSystem.enableDepthTest();
+                } else if (isValidIndex() && menu.getOffers().get(index).isOutOfStock()) {
+                    RenderSystem.disableDepthTest();
+                    renderIcon(LegacySprites.ERROR_CROSS_SPRITE, graphics, false, 15, 15);
+                    RenderSystem.enableDepthTest();
                 }
+            }
+
+            @Override
+            public void renderItem(GuiGraphics graphics, int i, int j, float f) {
+                if(itemIcon.isEmpty()) return;
+                ScreenUtil.secureTranslucentRender(graphics,isValidIndex() && menu.getOffers().get(index).isOutOfStock(),0.5f, ()-> super.renderItem(graphics, i, j, f));
             }
 
             @Override
@@ -119,10 +131,26 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                         for (int index = 0; index < 3; index++) {
                             Slot s = menu.slots.get(index);
                             if (s.hasItem()) break;
+                            if (!s.isActive()) continue;
                             LegacyIconHolder iconHolder = ScreenUtil.iconHolderRenderer.slotBounds(leftPos, topPos, s);
-                            iconHolder.itemIcon = index == 0 ? offer.getCostA() : index == 1 ? offer.getCostB() : offer.getResult();
+                            if (index != 0) iconHolder.itemIcon = index == 1 ? offer.getCostB() : offer.getResult();
                             iconHolder.setWarning(displaySlotsWarning[index]);
                             iconHolder.render(graphics, i, j, f);
+                            if (index == 0) iconHolder.renderItem(graphics,()->{
+                                ItemStack costA = offer.getCostA();
+                                ItemStack baseCostA = offer.getBaseCostA();
+                                graphics.renderFakeItem(costA, 0, 0);
+                                if (baseCostA.getCount() == costA.getCount()) {
+                                    graphics.renderItemDecorations(font, costA, 0, 0);
+                                } else {
+                                    graphics.renderItemDecorations(font, baseCostA, -12, 0, baseCostA.getCount() == 1 ? "1" : null);
+                                    graphics.renderItemDecorations(font, costA, 0, 0, costA.getCount() == 1 ? "1" : null);
+                                    graphics.pose().pushPose();
+                                    graphics.pose().translate(0.0f, 0.0f, 300.0f);
+                                    graphics.blitSprite(DISCOUNT_STRIKETHRUOGH_SPRITE, -5, +12, 0, 9, 2);
+                                    graphics.pose().popPose();
+                                }
+                            }, iconHolder.getX(),iconHolder.getY(),iconHolder.isWarning());
                         }
                     }
                 }
@@ -166,7 +194,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             }
             @Override
             public boolean isWarning() {
-                return super.isWarning() && ((LegacyMerchantOffer)menu.getOffers().get(index)).getRequiredLevel() <= menu.getTraderLevel();
+                return super.isWarning() && isValidIndex() && ((LegacyMerchantOffer)menu.getOffers().get(index)).getRequiredLevel() <= menu.getTraderLevel() && !menu.getOffers().get(index).isOutOfStock();
             }
 
             private boolean isValidIndex(){

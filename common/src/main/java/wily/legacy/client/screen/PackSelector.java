@@ -250,7 +250,7 @@ public class PackSelector extends AbstractWidget {
                 if (ioSupplier == null)
                     return fallback;
                 String string = pack.getId();
-                ResourceLocation resourceLocation3 = new ResourceLocation("minecraft", "pack/" + Util.sanitizeName(string, ResourceLocation::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(string) + "/icon");
+                ResourceLocation resourceLocation3 = new ResourceLocation("minecraft", icon + "/" + Util.sanitizeName(string, ResourceLocation::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(string) + "/icon");
                 InputStream inputStream = ioSupplier.get();
                 try {
                     NativeImage nativeImage = NativeImage.read(inputStream);

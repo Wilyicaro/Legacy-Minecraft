@@ -203,7 +203,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     protected void controlPage(boolean left, boolean right){
         if ((left|| right) && page.max > 0){
             int lastPage = page.get();
-            page.add( left ? 1 : -1);
+            page.add(left ? -1 : 1);
             if (lastPage != page.get()) {
                 tabList.resetSelectedTab();
                 rebuildWidgets();
@@ -214,7 +214,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     @Override
     public boolean keyPressed(int i, int j, int k) {
         tabList.controlTab(i);
-        if (hasShiftDown()) controlPage(i == 262 , i == 263);
+        if (hasShiftDown()) controlPage(i == 263 , i == 262);
         if (i == InputConstants.KEY_X && canClearQuickSelect()) {
             for (int n = 36; n < 45; ++n)
                 this.minecraft.gameMode.handleCreativeModeItemAdd(ItemStack.EMPTY, n);
@@ -322,7 +322,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
 
     @Override
     public void componentTick(ComponentState state) {
-        if (state.is(ControllerComponent.RIGHT_STICK) && state instanceof ComponentState.Stick s && s.pressed && s.canClick()) controlPage(s.x > 0 && s.x > Math.abs(s.y),s.x < 0 && -s.x > Math.abs(s.y));
+        if (state.is(ControllerComponent.RIGHT_STICK) && state instanceof ComponentState.Stick s && s.pressed && s.canClick()) controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
     }
 
     public static class CreativeModeMenu extends AbstractContainerMenu {

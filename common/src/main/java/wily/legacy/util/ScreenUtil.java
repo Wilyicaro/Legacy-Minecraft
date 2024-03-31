@@ -311,4 +311,9 @@ public class ScreenUtil {
         Lighting.setupFor3DItems();
     }
 
+    public static float getTextScale(){
+        return getLegacyOptions().legacyItemTooltips().get() ? (float) Math.sqrt(1280f / mc.getWindow().getScreenWidth() * 720f / mc.getWindow().getScreenHeight()) : 1.0f;
+    }
+
+
 }

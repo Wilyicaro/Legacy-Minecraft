@@ -39,7 +39,7 @@ public class KnownListing<T> {
 
         listingFile = "known_"+ registrar.key().location().getPath()+ ".json";
         this.path = path.resolve(listingFile);
-        if (Files.exists(this.  path)) {
+        if (Files.exists(this.path)) {
             try (BufferedReader bufferedReader = Files.newBufferedReader(this.path, Charsets.UTF_8);){
                 JsonArray array = GsonHelper.parseArray(bufferedReader);
                 array.forEach(e-> {

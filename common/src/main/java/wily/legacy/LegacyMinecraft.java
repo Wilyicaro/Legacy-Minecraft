@@ -2,13 +2,10 @@ package wily.legacy;
 
 import com.google.common.base.Suppliers;
 import dev.architectury.event.events.common.CommandRegistrationEvent;
-import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.networking.NetworkChannel;
 import dev.architectury.platform.Platform;
 import dev.architectury.registry.registries.RegistrarManager;
-import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -20,6 +17,7 @@ import wily.legacy.init.LegacyGameRules;
 import wily.legacy.init.LegacyMenuTypes;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.network.*;
+import wily.legacy.player.LegacyPlayerInfo;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -41,25 +39,17 @@ public class LegacyMinecraft
 
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
-    public static final Object2IntMap<String> playerVisualIds = new Object2IntArrayMap<>();
     public static void init(){
         LegacySoundEvents.register();
         LegacyMenuTypes.register();
         LegacyGameRules.init();
-        registerCommonPacket(ServerDisplayInfoSync.class,ServerDisplayInfoSync::new);
-        registerCommonPacket(ServerDisplayInfoSync.HostOptions.class,ServerDisplayInfoSync.HostOptions::new);
+        registerCommonPacket(PlayerInfoSync.class, PlayerInfoSync::new);
+        registerCommonPacket(PlayerInfoSync.HostOptions.class, PlayerInfoSync.HostOptions::new);
         registerCommonPacket(ServerOpenClientMenu.class,ServerOpenClientMenu::new);
         registerCommonPacket(ServerInventoryCraftPacket.class, ServerInventoryCraftPacket::new);
         registerCommonPacket(TipCommand.Packet.class, TipCommand.Packet::decode);
         registerCommonPacket(TipCommand.EntityPacket.class, TipCommand.EntityPacket::new);
-        LifecycleEvent.SERVER_STARTED.register(l-> playerVisualIds.clear());
-        PlayerEvent.PLAYER_JOIN.register(p->{
-            updateDisplayPlayersMap(p,true);
-        });
-        PlayerEvent.PLAYER_QUIT.register(p->{
-            updateDisplayPlayersMap(p,false);
-        });
-        LifecycleEvent.SERVER_STOPPED.register(l-> playerVisualIds.clear());
+        PlayerEvent.PLAYER_JOIN.register(LegacyMinecraft::updatePlayerPosition);
         CommandRegistrationEvent.EVENT.register((s,c,e)->{
             TipCommand.register(s,c);
         });
@@ -79,14 +69,20 @@ public class LegacyMinecraft
         registry.register("console_aspects",false);
         if (Platform.isForgeLike()) registry.register("programmer_art","programmer_art", Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP,false);
     }
-    public static void updateDisplayPlayersMap(ServerPlayer p, boolean addRemove){
+    public static void updatePlayerPosition(ServerPlayer p){
         if (p.getServer() == null) return;
-        if (addRemove) {
-            int i = 0;
-            while (playerVisualIds.containsValue(i))
-                i++;
-            playerVisualIds.put(p.getGameProfile().getName(),i);
-        } else playerVisualIds.removeInt(p.getGameProfile().getName());
+        int pos = 0;
+        boolean b = true;
+        main : while (b) {
+            b = false;
+            for (ServerPlayer player : p.server.getPlayerList().getPlayers())
+                if (player != p && ((LegacyPlayerInfo)p).getPosition() == pos){
+                    pos++;
+                    b = true;
+                    continue main;
+                }
+        }
+        ((LegacyPlayerInfo)p).setPosition(pos);
     }
     public static <T extends CommonPacket> void  registerCommonPacket(Class<T> packet, Function<FriendlyByteBuf,T> decode){
         NETWORK.register(packet,CommonPacket::encode,decode,CommonPacket::apply);
