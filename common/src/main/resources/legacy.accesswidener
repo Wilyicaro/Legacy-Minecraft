@@ -108,3 +108,8 @@ accessible field net/minecraft/world/item/AxeItem STRIPPABLES Ljava/util/Map;
 accessible field net/minecraft/world/item/ShovelItem FLATTENABLES Ljava/util/Map;
 accessible field net/minecraft/world/item/FoodOnAStickItem canInteractWith Lnet/minecraft/world/entity/EntityType;
 extendable method net/minecraft/client/gui/screens/Screen clearFocus ()V
+accessible field net/minecraft/client/renderer/texture/TextureAtlas texturesByName Ljava/util/Map;
+accessible field net/minecraft/client/renderer/FogRenderer fogRed F
+accessible field net/minecraft/client/renderer/FogRenderer fogGreen F
+accessible field net/minecraft/client/renderer/FogRenderer fogBlue F
+accessible class net/minecraft/client/renderer/FogRenderer$FogData

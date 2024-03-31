@@ -16,16 +16,19 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
 import wily.legacy.LegacyMinecraftPlatform;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ModsScreen extends PanelVListScreen{
-    protected final Map<Mod, SizedLocation> modLogosCache = new HashMap<>();
+    protected final Map<Mod, SizedLocation> modLogosCache = new ConcurrentHashMap<>();
     protected ScrollableRenderer scrollableRenderer =  new ScrollableRenderer(new LegacyScrollRenderer());
 
     public record SizedLocation(ResourceLocation location, int width, int height){

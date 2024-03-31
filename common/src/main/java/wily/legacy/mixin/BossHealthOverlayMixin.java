@@ -29,7 +29,7 @@ public abstract class BossHealthOverlayMixin {
             return;
         }
         RenderSystem.enableBlend();
-        RenderSystem.setShaderColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
+        RenderSystem.setShaderColor(1.0f,1.0f,1.0f, ScreenUtil.getInterfaceOpacity());
         minecraft.selectMainFont(true);
 
     }
@@ -69,5 +69,4 @@ public abstract class BossHealthOverlayMixin {
     private void drawBar(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int i, int j, int k, int l, int m, int n, int o, int p) {
         guiGraphics.blitSprite(resourceLocation,o <= 400 ? 400 : 406,j * 3,k,l,m,n,o,p * 3);
     }
-
 }

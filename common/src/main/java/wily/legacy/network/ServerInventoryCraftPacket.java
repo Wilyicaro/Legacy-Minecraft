@@ -37,7 +37,7 @@ public record ServerInventoryCraftPacket(List<Ingredient> ingredients, ItemStack
             Ingredient ing = ingredients.get(i);
             if (ing.isEmpty()) continue;
             int itemCount = inventory.items.stream().filter(ing).mapToInt(ItemStack::getCount).sum();
-            long ingCount = ingredients.stream().filter(ingredient-> ingredient == ing).count();
+            long ingCount = ingredients.stream().filter(ingredient-> !ingredient.isEmpty() && ingredient.equals(ing)).count();
             if (itemCount < ingCount && PagedList.occurrenceOf(ingredients,ing,i) >= itemCount) {
                 canCraft = false;
                 break;

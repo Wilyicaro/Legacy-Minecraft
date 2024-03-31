@@ -9,6 +9,10 @@ public interface LegacyOptions {
     OptionInstance<Double> hudOpacity();
     OptionInstance<Double> interfaceResolution();
     OptionInstance<Double> interfaceSensitivity();
+    OptionInstance<Boolean> overrideTerrainFogStart();
+    OptionInstance<Integer> terrainFogStart();
+    OptionInstance<Double> terrainFogEnd();
+    OptionInstance<Double> terrainFogOpacity();
     OptionInstance<Integer> autoSaveInterval();
     OptionInstance<Integer> hudScale();
     OptionInstance<Boolean> legacyCreativeTab();
@@ -28,6 +32,7 @@ public interface LegacyOptions {
     OptionInstance<Boolean> vanillaTabs();
     OptionInstance<Boolean> forceYellowText();
     OptionInstance<Boolean> displayNameTagBorder();
+    OptionInstance<Boolean> legacyItemTooltips();
     OptionInstance<Boolean> invertYController();
     OptionInstance<Boolean> invertControllerButtons();
     OptionInstance<Integer> controllerIcons();

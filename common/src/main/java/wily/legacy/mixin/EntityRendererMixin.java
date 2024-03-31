@@ -2,6 +2,7 @@ package wily.legacy.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -16,8 +17,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.player.LegacyPlayerInfo;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(EntityRenderer.class)
@@ -30,8 +31,8 @@ public abstract class EntityRendererMixin {
         String name = component.getString();
         int j = "deadmau5".equals(name) ? -10 : 0;
         int h = (int) (-font.width(component) / 2f);
-        int p = LegacyMinecraft.playerVisualIds.getOrDefault(name, name.hashCode());
-        float[] color = p == 0 || !(entity instanceof AbstractClientPlayer) ?  new float[]{0,0,0} : LegacyMinecraftClient.getVisualPlayerColor(p);
+        Minecraft minecraft = Minecraft.getInstance();
+        float[] color = !(entity instanceof AbstractClientPlayer p)  || minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(p.getUUID()) instanceof LegacyPlayerInfo info) || info.getPosition() == 0 ?  new float[]{0,0,0} : LegacyMinecraftClient.getVisualPlayerColor(info);
         poseStack.pushPose();
         fill(RenderType.debugLineStrip(1.0),multiBufferSource, poseStack, h - 1, j - 1, h + font.width(component) + 1,j + 9, color[0],color[1],color[2],1.0f);
         poseStack.translate(0, 8,0);

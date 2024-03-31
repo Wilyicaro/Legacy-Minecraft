@@ -4,7 +4,6 @@ import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.network.chat.Component;
-import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
 
 import java.util.List;
@@ -20,6 +19,7 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
     private final Consumer<LegacySliderButton<T>> onChange;
     private final Supplier<Tooltip> tooltipSupplier;
     private int slidingTime = 1;
+    private int lastSliderInput = -1;
     public T objectValue;
     public LegacySliderButton(int i, int j, int k, int l, Function<LegacySliderButton<T>,Component> messageGetter, Supplier<Tooltip> tooltipSupplier, T initialValue, Function<LegacySliderButton<T>,T> valueGetter, Function<T, Double> valueSetter, Consumer<LegacySliderButton<T>>  onChange) {
         super(i, j, k, l, Component.empty(), valueSetter.apply(initialValue));
@@ -70,6 +70,8 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
                     setValue(this.value + (bl ? -part : part));
                     part*=2;
                 }
+                if (slidingTime > 0 && i != lastSliderInput) slidingTime = 0;
+                lastSliderInput = i;
                 slidingTime++;
                 return true;
             }

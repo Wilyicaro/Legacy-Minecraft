@@ -32,7 +32,7 @@ public abstract class ForgeGuiMixin extends Gui {
         instance.pose().pushPose();
         instance.pose().translate(0,ScreenUtil.getHUDDistance() - ScreenUtil.getHUDSize(),0);
         instance.setColor(1.0f,1.0f,1.0f,ScreenUtil.getHUDOpacity());
-        int r = instance.drawString(arg,arg2,i,j + 63 - (lastToolHighlight.isEmpty() || this.toolHighlightTimer <= 0 ? 0 : (lastToolHighlight.getTooltipLines(null, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum() - 1) * 9),k);
+        int r = instance.drawString(arg,arg2,i,j + 63 - (lastToolHighlight.isEmpty() || this.toolHighlightTimer <= 0 ? 0 : (lastToolHighlight.getTooltipLines(minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum() - 1) * 9),k);
         instance.pose().popPose();
         instance.setColor(1.0f,1.0f,1.0f,1.0f);
         return r;

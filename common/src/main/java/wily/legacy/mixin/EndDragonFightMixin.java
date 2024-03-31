@@ -13,4 +13,8 @@ public class EndDragonFightMixin {
     private Component init(Component component){
         return component.copy().withStyle(ChatFormatting.DARK_PURPLE);
     }
+    @ModifyArg(method = "<init>(Lnet/minecraft/server/level/ServerLevel;JLnet/minecraft/world/level/dimension/end/EndDragonFight$Data;Lnet/minecraft/core/BlockPos;)V",at = @At(value = "INVOKE", target = "Lnet/minecraft/world/BossEvent;setCreateWorldFog(Z)Lnet/minecraft/world/BossEvent;"))
+    private boolean initCreateWorldFog(boolean bl){
+        return false;
+    }
 }

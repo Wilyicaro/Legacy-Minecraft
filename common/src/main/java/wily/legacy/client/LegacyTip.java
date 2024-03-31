@@ -66,7 +66,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
         return disappearTime(tip.getString().toCharArray().length * 80L);
     }
     public LegacyTip disappearTime(long disappearTime){
-        if (disappearTime > 0) {
+        if (disappearTime >= 0) {
             createdTime = Util.getMillis();
             this.disappearTime = disappearTime;
         }

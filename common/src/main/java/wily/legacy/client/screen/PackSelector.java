@@ -36,7 +36,9 @@ import wily.legacy.util.Stocker;
 
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -250,7 +252,7 @@ public class PackSelector extends AbstractWidget {
                 if (ioSupplier == null)
                     return fallback;
                 String string = pack.getId();
-                ResourceLocation resourceLocation3 = new ResourceLocation("minecraft", "pack/" + Util.sanitizeName(string, ResourceLocation::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(string) + "/icon");
+                ResourceLocation resourceLocation3 = new ResourceLocation("minecraft", icon + "/" + Util.sanitizeName(string, ResourceLocation::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(string) + "/icon");
                 InputStream inputStream = ioSupplier.get();
                 try {
                     NativeImage nativeImage = NativeImage.read(inputStream);

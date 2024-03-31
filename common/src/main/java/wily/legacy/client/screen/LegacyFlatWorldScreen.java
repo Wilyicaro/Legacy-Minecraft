@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import static wily.legacy.client.screen.ControlTooltip.CONTROL_ACTION_CACHE;
+
 @Environment(value=EnvType.CLIENT)
 public class LegacyFlatWorldScreen extends PanelVListScreen {
     public static int DEFAULT_MAX_WORLD_HEIGHT = 384;
@@ -44,7 +46,9 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
 
     public LegacyFlatWorldScreen(Screen screen, WorldCreationUiState uiState, HolderLookup.RegistryLookup<Biome> biomeGetter, HolderLookup.RegistryLookup<StructureSet> structureGetter, Consumer<FlatLevelGeneratorSettings> consumer, FlatLevelGeneratorSettings flatLevelGeneratorSettings) {
         super(screen,282,248,Component.translatable("createWorld.customize.flat.title"));
-        controlTooltipRenderer.tooltips.set(0,ControlTooltip.create(()-> ControllerComponent.DOWN_BUTTON.componentState.getIcon(true),()->tabList.selectedTab == 0 ? ControlTooltip.CONTROL_ACTION_CACHE.getUnchecked("legacy.menu.create_flat_world.layer_options") : null));
+        controlTooltipRenderer.tooltips.set(0,ControlTooltip.create(()-> ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN,true) : ControllerComponent.DOWN_BUTTON.componentState.getIcon(true),()->getFocused() != null ? ControlTooltip.CONTROL_ACTION_CACHE.getUnchecked(tabList.selectedTab == 0 ? "legacy.menu.create_flat_world.layer_options" : "mco.template.button.select") : null));
+        controlTooltipRenderer.tooltips.add(ControlTooltip.create(()-> ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O,true) : ControllerComponent.UP_BUTTON.componentState.getIcon(true),()-> ControlTooltip.CONTROL_ACTION_CACHE.getUnchecked("legacy.action.presets")));
+        controlTooltipRenderer.addCompound(()-> new Component[]{ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true) : ControllerComponent.LEFT_BUMPER.componentState.getIcon(true),ControlTooltip.SPACE,ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true) : ControllerComponent.RIGHT_BUMPER.componentState.getIcon(true)},()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.select_tab"));
         parent = Minecraft.getInstance().screen instanceof WorldMoreOptionsScreen s ? s : screen;
         this.uiState = uiState;
         this.applySettings = consumer;
@@ -198,7 +202,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
     @Override
     public boolean keyPressed(int i, int j, int k) {
         tabList.controlTab(i);
-        if (i == InputConstants.KEY_O && tabList.selectedTab == 0)
+        if (i == InputConstants.KEY_O)
             minecraft.setScreen(new LegacyFlatPresetsScreen(this,uiState.getSettings().worldgenLoadContext().lookupOrThrow(Registries.FLAT_LEVEL_GENERATOR_PRESET),uiState.getSettings().dataConfiguration().enabledFeatures(), f-> setPreset(f.value().settings())));
         return super.keyPressed(i, j, k);
     }

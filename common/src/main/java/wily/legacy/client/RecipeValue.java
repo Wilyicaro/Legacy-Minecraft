@@ -45,7 +45,7 @@ public interface RecipeValue<C extends Container, T extends Recipe<C>> extends P
         if (rcps.get(rcps.size() -1) instanceof ShulkerBoxColoring r) {
             Ingredient shulkerBoxes = Ingredient.of(Stream.concat(Stream.of(Items.SHULKER_BOX.getDefaultInstance()),Arrays.stream(DyeColor.values()).map(c->ShulkerBoxBlock.getBlockByColor(c).asItem().getDefaultInstance())));
             for (DyeColor color : DyeColor.values()) {
-                if (!(BuiltInRegistries.ITEM.get(new ResourceLocation(color.getName() + "_dye")) instanceof DyeItem d)) continue;
+                DyeItem d = DyeItem.byColor(color);
                 Recipe<?> rcp = new ShapelessRecipe(r.getGroup(), r.category(), ShulkerBoxBlock.getColoredItemStack(d.getDyeColor()), NonNullList.of(Ingredient.EMPTY,shulkerBoxes,Ingredient.of(d)));
                 if (filter.test(rcp)) rcps.add(rcp);
             }

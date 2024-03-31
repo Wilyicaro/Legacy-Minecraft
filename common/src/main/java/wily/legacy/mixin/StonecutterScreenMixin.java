@@ -1,20 +1,16 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.inventory.StonecutterMenu;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -25,15 +21,13 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.client.LegacySprites;
 import wily.legacy.client.Offset;
 import wily.legacy.client.StoneCuttingGroupManager;
 import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.client.screen.LegacyScrollRenderer;
-import wily.legacy.init.LegacySoundEvents;
+import wily.legacy.client.screen.RecipeIconHolder;
 import wily.legacy.network.ServerInventoryCraftPacket;
 import wily.legacy.util.PagedList;
 import wily.legacy.util.ScreenUtil;
@@ -48,7 +42,7 @@ import static wily.legacy.client.screen.ControlTooltip.*;
 
 @Mixin(StonecutterScreen.class)
 public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterMenu> {
-    protected List<LegacyIconHolder>  craftingButtons = new ArrayList<>();;
+    protected List<RecipeIconHolder<StonecutterRecipe>>  craftingButtons = new ArrayList<>();;
     protected List<List<StonecutterRecipe>> recipesByGroup = new ArrayList<>();
     protected List<List<StonecutterRecipe>> filteredRecipesByGroup = Collections.emptyList();
     protected Stocker.Sizeable craftingButtonsOffset =  new Stocker.Sizeable(0);
@@ -87,7 +81,10 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
         onlyCraftableRecipes = true;
         listener = new ContainerListener() {
             public void slotChanged(AbstractContainerMenu abstractContainerMenu, int i, ItemStack itemStack) {
-                if(onlyCraftableRecipes) filteredRecipesByGroup = recipesByGroup.stream().map(l->l.stream().filter(r->ServerInventoryCraftPacket.canCraft(r.getIngredients(),inventory)).toList()).filter(l-> !l.isEmpty()).toList();
+                if(onlyCraftableRecipes){
+                    filteredRecipesByGroup = recipesByGroup.stream().map(l->l.stream().filter(r->ServerInventoryCraftPacket.canCraft(r.getIngredients(),inventory)).toList()).filter(l-> !l.isEmpty()).toList();
+                    craftingButtons.get(selectedCraftingButton).updateRecipeDisplay();
+                }
             }
             public void dataChanged(AbstractContainerMenu abstractContainerMenu, int i, int j) {
 
@@ -156,34 +153,18 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
         for (int i = 0; i < 12; i++) {
             int index = i;
 
-            LegacyIconHolder h;
-            craftingButtons.add(h = new LegacyIconHolder(leftPos + 13 + i * 27,topPos + 38,27, 27) {
-                private int selectionOffset = 0;
-                boolean isHoveredTop = false;
-                boolean isHoveredBottom = false;
-                private List<StonecutterRecipe> focusedRecipes;
-                private boolean warningInputSlot = false;
+            RecipeIconHolder<StonecutterRecipe> h;
+            craftingButtons.add(h = new RecipeIconHolder<>(leftPos + 13 + i * 27, topPos + 38) {
+                private boolean warningInputSlot;
+
                 @Override
                 public void render(GuiGraphics graphics, int i, int j, float f) {
-                    if (isFocused()){
-                        selectedCraftingButton = index;
-                        updateIngredient(getFocusedRecipe());
-                    }
-                    isHoveredTop = isFocused() && getFocusedRecipes().size() > 2 && isMouseOver(i,j,-1);
-                    isHoveredBottom = isFocused() && getFocusedRecipes().size() >= 2 && isMouseOver(i,j,1);
-                    itemIcon = isValidIndex() ? getFocusedRecipes().get(0).getResultItem(minecraft.level.registryAccess()) : ItemStack.EMPTY;
+                    if (isFocused()) selectedCraftingButton = index;
                     super.render(graphics, i, j, f);
                 }
-                @Override
-                public void renderItem(GuiGraphics graphics, int i, int j, float f) {
-                    if (!isValidIndex()) return;
-                    ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(0)),0.5f, ()->renderItem(graphics,itemIcon,getX(),getY(),false));
-                }
-                public ResourceLocation getIconHolderSprite(){
-                    return ICON_HOLDER;
-                }
-                private boolean canCraft(StonecutterRecipe rcp){
-                    if (rcp == null || onlyCraftableRecipes) return true;
+
+                protected boolean canCraft(StonecutterRecipe rcp) {
+                    if (rcp == null || onlyCraftableRecipes || !hasAutoCrafting()) return true;
                     boolean focusedRcp = isFocused() && getFocusedRecipe() == rcp;
                     List<Ingredient> ings = focusedRcp ? ingredientSlot : rcp.getIngredients();
                     boolean canCraft = true;
@@ -191,10 +172,10 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
                         Ingredient ing = ings.get(i1);
                         if (ing.isEmpty()) continue;
                         int itemCount = minecraft.player.getInventory().items.stream().filter(ing).mapToInt(ItemStack::getCount).sum();
-                        long ingCount = ings.stream().filter(i-> i == ing).count();
-                        if (itemCount >= ingCount || PagedList.occurrenceOf(ings,ing,i1) < itemCount) {
+                        long ingCount = ings.stream().filter(i -> i == ing).count();
+                        if (itemCount >= ingCount || PagedList.occurrenceOf(ings, ing, i1) < itemCount) {
                             if (focusedRcp && ingredientSlot.contains(ing)) warningInputSlot = false;
-                        }else {
+                        } else {
                             canCraft = false;
                             if (!focusedRcp || !ingredientSlot.contains(ing)) break;
                             else warningInputSlot = true;
@@ -202,167 +183,79 @@ public class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterM
                     }
                     return canCraft;
                 }
-                private List<StonecutterRecipe> getFocusedRecipes(){
+
+                private List<StonecutterRecipe> getFocusedRecipes() {
                     if (!isFocused() || !isValidIndex() || !canScroll()) focusedRecipes = null;
                     else if (focusedRecipes == null) focusedRecipes = new ArrayList<>(getRecipes());
                     return focusedRecipes == null ? getRecipes() : focusedRecipes;
                 }
-                private List<StonecutterRecipe> getRecipes(){
+
+                protected List<StonecutterRecipe> getRecipes() {
                     List<List<StonecutterRecipe>> list = onlyCraftableRecipes ? filteredRecipesByGroup : recipesByGroup;
                     return list.size() <= craftingButtonsOffset.get() + index ? Collections.emptyList() : list.get(craftingButtonsOffset.get() + index);
                 }
-                private void updateResultSlot(){
+
+                @Override
+                protected void updateRecipeDisplay(StonecutterRecipe rcp) {
+                    ingredientSlot = rcp == null ? Collections.emptyList() : rcp.getIngredients();
                     if (!hasAutoCrafting()) {
                         menu.getRecipes().stream().filter(h -> h.value() == getFocusedRecipe()).findFirst().ifPresent(h -> {
-                            if (menu.clickMenuButton(minecraft.player, menu.getRecipes().indexOf(h))) minecraft.gameMode.handleInventoryButtonClick(menu.containerId, menu.getRecipes().indexOf(h));
+                            if (menu.clickMenuButton(minecraft.player, menu.getRecipes().indexOf(h)))
+                                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, menu.getRecipes().indexOf(h));
                         });
                     }
                 }
+
                 @Override
-                public void setFocused(boolean bl) {
-                    if (bl){
-                        updateResultSlot();
-                        selectionOffset = 0;
-                    }
-                    super.setFocused(bl);
-                }
-                @Override
-                public void renderTooltip(Minecraft minecraft, GuiGraphics graphics, int i, int j) {
-                    super.renderTooltip(minecraft, graphics, i, j);
-                    if (!isFocused()) return;
-                    if (isHoveredTop) renderTooltip(minecraft,graphics, getFocusedRecipes().get(getFocusedRecipes().size() - 1).getResultItem(minecraft.level.registryAccess()),i,j);
-                    if (isHoveredBottom) renderTooltip(minecraft,graphics, getFocusedRecipes().get(1).getResultItem(minecraft.level.registryAccess()),i,j);
-                    if (hasAutoCrafting()) {
-                        if(!ingredientSlot.isEmpty() && ScreenUtil.isHovering(menu.getSlot(0),leftPos,topPos,i,j)) renderTooltip(minecraft,graphics,getActualItem(ingredientSlot.get(0)),i,j);
-                        if(ScreenUtil.isHovering(menu.getSlot(1),leftPos,topPos,i,j)) renderTooltip(minecraft,graphics,getFocusedResult(),i,j);
-                    }
-                }
-                private StonecutterRecipe getFocusedRecipe(){
-                    return isValidIndex() ? getFocusedRecipes().get(selectionOffset == -1 ? getFocusedRecipes().size() - 1 : selectionOffset == 1 ? 1 : 0) : null;
-                }
-                private ItemStack getFocusedResult(){
-                    return getFocusedRecipe() == null ? ItemStack.EMPTY : getFocusedRecipe().getResultItem(minecraft.level.registryAccess()) ;
+                protected void toggleCraftableRecipes() {
+                    listener.slotChanged(menu, 0, ItemStack.EMPTY);
+                    onlyCraftableRecipes = !onlyCraftableRecipes;
                 }
 
                 @Override
                 public boolean keyPressed(int i, int j, int k) {
-                    if (i == InputConstants.KEY_O) {
-                        onlyCraftableRecipes = !onlyCraftableRecipes;
-                        listener.slotChanged(menu,0,ItemStack.EMPTY);
-                        focusedRecipes = null;
-                        updateIngredient(getFocusedRecipe());
+                    if (controlCyclicNavigation(i, index, craftingButtons, craftingButtonsOffset, scrollRenderer, StonecutterScreenMixin.this))
                         return true;
-                    }
-                    int oldSelection = selectionOffset;
-                    if ((i == 263 && index == 0) || (i == 262 && index == craftingButtons.size() - 1)){
-                        int oldOffset = craftingButtonsOffset.get();
-                        craftingButtonsOffset.add(i == 263 ? -1 : 1,true);
-                        if ((oldOffset == craftingButtonsOffset.max && i == 262) || (oldOffset == 0 && i == 263)) StonecutterScreenMixin.this.setFocused(craftingButtons.get(i == 263 ? craftingButtons.size() - 1 : 0));
-                        else {
-                            scrollRenderer.updateScroll(i == 263 ? ScreenDirection.LEFT : ScreenDirection.RIGHT);
-                            focusedRecipes = null;
-                        }
-                        ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
-                        return true;
-                    }
-                    if ((i == 265 || i == 264) && isValidIndex()) {
-                        if (i == InputConstants.KEY_UP && (getRecipes().size() > 2 || selectionOffset == 1))
-                            selectionOffset = Math.max(selectionOffset - 1, -1);
-                        if (i == InputConstants.KEY_DOWN && getRecipes().size() >= 2)
-                            selectionOffset = Math.min(selectionOffset + 1, 1);
-                        if (oldSelection != selectionOffset || canScroll()) {
-                            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
-                            if (oldSelection == selectionOffset && selectionOffset != 0)
-                                Collections.rotate(getFocusedRecipes(), -selectionOffset);
-                            updateIngredient(getFocusedRecipe());
-                            return true;
-                        }
-                    }
                     return super.keyPressed(i, j, k);
                 }
-                public boolean isWarning() {
-                    return getFocusedRecipe() == null || !canCraft(getFocusedRecipe());
+
+                @Override
+                public void renderTooltip(Minecraft minecraft, GuiGraphics graphics, int i, int j) {
+                    super.renderTooltip(minecraft, graphics, i, j);
+                    if (hasAutoCrafting() && isFocused()) {
+                        if (!ingredientSlot.isEmpty() && ScreenUtil.isHovering(menu.getSlot(0), leftPos, topPos, i, j))
+                            renderTooltip(minecraft, graphics, getActualItem(ingredientSlot.get(0)), i, j);
+                        if (ScreenUtil.isHovering(menu.getSlot(1), leftPos, topPos, i, j))
+                            renderTooltip(minecraft, graphics, getFocusedResult(), i, j);
+                    }
                 }
-                private void updateIngredient(StonecutterRecipe rcp) {
-                    ingredientSlot = rcp == null ? Collections.emptyList() : rcp.getIngredients();
-                }
-                private ItemStack getActualItem(Ingredient ingredient){
-                    return ingredient.isEmpty() ? ItemStack.EMPTY : ingredient.getItems()[(int) ((Util.getMillis() / 800)% ingredient.getItems().length)];
-                }
+
                 @Override
                 public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
                     if (hasAutoCrafting()) {
-                        if(!ingredientSlot.isEmpty()) ScreenUtil.iconHolderRenderer.slotBounds(leftPos, topPos, menu.getSlot(0)).itemHolder(getActualItem(ingredientSlot.get(0)), !onlyCraftableRecipes && !ingredientSlot.get(0).isEmpty() && warningInputSlot).render(graphics, i, j, f);
+                        if (!ingredientSlot.isEmpty())
+                            ScreenUtil.iconHolderRenderer.slotBounds(leftPos, topPos, menu.getSlot(0)).itemHolder(getActualItem(ingredientSlot.get(0)), !onlyCraftableRecipes && !ingredientSlot.get(0).isEmpty() && warningInputSlot).render(graphics, i, j, f);
                         ScreenUtil.iconHolderRenderer.slotBounds(leftPos, topPos, menu.getSlot(1)).itemHolder(getFocusedResult(), !canCraft(getFocusedRecipe())).render(graphics, i, j, f);
                     }
-                    if (isValidIndex()) {
+                    if (getFocusedRecipe() != null) {
                         Component resultName = getFocusedResult().getHoverName();
-                        ScreenUtil.renderScrollingString(graphics,font,resultName,leftPos + 11 + Math.max(163 - font.width(resultName),0) / 2,topPos + 114, leftPos + 170, topPos + 125,4210752, false);
-                        graphics.pose().pushPose();
-                        graphics.pose().translate(getXCorner() - 4.5f, getYCorner(), 0f);
-                        applyOffset(graphics);
-                        RenderSystem.disableDepthTest();
-                        if (getFocusedRecipes().size() == 2) {
-                            graphics.blitSprite(LegacySprites.CRAFTING_2_SLOTS_SELECTION_SPRITE, 0, -12, 36, 78);
-                        }else if (getFocusedRecipes().size() > 2)
-                            graphics.blitSprite(LegacySprites.CRAFTING_SELECTION_SPRITE, 0, -39, 36, 105);
-                        graphics.pose().popPose();
-                        if (getFocusedRecipes().size() >= 2){
-                            ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(1)), 0.5f, ()-> renderItem(graphics, getFocusedRecipes().get(1).getResultItem(minecraft.level.registryAccess()),getX(),getY() + 27,false));
-                            if (getFocusedRecipes().size() >= 3) ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(getFocusedRecipes().size() - 1)), 0.5f, ()-> renderItem(graphics, getFocusedRecipes().get(getFocusedRecipes().size() - 1).getResultItem(minecraft.level.registryAccess()),getX(),getY() - 27,false));
-                        }
-                        RenderSystem.enableDepthTest();
+                        ScreenUtil.renderScrollingString(graphics, font, resultName, leftPos + 11 + Math.max(163 - font.width(resultName), 0) / 2, topPos + 114, leftPos + 170, topPos + 125, 4210752, false);
                     }
-                    graphics.pose().pushPose();
-                    graphics.pose().translate(0,selectionOffset * 27,0);
-                    super.renderSelection(graphics,i,j,f);
-                    graphics.pose().popPose();
+                    super.renderSelection(graphics, i, j, f);
                 }
-                private boolean canScroll(){
-                    return getRecipes().size() >= 3;
-                }
-                private boolean isValidIndex() {
-                    return !getRecipes().isEmpty();
-                }
+
                 @Override
                 public boolean mouseScrolled(double d, double e, double f, double g) {
-                    if (isFocused() && canScroll()){
-                        Collections.rotate(getFocusedRecipes(),(int)Math.signum(g));
+                    if (isFocused() && canScroll()) {
+                        Collections.rotate(getFocusedRecipes(), (int) Math.signum(g));
                         return true;
                     }
                     return false;
-                }
-                private boolean isMouseOver(double d, double e, int selection){
-                    return ScreenUtil.isMouseOver(d,e,getXCorner(),getYCorner() + selection * 27,getWidth(),getHeight());
-                }
-
-                @Override
-                public boolean isMouseOver(double d, double e) {
-                    return isHovered || isHoveredTop || isHoveredBottom;
-                }
-
-                @Override
-                public void onClick(double d, double e) {
-                    int oldSelection = selectionOffset;
-                    selectionOffset = isHoveredTop ? -1 : isHoveredBottom ? 1 : 0;
-                    if (oldSelection == selectionOffset) super.onClick(d, e);
                 }
 
                 @Override
                 public void playClickSound() {
                     if (!isFocused()) super.playClickSound();
-                }
-
-                @Override
-                public void onPress(){
-                    if (isValidIndex()) {
-                        if (isFocused()) {
-                            if (hasAutoCrafting() && canCraft(getFocusedRecipe())) {
-                                LegacyMinecraft.NETWORK.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), -Item.getId(getFocusedResult().getItem()),hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
-                            } else ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT_FAIL.get(), 1.0f);
-                        }
-                        updateResultSlot();
-                    }
                 }
             });
             h.offset = new Offset(0.5,0.5,0);
