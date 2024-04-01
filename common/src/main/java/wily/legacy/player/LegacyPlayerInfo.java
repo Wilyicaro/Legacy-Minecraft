@@ -4,7 +4,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.network.FriendlyByteBuf;
 
 public interface LegacyPlayerInfo {
-    default GameProfile getProfile(){
+    default GameProfile legacyMinecraft$getProfile(){
         return null;
     }
     int getPosition();

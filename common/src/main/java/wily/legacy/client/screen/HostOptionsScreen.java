@@ -77,7 +77,7 @@ public class HostOptionsScreen extends PanelVListScreen{
             PlayerInfo playerInfo = minecraft.getConnection().getPlayerInfo(profile.getId());
             boolean initialVisibility = !((LegacyPlayerInfo)playerInfo).isVisible();
             AtomicBoolean invisible = new AtomicBoolean(initialVisibility);
-            PanelVListScreen screen = new PanelVListScreen(s-> Panel.centered(s,230, playerInfo.getGameMode().isSurvival() ? 120 : 88), HOST_OPTIONS){
+            PanelVListScreen screen = new PanelVListScreen(s-> Panel.centered(s,280, playerInfo.getGameMode().isSurvival() ? 120 : 88), HOST_OPTIONS){
                 @Override
                 protected void init() {
                     panel.init();

@@ -351,6 +351,8 @@
  "legacy.action.type": "Type",
  "legacy.action.select_tab": "Select Tab",
  "legacy.action.presets": "Presets",
+ "legacy.action.add": "Add",
+ "legacy.action.remove": "Remove",
  "legacy.action.resource_packs_screen": "Resource Packs Screen",
  "legacy.commands.legacyTip.incorrectName": "There are no custom tips with the name \"%s\".",
  "legacy.commands.legacyTip.invalidName": "There is already a custom tip with the name \"%s\".",

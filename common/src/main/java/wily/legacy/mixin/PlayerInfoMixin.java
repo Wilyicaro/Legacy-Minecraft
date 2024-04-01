@@ -1,11 +1,20 @@
 package wily.legacy.mixin;
 
+import com.mojang.authlib.GameProfile;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import wily.legacy.player.LegacyPlayerInfo;
 
 @Mixin(PlayerInfo.class)
-public class PlayerInfoMixin implements LegacyPlayerInfo {
+public abstract class PlayerInfoMixin implements LegacyPlayerInfo {
+    @Shadow public abstract GameProfile getProfile();
+
+    @Override
+    public GameProfile legacyMinecraft$getProfile() {
+        return getProfile();
+    }
+
     int position = -1;
     boolean visible = true;
     boolean disableExhaustion = false;

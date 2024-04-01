@@ -7,24 +7,23 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ShulkerBoxBlock;
 import wily.legacy.LegacyMinecraftPlatform;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 public interface RecipeValue<C extends Container, T extends Recipe<C>> extends Predicate<RecipeHolder<T>> {
     ResourceLocation TIPPED_ARROW = new ResourceLocation("tipped_arrow");
-    ResourceLocation SHULKER_BOX_COLORING = new ResourceLocation("shulker_box_coloring");
     Map<ResourceLocation, IdOverride> ID_RECIPE_VALUES_OVERRIDES = new HashMap<>(Map.of(TIPPED_ARROW, (type, manager, rcps, filter) -> {
         if (rcps.get(rcps.size() -1) instanceof TippedArrowRecipe r) {
             BuiltInRegistries.POTION.forEach(p -> {
@@ -39,16 +38,6 @@ public interface RecipeValue<C extends Container, T extends Recipe<C>> extends P
                 Recipe<?> rcp = new ShapelessRecipe(r.getGroup(), r.category(), result, ings);
                 if (filter.test(rcp)) rcps.add(rcp);
             });
-            rcps.remove(r);
-        }
-    },SHULKER_BOX_COLORING, (type, manager, rcps, filter) -> {
-        if (rcps.get(rcps.size() -1) instanceof ShulkerBoxColoring r) {
-            Ingredient shulkerBoxes = Ingredient.of(Stream.concat(Stream.of(Items.SHULKER_BOX.getDefaultInstance()),Arrays.stream(DyeColor.values()).map(c->ShulkerBoxBlock.getBlockByColor(c).asItem().getDefaultInstance())));
-            for (DyeColor color : DyeColor.values()) {
-                DyeItem d = DyeItem.byColor(color);
-                Recipe<?> rcp = new ShapelessRecipe(r.getGroup(), r.category(), ShulkerBoxBlock.getColoredItemStack(d.getDyeColor()), NonNullList.of(Ingredient.EMPTY,shulkerBoxes,Ingredient.of(d)));
-                if (filter.test(rcp)) rcps.add(rcp);
-            }
             rcps.remove(r);
         }
     }));
