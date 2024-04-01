@@ -34,12 +34,13 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     private void tick(CallbackInfo ci){
         if (getAbilities().mayfly != mayFlySurvival && gameMode.isSurvival()){
             getAbilities().mayfly = mayFlySurvival;
+            if (!getAbilities().mayfly && getAbilities().flying) getAbilities().flying = false;
             onUpdateAbilities();
         }
     }
 
     @Override
-    public GameProfile getProfile() {
+    public GameProfile legacyMinecraft$getProfile() {
         return getGameProfile();
     }
 

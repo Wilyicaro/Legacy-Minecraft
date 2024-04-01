@@ -140,7 +140,10 @@ public abstract class GuiMixin {
         }
         guiGraphics.setColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
-
+    @Redirect(method = "renderHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V", ordinal = 1))
+    private void renderHotbarSelection(GuiGraphics instance, ResourceLocation resourceLocation, int i, int j, int k, int l) {
+        instance.blitSprite(resourceLocation,i,j, 24, 24);
+    }
     @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
     public void renderHotbar(float f, GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null) {
@@ -159,7 +162,6 @@ public abstract class GuiMixin {
         if (player == null) {
             return;
         }
-        guiGraphics.blitSprite(new ResourceLocation(LegacyMinecraft.MOD_ID,"hud/hotbar_selection"), this.screenWidth / 2 - 91 - 1 + player.getInventory().selected * 20, this.screenHeight - 22 - 1, 24, 24);
         if (ScreenUtil.getHUDOpacity() < 1.0) {
             LegacyMinecraftClient.guiBufferSourceOverride = BufferSourceWrapper.translucent(guiGraphics.bufferSource());
         }

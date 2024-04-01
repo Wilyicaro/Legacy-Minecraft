@@ -404,7 +404,8 @@ public interface ControlTooltip {
             }
             HitResult bucketHitResult;
             if (actualItem.getItem() instanceof BucketItem i && mayInteractItemAt(minecraft,actualItem,bucketHitResult = (FluidBucketHooks.getFluid(i) == Fluids.EMPTY ? Item.getPlayerPOVHitResult(minecraft.level, minecraft.player,ClipContext.Fluid.SOURCE_ONLY) : minecraft.hitResult))){
-                if (FluidBucketHooks.getFluid(i) != Fluids.EMPTY) return CONTROL_ACTION_CACHE.getUnchecked(minecraft.level.getBlockState(((BlockHitResult)bucketHitResult).getBlockPos()).isAir() ? "legacy.action.empty" : "legacy.action.fill");
+                BlockState state;
+                if (FluidBucketHooks.getFluid(i) != Fluids.EMPTY) return CONTROL_ACTION_CACHE.getUnchecked((state = minecraft.level.getBlockState(((BlockHitResult)bucketHitResult).getBlockPos())).getBlock() instanceof LiquidBlockContainer || state.getBlock() instanceof AbstractCauldronBlock ? "legacy.action.fill" : "legacy.action.empty");
                 else if (minecraft.level.getBlockState(((BlockHitResult)bucketHitResult).getBlockPos()).getBlock() instanceof BucketPickup) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.collect");
             }
             if (minecraft.player.getItemInHand(hand).getItem() instanceof SaddleItem && minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Saddleable s && s.isSaddleable() && !s.isSaddled()) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.saddle");

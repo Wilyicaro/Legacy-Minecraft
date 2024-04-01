@@ -28,6 +28,10 @@ public class CraftingScreenMixin extends AbstractContainerScreen<CraftingMenu> {
     public CraftingScreenMixin(CraftingMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
+    @Override
+    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+        renderBg(guiGraphics, f, i, j);
+    }
 
     public void init() {
         imageWidth = 215;

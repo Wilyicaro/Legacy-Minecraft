@@ -91,7 +91,8 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     public LegacyCraftingScreen(LegacyCraftingMenu abstractContainerMenu, Inventory inventory, Component component, boolean is2x2) {
         super(abstractContainerMenu, inventory, component);
         ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().tooltips.set(0,create(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_RETURN,true) : ControllerComponent.DOWN_BUTTON.componentState.getIcon(true),()->getFocused() instanceof RecipeIconHolder<?> h && h.canCraft() || getFocused() instanceof CustomCraftingIconHolder c && c.canCraft() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.create") : null));
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_O,true) : ControllerComponent.UP_BUTTON.componentState.getIcon(true), ()-> groupTabList.selectedTab == 0 ? CONTROL_ACTION_CACHE.getUnchecked(onlyCraftableRecipes ? "legacy.action.all_recipes" : "legacy.action.show_craftable_recipes") : null);
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_O,true) : ControllerComponent.UP_BUTTON.componentState.getIcon(true), ()-> groupTabList.selectedTab == 0 ? CONTROL_ACTION_CACHE.getUnchecked(onlyCraftableRecipes ? "legacy.action.all_recipes" : "legacy.action.show_craftable_recipes") : groupTabList.selectedTab == 1 && getFocused() instanceof CustomCraftingIconHolder h && h.canAddIngredient() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.add") : null);
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_X,true) : ControllerComponent.LEFT_BUTTON.componentState.getIcon(true), ()-> groupTabList.selectedTab == 1 && getFocused() instanceof CustomCraftingIconHolder h && h.addedIngredients != null && !h.addedIngredients.isEmpty() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.remove") : null);
         ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().addCompound(()-> new Component[]{ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true) : ControllerComponent.LEFT_BUMPER.componentState.getIcon(true),ControlTooltip.SPACE,ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true) : ControllerComponent.RIGHT_BUMPER.componentState.getIcon(true)},()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.group"));
         ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true)}) : COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControllerComponent.LEFT_TRIGGER.componentState.getIcon(true),ControlTooltip.SPACE,ControllerComponent.RIGHT_TRIGGER.componentState.getIcon(true)}),()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.type"));
         ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> page.max > 0 && groupTabList.selectedTab == 0 ? ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true)}) : ControllerComponent.RIGHT_STICK.componentState.getIcon(true) : null,()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.page"));
@@ -149,9 +150,9 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             if (dyeArmorButtons.isEmpty()) return;
             ItemStack armor = dyeArmorButtons.get(0).itemIcon.isEmpty() ? Items.LEATHER_HELMET.getDefaultInstance() : dyeArmorButtons.get(0).itemIcon;
             updateShapedIngredients(ingredientsGrid,List.of(Ingredient.EMPTY,Ingredient.of(dyeArmorButtons.get(1).itemIcon),Ingredient.EMPTY, LegacyMinecraftPlatform.getStrictNBTIngredient(armor)),gridDimension,2,2,2);
-            DyeItem dye = dyeItemButtons.get(1).itemIcon.getItem() instanceof DyeItem i ? i : (DyeItem) Items.WHITE_DYE;
+            DyeItem dye = dyeArmorButtons.get(1).itemIcon.getItem() instanceof DyeItem i ? i : (DyeItem) Items.WHITE_DYE;
             h.applyAddedIngredients();
-            resultStack = dyeArmorButtons.get(0).itemIcon.isEmpty() || !dyeArmorButtons.get(1).hasItem ? armor : DyeableLeatherItem.dyeArmor(armor,h.addedIngredients != null ? Stream.concat(Stream.of(dye), h.addedIngredients.stream().map(ing-> (DyeItem)ing.getItems()[0].getItem())).toList() : List.of(dye));
+            resultStack = dyeArmorButtons.get(0).itemIcon.isEmpty() || !dyeArmorButtons.get(1).hasItem() ? armor : DyeableLeatherItem.dyeArmor(armor,h.addedIngredients != null ? Stream.concat(Stream.of(dye), h.addedIngredients.stream().map(ing-> (DyeItem)ing.getItems()[0].getItem())).toList() : List.of(dye));
             canCraft(ingredientsGrid,true);
         };
         Consumer<CustomCraftingIconHolder> dyeItemUpdateRecipe = h->{
@@ -207,6 +208,10 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                     if (itemIcon != inventory.items.get(i) && isValid.test(inventory.items.get(i))) return inventory.items.get(i);
                 return ItemStack.EMPTY;
             }
+            public boolean applyNextItemIfAbsent() {
+                return true;
+            }
+
             int findInventoryMatchSlot() {
                 for (int i = 0; i < menu.slots.size(); i++)
                     if (menu.slots.get(i).getItem() == itemIcon) return i;
@@ -382,7 +387,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         ItemStack nextItem = ItemStack.EMPTY;
         ItemStack previousItem = ItemStack.EMPTY;
         List<Ingredient> addedIngredients = null;
-        boolean hasItem = false;
+
         final ItemStack defaultItem;
         public CustomCraftingIconHolder(ItemStack defaultItem){
             super(27,27);
@@ -405,6 +410,9 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                 ingredientsGrid.set(i1,addedIngredients.get(index));
                 index++;
             }
+        }
+        public boolean applyNextItemIfAbsent(){
+            return false;
         }
         public CustomCraftingIconHolder enableAddIngredients(){
             addedIngredients = new ArrayList<>();
@@ -448,27 +456,34 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                 nextItem = nextItem();
                 previousItem = previousItem();
             }
-            if (itemIcon.isEmpty() && !nextItem.isEmpty()){
+            if ((itemIcon.isEmpty() || (applyNextItemIfAbsent() && !hasItem(itemIcon))) && !nextItem.isEmpty()){
                 itemIcon = nextItem;
                 updateRecipe();
             }
-            hasItem = hasItem(itemIcon);
             super.render(graphics, i, j, f);
         }
+        protected boolean hasItem() {
+            return hasItem(itemIcon);
+        }
         protected boolean hasItem(ItemStack stack) {
-            return inventory.items.stream().filter(s-> s.is(stack.getItem())).mapToInt(ItemStack::getCount).sum() >= stack.getCount();
+            return !stack.isEmpty() && inventory.items.stream().filter(s-> s.is(stack.getItem())).mapToInt(ItemStack::getCount).sum() >= stack.getCount();
         }
         @Override
         public void renderItem(GuiGraphics graphics, int i, int j, float f) {
              ScreenUtil.secureTranslucentRender(graphics,!itemIcon.isEmpty() && !hasItem(itemIcon),0.5f,()-> renderItem(graphics,itemIcon,getX(),getY(),false));
         }
         public boolean canAddIngredient(){
-            return hasItem && addedIngredients != null && ingredientsGrid.contains(Ingredient.EMPTY);
+            return hasItem(itemIcon) && addedIngredients != null && ingredientsGrid.stream().anyMatch(Ingredient::isEmpty);
         }
         @Override
         public boolean keyPressed(int i, int j, int k) {
             if (i == InputConstants.KEY_O && canAddIngredient()) {
                 addedIngredients.add(Ingredient.of(itemIcon));
+                updateRecipe();
+                return true;
+            }
+            if (i == InputConstants.KEY_X && addedIngredients != null && !addedIngredients.isEmpty()) {
+                addedIngredients.remove(addedIngredients.size() - 1);
                 updateRecipe();
                 return true;
             }
@@ -484,7 +499,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         @Override
         public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
             super.renderSelection(graphics, i, j, f);
-            if (!itemIcon.isEmpty() && hasItem){
+            if (!itemIcon.isEmpty() && hasItem(itemIcon)){
                 Slot s = menu.getSlot(findInventoryMatchSlot());
                 ScreenUtil.iconHolderRenderer.slotBounds(leftPos,topPos,s).renderHighlight(graphics);
             }

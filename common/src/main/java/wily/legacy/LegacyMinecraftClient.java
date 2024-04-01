@@ -100,7 +100,7 @@ public class LegacyMinecraftClient {
 
     public static int[] MAP_PLAYER_COLORS = new int[]{0xFFFFFF,0x00FF4C,0xFF2119,0x6385FF,0xFF63D9,0xFF9C00,0xFFFB19,0x63FFE4};
     public static float[] getVisualPlayerColor(LegacyPlayerInfo info){
-        return getVisualPlayerColor(info.getPosition() >= 0 ? info.getPosition() : info.getProfile().getId().hashCode());
+        return getVisualPlayerColor(info.getPosition() >= 0 ? info.getPosition() : info.legacyMinecraft$getProfile().getId().hashCode());
     }
     public static float[] getVisualPlayerColor(int i){
         i = Math.abs(i);
