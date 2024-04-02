@@ -1,8 +1,10 @@
-# Legacy4J ![https://legacy.curseforge.com/minecraft/mc-mods/legacy-minecraft/files](https://cf.way2muchnoise.eu/955526.svg) ![https://legacy.curseforge.com/minecraft/mc-mods/legacy-minecraft/files](https://cf.way2muchnoise.eu/versions/For%20MC_955526_all.svg)
-## Resume
+# Legacy4J 
+## Information
 
-**Legacy4J is a mod about nostalgia, of the old 4J Studios Minecraft Legacy Edition UI and its unique resources.**  
-The main objective of this project is remake every aspect of Legacy Console Edition in 1:1 for new Java Edition versions, adding its exclusive features, such as:
+**Legacy4J is a mod about nostalgia of old 4J Studios Minecraft Legacy Edition.**
+The main objective of this project is remake every aspect of Legacy Console Edition in 1:1 for Java Edition versions, adding its exclusive features, and bringing it to modern versions.
+
+The current features include:
 
 * Superflat in-GUI customizer
 * Tutorial World
@@ -14,4 +16,7 @@ The main objective of this project is remake every aspect of Legacy Console Edit
 * Auto-Save Icon from Legacy Edition
 * LE GUI blocks Lighting
 * The GUI (obviously)
+
+
+![image](https://cdn.modrinth.com/data/mIMHT3wf/images/cfc40bbe8eb9f64447fa5edd6fa8fce80cd85971.png)
 
