@@ -28,6 +28,11 @@ The main objective of this project is remake every aspect of Legacy Console Edit
 * The GUI
 * Tutorial World
 
+## The planned features include:
+- Backports to earlier versions
+- Creative Fly Speed
 
-![image](https://cdn.modrinth.com/data/mIMHT3wf/images/cfc40bbe8eb9f64447fa5edd6fa8fce80cd85971.png)
+![image2](https://cdn.modrinth.com/data/mIMHT3wf/images/1cd8bd8afb6f300f6d59b3c84d78fef738a1c839.png)
 
+### Notice!
+- 1.20.2 is deprecated as of 1.5.1a!
