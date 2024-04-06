@@ -15,6 +15,9 @@
 
 The main objective of this project is remake every aspect of Legacy Console Edition in 1:1 for Java Edition versions, adding its exclusive features, and bringing it to modern versions.
 
+Feel free to report Issues or Contribute here!
+You can also join our [Discord](https://discord.com/invite/FJVbVgT9uS) to talk to the developers, other members and suggest things for the mod!
+
 ## The current features include:
 
 * Auto-Save Icon from Legacy Edition
@@ -33,6 +36,3 @@ The main objective of this project is remake every aspect of Legacy Console Edit
 - Creative Fly Speed
 
 ![image2](https://cdn.modrinth.com/data/mIMHT3wf/images/1cd8bd8afb6f300f6d59b3c84d78fef738a1c839.png)
-
-### Notice!
-- 1.20.2 is deprecated as of 1.5.1a!
