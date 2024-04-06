@@ -36,6 +36,7 @@
   "breaks": {
     "bedrockwaters": "*",
     "forcecloseworldloadingscreen": "*"
+    "rrls": "*"
   },
   "conflicts": {
     "lemclienthelper": "*"
