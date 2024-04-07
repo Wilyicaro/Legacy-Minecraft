@@ -9,6 +9,7 @@
   ],
   "contributors": [
     "${mod_credits}"
+    "omo50"
   ],
   "contact": {
     "sources": "${mod_source}"
@@ -40,5 +41,8 @@
   },
   "conflicts": {
     "lemclienthelper": "*"
+    "sodium-extra": "*"
+    "reeses-sodium-options": "*"
+    "modmenu": "*"
   }
 }
