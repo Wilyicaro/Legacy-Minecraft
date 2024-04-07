@@ -38,7 +38,8 @@
     "bedrockwaters": "*",
     "forcecloseworldloadingscreen": "*"
     "rrls": "*"
-    "bedrockify": "*":
+    "bedrockify": "*"
+    "embeddium": "*"
   },
   "conflicts": {
     "lemclienthelper": "*"
