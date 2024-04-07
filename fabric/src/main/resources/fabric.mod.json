@@ -39,12 +39,12 @@
     "forcecloseworldloadingscreen": "*"
     "rrls": "*"
     "bedrockify": "*"
-    "embeddium": "*"
   },
   "conflicts": {
     "lemclienthelper": "*"
     "sodium-extra": "*"
     "reeses-sodium-options": "*"
     "modmenu": "*"
+    "embeddium": "*"
   }
 }
