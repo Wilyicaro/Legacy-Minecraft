@@ -39,6 +39,7 @@
     "forcecloseworldloadingscreen": "*"
     "rrls": "*"
     "bedrockify": "*"
+    "fancymenu": "*"
   },
   "conflicts": {
     "lemclienthelper": "*"
