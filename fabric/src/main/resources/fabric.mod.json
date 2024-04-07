@@ -39,6 +39,7 @@
     "forcecloseworldloadingscreen": "*"
     "rrls": "*"
     "bedrockify": "*"
+    "vulkanmod": "*"
   },
   "conflicts": {
     "lemclienthelper": "*"
