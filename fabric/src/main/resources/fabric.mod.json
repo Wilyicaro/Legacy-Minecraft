@@ -9,6 +9,7 @@
   ],
   "contributors": [
     "${mod_credits}"
+    "omo50"
   ],
   "contact": {
     "sources": "${mod_source}"
@@ -36,8 +37,15 @@
   "breaks": {
     "bedrockwaters": "*",
     "forcecloseworldloadingscreen": "*"
+    "rrls": "*"
+    "bedrockify": "*"
+    "fancymenu": "*"
   },
   "conflicts": {
     "lemclienthelper": "*"
+    "sodium-extra": "*"
+    "reeses-sodium-options": "*"
+    "modmenu": "*"
+    "embeddium": "*"
   }
 }
