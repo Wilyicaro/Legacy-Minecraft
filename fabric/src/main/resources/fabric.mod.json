@@ -38,6 +38,7 @@
     "bedrockwaters": "*",
     "forcecloseworldloadingscreen": "*"
     "rrls": "*"
+    "bedrockify": "*":
   },
   "conflicts": {
     "lemclienthelper": "*"
