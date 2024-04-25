@@ -8,7 +8,7 @@
     "${mod_authors}"
   ],
   "contributors": [
-    "${mod_credits}"
+    "${mod_credits}",
     "omo50"
   ],
   "contact": {
@@ -36,16 +36,16 @@
   },
   "breaks": {
     "bedrockwaters": "*",
-    "forcecloseworldloadingscreen": "*"
-    "rrls": "*"
-    "bedrockify": "*"
-    "vulkanmod": "*"
+    "forcecloseworldloadingscreen": "*",
+    "rrls": "*",
+    "bedrockify": "*",
+    "vulkanmod": "*",
     "embeddium": "*"
   },
   "conflicts": {
-    "lemclienthelper": "*"
-    "sodium-extra": "*"
-    "reeses-sodium-options": "*"
+    "lemclienthelper": "*",
+    "sodium-extra": "*",
+    "reeses-sodium-options": "*",
     "modmenu": "*"
   }
 }
