@@ -112,7 +112,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
     public void renderTip(GuiGraphics guiGraphics, int i, int j, float f) {
         if (canRemove.get() || Util.getMillis() - createdTime >= disappearTime) visibility = Visibility.HIDE;
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(getX(),getY(),0);
+        guiGraphics.pose().translate(getX(),getY(),800);
         ScreenUtil.renderPointerPanel(guiGraphics,0,0,getWidth(),getHeight());
         if (!title.getString().isEmpty()) {
             guiGraphics.drawString(minecraft.font,title,13,13,0xFFFFFF);

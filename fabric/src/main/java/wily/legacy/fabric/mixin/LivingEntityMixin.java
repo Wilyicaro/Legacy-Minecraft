@@ -22,6 +22,6 @@ public abstract class LivingEntityMixin extends Entity {
     }
     @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;getFriction()F"))
     public float travelFlight(Block instance) {
-        return (LivingEntity)(Object)this instanceof Player p && p.getAbilities().flying ? 0.6f : instance.getFriction();
+        return (LivingEntity)(Object)this instanceof Player p && p.getAbilities().flying ? 0.6f : onGround() ? instance.getFriction() : 1f;
     }
 }

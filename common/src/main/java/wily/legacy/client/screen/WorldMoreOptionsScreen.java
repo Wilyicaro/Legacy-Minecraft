@@ -192,7 +192,6 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
 
     @Override
     protected void init() {
-        panel.height = tabList.selectedTab == 0 && parent instanceof LoadSaveScreen ? 122 : 199;
         addRenderableWidget(tabList);
         super.init();
         tabList.init(panel.x,panel.y - 23,panel.width);
