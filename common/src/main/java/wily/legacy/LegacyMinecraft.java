@@ -11,11 +11,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import wily.legacy.init.LegacyGameRules;
-import wily.legacy.init.LegacyMenuTypes;
-import wily.legacy.init.LegacySoundEvents;
+import wily.legacy.init.*;
 import wily.legacy.network.*;
 import wily.legacy.player.LegacyPlayerInfo;
 
@@ -31,6 +30,7 @@ import java.util.zip.ZipInputStream;
 
 public class LegacyMinecraft
 {
+    public static LegacyServerProperties serverProperties;
 
     public static final String MOD_ID = "legacy";
     public static final Supplier<String> VERSION =  Platform.getMod(MOD_ID)::getVersion;
@@ -42,6 +42,7 @@ public class LegacyMinecraft
     public static void init(){
         LegacySoundEvents.register();
         LegacyMenuTypes.register();
+        LegacyBlockItems.register();
         LegacyGameRules.init();
         registerCommonPacket(PlayerInfoSync.class, PlayerInfoSync::new);
         registerCommonPacket(PlayerInfoSync.HostOptions.class, PlayerInfoSync.HostOptions::new);
@@ -53,6 +54,9 @@ public class LegacyMinecraft
         CommandRegistrationEvent.EVENT.register((s,c,e)->{
             TipCommand.register(s,c);
         });
+    }
+    public static boolean canRepair(ItemStack repairItem, ItemStack ingredient){
+        return repairItem.is(ingredient.getItem()) && repairItem.getCount() == 1 && ingredient.getCount() == 1 && repairItem.getItem().canBeDepleted() && !repairItem.isEnchanted() && !ingredient.isEnchanted();
     }
     @FunctionalInterface
     public interface PackRegistry {
@@ -75,14 +79,18 @@ public class LegacyMinecraft
         boolean b = true;
         main : while (b) {
             b = false;
+            LegacyMinecraft.LOGGER.warn("ATA");
             for (ServerPlayer player : p.server.getPlayerList().getPlayers())
-                if (player != p && ((LegacyPlayerInfo)p).getPosition() == pos){
+                if (player != p && ((LegacyPlayerInfo)player).getPosition() == pos){
+                    LegacyMinecraft.LOGGER.warn("BOM");
                     pos++;
                     b = true;
                     continue main;
                 }
         }
+        LegacyMinecraft.LOGGER.warn(pos);
         ((LegacyPlayerInfo)p).setPosition(pos);
+
     }
     public static <T extends CommonPacket> void  registerCommonPacket(Class<T> packet, Function<FriendlyByteBuf,T> decode){
         NETWORK.register(packet,CommonPacket::encode,decode,CommonPacket::apply);

@@ -139,24 +139,24 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
         access.close();
         if (resetNether) deleteLevelDimension(access,Level.NETHER);
         if (resetEnd) deleteLevelDimension(access,Level.END);
-        minecraft.execute(()-> {
-            resourcePackSelector.applyChanges(true);
-            if (!originalSelectedPacks.isEmpty()) Minecraft.getInstance().getResourcePackRepository().setSelected(originalSelectedPacks);
-        });
         LegacyMinecraftClient.enterWorldGameType = gameType;
+        resourcePackSelector.applyChanges(true, ()->minecraft.reloadResourcePacks().thenRun(this::completeLoad), this::completeLoad);
+        if (!originalSelectedPacks.isEmpty()) Minecraft.getInstance().getResourcePackRepository().setSelected(originalSelectedPacks);
+    }
+    private void completeLoad(){
         loadWorld(this,minecraft,summary);
         minecraft.execute(()-> {
-        if (minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer().isReady()){
-            minecraft.getSingleplayerServer().setDefaultGameType(gameType);
-            minecraft.getSingleplayerServer().setDifficulty(difficulty, false);
-            applyGameRules.accept(minecraft.getSingleplayerServer().getGameRules(), minecraft.getSingleplayerServer());
-            if (onlineOnStart) {
-                MutableComponent component = publishUnloadedServer(minecraft, gameType, allowCheats && trustPlayers, this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed");
-                this.minecraft.gui.getChat().addMessage(component);
-            }
-            ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setAllowCommands(allowCheats);
-            if (resourcePackSelector.hasChanged()) ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setSelectedResourcePacks(resourcePackSelector.getSelectedIds());
-        }});
+            if (minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer().isReady()){
+                minecraft.getSingleplayerServer().setDefaultGameType(gameType);
+                minecraft.getSingleplayerServer().setDifficulty(difficulty, false);
+                applyGameRules.accept(minecraft.getSingleplayerServer().getGameRules(), minecraft.getSingleplayerServer());
+                if (onlineOnStart) {
+                    MutableComponent component = publishUnloadedServer(minecraft, gameType, allowCheats && trustPlayers, this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed");
+                    this.minecraft.gui.getChat().addMessage(component);
+                }
+                ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setAllowCommands(allowCheats);
+                if (resourcePackSelector.hasChanged()) ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setSelectedResourcePacks(resourcePackSelector.getSelectedIds());
+            }});
     }
 
     @Override
@@ -230,10 +230,10 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0,0.5f,0);
         guiGraphics.blit(SaveRenderableList.iconCache.getUnchecked(summary).textureLocation(),panel.x + 14, panel.y + 10, 0,0,29,29,29,29);
-        guiGraphics.drawString(font,summary.getLevelName(),panel.x + 48, panel.y + 12, 0x404040,false);
-        guiGraphics.drawString(font,Component.translatable("legacy.menu.load_save.created_in", (summary.hasCheats() ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()),panel.x + 48, panel.y + 29, 0x404040,false);
+        guiGraphics.drawString(font,summary.getLevelName(),panel.x + 48, panel.y + 12, 0x383838,false);
+        guiGraphics.drawString(font,Component.translatable("legacy.menu.load_save.created_in", (summary.hasCheats() ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()),panel.x + 48, panel.y + 29, 0x383838,false);
         guiGraphics.pose().popPose();
-        guiGraphics.drawString(font,Component.translatable("commands.seed.success",((LegacyWorldSettings)(Object)summary.getSettings()).getDisplaySeed()),panel.x + 13, panel.y + 49, 0x404040,false);
+        guiGraphics.drawString(font,Component.translatable("commands.seed.success",((LegacyWorldSettings)(Object)summary.getSettings()).getDisplaySeed()),panel.x + 13, panel.y + 49, 0x383838,false);
     }
 
     public static void loadWorld(Screen screen, Minecraft minecraft, LevelSummary summary) {

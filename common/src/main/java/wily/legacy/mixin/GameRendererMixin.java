@@ -1,28 +1,34 @@
 package wily.legacy.mixin;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import wily.legacy.LegacyMinecraft;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySprites;
+import wily.legacy.client.LegacyTip;
+import wily.legacy.client.LegacyTipManager;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Consumer;
+
+import static wily.legacy.LegacyMinecraftClient.gammaEffect;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
@@ -33,40 +39,31 @@ public abstract class GameRendererMixin {
     @Shadow protected abstract void takeAutoScreenshot(Path path);
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/toasts/ToastComponent;render(Lnet/minecraft/client/gui/GuiGraphics;)V"))
-    private void render(ToastComponent instance, GuiGraphics graphics){
+    private void render(ToastComponent instance, GuiGraphics graphics, float f){
+        if (!LegacyTipManager.tips.isEmpty()) {
+            LegacyTip tip = LegacyTipManager.tips.get(0);
+            tip.setX(graphics.guiWidth() - tip.getWidth() - 30);
+            tip.renderTip(graphics,0,0,f);
+            if (tip.visibility == Toast.Visibility.HIDE) LegacyTipManager.tips.remove(tip);
+        }
         instance.render(graphics);
         if (GLFW.glfwGetInputMode(minecraft.getWindow().getWindow(),GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !LegacyMinecraftClient.controllerHandler.isCursorDisabled) {
             RenderSystem.disableDepthTest();
             RenderSystem.enableBlend();
             graphics.pose().pushPose();
             graphics.pose().translate(LegacyMinecraftClient.controllerHandler.getPointerX(),LegacyMinecraftClient.controllerHandler.getPointerY(), 0);
-            graphics.blitSprite(LegacySprites.POINTER, -8, -8, 16, 16);
+            graphics.blitSprite(minecraft.getWindow().getScreenWidth() >= 1920 ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
             graphics.pose().popPose();
             RenderSystem.disableBlend();
             RenderSystem.enableDepthTest();
         }
-        if (!((LegacyOptions)minecraft.options).legacyGamma().get()) return;
-        float gamma = minecraft.options.gamma().get().floatValue();
-        if (gamma != 0.5) {
+        float gamma = ((LegacyOptions)minecraft.options).legacyGamma().get().floatValue();
+        if (gammaEffect != null && gamma != 0.5) {
+            graphics.flush();
             RenderSystem.enableBlend();
             RenderSystem.disableDepthTest();
-            graphics.pose().pushPose();
-            graphics.pose().translate(0, 0, 4400f);
-            float fixedGamma;
-            if (gamma> 0.5) {
-                fixedGamma = (gamma - 0.5f) / 6f;
-                RenderSystem.blendFunc(GlStateManager.SourceFactor.DST_COLOR, GlStateManager.DestFactor.ONE);
-            }else {
-                fixedGamma = 0.5f+ gamma;
-                RenderSystem.blendFunc(GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.SRC_COLOR);
-            }
-            RenderSystem.setShaderColor(fixedGamma, fixedGamma, fixedGamma, 1.0f);
-            graphics.blit(new ResourceLocation(LegacyMinecraft.MOD_ID, "textures/gui/gamma.png"), 0, 0, 0, 0, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
-            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, (gamma > 0.5f ? gamma - 0.5f : 0.5f - gamma) / 2f);
-            RenderSystem.defaultBlendFunc();
-            graphics.blit(new ResourceLocation(LegacyMinecraft.MOD_ID, "textures/gui/gamma.png"), 0, 0, 0, 0, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
-            graphics.pose().popPose();
-            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+            gammaEffect.passes.forEach(p-> p.getEffect().safeGetUniform("gamma").set(gamma >= 0.5f ? gamma * 1.7f : 0.5f + gamma));
+            gammaEffect.process(this.minecraft.level != null && this.minecraft.level.tickRateManager().runsNormally() ? f : 1.0f);
             RenderSystem.enableDepthTest();
             RenderSystem.disableBlend();
         }
@@ -87,5 +84,9 @@ public abstract class GameRendererMixin {
                 }
         );
     }
+    @Inject(method = "resize",at = @At("RETURN"))
+    public void resize(int i, int j, CallbackInfo ci) {
+        if (gammaEffect != null) gammaEffect.resize(i,j);
 
+    }
 }

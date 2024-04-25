@@ -52,7 +52,7 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
         return canCraft(getFocusedRecipe());
     }
 
-    private List<R> getFocusedRecipes(){
+    List<R> getFocusedRecipes(){
         if (selectionOffset > 0 && getRecipes().size() < 2 || selectionOffset < 0 && getRecipes().size() <= 2) selectionOffset = 0;
         if (!isFocused() || !isValidIndex() || !canScroll()) focusedRecipes = null;
         else if (focusedRecipes == null) focusedRecipes = new ArrayList<>(getRecipes());
@@ -189,13 +189,16 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
     public void playClickSound() {
         if (!isFocused()) super.playClickSound();
     }
+    public void craft() {
+        ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT.get(),1.0f);
+        LegacyMinecraft.NETWORK.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), Screen.hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
+    }
 
     @Override
     public void onPress(){
         if (isFocused() && isValidIndex()){
             if (canCraft(getFocusedRecipe())){
-                ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT.get(),1.0f);
-                LegacyMinecraft.NETWORK.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), Screen.hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
+                craft();
                 updateRecipeDisplay(getFocusedRecipe());
             }else ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT_FAIL.get(),1.0f);
         }

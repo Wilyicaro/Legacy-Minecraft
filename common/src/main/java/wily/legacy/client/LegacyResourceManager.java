@@ -1,8 +1,10 @@
 package wily.legacy.client;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonSyntaxException;
 import dev.architectury.platform.Platform;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.PostChain;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.PackRepository;
@@ -13,6 +15,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 import org.lwjgl.glfw.GLFW;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.controller.ControllerHandler;
 
 import java.io.BufferedReader;
@@ -26,10 +29,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
+import static wily.legacy.LegacyMinecraftClient.gammaEffect;
+
 public class LegacyResourceManager implements PreparableReloadListener {
 
     public static final ResourceLocation GAMEPAD_MAPPINGS = new ResourceLocation(LegacyMinecraft.MOD_ID,"gamepad_mappings.txt");
     public static final ResourceLocation INTRO_LOCATION = new ResourceLocation(LegacyMinecraft.MOD_ID,"intro.json");
+    public static final ResourceLocation GAMMA_LOCATION = new ResourceLocation(LegacyMinecraft.MOD_ID,"shaders/post/gamma.json");
 
     public static final List<ResourceLocation> INTROS = new ArrayList<>();
 
@@ -51,11 +57,22 @@ public class LegacyResourceManager implements PreparableReloadListener {
                     throw new RuntimeException(e);
                 }
             });
+
+            if (gammaEffect != null) gammaEffect.close();
+            try {
+                gammaEffect = new PostChain(minecraft.getTextureManager(), resourceManager, minecraft.getMainRenderTarget(), GAMMA_LOCATION);
+                gammaEffect.resize(minecraft.getWindow().getWidth(), minecraft.getWindow().getHeight());
+            } catch (IOException iOException) {
+                LegacyMinecraft.LOGGER.warn("Failed to load gamma: {}", GAMMA_LOCATION, iOException);
+            } catch (JsonSyntaxException jsonSyntaxException) {
+                LegacyMinecraft.LOGGER.warn("Failed to parse shader: {}", GAMMA_LOCATION, jsonSyntaxException);
+            }
             registerIntroLocations(resourceManager);
             profilerFiller2.pop();
             profilerFiller2.endTick();
         }, executor2);
     }
+
     public static void registerIntroLocations(ResourceManager resourceManager){
         try {
             INTROS.clear();

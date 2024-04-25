@@ -21,10 +21,6 @@ public class BrewingStandMenuMixin {
                 return new Offset(0,0.5,0);
             }
             public int getWidth() {return 27;}
-
-            public int getHeight() {
-                return 27;
-            }
             public boolean hasIconHolder() {
                 return false;
             }
@@ -38,10 +34,6 @@ public class BrewingStandMenuMixin {
             }
 
             public int getWidth() {
-                return 27;
-            }
-
-            public int getHeight() {
                 return 27;
             }
             public boolean hasIconHolder() {
@@ -59,10 +51,6 @@ public class BrewingStandMenuMixin {
             public int getWidth() {
                 return 27;
             }
-
-            public int getHeight() {
-                return 27;
-            }
             public boolean hasIconHolder() {
                 return false;
             }
@@ -78,9 +66,6 @@ public class BrewingStandMenuMixin {
                 return 27;
             }
 
-            public int getHeight() {
-                return 27;
-            }
             public boolean hasIconHolder() {
                 return false;
             }
@@ -93,10 +78,6 @@ public class BrewingStandMenuMixin {
                 return new Offset(0,0.5,0);
             }
             public int getWidth() {
-                return 27;
-            }
-
-            public int getHeight() {
                 return 27;
             }
             public ResourceLocation getIconSprite() {

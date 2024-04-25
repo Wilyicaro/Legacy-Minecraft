@@ -9,28 +9,35 @@ import dev.architectury.event.events.client.ClientPlayerEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.registry.ReloadListenerRegistry;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
+import dev.architectury.registry.client.rendering.ColorHandlerRegistry;
+import dev.architectury.registry.client.rendering.RenderTypeRegistry;
 import dev.architectury.registry.menu.MenuRegistry;
+import net.minecraft.FileUtil;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.ComponentPath;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.navigation.ScreenDirection;
-import net.minecraft.client.gui.screens.DeathScreen;
-import net.minecraft.client.gui.screens.DisconnectedScreen;
-import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.*;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.PostChain;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.client.server.LanServerPinger;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -40,6 +47,7 @@ import net.minecraft.util.HttpUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.GrassColor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -53,6 +61,7 @@ import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.client.*;
 import wily.legacy.client.controller.ControllerHandler;
@@ -66,6 +75,7 @@ import wily.legacy.util.ScreenUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -73,6 +83,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import static wily.legacy.LegacyMinecraft.MOD_ID;
+import static wily.legacy.init.LegacyBlockItems.SHRUB;
 
 
 public class LegacyMinecraftClient {
@@ -91,6 +102,7 @@ public class LegacyMinecraftClient {
     public static final LegacyTipOverride.Manager legacyTipOverridesManager = new LegacyTipOverride.Manager();
     public static final LegacyResourceManager legacyResourceManager = new LegacyResourceManager();
     public static final StoneCuttingGroupManager stoneCuttingGroupManager = new StoneCuttingGroupManager();
+    public static final LoomTabListing.Manager loomListingManager = new LoomTabListing.Manager();
     public static final ControlTooltip.GuiManager controlTooltipGuiManager = new ControlTooltip.GuiManager();
 
     public static ControllerHandler controllerHandler;
@@ -98,6 +110,7 @@ public class LegacyMinecraftClient {
     public static KnownListing<EntityType<?>> knownEntities;
     public static GameType enterWorldGameType;
 
+    public static PostChain gammaEffect;
     public static int[] MAP_PLAYER_COLORS = new int[]{0xFFFFFF,0x00FF4C,0xFF2119,0x6385FF,0xFF63D9,0xFF9C00,0xFFFB19,0x63FFE4};
     public static float[] getVisualPlayerColor(LegacyPlayerInfo info){
         return getVisualPlayerColor(info.getPosition() >= 0 ? info.getPosition() : info.legacyMinecraft$getProfile().getId().hashCode());
@@ -130,6 +143,48 @@ public class LegacyMinecraftClient {
         return new LegacyFlatWorldScreen(createWorldScreen, createWorldScreen.getUiState(),biomeGetter, structureGetter, flatLevelGeneratorSettings -> createWorldScreen.getUiState().updateDimensions(PresetEditor.flatWorldConfigurator(flatLevelGeneratorSettings)), chunkGenerator instanceof FlatLevelSource ? ((FlatLevelSource)chunkGenerator).settings() : FlatLevelGeneratorSettings.getDefault(biomeGetter, structureGetter, placeFeatureGetter));
     }, Optional.of(WorldPresets.SINGLE_BIOME_SURFACE), (createWorldScreen, settings) -> new LegacyBuffetWorldScreen(createWorldScreen, settings.worldgenLoadContext().lookupOrThrow(Registries.BIOME), holder -> createWorldScreen.getUiState().updateDimensions(PresetEditor.fixedBiomeConfigurator(holder)))));
 
+    public static Screen getReplacementScreen(Screen screen){
+        if (screen instanceof TitleScreen)
+            return new MainMenuScreen();
+        else if (screen instanceof JoinMultiplayerScreen)
+            return new PlayGameScreen(new MainMenuScreen(),2);
+        else if (screen instanceof DisconnectedScreen s)
+            return ConfirmationScreen.createInfoScreen(getReplacementScreen(s.parent), s.getTitle(),s.reason);
+        else if (screen instanceof AlertScreen s) {
+            MultiLineLabel messageLines = MultiLineLabel.create(Minecraft.getInstance().font,s.messageText,200);
+            return new ConfirmationScreen(Minecraft.getInstance().screen, 230, 97 + messageLines.getLineCount() * 12, s.getTitle(), messageLines, b -> true) {
+                protected void initButtons() {
+                    okButton = addRenderableWidget(Button.builder(Component.translatable("gui.ok"), b -> s.callback.run()).bounds(panel.x + 15, panel.y + panel.height - 30, 200, 20).build());
+                }
+                public boolean shouldCloseOnEsc() {
+                    return s.shouldCloseOnEsc();
+                }
+            };
+        }else if (screen instanceof BackupConfirmScreen s) {
+            MultiLineLabel messageLines = MultiLineLabel.create(Minecraft.getInstance().font,s.description,200);
+            return new ConfirmationScreen(Minecraft.getInstance().screen, 230, 141 + messageLines.getLineCount() * 12 + (s.promptForCacheErase ? 14 : 0), s.getTitle(), messageLines, b -> true) {
+                boolean eraseCache = false;
+                protected void initButtons() {
+                    if (s.promptForCacheErase) addRenderableWidget(new TickBox(panel.x + 15, panel.y + panel.height - 88,eraseCache,b->Component.translatable("selectWorld.backupEraseCache"),b->null,b-> eraseCache = b.selected));
+                    okButton = addRenderableWidget(Button.builder(Component.translatable("selectWorld.backupJoinConfirmButton"), b -> s.onProceed.proceed(true, eraseCache)).bounds(panel.x + 15, panel.y + panel.height - 74, 200, 20).build());
+                    addRenderableWidget(Button.builder(Component.translatable("selectWorld.backupJoinSkipButton"), b -> s.onProceed.proceed(false, eraseCache)).bounds(panel.x + 15, panel.y + panel.height - 52, 200, 20).build());
+                    addRenderableWidget(Button.builder(CommonComponents.GUI_CANCEL, b -> s.onCancel.run()).bounds(panel.x + 15, panel.y + panel.height - 30, 200, 20).build());
+                }
+
+                @Override
+                public boolean keyPressed(int i, int j, int k) {
+                    if (s.keyPressed(i,j,k)) return true;
+                    return super.keyPressed(i, j, k);
+                }
+
+                public boolean shouldCloseOnEsc() {
+                    return s.shouldCloseOnEsc();
+                }
+            };
+        }else if (screen instanceof DeathScreen d)
+            return new LegacyDeathScreen(d.causeOfDeath,d.hardcore);
+        return screen;
+    }
     public static void init() {
         controllerHandler = new ControllerHandler(Minecraft.getInstance());
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyTipManager);
@@ -140,25 +195,25 @@ public class LegacyMinecraftClient {
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyBiomeOverrides);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyResourceManager);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, stoneCuttingGroupManager);
+        ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, loomListingManager);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, controlTooltipGuiManager);
+
 
         KeyMappingRegistry.register(keyCrafting);
         KeyMappingRegistry.register(keyHostOptions);
         KeyMappingRegistry.register(keyCycleHeldLeft);
         KeyMappingRegistry.register(keyCycleHeldRight);
         KeyMappingRegistry.register(keyToggleCursor);
+        KeyMappingRegistry.register(keyFlyUp);
+        KeyMappingRegistry.register(keyFlyDown);
+        KeyMappingRegistry.register(keyFlyLeft);
+        KeyMappingRegistry.register(keyFlyRight);
         knownBlocks = new KnownListing<>(Registries.BLOCK,Minecraft.getInstance().gameDirectory.toPath());
         knownEntities = new KnownListing<>(Registries.ENTITY_TYPE,Minecraft.getInstance().gameDirectory.toPath());
 
         ClientGuiEvent.SET_SCREEN.register((screen) -> {
-            if (screen instanceof TitleScreen)
-                return CompoundEventResult.interruptTrue(new MainMenuScreen());
-            if (screen instanceof JoinMultiplayerScreen)
-                return CompoundEventResult.interruptTrue(new PlayGameScreen(new MainMenuScreen(),2));
-            if (screen instanceof DisconnectedScreen s)
-                return CompoundEventResult.interruptTrue(ConfirmationScreen.createInfoScreen(s.parent, s.getTitle(),s.reason));
-            if (screen instanceof DeathScreen d)
-                return CompoundEventResult.interruptTrue(new LegacyDeathScreen(d.causeOfDeath,d.hardcore));
+            Screen replacement = getReplacementScreen(screen);
+            if (replacement != screen) return CompoundEventResult.interruptTrue(replacement);
             if (screen instanceof AbstractContainerScreen<?>) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
             return CompoundEventResult.interruptDefault(screen);
         });
@@ -169,6 +224,7 @@ public class LegacyMinecraftClient {
                     ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(ScreenDirection.DOWN));
                     if (path != null) path.applyFocus(true);
                 }
+                controllerHandler.resetCursor();
             }
         });
         ClientLifecycleEvent.CLIENT_STARTED.register(m-> controllerHandler.setup());
@@ -233,27 +289,48 @@ public class LegacyMinecraftClient {
     public static void enqueueInit() {
         MenuRegistry.registerScreenFactory(LegacyMenuTypes.CRAFTING_PANEL_MENU.get(),LegacyCraftingScreen::craftingScreen);
         MenuRegistry.registerScreenFactory(LegacyMenuTypes.PLAYER_CRAFTING_PANEL_MENU.get(),LegacyCraftingScreen::playerCraftingScreen);
+        MenuRegistry.registerScreenFactory(LegacyMenuTypes.LOOM_PANEL_MENU.get(),LegacyLoomScreen::new);
+        MenuRegistry.registerScreenFactory(LegacyMenuTypes.STONECUTTER_PANEL_MENU.get(),LegacyStonecutterScreen::new);
+        ColorHandlerRegistry.registerBlockColors((blockState, blockAndTintGetter, blockPos, i) -> blockAndTintGetter == null || blockPos == null ? GrassColor.getDefaultColor() : BiomeColors.getAverageGrassColor(blockAndTintGetter, blockPos),SHRUB.get());
+        ColorHandlerRegistry.registerItemColors((itemStack, i) -> GrassColor.getDefaultColor(),SHRUB.get().asItem());
+        RenderTypeRegistry.register(RenderType.cutoutMipped(),SHRUB.get());
     }
     public static final KeyMapping keyCrafting = new KeyMapping("legacy.key.crafting", InputConstants.KEY_E, "key.categories.inventory");
     public static final KeyMapping keyCycleHeldLeft = new KeyMapping("legacy.key.cycleHeldLeft", InputConstants.KEY_PAGEDOWN, "key.categories.inventory");
     public static final KeyMapping keyCycleHeldRight = new KeyMapping("legacy.key.cycleHeldRight", InputConstants.KEY_PAGEUP, "key.categories.inventory");
     public static final KeyMapping keyToggleCursor = new KeyMapping("legacy.key.toggleCursor", -1, "key.categories.misc");
     public static KeyMapping keyHostOptions = new KeyMapping( MOD_ID +".key.host_options", InputConstants.KEY_H, "key.categories.misc");
+    public static KeyMapping keyFlyUp = new KeyMapping( MOD_ID +".key.flyUp", InputConstants.KEY_UP, "key.categories.movement");
+    public static KeyMapping keyFlyDown = new KeyMapping( MOD_ID +".key.flyDown", InputConstants.KEY_DOWN, "key.categories.movement");
+    public static KeyMapping keyFlyLeft = new KeyMapping( MOD_ID +".key.flyLeft", InputConstants.KEY_LEFT, "key.categories.movement");
+    public static KeyMapping keyFlyRight = new KeyMapping( MOD_ID +".key.flyRight", InputConstants.KEY_RIGHT, "key.categories.movement");
     public static void resetVanillaOptions(Minecraft minecraft){
         canLoadVanillaOptions = false;
         minecraft.options = new Options(minecraft,minecraft.gameDirectory);
         minecraft.options.save();
         canLoadVanillaOptions = true;
     }
-    public static String importSaveFile(Minecraft minecraft, InputStream saveInputStream, String saveDirName){
+    public static String manageAvailableSaveDirName(Minecraft minecraft, Consumer<File> copy, String saveDirName){
         StringBuilder builder = new StringBuilder(saveDirName);
         int levelRepeat = 0;
         while (minecraft.getLevelSource().levelExists(builder +(levelRepeat > 0 ? String.format(" (%s)",levelRepeat) : "")))
             levelRepeat++;
         if (levelRepeat > 0)
             builder.append(String.format(" (%s)",levelRepeat));
-        LegacyMinecraft.copySaveToDirectory(saveInputStream,new File(minecraft.gameDirectory, "saves/" + builder));
+        copy.accept(new File(minecraft.gameDirectory, "saves/" + builder));
         return builder.toString();
+    }
+    public static String importSaveFile(Minecraft minecraft, InputStream saveInputStream, String saveDirName){
+        return manageAvailableSaveDirName(minecraft, f->LegacyMinecraft.copySaveToDirectory(saveInputStream,f),saveDirName);
+    }
+    public static String copySaveFile(Minecraft minecraft, Path savePath, String saveDirName){
+        return manageAvailableSaveDirName(minecraft, f-> {
+            try {
+                FileUtils.copyDirectory(savePath.toFile(),f);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        },saveDirName);
     }
     public static void registerExtraModels(Consumer<ResourceLocation> register){
 

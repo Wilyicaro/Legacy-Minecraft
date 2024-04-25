@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import wily.legacy.util.ScreenUtil;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -45,7 +46,7 @@ public class ConfirmationScreen extends PanelBackgroundScreen{
     protected void init() {
         super.init();
         initButtons();
-        parent.init(minecraft,width,height);
+        if (parent != null) parent.init(minecraft,width,height);
     }
     protected void initButtons(){
         addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b-> this.onClose()).bounds(panel.x + (panel.width - 200) / 2, panel.y + panel.height - 52,200,20).build());
@@ -54,15 +55,17 @@ public class ConfirmationScreen extends PanelBackgroundScreen{
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        guiGraphics.pose().translate(0,0,-800);
-        parent.render(guiGraphics,0,0,f);
-        guiGraphics.pose().translate(0,0,800);
+        if (parent != null) {
+            guiGraphics.pose().translate(0, 0, -800);
+            parent.render(guiGraphics, 0, 0, f);
+            guiGraphics.pose().translate(0, 0, 800);
+        }
         if (transparentBackground) renderTransparentBackground(guiGraphics);
     }
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
-        guiGraphics.drawString(font,title,panel.x+ 15,panel.y+ 15, 4210752,false);
-        messageLabel.renderLeftAlignedNoShadow(guiGraphics,panel.x + 15, panel.y + messageYOffset, 12, 4210752);
+        ScreenUtil.renderScrollingString(guiGraphics,font,title,panel.x + 15, panel.y + 15,panel.x + panel.width - 15, panel.y + 26, 0x383838,false);
+        messageLabel.renderLeftAlignedNoShadow(guiGraphics,panel.x + 15, panel.y + messageYOffset, 12, 0x383838);
     }
 }

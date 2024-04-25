@@ -2,40 +2,68 @@ package wily.legacy.inventory;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.client.Offset;
 import wily.legacy.init.LegacyMenuTypes;
 
-import java.util.function.Predicate;
+import java.util.List;
 
-public class LegacyCraftingMenu extends AbstractContainerMenu {
-    public static final Component CONTAINER_TITLE = Component.translatable("container.crafting");
-    private final Predicate<Player> stillValid;
+public class LegacyCraftingMenu extends AbstractContainerMenu implements RecipeMenu {
+    public static final Component CRAFTING_TITLE = Component.translatable("container.crafting");
+    public static final Component STONECUTTER_TITLE = Component.translatable("container.stonecutter");
+    public static final Component LOOM_TITLE = Component.translatable("container.stonecutter");
+    final BlockPos blockPos;
+    public boolean inventoryActive = true;
     public static LegacyCraftingMenu playerCraftingMenu(int window, Inventory inventory){
-        return new LegacyCraftingMenu(inventory, LegacyMenuTypes.PLAYER_CRAFTING_PANEL_MENU.get(),window,p->true);
+        return new LegacyCraftingMenu(inventory, LegacyMenuTypes.PLAYER_CRAFTING_PANEL_MENU.get(),window,null);
     }
-    public static LegacyCraftingMenu craftingMenu(int window, Inventory inventory,Predicate<Player> stillValid){
-        return new LegacyCraftingMenu(inventory, LegacyMenuTypes.CRAFTING_PANEL_MENU.get(),window,stillValid);
+    public static LegacyCraftingMenu craftingMenu(int window, Inventory inventory,BlockPos pos){
+        return new LegacyCraftingMenu(inventory, LegacyMenuTypes.CRAFTING_PANEL_MENU.get(),window,pos);
     }
     public static LegacyCraftingMenu craftingMenu(int window, Inventory inventory){
-        return craftingMenu(window, inventory, p-> true);
+        return craftingMenu(window, inventory,null);
+    }
+    public static LegacyCraftingMenu loomMenu(int window, Inventory inventory,BlockPos blockPos){
+        return new LegacyCraftingMenu(inventory, LegacyMenuTypes.LOOM_PANEL_MENU.get(),window,blockPos);
+    }
+    public static LegacyCraftingMenu loomMenu(int window, Inventory inventory){
+        return loomMenu(window,inventory,null);
+    }
+    public static LegacyCraftingMenu stoneCutterMenu(int window, Inventory inventory,BlockPos blockPos){
+        return new LegacyCraftingMenu(inventory, LegacyMenuTypes.STONECUTTER_PANEL_MENU.get(),window,blockPos){
+            long lastSoundTime;
+            @Override
+            public void onCraft(Player player, int buttonInfo, List<Ingredient> ingredients, ItemStack result) {
+                super.onCraft(player, buttonInfo, ingredients, result);
+                long l = player.level().getGameTime();
+                if (lastSoundTime != l) {
+                    player.level().playSound(null, this.blockPos, SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundSource.BLOCKS, 1.0f, 1.0f);
+                    lastSoundTime = l;
+                }
+            }
+        };
+    }
+    public static LegacyCraftingMenu stoneCutterMenu(int window, Inventory inventory){
+        return stoneCutterMenu(window, inventory,null);
     }
 
-    public LegacyCraftingMenu(Inventory inventory, @Nullable MenuType<?> menuType, int i, Predicate<Player> stillValid) {
+    public LegacyCraftingMenu(Inventory inventory, @Nullable MenuType<?> menuType, int i, BlockPos pos) {
         super(menuType, i);
-        this.stillValid = stillValid;
+        this.blockPos =pos;
         addInventorySlotGrid(inventory, 9,186, 133,3);
         addInventorySlotGrid(inventory, 0,186, 186,1);
     }
@@ -50,7 +78,10 @@ public class LegacyCraftingMenu extends AbstractContainerMenu {
                         super.setChanged();
                         slotsChanged(container);
                     }
-
+                    @Override
+                    public boolean isActive() {
+                        return inventoryActive;
+                    }
                     public Offset getOffset() {
                         return new Offset(0.5,0.5,0);
                     }
@@ -98,7 +129,7 @@ public class LegacyCraftingMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return stillValid.test(player);
+        return blockPos == null || !player.level().getBlockState(blockPos).isAir() && player.distanceToSqr((double)blockPos.getX() + 0.5, (double)blockPos.getY() + 0.5, (double)blockPos.getZ() + 0.5) <= 64.0;
     }
 
     public static boolean isValidBlock(Player player, BlockPos pos, Block wantedBlock){
@@ -106,6 +137,19 @@ public class LegacyCraftingMenu extends AbstractContainerMenu {
     }
 
     public static MenuProvider getMenuProvider(BlockPos pos, boolean is2x2) {
-        return new SimpleMenuProvider((i, inventory, player) ->  is2x2 ? playerCraftingMenu(i,inventory) : craftingMenu(i, inventory, p-> isValidBlock(p,pos, Blocks.CRAFTING_TABLE)), CONTAINER_TITLE);
+        return new SimpleMenuProvider((i, inventory, player) ->  is2x2 ? playerCraftingMenu(i,inventory) : craftingMenu(i, inventory, pos), CRAFTING_TITLE);
+    }
+    public static MenuProvider getMenuProvider(MenuConstructor constructor, Component component) {
+        return new SimpleMenuProvider(constructor, component);
+    }
+    public static MenuProvider getLoomMenuProvider(BlockPos pos) {
+        return getMenuProvider((i,inv,p)-> loomMenu(i,inv,pos), LOOM_TITLE);
+    }
+    public static MenuProvider getStonecutterMenuProvider(BlockPos pos) {
+        return getMenuProvider((i,inv,p)-> stoneCutterMenu(i,inv,pos), LOOM_TITLE);
+    }
+    @Override
+    public void onCraft(Player player, int buttonInfo, List<Ingredient> ingredients, ItemStack result) {
+        result.onCraftedBy(player.level(),player,result.getCount());
     }
 }

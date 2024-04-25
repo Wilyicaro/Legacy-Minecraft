@@ -1,7 +1,6 @@
 package wily.legacy.forge;
 
 import dev.architectury.platform.Mod;
-import dev.architectury.platform.forge.PlatformImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
@@ -15,14 +14,11 @@ import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.common.crafting.ingredients.PartialNBTIngredient;
 import net.minecraftforge.common.crafting.ingredients.StrictNBTIngredient;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.LoadingModList;
-import org.checkerframework.checker.units.qual.C;
 
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Optional;
 
 public class LegacyMinecraftPlatformImpl {
     public static Path getConfigDirectory() {

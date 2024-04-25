@@ -183,7 +183,7 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
         panel.render(guiGraphics, i, j, f);
         ScreenUtil.renderPanelRecess(guiGraphics,panel.x + 20, panel. y + 187, 275, 27,2f);
 
-        guiGraphics.drawString(this.font, this.title,panel.x + (panel.width - font.width(title)) / 2,panel. y + 8, 0x404040, false);
+        guiGraphics.drawString(this.font, this.title,panel.x + (panel.width - font.width(title)) / 2,panel. y + 8, 0x383838, false);
         Component layerCount = Component.translatable("legacy.menu.create_flat_world.layer_count", selectedLayer.count);
         guiGraphics.drawString(this.font, layerCount,panel.x + 49 - font.width(layerCount),panel. y + 197, 0xFFFFFF, true);
         guiGraphics.drawString(this.font, selectedLayer.getItem().getDescription(),panel.x + 70,panel. y + 197, 0xFFFFFF, true);

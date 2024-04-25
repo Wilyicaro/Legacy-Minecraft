@@ -27,7 +27,7 @@ public class LegacySlotWrapper extends Slot {
         return 21;
     }
     public int getHeight(){
-        return 21;
+        return getWidth();
     }
     public ResourceLocation getIconSprite() {
         return null;

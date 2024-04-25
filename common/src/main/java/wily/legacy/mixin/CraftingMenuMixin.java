@@ -13,7 +13,6 @@ public class CraftingMenuMixin {
     private Slot addSlotFirst(Slot originalSlot){
         return new LegacySlotWrapper(originalSlot, originalSlot.container,originalSlot.getContainerSlot(), 150, 39){
             public int getWidth() {return 32;}
-            public int getHeight() {return 32;}
         };
     }
     @ModifyArg(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/CraftingMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 1))

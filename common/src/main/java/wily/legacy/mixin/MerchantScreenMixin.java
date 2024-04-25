@@ -24,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.LegacyMinecraft;
+import wily.legacy.LegacyMinecraftPlatform;
 import wily.legacy.client.LegacySprites;
 import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.client.screen.LegacyIconHolder;
@@ -207,7 +208,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                     MerchantOffer offer = menu.getOffers().get(index);
                     if (((LegacyMerchantOffer)offer).getRequiredLevel() <= menu.getTraderLevel() && !offer.isOutOfStock() && !displaySlotsWarning[2]) {
                         if (hasAutoCrafting()) {
-                            LegacyMinecraft.NETWORK.sendToServer(new ServerInventoryCraftPacket(ingredientsFromStacks(offer.getCostA(),offer.getCostB()),offer.getResult(),index,hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
+                            LegacyMinecraft.NETWORK.sendToServer(new ServerInventoryCraftPacket(ingredientsFromStacks(offer.getCostA(),offer.getCostB()),offer.getResult(),-1,index,hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
                         } else {
                             postButtonClick();
                         }
@@ -225,7 +226,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         List<Ingredient> ings = new ArrayList<>();
         for (ItemStack stack : s) {
             for (int i = 0; i < stack.getCount(); i++)
-                ings.add(Ingredient.of(stack));
+                ings.add(LegacyMinecraftPlatform.getStrictNBTIngredient(stack));
         }
         return ings;
     }
@@ -323,16 +324,16 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         int k = this.menu.getTraderLevel();
         if (k > 0 && k <= 5 && this.menu.showProgressBar()) {
             MutableComponent component = Component.translatable("merchant.title", this.title, Component.translatable("merchant.level." + k));
-            guiGraphics.drawString(this.font, component, (imageWidth - this.font.width(component)) / 2, titleLabelY, 0x404040, false);
+            guiGraphics.drawString(this.font, component, (imageWidth - this.font.width(component)) / 2, titleLabelY, 0x383838, false);
         } else {
-            guiGraphics.drawString(this.font, this.title, titleLabelX, titleLabelY, 0x404040, false);
+            guiGraphics.drawString(this.font, this.title, titleLabelX, titleLabelY, 0x383838, false);
         }
-        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 0x404040, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 0x383838, false);
         if (getSelectedMerchantOffer() != null && menu.showProgressBar()) {
             int level = ((LegacyMerchantOffer)getSelectedMerchantOffer()).getRequiredLevel();
             if (level > 0) {
                 Component c = Component.translatable("merchant.level." + level);
-                guiGraphics.drawString(this.font, c, 13 + (105 - font.width(c)) / 2, 100, 0x404040, false);
+                guiGraphics.drawString(this.font, c, 13 + (105 - font.width(c)) / 2, 100, 0x383838, false);
             }
         }
     }

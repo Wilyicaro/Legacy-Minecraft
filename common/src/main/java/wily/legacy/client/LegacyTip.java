@@ -87,11 +87,11 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
     }
 
     public int width() {
-        return getWidth() + 30;
+        return getWidth();
     }
 
     public int height() {
-        return getHeight() + y;
+        return getHeight();
     }
 
     @Override

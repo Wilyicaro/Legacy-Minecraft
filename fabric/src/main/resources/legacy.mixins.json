@@ -12,7 +12,8 @@
     "TooltipRenderUtilMixin"
   ],
   "mixins": [
-    "ItemStackMixin"
+    "ItemStackMixin",
+    "LivingEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

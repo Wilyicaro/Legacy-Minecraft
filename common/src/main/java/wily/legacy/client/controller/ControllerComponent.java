@@ -10,8 +10,6 @@ import wily.legacy.LegacyMinecraft;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Locale;
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -26,60 +24,55 @@ public enum ControllerComponent {
     BACK(GLFW.GLFW_GAMEPAD_BUTTON_BACK,icon('\uE73E','\uE009'), InputConstants.KEY_H),
     GUIDE(GLFW.GLFW_GAMEPAD_BUTTON_GUIDE,icon('\uE745')),
     START(GLFW.GLFW_GAMEPAD_BUTTON_START,icon('\uE73D','\uE008'), InputConstants.KEY_ESCAPE),
-    LEFT_STICK((comp,state) -> comp.update(comp.getMagnitude() > 0.25), (k, c)-> matchesLeftStick(Minecraft.getInstance(),k,c), ComponentState.Stick::new,icon('\uE746','\uE748','\uE747'),InputConstants.KEY_W, InputConstants.KEY_A, InputConstants.KEY_S, InputConstants.KEY_D),
-    RIGHT_STICK(ControllerComponent::updatePlayerCamera,(k, c)->true, ComponentState.Stick::new,icon('\uE749','\uE74E','\uE74F')),
+    LEFT_STICK(c-> ComponentState.Axis.createStick(c,()->0.25f,()->GLFW.GLFW_GAMEPAD_AXIS_LEFT_X,()->GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y, ControllerComponent::matchesLeftStick,(a, s)->{}),icon('\uE746','\uE748','\uE747'),InputConstants.KEY_W, InputConstants.KEY_A, InputConstants.KEY_S, InputConstants.KEY_D),
+    RIGHT_STICK(c-> ComponentState.Axis.createStick(c,()->0.2f,()->GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X,()->GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y,(k, s)->s.timePressed == 0, ControllerComponent::updatePlayerCamera),icon('\uE749','\uE74E','\uE74F')),
     LEFT_STICK_BUTTON(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB,icon('\uE743','\u000F'), InputConstants.KEY_F5),
     RIGHT_STICK_BUTTON(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB,icon('\uE744','\u0010'), InputConstants.KEY_LSHIFT),
     LEFT_BUMPER(GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER,icon('\uE739','\uE74A'), InputConstants.KEY_PAGEDOWN),
     RIGHT_BUMPER(GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER,icon('\uE73A','\uE74B'), InputConstants.KEY_PAGEUP),
-    LEFT_TRIGGER((comp,state) -> comp.update(state.axes(GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER) > 0.2),icon('\uE73B','\uE74C'), InputConstants.MOUSE_BUTTON_RIGHT),
-    RIGHT_TRIGGER((comp,state) -> comp.update(state.axes(GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER) > 0.2),icon('\uE73C','\uE74D'), InputConstants.MOUSE_BUTTON_LEFT),
-    DPAD_UP(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP,icon('\uE742','\uE00F')),
-    DPAD_DOWN(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN,icon('\uE73F','\uE00C')),
-    DPAD_LEFT(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT,icon('\uE741','\uE00E'), InputConstants.MOUSE_BUTTON_MIDDLE),
-    DPAD_RIGHT(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT,icon('\uE740','\uE00D'));
+    LEFT_TRIGGER(c-> ComponentState.Axis.createTrigger(c,()->0.2f,()->GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER),icon('\uE73B','\uE74C'), InputConstants.MOUSE_BUTTON_RIGHT),
+    RIGHT_TRIGGER(c-> ComponentState.Axis.createTrigger(c,()->0.2f,()->GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER),icon('\uE73C','\uE74D'), InputConstants.MOUSE_BUTTON_LEFT),
+    DPAD_UP(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP,icon('\uE742','\uE00F'), InputConstants.KEY_UP),
+    DPAD_DOWN(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN,icon('\uE73F','\uE00C'), InputConstants.KEY_DOWN),
+    DPAD_LEFT(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT,icon('\uE741','\uE00E'), InputConstants.KEY_LEFT),
+    DPAD_RIGHT(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT,icon('\uE740','\uE00D'), InputConstants.KEY_RIGHT);
 
 
     public final Component displayName = Component.translatable(LegacyMinecraft.MOD_ID + ".controller_component." + name().toLowerCase(Locale.ENGLISH));
-    public final BiConsumer<ComponentState, GLFWGamepadState> updateState;
-    public final BiPredicate<KeyMapping,ComponentState> validKey;
     public final ComponentState componentState;
     public final Icon icon;
 
-    <T extends ComponentState> ControllerComponent(BiConsumer<T, GLFWGamepadState> updateState, BiPredicate<KeyMapping,T> validKey, Function<ControllerComponent,T> stateConstructor, Icon icon, int... defaultCorrespondentKeys){
-        this.updateState = (c,s)-> updateState.accept((T) c,s);
-        this.validKey = (c,s)->validKey.test(c, (T) s);
+    <T extends ComponentState> ControllerComponent(Function<ControllerComponent,T> stateConstructor, Icon icon, int... defaultCorrespondentKeys){
         this.componentState = stateConstructor.apply(this);
         this.icon = icon;
         for (int k : defaultCorrespondentKeys) DEFAULT_CONTROLLER_BUTTONS_BY_KEY.put(k,this);
     }
-    ControllerComponent(BiConsumer<ComponentState, GLFWGamepadState> updateState, Icon icon, int... defaultCorrespondentKeys){
-        this.updateState = updateState;
-        validKey = (k, c)-> c.timePressed == 0;
-        this.componentState = new ComponentState(this);
-        this.icon = icon;
-        for (int k : defaultCorrespondentKeys) DEFAULT_CONTROLLER_BUTTONS_BY_KEY.put(k,this);
+    ControllerComponent(Supplier<Integer> constant, Icon icon, int... defaultCorrespondentKeys){
+        this(c->new ComponentState(c){
+
+            @Override
+            public void update(GLFWGamepadState state) {
+                update(state.buttons(constant.get()) == GLFW.GLFW_PRESS);
+            }
+        },icon,defaultCorrespondentKeys);
     }
-    ControllerComponent(int button, Icon icon, int... defaultCorrespondentKeys){
-        this((c,s)-> c.update(s.buttons(button) == GLFW.GLFW_PRESS), icon,defaultCorrespondentKeys);
-    }
-    ControllerComponent(Supplier<Integer> button, Icon icon, int... defaultCorrespondentKeys){
-        this((c,s)-> c.update(s.buttons(button.get()) == GLFW.GLFW_PRESS), icon,defaultCorrespondentKeys);
+    ControllerComponent(int constant, Icon icon, int... defaultCorrespondentKeys){
+        this(()->constant, icon,defaultCorrespondentKeys);
     }
 
     public boolean matches(KeyMapping mapping){
         return ((LegacyKeyMapping)mapping).getComponent() == this;
     }
 
-    public static boolean matchesLeftStick(Minecraft minecraft, KeyMapping mapping, ComponentState.Stick s){
+    public static boolean matchesLeftStick(KeyMapping mapping, ComponentState.Axis s){
+        Minecraft minecraft = Minecraft.getInstance();
         return (minecraft.options.keyUp == mapping && s.y < 0 && -s.y > Math.abs(s.x)) || (minecraft.options.keyDown == mapping && s.y > 0 && s.y > Math.abs(s.x)) || (minecraft.options.keyRight == mapping && s.x > 0 && s.x > Math.abs(s.y)) || (minecraft.options.keyLeft == mapping && s.x < 0 && -s.x > Math.abs(s.y));
     }
-    public static void updatePlayerCamera(ComponentState.Stick stick, GLFWGamepadState state){
+    public static void updatePlayerCamera(ComponentState.Axis stick, GLFWGamepadState state){
         Minecraft minecraft = Minecraft.getInstance();
-        stick.update(stick.getMagnitude() >= 0.2);
         if (!minecraft.mouseHandler.isMouseGrabbed() || !minecraft.isWindowActive() || !stick.pressed || minecraft.player == null) return;
         double f = Math.pow(minecraft.options.sensitivity().get() * (double)0.6f + (double)0.2f,3) * 14 * (minecraft.player.isScoping() ? 0.125: 1.0);
-        minecraft.player.turn( stick.x * f,stick.y * f * (ScreenUtil.getLegacyOptions().invertYController().get() ? -1 : 1));
+        minecraft.player.turn(stick.getSmoothX() * f,stick.getSmoothY() * f * (ScreenUtil.getLegacyOptions().invertYController().get() ? -1 : 1));
     }
     public static void init() {;
     }

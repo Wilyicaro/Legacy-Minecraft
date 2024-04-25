@@ -2,21 +2,18 @@
 package wily.legacy.client.screen;
 
 import com.google.common.collect.Lists;
-import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.DeathScreen;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.ClickEvent.Action;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.util.ScreenUtil;
@@ -54,7 +51,7 @@ public class LegacyDeathScreen extends DeathScreen {
 
     private void handleExitToTitleScreen() {
         if (this.hardcore) {
-            ExitConfirmationScreen.exitToTitleScreen(minecraft,true);
+            ExitConfirmationScreen.exit(minecraft,true);
         } else {
             this.minecraft.setScreen(new ExitConfirmationScreen(this));
         }

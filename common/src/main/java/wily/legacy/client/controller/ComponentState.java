@@ -1,11 +1,16 @@
 package wily.legacy.client.controller;
 
+import net.minecraft.client.KeyMapping;
 import net.minecraft.network.chat.Component;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
 import wily.legacy.client.screen.ControlTooltip;
 
-public class ComponentState {
+import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+public abstract class ComponentState {
 
     public final ControllerComponent component;
     public boolean justPressed = false;
@@ -48,9 +53,7 @@ public class ComponentState {
     public boolean onceClick(boolean block){
         return onceClick(block ? Integer.MIN_VALUE : -(justPressed ? 5 : 1) * getDefaultDelay());
     }
-    public void update(GLFWGamepadState state){
-        component.updateState.accept(this,state);
-    }
+    public abstract void update(GLFWGamepadState state);
     public boolean is(ControllerComponent b){
         return component == b;
     }
@@ -61,20 +64,55 @@ public class ComponentState {
     public boolean isBlocked() {
         return timePressed == Integer.MIN_VALUE;
     }
+    public boolean canToggleKeyMapping(KeyMapping mapping){
+        return timePressed == 0;
+    }
 
-    public static class Stick extends ComponentState{
+    public static abstract class Axis extends ComponentState{
         public float y;
         public float x;
-        public void update(GLFWGamepadState state){
-            y = state.axes(component == ControllerComponent.LEFT_STICK ? GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y :  GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y);
-            x = state.axes(component == ControllerComponent.LEFT_STICK ? GLFW.GLFW_GAMEPAD_AXIS_LEFT_X :  GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X);
-            super.update(state);
+        public static Axis createStick(ControllerComponent component, Supplier<Float> deadZoneGetter, Supplier<Integer> xConstantGetter, Supplier<Integer> yConstantGetter, BiPredicate<KeyMapping, Axis> canToggleKeyMapping, BiConsumer<Axis, GLFWGamepadState> update){
+            return new Axis(component) {
+                @Override
+                public boolean canToggleKeyMapping(KeyMapping mapping) {
+                    return canToggleKeyMapping.test(mapping,this);
+                }
+                @Override
+                public float getDeadZone() {
+                    return deadZoneGetter.get();
+                }
+                @Override
+                public void update(GLFWGamepadState state) {
+                    x = state.axes(xConstantGetter.get());
+                    y = state.axes(yConstantGetter.get());
+                    update(getMagnitude() > getDeadZone());
+                    update.accept(this,state);
+                }
+            };
         }
-
+        public static Axis createTrigger(ControllerComponent component, Supplier<Float> deadZoneGetter, Supplier<Integer> yConstantGetter){
+            return new Axis(component) {
+                @Override
+                public float getDeadZone() {
+                    return deadZoneGetter.get();
+                }
+                @Override
+                public void update(GLFWGamepadState state) {;
+                    update( (y = state.axes(yConstantGetter.get())) > getDeadZone());
+                }
+            };
+        }
+        public abstract float getDeadZone();
         public float getMagnitude(){
             return Math.max(Math.abs(y),Math.abs(x));
         }
-        protected Stick(ControllerComponent component) {
+        public float getSmoothX(){
+            return   (x > getDeadZone() ? x - getDeadZone() : x < -getDeadZone() ? x + getDeadZone() : 0)  / (1 - getDeadZone());
+        }
+        public float getSmoothY(){
+            return  (y > getDeadZone() ? y - getDeadZone() : y < -getDeadZone() ? y + getDeadZone() : 0)  / (1 - getDeadZone());
+        }
+        protected Axis(ControllerComponent component) {
             super(component);
         }
     }

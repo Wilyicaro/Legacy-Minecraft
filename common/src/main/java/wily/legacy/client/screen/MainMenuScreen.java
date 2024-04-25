@@ -52,7 +52,7 @@ public class MainMenuScreen extends RenderableVListScreen {
         renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.mods"), () -> new ModsScreen(this)).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("options.language"), () -> new LegacyLanguageScreen(this, this.minecraft.getLanguageManager())).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("menu.options"), () -> new HelpOptionsScreen(this)).build());
-        renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> this.minecraft.stop()).build());
+        renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
     }
 
     public boolean isPauseScreen() {

@@ -106,7 +106,7 @@ public class HostOptionsScreen extends PanelVListScreen{
                 public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
                     panel.render(guiGraphics,i,j,f);
                     drawPlayerIcon(profile,guiGraphics, panel.x + 7,panel.y + 5);
-                    guiGraphics.drawString(font,profile.getName(),panel.x + 31, panel.y + 12, 0x404040,false);
+                    guiGraphics.drawString(font,profile.getName(),panel.x + 31, panel.y + 12, 0x383838,false);
                 }
             };
             List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
@@ -202,7 +202,7 @@ public class HostOptionsScreen extends PanelVListScreen{
             List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
             screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230,16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL,b1.getObjectValue().getLongDisplayName()),()->Tooltip.create(Component.translatable("selectWorld.gameMode."+gameType.get().getName()+ ".info")),gameType.get(),()->gameTypes, b1->minecraft.getConnection().sendCommand("gamemode " + b1.objectValue.getName())));
             screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_world_spawn"),b1-> minecraft.player.connection.sendCommand("setworldspawn")).bounds(0,0,215,20).build());
-            screen.renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 12, (l -> ((graphics, i, j, f) -> {}))),SimpleLayoutRenderable.create(240, 12, (l -> ((graphics, i, j, f) -> graphics.drawString(font, Component.translatable("soundCategory.weather"), l.x + 1, l.y + 4, 0x404040,false)))));
+            screen.renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 12, (l -> ((graphics, i, j, f) -> {}))),SimpleLayoutRenderable.create(240, 12, (l -> ((graphics, i, j, f) -> graphics.drawString(font, Component.translatable("soundCategory.weather"), l.x + 1, l.y + 4, 0x383838,false)))));
             screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230,16, b1 -> Component.translatable( "legacy.weather_state." + b1.getObjectValue()),()->null,weathers.get(savedWeather.get()),()->weathers, b1->savedWeather.set(weathers.indexOf(b1.getObjectValue()))));
             for (GameRules.Key<GameRules.BooleanValue> key : OTHER_RULES)
                 screen.renderableVList.addRenderable(new TickBox(0,0,gameRules.getRule(key).get(),b1-> Component.translatable(key.getDescriptionId()),b1-> null, b1->minecraft.player.connection.sendCommand("gamerule %s %s".formatted(key.getId(), b1.selected))));
@@ -253,7 +253,7 @@ public class HostOptionsScreen extends PanelVListScreen{
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f, alpha);
         panel.render(guiGraphics,i,j,f);
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
-        guiGraphics.drawString(font,title,panel.x + 11, panel.y + 8, 0x404040, false);
+        guiGraphics.drawString(font,title,panel.x + 11, panel.y + 8, 0x383838, false);
     }
 
     protected static float getDefaultOpacity() {

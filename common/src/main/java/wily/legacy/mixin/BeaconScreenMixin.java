@@ -94,8 +94,8 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
 
     @Override
     public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        guiGraphics.drawString(this.font, PRIMARY_EFFECT_LABEL, 9 + (121 - font.width(PRIMARY_EFFECT_LABEL)) /2, 13, 0x404040, false);
-        guiGraphics.drawString(this.font, SECONDARY_EFFECT_LABEL, 133 + (121 - font.width(SECONDARY_EFFECT_LABEL)) /2, 13, 0x404040, false);
+        guiGraphics.drawString(this.font, PRIMARY_EFFECT_LABEL, 9 + (121 - font.width(PRIMARY_EFFECT_LABEL)) /2, 13, 0x383838, false);
+        guiGraphics.drawString(this.font, SECONDARY_EFFECT_LABEL, 133 + (121 - font.width(SECONDARY_EFFECT_LABEL)) /2, 13, 0x383838, false);
     }
     private static final Item[] DISPLAY_ITEMS = new Item[]{Items.NETHERITE_INGOT,Items.EMERALD,Items.DIAMOND,Items.GOLD_INGOT,Items.IRON_INGOT};
     @Override

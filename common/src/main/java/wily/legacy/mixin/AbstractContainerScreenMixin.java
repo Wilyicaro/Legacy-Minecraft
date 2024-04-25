@@ -4,8 +4,8 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -20,13 +20,13 @@ import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.LegacyTip;
+import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.LegacyIconHolder;
@@ -67,9 +67,17 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Shadow protected int imageWidth;
 
     @Shadow protected Slot hoveredSlot;
+
+    @Shadow protected abstract void init();
+
+    @ModifyArg(method = "renderLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)I"), index = 4)
+    private int renderLabels(int i){
+        return 0x383838;
+    }
+
     private ControlTooltip.Renderer controlTooltipRenderer = new ControlTooltip.Renderer(this).add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true) : ControllerComponent.DOWN_BUTTON.componentState.getIcon(true),()->getHoveredSlot() != null && (getHoveredSlot().hasItem() || !menu.getCarried().isEmpty()) ? CONTROL_ACTION_CACHE.getUnchecked(getHoveredSlot().hasItem() && !getHoveredSlot().getItem().is(menu.getCarried().getItem()) ? menu.getCarried().isEmpty() ? "legacy.action.take" : "legacy.action.swap" : "legacy.action.place") : null).
             add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_ESCAPE,true) : ControllerComponent.RIGHT_BUTTON.componentState.getIcon(true),()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.exit")).
-            add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.MOUSE_BUTTON_RIGHT,true) : ControllerComponent.LEFT_BUTTON.componentState.getIcon(true),()->getHoveredSlot() != null && getHoveredSlot().getItem().getCount() > 1 ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.take_half") : null ).
+            add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.MOUSE_BUTTON_RIGHT,true) : ControllerComponent.LEFT_BUTTON.componentState.getIcon(true),()->getHoveredSlot() != null && getHoveredSlot().getItem().getCount() > 1 ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.take_half") : getHoveredSlot() != null && !menu.getCarried().isEmpty() && getHoveredSlot().hasItem() && LegacyMinecraft.canRepair(getHoveredSlot().getItem(),menu.getCarried()) ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.repair") : null).
             add(()->getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true),PLUS,getKeyIcon(InputConstants.KEY_LSHIFT,true)}) : ControllerComponent.UP_BUTTON.componentState.getIcon(true),()-> getHoveredSlot() != null && getHoveredSlot().hasItem() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.quick_move") : null).
             add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_W,true) : ControllerComponent.RIGHT_TRIGGER.componentState.getIcon(true),()->getHoveredSlot() != null && getHoveredSlot().hasItem() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.whats_this") : null);
 
@@ -81,12 +89,13 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         }
         if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && ScreenUtil.hasTip(hoveredSlot.getItem())) {
             ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
-            LegacyTip oldTip = minecraft.getToasts().getToast(LegacyTip.class, Toast.NO_TOKEN);
+            LegacyTip oldTip = LegacyTipManager.tips.isEmpty() ? null : LegacyTipManager.tips.get(0);
             if (oldTip == null) ScreenUtil.addTip(hoveredSlot.getItem().copy());
             else oldTip.tip(ScreenUtil.getTip(hoveredSlot.getItem())).autoHeight().title(Component.translatable(hoveredSlot.getItem().getDescriptionId())).itemStack(hoveredSlot.getItem().copy());
         }
     }
-    @Inject(method = "slotClicked", at = @At("HEAD"))
+
+    @Inject(method = "slotClicked", at = @At("HEAD"), cancellable = true)
     private void slotClicked(Slot slot, int i, int j, ClickType clickType, CallbackInfo ci) {
         ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
     }

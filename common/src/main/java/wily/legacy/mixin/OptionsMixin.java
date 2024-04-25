@@ -24,6 +24,7 @@ import wily.legacy.client.screen.ControlTooltip;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.function.BooleanSupplier;
 
 @Mixin(Options.class)
 public abstract class OptionsMixin implements LegacyOptions {
@@ -52,13 +53,14 @@ public abstract class OptionsMixin implements LegacyOptions {
 
     @Shadow public abstract OptionInstance<Integer> renderDistance();
 
+    @Shadow public abstract OptionInstance<Boolean> bobView();
+
     private OptionInstance<Double> hudDistance;
     private OptionInstance<Double> hudOpacity;
     private OptionInstance<Double> interfaceResolution;
     private OptionInstance<Double> interfaceSensitivity;
     private OptionInstance<Integer> terrainFogStart;
     private OptionInstance<Double> terrainFogEnd;
-    private OptionInstance<Double> terrainFogOpacity;
     private OptionInstance<Integer> autoSaveInterval;
     private OptionInstance<Boolean> overrideTerrainFogStart;
     private OptionInstance<Boolean> legacyCreativeTab;
@@ -69,7 +71,7 @@ public abstract class OptionsMixin implements LegacyOptions {
     private OptionInstance<Boolean> autoSaveWhenPause;
     private OptionInstance<Integer> hudScale;
     private OptionInstance<Boolean> showVanillaRecipeBook;
-    private OptionInstance<Boolean> legacyGamma;
+    private OptionInstance<Double> legacyGamma;
     private OptionInstance<Boolean> inGameTooltips;
     private OptionInstance<Boolean> tooltipBoxes;
     private OptionInstance<Boolean> hints;
@@ -82,6 +84,7 @@ public abstract class OptionsMixin implements LegacyOptions {
     private OptionInstance<Boolean> minecartSounds;
     private OptionInstance<Boolean> invertYController;
     private OptionInstance<Boolean> invertControllerButtons;
+    private OptionInstance<Integer> selectedController;
     private OptionInstance<Integer> controllerIcons;
     private OptionInstance<Difficulty> createWorldDifficulty;
 
@@ -93,6 +96,10 @@ public abstract class OptionsMixin implements LegacyOptions {
     protected int initKeyCrafting(int i) {
         return 73;
     }
+    @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ToggleKeyMapping;<init>(Ljava/lang/String;ILjava/lang/String;Ljava/util/function/BooleanSupplier;)V", ordinal = 0),index = 3)
+    protected BooleanSupplier initKeyShift(BooleanSupplier booleanSupplier) {
+        return ()-> (minecraft == null || minecraft.player == null || (!minecraft.player.getAbilities().flying && minecraft.player.getVehicle() == null)) && booleanSupplier.getAsBoolean();
+    }
     @Redirect(method = "<init>", at = @At( value = "INVOKE", target = "Lnet/minecraft/client/Options;load()V"))
     protected void init(Options instance) {
 
@@ -102,7 +109,7 @@ public abstract class OptionsMixin implements LegacyOptions {
         animatedCharacter = OptionInstance.createBoolean("legacy.options.animatedCharacter",true);
         classicCrafting = OptionInstance.createBoolean("legacy.options.classicCrafting",false);
         vanillaTabs = OptionInstance.createBoolean("legacy.options.vanillaTabs",OptionInstance.cachedConstantTooltip(Component.translatable("legacy.options.vanillaTabs.description")),false);
-        legacyGamma = OptionInstance.createBoolean("legacy.options.gamma",true);
+        legacyGamma = new OptionInstance<>("legacy.options.gamma", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 0.5, d -> {});
         displayHUD = OptionInstance.createBoolean("legacy.options.displayHud",!hideGui, b-> hideGui = !b);
         legacyCreativeTab = OptionInstance.createBoolean("legacy.options.creativeTab", true);
         autoSaveWhenPause = OptionInstance.createBoolean("legacy.options.autoSaveWhenPause", false);
@@ -120,15 +127,15 @@ public abstract class OptionsMixin implements LegacyOptions {
         legacyItemTooltips = OptionInstance.createBoolean("legacy.options.legacyItemTooltips", true);
         invertYController = OptionInstance.createBoolean("legacy.options.invertYController", false);
         invertControllerButtons = OptionInstance.createBoolean("legacy.options.invertControllerButtons", false, (b)-> ControllerComponent.RIGHT_BUTTON.componentState.block());
+        selectedController = new OptionInstance<>("legacy.controls.controller", OptionInstance.noTooltip(), (c, i)-> Component.translatable("options.generic_value",c,Component.literal(i+1 + (LegacyMinecraftClient.controllerHandler.connectedController == null ? "" : " (%s)".formatted(LegacyMinecraftClient.controllerHandler.connectedController)))),  new OptionInstance.IntRange(0, 15), 0, d -> {});
         hudScale = new OptionInstance<>("legacy.options.hudScale", OptionInstance.noTooltip(), OptionsMixin::genericValueLabel,  new OptionInstance.IntRange(1,3), 2, d -> {});
         hudOpacity = new OptionInstance<>("legacy.options.hudOpacity", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 0.8, d -> {});
         hudDistance = new OptionInstance<>("legacy.options.hudDistance", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
-        interfaceResolution = new OptionInstance<>("legacy.options.interfaceResolution", OptionInstance.noTooltip(), (c, d) -> percentValueLabel(c, 0.75 + d / 2), OptionInstance.UnitDouble.INSTANCE, 0.5, d -> minecraft.resizeDisplay());
+        interfaceResolution = new OptionInstance<>("legacy.options.interfaceResolution", OptionInstance.noTooltip(), (c, d) -> percentValueLabel(c, 0.5 + d), OptionInstance.UnitDouble.INSTANCE, 0.5, d -> minecraft.resizeDisplay());
         interfaceSensitivity = new OptionInstance<>("legacy.options.interfaceSensitivity", OptionInstance.noTooltip(), (c, d) -> percentValueLabel(c, d*2), OptionInstance.UnitDouble.INSTANCE, 0.5, d -> {});
         overrideTerrainFogStart = OptionInstance.createBoolean("legacy.options.overrideTerrainFogStart", true);
         terrainFogStart = new OptionInstance<>("legacy.options.terrainFogStart", OptionInstance.noTooltip(),(c,i)-> Component.translatable("options.chunks", i), new OptionInstance.ClampingLazyMaxIntRange(2, () -> renderDistance().get(), 0x7FFFFFFE), 4, d -> {});
         terrainFogEnd = new OptionInstance<>("legacy.options.terrainFogEnd", OptionInstance.noTooltip(),(c, d) -> percentValueLabel(c, d*2), OptionInstance.UnitDouble.INSTANCE, 0.5, d -> {});
-        terrainFogOpacity = new OptionInstance<>("legacy.options.terrainFogOpacity", OptionInstance.noTooltip(),OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
         controllerIcons = new OptionInstance<>("legacy.options.controllerIcons", OptionInstance.noTooltip(), (c, i)-> Component.translatable("options.generic_value",c,i == 0? Component.translatable("legacy.options.auto_value", ControlTooltip.getActiveControllerType().displayName) : ControlTooltip.Type.values()[i].displayName),  new OptionInstance.IntRange(0, ControlTooltip.Type.values().length - 1), 0, d -> {});
         createWorldDifficulty = new OptionInstance<>("options.difficulty", d->Tooltip.create(d.getInfo()), (c, d) -> d.getDisplayName(), new OptionInstance.Enum<>(Arrays.asList(Difficulty.values()), Codec.INT.xmap(Difficulty::byId, Difficulty::getId)), Difficulty.NORMAL, d -> {});
         if(LegacyMinecraftClient.canLoadVanillaOptions)
@@ -142,7 +149,6 @@ public abstract class OptionsMixin implements LegacyOptions {
         fieldAccess.process("interfaceSensitivity", interfaceSensitivity);
         fieldAccess.process("terrainFogStart", terrainFogStart);
         fieldAccess.process("terrainFogEnd", terrainFogEnd);
-        fieldAccess.process("terrainFogOpacity", terrainFogOpacity);
         fieldAccess.process("overrideTerrainFogStart", overrideTerrainFogStart);
         fieldAccess.process("autoSaveWhenPause", autoSaveWhenPause);
         fieldAccess.process("gameTooltips", inGameTooltips);
@@ -161,6 +167,7 @@ public abstract class OptionsMixin implements LegacyOptions {
         fieldAccess.process("displayHUD", displayHUD);
         fieldAccess.process("invertYController", invertYController);
         fieldAccess.process("invertControllerButtons", invertControllerButtons);
+        fieldAccess.process("selectedController", selectedController);
         fieldAccess.process("hudScale", hudScale);
         fieldAccess.process("controllerIcons", controllerIcons);
         fieldAccess.process("legacyCreativeTab", legacyCreativeTab);
@@ -192,9 +199,6 @@ public abstract class OptionsMixin implements LegacyOptions {
     public OptionInstance<Double> terrainFogEnd() {
         return terrainFogEnd;
     }
-    public OptionInstance<Double> terrainFogOpacity() {
-        return terrainFogOpacity;
-    }
     public OptionInstance<Boolean> legacyCreativeTab() {
         return legacyCreativeTab;
     }
@@ -212,7 +216,7 @@ public abstract class OptionsMixin implements LegacyOptions {
     public OptionInstance<Boolean> showVanillaRecipeBook() {
         return showVanillaRecipeBook;
     }
-    public OptionInstance<Boolean> legacyGamma() {return legacyGamma;}
+    public OptionInstance<Double> legacyGamma() {return legacyGamma;}
     public OptionInstance<Boolean> inGameTooltips() {
         return inGameTooltips;
     }
@@ -255,6 +259,9 @@ public abstract class OptionsMixin implements LegacyOptions {
     }
     public OptionInstance<Boolean> invertControllerButtons() {
         return invertControllerButtons;
+    }
+    public OptionInstance<Integer> selectedController() {
+        return selectedController;
     }
     public OptionInstance<Boolean> legacyItemTooltips() {
         return legacyItemTooltips;

@@ -21,7 +21,6 @@ public class AbstractFurnaceMenuMixin {
     private Slot addSlotThird(Slot originalSlot){
         return new LegacySlotWrapper(originalSlot, originalSlot.container,originalSlot.getContainerSlot(), 155, 44){
             public int getWidth() {return 32;}
-            public int getHeight() {return 32;}
         };
     }
     @ModifyArg(method = "<init>(Lnet/minecraft/world/inventory/MenuType;Lnet/minecraft/world/item/crafting/RecipeType;Lnet/minecraft/world/inventory/RecipeBookType;ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/Container;Lnet/minecraft/world/inventory/ContainerData;)V",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/AbstractFurnaceMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 3))

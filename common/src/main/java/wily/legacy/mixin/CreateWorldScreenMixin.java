@@ -156,19 +156,19 @@ public abstract class CreateWorldScreenMixin extends Screen{
         Lifecycle lifecycle2 = layeredRegistryAccess.compositeAccess().allRegistriesLifecycle();
         Lifecycle lifecycle3 = lifecycle2.add(lifecycle);
         boolean bl = lifecycle2 == Lifecycle.stable();
-        confirmWorldCreation(this.minecraft, self(), lifecycle3, () -> {
+        Runnable create = ()-> confirmWorldCreation(this.minecraft, self(), lifecycle3, () -> {
             try {
                 this.createNewWorld(complete.specialWorldProperty(), layeredRegistryAccess, lifecycle3);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }, bl);
+        resourcePackSelector.applyChanges(true, ()->minecraft.reloadResourcePacks().thenRun(create), create);
         onLoad();
 
     }
     private void onLoad() {
         minecraft.execute(()->{
-            resourcePackSelector.applyChanges(true);
             if (minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer().isReady()){
                 if (onlineOnStart) {
                     MutableComponent component = publishUnloadedServer(minecraft, uiState.getGameMode().gameType, trustPlayers && uiState.isAllowCheats(), this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed");
@@ -216,7 +216,7 @@ public abstract class CreateWorldScreenMixin extends Screen{
         this.renderBackground(guiGraphics, i, j, f);
         for (Renderable renderable : this.renderables)
             renderable.render(guiGraphics, i, j, f);
-        guiGraphics.drawString(font,NAME_LABEL, panel.x + 14, panel.y + 15, 0x404040,false);
+        guiGraphics.drawString(font,NAME_LABEL, panel.x + 14, panel.y + 15, 0x383838,false);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -25,14 +24,17 @@ import java.util.function.Function;
 public class LegacyTabButton extends AbstractButton {
     public static final ResourceLocation[][] SPRITES = new ResourceLocation[][]{new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_tab_left"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_tab_left")}, new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_tab_middle"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_tab_middle")}, new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_tab_right"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_tab_right")},
                                                                                 new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_vert_tab_up"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_vert_tab_up")}, new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_vert_tab_middle"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_vert_tab_middle")}, new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_vert_tab_down"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_vert_tab_down")}};
+    public static final Offset DEFAULT_OFFSET = new Offset(0,4,0);
+    public static final Offset DEFAULT_DESACTIVE_OFFSET = new Offset(0,22,0);
     public final ResourceLocation icon;
     public ItemStack itemIcon;
     private final Consumer<LegacyTabButton> onPress;
     public boolean selected;
     protected int type;
     public Function<LegacyTabButton, Offset> offset = (t)-> {
-     if (!t.selected) return new Offset(0,4,0);
-     return Offset.ZERO;
+        if (!isActive()) return DEFAULT_DESACTIVE_OFFSET;
+        if (!t.selected) return DEFAULT_OFFSET;
+        return Offset.ZERO;
     };
 
     public LegacyTabButton(int i, int j, int width, int height, int type, ResourceLocation iconSprite, CompoundTag itemIconTag, Component text, Tooltip tooltip, Consumer<LegacyTabButton> onPress) {
@@ -66,17 +68,19 @@ public class LegacyTabButton extends AbstractButton {
         }
         if (selected) guiGraphics.pose().translate(0F,0f,1F);
         ScreenUtil.renderTiles(SPRITES[type][selected ? 0 : 1],guiGraphics, getX(), getY(), getWidth(), this.getHeight(),2);
-        int k = this.active ? 0x404040 : 0xA0A0A0;
-        if (icon == null) this.renderString(guiGraphics, minecraft.font, k | Mth.ceil(this.alpha * 255.0f) << 24);
-        else {
-            if (itemIcon == null)
-                guiGraphics.blitSprite(icon,getX() + width / 2 - 12,getY() + height / 2 - 12,24,24);
+        if (active) {
+            if (icon == null)
+                this.renderString(guiGraphics, minecraft.font, 0x383838 | Mth.ceil(this.alpha * 255.0f) << 24);
             else {
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(getX() + width / 2f - 12, getY() + height / 2f - 12, 0);
-                guiGraphics.pose().scale(1.5f, 1.5f, 1.5f);
-                guiGraphics.renderItem(itemIcon, 0, 0);
-                guiGraphics.pose().popPose();
+                if (itemIcon == null)
+                    guiGraphics.blitSprite(icon, getX() + width / 2 - 12, getY() + height / 2 - 12, 24, 24);
+                else {
+                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().translate(getX() + width / 2f - 12, getY() + height / 2f - 12, 0);
+                    guiGraphics.pose().scale(1.5f, 1.5f, 1.5f);
+                    guiGraphics.renderItem(itemIcon, 0, 0);
+                    guiGraphics.pose().popPose();
+                }
             }
         }
         guiGraphics.pose().popPose();

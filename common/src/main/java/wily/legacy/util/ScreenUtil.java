@@ -28,10 +28,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
-import wily.legacy.client.BufferSourceWrapper;
-import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.LegacyTip;
-import wily.legacy.client.LegacyTipOverride;
+import wily.legacy.client.*;
 import wily.legacy.client.screen.LegacyIconHolder;
 
 import java.util.function.Consumer;
@@ -189,17 +186,17 @@ public class ScreenUtil {
         mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave));
     }
     public static void addTip(Entity entity){
-        if (hasTip(entity.getType())) mc.getToasts().addToast(new LegacyTip(entity.getType().getDescription(), ScreenUtil.getTip(entity.getType())));
+        if (hasTip(entity.getType())) LegacyTipManager.tips.add(new LegacyTip(entity.getType().getDescription(), ScreenUtil.getTip(entity.getType())));
         else if (entity.getPickResult() != null && !entity.getPickResult().isEmpty() && hasTip(entity.getPickResult())) addTip(entity.getPickResult());
     }
     public static void addTip(EntityType<?> entityType){
-        if (hasTip(entityType)) mc.getToasts().addToast(new LegacyTip(entityType.getDescription(), ScreenUtil.getTip(entityType)));
+        if (hasTip(entityType)) LegacyTipManager.tips.add(new LegacyTip(entityType.getDescription(), ScreenUtil.getTip(entityType)));
     }
     public static void addCustomTip(Component title, Component tip, ItemStack stack, long time){
-        mc.getToasts().addToast((title.getString().isEmpty() && tip.getString().isEmpty() && !stack.isEmpty() ?  new LegacyTip(stack) : new LegacyTip(title,tip).itemStack(stack)).disappearTime(time));
+        LegacyTipManager.tips.add((title.getString().isEmpty() && tip.getString().isEmpty() && !stack.isEmpty() ?  new LegacyTip(stack) : new LegacyTip(title,tip).itemStack(stack)).disappearTime(time));
     }
     public static void addTip(ItemStack stack){
-        if (hasTip(stack)) mc.getToasts().addToast(new LegacyTip(stack));
+        if (hasTip(stack)) LegacyTipManager.tips.add(new LegacyTip(stack));
     }
     public static Component getTip(ItemStack item){
         return hasValidTipOverride(item) ? LegacyTipOverride.getOverride(item) : Component.translatable(getTipId(item));

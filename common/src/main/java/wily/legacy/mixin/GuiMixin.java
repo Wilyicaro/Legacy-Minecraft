@@ -1,6 +1,5 @@
 package wily.legacy.mixin;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -9,24 +8,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.MobEffectTextureManager;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PlayerRideableJumping;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -38,15 +30,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.LegacyMinecraft;
 import wily.legacy.LegacyMinecraftClient;
 import wily.legacy.client.BufferSourceWrapper;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.controller.LegacyKeyMapping;
+import wily.legacy.client.LegacySprites;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.util.ScreenUtil;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 @Mixin(Gui.class)
@@ -65,6 +55,8 @@ public abstract class GuiMixin {
     @Shadow protected float lastAutosaveIndicatorValue;
 
     private int lastHotbarSelection = -1;
+    private long animatedCharacterTime;
+    private long remainingAnimatedCharacterTime;
 
     @Shadow protected abstract Player getCameraPlayer();
 
@@ -140,9 +132,9 @@ public abstract class GuiMixin {
         }
         guiGraphics.setColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
-    @Redirect(method = "renderHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V", ordinal = 1))
-    private void renderHotbarSelection(GuiGraphics instance, ResourceLocation resourceLocation, int i, int j, int k, int l) {
-        instance.blitSprite(resourceLocation,i,j, 24, 24);
+    @Inject(method = "renderHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V", ordinal = 1))
+    private void renderHotbarSelection(float f, GuiGraphics guiGraphics, CallbackInfo ci) {
+        guiGraphics.blitSprite(LegacySprites.HOTBAR_SELECTION_SPRITE,24,24,0,23,this.screenWidth / 2 - 91 - 1 + minecraft.player.getInventory().selected * 20, this.screenHeight, 24, 1);
     }
     @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
     public void renderHotbar(float f, GuiGraphics guiGraphics, CallbackInfo ci) {
@@ -178,7 +170,13 @@ public abstract class GuiMixin {
         Player player = this.getCameraPlayer();
         if (player == null) return;
         ControlTooltip.guiControlRenderer.render(guiGraphics,0,0,f);
-        if (((LegacyOptions)minecraft.options).animatedCharacter().get() && (player.isSprinting() || player.isShiftKeyDown() || player.isCrouching() || player.getAbilities().flying || player.isFallFlying())) {
+        boolean hasRemainingTime = player.isSprinting() || player.isShiftKeyDown() || player.isCrouching() || player.isFallFlying();
+
+        if (((LegacyOptions)minecraft.options).animatedCharacter().get() && (hasRemainingTime || player.getAbilities().flying )){
+            animatedCharacterTime = Util.getMillis();
+            remainingAnimatedCharacterTime = hasRemainingTime ? 450 : 0;
+        }
+        if (Util.getMillis() - animatedCharacterTime <= remainingAnimatedCharacterTime) {
             Vec3 deltaMove = player.getDeltaMovement();
             float bodyRot = player.yBodyRot;
             float xRot = player.getXRot();

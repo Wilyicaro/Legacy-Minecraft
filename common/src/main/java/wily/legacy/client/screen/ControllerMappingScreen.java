@@ -39,14 +39,14 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
                 ((LegacyKeyMapping)keyMapping).setComponent(((LegacyKeyMapping)keyMapping).getDefaultComponent());
             minecraft.setScreen(this);
         }))).size(240,20).build());
+        renderableVList.addRenderable(ScreenUtil.getLegacyOptions().selectedController().createButton(options,0,0,240));
+        renderableVList.addRenderable(ScreenUtil.getLegacyOptions().invertControllerButtons().createButton(options,0,0,240));
         for (KeyMapping keyMapping : keyMappings) {
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category)) {
-                renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> {}))), SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> graphics.drawString(font, Component.translatable(category), l.x + 1, l.y + 4, 0x404040, false)))));
-                if (category.equals("key.categories.movement")){
+                renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> {}))), SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> graphics.drawString(font, Component.translatable(category), l.x + 1, l.y + 4, 0x383838, false)))));
+                if (category.equals("key.categories.movement"))
                     renderableVList.addRenderable(ScreenUtil.getLegacyOptions().invertYController().createButton(options,0,0,240));
-                    renderableVList.addRenderable(ScreenUtil.getLegacyOptions().invertControllerButtons().createButton(options,0,0,240));
-                }
             }
             lastCategory = keyMapping.getCategory();
             LegacyKeyMapping mapping = (LegacyKeyMapping) keyMapping;

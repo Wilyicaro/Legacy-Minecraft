@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 public class LegacyTipManager extends SimplePreparableReloadListener<List<Supplier<LegacyTip>>> {
     private static final String TIPS = "texts/tips.json";
 
+    public static final List<LegacyTip> tips = new ArrayList<>();
     public static final List<Supplier<LegacyTip>> loadingTips = new ArrayList<>();
     @Override
     protected List<Supplier<LegacyTip>> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {

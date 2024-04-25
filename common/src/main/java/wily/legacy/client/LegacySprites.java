@@ -4,7 +4,14 @@ import net.minecraft.resources.ResourceLocation;
 import wily.legacy.LegacyMinecraft;
 
 public class LegacySprites {
+    public static final ResourceLocation BUTTON_SLOT_SELECTED_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/button_slot_selected");
+    public static final ResourceLocation BUTTON_SLOT_HIGHLIGHTED_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/button_slot_highlighted");
+    public static final ResourceLocation BUTTON_SLOT_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/button_slot");
+    public static final ResourceLocation BANNER_SLOT_SPRITE = new ResourceLocation("container/loom/banner_slot");
+    public static final ResourceLocation DYE_SLOT_SPRITE = new ResourceLocation("container/loom/dye_slot");
+    public static final ResourceLocation PATTERN_SLOT_SPRITE = new ResourceLocation("container/loom/pattern_slot");
     public static final ResourceLocation POINTER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/pointer");
+    public static final ResourceLocation SMALL_POINTER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/small_pointer");
     public static final ResourceLocation UNSELECT_HIGHLIGHTED_SPRITE = new ResourceLocation("transferable_list/unselect_highlighted");
     public static final ResourceLocation UNSELECT_SPRITE = new ResourceLocation("transferable_list/unselect");
     public static final ResourceLocation CRAFTING_2_SLOTS_SELECTION_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/crafting_2_slots_selection");
@@ -21,6 +28,7 @@ public class LegacySprites {
     public static final ResourceLocation SADDLE_SLOT_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/saddle_slot");
     public static final ResourceLocation LLAMA_ARMOR_SLOT_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/llama_armor_slot");
     public static final ResourceLocation ARMOR_SLOT_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/armor_slot");
+    public static final ResourceLocation HOTBAR_SELECTION_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"hud/hotbar_selection");
     public static final ResourceLocation EXPERIENCE_BAR_BACKGROUND_SPRITE = new ResourceLocation("hud/experience_bar_background");
     public static final ResourceLocation EXPERIENCE_BAR_CURRENT_SPRITE = new ResourceLocation("hud/experience_bar_progress");
     public static final ResourceLocation EXPERIENCE_BAR_RESULT_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/experience_bar_result");
@@ -42,6 +50,11 @@ public class LegacySprites {
     public static final ResourceLocation SMITHING_HAMMER_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/smithing_hammer");
     public static final ResourceLocation COMBINER_PLUS_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/combiner_plus");
     public static final ResourceLocation ARROW_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/arrow");
+    public static final ResourceLocation CARTOGRAPHY_TABLE_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/cartography_table_empty");
+    public static final ResourceLocation CARTOGRAPHY_TABLE_MAP_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/cartography_table_map");
+    public static final ResourceLocation CARTOGRAPHY_TABLE_COPY_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/cartography_table_copy");
+    public static final ResourceLocation CARTOGRAPHY_TABLE_LOCKED_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/cartography_table_glass");
+    public static final ResourceLocation CARTOGRAPHY_TABLE_ZOOM_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/cartography_table_zoom");
     public static final ResourceLocation JOIN_HIGHLIGHTED_SPRITE = new ResourceLocation("server_list/join_highlighted");
     public static final ResourceLocation JOIN_SPRITE = new ResourceLocation("server_list/join");
     public static final ResourceLocation MOVE_UP_HIGHLIGHTED_SPRITE = new ResourceLocation("server_list/move_up_highlighted");

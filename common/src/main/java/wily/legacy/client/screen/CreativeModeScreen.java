@@ -2,6 +2,7 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
+import dev.architectury.utils.GameInstance;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
@@ -152,7 +153,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         Component tabTitle = tabList.tabButtons.get(tabList.selectedTab).getMessage();
-        guiGraphics.drawString(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, 12, 0x404040, false);
+        guiGraphics.drawString(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, 12, 0x383838, false);
     }
 
     @Override
@@ -322,7 +323,9 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
 
     @Override
     public void componentTick(ComponentState state) {
-        if (state.is(ControllerComponent.RIGHT_STICK) && state instanceof ComponentState.Stick s && s.pressed && s.canClick()) controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
+        if (state.is(ControllerComponent.RIGHT_STICK) && state instanceof ComponentState.Axis s && s.pressed && s.canClick()){
+            controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
+        }
     }
 
     public static class CreativeModeMenu extends AbstractContainerMenu {

@@ -362,6 +362,7 @@ public interface ControlTooltip {
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack actualItem = minecraft.player.getItemInHand(hand);
             if (minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof BedBlock) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.sleep");
+            if (minecraft.hitResult instanceof BlockHitResult r && minecraft.hitResult.getType() != HitResult.Type.MISS && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof NoteBlock) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.change_pitch");
             if (canPlace(minecraft, hand)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.place");
             if (canFeedAbstractHorse(minecraft, hand)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.feed");
             if ( actualItem.is(Items.IRON_INGOT) && minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof IronGolem g  && g.getHealth() < g.getMaxHealth()) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.repair");
@@ -384,7 +385,6 @@ public interface ControlTooltip {
                 else if (minecraft.hitResult instanceof BlockHitResult r && r.getType() != HitResult.Type.MISS && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof PumpkinBlock) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.carve");
             }
             if (minecraft.hitResult instanceof BlockHitResult r && minecraft.hitResult.getType() != HitResult.Type.MISS && (blockState = minecraft.level.getBlockState(r.getBlockPos())).getBlock() instanceof JukeboxBlock && blockState.getValue(HAS_RECORD)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.eject");
-            if (minecraft.hitResult instanceof BlockHitResult r && minecraft.hitResult.getType() != HitResult.Type.MISS && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof NoteBlock) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.change_pitch");
             if (actualItem.getItem() instanceof FoodOnAStickItem<?> i && minecraft.player.getControlledVehicle() instanceof ItemSteerable && minecraft.player.getControlledVehicle().getType() == i.canInteractWith) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.boost");
             if (actualItem.getItem() instanceof LeadItem){
                 if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Mob m && m.canBeLeashed(minecraft.player)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.leash");

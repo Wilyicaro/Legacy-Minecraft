@@ -75,7 +75,7 @@ public abstract class MinecraftMixin {
 
     @ModifyArg(method = "resizeDisplay",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/Window;setGuiScale(D)V"))
     public double resizeDisplay(double d) {
-        return d * (0.625 - (ScreenUtil.getLegacyOptions().interfaceResolution().get()) / 4);
+        return d * (0.5625 - (ScreenUtil.getLegacyOptions().interfaceResolution().get()) / 8);
     }
     @Inject(method = "addInitialScreens", at = @At("HEAD"))
     private void addInitialScreens(List<Function<Runnable, Screen>> list, CallbackInfo ci) {

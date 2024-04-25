@@ -38,7 +38,7 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
         for (KeyMapping keyMapping : keyMappings) {
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category))
-                renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> {}))), SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> graphics.drawString(font, Component.translatable(category), l.x + 1, l.y + 4, 0x404040, false)))));
+                renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> {}))), SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> graphics.drawString(font, Component.translatable(category), l.x + 1, l.y + 4, 0x383838, false)))));
             lastCategory = keyMapping.getCategory();
             renderableVList.addRenderable(new AbstractButton(0,0,240,20,((LegacyKeyMapping)keyMapping).getDisplayName()) {
                 @Override

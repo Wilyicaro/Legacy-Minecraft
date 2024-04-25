@@ -78,14 +78,14 @@ public class InventoryScreenMixin extends AbstractContainerScreen<InventoryMenu>
         ScreenUtil.renderEntityPanel(graphics,leftPos + 40 + (hasClassicCrafting() ? 0 : 50),topPos + 13,63,84,2);
         InventoryScreen.renderEntityInInventoryFollowsMouse(graphics,leftPos + 40 + (hasClassicCrafting() ? 0 : 50),topPos + 13,leftPos + 103 + (hasClassicCrafting() ? 0 : 50),topPos + 97,35,0.0625f,i,j, minecraft.player);
         if (hasClassicCrafting()) {
-            graphics.drawString(this.font, this.title, leftPos + 111, topPos + 16, 0x404040, false);
+            graphics.drawString(this.font, this.title, leftPos + 111, topPos + 16, 0x383838, false);
             graphics.blitSprite(SMALL_ARROW_SPRITE,leftPos + 158,topPos + 43,16,13);
         }
         if (!recipeBookComponent.isVisible() && recipeButton != null && !recipeButton.isHovered()) recipeButton.setFocused(false);
     }
     @Override
     public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 0x404040, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 0x383838, false);
     }
 
     public boolean canReplace() {

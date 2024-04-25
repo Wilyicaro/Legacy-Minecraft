@@ -112,3 +112,19 @@ accessible field net/minecraft/client/renderer/FogRenderer fogRed F
 accessible field net/minecraft/client/renderer/FogRenderer fogGreen F
 accessible field net/minecraft/client/renderer/FogRenderer fogBlue F
 accessible class net/minecraft/client/renderer/FogRenderer$FogData
+accessible field net/minecraft/client/renderer/PostChain passes Ljava/util/List;
+accessible field net/minecraft/world/item/crafting/FireworkStarRecipe SHAPE_BY_ITEM Ljava/util/Map;
+accessible field net/minecraft/world/item/crafting/FireworkStarRecipe SHAPE_INGREDIENT Lnet/minecraft/world/item/crafting/Ingredient;
+accessible field net/minecraft/world/item/crafting/FireworkStarRecipe TRAIL_INGREDIENT Lnet/minecraft/world/item/crafting/Ingredient;
+accessible field net/minecraft/world/item/crafting/FireworkStarRecipe FLICKER_INGREDIENT Lnet/minecraft/world/item/crafting/Ingredient;
+accessible field net/minecraft/world/item/crafting/FireworkStarRecipe GUNPOWDER_INGREDIENT Lnet/minecraft/world/item/crafting/Ingredient;
+accessible field net/minecraft/world/item/crafting/FireworkRocketRecipe GUNPOWDER_INGREDIENT Lnet/minecraft/world/item/crafting/Ingredient;
+accessible field net/minecraft/world/item/crafting/FireworkRocketRecipe PAPER_INGREDIENT Lnet/minecraft/world/item/crafting/Ingredient;
+accessible field net/minecraft/client/Minecraft pendingReload Ljava/util/concurrent/CompletableFuture;
+accessible field net/minecraft/client/gui/screens/AlertScreen callback Ljava/lang/Runnable;
+accessible field net/minecraft/client/gui/screens/AlertScreen okButton Lnet/minecraft/network/chat/Component;
+accessible field net/minecraft/client/gui/screens/AlertScreen messageText Lnet/minecraft/network/chat/Component;
+accessible field net/minecraft/client/gui/screens/BackupConfirmScreen description Lnet/minecraft/network/chat/Component;
+accessible field net/minecraft/client/gui/screens/BackupConfirmScreen onProceed Lnet/minecraft/client/gui/screens/BackupConfirmScreen$Listener;
+accessible field net/minecraft/client/gui/screens/BackupConfirmScreen onCancel Ljava/lang/Runnable;
+accessible field net/minecraft/client/gui/screens/BackupConfirmScreen promptForCacheErase Z

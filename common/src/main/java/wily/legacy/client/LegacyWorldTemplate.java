@@ -12,6 +12,7 @@ import wily.legacy.LegacyMinecraft;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public record LegacyWorldTemplate(Component buttonName, ResourceLocation icon, ResourceLocation worldTemplate, String folderName, boolean directJoin) {
@@ -21,7 +22,7 @@ public record LegacyWorldTemplate(Component buttonName, ResourceLocation icon, R
         @Override
         protected List<LegacyWorldTemplate> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
             List<LegacyWorldTemplate> templates = new ArrayList<>();
-            resourceManager.getNamespaces().forEach(name->{
+            resourceManager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1)).forEach(name->{
                 resourceManager.getResource(new ResourceLocation(name, TEMPLATES)).ifPresent(r->{
                     try {
                         BufferedReader bufferedReader = r.openAsReader();

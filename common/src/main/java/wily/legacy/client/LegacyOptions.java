@@ -12,7 +12,6 @@ public interface LegacyOptions {
     OptionInstance<Boolean> overrideTerrainFogStart();
     OptionInstance<Integer> terrainFogStart();
     OptionInstance<Double> terrainFogEnd();
-    OptionInstance<Double> terrainFogOpacity();
     OptionInstance<Integer> autoSaveInterval();
     OptionInstance<Integer> hudScale();
     OptionInstance<Boolean> legacyCreativeTab();
@@ -21,7 +20,7 @@ public interface LegacyOptions {
     OptionInstance<Boolean> classicCrafting();
     OptionInstance<Boolean> autoSaveWhenPause();
     OptionInstance<Boolean> showVanillaRecipeBook();
-    OptionInstance<Boolean> legacyGamma();
+    OptionInstance<Double> legacyGamma();
     OptionInstance<Boolean> inGameTooltips();
     OptionInstance<Boolean> tooltipBoxes();
     OptionInstance<Boolean> hints();
@@ -36,5 +35,6 @@ public interface LegacyOptions {
     OptionInstance<Boolean> invertYController();
     OptionInstance<Boolean> invertControllerButtons();
     OptionInstance<Integer> controllerIcons();
+    OptionInstance<Integer> selectedController();
     OptionInstance<Difficulty> createWorldDifficulty();
 }

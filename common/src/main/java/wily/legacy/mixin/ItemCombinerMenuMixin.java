@@ -16,10 +16,6 @@ public class ItemCombinerMenuMixin {
             public int getWidth() {
                 return originalSlot.container.getContainerSize() > 2 ? super.getWidth() : 30;
             }
-
-            public int getHeight() {
-                return originalSlot.container.getContainerSize() > 2 ? super.getHeight() : 30;
-            }
         };
     }
     @ModifyArg(method = "createResultSlot",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/ItemCombinerMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;"))
@@ -27,10 +23,6 @@ public class ItemCombinerMenuMixin {
         return new LegacySlotWrapper(originalSlot){
 
             public int getWidth() {
-                return 30;
-            }
-
-            public int getHeight() {
                 return 30;
             }
         };

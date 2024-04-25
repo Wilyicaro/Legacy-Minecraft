@@ -12,38 +12,26 @@ public class GrindstoneMenuMixin {
 
     @ModifyArg(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/GrindstoneMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 0))
     private Slot addFirstSlot(Slot originalSlot){
-        return new LegacySlotWrapper(originalSlot, originalSlot.container, 0, 41, 30){
+        return new LegacySlotWrapper(originalSlot, originalSlot.container, originalSlot.getContainerSlot(), 41, 30){
             public int getWidth() {
-                return 30;
-            }
-
-            public int getHeight() {
                 return 30;
             }
         };
     }
     @ModifyArg(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/GrindstoneMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 1))
     private Slot addSecondSlot(Slot originalSlot){
-        return new LegacySlotWrapper(originalSlot,originalSlot.container, 1, 41, 65){
+        return new LegacySlotWrapper(originalSlot,originalSlot.container, originalSlot.getContainerSlot(),  41, 65){
 
             public int getWidth() {
-                return 30;
-            }
-
-            public int getHeight() {
                 return 30;
             }
         };
     }
     @ModifyArg(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/GrindstoneMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 2))
     private Slot addThirdSlot(Slot originalSlot){
-        return new LegacySlotWrapper(originalSlot,originalSlot.container, 0, 138, 46){
+        return new LegacySlotWrapper(originalSlot,originalSlot.container, originalSlot.getContainerSlot(),  138, 46){
 
             public int getWidth() {
-                return 30;
-            }
-
-            public int getHeight() {
                 return 30;
             }
         };

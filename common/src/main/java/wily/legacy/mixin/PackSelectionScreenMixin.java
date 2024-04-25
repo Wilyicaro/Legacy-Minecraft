@@ -85,8 +85,8 @@ public abstract class PackSelectionScreenMixin extends Screen {
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
         ScreenUtil.renderPanelRecess(guiGraphics,panel.x + 210, panel.y + 10, 190, 220,2f);
-        guiGraphics.drawString(this.font, SELECTED_PACK, panel.x + 10 + (190 - font.width(SELECTED_PACK)) / 2, panel.y + 18, 0x404040,false);
-        guiGraphics.drawString(this.font, AVAILABLE_PACK, panel.x + 210 + (190 - font.width(AVAILABLE_PACK)) / 2, panel.y + 18, 0x404040, false);
+        guiGraphics.drawString(this.font, SELECTED_PACK, panel.x + 10 + (190 - font.width(SELECTED_PACK)) / 2, panel.y + 18, 0x383838,false);
+        guiGraphics.drawString(this.font, AVAILABLE_PACK, panel.x + 210 + (190 - font.width(AVAILABLE_PACK)) / 2, panel.y + 18, 0x383838, false);
         controlTooltipRenderer.render(guiGraphics, i, j, f);
     }
 

@@ -61,7 +61,7 @@ public class ServerEditScreen extends ConfirmationScreen{
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
-        guiGraphics.drawString(this.font, ipBox.getMessage(), panel.x + 15, panel.y + 73, 0x404040,false);
+        guiGraphics.drawString(this.font, ipBox.getMessage(), panel.x + 15, panel.y + 73, 0x383838,false);
     }
 
     private void updateAddButtonStatus() {

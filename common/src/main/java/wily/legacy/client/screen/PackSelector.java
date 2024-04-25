@@ -169,6 +169,12 @@ public class PackSelector extends AbstractWidget {
             else packRepository.setSelected(getSelectedIds());
         }
     }
+    public void applyChanges(boolean reload, Runnable runnable, Runnable elseRun){
+        if (hasChanged()) {
+            applyChanges(reload);
+            runnable.run();
+        }else elseRun.run();
+    }
     public static void reloadResourcesChanges(PackSelector selector){
         selector.minecraft.options.updateResourcePacks(selector.packRepository);
     }
@@ -236,7 +242,7 @@ public class PackSelector extends AbstractWidget {
             visibleCount++;
         }
         RenderSystem.disableBlend();
-        guiGraphics.drawString(font,getMessage(),getX() + 1,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : 0x404040,isHoveredOrFocused());
+        guiGraphics.drawString(font,getMessage(),getX() + 1,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : 0x383838,isHoveredOrFocused());
         if (scrolledList.max > 0){
             if (scrolledList.get() < scrolledList.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
             if (scrolledList.get() > 0) scrollRenderer.renderScroll(guiGraphics,ScreenDirection.LEFT,getX() + 8, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);

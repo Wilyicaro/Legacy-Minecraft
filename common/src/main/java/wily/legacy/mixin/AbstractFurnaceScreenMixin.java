@@ -55,9 +55,9 @@ public class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends A
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         super.renderLabels(guiGraphics, i, j);
         Component ingredient = Component.translatable("legacy.container.ingredient");
-        guiGraphics.drawString(this.font, ingredient, 70 - font.width(ingredient), 32, 0x404040, false);
+        guiGraphics.drawString(this.font, ingredient, 70 - font.width(ingredient), 32, 0x383838, false);
         Component fuel = Component.translatable("legacy.container.fuel");
-        guiGraphics.drawString(this.font, fuel, 70 - font.width(fuel), 79, 0x404040, false);
+        guiGraphics.drawString(this.font, fuel, 70 - font.width(fuel), 79, 0x383838, false);
     }
 
     @Override

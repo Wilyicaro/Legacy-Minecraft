@@ -66,7 +66,7 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen{
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         ScreenUtil.renderDefaultBackground(guiGraphics,false);
-        guiGraphics.drawString(font,getTitle(),panel.x + (panel.width - font.width(getTitle()))/2, panel.y + 9, 0x404040);
+        guiGraphics.drawString(font,getTitle(),panel.x + (panel.width - font.width(getTitle()))/2, panel.y + 9, 0x383838);
         panel.render(guiGraphics,i,j,f);
         ScreenUtil.renderPanelRecess(guiGraphics,panel.x + 6, panel.y + 20, panel.width - 12, 231,2f);
     }

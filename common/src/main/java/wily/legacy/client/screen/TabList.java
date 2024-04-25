@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.TabButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -120,15 +121,19 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
         return controlTab(i == leftButton, i == rightButton);
     }
     public boolean controlTab(boolean left, boolean right){
-        if (left) {
-            tabButtons.get((selectedTab <= 0 ? tabButtons.size() : selectedTab) - 1).onPress();
-            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f);
-            return true;
-        } else if (right) {
-            tabButtons.get(selectedTab >= tabButtons.size() - 1 ? 0 : selectedTab + 1).onPress();
-            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f);
-            return true;
-        }return false;
+        if (!left && !right) return false;
+        Optional<LegacyTabButton> opt = tabButtons.stream().filter(LegacyTabButton::isActive).min(Comparator.comparingInt(t -> {
+            int diff = tabButtons.indexOf(t) - selectedTab;
+            return left ? diff < 0 ? -diff : tabButtons.size() * 2 - diff : diff > 0 ? diff : tabButtons.size() * 2 + diff;
+        }));
+        if (opt.isPresent()){
+            if (tabButtons.indexOf(opt.get()) != selectedTab){
+                opt.get().onPress();
+                ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f);
+                return true;
+            }
+        }
+        return false;
     }
 
     public void numberControlTab(int i){

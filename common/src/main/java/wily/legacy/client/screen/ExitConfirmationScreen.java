@@ -10,18 +10,22 @@ import wily.legacy.LegacyMinecraftClient;
 
 public class ExitConfirmationScreen extends ConfirmationScreen{
     public ExitConfirmationScreen(Screen parent) {
-        super(parent, 230, 156, Component.translatable("menu.quit"), Minecraft.getInstance().hasSingleplayerServer() ? Component.translatable("legacy.menu.exit_message") : Component.translatable("legacy.menu.server_exit_message"), b-> {});
+        super(parent, 230, 156, Component.translatable("menu.quit"), Minecraft.getInstance().hasSingleplayerServer() ? Component.translatable("legacy.menu.exit_message") : Minecraft.getInstance().screen instanceof MainMenuScreen ? Component.translatable("legacy.menu.gameExitMessage") : Component.translatable("legacy.menu.server_exit_message"), b-> {});
     }
 
     @Override
     protected void initButtons() {
         if (minecraft.hasSingleplayerServer())
-            addRenderableWidget(Button.builder(Component.translatable("legacy.menu.exit_and_save"),b-> exitToTitleScreen(minecraft,true)).bounds(panel.x + 15, panel.y + panel.height -52,200,20).build());
+            addRenderableWidget(Button.builder(Component.translatable("legacy.menu.exit_and_save"),b-> exit(minecraft,true)).bounds(panel.x + 15, panel.y + panel.height -52,200,20).build());
         else panel.height-=22;
         addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b-> this.onClose()).bounds(panel.x + 15, panel.y + panel.height - (minecraft.hasSingleplayerServer() ? 74 : 52),200,20).build());
-        addRenderableWidget(Button.builder(Component.translatable(minecraft.hasSingleplayerServer() ? "legacy.menu.exit_without_save" : "menu.quit"),b-> exitToTitleScreen(minecraft,false)).bounds(panel.x + 15, panel.y + panel.height - 30,200,20).build());
+        addRenderableWidget(Button.builder(Component.translatable(minecraft.hasSingleplayerServer() ? "legacy.menu.exit_without_save" : "menu.quit"),b-> exit(minecraft,false)).bounds(panel.x + 15, panel.y + panel.height - 30,200,20).build());
     }
-    public static void exitToTitleScreen(Minecraft minecraft, boolean save) {
+    public static void exit(Minecraft minecraft, boolean save) {
+        if (minecraft.screen instanceof ConfirmationScreen s && s.parent instanceof MainMenuScreen){
+            minecraft.stop();
+            return;
+        }
         if (save) {
             LegacyMinecraftClient.manualSave = true;
             LegacyMinecraftClient.retakeWorldIcon = true;
