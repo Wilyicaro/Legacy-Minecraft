@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 
 import java.io.IOException;
@@ -43,8 +43,8 @@ public abstract class IntegratedServerMixin extends MinecraftServer {
     }
     @Inject(method = "tickServer", at = @At("HEAD"))
     public void tickServer(BooleanSupplier booleanSupplier, CallbackInfo ci) {
-        if (LegacyMinecraftClient.manualSave){
-            LegacyMinecraftClient.manualSave = false;
+        if (Legacy4JClient.manualSave){
+            Legacy4JClient.manualSave = false;
             getProfiler().push("manualSave");
             LOGGER.info("Saving manually...");
             this.saveEverything(false, false, false);

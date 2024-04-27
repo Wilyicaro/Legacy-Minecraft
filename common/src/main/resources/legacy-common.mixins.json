@@ -90,6 +90,7 @@
     "DispenserMenuMixin",
     "EnchantmentMenuMixin",
     "EndDragonFightMixin",
+    "EntityMixin",
     "FoodDataMixin",
     "GrindstoneMenuMixin",
     "HopperMenuMixin",

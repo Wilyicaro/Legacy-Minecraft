@@ -11,7 +11,7 @@ import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.biome.Biome;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -53,7 +53,7 @@ public record LegacyBiomeOverride(Integer waterColor, Integer waterFogColor, flo
                         });
                     bufferedReader.close();
                 } catch (IOException exception) {
-                    LegacyMinecraft.LOGGER.warn(exception.getMessage());
+                    Legacy4J.LOGGER.warn(exception.getMessage());
                 }
             }));
             return overrides;

@@ -42,14 +42,12 @@ import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.Boat;
-import net.minecraft.world.entity.vehicle.Minecart;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.CampfireBlockEntity;
-import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
@@ -57,8 +55,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.util.JsonUtil;
@@ -103,7 +101,7 @@ public interface ControlTooltip {
         WII_U,
         SWITCH,
         STEAM;
-        public final ResourceLocation font = new ResourceLocation(LegacyMinecraft.MOD_ID, name().toLowerCase(Locale.ENGLISH) + "_components");
+        public final ResourceLocation font = new ResourceLocation(Legacy4J.MOD_ID, name().toLowerCase(Locale.ENGLISH) + "_components");
         public final Component displayName = Component.translatable("legacy.controls.controller."+name().toLowerCase(Locale.ENGLISH));
         public final Style style = Style.EMPTY.withFont(font);
         public boolean isKeyboard(){
@@ -111,7 +109,7 @@ public interface ControlTooltip {
         }
     }
     static Type getActiveControllerType(){
-        String controller = LegacyMinecraftClient.controllerHandler.connectedController;
+        String controller = Legacy4JClient.controllerHandler.connectedController;
         if (ScreenUtil.getLegacyOptions().controllerIcons().get() <= 0) {
             if (controller != null) {
                 if (controller.contains("PS3")) return Type.PS3;
@@ -125,7 +123,7 @@ public interface ControlTooltip {
         return Type.x360;
     }
     static Type getActiveType(){
-        if (LegacyMinecraftClient.controllerHandler.connectedController != null) return getActiveControllerType();
+        if (Legacy4JClient.controllerHandler.connectedController != null) return getActiveControllerType();
         return Type.KEYBOARD;
     }
     Component getIcon();
@@ -313,7 +311,7 @@ public interface ControlTooltip {
                     else if (ioElement instanceof JsonObject o) controlTooltips.add(guiControlTooltipFromJson(o));
                     bufferedReader.close();
                 } catch (IOException exception) {
-                    LegacyMinecraft.LOGGER.warn(exception.getMessage());
+                    Legacy4J.LOGGER.warn(exception.getMessage());
                 }
             }));
             return controlTooltips;
@@ -333,7 +331,7 @@ public interface ControlTooltip {
         protected void apply(List<ControlTooltip> list, ResourceManager resourceManager, ProfilerFiller profilerFiller) {
             Minecraft minecraft = Minecraft.getInstance();
             guiControlRenderer.tooltips.clear();
-            guiControlRenderer.add((LegacyKeyMapping) Minecraft.getInstance().options.keyInventory).add((LegacyKeyMapping) LegacyMinecraftClient.keyCrafting).add((LegacyKeyMapping) Minecraft.getInstance().options.keyUse,()-> getActualUse(minecraft)).add((LegacyKeyMapping) Minecraft.getInstance().options.keyAttack,()->getMainAction(minecraft));
+            guiControlRenderer.add((LegacyKeyMapping) Minecraft.getInstance().options.keyInventory).add((LegacyKeyMapping) Legacy4JClient.keyCrafting).add((LegacyKeyMapping) Minecraft.getInstance().options.keyUse,()-> getActualUse(minecraft)).add((LegacyKeyMapping) Minecraft.getInstance().options.keyAttack,()->getMainAction(minecraft));
             guiControlRenderer.tooltips.addAll(list);
             guiControlRenderer.add((LegacyKeyMapping) minecraft.options.keyShift,()->  minecraft.player.isPassenger() ? CONTROL_ACTION_CACHE.getUnchecked(minecraft.player.getVehicle() instanceof LivingEntity ? "legacy.action.dismount" : "legacy.action.exit") : null);
             guiControlRenderer.add((LegacyKeyMapping) minecraft.options.keyPickItem,()-> getPickAction(minecraft));

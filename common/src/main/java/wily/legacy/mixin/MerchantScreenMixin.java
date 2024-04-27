@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.network.chat.Component;
@@ -23,8 +22,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.LegacyMinecraftPlatform;
+import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JPlatform;
 import wily.legacy.client.LegacySprites;
 import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.client.screen.LegacyIconHolder;
@@ -208,7 +207,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                     MerchantOffer offer = menu.getOffers().get(index);
                     if (((LegacyMerchantOffer)offer).getRequiredLevel() <= menu.getTraderLevel() && !offer.isOutOfStock() && !displaySlotsWarning[2]) {
                         if (hasAutoCrafting()) {
-                            LegacyMinecraft.NETWORK.sendToServer(new ServerInventoryCraftPacket(ingredientsFromStacks(offer.getCostA(),offer.getCostB()),offer.getResult(),-1,index,hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
+                            Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(ingredientsFromStacks(offer.getCostA(),offer.getCostB()),offer.getResult(),index,hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
                         } else {
                             postButtonClick();
                         }
@@ -226,7 +225,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         List<Ingredient> ings = new ArrayList<>();
         for (ItemStack stack : s) {
             for (int i = 0; i < stack.getCount(); i++)
-                ings.add(LegacyMinecraftPlatform.getStrictNBTIngredient(stack));
+                ings.add(Legacy4JPlatform.getStrictNBTIngredient(stack));
         }
         return ings;
     }

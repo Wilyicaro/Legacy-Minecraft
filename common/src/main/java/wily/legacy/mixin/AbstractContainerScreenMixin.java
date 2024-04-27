@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
@@ -23,8 +22,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.controller.ControllerComponent;
@@ -77,13 +76,13 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     private ControlTooltip.Renderer controlTooltipRenderer = new ControlTooltip.Renderer(this).add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true) : ControllerComponent.DOWN_BUTTON.componentState.getIcon(true),()->getHoveredSlot() != null && (getHoveredSlot().hasItem() || !menu.getCarried().isEmpty()) ? CONTROL_ACTION_CACHE.getUnchecked(getHoveredSlot().hasItem() && !getHoveredSlot().getItem().is(menu.getCarried().getItem()) ? menu.getCarried().isEmpty() ? "legacy.action.take" : "legacy.action.swap" : "legacy.action.place") : null).
             add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_ESCAPE,true) : ControllerComponent.RIGHT_BUTTON.componentState.getIcon(true),()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.exit")).
-            add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.MOUSE_BUTTON_RIGHT,true) : ControllerComponent.LEFT_BUTTON.componentState.getIcon(true),()->getHoveredSlot() != null && getHoveredSlot().getItem().getCount() > 1 ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.take_half") : getHoveredSlot() != null && !menu.getCarried().isEmpty() && getHoveredSlot().hasItem() && LegacyMinecraft.canRepair(getHoveredSlot().getItem(),menu.getCarried()) ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.repair") : null).
+            add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.MOUSE_BUTTON_RIGHT,true) : ControllerComponent.LEFT_BUTTON.componentState.getIcon(true),()->getHoveredSlot() != null && getHoveredSlot().getItem().getCount() > 1 ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.take_half") : getHoveredSlot() != null && !menu.getCarried().isEmpty() && getHoveredSlot().hasItem() && Legacy4J.canRepair(getHoveredSlot().getItem(),menu.getCarried()) ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.repair") : null).
             add(()->getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true),PLUS,getKeyIcon(InputConstants.KEY_LSHIFT,true)}) : ControllerComponent.UP_BUTTON.componentState.getIcon(true),()-> getHoveredSlot() != null && getHoveredSlot().hasItem() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.quick_move") : null).
             add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_W,true) : ControllerComponent.RIGHT_TRIGGER.componentState.getIcon(true),()->getHoveredSlot() != null && getHoveredSlot().hasItem() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.whats_this") : null);
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
-        if (LegacyMinecraftClient.keyCrafting.matches(i, j)) {
+        if (Legacy4JClient.keyCrafting.matches(i, j)) {
             this.onClose();
             cir.setReturnValue(true);
         }
@@ -95,7 +94,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         }
     }
 
-    @Inject(method = "slotClicked", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "slotClicked", at = @At("HEAD"))
     private void slotClicked(Slot slot, int i, int j, ClickType clickType, CallbackInfo ci) {
         ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
     }
@@ -169,7 +168,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
             if (bl) {
                 graphics.fill(0, 0, 16, 16, -2130706433);
             }
-            graphics.renderItem(itemStack, 0, 0, slot.x + slot.y * this.imageWidth);
+            graphics.renderItem(minecraft.player, itemStack, 0, 0, slot.x + slot.y * this.imageWidth);
             graphics.renderItemDecorations(minecraft.font, itemStack, 0, 0, string);
         }
         graphics.pose().popPose();
@@ -177,15 +176,15 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     }
     @Redirect(method = "mouseClicked",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;isKeyDown(JI)Z"))
     public boolean mouseClicked(long l, int i) {
-        return InputConstants.isKeyDown(l,i) || LegacyMinecraftClient.controllerHandler.getButtonState(ControllerComponent.UP_BUTTON).pressed;
+        return InputConstants.isKeyDown(l,i) || Legacy4JClient.controllerHandler.getButtonState(ControllerComponent.UP_BUTTON).pressed;
     }
     @Redirect(method = "mouseReleased",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;hasShiftDown()Z"))
     public boolean mouseReleased(double d, double e, int i) {
-        return hasShiftDown() || LegacyMinecraftClient.controllerHandler.getButtonState(ControllerComponent.UP_BUTTON).released;
+        return hasShiftDown() || Legacy4JClient.controllerHandler.getButtonState(ControllerComponent.UP_BUTTON).released;
     }
     @Redirect(method = "mouseReleased",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;isKeyDown(JI)Z"))
     public boolean mouseReleased(long l, int i) {
-        return InputConstants.isKeyDown(l,i) || LegacyMinecraftClient.controllerHandler.getButtonState(ControllerComponent.UP_BUTTON).released;
+        return InputConstants.isKeyDown(l,i) || Legacy4JClient.controllerHandler.getButtonState(ControllerComponent.UP_BUTTON).released;
     }
 
     @Override

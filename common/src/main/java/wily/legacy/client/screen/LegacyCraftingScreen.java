@@ -18,7 +18,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import org.jetbrains.annotations.Nullable;
-import wily.legacy.LegacyMinecraftPlatform;
+import wily.legacy.Legacy4JPlatform;
 import wily.legacy.client.LegacyCraftingTabListing;
 import wily.legacy.client.Offset;
 import wily.legacy.client.controller.ComponentState;
@@ -58,6 +58,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     protected final List<RecipeIconHolder<CraftingRecipe>> craftingButtons = new ArrayList<>();
     protected final List<CustomRecipeIconHolder> dyeItemButtons = new ArrayList<>();
     protected final List<CustomRecipeIconHolder> dyeArmorButtons = new ArrayList<>();
+    protected final List<CustomRecipeIconHolder> dyeBannerButtons = new ArrayList<>();
     protected final List<CustomRecipeIconHolder> fireworkStarButtons = new ArrayList<>();
     protected final List<CustomRecipeIconHolder> fireworkStarFadeButtons = new ArrayList<>();
     protected final List<CustomRecipeIconHolder> fireworkButtons = new ArrayList<>();
@@ -159,6 +160,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         fireworkTabList.add(0,0,0,43,0,new ResourceLocation("firework_rocket"),null, Component.empty(),null, b-> repositionElements());
         dyeTabList.add(0,0,0,43,0,new ResourceLocation("leather_chestplate"),DyeableLeatherItem.dyeArmor(Items.LEATHER_CHESTPLATE.getDefaultInstance(),List.of((DyeItem) Items.GREEN_DYE)).getTag(), Component.empty(),null, b-> repositionElements());
         dyeTabList.add(0,0,0,43,0,groupTabList.tabButtons.get(2).icon,null, Component.empty(),null, b-> repositionElements());
+        dyeTabList.add(0,0,0,43,0,new ResourceLocation("white_banner"),null, Component.empty(),null, b-> repositionElements());
         Consumer<CustomCraftingIconHolder> fireworkStarUpdateRecipe = h->{
             clearIngredients(ingredientsGrid);
             if (fireworkStarButtons.isEmpty()) return;
@@ -181,7 +183,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             clearIngredients(ingredientsGrid);
             if (fireworkStarFadeButtons.isEmpty()) return;
             ItemStack item = fireworkStarFadeButtons.get(0).itemIcon.isEmpty() ? Items.FIREWORK_STAR.getDefaultInstance() : fireworkStarFadeButtons.get(0).itemIcon;
-            updateShapedIngredients(ingredientsGrid,List.of(Ingredient.EMPTY,Ingredient.of(fireworkStarFadeButtons.get(1).itemIcon),Ingredient.EMPTY,LegacyMinecraftPlatform.getStrictNBTIngredient(item)),gridDimension,2,2,2);
+            updateShapedIngredients(ingredientsGrid,List.of(Ingredient.EMPTY,Ingredient.of(fireworkStarFadeButtons.get(1).itemIcon),Ingredient.EMPTY, Legacy4JPlatform.getStrictNBTIngredient(item)),gridDimension,2,2,2);
             fireworkStarFadeButtons.get(1).applyAddedIngredients();
             resultStack = item.copy();
             if (fireworkStarFadeButtons.get(1).hasItem()) resultStack.getOrCreateTagElement("Explosion").putIntArray("FadeColors", Stream.concat(Stream.of(fireworkStarFadeButtons.get(1).itemIcon),fireworkStarFadeButtons.get(1).addedIngredientsItems.stream()).map(i->((DyeItem)i.getItem()).getDyeColor().getFireworkColor()).toList());
@@ -209,7 +211,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             clearIngredients(ingredientsGrid);
             if (dyeArmorButtons.isEmpty()) return;
             ItemStack armor = dyeArmorButtons.get(0).itemIcon.isEmpty() ? Items.LEATHER_HELMET.getDefaultInstance() : dyeArmorButtons.get(0).itemIcon;
-            updateShapedIngredients(ingredientsGrid,List.of(Ingredient.EMPTY,Ingredient.of(dyeArmorButtons.get(1).itemIcon),Ingredient.EMPTY, LegacyMinecraftPlatform.getStrictNBTIngredient(armor)),gridDimension,2,2,2);
+            updateShapedIngredients(ingredientsGrid,List.of(Ingredient.EMPTY,Ingredient.of(dyeArmorButtons.get(1).itemIcon),Ingredient.EMPTY, Legacy4JPlatform.getStrictNBTIngredient(armor)),gridDimension,2,2,2);
             DyeItem dye = dyeArmorButtons.get(1).itemIcon.getItem() instanceof DyeItem i ? i : (DyeItem) Items.WHITE_DYE;
             dyeArmorButtons.forEach(CustomRecipeIconHolder::applyAddedIngredients);
             resultStack = dyeArmorButtons.get(0).itemIcon.isEmpty() || !dyeArmorButtons.get(1).hasItem() ? armor : DyeableLeatherItem.dyeArmor(armor,Stream.concat(Stream.of(dye), dyeArmorButtons.get(1).addedIngredientsItems.stream().map(stack->(DyeItem)stack.getItem())).toList());
@@ -219,7 +221,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             clearIngredients(ingredientsGrid);
             if (dyeItemButtons.isEmpty()) return;
             ItemStack item = dyeItemButtons.get(0).itemIcon.isEmpty() ? Items.WHITE_BED.getDefaultInstance() : dyeItemButtons.get(0).itemIcon;
-            updateShapedIngredients(ingredientsGrid,List.of(Ingredient.EMPTY,Ingredient.of(dyeItemButtons.get(1).itemIcon),Ingredient.EMPTY, LegacyMinecraftPlatform.getStrictNBTIngredient(item)),gridDimension,2,2,2);
+            updateShapedIngredients(ingredientsGrid,List.of(Ingredient.EMPTY,Ingredient.of(dyeItemButtons.get(1).itemIcon),Ingredient.EMPTY, Legacy4JPlatform.getStrictNBTIngredient(item)),gridDimension,2,2,2);
             DyeItem dye = dyeItemButtons.get(1).itemIcon.getItem() instanceof DyeItem i ? i : (DyeItem) Items.WHITE_DYE;
             ResourceLocation location = BuiltInRegistries.ITEM.getKey(item.getItem());
             String path = location.getPath();
@@ -243,6 +245,17 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         dyeArmorButtons.add(craftingButtonByList(COLOR_TAB, dyes,dyeArmorUpdateRecipe).enableAddIngredients());
         dyeItemButtons.add(craftingButtonByPredicate(Component.translatable("entity.minecraft.item"),i-> i.getItem() instanceof BedItem || (i.getItem() instanceof BlockItem b &&  b.getBlock() instanceof ShulkerBoxBlock),dyeItemUpdateRecipe));
         dyeItemButtons.add(craftingButtonByList(COLOR_TAB, dyes,dyeItemUpdateRecipe));
+        dyeBannerButtons.add(craftingButtonByPredicate(LegacyLoomScreen.SELECT_BANNER_TAB,i-> i.getItem() instanceof BannerItem && itemHasPatterns(i), h->{
+            clearIngredients(ingredientsGrid);
+            if (dyeBannerButtons.isEmpty()) return;
+            updateShapedIngredients(ingredientsGrid,List.of(Legacy4JPlatform.getStrictNBTIngredient(h.itemIcon.getItem().getDefaultInstance())),gridDimension,2,2,2);
+            resultStack = h.itemIcon.copyWithCount(1);
+            canCraft(ingredientsGrid,true);
+        }));
+    }
+    public static boolean itemHasPatterns(ItemStack stack){
+        CompoundTag beTag = stack.getTagElement("BlockEntityTag");
+        return stack.getItem() instanceof BannerItem && (beTag != null && beTag.contains("Patterns") && !beTag.getList("Patterns",10).isEmpty());
     }
     protected CustomCraftingIconHolder craftingButtonByList(Component displayName, List<ItemStack> itemStacks, Consumer<CustomCraftingIconHolder> updateRecipe){
         return new CustomCraftingIconHolder(itemStacks.get(0)){
@@ -346,7 +359,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         }else {
             int size = getCraftingButtons().size();
             getCraftingButtons().forEach(b->{
-                b.setPos(leftPos + (size ==2 ? 52 : 21) + getCraftingButtons().indexOf(b) * (size ==2 ? 62 : 55),topPos + 39);
+                b.setPos(leftPos + (size == 1 ? 77 : size ==2 ? 52 : 21) + getCraftingButtons().indexOf(b) * (size ==2 ? 62 : 55),topPos + 39);
                 if (size == 3) b.offset = new Offset(0.5 + getCraftingButtons().indexOf(b) * 0.5,0,0);
                 b.init();
                 addWidget(b);
@@ -527,7 +540,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     public List<? extends LegacyIconHolder> getCraftingButtons(){
         return switch (groupTabList.selectedTab){
             case 1 -> fireworkTabList.selectedTab == 0 ? fireworkStarButtons : fireworkTabList.selectedTab == 1 ? fireworkStarFadeButtons : fireworkButtons;
-            case 2 -> dyeTabList.selectedTab == 0 ? dyeArmorButtons : dyeItemButtons;
+            case 2 -> dyeTabList.selectedTab == 0 ? dyeArmorButtons : dyeTabList.selectedTab == 1 ? dyeItemButtons : dyeBannerButtons;
             default -> craftingButtons;
         };
     }

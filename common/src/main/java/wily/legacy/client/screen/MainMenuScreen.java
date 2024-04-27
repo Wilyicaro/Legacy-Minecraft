@@ -1,37 +1,25 @@
 package wily.legacy.client.screen;
 
-import com.mojang.authlib.minecraft.BanDetails;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
-import com.mojang.realmsclient.RealmsMainScreen;
-import com.mojang.realmsclient.gui.screens.RealmsNotificationsScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.ConfirmScreen;
-import net.minecraft.client.gui.screens.LanguageSelectScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import net.minecraft.world.level.storage.LevelStorageSource;
-import net.minecraft.world.level.storage.LevelSummary;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import wily.legacy.LegacyMinecraftClient;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.Legacy4JClient;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Objects;
 
 import static wily.legacy.util.ScreenUtil.renderDefaultBackground;
@@ -167,9 +155,9 @@ public class MainMenuScreen extends RenderableVListScreen {
 
 
         if (this.splash != null) {
-            LegacyMinecraftClient.FONT_SHADOW_OFFSET = 1.0F;
+            Legacy4JClient.FONT_SHADOW_OFFSET = 1.0F;
             this.splash.render(guiGraphics, this.width, this.font, 255 << 24);
-            LegacyMinecraftClient.FONT_SHADOW_OFFSET = 0.5F;
+            Legacy4JClient.FONT_SHADOW_OFFSET = 0.5F;
         }
     }
 

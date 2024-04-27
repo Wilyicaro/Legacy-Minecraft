@@ -1,4 +1,4 @@
-package wily.legacy.forge.mixin;
+package wily.legacy.neoforge.mixin;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;

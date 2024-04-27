@@ -19,10 +19,10 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "wily.legacy.fabric.LegacyMinecraftFabric"
+      "wily.legacy.fabric.Legacy4JFabric"
     ],
     "client": [
-      "wily.legacy.fabric.LegacyMinecraftFabricClient"
+      "wily.legacy.fabric.Legacy4JFabricClient"
     ]
   },
   "mixins": [

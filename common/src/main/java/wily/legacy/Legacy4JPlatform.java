@@ -10,7 +10,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 import java.nio.file.Path;
 
-public class LegacyMinecraftPlatform {
+public class Legacy4JPlatform {
     @ExpectPlatform
     public static Path getConfigDirectory() {
         throw new AssertionError();

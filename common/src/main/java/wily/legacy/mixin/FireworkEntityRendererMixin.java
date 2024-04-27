@@ -19,11 +19,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 
 @Mixin(FireworkEntityRenderer.class)
 public abstract class FireworkEntityRendererMixin extends EntityRenderer<FireworkRocketEntity> {
-    private static final ResourceLocation FIREWORK_LOCATION = new ResourceLocation(LegacyMinecraft.MOD_ID, "textures/entity/projectiles/firework.png");
+    private static final ResourceLocation FIREWORK_LOCATION = new ResourceLocation(Legacy4J.MOD_ID, "textures/entity/projectiles/firework.png");
     protected FireworkEntityRendererMixin(EntityRendererProvider.Context context) {
         super(context);
     }

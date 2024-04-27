@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
@@ -49,7 +49,7 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
     }
     @Override
     public void init() {
-        CONFIRM_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/beacon_check");
+        CONFIRM_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"container/beacon_check");
         imageWidth = 260;
         imageHeight = 255;
         super.init();

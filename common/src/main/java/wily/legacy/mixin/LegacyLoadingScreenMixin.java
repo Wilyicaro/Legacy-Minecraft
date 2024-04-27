@@ -6,7 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 
-import static wily.legacy.LegacyMinecraftClient.legacyLoadingScreen;
+import static wily.legacy.Legacy4JClient.legacyLoadingScreen;
 
 @Mixin({LevelLoadingScreen.class, ProgressScreen.class, GenericDirtMessageScreen.class, ReceivingLevelScreen.class, ConnectScreen.class})
 public class LegacyLoadingScreenMixin extends Screen {

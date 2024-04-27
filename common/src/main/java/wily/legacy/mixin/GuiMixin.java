@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.BufferSourceWrapper;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySprites;
@@ -155,7 +155,7 @@ public abstract class GuiMixin {
             return;
         }
         if (ScreenUtil.getHUDOpacity() < 1.0) {
-            LegacyMinecraftClient.guiBufferSourceOverride = BufferSourceWrapper.translucent(guiGraphics.bufferSource());
+            Legacy4JClient.guiBufferSourceOverride = BufferSourceWrapper.translucent(guiGraphics.bufferSource());
         }
     }
     @Inject(method = "renderHotbar", at = @At("RETURN"))
@@ -163,7 +163,7 @@ public abstract class GuiMixin {
         if (minecraft.screen != null)
             return;
 
-        LegacyMinecraftClient.guiBufferSourceOverride = null;
+        Legacy4JClient.guiBufferSourceOverride = null;
         ScreenUtil.resetHUDScale(guiGraphics,i-> screenWidth = i,i-> screenHeight = i);
         guiGraphics.pose().popPose();
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);

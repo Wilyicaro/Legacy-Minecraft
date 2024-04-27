@@ -1,4 +1,4 @@
-package wily.legacy.forge.mixin;
+package wily.legacy.neoforge.mixin;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.block.LiquidBlockRenderer;

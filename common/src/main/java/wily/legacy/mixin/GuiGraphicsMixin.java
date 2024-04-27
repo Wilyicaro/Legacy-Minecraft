@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.GuiSpriteManager;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -24,12 +23,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -52,15 +50,15 @@ public abstract class GuiGraphicsMixin {
 
     @Inject(method = "bufferSource", at = @At("HEAD"), cancellable = true)
     private void bufferSource(CallbackInfoReturnable<MultiBufferSource.BufferSource> cir){
-        if (LegacyMinecraftClient.guiBufferSourceOverride != null) cir.setReturnValue(LegacyMinecraftClient.guiBufferSourceOverride);
+        if (Legacy4JClient.guiBufferSourceOverride != null) cir.setReturnValue(Legacy4JClient.guiBufferSourceOverride);
     }
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("HEAD"))
     private void renderItemDecorationsHead(Font font, ItemStack itemStack, int i, int j, String string, CallbackInfo ci){
-        LegacyMinecraftClient.FONT_SHADOW_OFFSET = 1.0F;
+        Legacy4JClient.FONT_SHADOW_OFFSET = 1.0F;
     }
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("RETURN"))
     private void renderItemDecorationsTail(Font font, ItemStack itemStack, int i, int j, String string, CallbackInfo ci){
-        LegacyMinecraftClient.FONT_SHADOW_OFFSET = 0.5F;
+        Legacy4JClient.FONT_SHADOW_OFFSET = 0.5F;
     }
     @Inject(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawManaged(Ljava/lang/Runnable;)V", shift = At.Shift.AFTER))
     private void renderTooltipInternal(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner, CallbackInfo ci){
@@ -114,7 +112,7 @@ public abstract class GuiGraphicsMixin {
                     return minecraft.getTextureManager().register("tile", new DynamicTexture(tileImage));
                 }
             } catch (IOException e) {
-                LegacyMinecraft.LOGGER.warn(e.getMessage());
+                Legacy4J.LOGGER.warn(e.getMessage());
             }
             return null;
         });

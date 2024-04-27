@@ -11,7 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorPreset;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Set;
@@ -25,7 +25,7 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen{
         presetGetter.listElements().forEach(holder->{
             Set<Block> set = (holder.value()).settings().getLayersInfo().stream().map((flatLayerInfo) -> flatLayerInfo.getBlockState().getBlock()).filter((block) -> !block.isEnabled(enabledFeatures)).collect(Collectors.toSet());
             if (!set.isEmpty()) {
-                LegacyMinecraft.LOGGER.info("Discarding flat world preset {} since it contains experimental blocks {}", holder.unwrapKey().map((resourceKey) -> resourceKey.location().toString()).orElse("<unknown>"), set);
+                Legacy4J.LOGGER.info("Discarding flat world preset {} since it contains experimental blocks {}", holder.unwrapKey().map((resourceKey) -> resourceKey.location().toString()).orElse("<unknown>"), set);
             } else {
                 FlatLevelGeneratorPreset preset = holder.value();
                 renderableVList.addRenderable(new AbstractButton(0,0,263,30,Component.translatable(holder.key().location().toLanguageKey("flat_world_preset"))) {

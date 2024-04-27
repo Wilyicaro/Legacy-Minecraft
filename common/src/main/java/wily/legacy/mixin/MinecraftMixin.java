@@ -1,6 +1,5 @@
 package wily.legacy.mixin;
 
-import com.mojang.serialization.Codec;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.Font;
@@ -8,14 +7,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.tutorial.Tutorial;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -26,12 +21,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.LegacyMinecraft;
 import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.LegacyLoadingScreen;
 import wily.legacy.client.screen.MainMenuScreen;
 import wily.legacy.client.screen.ReplaceableScreen;
-import wily.legacy.network.ServerOpenClientMenu;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
@@ -50,6 +43,7 @@ public abstract class MinecraftMixin {
     @Shadow @Nullable public LocalPlayer player;
 
     @Shadow @Final public Font font;
+    @Shadow @Nullable public Screen screen;
 
     @Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", ordinal = 1))
     private void handleKeybinds(Minecraft instance, Screen screen){
@@ -75,7 +69,7 @@ public abstract class MinecraftMixin {
 
     @ModifyArg(method = "resizeDisplay",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/Window;setGuiScale(D)V"))
     public double resizeDisplay(double d) {
-        return d * (0.5625 - (ScreenUtil.getLegacyOptions().interfaceResolution().get()) / 8);
+        return d * (0.375 - (ScreenUtil.getLegacyOptions().interfaceResolution().get()) / 4);
     }
     @Inject(method = "addInitialScreens", at = @At("HEAD"))
     private void addInitialScreens(List<Function<Runnable, Screen>> list, CallbackInfo ci) {

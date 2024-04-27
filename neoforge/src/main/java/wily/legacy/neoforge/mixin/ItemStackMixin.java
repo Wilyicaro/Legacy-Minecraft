@@ -1,4 +1,4 @@
-package wily.legacy.forge.mixin;
+package wily.legacy.neoforge.mixin;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.ItemStack;

@@ -9,15 +9,15 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class TickBox extends AbstractButton {
-    public static final ResourceLocation[] SPRITES = new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "widget/tickbox"), new ResourceLocation(LegacyMinecraft.MOD_ID, "widget/tickbox_hovered")};
-    public static final ResourceLocation TICK_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID, "widget/tick");
+    public static final ResourceLocation[] SPRITES = new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID, "widget/tickbox"), new ResourceLocation(Legacy4J.MOD_ID, "widget/tickbox_hovered")};
+    public static final ResourceLocation TICK_SPRITE = new ResourceLocation(Legacy4J.MOD_ID, "widget/tick");
     protected final Function<Boolean,Component> message;
     protected Function<Boolean,Tooltip> tooltip;
     private final Consumer<TickBox> onPress;

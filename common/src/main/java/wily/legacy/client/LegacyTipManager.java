@@ -10,7 +10,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.screen.LegacyLoadingScreen;
 
 import java.io.BufferedReader;
@@ -42,7 +42,7 @@ public class LegacyTipManager extends SimplePreparableReloadListener<List<Suppli
                     }
                 bufferedReader.close();
             } catch (IOException var8) {
-                LegacyMinecraft.LOGGER.warn(var8.getMessage());
+                Legacy4J.LOGGER.warn(var8.getMessage());
             }
         }));
         return loadingTips;

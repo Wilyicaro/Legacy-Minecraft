@@ -7,7 +7,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,7 +34,7 @@ public record LegacyWorldTemplate(Component buttonName, ResourceLocation icon, R
                         });
                         bufferedReader.close();
                     } catch (IOException var8) {
-                        LegacyMinecraft.LOGGER.warn(var8.getMessage());
+                        Legacy4J.LOGGER.warn(var8.getMessage());
                     }
                 });
             });

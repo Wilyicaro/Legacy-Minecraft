@@ -18,7 +18,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.util.JsonUtil;
 
 import java.io.BufferedReader;
@@ -74,7 +74,7 @@ public record LegacyTipOverride(BiPredicate<Item,CompoundTag> matchItemOverride,
                     else if (ioElement instanceof JsonObject o) overrides.add(overrideFromJson(o));
                     bufferedReader.close();
                 } catch (IOException exception) {
-                    LegacyMinecraft.LOGGER.warn(exception.getMessage());
+                    Legacy4J.LOGGER.warn(exception.getMessage());
                 }
             }));
             return overrides;

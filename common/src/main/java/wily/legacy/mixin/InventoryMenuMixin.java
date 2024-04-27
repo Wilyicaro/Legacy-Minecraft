@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.Offset;
 import wily.legacy.inventory.LegacySlotWrapper;
@@ -51,7 +51,7 @@ public class InventoryMenuMixin {
                 return null;
             }
             public ResourceLocation getIconSprite() {
-                return getItem().isEmpty() ? new ResourceLocation(LegacyMinecraft.MOD_ID,"container/"+ SLOT_IDS[i].getName()+ "_slot") : null;
+                return getItem().isEmpty() ? new ResourceLocation(Legacy4J.MOD_ID,"container/"+ SLOT_IDS[i].getName()+ "_slot") : null;
             }
             public Offset getOffset() {
                 return hasClassicCrafting() ? Offset.ZERO : EQUIP_SLOT_OFFSET;

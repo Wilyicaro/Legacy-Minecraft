@@ -9,7 +9,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.StonecutterRecipe;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.util.JsonUtil;
 
 import java.io.BufferedReader;
@@ -30,7 +30,7 @@ public class StoneCuttingGroupManager extends SimplePreparableReloadListener<Map
                 if (obj.has("groups")) JsonUtil.addGroupedRecipeValuesFromJson(groups,obj.get("groups"));
                 bufferedReader.close();
             } catch (IOException exception) {
-                LegacyMinecraft.LOGGER.warn(exception.getMessage());
+                Legacy4J.LOGGER.warn(exception.getMessage());
             }
         }));
         return groups;

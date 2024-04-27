@@ -30,7 +30,7 @@ import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.resources.IoSupplier;
 import org.joml.Math;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
 
@@ -274,7 +274,7 @@ public class PackSelector extends AbstractWidget {
             }
             return resourceLocation;
         } catch (Exception exception) {
-            LegacyMinecraft.LOGGER.warn("Failed to load icon from pack {}", pack.getId(), exception);
+            Legacy4J.LOGGER.warn("Failed to load icon from pack {}", pack.getId(), exception);
             return fallback;
         }
     }

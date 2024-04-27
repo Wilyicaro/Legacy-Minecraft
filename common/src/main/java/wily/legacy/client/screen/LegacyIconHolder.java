@@ -16,18 +16,18 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.Offset;
 import wily.legacy.inventory.LegacySlotWrapper;
 import wily.legacy.util.ScreenUtil;
 
 public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEventListener, NarratableEntry {
-    public static final ResourceLocation ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/icon_holder");
-    public static final ResourceLocation SIZEABLE_ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/sizeable_icon_holder");
-    public static final ResourceLocation SELECT_ICON_HIGHLIGHT = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/select_icon_highlight");
-    public static final ResourceLocation RED_ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/red_icon_holder");
-    public static final ResourceLocation GRAY_ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/gray_icon_holder");
-    public static final ResourceLocation WARNING_ICON = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/icon_warning");
+    public static final ResourceLocation ICON_HOLDER = new ResourceLocation(Legacy4J.MOD_ID,"container/icon_holder");
+    public static final ResourceLocation SIZEABLE_ICON_HOLDER = new ResourceLocation(Legacy4J.MOD_ID,"container/sizeable_icon_holder");
+    public static final ResourceLocation SELECT_ICON_HIGHLIGHT = new ResourceLocation(Legacy4J.MOD_ID,"container/select_icon_highlight");
+    public static final ResourceLocation RED_ICON_HOLDER = new ResourceLocation(Legacy4J.MOD_ID,"container/red_icon_holder");
+    public static final ResourceLocation GRAY_ICON_HOLDER = new ResourceLocation(Legacy4J.MOD_ID,"container/gray_icon_holder");
+    public static final ResourceLocation WARNING_ICON = new ResourceLocation(Legacy4J.MOD_ID,"container/icon_warning");
 
     public Offset offset = Offset.ZERO;
     public ResourceLocation iconSprite = null;

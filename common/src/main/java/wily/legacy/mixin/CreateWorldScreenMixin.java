@@ -23,7 +23,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.commands.PublishCommand;
-import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.flag.FeatureFlags;
@@ -40,7 +39,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyWorldSettings;
 import wily.legacy.client.controller.ControllerComponent;
@@ -53,10 +52,9 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static wily.legacy.LegacyMinecraftClient.publishUnloadedServer;
+import static wily.legacy.Legacy4JClient.publishUnloadedServer;
 import static wily.legacy.client.screen.ControlTooltip.*;
 import static wily.legacy.client.screen.ControlTooltip.CONTROL_ACTION_CACHE;
 
@@ -124,7 +122,7 @@ public abstract class CreateWorldScreenMixin extends Screen{
             }
         }));
         portEdit.setResponder(string -> {
-            Pair<Integer,Component> p = LegacyMinecraftClient.tryParsePort(string);
+            Pair<Integer,Component> p = Legacy4JClient.tryParsePort(string);
             if(p.getFirst() != null) port = p.getFirst();
             portEdit.setHint(Component.literal("" + this.port).withStyle(ChatFormatting.DARK_GRAY));
             if (p.getSecond() == null) {

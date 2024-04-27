@@ -15,7 +15,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Recipe;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.RecipeValue;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class JsonUtil {
         List<T> tip = new ArrayList<>();
         List<T> tipExclusions = new ArrayList<>();
         List<TagKey<T>> tipTags = new ArrayList<>();
-        Registrar<T> registrar = LegacyMinecraft.REGISTRIES.get().get(key);
+        Registrar<T> registrar = Legacy4J.REGISTRIES.get().get(key);
         if (o.has(name) && o.get(name) instanceof JsonPrimitive j && j.isString()) {
             String s = j.getAsString();
             if (s.startsWith("#"))

@@ -16,8 +16,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
-import wily.legacy.LegacyMinecraftPlatform;
+import wily.legacy.Legacy4JPlatform;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
@@ -61,12 +60,12 @@ public class ModsScreen extends PanelVListScreen{
         this.parent = parent;
         renderableVList.layoutSpacing(l->0);
         Platform.getMods().forEach(mod->{
-            if (LegacyMinecraftPlatform.isHiddenMod(mod)) return;
+            if (Legacy4JPlatform.isHiddenMod(mod)) return;
             renderableVList.addRenderable(new AbstractButton(0,0,260,30, Component.literal(mod.getName())) {
                 @Override
                 public void onPress() {
                     if (isFocused()){
-                        Screen config = LegacyMinecraftPlatform.getConfigScreen(mod,ModsScreen.this);
+                        Screen config = Legacy4JPlatform.getConfigScreen(mod,ModsScreen.this);
                         if (config != null) minecraft.setScreen(config);
                     }
                 }

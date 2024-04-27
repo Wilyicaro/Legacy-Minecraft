@@ -15,7 +15,7 @@ import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.block.entity.BannerPattern;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.util.CompoundTagUtil;
 
 import java.io.BufferedReader;
@@ -70,7 +70,7 @@ public class LoomTabListing {
                     });
                     bufferedReader.close();
                 } catch (IOException exception) {
-                    LegacyMinecraft.LOGGER.warn(exception.getMessage());
+                    Legacy4J.LOGGER.warn(exception.getMessage());
                 }
             }));
             return listings;

@@ -5,16 +5,14 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.NoticeWithLinkScreen;
-import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
 import net.minecraft.world.level.validation.ContentValidationException;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 
 import java.io.IOException;
-import java.nio.file.Files;
 
 public class SaveOptionsScreen extends ConfirmationScreen{
     protected final PlayGameScreen parent = (PlayGameScreen) super.parent;
@@ -41,7 +39,7 @@ public class SaveOptionsScreen extends ConfirmationScreen{
                 SystemToast.onWorldAccessFailure(this.minecraft, id);
                 parent.saveRenderableList.reloadSaveList();
             } catch (ContentValidationException contentValidationException) {
-                LegacyMinecraft.LOGGER.warn("{}", contentValidationException.getMessage());
+                Legacy4J.LOGGER.warn("{}", contentValidationException.getMessage());
                 this.minecraft.setScreen(NoticeWithLinkScreen.createWorldSymlinkWarningScreen(()-> minecraft.setScreen(parent)));
             }
         }){
@@ -58,7 +56,7 @@ public class SaveOptionsScreen extends ConfirmationScreen{
 
         addRenderableWidget(Button.builder(Component.translatable("legacy.menu.copySave"),b-> minecraft.setScreen(new ConfirmationScreen(parent,230,120, Component.translatable("legacy.menu.copySave"), Component.translatable("legacy.menu.copySaveMessage"), b1->{
             String id = summary.getLevelId();
-            LegacyMinecraftClient.copySaveFile(minecraft, this.minecraft.getLevelSource().getLevelPath(id),summary.getLevelName());
+            Legacy4JClient.copySaveFile(minecraft, this.minecraft.getLevelSource().getLevelPath(id),summary.getLevelName());
             parent.saveRenderableList.reloadSaveList();
             minecraft.setScreen(parent);
 

@@ -10,7 +10,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.network.ServerInventoryCraftPacket;
@@ -104,7 +104,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
         if (isFocused()){
             if (canCraft()){
                 ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT.get(),1.0f);
-                LegacyMinecraft.NETWORK.sendToServer(new ServerInventoryCraftPacket(getIngredientsGrid(), getResultStack(),applyNextItemIfAbsent() ? findInventoryMatchSlot() : -1,-1, Screen.hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
+                Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(getIngredientsGrid(), getResultStack(),-1,Screen.hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
                 updateRecipe();
             }else ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT_FAIL.get(),1.0f);
         }

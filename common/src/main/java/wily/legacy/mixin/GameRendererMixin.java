@@ -1,8 +1,6 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
@@ -17,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySprites;
 import wily.legacy.client.LegacyTip;
@@ -28,7 +26,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static wily.legacy.LegacyMinecraftClient.gammaEffect;
+import static wily.legacy.Legacy4JClient.gammaEffect;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
@@ -39,7 +37,7 @@ public abstract class GameRendererMixin {
     @Shadow protected abstract void takeAutoScreenshot(Path path);
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/toasts/ToastComponent;render(Lnet/minecraft/client/gui/GuiGraphics;)V"))
-    private void render(ToastComponent instance, GuiGraphics graphics, float f){
+    private void render(ToastComponent instance, GuiGraphics graphics, float f, long l, boolean bl){
         if (!LegacyTipManager.tips.isEmpty()) {
             LegacyTip tip = LegacyTipManager.tips.get(0);
             tip.setX(graphics.guiWidth() - tip.getWidth() - 30);
@@ -47,11 +45,11 @@ public abstract class GameRendererMixin {
             if (tip.visibility == Toast.Visibility.HIDE) LegacyTipManager.tips.remove(tip);
         }
         instance.render(graphics);
-        if (GLFW.glfwGetInputMode(minecraft.getWindow().getWindow(),GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !LegacyMinecraftClient.controllerHandler.isCursorDisabled) {
+        if (GLFW.glfwGetInputMode(minecraft.getWindow().getWindow(),GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerHandler.isCursorDisabled) {
             RenderSystem.disableDepthTest();
             RenderSystem.enableBlend();
             graphics.pose().pushPose();
-            graphics.pose().translate(LegacyMinecraftClient.controllerHandler.getPointerX(),LegacyMinecraftClient.controllerHandler.getPointerY(), 0);
+            graphics.pose().translate(Legacy4JClient.controllerHandler.getPointerX(), Legacy4JClient.controllerHandler.getPointerY(), 0);
             graphics.blitSprite(minecraft.getWindow().getScreenWidth() >= 1920 ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
             graphics.pose().popPose();
             RenderSystem.disableBlend();
@@ -70,16 +68,16 @@ public abstract class GameRendererMixin {
     }
     @Redirect(method = "tryTakeScreenshotIfNeeded",at = @At(value = "FIELD", opcode = Opcodes.GETFIELD, target = "Lnet/minecraft/client/renderer/GameRenderer;hasWorldScreenshot:Z"))
     private boolean canTakeWorldIcon(GameRenderer instance) {
-        return hasWorldScreenshot && !LegacyMinecraftClient.retakeWorldIcon;
+        return hasWorldScreenshot && !Legacy4JClient.retakeWorldIcon;
     }
     @Redirect(method = "tryTakeScreenshotIfNeeded",at = @At(value = "INVOKE", target = "Ljava/util/Optional;ifPresent(Ljava/util/function/Consumer;)V"))
     private void tryTakeScreenshotIfNeeded(Optional<Path> instance, Consumer<? super Path> action) {
         instance.ifPresent(path->{
-                    if (!LegacyMinecraftClient.retakeWorldIcon && Files.isRegularFile(path)) {
+                    if (!Legacy4JClient.retakeWorldIcon && Files.isRegularFile(path)) {
                         this.hasWorldScreenshot = true;
                     } else {
                         this.takeAutoScreenshot(path);
-                        LegacyMinecraftClient.retakeWorldIcon = false;
+                        Legacy4JClient.retakeWorldIcon = false;
                     }
                 }
         );

@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.util.ScreenUtil;
 
@@ -38,6 +38,6 @@ public abstract class ScreenMixin {
     }
     @Inject(method = "keyPressed",at = @At("HEAD"))
     private void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir){
-        if (LegacyMinecraftClient.keyToggleCursor.matches(i,j)) LegacyMinecraftClient.controllerHandler.toggleCursor();
+        if (Legacy4JClient.keyToggleCursor.matches(i,j)) Legacy4JClient.controllerHandler.toggleCursor();
     }
 }

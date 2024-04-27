@@ -37,7 +37,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
@@ -99,7 +99,7 @@ public class ServerRenderableList extends RenderableVList {
             this.lanServerDetector = new LanServerDetection.LanServerDetector(this.lanServerList);
             this.lanServerDetector.start();
         } catch (Exception exception) {
-            LegacyMinecraft.LOGGER.warn("Unable to start LAN server detection: {}", exception.getMessage());
+            Legacy4J.LOGGER.warn("Unable to start LAN server detection: {}", exception.getMessage());
         }
         super.init(screen, leftPos, topPos, listWidth, listHeight);
     }
@@ -119,10 +119,10 @@ public class ServerRenderableList extends RenderableVList {
     }
     public void updateServers(){
         renderables.clear();
-        addIconButton(this,new ResourceLocation(LegacyMinecraft.MOD_ID,"creation_list/add_server"),Component.translatable("legacy.menu.add_server"), c-> this.minecraft.setScreen(new ServerEditScreen(screen, new ServerData(I18n.get("selectServer.defaultName"), "", ServerData.Type.OTHER), true)));
+        addIconButton(this,new ResourceLocation(Legacy4J.MOD_ID,"creation_list/add_server"),Component.translatable("legacy.menu.add_server"), c-> this.minecraft.setScreen(new ServerEditScreen(screen, new ServerData(I18n.get("selectServer.defaultName"), "", ServerData.Type.OTHER), true)));
         Component component = this.getMultiplayerDisabledReason();
         Tooltip tooltip = component != null ? Tooltip.create(component) : null;
-        addIconButton(this,new ResourceLocation(LegacyMinecraft.MOD_ID,"creation_list/realms"), Component.translatable("menu.online"), b-> minecraft.setScreen(new RealmsMainScreen(screen)),tooltip);
+        addIconButton(this,new ResourceLocation(Legacy4J.MOD_ID,"creation_list/realms"), Component.translatable("menu.online"), b-> minecraft.setScreen(new RealmsMainScreen(screen)),tooltip);
         for (int i = 0; i < servers.size(); i++) {
             int index = i;
             ServerData server = servers.get(i);

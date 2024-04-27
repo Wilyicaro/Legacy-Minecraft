@@ -11,8 +11,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.Slot;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.util.ScreenUtil;
@@ -23,10 +23,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -51,7 +48,7 @@ public class ControllerHandler {
         try {
             applyGamePadMappingsFromBuffer(new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/mdqinc/SDL_GameControllerDB/master/gamecontrollerdb.txt").openStream())));
         } catch (IOException e) {
-            LegacyMinecraft.LOGGER.warn(e.getMessage());
+            Legacy4J.LOGGER.warn(e.getMessage());
         }
     }
     public static void applyGamePadMappingsFromBuffer(BufferedReader reader) throws IOException {
@@ -85,6 +82,7 @@ public class ControllerHandler {
                         if (connectedController == null && (connectedController = GLFW.glfwGetGamepadName(ScreenUtil.getLegacyOptions().selectedController().get())) != null)
                             minecraft.getToasts().addToast(new LegacyTip(Component.translatable("legacy.controller.detected"), Component.literal(connectedController)).disappearTime(4500));
                         minecraft.execute(() -> {
+
                             GLFWGamepadState gamepadState = GLFWGamepadState.calloc();
                             if (GLFW.glfwGetGamepadState(ScreenUtil.getLegacyOptions().selectedController().get(), gamepadState))
                                 componentsPressed(gamepadState);
@@ -94,7 +92,7 @@ public class ControllerHandler {
                 }
             },0,1);
         }).exceptionally(t-> {
-            LegacyMinecraft.LOGGER.warn(t.getMessage());
+            Legacy4J.LOGGER.warn(t.getMessage());
             return null;
         });
     }
@@ -111,8 +109,8 @@ public class ControllerHandler {
                 if (state.is(ControllerComponent.LEFT_STICK) && state instanceof ComponentState.Axis stick && state.pressed)
                     setPointerPos(minecraft.mouseHandler.xpos = (minecraft.mouseHandler.xpos() + stick.x * ((double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth()) * Math.pow(ScreenUtil.getLegacyOptions().interfaceSensitivity().get() * 0.9 + 0.3, 4.5)), minecraft.mouseHandler.ypos = (minecraft.mouseHandler.ypos() + stick.y * ((double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()) * Math.pow(ScreenUtil.getLegacyOptions().interfaceSensitivity().get() * 0.9 + 0.3, 4.5)));
 
+                if (state.is(ControllerComponent.RIGHT_TRIGGER) && state.pressed) minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 1,0,0);
                 if (state.is(ControllerComponent.DOWN_BUTTON) || state.is(ControllerComponent.UP_BUTTON) || state.is(ControllerComponent.LEFT_BUTTON)) {
-                    if (state.pressed) minecraft.screen.mouseDragged(getPointerX(), getPointerY(), state.is(ControllerComponent.LEFT_BUTTON) ? 1 : 0,0,0);
                     if (state.pressed && state.canClick())
                         minecraft.screen.mouseClicked(getPointerX(), getPointerY(), state.is(ControllerComponent.LEFT_BUTTON) ? 1 : 0);
                     else if (state.released)
@@ -129,7 +127,7 @@ public class ControllerHandler {
                     this.minecraft.setLastInputType(InputType.KEYBOARD_ARROW);
                     minecraft.screen.afterKeyboardAction();
                 }
-                ControllerComponent cursorComponent = ((LegacyKeyMapping)LegacyMinecraftClient.keyToggleCursor).getComponent();
+                ControllerComponent cursorComponent = ((LegacyKeyMapping) Legacy4JClient.keyToggleCursor).getComponent();
                 if (cursorComponent != null && state.is(cursorComponent) && state.canClick()) toggleCursor();
                 if (isCursorDisabled) simulateKeyAction(s-> state.is(ControllerComponent.DOWN_BUTTON) && state.onceClick(false),InputConstants.KEY_RETURN, state);
                 simulateKeyAction(s-> s.is(ControllerComponent.RIGHT_BUTTON) && state.onceClick(true),InputConstants.KEY_ESCAPE, state);
@@ -166,7 +164,7 @@ public class ControllerHandler {
                         a.movePointerToSlotIn(ScreenDirection.RIGHT);
                     if (isStickAnd.test(s -> s.x < 0 && -s.x > Math.abs(s.y)) || state.is(ControllerComponent.DPAD_LEFT) && state.canClick())
                         a.movePointerToSlotIn(ScreenDirection.LEFT);
-                }else if (state.is(ControllerComponent.LEFT_STICK) && state.released) a.movePointerToSlot(a.getHoveredSlot());
+                }else if (state.is(ControllerComponent.LEFT_STICK) && state.released) a.movePointerToSlot(a.findSlotAt(getPointerX(),getPointerY()));
             }
 
             KeyMapping.ALL.entrySet().stream().filter(k -> state.component.matches(k.getValue())).forEach(e -> {

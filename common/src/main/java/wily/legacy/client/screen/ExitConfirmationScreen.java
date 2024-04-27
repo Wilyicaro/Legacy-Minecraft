@@ -6,7 +6,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.chat.Component;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4JClient;
 
 public class ExitConfirmationScreen extends ConfirmationScreen{
     public ExitConfirmationScreen(Screen parent) {
@@ -27,8 +27,8 @@ public class ExitConfirmationScreen extends ConfirmationScreen{
             return;
         }
         if (save) {
-            LegacyMinecraftClient.manualSave = true;
-            LegacyMinecraftClient.retakeWorldIcon = true;
+            Legacy4JClient.manualSave = true;
+            Legacy4JClient.retakeWorldIcon = true;
         }
 
         if (minecraft.level != null) {

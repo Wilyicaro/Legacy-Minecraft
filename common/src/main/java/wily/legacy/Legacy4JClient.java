@@ -12,7 +12,6 @@ import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import dev.architectury.registry.client.rendering.ColorHandlerRegistry;
 import dev.architectury.registry.client.rendering.RenderTypeRegistry;
 import dev.architectury.registry.menu.MenuRegistry;
-import net.minecraft.FileUtil;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -82,11 +81,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import static wily.legacy.LegacyMinecraft.MOD_ID;
+import static wily.legacy.Legacy4J.MOD_ID;
 import static wily.legacy.init.LegacyBlockItems.SHRUB;
 
 
-public class LegacyMinecraftClient {
+public class Legacy4JClient {
     public static float FONT_SHADOW_OFFSET = 1.0F;
     public static boolean canLoadVanillaOptions = true;
     public static boolean manualSave = false;
@@ -237,7 +236,7 @@ public class LegacyMinecraftClient {
                 if (ScreenUtil.hasClassicCrafting()) {
                     minecraft.getTutorial().onOpenInventory();
                     minecraft.setScreen(new InventoryScreen(minecraft.player));
-                }else LegacyMinecraft.NETWORK.sendToServer(new ServerOpenClientMenu(2));
+                }else Legacy4J.NETWORK.sendToServer(new ServerOpenClientMenu(2));
             }
             while (keyHostOptions.consumeClick()) {
                 minecraft.setScreen(new HostOptionsScreen());
@@ -282,7 +281,7 @@ public class LegacyMinecraftClient {
     public static void onClientPlayerInfoChange(){
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level != null && minecraft.player != null)
-            LegacyMinecraft.NETWORK.sendToServer(new PlayerInfoSync(0, minecraft.player));
+            Legacy4J.NETWORK.sendToServer(new PlayerInfoSync(0, minecraft.player));
         if (minecraft.screen instanceof HostOptionsScreen s) s.reloadPlayerButtons();
 
     }
@@ -321,7 +320,7 @@ public class LegacyMinecraftClient {
         return builder.toString();
     }
     public static String importSaveFile(Minecraft minecraft, InputStream saveInputStream, String saveDirName){
-        return manageAvailableSaveDirName(minecraft, f->LegacyMinecraft.copySaveToDirectory(saveInputStream,f),saveDirName);
+        return manageAvailableSaveDirName(minecraft, f-> Legacy4J.copySaveToDirectory(saveInputStream,f),saveDirName);
     }
     public static String copySaveFile(Minecraft minecraft, Path savePath, String saveDirName){
         return manageAvailableSaveDirName(minecraft, f-> {
@@ -365,7 +364,7 @@ public class LegacyMinecraftClient {
                 });
             }, minecraft);
             server.getConnection().startTcpServerListener(null, i);
-            LegacyMinecraft.LOGGER.info("Started serving on {}", i);
+            Legacy4J.LOGGER.info("Started serving on {}", i);
             server.publishedPort = i;
             server.lanPinger = new LanServerPinger(server.getMotd(), "" + i);
             server.lanPinger.start();

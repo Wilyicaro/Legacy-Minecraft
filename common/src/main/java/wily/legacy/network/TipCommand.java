@@ -23,7 +23,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Collection;
@@ -47,7 +47,7 @@ public class TipCommand {
     }
     private static <T> int sendTip(CommandContext<CommandSourceStack> context, T packet) throws CommandSyntaxException {
         Collection<ServerPlayer> players = EntityArgument.getPlayers(context, "targets");
-        LegacyMinecraft.NETWORK.sendToPlayers(players, packet);
+        Legacy4J.NETWORK.sendToPlayers(players, packet);
         return players.size();
     }
     private static int addCustomTip(CommandContext<CommandSourceStack> context) {

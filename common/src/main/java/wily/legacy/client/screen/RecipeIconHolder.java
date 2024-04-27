@@ -7,11 +7,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacySprites;
 import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.init.LegacySoundEvents;
@@ -191,7 +190,7 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
     }
     public void craft() {
         ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT.get(),1.0f);
-        LegacyMinecraft.NETWORK.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), Screen.hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
+        Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), Screen.hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
     }
 
     @Override

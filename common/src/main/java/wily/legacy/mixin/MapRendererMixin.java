@@ -12,7 +12,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.saveddata.maps.MapDecoration;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.joml.Matrix4f;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -20,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.player.LegacyPlayerInfo;
 
 import java.util.stream.Collectors;
@@ -73,7 +72,7 @@ public abstract class MapRendererMixin {
             float n = (float)(b / 16 + 1) / 16.0f;
             Matrix4f matrix4f2 = poseStack.last().pose();
             Minecraft minecraft = Minecraft.getInstance();
-            float[] color = mapDecoration.name() == null || minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(mapDecoration.name().getString()) instanceof LegacyPlayerInfo info) ? new float[]{1.0f,1.0f,1.0f} : LegacyMinecraftClient.getVisualPlayerColor(info);
+            float[] color = mapDecoration.name() == null || minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(mapDecoration.name().getString()) instanceof LegacyPlayerInfo info) ? new float[]{1.0f,1.0f,1.0f} : Legacy4JClient.getVisualPlayerColor(info);
             VertexConsumer vertexConsumer2 = multiBufferSource.getBuffer(MAP_ICONS);
             vertexConsumer2.vertex(matrix4f2, -1.0f, 1.0f, (float)l * -0.001f).color(color[0], color[1], color[2], 1.0f).uv(g, h).uv2(i).endVertex();
             vertexConsumer2.vertex(matrix4f2, 1.0f, 1.0f, (float)l * -0.001f).color(color[0], color[1], color[2], 1.0f).uv(m, h).uv2(i).endVertex();

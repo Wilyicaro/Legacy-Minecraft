@@ -1,7 +1,6 @@
 package wily.legacy.forge;
 
 import dev.architectury.platform.Mod;
-import dev.architectury.platform.forge.PlatformImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
@@ -11,17 +10,17 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
-import net.neoforged.fml.ModList;
-import net.neoforged.fml.loading.FMLPaths;
-import net.neoforged.fml.loading.LoadingModList;
-import net.neoforged.neoforge.client.ConfigScreenHandler;
-import net.neoforged.neoforge.common.crafting.NBTIngredient;
+import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.common.crafting.ingredients.PartialNBTIngredient;
+import net.minecraftforge.common.crafting.ingredients.StrictNBTIngredient;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.fml.loading.LoadingModList;
 
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Optional;
 
-public class LegacyMinecraftPlatformImpl {
+public class Legacy4JPlatformImpl {
     public static Path getConfigDirectory() {
         return FMLPaths.CONFIGDIR.get();
     }
@@ -43,9 +42,9 @@ public class LegacyMinecraftPlatformImpl {
     }
 
     public static Ingredient getNBTIngredient(ItemStack... stacks) {
-        return NBTIngredient.of(false,stacks[0].getTag(), Arrays.stream(stacks).map(ItemStack::getItem).toArray(ItemLike[]::new));
+        return PartialNBTIngredient.of(stacks[0].getTag(), Arrays.stream(stacks).map(ItemStack::getItem).toArray(ItemLike[]::new));
     }
     public static Ingredient getStrictNBTIngredient(ItemStack stack) {
-        return NBTIngredient.of(true,stack);
+        return StrictNBTIngredient.of(stack);
     }
 }

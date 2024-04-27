@@ -12,15 +12,12 @@ import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ShulkerBoxBlock;
-import wily.legacy.LegacyMinecraftPlatform;
+import wily.legacy.Legacy4JPlatform;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 public interface RecipeValue<C extends Container, T extends Recipe<C>> extends Predicate<RecipeHolder<T>> {
     ResourceLocation TIPPED_ARROW = new ResourceLocation("tipped_arrow");
@@ -34,7 +31,7 @@ public interface RecipeValue<C extends Container, T extends Recipe<C>> extends P
                 PotionUtils.setPotion(result, p);
                 NonNullList<Ingredient> ings = NonNullList.create();
                 for (int i = 0; i < 8; i++) ings.add(Ingredient.of(Items.ARROW.getDefaultInstance()));
-                ings.add(4, LegacyMinecraftPlatform.getNBTIngredient(potion));
+                ings.add(4, Legacy4JPlatform.getNBTIngredient(potion));
                 Recipe<?> rcp = new ShapelessRecipe(r.getGroup(), r.category(), result, ings);
                 if (filter.test(rcp)) rcps.add(rcp);
             });

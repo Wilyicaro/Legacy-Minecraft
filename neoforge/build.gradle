@@ -5,7 +5,7 @@ plugins {
 architectury {
     platformSetupLoomIde()
     neoForge{
-        platformPackage = "forge"
+        platformPackage = "neoforge"
     }
 }
 
@@ -70,6 +70,7 @@ processResources {
 shadowJar {
     exclude "fabric.mod.json"
     exclude "legacy.common.json"
+    exclude "legacy.accessWidener"
 
     configurations = [project.configurations.shadowCommon]
     archiveClassifier = "dev-shadow"
@@ -79,6 +80,7 @@ shadowJar {
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
+    atAccessWideners.add "legacy.accesswidener"
 }
 
 jar {
@@ -86,9 +88,15 @@ jar {
 }
 
 sourcesJar {
-    def commonSources = project(":common").sourcesJar
-    dependsOn commonSources
-    from commonSources.archiveFile.map { zipTree(it) }
+    afterEvaluate {
+        [":common"].forEach {
+            def depSources = project(it).sourcesJar
+            dependsOn depSources
+            from(depSources.archiveFile.map { zipTree(it) }) {
+                exclude "legacy.accesswidener"
+            }
+        }
+    }
 }
 
 

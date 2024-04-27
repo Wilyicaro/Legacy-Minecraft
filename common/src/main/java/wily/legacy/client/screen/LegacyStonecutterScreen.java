@@ -14,11 +14,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.crafting.StonecutterRecipe;
 import org.spongepowered.asm.mixin.Unique;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.StoneCuttingGroupManager;
 import wily.legacy.client.Offset;
 import wily.legacy.client.controller.ControllerComponent;
-import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.network.ServerInventoryCraftPacket;
 import wily.legacy.util.PagedList;
@@ -234,7 +233,7 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                     return false;
                 }
                 public void craft() {
-                    LegacyMinecraft.NETWORK.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), Screen.hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
+                    Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), Screen.hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
                 }
             });
             h.offset = CRAFTING_OFFSET;

@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Locale;
@@ -38,7 +38,7 @@ public enum ControllerComponent {
     DPAD_RIGHT(GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT,icon('\uE740','\uE00D'), InputConstants.KEY_RIGHT);
 
 
-    public final Component displayName = Component.translatable(LegacyMinecraft.MOD_ID + ".controller_component." + name().toLowerCase(Locale.ENGLISH));
+    public final Component displayName = Component.translatable(Legacy4J.MOD_ID + ".controller_component." + name().toLowerCase(Locale.ENGLISH));
     public final ComponentState componentState;
     public final Icon icon;
 

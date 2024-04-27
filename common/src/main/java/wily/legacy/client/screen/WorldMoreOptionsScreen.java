@@ -19,7 +19,7 @@ import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.WorldDataConfiguration;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.util.ScreenUtil;
 
@@ -157,7 +157,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
         addGameRulesOptions(renderableVList,gameRules, k-> k.getCategory() == GameRules.Category.UPDATES);
         gameRenderables.addRenderable(new TickBox(0,0,parent.allowCheats,b->Component.translatable("selectWorld.allowCommands"),b->Tooltip.create(Component.translatable("selectWorld.allowCommands.info")),b->{
             parent.allowCheats = b.selected;
-            LegacyMinecraft.LOGGER.warn(parent.allowCheats);
+            Legacy4J.LOGGER.warn(parent.allowCheats);
         }));
         for (GameRules.Category value : GameRules.Category.values()) {
             if (value == GameRules.Category.UPDATES) continue;

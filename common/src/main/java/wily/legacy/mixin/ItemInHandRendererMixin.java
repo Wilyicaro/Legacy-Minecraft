@@ -21,9 +21,10 @@ public class ItemInHandRendererMixin {
 
     @Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", shift = At.Shift.AFTER))
     private void renderItemInHand(AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, MultiBufferSource multiBufferSource, int j, CallbackInfo ci) {
-        int screenWidth = minecraft.getWindow().getGuiScaledWidth();
-        int screenHeight = minecraft.getWindow().getGuiScaledHeight();
+        int screenWidth = minecraft.getWindow().getScreenWidth();
+        int screenHeight = minecraft.getWindow().getScreenHeight();
         HumanoidArm humanoidArm = interactionHand == InteractionHand.MAIN_HAND ? abstractClientPlayer.getMainArm() : abstractClientPlayer.getMainArm().getOpposite();
-        poseStack.translate((humanoidArm == HumanoidArm.RIGHT ? 1 : -1) * (screenWidth - screenHeight * 16f/9f) / 1920,0,0);
+        float d =  (screenWidth - screenHeight * 16f/9f) / screenWidth;
+        if (d != 0) poseStack.translate( (humanoidArm == HumanoidArm.RIGHT ? 1 : -1) * d / 4,0,d / 4);
     }
 }

@@ -6,17 +6,15 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.server.packs.resources.ReloadInstance;
-import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacyResourceManager;
 import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.util.ScreenUtil;
@@ -76,7 +74,6 @@ public class LoadingOverlayMixin extends Overlay {
                 GlStateManager._clearColor(0, 0, 0, 1.0f);
                 GlStateManager._clear(16384, Minecraft.ON_OSX);
                 guiGraphics.fill(RenderType.guiOverlay(),0,0,guiGraphics.guiWidth(),guiGraphics.guiHeight(),0);
-                LegacyMinecraft.LOGGER.warn((minecraft.screen == null) + "-" + reload.isDone() + "-" + (g >= 1.0f));
             }
             if (g < 1.0f && !reload.isDone())
                 ScreenUtil.drawGenericLoading(guiGraphics, (guiGraphics.guiWidth() - 75) / 2, (guiGraphics.guiHeight() - 75) / 2);

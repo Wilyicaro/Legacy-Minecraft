@@ -23,7 +23,7 @@ import wily.legacy.util.ScreenUtil;
 
 import java.util.ArrayList;
 
-import static wily.legacy.LegacyMinecraft.MOD_ID;
+import static wily.legacy.Legacy4J.MOD_ID;
 
 @Mixin(EnchantmentScreen.class)
 public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<EnchantmentMenu> {

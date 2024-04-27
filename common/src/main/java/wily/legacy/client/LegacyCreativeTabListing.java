@@ -12,9 +12,8 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.util.CompoundTagUtil;
-import wily.legacy.util.ScreenUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -61,7 +60,7 @@ public record LegacyCreativeTabListing(Component name, ResourceLocation icon, Co
 
                         bufferedReader.close();
                     } catch (IOException var8) {
-                        LegacyMinecraft.LOGGER.warn(var8);
+                        Legacy4J.LOGGER.warn(var8);
                     }
                 });
             });

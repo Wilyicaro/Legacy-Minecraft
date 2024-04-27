@@ -4,8 +4,7 @@ import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.network.chat.Component;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4JClient;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -54,12 +53,12 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
     }
     public void setFocused(boolean bl) {
         super.setFocused(bl);
-        if (bl) canChangeValue = LegacyMinecraftClient.controllerHandler.canChangeSlidersValue;
+        if (bl) canChangeValue = Legacy4JClient.controllerHandler.canChangeSlidersValue;
     }
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (CommonInputs.selected(i)) {
-            LegacyMinecraftClient.controllerHandler.canChangeSlidersValue = this.canChangeValue = !this.canChangeValue;
+            Legacy4JClient.controllerHandler.canChangeSlidersValue = this.canChangeValue = !this.canChangeValue;
             return true;
         }
         if (this.canChangeValue) {

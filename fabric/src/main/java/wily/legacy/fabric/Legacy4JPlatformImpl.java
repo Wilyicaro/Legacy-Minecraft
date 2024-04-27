@@ -1,14 +1,12 @@
 package wily.legacy.fabric;
 
 import dev.architectury.platform.Mod;
-import dev.architectury.platform.Platform;
 import dev.architectury.platform.fabric.PlatformImpl;
 import net.fabricmc.fabric.impl.recipe.ingredient.builtin.NbtIngredient;
 import net.fabricmc.fabric.impl.tag.convention.TagRegistration;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.fabricmc.loader.api.metadata.ModOrigin;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -18,7 +16,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import java.nio.file.Path;
 import java.util.Optional;
 
-public class LegacyMinecraftPlatformImpl {
+public class Legacy4JPlatformImpl {
 
     public static Path getConfigDirectory() {
         return FabricLoader.getInstance().getConfigDir();

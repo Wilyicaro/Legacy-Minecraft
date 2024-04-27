@@ -17,24 +17,21 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public record ServerInventoryCraftPacket(List<Ingredient> ingredients, ItemStack result, int giveSlot, int button, boolean max) implements CommonPacket{
+public record ServerInventoryCraftPacket(List<Ingredient> ingredients, ItemStack result, int button, boolean max) implements CommonPacket{
     public ServerInventoryCraftPacket(FriendlyByteBuf buf){
-        this(buf.readList(Ingredient::fromNetwork), buf.readItem(), buf.readVarInt(),buf.readVarInt(), buf.readBoolean());
+        this(buf.readList(Ingredient::fromNetwork), buf.readItem(),buf.readVarInt(), buf.readBoolean());
     }
-    public ServerInventoryCraftPacket(Recipe<?> rcp, int giveSlot, int button, boolean max){
-        this(rcp.getIngredients(),rcp.getResultItem(RegistryAccess.EMPTY), giveSlot,button, max);
+    public ServerInventoryCraftPacket(Recipe<?> rcp, int button, boolean max){
+        this(rcp.getIngredients(),rcp.getResultItem(RegistryAccess.EMPTY),button, max);
     }
     public ServerInventoryCraftPacket(Recipe<?> rcp, boolean max){
-        this(rcp,-1,-1,max);
+        this(rcp,-1,max);
     }
-    public ServerInventoryCraftPacket(Recipe<?> rcp, int giveSlot, boolean max){
-        this(rcp,giveSlot,-1,max);
-    }
+
     @Override
     public void encode(FriendlyByteBuf buf) {
         buf.writeCollection(ingredients,(r,i)->i.toNetwork(r));
         buf.writeItem(result);
-        buf.writeVarInt(giveSlot);
         buf.writeVarInt(button);
         buf.writeBoolean(max);
     }
@@ -72,11 +69,7 @@ public record ServerInventoryCraftPacket(List<Ingredient> ingredients, ItemStack
                         break;
                     }
                 });
-                Slot s;
-                if (giveSlot >= 0 && (!(s = sp.containerMenu.slots.get(giveSlot)).hasItem() || ItemStack.isSameItemSameTags(s.getItem(),result) && s.getItem().getCount() + result.getCount() <= result.getMaxStackSize())){
-                    if (s.hasItem()) s.getItem().grow(result.getCount());
-                    else s.set(result);
-                }else sp.getInventory().placeItemBackInInventory(result.copy());
+                sp.getInventory().placeItemBackInInventory(result.copy());
                 if (sp.containerMenu instanceof RecipeMenu m) m.onCraft(sp,button,ingredients,result);
             }
         }

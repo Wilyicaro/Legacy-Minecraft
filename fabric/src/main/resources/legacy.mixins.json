@@ -12,6 +12,7 @@
     "TooltipRenderUtilMixin"
   ],
   "mixins": [
+    "CustomIngredientImplMixin",
     "ItemStackMixin",
     "LivingEntityMixin"
   ],

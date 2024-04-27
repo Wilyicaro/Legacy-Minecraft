@@ -6,8 +6,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.packs.PackSelectionModel;
@@ -20,7 +18,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacySprites;
 import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.client.screen.*;
@@ -57,7 +55,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
         return(PackSelectionScreen)(Object) this;
     }
     public void clearFocus() {
-        if (lastFocused >= 0 && LegacyMinecraftClient.controllerHandler.isCursorDisabled) return;
+        if (lastFocused >= 0 && Legacy4JClient.controllerHandler.isCursorDisabled) return;
         lastFocused = -1;
         super.clearFocus();
     }

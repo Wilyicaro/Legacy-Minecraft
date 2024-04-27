@@ -11,7 +11,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.crafting.CraftingRecipe;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.util.CompoundTagUtil;
 import wily.legacy.util.JsonUtil;
 
@@ -67,7 +67,7 @@ public class LegacyCraftingTabListing {
                     });
                     bufferedReader.close();
                 } catch (IOException exception) {
-                    LegacyMinecraft.LOGGER.warn(exception.getMessage());
+                    Legacy4J.LOGGER.warn(exception.getMessage());
                 }
             }));
             return listings;

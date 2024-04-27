@@ -14,7 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.Offset;
 import wily.legacy.util.ScreenUtil;
 
@@ -22,8 +22,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class LegacyTabButton extends AbstractButton {
-    public static final ResourceLocation[][] SPRITES = new ResourceLocation[][]{new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_tab_left"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_tab_left")}, new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_tab_middle"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_tab_middle")}, new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_tab_right"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_tab_right")},
-                                                                                new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_vert_tab_up"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_vert_tab_up")}, new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_vert_tab_middle"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_vert_tab_middle")}, new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/high_vert_tab_down"),new ResourceLocation(LegacyMinecraft.MOD_ID, "tiles/low_vert_tab_down")}};
+    public static final ResourceLocation[][] SPRITES = new ResourceLocation[][]{new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID, "tiles/high_tab_left"),new ResourceLocation(Legacy4J.MOD_ID, "tiles/low_tab_left")}, new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID, "tiles/high_tab_middle"),new ResourceLocation(Legacy4J.MOD_ID, "tiles/low_tab_middle")}, new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID, "tiles/high_tab_right"),new ResourceLocation(Legacy4J.MOD_ID, "tiles/low_tab_right")},
+                                                                                new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID, "tiles/high_vert_tab_up"),new ResourceLocation(Legacy4J.MOD_ID, "tiles/low_vert_tab_up")}, new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID, "tiles/high_vert_tab_middle"),new ResourceLocation(Legacy4J.MOD_ID, "tiles/low_vert_tab_middle")}, new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID, "tiles/high_vert_tab_down"),new ResourceLocation(Legacy4J.MOD_ID, "tiles/low_vert_tab_down")}};
     public static final Offset DEFAULT_OFFSET = new Offset(0,4,0);
     public static final Offset DEFAULT_DESACTIVE_OFFSET = new Offset(0,22,0);
     public final ResourceLocation icon;

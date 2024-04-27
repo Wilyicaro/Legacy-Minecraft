@@ -1,4 +1,4 @@
-package wily.legacy.forge.mixin;
+package wily.legacy.neoforge.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;

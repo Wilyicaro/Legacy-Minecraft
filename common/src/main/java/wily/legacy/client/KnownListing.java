@@ -20,12 +20,11 @@ import dev.architectury.registry.registries.Registrar;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import org.slf4j.Logger;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 
 @Environment(value=EnvType.CLIENT)
 public class KnownListing<T> {
@@ -35,7 +34,7 @@ public class KnownListing<T> {
     private final Registrar<T> registrar;
     private final String listingFile;
     public KnownListing(ResourceKey<Registry<T>> registryKey, Path path){
-        registrar = LegacyMinecraft.REGISTRIES.get().get(registryKey);
+        registrar = Legacy4J.REGISTRIES.get().get(registryKey);
 
         listingFile = "known_"+ registrar.key().location().getPath()+ ".json";
         this.path = path.resolve(listingFile);

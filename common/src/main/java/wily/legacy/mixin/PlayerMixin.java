@@ -28,6 +28,6 @@ public abstract class PlayerMixin extends LivingEntity {
     }
     @Inject(method = "getFlyingSpeed", at = @At(value = "RETURN"), cancellable = true)
     protected void getFlyingSpeed(CallbackInfoReturnable<Float> cir) {
-        cir.setReturnValue(cir.getReturnValueF() * (getAbilities().flying ?  (isSprinting() ? 6 : 2) : 1));
+        cir.setReturnValue(cir.getReturnValueF() * (getAbilities().flying ? (isSprinting() ? 6 : 2) : 1));
     }
 }

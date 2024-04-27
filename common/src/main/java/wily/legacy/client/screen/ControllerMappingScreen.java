@@ -12,7 +12,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.controller.ComponentState;
 import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.client.controller.ControllerEvent;
@@ -108,7 +108,7 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
     public void componentTick(ComponentState state) {
         if (selectedKey != null) {
             if (!state.canClick()) return;
-            selectedKey.setComponent(!state.is(ControllerComponent.BACK) || selectedKey.self() == LegacyMinecraftClient.keyHostOptions ? state.component : null);
+            selectedKey.setComponent(!state.is(ControllerComponent.BACK) || selectedKey.self() == Legacy4JClient.keyHostOptions ? state.component : null);
             selectedKey = null;
             state.block();
         }

@@ -28,9 +28,10 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
 import net.minecraft.world.level.validation.ContentValidationException;
 import net.minecraft.world.level.validation.ForbiddenSymlinkInfo;
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.ScreenUtil;
 
@@ -72,6 +73,12 @@ public class SaveRenderableList extends RenderableVList {
     @Nullable
     public List<LevelSummary> currentlyDisplayedLevels;
     private String filter;
+    public static LoadingCache<LevelSummary, Long> sizeCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
+        @Override
+        public Long load(LevelSummary key) {
+            return FileUtils.sizeOfDirectory(Minecraft.getInstance().getLevelSource().getLevelPath(key.getLevelId()).toFile());
+        }
+    });
     public static LoadingCache<LevelSummary, FaviconTexture> iconCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
         @Override
         public FaviconTexture load(LevelSummary key) {
@@ -81,7 +88,7 @@ public class SaveRenderableList extends RenderableVList {
                 if (basicFileAttributes.isSymbolicLink()) {
                     List<ForbiddenSymlinkInfo> list = Minecraft.getInstance().directoryValidator().validateSymlink(iconFile);
                     if (!list.isEmpty()) {
-                        LegacyMinecraft.LOGGER.warn("{}", ContentValidationException.getMessage(iconFile, list));
+                        Legacy4J.LOGGER.warn("{}", ContentValidationException.getMessage(iconFile, list));
                         iconFile = null;
                     } else {
                         basicFileAttributes = Files.readAttributes(iconFile, BasicFileAttributes.class);
@@ -93,7 +100,7 @@ public class SaveRenderableList extends RenderableVList {
             } catch (NoSuchFileException noSuchFileException) {
                 iconFile = null;
             } catch (IOException iOException) {
-                LegacyMinecraft.LOGGER.error("could not validate symlink", iOException);
+                Legacy4J.LOGGER.error("could not validate symlink", iOException);
                 iconFile = null;
             }
             FaviconTexture icon = FaviconTexture.forWorld(Minecraft.getInstance().getTextureManager(), key.getLevelId());
@@ -102,7 +109,7 @@ public class SaveRenderableList extends RenderableVList {
                 try (InputStream inputStream = Files.newInputStream(iconFile)) {
                     icon.upload(NativeImage.read(inputStream));
                 } catch (Throwable throwable) {
-                    LegacyMinecraft.LOGGER.error("Invalid icon for world {}", key.getLevelId(), throwable);
+                    Legacy4J.LOGGER.error("Invalid icon for world {}", key.getLevelId(), throwable);
                 }
             } else {
                 icon.clear();
@@ -150,7 +157,7 @@ public class SaveRenderableList extends RenderableVList {
         try {
             levelCandidates = this.minecraft.getLevelSource().findLevelCandidates();
         } catch (LevelStorageException levelStorageException) {
-            LegacyMinecraft.LOGGER.error("Couldn't load level list", levelStorageException);
+            Legacy4J.LOGGER.error("Couldn't load level list", levelStorageException);
             handleLevelLoadFailure(minecraft,levelStorageException.getMessageComponent());
             return CompletableFuture.completedFuture(List.of());
         }
@@ -160,7 +167,9 @@ public class SaveRenderableList extends RenderableVList {
         }
 
         if (currentlyDisplayedLevels == null || currentlyDisplayedLevels.isEmpty()) screen.isLoading = true;
-        return this.minecraft.getLevelSource().loadLevelSummaries(levelCandidates).exceptionally(throwable -> {
+        CompletableFuture<List<LevelSummary>> completableFuture = this.minecraft.getLevelSource().loadLevelSummaries(levelCandidates);
+        completableFuture.thenAcceptAsync(l-> l.forEach(s->sizeCache.refresh(s)));
+        return completableFuture.exceptionally(throwable -> {
             this.minecraft.delayCrash(CrashReport.forThrowable(throwable, "Couldn't load level list"));
             return List.of();
         });

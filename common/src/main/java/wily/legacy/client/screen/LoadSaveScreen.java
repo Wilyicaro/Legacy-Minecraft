@@ -22,8 +22,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
 import org.jetbrains.annotations.Nullable;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyWorldSettings;
 import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.util.ScreenUtil;
@@ -40,7 +40,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-import static wily.legacy.LegacyMinecraftClient.publishUnloadedServer;
+import static wily.legacy.Legacy4JClient.publishUnloadedServer;
 import static wily.legacy.client.screen.ControlTooltip.*;
 import static wily.legacy.client.screen.ControlTooltip.CONTROL_ACTION_CACHE;
 
@@ -55,6 +55,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
     public boolean resetEnd = false;
     public Difficulty difficulty;
     public GameType gameType;
+    protected boolean changedGameType = false;
     public final LevelSummary summary;
     protected boolean onlineOnStart = false;
     private int port = HttpUtil.getAvailablePort();
@@ -96,7 +97,10 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
     protected void init() {
         panel.init();
         List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
-        addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 65, 220,16, b -> b.getDefaultMessage(GAME_MODEL_LABEL,b.getObjectValue().getLongDisplayName()),()->Tooltip.create(Component.translatable("selectWorld.gameMode."+gameType.getName()+ ".info")),gameType,()->gameTypes, b->gameType =b.objectValue));
+        addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 65, 220,16, b -> b.getDefaultMessage(GAME_MODEL_LABEL,b.getObjectValue().getLongDisplayName()),()->Tooltip.create(Component.translatable("selectWorld.gameMode."+gameType.getName()+ ".info")),gameType,()->gameTypes, b->{
+            changedGameType = true;
+            gameType =b.objectValue;
+        })).active = !summary.isHardcore();
         addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 90, 220,16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getObjectValue().getDisplayName()),()->Tooltip.create(difficulty.getInfo()), difficulty,()-> Arrays.asList(Difficulty.values()), b-> difficulty = b.objectValue)).active = !((LegacyWorldSettings)(Object)summary.getSettings()).isDifficultyLocked() && !summary.isHardcore();
         EditBox portEdit = addRenderableWidget(new EditBox(minecraft.font, panel.x + 124, panel.y + 157,100,20,Component.translatable("lanServer.port")));
         portEdit.visible = onlineOnStart;
@@ -117,7 +121,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
             }
         }));
         portEdit.setResponder(string -> {
-            Pair<Integer,Component> p = LegacyMinecraftClient.tryParsePort(string);
+            Pair<Integer,Component> p = Legacy4JClient.tryParsePort(string);
             if(p.getFirst() != null) port = p.getFirst();
             portEdit.setHint(Component.literal("" + this.port).withStyle(ChatFormatting.DARK_GRAY));
             if (p.getSecond() == null) {
@@ -139,7 +143,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
         access.close();
         if (resetNether) deleteLevelDimension(access,Level.NETHER);
         if (resetEnd) deleteLevelDimension(access,Level.END);
-        LegacyMinecraftClient.enterWorldGameType = gameType;
+        if (changedGameType && summary.getGameMode() != gameType) Legacy4JClient.enterWorldGameType = gameType;
         resourcePackSelector.applyChanges(true, ()->minecraft.reloadResourcePacks().thenRun(this::completeLoad), this::completeLoad);
         if (!originalSelectedPacks.isEmpty()) Minecraft.getInstance().getResourcePackRepository().setSelected(originalSelectedPacks);
     }
@@ -175,15 +179,15 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
 
     public static void deleteLevelDimension(LevelStorageSource.LevelStorageAccess access, ResourceKey<Level> dimension) throws IOException {
         Path path = access.getDimensionPath(dimension);
-        LegacyMinecraft.LOGGER.info("Deleting dimension {}", dimension);
+        Legacy4J.LOGGER.info("Deleting dimension {}", dimension);
         int i = 1;
 
         while(i <= 5) {
-            LegacyMinecraft.LOGGER.info("Attempt {}...", i);
+            Legacy4J.LOGGER.info("Attempt {}...", i);
             try {
                 Files.walkFileTree(path,new SimpleFileVisitor<>(){
                     public FileVisitResult visitFile(Path pathx, BasicFileAttributes basicFileAttributes) throws IOException {
-                        LegacyMinecraft.LOGGER.debug("Deleting {}", pathx);
+                        Legacy4J.LOGGER.debug("Deleting {}", pathx);
                         Files.delete(pathx);
                         return FileVisitResult.CONTINUE;
                     }
@@ -201,7 +205,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
                 if (i >= 5) {
                     throw var6;
                 }
-                LegacyMinecraft.LOGGER.warn("Failed to delete {}", path, var6);
+                Legacy4J.LOGGER.warn("Failed to delete {}", path, var6);
                 try {
                     Thread.sleep(500L);
                 } catch (InterruptedException var5) {

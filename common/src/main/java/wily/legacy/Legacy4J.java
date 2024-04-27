@@ -28,7 +28,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 
-public class LegacyMinecraft
+public class Legacy4J
 {
     public static LegacyServerProperties serverProperties;
 
@@ -50,7 +50,7 @@ public class LegacyMinecraft
         registerCommonPacket(ServerInventoryCraftPacket.class, ServerInventoryCraftPacket::new);
         registerCommonPacket(TipCommand.Packet.class, TipCommand.Packet::decode);
         registerCommonPacket(TipCommand.EntityPacket.class, TipCommand.EntityPacket::new);
-        PlayerEvent.PLAYER_JOIN.register(LegacyMinecraft::updatePlayerPosition);
+        PlayerEvent.PLAYER_JOIN.register(Legacy4J::updatePlayerPosition);
         CommandRegistrationEvent.EVENT.register((s,c,e)->{
             TipCommand.register(s,c);
         });
@@ -79,16 +79,14 @@ public class LegacyMinecraft
         boolean b = true;
         main : while (b) {
             b = false;
-            LegacyMinecraft.LOGGER.warn("ATA");
             for (ServerPlayer player : p.server.getPlayerList().getPlayers())
                 if (player != p && ((LegacyPlayerInfo)player).getPosition() == pos){
-                    LegacyMinecraft.LOGGER.warn("BOM");
                     pos++;
                     b = true;
                     continue main;
                 }
         }
-        LegacyMinecraft.LOGGER.warn(pos);
+        Legacy4J.LOGGER.warn(pos);
         ((LegacyPlayerInfo)p).setPosition(pos);
 
     }

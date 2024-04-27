@@ -6,8 +6,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.player.LegacyPlayer;
 import wily.legacy.player.LegacyPlayerInfo;
 
@@ -51,7 +51,7 @@ public record PlayerInfoSync(int type, UUID player) implements CommonPacket {
         if (p instanceof ServerPlayer sp) {
             sp = sp.server.getPlayerList().getPlayer(player);
             if (sp == null) return;
-            if (type == 0) LegacyMinecraft.NETWORK.sendToPlayer(sp, new HostOptions(sp.server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().getId(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(sp.server.getGameRules())));
+            if (type == 0) Legacy4J.NETWORK.sendToPlayer(sp, new HostOptions(sp.server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().getId(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(sp.server.getGameRules())));
             else if (type <= 2) ((LegacyPlayer) sp).setCrafting(type == 1);
             else if (type <= 4) ((LegacyPlayerInfo)sp).setDisableExhaustion(type == 3);
             else if (type <= 6) ((LegacyPlayerInfo)sp).setMayFlySurvival(type == 5);
@@ -79,7 +79,7 @@ public record PlayerInfoSync(int type, UUID player) implements CommonPacket {
         public void apply(Supplier<NetworkManager.PacketContext> ctx) {
             Player p = ctx.get().getPlayer();
             if (p.level().isClientSide){
-                LegacyMinecraftClient.updateLegacyPlayerInfos(players);
+                Legacy4JClient.updateLegacyPlayerInfos(players);
                 GameRules displayRules = p.level().getGameRules();
                 GameRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
                     @Override

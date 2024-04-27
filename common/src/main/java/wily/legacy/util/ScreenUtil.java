@@ -26,8 +26,8 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.LegacyIconHolder;
 
@@ -39,15 +39,16 @@ public class ScreenUtil {
     public static long lastHotbarSelectionChange = -1;
     protected static LogoRenderer logoRenderer = new LogoRenderer(false);
     public static LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
-    public static final ResourceLocation SAVE_CHEST_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"hud/save_chest");
-    public static final ResourceLocation SAVE_ARROW_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"hud/save_arrow");
-    public static final ResourceLocation LOADING_BLOCK_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"widget/loading_block");
-    public static final ResourceLocation POINTER_PANEL_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"tiles/pointer_panel");
-    public static final ResourceLocation PANEL_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"tiles/panel");
-    public static final ResourceLocation PANEL_RECESS_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"tiles/panel_recess");
-    public static final ResourceLocation ENTITY_PANEL_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"tiles/entity_panel");
-    public static final ResourceLocation SQUARE_RECESSED_PANEL = new ResourceLocation(LegacyMinecraft.MOD_ID,"tiles/square_recessed_panel");
-    public static final ResourceLocation SQUARE_ENTITY_PANEL = new ResourceLocation(LegacyMinecraft.MOD_ID,"tiles/square_entity_panel");
+    public static final ResourceLocation SAVE_CHEST_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"hud/save_chest");
+    public static final ResourceLocation SAVE_ARROW_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"hud/save_arrow");
+    public static final ResourceLocation LOADING_BLOCK_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"widget/loading_block");
+    public static final ResourceLocation POINTER_PANEL_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"tiles/pointer_panel");
+    public static final ResourceLocation PANEL_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel");
+    public static final ResourceLocation PANEL_RECESS_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel_recess");
+    public static final ResourceLocation PANEL_TRANSLUCENT_RECESS_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel_translucent_recess");
+    public static final ResourceLocation ENTITY_PANEL_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"tiles/entity_panel");
+    public static final ResourceLocation SQUARE_RECESSED_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/square_recessed_panel");
+    public static final ResourceLocation SQUARE_ENTITY_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/square_entity_panel");
     public static void renderPointerPanel(GuiGraphics graphics, int x, int y, int width, int height){
         RenderSystem.enableBlend();
         RenderSystem.disableDepthTest();
@@ -60,6 +61,9 @@ public class ScreenUtil {
     }
     public static void renderPanelRecess(GuiGraphics graphics, int x, int y, int width, int height, float dp){
         renderTiles(PANEL_RECESS_SPRITE,graphics,x,y,width,height,dp);
+    }
+    public static void renderPanelTranslucentRecess(GuiGraphics graphics, int x, int y, int width, int height, float dp){
+        renderTiles(PANEL_TRANSLUCENT_RECESS_SPRITE,graphics,x,y,width,height,dp);
     }
     public static void renderEntityPanel(GuiGraphics graphics, int x, int y, int width, int height, float dp){
         renderTiles(ENTITY_PANEL_SPRITE,graphics,x,y,width,height,dp);
@@ -111,7 +115,7 @@ public class ScreenUtil {
     }
     public static void renderPanoramaBackground(GuiGraphics guiGraphics, boolean isNight){
         RenderSystem.depthMask(false);
-        ResourceLocation panorama = new ResourceLocation(LegacyMinecraft.MOD_ID, "textures/gui/title/panorama_" + (isNight ? "night" : "day") + ".png");
+        ResourceLocation panorama = new ResourceLocation(Legacy4J.MOD_ID, "textures/gui/title/panorama_" + (isNight ? "night" : "day") + ".png");
         Minecraft.getInstance().getTextureManager().getTexture(panorama).setFilter(true, false);
         guiGraphics.blit(panorama, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() / 66.32f, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiHeight() * 820/144, guiGraphics.guiHeight());
         RenderSystem.depthMask(true);
@@ -272,13 +276,13 @@ public class ScreenUtil {
             render.run();
             return;
         }
-        LegacyMinecraftClient.guiBufferSourceOverride = BufferSourceWrapper.translucent(graphics.bufferSource());
+        Legacy4JClient.guiBufferSourceOverride = BufferSourceWrapper.translucent(graphics.bufferSource());
         graphics.setColor(1.0f, 1.0f, 1.0f, alpha);
         RenderSystem.enableBlend();
         render.run();
         RenderSystem.disableBlend();
         graphics.setColor(1.0f, 1.0f, 1.0f, 1.0f);
-        LegacyMinecraftClient.guiBufferSourceOverride = null;
+        Legacy4JClient.guiBufferSourceOverride = null;
     }
     public static boolean isHovering(Slot slot,int leftPos, int topPos,  double d, double e) {
         LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(slot);

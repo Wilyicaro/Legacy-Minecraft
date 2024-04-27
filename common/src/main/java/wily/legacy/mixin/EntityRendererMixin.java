@@ -17,8 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.player.LegacyPlayerInfo;
 import wily.legacy.util.ScreenUtil;
 
@@ -33,7 +32,7 @@ public abstract class EntityRendererMixin {
         int j = "deadmau5".equals(name) ? -10 : 0;
         int h = (int) (-font.width(component) / 2f);
         Minecraft minecraft = Minecraft.getInstance();
-        float[] color = !(entity instanceof AbstractClientPlayer p)  || minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(p.getUUID()) instanceof LegacyPlayerInfo info) || info.getPosition() == 0 ?  new float[]{0,0,0} : LegacyMinecraftClient.getVisualPlayerColor(info);
+        float[] color = !(entity instanceof AbstractClientPlayer p)  || minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(p.getUUID()) instanceof LegacyPlayerInfo info) || info.getPosition() == 0 ?  new float[]{0,0,0} : Legacy4JClient.getVisualPlayerColor(info);
         poseStack.pushPose();
         fill(RenderType.debugLineStrip(1.0),multiBufferSource, poseStack, h - 1, j - 1, h + font.width(component) + 1,j + 9, color[0],color[1],color[2],1.0f);
         poseStack.translate(0, 8,0);

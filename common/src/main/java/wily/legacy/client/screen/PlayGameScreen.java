@@ -1,7 +1,9 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerList;
@@ -10,10 +12,11 @@ import net.minecraft.client.server.LanServer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.storage.LevelSummary;
 import org.apache.commons.compress.utils.FileNameUtils;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.util.ScreenUtil;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
@@ -46,21 +49,43 @@ public class PlayGameScreen extends PanelVListScreen{
     @Override
     protected void init() {
         panel.height = Math.min(256,height-52);
-        addRenderableWidget(tabList);
+        addWidget(tabList);
         panel.init();
-        addRenderableOnly(panel);
-        addRenderableOnly(((guiGraphics, i, j, f) -> {
-            ScreenUtil.renderPanelRecess(guiGraphics, panel.x + 9, panel.y + 9, panel.width - 18, panel.height - 18, 2);
-            if (isLoading)
-                ScreenUtil.drawGenericLoading(guiGraphics, panel.x + 112 , panel.y + 66);
-        }));
-        getRenderableVList().init(this,panel.x + 15,panel.y + 15,270, panel.height - 10);
+        getRenderableVList().init(this,panel.x + 15,panel.y + 15,270, panel.height - 10 - (tabList.selectedTab == 0 ? 21 : 0));
         tabList.init(panel.x,panel.y - 24,panel.width);
     }
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         ScreenUtil.renderDefaultBackground(guiGraphics,false);
+        tabList.render(guiGraphics,i,j,f);
+        panel.render(guiGraphics,i,j,f);
+        ScreenUtil.renderPanelRecess(guiGraphics, panel.x + 9, panel.y + 9, panel.width - 18, panel.height - 18 - (tabList.selectedTab == 0 ? 21 : 0), 2);
+        if (tabList.selectedTab == 0){
+            if (saveRenderableList.currentlyDisplayedLevels != null) {
+                guiGraphics.pose().pushPose();
+                guiGraphics.pose().translate(panel.x + 11.25f, panel.y + panel.height - 22.75, 0);
+                long storageSize = new File("/").getTotalSpace() / 100;
+                for (LevelSummary level : saveRenderableList.currentlyDisplayedLevels) {
+                    Long size;
+                    if ((size = SaveRenderableList.sizeCache.getIfPresent(level)) == null) continue;
+                    float scaledSize = size * (panel.width - 21f)/ storageSize;
+                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().scale(scaledSize,1,1);
+                    guiGraphics.fill(0, 0, 1, 11,getFocused() instanceof AbstractButton b && saveRenderableList.renderables.contains(b) && saveRenderableList.renderables.indexOf(b) == saveRenderableList.currentlyDisplayedLevels.indexOf(level) ? 0xFFFFFF00 : 0xFF8C9DE2);
+                    guiGraphics.pose().popPose();
+                    guiGraphics.pose().translate(scaledSize, 0, 0);
+                }
+                guiGraphics.pose().popPose();
+            }
+            RenderSystem.enableBlend();
+            ScreenUtil.renderPanelTranslucentRecess(guiGraphics, panel.x + 9, panel.y + panel.height - 25, panel.width - 18 , 16, 2);
+            RenderSystem.disableBlend();
+
+        }
+        if (isLoading)
+            ScreenUtil.drawGenericLoading(guiGraphics, panel.x + 112 ,
+                    panel.y + 66);
     }
 
     @Override
@@ -139,7 +164,7 @@ public class PlayGameScreen extends PanelVListScreen{
             minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.import_save"), Component.translatable("legacy.menu.import_save_message", string), (b) -> {
                 list.forEach(p -> {
                     try {
-                        LegacyMinecraftClient.importSaveFile(minecraft, new FileInputStream(p.toFile()), FileNameUtils.getBaseName(p.getFileName().toString()));
+                        Legacy4JClient.importSaveFile(minecraft, new FileInputStream(p.toFile()), FileNameUtils.getBaseName(p.getFileName().toString()));
                     } catch (FileNotFoundException e) {
                         throw new RuntimeException(e);
                     }

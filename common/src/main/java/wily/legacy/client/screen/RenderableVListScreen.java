@@ -5,7 +5,7 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4JClient;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -30,7 +30,7 @@ public class RenderableVListScreen extends LegacyScreen {
 
     @Override
     public void clearFocus() {
-        if (lastFocused > -1 && LegacyMinecraftClient.controllerHandler.isCursorDisabled) return;
+        if (lastFocused > -1 && Legacy4JClient.controllerHandler.isCursorDisabled) return;
         lastFocused = -1;
         super.clearFocus();
     }

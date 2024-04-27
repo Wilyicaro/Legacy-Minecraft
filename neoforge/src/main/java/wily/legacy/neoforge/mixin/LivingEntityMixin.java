@@ -1,4 +1,4 @@
-package wily.legacy.forge.mixin;
+package wily.legacy.neoforge.mixin;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;

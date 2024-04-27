@@ -13,8 +13,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyWorldTemplate;
 import wily.legacy.util.ScreenUtil;
 
@@ -29,10 +29,10 @@ public class CreationList extends RenderableVList{
     public CreationList() {
         layoutSpacing(l->0);
         minecraft = Minecraft.getInstance();
-        addIconButton(this,new ResourceLocation(LegacyMinecraft.MOD_ID,"creation_list/create_world"),Component.translatable("legacy.menu.create_world"), c-> CreateWorldScreen.openFresh(this.minecraft, screen));
+        addIconButton(this,new ResourceLocation(Legacy4J.MOD_ID,"creation_list/create_world"),Component.translatable("legacy.menu.create_world"), c-> CreateWorldScreen.openFresh(this.minecraft, screen));
         LegacyWorldTemplate.list.forEach(t-> addIconButton(this,t.icon(),t.buttonName(), c-> {
             try {
-                String name = LegacyMinecraftClient.importSaveFile(minecraft,minecraft.getResourceManager().getResourceOrThrow(t.worldTemplate()).open(),t.folderName());
+                String name = Legacy4JClient.importSaveFile(minecraft,minecraft.getResourceManager().getResourceOrThrow(t.worldTemplate()).open(),t.folderName());
                 if (t.directJoin()) minecraft.createWorldOpenFlows().checkForBackupAndLoad(name, ()-> minecraft.setScreen(screen));
                 else {
                     LevelStorageSource.LevelStorageAccess access = minecraft.getLevelSource().createAccess(name);

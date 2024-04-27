@@ -7,12 +7,12 @@ import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
 
-@Mod.EventBusSubscriber(modid = LegacyMinecraft.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = Legacy4J.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientEvents {
     public static final List<VanillaGuiOverlay> HUD_VANILLA_OVERLAYS = List.of(VanillaGuiOverlay.PLAYER_HEALTH,VanillaGuiOverlay.AIR_LEVEL,VanillaGuiOverlay.ARMOR_LEVEL,VanillaGuiOverlay.MOUNT_HEALTH,VanillaGuiOverlay.FOOD_LEVEL);
     @SubscribeEvent
