@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -184,9 +185,11 @@ public class ScreenUtil {
         return mc.getResourcePackRepository().getSelectedPacks().stream().anyMatch(p->p.getId().equals("programmer_art"));
     }
     public static void playSimpleUISound(SoundEvent sound, float grave, float volume){
+        mc.getSoundManager().stop(sound.getLocation(), SoundSource.MASTER);
         mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave, volume));
     }
     public static void playSimpleUISound(SoundEvent sound, float grave){
+        mc.getSoundManager().stop(sound.getLocation(), SoundSource.MASTER);
         mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave));
     }
     public static void addTip(Entity entity){

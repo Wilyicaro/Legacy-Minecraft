@@ -35,6 +35,8 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
 
     @Shadow private boolean lastOnGround;
 
+    @Shadow protected abstract boolean hasEnoughFoodToStartSprinting();
+
     public LocalPlayerMixin(ClientLevel clientLevel, GameProfile gameProfile) {
         super(clientLevel, gameProfile);
     }
@@ -57,7 +59,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
     }
     @Redirect(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;setSprinting(Z)V", ordinal = 3))
     public void aiStepSprintingWater(LocalPlayer instance, boolean b) {
-        if (isAffectedByFluids()) instance.setSprinting(b);
+        if (isAffectedByFluids() || !this.input.hasForwardImpulse() || !this.hasEnoughFoodToStartSprinting()) instance.setSprinting(b);
     }
     @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;aiStep()V"))
     public void setYElytraFlightElevation(CallbackInfo ci) {

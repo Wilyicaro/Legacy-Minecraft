@@ -335,7 +335,10 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                 public boolean keyPressed(int i, int j, int k) {
                     if ((i == InputConstants.KEY_O || i == InputConstants.KEY_X) && isValidIndex()){
                         if (i == InputConstants.KEY_O){
-                            if (this.canCraft()) selectedPatterns.add(getFocusedRecipe());
+                            if (this.canCraft()){
+                                selectedPatterns.add(getFocusedRecipe());
+                                ScreenUtil.playSimpleUISound(SoundEvents.UI_LOOM_SELECT_PATTERN,1.0f);
+                            }
                         } else selectedPatterns.remove(getFocusedRecipe());
                         int cycle = getFocusedRecipes().indexOf(getFocusedRecipe()) - getRecipes().indexOf(getFocusedRecipe());
                         focusedRecipes = null;
