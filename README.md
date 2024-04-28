@@ -18,6 +18,8 @@ The main objective of this project is remake every aspect of Legacy Console Edit
 Feel free to report Issues or Contribute here!
 You can also join our [Discord](https://discord.com/invite/FJVbVgT9uS) to talk to the developers, other members and suggest things for the mod!
 
+### You should also check out the official modpack, [Re-Console](https://modrinth.com/modpack/legacy-minecraft)
+
 ## The current features include:
 
 * Auto-Save Icon from Legacy Edition
