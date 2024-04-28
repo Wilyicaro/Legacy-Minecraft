@@ -1,5 +1,6 @@
 package wily.legacy.client.screen;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
@@ -9,6 +10,7 @@ import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
+import net.minecraft.client.gui.screens.worldselection.ConfirmExperimentalFeaturesScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
 import net.minecraft.locale.Language;
@@ -17,6 +19,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.level.DataPackConfig;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.WorldDataConfiguration;
 import wily.legacy.Legacy4J;
@@ -196,7 +201,6 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
         super.init();
         tabList.init(panel.x,panel.y - 23,panel.width);
     }
-
     void openDataPackSelectionScreen(CreateWorldScreen screen, WorldDataConfiguration worldDataConfiguration) {
         Pair<Path, PackRepository> pair = screen.getDataPackSelectionSettings(worldDataConfiguration);
         if (pair != null) {

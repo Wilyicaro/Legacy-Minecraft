@@ -127,7 +127,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
         }
         if ((itemIcon.isEmpty() || (applyNextItemIfAbsent() && !hasItem(itemIcon))) && !nextItem.isEmpty()){
             itemIcon = nextItem;
-            updateRecipe();
+            if (isFocused()) updateRecipe();
         }
         super.render(graphics, i, j, f);
     }
@@ -174,7 +174,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
         }
         graphics.pose().pushPose();
         applyOffset(graphics);
-        if (!previousItem.isEmpty() || !nextItem.isEmpty()){
+        if ((!previousItem.isEmpty() || !nextItem.isEmpty()) && !ItemStack.isSameItem(nextItem,itemIcon) && !ItemStack.isSameItem(previousItem,itemIcon)){
             getScrollRenderer().renderScroll(graphics, ScreenDirection.UP,getX() + 5,getY() - 14);
             getScrollRenderer().renderScroll(graphics, ScreenDirection.DOWN,getX() + 5,getY() + 31);
         }

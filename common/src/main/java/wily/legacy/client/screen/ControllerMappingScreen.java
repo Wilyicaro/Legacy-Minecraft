@@ -90,6 +90,7 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
     public boolean keyPressed(int i, int j, int k) {
         if (i == InputConstants.KEY_ESCAPE && selectedKey != null) {
             selectedKey.setComponent(null);
+            minecraft.options.save();
             selectedKey = null;
             return true;
         }
@@ -109,6 +110,7 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
         if (selectedKey != null) {
             if (!state.canClick()) return;
             selectedKey.setComponent(!state.is(ControllerComponent.BACK) || selectedKey.self() == Legacy4JClient.keyHostOptions ? state.component : null);
+            minecraft.options.save();
             selectedKey = null;
             state.block();
         }

@@ -24,6 +24,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class TabList implements Renderable,GuiEventListener, NarratableEntry {
+
     public final List<LegacyTabButton> tabButtons;
     public int selectedTab = 0;
     boolean focused = false;

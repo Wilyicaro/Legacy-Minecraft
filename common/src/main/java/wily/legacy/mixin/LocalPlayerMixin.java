@@ -55,9 +55,9 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
     public boolean aiStepSprinting(LocalPlayer instance) {
         return false;
     }
-    @Redirect(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;isInWater()Z", ordinal = 1))
-    public boolean aiStepSprintingWater(LocalPlayer instance) {
-        return instance.isInWater() && isAffectedByFluids();
+    @Redirect(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;setSprinting(Z)V", ordinal = 3))
+    public void aiStepSprintingWater(LocalPlayer instance, boolean b) {
+        if (isAffectedByFluids()) instance.setSprinting(b);
     }
     @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;aiStep()V"))
     public void setYElytraFlightElevation(CallbackInfo ci) {

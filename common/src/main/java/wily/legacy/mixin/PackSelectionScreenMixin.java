@@ -2,6 +2,7 @@ package wily.legacy.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -59,7 +60,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
         lastFocused = -1;
         super.clearFocus();
     }
-
+    Screen parent;
     public void repositionElements() {
         lastFocused = getFocused() != null ? children().indexOf(getFocused()) : -1;
         super.repositionElements();
@@ -91,6 +92,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
     @Inject(method = "<init>", at = @At("RETURN"))
     public void init(CallbackInfo info){
         reload();
+        parent = Minecraft.getInstance().screen;
     }
 
     @Inject(method = "populateLists", at = @At("HEAD"), cancellable = true)
@@ -103,6 +105,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
     @Inject(method = "onClose", at = @At("RETURN"))
     public void onClose(CallbackInfo info){
         ScreenUtil.playSimpleUISound(LegacySoundEvents.BACK.get(),1.0f);
+        if (parent != null) minecraft.setScreen(parent);
     }
     private void addPacks(RenderableVList list,Stream<PackSelectionModel.Entry> stream){
         list.renderables.clear();

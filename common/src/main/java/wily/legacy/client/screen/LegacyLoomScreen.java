@@ -161,13 +161,16 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                         patternsTag.add(addPattern);
                         addPattern.putString("Pattern", pattern.getHashname());
                         addPattern.putInt("Color", color.getId());
-                        List<Ingredient> displayIngs = new ArrayList<>(List.of(previewIng, Ingredient.of(DyeItem.byColor(color))));
+                        Ingredient dye = Ingredient.of(DyeItem.byColor(color));
+                        List<Ingredient> previewIngs = new ArrayList<>(selectedIngredients);
+                        previewIngs.add(dye);
+                        List<Ingredient> displayIngs = new ArrayList<>(List.of(previewIng, dye));
                         Ingredient extraIng = getPatternExtraIngredient(p);
                         if (!extraIng.isEmpty()) displayIngs.add(1,extraIng);
                         NonNullList<Ingredient> ings = NonNullList.create();
                         ings.addAll(displayIngs);
                         ings.set(0,selectedIngredients.get(0));
-                        return new BannerRecipe(displayIngs,ings,result, p, color);
+                        return new BannerRecipe(previewIngs,displayIngs,ings,result, p, color);
                     }).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
                         Collections.reverse(l);
                         return l;
@@ -317,7 +320,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
 
                 protected boolean canCraft(BannerRecipe rcp) {
                     if (rcp == null) return true;
-                    return canItemAcceptPatterns(previewStack) && LegacyLoomScreen.this.canCraft(rcp.getIngredients(),isFocused() && getFocusedRecipe() == rcp);
+                    return canItemAcceptPatterns(previewStack) && LegacyLoomScreen.this.canCraft(rcp.getIngredients(),isFocused() && getFocusedRecipe() == rcp) && LegacyLoomScreen.this.canCraft(rcp.previewIngredients,false);
                 }
 
                 protected List<BannerRecipe> getRecipes() {
@@ -332,7 +335,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                 public boolean keyPressed(int i, int j, int k) {
                     if ((i == InputConstants.KEY_O || i == InputConstants.KEY_X) && isValidIndex()){
                         if (i == InputConstants.KEY_O){
-                            if (this.canCraft() && LegacyLoomScreen.this.canCraft()) selectedPatterns.add(getFocusedRecipe());
+                            if (this.canCraft()) selectedPatterns.add(getFocusedRecipe());
                         } else selectedPatterns.remove(getFocusedRecipe());
                         int cycle = getFocusedRecipes().indexOf(getFocusedRecipe()) - getRecipes().indexOf(getFocusedRecipe());
                         focusedRecipes = null;
@@ -371,7 +374,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
             h.offset = new Offset(0.5,0.5,0);
         }
     }
-    record BannerRecipe(List<Ingredient> displayIngredients, NonNullList<Ingredient> ingredients, ItemStack resultStack, ResourceKey<BannerPattern> pattern, DyeColor color) implements Recipe<CraftingContainer>{
+    record BannerRecipe(List<Ingredient> previewIngredients,List<Ingredient> displayIngredients, NonNullList<Ingredient> ingredients, ItemStack resultStack, ResourceKey<BannerPattern> pattern, DyeColor color) implements Recipe<CraftingContainer>{
 
         @Override
         public boolean matches(CraftingContainer container, Level level) {

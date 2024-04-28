@@ -33,6 +33,7 @@ public class ControllerHandler {
     protected static final Map<Integer, ControllerComponent> DEFAULT_CONTROLLER_BUTTONS_BY_KEY = new HashMap<>();
     public String connectedController = null;
     public boolean isCursorDisabled = false;
+    public boolean forceEnableCursor = false;
     public boolean resetCursor = false;
     public boolean canChangeSlidersValue = true;
     private final Minecraft minecraft;
@@ -208,6 +209,7 @@ public class ControllerHandler {
         return button.componentState;
     }
     public void disableCursor(){
+        if (forceEnableCursor) return;
         GLFW.glfwSetInputMode(minecraft.getWindow().getWindow(),GLFW.GLFW_CURSOR,GLFW.GLFW_CURSOR_HIDDEN);
         minecraft.mouseHandler.xpos = -1;
         minecraft.mouseHandler.ypos = -1;
@@ -234,7 +236,12 @@ public class ControllerHandler {
         resetCursor = true;
     }
     public void toggleCursor(){
-        if (isCursorDisabled) enableCursor();
-        else disableCursor();
+        forceEnableCursor = !forceEnableCursor;
+        if (isCursorDisabled){
+            if (forceEnableCursor) {
+                enableCursor();
+                if (minecraft.screen != null) minecraft.screen.repositionElements();
+            }
+        } else if (!forceEnableCursor) disableCursor();
     }
 }

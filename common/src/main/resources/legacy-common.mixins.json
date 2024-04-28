@@ -109,6 +109,8 @@
     "ServerPlayerMixin",
     "ShulkerBoxMenuMixin",
     "SmithingMenuMixin",
+    "SnowLayerBlockMixin",
+    "SpawnEggItemMixin",
     "StonecutterBlockMixin",
     "StonecutterMenuMixin",
     "VillagerMixin",

@@ -40,7 +40,10 @@ public abstract class RecipeToastMixin implements Toast {
             this.lastChanged = l;
             this.changed = false;
         }
-        if (this.recipes.isEmpty() || !ScreenUtil.hasClassicCrafting()) cir.setReturnValue(Toast.Visibility.HIDE);
+        if (this.recipes.isEmpty() || !ScreenUtil.hasClassicCrafting()){
+            cir.setReturnValue(Toast.Visibility.HIDE);
+            return;
+        }
 
         ScreenUtil.renderPointerPanel(guiGraphics,0,0,width(),height());
         guiGraphics.pose().pushPose();

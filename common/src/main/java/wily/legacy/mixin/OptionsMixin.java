@@ -98,7 +98,7 @@ public abstract class OptionsMixin implements LegacyOptions {
     }
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ToggleKeyMapping;<init>(Ljava/lang/String;ILjava/lang/String;Ljava/util/function/BooleanSupplier;)V", ordinal = 0),index = 3)
     protected BooleanSupplier initKeyShift(BooleanSupplier booleanSupplier) {
-        return ()-> (minecraft == null || minecraft.player == null || (!minecraft.player.getAbilities().flying && minecraft.player.getVehicle() == null)) && booleanSupplier.getAsBoolean();
+        return ()-> (minecraft == null || minecraft.player == null || (!minecraft.player.getAbilities().flying && minecraft.player.getVehicle() == null && !minecraft.player.isInWater() )) && booleanSupplier.getAsBoolean();
     }
     @Redirect(method = "<init>", at = @At( value = "INVOKE", target = "Lnet/minecraft/client/Options;load()V"))
     protected void init(Options instance) {

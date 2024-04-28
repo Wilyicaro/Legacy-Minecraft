@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Supplier;
@@ -65,7 +66,9 @@ public class PlayGameScreen extends PanelVListScreen{
             if (saveRenderableList.currentlyDisplayedLevels != null) {
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(panel.x + 11.25f, panel.y + panel.height - 22.75, 0);
-                long storageSize = new File("/").getTotalSpace() / 100;
+                long storage = new File("/").getTotalSpace();
+                long fixedStorage = SaveRenderableList.sizeCache.asMap().values().stream().max(Comparator.comparingLong(l->l)).orElse(0L) * (saveRenderableList.currentlyDisplayedLevels.size() + 1);
+                long storageSize = fixedStorage != 0 ? Math.min(storage,fixedStorage) : storage;
                 for (LevelSummary level : saveRenderableList.currentlyDisplayedLevels) {
                     Long size;
                     if ((size = SaveRenderableList.sizeCache.getIfPresent(level)) == null) continue;
