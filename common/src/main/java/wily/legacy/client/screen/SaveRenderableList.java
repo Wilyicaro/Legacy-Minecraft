@@ -50,14 +50,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public class SaveRenderableList extends RenderableVList {
-    static final ResourceLocation ERROR_HIGHLIGHTED_SPRITE = new ResourceLocation("world_list/error_highlighted");
-    static final ResourceLocation ERROR_SPRITE = new ResourceLocation("world_list/error");
-    static final ResourceLocation MARKED_JOIN_HIGHLIGHTED_SPRITE = new ResourceLocation("world_list/marked_join_highlighted");
-    static final ResourceLocation MARKED_JOIN_SPRITE = new ResourceLocation("world_list/marked_join");
-    static final ResourceLocation WARNING_HIGHLIGHTED_SPRITE = new ResourceLocation("world_list/warning_highlighted");
-    static final ResourceLocation WARNING_SPRITE = new ResourceLocation("world_list/warning");
-    static final ResourceLocation JOIN_HIGHLIGHTED_SPRITE = new ResourceLocation("world_list/join_highlighted");
-    static final ResourceLocation JOIN_SPRITE = new ResourceLocation("world_list/join");
+    static final ResourceLocation ERROR_HIGHLIGHTED = new ResourceLocation("world_list/error_highlighted");
+    static final ResourceLocation ERROR = new ResourceLocation("world_list/error");
+    static final ResourceLocation MARKED_JOIN_HIGHLIGHTED = new ResourceLocation("world_list/marked_join_highlighted");
+    static final ResourceLocation MARKED_JOIN = new ResourceLocation("world_list/marked_join");
+    static final ResourceLocation WARNING_HIGHLIGHTED = new ResourceLocation("world_list/warning_highlighted");
+    static final ResourceLocation WARNING = new ResourceLocation("world_list/warning");
+    static final ResourceLocation JOIN_HIGHLIGHTED = new ResourceLocation("world_list/join_highlighted");
+    static final ResourceLocation JOIN = new ResourceLocation("world_list/join");
     static final Logger LOGGER = LogUtils.getLogger();
     static final Component FROM_NEWER_TOOLTIP_1 = Component.translatable("selectWorld.tooltip.fromNewerVersion1").withStyle(ChatFormatting.RED);
     static final Component FROM_NEWER_TOOLTIP_2 = Component.translatable("selectWorld.tooltip.fromNewerVersion2").withStyle(ChatFormatting.RED);
@@ -226,10 +226,10 @@ public class SaveRenderableList extends RenderableVList {
                             guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
 
                             boolean hoverIcon = ScreenUtil.isMouseOver(i, j, getX() + 5, getY() + 5, 20, height);
-                            ResourceLocation resourceLocation = hoverIcon ? JOIN_HIGHLIGHTED_SPRITE : JOIN_SPRITE;
-                            ResourceLocation resourceLocation2 = hoverIcon ? WARNING_HIGHLIGHTED_SPRITE : WARNING_SPRITE;
-                            ResourceLocation resourceLocation3 = hoverIcon ? ERROR_HIGHLIGHTED_SPRITE : ERROR_SPRITE;
-                            ResourceLocation resourceLocation4 = hoverIcon ? MARKED_JOIN_HIGHLIGHTED_SPRITE : MARKED_JOIN_SPRITE;
+                            ResourceLocation resourceLocation = hoverIcon ? JOIN_HIGHLIGHTED : JOIN;
+                            ResourceLocation resourceLocation2 = hoverIcon ? WARNING_HIGHLIGHTED : WARNING;
+                            ResourceLocation resourceLocation3 = hoverIcon ? ERROR_HIGHLIGHTED : ERROR;
+                            ResourceLocation resourceLocation4 = hoverIcon ? MARKED_JOIN_HIGHLIGHTED : MARKED_JOIN;
                             if (summary instanceof LevelSummary.SymlinkLevelSummary || summary instanceof LevelSummary.CorruptedLevelSummary) {
                                 guiGraphics.blitSprite(resourceLocation3, getX(), getY(), 32, 32);
                                 guiGraphics.blitSprite(resourceLocation4, getX(), getY(), 32, 32);

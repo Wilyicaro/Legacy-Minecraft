@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static wily.legacy.client.LegacySprites.LOADING_BACKGROUND_SPRITE;
-import static wily.legacy.client.LegacySprites.LOADING_BAR_SPRITE;
+import static wily.legacy.util.LegacySprites.LOADING_BACKGROUND;
+import static wily.legacy.util.LegacySprites.LOADING_BAR;
 
 public class LegacyLoadingScreen extends LegacyScreen {
     public static final List<Supplier<LegacyTip>> usingLoadingTips = new ArrayList<>(LegacyTipManager.loadingTips);
@@ -74,9 +74,9 @@ public class LegacyLoadingScreen extends LegacyScreen {
             if (progress != -1) {
                 if (lastLoadingStage != null)
                     guiGraphics.drawString(minecraft.font, lastLoadingStage, x, height / 2 + 4, 16777215);
-                guiGraphics.blitSprite(LOADING_BACKGROUND_SPRITE, x, y, 320, 10);
+                guiGraphics.blitSprite(LOADING_BACKGROUND, x, y, 320, 10);
                 if (progress >= 0)
-                    guiGraphics.blitSprite(LOADING_BAR_SPRITE, x + 1, y + 1, (int) (318 * (progress / 100F)), 8);
+                    guiGraphics.blitSprite(LOADING_BAR, x + 1, y + 1, (int) (318 * (progress / 100F)), 8);
                 LegacyTip tip = getLoadingTip();
                 if (tip != null) {
                     tip.setX((width - tip.width) / 2);

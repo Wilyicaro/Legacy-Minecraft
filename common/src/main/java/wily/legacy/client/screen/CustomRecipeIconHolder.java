@@ -6,12 +6,13 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.controller.ControllerComponent;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.network.ServerInventoryCraftPacket;
 import wily.legacy.util.ScreenUtil;
@@ -103,8 +104,8 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
     public void onPress() {
         if (isFocused()){
             if (canCraft()){
-                ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT.get(),1.0f);
-                Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(getIngredientsGrid(), getResultStack(),-1,Screen.hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
+                ScreenUtil.playSimpleUISound(SoundEvents.ITEM_PICKUP,1.0f);
+                Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(getIngredientsGrid(), getResultStack(),-1,Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
                 updateRecipe();
             }else ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT_FAIL.get(),1.0f);
         }
@@ -174,7 +175,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
         }
         graphics.pose().pushPose();
         applyOffset(graphics);
-        if ((!previousItem.isEmpty() || !nextItem.isEmpty()) && !ItemStack.isSameItem(nextItem,itemIcon) && !ItemStack.isSameItem(previousItem,itemIcon)){
+        if ((!previousItem.isEmpty() && !ItemStack.matches(previousItem,itemIcon) || !nextItem.isEmpty() && !ItemStack.matches(nextItem,itemIcon))){
             getScrollRenderer().renderScroll(graphics, ScreenDirection.UP,getX() + 5,getY() - 14);
             getScrollRenderer().renderScroll(graphics, ScreenDirection.DOWN,getX() + 5,getY() + 31);
         }

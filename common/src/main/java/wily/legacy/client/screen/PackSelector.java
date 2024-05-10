@@ -41,8 +41,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static wily.legacy.client.LegacySprites.PACK_HIGHLIGHTED_SPRITE;
-import static wily.legacy.client.LegacySprites.PACK_SELECTED_SPRITE;
+import static wily.legacy.util.LegacySprites.PACK_HIGHLIGHTED;
+import static wily.legacy.util.LegacySprites.PACK_SELECTED;
 
 public class PackSelector extends AbstractWidget {
     public static final ResourceLocation DEFAULT_ICON = new ResourceLocation("textures/misc/unknown_pack.png");
@@ -236,9 +236,9 @@ public class PackSelector extends AbstractWidget {
         for (int index = 0; index < displayPacks.size(); index++) {
             if (visibleCount>=getMaxPacks()) break;
             guiGraphics.blit(getPackIcon(displayPacks.get(scrolledList.get() + index)), getX() + 21 + 30 * index,getY() + font.lineHeight + 4,0.0f, 0.0f, 28, 28, 28, 28);
-            if (model.selected.contains(displayPacks.get(scrolledList.get() + index)))  guiGraphics.blitSprite(PACK_SELECTED_SPRITE, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
+            if (model.selected.contains(displayPacks.get(scrolledList.get() + index)))  guiGraphics.blitSprite(PACK_SELECTED, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
             if (scrolledList.get() + index == selectedIndex)
-                guiGraphics.blitSprite(PACK_HIGHLIGHTED_SPRITE, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
+                guiGraphics.blitSprite(PACK_HIGHLIGHTED, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
             visibleCount++;
         }
         RenderSystem.disableBlend();

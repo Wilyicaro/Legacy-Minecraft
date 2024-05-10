@@ -14,10 +14,12 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import wily.legacy.Legacy4J;
 import wily.legacy.util.CompoundTagUtil;
+import wily.legacy.util.JsonUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public record LegacyCreativeTabListing(Component name, ResourceLocation icon, CompoundTag itemIconTag, List<ItemStack> displayItems) {
@@ -30,7 +32,7 @@ public record LegacyCreativeTabListing(Component name, ResourceLocation icon, Co
         @Override
         protected List<LegacyCreativeTabListing> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
             List<LegacyCreativeTabListing> creativeTabListing = new ArrayList<>();
-            resourceManager.getNamespaces().forEach(name->{
+            resourceManager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1)).forEach(name->{
                 resourceManager.getResource(new ResourceLocation(name,LISTING)).ifPresent(r->{
                     try {
                         BufferedReader bufferedReader = r.openAsReader();
@@ -43,15 +45,8 @@ public record LegacyCreativeTabListing(Component name, ResourceLocation icon, Co
                                 LegacyCreativeTabListing l = new LegacyCreativeTabListing(Component.translatable(s),new ResourceLocation(GsonHelper.getAsString(tabObj,"icon")), tag, new ArrayList<>());
                                 if (tabObj.get("listing") instanceof JsonArray a) {
                                     a.forEach(e -> {
-                                        JsonElement itemElement = e;
-                                        if (e instanceof JsonObject o) itemElement = o.get("item");
-                                        if (itemElement instanceof JsonPrimitive j && j.isString() && BuiltInRegistries.ITEM.containsKey(new ResourceLocation(j.getAsString()))) {
-                                            ItemStack i = new ItemStack(BuiltInRegistries.ITEM.get(new ResourceLocation(j.getAsString())));
-                                            l.displayItems.add(i);
-                                            if (e instanceof JsonObject o && o.get("nbt") instanceof JsonPrimitive p && p.isString()) {
-                                                i.setTag(CompoundTagUtil.parseCompoundTag(p.getAsString()));
-                                            }
-                                        }
+                                        ItemStack item = JsonUtil.getItemFromJson(e,true);
+                                        if (!item.isEmpty()) l.displayItems.add(item);
                                     });
                                 }
                                 creativeTabListing.add(l);

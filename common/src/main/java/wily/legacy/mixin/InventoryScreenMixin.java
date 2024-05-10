@@ -5,7 +5,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.network.chat.Component;
@@ -19,7 +18,7 @@ import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.client.screen.ReplaceableScreen;
 import wily.legacy.util.ScreenUtil;
 
-import static wily.legacy.client.LegacySprites.SMALL_ARROW_SPRITE;
+import static wily.legacy.util.LegacySprites.SMALL_ARROW;
 
 @Mixin(InventoryScreen.class)
 public class InventoryScreenMixin extends AbstractContainerScreen<InventoryMenu> implements ReplaceableScreen {
@@ -79,7 +78,7 @@ public class InventoryScreenMixin extends AbstractContainerScreen<InventoryMenu>
         InventoryScreen.renderEntityInInventoryFollowsMouse(graphics,leftPos + 40 + (hasClassicCrafting() ? 0 : 50),topPos + 13,leftPos + 103 + (hasClassicCrafting() ? 0 : 50),topPos + 97,35,0.0625f,i,j, minecraft.player);
         if (hasClassicCrafting()) {
             graphics.drawString(this.font, this.title, leftPos + 111, topPos + 16, 0x383838, false);
-            graphics.blitSprite(SMALL_ARROW_SPRITE,leftPos + 158,topPos + 43,16,13);
+            graphics.blitSprite(SMALL_ARROW,leftPos + 158,topPos + 43,16,13);
         }
         if (!recipeBookComponent.isVisible() && recipeButton != null && !recipeButton.isHovered()) recipeButton.setFocused(false);
     }

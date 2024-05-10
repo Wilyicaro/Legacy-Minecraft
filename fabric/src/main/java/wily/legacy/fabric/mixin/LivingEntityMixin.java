@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.Block;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import wily.legacy.Legacy4JClient;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
@@ -22,6 +23,6 @@ public abstract class LivingEntityMixin extends Entity {
     }
     @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;getFriction()F"))
     public float travelFlight(Block instance) {
-        return (LivingEntity)(Object)this instanceof Player p && p.getAbilities().flying ? 0.6f : onGround() ? instance.getFriction() : 1f;
+        return (LivingEntity)(Object)this instanceof Player p && p.getAbilities().flying && (!level().isClientSide || Legacy4JClient.isModEnabledOnServer()) ? 0.6f : onGround() ? instance.getFriction() : 1f;
     }
 }

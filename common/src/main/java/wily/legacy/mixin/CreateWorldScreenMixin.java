@@ -38,12 +38,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyWorldSettings;
-import wily.legacy.client.controller.ControllerComponent;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.util.ScreenUtil;
@@ -69,8 +68,6 @@ public abstract class CreateWorldScreenMixin extends Screen{
     @Shadow @Final private static Component NAME_LABEL;
     @Shadow @Final private static Logger LOGGER;
 
-    @Shadow abstract void openExperimentsScreen(WorldDataConfiguration arg);
-
     @Shadow protected abstract LevelSettings createLevelSettings(boolean bl);
 
     protected boolean trustPlayers;
@@ -94,10 +91,11 @@ public abstract class CreateWorldScreenMixin extends Screen{
         uiState.setDifficulty(((LegacyOptions)minecraft.options).createWorldDifficulty().get());
         panel = new Panel(p-> (width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 160 : 0))) / 2, p-> (height - p.height) / 2,245,228);
         resourcePackSelector = PackSelector.resources(panel.x + 13, panel.y + 106, 220,45, !ScreenUtil.hasTooltipBoxes());
-        controlTooltipRenderer.add(()-> getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{getKeyIcon(InputConstants.KEY_LSHIFT,true), PLUS,getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true)}) : ControllerComponent.LEFT_BUTTON.componentState.getIcon(true), ()-> getFocused() == resourcePackSelector ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.resource_packs_screen") : null);
+        controlTooltipRenderer.add(()-> getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{getKeyIcon(InputConstants.KEY_LSHIFT,true), PLUS,getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true)}) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(true), ()-> getFocused() == resourcePackSelector ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.resource_packs_screen") : null);
     }
-    @Override
-    public void init() {
+    @Inject(method = "init", at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         panel.init();
         addRenderableOnly(panel);
         EditBox nameEdit = new EditBox(font, panel.x + 13, panel.y + 25,220, 20, Component.translatable("selectWorld.enterName"));
@@ -220,14 +218,7 @@ public abstract class CreateWorldScreenMixin extends Screen{
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (super.keyPressed(i, j, k)) {
-            return true;
-        }
-        if (i == 257 || i == 335) {
-            this.onCreate();
-            return true;
-        }
-        return false;
+        return super.keyPressed(i,j,k);
     }
 
     private void removeTempDataPackDir() {

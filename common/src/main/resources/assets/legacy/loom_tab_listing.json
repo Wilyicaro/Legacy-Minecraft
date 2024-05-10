@@ -3,7 +3,7 @@
     "icon": "white_banner",
     "displayName": "legacy.container.tab.stripes",
     "nbt": "{BlockEntityTag:{Patterns:[{Pattern:\"cr\",Color:15}]}}",
-    "listing": ["cross","small_stripes","stripe_bottom","stripe_middle","stripe_downleft","stripe_downright","stripe_left","stripe_middle","stripe_right","stripe_top"]
+    "listing": ["cross","small_stripes","straight_cross","stripe_bottom","stripe_center","stripe_downleft","stripe_downright","stripe_left","stripe_middle","stripe_right","stripe_top"]
   },
   "halves": {
     "icon": "white_banner",

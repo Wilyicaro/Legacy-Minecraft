@@ -2,7 +2,6 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
-import dev.architectury.utils.GameInstance;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
@@ -26,10 +25,10 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.client.LegacyCreativeTabListing;
 import wily.legacy.client.Offset;
-import wily.legacy.client.controller.ComponentState;
-import wily.legacy.client.controller.ControllerComponent;
-import wily.legacy.client.controller.ControllerEvent;
-import wily.legacy.inventory.LegacySlotWrapper;
+import wily.legacy.client.controller.BindingState;
+import wily.legacy.client.controller.Controller;
+import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.PagedList;
 import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
@@ -41,7 +40,7 @@ import java.util.stream.Stream;
 import static wily.legacy.client.screen.ControlTooltip.*;
 import static wily.legacy.client.screen.ControlTooltip.CONTROL_ACTION_CACHE;
 
-public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeModeScreen.CreativeModeMenu> implements ControllerEvent {
+public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeModeScreen.CreativeModeMenu> implements Controller.Event {
     protected Stocker.Sizeable page = new Stocker.Sizeable(0);
     protected final TabList tabList = new TabList(new PagedList<>(page,8));
     protected final Panel panel;
@@ -54,9 +53,9 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
 
     public CreativeModeScreen(Player player) {
         super(new CreativeModeMenu(player), player.getInventory(), Component.empty());
-        ((LegacyMenuAccess<?>) this).getControlTooltipRenderer().tooltips.set(3,ControlTooltip.create(()->getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true),PLUS,getKeyIcon(InputConstants.KEY_LSHIFT,true)}) : ControllerComponent.UP_BUTTON.componentState.getIcon(true),()-> hoveredSlot != null && hoveredSlot.hasItem() ? CONTROL_ACTION_CACHE.getUnchecked(hoveredSlot.container == creativeModeGrid ?  "legacy.action.take_all" : "legacy.action.clear") : null));
-        ((LegacyMenuAccess<?>) this).getControlTooltipRenderer().tooltips.set(2,ControlTooltip.create(()->getActiveType().isKeyboard() ?  getKeyIcon(canClearQuickSelect() ? InputConstants.KEY_X: InputConstants.MOUSE_BUTTON_RIGHT,true) : ControllerComponent.LEFT_BUTTON.componentState.getIcon(true),()-> CONTROL_ACTION_CACHE.getUnchecked(canClearQuickSelect() ? "legacy.action.clear_quick_select" : "legacy.action.take_half")));
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> page.max > 0 ? ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true)}) : ControllerComponent.RIGHT_STICK.componentState.getIcon(true) : null,()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.page"));
+        ((LegacyMenuAccess<?>) this).getControlTooltipRenderer().tooltips.set(3,ControlTooltip.create(()->getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true),PLUS,getKeyIcon(InputConstants.KEY_LSHIFT,true)}) : ControllerBinding.UP_BUTTON.bindingState.getIcon(true),()-> hoveredSlot != null && hoveredSlot.hasItem() ? CONTROL_ACTION_CACHE.getUnchecked(hoveredSlot.container == creativeModeGrid ?  "legacy.action.take_all" : "legacy.action.clear") : null));
+        ((LegacyMenuAccess<?>) this).getControlTooltipRenderer().tooltips.set(2,ControlTooltip.create(()->getActiveType().isKeyboard() ?  getKeyIcon(canClearQuickSelect() ? InputConstants.KEY_X: InputConstants.MOUSE_BUTTON_RIGHT,true) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(true),()-> CONTROL_ACTION_CACHE.getUnchecked(canClearQuickSelect() ? "legacy.action.clear_quick_select" : "legacy.action.take_half")));
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> page.max > 0 ? ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true)}) : ControllerBinding.RIGHT_STICK.bindingState.getIcon(true) : null,()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.page"));
         LegacyCreativeTabListing.rebuildVanillaCreativeTabsItems(Minecraft.getInstance());
         displayListing = Stream.concat(LegacyCreativeTabListing.list.stream(), BuiltInRegistries.CREATIVE_MODE_TAB.stream().filter(CreativeModeScreen::canDisplayVanillaCreativeTab).map(c->new LegacyCreativeTabListing(c.getDisplayName(), BuiltInRegistries.ITEM.getKey(c.getIconItem().getItem()), c.getIconItem().getTag(),new ArrayList<>(c.getDisplayItems())))).toList();
         player.containerMenu = this.menu;
@@ -322,8 +321,8 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     }
 
     @Override
-    public void componentTick(ComponentState state) {
-        if (state.is(ControllerComponent.RIGHT_STICK) && state instanceof ComponentState.Axis s && s.pressed && s.canClick()){
+    public void componentTick(BindingState state) {
+        if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s && s.pressed && s.canClick()){
             controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
         }
     }
@@ -336,7 +335,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
             this.inventoryMenu = player.inventoryMenu;
             for (int h = 0; h < 5; h++) {
                 for (int x = 0; x < 10; x++) {
-                    addSlot(new LegacySlotWrapper(creativeModeGrid,h * 10 + x, 21 + x * 27, 29 + h * 27){
+                    addSlot(LegacySlotDisplay.override(new Slot(creativeModeGrid,h * 10 + x, 21 + x * 27, 29 + h * 27), new LegacySlotDisplay(){
                         public int getWidth() {
                             return 27;
                         }
@@ -344,11 +343,11 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
                         public int getHeight() {
                             return 27;
                         }
-                    });
+                    }));
                 }
             }
             for (int x = 0; x < 9; x++) {
-                addSlot(new LegacySlotWrapper(player.getInventory(), x,35 + x * 27,176){
+                addSlot(LegacySlotDisplay.override(new Slot(player.getInventory(), x,35 + x * 27,176), new LegacySlotDisplay(){
                     public int getWidth() {
                         return 27;
                     }
@@ -356,7 +355,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
                     public int getHeight() {
                         return 27;
                     }
-                });
+                }));
             }
         }
 

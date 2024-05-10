@@ -29,7 +29,7 @@ public record ServerOpenClientMenu(BlockPos pos, int clientMenu) implements Comm
     public void apply(Supplier<NetworkManager.PacketContext> ctx) {
         Player p = ctx.get().getPlayer();
         if (p instanceof ServerPlayer sp){
-            MenuRegistry.openMenu(sp, clientMenu == 0 ? Blocks.CRAFTING_TABLE.getMenuProvider(sp.level().getBlockState(pos),sp.level(),pos) : LegacyCraftingMenu.getMenuProvider(pos,clientMenu == 2));
+            MenuRegistry.openMenu(sp, LegacyCraftingMenu.getMenuProvider(pos,clientMenu == 1));
         }
     }
 }

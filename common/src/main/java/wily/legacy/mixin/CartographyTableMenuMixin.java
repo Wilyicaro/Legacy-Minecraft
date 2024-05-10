@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.inventory.LegacySlotWrapper;
+import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.inventory.RenameItemMenu;
 
 @Mixin(CartographyTableMenu.class)
@@ -33,37 +33,37 @@ public abstract class CartographyTableMenuMixin extends AbstractContainerMenu im
 
     @ModifyArg(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/CartographyTableMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 0))
     private Slot addFirstSlot(Slot originalSlot){
-        return new LegacySlotWrapper(originalSlot, originalSlot.container, originalSlot.getContainerSlot(), 10, 62){
+        return LegacySlotDisplay.override(originalSlot, 10, 62,new LegacySlotDisplay(){
             public int getWidth() {
                 return 23;
             }
-        };
+        });
     }
     @ModifyArg(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/CartographyTableMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 1))
     private Slot addSecondSlot(Slot originalSlot){
-        return new LegacySlotWrapper(originalSlot,originalSlot.container, originalSlot.getContainerSlot(),  10, 105){
+        return LegacySlotDisplay.override(originalSlot,10, 105,new LegacySlotDisplay(){
 
             public int getWidth() {
                 return 23;
             }
-        };
+        });
     }
     @ModifyArg(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/CartographyTableMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 2))
     private Slot addThirdSlot(Slot originalSlot){
-        return new LegacySlotWrapper(originalSlot,originalSlot.container, 0, 166, 82){
+        return LegacySlotDisplay.override(originalSlot, 166, 82,new LegacySlotDisplay(){
 
             public int getWidth() {
                 return 27;
             }
-        };
+        });
     }
     @ModifyArg(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/CartographyTableMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 3))
     private Slot addInventorySlots(Slot originalSlot){
-        return new LegacySlotWrapper(originalSlot, originalSlot.container,originalSlot.getContainerSlot(), 10 + (originalSlot.getContainerSlot() - 9) % 9 * 21,156 + (originalSlot.getContainerSlot() - 9) / 9 * 21);
+        return LegacySlotDisplay.override(originalSlot, 10 + (originalSlot.getContainerSlot() - 9) % 9 * 21,156 + (originalSlot.getContainerSlot() - 9) / 9 * 21);
     }
     @ModifyArg(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/CartographyTableMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 4))
     private Slot addHotbarSlots(Slot originalSlot){
-        return new LegacySlotWrapper(originalSlot, originalSlot.container,originalSlot.getContainerSlot(), 10 + originalSlot.getContainerSlot() * 21,225);
+        return LegacySlotDisplay.override(originalSlot, 10 + originalSlot.getContainerSlot() * 21,225);
     }
 
     @Override

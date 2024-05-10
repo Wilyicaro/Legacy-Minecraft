@@ -18,6 +18,8 @@ import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
 
+import static wily.legacy.client.screen.ControlTooltip.MORE;
+
 @Mixin(Gui.class)
 
 public abstract class GuiMixin {
@@ -46,7 +48,7 @@ public abstract class GuiMixin {
             List<Component> tooltipLines = this.lastToolHighlight.getTooltipLines(minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).toList();
             for (int i = 0; i < tooltipLines.size(); i++) {
                 int l;
-                Component mutableComponent = tooltipLines.get(i);
+                Component mutableComponent = i >= 4 ? MORE : tooltipLines.get(i);
                 int width = this.getFont().width(mutableComponent);
                 int j = (this.screenWidth - width) / 2;
                 int k = this.screenHeight - getFont().lineHeight * (tooltipLines.size() - 1 - i);
@@ -63,6 +65,7 @@ public abstract class GuiMixin {
                         guiGraphics.drawString(font, mutableComponent, j, k, 16777215 + (l << 24));
                     }
                 }
+                if (i >= 4) break;
             }
         }
         this.minecraft.getProfiler().pop();

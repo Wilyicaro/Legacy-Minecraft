@@ -12,7 +12,7 @@ import net.minecraft.world.inventory.AnvilMenu;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import wily.legacy.client.LegacySprites;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(AnvilScreen.class)
@@ -86,19 +86,19 @@ public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 13.5, topPos + 9.5,0f);
         guiGraphics.pose().scale(2.5f,2.5f,2.5f);
-        guiGraphics.blitSprite(LegacySprites.ANVIL_HAMMER_SPRITE,0,0,15,15);
+        guiGraphics.blitSprite(LegacySprites.ANVIL_HAMMER,0,0,15,15);
         guiGraphics.pose().popPose();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 53, topPos + 60,0f);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        guiGraphics.blitSprite(LegacySprites.COMBINER_PLUS_SPRITE,0,0,13,13);
+        guiGraphics.blitSprite(LegacySprites.COMBINER_PLUS,0,0,13,13);
         guiGraphics.pose().popPose();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 122, topPos + 59,0f);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        guiGraphics.blitSprite(LegacySprites.ARROW_SPRITE,0,0,22,15);
+        guiGraphics.blitSprite(LegacySprites.ARROW,0,0,22,15);
         if ((this.menu.getSlot(0).hasItem() || this.menu.getSlot(1).hasItem()) && !this.menu.getSlot(this.menu.getResultSlot()).hasItem())
-            guiGraphics.blitSprite(LegacySprites.ERROR_CROSS_SPRITE, 4, 0, 15, 15);
+            guiGraphics.blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
         guiGraphics.pose().popPose();
     }
 }

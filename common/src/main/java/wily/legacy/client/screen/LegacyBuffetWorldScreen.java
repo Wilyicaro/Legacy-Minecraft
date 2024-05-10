@@ -41,7 +41,7 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
                 super.renderWidget(guiGraphics, i, j, f);
                 RenderSystem.enableBlend();
                 guiGraphics.blitSprite(TickBox.SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);
-                if (selectedBiome == biome) guiGraphics.blitSprite(TickBox.TICK_SPRITE, this.getX() + 6, this.getY()  + (height - 12) / 2, 14, 12);
+                if (selectedBiome == biome) guiGraphics.blitSprite(TickBox.TICK, this.getX() + 6, this.getY()  + (height - 12) / 2, 14, 12);
                 RenderSystem.disableBlend();
             }
             @Override

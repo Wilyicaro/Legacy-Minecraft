@@ -129,3 +129,15 @@ accessible field net/minecraft/client/gui/screens/BackupConfirmScreen onProceed 
 accessible field net/minecraft/client/gui/screens/BackupConfirmScreen onCancel Ljava/lang/Runnable;
 accessible field net/minecraft/client/gui/screens/BackupConfirmScreen promptForCacheErase Z
 accessible field net/minecraft/world/level/block/entity/DecoratedPotPatterns ITEM_TO_POT_TEXTURE Ljava/util/Map;
+accessible class net/minecraft/client/gui/screens/inventory/BookEditScreen$DisplayCache
+accessible class net/minecraft/client/gui/screens/inventory/BookEditScreen$LineInfo
+accessible class net/minecraft/client/gui/screens/inventory/BookEditScreen$Pos2i
+accessible method net/minecraft/client/gui/screens/inventory/BookEditScreen$Pos2i <init> (II)V
+accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$LineInfo asComponent Lnet/minecraft/network/chat/Component;
+accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$LineInfo x I
+accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$LineInfo y I
+accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$DisplayCache lines [Lnet/minecraft/client/gui/screens/inventory/BookEditScreen$LineInfo;
+accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$DisplayCache selection [Lnet/minecraft/client/renderer/Rect2i;
+accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$DisplayCache cursor Lnet/minecraft/client/gui/screens/inventory/BookEditScreen$Pos2i;
+accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$DisplayCache cursorAtEnd Z
+accessible class net/minecraft/client/gui/Font$StringRenderOutput

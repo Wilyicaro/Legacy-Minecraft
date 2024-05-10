@@ -9,7 +9,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
-import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.blockentity.BannerRenderer;
@@ -20,7 +19,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.LoomMenu;
 import net.minecraft.world.item.DyeColor;
@@ -31,13 +29,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import wily.legacy.client.LegacySprites;
 import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
 
-import static wily.legacy.client.LegacySprites.*;
+import static wily.legacy.util.LegacySprites.*;
 
 @Mixin(LoomScreen.class)
 public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> {
@@ -140,7 +137,7 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
                     if (s >= list.size()) break block0;
                     int t = q * 18;
                     int u = p * 18;
-                    guiGraphics.blitSprite(s == menu.getSelectedBannerPatternIndex() ? BUTTON_SLOT_SELECTED_SPRITE : (ScreenUtil.isMouseOver(i,j,leftPos + 73.5f + t,topPos + 19.5f + u,18,18)? BUTTON_SLOT_HIGHLIGHTED_SPRITE : BUTTON_SLOT_SPRITE), t, u, 18, 18);
+                    guiGraphics.blitSprite(s == menu.getSelectedBannerPatternIndex() ? BUTTON_SLOT_SELECTED : (ScreenUtil.isMouseOver(i,j,leftPos + 73.5f + t,topPos + 19.5f + u,18,18)? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, 18, 18);
                     guiGraphics.pose().pushPose();
                     this.renderPattern(guiGraphics, list.get(s), t + 3, u + 3);
                     guiGraphics.pose().popPose();

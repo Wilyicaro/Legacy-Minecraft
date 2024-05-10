@@ -2,7 +2,10 @@ package wily.legacy.mixin;
 
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -14,11 +17,17 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.util.ScreenUtil;
 
+import java.util.List;
+
 @Mixin(Screen.class)
-public abstract class ScreenMixin {
+public abstract class ScreenMixin extends AbstractContainerEventHandler {
     @Shadow public int width;
 
     @Shadow public int height;
+
+    @Shadow public abstract void clearFocus();
+
+    @Shadow @Final public List<GuiEventListener> children;
 
     @Inject(method = "changeFocus",at = @At("HEAD"))
     private void render(ComponentPath componentPath, CallbackInfo ci){
@@ -38,6 +47,9 @@ public abstract class ScreenMixin {
     }
     @Inject(method = "keyPressed",at = @At("HEAD"))
     private void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir){
-        if (Legacy4JClient.keyToggleCursor.matches(i,j)) Legacy4JClient.controllerHandler.toggleCursor();
+        if (Legacy4JClient.keyToggleCursor.matches(i,j)) Legacy4JClient.controllerManager.toggleCursor();
+    }
+    @Redirect(method = "rebuildWidgets",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;clearFocus()V"))
+    public void rebuildWidgets(Screen instance) {
     }
 }

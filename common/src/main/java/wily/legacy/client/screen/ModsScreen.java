@@ -80,7 +80,7 @@ public class ModsScreen extends PanelVListScreen{
                         if (opt.isPresent() && mod.findResource(opt.get()).isPresent())
                             try {
                                 NativeImage image = NativeImage.read(Files.newInputStream(mod.findResource(opt.get()).get()));
-                                return new SizedLocation(minecraft.getTextureManager().register(opt.get(), new DynamicTexture(image)),image.getWidth(),image.getHeight());
+                                return new SizedLocation(minecraft.getTextureManager().register(opt.get().toLowerCase(Locale.ENGLISH), new DynamicTexture(image)),image.getWidth(),image.getHeight());
                             } catch (IOException e) {
                             }
                         ResourceLocation defaultLogo = PackSelector.DEFAULT_ICON;

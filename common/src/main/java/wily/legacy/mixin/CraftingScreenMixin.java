@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.ScreenUtil;
 
-import static wily.legacy.client.LegacySprites.ARROW_SPRITE;
+import static wily.legacy.util.LegacySprites.ARROW;
 
 @Mixin(CraftingScreen.class)
 public class CraftingScreenMixin extends AbstractContainerScreen<CraftingMenu> {
@@ -63,7 +63,7 @@ public class CraftingScreenMixin extends AbstractContainerScreen<CraftingMenu> {
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 105,topPos + 43,0);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        guiGraphics.blitSprite(ARROW_SPRITE,0,0,22,15);
+        guiGraphics.blitSprite(ARROW,0,0,22,15);
         guiGraphics.pose().popPose();
         if (!recipeBookComponent.isVisible() && recipeButton != null && !recipeButton.isHovered()) recipeButton.setFocused(false);
     }

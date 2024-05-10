@@ -20,8 +20,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.LegacySprites;
-import wily.legacy.client.controller.ControllerComponent;
+import wily.legacy.util.LegacySprites;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.util.ScreenUtil;
@@ -30,8 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static wily.legacy.client.LegacySprites.UNSELECT_HIGHLIGHTED_SPRITE;
-import static wily.legacy.client.LegacySprites.UNSELECT_SPRITE;
+import static wily.legacy.util.LegacySprites.UNSELECT_HIGHLIGHTED;
+import static wily.legacy.util.LegacySprites.UNSELECT;
 
 @Mixin(PackSelectionScreen.class)
 public abstract class PackSelectionScreenMixin extends Screen {
@@ -56,7 +56,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
         return(PackSelectionScreen)(Object) this;
     }
     public void clearFocus() {
-        if (lastFocused >= 0 && Legacy4JClient.controllerHandler.isCursorDisabled) return;
+        if (lastFocused >= 0 && Legacy4JClient.controllerManager.isCursorDisabled) return;
         lastFocused = -1;
         super.clearFocus();
     }
@@ -129,30 +129,30 @@ public abstract class PackSelectionScreenMixin extends Screen {
                         int q = mouseY - getY();
                         if (e.canSelect()) {
                             if (p < 32) {
-                                guiGraphics.blitSprite(LegacySprites.JOIN_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                                guiGraphics.blitSprite(LegacySprites.JOIN_HIGHLIGHTED, getX(), getY(), 32, 32);
                             } else {
-                                guiGraphics.blitSprite(LegacySprites.JOIN_SPRITE, getX(), getY(), 32, 32);
+                                guiGraphics.blitSprite(LegacySprites.JOIN, getX(), getY(), 32, 32);
                             }
                         } else {
                             if (e.canUnselect()) {
                                 if (p < 16) {
-                                    guiGraphics.blitSprite(UNSELECT_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                                    guiGraphics.blitSprite(UNSELECT_HIGHLIGHTED, getX(), getY(), 32, 32);
                                 } else {
-                                    guiGraphics.blitSprite(UNSELECT_SPRITE, getX(), getY(), 32, 32);
+                                    guiGraphics.blitSprite(UNSELECT, getX(), getY(), 32, 32);
                                 }
                             }
                             if (e.canMoveUp()) {
                                 if (p < 32 && p > 16 && q < 16) {
-                                    guiGraphics.blitSprite(LegacySprites.TRANSFER_MOVE_UP_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                                    guiGraphics.blitSprite(LegacySprites.TRANSFER_MOVE_UP_HIGHLIGHTED, getX(), getY(), 32, 32);
                                 } else {
-                                    guiGraphics.blitSprite(LegacySprites.TRANSFER_MOVE_UP_SPRITE, getX(), getY(), 32, 32);
+                                    guiGraphics.blitSprite(LegacySprites.TRANSFER_MOVE_UP, getX(), getY(), 32, 32);
                                 }
                             }
                             if (e.canMoveDown()) {
                                 if (p < 32 && p > 16 && q > 16) {
-                                    guiGraphics.blitSprite(LegacySprites.TRANSFER_MOVE_DOWN_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                                    guiGraphics.blitSprite(LegacySprites.TRANSFER_MOVE_DOWN_HIGHLIGHTED, getX(), getY(), 32, 32);
                                 } else {
-                                    guiGraphics.blitSprite(LegacySprites.TRANSFER_MOVE_DOWN_SPRITE, getX(), getY(), 32, 32);
+                                    guiGraphics.blitSprite(LegacySprites.TRANSFER_MOVE_DOWN, getX(), getY(), 32, 32);
                                 }
                             }
                         }
@@ -203,7 +203,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
                     }));
                 }
                 public boolean keyPressed(int i, int j, int k) {
-                    if (Screen.hasShiftDown() || ControllerComponent.LEFT_BUTTON.componentState.pressed) {
+                    if (Screen.hasShiftDown() || ControllerBinding.LEFT_BUTTON.bindingState.pressed) {
                         switch (i) {
                             case 265 -> {
                                 if (e.canMoveUp()) e.moveUp();

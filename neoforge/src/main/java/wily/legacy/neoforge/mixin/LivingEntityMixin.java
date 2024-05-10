@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import wily.legacy.Legacy4JClient;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
@@ -25,6 +26,6 @@ public abstract class LivingEntityMixin extends Entity {
     }
     @Redirect(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getFriction(Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/Entity;)F"))
     public float travelFlight(BlockState instance, LevelReader levelReader, BlockPos blockPos, Entity entity) {
-        return (LivingEntity)(Object)this instanceof Player p && p.getAbilities().flying ? 0.6f : onGround() ? instance.getFriction(levelReader,blockPos,entity) : 1f;
+        return (LivingEntity)(Object)this instanceof Player p && p.getAbilities().flying && (!level().isClientSide || Legacy4JClient.isModEnabledOnServer()) ? 0.6f : onGround() ? instance.getFriction(levelReader,blockPos,entity) : 1f;
     }
 }

@@ -24,7 +24,7 @@ import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
 
-import static wily.legacy.client.LegacySprites.*;
+import static wily.legacy.util.LegacySprites.*;
 
 @Mixin(StonecutterScreen.class)
 public abstract class StonecutterScreenMixin extends AbstractContainerScreen<StonecutterMenu> {
@@ -103,7 +103,7 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
                     if (s >= list.size()) break block0;
                     int t = q * 18;
                     int u = p * 18;
-                    guiGraphics.blitSprite(s == menu.getSelectedRecipeIndex() ? BUTTON_SLOT_SELECTED_SPRITE : (ScreenUtil.isMouseOver(i,j,leftPos + 73.5f + t,topPos + 19.5f + u,18,18)? BUTTON_SLOT_HIGHLIGHTED_SPRITE : BUTTON_SLOT_SPRITE), t, u, 18, 18);
+                    guiGraphics.blitSprite(s == menu.getSelectedRecipeIndex() ? BUTTON_SLOT_SELECTED : (ScreenUtil.isMouseOver(i,j,leftPos + 73.5f + t,topPos + 19.5f + u,18,18)? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, 18, 18);
                     guiGraphics.renderItem(list.get(s).value().getResultItem(this.minecraft.level.registryAccess()), 1 + t, 1 + u);
                 }
             }

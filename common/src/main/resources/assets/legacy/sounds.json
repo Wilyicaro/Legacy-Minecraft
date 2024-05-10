@@ -13,17 +13,17 @@
       }
     ]
   },
-  "random.craft": {
-    "sounds": [
-      {
-        "name": "legacy:craft"
-      }
-    ]
-  },
   "random.craft_fail": {
     "sounds": [
       {
         "name": "legacy:craft_fail"
+      }
+    ]
+  },
+  "random.scroll": {
+    "sounds": [
+      {
+        "name": "legacy:scroll"
       }
     ]
   }

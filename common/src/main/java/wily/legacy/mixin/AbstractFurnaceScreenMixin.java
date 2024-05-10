@@ -14,10 +14,10 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.LegacySprites;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
-import static wily.legacy.client.LegacySprites.ARROW_SPRITE;
+import static wily.legacy.util.LegacySprites.ARROW;
 
 @Mixin(AbstractFurnaceScreen.class)
 public class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends AbstractContainerScreen<T> {
@@ -84,12 +84,12 @@ public class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends A
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 114,topPos + 48,0);
         guiGraphics.pose().scale(1.5f,1.5f,1.0f);
-        guiGraphics.blitSprite(ARROW_SPRITE,0,0,22,15);
+        guiGraphics.blitSprite(ARROW,0,0,22,15);
         guiGraphics.pose().popPose();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 114,topPos + 46.5,0);
         guiGraphics.pose().scale(0.5f,0.5f,1.0f);
-        guiGraphics.blitSprite(LegacySprites.FULL_ARROW_SPRITE,66,48,0,0,0,0,2, (int) Math.ceil(menu.getBurnProgress() * 66), 48);
+        guiGraphics.blitSprite(LegacySprites.FULL_ARROW,66,48,0,0,0,0,2, (int) Math.ceil(menu.getBurnProgress() * 66), 48);
         guiGraphics.pose().popPose();
         if (!recipeBookComponent.isVisible() && recipeButton != null && !recipeButton.isHovered()) recipeButton.setFocused(false);
     }

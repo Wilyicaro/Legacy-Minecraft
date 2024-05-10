@@ -22,8 +22,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.*;
 
-import static wily.legacy.util.CompoundTagUtil.getJsonStringOrNull;
-import static wily.legacy.util.CompoundTagUtil.ifJsonStringNotNull;
+import static wily.legacy.util.JsonUtil.getJsonStringOrNull;
+import static wily.legacy.util.JsonUtil.ifJsonStringNotNull;
 
 public class LoomTabListing {
     public static final List<LoomTabListing> list = new ArrayList<>();

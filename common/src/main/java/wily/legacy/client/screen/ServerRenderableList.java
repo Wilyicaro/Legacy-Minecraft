@@ -38,7 +38,7 @@ import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.LegacySprites;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import java.net.UnknownHostException;
@@ -51,18 +51,18 @@ import java.util.concurrent.ThreadPoolExecutor;
 import static wily.legacy.client.screen.CreationList.addIconButton;
 
 public class ServerRenderableList extends RenderableVList {
-    static final ResourceLocation INCOMPATIBLE_SPRITE = new ResourceLocation("server_list/incompatible");
-    static final ResourceLocation UNREACHABLE_SPRITE = new ResourceLocation("server_list/unreachable");
-    static final ResourceLocation PING_1_SPRITE = new ResourceLocation("server_list/ping_1");
-    static final ResourceLocation PING_2_SPRITE = new ResourceLocation("server_list/ping_2");
-    static final ResourceLocation PING_3_SPRITE = new ResourceLocation("server_list/ping_3");
-    static final ResourceLocation PING_4_SPRITE = new ResourceLocation("server_list/ping_4");
-    static final ResourceLocation PING_5_SPRITE = new ResourceLocation("server_list/ping_5");
-    static final ResourceLocation PINGING_1_SPRITE = new ResourceLocation("server_list/pinging_1");
-    static final ResourceLocation PINGING_2_SPRITE = new ResourceLocation("server_list/pinging_2");
-    static final ResourceLocation PINGING_3_SPRITE = new ResourceLocation("server_list/pinging_3");
-    static final ResourceLocation PINGING_4_SPRITE = new ResourceLocation("server_list/pinging_4");
-    static final ResourceLocation PINGING_5_SPRITE = new ResourceLocation("server_list/pinging_5");
+    static final ResourceLocation INCOMPATIBLE = new ResourceLocation("server_list/incompatible");
+    static final ResourceLocation UNREACHABLE = new ResourceLocation("server_list/unreachable");
+    static final ResourceLocation PING_1 = new ResourceLocation("server_list/ping_1");
+    static final ResourceLocation PING_2 = new ResourceLocation("server_list/ping_2");
+    static final ResourceLocation PING_3 = new ResourceLocation("server_list/ping_3");
+    static final ResourceLocation PING_4 = new ResourceLocation("server_list/ping_4");
+    static final ResourceLocation PING_5 = new ResourceLocation("server_list/ping_5");
+    static final ResourceLocation PINGING_1 = new ResourceLocation("server_list/pinging_1");
+    static final ResourceLocation PINGING_2 = new ResourceLocation("server_list/pinging_2");
+    static final ResourceLocation PINGING_3 = new ResourceLocation("server_list/pinging_3");
+    static final ResourceLocation PINGING_4 = new ResourceLocation("server_list/pinging_4");
+    static final ResourceLocation PINGING_5 = new ResourceLocation("server_list/pinging_5");
     static final Logger LOGGER = LogUtils.getLogger();
     static final ThreadPoolExecutor THREAD_POOL = new ScheduledThreadPoolExecutor(5, new ThreadFactoryBuilder().setNameFormat("Server Pinger #%d").setDaemon(true).setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(LOGGER)).build());
     private static final ResourceLocation ICON_MISSING = new ResourceLocation("textures/misc/unknown_server.png");
@@ -164,11 +164,11 @@ public class ServerRenderableList extends RenderableVList {
                     int q = minecraft.font.width(component);
                     guiGraphics.drawString(minecraft.font, component, getX() + 270 - q - 15 - 2, getY() + 3, -8355712, false);
                     if (bl2) {
-                        resourceLocation = INCOMPATIBLE_SPRITE;
+                        resourceLocation = INCOMPATIBLE;
                         component2 = INCOMPATIBLE_STATUS;
                         list2 = server.playerList;
                     } else if (this.pingCompleted()) {
-                        resourceLocation = server.ping < 0L ? UNREACHABLE_SPRITE : (server.ping < 150L ? PING_5_SPRITE : (server.ping < 300L ? PING_4_SPRITE : (server.ping < 600L ? PING_3_SPRITE : (server.ping < 1000L ? PING_2_SPRITE : PING_1_SPRITE))));
+                        resourceLocation = server.ping < 0L ? UNREACHABLE : (server.ping < 150L ? PING_5 : (server.ping < 300L ? PING_4 : (server.ping < 600L ? PING_3 : (server.ping < 1000L ? PING_2 : PING_1))));
                         if (server.ping < 0L) {
                             component2 = NO_CONNECTION_STATUS;
                             list2 = Collections.emptyList();
@@ -182,11 +182,11 @@ public class ServerRenderableList extends RenderableVList {
                             r = 8 - r;
                         }
                         resourceLocation = switch (r) {
-                            default -> PINGING_1_SPRITE;
-                            case 1 -> PINGING_2_SPRITE;
-                            case 2 -> PINGING_3_SPRITE;
-                            case 3 -> PINGING_4_SPRITE;
-                            case 4 -> PINGING_5_SPRITE;
+                            default -> PINGING_1;
+                            case 1 -> PINGING_2;
+                            case 2 -> PINGING_3;
+                            case 3 -> PINGING_4;
+                            case 4 -> PINGING_5;
                         };
                         component2 = PINGING_STATUS;
                         list2 = Collections.emptyList();
@@ -214,22 +214,22 @@ public class ServerRenderableList extends RenderableVList {
                         int u = mouseX - getX();
                         int v = mouseY - getY();
                         if (u < 32 && u > 16) {
-                            guiGraphics.blitSprite(LegacySprites.JOIN_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                            guiGraphics.blitSprite(LegacySprites.JOIN_HIGHLIGHTED, getX(), getY(), 32, 32);
                         } else {
-                            guiGraphics.blitSprite(LegacySprites.JOIN_SPRITE, getX(), getY(), 32, 32);
+                            guiGraphics.blitSprite(LegacySprites.JOIN, getX(), getY(), 32, 32);
                         }
                         if (index > 0) {
                             if (u < 16 && v < 16) {
-                                guiGraphics.blitSprite(LegacySprites.MOVE_UP_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                                guiGraphics.blitSprite(LegacySprites.MOVE_UP_HIGHLIGHTED, getX(), getY(), 32, 32);
                             } else {
-                                guiGraphics.blitSprite(LegacySprites.MOVE_UP_SPRITE, getX(), getY(), 32, 32);
+                                guiGraphics.blitSprite(LegacySprites.MOVE_UP, getX(), getY(), 32, 32);
                             }
                         }
                         if (index < screen.getServers().size() - 1) {
                             if (u < 16 && v > 16) {
-                                guiGraphics.blitSprite(LegacySprites.MOVE_DOWN_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                                guiGraphics.blitSprite(LegacySprites.MOVE_DOWN_HIGHLIGHTED, getX(), getY(), 32, 32);
                             } else {
-                                guiGraphics.blitSprite(LegacySprites.MOVE_DOWN_SPRITE, getX(), getY(), 32, 32);
+                                guiGraphics.blitSprite(LegacySprites.MOVE_DOWN, getX(), getY(), 32, 32);
                             }
                         }
                     }

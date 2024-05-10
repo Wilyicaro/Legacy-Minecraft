@@ -21,9 +21,12 @@ import wily.legacy.util.ScreenUtil;
 import java.util.Comparator;
 import java.util.List;
 
+import static wily.legacy.client.screen.ControlTooltip.MORE;
+
 @Mixin(Gui.class)
 
 public abstract class GuiMixin {
+
     @Shadow @Final protected Minecraft minecraft;
 
     @Shadow protected int screenHeight;
@@ -45,7 +48,7 @@ public abstract class GuiMixin {
         instance.pose().translate(0,ScreenUtil.getHUDDistance() - ScreenUtil.getHUDSize(),0);
         instance.setColor(1.0f,1.0f,1.0f,ScreenUtil.getHUDOpacity());
 
-        int r = instance.drawString(arg,arg2,i,j + 63 - (lastToolHighlight.isEmpty() || this.toolHighlightTimer <= 0 ? 0 : (lastToolHighlight.getTooltipLines(minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum() - 1) * 9),k);
+        int r = instance.drawString(arg,arg2,i,j + 63 - (lastToolHighlight.isEmpty() || this.toolHighlightTimer <= 0 ? 0 : (Math.min(4,lastToolHighlight.getTooltipLines(minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum()) - 1) * 9),k);
         instance.pose().popPose();
         instance.setColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
@@ -112,11 +115,12 @@ public abstract class GuiMixin {
                 int maxWidth = tooltipLines.stream().map(c-> getFont().width(c)).max(Comparator.comparingInt(i-> i)).orElse(0);
                 guiGraphics.fill((this.screenWidth - maxWidth) / 2 - 2, screenHeight - getFont().lineHeight * (tooltipLines.size() - 1) - 2, (this.screenWidth - maxWidth) / 2 + maxWidth + 2, screenHeight + this.getFont().lineHeight + 2, this.minecraft.options.getBackgroundColor(0));
                 for (int i = 0; i < tooltipLines.size(); i++) {
-                    Component mutableComponent = tooltipLines.get(i);
+                    Component mutableComponent = i >= 4 ? MORE : tooltipLines.get(i);
                     int width = this.getFont().width(mutableComponent);
                     int j = (this.screenWidth - width) / 2;
                     int k = this.screenHeight - getFont().lineHeight * (tooltipLines.size() - 1 - i);
                     guiGraphics.drawString(this.getFont(), mutableComponent, j, k, 0xFFFFFF + (l << 24));
+                    if (i >= 4) break;
                 }
             }
         }

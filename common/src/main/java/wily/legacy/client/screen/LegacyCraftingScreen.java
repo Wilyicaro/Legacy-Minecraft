@@ -24,9 +24,9 @@ import org.jetbrains.annotations.Nullable;
 import wily.legacy.Legacy4JPlatform;
 import wily.legacy.client.LegacyCraftingTabListing;
 import wily.legacy.client.Offset;
-import wily.legacy.client.controller.ComponentState;
-import wily.legacy.client.controller.ControllerComponent;
-import wily.legacy.client.controller.ControllerEvent;
+import wily.legacy.client.controller.BindingState;
+import wily.legacy.client.controller.Controller;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.network.ServerInventoryCraftPacket;
 import wily.legacy.util.PagedList;
@@ -40,11 +40,11 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static wily.legacy.client.LegacySprites.SMALL_ARROW_SPRITE;
+import static wily.legacy.util.LegacySprites.SMALL_ARROW;
 import static wily.legacy.client.screen.ControlTooltip.*;
 import static wily.legacy.client.screen.RecipeIconHolder.getActualItem;
 
-public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCraftingMenu> implements ControllerEvent {
+public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCraftingMenu> implements Controller.Event {
     public static final Offset CRAFTING_OFFSET = new Offset(0.5,0.5,0);
     private final Inventory inventory;
     private final boolean is2x2;
@@ -106,12 +106,12 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     protected boolean inited = false;
     public LegacyCraftingScreen(LegacyCraftingMenu abstractContainerMenu, Inventory inventory, Component component, boolean is2x2) {
         super(abstractContainerMenu, inventory, component);
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().tooltips.set(0,create(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_RETURN,true) : ControllerComponent.DOWN_BUTTON.componentState.getIcon(true),()->getFocused() instanceof RecipeIconHolder<?> h && h.canCraft() || getFocused() instanceof CustomCraftingIconHolder c && c.canCraft() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.create") : null));
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_O,true) : ControllerComponent.UP_BUTTON.componentState.getIcon(true), ()-> groupTabList.selectedTab == 0 ? CONTROL_ACTION_CACHE.getUnchecked(onlyCraftableRecipes ? "legacy.action.all_recipes" : "legacy.action.show_craftable_recipes") : getFocused() instanceof CustomCraftingIconHolder h && h.canAddIngredient() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.add") : null);
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_X,true) : ControllerComponent.LEFT_BUTTON.componentState.getIcon(true), ()-> groupTabList.selectedTab != 0 && getFocused() instanceof CustomCraftingIconHolder h && h.addedIngredientsItems != null && !h.addedIngredientsItems.isEmpty() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.remove") : null);
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().addCompound(()-> new Component[]{ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true) : ControllerComponent.LEFT_BUMPER.componentState.getIcon(true),ControlTooltip.SPACE,ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true) : ControllerComponent.RIGHT_BUMPER.componentState.getIcon(true)},()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.group"));
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true)}) : COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControllerComponent.LEFT_TRIGGER.componentState.getIcon(true),ControlTooltip.SPACE,ControllerComponent.RIGHT_TRIGGER.componentState.getIcon(true)}),()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.type"));
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> page.max > 0 && groupTabList.selectedTab == 0 ? ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true)}) : ControllerComponent.RIGHT_STICK.componentState.getIcon(true) : null,()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.page"));
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().tooltips.set(0,create(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_RETURN,true) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(true),()->getFocused() instanceof RecipeIconHolder<?> h && h.canCraft() || getFocused() instanceof CustomCraftingIconHolder c && c.canCraft() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.create") : null));
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_O,true) : ControllerBinding.UP_BUTTON.bindingState.getIcon(true), ()-> groupTabList.selectedTab == 0 ? CONTROL_ACTION_CACHE.getUnchecked(onlyCraftableRecipes ? "legacy.action.all_recipes" : "legacy.action.show_craftable_recipes") : getFocused() instanceof CustomCraftingIconHolder h && h.canAddIngredient() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.add") : null);
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_X,true) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(true), ()-> groupTabList.selectedTab != 0 && getFocused() instanceof CustomCraftingIconHolder h && h.addedIngredientsItems != null && !h.addedIngredientsItems.isEmpty() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.remove") : null);
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().addCompound(()-> new Component[]{ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(true),ControlTooltip.SPACE,ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon(true)},()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.group"));
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true)}) : COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControllerBinding.LEFT_TRIGGER.bindingState.getIcon(true),ControlTooltip.SPACE, ControllerBinding.RIGHT_TRIGGER.bindingState.getIcon(true)}),()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.type"));
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> page.max > 0 && groupTabList.selectedTab == 0 ? ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true)}) : ControllerBinding.RIGHT_STICK.bindingState.getIcon(true) : null,()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.page"));
         this.inventory = inventory;
         this.is2x2 = is2x2;
         gridDimension = is2x2 ? 2 : 3;
@@ -274,8 +274,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             }
             canCraft(ingredientsGrid,true);
         }));
-        List<ItemStack> potterySherds = DecoratedPotPatterns.ITEM_TO_POT_TEXTURE.keySet().stream().map(Item::getDefaultInstance).toList();
-        decoratedPotButtons.add(craftingButtonByList(ADD_SHERD, potterySherds,h->{
+        decoratedPotButtons.add(craftingButtonByList(ADD_SHERD, DecoratedPotPatterns.ITEM_TO_POT_TEXTURE.keySet().stream().map(Item::getDefaultInstance).toList(),h->{
             clearIngredients(ingredientsGrid);
             if (is2x2) return;
             Function<Integer,Item> sherdByIndex = i-> h.addedIngredientsItems.size() >= i + 1 ? h.addedIngredientsItems.get(i).getItem() : Items.BRICK;
@@ -363,10 +362,10 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         super.repositionElements();
     }
     @Override
-    public void componentTick(ComponentState state) {
+    public void componentTick(BindingState state) {
         if (state.pressed && state.canClick()){
-            if (state.is(ControllerComponent.LEFT_TRIGGER) || state.is(ControllerComponent.RIGHT_TRIGGER)) groupTabList.controlTab(state.is(ControllerComponent.LEFT_TRIGGER),state.is(ControllerComponent.RIGHT_TRIGGER));
-            if (state.is(ControllerComponent.RIGHT_STICK) && state instanceof ComponentState.Axis s) controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
+            if (state.is(ControllerBinding.LEFT_TRIGGER) || state.is(ControllerBinding.RIGHT_TRIGGER)) groupTabList.controlTab(state.is(ControllerBinding.LEFT_TRIGGER),state.is(ControllerBinding.RIGHT_TRIGGER));
+            if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s) controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
         }
     }
     @Override
@@ -418,19 +417,22 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         };
     }
     protected boolean canCraft(List<Ingredient> ingredients, boolean isFocused) {
-        List<Ingredient> ings = isFocused ? ingredientsGrid : ingredients;
+        return canCraft(isFocused ? ingredientsGrid : ingredients, isFocused ? warningSlots : null);
+    }
+    public static boolean canCraft(List<Ingredient> ings, boolean[] warningSlots) {
+        Minecraft minecraft = Minecraft.getInstance();
         if (ings.stream().allMatch(Ingredient::isEmpty)) return false;
         boolean canCraft = true;
         for (int i1 = 0; i1 < ings.size(); i1++) {
             Ingredient ing = ings.get(i1);
             if (ing.isEmpty()) continue;
-            int itemCount = inventory.items.stream().filter(ing).mapToInt(ItemStack::getCount).sum() + (menu.getCarried().isEmpty() || !ing.test(menu.getCarried()) ? 0 : menu.getCarried().getCount());
+            int itemCount = minecraft.player.getInventory().items.stream().filter(ing).mapToInt(ItemStack::getCount).sum() + (minecraft.player.containerMenu.getCarried().isEmpty() || !ing.test(minecraft.player.containerMenu.getCarried()) ? 0 : minecraft.player.containerMenu.getCarried().getCount());
             long ingCount = ings.stream().filter(i -> !i.isEmpty() && i.equals(ing)).count();
             if (itemCount >= ingCount || PagedList.occurrenceOf(ings, ing, i1) < itemCount) {
-                if (isFocused && ingredientsGrid.contains(ing)) warningSlots[i1] = false;
+                if (warningSlots != null) warningSlots[i1] = false;
             } else {
                 canCraft = false;
-                if (!isFocused || !ingredientsGrid.contains(ing)) break;
+                if (warningSlots == null) break;
                 else warningSlots[i1] = true;
             }
         }
@@ -541,7 +543,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         ScreenUtil.renderSquareRecessedPanel(guiGraphics, leftPos + 9, topPos + 103, 163, 105, 2f);
         ScreenUtil.renderSquareRecessedPanel(guiGraphics, leftPos + 176, topPos + 103, 163, 105, 2f);
         if (groupTabList.selectedTab != 0) ScreenUtil.renderSquareRecessedPanel(guiGraphics, leftPos + 176, topPos + 8, 163, 93, 2f);
-        guiGraphics.blitSprite(SMALL_ARROW_SPRITE, leftPos + (is2x2 ? 87 : 97), topPos + 161, 16, 13);
+        guiGraphics.blitSprite(SMALL_ARROW, leftPos + (is2x2 ? 87 : 97), topPos + 161, 16, 13);
         if (groupTabList.selectedTab == 0) {
             if (craftingButtonsOffset.get() > 0)
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + 5, topPos + 45);

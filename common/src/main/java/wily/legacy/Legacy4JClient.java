@@ -45,10 +45,14 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.GrassColor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CraftingTableBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
@@ -62,10 +66,12 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
+import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.client.*;
-import wily.legacy.client.controller.ControllerHandler;
+import wily.legacy.client.controller.ControllerManager;
 import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacyMenuTypes;
+import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.network.ServerOpenClientMenu;
 import wily.legacy.player.LegacyPlayerInfo;
@@ -82,11 +88,11 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import static wily.legacy.Legacy4J.MOD_ID;
-import static wily.legacy.init.LegacyBlockItems.SHRUB;
+import static wily.legacy.init.LegacyRegistries.SHRUB;
 
 
 public class Legacy4JClient {
-    public static float FONT_SHADOW_OFFSET = 1.0F;
+    public static boolean legacyFont = true;
     public static boolean canLoadVanillaOptions = true;
     public static boolean manualSave = false;
     public static boolean retakeWorldIcon = false;
@@ -104,7 +110,7 @@ public class Legacy4JClient {
     public static final LoomTabListing.Manager loomListingManager = new LoomTabListing.Manager();
     public static final ControlTooltip.GuiManager controlTooltipGuiManager = new ControlTooltip.GuiManager();
 
-    public static ControllerHandler controllerHandler;
+    public static ControllerManager controllerManager;
     public static KnownListing<Block> knownBlocks;
     public static KnownListing<EntityType<?>> knownEntities;
     public static GameType enterWorldGameType;
@@ -185,7 +191,7 @@ public class Legacy4JClient {
         return screen;
     }
     public static void init() {
-        controllerHandler = new ControllerHandler(Minecraft.getInstance());
+        controllerManager = new ControllerManager(Minecraft.getInstance());
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyTipManager);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyCreativeListingManager);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, legacyCraftingListingManager);
@@ -210,6 +216,7 @@ public class Legacy4JClient {
         knownBlocks = new KnownListing<>(Registries.BLOCK,Minecraft.getInstance().gameDirectory.toPath());
         knownEntities = new KnownListing<>(Registries.ENTITY_TYPE,Minecraft.getInstance().gameDirectory.toPath());
 
+        ClientPlayerEvent.CLIENT_PLAYER_JOIN.register(p-> Legacy4J.NETWORK.sendToServer(new PlayerInfoSync(ScreenUtil.hasClassicCrafting() ? 1 : 2,p)));
         ClientGuiEvent.SET_SCREEN.register((screen) -> {
             Screen replacement = getReplacementScreen(screen);
             if (replacement != screen) return CompoundEventResult.interruptTrue(replacement);
@@ -217,26 +224,31 @@ public class Legacy4JClient {
             return CompoundEventResult.interruptDefault(screen);
         });
         ClientGuiEvent.INIT_POST.register((screen,access) -> {
-            if (controllerHandler.connectedController != null) {
-                if (!(screen instanceof MenuAccess<?>) || screen.children().stream().anyMatch(g-> g instanceof LegacyIconHolder)) controllerHandler.disableCursor();
+            if (screen.getFocused() != null && !screen.children().contains(screen.getFocused())){
+                screen.clearFocus();
+            }
+            if (controllerManager.connectedController != null) {
+                if (!(screen instanceof MenuAccess<?>) || screen.children().stream().anyMatch(g-> g instanceof LegacyIconHolder)) controllerManager.disableCursor();
                 if (screen.getFocused() == null || !screen.getFocused().isFocused()) {
                     ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(ScreenDirection.DOWN));
                     if (path != null) path.applyFocus(true);
                 }
-                controllerHandler.resetCursor();
+                controllerManager.resetCursor();
             }
         });
-        ClientLifecycleEvent.CLIENT_STARTED.register(m-> controllerHandler.setup());
+        ClientLifecycleEvent.CLIENT_STARTED.register(m-> controllerManager.setup());
         ClientTickEvent.CLIENT_PRE.register(minecraft -> {
             while (keyCrafting.consumeClick()){
                 if (minecraft.gameMode != null && minecraft.gameMode.hasInfiniteItems()) {
                     minecraft.setScreen(CreativeModeScreen.getActualCreativeScreenInstance(minecraft));
                     continue;
                 }
-                if (ScreenUtil.hasClassicCrafting()) {
+                if (ScreenUtil.hasClassicCrafting() || !isModEnabledOnServer()) {
+                    if (!isModEnabledOnServer()) ScreenUtil.getLegacyOptions().classicCrafting().set(true);
                     minecraft.getTutorial().onOpenInventory();
                     minecraft.setScreen(new InventoryScreen(minecraft.player));
-                }else Legacy4J.NETWORK.sendToServer(new ServerOpenClientMenu(2));
+                }else Legacy4J.NETWORK.sendToServer(minecraft.hitResult != null && minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof CraftingTableBlock ?
+                new ServerOpenClientMenu(r.getBlockPos(),0) : new ServerOpenClientMenu(1));
             }
             while (keyHostOptions.consumeClick()) {
                 minecraft.setScreen(new HostOptionsScreen());
@@ -278,6 +290,10 @@ public class Legacy4JClient {
             }
         });
     }
+    public static boolean isModEnabledOnServer(){
+        Minecraft minecraft = Minecraft.getInstance();
+        return minecraft.player != null && minecraft.player.connection.getPlayerInfo(minecraft.player.getUUID()) instanceof LegacyPlayerInfo i && i.getPosition() >= 0;
+    }
     public static void onClientPlayerInfoChange(){
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level != null && minecraft.player != null)
@@ -290,9 +306,22 @@ public class Legacy4JClient {
         MenuRegistry.registerScreenFactory(LegacyMenuTypes.PLAYER_CRAFTING_PANEL_MENU.get(),LegacyCraftingScreen::playerCraftingScreen);
         MenuRegistry.registerScreenFactory(LegacyMenuTypes.LOOM_PANEL_MENU.get(),LegacyLoomScreen::new);
         MenuRegistry.registerScreenFactory(LegacyMenuTypes.STONECUTTER_PANEL_MENU.get(),LegacyStonecutterScreen::new);
+        MenuRegistry.registerScreenFactory(LegacyMenuTypes.MERCHANT_MENU.get(),LegacyMerchantScreen::new);
         ColorHandlerRegistry.registerBlockColors((blockState, blockAndTintGetter, blockPos, i) -> blockAndTintGetter == null || blockPos == null ? GrassColor.getDefaultColor() : BiomeColors.getAverageGrassColor(blockAndTintGetter, blockPos),SHRUB.get());
+        ColorHandlerRegistry.registerBlockColors((blockState, blockAndTintGetter, blockPos, i) -> {
+            if (blockAndTintGetter != null && blockPos != null){
+                if (blockAndTintGetter.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be){
+                    if (be.potion != Potions.WATER) return PotionUtils.getColor(be.potion);
+                    else if (be.waterColor != null) return be.waterColor;
+                }
+                return BiomeColors.getAverageWaterColor(blockAndTintGetter, blockPos);
+            }
+            return -1;
+        }, Blocks.WATER_CAULDRON);
+        ColorHandlerRegistry.registerItemColors((item,i) ->0x3153AF, LegacyRegistries.WATER.get());
         ColorHandlerRegistry.registerItemColors((itemStack, i) -> GrassColor.getDefaultColor(),SHRUB.get().asItem());
         RenderTypeRegistry.register(RenderType.cutoutMipped(),SHRUB.get());
+        RenderTypeRegistry.register(RenderType.translucent(),Blocks.WATER);
     }
     public static final KeyMapping keyCrafting = new KeyMapping("legacy.key.crafting", InputConstants.KEY_E, "key.categories.inventory");
     public static final KeyMapping keyCycleHeldLeft = new KeyMapping("legacy.key.cycleHeldLeft", InputConstants.KEY_PAGEDOWN, "key.categories.inventory");

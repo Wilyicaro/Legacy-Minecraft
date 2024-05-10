@@ -20,7 +20,7 @@ import wily.legacy.util.ScreenUtil;
 
 @Environment(EnvType.CLIENT)
 public class LegacyDeathScreen extends DeathScreen {
-    private static final ResourceLocation DRAFT_REPORT_SPRITE = new ResourceLocation("icon/draft_report");
+    private static final ResourceLocation DRAFT_REPORT = new ResourceLocation("icon/draft_report");
     private int delayTicker;
     private final Component causeOfDeath;
     private final boolean hardcore;
@@ -76,7 +76,7 @@ public class LegacyDeathScreen extends DeathScreen {
         }
 
         if (this.exitToTitleButton != null && this.minecraft.getReportingContext().hasDraftReport()) {
-            guiGraphics.blitSprite(DRAFT_REPORT_SPRITE, this.exitToTitleButton.getX() + this.exitToTitleButton.getWidth() - 17, this.exitToTitleButton.getY() + 3, 15, 15);
+            guiGraphics.blitSprite(DRAFT_REPORT, this.exitToTitleButton.getX() + this.exitToTitleButton.getWidth() - 17, this.exitToTitleButton.getY() + 3, 15, 15);
         }
         for (Renderable renderable : this.renderables)
             renderable.render(guiGraphics, i, j, f);

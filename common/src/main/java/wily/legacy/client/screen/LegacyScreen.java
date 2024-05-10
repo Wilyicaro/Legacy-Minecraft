@@ -3,7 +3,6 @@ package wily.legacy.client.screen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import wily.legacy.client.controller.ControllerComponent;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.util.ScreenUtil;
 

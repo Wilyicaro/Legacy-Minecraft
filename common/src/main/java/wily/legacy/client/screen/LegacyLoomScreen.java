@@ -30,9 +30,10 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JPlatform;
 import wily.legacy.client.LoomTabListing;
 import wily.legacy.client.Offset;
-import wily.legacy.client.controller.ComponentState;
-import wily.legacy.client.controller.ControllerComponent;
-import wily.legacy.client.controller.ControllerEvent;
+import wily.legacy.client.controller.BindingState;
+import wily.legacy.client.controller.Controller;
+import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.network.ServerInventoryCraftPacket;
 import wily.legacy.util.PagedList;
@@ -42,12 +43,12 @@ import wily.legacy.util.Stocker;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static wily.legacy.client.LegacySprites.SMALL_ARROW_SPRITE;
+import static wily.legacy.util.LegacySprites.SMALL_ARROW;
 import static wily.legacy.client.screen.ControlTooltip.*;
 import static wily.legacy.client.screen.LegacyCraftingScreen.clearIngredients;
 import static wily.legacy.client.screen.RecipeIconHolder.getActualItem;
 
-public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu> implements ControllerEvent {
+public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu> implements Controller.Event {
     private final Inventory inventory;
     private int lastFocused;
     protected final List<Ingredient> ingredientsGrid = new ArrayList<>(Collections.nCopies(9,Ingredient.EMPTY));
@@ -98,10 +99,16 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         }
 
         @Override
+        public void render(GuiGraphics graphics, int i, int j, float f) {
+            if (isFocused()) selectedCraftingButton = getCraftingButtons().indexOf(this);
+            super.render(graphics, i, j, f);
+        }
+
+        @Override
         public boolean keyPressed(int i, int j, int k) {
             if (i == InputConstants.KEY_O && !itemIcon.isEmpty() && hasItem()) {
                 updateRecipe();
-                selectedStack = itemIcon;
+                selectedStack = itemIcon.copyWithCount(1);
                 craftingTabList.tabButtons.get(1).onPress();
                 return true;
             }
@@ -110,8 +117,8 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
 
         void updateRecipe() {
             clearIngredients(ingredientsGrid);
-            ingredientsGrid.set(4, Legacy4JPlatform.getStrictNBTIngredient(itemIcon));
-            resultStack = itemIcon;
+            resultStack = itemIcon.copyWithCount(1);
+            ingredientsGrid.set(4, Legacy4JPlatform.getStrictNBTIngredient(resultStack));
         }
 
         @Override
@@ -166,7 +173,10 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                         previewIngs.add(dye);
                         List<Ingredient> displayIngs = new ArrayList<>(List.of(previewIng, dye));
                         Ingredient extraIng = getPatternExtraIngredient(p);
-                        if (!extraIng.isEmpty()) displayIngs.add(1,extraIng);
+                        if (!extraIng.isEmpty()){
+                            displayIngs.add(1,extraIng);
+                            previewIngs.add(extraIng);
+                        }
                         NonNullList<Ingredient> ings = NonNullList.create();
                         ings.addAll(displayIngs);
                         ings.set(0,selectedIngredients.get(0));
@@ -190,11 +200,11 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
     protected boolean inited = false;
     public LegacyLoomScreen(LegacyCraftingMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().tooltips.set(0,create(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_RETURN,true) : ControllerComponent.DOWN_BUTTON.componentState.getIcon(true),()->  getFocused() instanceof RecipeIconHolder<?> && canCraft() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.create") : null));
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_O,true) : ControllerComponent.UP_BUTTON.componentState.getIcon(true), ()->getFocused() instanceof RecipeIconHolder<?> r && r.canCraft() || getFocused() instanceof CustomRecipeIconHolder h && h.hasItem() ? CONTROL_ACTION_CACHE.getUnchecked(getFocused() instanceof CustomRecipeIconHolder ? "mco.template.button.select" : "legacy.action.add") : null);
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_X,true) : ControllerComponent.LEFT_BUTTON.componentState.getIcon(true), ()-> getFocused() instanceof RecipeIconHolder<?> r && r.getFocusedRecipe() != null && selectedPatterns.contains(r.getFocusedRecipe()) ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.remove") : null);
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().addCompound(()-> new Component[]{ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true) : ControllerComponent.LEFT_BUMPER.componentState.getIcon(true),ControlTooltip.SPACE,ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true) : ControllerComponent.RIGHT_BUMPER.componentState.getIcon(true)},()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.group"));
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> page.max > 0 ? ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true)}) : ControllerComponent.RIGHT_STICK.componentState.getIcon(true) : null,()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.page"));
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().tooltips.set(0,create(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_RETURN,true) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(true),()->  getFocused() instanceof RecipeIconHolder<?> && canCraft() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.create") : null));
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_O,true) : ControllerBinding.UP_BUTTON.bindingState.getIcon(true), ()->getFocused() instanceof RecipeIconHolder<?> r && r.canCraft() || getFocused() instanceof CustomRecipeIconHolder h && h.hasItem() ? CONTROL_ACTION_CACHE.getUnchecked(getFocused() instanceof CustomRecipeIconHolder ? "mco.template.button.select" : "legacy.action.add") : null);
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_X,true) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(true), ()-> getFocused() instanceof RecipeIconHolder<?> r && r.getFocusedRecipe() != null && selectedPatterns.contains(r.getFocusedRecipe()) ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.remove") : null);
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().addCompound(()-> new Component[]{ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(true),ControlTooltip.SPACE,ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon(true)},()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.group"));
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> page.max > 0 ? ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true)}) : ControllerBinding.RIGHT_STICK.bindingState.getIcon(true) : null,()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.page"));
         this.inventory = inventory;
         craftingTabList.addTabButton(43,0,new ResourceLocation("white_banner"),null,Component.empty(),t-> repositionElements());
         for (LoomTabListing listing : LoomTabListing.list) {
@@ -232,8 +242,8 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         super.repositionElements();
     }
     @Override
-    public void componentTick(ComponentState state) {
-        if (state.pressed && state.canClick() && state.is(ControllerComponent.RIGHT_STICK) && state instanceof ComponentState.Axis s) controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
+    public void componentTick(BindingState state) {
+        if (state.pressed && state.canClick() && state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s) controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
     }
     public static Ingredient getPatternExtraIngredient(ResourceKey<BannerPattern> pattern){
         Holder<BannerPattern> holder = BuiltInRegistries.BANNER_PATTERN.getHolderOrThrow(pattern);
@@ -365,11 +375,11 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                     if (isFocused() && isValidIndex()){
                         if (LegacyLoomScreen.this.canCraft()){
                             ScreenUtil.playSimpleUISound(SoundEvents.UI_LOOM_TAKE_RESULT,1.0f);
-                            Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(selectedIngredients,previewStack,-1, Screen.hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
+                            Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(selectedIngredients,previewStack,-1, Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
                             selectedStack = ItemStack.EMPTY;
                             previewStack = ItemStack.EMPTY;
                             craftingTabList.tabButtons.get(0).onPress();
-                        }
+                        } ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT_FAIL.get(),1.0f);
                     }
                 }
 
@@ -433,7 +443,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
             guiGraphics.pose().popPose();
         }
         if (craftingTabList.selectedTab == 0) ScreenUtil.renderSquareRecessedPanel(guiGraphics, leftPos + 176, topPos + 8, 163, 93, 2f);
-        guiGraphics.blitSprite(SMALL_ARROW_SPRITE, leftPos + 97, topPos + 161, 16, 13);
+        guiGraphics.blitSprite(SMALL_ARROW, leftPos + 97, topPos + 161, 16, 13);
         if (craftingTabList.selectedTab != 0) {
             if (craftingButtonsOffset.get() > 0)
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + 5, topPos + 45);

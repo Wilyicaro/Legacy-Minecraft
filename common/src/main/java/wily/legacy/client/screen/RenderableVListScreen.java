@@ -30,7 +30,7 @@ public class RenderableVListScreen extends LegacyScreen {
 
     @Override
     public void clearFocus() {
-        if (lastFocused > -1 && Legacy4JClient.controllerHandler.isCursorDisabled) return;
+        if (lastFocused > -1 && Legacy4JClient.controllerManager.isCursorDisabled) return;
         lastFocused = -1;
         super.clearFocus();
     }

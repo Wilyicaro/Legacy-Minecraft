@@ -1,6 +1,5 @@
 package wily.legacy.client.screen;
 
-import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
@@ -10,7 +9,6 @@ import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
-import net.minecraft.client.gui.screens.worldselection.ConfirmExperimentalFeaturesScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
 import net.minecraft.locale.Language;
@@ -19,13 +17,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
-import net.minecraft.world.flag.FeatureFlagSet;
-import net.minecraft.world.flag.FeatureFlags;
-import net.minecraft.world.level.DataPackConfig;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.WorldDataConfiguration;
-import wily.legacy.Legacy4J;
-import wily.legacy.client.controller.ControllerComponent;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.ScreenUtil;
 
 import java.nio.file.Path;
@@ -49,7 +43,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
     protected WorldMoreOptionsScreen(Screen parent, Function<Panel,Integer> posHeight) {
         super(s -> new Panel(p -> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 188 : 0))) / 2, p -> (s.height - posHeight.apply(p)) / 2, 244, 199), Component.translatable("createWorld.tab.more.title"));
         this.parent = parent;
-        controlTooltipRenderer.addCompound(()-> new Component[]{ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true) : ControllerComponent.LEFT_BUMPER.componentState.getIcon(true),ControlTooltip.SPACE,ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true) : ControllerComponent.RIGHT_BUMPER.componentState.getIcon(true)},()->CONTROL_ACTION_CACHE.getUnchecked(tabList.selectedTab == 0 ?  "legacy.menu.game_options" : "createWorld.tab.world.title"));
+        controlTooltipRenderer.addCompound(()-> new Component[]{ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(true),ControlTooltip.SPACE,ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon(true)},()->CONTROL_ACTION_CACHE.getUnchecked(tabList.selectedTab == 0 ?  "legacy.menu.game_options" : "createWorld.tab.world.title"));
     }
     public WorldMoreOptionsScreen(CreateWorldScreen parent, Consumer<Boolean> setTrustPlayers) {
         this(parent, p-> p.height);
@@ -160,10 +154,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
         renderableVList.addRenderable(new TickBox(0,0,parent.resetEnd, b-> Component.translatable("legacy.menu.load_save.reset_end"),b-> null,t-> parent.resetEnd = t.selected));
         renderableVList.addRenderable(new TickBox(0,0,parent.trustPlayers, b-> Component.translatable("legacy.menu.selectWorld.trust_players"),b-> null,t-> parent.trustPlayers = t.selected));
         addGameRulesOptions(renderableVList,gameRules, k-> k.getCategory() == GameRules.Category.UPDATES);
-        gameRenderables.addRenderable(new TickBox(0,0,parent.allowCheats,b->Component.translatable("selectWorld.allowCommands"),b->Tooltip.create(Component.translatable("selectWorld.allowCommands.info")),b->{
-            parent.allowCheats = b.selected;
-            Legacy4J.LOGGER.warn(parent.allowCheats);
-        }));
+        gameRenderables.addRenderable(new TickBox(0,0,parent.allowCheats,b->Component.translatable("selectWorld.allowCommands"),b->Tooltip.create(Component.translatable("selectWorld.allowCommands.info")),b-> parent.allowCheats = b.selected));
         for (GameRules.Category value : GameRules.Category.values()) {
             if (value == GameRules.Category.UPDATES) continue;
             addGameRulesOptions(gameRenderables,gameRules, k-> k.getCategory() == value);

@@ -17,8 +17,10 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PlayerRideableJumping;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -33,7 +35,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.BufferSourceWrapper;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.LegacySprites;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.util.ScreenUtil;
 
@@ -61,7 +63,10 @@ public abstract class GuiMixin {
     @Shadow protected abstract Player getCameraPlayer();
 
     @Shadow public abstract void render(GuiGraphics guiGraphics, float f);
-
+    @Redirect(method = "renderSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getPopTime()I"))
+    public int renderSlot(ItemStack instance) {
+        return 0;
+    }
     @Inject(method = "renderVignette", at = @At("HEAD"), cancellable = true)
     public void renderVignette(GuiGraphics guiGraphics, Entity entity, CallbackInfo ci) {
         if (minecraft.screen != null || !((LegacyOptions)minecraft.options).vignette().get())
@@ -134,7 +139,7 @@ public abstract class GuiMixin {
     }
     @Inject(method = "renderHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V", ordinal = 1))
     private void renderHotbarSelection(float f, GuiGraphics guiGraphics, CallbackInfo ci) {
-        guiGraphics.blitSprite(LegacySprites.HOTBAR_SELECTION_SPRITE,24,24,0,23,this.screenWidth / 2 - 91 - 1 + minecraft.player.getInventory().selected * 20, this.screenHeight, 24, 1);
+        guiGraphics.blitSprite(LegacySprites.HOTBAR_SELECTION,24,24,0,23,this.screenWidth / 2 - 91 - 1 + minecraft.player.getInventory().selected * 20, this.screenHeight, 24, 1);
     }
     @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
     public void renderHotbar(float f, GuiGraphics guiGraphics, CallbackInfo ci) {
@@ -142,10 +147,50 @@ public abstract class GuiMixin {
             ci.cancel();
             return;
         }
+        if (minecraft.getCameraEntity() instanceof LivingEntity character) {
+            boolean hasRemainingTime = character.isSprinting() || character.isShiftKeyDown() || character.isCrouching() || character.isFallFlying();
+            if (((LegacyOptions) minecraft.options).animatedCharacter().get() && (hasRemainingTime || character instanceof Player p && p.getAbilities().flying)) {
+                animatedCharacterTime = Util.getMillis();
+                remainingAnimatedCharacterTime = hasRemainingTime ? 450 : 0;
+            }
+            if (Util.getMillis() - animatedCharacterTime <= remainingAnimatedCharacterTime) {
+                Vec3 deltaMove = character.getDeltaMovement();
+                float bodyRotO = character.yBodyRotO;
+                float bodyRot = character.yBodyRot;
+                float xRot = character.getXRot();
+                float xRotO = character.xRotO;
+                float yRot = character.getYRot();
+                float yRotO = character.yRotO;
+                float yHeadRotO = character.yHeadRotO;
+                float yHeadRot = character.yHeadRot;
+                character.setDeltaMovement(new Vec3(Math.min(Math.max(-0.1, deltaMove.x), 0.1), 0, Math.min(0, Math.max(-0.1, deltaMove.z))));
+                character.yBodyRotO = character.yBodyRot = 180.0f;
+                character.setYRot(180);
+                character.yRotO = character.getYRot();
+                character.setXRot(character.xRotO = character.isFallFlying() ? xRot : 0);
+                character.yHeadRot = 180 + (character.isFallFlying() ? 0 : yHeadRot - bodyRot);
+                character.yHeadRotO = character.yHeadRot;
+                guiGraphics.pose().pushPose();
+                ScreenUtil.applyHUDScale(guiGraphics, w -> {
+                }, h -> {
+                });
+                ScreenUtil.renderEntity(guiGraphics, 28f, 50f, 13, ScreenUtil.getLegacyOptions().smoothAnimatedCharacter().get() ? f : 0,new Vector3f(), new Quaternionf().rotationXYZ(0.0f, -0.43633232f, (float) Math.PI), null, character);
+                guiGraphics.pose().popPose();
+                character.setDeltaMovement(deltaMove);
+                character.yBodyRotO = bodyRotO;
+                character.yBodyRot = bodyRot;
+                character.setXRot(xRot);
+                character.xRotO = xRotO;
+                character.setYRot(yRot);
+                character.yRotO = yRotO;
+                character.yHeadRot = yHeadRot;
+                character.yHeadRotO = yHeadRotO;
+            }
+        }
         int newSelection = minecraft.player != null ? minecraft.player.getInventory().selected : -1;
         if (lastHotbarSelection >= 0 && lastHotbarSelection != newSelection) ScreenUtil.lastHotbarSelectionChange = Util.getMillis();
         lastHotbarSelection = newSelection;
-
+        RenderSystem.enableBlend();
         guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F,  ScreenUtil.getHUDDistance(),0.0F);
@@ -158,51 +203,17 @@ public abstract class GuiMixin {
             Legacy4JClient.guiBufferSourceOverride = BufferSourceWrapper.translucent(guiGraphics.bufferSource());
         }
     }
+
     @Inject(method = "renderHotbar", at = @At("RETURN"))
     public void renderHotbarTail(float f, GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null)
             return;
-
+        RenderSystem.disableBlend();
         Legacy4JClient.guiBufferSourceOverride = null;
         ScreenUtil.resetHUDScale(guiGraphics,i-> screenWidth = i,i-> screenHeight = i);
         guiGraphics.pose().popPose();
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
-        Player player = this.getCameraPlayer();
-        if (player == null) return;
-        ControlTooltip.guiControlRenderer.render(guiGraphics,0,0,f);
-        boolean hasRemainingTime = player.isSprinting() || player.isShiftKeyDown() || player.isCrouching() || player.isFallFlying();
-
-        if (((LegacyOptions)minecraft.options).animatedCharacter().get() && (hasRemainingTime || player.getAbilities().flying )){
-            animatedCharacterTime = Util.getMillis();
-            remainingAnimatedCharacterTime = hasRemainingTime ? 450 : 0;
-        }
-        if (Util.getMillis() - animatedCharacterTime <= remainingAnimatedCharacterTime) {
-            Vec3 deltaMove = player.getDeltaMovement();
-            float bodyRot = player.yBodyRot;
-            float xRot = player.getXRot();
-            float yRot = player.getYRot();
-            float yRotO = player.yRotO;
-            float yHeadRotO = player.yHeadRotO;
-            float yHeadRot = player.yHeadRot;
-            player.setDeltaMovement(new Vec3(Math.min(Math.max(-0.1,deltaMove.x),0.1),0,Math.min(0,Math.max(-0.1,deltaMove.z))));
-            player.yBodyRot = 180.0f;
-            player.setYRot(180);
-            player.yRotO = player.getYRot();
-            player.setXRot(player.isFallFlying() ? xRot : 0);
-            player.yHeadRot = 180 + (player.isFallFlying() ? 0 : yHeadRot - bodyRot);
-            player.yHeadRotO = player.yHeadRot;
-            guiGraphics.pose().pushPose();
-            ScreenUtil.applyHUDScale(guiGraphics,w->{},h->{});
-            InventoryScreen.renderEntityInInventory(guiGraphics, 28f, 50f,13, new Vector3f(), new Quaternionf().rotationXYZ(0.0f, -0.43633232f, (float) Math.PI), null, player);
-            guiGraphics.pose().popPose();
-            player.setDeltaMovement(deltaMove);
-            player.yBodyRot = bodyRot;
-            player.setXRot(xRot);
-            player.setYRot(yRot);
-            player.yRotO = yRotO;
-            player.yHeadRot = yHeadRot;
-            player.yHeadRotO = yHeadRotO;
-        }
+        if (minecraft.player != null) ControlTooltip.guiControlRenderer.render(guiGraphics,0,0,f);
     }
     @ModifyVariable(method = "renderJumpMeter", at = @At(value="HEAD", ordinal = 0), argsOnly = true)
     public int modifyJumpMeterX(int value) {

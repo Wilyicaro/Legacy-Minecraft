@@ -60,10 +60,12 @@ public class LegacyCraftingMenu extends AbstractContainerMenu implements RecipeM
     public static LegacyCraftingMenu stoneCutterMenu(int window, Inventory inventory){
         return stoneCutterMenu(window, inventory,null);
     }
-
-    public LegacyCraftingMenu(Inventory inventory, @Nullable MenuType<?> menuType, int i, BlockPos pos) {
+    public LegacyCraftingMenu(@Nullable MenuType<?> menuType, int i, BlockPos pos) {
         super(menuType, i);
         this.blockPos =pos;
+    }
+    public LegacyCraftingMenu(Inventory inventory, @Nullable MenuType<?> menuType, int i, BlockPos pos) {
+        this(menuType, i,pos);
         addInventorySlotGrid(inventory, 9,186, 133,3);
         addInventorySlotGrid(inventory, 0,186, 186,1);
     }
@@ -72,7 +74,7 @@ public class LegacyCraftingMenu extends AbstractContainerMenu implements RecipeM
     public void addInventorySlotGrid(Container container, int startIndex, int x, int y, int rows){
         for (int j = 0; j < rows; j++) {
             for (int k = 0; k < 9; k++) {
-                addSlot(new LegacySlotWrapper(container,startIndex +  j * 9 + k,x + k * 16,y + j * 16){
+                addSlot(LegacySlotDisplay.override(new Slot(container,startIndex +  j * 9 + k,x + k * 16,y + j * 16){
                     @Override
                     public void setChanged() {
                         super.setChanged();
@@ -82,6 +84,7 @@ public class LegacyCraftingMenu extends AbstractContainerMenu implements RecipeM
                     public boolean isActive() {
                         return inventoryActive;
                     }
+                }, new LegacySlotDisplay(){
                     public Offset getOffset() {
                         return new Offset(0.5,0.5,0);
                     }
@@ -91,7 +94,7 @@ public class LegacyCraftingMenu extends AbstractContainerMenu implements RecipeM
                     public int getHeight() {
                         return 16;
                     }
-                });
+                }));
             }
         }
     }

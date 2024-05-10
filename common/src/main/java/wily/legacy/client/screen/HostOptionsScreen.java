@@ -21,7 +21,7 @@ import net.minecraft.world.level.GameType;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.LegacySprites;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.player.LegacyPlayerInfo;
@@ -42,6 +42,8 @@ public class HostOptionsScreen extends PanelVListScreen{
     protected final Component title;
     protected float alpha = getDefaultOpacity();
     protected boolean shouldFade = false;
+
+    public final ControlTooltip.Renderer controlTooltipRenderer = ControlTooltip.defaultScreen(this);
 
     public static final List<GameRules.Key<GameRules.BooleanValue>> WORLD_RULES = List.of(GameRules.RULE_DOFIRETICK,GameRules.RULE_DAYLIGHT,GameRules.RULE_KEEPINVENTORY,GameRules.RULE_DOMOBSPAWNING,GameRules.RULE_MOBGRIEFING, LegacyGameRules.GLOBAL_MAP_PLAYER_ICON);
     public static final List<GameRules.Key<GameRules.BooleanValue>> OTHER_RULES = List.of(GameRules.RULE_WEATHER_CYCLE,GameRules.RULE_DOMOBLOOT,GameRules.RULE_DOBLOCKDROPS,GameRules.RULE_NATURAL_REGENERATION);
@@ -67,7 +69,7 @@ public class HostOptionsScreen extends PanelVListScreen{
         float[] color = Legacy4JClient.getVisualPlayerColor(((LegacyPlayerInfo)Minecraft.getInstance().getConnection().getPlayerInfo(profile.getId())));
         guiGraphics.setColor(color[0],color[1],color[2],1.0f);
         RenderSystem.enableBlend();
-        guiGraphics.blitSprite(LegacySprites.MAP_PLAYER_SPRITE,x,y, 20,20);
+        guiGraphics.blitSprite(LegacySprites.MAP_PLAYER,x,y, 20,20);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
     }
@@ -256,7 +258,13 @@ public class HostOptionsScreen extends PanelVListScreen{
         guiGraphics.drawString(font,title,panel.x + 11, panel.y + 8, 0x383838, false);
     }
 
+    @Override
+    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        super.render(guiGraphics, i, j, f);
+        controlTooltipRenderer.render(guiGraphics,i,j,f);
+    }
+
     protected static float getDefaultOpacity() {
-        return ((LegacyOptions)Minecraft.getInstance().options).hudOpacity().get().floatValue();
+        return 0.8f;
     }
 }

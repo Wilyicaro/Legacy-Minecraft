@@ -7,9 +7,12 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.CommonListenerCookie;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.PacketUtils;
+import net.minecraft.network.protocol.game.ClientboundMerchantOffersPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -18,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.screen.CreativeModeScreen;
+import wily.legacy.inventory.LegacyMerchantMenu;
 
 @Mixin(ClientPacketListener.class)
 public abstract class ClientPacketListenerMixin extends ClientCommonPacketListenerImpl {
@@ -50,5 +54,14 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     @Redirect(method = "handleSetEntityPassengersPacket", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;setOverlayMessage(Lnet/minecraft/network/chat/Component;Z)V"))
     public void handleSetEntityPassengersPacket(Gui instance, Component component, boolean bl) {
 
+    }
+    @Inject(method = "handleMerchantOffers", at = @At("RETURN"))
+    public void handleMerchantOffers(ClientboundMerchantOffersPacket clientboundMerchantOffersPacket, CallbackInfo ci) {
+        if (clientboundMerchantOffersPacket.getContainerId() == minecraft.player.containerMenu.containerId && minecraft.player.containerMenu instanceof LegacyMerchantMenu m) {
+            m.merchant.overrideOffers(clientboundMerchantOffersPacket.getOffers());
+            m.merchant.overrideXp(clientboundMerchantOffersPacket.getVillagerXp());
+            m.merchantLevel = clientboundMerchantOffersPacket.getVillagerLevel();
+            m.showProgressBar = clientboundMerchantOffersPacket.showProgress();
+        }
     }
 }

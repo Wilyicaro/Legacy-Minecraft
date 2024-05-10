@@ -12,7 +12,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
-import wily.legacy.client.controller.ControllerComponent;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.util.ScreenUtil;
 
@@ -59,7 +59,7 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
                 }
                 @Override
                 public void onPress() {
-                    if (Screen.hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed) setAndUpdateKey(keyMapping, keyMapping.getDefaultKey());
+                    if (Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed) setAndUpdateKey(keyMapping, keyMapping.getDefaultKey());
                     else selectedKey = keyMapping;
                 }
                 @Override

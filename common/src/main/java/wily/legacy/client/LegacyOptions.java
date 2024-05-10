@@ -37,4 +37,5 @@ public interface LegacyOptions {
     OptionInstance<Integer> controllerIcons();
     OptionInstance<Integer> selectedController();
     OptionInstance<Difficulty> createWorldDifficulty();
+    OptionInstance<Boolean> smoothAnimatedCharacter();
 }

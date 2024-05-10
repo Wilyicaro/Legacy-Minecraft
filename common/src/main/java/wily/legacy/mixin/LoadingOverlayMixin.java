@@ -14,9 +14,8 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacyResourceManager;
-import wily.legacy.client.controller.ControllerComponent;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Optional;
@@ -49,7 +48,7 @@ public class LoadingOverlayMixin extends Overlay {
         }
         if (!finishedIntro && timer % INTROS.size() >= INTROS.size() - 0.01f && reload.isDone()) finishedIntro = true;
         if (!finishedIntro) {
-            if ((InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_RETURN) || ControllerComponent.DOWN_BUTTON.componentState.pressed) && reload.isDone() && minecraft.screen != null) finishedIntro = true;
+            if ((InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_RETURN) || ControllerBinding.DOWN_BUTTON.bindingState.pressed) && reload.isDone() && minecraft.screen != null) finishedIntro = true;
             if (timer % INTROS.size() >= INTROS.size() - 0.01f) finishedIntro = true;
 
             guiGraphics.fill(RenderType.guiOverlay(), 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFFFFFFFF);
@@ -75,7 +74,7 @@ public class LoadingOverlayMixin extends Overlay {
                 GlStateManager._clear(16384, Minecraft.ON_OSX);
                 guiGraphics.fill(RenderType.guiOverlay(),0,0,guiGraphics.guiWidth(),guiGraphics.guiHeight(),0);
             }
-            if (g < 1.0f && !reload.isDone())
+            if (g < 1.0f && !reload.isDone() && minecraft.isGameLoadFinished())
                 ScreenUtil.drawGenericLoading(guiGraphics, (guiGraphics.guiWidth() - 75) / 2, (guiGraphics.guiHeight() - 75) / 2);
 
             if (g >= 2.0f)

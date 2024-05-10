@@ -40,34 +40,34 @@ public class ScreenUtil {
     public static long lastHotbarSelectionChange = -1;
     protected static LogoRenderer logoRenderer = new LogoRenderer(false);
     public static LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
-    public static final ResourceLocation SAVE_CHEST_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"hud/save_chest");
-    public static final ResourceLocation SAVE_ARROW_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"hud/save_arrow");
-    public static final ResourceLocation LOADING_BLOCK_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"widget/loading_block");
-    public static final ResourceLocation POINTER_PANEL_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"tiles/pointer_panel");
-    public static final ResourceLocation PANEL_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel");
-    public static final ResourceLocation PANEL_RECESS_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel_recess");
-    public static final ResourceLocation PANEL_TRANSLUCENT_RECESS_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel_translucent_recess");
-    public static final ResourceLocation ENTITY_PANEL_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"tiles/entity_panel");
+    public static final ResourceLocation SAVE_CHEST = new ResourceLocation(Legacy4J.MOD_ID,"hud/save_chest");
+    public static final ResourceLocation SAVE_ARROW = new ResourceLocation(Legacy4J.MOD_ID,"hud/save_arrow");
+    public static final ResourceLocation LOADING_BLOCK = new ResourceLocation(Legacy4J.MOD_ID,"widget/loading_block");
+    public static final ResourceLocation POINTER_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/pointer_panel");
+    public static final ResourceLocation PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel");
+    public static final ResourceLocation PANEL_RECESS = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel_recess");
+    public static final ResourceLocation PANEL_TRANSLUCENT_RECESS = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel_translucent_recess");
+    public static final ResourceLocation ENTITY_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/entity_panel");
     public static final ResourceLocation SQUARE_RECESSED_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/square_recessed_panel");
     public static final ResourceLocation SQUARE_ENTITY_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/square_entity_panel");
     public static void renderPointerPanel(GuiGraphics graphics, int x, int y, int width, int height){
         RenderSystem.enableBlend();
         RenderSystem.disableDepthTest();
-        graphics.blitSprite(POINTER_PANEL_SPRITE,x,y,width,height);
+        graphics.blitSprite(POINTER_PANEL,x,y,width,height);
         RenderSystem.enableDepthTest();
         RenderSystem.disableBlend();
     }
     public static void renderPanel(GuiGraphics graphics, int x, int y, int width, int height, float dp){
-      renderTiles(PANEL_SPRITE,graphics,x,y,width,height,dp);
+      renderTiles(PANEL,graphics,x,y,width,height,dp);
     }
     public static void renderPanelRecess(GuiGraphics graphics, int x, int y, int width, int height, float dp){
-        renderTiles(PANEL_RECESS_SPRITE,graphics,x,y,width,height,dp);
+        renderTiles(PANEL_RECESS,graphics,x,y,width,height,dp);
     }
     public static void renderPanelTranslucentRecess(GuiGraphics graphics, int x, int y, int width, int height, float dp){
-        renderTiles(PANEL_TRANSLUCENT_RECESS_SPRITE,graphics,x,y,width,height,dp);
+        renderTiles(PANEL_TRANSLUCENT_RECESS,graphics,x,y,width,height,dp);
     }
     public static void renderEntityPanel(GuiGraphics graphics, int x, int y, int width, int height, float dp){
-        renderTiles(ENTITY_PANEL_SPRITE,graphics,x,y,width,height,dp);
+        renderTiles(ENTITY_PANEL,graphics,x,y,width,height,dp);
     }
     public static void renderSquareEntityPanel(GuiGraphics graphics, int x, int y, int width, int height, float dp){
         renderTiles(SQUARE_ENTITY_PANEL,graphics,x,y,width,height,dp);
@@ -90,12 +90,12 @@ public class ScreenUtil {
     public static void drawAutoSavingIcon(GuiGraphics graphics,int x, int y) {
         graphics.pose().pushPose();
         graphics.pose().scale(0.5F,0.5F,1);
-        graphics.blitSprite(SAVE_CHEST_SPRITE,x * 2,y * 2,48,48);
+        graphics.blitSprite(SAVE_CHEST,x * 2,y * 2,48,48);
         graphics.pose().popPose();
         graphics.pose().pushPose();
         double heightAnim = (Util.getMillis() / 50D) % 11;
         graphics.pose().translate(x + 5.5,y - 8 - (heightAnim > 5 ? 10 - heightAnim : heightAnim),0);
-        graphics.blitSprite(SAVE_ARROW_SPRITE,0,0,13,16);
+        graphics.blitSprite(SAVE_ARROW,0,0,13,16);
         graphics.pose().popPose();
     }
     public static void renderDefaultBackground(GuiGraphics guiGraphics){
@@ -185,11 +185,17 @@ public class ScreenUtil {
         return mc.getResourcePackRepository().getSelectedPacks().stream().anyMatch(p->p.getId().equals("programmer_art"));
     }
     public static void playSimpleUISound(SoundEvent sound, float grave, float volume){
-        mc.getSoundManager().stop(sound.getLocation(), SoundSource.MASTER);
+        playSimpleUISound(sound,grave,volume,false);
+    }
+    public static void playSimpleUISound(SoundEvent sound, float grave, float volume,boolean pauseRepeatedSounds){
+        if (pauseRepeatedSounds) mc.getSoundManager().stop(sound.getLocation(), SoundSource.MASTER);
         mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave, volume));
     }
     public static void playSimpleUISound(SoundEvent sound, float grave){
-        mc.getSoundManager().stop(sound.getLocation(), SoundSource.MASTER);
+        playSimpleUISound(sound,grave,false);
+    }
+    public static void playSimpleUISound(SoundEvent sound, float grave, boolean pauseRepeatedSounds){
+        if (pauseRepeatedSounds)mc.getSoundManager().stop(sound.getLocation(), SoundSource.MASTER);
         mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave));
     }
     public static void addTip(Entity entity){
@@ -248,7 +254,7 @@ public class ScreenUtil {
             float alpha = l >= v - 100  ? (l <= v ? l / v: (n - l) / 200f) : 0;
             if (alpha > 0) {
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
-                graphics.blitSprite(LOADING_BLOCK_SPRITE, x+ (i <= 2 ? i : i >= 4 ? i == 7 ? 0 : 6 - i : 2) * 27, y + (i <= 2 ? 0 : i == 3 || i == 7 ? 1 : 2)* 27, 21, 21);
+                graphics.blitSprite(LOADING_BLOCK, x+ (i <= 2 ? i : i >= 4 ? i == 7 ? 0 : 6 - i : 2) * 27, y + (i <= 2 ? 0 : i == 3 || i == 7 ? 1 : 2)* 27, 21, 21);
             }
         }
         RenderSystem.disableBlend();
@@ -316,7 +322,7 @@ public class ScreenUtil {
     }
 
     public static float getTextScale(){
-        return getLegacyOptions().legacyItemTooltips().get() ? (float) Math.sqrt(1280f / mc.getWindow().getScreenWidth() * 720f / mc.getWindow().getScreenHeight()) : 1.0f;
+        return getLegacyOptions().legacyItemTooltips().get() ? Math.max(0.5f,Math.min((float) Math.sqrt(1280f / mc.getWindow().getScreenWidth() * 720f / mc.getWindow().getScreenHeight()),2)) : 1.0f;
     }
 
 

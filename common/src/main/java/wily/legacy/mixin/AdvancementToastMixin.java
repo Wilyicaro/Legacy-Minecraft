@@ -15,6 +15,9 @@ import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
@@ -25,8 +28,8 @@ public abstract class AdvancementToastMixin implements Toast {
 
     @Shadow @Final private AdvancementHolder advancement;
 
-    @Override
-    public Visibility render(GuiGraphics guiGraphics, ToastComponent toastComponent, long l) {
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphics guiGraphics, ToastComponent toastComponent, long l, CallbackInfoReturnable<Visibility> cir) {
         DisplayInfo displayInfo = this.advancement.value().display().orElse(null);
         ScreenUtil.renderPointerPanel(guiGraphics,0,0,width(),height());
         if (displayInfo != null) {
@@ -65,9 +68,10 @@ public abstract class AdvancementToastMixin implements Toast {
             if (toastComponent.getMinecraft().player != null) PlayerFaceRenderer.draw(guiGraphics, toastComponent.getMinecraft().player.getSkin(), 7, (height() - 32) / 2, 32);
             ScreenUtil.renderPanel(guiGraphics,width() - 38,(height() - 28) / 2,28,28,2f);
             guiGraphics.renderItem(displayInfo.getIcon(), width() - 32, (height() - 16) / 2);
-            return (double)l >= 5000.0 * toastComponent.getNotificationDisplayTimeMultiplier() ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
+            cir.setReturnValue((double)l >= 5000.0 * toastComponent.getNotificationDisplayTimeMultiplier() ? Toast.Visibility.HIDE : Toast.Visibility.SHOW);
+            return;
         }
-        return Toast.Visibility.HIDE;
+        cir.setReturnValue(Toast.Visibility.HIDE);
     }
 
     @Override

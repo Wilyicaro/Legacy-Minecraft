@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.LegacySprites;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
 
@@ -45,11 +45,11 @@ public abstract class GameRendererMixin {
             if (tip.visibility == Toast.Visibility.HIDE) LegacyTipManager.tips.remove(tip);
         }
         instance.render(graphics);
-        if (GLFW.glfwGetInputMode(minecraft.getWindow().getWindow(),GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerHandler.isCursorDisabled) {
+        if (GLFW.glfwGetInputMode(minecraft.getWindow().getWindow(),GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerManager.isCursorDisabled) {
             RenderSystem.disableDepthTest();
             RenderSystem.enableBlend();
             graphics.pose().pushPose();
-            graphics.pose().translate(Legacy4JClient.controllerHandler.getPointerX(), Legacy4JClient.controllerHandler.getPointerY(), 0);
+            graphics.pose().translate(Legacy4JClient.controllerManager.getPointerX(), Legacy4JClient.controllerManager.getPointerY(), 0);
             graphics.blitSprite(minecraft.getWindow().getScreenWidth() >= 1920 ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
             graphics.pose().popPose();
             RenderSystem.disableBlend();

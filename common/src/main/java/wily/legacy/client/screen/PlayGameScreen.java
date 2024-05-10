@@ -13,7 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.storage.LevelSummary;
 import org.apache.commons.compress.utils.FileNameUtils;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.controller.ControllerComponent;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.File;
@@ -34,7 +34,7 @@ public class PlayGameScreen extends PanelVListScreen{
         tabList.selectedTab = -1;
         tabList.tabButtons.get(initialTab).onPress();
         Supplier<Boolean> saveOptions = ()-> saveRenderableList.renderables.stream().anyMatch(r-> r instanceof GuiEventListener l && l.isFocused());
-        controlTooltipRenderer.add(()->ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O,true) : ControllerComponent.UP_BUTTON.componentState.getIcon(true),()->saveOptions.get() || serverRenderableList.renderables.stream().anyMatch(r-> serverRenderableList.renderables.indexOf(r) > 1 && r instanceof GuiEventListener l && l.isFocused()) ? CONTROL_ACTION_CACHE.getUnchecked(saveOptions.get() ? "legacy.menu.save_options" : "legacy.menu.server_options") : null);
+        controlTooltipRenderer.add(()->ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O,true) : ControllerBinding.UP_BUTTON.bindingState.getIcon(true),()->saveOptions.get() || serverRenderableList.renderables.stream().anyMatch(r-> serverRenderableList.renderables.indexOf(r) > 1 && r instanceof GuiEventListener l && l.isFocused()) ? CONTROL_ACTION_CACHE.getUnchecked(saveOptions.get() ? "legacy.menu.save_options" : "legacy.menu.server_options") : null);
     }
     public PlayGameScreen(Screen parent) {
         this(parent,0);

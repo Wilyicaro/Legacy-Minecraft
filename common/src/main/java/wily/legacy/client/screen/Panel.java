@@ -19,11 +19,17 @@ public class Panel extends SimpleLayoutRenderable {
         this.updatedX = leftPosGetter;
         this.updatedY = topPosGetter;
     }
+    public int centeredLeftPos(Screen screen){
+        return (screen.width - width) / 2;
+    }
+    public int centeredTopPos(Screen screen){
+        return (screen.height - height) / 2;
+    }
     public static Panel centered(Screen screen, int imageWidth, int imageHeight){
         return centered(screen,imageWidth,imageHeight,0,0);
     }
     public static Panel centered(Screen screen, int imageWidth, int imageHeight, int xOffset, int yOffset){
-        return new Panel(g-> (screen.width - g.width) / 2 + xOffset, g-> (screen.height - g.height) / 2 + yOffset, imageWidth, imageHeight);
+        return new Panel(g-> g.centeredLeftPos(screen) + xOffset, g-> g.centeredTopPos(screen) + yOffset, imageWidth, imageHeight);
     }
     public void init(){
         setX(updatedX.apply(this));

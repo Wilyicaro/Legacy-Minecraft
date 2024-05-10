@@ -13,7 +13,8 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.controller.ControllerHandler;
+import wily.legacy.Legacy4JClient;
+import wily.legacy.client.controller.ControllerManager;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class LegacyResourceManager implements PreparableReloadListener {
             }
             resourceManager.getResource(GAMEPAD_MAPPINGS).ifPresent(r->{
                 try {
-                    ControllerHandler.applyGamePadMappingsFromBuffer(r.openAsReader());
+                    ControllerManager.getHandler().applyGamePadMappingsFromBuffer(r.openAsReader());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

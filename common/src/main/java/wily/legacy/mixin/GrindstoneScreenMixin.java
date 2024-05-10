@@ -9,8 +9,8 @@ import net.minecraft.world.inventory.GrindstoneMenu;
 import org.spongepowered.asm.mixin.Mixin;
 import wily.legacy.util.ScreenUtil;
 
-import static wily.legacy.client.LegacySprites.ARROW_SPRITE;
-import static wily.legacy.client.LegacySprites.ERROR_CROSS_SPRITE;
+import static wily.legacy.util.LegacySprites.ARROW;
+import static wily.legacy.util.LegacySprites.ERROR_CROSS;
 
 @Mixin(GrindstoneScreen.class)
 public class GrindstoneScreenMixin extends AbstractContainerScreen<GrindstoneMenu> {
@@ -40,9 +40,9 @@ public class GrindstoneScreenMixin extends AbstractContainerScreen<GrindstoneMen
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 85,topPos + 50,0);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        guiGraphics.blitSprite(ARROW_SPRITE,0,0,22,15);
+        guiGraphics.blitSprite(ARROW,0,0,22,15);
         if ((this.menu.getSlot(0).hasItem() || this.menu.getSlot(1).hasItem()) && !this.menu.getSlot(2).hasItem())
-            guiGraphics.blitSprite(ERROR_CROSS_SPRITE, 2, 0, 15, 15);
+            guiGraphics.blitSprite(ERROR_CROSS, 2, 0, 15, 15);
         guiGraphics.pose().popPose();
     }
 }

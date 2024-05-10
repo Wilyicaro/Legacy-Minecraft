@@ -11,14 +11,14 @@ import wily.legacy.Legacy4JClient;
 public class MouseHandlerMixin {
     @Inject(method = "onMove", at = @At("HEAD"), cancellable = true)
     private void onMove(long l, double d, double e, CallbackInfo ci) {
-        if (Legacy4JClient.controllerHandler.isCursorDisabled) ci.cancel();
+        if (Legacy4JClient.controllerManager.isCursorDisabled) ci.cancel();
     }
     @Inject(method = "onScroll", at = @At("HEAD"), cancellable = true)
     private void onScroll(long l, double d, double e, CallbackInfo ci) {
-        if (Legacy4JClient.controllerHandler.isCursorDisabled) ci.cancel();
+        if (Legacy4JClient.controllerManager.isCursorDisabled) ci.cancel();
     }
     @Inject(method = "onPress", at = @At("HEAD"), cancellable = true)
     private void onPress(long l, int i, int j, int k, CallbackInfo ci) {
-        if (Legacy4JClient.controllerHandler.isCursorDisabled) ci.cancel();
+        if (Legacy4JClient.controllerManager.isCursorDisabled) ci.cancel();
     }
 }

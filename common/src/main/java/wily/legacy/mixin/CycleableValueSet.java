@@ -40,7 +40,6 @@ public interface CycleableValueSet<T> extends OptionInstance.ValueSet<T> {
                         valueSetter().set(optionInstance, s.objectValue);
                         options.save();
                         consumer.accept(s.objectValue);
-                        if (optionInstance == options.guiScale()) Minecraft.getInstance().resizeDisplay();
                     }
                 });
             }

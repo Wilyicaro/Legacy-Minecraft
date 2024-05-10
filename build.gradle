@@ -110,7 +110,7 @@ subprojects {
                     def lines = processedLine.split(" -")
                     changes << "\n**${lines[0]}**  "
                     lines[0] = ""
-                    lines.each {s-> changes << "\n-" + s + "  "}
+                    lines.each {s-> changes << "\n- " + s + "  "}
                 }
             }
             changes << "\n[Click here for complete changelog]($mod_source/commits/$branch)"

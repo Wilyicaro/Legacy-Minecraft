@@ -15,10 +15,11 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
-import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.level.material.Fluids;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.inventory.LegacySlotWrapper;
+import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
 
@@ -42,7 +43,7 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
 
     public FlatWorldLayerSelector(Screen parent, Consumer<FlatWorldLayerSelector> applyLayer, int maxLayerHeight, Component component) {
         super(325,245, component);
-        Legacy4JClient.controllerHandler.enableCursor();
+        Legacy4JClient.controllerManager.enableCursor();
         this.parent = parent;
         this.applyLayer = applyLayer;
         this.maxLayerHeight = maxLayerHeight;
@@ -59,19 +60,22 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
             }
         };
         for (int i = 0; i < layerSelectionGrid.getContainerSize(); i++) {
-            menu.slots.add(new LegacySlotWrapper(layerSelectionGrid,i,23 + i % 10 * 27, 24 + i / 10 * 27){
+            menu.slots.add(LegacySlotDisplay.override(new Slot(layerSelectionGrid,i,23 + i % 10 * 27, 24 + i / 10 * 27), new LegacySlotDisplay(){
                 public int getWidth() {
                     return 27;
                 }
                 public int getHeight() {
                     return 27;
                 }
-            });
+            }));
         }
-        BuiltInRegistries.FLUID.forEach(f-> {
-            if (f.getBucket() != null && (!(f instanceof FlowingFluid fluid) || fluid.isSame(fluid.getSource()))) layerItems.add(f.getBucket().getDefaultInstance());
+        BuiltInRegistries.FLUID.stream().filter(f-> f.getBucket() != null && (f == Fluids.EMPTY || f.isSource(f.defaultFluidState()))).forEach(f-> {
+            Item i;
+            if ((i =f.defaultFluidState().createLegacyBlock().getBlock().asItem()) instanceof BlockItem) layerItems.add(i.getDefaultInstance());
+            else layerItems.add(f.getBucket().getDefaultInstance());
         });
         BuiltInRegistries.BLOCK.forEach(b->{
+            if (b instanceof LiquidBlock) return;
             Item i = Item.BY_BLOCK.getOrDefault(b, null);
             if (i != null) layerItems.add(i.getDefaultInstance());
         });

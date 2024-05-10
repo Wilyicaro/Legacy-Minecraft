@@ -11,6 +11,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 import dev.architectury.hooks.fluid.FluidBucketHooks;
+import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -57,7 +58,7 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.controller.ControllerComponent;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.util.JsonUtil;
 import wily.legacy.util.ScreenUtil;
@@ -109,31 +110,24 @@ public interface ControlTooltip {
         }
     }
     static Type getActiveControllerType(){
-        String controller = Legacy4JClient.controllerHandler.connectedController;
         if (ScreenUtil.getLegacyOptions().controllerIcons().get() <= 0) {
-            if (controller != null) {
-                if (controller.contains("PS3")) return Type.PS3;
-                else if (controller.contains("PS4") || controller.contains("PS5")) return Type.PS4;
-                else if (controller.contains("Xbox 360")) return Type.x360;
-                else if (controller.contains("Xbox One")) return Type.xONE;
-                else if (controller.contains("Nintendo Switch")) return Type.SWITCH;
-                else if (controller.contains("Wii U")) return Type.WII_U;
-            }
+            if (Legacy4JClient.controllerManager.connectedController != null){
+                return Legacy4JClient.controllerManager.connectedController.getType();
+            } else return Type.x360;
         } else return Type.values()[ScreenUtil.getLegacyOptions().controllerIcons().get()];
-        return Type.x360;
     }
     static Type getActiveType(){
-        if (Legacy4JClient.controllerHandler.connectedController != null) return getActiveControllerType();
+        if (Legacy4JClient.controllerManager.connectedController != null) return getActiveControllerType();
         return Type.KEYBOARD;
     }
     Component getIcon();
     @Nullable
     Component getAction();
-
+    Component MORE = Component.literal("...").withStyle(ChatFormatting.DARK_GRAY);
     Component SPACE = Component.literal("  ");
     Component PLUS = Component.literal("+");
     static ControlTooltip.Renderer defaultScreen(Screen screen){
-        return new Renderer(screen).add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_RETURN,true) : ControllerComponent.DOWN_BUTTON.componentState.getIcon(true),()->screen.getFocused() == null ? null : CONTROL_ACTION_CACHE.getUnchecked("mco.template.button.select")).add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_ESCAPE,true) : ControllerComponent.RIGHT_BUTTON.componentState.getIcon(true),()->CONTROL_ACTION_CACHE.getUnchecked("gui.back"));
+        return new Renderer(screen).add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_RETURN,true) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(true),()->screen.getFocused() == null ? null : CONTROL_ACTION_CACHE.getUnchecked("mco.template.button.select")).add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_ESCAPE,true) : ControllerBinding.RIGHT_BUTTON.bindingState.getIcon(true),()->CONTROL_ACTION_CACHE.getUnchecked("gui.back"));
     }
     static ControlTooltip create(Supplier<Component> icon, Supplier<Component> action) {
         return new ControlTooltip() {
@@ -146,7 +140,7 @@ public interface ControlTooltip {
         };
     }
     static ControlTooltip create(LegacyKeyMapping mapping,Supplier<Component> action, boolean allowPressed){
-        return create(()-> getActiveType().isKeyboard() ? getKeyIcon(mapping.getKey().getValue(),allowPressed) : mapping.getComponent() == null ? null : mapping.getComponent().componentState.getIcon(allowPressed),action);
+        return create(()-> getActiveType().isKeyboard() ? getKeyIcon(mapping.getKey().getValue(),allowPressed) : mapping.getBinding() == null ? null : mapping.getBinding().bindingState.getIcon(allowPressed),action);
     }
     class Renderer implements Renderable{
 
@@ -355,7 +349,7 @@ public interface ControlTooltip {
     }
     static Component getActualUse(Minecraft minecraft){
         BlockState blockState;
-        if ((minecraft.hitResult instanceof BlockHitResult r && ((blockState = minecraft.level.getBlockState(r.getBlockPos())).getBlock() instanceof ButtonBlock || blockState.getBlock() instanceof LeverBlock || (blockState.getMenuProvider(minecraft.level,r.getBlockPos()) != null || minecraft.level.getBlockEntity(r.getBlockPos()) instanceof MenuProvider)))) return CONTROL_ACTION_CACHE.getUnchecked((blockState.getBlock() instanceof AbstractChestBlock<?> || blockState.getBlock() instanceof ShulkerBoxBlock || blockState.getBlock() instanceof BarrelBlock) ? "legacy.action.open" :  "key.use");
+        if ((minecraft.hitResult instanceof BlockHitResult r && ((blockState = minecraft.level.getBlockState(r.getBlockPos())).getBlock() instanceof ButtonBlock || blockState.getBlock() instanceof LeverBlock || blockState.getBlock() instanceof DoorBlock || blockState.getBlock() instanceof FenceGateBlock || (blockState.getMenuProvider(minecraft.level,r.getBlockPos()) != null || minecraft.level.getBlockEntity(r.getBlockPos()) instanceof MenuProvider)))) return CONTROL_ACTION_CACHE.getUnchecked((blockState.getBlock() instanceof AbstractChestBlock<?> || blockState.getBlock() instanceof ShulkerBoxBlock || blockState.getBlock() instanceof BarrelBlock) ? "legacy.action.open" :  "key.use");
         if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof AbstractVillager v && !v.getOffers().isEmpty()) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.trade");
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack actualItem = minecraft.player.getItemInHand(hand);

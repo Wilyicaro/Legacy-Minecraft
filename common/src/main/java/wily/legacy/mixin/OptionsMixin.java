@@ -1,6 +1,7 @@
 package wily.legacy.mixin;
 
 import com.mojang.serialization.Codec;
+import io.github.libsdl4j.api.gamecontroller.SdlGamecontroller;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
@@ -16,11 +17,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.controller.ControllerComponent;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.network.PlayerInfoSync;
 
 import java.io.File;
 import java.util.Arrays;
@@ -87,6 +90,7 @@ public abstract class OptionsMixin implements LegacyOptions {
     private OptionInstance<Integer> selectedController;
     private OptionInstance<Integer> controllerIcons;
     private OptionInstance<Difficulty> createWorldDifficulty;
+    private OptionInstance<Boolean> smoothAnimatedCharacter;
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;<init>(Ljava/lang/String;ILjava/lang/String;)V", ordinal = 5),index = 0)
     protected String initKeyCraftingName(String string) {
@@ -98,7 +102,7 @@ public abstract class OptionsMixin implements LegacyOptions {
     }
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ToggleKeyMapping;<init>(Ljava/lang/String;ILjava/lang/String;Ljava/util/function/BooleanSupplier;)V", ordinal = 0),index = 3)
     protected BooleanSupplier initKeyShift(BooleanSupplier booleanSupplier) {
-        return ()-> (minecraft == null || minecraft.player == null || (!minecraft.player.getAbilities().flying && minecraft.player.getVehicle() == null && !minecraft.player.isInWater() )) && booleanSupplier.getAsBoolean();
+        return ()-> (minecraft == null || minecraft.player == null || (!minecraft.player.getAbilities().flying && minecraft.player.getVehicle() == null && minecraft.player.onGround())) && booleanSupplier.getAsBoolean();
     }
     @Redirect(method = "<init>", at = @At( value = "INVOKE", target = "Lnet/minecraft/client/Options;load()V"))
     protected void init(Options instance) {
@@ -107,7 +111,9 @@ public abstract class OptionsMixin implements LegacyOptions {
     @Inject(method = "<init>", at = @At( "RETURN"))
     protected void init(Minecraft minecraft, File file, CallbackInfo ci) {
         animatedCharacter = OptionInstance.createBoolean("legacy.options.animatedCharacter",true);
-        classicCrafting = OptionInstance.createBoolean("legacy.options.classicCrafting",false);
+        classicCrafting = OptionInstance.createBoolean("legacy.options.classicCrafting",false, b-> {
+            if (minecraft.player != null) Legacy4J.NETWORK.sendToServer(new PlayerInfoSync(b ? 1 : 2, minecraft.player));
+        });
         vanillaTabs = OptionInstance.createBoolean("legacy.options.vanillaTabs",OptionInstance.cachedConstantTooltip(Component.translatable("legacy.options.vanillaTabs.description")),false);
         legacyGamma = new OptionInstance<>("legacy.options.gamma", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 0.5, d -> {});
         displayHUD = OptionInstance.createBoolean("legacy.options.displayHud",!hideGui, b-> hideGui = !b);
@@ -126,8 +132,8 @@ public abstract class OptionsMixin implements LegacyOptions {
         displayNameTagBorder = OptionInstance.createBoolean("legacy.options.displayNameTagBorder", true);
         legacyItemTooltips = OptionInstance.createBoolean("legacy.options.legacyItemTooltips", true);
         invertYController = OptionInstance.createBoolean("legacy.options.invertYController", false);
-        invertControllerButtons = OptionInstance.createBoolean("legacy.options.invertControllerButtons", false, (b)-> ControllerComponent.RIGHT_BUTTON.componentState.block());
-        selectedController = new OptionInstance<>("legacy.controls.controller", OptionInstance.noTooltip(), (c, i)-> Component.translatable("options.generic_value",c,Component.literal(i+1 + (Legacy4JClient.controllerHandler.connectedController == null ? "" : " (%s)".formatted(Legacy4JClient.controllerHandler.connectedController)))),  new OptionInstance.IntRange(0, 15), 0, d -> {});
+        invertControllerButtons = OptionInstance.createBoolean("legacy.options.invertControllerButtons", false, (b)-> ControllerBinding.RIGHT_BUTTON.bindingState.block());
+        selectedController = new OptionInstance<>("legacy.controls.controller", OptionInstance.noTooltip(), (c, i)-> Component.translatable("options.generic_value",c,Component.literal(i+1 + (Legacy4JClient.controllerManager.connectedController == null ? "" : " (%s)".formatted(Legacy4JClient.controllerManager.connectedController.getName())))),  new OptionInstance.IntRange(0, 15), 0, d -> {});
         hudScale = new OptionInstance<>("legacy.options.hudScale", OptionInstance.noTooltip(), OptionsMixin::genericValueLabel,  new OptionInstance.IntRange(1,3), 2, d -> {});
         hudOpacity = new OptionInstance<>("legacy.options.hudOpacity", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 0.8, d -> {});
         hudDistance = new OptionInstance<>("legacy.options.hudDistance", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
@@ -138,6 +144,7 @@ public abstract class OptionsMixin implements LegacyOptions {
         terrainFogEnd = new OptionInstance<>("legacy.options.terrainFogEnd", OptionInstance.noTooltip(),(c, d) -> percentValueLabel(c, d*2), OptionInstance.UnitDouble.INSTANCE, 0.5, d -> {});
         controllerIcons = new OptionInstance<>("legacy.options.controllerIcons", OptionInstance.noTooltip(), (c, i)-> Component.translatable("options.generic_value",c,i == 0? Component.translatable("legacy.options.auto_value", ControlTooltip.getActiveControllerType().displayName) : ControlTooltip.Type.values()[i].displayName),  new OptionInstance.IntRange(0, ControlTooltip.Type.values().length - 1), 0, d -> {});
         createWorldDifficulty = new OptionInstance<>("options.difficulty", d->Tooltip.create(d.getInfo()), (c, d) -> d.getDisplayName(), new OptionInstance.Enum<>(Arrays.asList(Difficulty.values()), Codec.INT.xmap(Difficulty::byId, Difficulty::getId)), Difficulty.NORMAL, d -> {});
+        smoothAnimatedCharacter = OptionInstance.createBoolean("legacy.options.smoothAnimatedCharacter",false);
         if(Legacy4JClient.canLoadVanillaOptions)
             load();
     }
@@ -175,12 +182,13 @@ public abstract class OptionsMixin implements LegacyOptions {
         fieldAccess.process("classicCrafting", classicCrafting);
         fieldAccess.process("vanillaTabs", vanillaTabs);
         fieldAccess.process("legacyGamma", legacyGamma);
+        fieldAccess.process("smoothAnimatedCharacter", smoothAnimatedCharacter);
         hideGui = !displayHUD.get();
         for (KeyMapping keyMapping : keyMappings) {
             LegacyKeyMapping mapping = (LegacyKeyMapping) keyMapping;
-            int i = fieldAccess.process("component_" + keyMapping.getName(), mapping.getComponent() == null ? -1 : mapping.getComponent().ordinal());
-            if ((mapping.getComponent() == null && i >= 0) || (mapping.getComponent() != null && mapping.getComponent().ordinal() != i))
-                mapping.setComponent(i < 0 ? null : ControllerComponent.values()[i]);
+            int i = fieldAccess.process("component_" + keyMapping.getName(), mapping.getBinding() == null ? -1 : mapping.getBinding().ordinal());
+            if ((mapping.getBinding() == null && i >= 0) || (mapping.getBinding() != null && mapping.getBinding().ordinal() != i))
+                mapping.setBinding(i < 0 ? null : ControllerBinding.values()[i]);
         }
     }
 
@@ -265,5 +273,8 @@ public abstract class OptionsMixin implements LegacyOptions {
     }
     public OptionInstance<Boolean> legacyItemTooltips() {
         return legacyItemTooltips;
+    }
+    public OptionInstance<Boolean> smoothAnimatedCharacter() {
+        return smoothAnimatedCharacter;
     }
 }

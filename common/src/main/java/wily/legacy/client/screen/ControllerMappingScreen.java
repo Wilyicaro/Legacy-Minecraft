@@ -13,9 +13,9 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.controller.ComponentState;
-import wily.legacy.client.controller.ControllerComponent;
-import wily.legacy.client.controller.ControllerEvent;
+import wily.legacy.client.controller.BindingState;
+import wily.legacy.client.controller.Controller;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.util.ScreenUtil;
 
@@ -25,7 +25,7 @@ import java.util.Objects;
 import static wily.legacy.client.screen.LegacyKeyBindsScreen.NONE;
 import static wily.legacy.client.screen.LegacyKeyBindsScreen.SELECTION;
 
-public class ControllerMappingScreen extends PanelVListScreen implements ControllerEvent {
+public class ControllerMappingScreen extends PanelVListScreen implements Controller.Event {
     protected LegacyKeyMapping selectedKey = null;
     public ControllerMappingScreen(Screen parent, Options options) {
         super(parent, 255, 293, Component.translatable("legacy.controls.controller"));
@@ -36,7 +36,7 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
         String lastCategory = null;
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.reset_defaults"),button -> minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.reset_controls"),Component.translatable("legacy.menu.reset_controls_message"), b-> {
             for (KeyMapping keyMapping : keyMappings)
-                ((LegacyKeyMapping)keyMapping).setComponent(((LegacyKeyMapping)keyMapping).getDefaultComponent());
+                ((LegacyKeyMapping)keyMapping).setBinding(((LegacyKeyMapping)keyMapping).getDefaultBinding());
             minecraft.setScreen(this);
         }))).size(240,20).build());
         renderableVList.addRenderable(ScreenUtil.getLegacyOptions().selectedController().createButton(options,0,0,240));
@@ -55,7 +55,7 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
                 protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                     if (!isFocused() && isPressed()) selectedKey = null;
                     super.renderWidget(guiGraphics, i, j, f);
-                    Component c = isPressed() ? SELECTION : mapping.getComponent() == null ? null : mapping.getComponent().componentState.getIcon(false);
+                    Component c = isPressed() ? SELECTION : mapping.getBinding() == null ? null : mapping.getBinding().bindingState.getIcon(false);
                     if (c == null){
                         guiGraphics.drawString(font,NONE, getX() + width - 20 - (font.width(NONE) / 2), getY() + (height -  font.lineHeight) / 2 + 1,0xFFFFFF);
                         return;
@@ -69,8 +69,8 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
                 }
                 @Override
                 public void onPress() {
-                    ControllerComponent.DOWN_BUTTON.componentState.block();
-                    if (Screen.hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed) mapping.setComponent(mapping.getDefaultComponent());
+                    ControllerBinding.DOWN_BUTTON.bindingState.block();
+                    if (Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed) mapping.setBinding(mapping.getDefaultBinding());
                     else if (!ControlTooltip.getActiveType().isKeyboard()) selectedKey = mapping;
                 }
                 @Override
@@ -89,7 +89,7 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (i == InputConstants.KEY_ESCAPE && selectedKey != null) {
-            selectedKey.setComponent(null);
+            selectedKey.setBinding(null);
             minecraft.options.save();
             selectedKey = null;
             return true;
@@ -106,10 +106,10 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
         getRenderableVList().init(this,panel.x + 7,panel.y + 6,panel.width - 14,panel.height);
     }
     @Override
-    public void componentTick(ComponentState state) {
+    public void componentTick(BindingState state) {
         if (selectedKey != null) {
-            if (!state.canClick()) return;
-            selectedKey.setComponent(!state.is(ControllerComponent.BACK) || selectedKey.self() == Legacy4JClient.keyHostOptions ? state.component : null);
+            if (!state.canClick() || !state.component.isBindable) return;
+            selectedKey.setBinding(!state.is(ControllerBinding.BACK) || selectedKey.self() == Legacy4JClient.keyHostOptions ? state.component : null);
             minecraft.options.save();
             selectedKey = null;
             state.block();

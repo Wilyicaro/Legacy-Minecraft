@@ -27,9 +27,9 @@ import static wily.legacy.Legacy4J.MOD_ID;
 
 @Mixin(EnchantmentScreen.class)
 public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<EnchantmentMenu> {
-    private static final ResourceLocation ENCHANTMENT_BUTTON_EMPTY_SPRITE = new ResourceLocation(MOD_ID, "container/enchantment_button_empty");
-    private static final ResourceLocation ENCHANTMENT_BUTTON_ACTIVE_SPRITE = new ResourceLocation(MOD_ID, "container/enchantment_button_active");
-    private static final ResourceLocation ENCHANTMENT_BUTTON_SELECTED_SPRITE = new ResourceLocation(MOD_ID, "container/enchantment_button_selected");
+    private static final ResourceLocation ENCHANTMENT_BUTTON_EMPTY = new ResourceLocation(MOD_ID, "container/enchantment_button_empty");
+    private static final ResourceLocation ENCHANTMENT_BUTTON_ACTIVE = new ResourceLocation(MOD_ID, "container/enchantment_button_active");
+    private static final ResourceLocation ENCHANTMENT_BUTTON_SELECTED = new ResourceLocation(MOD_ID, "container/enchantment_button_selected");
 
     @Shadow protected abstract void renderBook(GuiGraphics arg, int i, int j, float g);
 
@@ -85,7 +85,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         for (int n = 0; n < 3; ++n) {
             guiGraphics.pose().translate(0f,21f,0f);
             int enchantCost = this.menu.costs[n];
-            guiGraphics.blitSprite(ENCHANTMENT_BUTTON_EMPTY_SPRITE, 0, 0, 120, 21);
+            guiGraphics.blitSprite(ENCHANTMENT_BUTTON_EMPTY, 0, 0, 120, 21);
             guiGraphics.blitSprite(DISABLED_LEVEL_SPRITES[n], -1, -1, 24, 24);
             if (enchantCost == 0)
                 continue;
@@ -100,10 +100,10 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
                 double t = i - (leftPos + 80.5);
                 double u = j - (topPos + 23.5 + 21 * n);
                 if (t >= 0 && u >= 0 && t < 120 && u < 21) {
-                    guiGraphics.blitSprite(ENCHANTMENT_BUTTON_SELECTED_SPRITE, 0, 0, 120, 21);
+                    guiGraphics.blitSprite(ENCHANTMENT_BUTTON_SELECTED, 0, 0, 120, 21);
                     s = 0xFFFF80;
                 } else {
-                    guiGraphics.blitSprite(ENCHANTMENT_BUTTON_ACTIVE_SPRITE, 0, 0, 120, 21);
+                    guiGraphics.blitSprite(ENCHANTMENT_BUTTON_ACTIVE, 0, 0, 120, 21);
                 }
                 guiGraphics.blitSprite(ENABLED_LEVEL_SPRITES[n], -1, -1, 24, 24);
                 guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, s);

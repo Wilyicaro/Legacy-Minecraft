@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.Unique;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.StoneCuttingGroupManager;
 import wily.legacy.client.Offset;
-import wily.legacy.client.controller.ControllerComponent;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.network.ServerInventoryCraftPacket;
 import wily.legacy.util.PagedList;
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static wily.legacy.client.LegacySprites.ARROW_SPRITE;
+import static wily.legacy.util.LegacySprites.ARROW;
 import static wily.legacy.client.screen.ControlTooltip.*;
 import static wily.legacy.client.screen.ControlTooltip.CONTROL_ACTION_CACHE;
 import static wily.legacy.client.screen.LegacyCraftingScreen.CRAFTING_OFFSET;
@@ -55,8 +55,8 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
 
     public LegacyStonecutterScreen(LegacyCraftingMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().tooltips.add(0,create(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_RETURN,true) : ControllerComponent.DOWN_BUTTON.componentState.getIcon(true),()->getFocused() instanceof LegacyIconHolder h && !h.isWarning()? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.create") : null));
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_O,true) : ControllerComponent.UP_BUTTON.componentState.getIcon(true), ()-> CONTROL_ACTION_CACHE.getUnchecked(onlyCraftableRecipes ? "legacy.action.all_recipes" : "legacy.action.show_craftable_recipes"));
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().tooltips.add(0,create(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_RETURN,true) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(true),()->getFocused() instanceof LegacyIconHolder h && !h.isWarning()? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.create") : null));
+        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_O,true) : ControllerBinding.UP_BUTTON.bindingState.getIcon(true), ()-> CONTROL_ACTION_CACHE.getUnchecked(onlyCraftableRecipes ? "legacy.action.all_recipes" : "legacy.action.show_craftable_recipes"));
         RecipeManager manager = Minecraft.getInstance().level.getRecipeManager();
         StoneCuttingGroupManager.list.values().forEach(l->{
             List<StonecutterRecipe> group = new ArrayList<>();
@@ -111,7 +111,7 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
         ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
         ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 9,topPos + 103,163,105,2f);
         ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 176,topPos + 103,163,105,2f);
-        guiGraphics.blitSprite(ARROW_SPRITE,leftPos + 79,topPos + 158,22,15);
+        guiGraphics.blitSprite(ARROW,leftPos + 79,topPos + 158,22,15);
         if (craftingButtonsOffset.get() > 0) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + 5, topPos + 45);
         if (craftingButtonsOffset.max > 0 && craftingButtonsOffset.get() < craftingButtonsOffset.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + 337, topPos + 45);
     }
@@ -233,7 +233,7 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                     return false;
                 }
                 public void craft() {
-                    Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), Screen.hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
+                    Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
                 }
             });
             h.offset = CRAFTING_OFFSET;

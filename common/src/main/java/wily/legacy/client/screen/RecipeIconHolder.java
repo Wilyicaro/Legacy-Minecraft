@@ -7,12 +7,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.LegacySprites;
-import wily.legacy.client.controller.ControllerComponent;
+import wily.legacy.util.LegacySprites;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.network.ServerInventoryCraftPacket;
 import wily.legacy.util.ScreenUtil;
@@ -137,9 +138,9 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
             applyOffset(graphics);
             RenderSystem.disableDepthTest();
             if (getFocusedRecipes().size() == 2) {
-                graphics.blitSprite(LegacySprites.CRAFTING_2_SLOTS_SELECTION_SPRITE, 0, -12, 36, 78);
+                graphics.blitSprite(LegacySprites.CRAFTING_2_SLOTS_SELECTION, 0, -12, 36, 78);
             }else if (getFocusedRecipes().size() > 2)
-                graphics.blitSprite(LegacySprites.CRAFTING_SELECTION_SPRITE, 0, -39, 36, 105);
+                graphics.blitSprite(LegacySprites.CRAFTING_SELECTION, 0, -39, 36, 105);
             graphics.pose().popPose();
             if (getFocusedRecipes().size() >= 2){
                 ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(1)), 0.5f, ()-> renderItem(graphics, getFocusedRecipes().get(1).getResultItem(minecraft.level.registryAccess()),getX(),getY() + 27,false));
@@ -189,8 +190,8 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
         if (!isFocused()) super.playClickSound();
     }
     public void craft() {
-        ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT.get(),1.0f);
-        Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), Screen.hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed));
+        ScreenUtil.playSimpleUISound(SoundEvents.ITEM_PICKUP,1.0f);
+        Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
     }
 
     @Override

@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyWorldSettings;
-import wily.legacy.client.controller.ControllerComponent;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
@@ -78,7 +78,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
             Minecraft.getInstance().getResourcePackRepository().setSelected(packs);
         }
         resourcePackSelector = PackSelector.resources(panel.x + 13, panel.y + 112, 220,45, !ScreenUtil.hasTooltipBoxes());
-        controlTooltipRenderer.add(()-> getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{getKeyIcon(InputConstants.KEY_LSHIFT,true), PLUS,getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true)}) : ControllerComponent.LEFT_BUTTON.componentState.getIcon(true), ()-> getFocused() == resourcePackSelector ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.resource_packs_screen") : null);
+        controlTooltipRenderer.add(()-> getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{getKeyIcon(InputConstants.KEY_LSHIFT,true), PLUS,getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true)}) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(true), ()-> getFocused() == resourcePackSelector ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.resource_packs_screen") : null);
         if (!originalSelectedPacks.isEmpty()) Minecraft.getInstance().getResourcePackRepository().setSelected(originalSelectedPacks);
 
     }
@@ -134,6 +134,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
                 loadButton.active = false;
             }
         });
+        setInitialFocus(loadButton);
         resourcePackSelector.setX(panel.x + 13);
         resourcePackSelector.setY(panel.y + 112);
         addRenderableWidget(resourcePackSelector);

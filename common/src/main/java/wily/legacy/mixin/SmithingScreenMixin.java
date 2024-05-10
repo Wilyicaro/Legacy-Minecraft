@@ -15,7 +15,7 @@ import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import wily.legacy.client.LegacySprites;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(SmithingScreen.class)
@@ -63,14 +63,14 @@ public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMen
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 13.5, topPos + 9.5,0f);
         guiGraphics.pose().scale(2.5f,2.5f,2.5f);
-        guiGraphics.blitSprite(LegacySprites.SMITHING_HAMMER_SPRITE,0,0,15,15);
+        guiGraphics.blitSprite(LegacySprites.SMITHING_HAMMER,0,0,15,15);
         guiGraphics.pose().popPose();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 82, topPos + 59,0f);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        guiGraphics.blitSprite(LegacySprites.ARROW_SPRITE,0,0,22,15);
+        guiGraphics.blitSprite(LegacySprites.ARROW,0,0,22,15);
         if (hasRecipeError())
-            guiGraphics.blitSprite(LegacySprites.ERROR_CROSS_SPRITE, 4, 0, 15, 15);
+            guiGraphics.blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
         guiGraphics.pose().popPose();
         InventoryScreen.renderEntityInInventory(guiGraphics, this.leftPos + 182, this.topPos + 95, 35, ARMOR_STAND_TRANSLATION, ARMOR_STAND_ANGLE, null, this.armorStandPreview);
     }

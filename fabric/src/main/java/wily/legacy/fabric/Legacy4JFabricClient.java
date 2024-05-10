@@ -9,7 +9,7 @@ public class Legacy4JFabricClient implements ClientModInitializer {
     public void onInitializeClient() {
         Legacy4JClient.init();
         Legacy4JClient.enqueueInit();
-        ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, out) -> Legacy4JClient.registerExtraModels(out));
+       // ModelLoadingRegistry.INSTANCE.registerModelProvider((manager, out) -> Legacy4JClient.registerExtraModels(out));
 
     }
 }

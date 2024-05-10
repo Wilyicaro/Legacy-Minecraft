@@ -9,15 +9,15 @@ import wily.legacy.client.screen.ControlTooltip;
 import java.util.function.Function;
 
 public interface LegacyKeyMapping {
-    default KeyMapping keyToDefaultButton(Function<InputConstants.Key,ControllerComponent> buttonGetter){
-        setDefaultComponent(buttonGetter.apply(self().getDefaultKey()));
+    default KeyMapping keyToDefaultButton(Function<InputConstants.Key, ControllerBinding> buttonGetter){
+        setDefaultBinding(buttonGetter.apply(self().getDefaultKey()));
         return self();
     }
     default KeyMapping self(){
         return (KeyMapping) this;
     }
-    ControllerComponent getDefaultComponent();
-    ControllerComponent getComponent();
+    ControllerBinding getDefaultBinding();
+    ControllerBinding getBinding();
 
     default Component getDisplayName() {
         String name = self().getName();
@@ -31,6 +31,6 @@ public interface LegacyKeyMapping {
     }
     InputConstants.Key getKey();
 
-    void setComponent(ControllerComponent button);
-    void setDefaultComponent(ControllerComponent button);
+    void setBinding(ControllerBinding binding);
+    void setDefaultBinding(ControllerBinding binding);
 }

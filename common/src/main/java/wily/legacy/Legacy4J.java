@@ -11,6 +11,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.world.item.DyeableLeatherItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +24,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.zip.ZipEntry;
@@ -42,7 +47,7 @@ public class Legacy4J
     public static void init(){
         LegacySoundEvents.register();
         LegacyMenuTypes.register();
-        LegacyBlockItems.register();
+        LegacyRegistries.register();
         LegacyGameRules.init();
         registerCommonPacket(PlayerInfoSync.class, PlayerInfoSync::new);
         registerCommonPacket(PlayerInfoSync.HostOptions.class, PlayerInfoSync.HostOptions::new);
@@ -57,6 +62,50 @@ public class Legacy4J
     }
     public static boolean canRepair(ItemStack repairItem, ItemStack ingredient){
         return repairItem.is(ingredient.getItem()) && repairItem.getCount() == 1 && ingredient.getCount() == 1 && repairItem.getItem().canBeDepleted() && !repairItem.isEnchanted() && !ingredient.isEnchanted();
+    }
+    public static void dyeArmor(ItemStack itemStack, int color) {
+        List<Integer> colors = new ArrayList<>();
+
+        DyeableLeatherItem dyeableLeatherItem = null;
+        Item item = itemStack.getItem();
+        if (item instanceof DyeableLeatherItem) {
+            dyeableLeatherItem = (DyeableLeatherItem) item;
+            if (dyeableLeatherItem.hasCustomColor(itemStack)) colors.add(dyeableLeatherItem.getColor(itemStack));
+            colors.add(color);
+        }
+        if (dyeableLeatherItem == null) return;
+        dyeableLeatherItem.setColor(itemStack, mixColors(colors.iterator()));
+    }
+    public static int mixColors(Iterator<Integer> colors){
+        int n;
+        float h;
+        int[] is = new int[3];
+        int i = 0;
+        int j = 0;
+
+        for (Iterator<Integer> it = colors; it.hasNext(); ) {
+            Integer color = it.next();
+            float f = (float)(color >> 16 & 0xFF) / 255.0f;
+            float g = (float)(color >> 8 & 0xFF) / 255.0f;
+            h = (float)(color & 0xFF) / 255.0f;
+            i += (int)(Math.max(f, Math.max(g, h)) * 255.0f);
+            is[0] = is[0] + (int)(f * 255.0f);
+            is[1] = is[1] + (int)(g * 255.0f);
+            is[2] = is[2] + (int)(h * 255.0f);
+            ++j;
+        }
+        int k = is[0] / j;
+        int o = is[1] / j;
+        int p = is[2] / j;
+        h = (float)i / (float)j;
+        float q = Math.max(k, Math.max(o, p));
+        k = (int)((float)k * h / q);
+        o = (int)((float)o * h / q);
+        p = (int)((float)p * h / q);
+        n = k;
+        n = (n << 8) + o;
+        n = (n << 8) + p;
+        return n;
     }
     @FunctionalInterface
     public interface PackRegistry {
@@ -86,7 +135,6 @@ public class Legacy4J
                     continue main;
                 }
         }
-        Legacy4J.LOGGER.warn(pos);
         ((LegacyPlayerInfo)p).setPosition(pos);
 
     }

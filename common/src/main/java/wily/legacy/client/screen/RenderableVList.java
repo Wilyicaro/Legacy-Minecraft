@@ -141,6 +141,7 @@ public class RenderableVList {
                             screen.setFocused(l);
                         clicked = true;
                     } else if (cyclic){
+                        screen.setFocused(null);
                         while (canScrollDown)
                             mouseScrolled(0, 0, 0, -1);
                         GuiEventListener l = getLastFocusable();

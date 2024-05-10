@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.Legacy4JClient;
 
 import static wily.legacy.Legacy4JClient.*;
 
@@ -59,19 +60,21 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
     }
     @Redirect(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;setSprinting(Z)V", ordinal = 3))
     public void aiStepSprintingWater(LocalPlayer instance, boolean b) {
-        if (isAffectedByFluids() || !this.input.hasForwardImpulse() || !this.hasEnoughFoodToStartSprinting()) instance.setSprinting(b);
+        if (!Legacy4JClient.isModEnabledOnServer() || isAffectedByFluids() || !this.input.hasForwardImpulse() || !this.hasEnoughFoodToStartSprinting()) instance.setSprinting(b);
     }
     @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;aiStep()V"))
     public void setYElytraFlightElevation(CallbackInfo ci) {
+        if (!Legacy4JClient.isModEnabledOnServer()) return;
         if (isFallFlying() && getAbilities().mayfly && getAbilities().invulnerable && this.isControlledCamera() && this.input.jumping)
             setDeltaMovement(new Vec3(getDeltaMovement().x,this.getAbilities().getFlyingSpeed() * 12,getDeltaMovement().z));
     }
     @Inject(method = "aiStep", at = @At(value = "RETURN"))
     public void setYFlightElevation(CallbackInfo ci) {
+        if (!Legacy4JClient.isModEnabledOnServer()) return;
         if (this.getAbilities().flying && this.isControlledCamera()) {
             if (keyFlyDown.isDown() && !keyFlyUp.isDown() || !keyFlyDown.isDown() && keyFlyUp.isDown())
                 setDeltaMovement(getDeltaMovement().add(0,(keyFlyUp.isDown() ? 1.5 : keyFlyDown.isDown() ? -1.5 : 0) * this.getAbilities().getFlyingSpeed(), 0));
-            if (!lastOnGround){
+            if (!lastOnGround && !isSpectator()){
                 checkSupportingBlock(true,null);
                 lastOnGround = mainSupportingBlockPos.isPresent();
             }
@@ -86,6 +89,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
     }
     @Inject(method = "serverAiStep", at = @At("RETURN"))
     public void serverAiStep(CallbackInfo ci) {
+        if (!Legacy4JClient.isModEnabledOnServer()) return;
         if (this.isControlledCamera() && this.getAbilities().flying) {
             if (keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown()) xxa+= (keyFlyLeft.isDown() ? 12 : -12) * this.getAbilities().getFlyingSpeed();
         }
