@@ -33,7 +33,7 @@ public class SDLControllerHandler implements Controller.Handler{
 
     @Override
     public void setup(ControllerManager manager) {
-        manager.componentsPressed();
+        manager.updateBindings();
     }
 
     @Override

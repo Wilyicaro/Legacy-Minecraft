@@ -40,6 +40,8 @@ public class ScreenUtil {
     public static long lastHotbarSelectionChange = -1;
     protected static LogoRenderer logoRenderer = new LogoRenderer(false);
     public static LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
+    public static final ResourceLocation PANORAMA_DAY = new ResourceLocation(Legacy4J.MOD_ID, "textures/gui/title/panorama_day.png");
+    public static final ResourceLocation PANORAMA_NIGHT = new ResourceLocation(Legacy4J.MOD_ID, "textures/gui/title/panorama_night.png");
     public static final ResourceLocation SAVE_CHEST = new ResourceLocation(Legacy4J.MOD_ID,"hud/save_chest");
     public static final ResourceLocation SAVE_ARROW = new ResourceLocation(Legacy4J.MOD_ID,"hud/save_arrow");
     public static final ResourceLocation LOADING_BLOCK = new ResourceLocation(Legacy4J.MOD_ID,"widget/loading_block");
@@ -116,9 +118,8 @@ public class ScreenUtil {
     }
     public static void renderPanoramaBackground(GuiGraphics guiGraphics, boolean isNight){
         RenderSystem.depthMask(false);
-        ResourceLocation panorama = new ResourceLocation(Legacy4J.MOD_ID, "textures/gui/title/panorama_" + (isNight ? "night" : "day") + ".png");
-        Minecraft.getInstance().getTextureManager().getTexture(panorama).setFilter(true, false);
-        guiGraphics.blit(panorama, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() / 66.32f, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiHeight() * 820/144, guiGraphics.guiHeight());
+        Minecraft.getInstance().getTextureManager().getTexture(isNight ? PANORAMA_NIGHT : PANORAMA_DAY).setFilter(true, false);
+        guiGraphics.blit(isNight ? PANORAMA_NIGHT : PANORAMA_DAY, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() / 66.32f, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiHeight() * 820/144, guiGraphics.guiHeight());
         RenderSystem.depthMask(true);
     }
     public static void drawOutlinedString(GuiGraphics graphics, Font font, Component component, int x, int y, int color, int outlineColor, float outline) {

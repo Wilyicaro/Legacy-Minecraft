@@ -24,6 +24,19 @@ public abstract class BindingState {
             }
         };
     }
+    public static BindingState createWithoutToggle(ControllerBinding component, Predicate<Controller> update){
+        return new BindingState(component) {
+            @Override
+            public boolean canDownKeyMapping(KeyMapping mapping) {
+                return pressed;
+            }
+
+            @Override
+            public void update(Controller handler) {
+                update(update.test(handler));
+            }
+        };
+    }
 
     protected BindingState(ControllerBinding component){
         this.component = component;

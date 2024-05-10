@@ -35,7 +35,7 @@ public class GLFWControllerHandler implements Controller.Handler{
     public void setup(ControllerManager manager) {
         gamepadState = GLFWGamepadState.calloc();
         if (GLFW.glfwGetGamepadState(ScreenUtil.getLegacyOptions().selectedController().get(), gamepadState))
-            manager.componentsPressed();
+            manager.updateBindings();
         gamepadState.free();
     }
 

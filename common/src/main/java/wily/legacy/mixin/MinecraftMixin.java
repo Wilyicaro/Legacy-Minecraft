@@ -79,7 +79,7 @@ public abstract class MinecraftMixin {
     }
     @Unique
     public double getTweakedHeightScale(int height) {
-        if (height != 720 && height != 1440) return 1.001d;
+        if (height % 720 != 0) return 1.001d;
         return 1d;
     }
     @Inject(method = "addInitialScreens", at = @At("HEAD"))

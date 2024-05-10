@@ -1,6 +1,7 @@
 package wily.legacy.mixin;
 
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -40,7 +41,7 @@ public abstract class SlotMixin implements LegacySlotDisplay, LegacySlot {
     @Inject(method = "getItem", at = @At("RETURN"))
     public void getItem(CallbackInfoReturnable<ItemStack> cir) {
         ItemStack s = cir.getReturnValue();
-        if ( !ItemStack.matches(s,lastItemStack) && lastItemStackChange != Util.getMillis()){
+        if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.containerMenu.slots.contains(this) && !ItemStack.matches(s,lastItemStack) && lastItemStackChange != Util.getMillis()){
             lastItemStackChange = Util.getMillis();
             lastItemStack = s;
             setChanged();

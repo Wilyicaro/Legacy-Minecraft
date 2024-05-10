@@ -72,6 +72,7 @@ public  class ControllerManager {
                             if (isCursorDisabled) enableCursor();
                             minecraft.getToasts().addToast(new LegacyTip(CONTROLLER_DISCONNECTED, Component.literal(connectedController.getName())).disappearTime(4500));
                             connectedController.close();
+                            updateBindings(Controller.EMPTY);
                             connectedController = null;
                         }
                         return;
@@ -90,12 +91,15 @@ public  class ControllerManager {
     public void setPointerPos(double x, double y){
         GLFW.glfwSetCursorPos(minecraft.getWindow().getWindow(),minecraft.mouseHandler.xpos = x,minecraft.mouseHandler.ypos = y);
     }
+    public synchronized void updateBindings() {
+        updateBindings(connectedController);
+    }
 
-    public synchronized void componentsPressed() {
+    public synchronized void updateBindings(Controller controller) {
         for (ControllerBinding binding : ControllerBinding.values()) {
-            if (connectedController == null) break;
+            if (controller == null) break;
             BindingState state = binding.bindingState;
-            state.update(connectedController);
+            state.update(controller);
             if (minecraft.screen != null && !isCursorDisabled) {
                 if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && state.pressed)
                     setPointerPos(minecraft.mouseHandler.xpos = (minecraft.mouseHandler.xpos() + stick.x * ((double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth())  * ScreenUtil.getLegacyOptions().interfaceSensitivity().get() / 2.5), minecraft.mouseHandler.ypos = (minecraft.mouseHandler.ypos() + stick.y * ((double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()) * ScreenUtil.getLegacyOptions().interfaceSensitivity().get() / 2.5));
@@ -112,9 +116,9 @@ public  class ControllerManager {
             if (state.is(ControllerBinding.START) && state.justPressed && minecraft.screen == null)
                 minecraft.pauseGame(false);
 
-            if (minecraft.player != null && minecraft.getConnection() != null && connectedController.hasLED()){
+            if (minecraft.player != null && minecraft.getConnection() != null && controller.hasLED()){
                 float[] colors = Legacy4JClient.getVisualPlayerColor((LegacyPlayerInfo) minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID()));
-                connectedController.setLED((byte) (colors[0] * 255),(byte) (colors[1] * 255),(byte) (colors[2] * 255));
+                controller.setLED((byte) (colors[0] * 255),(byte) (colors[1] * 255),(byte) (colors[2] * 255));
             }
             if (minecraft.screen != null) {
                 if (minecraft.screen instanceof Controller.Event e) e.componentTick(state);
