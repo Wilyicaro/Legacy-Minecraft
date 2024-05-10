@@ -38,7 +38,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
@@ -57,7 +56,6 @@ import java.util.stream.Stream;
 
 import static wily.legacy.Legacy4JClient.publishUnloadedServer;
 import static wily.legacy.client.screen.ControlTooltip.*;
-import static wily.legacy.client.screen.ControlTooltip.CONTROL_ACTION_CACHE;
 
 @Mixin(CreateWorldScreen.class)
 public abstract class CreateWorldScreenMixin extends Screen{
@@ -175,9 +173,9 @@ public abstract class CreateWorldScreenMixin extends Screen{
                     if (resourcePackSelector.hasChanged()) ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setSelectedResourcePacks(resourcePackSelector.getSelectedIds());
                     this.minecraft.gui.getChat().addMessage(component);
                 }
-        }});
+            }});
     }
-    
+
     private static void confirmWorldCreation(Minecraft minecraft, CreateWorldScreen createWorldScreen, Lifecycle lifecycle, Runnable runnable, boolean bl2) {
         if (bl2 || lifecycle == Lifecycle.stable()) {
             runnable.run();
@@ -220,14 +218,7 @@ public abstract class CreateWorldScreenMixin extends Screen{
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (super.keyPressed(i, j, k)) {
-            return true;
-        }
-        if (i == 257 || i == 335) {
-            this.onCreate();
-            return true;
-        }
-        return false;
+        return super.keyPressed(i,j,k);
     }
 
     private void removeTempDataPackDir() {

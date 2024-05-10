@@ -112,19 +112,13 @@ public interface ControlTooltip {
         String controller = Legacy4JClient.controllerHandler.connectedController;
         if (ScreenUtil.getLegacyOptions().controllerIcons().get() <= 0) {
             if (controller != null) {
-                if (controller.contains("PS3")) return Type.PS3;
-                else if (controller.contains("PS4") || controller.contains("PS5")) return Type.PS4;
-                else if (controller.contains("Xbox 360")) return Type.x360;
-                else if (controller.contains("Xbox One")) return Type.xONE;
-                else if (controller.contains("Nintendo Switch")) return Type.SWITCH;
-                else if (controller.contains("Wii U")) return Type.WII_U;
+               return Type.x360;
             }
         } else return Type.values()[ScreenUtil.getLegacyOptions().controllerIcons().get()];
         return Type.x360;
     }
     static Type getActiveType(){
-        if (Legacy4JClient.controllerHandler.connectedController != null) return getActiveControllerType();
-        return Type.KEYBOARD;
+        return getActiveControllerType();
     }
     Component getIcon();
     @Nullable

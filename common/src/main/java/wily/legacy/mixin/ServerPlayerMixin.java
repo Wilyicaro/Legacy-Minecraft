@@ -24,7 +24,7 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
 
     int position = -1;
     boolean classicCrafting = true;
-    boolean disableExhaustion = false;
+    boolean disableExhaustion = true;
     boolean mayFlySurvival = false;
 
     public ServerPlayerMixin(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {

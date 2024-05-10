@@ -43,8 +43,8 @@ public class PauseScreenMixin extends Screen {
                     this.minecraft.setScreen(null);
                     this.minecraft.mouseHandler.grabMouse();
                 }).build(),Button.builder(Component.translatable("menu.options"), button -> this.minecraft.setScreen(new HelpOptionsScreen(this))).build()
-                ,Button.builder(Component.translatable("gui.stats"), button -> this.minecraft.setScreen(new StatsScreen(this, this.minecraft.player.getStats()))).build()
-                ,Button.builder(Component.translatable("gui.advancements"), button -> this.minecraft.setScreen(new AdvancementsScreen(this.minecraft.getConnection().getAdvancements()))).build()
+                ,Button.builder(Component.literal("Leaderboards"), button -> this.minecraft.setScreen(new StatsScreen(this, this.minecraft.player.getStats()))).build()
+                ,Button.builder(Component.literal("Achievements"), button -> this.minecraft.setScreen(new AdvancementsScreen(this.minecraft.getConnection().getAdvancements()))).build()
         );
         minecraft = Minecraft.getInstance();
         if (minecraft.level != null && minecraft.hasSingleplayerServer())
@@ -74,6 +74,6 @@ public class PauseScreenMixin extends Screen {
 
     @Override
     public void init() {
-        renderableVList.init(this,width / 2 - 112,this.height / 3 + 10,225,0);
+        renderableVList.init(this,width / 2 - 100,this.height / 3 + 10,200,0);
     }
 }

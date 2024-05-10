@@ -50,7 +50,7 @@ public abstract class GameRendererMixin {
             RenderSystem.enableBlend();
             graphics.pose().pushPose();
             graphics.pose().translate(Legacy4JClient.controllerHandler.getPointerX(), Legacy4JClient.controllerHandler.getPointerY(), 0);
-            graphics.blitSprite(minecraft.getWindow().getScreenWidth() >= 1920 ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
+            graphics.blitSprite(LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
             graphics.pose().popPose();
             RenderSystem.disableBlend();
             RenderSystem.enableDepthTest();

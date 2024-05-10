@@ -1,0 +1,8 @@
+{
+  "overrides": {
+    "default": {
+      "water_transparency": 1.0,
+      "water_color": "#3153AF"
+    }
+  }
+}

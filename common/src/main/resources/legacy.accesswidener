@@ -129,3 +129,4 @@ accessible field net/minecraft/client/gui/screens/BackupConfirmScreen onProceed 
 accessible field net/minecraft/client/gui/screens/BackupConfirmScreen onCancel Ljava/lang/Runnable;
 accessible field net/minecraft/client/gui/screens/BackupConfirmScreen promptForCacheErase Z
 accessible field net/minecraft/world/level/block/entity/DecoratedPotPatterns ITEM_TO_POT_TEXTURE Ljava/util/Map;
+accessible class net/minecraft/client/gui/Font$StringRenderOutput

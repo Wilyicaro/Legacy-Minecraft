@@ -14,7 +14,7 @@ import wily.legacy.util.ScreenUtil;
 public class TooltipRenderUtilMixin {
     @Inject(method = "renderTooltipBackground", at = @At("HEAD"), cancellable = true)
     private static void renderTooltipBackground(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, CallbackInfo ci){
-        ScreenUtil.renderPointerPanel(guiGraphics,i - (int)(5 * ScreenUtil.getTextScale()),j - (int)(9 *  ScreenUtil.getTextScale()),(int)((k + 11) *  ScreenUtil.getTextScale()),(int)((l + 16) *  ScreenUtil.getTextScale()));
+        ScreenUtil.renderPointerPanel(guiGraphics,i - (int)(3 * ScreenUtil.getTextScale()),j - (int)(3 *  ScreenUtil.getTextScale()),(int)((k + 6) *  ScreenUtil.getTextScale()),(int)((l + 6) *  ScreenUtil.getTextScale()));
         ci.cancel();
     }
 }

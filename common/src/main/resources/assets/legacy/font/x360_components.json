@@ -186,35 +186,35 @@
             "type": "bitmap",
             "file": "legacy:component/x360/right_bumper_pressed.png",
             "ascent": 11,
-            "height": 15,
+            "height": 25,
             "chars": ["\uE74B"]
         },
         {
             "type": "bitmap",
             "file": "legacy:component/x360/left_trigger.png",
-            "ascent": 11,
-            "height": 15,
+            "ascent": 16,
+            "height": 25,
             "chars": ["\uE73B"]
         },
         {
             "type": "bitmap",
             "file": "legacy:component/x360/left_trigger_pressed.png",
-            "ascent": 11,
-            "height": 15,
+            "ascent": 16,
+            "height": 25,
             "chars": ["\uE74C"]
         },
         {
             "type": "bitmap",
             "file": "legacy:component/x360/right_trigger.png",
-            "ascent": 11,
-            "height": 15,
+            "ascent": 16,
+            "height": 25,
             "chars": ["\uE73C"]
         },
         {
             "type": "bitmap",
             "file": "legacy:component/x360/right_trigger_pressed.png",
-            "ascent": 11,
-            "height": 15,
+            "ascent": 16,
+            "height": 25,
             "chars": ["\uE74D"]
         },
         {

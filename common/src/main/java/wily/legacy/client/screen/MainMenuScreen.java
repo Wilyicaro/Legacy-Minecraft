@@ -30,6 +30,9 @@ public class MainMenuScreen extends RenderableVListScreen {
     private SplashRenderer splash;
     @Nullable
     private WarningLabel warningLabel;
+    public ConfirmationScreen createXboxLiveScreen(){
+        return ConfirmationScreen.createInfoScreen(this,Component.literal("Gamer profile not online"), Component.literal("This feature requires a gamer profile which is signed into Xbox LIVE"));
+    }
 
     public MainMenuScreen() {
         super(Component.translatable("narrator.screen.title"), b->{});
@@ -37,9 +40,10 @@ public class MainMenuScreen extends RenderableVListScreen {
         minecraft = Minecraft.getInstance();
         if (minecraft.isDemo()) createDemoMenuOptions();
         else this.createNormalMenuOptions();
-        renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.mods"), () -> new ModsScreen(this)).build());
-        renderableVList.addRenderable(openScreenButton(Component.translatable("options.language"), () -> new LegacyLanguageScreen(this, this.minecraft.getLanguageManager())).build());
+        renderableVList.addRenderable(openScreenButton(Component.literal("Leaderboards"), this::createXboxLiveScreen).build());
+        renderableVList.addRenderable(openScreenButton(Component.literal("Achievements"), this::createXboxLiveScreen).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("menu.options"), () -> new HelpOptionsScreen(this)).build());
+        renderableVList.addRenderable(openScreenButton(Component.literal("Download Content"), this::createXboxLiveScreen).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
     }
 
@@ -52,9 +56,6 @@ public class MainMenuScreen extends RenderableVListScreen {
     }
 
     protected void init() {
-        if (this.splash == null) {
-            this.splash = this.minecraft.getSplashManager().getSplash();
-        }
         int l = this.height / 4 + 48;
 
         super.init();
@@ -155,12 +156,17 @@ public class MainMenuScreen extends RenderableVListScreen {
 
 
         if (this.splash != null) {
-            Legacy4JClient.FONT_SHADOW_OFFSET = 1.0F;
+            Legacy4JClient.legacyFont = false;
             this.splash.render(guiGraphics, this.width, this.font, 255 << 24);
-            Legacy4JClient.FONT_SHADOW_OFFSET = 0.5F;
+            Legacy4JClient.legacyFont = true;
         }
     }
 
+    @Override
+    public void added() {
+        super.added();
+        this.splash = this.minecraft.getSplashManager().getSplash();
+    }
 
     private void confirmDemo(boolean bl) {
         if (bl) {

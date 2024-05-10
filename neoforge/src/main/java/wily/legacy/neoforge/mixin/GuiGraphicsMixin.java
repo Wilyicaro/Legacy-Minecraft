@@ -18,10 +18,10 @@ public class GuiGraphicsMixin {
     }
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("HEAD"))
     private void renderItemDecorationsHead(Font font, ItemStack itemStack, int i, int j, String string, CallbackInfo ci){
-        Legacy4JClient.FONT_SHADOW_OFFSET = 1.0F;
+        Legacy4JClient.legacyFont = 1.0F;
     }
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("RETURN"))
     private void renderItemDecorationsTail(Font font, ItemStack itemStack, int i, int j, String string, CallbackInfo ci){
-        Legacy4JClient.FONT_SHADOW_OFFSET = 0.5F;
+        Legacy4JClient.legacyFont = 0.5F;
     }
 }

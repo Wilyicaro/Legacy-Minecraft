@@ -74,7 +74,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     protected List<List<CraftingRecipe>> filteredRecipesByGroup = Collections.emptyList();
     protected final Stocker.Sizeable page =  new Stocker.Sizeable(0);
     protected final Stocker.Sizeable craftingButtonsOffset =  new Stocker.Sizeable(0);
-    protected final TabList craftingTabList = new TabList(new PagedList<>(page,7));
+    protected final TabList craftingTabList;
     protected final TabList fireworkTabList = new TabList();
     protected final TabList dyeTabList = new TabList();
     protected final TabList groupTabList = new TabList().add(0,0,42, 42, 4, new ResourceLocation("crafting_table"),null,Component.empty(),null,b->repositionElements()).add(0,0,42, 42, 4, new ResourceLocation("firework_rocket"),null,Component.empty(),null,b->repositionElements()).add(0,0,42, 42, 4, new ResourceLocation("cyan_dye"),null,Component.empty(),null,b->repositionElements());
@@ -110,10 +110,10 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_O,true) : ControllerComponent.UP_BUTTON.componentState.getIcon(true), ()-> groupTabList.selectedTab == 0 ? CONTROL_ACTION_CACHE.getUnchecked(onlyCraftableRecipes ? "legacy.action.all_recipes" : "legacy.action.show_craftable_recipes") : getFocused() instanceof CustomCraftingIconHolder h && h.canAddIngredient() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.add") : null);
         ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_X,true) : ControllerComponent.LEFT_BUTTON.componentState.getIcon(true), ()-> groupTabList.selectedTab != 0 && getFocused() instanceof CustomCraftingIconHolder h && h.addedIngredientsItems != null && !h.addedIngredientsItems.isEmpty() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.remove") : null);
         ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().addCompound(()-> new Component[]{ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true) : ControllerComponent.LEFT_BUMPER.componentState.getIcon(true),ControlTooltip.SPACE,ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true) : ControllerComponent.RIGHT_BUMPER.componentState.getIcon(true)},()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.group"));
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true)}) : COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControllerComponent.LEFT_TRIGGER.componentState.getIcon(true),ControlTooltip.SPACE,ControllerComponent.RIGHT_TRIGGER.componentState.getIcon(true)}),()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.type"));
         ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> page.max > 0 && groupTabList.selectedTab == 0 ? ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true)}) : ControllerComponent.RIGHT_STICK.componentState.getIcon(true) : null,()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.page"));
+        craftingTabList = new TabList(new PagedList<>(page,is2x2 ? 6 : 7));
         this.inventory = inventory;
-        this.is2x2 = is2x2;
+        this.is2x2 = menu.is2x2 = is2x2;
         gridDimension = is2x2 ? 2 : 3;
         ingredientsGrid = new ArrayList<>(Collections.nCopies(gridDimension * gridDimension,Ingredient.EMPTY));
         warningSlots = new boolean[gridDimension * gridDimension];
@@ -159,6 +159,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         craftingTabList.resetSelectedTab();
         inited = true;
         addCraftingButtons();
+        if (true) return;
         CompoundTag redStarTag = new CompoundTag();
         CompoundTag explosionTag = new CompoundTag();
         redStarTag.put("Explosion",explosionTag);
@@ -352,7 +353,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         Component title = getTabList() == craftingTabList ? getTabList().tabButtons.get(getTabList().selectedTab).getMessage() : getFocused() instanceof CustomCraftingIconHolder h ? h.getDisplayName() : Component.empty();
         guiGraphics.drawString(this.font, title,((groupTabList.selectedTab == 0 ? imageWidth : imageWidth / 2) - font.width(title)) / 2,17, 0x383838, false);
-        guiGraphics.drawString(this.font, this.playerInventoryTitle, (355 + 160 - font.width(playerInventoryTitle))/ 2, 114, 0x383838, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, imageWidth / 2 + (imageWidth / 2 - font.width(playerInventoryTitle)) / 2 - (is2x2 ? 10 : 0), 116, 0x383838, false);
         guiGraphics.pose().translate(-leftPos,-topPos,0);
         getCraftingButtons().forEach(b-> b.render(guiGraphics,i,j,0));
         if (selectedCraftingButton < getCraftingButtons().size()) getCraftingButtons().get(selectedCraftingButton).renderSelection(guiGraphics, i, j, 0);
@@ -372,19 +373,17 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     @Override
     protected void init() {
         resultStack = ItemStack.EMPTY;
-        imageWidth = 348;
+        imageWidth =  is2x2 ? 300 : 348;
         imageHeight = 215;
         super.init();
-        leftPos+=21;
         topPos+=18;
         menu.addSlotListener(listener);
-        addWidget(groupTabList);
         if (lastFocused >= 0 && lastFocused < getCraftingButtons().size()) setInitialFocus(getCraftingButtons().get(lastFocused));
         else if (!getCraftingButtons().isEmpty()) setInitialFocus(getCraftingButtons().get(0));
         if (groupTabList.selectedTab == 0) {
             craftingButtonsOffset.max = Math.max(0,recipesByTab.get(page.get() * 7 + craftingTabList.selectedTab).size() - 12);
             craftingButtons.forEach(b->{
-                b.setPos(leftPos + 13 + craftingButtons.indexOf(b) * 27,topPos + 38);
+                b.setPos(leftPos + (is2x2 ? 16 : 13) + craftingButtons.indexOf(b) * 27,topPos + 38);
                 addWidget(b);
             });
         }else {
@@ -400,15 +399,10 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         addWidget(getTabList());
         getTabList().init(leftPos, topPos - 37, imageWidth, (t, i) -> {
             int index = getTabList().tabButtons.indexOf(t);
-            t.type = index == 0 ? 0 : index >= 6 ? 2 : 1;
+            t.type = index == 0 ? 0 : index >= (is2x2 ? 6 : 7) - 1 ? 2 : 1;
             t.setWidth(51);
-            t.offset = (t1) -> new Offset(-1.5 * getTabList().tabButtons.indexOf(t), t1.selected ? 0 : 4.5, 0);
+            t.offset = (t1) -> new Offset( (is2x2 ? -1.2 : -1.5) * getTabList().tabButtons.indexOf(t), t1.selected ? 0 : 1.5, 0);
         });
-        groupTabList.init((b,i)->{
-            b.setX(leftPos - b.getWidth() + 6);
-            b.setY(topPos + i + 4);
-            b.offset = (t1) -> new Offset(t1.selected ? 0 : 3.5, 0.5, 0);
-        },true);
     }
     protected TabList getTabList(){
         return switch (groupTabList.selectedTab){
@@ -437,7 +431,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         return canCraft;
     }
     protected void addCraftingButtons(){
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < (is2x2 ? 10 : 12); i++) {
             int index = i;
 
             RecipeIconHolder<CraftingRecipe> h;
@@ -535,13 +529,12 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
-        groupTabList.render(guiGraphics, i, j, f);
         getTabList().render(guiGraphics, i, j, f);
         ScreenUtil.renderPanel(guiGraphics, leftPos, topPos, imageWidth, imageHeight, 2f);
-        ScreenUtil.renderSquareRecessedPanel(guiGraphics, leftPos + 9, topPos + 103, 163, 105, 2f);
-        ScreenUtil.renderSquareRecessedPanel(guiGraphics, leftPos + 176, topPos + 103, 163, 105, 2f);
+        ScreenUtil.renderSquareRecessedPanel(guiGraphics, leftPos + 9, topPos + 112, imageWidth / 2 - 11 - (is2x2 ? 10 : 0), 96, 2f);
+        ScreenUtil.renderSquareRecessedPanel(guiGraphics, leftPos + imageWidth / 2  + 2 - (is2x2 ? 10 : 0), topPos + 112, imageWidth / 2 - 11 + (is2x2 ? 10 : 0), 96, 2f);
         if (groupTabList.selectedTab != 0) ScreenUtil.renderSquareRecessedPanel(guiGraphics, leftPos + 176, topPos + 8, 163, 93, 2f);
-        guiGraphics.blitSprite(SMALL_ARROW_SPRITE, leftPos + (is2x2 ? 87 : 97), topPos + 161, 16, 13);
+        guiGraphics.blitSprite(SMALL_ARROW_SPRITE, leftPos + (is2x2 ? 69 : 97), topPos + 161, 16, 13);
         if (groupTabList.selectedTab == 0) {
             if (craftingButtonsOffset.get() > 0)
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + 5, topPos + 45);
@@ -581,11 +574,11 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         renderBackground(guiGraphics, i, j, f);
         super.render(guiGraphics, i, j, f);
         for (int index = 0; index < ingredientsGrid.size(); index++)
-            ScreenUtil.iconHolderRenderer.itemHolder(leftPos + (is2x2 ? 33 : 21) + index % gridDimension * 23, topPos + (is2x2 ? 145 : 133) + index / gridDimension * 23, 23, 23, getActualItem(ingredientsGrid.get(index)), (!onlyCraftableRecipes || groupTabList.selectedTab != 0) && !getActualItem(ingredientsGrid.get(index)).isEmpty() &&  warningSlots[index], new Offset(0.5, is2x2 ? 0 : 0.5, 0)).render(guiGraphics, i, j, f);;
-        ScreenUtil.iconHolderRenderer.itemHolder(leftPos + (is2x2 ? 113 : 124), topPos + 151, 36, 36, resultStack, (!onlyCraftableRecipes || groupTabList.selectedTab != 0) && ingredientsGrid.stream().anyMatch(ing-> !ing.isEmpty()) && !canCraft(ingredientsGrid,false), new Offset(0.5, 0, 0)).render(guiGraphics, i, j, f);
+            ScreenUtil.iconHolderRenderer.itemHolder(leftPos + (is2x2 ? 15 : 21) + index % gridDimension * 23, topPos + (is2x2 ? 145 : 133) + index / gridDimension * 23, 23, 23, getActualItem(ingredientsGrid.get(index)), (!onlyCraftableRecipes || groupTabList.selectedTab != 0) && !getActualItem(ingredientsGrid.get(index)).isEmpty() &&  warningSlots[index], new Offset(0.5, is2x2 ? 0 : 0.5, 0)).render(guiGraphics, i, j, f);;
+        ScreenUtil.iconHolderRenderer.itemHolder(leftPos + (is2x2 ? 100 : 124), topPos + 151, 36, 36, resultStack, (!onlyCraftableRecipes || groupTabList.selectedTab != 0) && ingredientsGrid.stream().anyMatch(ing-> !ing.isEmpty()) && !canCraft(ingredientsGrid,false), new Offset(0.5, 0, 0)).render(guiGraphics, i, j, f);
         if (!resultStack.isEmpty()) {
             Component resultName = resultStack.getHoverName();
-            ScreenUtil.renderScrollingString(guiGraphics, font, resultName, leftPos + 11 + Math.max(163 - font.width(resultName), 0) / 2, topPos + 114, leftPos + 170, topPos + 125, 0x383838, false);
+            ScreenUtil.renderScrollingString(guiGraphics, font, resultName, leftPos + (imageWidth / 2 - font.width(resultName)) / 2, topPos + 116, leftPos + 170, topPos + 125, 0x383838, false);
             if (groupTabList.selectedTab != 0){
                 List<Component> list = resultStack.getTooltipLines(minecraft.player, TooltipFlag.NORMAL);
                 for (int i1 = 0; i1 < list.size(); i1++) {

@@ -17,7 +17,7 @@ public abstract class PlayerInfoMixin implements LegacyPlayerInfo {
 
     int position = -1;
     boolean visible = true;
-    boolean disableExhaustion = false;
+    boolean disableExhaustion = true;
     boolean mayFlySurvival = false;
     @Override
     public int getPosition() {

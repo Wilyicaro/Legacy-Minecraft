@@ -86,7 +86,7 @@ import static wily.legacy.init.LegacyBlockItems.SHRUB;
 
 
 public class Legacy4JClient {
-    public static float FONT_SHADOW_OFFSET = 1.0F;
+    public static boolean legacyFont = true;
     public static boolean canLoadVanillaOptions = true;
     public static boolean manualSave = false;
     public static boolean retakeWorldIcon = false;

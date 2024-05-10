@@ -42,6 +42,7 @@ public class LegacyResourceManager implements PreparableReloadListener {
                 repo.removePack("legacy:legacy_waters");
                 minecraft.reloadResourcePacks();
             }
+            if (repo.addPack("programmer_art")) minecraft.reloadResourcePacks();
             resourceManager.getResource(GAMEPAD_MAPPINGS).ifPresent(r->{
                 try {
                     ControllerHandler.applyGamePadMappingsFromBuffer(r.openAsReader());

@@ -35,6 +35,7 @@
     "EntityRendererMixin",
     "FireworkEntityRendererMixin",
     "FogRendererMixin",
+    "FontMixin",
     "GameRendererMixin",
     "GLStateManagerMixin",
     "GlyphInfoMixin",
@@ -72,8 +73,7 @@
     "SmithingScreenMixin",
     "StonecutterScreenMixin",
     "ToastComponentMixin",
-    "TutorialToastMixin",
-    "WindowMixin"
+    "TutorialToastMixin"
   ],
   "mixins": [
     "AbstractContainerMenuMixin",
