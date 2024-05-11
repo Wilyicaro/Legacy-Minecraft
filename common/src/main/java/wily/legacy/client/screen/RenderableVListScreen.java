@@ -13,8 +13,6 @@ import java.util.function.Supplier;
 public class RenderableVListScreen extends LegacyScreen {
     protected final RenderableVList renderableVList = new RenderableVList().layoutSpacing(l->5);
 
-    protected int lastFocused = -1;
-
     public RenderableVListScreen(Component component, Consumer<RenderableVList> vListBuild) {
         super(component);
         vListBuild.accept(renderableVList);
@@ -28,15 +26,8 @@ public class RenderableVListScreen extends LegacyScreen {
         return Button.builder(component, button -> this.minecraft.setScreen(supplier.get()));
     }
 
-    @Override
-    public void clearFocus() {
-        if (lastFocused > -1 && Legacy4JClient.controllerManager.isCursorDisabled) return;
-        lastFocused = -1;
-        super.clearFocus();
-    }
 
     public void repositionElements() {
-        lastFocused = getFocused() instanceof Renderable r ? renderableVList.renderables.indexOf(r) : -1;
         super.repositionElements();
     }
     @Override
@@ -48,6 +39,5 @@ public class RenderableVListScreen extends LegacyScreen {
     @Override
     protected void init() {
         renderableVList.init(this,width / 2 - 112,this.height / 3 + 10,225,0);
-        if (lastFocused >= 0 && lastFocused < renderableVList.renderables.size()) setInitialFocus((GuiEventListener) renderableVList.renderables.get(lastFocused));
     }
 }

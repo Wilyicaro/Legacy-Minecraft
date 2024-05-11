@@ -33,14 +33,14 @@ public enum ControllerBinding {
     DPAD_DOWN(icon('\uE73F','\uE00C'), InputConstants.KEY_DOWN),
     DPAD_LEFT(icon('\uE741','\uE00E'), InputConstants.KEY_LEFT),
     DPAD_RIGHT(icon('\uE740','\uE00D'), InputConstants.KEY_RIGHT),
-    LEFT_STICK_UP(c-> BindingState.createWithoutToggle(c, h-> LEFT_STICK.bindingState instanceof BindingState.Axis a && a.y < -0.5),icon('\uE746','\uE748','\uE747'),InputConstants.KEY_W),
-    LEFT_STICK_DOWN(c-> BindingState.createWithoutToggle(c, h-> LEFT_STICK.bindingState instanceof BindingState.Axis a && a.y > 0.5),icon('\uE746','\uE748','\uE747'),InputConstants.KEY_S),
-    LEFT_STICK_RIGHT(c-> BindingState.createWithoutToggle(c, h-> LEFT_STICK.bindingState instanceof BindingState.Axis a && a.x > 0.5),icon('\uE746','\uE748','\uE747'),InputConstants.KEY_D),
-    LEFT_STICK_LEFT(c-> BindingState.createWithoutToggle(c, h-> LEFT_STICK.bindingState instanceof BindingState.Axis a && a.x < -0.5),icon('\uE746','\uE748','\uE747'),InputConstants.KEY_A),
-    RIGHT_STICK_UP(c-> BindingState.createWithoutToggle(c, h-> RIGHT_STICK.bindingState instanceof BindingState.Axis a && a.y < -0.5),icon('\uE749','\uE74E','\uE74F')),
-    RIGHT_STICK_DOWN(c-> BindingState.createWithoutToggle(c, h-> RIGHT_STICK.bindingState instanceof BindingState.Axis a && a.y > 0.5),icon('\uE749','\uE74E','\uE74F')),
-    RIGHT_STICK_RIGHT(c-> BindingState.createWithoutToggle(c, h-> RIGHT_STICK.bindingState instanceof BindingState.Axis a && a.x > 0.5),icon('\uE749','\uE74E','\uE74F')),
-    RIGHT_STICK_LEFT(c-> BindingState.createWithoutToggle(c, h-> RIGHT_STICK.bindingState instanceof BindingState.Axis a && a.x < -0.5),icon('\uE749','\uE74E','\uE74F'));
+    LEFT_STICK_UP(c-> BindingState.create(c, h-> LEFT_STICK.bindingState instanceof BindingState.Axis a && a.y < -0.5),icon('\uE746','\uE748','\uE747'),InputConstants.KEY_W),
+    LEFT_STICK_DOWN(c-> BindingState.create(c, h-> LEFT_STICK.bindingState instanceof BindingState.Axis a && a.y > 0.5),icon('\uE746','\uE748','\uE747'),InputConstants.KEY_S),
+    LEFT_STICK_RIGHT(c-> BindingState.create(c, h-> LEFT_STICK.bindingState instanceof BindingState.Axis a && a.x > 0.5),icon('\uE746','\uE748','\uE747'),InputConstants.KEY_D),
+    LEFT_STICK_LEFT(c-> BindingState.create(c, h-> LEFT_STICK.bindingState instanceof BindingState.Axis a && a.x < -0.5),icon('\uE746','\uE748','\uE747'),InputConstants.KEY_A),
+    RIGHT_STICK_UP(c-> BindingState.create(c, h-> RIGHT_STICK.bindingState instanceof BindingState.Axis a && a.y < -0.5),icon('\uE749','\uE74E','\uE74F')),
+    RIGHT_STICK_DOWN(c-> BindingState.create(c, h-> RIGHT_STICK.bindingState instanceof BindingState.Axis a && a.y > 0.5),icon('\uE749','\uE74E','\uE74F')),
+    RIGHT_STICK_RIGHT(c-> BindingState.create(c, h-> RIGHT_STICK.bindingState instanceof BindingState.Axis a && a.x > 0.5),icon('\uE749','\uE74E','\uE74F')),
+    RIGHT_STICK_LEFT(c-> BindingState.create(c, h-> RIGHT_STICK.bindingState instanceof BindingState.Axis a && a.x < -0.5),icon('\uE749','\uE74E','\uE74F'));
 
 
     public final Component displayName = Component.translatable(Legacy4J.MOD_ID + ".controller_component." + name().toLowerCase(Locale.ENGLISH));

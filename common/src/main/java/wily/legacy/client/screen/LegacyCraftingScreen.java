@@ -49,7 +49,6 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     private final Inventory inventory;
     private final boolean is2x2;
     private final int gridDimension;
-    private int lastFocused;
     private boolean onlyCraftableRecipes = false;
     protected final List<Ingredient> ingredientsGrid;
     protected ItemStack resultStack = ItemStack.EMPTY;
@@ -357,10 +356,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         if (selectedCraftingButton < getCraftingButtons().size()) getCraftingButtons().get(selectedCraftingButton).renderSelection(guiGraphics, i, j, 0);
         guiGraphics.pose().translate(leftPos,topPos,0);
     }
-    public void repositionElements() {
-        lastFocused = getFocused() instanceof LegacyIconHolder h ? getCraftingButtons().indexOf(h) : -1;
-        super.repositionElements();
-    }
+
     @Override
     public void componentTick(BindingState state) {
         if (state.pressed && state.canClick()){
@@ -378,9 +374,8 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         topPos+=18;
         menu.addSlotListener(listener);
         addWidget(groupTabList);
-        if (lastFocused >= 0 && lastFocused < getCraftingButtons().size()) setInitialFocus(getCraftingButtons().get(lastFocused));
-        else if (!getCraftingButtons().isEmpty()) setInitialFocus(getCraftingButtons().get(0));
-        if (groupTabList.selectedTab == 0) {
+       if (selectedCraftingButton < getCraftingButtons().size() && getFocused() != getCraftingButtons().get(selectedCraftingButton)) setFocused(getCraftingButtons().get(selectedCraftingButton));
+       if (groupTabList.selectedTab == 0) {
             craftingButtonsOffset.max = Math.max(0,recipesByTab.get(page.get() * 7 + craftingTabList.selectedTab).size() - 12);
             craftingButtons.forEach(b->{
                 b.setPos(leftPos + 13 + craftingButtons.indexOf(b) * 27,topPos + 38);

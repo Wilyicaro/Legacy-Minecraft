@@ -50,7 +50,6 @@ import static wily.legacy.client.screen.RecipeIconHolder.getActualItem;
 
 public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu> implements Controller.Event {
     private final Inventory inventory;
-    private int lastFocused;
     protected final List<Ingredient> ingredientsGrid = new ArrayList<>(Collections.nCopies(9,Ingredient.EMPTY));
     protected final List<Ingredient> selectedIngredients = new ArrayList<>();
     protected ItemStack resultStack = ItemStack.EMPTY;
@@ -237,10 +236,6 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         if (selectedCraftingButton < getCraftingButtons().size()) getCraftingButtons().get(selectedCraftingButton).renderSelection(guiGraphics, i, j, 0);
         guiGraphics.pose().translate(leftPos,topPos,0);
     }
-    public void repositionElements() {
-        lastFocused = getFocused() instanceof LegacyIconHolder h ? getCraftingButtons().indexOf(h) : -1;
-        super.repositionElements();
-    }
     @Override
     public void componentTick(BindingState state) {
         if (state.pressed && state.canClick() && state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s) controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
@@ -265,8 +260,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         menu.addSlotListener(listener);
         craftingTabList.selectedTab = selectedStack.isEmpty() ? 0 : Math.max(craftingTabList.selectedTab,1);
         menu.inventoryActive = selectedStack.isEmpty();
-        if (lastFocused >= 0 && lastFocused < getCraftingButtons().size()) setInitialFocus(getCraftingButtons().get(lastFocused));
-        else if (!getCraftingButtons().isEmpty()) setInitialFocus(getCraftingButtons().get(0));
+        if (selectedCraftingButton < getCraftingButtons().size() && getFocused() != getCraftingButtons().get(selectedCraftingButton)) setFocused(getCraftingButtons().get(selectedCraftingButton));
         if (craftingTabList.selectedTab != 0) {
             craftingButtonsOffset.max = Math.max(0,LoomTabListing.list.get(page.get() * 7 + craftingTabList.selectedTab - 1).patterns.size() - 12);
             craftingButtons.forEach(b->{
@@ -376,10 +370,11 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                         if (LegacyLoomScreen.this.canCraft()){
                             ScreenUtil.playSimpleUISound(SoundEvents.UI_LOOM_TAKE_RESULT,1.0f);
                             Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(selectedIngredients,previewStack,-1, Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
+                            selectedPatterns.clear();
                             selectedStack = ItemStack.EMPTY;
                             previewStack = ItemStack.EMPTY;
                             craftingTabList.tabButtons.get(0).onPress();
-                        } ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT_FAIL.get(),1.0f);
+                        } else ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT_FAIL.get(),1.0f);
                     }
                 }
 

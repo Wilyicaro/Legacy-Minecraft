@@ -92,7 +92,7 @@ public  class ControllerManager {
         GLFW.glfwSetCursorPos(minecraft.getWindow().getWindow(),minecraft.mouseHandler.xpos = x,minecraft.mouseHandler.ypos = y);
     }
     public synchronized void updateBindings() {
-        updateBindings(connectedController);
+        updateBindings(minecraft.isWindowActive() ? connectedController : Controller.EMPTY);
     }
 
     public synchronized void updateBindings(Controller controller) {
@@ -102,9 +102,12 @@ public  class ControllerManager {
             state.update(controller);
             if (minecraft.screen != null && !isCursorDisabled) {
                 if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && state.pressed)
-                    setPointerPos(minecraft.mouseHandler.xpos = (minecraft.mouseHandler.xpos() + stick.x * ((double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth())  * ScreenUtil.getLegacyOptions().interfaceSensitivity().get() / 2.5), minecraft.mouseHandler.ypos = (minecraft.mouseHandler.ypos() + stick.y * ((double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()) * ScreenUtil.getLegacyOptions().interfaceSensitivity().get() / 2.5));
+                    setPointerPos(minecraft.mouseHandler.xpos = (minecraft.mouseHandler.xpos() + stick.x * ((double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth())  * ScreenUtil.getLegacyOptions().interfaceSensitivity().get() / 2), minecraft.mouseHandler.ypos = (minecraft.mouseHandler.ypos() + stick.y * ((double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()) * ScreenUtil.getLegacyOptions().interfaceSensitivity().get() / 2));
 
-                if (state.is(ControllerBinding.RIGHT_TRIGGER) && state.pressed) minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 1,0,0);
+                if (state.is(ControllerBinding.RIGHT_TRIGGER) && state.pressed){
+                    if (state.justPressed) minecraft.screen.mouseClicked(getPointerX(), getPointerY(), 1);
+                    minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 1,0,0);
+                }
                 if (state.is(ControllerBinding.DOWN_BUTTON) || state.is(ControllerBinding.UP_BUTTON) || state.is(ControllerBinding.LEFT_BUTTON)) {
                     if (state.pressed && state.canClick())
                         minecraft.screen.mouseClicked(getPointerX(), getPointerY(), state.is(ControllerBinding.LEFT_BUTTON) ? 1 : 0);
@@ -152,16 +155,14 @@ public  class ControllerManager {
 
 
             if (minecraft.screen instanceof LegacyMenuAccess<?> a && !isCursorDisabled) {
-
-                Predicate<Predicate<BindingState.Axis>> isStickAnd = s -> state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && s.test(stick) &&  stick.getMagnitude() <= 0.35 && stick.getMagnitude() <= 0.45 && state.onceClick(true);
-                if (state.pressed) {
-                    if (isStickAnd.test(s -> s.y < 0 && -s.y > Math.abs(s.x)) || state.is(ControllerBinding.DPAD_UP) && state.canClick())
+                if (state.pressed && state.canClick()) {
+                    if (state.is(ControllerBinding.DPAD_UP))
                         a.movePointerToSlotIn(ScreenDirection.UP);
-                    if (isStickAnd.test(s -> s.y > 0 && s.y > Math.abs(s.x)) || state.is(ControllerBinding.DPAD_DOWN) && state.canClick())
+                    else if (state.is(ControllerBinding.DPAD_DOWN))
                         a.movePointerToSlotIn(ScreenDirection.DOWN);
-                    if (isStickAnd.test(s -> s.x > 0 && s.x > Math.abs(s.y)) || state.is(ControllerBinding.DPAD_RIGHT) && state.canClick())
+                    else if (state.is(ControllerBinding.DPAD_RIGHT))
                         a.movePointerToSlotIn(ScreenDirection.RIGHT);
-                    if (isStickAnd.test(s -> s.x < 0 && -s.x > Math.abs(s.y)) || state.is(ControllerBinding.DPAD_LEFT) && state.canClick())
+                    else if (state.is(ControllerBinding.DPAD_LEFT))
                         a.movePointerToSlotIn(ScreenDirection.LEFT);
                 }else if (state.is(ControllerBinding.LEFT_STICK) && state.released) a.movePointerToSlot(a.findSlotAt(getPointerX(),getPointerY()));
             }

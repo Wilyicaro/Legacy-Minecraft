@@ -11,7 +11,8 @@ import wily.legacy.util.ScreenUtil;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class ConfirmationScreen extends PanelBackgroundScreen{
+public class
+ConfirmationScreen extends PanelBackgroundScreen{
     protected final MultiLineLabel messageLabel;
     protected Predicate<Button> okAction;
     public Button okButton;

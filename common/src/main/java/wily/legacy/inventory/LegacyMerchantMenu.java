@@ -40,7 +40,7 @@ public class LegacyMerchantMenu extends LegacyCraftingMenu{
             merchant.notifyTrade(offer);
             player.awardStat(Stats.TRADED_WITH_VILLAGER);
             merchant.overrideXp(merchant.getVillagerXp() + offer.getXp());
-            player.sendMerchantOffers(containerId, merchant.getOffers(), merchant instanceof Villager v ? v.getVillagerData().getLevel() : 0, merchant.getVillagerXp(), showProgressBar, merchant.canRestock());
+            player.sendMerchantOffers(containerId, merchant.getOffers(), merchant instanceof Villager v ? v.getVillagerData().getLevel() : 0, merchant.getVillagerXp(), merchant.showProgressBar(), merchant.canRestock());
         }
     }
 

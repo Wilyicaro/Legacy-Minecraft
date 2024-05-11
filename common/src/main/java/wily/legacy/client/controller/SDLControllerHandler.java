@@ -44,7 +44,7 @@ public class SDLControllerHandler implements Controller.Handler{
             @Override
             public String getName() {
                 if (name == null) name = SdlGamecontroller.SDL_GameControllerName(controller);
-                return name;
+                return name == null ? "Unknown" : name;
             }
 
             @Override

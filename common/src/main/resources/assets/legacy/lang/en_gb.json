@@ -17,6 +17,8 @@
  "menu.quit": "Exit Game",
  "menu.savingLevel" : "Preparing to Save Level",
  "disconnect.quitting" : "Exiting Game",
+ "selectWorld.allowCommands": "Host Privileges",
+ "selectWorld.allowCommands.info": "When enabled, the host can execute commands.",
  "gamerule.announceAdvancements": "Announce Advancements",
  "gamerule.announceAdvancements.description": "When enabled, players who receive advancements will be announced in chat.",
  "gamerule.blockExplosionDropDecay": "Block Explosion Drop Decay",
@@ -117,6 +119,7 @@
  "gamerule.universalAnger.description": "When enabled, angered neutral mobs will attack any nearby player, not just the player that angered them.",
  "gamerule.waterSourceConversion": "Water Source Conversion",
  "gamerule.waterSourceConversion.description": "When enabled, two water sources that flow into the same block will create a new water source.",
+ "key.inventory": "Inventory",
  "key.use": "Use",
  "key.attack": "Action"
 }

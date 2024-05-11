@@ -47,7 +47,7 @@ public class GLFWControllerHandler implements Controller.Handler{
             @Override
             public String getName() {
                 if (name == null) name = GLFW.glfwGetGamepadName(jid);
-                return name;
+                return name == null ? "Unknown" : name;
             }
 
             @Override

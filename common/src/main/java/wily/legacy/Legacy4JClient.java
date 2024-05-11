@@ -7,6 +7,7 @@ import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientLifecycleEvent;
 import dev.architectury.event.events.client.ClientPlayerEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
+import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.registry.ReloadListenerRegistry;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import dev.architectury.registry.client.rendering.ColorHandlerRegistry;
@@ -216,6 +217,7 @@ public class Legacy4JClient {
         knownBlocks = new KnownListing<>(Registries.BLOCK,Minecraft.getInstance().gameDirectory.toPath());
         knownEntities = new KnownListing<>(Registries.ENTITY_TYPE,Minecraft.getInstance().gameDirectory.toPath());
 
+        TickEvent.SERVER_LEVEL_PRE.register(l-> l.noSave = !ScreenUtil.getLegacyOptions().autoSave().get());
         ClientPlayerEvent.CLIENT_PLAYER_JOIN.register(p-> Legacy4J.NETWORK.sendToServer(new PlayerInfoSync(ScreenUtil.hasClassicCrafting() ? 1 : 2,p)));
         ClientGuiEvent.SET_SCREEN.register((screen) -> {
             Screen replacement = getReplacementScreen(screen);

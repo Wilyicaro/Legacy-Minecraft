@@ -10,7 +10,6 @@ import java.util.function.Function;
 
 public class PanelVListScreen extends PanelBackgroundScreen{
     protected final RenderableVList renderableVList = new RenderableVList();
-    protected int lastFocused = -1;
     public PanelVListScreen(Function<Screen,Panel> panelConstructor, Component component) {
         super(panelConstructor, component);
     }
@@ -26,16 +25,10 @@ public class PanelVListScreen extends PanelBackgroundScreen{
         this(parent,imageWidth, imageHeight, component);
         renderableVList.addOptions(optionInstances);
     }
-    public void repositionElements() {
-        lastFocused = getFocused() instanceof Renderable r ? getRenderableVList().renderables.indexOf(r) : -1;
-        super.repositionElements();
-    }
     @Override
     protected void init() {
         super.init();
         getRenderableVList().init(this,panel.x + 10,panel.y + 10,panel.width - 20,panel.height);
-        if (lastFocused >= 0 && lastFocused < renderableVList.renderables.size()) setInitialFocus((GuiEventListener) getRenderableVList().renderables.get(lastFocused));
-        else setInitialFocus(getRenderableVList().getFirstFocusable());
     }
 
     public RenderableVList getRenderableVList() {

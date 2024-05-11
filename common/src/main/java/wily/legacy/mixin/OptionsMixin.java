@@ -1,7 +1,6 @@
 package wily.legacy.mixin;
 
 import com.mojang.serialization.Codec;
-import io.github.libsdl4j.api.gamecontroller.SdlGamecontroller;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
@@ -37,10 +36,6 @@ public abstract class OptionsMixin implements LegacyOptions {
 
     @Shadow public abstract void load();
 
-    @Shadow
-    public static Component genericValueLabel(Component arg, Component arg2) {
-        return null;
-    }
 
     @Shadow
     public static Component genericValueLabel(Component arg, int i) {
@@ -64,14 +59,13 @@ public abstract class OptionsMixin implements LegacyOptions {
     private OptionInstance<Double> interfaceSensitivity;
     private OptionInstance<Integer> terrainFogStart;
     private OptionInstance<Double> terrainFogEnd;
-    private OptionInstance<Integer> autoSaveInterval;
     private OptionInstance<Boolean> overrideTerrainFogStart;
     private OptionInstance<Boolean> legacyCreativeTab;
     private OptionInstance<Boolean> displayHUD;
     private OptionInstance<Boolean> animatedCharacter;
     private OptionInstance<Boolean> classicCrafting;
     private OptionInstance<Boolean> vanillaTabs;
-    private OptionInstance<Boolean> autoSaveWhenPause;
+    private OptionInstance<Boolean> autoSave;
     private OptionInstance<Integer> hudScale;
     private OptionInstance<Boolean> showVanillaRecipeBook;
     private OptionInstance<Double> legacyGamma;
@@ -102,7 +96,7 @@ public abstract class OptionsMixin implements LegacyOptions {
     }
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ToggleKeyMapping;<init>(Ljava/lang/String;ILjava/lang/String;Ljava/util/function/BooleanSupplier;)V", ordinal = 0),index = 3)
     protected BooleanSupplier initKeyShift(BooleanSupplier booleanSupplier) {
-        return ()-> (minecraft == null || minecraft.player == null || (!minecraft.player.getAbilities().flying && minecraft.player.getVehicle() == null && minecraft.player.onGround())) && booleanSupplier.getAsBoolean();
+        return ()-> (minecraft == null || minecraft.player == null || (!minecraft.player.getAbilities().flying && minecraft.player.getVehicle() == null && (!minecraft.player.isUnderWater() || minecraft.player.onGround()))) && booleanSupplier.getAsBoolean();
     }
     @Redirect(method = "<init>", at = @At( value = "INVOKE", target = "Lnet/minecraft/client/Options;load()V"))
     protected void init(Options instance) {
@@ -118,7 +112,7 @@ public abstract class OptionsMixin implements LegacyOptions {
         legacyGamma = new OptionInstance<>("legacy.options.gamma", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 0.5, d -> {});
         displayHUD = OptionInstance.createBoolean("legacy.options.displayHud",!hideGui, b-> hideGui = !b);
         legacyCreativeTab = OptionInstance.createBoolean("legacy.options.creativeTab", true);
-        autoSaveWhenPause = OptionInstance.createBoolean("legacy.options.autoSaveWhenPause", false);
+        autoSave = OptionInstance.createBoolean("legacy.options.autoSave", true);
         inGameTooltips = OptionInstance.createBoolean("legacy.options.gameTooltips", true);
         tooltipBoxes = OptionInstance.createBoolean("legacy.options.tooltipBoxes", true);
         hints = OptionInstance.createBoolean("legacy.options.hints", true);
@@ -126,7 +120,6 @@ public abstract class OptionsMixin implements LegacyOptions {
         vignette = OptionInstance.createBoolean("legacy.options.vignette", false);
         minecartSounds = OptionInstance.createBoolean("legacy.options.minecartSounds", true);
         caveSounds = OptionInstance.createBoolean("legacy.options.caveSounds", true);
-        autoSaveInterval = new OptionInstance<>("legacy.options.autoSaveInterval", OptionInstance.noTooltip(), (c,i)-> i == 0 ? genericValueLabel(c,Component.translatable("options.off")) :Component.translatable( "legacy.options.mins_value",c, i * 5), new OptionInstance.IntRange(0,24), 1, d -> {});
         showVanillaRecipeBook = OptionInstance.createBoolean("legacy.options.showVanillaRecipeBook", false);
         forceYellowText = OptionInstance.createBoolean("legacy.options.forceYellowText", false);
         displayNameTagBorder = OptionInstance.createBoolean("legacy.options.displayNameTagBorder", true);
@@ -157,7 +150,7 @@ public abstract class OptionsMixin implements LegacyOptions {
         fieldAccess.process("terrainFogStart", terrainFogStart);
         fieldAccess.process("terrainFogEnd", terrainFogEnd);
         fieldAccess.process("overrideTerrainFogStart", overrideTerrainFogStart);
-        fieldAccess.process("autoSaveWhenPause", autoSaveWhenPause);
+        fieldAccess.process("autoSave", autoSave);
         fieldAccess.process("gameTooltips", inGameTooltips);
         fieldAccess.process("tooltipBoxes", tooltipBoxes);
         fieldAccess.process("hints", hints);
@@ -166,7 +159,6 @@ public abstract class OptionsMixin implements LegacyOptions {
         fieldAccess.process("caveSounds", caveSounds);
         fieldAccess.process("minecartSounds", minecartSounds);
         fieldAccess.process("createWorldDifficulty", createWorldDifficulty);
-        fieldAccess.process("autoSaveInterval", autoSaveInterval);
         fieldAccess.process("showVanillaRecipeBook", showVanillaRecipeBook);
         fieldAccess.process("forceYellowText", forceYellowText);
         fieldAccess.process("displayNameTagBorder", displayNameTagBorder);
@@ -217,10 +209,7 @@ public abstract class OptionsMixin implements LegacyOptions {
         return animatedCharacter;
     }
     public OptionInstance<Boolean> classicCrafting() {return classicCrafting;}
-    public OptionInstance<Boolean> autoSaveWhenPause() {return autoSaveWhenPause;}
-    public OptionInstance<Integer> autoSaveInterval() {
-        return autoSaveInterval;
-    }
+    public OptionInstance<Boolean> autoSave() {return autoSave;}
     public OptionInstance<Boolean> showVanillaRecipeBook() {
         return showVanillaRecipeBook;
     }

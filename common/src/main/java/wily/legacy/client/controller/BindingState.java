@@ -1,6 +1,7 @@
 package wily.legacy.client.controller;
 
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.ToggleKeyMapping;
 import net.minecraft.network.chat.Component;
 import wily.legacy.client.screen.ControlTooltip;
 
@@ -18,19 +19,6 @@ public abstract class BindingState {
     public boolean released;
     public static BindingState create(ControllerBinding component, Predicate<Controller> update){
         return new BindingState(component) {
-            @Override
-            public void update(Controller handler) {
-                update(update.test(handler));
-            }
-        };
-    }
-    public static BindingState createWithoutToggle(ControllerBinding component, Predicate<Controller> update){
-        return new BindingState(component) {
-            @Override
-            public boolean canDownKeyMapping(KeyMapping mapping) {
-                return pressed;
-            }
-
             @Override
             public void update(Controller handler) {
                 update(update.test(handler));
@@ -85,7 +73,7 @@ public abstract class BindingState {
         return timePressed == Integer.MIN_VALUE;
     }
     public boolean canDownKeyMapping(KeyMapping mapping){
-        return timePressed == 0;
+        return !(mapping instanceof ToggleKeyMapping) || timePressed == 0;
     }
     public boolean canReleaseKeyMapping(KeyMapping mapping){
         return released;

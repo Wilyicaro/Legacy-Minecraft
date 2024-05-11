@@ -27,6 +27,7 @@
     "ClientMinecraftServerMixin",
     "ClientPacketListenerMixin",
     "ClientPrimaryLevelDataMixin",
+    "ClientTextTooltipMixin",
     "ContainerScreenMixin",
     "CrafterScreenMixin",
     "CraftingScreenMixin",
@@ -76,11 +77,12 @@
     "SignEditScreenMixin",
     "SimpleSoundInstanceMixin",
     "SliderableValueSetMixin",
+    "SlotMixin",
     "SmithingScreenMixin",
     "StonecutterScreenMixin",
     "ToastComponentMixin",
     "TutorialToastMixin",
-    "SlotMixin"
+    "ClientMinecraftServerMixin"
   ],
   "mixins": [
     "AbstractContainerMenuMixin",

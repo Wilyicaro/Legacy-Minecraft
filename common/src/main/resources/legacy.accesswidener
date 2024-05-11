@@ -141,3 +141,4 @@ accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$Displ
 accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$DisplayCache cursor Lnet/minecraft/client/gui/screens/inventory/BookEditScreen$Pos2i;
 accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$DisplayCache cursorAtEnd Z
 accessible class net/minecraft/client/gui/Font$StringRenderOutput
+accessible field net/minecraft/client/resources/TextureAtlasHolder textureAtlas Lnet/minecraft/client/renderer/texture/TextureAtlas;

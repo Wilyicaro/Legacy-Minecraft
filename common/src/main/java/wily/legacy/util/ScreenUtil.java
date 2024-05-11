@@ -9,6 +9,8 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.texture.SpriteContents;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
@@ -40,6 +42,7 @@ public class ScreenUtil {
     public static long lastHotbarSelectionChange = -1;
     protected static LogoRenderer logoRenderer = new LogoRenderer(false);
     public static LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
+    public static final ResourceLocation MINECRAFT = new ResourceLocation(Legacy4J.MOD_ID, "title/minecraft");
     public static final ResourceLocation PANORAMA_DAY = new ResourceLocation(Legacy4J.MOD_ID, "textures/gui/title/panorama_day.png");
     public static final ResourceLocation PANORAMA_NIGHT = new ResourceLocation(Legacy4J.MOD_ID, "textures/gui/title/panorama_night.png");
     public static final ResourceLocation SAVE_CHEST = new ResourceLocation(Legacy4J.MOD_ID,"hud/save_chest");
@@ -113,8 +116,15 @@ public class ScreenUtil {
         if (mc.level == null || loading)
             renderPanoramaBackground(guiGraphics, loading && getActualLevelNight());
         else mc.screen.renderTransparentBackground(guiGraphics);
-        if (title)
-            logoRenderer.renderLogo(guiGraphics,mc.screen == null ?  0: mc.screen.width,1.0F);
+        if (title) {
+            TextureAtlasSprite sprite = Minecraft.getInstance().getGuiSprites().textureAtlas.texturesByName.get(MINECRAFT);
+            if (sprite == null)
+                logoRenderer.renderLogo(guiGraphics, mc.screen == null ? 0 : mc.screen.width, 1.0F);
+            else try (SpriteContents contents = sprite.contents()) {
+                    guiGraphics.blitSprite(MINECRAFT,(guiGraphics.guiWidth() - contents.width() / 2) / 2, 30, contents.width() / 2, contents.height() / 2);
+            }
+
+        }
     }
     public static void renderPanoramaBackground(GuiGraphics guiGraphics, boolean isNight){
         RenderSystem.depthMask(false);

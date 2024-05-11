@@ -12,13 +12,12 @@ public interface LegacyOptions {
     OptionInstance<Boolean> overrideTerrainFogStart();
     OptionInstance<Integer> terrainFogStart();
     OptionInstance<Double> terrainFogEnd();
-    OptionInstance<Integer> autoSaveInterval();
     OptionInstance<Integer> hudScale();
     OptionInstance<Boolean> legacyCreativeTab();
     OptionInstance<Boolean> displayHUD();
     OptionInstance<Boolean> animatedCharacter();
     OptionInstance<Boolean> classicCrafting();
-    OptionInstance<Boolean> autoSaveWhenPause();
+    OptionInstance<Boolean> autoSave();
     OptionInstance<Boolean> showVanillaRecipeBook();
     OptionInstance<Double> legacyGamma();
     OptionInstance<Boolean> inGameTooltips();
