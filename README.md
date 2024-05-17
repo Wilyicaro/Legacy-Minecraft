@@ -27,7 +27,7 @@ Download [Re-Console](https://modrinth.com/modpack/legacy-minecraft) today!
 *You can also join our [Discord](https://discord.com/invite/CVas58uPyb) to talk to the developers, other members and suggest features for the mod!*
 
 
-# Planned and Implemented Features
+# 📝 Planned and Implemented Features
 | Feature                                                             | Implemented | Planned |
 |:--------------------------------------------------------------------|:-----------:|:-------:|
 | All Interfaces                                                      | ✅           | ✅       |
@@ -42,4 +42,3 @@ Download [Re-Console](https://modrinth.com/modpack/legacy-minecraft) today!
 | LCE Creative Flight                                                 | ✅           | ✅       |
 | Superflat in-GUI customizer                                         | ✅           | ✅       |
 | Tutorial World                                                      | ✅           | ✅       |
-
