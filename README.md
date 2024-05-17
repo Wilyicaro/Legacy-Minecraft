@@ -10,7 +10,7 @@
 # 📜 About
 **Legacy4J** is a mod about nostalgia of old 4J Studios Minecraft Legacy Edition. The main objective of this mod is remake every aspect of [Legacy Console Edition](https://minecraft.wiki/w/Legacy_Console_Edition) in 1:1 for Java Edition versions, adding its exclusive features, and bringing it to modern versions.
 
-![image](https://cdn.modrinth.com/data/mIMHT3wf/images/cfc40bbe8eb9f64447fa5edd6fa8fce80cd85971.png)
+
 
 
 # 👋You should also check out the official modpack!
@@ -39,4 +39,4 @@
 | LCE Creative Flight                                                 | ✅           | ✅       |
 | Superflat in-GUI customizer                                         | ✅           | ✅       |
 | Tutorial World                                                      | ✅           | ✅       |
-![image2](https://cdn.modrinth.com/data/mIMHT3wf/images/1cd8bd8afb6f300f6d59b3c84d78fef738a1c839.png)
+
