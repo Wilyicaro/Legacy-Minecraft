@@ -10,6 +10,7 @@
 # 📜 About
 **Legacy4J** is a mod about nostalgia of old 4J Studios Minecraft Legacy Edition. The main objective of this mod is remake every aspect of [Legacy Console Edition](https://minecraft.wiki/w/Legacy_Console_Edition) in 1:1 for Java Edition versions, adding its exclusive features, and bringing it to modern versions.
 
+![4d16d058705efd1447a848f3715b36b407841422](https://github.com/omo50/Legacy-Minecraft/assets/144749186/5deb83e5-24ee-4006-9eb5-544e2517ad2d)
 
 
 
