@@ -10,13 +10,15 @@
 # 📜 About
 **Legacy4J** is a mod about nostalgia of old 4J Studios Minecraft Legacy Edition. The main objective of this mod is remake every aspect of [Legacy Console Edition](https://minecraft.wiki/w/Legacy_Console_Edition) in 1:1 for Java Edition versions, adding its exclusive features, and bringing it to modern versions.
 
+This includes the crafting menu, creative flight, the gamma system, the hud, and more!
+
 ![4d16d058705efd1447a848f3715b36b407841422](https://github.com/omo50/Legacy-Minecraft/assets/144749186/5deb83e5-24ee-4006-9eb5-544e2517ad2d)
 
-
-
 # 👋You should also check out the official modpack!
+Better performance, all tutorial worlds, and more!
+Download [Re-Console](https://modrinth.com/modpack/legacy-minecraft) today!
 
-
+![892ef1c08dae6aee23c78dd0154bd801094a6d5e](https://github.com/omo50/Legacy-Minecraft/assets/144749186/ff8b464b-e0e7-4951-a33f-242df53c5b8c)
 
 > ### 🚫 THIS MOD CAN BE CONSIDERED A HACK IN SERVERS
 > WE ARE NOT RESPONSIBLE FOR SERVER PUNISHMENTS 
