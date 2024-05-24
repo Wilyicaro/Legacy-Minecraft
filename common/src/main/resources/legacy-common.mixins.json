@@ -26,6 +26,7 @@
     "ClientLevelStorageSourceMixin",
     "ClientMinecraftServerMixin",
     "ClientPacketListenerMixin",
+    "ClientPersistentEntitySectionManagerMixin",
     "ClientPrimaryLevelDataMixin",
     "ClientTextTooltipMixin",
     "ContainerScreenMixin",
@@ -57,6 +58,7 @@
     "ItemInHandRendererMixin",
     "KeyboardControllerInputMixin",
     "KeyMappingMixin",
+    "LegacyLoadingMessageScreenMixin",
     "LegacyLoadingScreenMixin",
     "LoadingOverlayMixin",
     "LocalPlayerMixin",
@@ -81,8 +83,7 @@
     "SmithingScreenMixin",
     "StonecutterScreenMixin",
     "ToastComponentMixin",
-    "TutorialToastMixin",
-    "ClientMinecraftServerMixin"
+    "TutorialToastMixin"
   ],
   "mixins": [
     "AbstractContainerMenuMixin",
@@ -98,6 +99,7 @@
     "CraftingTableBlockMixin",
     "DedicatedServerPropertiesMixin",
     "DispenserMenuMixin",
+    "EmptyMapItemMixin",
     "EnchantmentMenuMixin",
     "EndDragonFightMixin",
     "EntityMixin",
@@ -114,7 +116,6 @@
     "MerchantMenuMixin",
     "MerchantMixin",
     "MerchantOfferMixin",
-    "MerchantOffersMixin",
     "PlayerListMixin",
     "PlayerMixin",
     "ServerGamePacketListenerImplMixin",

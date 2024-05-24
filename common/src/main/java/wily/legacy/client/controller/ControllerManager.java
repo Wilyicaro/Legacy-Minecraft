@@ -4,23 +4,22 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.InputType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.Slot;
 import org.lwjgl.glfw.GLFW;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyTip;
+import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.player.LegacyPlayerInfo;
 import wily.legacy.util.ScreenUtil;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Predicate;
@@ -34,7 +33,7 @@ public  class ControllerManager {
     public boolean resetCursor = false;
     public boolean canChangeSlidersValue = true;
     private final Minecraft minecraft;
-    public static final List<Controller.Handler> handlers = List.of(GLFWControllerHandler.getInstance(),SDLControllerHandler.getInstance());
+    public static final List<Controller.Handler> handlers = List.of(GLFWControllerHandler.getInstance(),SDLControllerHandler.getInstance(), Controller.Handler.EMPTY);
 
     public static final Component CONTROLLER_DETECTED = Component.translatable("legacy.controller.detected");
     public static final Component CONTROLLER_DISCONNECTED = Component.translatable("legacy.controller.disconnected");
@@ -46,22 +45,14 @@ public  class ControllerManager {
         ControllerBinding.init();
         return DEFAULT_CONTROLLER_BUTTONS_BY_KEY.get(i);
     }
-    public void tryDownloadAndApplyNewMappings(){
-        try {
-            getHandler().applyGamePadMappingsFromBuffer(new BufferedReader(new InputStreamReader(new URL("https://raw.githubusercontent.com/mdqinc/SDL_GameControllerDB/master/gamecontrollerdb.txt").openStream())));
-        } catch (IOException e) {
-            Legacy4J.LOGGER.warn(e.getMessage());
-        }
-    }
 
     public static Controller.Handler getHandler() {
-        return handlers.get(Minecraft.ON_OSX ? 0 : 1);
+        return handlers.get(ScreenUtil.getLegacyOptions().selectedControllerHandler().get());
     }
 
     public void setup(){
         GLFW.glfwSetInputMode(minecraft.getWindow().getWindow(),GLFW.GLFW_CURSOR,GLFW.GLFW_CURSOR_HIDDEN);
-        tryDownloadAndApplyNewMappings();
-        handlers.forEach(Controller.Handler::init);
+        getHandler().init();
         CompletableFuture.runAsync(()-> new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -96,17 +87,22 @@ public  class ControllerManager {
     }
 
     public synchronized void updateBindings(Controller controller) {
+        if (minecraft.screen instanceof Controller.Event e) e.controllerTick(controller);
+        if (!LegacyTipManager.tips.isEmpty()) LegacyTipManager.tips.get(0).controllerTick(controller);
+
         for (ControllerBinding binding : ControllerBinding.values()) {
             if (controller == null) break;
             BindingState state = binding.bindingState;
             state.update(controller);
+            if (!LegacyTipManager.tips.isEmpty()) LegacyTipManager.tips.get(0).bindingStateTick(state);
             if (minecraft.screen != null && !isCursorDisabled) {
                 if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && state.pressed)
                     setPointerPos(minecraft.mouseHandler.xpos = (minecraft.mouseHandler.xpos() + stick.x * ((double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth())  * ScreenUtil.getLegacyOptions().interfaceSensitivity().get() / 2), minecraft.mouseHandler.ypos = (minecraft.mouseHandler.ypos() + stick.y * ((double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()) * ScreenUtil.getLegacyOptions().interfaceSensitivity().get() / 2));
 
-                if (state.is(ControllerBinding.RIGHT_TRIGGER) && state.pressed){
-                    if (state.justPressed) minecraft.screen.mouseClicked(getPointerX(), getPointerY(), 1);
-                    minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 1,0,0);
+                if (state.is(ControllerBinding.LEFT_TRIGGER) && minecraft.screen instanceof LegacyMenuAccess<?> m && m.getMenu().getCarried().getCount() > 1){
+                    if (state.justPressed) minecraft.screen.mouseClicked(getPointerX(), getPointerY(), 0);
+                    else if (state.released) minecraft.screen.mouseReleased(getPointerX(), getPointerY(),0);
+                    if (state.pressed) minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
                 }
                 if (state.is(ControllerBinding.DOWN_BUTTON) || state.is(ControllerBinding.UP_BUTTON) || state.is(ControllerBinding.LEFT_BUTTON)) {
                     if (state.pressed && state.canClick())
@@ -124,14 +120,14 @@ public  class ControllerManager {
                 controller.setLED((byte) (colors[0] * 255),(byte) (colors[1] * 255),(byte) (colors[2] * 255));
             }
             if (minecraft.screen != null) {
-                if (minecraft.screen instanceof Controller.Event e) e.componentTick(state);
+                if (minecraft.screen instanceof Controller.Event e) e.bindingStateTick(state);
                 if (state.pressed && state.canClick()) {
                     this.minecraft.setLastInputType(InputType.KEYBOARD_ARROW);
                     minecraft.screen.afterKeyboardAction();
                 }
                 ControllerBinding cursorComponent = ((LegacyKeyMapping) Legacy4JClient.keyToggleCursor).getBinding();
                 if (cursorComponent != null && state.is(cursorComponent) && state.canClick()) toggleCursor();
-                if (isCursorDisabled) simulateKeyAction(s-> state.is(ControllerBinding.DOWN_BUTTON) && state.onceClick(false),InputConstants.KEY_RETURN, state);
+                if (isCursorDisabled) simulateKeyAction(s-> state.is(ControllerBinding.DOWN_BUTTON) && (minecraft.screen instanceof AbstractContainerScreen || state.onceClick(false) && state.justPressed),InputConstants.KEY_RETURN, state);
                 simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_BUTTON) && state.onceClick(true),InputConstants.KEY_ESCAPE, state);
                 simulateKeyAction(s-> s.is(ControllerBinding.LEFT_BUTTON),InputConstants.KEY_X, state);
                 simulateKeyAction(s->s.is(ControllerBinding.UP_BUTTON),InputConstants.KEY_O, state);
@@ -174,9 +170,8 @@ public  class ControllerManager {
                     if (binding == ControllerBinding.START && state.pressed) {
                         value.setDown(false);
                     } else {
-                        if (state.canClick()) KeyMapping.click(((LegacyKeyMapping) value).getKey());
-                        boolean valid = state.canDownKeyMapping(value);
-                        if (state.pressed && valid) value.setDown(true);
+                        if (state.canClick()) value.clickCount++;
+                        if (state.pressed && state.canDownKeyMapping(value)) value.setDown(true);
                         else if (state.canReleaseKeyMapping(value)) value.setDown(false);
                         if (value == minecraft.options.keyTogglePerspective) state.onceClick(true);
                     }
@@ -207,7 +202,6 @@ public  class ControllerManager {
         return button.bindingState;
     }
     public void disableCursor(){
-        if (forceEnableCursor) return;
         GLFW.glfwSetInputMode(minecraft.getWindow().getWindow(),GLFW.GLFW_CURSOR,GLFW.GLFW_CURSOR_HIDDEN);
         minecraft.mouseHandler.xpos = -1;
         minecraft.mouseHandler.ypos = -1;
@@ -235,11 +229,10 @@ public  class ControllerManager {
     }
     public void toggleCursor(){
         forceEnableCursor = !forceEnableCursor;
-        if (isCursorDisabled){
-            if (forceEnableCursor) {
-                enableCursor();
-                if (minecraft.screen != null) minecraft.screen.repositionElements();
-            }
-        } else if (!forceEnableCursor) disableCursor();
+        if (forceEnableCursor) {
+            enableCursor();
+            resetCursor = true;
+            resetCursor();
+        }else if (minecraft.screen != null) minecraft.screen.repositionElements();
     }
 }

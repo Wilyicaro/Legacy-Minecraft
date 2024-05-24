@@ -44,27 +44,26 @@ public abstract class FireworkEntityRendererMixin extends EntityRenderer<Firewor
         VertexConsumer vertexConsumer = multiBufferSource.getBuffer(RenderType.entityCutout(this.getTextureLocation(entity)));
         PoseStack.Pose pose = poseStack.last();
         Matrix4f matrix4f = pose.pose();
-        Matrix3f matrix3f = pose.normal();
-        this.vertex(matrix4f, matrix3f, vertexConsumer, -7, -2, -2, 0.0f, 0.15625f, -1, 0, 0, i);
-        this.vertex(matrix4f, matrix3f, vertexConsumer, -7, -2, 2, 0.15625f, 0.15625f, -1, 0, 0, i);
-        this.vertex(matrix4f, matrix3f, vertexConsumer, -7, 2, 2, 0.15625f, 0.3125f, -1, 0, 0, i);
-        this.vertex(matrix4f, matrix3f, vertexConsumer, -7, 2, -2, 0.0f, 0.3125f, -1, 0, 0, i);
-        this.vertex(matrix4f, matrix3f, vertexConsumer, -7, 2, -2, 0.0f, 0.15625f, 1, 0, 0, i);
-        this.vertex(matrix4f, matrix3f, vertexConsumer, -7, 2, 2, 0.15625f, 0.15625f, 1, 0, 0, i);
-        this.vertex(matrix4f, matrix3f, vertexConsumer, -7, -2, 2, 0.15625f, 0.3125f, 1, 0, 0, i);
-        this.vertex(matrix4f, matrix3f, vertexConsumer, -7, -2, -2, 0.0f, 0.3125f, 1, 0, 0, i);
+        this.vertex(matrix4f, pose, vertexConsumer, -7, -2, -2, 0.0f, 0.15625f, -1, 0, 0, i);
+        this.vertex(matrix4f, pose, vertexConsumer, -7, -2, 2, 0.15625f, 0.15625f, -1, 0, 0, i);
+        this.vertex(matrix4f, pose, vertexConsumer, -7, 2, 2, 0.15625f, 0.3125f, -1, 0, 0, i);
+        this.vertex(matrix4f, pose, vertexConsumer, -7, 2, -2, 0.0f, 0.3125f, -1, 0, 0, i);
+        this.vertex(matrix4f, pose, vertexConsumer, -7, 2, -2, 0.0f, 0.15625f, 1, 0, 0, i);
+        this.vertex(matrix4f, pose, vertexConsumer, -7, 2, 2, 0.15625f, 0.15625f, 1, 0, 0, i);
+        this.vertex(matrix4f, pose, vertexConsumer, -7, -2, 2, 0.15625f, 0.3125f, 1, 0, 0, i);
+        this.vertex(matrix4f, pose, vertexConsumer, -7, -2, -2, 0.0f, 0.3125f, 1, 0, 0, i);
         for (int u = 0; u < 4; ++u) {
             poseStack.mulPose(Axis.XP.rotationDegrees(90.0f));
-            this.vertex(matrix4f, matrix3f, vertexConsumer, -8, -2, 0, 0.0f, 0.0f, 0, 1, 0, i);
-            this.vertex(matrix4f, matrix3f, vertexConsumer, 8, -2, 0, 0.5f, 0.0f, 0, 1, 0, i);
-            this.vertex(matrix4f, matrix3f, vertexConsumer, 8, 2, 0, 0.5f, 0.15625f, 0, 1, 0, i);
-            this.vertex(matrix4f, matrix3f, vertexConsumer, -8, 2, 0, 0.0f, 0.15625f, 0, 1, 0, i);
+            this.vertex(matrix4f, pose, vertexConsumer, -8, -2, 0, 0.0f, 0.0f, 0, 1, 0, i);
+            this.vertex(matrix4f, pose, vertexConsumer, 8, -2, 0, 0.5f, 0.0f, 0, 1, 0, i);
+            this.vertex(matrix4f, pose, vertexConsumer, 8, 2, 0, 0.5f, 0.15625f, 0, 1, 0, i);
+            this.vertex(matrix4f, pose, vertexConsumer, -8, 2, 0, 0.0f, 0.15625f, 0, 1, 0, i);
         }
         poseStack.popPose();
         super.render(entity, f, g, poseStack, multiBufferSource, i);
 
     }
-    public void vertex(Matrix4f matrix4f, Matrix3f matrix3f, VertexConsumer vertexConsumer, int i, int j, int k, float f, float g, int l, int m, int n, int o) {
-        vertexConsumer.vertex(matrix4f, i, j, k).color(255, 255, 255, 255).uv(f, g).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(o).normal(matrix3f, l, n, m).endVertex();
+    public void vertex(Matrix4f matrix4f, PoseStack.Pose pose, VertexConsumer vertexConsumer, int i, int j, int k, float f, float g, int l, int m, int n, int o) {
+        vertexConsumer.vertex(matrix4f, i, j, k).color(255, 255, 255, 255).uv(f, g).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(o).normal(pose, l, n, m).endVertex();
     }
 }

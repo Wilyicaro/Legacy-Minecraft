@@ -14,6 +14,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.init.LegacySoundEvents;
+import wily.legacy.network.CommonNetworkManager;
 import wily.legacy.network.ServerInventoryCraftPacket;
 import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
@@ -105,7 +106,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
         if (isFocused()){
             if (canCraft()){
                 ScreenUtil.playSimpleUISound(SoundEvents.ITEM_PICKUP,1.0f);
-                Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(getIngredientsGrid(), getResultStack(),-1,Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
+                CommonNetworkManager.sendToServer(new ServerInventoryCraftPacket(getIngredientsGrid(), getResultStack(),-1,Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
                 updateRecipe();
             }else ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT_FAIL.get(),1.0f);
         }
@@ -136,11 +137,11 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
         return hasItem(itemIcon);
     }
     protected boolean hasItem(ItemStack stack) {
-        return !stack.isEmpty() && minecraft.player.getInventory().items.stream().filter(s-> ItemStack.isSameItemSameTags(s,stack)).mapToInt(ItemStack::getCount).sum() >= stack.getCount();
+        return !stack.isEmpty() && minecraft.player.getInventory().items.stream().filter(s-> ItemStack.isSameItemSameComponents(s,stack)).mapToInt(ItemStack::getCount).sum() >= stack.getCount();
     }
     @Override
     public void renderItem(GuiGraphics graphics, int i, int j, float f) {
-        ScreenUtil.secureTranslucentRender(graphics,!itemIcon.isEmpty() && !hasItem(itemIcon),0.5f,()-> renderItem(graphics,itemIcon,getX(),getY(),false));
+        ScreenUtil.secureTranslucentRender(graphics,!itemIcon.isEmpty() && !hasItem(itemIcon),0.5f,(u)-> renderItem(graphics,itemIcon,getX(),getY(),false));
     }
     public boolean canAddIngredient(){
         return hasItem(itemIcon) && addedIngredientsItems != null && canAddIngredient.test(this) && getIngredientsGrid().stream().anyMatch(Ingredient::isEmpty);
@@ -175,7 +176,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
         }
         graphics.pose().pushPose();
         applyOffset(graphics);
-        if ((!previousItem.isEmpty() && !ItemStack.matches(previousItem,itemIcon) || !nextItem.isEmpty() && !ItemStack.matches(nextItem,itemIcon))){
+        if (!previousItem.isEmpty() && previousItem!=itemIcon || !nextItem.isEmpty() && nextItem!=itemIcon){
             getScrollRenderer().renderScroll(graphics, ScreenDirection.UP,getX() + 5,getY() - 14);
             getScrollRenderer().renderScroll(graphics, ScreenDirection.DOWN,getX() + 5,getY() + 31);
         }

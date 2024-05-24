@@ -1,9 +1,10 @@
 import java.text.SimpleDateFormat
 
 plugins {
-    id "architectury-plugin" version "3.4-SNAPSHOT"
-    id "dev.architectury.loom" version "1.5+" apply false
+    id "architectury-plugin" version "3.4+"
+    id "dev.architectury.loom" version "1.6-SNAPSHOT" apply false
     id "me.shedaniel.unified-publishing" version "0.1.+" apply false
+    id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
 }
 
 architectury {
@@ -74,10 +75,17 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
     }
+    java {
+
+        withSourcesJar()
+
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
 
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
-        options.release = 17
+        options.release = 21
     }
 
     java {
@@ -133,7 +141,7 @@ subprojects {
     unifiedPublishing {
         project {
             def isFabric = project.name ==  "fabric"
-            displayName = "Legacy Minecraft [$modPlatformName] $project.version"
+            displayName = "Legacy4J [$modPlatformName] $project.version"
             releaseType = "$stage"
             changelog = releaseChangelog()
             gameVersions = ["$minecraft_version"]

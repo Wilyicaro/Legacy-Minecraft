@@ -21,6 +21,7 @@ import net.minecraft.world.level.GameType;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.network.CommonNetworkManager;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.network.PlayerInfoSync;
@@ -54,7 +55,6 @@ public class HostOptionsScreen extends PanelVListScreen{
         addPlayerButtons();
         renderableVList.layoutSpacing(l->0);
         panel.dp = 3f;
-        ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
     }
     public HostOptionsScreen() {
         this(PLAYERS_INVITE);
@@ -114,8 +114,8 @@ public class HostOptionsScreen extends PanelVListScreen{
             List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
             screen.renderableVList.addRenderable(new TickBox(0,0,initialVisibility,b1-> Component.translatable("legacy.menu.host_options.player.invisible"),b1-> null, b1->invisible.set(b1.selected)));
             if (playerInfo.getGameMode().isSurvival()){
-                screen.renderableVList.addRenderable(new TickBox(0,0,((LegacyPlayerInfo) playerInfo).mayFlySurvival(),b1-> Component.translatable("legacy.menu.host_options.player.mayFly"),b1-> null, b1-> Legacy4J.NETWORK.sendToServer(new PlayerInfoSync(b1.selected ? 5 : 6, profile))));
-                screen.renderableVList.addRenderable(new TickBox(0,0,((LegacyPlayerInfo) playerInfo).isExhaustionDisabled(),b1-> Component.translatable("legacy.menu.host_options.player.disableExhaustion"),b1-> null, b1-> Legacy4J.NETWORK.sendToServer(new PlayerInfoSync(b1.selected ? 3 : 4, profile))));
+                screen.renderableVList.addRenderable(new TickBox(0,0,((LegacyPlayerInfo) playerInfo).mayFlySurvival(),b1-> Component.translatable("legacy.menu.host_options.player.mayFly"),b1-> null, b1-> CommonNetworkManager.sendToServer(new PlayerInfoSync(b1.selected ? 5 : 6, profile))));
+                screen.renderableVList.addRenderable(new TickBox(0,0,((LegacyPlayerInfo) playerInfo).isExhaustionDisabled(),b1-> Component.translatable("legacy.menu.host_options.player.disableExhaustion"),b1-> null, b1-> CommonNetworkManager.sendToServer(new PlayerInfoSync(b1.selected ? 3 : 4, profile))));
             }
             screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230,16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL,b1.getObjectValue().getLongDisplayName()),()->Tooltip.create(Component.translatable("selectWorld.gameMode."+playerInfo.getGameMode().getName()+ ".info")),playerInfo.getGameMode(),()->gameTypes, b1->minecraft.getConnection().sendCommand("gamemode %s %s".formatted(b1.objectValue.getName(),profile.getName()))));
             screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_player_spawn"),b1-> minecraft.player.connection.sendCommand("spawnpoint %s ~ ~ ~".formatted(profile.getName()))).bounds(0,0,215,20).build());
@@ -160,7 +160,7 @@ public class HostOptionsScreen extends PanelVListScreen{
 
     @Override
     protected void init() {
-        Legacy4J.NETWORK.sendToServer(new PlayerInfoSync(0,minecraft.player));
+        CommonNetworkManager.sendToServer(new PlayerInfoSync(0,minecraft.player));
         panel.init();
         addHostOptionsButton();
         renderableVList.init(this,panel.x + 10,panel.y + 22,panel.width - 20,panel.height - 8);
@@ -253,7 +253,9 @@ public class HostOptionsScreen extends PanelVListScreen{
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f, alpha);
+        RenderSystem.enableBlend();
         panel.render(guiGraphics,i,j,f);
+        RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
         guiGraphics.drawString(font,title,panel.x + 11, panel.y + 8, 0x383838, false);
     }

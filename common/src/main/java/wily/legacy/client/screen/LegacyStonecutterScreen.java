@@ -19,6 +19,7 @@ import wily.legacy.client.StoneCuttingGroupManager;
 import wily.legacy.client.Offset;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.inventory.LegacyCraftingMenu;
+import wily.legacy.network.CommonNetworkManager;
 import wily.legacy.network.ServerInventoryCraftPacket;
 import wily.legacy.util.PagedList;
 import wily.legacy.util.ScreenUtil;
@@ -45,7 +46,6 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
     protected int selectedCraftingButton = 0;
     private boolean onlyCraftableRecipes;
 
-    private int lastFocused = -1;
 
     private ContainerListener listener;
     @Override
@@ -80,18 +80,13 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
         listener.slotChanged(menu,0,ItemStack.EMPTY);
         onlyCraftableRecipes = false;
     }
-    public void repositionElements() {
-        lastFocused = getFocused() instanceof LegacyIconHolder h ? craftingButtons.indexOf(h) : -1;
-        super.repositionElements();
-    }
     @Override
     public void init() {
         imageWidth = 348;
         imageHeight = 215;
         super.init();
         menu.addSlotListener(listener);
-        if (lastFocused >= 0 && lastFocused < craftingButtons.size()) setInitialFocus(craftingButtons.get(lastFocused));
-        else setInitialFocus(craftingButtons.get(0));
+        if (selectedCraftingButton < craftingButtons.size()) setFocused(craftingButtons.get(selectedCraftingButton));
         craftingButtons.forEach(b->{
             b.setPos(leftPos + 13 + craftingButtons.indexOf(b) * 27,topPos + 38);
             addRenderableWidget(b);
@@ -233,7 +228,7 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                     return false;
                 }
                 public void craft() {
-                    Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
+                    CommonNetworkManager.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
                 }
             });
             h.offset = CRAFTING_OFFSET;

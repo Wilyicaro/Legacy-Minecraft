@@ -1,7 +1,6 @@
 accessWidener   v2  named
 accessible class net/minecraft/client/OptionInstance$SliderableValueSet
 accessible class net/minecraft/client/OptionInstance$CycleableValueSet
-accessible method net/minecraft/client/OptionInstance$OptionInstanceSliderButton <init> (Lnet/minecraft/client/Options;IIIILnet/minecraft/client/OptionInstance;Lnet/minecraft/client/OptionInstance$SliderableValueSet;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Ljava/util/function/Consumer;)V
 accessible field net/minecraft/client/OptionInstance toString Ljava/util/function/Function;
 accessible field net/minecraft/client/OptionInstance value Ljava/lang/Object;
 accessible field net/minecraft/client/OptionInstance caption Lnet/minecraft/network/chat/Component;
@@ -13,7 +12,6 @@ accessible method net/minecraft/client/gui/screens/worldselection/CreateWorldScr
 accessible field net/minecraft/client/gui/screens/worldselection/CreateWorldScreen packValidator Lnet/minecraft/world/level/validation/DirectoryValidator;
 accessible field net/minecraft/client/gui/screens/worldselection/CreateWorldScreen tempDataPackDir Ljava/nio/file/Path;
 accessible field net/minecraft/client/gui/screens/worldselection/CreateWorldScreen tempDataPackRepository Lnet/minecraft/server/packs/repository/PackRepository;
-accessible field net/minecraft/client/gui/screens/worldselection/CreateWorldScreen bottomButtons Lnet/minecraft/client/gui/layouts/GridLayout;
 accessible field net/minecraft/client/gui/screens/worldselection/CreateWorldScreen tabNavigationBar Lnet/minecraft/client/gui/components/tabs/TabNavigationBar;
 accessible field net/minecraft/client/gui/screens/Screen renderables Ljava/util/List;
 accessible field net/minecraft/client/gui/components/AbstractSliderButton canChangeValue Z
@@ -31,7 +29,6 @@ accessible field net/minecraft/client/gui/screens/ProgressScreen header Lnet/min
 accessible field net/minecraft/client/gui/screens/ProgressScreen stage Lnet/minecraft/network/chat/Component;
 accessible method net/minecraft/client/gui/screens/Screen repositionElements ()V
 accessible field net/minecraft/client/gui/Gui autosaveIndicatorValue F
-accessible method net/minecraft/client/gui/Gui renderSavingIndicator (Lnet/minecraft/client/gui/GuiGraphics;)V
 accessible field net/minecraft/client/gui/screens/ProgressScreen clearScreenAfterStop Z
 accessible field net/minecraft/client/gui/screens/ProgressScreen stop Z
 accessible class net/minecraft/client/Options$FieldAccess
@@ -67,16 +64,12 @@ accessible class net/minecraft/client/gui/screens/inventory/BeaconScreen$BeaconU
 accessible class net/minecraft/client/gui/screens/inventory/BeaconScreen$BeaconButton
 accessible field net/minecraft/client/gui/screens/recipebook/GhostRecipe ingredients Ljava/util/List;
 accessible field net/minecraft/client/gui/screens/recipebook/GhostRecipe time F
-accessible method net/minecraft/client/Minecraft selectMainFont (Z)V
 accessible method net/minecraft/world/item/trading/MerchantOffers <init> (I)V
-accessible method net/minecraft/world/item/trading/MerchantOffer isRequiredItem (Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)Z
 accessible method net/minecraft/world/inventory/AbstractContainerMenu moveItemStackTo (Lnet/minecraft/world/item/ItemStack;IIZ)Z
 accessible method net/minecraft/client/gui/screens/worldselection/CreateWorldScreen getDataPackSelectionSettings (Lnet/minecraft/world/level/WorldDataConfiguration;)Lcom/mojang/datafixers/util/Pair;
 accessible method net/minecraft/client/gui/screens/worldselection/CreateWorldScreen tryApplyNewDataPacks (Lnet/minecraft/server/packs/repository/PackRepository;ZLjava/util/function/Consumer;)V
 accessible method net/minecraft/client/gui/screens/worldselection/PresetEditor flatWorldConfigurator (Lnet/minecraft/world/level/levelgen/flat/FlatLevelGeneratorSettings;)Lnet/minecraft/client/gui/screens/worldselection/WorldCreationContext$DimensionsUpdater;
 accessible method net/minecraft/client/gui/screens/worldselection/PresetEditor fixedBiomeConfigurator (Lnet/minecraft/core/Holder;)Lnet/minecraft/client/gui/screens/worldselection/WorldCreationContext$DimensionsUpdater;
-accessible field net/minecraft/client/gui/Gui screenWidth I
-accessible field net/minecraft/client/gui/Gui screenHeight I
 accessible method net/minecraft/world/level/GameRules register (Ljava/lang/String;Lnet/minecraft/world/level/GameRules$Category;Lnet/minecraft/world/level/GameRules$Type;)Lnet/minecraft/world/level/GameRules$Key;
 accessible method net/minecraft/world/level/GameRules$BooleanValue create (Z)Lnet/minecraft/world/level/GameRules$Type;
 accessible class net/minecraft/client/gui/MapRenderer$MapInstance
@@ -116,7 +109,7 @@ accessible field net/minecraft/client/renderer/PostChain passes Ljava/util/List;
 accessible field net/minecraft/world/item/crafting/FireworkStarRecipe SHAPE_BY_ITEM Ljava/util/Map;
 accessible field net/minecraft/world/item/crafting/FireworkStarRecipe SHAPE_INGREDIENT Lnet/minecraft/world/item/crafting/Ingredient;
 accessible field net/minecraft/world/item/crafting/FireworkStarRecipe TRAIL_INGREDIENT Lnet/minecraft/world/item/crafting/Ingredient;
-accessible field net/minecraft/world/item/crafting/FireworkStarRecipe FLICKER_INGREDIENT Lnet/minecraft/world/item/crafting/Ingredient;
+accessible field net/minecraft/world/item/crafting/FireworkStarRecipe TWINKLE_INGREDIENT Lnet/minecraft/world/item/crafting/Ingredient;
 accessible field net/minecraft/world/item/crafting/FireworkStarRecipe GUNPOWDER_INGREDIENT Lnet/minecraft/world/item/crafting/Ingredient;
 accessible field net/minecraft/world/item/crafting/FireworkRocketRecipe GUNPOWDER_INGREDIENT Lnet/minecraft/world/item/crafting/Ingredient;
 accessible field net/minecraft/world/item/crafting/FireworkRocketRecipe PAPER_INGREDIENT Lnet/minecraft/world/item/crafting/Ingredient;
@@ -142,3 +135,8 @@ accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$Displ
 accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$DisplayCache cursorAtEnd Z
 accessible class net/minecraft/client/gui/Font$StringRenderOutput
 accessible field net/minecraft/client/resources/TextureAtlasHolder textureAtlas Lnet/minecraft/client/renderer/texture/TextureAtlas;
+accessible field net/minecraft/client/multiplayer/ClientAdvancements progress Ljava/util/Map;
+accessible field net/minecraft/network/protocol/game/ClientboundAwardStatsPacket STAT_VALUES_STREAM_CODEC Lnet/minecraft/network/codec/StreamCodec;
+accessible field net/minecraft/stats/StatsCounter stats Lit/unimi/dsi/fastutil/objects/Object2IntMap;
+accessible field net/minecraft/client/KeyMapping clickCount I
+accessible method net/minecraft/world/item/trading/MerchantOffer <init> (Lnet/minecraft/world/item/trading/ItemCost;Ljava/util/Optional;Lnet/minecraft/world/item/ItemStack;IIZIIFI)V

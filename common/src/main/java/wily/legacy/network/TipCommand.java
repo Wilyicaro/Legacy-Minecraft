@@ -18,8 +18,9 @@ import net.minecraft.commands.arguments.item.ItemArgument;
 import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
@@ -43,11 +44,11 @@ public class TipCommand {
         commandDispatcher.register(Commands.literal("legacyTip").requires(commandSourceStack -> commandSourceStack.hasPermission(2)).
                 then(Commands.literal("item").then(Commands.argument("item", ItemArgument.item(commandBuildContext)).then(Commands.literal("display").then(Commands.argument("targets", EntityArgument.players()).executes(commandContext -> sendTip(commandContext,new Packet().itemIcon(ItemArgument.getItem(commandContext,"item").createItemStack(1,true)))))))).
                 then(Commands.literal("entity").then(Commands.argument("entity", ResourceArgument.resource(commandBuildContext, Registries.ENTITY_TYPE)).suggests(SuggestionProviders.SUMMONABLE_ENTITIES).then(Commands.literal("display").then(Commands.argument("targets", EntityArgument.players()).executes(commandContext -> sendTip(commandContext,new EntityPacket(ResourceArgument.getSummonableEntityType(commandContext, "entity").value()))))))).
-                then(Commands.literal("custom").then(Commands.argument("custom_tip",StringArgumentType.string()).suggests(TIP_PROVIDER).then(Commands.literal("add").executes(TipCommand::addCustomTip)).then(Commands.literal("remove").executes(c-> handleCustomTipPresence(c, CUSTOM_TIPS::remove,"legacy.commands.legacyTip.success.remove"))).then(Commands.literal("reset").executes(c-> handleCustomTipPresence(c, s-> CUSTOM_TIPS.put(s,new Packet()),"legacy.commands.legacyTip.success.reset"))).then(Commands.literal("modify").then(Commands.literal("item").then(Commands.argument("item",ItemArgument.item(commandBuildContext)).executes(c-> modifyCustomTip(c, t->t.itemIcon(ItemArgument.getItem(c,"item").createItemStack(1,false)))))).then(Commands.literal("tip").then(Commands.argument("tip", ComponentArgument.textComponent()).executes(c-> modifyCustomTip(c, t->t.tip(ComponentArgument.getComponent(c,"tip")))))).then(Commands.literal("title").then(Commands.argument("title", ComponentArgument.textComponent()).executes(c-> modifyCustomTip(c, t->t.title(ComponentArgument.getComponent(c,"title")))))).then(Commands.literal("time").then(Commands.argument("seconds", IntegerArgumentType.integer(1)).executes(c-> modifyCustomTip(c, t->t.disappearTime(IntegerArgumentType.getInteger(c,"seconds"))))))).then(Commands.literal("display").then(Commands.argument("targets", EntityArgument.players()).executes(commandContext -> sendTip(commandContext,CUSTOM_TIPS.get(StringArgumentType.getString(commandContext,"custom_tip")))))))));
+                then(Commands.literal("custom").then(Commands.argument("custom_tip",StringArgumentType.string()).suggests(TIP_PROVIDER).then(Commands.literal("add").executes(TipCommand::addCustomTip)).then(Commands.literal("remove").executes(c-> handleCustomTipPresence(c, CUSTOM_TIPS::remove,"legacy.commands.legacyTip.success.remove"))).then(Commands.literal("reset").executes(c-> handleCustomTipPresence(c, s-> CUSTOM_TIPS.put(s,new Packet()),"legacy.commands.legacyTip.success.reset"))).then(Commands.literal("modify").then(Commands.literal("item").then(Commands.argument("item",ItemArgument.item(commandBuildContext)).executes(c-> modifyCustomTip(c, t->t.itemIcon(ItemArgument.getItem(c,"item").createItemStack(1,false)))))).then(Commands.literal("tip").then(Commands.argument("tip", ComponentArgument.textComponent(commandBuildContext)).executes(c-> modifyCustomTip(c, t->t.tip(ComponentArgument.getComponent(c,"tip")))))).then(Commands.literal("title").then(Commands.argument("title", ComponentArgument.textComponent(commandBuildContext)).executes(c-> modifyCustomTip(c, t->t.title(ComponentArgument.getComponent(c,"title")))))).then(Commands.literal("time").then(Commands.argument("seconds", IntegerArgumentType.integer(1)).executes(c-> modifyCustomTip(c, t->t.disappearTime(IntegerArgumentType.getInteger(c,"seconds"))))))).then(Commands.literal("display").then(Commands.argument("targets", EntityArgument.players()).executes(commandContext -> sendTip(commandContext,CUSTOM_TIPS.get(StringArgumentType.getString(commandContext,"custom_tip")))))))));
     }
-    private static <T> int sendTip(CommandContext<CommandSourceStack> context, T packet) throws CommandSyntaxException {
-        Collection<ServerPlayer> players = EntityArgument.getPlayers(context, "targets");
-        Legacy4J.NETWORK.sendToPlayers(players, packet);
+    private static <T extends CommonPacket> int sendTip(CommandContext<CommandSourceStack> context, T packet) throws CommandSyntaxException {
+        Collection<ServerPlayer> players = EntityArgument.getOptionalPlayers(context, "targets");
+        CommonNetworkManager.sendToPlayers(players, packet);
         return players.size();
     }
     private static int addCustomTip(CommandContext<CommandSourceStack> context) {
@@ -104,33 +105,33 @@ public class TipCommand {
             this.time = time;
             return this;
         }
-        public static Packet decode(FriendlyByteBuf buf){
-            return new Packet().title(buf.readComponent()).tip(buf.readComponent()).itemIcon(buf.readItem()).disappearTime(buf.readInt());
+        public static Packet decode(RegistryFriendlyByteBuf buf){
+            return new Packet().title(ComponentSerialization.STREAM_CODEC.decode(buf)).tip(ComponentSerialization.STREAM_CODEC.decode(buf)).itemIcon(ItemStack.STREAM_CODEC.decode(buf)).disappearTime(buf.readInt());
         }
         @Override
-        public void encode(FriendlyByteBuf buf) {
-            buf.writeComponent(title);
-            buf.writeComponent(tip);
-            buf.writeItem(itemIcon);
+        public void encode(RegistryFriendlyByteBuf buf) {
+            ComponentSerialization.STREAM_CODEC.encode(buf,title);
+            ComponentSerialization.STREAM_CODEC.encode(buf,tip);
+            ItemStack.STREAM_CODEC.encode(buf,itemIcon);
             buf.writeInt(time);
         }
 
         @Override
-        public void apply(Supplier<NetworkManager.PacketContext> ctx) {
-            if (ctx.get().getEnv() == EnvType.CLIENT) ScreenUtil.addCustomTip(title,tip,itemIcon, time * 1000L);
+        public void apply(NetworkManager.PacketContext ctx) {
+            if (ctx.getEnv() == EnvType.CLIENT) ScreenUtil.addCustomTip(title,tip,itemIcon, time * 1000L);
         }
     }
     public record EntityPacket(EntityType<?> type) implements CommonPacket{
-        public EntityPacket(FriendlyByteBuf buf){
+        public EntityPacket(RegistryFriendlyByteBuf buf){
             this(BuiltInRegistries.ENTITY_TYPE.get(buf.readResourceLocation()));
         }
         @Override
-        public void encode(FriendlyByteBuf buf) {
+        public void encode(RegistryFriendlyByteBuf buf) {
             buf.writeResourceLocation(BuiltInRegistries.ENTITY_TYPE.getKey(type));
         }
         @Override
-        public void apply(Supplier<NetworkManager.PacketContext> ctx) {
-            if (ctx.get().getEnv() == EnvType.CLIENT) ScreenUtil.addTip(type);
+        public void apply(NetworkManager.PacketContext ctx) {
+            if (ctx.getEnv() == EnvType.CLIENT) ScreenUtil.addTip(type);
         }
     }
 }

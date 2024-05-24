@@ -73,7 +73,7 @@ public abstract class BindingState {
         return timePressed == Integer.MIN_VALUE;
     }
     public boolean canDownKeyMapping(KeyMapping mapping){
-        return !(mapping instanceof ToggleKeyMapping) || timePressed == 0;
+        return( !(mapping instanceof ToggleKeyMapping) || timePressed == 0) && canClick();
     }
     public boolean canReleaseKeyMapping(KeyMapping mapping){
         return released;
@@ -94,7 +94,7 @@ public abstract class BindingState {
                 public void update(Controller controller) {
                     x = controller.axisValue(ControllerManager.getHandler().getBindingIndex(component.getMapped() == ControllerBinding.LEFT_STICK ? ControllerBinding.LEFT_STICK_RIGHT : ControllerBinding.RIGHT_STICK_RIGHT));
                     y = controller.axisValue(ControllerManager.getHandler().getBindingIndex(component.getMapped() == ControllerBinding.LEFT_STICK ? ControllerBinding.LEFT_STICK_UP : ControllerBinding.RIGHT_STICK_UP));
-                    update( getMagnitude() > getDeadZone());
+                    update( getMagnitude() >= getDeadZone());
                     update.accept(this,controller);
                 }
             };
@@ -107,7 +107,7 @@ public abstract class BindingState {
                 }
                 @Override
                 public void update(Controller controller) {;
-                    update( (y = controller.axisValue(ControllerManager.getHandler().getBindingIndex(component.getMapped()))) > getDeadZone());
+                    update( (y = controller.axisValue(ControllerManager.getHandler().getBindingIndex(component.getMapped()))) >= getDeadZone());
                 }
             };
         }
@@ -116,10 +116,10 @@ public abstract class BindingState {
             return Math.max(Math.abs(y),Math.abs(x));
         }
         public float getSmoothX(){
-            return   (x > getDeadZone() ? x - getDeadZone() : x < -getDeadZone() ? x + getDeadZone() : 0)  / (1 - getDeadZone());
+            return (x > getDeadZone() ? x - getDeadZone() : x < -getDeadZone() ? x + getDeadZone() : 0)  / (1 - getDeadZone());
         }
         public float getSmoothY(){
-            return  (y > getDeadZone() ? y - getDeadZone() : y < -getDeadZone() ? y + getDeadZone() : 0)  / (1 - getDeadZone());
+            return (y > getDeadZone() ? y - getDeadZone() : y < -getDeadZone() ? y + getDeadZone() : 0)  / (1 - getDeadZone());
         }
         protected Axis(ControllerBinding component) {
             super(component);

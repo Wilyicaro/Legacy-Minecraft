@@ -27,20 +27,20 @@ public class Legacy4JPlatform {
     }
 
     @ExpectPlatform
-    public static Screen getConfigScreen(Mod mod, Screen screen) {
-        throw new AssertionError();
-    }
-    @ExpectPlatform
     public static boolean isLoadingMod(String modId) {
         throw new AssertionError();
     }
 
     @ExpectPlatform
-    public static Ingredient getNBTIngredient(ItemStack... stacks) {
+    public static Ingredient getComponentsIngredient(ItemStack... stacks) {
         throw new AssertionError();
     }
     @ExpectPlatform
-    public static Ingredient getStrictNBTIngredient(ItemStack stack) {
+    public static Ingredient getStrictComponentsIngredient(ItemStack stack) {
+        throw new AssertionError();
+    }
+    @ExpectPlatform
+    public static Screen getConfigScreen(Mod mod, Screen screen) {
         throw new AssertionError();
     }
 }

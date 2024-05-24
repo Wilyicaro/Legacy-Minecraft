@@ -4,13 +4,12 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.components.TabButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import wily.legacy.init.LegacySoundEvents;
@@ -38,8 +37,8 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
         tabButtons.add(button);
         return button;
     }
-    public LegacyTabButton addTabButton(int x, int y, int width, int height, int type, ResourceLocation icon, CompoundTag itemIconTag, Component message, Tooltip tooltip, Consumer<LegacyTabButton> onPress){
-        return this.addTabButton(new LegacyTabButton(x,y,width,height,type,icon,itemIconTag,message,tooltip, t-> {if (selectedTab != tabButtons.indexOf(t)) {
+    public LegacyTabButton addTabButton(int x, int y, int width, int height, int type, ResourceLocation icon, DataComponentPatch itemPatch, Component message, Tooltip tooltip, Consumer<LegacyTabButton> onPress){
+        return this.addTabButton(new LegacyTabButton(x,y,width,height,type,icon,itemPatch,message,tooltip, t-> {if (selectedTab != tabButtons.indexOf(t)) {
             selectedTab = tabButtons.indexOf(t);
             onPress.accept(t);
         }}));
@@ -47,11 +46,11 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
     public LegacyTabButton addTabButton(int height, int type, ResourceLocation icon, Component component, Consumer<LegacyTabButton> onPress){
         return addTabButton(0,0,0,height,type,icon, null,component, null,onPress);
     }
-    public LegacyTabButton addTabButton(int height, int type, ResourceLocation icon, CompoundTag itemIconTag, Component component, Consumer<LegacyTabButton> onPress){
+    public LegacyTabButton addTabButton(int height, int type, ResourceLocation icon, DataComponentPatch itemIconTag, Component component, Consumer<LegacyTabButton> onPress){
         return addTabButton(0,0,0,height,type,icon, itemIconTag,component, null,onPress);
     }
-    public TabList add(int x, int y, int width, int height, int type, ResourceLocation icon, CompoundTag itemIconTag, Component message, Tooltip tooltip, Consumer<LegacyTabButton> onPress){
-        this.addTabButton(x,y,width,height,type,icon,itemIconTag,message,tooltip,onPress);
+    public TabList add(int x, int y, int width, int height, int type, ResourceLocation icon, DataComponentPatch itemPatch, Component message, Tooltip tooltip, Consumer<LegacyTabButton> onPress){
+        this.addTabButton(x,y,width,height,type,icon,itemPatch,message,tooltip,onPress);
         return this;
     }
 

@@ -36,7 +36,6 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
     protected final int maxLayerHeight;
     protected ItemStack selectedLayer = Items.AIR.getDefaultInstance();
 
-    protected Screen parent;
     protected final AbstractContainerMenu menu;
     protected Slot hoveredSlot = null;
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
@@ -91,10 +90,6 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
         return new FlatLayerInfo(selectedLayer.count, selectedLayer.getItem() instanceof BlockItem b ? b.getBlock() : selectedLayer.getItem() instanceof BucketItem bucket ? bucket.arch$getFluid().defaultFluidState().createLegacyBlock().getBlock(): Blocks.AIR);
     }
 
-    @Override
-    public void onClose() {
-        minecraft.setScreen(parent);
-    }
     public void updateCreativeGridScroll(double d, double e, int i){
         float x = panel.x + 299.5f;
         float y = panel.y + 23.5f;

@@ -9,13 +9,14 @@ import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import wily.legacy.client.controller.Controller;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.SimpleLayoutRenderable;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.function.Supplier;
 
-public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
+public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controller.Event{
 
     private MultiLineLabel tipLabel;
     public Visibility visibility = Visibility.SHOW;
@@ -118,7 +119,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements  Toast{
             guiGraphics.drawString(minecraft.font,title,13,13,0xFFFFFF);
             tipLabel.renderLeftAlignedNoShadow(guiGraphics,13,25, 12,0xFFFFFF);
         }else
-            tipLabel.renderCentered(guiGraphics,width / 2,13);
+            tipLabel.renderCentered(guiGraphics,width / 2,13,12,0xFFFFFF);
         if (holder != null) holder.render(guiGraphics,i,j,f);
         guiGraphics.pose().popPose();
     }

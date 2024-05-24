@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CartographyTableScreen;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundRenameItemPacket;
 import net.minecraft.world.entity.player.Inventory;
@@ -17,6 +18,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.inventory.RenameItemMenu;
 import wily.legacy.util.ScreenUtil;
@@ -67,7 +71,7 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
             if (!slot.hasItem())
                 return;
 
-            if (!slot.getItem().hasCustomHoverName() && s.equals(slot.getItem().getHoverName().getString())) {
+            if (!slot.getItem().getComponents().has(DataComponents.CUSTOM_NAME) && s.equals(slot.getItem().getHoverName().getString())) {
                 s = "";
             }
             ((RenameItemMenu)menu).setResultItemName(s);
@@ -91,11 +95,12 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (this.name.keyPressed(i, j, k) || this.name.canConsumeInput()) {
+        if (i != 256 && (this.name.keyPressed(i, j, k) || this.name.canConsumeInput())) {
             return true;
         }
         return super.keyPressed(i, j, k);
     }
+
 
     public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         super.renderLabels(guiGraphics, i, j);
@@ -114,8 +119,9 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
         this.init(minecraft, i, j);
         this.name.setValue(string);
     }
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
         name.render(guiGraphics, i, j, f);
         guiGraphics.blitSprite(LegacySprites.COMBINER_PLUS,leftPos + 14, topPos + 88,13,13);
@@ -126,7 +132,7 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
         ItemStack input = menu.getSlot(0).getItem();
         guiGraphics.blitSprite(LegacySprites.ARROW,leftPos + 36, topPos + 87,22,15);
         if (input.is(Items.FILLED_MAP)) {
-            MapItemSavedData mapItemSavedData = MapItem.getSavedData(MapItem.getMapId(input), this.minecraft.level);
+            MapItemSavedData mapItemSavedData = MapItem.getSavedData(input.get(DataComponents.MAP_ID), this.minecraft.level);
             if (mapItemSavedData != null && (mapItemSavedData.locked && (bl2 || bl3) || bl2 && mapItemSavedData.scale >= 4))
                 guiGraphics.blitSprite(LegacySprites.ERROR_CROSS, leftPos + 40, topPos + 87, 15, 15);
             guiGraphics.blitSprite(bl ? LegacySprites.CARTOGRAPHY_TABLE_COPY : bl2 ? LegacySprites.CARTOGRAPHY_TABLE_ZOOM : bl3 ? LegacySprites.CARTOGRAPHY_TABLE_LOCKED : LegacySprites.CARTOGRAPHY_TABLE_MAP,leftPos + 70, topPos + 61,66,66);

@@ -42,7 +42,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
         super(clientLevel, gameProfile);
     }
 
-    @Redirect(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;onGround()Z", ordinal = 2))
+    @Redirect(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;onGround()Z", ordinal = 3))
     public boolean onGroundFlying(LocalPlayer instance) {
         return false;
     }

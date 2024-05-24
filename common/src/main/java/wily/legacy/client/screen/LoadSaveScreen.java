@@ -50,7 +50,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
     public BiConsumer<GameRules, MinecraftServer> applyGameRules = (r,s)-> {};
     protected final LevelStorageSource.LevelStorageAccess access;
     public boolean trustPlayers;
-    public boolean allowCheats;
+    public boolean allowCommands;
     public boolean resetNether = false;
     public boolean resetEnd = false;
     public Difficulty difficulty;
@@ -70,7 +70,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
         this.access = access;
         difficulty = summary.getSettings().difficulty();
         gameType = summary.getSettings().gameType();
-        allowCheats = summary.hasCheats();
+        allowCommands = summary.hasCommands();
         trustPlayers = ((LegacyWorldSettings)(Object)summary.getSettings()).trustPlayers();
         List<String> packs = ((LegacyWorldSettings)(Object)summary.getSettings()).getSelectedResourcePacks();
         if (!packs.isEmpty()){
@@ -156,16 +156,16 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
                 minecraft.getSingleplayerServer().setDifficulty(difficulty, false);
                 applyGameRules.accept(minecraft.getSingleplayerServer().getGameRules(), minecraft.getSingleplayerServer());
                 if (onlineOnStart) {
-                    MutableComponent component = publishUnloadedServer(minecraft, gameType, allowCheats && trustPlayers, this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed");
+                    MutableComponent component = publishUnloadedServer(minecraft, gameType, allowCommands && trustPlayers, this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed");
                     this.minecraft.gui.getChat().addMessage(component);
                 }
-                ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setAllowCommands(allowCheats);
+                ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setAllowCommands(allowCommands);
                 if (resourcePackSelector.hasChanged()) ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setSelectedResourcePacks(resourcePackSelector.getSelectedIds());
             }});
     }
 
     @Override
-    public void removed() {
+    public void onClose() {
         if (deleteOnClose) {
             try {
                 access.deleteLevel();
@@ -174,9 +174,8 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
             }
         }
         access.safeClose();
-        super.removed();
+        super.onClose();
     }
-
 
     public static void deleteLevelDimension(LevelStorageSource.LevelStorageAccess access, ResourceKey<Level> dimension) throws IOException {
         Path path = access.getDimensionPath(dimension);
@@ -218,6 +217,10 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
     }
 
     @Override
+    protected void setInitialFocus() {
+    }
+
+    @Override
     public boolean mouseScrolled(double d, double e, double f, double g) {
         if (resourcePackSelector.scrollableRenderer.mouseScrolled(g)) return true;
         return super.mouseScrolled(d, e, f, g);
@@ -236,13 +239,13 @@ public class LoadSaveScreen extends PanelBackgroundScreen{
         guiGraphics.pose().translate(0,0.5f,0);
         guiGraphics.blit(SaveRenderableList.iconCache.getUnchecked(summary).textureLocation(),panel.x + 14, panel.y + 10, 0,0,29,29,29,29);
         guiGraphics.drawString(font,summary.getLevelName(),panel.x + 48, panel.y + 12, 0x383838,false);
-        guiGraphics.drawString(font,Component.translatable("legacy.menu.load_save.created_in", (summary.hasCheats() ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()),panel.x + 48, panel.y + 29, 0x383838,false);
+        guiGraphics.drawString(font,Component.translatable("legacy.menu.load_save.created_in", (summary.hasCommands() ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()),panel.x + 48, panel.y + 29, 0x383838,false);
         guiGraphics.pose().popPose();
         guiGraphics.drawString(font,Component.translatable("commands.seed.success",((LegacyWorldSettings)(Object)summary.getSettings()).getDisplaySeed()),panel.x + 13, panel.y + 49, 0x383838,false);
     }
 
     public static void loadWorld(Screen screen, Minecraft minecraft, LevelSummary summary) {
         SaveRenderableList.resetIconCache();
-        minecraft.createWorldOpenFlows().checkForBackupAndLoad(summary.getLevelId(), ()-> minecraft.setScreen(screen));
+        minecraft.createWorldOpenFlows().openWorld(summary.getLevelId(), ()-> minecraft.setScreen(screen));
     }
 }

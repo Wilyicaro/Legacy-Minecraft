@@ -39,14 +39,13 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
                 ((LegacyKeyMapping)keyMapping).setBinding(((LegacyKeyMapping)keyMapping).getDefaultBinding());
             minecraft.setScreen(this);
         }))).size(240,20).build());
-        renderableVList.addRenderable(ScreenUtil.getLegacyOptions().selectedController().createButton(options,0,0,240));
-        renderableVList.addRenderable(ScreenUtil.getLegacyOptions().invertControllerButtons().createButton(options,0,0,240));
+        renderableVList.addOptions(ScreenUtil.getLegacyOptions().selectedController(),ScreenUtil.getLegacyOptions().selectedControllerHandler(),ScreenUtil.getLegacyOptions().invertControllerButtons(),ScreenUtil.getLegacyOptions().leftStickDeadZone(),ScreenUtil.getLegacyOptions().rightStickDeadZone(),ScreenUtil.getLegacyOptions().leftTriggerDeadZone(),ScreenUtil.getLegacyOptions().rightTriggerDeadZone());
         for (KeyMapping keyMapping : keyMappings) {
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category)) {
                 renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> {}))), SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> graphics.drawString(font, Component.translatable(category), l.x + 1, l.y + 4, 0x383838, false)))));
                 if (category.equals("key.categories.movement"))
-                    renderableVList.addRenderable(ScreenUtil.getLegacyOptions().invertYController().createButton(options,0,0,240));
+                    renderableVList.addOptions(ScreenUtil.getLegacyOptions().invertYController(),ScreenUtil.getLegacyOptions().smoothMovement());
             }
             lastCategory = keyMapping.getCategory();
             LegacyKeyMapping mapping = (LegacyKeyMapping) keyMapping;
@@ -70,8 +69,10 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
                 @Override
                 public void onPress() {
                     ControllerBinding.DOWN_BUTTON.bindingState.block();
-                    if (Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed) mapping.setBinding(mapping.getDefaultBinding());
-                    else if (!ControlTooltip.getActiveType().isKeyboard()) selectedKey = mapping;
+                    if (Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed){
+                        mapping.setBinding(mapping.getDefaultBinding());
+                        options.save();
+                    } else if (!ControlTooltip.getActiveType().isKeyboard()) selectedKey = mapping;
                 }
                 @Override
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
@@ -106,7 +107,7 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
         getRenderableVList().init(this,panel.x + 7,panel.y + 6,panel.width - 14,panel.height);
     }
     @Override
-    public void componentTick(BindingState state) {
+    public void bindingStateTick(BindingState state) {
         if (selectedKey != null) {
             if (!state.canClick() || !state.component.isBindable) return;
             selectedKey.setBinding(!state.is(ControllerBinding.BACK) || selectedKey.self() == Legacy4JClient.keyHostOptions ? state.component : null);

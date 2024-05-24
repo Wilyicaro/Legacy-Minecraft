@@ -12,7 +12,9 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
+import wily.legacy.client.LegacyBiomeOverride;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.function.Consumer;
@@ -39,6 +41,14 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
             @Override
             protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                 super.renderWidget(guiGraphics, i, j, f);
+                ItemStack s = LegacyBiomeOverride.getOrDefault(biome.unwrapKey()).icon();
+                if (!s.isEmpty()){
+                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().translate(getX() + 26, getY() + 5,0);
+                    guiGraphics.pose().scale(1.25f,1.25f,1.25f);
+                    guiGraphics.renderItem(s,0, 0);
+                    guiGraphics.pose().popPose();
+                }
                 RenderSystem.enableBlend();
                 guiGraphics.blitSprite(TickBox.SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);
                 if (selectedBiome == biome) guiGraphics.blitSprite(TickBox.TICK, this.getX() + 6, this.getY()  + (height - 12) / 2, 14, 12);

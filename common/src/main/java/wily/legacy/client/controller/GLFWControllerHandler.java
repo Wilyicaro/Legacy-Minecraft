@@ -1,6 +1,5 @@
 package wily.legacy.client.controller;
 
-import io.github.libsdl4j.api.gamecontroller.*;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
 import wily.legacy.client.screen.ControlTooltip;
@@ -13,8 +12,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 public class GLFWControllerHandler implements Controller.Handler{
+    private boolean init = false;
     GLFWGamepadState gamepadState;
 
+    @Override
+    public String getName() {
+        return "GLFW";
+    }
 
     private static final GLFWControllerHandler INSTANCE = new GLFWControllerHandler();
 
@@ -24,7 +28,12 @@ public class GLFWControllerHandler implements Controller.Handler{
     }
 
     @Override
-    public void init() {
+    public boolean init() {
+        if (!init){
+            tryDownloadAndApplyNewMappings();
+            init = true;
+        }
+        return true;
     }
 
     @Override
@@ -90,7 +99,7 @@ public class GLFWControllerHandler implements Controller.Handler{
 
     @Override
     public boolean isValidController(int jid) {
-        return SdlGamecontroller.SDL_IsGameController(jid);
+        return GLFW.glfwJoystickIsGamepad(jid);
     }
 
     @Override

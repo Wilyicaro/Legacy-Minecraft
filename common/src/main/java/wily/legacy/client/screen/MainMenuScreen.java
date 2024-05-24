@@ -56,9 +56,6 @@ public class MainMenuScreen extends RenderableVListScreen {
 
         super.init();
 
-        if (!this.minecraft.is64Bit()) {
-            this.warningLabel = new WarningLabel(this.font, MultiLineLabel.create(this.font, Component.translatable("title.32bit.deprecation"), 350, 2), this.width / 2, l - 24);
-        }
     }
 
     private void createNormalMenuOptions() {
@@ -71,7 +68,7 @@ public class MainMenuScreen extends RenderableVListScreen {
         boolean bl = this.checkDemoWorldPresence();
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.playdemo"), (button) -> {
             if (bl) {
-                this.minecraft.createWorldOpenFlows().checkForBackupAndLoad("Demo_World", ()-> this.minecraft.setScreen(this));
+                this.minecraft.createWorldOpenFlows().openWorld("Demo_World", ()-> this.minecraft.setScreen(this));
             } else {
                 this.minecraft.createWorldOpenFlows().createFreshLevel("Demo_World", MinecraftServer.DEMO_SETTINGS, WorldOptions.DEMO_OPTIONS, WorldPresets::createNormalWorldDimensions, this);
             }

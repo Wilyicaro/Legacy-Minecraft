@@ -68,7 +68,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
         parent.getUiState().addListener( s->customizeButton.active = !s.isDebug() && s.getPresetEditor() != null);
         renderableVList.addRenderable(customizeButton);
         SimpleLayoutRenderable.create(0,9,r-> ((guiGraphics, i, j, f) -> {}));
-        TickBox hostPrivilleges = new TickBox(0,0,parent.getUiState().isAllowCheats(),b->Component.translatable("selectWorld.allowCommands"),b->Tooltip.create(Component.translatable("selectWorld.allowCommands.info")),b->parent.getUiState().setAllowCheats(b.selected));
+        TickBox hostPrivilleges = new TickBox(0,0,parent.getUiState().isAllowCommands(),b->Component.translatable("selectWorld.allowCommands"),b->Tooltip.create(Component.translatable("selectWorld.allowCommands.info")),b->parent.getUiState().setAllowCommands(b.selected));
         parent.getUiState().addListener(s-> hostPrivilleges.active = !s.isDebug() && !s.isHardcore());
         GameRules gameRules = parent.getUiState().getGameRules();
         Pair<Path,PackRepository> pair = parent.getDataPackSelectionSettings(parent.getUiState().getSettings().dataConfiguration());
@@ -93,7 +93,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
             };
         }
         renderableVList.addRenderable(Button.builder(Component.translatable("selectWorld.dataPacks"), button -> openDataPackSelectionScreen(parent, parent.getUiState().getSettings().dataConfiguration())).build());
-        renderableVList.addRenderable(new TickBox(0,0,parent.getUiState().isAllowCheats(), b-> Component.translatable("legacy.menu.selectWorld.trust_players"),b-> null,t-> setTrustPlayers.accept(t.selected)));
+        renderableVList.addRenderable(new TickBox(0,0,parent.getUiState().isAllowCommands(), b-> Component.translatable("legacy.menu.selectWorld.trust_players"),b-> null,t-> setTrustPlayers.accept(t.selected)));
         addGameRulesOptions(renderableVList,gameRules, k-> k.getCategory() == GameRules.Category.UPDATES);
         gameRenderables.addRenderable(hostPrivilleges);
         for (GameRules.Category value : GameRules.Category.values()) {
@@ -154,7 +154,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
         renderableVList.addRenderable(new TickBox(0,0,parent.resetEnd, b-> Component.translatable("legacy.menu.load_save.reset_end"),b-> null,t-> parent.resetEnd = t.selected));
         renderableVList.addRenderable(new TickBox(0,0,parent.trustPlayers, b-> Component.translatable("legacy.menu.selectWorld.trust_players"),b-> null,t-> parent.trustPlayers = t.selected));
         addGameRulesOptions(renderableVList,gameRules, k-> k.getCategory() == GameRules.Category.UPDATES);
-        gameRenderables.addRenderable(new TickBox(0,0,parent.allowCheats,b->Component.translatable("selectWorld.allowCommands"),b->Tooltip.create(Component.translatable("selectWorld.allowCommands.info")),b-> parent.allowCheats = b.selected));
+        gameRenderables.addRenderable(new TickBox(0,0,parent.allowCommands, b->Component.translatable("selectWorld.allowCommands"), b->Tooltip.create(Component.translatable("selectWorld.allowCommands.info")), b-> parent.allowCommands = b.selected));
         for (GameRules.Category value : GameRules.Category.values()) {
             if (value == GameRules.Category.UPDATES) continue;
             addGameRulesOptions(gameRenderables,gameRules, k-> k.getCategory() == value);

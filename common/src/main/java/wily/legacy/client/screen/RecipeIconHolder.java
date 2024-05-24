@@ -12,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import wily.legacy.Legacy4J;
+import wily.legacy.network.CommonNetworkManager;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.init.LegacySoundEvents;
@@ -44,7 +45,7 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
     @Override
     public void renderItem(GuiGraphics graphics, int i, int j, float f) {
         if (!isValidIndex()) return;
-        ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(0)),0.5f, ()->super.renderItem(graphics,i,j,f));
+        ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(0)),0.5f, (u)->super.renderItem(graphics,i,j,f));
     }
 
     protected abstract boolean canCraft(R rcp);
@@ -143,8 +144,8 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
                 graphics.blitSprite(LegacySprites.CRAFTING_SELECTION, 0, -39, 36, 105);
             graphics.pose().popPose();
             if (getFocusedRecipes().size() >= 2){
-                ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(1)), 0.5f, ()-> renderItem(graphics, getFocusedRecipes().get(1).getResultItem(minecraft.level.registryAccess()),getX(),getY() + 27,false));
-                if (getFocusedRecipes().size() >= 3) ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(getFocusedRecipes().size() - 1)), 0.5f, ()-> renderItem(graphics, getFocusedRecipes().get(getFocusedRecipes().size() - 1).getResultItem(minecraft.level.registryAccess()),getX(),getY() - 27,false));
+                ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(1)), 0.5f, (u)-> renderItem(graphics, getFocusedRecipes().get(1).getResultItem(minecraft.level.registryAccess()),getX(),getY() + 27,false));
+                if (getFocusedRecipes().size() >= 3) ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(getFocusedRecipes().size() - 1)), 0.5f, (u)-> renderItem(graphics, getFocusedRecipes().get(getFocusedRecipes().size() - 1).getResultItem(minecraft.level.registryAccess()),getX(),getY() - 27,false));
             }
             RenderSystem.enableDepthTest();
         }
@@ -191,7 +192,7 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
     }
     public void craft() {
         ScreenUtil.playSimpleUISound(SoundEvents.ITEM_PICKUP,1.0f);
-        Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
+        CommonNetworkManager.sendToServer(new ServerInventoryCraftPacket(getFocusedRecipe(), Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
     }
 
     @Override

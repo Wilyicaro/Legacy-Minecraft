@@ -1,5 +1,6 @@
 package wily.legacy.mixin;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.*;
@@ -68,7 +69,6 @@ public abstract class CartographyTableMenuMixin extends AbstractContainerMenu im
 
     @Override
     public void setResultItemName(String name) {
-        if (RenameItemMenu.validateName(name) == null) return;
         itemName = name;
         slotsChanged(resultContainer);
     }
@@ -95,19 +95,19 @@ public abstract class CartographyTableMenuMixin extends AbstractContainerMenu im
             MapItemSavedData data = MapItem.getSavedData(itemStack,level);
             if (data == null || data.locked) return;
             ItemStack result = resultContainer.getItem(0);
-            if (resultContainer.getItem(0).isEmpty() && itemStack.is(Items.FILLED_MAP)) {
+            if (resultContainer.getItem(0).isEmpty() && itemStack.is(Items.FILLED_MAP) && itemStack2.isEmpty()) {
                 result = itemStack.copyWithCount(1);
-                if (RenameItemMenu.validateName(itemName) != null) result.setHoverName(Component.literal(itemName));
+                if (RenameItemMenu.validateName(itemName) != null) result.set(DataComponents.CUSTOM_NAME,Component.literal(itemName));
                 resultContainer.setItem(0, result);
                 return;
             }
             if (RenameItemMenu.validateName(itemName) != null) {
                 if (!itemStack3.getHoverName().getString().equals(itemName)) {
-                    result.setHoverName(Component.literal(itemName));
+                    result.set(DataComponents.CUSTOM_NAME,Component.literal(itemName));
                     broadcastChanges();
                 }
-            } else if (result.hasCustomHoverName()){
-                result.resetHoverName();
+            } else if (result.get(DataComponents.CUSTOM_NAME) != null){
+                result.set(DataComponents.CUSTOM_NAME,null);
                 broadcastChanges();
             }
         }));

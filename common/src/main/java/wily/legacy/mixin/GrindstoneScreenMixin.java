@@ -7,13 +7,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.GrindstoneMenu;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.util.ScreenUtil;
 
 import static wily.legacy.util.LegacySprites.ARROW;
 import static wily.legacy.util.LegacySprites.ERROR_CROSS;
 
 @Mixin(GrindstoneScreen.class)
-public class GrindstoneScreenMixin extends AbstractContainerScreen<GrindstoneMenu> {
+public abstract class GrindstoneScreenMixin extends AbstractContainerScreen<GrindstoneMenu> {
     public GrindstoneScreenMixin(GrindstoneMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
@@ -34,8 +37,9 @@ public class GrindstoneScreenMixin extends AbstractContainerScreen<GrindstoneMen
         renderBg(guiGraphics, f, i, j);
     }
 
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderPanel(guiGraphics,leftPos,topPos, imageWidth,imageHeight,2f);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 85,topPos + 50,0);

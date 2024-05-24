@@ -5,6 +5,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
@@ -25,11 +26,9 @@ import static wily.legacy.client.screen.ControlTooltip.MORE;
 public abstract class GuiMixin {
     @Shadow @Final protected Minecraft minecraft;
 
-    @Shadow protected int screenHeight;
 
     @Shadow public abstract Font getFont();
 
-    @Shadow protected int screenWidth;
 
     @Shadow protected int toolHighlightTimer;
 
@@ -37,21 +36,19 @@ public abstract class GuiMixin {
 
     @Inject(method = "renderSelectedItemName(Lnet/minecraft/client/gui/GuiGraphics;I)V", at = @At("HEAD"), cancellable = true, remap = false)
     public void renderSelectedItemName(GuiGraphics guiGraphics, int shift, CallbackInfo ci) {
-        if (minecraft.screen != null){
-            ci.cancel();
-            return;
-        }
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0,ScreenUtil.getHUDDistance() - Math.max(shift, ScreenUtil.getHUDSize()),0);
+        ci.cancel();
+        if (minecraft.screen != null) return;
+        ScreenUtil.prepareHUDRender(guiGraphics);
+        guiGraphics.pose().translate(0, -Math.max(shift, ScreenUtil.getHUDSize()),0);
         this.minecraft.getProfiler().push("selectedItemName");
         if (this.toolHighlightTimer > 0 && !this.lastToolHighlight.isEmpty()) {
-            List<Component> tooltipLines = this.lastToolHighlight.getTooltipLines(minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).toList();
+            List<Component> tooltipLines = this.lastToolHighlight.getTooltipLines(Item.TooltipContext.of(minecraft.level),minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).toList();
             for (int i = 0; i < tooltipLines.size(); i++) {
                 int l;
                 Component mutableComponent = i >= 4 ? MORE : tooltipLines.get(i);
                 int width = this.getFont().width(mutableComponent);
-                int j = (this.screenWidth - width) / 2;
-                int k = this.screenHeight - getFont().lineHeight * (tooltipLines.size() - 1 - i);
+                int j = (guiGraphics.guiWidth() - width) / 2;
+                int k = guiGraphics.guiHeight() - getFont().lineHeight * (Math.min(4,tooltipLines.size()) - 1 - i);
                 if ((l = (int)((float)this.toolHighlightTimer * 256.0f / 10.0f)) > 255) {
                     l = 255;
                 }
@@ -61,7 +58,7 @@ public abstract class GuiMixin {
                     if (font == null) {
                         guiGraphics.drawString(this.getFont(), mutableComponent, j, k, 0xFFFFFF + (l << 24));
                     } else {
-                        j = (this.screenWidth - font.width(mutableComponent)) / 2;
+                        j = (guiGraphics.guiWidth() - font.width(mutableComponent)) / 2;
                         guiGraphics.drawString(font, mutableComponent, j, k, 16777215 + (l << 24));
                     }
                 }
@@ -69,8 +66,22 @@ public abstract class GuiMixin {
             }
         }
         this.minecraft.getProfiler().pop();
-        guiGraphics.pose().popPose();
-        ci.cancel();
+        ScreenUtil.finishHUDRender(guiGraphics);
     }
-
+    @Inject(method = {"renderHealthLevel","renderArmorLevel","renderFoodLevel","renderAirLevel"}, at = @At("HEAD"), cancellable = true)
+    public void renderHealth(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (minecraft.screen != null){
+            ci.cancel();
+            return;
+        }
+        ScreenUtil.prepareHUDRender(guiGraphics);
+        guiGraphics.pose().translate(guiGraphics.guiWidth() / 2f, guiGraphics.guiHeight(),0);
+        ScreenUtil.applyHUDScale(guiGraphics);
+        guiGraphics.pose().translate(-guiGraphics.guiWidth() / 2, -guiGraphics.guiHeight(),0);
+    }
+    @Inject(method = {"renderHealthLevel","renderArmorLevel","renderFoodLevel","renderAirLevel"}, at = @At("RETURN"))
+    public void renderHealthReturn(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (minecraft.screen != null) return;
+        ScreenUtil.finishHUDRender(guiGraphics);
+    }
 }

@@ -21,6 +21,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class LegacyBiomeOverride {
     public static final Map<ResourceLocation,LegacyBiomeOverride> map = new HashMap<>();
@@ -74,8 +75,7 @@ public class LegacyBiomeOverride {
                         jsonObject.asMap().forEach((s,e)-> {
                             if (e instanceof JsonObject o){
                                 LegacyBiomeOverride override = overrides.computeIfAbsent(new ResourceLocation(s), resourceLocation-> new LegacyBiomeOverride());
-                                ItemStack icon = JsonUtil.getItemFromJson(o,true);
-                                if (!icon.isEmpty()) override.icon = icon;
+                                override.icon = JsonUtil.getItemFromJson(o,true).get();
                                 Integer i;
                                 if ((i = optionalJsonColor(o, "water_color", null)) != null) override.waterColor = i;
                                 if ((i = optionalJsonColor(o, "water_fog_color", null)) != null) override.waterFogColor = i;

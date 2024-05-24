@@ -252,7 +252,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
     }
     @Override
     public boolean mouseScrolled(double d, double e, double f, double g) {
-        getRenderableVList().mouseScrolled(d,e,f,g);
+        getRenderableVList().mouseScrolled(g);
         return super.mouseScrolled(d, e, f, g);
     }
 

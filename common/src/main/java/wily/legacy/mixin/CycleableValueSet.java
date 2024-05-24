@@ -33,6 +33,7 @@ public interface CycleableValueSet<T> extends OptionInstance.ValueSet<T> {
                 return new TickBox(i,j,k,values.indexOf(optionInstance.value) == 0,b-> Legacy4JClient.OPTION_BOOLEAN_CAPTION.getOrDefault(optionInstance.caption,optionInstance.caption), b-> tooltipSupplier.apply(values.get(b ? 0 : 1)), t-> {
                     this.valueSetter().set(optionInstance,values.get(t.selected ? 0 : 1));
                     options.save();
+                    consumer.accept(optionInstance.value);
                 });
             }else {
                 return new LegacySliderButton<>(i,j,k,16, (b)-> b.getDefaultMessage(optionInstance.caption,optionInstance.toString.apply(optionInstance.value)),()->tooltipSupplier.apply(optionInstance.value),optionInstance.value,()->valueListSupplier().getSelectedList(),s->{

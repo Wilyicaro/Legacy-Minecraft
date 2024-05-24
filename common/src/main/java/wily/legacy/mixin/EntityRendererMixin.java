@@ -26,7 +26,7 @@ public abstract class EntityRendererMixin {
     @Shadow @Final private Font font;
 
     @Inject(method = "renderNameTag", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;scale(FFF)V", shift = At.Shift.AFTER))
-    protected void renderNameTag(Entity entity, Component component, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci) {
+    protected void renderNameTag(Entity entity, Component component, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, float f, CallbackInfo ci) {
         if (!component.equals(entity.getDisplayName()) || !ScreenUtil.getLegacyOptions().displayNameTagBorder().get()) return;
         String name = component.getString();
         int j = "deadmau5".equals(name) ? -10 : 0;

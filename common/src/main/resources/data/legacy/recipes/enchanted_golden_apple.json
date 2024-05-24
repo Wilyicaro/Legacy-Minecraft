@@ -15,6 +15,6 @@
     "###"
   ],
   "result": {
-    "item": "minecraft:enchanted_golden_apple"
+    "id": "minecraft:enchanted_golden_apple"
   }
 }

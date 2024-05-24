@@ -2,7 +2,6 @@ package wily.legacy.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
@@ -18,12 +17,14 @@ import net.minecraft.world.item.trading.MerchantOffers;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.inventory.LegacyMerchantOffer;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
-
-import java.util.Iterator;
 
 import static wily.legacy.util.LegacySprites.ARROW;
 
@@ -42,8 +43,6 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
     @Shadow private int shopItem;
 
-    @Shadow protected abstract void renderProgressBar(GuiGraphics arg, int m, int n, MerchantOffer arg2);
-
     @Shadow private boolean isDragging;
 
     @Shadow protected abstract void postButtonClick();
@@ -53,8 +52,9 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     public MerchantScreenMixin(MerchantMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
-    @Override
-    public void init() {
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         imageWidth = 330;
         imageHeight = 202;
         inventoryLabelX = 131;
@@ -62,8 +62,9 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         super.init();
     }
 
-    @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    @Inject(method = "render",at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        ci.cancel();
         super.render(guiGraphics, i, j, f);
         MerchantOffers merchantOffers = this.menu.getOffers();
         if (!merchantOffers.isEmpty()) {
@@ -91,6 +92,15 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             }
             guiGraphics.pose().popPose();
 
+            for (int index = 0; index < 9; index++) {
+                if (index + scrollOff >= merchantOffers.size()) break;
+                MerchantOffer merchantOffer = merchantOffers.get(index + scrollOff);
+                int diffY = (index + scrollOff) * 18;
+                if (ScreenUtil.isMouseOver(i,j,leftPos + 18.5F, topPos + diffY + 23.5F,16,16)) guiGraphics.renderTooltip(font,merchantOffer.getCostA(),i,j);
+                else if (!merchantOffer.getCostB().isEmpty() && ScreenUtil.isMouseOver(i,j,leftPos + 43.5F, topPos + diffY + 23.5F,16,16)) guiGraphics.renderTooltip(font,merchantOffer.getCostB(),i,j);
+                else if (ScreenUtil.isMouseOver(i,j,leftPos + 76.5F, topPos + diffY + 23.5F,16,16)) guiGraphics.renderTooltip(font,merchantOffer.getResult(),i,j);
+            }
+
             MerchantOffer merchantOffer = merchantOffers.get(this.shopItem);
             if (shopItem - scrollOff < 9 && shopItem - scrollOff >= 0 && merchantOffer.isOutOfStock() && this.isHovering( 7,21 + 18 * (shopItem - scrollOff),105,18, i, j) && this.menu.canRestock()) {
                 guiGraphics.renderTooltip(this.font, DEPRECATED_TOOLTIP, i, j);
@@ -100,7 +110,9 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
         this.renderTooltip(guiGraphics, i, j);
     }
-    public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
+    @Inject(method = "renderLabels",at = @At("HEAD"), cancellable = true)
+    public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         int k = this.menu.getTraderLevel();
         if (k > 0 && k <= 5 && this.menu.showProgressBar()) {
             Component component = Component.translatable("merchant.title", this.title, Component.translatable("merchant.level." + k));
@@ -112,7 +124,8 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 0x383838, false);
         guiGraphics.drawString(this.font, TRADES_LABEL, 7 + (105 - this.font.width(TRADES_LABEL)) / 2, 10, 0x383838, false);
     }
-    public boolean mouseClicked(double d, double e, int i) {
+    @Inject(method = "mouseClicked",at = @At("HEAD"), cancellable = true)
+    public void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
         this.isDragging = false;
         for (int index = 0; index < 9; index++) {
             boolean hovered = false;
@@ -121,7 +134,8 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                     ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
                     if (shopItem == index + scrollOff && ((LegacyMerchantOffer)menu.getOffers().get(index + scrollOff)).getRequiredLevel() <= menu.getTraderLevel()) postButtonClick();
                     else shopItem = index + scrollOff;
-                    return true;
+                    cir.setReturnValue(true);
+                    return;
                 }
                 break;
             }
@@ -129,19 +143,21 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         }
         if (this.menu.getOffers().size() > 9 && ScreenUtil.isMouseOver(d,e,leftPos + 115,topPos + 21,13,165)) this.isDragging = true;
 
-        return super.mouseClicked(d, e, i);
+        cir.setReturnValue(super.mouseClicked(d, e, i));
     }
-    public boolean mouseDragged(double d, double e, int i, double f, double g) {
+    @Inject(method = "mouseDragged",at = @At("HEAD"), cancellable = true)
+    public void mouseDragged(double d, double e, int i, double f, double g, CallbackInfoReturnable<Boolean> cir) {
         if (this.isDragging) {
             int oldScroll = scrollOff;
             this.scrollOff = (int) Math.round(Math.max(0,Math.min( (e - (topPos + 18)) / 165,menu.getOffers().size() - 9)));
             if (scrollOff != oldScroll) scrollRenderer.updateScroll(oldScroll - scrollOff > 0 ? ScreenDirection.UP : ScreenDirection.DOWN);
-            return true;
+            cir.setReturnValue(true);
         } else {
-            return super.mouseDragged(d, e, i, f, g);
+            cir.setReturnValue(super.mouseDragged(d, e, i, f, g));
         }
     }
-    public boolean mouseScrolled(double d, double e, double f, double g) {
+    @Inject(method = "mouseScrolled",at = @At("HEAD"), cancellable = true)
+    public void mouseScrolled(double d, double e, double f, double g, CallbackInfoReturnable<Boolean> cir) {
         if (menu.getOffers().size() > 9) {
             int j = menu.getOffers().size() - 9;
             int oldScroll = scrollOff;
@@ -149,7 +165,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             if (scrollOff != oldScroll) scrollRenderer.updateScroll(oldScroll - scrollOff > 0 ? ScreenDirection.UP : ScreenDirection.DOWN);
         }
 
-        return true;
+        cir.setReturnValue(true);
     }
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {

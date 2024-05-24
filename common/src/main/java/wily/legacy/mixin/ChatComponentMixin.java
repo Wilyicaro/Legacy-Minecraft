@@ -32,11 +32,11 @@ public abstract class ChatComponentMixin {
         return 0x373737 + i;
     }
     @Inject(method = "render",at = @At(value = "HEAD"), cancellable = true)
-    private void stopRender(GuiGraphics guiGraphics, int i, int j, int k, CallbackInfo ci) {
+    private void stopRender(GuiGraphics guiGraphics, int i, int j, int k, boolean bl, CallbackInfo ci) {
         if (minecraft.screen != null && !isChatFocused()) ci.cancel();
     }
     @Inject(method = "render",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", shift = At.Shift.AFTER, ordinal = 0))
-    private void changeRenderY(GuiGraphics guiGraphics, int i, int j, int k, CallbackInfo ci) {
+    private void changeRenderY(GuiGraphics guiGraphics, int i, int j, int k, boolean bl, CallbackInfo ci) {
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
         if (!isChatFocused()) guiGraphics.pose().translate(0.0F, ScreenUtil.getHUDDistance() - 42,0.0F);
     }

@@ -1,7 +1,9 @@
 package wily.legacy.client;
 
 import com.google.gson.*;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -28,15 +30,15 @@ public class LegacyCraftingTabListing {
     public String id;
     public Component displayName;
     public ResourceLocation icon;
-    public CompoundTag itemIconTag;
+    public DataComponentPatch itemPatch;
     public final Map<String,List<RecipeValue<CraftingContainer, CraftingRecipe>>> craftings = new LinkedHashMap<>();
 
 
-    public LegacyCraftingTabListing(String id, Component displayName, ResourceLocation icon, CompoundTag itemIconTag){
+    public LegacyCraftingTabListing(String id, Component displayName, ResourceLocation icon, DataComponentPatch itemPatch){
         this.id = id;
         this.displayName = displayName;
         this.icon = icon;
-        this.itemIconTag = itemIconTag;
+        this.itemPatch = itemPatch;
     }
     public boolean isValid(){
         return displayName != null && id != null && !craftings.isEmpty() && icon != null;
@@ -56,10 +58,10 @@ public class LegacyCraftingTabListing {
                             listings.stream().filter(l-> c.equals(l.id)).findFirst().ifPresentOrElse(l->{
                                 ifJsonStringNotNull(go,"displayName", Component::translatable, n-> l.displayName = n);
                                 ifJsonStringNotNull(go,"icon", ResourceLocation::new, n-> l.icon = n);
-                                ifJsonStringNotNull(go,"nbt", CompoundTagUtil::parseCompoundTag, n-> l.itemIconTag = n);
+                                if (go.get("components") instanceof JsonObject compJson) l.itemPatch = JsonUtil.getComponentsFromJson(compJson);
                                 JsonUtil.addGroupedRecipeValuesFromJson(l.craftings,listingElement);
                             }, ()->{
-                                LegacyCraftingTabListing listing = new LegacyCraftingTabListing(c,getJsonStringOrNull(go,"displayName",Component::translatable),getJsonStringOrNull(go,"icon",ResourceLocation::new), getJsonStringOrNull(go,"nbt",CompoundTagUtil::parseCompoundTag));
+                                LegacyCraftingTabListing listing = new LegacyCraftingTabListing(c,getJsonStringOrNull(go,"displayName",Component::translatable),getJsonStringOrNull(go,"icon",ResourceLocation::new), go.get("components") instanceof JsonObject compJson ? JsonUtil.getComponentsFromJson(compJson) : null);
                                 JsonUtil.addGroupedRecipeValuesFromJson(listing.craftings,listingElement);
                                 listings.add(listing);
                             });

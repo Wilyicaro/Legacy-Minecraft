@@ -18,6 +18,7 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JPlatform;
 import wily.legacy.client.Offset;
+import wily.legacy.network.CommonNetworkManager;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.init.LegacySoundEvents;
@@ -36,7 +37,6 @@ import static wily.legacy.util.LegacySprites.DISCOUNT_STRIKETHRUOGH_SPRITE;
 
 public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchantMenu> {
     private int selectedTrade = 0;
-    private int lastFocused = -1;
     protected final boolean[] displaySlotsWarning = new boolean[3];;
 
     protected final List<LegacyIconHolder> merchantTradeButtons = new ArrayList<>();;
@@ -60,21 +60,15 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
 
     private void updateSlotsDisplay(){
         List<ItemStack> compactList = new ArrayList<>();
-        for (int i1 = 0; i1 < 36; i1++) {
-            if (i1 == 2)  continue;
-            Slot s = menu.slots.get(i1);
-            if (s.getItem().isEmpty()) continue;
-            ItemStack item = s.getItem();
-            compactList.stream().filter(i->ItemStack.isSameItemSameTags(i,item)).findFirst().ifPresentOrElse(i-> i.grow(item.getCount()), ()-> compactList.add(item.copy()));
-        }
+        ServerInventoryCraftPacket.handleCompactInventoryList(compactList,Minecraft.getInstance().player.getInventory(),menu.getCarried());
         merchantTradeButtons.forEach(b->{
             b.allowFocusedItemTooltip = true;
             int i = merchantTradeButtons.indexOf(b);
             boolean warning = false;
             if (i < menu.merchant.getOffers().size()) {
                 MerchantOffer offer = menu.merchant.getOffers().get(i);
-                boolean matchesCostA = compactList.stream().anyMatch(item -> offer.isRequiredItem(item, offer.getCostA()) && item.getCount() >= offer.getCostA().getCount());
-                boolean matchesCostB = offer.getCostB().isEmpty() || compactList.stream().anyMatch(item -> offer.isRequiredItem(item, offer.getCostB()) && item.getCount() >= offer.getCostB().getCount());
+                boolean matchesCostA = compactList.stream().anyMatch(item -> offer.satisfiedBy(item, offer.getCostB()) && item.getCount() >= offer.getCostA().getCount());
+                boolean matchesCostB = offer.getCostB().isEmpty() || compactList.stream().anyMatch(item -> offer.satisfiedBy(offer.getCostA(),item) && item.getCount() >= offer.getCostB().getCount());
                 warning = !matchesCostA || !matchesCostB;
                 if (i == selectedTrade){
                     displaySlotsWarning[0] = !matchesCostA;
@@ -108,7 +102,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
             @Override
             public void renderItem(GuiGraphics graphics, int i, int j, float f) {
                 if(itemIcon.isEmpty()) return;
-                ScreenUtil.secureTranslucentRender(graphics,isValidIndex() && menu.merchant.getOffers().get(index).isOutOfStock(),0.5f, ()-> super.renderItem(graphics, i, j, f));
+                ScreenUtil.secureTranslucentRender(graphics,isValidIndex() && menu.merchant.getOffers().get(index).isOutOfStock(),0.5f, (u)-> super.renderItem(graphics, i, j, f));
             }
 
             @Override
@@ -188,7 +182,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
                 if (isValidIndex() && isFocused() && index == selectedTrade) {
                     MerchantOffer offer = menu.merchant.getOffers().get(index);
                     if (((LegacyMerchantOffer)offer).getRequiredLevel() <= menu.merchantLevel && !offer.isOutOfStock() && !displaySlotsWarning[2]) {
-                        Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(ingredientsFromStacks(offer.getCostA(),offer.getCostB()),offer.getResult(),index,hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
+                        CommonNetworkManager.sendToServer(new ServerInventoryCraftPacket(ingredientsFromStacks(offer.getCostA(),offer.getCostB()),offer.getResult(),index,hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
                     }else ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT_FAIL.get(),1.0f);
                 }
             }
@@ -200,17 +194,13 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
         List<Ingredient> ings = new ArrayList<>();
         for (ItemStack stack : s) {
             for (int i = 0; i < stack.getCount(); i++)
-                ings.add(Legacy4JPlatform.getStrictNBTIngredient(stack));
+                ings.add(Legacy4JPlatform.getStrictComponentsIngredient(stack));
         }
         return ings;
     }
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
-    }
-    public void repositionElements() {
-        lastFocused = getFocused() instanceof LegacyIconHolder h ? merchantTradeButtons.indexOf(h) : -1;
-        super.repositionElements();
     }
     public void init() {
         imageWidth = 291;
@@ -221,8 +211,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
         inventoryLabelY = 87;
         super.init();
         updateSlotsDisplay();
-        if (lastFocused >= 0 && lastFocused < merchantTradeButtons.size()) setInitialFocus(merchantTradeButtons.get(lastFocused));
-        else setInitialFocus(merchantTradeButtons.get(0));
+        if (getFocused() != merchantTradeButtons.get(selectedTrade)) setFocused(merchantTradeButtons.get(selectedTrade));
         merchantTradeButtons.forEach(holder->{
             int i = merchantTradeButtons.indexOf(holder);
             holder.setX(leftPos + 13 + 27*i);

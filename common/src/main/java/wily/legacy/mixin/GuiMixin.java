@@ -8,10 +8,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.MobEffectTextureManager;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
@@ -20,7 +19,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PlayerRideableJumping;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -29,7 +30,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
@@ -45,12 +45,12 @@ import java.util.Collection;
 
 public abstract class GuiMixin {
     @Shadow @Final protected Minecraft minecraft;
-
-    @Shadow protected int screenHeight;
+    @Shadow
+    private ItemStack lastToolHighlight;
+    @Shadow
+    public int toolHighlightTimer;
 
     @Shadow public abstract Font getFont();
-
-    @Shadow protected int screenWidth;
 
     @Shadow protected float autosaveIndicatorValue;
 
@@ -63,6 +63,9 @@ public abstract class GuiMixin {
     @Shadow protected abstract Player getCameraPlayer();
 
     @Shadow public abstract void render(GuiGraphics guiGraphics, float f);
+
+    @Shadow protected abstract boolean isExperienceBarVisible();
+
     @Redirect(method = "renderSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getPopTime()I"))
     public int renderSlot(ItemStack instance) {
         return 0;
@@ -73,14 +76,16 @@ public abstract class GuiMixin {
             ci.cancel();
     }
     @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
-    public void renderCrosshair(GuiGraphics guiGraphics, CallbackInfo ci) {
+    public void renderCrosshair(GuiGraphics guiGraphics, float partialTicks, CallbackInfo ci) {
         if (minecraft.screen != null) {
             ci.cancel();
             return;
         }
 
         guiGraphics.pose().pushPose();
-        ScreenUtil.applyHUDScale(guiGraphics,i-> screenWidth = i,i-> screenHeight = i);
+        guiGraphics.pose().translate(guiGraphics.guiWidth()/2f,guiGraphics.guiHeight()/2f,0);
+        ScreenUtil.applyHUDScale(guiGraphics);
+        guiGraphics.pose().translate(-guiGraphics.guiWidth()/2,-guiGraphics.guiHeight()/2,0);
     }
     @Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;)V"))
     public void renderCrosshairBlendFunc(GlStateManager.SourceFactor sourceFactor, GlStateManager.DestFactor destFactor, GlStateManager.SourceFactor sourceFactor2, GlStateManager.DestFactor destFactor2, GuiGraphics guiGraphics) {
@@ -90,15 +95,14 @@ public abstract class GuiMixin {
         } else RenderSystem.blendFuncSeparate(sourceFactor,destFactor,sourceFactor2,destFactor2);
     }
     @Inject(method = "renderCrosshair", at = @At("RETURN"))
-    public void renderCrosshairReturn(GuiGraphics guiGraphics, CallbackInfo ci) {
+    public void renderCrosshairReturn(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
         if (minecraft.screen != null)
             return;
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
-        ScreenUtil.resetHUDScale(guiGraphics,i-> screenWidth = i,i-> screenHeight = i);
         guiGraphics.pose().popPose();
     }
     @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
-    public void renderEffects(GuiGraphics guiGraphics, CallbackInfo ci) {
+    public void renderEffects(GuiGraphics guiGraphics,float partialTicks, CallbackInfo ci) {
         ci.cancel();
         Collection<MobEffectInstance> collection = this.minecraft.player.getActiveEffects();
         if (minecraft.screen != null || collection.isEmpty()) {
@@ -109,14 +113,14 @@ public abstract class GuiMixin {
         float backAlpha = ScreenUtil.getHUDOpacity();
         MobEffectTextureManager mobEffectTextureManager = this.minecraft.getMobEffectTextures();
         for (MobEffectInstance mobEffectInstance : Ordering.natural().reverse().sortedCopy(collection)) {
-            MobEffect mobEffect = mobEffectInstance.getEffect();
+            Holder<MobEffect> mobEffect = mobEffectInstance.getEffect();
             if (!mobEffectInstance.showIcon()) continue;
-            int k = this.screenWidth - 55;
+            int k = guiGraphics.guiWidth() - 55;
             int l = 18;
             if (this.minecraft.isDemo()) {
                 l += 15;
             }
-            if (mobEffect.isBeneficial()) {
+            if (mobEffect.value().isBeneficial()) {
                 k -= 24 * ++i;
             } else {
                 k -= 24 * ++j;
@@ -137,12 +141,12 @@ public abstract class GuiMixin {
         }
         guiGraphics.setColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
-    @Inject(method = "renderHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V", ordinal = 1))
-    private void renderHotbarSelection(float f, GuiGraphics guiGraphics, CallbackInfo ci) {
-        guiGraphics.blitSprite(LegacySprites.HOTBAR_SELECTION,24,24,0,23,this.screenWidth / 2 - 91 - 1 + minecraft.player.getInventory().selected * 20, this.screenHeight, 24, 1);
+    @Inject(method = "renderItemHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V", ordinal = 1))
+    private void renderHotbarSelection(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
+        guiGraphics.blitSprite(LegacySprites.HOTBAR_SELECTION,24,24,0,23,guiGraphics.guiWidth() / 2 - 91 - 1 + minecraft.player.getInventory().selected * 20, guiGraphics.guiHeight(), 24, 1);
     }
-    @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
-    public void renderHotbar(float f, GuiGraphics guiGraphics, CallbackInfo ci) {
+    @Inject(method = "renderItemHotbar", at = @At("HEAD"), cancellable = true)
+    public void renderHotbar(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
         if (minecraft.screen != null) {
             ci.cancel();
             return;
@@ -171,9 +175,7 @@ public abstract class GuiMixin {
                 character.yHeadRot = 180 + (character.isFallFlying() ? 0 : yHeadRot - bodyRot);
                 character.yHeadRotO = character.yHeadRot;
                 guiGraphics.pose().pushPose();
-                ScreenUtil.applyHUDScale(guiGraphics, w -> {
-                }, h -> {
-                });
+                ScreenUtil.applyHUDScale(guiGraphics);
                 ScreenUtil.renderEntity(guiGraphics, 28f, 50f, 13, ScreenUtil.getLegacyOptions().smoothAnimatedCharacter().get() ? f : 0,new Vector3f(), new Quaternionf().rotationXYZ(0.0f, -0.43633232f, (float) Math.PI), null, character);
                 guiGraphics.pose().popPose();
                 character.setDeltaMovement(deltaMove);
@@ -190,11 +192,10 @@ public abstract class GuiMixin {
         int newSelection = minecraft.player != null ? minecraft.player.getInventory().selected : -1;
         if (lastHotbarSelection >= 0 && lastHotbarSelection != newSelection) ScreenUtil.lastHotbarSelectionChange = Util.getMillis();
         lastHotbarSelection = newSelection;
-        RenderSystem.enableBlend();
-        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0F,  ScreenUtil.getHUDDistance(),0.0F);
-        ScreenUtil.applyHUDScale(guiGraphics,i-> screenWidth = i,i-> screenHeight = i);
+        ScreenUtil.prepareHUDRender(guiGraphics);
+        guiGraphics.pose().translate(guiGraphics.guiWidth()/2f, guiGraphics.guiHeight(),0.0F);
+        ScreenUtil.applyHUDScale(guiGraphics);
+        guiGraphics.pose().translate(-guiGraphics.guiWidth()/2,-guiGraphics.guiHeight(),0);
         Player player = this.getCameraPlayer();
         if (player == null) {
             return;
@@ -204,82 +205,99 @@ public abstract class GuiMixin {
         }
     }
 
-    @Inject(method = "renderHotbar", at = @At("RETURN"))
-    public void renderHotbarTail(float f, GuiGraphics guiGraphics, CallbackInfo ci) {
-        if (minecraft.screen != null)
-            return;
-        RenderSystem.disableBlend();
+    @Inject(method = "renderItemHotbar", at = @At("RETURN"))
+    public void renderHotbarTail(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
+        if (minecraft.screen != null) return;
+
         Legacy4JClient.guiBufferSourceOverride = null;
-        ScreenUtil.resetHUDScale(guiGraphics,i-> screenWidth = i,i-> screenHeight = i);
-        guiGraphics.pose().popPose();
-        guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
+        ScreenUtil.finishHUDRender(guiGraphics);
         if (minecraft.player != null) ControlTooltip.guiControlRenderer.render(guiGraphics,0,0,f);
     }
-    @ModifyVariable(method = "renderJumpMeter", at = @At(value="HEAD", ordinal = 0), argsOnly = true)
-    public int modifyJumpMeterX(int value) {
-        return (int) (screenWidth * ScreenUtil.getHUDScale() / 3 / 2 - 91);
-    }
 
+    @Inject(method = "renderExperienceLevel", at = @At("HEAD"), cancellable = true)
+    public void renderExperienceLevel(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
+        ci.cancel();
+        if (minecraft.screen != null) return;
+        int i = this.minecraft.player.experienceLevel;
+        if (this.isExperienceBarVisible() && i > 0) {
+            ScreenUtil.prepareHUDRender(guiGraphics);
+            guiGraphics.pose().translate(guiGraphics.guiWidth() /2f, guiGraphics.guiHeight(),0);
+            ScreenUtil.applyHUDScale(guiGraphics);
+            this.minecraft.getProfiler().push("expLevel");
+            String exp = "" + i;
+            ScreenUtil.drawOutlinedString(guiGraphics,getFont(), Component.literal(exp),-this.getFont().width(exp) / 2,-39,8453920,0,4/3F);
+            this.minecraft.getProfiler().pop();
+            ScreenUtil.finishHUDRender(guiGraphics);
+        }
+    }
+    @Inject(method = "renderOverlayMessage", at = @At(value = "HEAD"), cancellable = true)
+    public void renderOverlayMessage(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
+        if (minecraft.screen != null){
+            ci.cancel();
+            return;
+        }
+        ScreenUtil.prepareHUDRender(guiGraphics);
+        guiGraphics.pose().translate(0, ScreenUtil.getHUDSize() - (this.lastToolHighlight.isEmpty() || this.toolHighlightTimer <= 0 ? 0 : (Math.min(4,lastToolHighlight.getTooltipLines(Item.TooltipContext.of(minecraft.level),minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum()) - 1) * 9),0);
+    }
+    @Inject(method = "renderOverlayMessage", at = @At(value = "RETURN"))
+    public void renderOverlayMessageReturn(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
+        if (minecraft.screen != null) return;
+
+        ScreenUtil.finishHUDRender(guiGraphics);
+    }
+    @Inject(method = {"renderVehicleHealth","renderPlayerHealth"}, at = @At("HEAD"), cancellable = true)
+    public void renderHealth(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (minecraft.screen != null){
+            ci.cancel();
+            return;
+        }
+        ScreenUtil.prepareHUDRender(guiGraphics);
+        guiGraphics.pose().translate(guiGraphics.guiWidth() / 2f, guiGraphics.guiHeight(),0);
+        ScreenUtil.applyHUDScale(guiGraphics);
+        guiGraphics.pose().translate(-guiGraphics.guiWidth() / 2, -guiGraphics.guiHeight(),0);
+    }
+    @Inject(method = {"renderVehicleHealth","renderPlayerHealth"}, at = @At("RETURN"))
+    public void renderHealthReturn(GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (minecraft.screen != null) return;
+        ScreenUtil.finishHUDRender(guiGraphics);
+    }
+    @Inject(method = "renderExperienceBar", at = @At("HEAD"), cancellable = true)
+    public void renderExperienceBar(GuiGraphics guiGraphics, int i, CallbackInfo ci) {
+        if (minecraft.screen != null){
+            ci.cancel();
+            return;
+        }
+        ScreenUtil.prepareHUDRender(guiGraphics);
+        guiGraphics.pose().translate(guiGraphics.guiWidth() / 2f, guiGraphics.guiHeight(),0);
+        ScreenUtil.applyHUDScale(guiGraphics);
+        guiGraphics.pose().translate(-guiGraphics.guiWidth() / 2, -guiGraphics.guiHeight(),0);
+    }
+    @Inject(method = "renderExperienceBar", at = @At("RETURN"))
+    public void renderExperienceBarReturn(GuiGraphics guiGraphics, int i, CallbackInfo ci) {
+        if (minecraft.screen != null) return;
+        ScreenUtil.finishHUDRender(guiGraphics);
+    }
     @Inject(method = "renderJumpMeter", at = @At("HEAD"), cancellable = true)
     public void renderJumpMeter(PlayerRideableJumping playerRideableJumping, GuiGraphics guiGraphics, int i, CallbackInfo ci) {
         if (minecraft.screen != null){
             ci.cancel();
             return;
         }
-        guiGraphics.setColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
-        RenderSystem.enableBlend();
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0F,ScreenUtil.getHUDDistance(),0.0F);
-        ScreenUtil.applyHUDScale(guiGraphics,w-> screenWidth = w,h-> screenHeight = h);
+        ScreenUtil.prepareHUDRender(guiGraphics);
+        guiGraphics.pose().translate(guiGraphics.guiWidth() / 2f, guiGraphics.guiHeight(),0);
+        ScreenUtil.applyHUDScale(guiGraphics);
+        guiGraphics.pose().translate(-guiGraphics.guiWidth() / 2, -guiGraphics.guiHeight(),0);
     }
     @Inject(method = "renderJumpMeter", at = @At("RETURN"))
     public void renderJumpMeterReturn(PlayerRideableJumping playerRideableJumping, GuiGraphics guiGraphics, int i, CallbackInfo ci) {
-        if (minecraft.screen != null)
-            return;
-        RenderSystem.disableBlend();
-        ScreenUtil.resetHUDScale(guiGraphics,w-> screenWidth = w,h-> screenHeight = h);
-        guiGraphics.pose().popPose();
-        guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
+        if (minecraft.screen != null) return;
+        ScreenUtil.finishHUDRender(guiGraphics);
     }
-    @ModifyVariable(method = "renderExperienceBar", at = @At(value="HEAD", ordinal = 0), argsOnly = true)
-    public int modifyExperienceBarX(int value) {
-        return (int) (screenWidth * ScreenUtil.getHUDScale() / 3 / 2 - 91);
-    }
-    @Inject(method = "renderExperienceBar", at = @At("HEAD"), cancellable = true)
-    public void renderExperienceBar(GuiGraphics guiGraphics, int i, CallbackInfo ci) {
-        if (minecraft.screen != null) {
-            ci.cancel();
-            return;
-        }
-        guiGraphics.setColor(1.0f, 1.0f, 1.0f, ScreenUtil.getHUDOpacity());
-        RenderSystem.enableBlend();
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0F, ScreenUtil.getHUDDistance(), 0.0F);
-        ScreenUtil.applyHUDScale(guiGraphics,w-> screenWidth = w,h-> screenHeight = h);
-    }
-    @Inject(method = "renderExperienceBar", at = @At("RETURN"))
-    public void renderExperienceBarReturn(GuiGraphics guiGraphics, int i, CallbackInfo ci) {
-        if (minecraft.screen != null)
-            return;
-        RenderSystem.disableBlend();
-        ScreenUtil.resetHUDScale(guiGraphics,w-> screenWidth = w,h-> screenHeight = h);
-        guiGraphics.pose().popPose();
-        guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
-    }
-    @Redirect(method = "renderExperienceBar", at = @At(value = "FIELD", target = "Lnet/minecraft/client/player/LocalPlayer;experienceLevel:I", ordinal = 0))
-    public int renderExperienceBar(LocalPlayer instance, GuiGraphics guiGraphics) {
-        if (instance.experienceLevel > 0) {
-            this.minecraft.getProfiler().push("expLevel");
-            String string = "" + instance.experienceLevel;
-            ScreenUtil.drawOutlinedString(guiGraphics,getFont(), Component.literal(string),(this.screenWidth- this.getFont().width(string)) / 2,this.screenHeight - 39,8453920,0,4/3F);
-            this.minecraft.getProfiler().pop();
-        }
-        return 0;
-    }
+
     @Inject(method = "renderSavingIndicator", at = @At("HEAD"), cancellable = true)
-    public void renderAutoSaveIndicator(GuiGraphics guiGraphics, CallbackInfo ci) {
+    public void renderAutoSaveIndicator(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
         if (minecraft.options.showAutosaveIndicator().get().booleanValue() && (autosaveIndicatorValue > 0 || lastAutosaveIndicatorValue > 0) && Mth.clamp(Mth.lerp(this.minecraft.getFrameTime(), this.lastAutosaveIndicatorValue, this.autosaveIndicatorValue), 0.0f, 1.0f) > 0.02)
-            ScreenUtil.drawAutoSavingIcon(guiGraphics,screenWidth - 66,44);
+            ScreenUtil.drawAutoSavingIcon(guiGraphics,guiGraphics.guiWidth() - 66,44);
         ci.cancel();
     }
 

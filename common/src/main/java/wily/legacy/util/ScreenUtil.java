@@ -69,7 +69,9 @@ public class ScreenUtil {
         renderTiles(PANEL_RECESS,graphics,x,y,width,height,dp);
     }
     public static void renderPanelTranslucentRecess(GuiGraphics graphics, int x, int y, int width, int height, float dp){
+        RenderSystem.enableBlend();
         renderTiles(PANEL_TRANSLUCENT_RECESS,graphics,x,y,width,height,dp);
+        RenderSystem.disableBlend();
     }
     public static void renderEntityPanel(GuiGraphics graphics, int x, int y, int width, int height, float dp){
         renderTiles(ENTITY_PANEL,graphics,x,y,width,height,dp);
@@ -121,7 +123,11 @@ public class ScreenUtil {
             if (sprite == null)
                 logoRenderer.renderLogo(guiGraphics, mc.screen == null ? 0 : mc.screen.width, 1.0F);
             else try (SpriteContents contents = sprite.contents()) {
-                    guiGraphics.blitSprite(MINECRAFT,(guiGraphics.guiWidth() - contents.width() / 2) / 2, 30, contents.width() / 2, contents.height() / 2);
+                guiGraphics.pose().pushPose();
+                guiGraphics.pose().translate((guiGraphics.guiWidth() - 285.5f) / 2, 30,0);
+                guiGraphics.pose().scale(0.5f,0.5f,0.5f);
+                    guiGraphics.blitSprite(MINECRAFT,(guiGraphics.guiWidth() - contents.width() / 2) / 2, 30, 571,138);
+                guiGraphics.pose().popPose();
             }
 
         }
@@ -154,15 +160,19 @@ public class ScreenUtil {
     public static boolean isMouseOver(double mouseX, double mouseY, double x, double y, int width, int height){
         return mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height;
     }
-    public static void applyHUDScale(GuiGraphics graphics, Consumer<Integer> applyWidth, Consumer<Integer> applyHeight){
+    public static void applyHUDScale(GuiGraphics graphics){
         graphics.pose().scale(3f / getHUDScale(), 3f / getHUDScale() ,3f / getHUDScale());
-        applyHeight.accept((int) (mc.getWindow().getGuiScaledHeight() * getHUDScale()/3));
-        applyWidth.accept((int) (mc.getWindow().getGuiScaledWidth() * getHUDScale()/3));
     }
-    public static void resetHUDScale(GuiGraphics graphics, Consumer<Integer> applyWidth, Consumer<Integer> applyHeight){
-        graphics.pose().scale(getHUDScale()/3f,getHUDScale()/3f,getHUDScale()/3f);
-        applyHeight.accept(mc.getWindow().getGuiScaledHeight());
-        applyWidth.accept(mc.getWindow().getGuiScaledWidth());
+    public static void prepareHUDRender(GuiGraphics graphics){
+        graphics.pose().pushPose();
+        graphics.setColor(1.0f,1.0f,1.0f,getHUDOpacity());
+        graphics.pose().translate(0,getHUDDistance(),0);
+        RenderSystem.enableBlend();
+    }
+    public static void finishHUDRender(GuiGraphics graphics){
+        graphics.pose().popPose();
+        graphics.setColor(1.0f,1.0f,1.0f,1.0f);
+        RenderSystem.disableBlend();
     }
     public static boolean hasClassicCrafting(){
         return getLegacyOptions().classicCrafting().get();
@@ -275,11 +285,13 @@ public class ScreenUtil {
         renderScrollingString(guiGraphics,font,component.getVisualOrderText(),j,k,l,m,n,shadow);
     }
     public static void renderScrollingString(GuiGraphics guiGraphics, Font font, FormattedCharSequence charSequence, int j, int k, int l, int m, int n, boolean shadow) {
-        int o = font.width(charSequence);
+        renderScrollingString(guiGraphics,font,charSequence,j,k,l,m,n,shadow,font.width(charSequence));
+    }
+    public static void renderScrollingString(GuiGraphics guiGraphics, Font font, FormattedCharSequence charSequence, int j, int k, int l, int m, int n, boolean shadow, int stringWidth) {
         int p = (k + m - font.lineHeight) / 2 + 1;
         int q = l - j;
-        if (o > q) {
-            int r = o - q;
+        if (stringWidth > q) {
+            int r = stringWidth - q;
             double d = (double) Util.getMillis() / 1000.0;
             double e = Math.max((double)r * 0.5, 3.0);
             double f = Math.sin(1.5707963267948966 * Math.cos(Math.PI * 2 * d / e)) / 2.0 + 0.5;
@@ -291,15 +303,15 @@ public class ScreenUtil {
             guiGraphics.drawString(font, charSequence, j, p, n,shadow);
         }
     }
-    public static void secureTranslucentRender(GuiGraphics graphics, boolean translucent, float alpha, Runnable render){
+    public static void secureTranslucentRender(GuiGraphics graphics, boolean translucent, float alpha, Consumer<Boolean> render){
         if (!translucent){
-            render.run();
+            render.accept(false);
             return;
         }
         Legacy4JClient.guiBufferSourceOverride = BufferSourceWrapper.translucent(graphics.bufferSource());
         graphics.setColor(1.0f, 1.0f, 1.0f, alpha);
         RenderSystem.enableBlend();
-        render.run();
+        render.accept(true);
         RenderSystem.disableBlend();
         graphics.setColor(1.0f, 1.0f, 1.0f, 1.0f);
         Legacy4JClient.guiBufferSourceOverride = null;
@@ -313,9 +325,13 @@ public class ScreenUtil {
         return (d -= leftPos) >= xCorner && d < (xCorner + width) && (e -= topPos) >= yCorner && e < (yCorner + height);
     }
     public static void renderEntity(GuiGraphics guiGraphics, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, LivingEntity livingEntity) {
+        renderEntity(guiGraphics,x,y,size,partialTicks,vector3f,quaternionf,quaternionf2,livingEntity,false);
+    }
+    public static void renderEntity(GuiGraphics guiGraphics, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, LivingEntity livingEntity, boolean forceSize) {
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(x, y, 50.0);
-        guiGraphics.pose().mulPoseMatrix(new Matrix4f().scaling(size, size, -size));
+        float h = forceSize ? Math.max(1f,Math.max(livingEntity.getBbWidth(), livingEntity.getBbHeight())) : 1;
+        guiGraphics.pose().mulPose(new Matrix4f().scaling(size / h, size / h, -size / h));
         guiGraphics.pose().translate(vector3f.x, vector3f.y, vector3f.z);
         guiGraphics.pose().mulPose(quaternionf);
         Lighting.setupForEntityInInventory();
@@ -333,7 +349,7 @@ public class ScreenUtil {
     }
 
     public static float getTextScale(){
-        return getLegacyOptions().legacyItemTooltips().get() ? Math.max(0.5f,Math.min((float) Math.sqrt(1280f / mc.getWindow().getScreenWidth() * 720f / mc.getWindow().getScreenHeight()),2)) : 1.0f;
+        return getLegacyOptions().legacyItemTooltips().get() ? Math.max(2/3f,Math.min((float) Math.sqrt(1280f / mc.getWindow().getScreenWidth() * 720f / mc.getWindow().getScreenHeight()),4/3f)) : 1.0f;
     }
 
 

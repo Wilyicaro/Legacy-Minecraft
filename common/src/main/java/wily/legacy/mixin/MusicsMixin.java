@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(Musics.class)
 public class MusicsMixin {
-    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/sounds/Music;<init>(Lnet/minecraft/core/Holder;IIZ)V",ordinal = 0), index = 3)
+    @ModifyArg(method = "<clinit>", at = @At(value = "INVOKE", target = "Lnet/minecraft/sounds/Music;<init>(Lnet/minecraft/core/Holder;IIZ)V"), index = 3)
     private static boolean init(boolean bl){
         return false;
     }

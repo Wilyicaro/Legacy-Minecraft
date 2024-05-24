@@ -3,6 +3,7 @@ package wily.legacy.network;
 import com.mojang.authlib.GameProfile;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
@@ -18,7 +19,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public record PlayerInfoSync(int type, UUID player) implements CommonPacket {
-    public PlayerInfoSync(FriendlyByteBuf buf){
+    public PlayerInfoSync(RegistryFriendlyByteBuf buf){
         this(buf.readVarInt(),buf.readUUID());
     }
     public PlayerInfoSync(int type, Player player){
@@ -28,7 +29,7 @@ public record PlayerInfoSync(int type, UUID player) implements CommonPacket {
         this(type,profile.getId());
     }
     @Override
-    public void encode(FriendlyByteBuf buf) {
+    public void encode(RegistryFriendlyByteBuf buf) {
         buf.writeVarInt(type);
         buf.writeUUID(player);
     }
@@ -46,12 +47,12 @@ public record PlayerInfoSync(int type, UUID player) implements CommonPacket {
         return rules;
     }
     @Override
-    public void apply(Supplier<NetworkManager.PacketContext> ctx) {
-        Player p = ctx.get().getPlayer();
+    public void apply(NetworkManager.PacketContext ctx) {
+        Player p = ctx.getPlayer();
         if (p instanceof ServerPlayer sp) {
             sp = sp.server.getPlayerList().getPlayer(player);
             if (sp == null) return;
-            if (type == 0) Legacy4J.NETWORK.sendToPlayer(sp, new HostOptions(sp.server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().getId(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(sp.server.getGameRules())));
+            if (type == 0) CommonNetworkManager.sendToPlayer(sp, new HostOptions(sp.server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().getId(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(sp.server.getGameRules())));
             else if (type <= 2) ((LegacyPlayer) sp).setCrafting(type == 1);
             else if (type <= 4) ((LegacyPlayerInfo)sp).setDisableExhaustion(type == 3);
             else if (type <= 6) ((LegacyPlayerInfo)sp).setMayFlySurvival(type == 5);
@@ -59,15 +60,15 @@ public record PlayerInfoSync(int type, UUID player) implements CommonPacket {
     }
     public record HostOptions(Map<UUID, LegacyPlayerInfo> players, Map<String,Object> gameRules) implements CommonPacket {
         public HostOptions(FriendlyByteBuf buf){
-            this(buf.readMap(HashMap::new, FriendlyByteBuf::readUUID, LegacyPlayerInfo::fromNetwork), buf.readMap(HashMap::new, FriendlyByteBuf::readUtf, b->{
+            this(buf.readMap(HashMap::new, b->b.readUUID(), LegacyPlayerInfo::fromNetwork), buf.readMap(HashMap::new, FriendlyByteBuf::readUtf, b->{
                 int type = b.readVarInt();
                 if (type == 0) return b.readBoolean();
                 else return b.readVarInt();
             }));
         }
         @Override
-        public void encode(FriendlyByteBuf buf) {
-            buf.writeMap(players,FriendlyByteBuf::writeUUID,(b,i)->i.toNetwork(b));
+        public void encode(RegistryFriendlyByteBuf buf) {
+            buf.writeMap(players,(b,u)->b.writeUUID(u),(b,i)->i.toNetwork(buf));
             buf.writeMap(gameRules,FriendlyByteBuf::writeUtf,(b,obj)-> {
                 b.writeVarInt(obj instanceof Boolean ? 0 : 1);
                 if (obj instanceof Boolean bol)  b.writeBoolean(bol);
@@ -76,8 +77,8 @@ public record PlayerInfoSync(int type, UUID player) implements CommonPacket {
         }
 
         @Override
-        public void apply(Supplier<NetworkManager.PacketContext> ctx) {
-            Player p = ctx.get().getPlayer();
+        public void apply(NetworkManager.PacketContext ctx) {
+            Player p = ctx.getPlayer();
             if (p.level().isClientSide){
                 Legacy4JClient.updateLegacyPlayerInfos(players);
                 GameRules displayRules = p.level().getGameRules();

@@ -5,9 +5,11 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.CommonListenerCookie;
+import net.minecraft.client.sounds.MusicManager;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.PacketUtils;
+import net.minecraft.network.protocol.game.ClientboundAwardStatsPacket;
 import net.minecraft.network.protocol.game.ClientboundMerchantOffersPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
@@ -21,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.screen.CreativeModeScreen;
+import wily.legacy.client.screen.LeaderboardsScreen;
 import wily.legacy.inventory.LegacyMerchantMenu;
 
 @Mixin(ClientPacketListener.class)
@@ -28,7 +31,10 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     protected ClientPacketListenerMixin(Minecraft minecraft, Connection connection, CommonListenerCookie commonListenerCookie) {
         super(minecraft, connection, commonListenerCookie);
     }
+    @Redirect(method = "handleRespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/MusicManager;stopPlaying()V"))
+    public void handleRespawn(MusicManager instance) {
 
+    }
     @Inject(method = "handlePlayerInfoUpdate", at = @At("RETURN"))
     public void handlePlayerInfoUpdate(ClientboundPlayerInfoUpdatePacket clientboundPlayerInfoUpdatePacket, CallbackInfo ci) {
         Legacy4JClient.onClientPlayerInfoChange();
@@ -62,6 +68,13 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
             m.merchant.overrideXp(clientboundMerchantOffersPacket.getVillagerXp());
             m.merchantLevel = clientboundMerchantOffersPacket.getVillagerLevel();
             m.showProgressBar = clientboundMerchantOffersPacket.showProgress();
+        }
+    }
+    @Inject(method = "handleAwardStats", at = @At("RETURN"))
+    public void handleAwardStats(ClientboundAwardStatsPacket clientboundAwardStatsPacket, CallbackInfo ci) {
+        if (!Legacy4JClient.isModEnabledOnServer()) {
+            LeaderboardsScreen.refreshStatsBoards(minecraft);
+            if (minecraft.screen instanceof LeaderboardsScreen s && LeaderboardsScreen.statsBoards.get(s.selectedStatBoard).statsList.isEmpty()) minecraft.executeIfPossible(() -> s.changeStatBoard(false));
         }
     }
 }

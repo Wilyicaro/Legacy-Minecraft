@@ -1,17 +1,18 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -25,8 +26,8 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BannerPattern;
+import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import org.jetbrains.annotations.Nullable;
-import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JPlatform;
 import wily.legacy.client.LoomTabListing;
 import wily.legacy.client.Offset;
@@ -35,6 +36,7 @@ import wily.legacy.client.controller.Controller;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.inventory.LegacyCraftingMenu;
+import wily.legacy.network.CommonNetworkManager;
 import wily.legacy.network.ServerInventoryCraftPacket;
 import wily.legacy.util.PagedList;
 import wily.legacy.util.ScreenUtil;
@@ -50,6 +52,7 @@ import static wily.legacy.client.screen.RecipeIconHolder.getActualItem;
 
 public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu> implements Controller.Event {
     private final Inventory inventory;
+    protected final List<ItemStack> compactInventoryList = new ArrayList<>();
     protected final List<Ingredient> ingredientsGrid = new ArrayList<>(Collections.nCopies(9,Ingredient.EMPTY));
     protected final List<Ingredient> selectedIngredients = new ArrayList<>();
     protected ItemStack resultStack = ItemStack.EMPTY;
@@ -117,7 +120,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         void updateRecipe() {
             clearIngredients(ingredientsGrid);
             resultStack = itemIcon.copyWithCount(1);
-            ingredientsGrid.set(4, Legacy4JPlatform.getStrictNBTIngredient(resultStack));
+            ingredientsGrid.set(4, Legacy4JPlatform.getStrictComponentsIngredient(resultStack));
         }
 
         @Override
@@ -138,35 +141,26 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
             selectedIngredients.clear();
             if (craftingTabList.selectedTab != 0 && !selectedStack.isEmpty()) {
                 previewStack = selectedStack.copy();
-                selectedIngredients.add(Legacy4JPlatform.getStrictNBTIngredient(selectedStack));
+                selectedIngredients.add(Legacy4JPlatform.getStrictComponentsIngredient(selectedStack));
                 if (!selectedPatterns.isEmpty()) {
-                    CompoundTag beTag = previewStack.getOrCreateTagElement("BlockEntityTag");
-                    ListTag patternsTag = beTag.getList("Patterns", 10);
-                    if (!beTag.contains("Patterns", 9)) beTag.put("Patterns", patternsTag);
+                    List<BannerPatternLayers.Layer> layersList = previewStack.get(DataComponents.BANNER_PATTERNS) == null ? new ArrayList<>() : new ArrayList<>(previewStack.get(DataComponents.BANNER_PATTERNS).layers());
                     selectedPatterns.forEach(rcp -> {
-                        CompoundTag patternTag = new CompoundTag();
-                        patternsTag.add(patternTag);
-                        patternTag.putString("Pattern", BuiltInRegistries.BANNER_PATTERN.get(rcp.pattern).getHashname());
-                        patternTag.putInt("Color", rcp.color.getId());
+                        layersList.add(new BannerPatternLayers.Layer(Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN).getOrThrow(rcp.pattern),rcp.color));
                         for (int i1 = 1; i1 < rcp.ingredients.size(); i1++) {
                             Ingredient ing = rcp.ingredients.get(i1);
                             if (ing.isEmpty()) continue;
                             selectedIngredients.add(ing);
                         }
                     });
+                    previewStack.set(DataComponents.BANNER_PATTERNS,new BannerPatternLayers(layersList));
                 }
-                Ingredient previewIng = Legacy4JPlatform.getStrictNBTIngredient(previewStack);
+                Ingredient previewIng = Legacy4JPlatform.getStrictComponentsIngredient(previewStack);
                 LoomTabListing.list.get(craftingTabList.selectedTab - 1).patterns.forEach(p -> {
-                    BannerPattern pattern = BuiltInRegistries.BANNER_PATTERN.get(p);
                     recipesByGroup.add(Arrays.stream(DyeColor.values()).map(color -> {
                         ItemStack result = previewStack.copy();
-                        CompoundTag beTag = result.getOrCreateTagElement("BlockEntityTag");
-                        ListTag patternsTag = beTag.getList("Patterns", 10);
-                        if (!beTag.contains("Patterns", 9)) beTag.put("Patterns", patternsTag);
-                        CompoundTag addPattern = new CompoundTag();
-                        patternsTag.add(addPattern);
-                        addPattern.putString("Pattern", pattern.getHashname());
-                        addPattern.putInt("Color", color.getId());
+                        List<BannerPatternLayers.Layer> layersList = result.get(DataComponents.BANNER_PATTERNS) == null ? new ArrayList<>() : new ArrayList<>(result.get(DataComponents.BANNER_PATTERNS).layers());
+                        layersList.add(new BannerPatternLayers.Layer(Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN).getOrThrow(p),color));
+                        result.set(DataComponents.BANNER_PATTERNS,new BannerPatternLayers(layersList));
                         Ingredient dye = Ingredient.of(DyeItem.byColor(color));
                         List<Ingredient> previewIngs = new ArrayList<>(selectedIngredients);
                         previewIngs.add(dye);
@@ -205,20 +199,21 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().addCompound(()-> new Component[]{ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(true),ControlTooltip.SPACE,ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon(true)},()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.group"));
         ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> page.max > 0 ? ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true)}) : ControllerBinding.RIGHT_STICK.bindingState.getIcon(true) : null,()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.page"));
         this.inventory = inventory;
-        craftingTabList.addTabButton(43,0,new ResourceLocation("white_banner"),null,Component.empty(),t-> repositionElements());
+        craftingTabList.addTabButton(43,0,new ResourceLocation("white_banner"),null,Component.empty(),t-> resetElements());
         for (LoomTabListing listing : LoomTabListing.list) {
             if (!listing.isValid()) continue;
 
-            craftingTabList.addTabButton(43,0,listing.icon,listing.itemIconTag,listing.displayName, t->{
-                listener.slotChanged(menu,-1,ItemStack.EMPTY);
-                setFocused(null);
-                craftingButtonsOffset.set(0);
-                if (inited) repositionElements();
-            });
+            craftingTabList.addTabButton(43,0,Items.WHITE_BANNER.arch$registryName(), DataComponentPatch.builder().set(DataComponents.BANNER_PATTERNS,new BannerPatternLayers(List.of(new BannerPatternLayers.Layer(Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN).getOrThrow(listing.patternIcon), DyeColor.BLACK)))).build(),listing.displayName, t->resetElements());
         }
         craftingTabList.resetSelectedTab();
         inited = true;
         addCraftingButtons();
+    }
+    public void resetElements(){
+        listener.slotChanged(menu,-1,ItemStack.EMPTY);
+        selectedCraftingButton = 0;
+        craftingButtonsOffset.set(0);
+        if (inited) repositionElements();
     }
     @Override
     public void setFocused(@Nullable GuiEventListener guiEventListener) {
@@ -237,11 +232,12 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         guiGraphics.pose().translate(leftPos,topPos,0);
     }
     @Override
-    public void componentTick(BindingState state) {
+    public void bindingStateTick(BindingState state) {
         if (state.pressed && state.canClick() && state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s) controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
     }
     public static Ingredient getPatternExtraIngredient(ResourceKey<BannerPattern> pattern){
-        Holder<BannerPattern> holder = BuiltInRegistries.BANNER_PATTERN.getHolderOrThrow(pattern);
+        if (Minecraft.getInstance().getConnection() == null) return Ingredient.EMPTY;
+        Holder<BannerPattern> holder = Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN).getOrThrow(pattern);
         if (holder.is(BannerPatternTags.PATTERN_ITEM_CREEPER)) return CREEPER_BANNER_PATTERN;
         else if (holder.is(BannerPatternTags.PATTERN_ITEM_FLOWER)) return FLOWER_BANNER_PATTERN;
         else if (holder.is(BannerPatternTags.PATTERN_ITEM_SKULL)) return SKULL_BANNER_PATTERN;
@@ -260,7 +256,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         menu.addSlotListener(listener);
         craftingTabList.selectedTab = selectedStack.isEmpty() ? 0 : Math.max(craftingTabList.selectedTab,1);
         menu.inventoryActive = selectedStack.isEmpty();
-        if (selectedCraftingButton < getCraftingButtons().size() && getFocused() != getCraftingButtons().get(selectedCraftingButton)) setFocused(getCraftingButtons().get(selectedCraftingButton));
+        if (selectedCraftingButton < getCraftingButtons().size()) setFocused(getCraftingButtons().get(selectedCraftingButton));
         if (craftingTabList.selectedTab != 0) {
             craftingButtonsOffset.max = Math.max(0,LoomTabListing.list.get(page.get() * 7 + craftingTabList.selectedTab - 1).patterns.size() - 12);
             craftingButtons.forEach(b->{
@@ -291,12 +287,14 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
 
     protected boolean canCraft(List<Ingredient> ingredients, boolean isFocused) {
         boolean canCraft = true;
+        compactInventoryList.clear();
+        ServerInventoryCraftPacket.handleCompactInventoryList(compactInventoryList,minecraft.player.getInventory(),menu.getCarried());
         for (int i1 = 0; i1 < ingredients.size(); i1++) {
             Ingredient ing = ingredients.get(i1);
             if (ing.isEmpty()) continue;
-            int itemCount = inventory.items.stream().filter(ing).mapToInt(ItemStack::getCount).sum() + (menu.getCarried().isEmpty() || !ing.test(menu.getCarried()) ? 0 : menu.getCarried().getCount());
-            long ingCount = ingredients.stream().filter(i -> !i.isEmpty() && i.equals(ing)).count();
-            if (itemCount >= ingCount || PagedList.occurrenceOf(ingredients, ing, i1) < itemCount) {
+            Optional<ItemStack> match = compactInventoryList.stream().filter(i-> !i.isEmpty() && ing.test(i.copyWithCount(1))).findFirst();
+            if (match.isPresent()) {
+                match.get().shrink(1);
                 if (isFocused) warningSlots[i1] = false;
             } else {
                 canCraft = false;
@@ -307,8 +305,8 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         return canCraft;
     }
     public static boolean canItemAcceptPatterns(ItemStack stack){
-        CompoundTag beTag = stack.getTagElement("BlockEntityTag");
-        return stack.getItem() instanceof BannerItem && (beTag == null || !beTag.contains("Patterns") || beTag.getList("Patterns",10).size() < 6);
+
+        return stack.getItem() instanceof BannerItem && (stack.get(DataComponents.BANNER_PATTERNS) == null || stack.get(DataComponents.BANNER_PATTERNS).layers().size() < 6);
     }
     protected void addCraftingButtons(){
         for (int i = 0; i < 12; i++) {
@@ -369,7 +367,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                     if (isFocused() && isValidIndex()){
                         if (LegacyLoomScreen.this.canCraft()){
                             ScreenUtil.playSimpleUISound(SoundEvents.UI_LOOM_TAKE_RESULT,1.0f);
-                            Legacy4J.NETWORK.sendToServer(new ServerInventoryCraftPacket(selectedIngredients,previewStack,-1, Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
+                            CommonNetworkManager.sendToServer(new ServerInventoryCraftPacket(selectedIngredients,previewStack,-1, Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
                             selectedPatterns.clear();
                             selectedStack = ItemStack.EMPTY;
                             previewStack = ItemStack.EMPTY;
@@ -393,7 +391,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
             return ingredients;
         }
         @Override
-        public ItemStack assemble(CraftingContainer container, RegistryAccess registryAccess) {
+        public ItemStack assemble(CraftingContainer container, HolderLookup.Provider provider) {
             return resultStack;
         }
         @Override
@@ -401,7 +399,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
             return true;
         }
         @Override
-        public ItemStack getResultItem(RegistryAccess registryAccess) {
+        public ItemStack getResultItem(HolderLookup.Provider provider) {
             return resultStack;
         }
         @Override
@@ -479,7 +477,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
             Component resultName = resultStack.getHoverName();
             ScreenUtil.renderScrollingString(guiGraphics, font, resultName, leftPos + 11 + Math.max(163 - font.width(resultName), 0) / 2, topPos + 114, leftPos + 170, topPos + 125, 0x383838, false);
             if (craftingTabList.selectedTab == 0){
-                List<Component> list = resultStack.getTooltipLines(minecraft.player, TooltipFlag.NORMAL);
+                List<Component> list = resultStack.getTooltipLines(Item.TooltipContext.of(minecraft.level),minecraft.player, TooltipFlag.NORMAL);
                 for (int i1 = 0; i1 < list.size(); i1++) {
                     if (26 + i1 * 13 >= 93) break;
                     Component c = list.get(i1);

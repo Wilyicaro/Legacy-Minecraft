@@ -8,6 +8,7 @@ import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -37,15 +38,17 @@ public class LegacyTabButton extends AbstractButton {
         return Offset.ZERO;
     };
 
-    public LegacyTabButton(int i, int j, int width, int height, int type, ResourceLocation iconSprite, CompoundTag itemIconTag, Component text, Tooltip tooltip, Consumer<LegacyTabButton> onPress) {
+    public LegacyTabButton(int i, int j, int width, int height, int type, ResourceLocation iconSprite, DataComponentPatch patch, Component text, Tooltip tooltip, Consumer<LegacyTabButton> onPress) {
         super(i, j, width, height, text);
         setTooltip(tooltip);
         this.onPress = onPress;
         this.type = type;
         icon = iconSprite;
         if (itemIcon == null && icon != null)
-            if (BuiltInRegistries.ITEM.containsKey(icon))
-                (itemIcon = BuiltInRegistries.ITEM.get(icon).getDefaultInstance()).setTag(itemIconTag);
+            if (BuiltInRegistries.ITEM.containsKey(icon)) {
+                itemIcon = BuiltInRegistries.ITEM.get(icon).getDefaultInstance();
+                if (patch != null) itemIcon.applyComponents(patch);
+            }
     }
 
     @Override

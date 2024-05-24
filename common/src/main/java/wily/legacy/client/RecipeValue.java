@@ -2,13 +2,14 @@ package wily.legacy.client;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.Block;
@@ -23,15 +24,16 @@ public interface RecipeValue<C extends Container, T extends Recipe<C>> extends P
     ResourceLocation TIPPED_ARROW = new ResourceLocation("tipped_arrow");
     Map<ResourceLocation, IdOverride> ID_RECIPE_VALUES_OVERRIDES = new HashMap<>(Map.of(TIPPED_ARROW, (type, manager, rcps, filter) -> {
         if (rcps.get(rcps.size() -1) instanceof TippedArrowRecipe r) {
-            BuiltInRegistries.POTION.forEach(p -> {
-                if (p == Potions.EMPTY || (p.getEffects().isEmpty() && p != Potions.WATER)) return;
+            BuiltInRegistries.POTION.holders().forEach(p -> {
+                if (p.value().getEffects().isEmpty() && p != Potions.WATER) return;
                 ItemStack potion = Items.LINGERING_POTION.getDefaultInstance();
                 ItemStack result = new ItemStack(Items.TIPPED_ARROW,8);
-                PotionUtils.setPotion(potion, p);
-                PotionUtils.setPotion(result, p);
+                PotionContents contents = new PotionContents(p);
+                potion.set(DataComponents.POTION_CONTENTS,contents);
+                result.set(DataComponents.POTION_CONTENTS,contents);
                 NonNullList<Ingredient> ings = NonNullList.create();
                 for (int i = 0; i < 8; i++) ings.add(Ingredient.of(Items.ARROW.getDefaultInstance()));
-                ings.add(4, Legacy4JPlatform.getNBTIngredient(potion));
+                ings.add(4, Legacy4JPlatform.getStrictComponentsIngredient(potion));
                 Recipe<?> rcp = new ShapelessRecipe(r.getGroup(), r.category(), result, ings);
                 if (filter.test(rcp)) rcps.add(rcp);
             });

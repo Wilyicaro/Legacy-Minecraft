@@ -11,11 +11,14 @@ import net.minecraft.world.inventory.BrewingStandMenu;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(BrewingStandScreen.class)
-public class BrewingStandScreenMixin extends AbstractContainerScreen<BrewingStandMenu> {
+public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<BrewingStandMenu> {
     @Shadow @Final private static ResourceLocation FUEL_LENGTH_SPRITE;
 
     @Shadow @Final private static ResourceLocation BREW_PROGRESS_SPRITE;
@@ -27,8 +30,9 @@ public class BrewingStandScreenMixin extends AbstractContainerScreen<BrewingStan
     public BrewingStandScreenMixin(BrewingStandMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
-    @Override
-    public void init() {
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         imageWidth = 213;
         imageHeight = 225;
         inventoryLabelX = 13;
@@ -57,8 +61,9 @@ public class BrewingStandScreenMixin extends AbstractContainerScreen<BrewingStan
         guiGraphics.pose().popPose();
     }
 
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 58.5f,topPos + 22.5, 0f);

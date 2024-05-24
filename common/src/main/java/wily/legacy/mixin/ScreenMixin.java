@@ -25,9 +25,6 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
 
     @Shadow public int height;
 
-    @Shadow public abstract void clearFocus();
-
-    @Shadow @Final public List<GuiEventListener> children;
 
     @Inject(method = "changeFocus",at = @At("HEAD"))
     private void render(ComponentPath componentPath, CallbackInfo ci){
@@ -41,8 +38,12 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     public void renderTransparentBackground(GuiGraphics graphics, int i, int j, int k, int l, int m, int n) {
         graphics.fillGradient(i,j,k,l, -1073741824, -805306368);
     }
-    @Redirect(method = "renderBackground",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderDirtBackground(Lnet/minecraft/client/gui/GuiGraphics;)V"))
-    public void renderBackground(Screen instance, GuiGraphics guiGraphics) {
+    @Redirect(method = "renderBackground",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderBlurredBackground(F)V"))
+    public void renderBackground(Screen instance, float f) {
+    }
+    @Inject(method = "renderPanorama",at = @At("HEAD"), cancellable = true)
+    public void renderBackground(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderDefaultBackground(guiGraphics,true,true);
     }
     @Inject(method = "keyPressed",at = @At("HEAD"))
@@ -52,4 +53,17 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     @Redirect(method = "rebuildWidgets",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;clearFocus()V"))
     public void rebuildWidgets(Screen instance) {
     }
+    @Redirect(method = "rebuildWidgets",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;setInitialFocus()V"))
+    public void rebuildWidgetsInitialFocus(Screen instance) {
+    }
+    @Inject(method = "setInitialFocus(Lnet/minecraft/client/gui/components/events/GuiEventListener;)V",at = @At(value = "HEAD"), cancellable = true)
+    public void setInitialFocus(GuiEventListener guiEventListener, CallbackInfo ci) {
+        setFocused(guiEventListener);
+        ci.cancel();
+    }
+    @Inject(method = "setInitialFocus()V",at = @At(value = "HEAD"), cancellable = true)
+    public void setInitialFocus(CallbackInfo ci) {
+        ci.cancel();
+    }
+
 }

@@ -13,6 +13,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Collection;
@@ -28,8 +31,9 @@ public abstract class EffectRenderingInventoryScreenMixin extends AbstractContai
         super(abstractContainerMenu, inventory, component);
     }
 
-    @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    @Inject(method = "render",at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        ci.cancel();
         super.render(guiGraphics, i, j, f);
         int x = this.leftPos + this.imageWidth + 3;
         int l = this.width - x;

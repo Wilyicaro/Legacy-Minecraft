@@ -31,8 +31,7 @@ import static wily.legacy.client.screen.ControlTooltip.CONTROL_ACTION_CACHE;
 public class PlayGameScreen extends PanelVListScreen{
     public PlayGameScreen(Screen parent, int initialTab) {
         super(parent,300,256,Component.translatable("legacy.menu.play_game"));
-        tabList.selectedTab = -1;
-        tabList.tabButtons.get(initialTab).onPress();
+        tabList.selectedTab = initialTab;
         Supplier<Boolean> saveOptions = ()-> saveRenderableList.renderables.stream().anyMatch(r-> r instanceof GuiEventListener l && l.isFocused());
         controlTooltipRenderer.add(()->ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O,true) : ControllerBinding.UP_BUTTON.bindingState.getIcon(true),()->saveOptions.get() || serverRenderableList.renderables.stream().anyMatch(r-> serverRenderableList.renderables.indexOf(r) > 1 && r instanceof GuiEventListener l && l.isFocused()) ? CONTROL_ACTION_CACHE.getUnchecked(saveOptions.get() ? "legacy.menu.save_options" : "legacy.menu.server_options") : null);
     }
@@ -81,10 +80,7 @@ public class PlayGameScreen extends PanelVListScreen{
                 }
                 guiGraphics.pose().popPose();
             }
-            RenderSystem.enableBlend();
             ScreenUtil.renderPanelTranslucentRecess(guiGraphics, panel.x + 9, panel.y + panel.height - 25, panel.width - 18 , 16, 2);
-            RenderSystem.disableBlend();
-
         }
         if (isLoading)
             ScreenUtil.drawGenericLoading(guiGraphics, panel.x + 112 ,
@@ -125,7 +121,6 @@ public class PlayGameScreen extends PanelVListScreen{
                 rebuildWidgets();
             }
         }
-        if (tabList.selectedTab == 2) minecraft.getRealms32BitWarningStatus().showRealms32BitWarningIfNeeded(this);
         this.pinger.tick();
     }
 

@@ -5,8 +5,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -14,13 +15,19 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BannerPattern;
+import net.minecraft.world.level.block.entity.BannerPatternLayers;
+import net.minecraft.world.level.block.entity.BannerPatterns;
 import wily.legacy.Legacy4J;
-import wily.legacy.util.CompoundTagUtil;
+import wily.legacy.util.JsonUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Supplier;
 
 import static wily.legacy.util.JsonUtil.getJsonStringOrNull;
 import static wily.legacy.util.JsonUtil.ifJsonStringNotNull;
@@ -30,21 +37,20 @@ public class LoomTabListing {
     private static final String LOOM_TAB_LISTING = "loom_tab_listing.json";
     public String id;
     public Component displayName;
-    public ResourceLocation icon;
-    public CompoundTag itemIconTag;
+    public ResourceKey<BannerPattern> patternIcon;
     public final List<ResourceKey<BannerPattern>> patterns = new ArrayList<>();
 
 
-    public LoomTabListing(String id, Component displayName, ResourceLocation icon, CompoundTag itemIconTag){
+    public LoomTabListing(String id, Component displayName, ResourceKey<BannerPattern> patternIcon){
         this.id = id;
         this.displayName = displayName;
-        this.icon = icon;
-        this.itemIconTag = itemIconTag;
+        this.patternIcon = patternIcon;
     }
     public boolean isValid(){
-        return displayName != null && id != null && !patterns.isEmpty() && icon != null;
+        return displayName != null && id != null && !patterns.isEmpty() && patternIcon != null;
     }
     public static class Manager extends SimplePreparableReloadListener<List<LoomTabListing>> {
+
         @Override
         protected List<LoomTabListing> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
             List<LoomTabListing> listings = new ArrayList<>();
@@ -58,11 +64,10 @@ public class LoomTabListing {
                             JsonElement listingElement = go.get("listing");
                             listings.stream().filter(l-> c.equals(l.id)).findFirst().ifPresentOrElse(l->{
                                 ifJsonStringNotNull(go,"displayName", Component::translatable, n-> l.displayName = n);
-                                ifJsonStringNotNull(go,"icon", ResourceLocation::new, n-> l.icon = n);
-                                ifJsonStringNotNull(go,"nbt", CompoundTagUtil::parseCompoundTag, n-> l.itemIconTag = n);
+                                ifJsonStringNotNull(go,"patternIcon", ResourceLocation::new, n-> l.patternIcon = ResourceKey.create(Registries.BANNER_PATTERN, n));
                                 addBannerPatternsFromJson(l.patterns,listingElement);
                             }, ()->{
-                                LoomTabListing listing = new LoomTabListing(c,getJsonStringOrNull(go,"displayName",Component::translatable),getJsonStringOrNull(go,"icon",ResourceLocation::new), getJsonStringOrNull(go,"nbt",CompoundTagUtil::parseCompoundTag));
+                                LoomTabListing listing = new LoomTabListing(c,getJsonStringOrNull(go,"displayName",Component::translatable),getJsonStringOrNull(go,"patternIcon",l-> ResourceKey.create(Registries.BANNER_PATTERN, new ResourceLocation(l))));
                                 addBannerPatternsFromJson(listing.patterns,listingElement);
                                 listings.add(listing);
                             });

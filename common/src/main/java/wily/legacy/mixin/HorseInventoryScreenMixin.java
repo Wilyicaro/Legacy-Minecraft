@@ -11,10 +11,13 @@ import net.minecraft.world.inventory.HorseInventoryMenu;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(HorseInventoryScreen.class)
-public class HorseInventoryScreenMixin extends AbstractContainerScreen<HorseInventoryMenu> {
+public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<HorseInventoryMenu> {
     @Shadow @Final private AbstractHorse horse;
 
     public HorseInventoryScreenMixin(HorseInventoryMenu abstractContainerMenu, Inventory inventory, Component component) {
@@ -32,8 +35,9 @@ public class HorseInventoryScreenMixin extends AbstractContainerScreen<HorseInve
         super.init();
     }
 
-    @Override
-    public void renderBg(GuiGraphics graphics, float f, int i, int j) {
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics graphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderPanel(graphics,leftPos,topPos,imageWidth,imageHeight,2f);
         ScreenUtil.renderSquareEntityPanel(graphics,leftPos + 34,topPos + 20,63,63,2);
         ScreenUtil.renderSquareRecessedPanel(graphics,leftPos + 97,topPos + 20,105,63,2);

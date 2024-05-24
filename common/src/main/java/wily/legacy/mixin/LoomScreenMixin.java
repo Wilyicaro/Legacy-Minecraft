@@ -21,14 +21,19 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.LoomMenu;
+import net.minecraft.world.item.BannerItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.block.entity.BannerPattern;
+import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.util.ScreenUtil;
 
@@ -40,7 +45,6 @@ import static wily.legacy.util.LegacySprites.*;
 public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> {
 
 
-    @Shadow @Nullable private List<Pair<Holder<BannerPattern>, DyeColor>> resultBannerPatterns;
 
     @Shadow private boolean hasMaxPatterns;
 
@@ -58,14 +62,16 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
 
     @Shadow protected abstract int totalRowCount();
 
+    @Shadow private @Nullable BannerPatternLayers resultBannerPatterns;
     private LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
 
     public LoomScreenMixin(LoomMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
 
-    @Override
-    public void init() {
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         imageWidth = 215;
         imageHeight = 217;
         inventoryLabelX = 14;
@@ -88,8 +94,9 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
         renderBg(guiGraphics, f, i, j);
     }
 
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderPanel(guiGraphics,leftPos,topPos, imageWidth,imageHeight,2f);
         ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 72,  topPos+ 18, 75, 75,2f);
         guiGraphics.pose().pushPose();
@@ -120,7 +127,8 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
             guiGraphics.pose().scale(1f, -1f, -1f);
             this.flag.xRot = 0.0f;
             this.flag.y = -32.0f;
-            BannerRenderer.renderPatterns(guiGraphics.pose(), guiGraphics.bufferSource(), 0xF000F0, OverlayTexture.NO_OVERLAY, this.flag, ModelBakery.BANNER_BASE, true, this.resultBannerPatterns);
+            DyeColor dyeColor = ((BannerItem)menu.getResultSlot().getItem().getItem()).getColor();
+            BannerRenderer.renderPatterns(guiGraphics.pose(), guiGraphics.bufferSource(), 0xF000F0, OverlayTexture.NO_OVERLAY, this.flag, ModelBakery.BANNER_BASE, true, dyeColor, this.resultBannerPatterns);
             guiGraphics.pose().popPose();
             guiGraphics.flush();
         } else if (this.hasMaxPatterns) {
@@ -147,7 +155,8 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
         guiGraphics.pose().popPose();
         Lighting.setupFor3DItems();
     }
-    public boolean mouseClicked(double d, double e, int i) {
+    @Inject(method = "mouseClicked",at = @At("HEAD"), cancellable = true)
+    public void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
         this.scrolling = false;
         if (this.displayPatterns) {
             double j = leftPos + 73.5f;
@@ -161,14 +170,16 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
                     if (!(f >= 0.0) || !(g >= 0.0) || !(f < 18.0) || !(g < 18.0) || !menu.clickMenuButton(this.minecraft.player, o)) continue;
                     Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_LOOM_SELECT_PATTERN, 1.0f));
                     this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, o);
-                    return true;
+                    cir.setReturnValue(true);
+                    return;
                 }
             }
             if (ScreenUtil.isMouseOver(d,e,leftPos+ 149.5,topPos + 18,13,75)) this.scrolling = true;
         }
-        return super.mouseClicked(d, e, i);
+        cir.setReturnValue(super.mouseClicked(d, e, i));
     }
-    public boolean mouseDragged(double d, double e, int i, double f, double g) {
+    @Inject(method = "mouseDragged",at = @At("HEAD"), cancellable = true)
+    public void mouseDragged(double d, double e, int i, double f, double g, CallbackInfoReturnable<Boolean> cir) {
         int j = this.totalRowCount() - 4;
         if (this.scrolling && this.displayPatterns && j > 0) {
             int oldRow = startRow;
@@ -176,9 +187,10 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
             if (oldRow != startRow){
                 scrollRenderer.updateScroll(oldRow - startRow > 0 ? ScreenDirection.UP : ScreenDirection.DOWN);
             }
-            return true;
+            cir.setReturnValue(true);
+            return;
         }
-        return super.mouseDragged(d, e, i, f, g);
+        cir.setReturnValue(super.mouseDragged(d, e, i, f, g));
     }
     @Redirect(method = "mouseScrolled",at = @At(value = "FIELD",target = "Lnet/minecraft/client/gui/screens/inventory/LoomScreen;startRow:I"))
     private void mouseScrolled(LoomScreen instance, int value){

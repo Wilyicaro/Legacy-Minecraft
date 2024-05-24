@@ -13,6 +13,9 @@ import net.minecraft.world.inventory.Slot;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(CrafterScreen.class)
@@ -26,12 +29,6 @@ public abstract class CrafterScreenMixin extends AbstractContainerScreen<Crafter
 
     @Shadow @Final private static ResourceLocation UNPOWERED_REDSTONE_LOCATION_SPRITE;
 
-    @Shadow @Final private Player player;
-
-    @Shadow protected abstract void enableSlot(int i);
-
-    @Shadow protected abstract void disableSlot(int i);
-
     public CrafterScreenMixin(CrafterMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
@@ -42,11 +39,14 @@ public abstract class CrafterScreenMixin extends AbstractContainerScreen<Crafter
         renderBg(guiGraphics, f, i, j);
     }
 
-    @Override
-    public void renderSlot(GuiGraphics guiGraphics, Slot slot) {
+    @Inject(method = "renderSlot",at = @At("HEAD"), cancellable = true)
+    public void renderSlot(GuiGraphics guiGraphics, Slot slot, CallbackInfo ci) {
+        ci.cancel();
         super.renderSlot(guiGraphics, slot);
     }
-    public void init() {
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         imageWidth = 215;
         imageHeight = 202;
         inventoryLabelX = 14;
@@ -55,14 +55,16 @@ public abstract class CrafterScreenMixin extends AbstractContainerScreen<Crafter
         titleLabelY = 11;
         super.init();
     }
-    @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    @Inject(method = "render",at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        ci.cancel();
         super.render(guiGraphics, i, j, f);
         this.renderTooltip(guiGraphics, i, j);
         if (this.hoveredSlot instanceof CrafterSlot && !this.menu.isSlotDisabled(this.hoveredSlot.index) && this.menu.getCarried().isEmpty() && !this.hoveredSlot.hasItem()) guiGraphics.renderTooltip(this.font, DISABLED_SLOT_TOOLTIP, i, j);
     }
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
         guiGraphics.blitSprite(menu.isPowered() ? POWERED_REDSTONE_LOCATION_SPRITE : UNPOWERED_REDSTONE_LOCATION_SPRITE,leftPos + 105,topPos + 43,24,24);
     }

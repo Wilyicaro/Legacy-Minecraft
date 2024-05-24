@@ -9,7 +9,6 @@ pluginManagement {
 
 include("common")
 include("fabric")
-include("forge")
 include("neoforge")
 
 rootProject.name = "Legacy4J"

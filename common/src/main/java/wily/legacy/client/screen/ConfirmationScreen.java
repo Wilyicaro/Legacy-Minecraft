@@ -58,7 +58,7 @@ ConfirmationScreen extends PanelBackgroundScreen{
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         if (parent != null) {
             guiGraphics.pose().translate(0, 0, -800);
-            parent.render(guiGraphics, 0, 0, f);
+            parent.renderWithTooltip(guiGraphics, 0, 0, f);
             guiGraphics.pose().translate(0, 0, 800);
         }
         if (transparentBackground) renderTransparentBackground(guiGraphics);

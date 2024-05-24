@@ -34,7 +34,10 @@ import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static wily.legacy.client.screen.ControlTooltip.*;
@@ -49,7 +52,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     protected boolean hasClickedOutside;
     public final List<Stocker.Sizeable> tabsScrolledList = new ArrayList<>();
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
-    protected final List<LegacyCreativeTabListing> displayListing;
+    protected final List<List<ItemStack>> displayListing = new ArrayList<>();
 
     public CreativeModeScreen(Player player) {
         super(new CreativeModeMenu(player), player.getInventory(), Component.empty());
@@ -57,17 +60,23 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
         ((LegacyMenuAccess<?>) this).getControlTooltipRenderer().tooltips.set(2,ControlTooltip.create(()->getActiveType().isKeyboard() ?  getKeyIcon(canClearQuickSelect() ? InputConstants.KEY_X: InputConstants.MOUSE_BUTTON_RIGHT,true) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(true),()-> CONTROL_ACTION_CACHE.getUnchecked(canClearQuickSelect() ? "legacy.action.clear_quick_select" : "legacy.action.take_half")));
         ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> page.max > 0 ? ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true)}) : ControllerBinding.RIGHT_STICK.bindingState.getIcon(true) : null,()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.page"));
         LegacyCreativeTabListing.rebuildVanillaCreativeTabsItems(Minecraft.getInstance());
-        displayListing = Stream.concat(LegacyCreativeTabListing.list.stream(), BuiltInRegistries.CREATIVE_MODE_TAB.stream().filter(CreativeModeScreen::canDisplayVanillaCreativeTab).map(c->new LegacyCreativeTabListing(c.getDisplayName(), BuiltInRegistries.ITEM.getKey(c.getIconItem().getItem()), c.getIconItem().getTag(),new ArrayList<>(c.getDisplayItems())))).toList();
+        for (LegacyCreativeTabListing tab : LegacyCreativeTabListing.list) {
+            displayListing.add(tab.displayItems().stream().map(Supplier::get).filter(i-> !i.isEmpty() && i.isItemEnabled(Minecraft.getInstance().getConnection().enabledFeatures())).toList());
+            tabList.addTabButton(39, 0, tab.icon(), tab.itemPatch(), tab.name(), b -> fillCreativeGrid());
+        }
+        BuiltInRegistries.CREATIVE_MODE_TAB.stream().filter(CreativeModeScreen::canDisplayVanillaCreativeTab).forEach(c-> {
+            displayListing.add(List.copyOf(c.getDisplayItems()));
+            tabList.addTabButton(39, 0, BuiltInRegistries.ITEM.getKey(c.getIconItem().getItem()), c.getIconItem().getComponentsPatch(), c.getDisplayName(), b -> fillCreativeGrid());
+        });
+
         player.containerMenu = this.menu;
         panel = new Panel(p-> (width - p.width) / 2, p-> Math.max(33,(height - 179)/ 2) ,321, 212);
         displayListing.forEach(t->{
             Stocker.Sizeable scroll = new Stocker.Sizeable(0);
-            scroll.max = t.displayItems().size() <= creativeModeGrid.getContainerSize() ? 0 : t.displayItems().size() / creativeModeGrid.getContainerSize();
+            scroll.max = t.size() <= creativeModeGrid.getContainerSize() ? 0 : t.size() / creativeModeGrid.getContainerSize();
             tabsScrolledList.add(scroll);
         });
 
-        for (LegacyCreativeTabListing tab : displayListing)
-            tabList.addTabButton(39, 0, tab.icon(), tab.itemIconTag(), tab.name(), b -> fillCreativeGrid());
     }
     public boolean canClearQuickSelect(){
         return hoveredSlot == null || !hoveredSlot.hasItem();
@@ -116,7 +125,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     }
     public void fillCreativeGrid(){
         if (displayListing.isEmpty()) return;
-        List<ItemStack> list = displayListing.get(page.get() * 8 + tabList.selectedTab).displayItems();
+        List<ItemStack> list = displayListing.get(page.get() * 8 + tabList.selectedTab);
         for (int i = 0; i < creativeModeGrid.getContainerSize(); i++) {
             int index = tabsScrolledList.get(page.get() * 8 + tabList.selectedTab).get() * 50 + i;
             creativeModeGrid.setItem(i,list.size() > index ?  list.get(index) : ItemStack.EMPTY);
@@ -255,7 +264,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
                     }
                     return;
                 }
-                if (!itemStack.isEmpty() && !itemStack2.isEmpty() && ItemStack.isSameItemSameTags(itemStack, itemStack2)) {
+                if (!itemStack.isEmpty() && !itemStack2.isEmpty() && ItemStack.isSameItemSameComponents(itemStack, itemStack2)) {
                     if (j == 0) {
                         if (bl) {
                             itemStack.setCount(itemStack.getMaxStackSize());
@@ -321,7 +330,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     }
 
     @Override
-    public void componentTick(BindingState state) {
+    public void bindingStateTick(BindingState state) {
         if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s && s.pressed && s.canClick()){
             controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
         }

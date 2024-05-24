@@ -33,7 +33,7 @@ public class CreationList extends RenderableVList{
         LegacyWorldTemplate.list.forEach(t-> addIconButton(this,t.icon(),t.buttonName(), c-> {
             try {
                 String name = Legacy4JClient.importSaveFile(minecraft,minecraft.getResourceManager().getResourceOrThrow(t.worldTemplate()).open(),t.folderName());
-                if (t.directJoin()) minecraft.createWorldOpenFlows().checkForBackupAndLoad(name, ()-> minecraft.setScreen(screen));
+                if (t.directJoin()) minecraft.createWorldOpenFlows().openWorld(name, ()-> minecraft.setScreen(screen));
                 else {
                     LevelStorageSource.LevelStorageAccess access = minecraft.getLevelSource().createAccess(name);
                     LevelSummary summary = access.getSummary(access.getDataTag());

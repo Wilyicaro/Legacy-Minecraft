@@ -206,7 +206,7 @@ public class SaveRenderableList extends RenderableVList {
 
                     @Override
                     protected MutableComponent createNarrationMessage() {
-                        MutableComponent component = Component.translatable("narrator.select.world_info", summary.getLevelName(), new Date(summary.getLastPlayed()), summary.getInfo());
+                        MutableComponent component = Component.translatable("narrator.select.world_info", summary.getLevelName(), new Date(summary.getLastPlayed()).toString(), summary.getInfo());
                         if (summary.isLocked()) {
                             component = CommonComponents.joinForNarration(component, WORLD_LOCKED_TOOLTIP);
                         }

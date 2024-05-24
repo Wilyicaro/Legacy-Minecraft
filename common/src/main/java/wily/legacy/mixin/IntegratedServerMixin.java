@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyWorldSettings;
@@ -63,6 +64,13 @@ public abstract class IntegratedServerMixin extends MinecraftServer {
     public void stopServer(CallbackInfo ci) {
         if (!((LegacyOptions) minecraft.options).autoSave().get()){
             ci.cancel();
+            if (Legacy4JClient.deleteLevelWhenExitWithoutSaving){
+                try {
+                    storageSource.deleteLevel();
+                } catch (IOException e) {
+                    Legacy4J.LOGGER.warn(e.getMessage());
+                }
+            }
             if (self().metricsRecorder.isRecording()) {
                 self().cancelRecordingMetrics();
             }
@@ -79,6 +87,7 @@ public abstract class IntegratedServerMixin extends MinecraftServer {
                 this.lanPinger = null;
             }
         }
+        Legacy4JClient.deleteLevelWhenExitWithoutSaving = false;
     }
 
     @Override

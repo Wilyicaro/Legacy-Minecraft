@@ -23,6 +23,7 @@ import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.FaviconTexture;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
@@ -129,69 +130,66 @@ public class ServerRenderableList extends RenderableVList {
             FaviconTexture icon = FaviconTexture.forServer(this.minecraft.getTextureManager(), server.ip);
             addRenderable(new AbstractButton(0,0,270,30,Component.literal(server.name)) {
                 private byte @Nullable [] lastIconBytes;
+                @Nullable
+                private List<Component> onlinePlayersTooltip;
+                @Nullable
+                private ResourceLocation statusIcon;
+                @Nullable
+                private Component statusIconTooltip;
                 @Override
                 protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
                     super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
                     List<Component> list2;
                     Component component2;
                     ResourceLocation resourceLocation;
-                    if (!server.pinged) {
-                        server.pinged = true;
-                        server.ping = -2L;
+                    if (server.state() == ServerData.State.INITIAL) {
+                        server.setState(ServerData.State.PINGING);
                         server.motd = CommonComponents.EMPTY;
                         server.status = CommonComponents.EMPTY;
                         THREAD_POOL.submit(() -> {
                             try {
-                                screen.getPinger().pingServer(server, () -> minecraft.execute(this::updateServerList));
+                                screen.getPinger().pingServer(server, () -> minecraft.execute(this::updateServerList), () -> {
+                                    server.setState(server.protocol == SharedConstants.getCurrentVersion().getProtocolVersion() ? ServerData.State.SUCCESSFUL : ServerData.State.INCOMPATIBLE);
+                                    minecraft.execute(this::refreshStatus);
+                                });
                             } catch (UnknownHostException unknownHostException) {
-                                server.ping = -1L;
-                                server.motd = CANT_RESOLVE_TEXT;
+                               server.setState(ServerData.State.UNREACHABLE);
+                               server.motd = CANT_RESOLVE_TEXT;
+                                minecraft.execute(this::refreshStatus);
                             } catch (Exception exception) {
-                                server.ping = -1L;
+                                server.setState(ServerData.State.UNREACHABLE);
                                 server.motd = CANT_CONNECT_TEXT;
+                                minecraft.execute(this::refreshStatus);
                             }
                         });
                     }
                     boolean bl2 = !this.isCompatible();
                     guiGraphics.drawString(minecraft.font, getMessage(), getX() + 32 + 3, getY() + 3, 0xFFFFFF);
-                    minecraft.selectMainFont(true);
-                    List<FormattedCharSequence> list = minecraft.font.split(server.motd, Math.max(234,minecraft.font.width(server.motd) / 2));
-                    for (int p = 0; p < Math.min(list.size(), 2); ++p) {
-                        ScreenUtil.renderScrollingString(guiGraphics,minecraft.font, list.get(p), getX() + 35,  getY() + 8 + minecraft.font.lineHeight * p,getX() + 269,getY() + 19 + minecraft.font.lineHeight * p, -8355712, false);
+                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().translate(getX() + 35,  getY() + 10,0);
+                    guiGraphics.pose().scale(2/3f,2/3f,2/3f);
+                    List<FormattedCharSequence> list = minecraft.font.split(server.motd, Math.max(234,minecraft.font.width(server.motd) / 2 + 20));
+                    for (int p = 0; p < Math.min(2,list.size()); ++p) {
+                        ScreenUtil.renderScrollingString(guiGraphics,minecraft.font, list.get(p), 0,  minecraft.font.lineHeight * p,234 , 11 + minecraft.font.lineHeight * p, -8355712, false,minecraft.font.width(list.get(p))* 2/3);
                     }
-                    minecraft.selectMainFont(false);
+                    guiGraphics.pose().popPose();
                     Component component = bl2 ? server.version.copy().withStyle(ChatFormatting.RED) : server.status;
                     int q = minecraft.font.width(component);
                     guiGraphics.drawString(minecraft.font, component, getX() + 270 - q - 15 - 2, getY() + 3, -8355712, false);
-                    if (bl2) {
-                        resourceLocation = INCOMPATIBLE;
-                        component2 = INCOMPATIBLE_STATUS;
-                        list2 = server.playerList;
-                    } else if (this.pingCompleted()) {
-                        resourceLocation = server.ping < 0L ? UNREACHABLE : (server.ping < 150L ? PING_5 : (server.ping < 300L ? PING_4 : (server.ping < 600L ? PING_3 : (server.ping < 1000L ? PING_2 : PING_1))));
-                        if (server.ping < 0L) {
-                            component2 = NO_CONNECTION_STATUS;
-                            list2 = Collections.emptyList();
-                        } else {
-                            component2 = Component.translatable("multiplayer.status.ping", server.ping);
-                            list2 = server.playerList;
+                    if (server.state() == ServerData.State.PINGING) {
+                        int p = (int)(Util.getMillis() / 100L + (long)(index * 2) & 7L);
+                        if (p > 4) {
+                            p = 8 - p;
                         }
-                    } else {
-                        int r = (int)(Util.getMillis() / 100L + (long)(index * 2) & 7L);
-                        if (r > 4) {
-                            r = 8 - r;
-                        }
-                        resourceLocation = switch (r) {
+                        this.statusIcon = switch (p) {
                             default -> PINGING_1;
                             case 1 -> PINGING_2;
                             case 2 -> PINGING_3;
                             case 3 -> PINGING_4;
                             case 4 -> PINGING_5;
                         };
-                        component2 = PINGING_STATUS;
-                        list2 = Collections.emptyList();
                     }
-                    guiGraphics.blitSprite(resourceLocation, getX() + width - 15, getY() + 3, 10, 8);
+                    if (statusIcon != null) guiGraphics.blitSprite(statusIcon, getX() + width - 15, getY() + 3, 10, 8);
                     byte[] bs = server.getIconBytes();
                     if (!Arrays.equals(bs, this.lastIconBytes)) {
                         if (this.uploadServerIcon(bs)) {
@@ -204,10 +202,10 @@ public class ServerRenderableList extends RenderableVList {
                     this.drawIcon(guiGraphics, getX(), getY(), icon.textureLocation());
                     int s = mouseX - getX();
                     int t = mouseY - getY();
-                    if (s >= width - 15 && s <= width - 5 && t >= 2 && t <= 10) {
-                        guiGraphics.renderTooltip(minecraft.font,component2, mouseX,mouseY);
-                    } else if (s >= width - q - 15 - 2 && s <= width - 15 - 2 && t >= 2 && t <= 10) {
-                        guiGraphics.renderComponentTooltip(minecraft.font,list2, mouseX,mouseY);
+                    if (statusIconTooltip != null && s >= width - 15 && s <= width - 5 && t >= 2 && t <= 10) {
+                        guiGraphics.renderTooltip(minecraft.font,statusIconTooltip, mouseX,mouseY);
+                    } else if (onlinePlayersTooltip != null && s >= width - q - 15 - 2 && s <= width - 15 - 2 && t >= 2 && t <= 10) {
+                        guiGraphics.renderComponentTooltip(minecraft.font,onlinePlayersTooltip, mouseX,mouseY);
                     }
                     if (minecraft.options.touchscreen().get().booleanValue() || isHovered) {
                         guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
@@ -234,8 +232,32 @@ public class ServerRenderableList extends RenderableVList {
                         }
                     }
                 }
-                private boolean pingCompleted() {
-                    return server.pinged && server.ping != -2L;
+                private void refreshStatus() {
+                    this.onlinePlayersTooltip = null;
+                    switch (server.state()) {
+                        case INITIAL:
+                        case PINGING: {
+                            this.statusIcon = PING_1;
+                            this.statusIconTooltip = PINGING_STATUS;
+                            break;
+                        }
+                        case INCOMPATIBLE: {
+                            this.statusIcon = INCOMPATIBLE;
+                            this.statusIconTooltip = INCOMPATIBLE_STATUS;
+                            this.onlinePlayersTooltip = server.playerList;
+                            break;
+                        }
+                        case UNREACHABLE: {
+                            this.statusIcon = UNREACHABLE;
+                            this.statusIconTooltip = NO_CONNECTION_STATUS;
+                            break;
+                        }
+                        case SUCCESSFUL: {
+                            this.statusIcon = server.ping < 150L ? PING_5 : (server.ping < 300L ? PING_4 : (server.ping < 600L ? PING_3 : (server.ping < 1000L ? PING_2: PINGING_1)));
+                            this.statusIconTooltip = Component.translatable("multiplayer.status.ping", server.ping);
+                            this.onlinePlayersTooltip = server.playerList;
+                        }
+                    }
                 }
 
                 private boolean isCompatible() {
@@ -317,23 +339,30 @@ public class ServerRenderableList extends RenderableVList {
                     MutableComponent mutableComponent = Component.empty();
                     mutableComponent.append(Component.translatable("narrator.select", server.name));
                     mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
-                    if (!this.isCompatible()) {
-                        mutableComponent.append(INCOMPATIBLE_STATUS);
-                        mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
-                        mutableComponent.append(Component.translatable("multiplayer.status.version.narration", server.version));
-                        mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
-                        mutableComponent.append(Component.translatable("multiplayer.status.motd.narration", server.motd));
-                    } else if (server.ping < 0L) {
-                        mutableComponent.append(NO_CONNECTION_STATUS);
-                    } else if (!this.pingCompleted()) {
-                        mutableComponent.append(PINGING_STATUS);
-                    } else {
-                        mutableComponent.append(ONLINE_STATUS);
-                        mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
-                        mutableComponent.append(Component.translatable("multiplayer.status.ping.narration", server.ping));
-                        mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
+                    switch (server.state()) {
+                        case INCOMPATIBLE: {
+                            mutableComponent.append(INCOMPATIBLE_STATUS);
+                            mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
+                            mutableComponent.append(Component.translatable("multiplayer.status.version.narration", server.version));
+                            mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
                             mutableComponent.append(Component.translatable("multiplayer.status.motd.narration", server.motd));
-                        if (server.players != null) {
+                            break;
+                        }
+                        case UNREACHABLE: {
+                            mutableComponent.append(NO_CONNECTION_STATUS);
+                            break;
+                        }
+                        case PINGING: {
+                            mutableComponent.append(PINGING_STATUS);
+                            break;
+                        }
+                        default: {
+                            mutableComponent.append(ONLINE_STATUS);
+                            mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
+                            mutableComponent.append(Component.translatable("multiplayer.status.ping.narration", server.ping));
+                            mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
+                            mutableComponent.append(Component.translatable("multiplayer.status.motd.narration", server.motd));
+                            if (server.players == null) break;
                             mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
                             mutableComponent.append(Component.translatable("multiplayer.status.player_count.narration", server.players.online(), server.players.max()));
                             mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
@@ -399,7 +428,7 @@ public class ServerRenderableList extends RenderableVList {
         join(new ServerData(lanServer.getMotd(),lanServer.getAddress(),ServerData.Type.LAN));
     }
     private void join(ServerData serverData) {
-        ConnectScreen.startConnecting(screen, this.minecraft, ServerAddress.parseString(serverData.ip), serverData, false);
+        ConnectScreen.startConnecting(screen, this.minecraft, ServerAddress.parseString(serverData.ip), serverData, false,null);
     }
 
 }

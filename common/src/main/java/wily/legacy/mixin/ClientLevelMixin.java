@@ -20,6 +20,6 @@ public class ClientLevelMixin {
     public int calculateBlockTint(ColorResolver instance, Biome biome, double x, double z, BlockPos pos) {
         BlockPos.MutableBlockPos m = pos.mutable();
         LegacyBiomeOverride o = LegacyBiomeOverride.getOrDefault(self().getBiome(m.setX((int) x).setZ((int) z)).unwrapKey());
-        return instance == BiomeColors.WATER_COLOR_RESOLVER && self().getFluidState(m).is(FluidTags.WATER) && o.waterColor() != null  ? o.waterColor() : instance.getColor(biome,x,z);
+        return instance == BiomeColors.WATER_COLOR_RESOLVER && self().getFluidState(m).is(FluidTags.WATER) && o.waterColor() != null ? o.waterColor() : instance.getColor(biome,x,z);
     }
 }

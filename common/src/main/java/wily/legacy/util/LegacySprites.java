@@ -4,6 +4,10 @@ import net.minecraft.resources.ResourceLocation;
 import wily.legacy.Legacy4J;
 
 public class LegacySprites {
+    public static final ResourceLocation ENCHANTING_SLOT = new ResourceLocation(Legacy4J.MOD_ID,"container/enchanting_slot");
+    public static final ResourceLocation LEADERBOARD_BUTTON = new ResourceLocation(Legacy4J.MOD_ID,"widget/leaderboard_button");
+    public static final ResourceLocation LEADERBOARD_BUTTON_HIGHLIGHTED = new ResourceLocation(Legacy4J.MOD_ID,"widget/leaderboard_button_highlighted");
+    public static final ResourceLocation PANEL_HIGHLIGHT = new ResourceLocation(Legacy4J.MOD_ID,"widget/panel_highlight");
     public static final ResourceLocation DISCOUNT_STRIKETHRUOGH_SPRITE = new ResourceLocation("container/villager/discount_strikethrough");
     public static final ResourceLocation NON_INTERACTIVE_RESULT_SLOT = new ResourceLocation(Legacy4J.MOD_ID,"container/non_interactive_result_slot");
     public static final ResourceLocation CRAFTER_SLOT = new ResourceLocation(Legacy4J.MOD_ID,"container/crafter_slot");

@@ -4,7 +4,6 @@
   "compatibilityLevel": "JAVA_17",
   "client": [
     "AbstractContainerScreenMixin",
-    "ExtendedGuiMixin",
     "GuiGraphicsMixin",
     "GuiMixin",
     "MinecraftMixin",

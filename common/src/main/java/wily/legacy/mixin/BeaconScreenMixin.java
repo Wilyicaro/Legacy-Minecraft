@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.BeaconScreen;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
@@ -18,6 +19,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4J;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
@@ -47,8 +51,9 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    @Override
-    public void init() {
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         CONFIRM_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"container/beacon_check");
         imageWidth = 260;
         imageHeight = 255;
@@ -65,41 +70,43 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
 
         int j;
         int l;
-        MobEffect mobEffect;
+        Holder<MobEffect> mobEffect;
         BeaconScreen.BeaconPowerButton beaconPowerButton;
         for(int i = 0; i <= 2; ++i) {
-            j = BeaconBlockEntity.BEACON_EFFECTS[i].length;
+            j = BeaconBlockEntity.BEACON_EFFECTS.get(i).size();
             for(l = 0; l < j; ++l) {
-                mobEffect = BeaconBlockEntity.BEACON_EFFECTS[i][l];
+                mobEffect = BeaconBlockEntity.BEACON_EFFECTS.get(i).get(l);
                 beaconPowerButton = self().new BeaconPowerButton(this.leftPos + 59 + (j > 1 ? l * 27 : 13), this.topPos + 38 + i * 30, mobEffect, true, i);
                 beaconPowerButton.active = false;
                 this.addBeaconButton(beaconPowerButton);
             }
         }
 
-        j = BeaconBlockEntity.BEACON_EFFECTS[3].length + 1;
+        j = BeaconBlockEntity.BEACON_EFFECTS.get(3).size() + 1;
         int k = j > 1 ? 0 : 13;
 
         for(l = 0; l < j - 1; ++l) {
-            mobEffect = BeaconBlockEntity.BEACON_EFFECTS[3][l];
+            mobEffect = BeaconBlockEntity.BEACON_EFFECTS.get(3).get(l);
             beaconPowerButton = self().new BeaconPowerButton(this.leftPos + 164 + l * 27 + k, this.topPos + 68, mobEffect, false, 3);
             beaconPowerButton.active = false;
             this.addBeaconButton(beaconPowerButton);
         }
 
-        BeaconScreen.BeaconPowerButton beaconPowerButton2 = self().new BeaconUpgradePowerButton(this.leftPos + 165 + (j - 1) * 24 - k / 2, this.topPos + 68, BeaconBlockEntity.BEACON_EFFECTS[0][0]);
+        BeaconScreen.BeaconPowerButton beaconPowerButton2 = self().new BeaconUpgradePowerButton(this.leftPos + 165 + (j - 1) * 24 - k / 2, this.topPos + 68, BeaconBlockEntity.BEACON_EFFECTS.get(0).get(0));
         beaconPowerButton2.visible = false;
         this.addBeaconButton(beaconPowerButton2);
     }
 
-    @Override
-    public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
+    @Inject(method = "renderLabels",at = @At("HEAD"), cancellable = true)
+    public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         guiGraphics.drawString(this.font, PRIMARY_EFFECT_LABEL, 9 + (121 - font.width(PRIMARY_EFFECT_LABEL)) /2, 13, 0x383838, false);
         guiGraphics.drawString(this.font, SECONDARY_EFFECT_LABEL, 133 + (121 - font.width(SECONDARY_EFFECT_LABEL)) /2, 13, 0x383838, false);
     }
     private static final Item[] DISPLAY_ITEMS = new Item[]{Items.NETHERITE_INGOT,Items.EMERALD,Items.DIAMOND,Items.GOLD_INGOT,Items.IRON_INGOT};
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
         ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 8,topPos + 9,120, 115,2f);
         ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 132,topPos + 9,120, 115,2f);

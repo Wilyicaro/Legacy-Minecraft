@@ -13,6 +13,9 @@ import net.minecraft.world.inventory.AbstractFurnaceMenu;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
@@ -20,7 +23,7 @@ import wily.legacy.util.ScreenUtil;
 import static wily.legacy.util.LegacySprites.ARROW;
 
 @Mixin(AbstractFurnaceScreen.class)
-public class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends AbstractContainerScreen<T> {
+public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends AbstractContainerScreen<T> {
     @Shadow private boolean widthTooNarrow;
 
     @Shadow @Final public AbstractFurnaceRecipeBookComponent recipeBookComponent;
@@ -29,8 +32,9 @@ public class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends A
     public AbstractFurnaceScreenMixin(T abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
-    @Override
-    public void init() {
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         imageWidth = 214;
         imageHeight = 215;
         inventoryLabelX = 14;
@@ -65,8 +69,9 @@ public class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends A
         renderBg(guiGraphics, f, i, j);
     }
 
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 77,topPos + 48,0);

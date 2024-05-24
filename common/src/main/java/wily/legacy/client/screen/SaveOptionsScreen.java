@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.NoticeWithLinkScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.StringUtil;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
 import net.minecraft.world.level.validation.ContentValidationException;
@@ -46,7 +47,7 @@ public class SaveOptionsScreen extends ConfirmationScreen{
             @Override
             protected void init() {
                 super.init();
-                renameBox.setResponder(s-> okButton.active = !Util.isBlank(s));
+                renameBox.setResponder(s-> okButton.active = !StringUtil.isBlank(s));
                 renameBox.setY(panel.y + 45);
                 renameBox.setValue(summary.getLevelName());
                 addRenderableWidget(renameBox);

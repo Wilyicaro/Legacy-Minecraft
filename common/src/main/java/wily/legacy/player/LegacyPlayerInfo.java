@@ -1,7 +1,14 @@
 package wily.legacy.player;
 
 import com.mojang.authlib.GameProfile;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.protocol.game.ClientboundAwardStatsPacket;
+import net.minecraft.stats.Stat;
+import net.minecraft.stats.StatType;
 
 public interface LegacyPlayerInfo {
     default GameProfile legacyMinecraft$getProfile(){
@@ -16,12 +23,17 @@ public interface LegacyPlayerInfo {
     boolean mayFlySurvival();
     void setMayFlySurvival(boolean mayFly);
 
+    Object2IntMap<Stat<?>> getStatsMap();
+    void setStatsMap(Object2IntMap<Stat<?>> statsMap);
+
     static LegacyPlayerInfo fromNetwork(FriendlyByteBuf buf){
         return new LegacyPlayerInfo() {
             int pos = buf.readVarInt();
             boolean invisible = buf.readBoolean();
             boolean exhaustion = buf.readBoolean();
             boolean mayFly = buf.readBoolean();
+
+            Object2IntMap<Stat<?>> statsMap = ClientboundAwardStatsPacket.STAT_VALUES_STREAM_CODEC.decode((RegistryFriendlyByteBuf) buf);
             public int getPosition() {
                 return pos;
             }
@@ -46,18 +58,28 @@ public interface LegacyPlayerInfo {
             public void setMayFlySurvival(boolean mayFly) {
                 this.mayFly = mayFly;
             }
+            @Override
+            public Object2IntMap<Stat<?>> getStatsMap() {
+                return statsMap;
+            }
+            @Override
+            public void setStatsMap(Object2IntMap<Stat<?>> statsMap) {
+                this.statsMap = statsMap;
+            }
         };
     }
-    default void toNetwork(FriendlyByteBuf buf){
+    default void toNetwork(RegistryFriendlyByteBuf buf){
         buf.writeVarInt(getPosition());
         buf.writeBoolean(isVisible());
         buf.writeBoolean(isExhaustionDisabled());
         buf.writeBoolean(mayFlySurvival());
+        ClientboundAwardStatsPacket.STAT_VALUES_STREAM_CODEC.encode(buf,getStatsMap());
     }
     default void copyFrom(LegacyPlayerInfo info){
         this.setPosition(info.getPosition());
         this.setVisibility(info.isVisible());
         this.setDisableExhaustion(info.isExhaustionDisabled());
         this.setMayFlySurvival(info.mayFlySurvival());
+        this.setStatsMap(info.getStatsMap());
     }
 }
