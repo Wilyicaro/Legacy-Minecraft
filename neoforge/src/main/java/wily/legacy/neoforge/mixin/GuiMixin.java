@@ -37,10 +37,8 @@ public abstract class GuiMixin {
 
     @Inject(method = "renderSelectedItemName(Lnet/minecraft/client/gui/GuiGraphics;I)V", at = @At("HEAD"), cancellable = true, remap = false)
     public void renderSelectedItemName(GuiGraphics guiGraphics, int shift, CallbackInfo ci) {
-        if (minecraft.screen != null){
-            ci.cancel();
-            return;
-        }
+        ci.cancel();
+        if (minecraft.screen != null) return;
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0,ScreenUtil.getHUDDistance() - Math.max(shift, ScreenUtil.getHUDSize()),0);
         this.minecraft.getProfiler().push("selectedItemName");
@@ -51,7 +49,7 @@ public abstract class GuiMixin {
                 Component mutableComponent = i >= 4 ? MORE : tooltipLines.get(i);
                 int width = this.getFont().width(mutableComponent);
                 int j = (this.screenWidth - width) / 2;
-                int k = this.screenHeight - getFont().lineHeight * (tooltipLines.size() - 1 - i);
+                int k = this.screenHeight - getFont().lineHeight * (Math.min(4,tooltipLines.size()) - 1 - i);
                 if ((l = (int)((float)this.toolHighlightTimer * 256.0f / 10.0f)) > 255) {
                     l = 255;
                 }
@@ -70,7 +68,6 @@ public abstract class GuiMixin {
         }
         this.minecraft.getProfiler().pop();
         guiGraphics.pose().popPose();
-        ci.cancel();
     }
 
 }

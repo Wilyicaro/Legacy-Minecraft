@@ -98,11 +98,8 @@ public abstract class GuiMixin {
     }
     @Inject(method = "renderSelectedItemName", at = @At("HEAD"), cancellable = true)
     public void renderSelectedItemName(GuiGraphics guiGraphics, CallbackInfo ci) {
-        if (minecraft.screen != null){
-            ci.cancel();
-            return;
-        }
-
+        ci.cancel();
+        if (minecraft.screen != null) return;
         RenderSystem.enableBlend();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F,ScreenUtil.getHUDDistance() - ScreenUtil.getHUDSize(),0.0F);
@@ -118,7 +115,7 @@ public abstract class GuiMixin {
                     Component mutableComponent = i >= 4 ? MORE : tooltipLines.get(i);
                     int width = this.getFont().width(mutableComponent);
                     int j = (this.screenWidth - width) / 2;
-                    int k = this.screenHeight - getFont().lineHeight * (tooltipLines.size() - 1 - i);
+                    int k = this.screenHeight - getFont().lineHeight * (Math.min(4,tooltipLines.size()) - 1 - i);
                     guiGraphics.drawString(this.getFont(), mutableComponent, j, k, 0xFFFFFF + (l << 24));
                     if (i >= 4) break;
                 }
@@ -127,7 +124,6 @@ public abstract class GuiMixin {
         RenderSystem.disableBlend();
         this.minecraft.getProfiler().pop();
         guiGraphics.pose().popPose();
-        ci.cancel();
     }
 
 }

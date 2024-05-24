@@ -95,6 +95,7 @@ public abstract class MinecraftMixin {
     @Unique
     public double getTweakedHeightScale(int height) {
         if (ScreenUtil.getLegacyOptions().autoResolution().get()){
+            if (height == 1080) return 0.999623452;
             if (height % 720 != 0) return 1.001d;
             return 1d;
         }

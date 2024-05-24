@@ -39,7 +39,6 @@ public abstract class PackSelectionScreenMixin extends Screen {
     private static final Component INCOMPATIBLE_CONFIRM_TITLE = Component.translatable("pack.incompatible.confirm.title");
     private static final Component AVAILABLE_PACK = Component.translatable("pack.selected.title");
     private static final Component SELECTED_PACK = Component.translatable("pack.available.title");
-    protected int lastFocused = -1;
     @Shadow @Final private PackSelectionModel model;
     @Shadow protected abstract void reload();
 
@@ -55,16 +54,8 @@ public abstract class PackSelectionScreenMixin extends Screen {
     private PackSelectionScreen self(){
         return(PackSelectionScreen)(Object) this;
     }
-    public void clearFocus() {
-        if (lastFocused >= 0 && Legacy4JClient.controllerManager.isCursorDisabled) return;
-        lastFocused = -1;
-        super.clearFocus();
-    }
+
     Screen parent;
-    public void repositionElements() {
-        lastFocused = getFocused() != null ? children().indexOf(getFocused()) : -1;
-        super.repositionElements();
-    }
     @Inject(method = "init",at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
@@ -73,7 +64,6 @@ public abstract class PackSelectionScreenMixin extends Screen {
         unselectedPacksList.init(this,panel.x + 15, panel.y + 30, 180, 210);
         selectedPacksList.init(this,panel.x + 215, panel.y + 30, 180, 210);
         this.doneButton = Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).build();
-        if (lastFocused >= 0 && lastFocused < children.size()) setInitialFocus(children.get(lastFocused));
     }
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
