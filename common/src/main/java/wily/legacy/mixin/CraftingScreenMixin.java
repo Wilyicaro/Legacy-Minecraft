@@ -10,13 +10,16 @@ import net.minecraft.world.inventory.*;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.ScreenUtil;
 
 import static wily.legacy.util.LegacySprites.ARROW;
 
 @Mixin(CraftingScreen.class)
-public class CraftingScreenMixin extends AbstractContainerScreen<CraftingMenu> {
+public abstract class CraftingScreenMixin extends AbstractContainerScreen<CraftingMenu> {
 
 
     @Shadow private boolean widthTooNarrow;
@@ -32,8 +35,9 @@ public class CraftingScreenMixin extends AbstractContainerScreen<CraftingMenu> {
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-
-    public void init() {
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         imageWidth = 215;
         imageHeight = 202;
         inventoryLabelX = 14;
@@ -57,8 +61,9 @@ public class CraftingScreenMixin extends AbstractContainerScreen<CraftingMenu> {
         else if (recipeBookComponent.isVisible()) recipeBookComponent.toggleVisibility();
     }
 
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 105,topPos + 43,0);

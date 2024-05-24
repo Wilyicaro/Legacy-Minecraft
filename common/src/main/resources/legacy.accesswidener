@@ -142,3 +142,8 @@ accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$Displ
 accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$DisplayCache cursorAtEnd Z
 accessible class net/minecraft/client/gui/Font$StringRenderOutput
 accessible field net/minecraft/client/resources/TextureAtlasHolder textureAtlas Lnet/minecraft/client/renderer/texture/TextureAtlas;
+accessible field net/minecraft/client/multiplayer/ClientAdvancements progress Ljava/util/Map;
+accessible method net/minecraft/network/protocol/game/ClientboundAwardStatsPacket readStatCap (Lnet/minecraft/network/FriendlyByteBuf;Lnet/minecraft/stats/StatType;)Lnet/minecraft/stats/Stat;
+accessible method net/minecraft/network/protocol/game/ClientboundAwardStatsPacket writeStatCap (Lnet/minecraft/network/FriendlyByteBuf;Lnet/minecraft/stats/Stat;)V
+accessible field net/minecraft/stats/StatsCounter stats Lit/unimi/dsi/fastutil/objects/Object2IntMap;
+accessible field net/minecraft/client/KeyMapping clickCount I

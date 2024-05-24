@@ -13,8 +13,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 public class GLFWControllerHandler implements Controller.Handler{
+    private boolean init = false;
     GLFWGamepadState gamepadState;
 
+    @Override
+    public String getName() {
+        return "GLFW";
+    }
 
     private static final GLFWControllerHandler INSTANCE = new GLFWControllerHandler();
 
@@ -24,7 +29,12 @@ public class GLFWControllerHandler implements Controller.Handler{
     }
 
     @Override
-    public void init() {
+    public boolean init() {
+        if (!init){
+            tryDownloadAndApplyNewMappings();
+            init = true;
+        }
+        return true;
     }
 
     @Override

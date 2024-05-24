@@ -46,7 +46,7 @@ public abstract class MapRendererMixin {
             poseStack.pushPose();
             poseStack.translate(-0.2f,0.4f,-0.1f);
             poseStack.scale(1f, 0.95f, 1);
-            font.drawInBatch("X:%s,Y:%s,Z:%s".formatted(Math.round(minecraft.player.getX()), Math.round(minecraft.player.getY()),Math.round(minecraft.player.getZ())), 0.0f, 0.0f, 0, false, poseStack.last().pose(), multiBufferSource, Font.DisplayMode.NORMAL, 0, i);
+            font.drawInBatch("X:%s,Y:%s,Z:%s".formatted((int)minecraft.player.getX(), (int)minecraft.player.getY(),(int)minecraft.player.getZ()), 0.0f, 0.0f, 0, false, poseStack.last().pose(), multiBufferSource, Font.DisplayMode.NORMAL, 0, i);
             poseStack.popPose();
         }
         //poseStack.pushPose();

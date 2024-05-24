@@ -43,7 +43,7 @@ public abstract class SlotMixin implements LegacySlotDisplay, LegacySlot {
         ItemStack s = cir.getReturnValue();
         if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.containerMenu.slots.contains(this) && !ItemStack.matches(s,lastItemStack) && lastItemStackChange != Util.getMillis()){
             lastItemStackChange = Util.getMillis();
-            lastItemStack = s;
+            lastItemStack = s.copy();
             setChanged();
         }
     }

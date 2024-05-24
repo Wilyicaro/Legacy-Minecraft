@@ -17,6 +17,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MapItem;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.inventory.RenameItemMenu;
 import wily.legacy.util.ScreenUtil;
@@ -91,11 +94,12 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (this.name.keyPressed(i, j, k) || this.name.canConsumeInput()) {
+        if (i != 256 && (this.name.keyPressed(i, j, k) || this.name.canConsumeInput())) {
             return true;
         }
         return super.keyPressed(i, j, k);
     }
+
 
     public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         super.renderLabels(guiGraphics, i, j);
@@ -114,8 +118,9 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
         this.init(minecraft, i, j);
         this.name.setValue(string);
     }
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
         name.render(guiGraphics, i, j, f);
         guiGraphics.blitSprite(LegacySprites.COMBINER_PLUS,leftPos + 14, topPos + 88,13,13);

@@ -12,6 +12,9 @@ import net.minecraft.world.inventory.AnvilMenu;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
@@ -39,7 +42,9 @@ public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
     public AnvilScreenMixin(AnvilMenu itemCombinerMenu, Inventory inventory, Component component, ResourceLocation resourceLocation) {
         super(itemCombinerMenu, inventory, component, resourceLocation);
     }
-    public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
+    @Inject(method = "renderLabels",at = @At("HEAD"), cancellable = true)
+    public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         super.renderLabels(guiGraphics, i, j);
         int k = this.menu.getCost();
         if (k > 0) {
@@ -62,7 +67,9 @@ public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
             }
         }
     }
-    public void subInit() {
+    @Inject(method = "subInit",at = @At("HEAD"), cancellable = true)
+    public void subInit(CallbackInfo ci) {
+        ci.cancel();
         this.name = new EditBox(this.font, leftPos + 72, topPos + 26, 120, 18, Component.translatable("container.repair"));
         this.name.setCanLoseFocus(false);
         this.name.setTextColor(-1);
@@ -80,8 +87,9 @@ public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
         renderBg(guiGraphics, f, i, j);
     }
 
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 13.5, topPos + 9.5,0f);

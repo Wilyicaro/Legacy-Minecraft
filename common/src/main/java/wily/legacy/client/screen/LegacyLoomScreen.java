@@ -50,6 +50,7 @@ import static wily.legacy.client.screen.RecipeIconHolder.getActualItem;
 
 public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu> implements Controller.Event {
     private final Inventory inventory;
+    protected final List<ItemStack> compactInventoryList = new ArrayList<>();
     protected final List<Ingredient> ingredientsGrid = new ArrayList<>(Collections.nCopies(9,Ingredient.EMPTY));
     protected final List<Ingredient> selectedIngredients = new ArrayList<>();
     protected ItemStack resultStack = ItemStack.EMPTY;
@@ -205,20 +206,21 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().addCompound(()-> new Component[]{ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(true),ControlTooltip.SPACE,ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon(true)},()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.group"));
         ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> page.max > 0 ? ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true)}) : ControllerBinding.RIGHT_STICK.bindingState.getIcon(true) : null,()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.page"));
         this.inventory = inventory;
-        craftingTabList.addTabButton(43,0,new ResourceLocation("white_banner"),null,Component.empty(),t-> repositionElements());
+        craftingTabList.addTabButton(43,0,new ResourceLocation("white_banner"),null,Component.empty(),t-> resetElements());
         for (LoomTabListing listing : LoomTabListing.list) {
             if (!listing.isValid()) continue;
 
-            craftingTabList.addTabButton(43,0,listing.icon,listing.itemIconTag,listing.displayName, t->{
-                listener.slotChanged(menu,-1,ItemStack.EMPTY);
-                setFocused(null);
-                craftingButtonsOffset.set(0);
-                if (inited) repositionElements();
-            });
+            craftingTabList.addTabButton(43,0,listing.icon,listing.itemIconTag,listing.displayName, t->resetElements());
         }
         craftingTabList.resetSelectedTab();
         inited = true;
         addCraftingButtons();
+    }
+    public void resetElements(){
+        listener.slotChanged(menu,-1,ItemStack.EMPTY);
+        selectedCraftingButton = 0;
+        craftingButtonsOffset.set(0);
+        if (inited) repositionElements();
     }
     @Override
     public void setFocused(@Nullable GuiEventListener guiEventListener) {
@@ -237,7 +239,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         guiGraphics.pose().translate(leftPos,topPos,0);
     }
     @Override
-    public void componentTick(BindingState state) {
+    public void bindingStateTick(BindingState state) {
         if (state.pressed && state.canClick() && state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s) controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
     }
     public static Ingredient getPatternExtraIngredient(ResourceKey<BannerPattern> pattern){
@@ -260,7 +262,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         menu.addSlotListener(listener);
         craftingTabList.selectedTab = selectedStack.isEmpty() ? 0 : Math.max(craftingTabList.selectedTab,1);
         menu.inventoryActive = selectedStack.isEmpty();
-        if (selectedCraftingButton < getCraftingButtons().size() && getFocused() != getCraftingButtons().get(selectedCraftingButton)) setFocused(getCraftingButtons().get(selectedCraftingButton));
+        if (selectedCraftingButton < getCraftingButtons().size()) setFocused(getCraftingButtons().get(selectedCraftingButton));
         if (craftingTabList.selectedTab != 0) {
             craftingButtonsOffset.max = Math.max(0,LoomTabListing.list.get(page.get() * 7 + craftingTabList.selectedTab - 1).patterns.size() - 12);
             craftingButtons.forEach(b->{
@@ -291,12 +293,14 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
 
     protected boolean canCraft(List<Ingredient> ingredients, boolean isFocused) {
         boolean canCraft = true;
+        compactInventoryList.clear();
+        ServerInventoryCraftPacket.handleCompactInventoryList(compactInventoryList,minecraft.player.getInventory(),menu.getCarried());
         for (int i1 = 0; i1 < ingredients.size(); i1++) {
             Ingredient ing = ingredients.get(i1);
             if (ing.isEmpty()) continue;
-            int itemCount = inventory.items.stream().filter(ing).mapToInt(ItemStack::getCount).sum() + (menu.getCarried().isEmpty() || !ing.test(menu.getCarried()) ? 0 : menu.getCarried().getCount());
-            long ingCount = ingredients.stream().filter(i -> !i.isEmpty() && i.equals(ing)).count();
-            if (itemCount >= ingCount || PagedList.occurrenceOf(ingredients, ing, i1) < itemCount) {
+            Optional<ItemStack> match = compactInventoryList.stream().filter(i-> !i.isEmpty() && ing.test(i.copyWithCount(1))).findFirst();
+            if (match.isPresent()) {
+                match.get().shrink(1);
                 if (isFocused) warningSlots[i1] = false;
             } else {
                 canCraft = false;

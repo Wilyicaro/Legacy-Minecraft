@@ -19,6 +19,10 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.ArrayList;
@@ -43,8 +47,9 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         super(abstractContainerMenu, inventory, component);
     }
 
-    @Override
-    public void init() {
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         this.bookModel = new BookModel(this.minecraft.getEntityModels().bakeLayer(ModelLayers.BOOK));
         imageWidth = 215;
         imageHeight = 217;
@@ -59,18 +64,21 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    public boolean mouseClicked(double d, double e, int i) {
+    @Inject(method = "mouseClicked",at = @At("HEAD"), cancellable = true)
+    public void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
         for (int l = 0; l < 3; ++l) {
             double f = d - (leftPos + 80.5);
             double g = e - (topPos + 23.5 + 21 * l);
             if (!(f >= 0.0) || !(g >= 0.0) || !(f < 120) || !(g < 21) || !this.menu.clickMenuButton(this.minecraft.player, l)) continue;
             this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, l);
-            return true;
+            cir.setReturnValue(true);
+            return;
         }
-        return super.mouseClicked(d, e, i);
+       cir.setReturnValue(super.mouseClicked(d, e, i));
     }
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderPanel(guiGraphics,leftPos,topPos, imageWidth,imageHeight,2f);
         ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 79,  topPos+ 22, 123, 66,2f);
         guiGraphics.pose().pushPose();
@@ -113,8 +121,9 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         }
         guiGraphics.pose().popPose();
     }
-    @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    @Inject(method = "render",at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        ci.cancel();
         f = this.minecraft.getFrameTime();
         super.render(guiGraphics, i, j, f);
         this.renderTooltip(guiGraphics, i, j);

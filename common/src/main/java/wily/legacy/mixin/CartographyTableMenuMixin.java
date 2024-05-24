@@ -68,7 +68,6 @@ public abstract class CartographyTableMenuMixin extends AbstractContainerMenu im
 
     @Override
     public void setResultItemName(String name) {
-        if (RenameItemMenu.validateName(name) == null) return;
         itemName = name;
         slotsChanged(resultContainer);
     }
@@ -95,7 +94,7 @@ public abstract class CartographyTableMenuMixin extends AbstractContainerMenu im
             MapItemSavedData data = MapItem.getSavedData(itemStack,level);
             if (data == null || data.locked) return;
             ItemStack result = resultContainer.getItem(0);
-            if (resultContainer.getItem(0).isEmpty() && itemStack.is(Items.FILLED_MAP)) {
+            if (resultContainer.getItem(0).isEmpty() && itemStack.is(Items.FILLED_MAP) && itemStack2.isEmpty()) {
                 result = itemStack.copyWithCount(1);
                 if (RenameItemMenu.validateName(itemName) != null) result.setHoverName(Component.literal(itemName));
                 resultContainer.setItem(0, result);

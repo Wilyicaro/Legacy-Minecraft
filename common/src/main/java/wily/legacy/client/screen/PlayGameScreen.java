@@ -81,10 +81,7 @@ public class PlayGameScreen extends PanelVListScreen{
                 }
                 guiGraphics.pose().popPose();
             }
-            RenderSystem.enableBlend();
             ScreenUtil.renderPanelTranslucentRecess(guiGraphics, panel.x + 9, panel.y + panel.height - 25, panel.width - 18 , 16, 2);
-            RenderSystem.disableBlend();
-
         }
         if (isLoading)
             ScreenUtil.drawGenericLoading(guiGraphics, panel.x + 112 ,

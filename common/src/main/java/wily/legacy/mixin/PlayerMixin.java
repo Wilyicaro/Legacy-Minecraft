@@ -25,7 +25,7 @@ public abstract class PlayerMixin extends LivingEntity {
     }
     @Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At(value = "RETURN"))
     public void drop(ItemStack itemStack, boolean bl, boolean bl2, CallbackInfoReturnable<ItemEntity> cir) {
-        if (cir.getReturnValue() != null && !level().isClientSide) super.playSound(SoundEvents.ITEM_PICKUP,1.0f,1.0f);
+        if (cir.getReturnValue() != null && !level().isClientSide && bl2) super.playSound(SoundEvents.ITEM_PICKUP,1.0f,1.0f);
     }
     @Inject(method = "getFlyingSpeed", at = @At(value = "RETURN"), cancellable = true)
     protected void getFlyingSpeed(CallbackInfoReturnable<Float> cir) {

@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "block": "#leaves",
+    "tip": "block.minecraft.leaves.tip"
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "listing": [
+    {
+      "type": "picked_up",
+      "displayName": "legacy.menu.leaderboard.farming",
+      "predicate": {
+        "items": ["egg","wheat","carrot","potato","beetroot","brown_mushroom","red_mushroom","sugar_cane","bamboo","milk_bucket","pumpkin","melon_slice"]
+      }
+    },
+    {
+      "type": "mined",
+      "displayName": "legacy.menu.leaderboard.mining_blocks"
+    },
+    {
+      "type": "crafted",
+      "displayName": "legacy.menu.leaderboard.crafting_items"
+    },
+    {
+      "type": "used",
+      "displayName": "legacy.menu.leaderboard.using_items"
+    },
+    {
+      "type": "broken",
+      "displayName": "legacy.menu.leaderboard.breaking_items"
+    },
+    {
+      "type": "picked_up",
+      "displayName": "legacy.menu.leaderboard.picking_items"
+    },
+    {
+      "type": "dropped",
+      "displayName": "legacy.menu.leaderboard.dropping_items"
+    },
+    {
+      "type": "killed",
+      "displayName": "legacy.menu.leaderboard.kills"
+    },
+    {
+      "type": "killed_by",
+      "displayName": "legacy.menu.leaderboard.deaths"
+    },
+    {
+      "type": "custom",
+      "displayName": "legacy.menu.leaderboard.travelling",
+      "predicate": {
+        "custom_stats": [
+          "walk_one_cm",
+          "fall_one_cm",
+          "minecart_one_cm",
+          "boat_one_cm",
+          "sneak_time",
+          "crouch_one_cm",
+          "sprint_one_cm",
+          "walk_on_water_one_cm",
+          "climb_one_cm",
+          "fly_one_cm",
+          "walk_under_water_one_cm",
+          "pig_one_cm",
+          "horse_one_cm",
+          "aviate_one_cm",
+          "swim_one_cm",
+          "strider_one_cm",
+          "jump"
+        ]
+      },
+      "overrides": [
+        {
+          "type": "item",
+          "predicate": {
+            "custom_stat": "minecart_one_cm"
+          },
+          "id": "minecart"
+        },
+        {
+          "type": "item",
+          "predicate": {
+            "custom_stat": "boat_one_cm"
+          },
+          "id": "oak_boat"
+        },
+        {
+          "type": "entity_type",
+          "predicate": {
+            "custom_stat": "pig_one_cm"
+          },
+          "id": "pig"
+        },
+        {
+          "type": "entity_type",
+          "predicate": {
+            "custom_stat": "horse_one_cm"
+          },
+          "id": "horse"
+        },
+        {
+          "type": "entity_type",
+          "predicate": {
+            "custom_stat": "strider_one_cm"
+          },
+          "id": "strider"
+        }
+      ]
+    },
+    {
+      "type": "custom",
+      "displayName": "stat.generalButton"
+    }
+  ]
+}

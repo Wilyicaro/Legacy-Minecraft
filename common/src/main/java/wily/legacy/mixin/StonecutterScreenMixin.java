@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.util.ScreenUtil;
@@ -73,8 +74,9 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
         super.init();
     }
 
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
         ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 70,  topPos+ 18, 75, 75,2f);
         guiGraphics.pose().pushPose();
@@ -110,26 +112,29 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
         }
         guiGraphics.pose().popPose();
     }
-    public boolean mouseClicked(double d, double e, int i) {
+    @Inject(method = "mouseClicked",at = @At("HEAD"), cancellable = true)
+    public void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
         this.scrolling = false;
         if (this.displayRecipes) {
             double j = this.leftPos + 71.5;
             double k = this.topPos + 19.5;
-            int l = this.startIndex + 12;
-            for (int m = this.startIndex; m < l; ++m) {
+            for (int m = this.startIndex; m < startIndex + 16; ++m) {
                 int n = m - this.startIndex;
                 double f = d - (j + n % 4 * 18);
                 double g = e - (k + n / 4 * 18);
                 if (!(f >= 0.0) || !(g >= 0.0) || !(f < 18.0) || !(g < 18.0) || !this.menu.clickMenuButton(this.minecraft.player, m)) continue;
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_STONECUTTER_SELECT_RECIPE, 1.0f));
                 this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, m);
-                return true;
+                cir.setReturnValue(true);
+                return;
             }
             if (ScreenUtil.isMouseOver(d,e,leftPos + 148.5,topPos + 18,13,75)) this.scrolling = true;
         }
-        return super.mouseClicked(d, e, i);
+        cir.setReturnValue(super.mouseClicked(d, e, i));
     }
-    public void renderTooltip(GuiGraphics guiGraphics, int i, int j) {
+    @Inject(method = "renderTooltip",at = @At("HEAD"), cancellable = true)
+    public void renderTooltip(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         super.renderTooltip(guiGraphics, i, j);
         if (this.displayRecipes) {
             List<RecipeHolder<StonecutterRecipe>> list = this.menu.getRecipes();
@@ -138,21 +143,23 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
                     int r = p + this.startIndex;
                     int s = r * 4 + q;
                     if (s >= list.size()) break block0;
-                    if (ScreenUtil.isMouseOver(i,j,leftPos + 73.5f + q * 18,topPos + 19.5f + p * 18,18,18)) guiGraphics.renderTooltip(this.font, list.get(r).value().getResultItem(this.minecraft.level.registryAccess()), i, j);
+                    if (ScreenUtil.isMouseOver(i,j,leftPos + 73.5f + q * 18,topPos + 19.5f + p * 18,18,18)) guiGraphics.renderTooltip(this.font, list.get(s).value().getResultItem(this.minecraft.level.registryAccess()), i, j);
                 }
             }
         }
     }
-    public boolean mouseDragged(double d, double e, int i, double f, double g) {
+    @Inject(method = "mouseDragged",at = @At("HEAD"), cancellable = true)
+    public void mouseDragged(double d, double e, int i, double f, double g, CallbackInfoReturnable<Boolean> cir) {
         if (this.scrolling && this.displayRecipes && isScrollBarActive()) {
             int oldIndex = startIndex;
             this.startIndex = (int) Math.max(Math.round(getOffscreenRows() * Math.min(1,(e - (topPos + 18)) / 75)), 0) * 4;
             if (oldIndex != startIndex){
                 scrollRenderer.updateScroll(oldIndex - startIndex > 0 ? ScreenDirection.UP : ScreenDirection.DOWN);
             }
-            return true;
+            cir.setReturnValue(true);
+            return;
         }
-        return super.mouseDragged(d, e, i, f, g);
+        cir.setReturnValue(super.mouseDragged(d, e, i, f, g));
     }
     @Redirect(method = "mouseScrolled",at = @At(value = "FIELD",target = "Lnet/minecraft/client/gui/screens/inventory/StonecutterScreen;startIndex:I"))
     private void mouseDragged(StonecutterScreen instance, int value){

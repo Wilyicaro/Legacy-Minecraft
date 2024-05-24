@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
@@ -105,8 +106,9 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
             minecraft.setScreen(new ConfirmationScreen(this,EXIT_BOOK,EXIT_BOOK_MESSAGE,b-> minecraft.setScreen(null)));
         }else super.onClose();
     }
-
-    public void init() {
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         this.clearDisplayCache();
         panel.init();
         addRenderableWidget(panel);
@@ -131,12 +133,14 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
 
         this.forwardButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.x + panel.width - 62, panel.y + panel.height - 34, true, (button) -> this.pageForward(), true));
         this.backButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.x + 26, panel.y + panel.height - 34, false, (button) -> this.pageBack(), true));
-        setInitialFocus(panel);
+        setFocused(panel);
         this.updateButtonVisibility();
     }
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
     }
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    @Inject(method = "render",at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        ci.cancel();
         super.render(guiGraphics, i, j, f);
         int n;
         int o;
@@ -167,28 +171,29 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
     }
 
     @Override
-    public void componentTick(BindingState state) {
+    public void bindingStateTick(BindingState state) {
         if ((state.is(ControllerBinding.RIGHT_BUMPER) || state.is(ControllerBinding.LEFT_BUMPER)) && state.canClick()){
             (state.is(ControllerBinding.RIGHT_BUMPER) ? forwardButton : backButton).keyPressed(InputConstants.KEY_RETURN,0,0);
         }
     }
-
-    public boolean keyPressed(int i, int j, int k) {
+    @Inject(method = "keyPressed",at = @At("HEAD"), cancellable = true)
+    public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
         if ((ControlTooltip.getActiveType().isKeyboard() && (i == InputConstants.KEY_RIGHT || i == InputConstants.KEY_LEFT)) && getFocused() != panel){
             (i == InputConstants.KEY_RIGHT ? forwardButton : backButton).keyPressed(InputConstants.KEY_RETURN,0,0);
-            return true;
+            cir.setReturnValue(true);
+            return;
         }
         if (super.keyPressed(i, j, k)) {
-            return true;
+            cir.setReturnValue(true);
         } else if (this.isSigning) {
-            return this.titleKeyPressed(i, j, k);
+            cir.setReturnValue(titleKeyPressed(i,j,k));
         } else {
             boolean bl = this.bookKeyPressed(i, j, k);
             if (bl) {
                 this.clearDisplayCache();
-                return true;
+                cir.setReturnValue(true);
             } else {
-                return false;
+                cir.setReturnValue(false);
             }
         }
     }

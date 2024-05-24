@@ -1,5 +1,6 @@
 package wily.legacy.client.screen;
 
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.navigation.CommonInputs;
@@ -50,15 +51,22 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
 
     @Override
     protected void updateMessage() {
-        setMessage(messageGetter.apply(this));
         setTooltip(tooltipSupplier.get());
     }
+
+    @Override
+    public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+        setMessage(messageGetter.apply(this));
+        super.renderWidget(guiGraphics, i, j, f);
+    }
+
     public void setFocused(boolean bl) {
         super.setFocused(bl);
         if (bl) canChangeValue = Legacy4JClient.controllerManager.canChangeSlidersValue;
     }
     @Override
     public boolean keyPressed(int i, int j, int k) {
+        if (!active) return false;
         if (CommonInputs.selected(i)) {
             Legacy4JClient.controllerManager.canChangeSlidersValue = this.canChangeValue = !this.canChangeValue;
             return true;
@@ -68,11 +76,11 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
             if ((bl && value > 0) || (i == 262 && value < 1.0)) {
                 double part = 1d / (width - 8) * slidingTime;
                 T v = getObjectValue();
-                while (v.equals(getObjectValue()) && part <= 1) {
+                while (v.equals(getObjectValue())) {
                     setValue(this.value + (bl ? -part : part));
-                    part*=2;
+                    if (part >= 1) break;
+                    part= Math.min(part * 2,1);
                 }
-                ScreenUtil.playSimpleUISound(LegacySoundEvents.SCROLL.get(),1.0f);
                 if (slidingTime > 0 && i != lastSliderInput) slidingTime = 0;
                 lastSliderInput = i;
                 slidingTime++;
@@ -87,9 +95,13 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
     }
     @Override
     protected void applyValue() {
+        T oldValue = objectValue;
         objectValue = valueGetter.apply(this);
         value = valueSetter.apply(objectValue);
-        onChange.accept(this);
+        if (!oldValue.equals(objectValue)){
+            ScreenUtil.playSimpleUISound(LegacySoundEvents.SCROLL.get(),1.0f);
+            onChange.accept(this);
+        }
     }
 
 }

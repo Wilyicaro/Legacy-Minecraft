@@ -76,7 +76,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     protected final TabList craftingTabList = new TabList(new PagedList<>(page,7));
     protected final TabList fireworkTabList = new TabList();
     protected final TabList dyeTabList = new TabList();
-    protected final TabList groupTabList = new TabList().add(0,0,42, 42, 4, new ResourceLocation("crafting_table"),null,Component.empty(),null,b->repositionElements()).add(0,0,42, 42, 4, new ResourceLocation("firework_rocket"),null,Component.empty(),null,b->repositionElements()).add(0,0,42, 42, 4, new ResourceLocation("cyan_dye"),null,Component.empty(),null,b->repositionElements());
+    protected final TabList groupTabList = new TabList().add(0,0,42, 42, 4, new ResourceLocation("crafting_table"),null,Component.empty(),null,b->repositionElements()).add(0,0,42, 42, 4, new ResourceLocation("firework_rocket"),null,Component.empty(),null,b->resetElements()).add(0,0,42, 42, 4, new ResourceLocation("cyan_dye"),null,Component.empty(),null,b->resetElements());
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     private final boolean[] warningSlots;
     protected final ContainerListener listener = new ContainerListener() {
@@ -131,12 +131,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
 
             recipesByTab.add(groups);
 
-            craftingTabList.addTabButton(43,0,listing.icon,listing.itemIconTag,listing.displayName, t->{
-                listener.slotChanged(menu,-1,ItemStack.EMPTY);
-                setFocused(null);
-                craftingButtonsOffset.set(0);
-                if (inited) repositionElements();
-            });
+            craftingTabList.addTabButton(43,0,listing.icon,listing.itemIconTag,listing.displayName, t->resetElements());
 
         }
         if (ScreenUtil.getLegacyOptions().vanillaTabs().get()) manager.getAllRecipesFor(RecipeType.CRAFTING).stream().collect(Collectors.groupingBy(h->h.value().category(),()->new TreeMap<>(Comparator.comparingInt(Enum::ordinal)),Collectors.groupingBy(h->h.value().getGroup().isEmpty() ? h.id().toString() : h.value().getGroup()))).forEach((category, m)->{
@@ -148,12 +143,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             });
             if (groups.isEmpty()) return;
             recipesByTab.add(groups);
-            craftingTabList.addTabButton(43,0,VANILLA_CATEGORY_ICONS[category.ordinal()].arch$registryName(), getTitle(), t->{
-                listener.slotChanged(menu,-1,ItemStack.EMPTY);
-                setFocused(null);
-                craftingButtonsOffset.set(0);
-                if (inited) repositionElements();
-            });
+            craftingTabList.addTabButton(43,0,VANILLA_CATEGORY_ICONS[category.ordinal()].arch$registryName(), getTitle(), t->resetElements());
         });
         craftingTabList.resetSelectedTab();
         inited = true;
@@ -162,13 +152,13 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         CompoundTag explosionTag = new CompoundTag();
         redStarTag.put("Explosion",explosionTag);
         explosionTag.putIntArray("Colors", List.of(DyeColor.RED.getFireworkColor()));
-        fireworkTabList.add(0,0,0,43,0,new ResourceLocation("firework_star"),null, Component.empty(),null, b-> repositionElements());
-        fireworkTabList.add(0,0,0,43,0,new ResourceLocation("firework_star"),redStarTag, Component.empty(),null, b-> repositionElements());
-        fireworkTabList.add(0,0,0,43,0,new ResourceLocation("firework_rocket"),null, Component.empty(),null, b-> repositionElements());
-        dyeTabList.add(0,0,0,43,0,new ResourceLocation("leather_chestplate"),DyeableLeatherItem.dyeArmor(Items.LEATHER_CHESTPLATE.getDefaultInstance(),List.of((DyeItem) Items.GREEN_DYE)).getTag(), Component.empty(),null, b-> repositionElements());
-        dyeTabList.add(0,0,0,43,0,groupTabList.tabButtons.get(2).icon,null, Component.empty(),null, b-> repositionElements());
-        dyeTabList.add(0,0,0,43,0,new ResourceLocation("white_banner"),null, Component.empty(),null, b-> repositionElements());
-        if (!is2x2) dyeTabList.add(0,0,0,43,0,new ResourceLocation("decorated_pot"),null, Component.empty(),null, b-> repositionElements());
+        fireworkTabList.add(0,0,0,43,0,new ResourceLocation("firework_star"),null, Component.empty(),null, b-> resetElements());
+        fireworkTabList.add(0,0,0,43,0,new ResourceLocation("firework_star"),redStarTag, Component.empty(),null, b-> resetElements());
+        fireworkTabList.add(0,0,0,43,0,new ResourceLocation("firework_rocket"),null, Component.empty(),null, b-> resetElements());
+        dyeTabList.add(0,0,0,43,0,new ResourceLocation("leather_chestplate"),DyeableLeatherItem.dyeArmor(Items.LEATHER_CHESTPLATE.getDefaultInstance(),List.of((DyeItem) Items.GREEN_DYE)).getTag(), Component.empty(),null, b-> resetElements());
+        dyeTabList.add(0,0,0,43,0,groupTabList.tabButtons.get(2).icon,null, Component.empty(),null, b-> resetElements());
+        dyeTabList.add(0,0,0,43,0,new ResourceLocation("white_banner"),null, Component.empty(),null, b-> resetElements());
+        if (!is2x2) dyeTabList.add(0,0,0,43,0,new ResourceLocation("decorated_pot"),null, Component.empty(),null, b-> resetElements());
         Consumer<CustomCraftingIconHolder> fireworkStarUpdateRecipe = h->{
             clearIngredients(ingredientsGrid);
             if (fireworkStarButtons.isEmpty()) return;
@@ -282,6 +272,12 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             canCraft(ingredientsGrid,true);
         }).enableAddIngredients(h->h.addedIngredientsItems.size() < 4));
     }
+    public void resetElements(){
+        listener.slotChanged(menu,-1,ItemStack.EMPTY);
+        selectedCraftingButton = 0;
+        craftingButtonsOffset.set(0);
+        if (inited) repositionElements();
+    }
     public static boolean itemHasPatterns(ItemStack stack){
         CompoundTag beTag = stack.getTagElement("BlockEntityTag");
         return stack.getItem() instanceof BannerItem && (beTag != null && beTag.contains("Patterns") && !beTag.getList("Patterns",10).isEmpty());
@@ -358,7 +354,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     }
 
     @Override
-    public void componentTick(BindingState state) {
+    public void bindingStateTick(BindingState state) {
         if (state.pressed && state.canClick()){
             if (state.is(ControllerBinding.LEFT_TRIGGER) || state.is(ControllerBinding.RIGHT_TRIGGER)) groupTabList.controlTab(state.is(ControllerBinding.LEFT_TRIGGER),state.is(ControllerBinding.RIGHT_TRIGGER));
             if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s) controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
@@ -374,7 +370,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         topPos+=18;
         menu.addSlotListener(listener);
         addWidget(groupTabList);
-       if (selectedCraftingButton < getCraftingButtons().size() && getFocused() != getCraftingButtons().get(selectedCraftingButton)) setFocused(getCraftingButtons().get(selectedCraftingButton));
+       if (selectedCraftingButton < getCraftingButtons().size()) setFocused(getCraftingButtons().get(selectedCraftingButton));
        if (groupTabList.selectedTab == 0) {
             craftingButtonsOffset.max = Math.max(0,recipesByTab.get(page.get() * 7 + craftingTabList.selectedTab).size() - 12);
             craftingButtons.forEach(b->{
@@ -421,7 +417,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         for (int i1 = 0; i1 < ings.size(); i1++) {
             Ingredient ing = ings.get(i1);
             if (ing.isEmpty()) continue;
-            int itemCount = minecraft.player.getInventory().items.stream().filter(ing).mapToInt(ItemStack::getCount).sum() + (minecraft.player.containerMenu.getCarried().isEmpty() || !ing.test(minecraft.player.containerMenu.getCarried()) ? 0 : minecraft.player.containerMenu.getCarried().getCount());
+            int itemCount = minecraft.player.getInventory().items.stream().filter(i-> !i.isEmpty() && ing.test(i.copyWithCount(1))).mapToInt(ItemStack::getCount).sum() + (minecraft.player.containerMenu.getCarried().isEmpty() || !ing.test(minecraft.player.containerMenu.getCarried()) ? 0 : minecraft.player.containerMenu.getCarried().getCount());
             long ingCount = ings.stream().filter(i -> !i.isEmpty() && i.equals(ing)).count();
             if (itemCount >= ingCount || PagedList.occurrenceOf(ings, ing, i1) < itemCount) {
                 if (warningSlots != null) warningSlots[i1] = false;

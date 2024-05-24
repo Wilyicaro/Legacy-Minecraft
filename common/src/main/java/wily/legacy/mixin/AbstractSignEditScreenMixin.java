@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.WidgetPanel;
 
@@ -64,7 +65,9 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     private int renderSignText(GuiGraphics instance, Font arg, String string, int i, int j, int k, boolean bl){
         return getFocused() == panel ? instance.drawString(arg,string,i,j,k,bl) : -1;
     }
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    @Inject(method = "render",at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        ci.cancel();
         super.render(guiGraphics, i, j, f);
         Lighting.setupForFlatItems();
         guiGraphics.pose().pushPose();
@@ -76,23 +79,28 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         Lighting.setupFor3DItems();
         controlTooltipRenderer.render(guiGraphics, i, j, f);
     }
-    public boolean keyPressed(int i, int j, int k) {
+    @Inject(method = "keyPressed",at = @At("HEAD"), cancellable = true)
+    public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
         if (i == 265) {
             setFocused(panel);
             this.line = Math.max(0,this.line - 1);
             this.signField.setCursorToEnd();
-            return true;
+            cir.setReturnValue(true);
+            return;
         } else if (i != 264 && i != 257 && i != 335) {
-            return this.signField.keyPressed(i) || super.keyPressed(i, j, k);
+            cir.setReturnValue(this.signField.keyPressed(i) || super.keyPressed(i, j, k));
+            return;
         } else if (line < 3) {
             setFocused(panel);
             this.line = this.line + 1;
             this.signField.setCursorToEnd();
-            return true;
-        }return super.keyPressed(i,j,k);
+            cir.setReturnValue(true);
+            return;
+        }cir.setReturnValue(super.keyPressed(i,j,k));
     }
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
 
     }
+
 }

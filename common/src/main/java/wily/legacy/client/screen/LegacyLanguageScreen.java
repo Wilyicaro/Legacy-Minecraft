@@ -1,5 +1,6 @@
 package wily.legacy.client.screen;
 
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
@@ -13,8 +14,13 @@ public class LegacyLanguageScreen extends PanelVListScreen{
     public LegacyLanguageScreen(Screen parent, LanguageManager manager) {
         super(parent, 255, 240, Component.translatable("controls.keybinds.title"));
         manager.getLanguages().forEach(((s, languageInfo) -> {
-            AbstractButton langButton;
-            renderableVList.addRenderable(langButton = new AbstractButton(0,0,260,20,languageInfo.toComponent()) {
+            renderableVList.addRenderable(new AbstractButton(0,0,260,20,languageInfo.toComponent()) {
+                @Override
+                protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+                    super.renderWidget(guiGraphics, i, j, f);
+                    if (manager.getSelected().equals(s)) setFocused(true);
+                }
+
                 @Override
                 public void onPress() {
                     selectedLang = s;
@@ -24,7 +30,6 @@ public class LegacyLanguageScreen extends PanelVListScreen{
                     defaultButtonNarrationText(narrationElementOutput);
                 }
             });
-            if (manager.getSelected().equals(s)) setFocused(langButton);
         }));
     }
 

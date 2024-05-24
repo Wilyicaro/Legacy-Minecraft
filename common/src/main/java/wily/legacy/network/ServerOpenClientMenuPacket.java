@@ -6,17 +6,16 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Blocks;
 import wily.legacy.inventory.LegacyCraftingMenu;
 
 import java.util.function.Supplier;
 
-public record ServerOpenClientMenu(BlockPos pos, int clientMenu) implements CommonPacket{
-    public ServerOpenClientMenu(int clientMenu){
+public record ServerOpenClientMenuPacket(BlockPos pos, int clientMenu) implements CommonPacket{
+    public ServerOpenClientMenuPacket(int clientMenu){
         this(BlockPos.ZERO,clientMenu);
     }
 
-    public ServerOpenClientMenu(FriendlyByteBuf buf){
+    public ServerOpenClientMenuPacket(FriendlyByteBuf buf){
         this(buf.readBlockPos(),buf.readInt());
     }
     @Override

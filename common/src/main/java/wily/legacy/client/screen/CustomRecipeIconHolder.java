@@ -140,7 +140,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
     }
     @Override
     public void renderItem(GuiGraphics graphics, int i, int j, float f) {
-        ScreenUtil.secureTranslucentRender(graphics,!itemIcon.isEmpty() && !hasItem(itemIcon),0.5f,()-> renderItem(graphics,itemIcon,getX(),getY(),false));
+        ScreenUtil.secureTranslucentRender(graphics,!itemIcon.isEmpty() && !hasItem(itemIcon),0.5f,(u)-> renderItem(graphics,itemIcon,getX(),getY(),false));
     }
     public boolean canAddIngredient(){
         return hasItem(itemIcon) && addedIngredientsItems != null && canAddIngredient.test(this) && getIngredientsGrid().stream().anyMatch(Ingredient::isEmpty);
@@ -175,7 +175,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
         }
         graphics.pose().pushPose();
         applyOffset(graphics);
-        if ((!previousItem.isEmpty() && !ItemStack.matches(previousItem,itemIcon) || !nextItem.isEmpty() && !ItemStack.matches(nextItem,itemIcon))){
+        if (!previousItem.isEmpty() && previousItem!=itemIcon || !nextItem.isEmpty() && nextItem!=itemIcon){
             getScrollRenderer().renderScroll(graphics, ScreenDirection.UP,getX() + 5,getY() - 14);
             getScrollRenderer().renderScroll(graphics, ScreenDirection.DOWN,getX() + 5,getY() + 31);
         }

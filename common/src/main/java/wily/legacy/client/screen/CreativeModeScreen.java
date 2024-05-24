@@ -116,7 +116,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     }
     public void fillCreativeGrid(){
         if (displayListing.isEmpty()) return;
-        List<ItemStack> list = displayListing.get(page.get() * 8 + tabList.selectedTab).displayItems();
+        List<ItemStack> list = displayListing.get(page.get() * 8 + tabList.selectedTab).displayItems().stream().filter(i-> i.getItem().isEnabled(minecraft.getConnection().enabledFeatures())).toList();
         for (int i = 0; i < creativeModeGrid.getContainerSize(); i++) {
             int index = tabsScrolledList.get(page.get() * 8 + tabList.selectedTab).get() * 50 + i;
             creativeModeGrid.setItem(i,list.size() > index ?  list.get(index) : ItemStack.EMPTY);
@@ -321,7 +321,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     }
 
     @Override
-    public void componentTick(BindingState state) {
+    public void bindingStateTick(BindingState state) {
         if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s && s.pressed && s.canClick()){
             controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
         }

@@ -17,7 +17,9 @@ public interface LegacyOptions {
     OptionInstance<Boolean> displayHUD();
     OptionInstance<Boolean> animatedCharacter();
     OptionInstance<Boolean> classicCrafting();
+    OptionInstance<Boolean> autoResolution();
     OptionInstance<Boolean> autoSave();
+    OptionInstance<Boolean> smoothMovement();
     OptionInstance<Boolean> showVanillaRecipeBook();
     OptionInstance<Double> legacyGamma();
     OptionInstance<Boolean> inGameTooltips();
@@ -35,6 +37,11 @@ public interface LegacyOptions {
     OptionInstance<Boolean> invertControllerButtons();
     OptionInstance<Integer> controllerIcons();
     OptionInstance<Integer> selectedController();
+    OptionInstance<Integer> selectedControllerHandler();
     OptionInstance<Difficulty> createWorldDifficulty();
     OptionInstance<Boolean> smoothAnimatedCharacter();
+    OptionInstance<Double> leftStickDeadZone();
+    OptionInstance<Double> rightStickDeadZone();
+    OptionInstance<Double> leftTriggerDeadZone();
+    OptionInstance<Double> rightTriggerDeadZone();
 }

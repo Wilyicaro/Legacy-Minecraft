@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
@@ -56,17 +57,21 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         super(component);
     }
 
-    public void init() {
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         panel.init();
         addRenderableWidget(panel);
         this.forwardButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.x + panel.width - 62, panel.y + panel.height - 34, true, (button) -> this.pageForward(), true));
         this.backButton = this.addRenderableWidget(panel.createLegacyPageButton(panel.x + 26, panel.y + panel.height - 34, false, (button) -> this.pageBack(), true));
-        setInitialFocus(panel);
+        setFocused(panel);
         this.updateButtonVisibility();
     }
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
     }
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    @Inject(method = "render",at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        ci.cancel();
         super.render(guiGraphics, i, j, f);
 
         if (this.cachedPage != this.currentPage) {
@@ -89,17 +94,19 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
 
     }
     @Override
-    public void componentTick(BindingState state) {
+    public void bindingStateTick(BindingState state) {
         if ((state.is(ControllerBinding.RIGHT_BUMPER) || state.is(ControllerBinding.LEFT_BUMPER)) && state.canClick()){
             (state.is(ControllerBinding.RIGHT_BUMPER) ? forwardButton : backButton).keyPressed(InputConstants.KEY_RETURN,0,0);
         }
     }
-    public boolean keyPressed(int i, int j, int k) {
+    @Inject(method = "keyPressed",at = @At("HEAD"), cancellable = true)
+    public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
         if (ControlTooltip.getActiveType().isKeyboard() && (i == InputConstants.KEY_RIGHT || i == InputConstants.KEY_LEFT)){
             (i == InputConstants.KEY_RIGHT ? forwardButton : backButton).keyPressed(InputConstants.KEY_RETURN,0,0);
-            return true;
+            cir.setReturnValue(true);
+            return;
         }
-        return super.keyPressed(i, j, k);
+        cir.setReturnValue(super.keyPressed(i,j,k));
     }
     @Inject(method = "getClickedComponentStyleAt",at = @At("HEAD"), cancellable = true)
     public void getClickedComponentStyleAt(double d, double e, CallbackInfoReturnable<Style> cir) {
@@ -114,7 +121,7 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
             return;
         }
         int k = Math.min(176 / this.font.lineHeight, this.cachedPageComponents.size());
-        if (i <= 114 && j < this.minecraft.font.lineHeight * k + k) {
+        if (i <= 159 && j < this.minecraft.font.lineHeight * k + k) {
             int l = j / this.minecraft.font.lineHeight;
             if (l < this.cachedPageComponents.size()) {
                 FormattedCharSequence formattedCharSequence = this.cachedPageComponents.get(l);

@@ -12,18 +12,28 @@ import java.util.stream.Collectors;
 import static io.github.libsdl4j.api.gamecontroller.SdlGamecontroller.SDL_GameControllerUpdate;
 
 public class SDLControllerHandler implements Controller.Handler{
+    private boolean init = false;
 
     private static final SDLControllerHandler INSTANCE = new SDLControllerHandler();
 
-
+    @Override
+    public String getName() {
+        return "SDL2 (libsdl4j)";
+    }
     public static SDLControllerHandler getInstance(){
         return INSTANCE;
     }
 
-    public void init() {
-        if (Sdl.SDL_Init(SdlSubSystemConst.SDL_INIT_JOYSTICK | SdlSubSystemConst.SDL_INIT_GAMECONTROLLER) < 0){
-            Legacy4J.LOGGER.warn("SDL Game Controller failed to start!");
+    public boolean init() {
+        if (!init) {
+            if (Sdl.SDL_Init(SdlSubSystemConst.SDL_INIT_JOYSTICK | SdlSubSystemConst.SDL_INIT_GAMECONTROLLER) < 0) {
+                Legacy4J.LOGGER.warn("SDL Game Controller failed to start!");
+                return false;
+            }
+            tryDownloadAndApplyNewMappings();
+            init = true;
         }
+        return true;
     }
 
     @Override

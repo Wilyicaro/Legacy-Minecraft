@@ -38,7 +38,7 @@ public class Legacy4J
     public static LegacyServerProperties serverProperties;
 
     public static final String MOD_ID = "legacy";
-    public static final Supplier<String> VERSION =  Platform.getMod(MOD_ID)::getVersion;
+    public static final Supplier<String> VERSION =  ()-> Platform.getMod(MOD_ID).getVersion();
     public static final NetworkChannel NETWORK = NetworkChannel.create(new ResourceLocation(MOD_ID, "main"));
     public static final Supplier<RegistrarManager> REGISTRIES = Suppliers.memoize(() -> RegistrarManager.get(MOD_ID));
 
@@ -51,11 +51,12 @@ public class Legacy4J
         LegacyGameRules.init();
         registerCommonPacket(PlayerInfoSync.class, PlayerInfoSync::new);
         registerCommonPacket(PlayerInfoSync.HostOptions.class, PlayerInfoSync.HostOptions::new);
-        registerCommonPacket(ServerOpenClientMenu.class,ServerOpenClientMenu::new);
+        registerCommonPacket(ServerOpenClientMenuPacket.class, ServerOpenClientMenuPacket::new);
         registerCommonPacket(ServerInventoryCraftPacket.class, ServerInventoryCraftPacket::new);
         registerCommonPacket(TipCommand.Packet.class, TipCommand.Packet::decode);
         registerCommonPacket(TipCommand.EntityPacket.class, TipCommand.EntityPacket::new);
-        PlayerEvent.PLAYER_JOIN.register(Legacy4J::updatePlayerPosition);
+        registerCommonPacket(ClientAdvancementsPacket.class, ClientAdvancementsPacket::new);
+        PlayerEvent.PLAYER_JOIN.register(Legacy4J::onServerPlayerJoin);
         CommandRegistrationEvent.EVENT.register((s,c,e)->{
             TipCommand.register(s,c);
         });
@@ -122,8 +123,9 @@ public class Legacy4J
         registry.register("console_aspects",false);
         if (Platform.isForgeLike()) registry.register("programmer_art","programmer_art", Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP,false);
     }
-    public static void updatePlayerPosition(ServerPlayer p){
+    public static void onServerPlayerJoin(ServerPlayer p){
         if (p.getServer() == null) return;
+        Legacy4J.NETWORK.sendToPlayer(p, new ClientAdvancementsPacket(p.getServer().getAdvancements().getAllAdvancements()));
         int pos = 0;
         boolean b = true;
         main : while (b) {

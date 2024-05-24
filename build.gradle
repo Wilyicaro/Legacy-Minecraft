@@ -133,7 +133,7 @@ subprojects {
     unifiedPublishing {
         project {
             def isFabric = project.name ==  "fabric"
-            displayName = "Legacy Minecraft [$modPlatformName] $project.version"
+            displayName = "Legacy4J [$modPlatformName] $project.version"
             releaseType = "$stage"
             changelog = releaseChangelog()
             gameVersions = ["$minecraft_version"]

@@ -25,9 +25,6 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
 
     @Shadow public int height;
 
-    @Shadow public abstract void clearFocus();
-
-    @Shadow @Final public List<GuiEventListener> children;
 
     @Inject(method = "changeFocus",at = @At("HEAD"))
     private void render(ComponentPath componentPath, CallbackInfo ci){
@@ -51,5 +48,9 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     }
     @Redirect(method = "rebuildWidgets",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;clearFocus()V"))
     public void rebuildWidgets(Screen instance) {
+    }
+    @Inject(method = "setInitialFocus",at = @At(value = "HEAD"))
+    public void rebuildWidgets(GuiEventListener guiEventListener, CallbackInfo ci) {
+        setFocused(guiEventListener);
     }
 }

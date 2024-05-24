@@ -35,7 +35,33 @@
       "minecraft:polished_diorite_slab", "minecraft:andesite_slab", "minecraft:polished_andesite_slab", "minecraft:mud_brick_slab", "minecraft:brick_slab", "minecraft:nether_brick_slab", "minecraft:red_nether_brick_slab", "minecraft:end_stone_brick_slab", "minecraft:quartz_slab", "minecraft:smooth_quartz_slab",
       "minecraft:purpur_slab", "minecraft:prismarine_slab", "minecraft:dark_prismarine_slab", "minecraft:prismarine_brick_slab", "minecraft:cut_copper_slab", "minecraft:exposed_cut_copper_slab", "minecraft:weathered_cut_copper_slab", "minecraft:oxidized_cut_copper_slab", "minecraft:waxed_cut_copper_slab", "minecraft:waxed_exposed_cut_copper_slab",
       "minecraft:waxed_weathered_cut_copper_slab", "minecraft:waxed_oxidized_cut_copper_slab", "minecraft:stone_stairs", "minecraft:cobblestone_stairs", "minecraft:mossy_cobblestone_stairs", "minecraft:stone_brick_stairs", "minecraft:mossy_stone_brick_stairs", "minecraft:cobbled_deepslate_stairs", "minecraft:polished_deepslate_stairs", "minecraft:deepslate_brick_stairs",
-      "minecraft:deepslate_tile_stairs", "minecraft:blackstone_stairs", "minecraft:polished_blackstone_stairs", "minecraft:polished_blackstone_brick_stairs", "minecraft:oak_stairs", "minecraft:spruce_stairs", "minecraft:birch_stairs", "minecraft:jungle_stairs", "minecraft:acacia_stairs", "minecraft:dark_oak_stairs",
+      "minecraft:deepslate_tile_stairs", "minecraft:blackstone_stairs", {
+        "stripes": {
+          "displayName": "legacy.container.tab.stripes",
+          "patternIcon":  "cross",
+          "listing": ["cross","small_stripes","straight_cross","stripe_bottom","stripe_center","stripe_downleft","stripe_downright","stripe_left","stripe_middle","stripe_right","stripe_top"]
+        },
+        "halves": {
+          "patternIcon":  "diagonal_left",
+          "displayName": "legacy.container.tab.halves",
+          "listing": ["diagonal_left","diagonal_right","diagonal_up_left","diagonal_up_right","half_horizontal","half_horizontal_bottom","half_vertical","half_vertical_right"]
+        },
+        "shapes": {
+          "patternIcon": "circle",
+          "displayName": "legacy.container.tab.shapes",
+          "listing": ["circle","rhombus","square_bottom_left","square_bottom_right","square_top_left","square_top_right","triangle_bottom","triangle_top","triangles_bottom","triangles_top"]
+        },
+        "borders_backgrounds_and_gradients": {
+          "patternIcon":  "border",
+          "displayName": "legacy.container.tab.borders_backgrounds_and_gradients",
+          "listing": ["bricks","curly_border","border","gradient","gradient_up"]
+        },
+        "symbols": {
+          "patternIcon": "creeper",
+          "displayName": "legacy.container.tab.symbols",
+          "listing": ["creeper","flower","mojang","skull","globe","piglin","guster","flow"]
+        }
+      },"minecraft:polished_blackstone_stairs", "minecraft:polished_blackstone_brick_stairs", "minecraft:oak_stairs", "minecraft:spruce_stairs", "minecraft:birch_stairs", "minecraft:jungle_stairs", "minecraft:acacia_stairs", "minecraft:dark_oak_stairs",
       "minecraft:cherry_stairs", "minecraft:mangrove_stairs", "minecraft:bamboo_stairs", "minecraft:bamboo_mosaic_stairs", "minecraft:crimson_stairs", "minecraft:warped_stairs", "minecraft:sandstone_stairs", "minecraft:smooth_sandstone_stairs", "minecraft:red_sandstone_stairs", "minecraft:smooth_red_sandstone_stairs",
       "minecraft:granite_stairs", "minecraft:polished_granite_stairs", "minecraft:diorite_stairs", "minecraft:polished_diorite_stairs", "minecraft:andesite_stairs", "minecraft:polished_andesite_stairs", "minecraft:mud_brick_stairs", "minecraft:brick_stairs", "minecraft:nether_brick_stairs", "minecraft:red_nether_brick_stairs",
       "minecraft:end_stone_brick_stairs", "minecraft:quartz_stairs", "minecraft:smooth_quartz_stairs", "minecraft:purpur_stairs", "minecraft:prismarine_stairs", "minecraft:dark_prismarine_stairs", "minecraft:prismarine_brick_stairs", "minecraft:cut_copper_stairs", "minecraft:exposed_cut_copper_stairs", "minecraft:weathered_cut_copper_stairs",

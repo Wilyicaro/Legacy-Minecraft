@@ -2,7 +2,7 @@
   "overrides": [
     {
       "items": ["#minecraft:terracotta","!minecraft:terracotta"],
-      "tip": "block.minecraft.stained_terracotta.tip"
+      "tip": "block.minecraft.colored_terracotta.tip"
     },
     {
       "block": "#minecraft:shulker_boxes",

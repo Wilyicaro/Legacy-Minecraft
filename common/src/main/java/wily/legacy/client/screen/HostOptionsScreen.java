@@ -54,7 +54,6 @@ public class HostOptionsScreen extends PanelVListScreen{
         addPlayerButtons();
         renderableVList.layoutSpacing(l->0);
         panel.dp = 3f;
-        ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
     }
     public HostOptionsScreen() {
         this(PLAYERS_INVITE);

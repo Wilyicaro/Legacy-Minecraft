@@ -21,6 +21,12 @@ configurations {
     runtimeClasspath.extendsFrom common
     developmentFabric.extendsFrom common
 }
+repositories {
+    maven {
+        name = "Terraformers"
+        url = "https://maven.terraformersmc.com/"
+    }
+}
 
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
@@ -30,6 +36,7 @@ dependencies {
     //modCompileOnly "mezz.jei:jei-${jei_minecraft_version}-fabric-api:${jei_version}"
     //modRuntimeOnly "mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}"
     api(include("io.github.libsdl4j:libsdl4j:2.28.4-1.6"))
+    modImplementation("com.terraformersmc:modmenu:9.0.0")
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }

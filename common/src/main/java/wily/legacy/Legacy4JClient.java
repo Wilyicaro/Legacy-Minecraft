@@ -7,6 +7,7 @@ import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientLifecycleEvent;
 import dev.architectury.event.events.client.ClientPlayerEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
+import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.registry.ReloadListenerRegistry;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
@@ -19,10 +20,11 @@ import net.minecraft.client.Options;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
+import net.minecraft.client.gui.components.toasts.AdvancementToast;
+import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.*;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
@@ -69,12 +71,13 @@ import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.client.*;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.ControllerManager;
 import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacyMenuTypes;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.PlayerInfoSync;
-import wily.legacy.network.ServerOpenClientMenu;
+import wily.legacy.network.ServerOpenClientMenuPacket;
 import wily.legacy.player.LegacyPlayerInfo;
 import wily.legacy.util.ScreenUtil;
 
@@ -97,6 +100,7 @@ public class Legacy4JClient {
     public static boolean canLoadVanillaOptions = true;
     public static boolean manualSave = false;
     public static boolean retakeWorldIcon = false;
+    public static boolean deleteLevelWhenExitWithoutSaving = false;
     public static final Map<Component, Component> OPTION_BOOLEAN_CAPTION = Map.of(Component.translatable("key.sprint"),Component.translatable("options.key.toggleSprint"),Component.translatable("key.sneak"),Component.translatable("options.key.toggleSneak"));
     public static LegacyLoadingScreen legacyLoadingScreen = new LegacyLoadingScreen();
     public static MultiBufferSource.BufferSource guiBufferSourceOverride = null;
@@ -110,12 +114,14 @@ public class Legacy4JClient {
     public static final StoneCuttingGroupManager stoneCuttingGroupManager = new StoneCuttingGroupManager();
     public static final LoomTabListing.Manager loomListingManager = new LoomTabListing.Manager();
     public static final ControlTooltip.GuiManager controlTooltipGuiManager = new ControlTooltip.GuiManager();
+    public static final LeaderboardsScreen.Manager leaderBoardListingManager = new LeaderboardsScreen.Manager();
 
     public static ControllerManager controllerManager;
     public static KnownListing<Block> knownBlocks;
     public static KnownListing<EntityType<?>> knownEntities;
     public static GameType enterWorldGameType;
 
+    private static int advancementKeyHold = 0;
     public static PostChain gammaEffect;
     public static int[] MAP_PLAYER_COLORS = new int[]{0xFFFFFF,0x00FF4C,0xFF2119,0x6385FF,0xFF63D9,0xFF9C00,0xFFFB19,0x63FFE4};
     public static float[] getVisualPlayerColor(LegacyPlayerInfo info){
@@ -132,11 +138,13 @@ public class Legacy4JClient {
         return new float[]{r,g,b};
     }
     public static void updateLegacyPlayerInfos(Map<UUID, LegacyPlayerInfo> map){
+        Minecraft minecraft = Minecraft.getInstance();
         map.forEach((s,i)->{
-            Minecraft minecraft = Minecraft.getInstance();
             if (minecraft.getConnection() != null && minecraft.getConnection().getPlayerInfo(s) instanceof LegacyPlayerInfo info)
                 info.copyFrom(i);
         });
+        LeaderboardsScreen.refreshStatsBoards(minecraft);
+        if (minecraft.screen instanceof LeaderboardsScreen s && LeaderboardsScreen.statsBoards.get(s.selectedStatBoard).statsList.isEmpty()) minecraft.executeIfPossible(()-> s.changeStatBoard(false));
     }
 
 
@@ -203,6 +211,7 @@ public class Legacy4JClient {
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, stoneCuttingGroupManager);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, loomListingManager);
         ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, controlTooltipGuiManager);
+        ReloadListenerRegistry.register(PackType.CLIENT_RESOURCES, leaderBoardListingManager);
 
 
         KeyMappingRegistry.register(keyCrafting);
@@ -217,19 +226,21 @@ public class Legacy4JClient {
         knownBlocks = new KnownListing<>(Registries.BLOCK,Minecraft.getInstance().gameDirectory.toPath());
         knownEntities = new KnownListing<>(Registries.ENTITY_TYPE,Minecraft.getInstance().gameDirectory.toPath());
 
+        LifecycleEvent.SERVER_LEVEL_SAVE.register(l-> deleteLevelWhenExitWithoutSaving = false);
+
         TickEvent.SERVER_LEVEL_PRE.register(l-> l.noSave = !ScreenUtil.getLegacyOptions().autoSave().get());
         ClientPlayerEvent.CLIENT_PLAYER_JOIN.register(p-> Legacy4J.NETWORK.sendToServer(new PlayerInfoSync(ScreenUtil.hasClassicCrafting() ? 1 : 2,p)));
         ClientGuiEvent.SET_SCREEN.register((screen) -> {
             Screen replacement = getReplacementScreen(screen);
             if (replacement != screen) return CompoundEventResult.interruptTrue(replacement);
-            if (screen instanceof AbstractContainerScreen<?>) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+            if (Minecraft.getInstance().screen == null && Minecraft.getInstance().level != null && screen != null && (screen instanceof PauseScreen || !screen.isPauseScreen()) ) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
             return CompoundEventResult.interruptDefault(screen);
         });
         ClientGuiEvent.INIT_POST.register((screen,access) -> {
             if (screen.getFocused() != null && !screen.children().contains(screen.getFocused())){
                 screen.clearFocus();
             }
-            if (controllerManager.connectedController != null) {
+            if ((controllerManager.connectedController != null) && !controllerManager.forceEnableCursor) {
                 if (!(screen instanceof MenuAccess<?>) || screen.children().stream().anyMatch(g-> g instanceof LegacyIconHolder)) controllerManager.disableCursor();
                 if (screen.getFocused() == null || !screen.getFocused().isFocused()) {
                     ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(ScreenDirection.DOWN));
@@ -241,6 +252,17 @@ public class Legacy4JClient {
         ClientLifecycleEvent.CLIENT_STARTED.register(m-> controllerManager.setup());
         ClientTickEvent.CLIENT_PRE.register(minecraft -> {
             while (keyCrafting.consumeClick()){
+                AdvancementToast toast = minecraft.getToasts().getToast(AdvancementToast.class, Toast.NO_TOKEN);
+                if (toast != null){
+                    advancementKeyHold++;
+                    if (advancementKeyHold == 10){
+                        minecraft.getToasts().clear();
+                        advancementKeyHold = 0;
+                        ControllerBinding.LEFT_BUTTON.bindingState.block();
+                        minecraft.setScreen(new LegacyAdvancementsScreen(null,minecraft.getConnection().getAdvancements()));
+                    }
+                    continue;
+                }
                 if (minecraft.gameMode != null && minecraft.gameMode.hasInfiniteItems()) {
                     minecraft.setScreen(CreativeModeScreen.getActualCreativeScreenInstance(minecraft));
                     continue;
@@ -250,7 +272,7 @@ public class Legacy4JClient {
                     minecraft.getTutorial().onOpenInventory();
                     minecraft.setScreen(new InventoryScreen(minecraft.player));
                 }else Legacy4J.NETWORK.sendToServer(minecraft.hitResult != null && minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof CraftingTableBlock ?
-                new ServerOpenClientMenu(r.getBlockPos(),0) : new ServerOpenClientMenu(1));
+                new ServerOpenClientMenuPacket(r.getBlockPos(),0) : new ServerOpenClientMenuPacket(1));
             }
             while (keyHostOptions.consumeClick()) {
                 minecraft.setScreen(new HostOptionsScreen());
@@ -272,6 +294,7 @@ public class Legacy4JClient {
                 minecraft.getSingleplayerServer().getPlayerList().getPlayer(p.getUUID()).setGameMode(enterWorldGameType);
                 enterWorldGameType = null;
             }
+            if (minecraft.getConnection().getPlayerInfo(p.getUUID()) instanceof LegacyPlayerInfo i && i.getPosition() < 0) p.sendSystemMessage(Component.literal("You're using Legacy4J in a server without the mod, be aware that you may be banned if the server does not allow changes to the client, even if you disable Smooth Movement of the controller, you still have this risk."));
         });
         ClientTickEvent.CLIENT_LEVEL_POST.register((level)->{
             Minecraft minecraft = Minecraft.getInstance();
@@ -294,14 +317,17 @@ public class Legacy4JClient {
     }
     public static boolean isModEnabledOnServer(){
         Minecraft minecraft = Minecraft.getInstance();
-        return minecraft.player != null && minecraft.player.connection.getPlayerInfo(minecraft.player.getUUID()) instanceof LegacyPlayerInfo i && i.getPosition() >= 0;
+        return minecraft.getConnection() != null && minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID()) instanceof LegacyPlayerInfo i && i.getPosition() >= 0;
     }
     public static void onClientPlayerInfoChange(){
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level != null && minecraft.player != null)
             Legacy4J.NETWORK.sendToServer(new PlayerInfoSync(0, minecraft.player));
         if (minecraft.screen instanceof HostOptionsScreen s) s.reloadPlayerButtons();
-
+        else if (minecraft.screen instanceof LeaderboardsScreen s){
+            s.rebuildRenderableVList(minecraft);
+            s.repositionElements();
+        }
     }
     public static void enqueueInit() {
         MenuRegistry.registerScreenFactory(LegacyMenuTypes.CRAFTING_PANEL_MENU.get(),LegacyCraftingScreen::craftingScreen);
@@ -320,7 +346,7 @@ public class Legacy4JClient {
             }
             return -1;
         }, Blocks.WATER_CAULDRON);
-        ColorHandlerRegistry.registerItemColors((item,i) ->0x3153AF, LegacyRegistries.WATER.get());
+        ColorHandlerRegistry.registerItemColors((item,i) ->0xFF3153AF, LegacyRegistries.WATER.get());
         ColorHandlerRegistry.registerItemColors((itemStack, i) -> GrassColor.getDefaultColor(),SHRUB.get().asItem());
         RenderTypeRegistry.register(RenderType.cutoutMipped(),SHRUB.get());
         RenderTypeRegistry.register(RenderType.translucent(),Blocks.WATER);

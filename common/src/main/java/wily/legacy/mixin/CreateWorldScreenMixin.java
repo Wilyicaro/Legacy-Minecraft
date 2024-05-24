@@ -61,14 +61,13 @@ import static wily.legacy.client.screen.ControlTooltip.CONTROL_ACTION_CACHE;
 @Mixin(CreateWorldScreen.class)
 public abstract class CreateWorldScreenMixin extends Screen{
     public ControlTooltip.Renderer controlTooltipRenderer = ControlTooltip.defaultScreen(this);
-    @Shadow @Final private Screen lastScreen;
     @Shadow @Final private WorldCreationUiState uiState;
     @Shadow @Final private static Component GAME_MODEL_LABEL;
-    @Shadow @Final private static Component PREPARING_WORLD_DATA;
     @Shadow @Final private static Component NAME_LABEL;
-    @Shadow @Final private static Logger LOGGER;
 
-    @Shadow protected abstract LevelSettings createLevelSettings(boolean bl);
+    @Shadow protected abstract void createNewWorld(PrimaryLevelData.SpecialWorldProperty arg, LayeredRegistryAccess<RegistryLayer> arg2, Lifecycle lifecycle);
+
+    @Shadow public abstract void popScreen();
 
     protected boolean trustPlayers;
     protected boolean onlineOnStart = false;
@@ -153,13 +152,7 @@ public abstract class CreateWorldScreenMixin extends Screen{
         Lifecycle lifecycle2 = layeredRegistryAccess.compositeAccess().allRegistriesLifecycle();
         Lifecycle lifecycle3 = lifecycle2.add(lifecycle);
         boolean bl = lifecycle2 == Lifecycle.stable();
-        Runnable create = ()-> confirmWorldCreation(this.minecraft, self(), lifecycle3, () -> {
-            try {
-                this.createNewWorld(complete.specialWorldProperty(), layeredRegistryAccess, lifecycle3);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }, bl);
+        Runnable create = ()-> confirmWorldCreation(this.minecraft, self(), lifecycle3, () -> this.createNewWorld(complete.specialWorldProperty(), layeredRegistryAccess, lifecycle3), bl);
         resourcePackSelector.applyChanges(true, ()->minecraft.reloadResourcePacks().thenRun(create), create);
         onLoad();
 
@@ -167,6 +160,7 @@ public abstract class CreateWorldScreenMixin extends Screen{
     private void onLoad() {
         minecraft.execute(()->{
             if (minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer().isReady()){
+                if (!ScreenUtil.getLegacyOptions().autoSave().get()) Legacy4JClient.deleteLevelWhenExitWithoutSaving = true;
                 if (onlineOnStart) {
                     MutableComponent component = publishUnloadedServer(minecraft, uiState.getGameMode().gameType, trustPlayers && uiState.isAllowCheats(), this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed");
                     ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setTrustPlayers(trustPlayers);
@@ -184,19 +178,6 @@ public abstract class CreateWorldScreenMixin extends Screen{
         } else {
             minecraft.setScreen(new ConfirmationScreen(createWorldScreen, Component.translatable("selectWorld.warning.deprecated.title"), Component.translatable("selectWorld.warning.deprecated.question"),b->runnable.run()));
         }
-    }
-    private void createNewWorld(PrimaryLevelData.SpecialWorldProperty specialWorldProperty, LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess, Lifecycle lifecycle) throws IOException {
-        minecraft.setScreen(new GenericDirtMessageScreen(PREPARING_WORLD_DATA));
-        Optional<LevelStorageSource.LevelStorageAccess> optional = this.createNewWorldDirectory();
-        if (optional.isEmpty()) {
-            return;
-        }
-        this.removeTempDataPackDir();
-        boolean bl = specialWorldProperty == PrimaryLevelData.SpecialWorldProperty.DEBUG;
-        WorldCreationContext worldCreationContext = this.uiState.getSettings();
-        LevelSettings levelSettings = this.createLevelSettings(bl);
-        PrimaryLevelData worldData = new PrimaryLevelData(levelSettings, worldCreationContext.options(), specialWorldProperty, lifecycle);
-        this.minecraft.createWorldOpenFlows().createLevelFromExistingSettings(optional.get(), worldCreationContext.dataPackResources(), layeredRegistryAccess, worldData);
     }
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
@@ -221,77 +202,7 @@ public abstract class CreateWorldScreenMixin extends Screen{
         return super.keyPressed(i,j,k);
     }
 
-    private void removeTempDataPackDir() {
-        if (this.tempDataPackDir != null) {
-            try (Stream<Path> stream = Files.walk(this.tempDataPackDir);){
-                stream.sorted(Comparator.reverseOrder()).forEach(path -> {
-                    try {
-                        Files.delete(path);
-                    } catch (IOException iOException) {
-                        LOGGER.warn("Failed to remove temporary file {}", path, iOException);
-                    }
-                });
-            } catch (IOException iOException) {
-                LOGGER.warn("Failed to list temporary dir {}", this.tempDataPackDir);
-            }
-            this.tempDataPackDir = null;
-        }
-    }
 
-    private static void copyBetweenDirs(Path path, Path path2, Path path3) {
-        try {
-            Util.copyBetweenDirs(path, path2, path3);
-        } catch (IOException iOException) {
-            LOGGER.warn("Failed to copy datapack file from {} to {}", path3, path2);
-            throw new UncheckedIOException(iOException);
-        }
-    }
-
-    private Optional<LevelStorageSource.LevelStorageAccess> createNewWorldDirectory() throws IOException {
-        String string;
-        block12: {
-            LevelStorageSource.LevelStorageAccess levelStorageAccess;
-            block11: {
-                string = this.uiState.getTargetFolder();
-                levelStorageAccess = this.minecraft.getLevelSource().createAccess(string);
-                if (this.tempDataPackDir != null) break block11;
-                return Optional.of(levelStorageAccess);
-            }
-            Stream<Path> stream = Files.walk(this.tempDataPackDir);
-            try {
-                Path path3 = levelStorageAccess.getLevelPath(LevelResource.DATAPACK_DIR);
-                FileUtil.createDirectoriesSafe(path3);
-                stream.filter(path -> !path.equals(this.tempDataPackDir)).forEach(path2 -> copyBetweenDirs(this.tempDataPackDir, path3, path2));
-                if (stream == null) break block12;
-            } catch (Throwable throwable) {
-                try {
-                    try {
-                        if (stream != null) {
-                            try {
-                                stream.close();
-                            } catch (Throwable throwable2) {
-                                throwable.addSuppressed(throwable2);
-                            }
-                        }
-                        throw throwable;
-                    } catch (IOException | UncheckedIOException exception) {
-                        LOGGER.warn("Failed to copy datapacks to world {}", string, exception);
-                        levelStorageAccess.close();
-                    }
-                } catch (IOException | UncheckedIOException exception2) {
-                    LOGGER.warn("Failed to create access for {}", string, exception2);
-                }
-            }
-            stream.close();
-        }
-        SystemToast.onPackCopyFailure(this.minecraft, string);
-        this.popScreen();
-        return Optional.empty();
-    }
-    public void popScreen() {
-        this.minecraft.setScreen(lastScreen);
-        this.removeTempDataPackDir();
-    }
 
     @Override
     public void onClose() {

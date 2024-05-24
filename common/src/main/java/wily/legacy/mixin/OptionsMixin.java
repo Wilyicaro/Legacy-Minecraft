@@ -20,6 +20,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.controller.ControllerManager;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.network.PlayerInfoSync;
@@ -51,8 +52,6 @@ public abstract class OptionsMixin implements LegacyOptions {
 
     @Shadow public abstract OptionInstance<Integer> renderDistance();
 
-    @Shadow public abstract OptionInstance<Boolean> bobView();
-
     private OptionInstance<Double> hudDistance;
     private OptionInstance<Double> hudOpacity;
     private OptionInstance<Double> interfaceResolution;
@@ -81,10 +80,17 @@ public abstract class OptionsMixin implements LegacyOptions {
     private OptionInstance<Boolean> minecartSounds;
     private OptionInstance<Boolean> invertYController;
     private OptionInstance<Boolean> invertControllerButtons;
+    private OptionInstance<Double> leftStickDeadZone;
+    private OptionInstance<Double> rightStickDeadZone;
+    private OptionInstance<Double> leftTriggerDeadZone;
+    private OptionInstance<Double> rightTriggerDeadZone;
     private OptionInstance<Integer> selectedController;
     private OptionInstance<Integer> controllerIcons;
+    private OptionInstance<Boolean> smoothMovement;
     private OptionInstance<Difficulty> createWorldDifficulty;
     private OptionInstance<Boolean> smoothAnimatedCharacter;
+    private OptionInstance<Integer> selectedControllerHandler;
+    private OptionInstance<Boolean> autoResolution;
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;<init>(Ljava/lang/String;ILjava/lang/String;)V", ordinal = 5),index = 0)
     protected String initKeyCraftingName(String string) {
@@ -93,6 +99,10 @@ public abstract class OptionsMixin implements LegacyOptions {
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;<init>(Ljava/lang/String;ILjava/lang/String;)V", ordinal = 5),index = 1)
     protected int initKeyCrafting(int i) {
         return 73;
+    }
+    @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/OptionInstance;<init>(Ljava/lang/String;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Lnet/minecraft/client/OptionInstance$CaptionBasedToString;Lnet/minecraft/client/OptionInstance$ValueSet;Ljava/lang/Object;Ljava/util/function/Consumer;)V", ordinal = 6),index = 4)
+    protected Object initChatSpacingOption(Object object) {
+        return 1.0d;
     }
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ToggleKeyMapping;<init>(Ljava/lang/String;ILjava/lang/String;Ljava/util/function/BooleanSupplier;)V", ordinal = 0),index = 3)
     protected BooleanSupplier initKeyShift(BooleanSupplier booleanSupplier) {
@@ -127,6 +137,14 @@ public abstract class OptionsMixin implements LegacyOptions {
         invertYController = OptionInstance.createBoolean("legacy.options.invertYController", false);
         invertControllerButtons = OptionInstance.createBoolean("legacy.options.invertControllerButtons", false, (b)-> ControllerBinding.RIGHT_BUTTON.bindingState.block());
         selectedController = new OptionInstance<>("legacy.controls.controller", OptionInstance.noTooltip(), (c, i)-> Component.translatable("options.generic_value",c,Component.literal(i+1 + (Legacy4JClient.controllerManager.connectedController == null ? "" : " (%s)".formatted(Legacy4JClient.controllerManager.connectedController.getName())))),  new OptionInstance.IntRange(0, 15), 0, d -> {});
+        selectedControllerHandler =  new OptionInstance<>("legacy.controls.controllerHandler", OptionInstance.noTooltip(), (c, i)-> Component.translatable("options.generic_value",c,Component.literal(ControllerManager.handlers.get(i).getName())), new OptionInstance.IntRange(0, ControllerManager.handlers.size() - 1), Minecraft.ON_OSX ? 0 : 1, d -> {
+            Legacy4JClient.controllerManager.connectedController = null;
+            ControllerManager.getHandler().init();
+        });
+        leftStickDeadZone = new OptionInstance<>("legacy.options.leftStickDeadZone", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 0.25, d -> {});
+        rightStickDeadZone = new OptionInstance<>("legacy.options.rightStickDeadZone", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 0.2, d -> {});
+        leftTriggerDeadZone = new OptionInstance<>("legacy.options.leftTriggerDeadZone", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 0.2, d -> {});
+        rightTriggerDeadZone = new OptionInstance<>("legacy.options.rightTriggerDeadZone", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 0.2, d -> {});
         hudScale = new OptionInstance<>("legacy.options.hudScale", OptionInstance.noTooltip(), OptionsMixin::genericValueLabel,  new OptionInstance.IntRange(1,3), 2, d -> {});
         hudOpacity = new OptionInstance<>("legacy.options.hudOpacity", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 0.8, d -> {});
         hudDistance = new OptionInstance<>("legacy.options.hudDistance", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 1.0, d -> {});
@@ -137,7 +155,9 @@ public abstract class OptionsMixin implements LegacyOptions {
         terrainFogEnd = new OptionInstance<>("legacy.options.terrainFogEnd", OptionInstance.noTooltip(),(c, d) -> percentValueLabel(c, d*2), OptionInstance.UnitDouble.INSTANCE, 0.5, d -> {});
         controllerIcons = new OptionInstance<>("legacy.options.controllerIcons", OptionInstance.noTooltip(), (c, i)-> Component.translatable("options.generic_value",c,i == 0? Component.translatable("legacy.options.auto_value", ControlTooltip.getActiveControllerType().displayName) : ControlTooltip.Type.values()[i].displayName),  new OptionInstance.IntRange(0, ControlTooltip.Type.values().length - 1), 0, d -> {});
         createWorldDifficulty = new OptionInstance<>("options.difficulty", d->Tooltip.create(d.getInfo()), (c, d) -> d.getDisplayName(), new OptionInstance.Enum<>(Arrays.asList(Difficulty.values()), Codec.INT.xmap(Difficulty::byId, Difficulty::getId)), Difficulty.NORMAL, d -> {});
+        smoothMovement = OptionInstance.createBoolean("legacy.options.smoothMovement",true);
         smoothAnimatedCharacter = OptionInstance.createBoolean("legacy.options.smoothAnimatedCharacter",false);
+        autoResolution = OptionInstance.createBoolean("legacy.options.autoResolution", true, b -> minecraft.resizeDisplay());
         if(Legacy4JClient.canLoadVanillaOptions)
             load();
     }
@@ -167,6 +187,11 @@ public abstract class OptionsMixin implements LegacyOptions {
         fieldAccess.process("invertYController", invertYController);
         fieldAccess.process("invertControllerButtons", invertControllerButtons);
         fieldAccess.process("selectedController", selectedController);
+        fieldAccess.process("selectedControllerHandler", selectedControllerHandler);
+        fieldAccess.process("leftStickDeadZone", leftStickDeadZone);
+        fieldAccess.process("rightStickDeadZone", rightStickDeadZone);
+        fieldAccess.process("leftTriggerDeadZone", leftTriggerDeadZone);
+        fieldAccess.process("rightTriggerDeadZone", rightTriggerDeadZone);
         fieldAccess.process("hudScale", hudScale);
         fieldAccess.process("controllerIcons", controllerIcons);
         fieldAccess.process("legacyCreativeTab", legacyCreativeTab);
@@ -175,12 +200,13 @@ public abstract class OptionsMixin implements LegacyOptions {
         fieldAccess.process("vanillaTabs", vanillaTabs);
         fieldAccess.process("legacyGamma", legacyGamma);
         fieldAccess.process("smoothAnimatedCharacter", smoothAnimatedCharacter);
+        fieldAccess.process("smoothMovement", smoothMovement);
         hideGui = !displayHUD.get();
         for (KeyMapping keyMapping : keyMappings) {
             LegacyKeyMapping mapping = (LegacyKeyMapping) keyMapping;
             int i = fieldAccess.process("component_" + keyMapping.getName(), mapping.getBinding() == null ? -1 : mapping.getBinding().ordinal());
             if ((mapping.getBinding() == null && i >= 0) || (mapping.getBinding() != null && mapping.getBinding().ordinal() != i))
-                mapping.setBinding(i < 0 ? null : ControllerBinding.values()[i]);
+                mapping.setBinding(i < 0 ? null : ControllerBinding.values()[i].isBindable ? ControllerBinding.values()[i] : mapping.getDefaultBinding());
         }
     }
 
@@ -263,7 +289,29 @@ public abstract class OptionsMixin implements LegacyOptions {
     public OptionInstance<Boolean> legacyItemTooltips() {
         return legacyItemTooltips;
     }
+    public OptionInstance<Boolean> smoothMovement() {
+        return smoothMovement;
+    }
+
     public OptionInstance<Boolean> smoothAnimatedCharacter() {
         return smoothAnimatedCharacter;
+    }
+    public OptionInstance<Integer> selectedControllerHandler() {
+        return selectedControllerHandler;
+    }
+    public OptionInstance<Boolean> autoResolution() {
+        return autoResolution;
+    }
+    public OptionInstance<Double> leftStickDeadZone() {
+        return leftStickDeadZone;
+    }
+    public OptionInstance<Double> rightStickDeadZone() {
+        return rightStickDeadZone;
+    }
+    public OptionInstance<Double> leftTriggerDeadZone() {
+        return leftTriggerDeadZone;
+    }
+    public OptionInstance<Double> rightTriggerDeadZone() {
+        return rightTriggerDeadZone;
     }
 }

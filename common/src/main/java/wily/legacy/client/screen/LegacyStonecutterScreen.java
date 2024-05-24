@@ -45,7 +45,6 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
     protected int selectedCraftingButton = 0;
     private boolean onlyCraftableRecipes;
 
-    private int lastFocused = -1;
 
     private ContainerListener listener;
     @Override
@@ -80,18 +79,13 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
         listener.slotChanged(menu,0,ItemStack.EMPTY);
         onlyCraftableRecipes = false;
     }
-    public void repositionElements() {
-        lastFocused = getFocused() instanceof LegacyIconHolder h ? craftingButtons.indexOf(h) : -1;
-        super.repositionElements();
-    }
     @Override
     public void init() {
         imageWidth = 348;
         imageHeight = 215;
         super.init();
         menu.addSlotListener(listener);
-        if (lastFocused >= 0 && lastFocused < craftingButtons.size()) setInitialFocus(craftingButtons.get(lastFocused));
-        else setInitialFocus(craftingButtons.get(0));
+        if (selectedCraftingButton < craftingButtons.size()) setFocused(craftingButtons.get(selectedCraftingButton));
         craftingButtons.forEach(b->{
             b.setPos(leftPos + 13 + craftingButtons.indexOf(b) * 27,topPos + 38);
             addRenderableWidget(b);

@@ -9,10 +9,13 @@ import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.DispenserMenu;
 import net.minecraft.world.inventory.HopperMenu;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin({ContainerScreen.class, ShulkerBoxScreen.class, HopperScreen.class, DispenserScreen.class})
-public class ContainerScreenMixin extends AbstractContainerScreen {
+public abstract class ContainerScreenMixin extends AbstractContainerScreen {
 
     public ContainerScreenMixin(AbstractContainerMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
@@ -21,6 +24,7 @@ public class ContainerScreenMixin extends AbstractContainerScreen {
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
+
     public void init() {
         int k = ((menu instanceof ChestMenu m ? m.getRowCount() : menu  instanceof HopperMenu ? 1 : 3) - 3) * 21;
         boolean centeredTitle = menu instanceof HopperMenu || menu instanceof DispenserMenu;
@@ -33,8 +37,9 @@ public class ContainerScreenMixin extends AbstractContainerScreen {
         super.init();
     }
 
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
     }
 }

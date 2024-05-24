@@ -65,8 +65,9 @@ public abstract class PackSelectionScreenMixin extends Screen {
         lastFocused = getFocused() != null ? children().indexOf(getFocused()) : -1;
         super.repositionElements();
     }
-    @Override
-    public void init() {
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         super.init();
         panel.init();
         unselectedPacksList.init(this,panel.x + 15, panel.y + 30, 180, 210);
@@ -90,7 +91,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    public void init(CallbackInfo info){
+    public void initConstruct(CallbackInfo info){
         reload();
         parent = Minecraft.getInstance().screen;
     }
@@ -207,11 +208,11 @@ public abstract class PackSelectionScreenMixin extends Screen {
                         switch (i) {
                             case 265 -> {
                                 if (e.canMoveUp()) e.moveUp();
-                                return true;
+                                return false;
                             }
                             case 264 -> {
                                 if (e.canMoveDown()) e.moveDown();
-                                return true;
+                                return false;
                             }
                         }
                     }
@@ -229,8 +230,8 @@ public abstract class PackSelectionScreenMixin extends Screen {
 
     @Override
     public boolean mouseScrolled(double d, double e, double f, double g) {
-        if (ScreenUtil.isMouseOver(d,e,panel.x + 10, panel.y + 10, 190, 220)) unselectedPacksList.mouseScrolled(d,e,f,g);
-        else if (ScreenUtil.isMouseOver(d,e,panel.x + 210, panel.y + 10, 190, 220)) selectedPacksList.mouseScrolled(d,e,f,g);
+        if (ScreenUtil.isMouseOver(d,e,panel.x + 10, panel.y + 10, 190, 220)) unselectedPacksList.mouseScrolled(g);
+        else if (ScreenUtil.isMouseOver(d,e,panel.x + 210, panel.y + 10, 190, 220)) selectedPacksList.mouseScrolled(g);
         return super.mouseScrolled(d, e, f, g);
     }
 

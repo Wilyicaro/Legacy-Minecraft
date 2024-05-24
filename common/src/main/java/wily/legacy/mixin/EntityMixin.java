@@ -36,9 +36,9 @@ public abstract class EntityMixin {
     }
     @Inject(method = "rideTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;positionRider(Lnet/minecraft/world/entity/Entity;)V", shift = At.Shift.AFTER))
     private void modifyYawAndPitch(CallbackInfo ci) {
-        if (this.getVehicle().getControllingPassenger() == (Object) this) return;
+        if (this.getVehicle().getControllingPassenger() == (Object) this || getVehicle() instanceof LivingEntity) return;
 
-        this.ridingEntityYRotDelta = this.ridingEntityYRotDelta + (this.getVehicle() instanceof LivingEntity livingVehicle ? this.getVehicle().getVisualRotationYInDegrees() - livingVehicle.yBodyRotO : this.getVehicle().getYRot() - this.getVehicle().yRotO);
+        this.ridingEntityYRotDelta = this.ridingEntityYRotDelta + (this.getVehicle().getYRot() - this.getVehicle().yRotO);
 
         while (this.ridingEntityYRotDelta >= 180.0) this.ridingEntityYRotDelta -= 360.0F;
 

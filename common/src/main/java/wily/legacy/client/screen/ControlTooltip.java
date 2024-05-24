@@ -18,7 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -313,8 +313,8 @@ public interface ControlTooltip {
         protected ControlTooltip guiControlTooltipFromJson(JsonObject o){
             LegacyKeyMapping mapping = (LegacyKeyMapping)KeyMapping.ALL.get(GsonHelper.getAsString(o, "keyMapping"));
             BiPredicate<Item, CompoundTag> itemPredicate = o.has("heldItem") ? o.get("heldItem") instanceof JsonObject obj ? JsonUtil.registryMatchesItem(obj) : o.get("heldItem").getAsBoolean() ? (i,t)-> i != null && i != Items.AIR : (i, t)-> false : (i, t)-> true;
-            Predicate<Block> blockPredicate = o.has("hitBlock") ? o.get("hitBlock") instanceof JsonObject obj ? JsonUtil.registryMatches(Registries.BLOCK,obj) : o.get("hitBlock").getAsBoolean() ? b-> !b.defaultBlockState().isAir() : b-> false : b-> true;
-            Predicate<EntityType<?>> entityPredicate = o.has("hitEntity") ? o.get("hitEntity") instanceof JsonObject obj ? JsonUtil.registryMatches(Registries.ENTITY_TYPE,obj) : staticPredicate(o.get("hitEntity").getAsBoolean()) : e-> true;
+            Predicate<Block> blockPredicate = o.has("hitBlock") ? o.get("hitBlock") instanceof JsonObject obj ? JsonUtil.registryMatches(BuiltInRegistries.BLOCK,obj) : o.get("hitBlock").getAsBoolean() ? b-> !b.defaultBlockState().isAir() : b-> false : b-> true;
+            Predicate<EntityType<?>> entityPredicate = o.has("hitEntity") ? o.get("hitEntity") instanceof JsonObject obj ? JsonUtil.registryMatches(BuiltInRegistries.ENTITY_TYPE,obj) : staticPredicate(o.get("hitEntity").getAsBoolean()) : e-> true;
             Minecraft minecraft = Minecraft.getInstance();
             Component c =o.get("action") instanceof JsonPrimitive p ? Component.translatable(p.getAsString()) : mapping.getDisplayName();
             return create(mapping, ()->minecraft.player != null && itemPredicate.test(minecraft.player.getMainHandItem().getItem(),minecraft.player.getMainHandItem().getTag()) && ((minecraft.hitResult instanceof BlockHitResult r && blockPredicate.test(minecraft.level.getBlockState(r.getBlockPos()).getBlock())) || (minecraft.hitResult instanceof EntityHitResult er && entityPredicate.test(er.getEntity().getType()))) ? c : null,false);
@@ -356,7 +356,7 @@ public interface ControlTooltip {
             if (minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof BedBlock) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.sleep");
             if (minecraft.hitResult instanceof BlockHitResult r && minecraft.hitResult.getType() != HitResult.Type.MISS && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof NoteBlock) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.change_pitch");
             if (canPlace(minecraft, hand)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.place");
-            if (canFeedAbstractHorse(minecraft, hand)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.feed");
+            if (canFeed(minecraft, hand)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.feed");
             if ( actualItem.is(Items.IRON_INGOT) && minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof IronGolem g  && g.getHealth() < g.getMaxHealth()) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.repair");
             if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof TamableAnimal a && a.isTame() && a.isFood(actualItem) && a.getHealth() < a.getMaxHealth()) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.heal");
             if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof TamableAnimal a && a.isTame() && a.isOwnedBy(minecraft.player)) return CONTROL_ACTION_CACHE.getUnchecked(a.isInSittingPose() ? "legacy.action.follow_me" : "legacy.action.sit" );
@@ -417,13 +417,13 @@ public interface ControlTooltip {
     static boolean mayInteractItemAt(Minecraft minecraft, ItemStack usedItem, HitResult result){
         return result instanceof BlockHitResult r && r.getType() != HitResult.Type.MISS && minecraft.level.mayInteract(minecraft.player, r.getBlockPos()) && minecraft.player.mayUseItemAt(r.getBlockPos(), r.getDirection(), usedItem);
     }
-    static boolean canFeedAbstractHorse(Minecraft minecraft, InteractionHand hand){
+    static boolean canFeed(Minecraft minecraft, InteractionHand hand){
         ItemStack usedItem = minecraft.player.getItemInHand(hand);
-        return (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof AbstractHorse h && h.isFood(usedItem) && (h instanceof Llama || (h.isBaby() || !usedItem.is(Items.HAY_BLOCK))) && (!h.isTamed() || !isLoveFood(h,usedItem) && h.getHealth() < h.getMaxHealth() && !minecraft.player.isSecondaryUseActive()));
+        return (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Animal a && a.isFood(usedItem) && (!(a instanceof AbstractHorse) && a.isBaby() || a instanceof AbstractHorse h && (a instanceof Llama || (a.isBaby() || !usedItem.is(Items.HAY_BLOCK))) && (!h.isTamed() || !isLoveFood(a,usedItem) && a.getHealth() < a.getMaxHealth() && !minecraft.player.isSecondaryUseActive())));
     }
     static boolean canSetLoveMode(Minecraft minecraft, InteractionHand hand){
         ItemStack usedItem = minecraft.player.getItemInHand(hand);
-        return (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Animal a && a.isFood(minecraft.player.getItemInHand(hand)) && a.canFallInLove() && !a.isInLove() && (!(a instanceof AbstractHorse) || isLoveFood(a,usedItem)));
+        return (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Animal a && !a.isBaby() && a.isFood(minecraft.player.getItemInHand(hand)) && a.canFallInLove() && !a.isInLove() && (!(a instanceof AbstractHorse) || isLoveFood(a,usedItem)));
     }
     static boolean isLoveFood(Animal a, ItemStack stack){
         return (a instanceof Llama && stack.is(Items.HAY_BLOCK)) || a instanceof Horse && ((stack.is(Items.GOLDEN_CARROT) || stack.is(Items.GOLDEN_APPLE) || stack.is(Items.ENCHANTED_GOLDEN_APPLE)));

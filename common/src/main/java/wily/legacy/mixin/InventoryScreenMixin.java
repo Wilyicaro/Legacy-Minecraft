@@ -13,6 +13,9 @@ import net.minecraft.world.inventory.InventoryMenu;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.client.screen.ReplaceableScreen;
@@ -21,7 +24,7 @@ import wily.legacy.util.ScreenUtil;
 import static wily.legacy.util.LegacySprites.SMALL_ARROW;
 
 @Mixin(InventoryScreen.class)
-public class InventoryScreenMixin extends AbstractContainerScreen<InventoryMenu> implements ReplaceableScreen {
+public abstract class InventoryScreenMixin extends AbstractContainerScreen<InventoryMenu> implements ReplaceableScreen {
     @Shadow @Final private RecipeBookComponent recipeBookComponent;
 
     @Shadow private boolean widthTooNarrow;
@@ -35,7 +38,9 @@ public class InventoryScreenMixin extends AbstractContainerScreen<InventoryMenu>
     private boolean hasClassicCrafting(){
         return ((LegacyOptions) Minecraft.getInstance().options).classicCrafting().get();
     }
-    public void containerTick() {
+    @Inject(method = "containerTick",at = @At("HEAD"), cancellable = true)
+    public void containerTick(CallbackInfo ci) {
+        ci.cancel();
         if (canReplace()) {
             this.minecraft.setScreen(getReplacement());
         } else {
@@ -46,8 +51,9 @@ public class InventoryScreenMixin extends AbstractContainerScreen<InventoryMenu>
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    @Override
-    public void init() {
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         if (canReplace()) {
             this.minecraft.setScreen(getReplacement());
         }else {
@@ -71,8 +77,9 @@ public class InventoryScreenMixin extends AbstractContainerScreen<InventoryMenu>
         }
     }
 
-    @Override
-    public void renderBg(GuiGraphics graphics, float f, int i, int j) {
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics graphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderPanel(graphics,leftPos,topPos,imageWidth,imageHeight,2f);
         ScreenUtil.renderEntityPanel(graphics,leftPos + 40 + (hasClassicCrafting() ? 0 : 50),topPos + 13,63,84,2);
         InventoryScreen.renderEntityInInventoryFollowsMouse(graphics,leftPos + 40 + (hasClassicCrafting() ? 0 : 50),topPos + 13,leftPos + 103 + (hasClassicCrafting() ? 0 : 50),topPos + 97,35,0.0625f,i,j, minecraft.player);
@@ -82,8 +89,9 @@ public class InventoryScreenMixin extends AbstractContainerScreen<InventoryMenu>
         }
         if (!recipeBookComponent.isVisible() && recipeButton != null && !recipeButton.isHovered()) recipeButton.setFocused(false);
     }
-    @Override
-    public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
+    @Inject(method = "renderLabels",at = @At("HEAD"), cancellable = true)
+    public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 0x383838, false);
     }
 

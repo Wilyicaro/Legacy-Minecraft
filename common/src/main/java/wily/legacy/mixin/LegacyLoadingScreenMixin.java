@@ -5,6 +5,9 @@ import net.minecraft.client.gui.screens.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static wily.legacy.Legacy4JClient.legacyLoadingScreen;
 
@@ -23,8 +26,9 @@ public class LegacyLoadingScreenMixin extends Screen {
         this.minecraft.setScreen(null);
     }
 
-    @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    @Inject(method = "render",at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        ci.cancel();
         Component lastLoadingHeader = null;
         Component lastLoadingStage = null;
         boolean genericLoading = false;

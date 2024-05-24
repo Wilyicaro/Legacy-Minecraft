@@ -5,10 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.achievement.StatsScreen;
-import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -30,7 +27,6 @@ public class PauseScreenMixin extends Screen {
     }
     protected RenderableVList renderableVList;
     protected boolean updateAutoSaveIndicator;
-    private boolean inited = false;
     private ControlTooltip.Renderer controlTooltipRenderer = ControlTooltip.defaultScreen(this);
 
     @Override
@@ -52,8 +48,8 @@ public class PauseScreenMixin extends Screen {
                     this.minecraft.setScreen(null);
                     this.minecraft.mouseHandler.grabMouse();
                 }).build(),Button.builder(Component.translatable("menu.options"), button -> this.minecraft.setScreen(new HelpOptionsScreen(this))).build()
-                ,Button.builder(Component.translatable("gui.stats"), button -> this.minecraft.setScreen(new StatsScreen(this, this.minecraft.player.getStats()))).build()
-                ,Button.builder(Component.translatable("gui.advancements"), button -> this.minecraft.setScreen(new AdvancementsScreen(this.minecraft.getConnection().getAdvancements()))).build()
+                ,Button.builder(Component.translatable("legacy.menu.leaderboards"), button -> this.minecraft.setScreen(new LeaderboardsScreen(this))).build()
+                ,Button.builder(Component.translatable("gui.advancements"), button -> this.minecraft.setScreen(new LegacyAdvancementsScreen(this,this.minecraft.getConnection().getAdvancements()))).build()
         );
         minecraft = Minecraft.getInstance();
         if (minecraft.level != null && minecraft.hasSingleplayerServer())
@@ -69,18 +65,17 @@ public class PauseScreenMixin extends Screen {
             }))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), button -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
     }
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    @Inject(method = "renderBackground",at = @At("HEAD"), cancellable = true)
+    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        ci.cancel();
         ScreenUtil.renderDefaultBackground(guiGraphics);
         controlTooltipRenderer.render(guiGraphics, i, j, f);
     }
 
-    @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    @Inject(method = "render",at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        ci.cancel();
         super.render(guiGraphics, i, j, f);
-        if (!inited){
-            ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
-            inited = true;
-        }
         if (updateAutoSaveIndicator){
             updateAutoSaveIndicator = false;
             minecraft.gui.autosaveIndicatorValue = 1.0F;
@@ -90,8 +85,9 @@ public class PauseScreenMixin extends Screen {
         }
     }
 
-    @Override
-    public void init() {
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         renderableVList.init(this,width / 2 - 112,this.height / 3 + 10,225,0);
     }
 }

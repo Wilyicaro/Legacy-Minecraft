@@ -41,9 +41,9 @@ public class Legacy4JPlatformImpl {
     }
 
     public static Ingredient getNBTIngredient(ItemStack... stacks) {
-        return NBTIngredient.of(false,stacks[0].getTag(), Arrays.stream(stacks).map(ItemStack::getItem).toArray(ItemLike[]::new));
+        return stacks[0].getTag() == null ? Ingredient.of(stacks) : NBTIngredient.of(false,stacks[0].getTag(), Arrays.stream(stacks).map(ItemStack::getItem).toArray(ItemLike[]::new));
     }
     public static Ingredient getStrictNBTIngredient(ItemStack stack) {
-        return NBTIngredient.of(true,stack);
+        return NBTIngredient.of(true, stack.getTag(), stack.serializeAttachments(), stack.getItem());
     }
 }
