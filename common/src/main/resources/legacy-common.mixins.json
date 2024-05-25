@@ -35,6 +35,7 @@
     "CreateWorldScreenMixin",
     "CycleableValueSet",
     "CyclingSlotBackgroundMixin",
+    "DeathScreenMixin",
     "EffectRenderingInventoryScreenMixin",
     "EnchantmentScreenMixin",
     "EndCrystalRendererMixin",

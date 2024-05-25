@@ -77,7 +77,8 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
         if (isHoveredBottom) renderTooltip(minecraft,graphics, getFocusedRecipes().get(1).getResultItem(minecraft.level.registryAccess()),i,j);
     }
     protected R getFocusedRecipe(){
-        return isValidIndex() ? getFocusedRecipes().get(selectionOffset == -1 ? getFocusedRecipes().size() - 1 : selectionOffset == 1 ? 1 : 0) : null;
+        if (selectionOffset > 0 && getRecipes().size() < 2 || selectionOffset < 0 && getRecipes().size() <= 2) selectionOffset = 0;
+        return isValidIndex() ? getFocusedRecipes().get(getSelectionIndex()) : null;
     }
     protected ItemStack getFocusedResult(){
         return getFocusedRecipe() == null ? ItemStack.EMPTY : getFocusedRecipe().getResultItem(minecraft.level.registryAccess()) ;
@@ -158,7 +159,10 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
         return getRecipes().size() >= 3;
     }
     protected boolean isValidIndex() {
-        return !getRecipes().isEmpty();
+        return !getRecipes().isEmpty() && getSelectionIndex() < getRecipes().size();
+    }
+    protected int getSelectionIndex(){
+        return selectionOffset == -1 ? getFocusedRecipes().size() - 1 : selectionOffset == 1 ? 1 : 0;
     }
     @Override
     public boolean mouseScrolled(double d, double e, double f, double g) {

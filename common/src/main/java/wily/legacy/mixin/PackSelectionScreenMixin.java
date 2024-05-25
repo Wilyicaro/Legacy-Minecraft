@@ -55,7 +55,6 @@ public abstract class PackSelectionScreenMixin extends Screen {
         return(PackSelectionScreen)(Object) this;
     }
 
-    Screen parent;
     @Inject(method = "init",at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
@@ -65,6 +64,13 @@ public abstract class PackSelectionScreenMixin extends Screen {
         selectedPacksList.init(this,panel.x + 215, panel.y + 30, 180, 210);
         this.doneButton = Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).build();
     }
+
+    @Inject(method = "repositionElements",at = @At("HEAD"), cancellable = true)
+    public void repositionElements(CallbackInfo ci) {
+        super.repositionElements();
+        ci.cancel();
+    }
+
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         ScreenUtil.renderDefaultBackground(guiGraphics);
@@ -83,7 +89,6 @@ public abstract class PackSelectionScreenMixin extends Screen {
     @Inject(method = "<init>", at = @At("RETURN"))
     public void initConstruct(CallbackInfo info){
         reload();
-        parent = Minecraft.getInstance().screen;
     }
 
     @Inject(method = "populateLists", at = @At("HEAD"), cancellable = true)
@@ -96,7 +101,6 @@ public abstract class PackSelectionScreenMixin extends Screen {
     @Inject(method = "onClose", at = @At("RETURN"))
     public void onClose(CallbackInfo info){
         ScreenUtil.playSimpleUISound(LegacySoundEvents.BACK.get(),1.0f);
-        if (parent != null) minecraft.setScreen(parent);
     }
     private void addPacks(RenderableVList list,Stream<PackSelectionModel.Entry> stream){
         list.renderables.clear();

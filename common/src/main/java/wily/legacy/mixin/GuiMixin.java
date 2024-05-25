@@ -153,7 +153,7 @@ public abstract class GuiMixin {
         }
         if (minecraft.getCameraEntity() instanceof LivingEntity character) {
             boolean hasRemainingTime = character.isSprinting() || character.isShiftKeyDown() || character.isCrouching() || character.isFallFlying();
-            if (((LegacyOptions) minecraft.options).animatedCharacter().get() && (hasRemainingTime || character instanceof Player p && p.getAbilities().flying)) {
+            if (((LegacyOptions) minecraft.options).animatedCharacter().get() && (hasRemainingTime || character instanceof Player p && p.getAbilities().flying) && !character.isSleeping()) {
                 animatedCharacterTime = Util.getMillis();
                 remainingAnimatedCharacterTime = hasRemainingTime ? 450 : 0;
             }
@@ -237,7 +237,7 @@ public abstract class GuiMixin {
             return;
         }
         ScreenUtil.prepareHUDRender(guiGraphics);
-        guiGraphics.pose().translate(0, ScreenUtil.getHUDSize() - (this.lastToolHighlight.isEmpty() || this.toolHighlightTimer <= 0 ? 0 : (Math.min(4,lastToolHighlight.getTooltipLines(Item.TooltipContext.of(minecraft.level),minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum()) - 1) * 9),0);
+        guiGraphics.pose().translate(0, 63 - ScreenUtil.getHUDSize() - (this.lastToolHighlight.isEmpty() || this.toolHighlightTimer <= 0 ? 0 : (Math.min(4,lastToolHighlight.getTooltipLines(Item.TooltipContext.of(minecraft.level),minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum()) - 1) * 9),0);
     }
     @Inject(method = "renderOverlayMessage", at = @At(value = "RETURN"))
     public void renderOverlayMessageReturn(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
