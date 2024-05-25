@@ -72,7 +72,7 @@
       "end_crystal",
       {"group": "item_transport", "recipes": ["hopper","dispenser","dropper"]},
       {"group": "button", "recipes": ["stone_button","oak_button","birch_button","spruce_button","jungle_button","acacia_button","dark_oak_button","mangrove_button","bamboo_button","cherry_button","crimson_button","warped_button"]},
-      {"group": "pressure_plate", "recipes": ["oak_pressure_plate","birch_pressure_plate","spruce_pressure_plate","jungle_pressure_plate","acacia_pressure_plate","dark_oak_pressure_plate","mangrove_pressure_plate","bamboo_pressure_plate","cherry_pressure_plate","crimson_pressure_plate","warped_pressure_plate","stone_pressure_plate","stone_pressure_plate","polished_blackstone_pressure_plate","heavy_weighted_pressure_plate","light_weighted_pressure_plate"]},
+      {"group": "pressure_plate", "recipes": ["oak_pressure_plate","birch_pressure_plate","spruce_pressure_plate","jungle_pressure_plate","acacia_pressure_plate","dark_oak_pressure_plate","mangrove_pressure_plate","bamboo_pressure_plate","cherry_pressure_plate","crimson_pressure_plate","warped_pressure_plate","stone_pressure_plate","polished_blackstone_pressure_plate","heavy_weighted_pressure_plate","light_weighted_pressure_plate"]},
       "observer",
       {"group": "piston", "recipes": ["piston","sticky_piston"]}
     ]
