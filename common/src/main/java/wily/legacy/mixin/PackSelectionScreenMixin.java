@@ -8,9 +8,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.packs.PackSelectionModel;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
+import net.minecraft.client.gui.screens.worldselection.ConfirmExperimentalFeaturesScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Final;
@@ -55,7 +57,6 @@ public abstract class PackSelectionScreenMixin extends Screen {
         return(PackSelectionScreen)(Object) this;
     }
 
-    Screen parent;
     @Inject(method = "init",at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
@@ -79,11 +80,9 @@ public abstract class PackSelectionScreenMixin extends Screen {
         guiGraphics.drawString(this.font, AVAILABLE_PACK, panel.x + 210 + (190 - font.width(AVAILABLE_PACK)) / 2, panel.y + 18, 0x383838, false);
         controlTooltipRenderer.render(guiGraphics, i, j, f);
     }
-
     @Inject(method = "<init>", at = @At("RETURN"))
     public void initConstruct(CallbackInfo info){
         reload();
-        parent = Minecraft.getInstance().screen;
     }
 
     @Inject(method = "populateLists", at = @At("HEAD"), cancellable = true)
@@ -96,7 +95,6 @@ public abstract class PackSelectionScreenMixin extends Screen {
     @Inject(method = "onClose", at = @At("RETURN"))
     public void onClose(CallbackInfo info){
         ScreenUtil.playSimpleUISound(LegacySoundEvents.BACK.get(),1.0f);
-        if (parent != null) minecraft.setScreen(parent);
     }
     private void addPacks(RenderableVList list,Stream<PackSelectionModel.Entry> stream){
         list.renderables.clear();

@@ -508,6 +508,7 @@
  "legacy.action.show_description": "Show Description",
  "legacy.action.change_filter": "Change Filter",
  "legacy.action.distribute": "Distribute",
+ "legacy.action.wake_up": "Wake Up",
  "legacy.action.resource_packs_screen": "Resource Packs Screen",
  "legacy.commands.legacyTip.incorrectName": "There are no custom tips with the name \"%s\".",
  "legacy.commands.legacyTip.invalidName": "There is already a custom tip with the name \"%s\".",

@@ -165,6 +165,7 @@ public abstract class OptionsMixin implements LegacyOptions {
     private void processOptions(Options.FieldAccess fieldAccess, CallbackInfo ci){
         fieldAccess.process("hudDistance", hudDistance);
         fieldAccess.process("hudOpacity", hudOpacity);
+        fieldAccess.process("autoResolution", autoResolution);
         fieldAccess.process("interfaceResolution", interfaceResolution);
         fieldAccess.process("interfaceSensitivity", interfaceSensitivity);
         fieldAccess.process("terrainFogStart", terrainFogStart);

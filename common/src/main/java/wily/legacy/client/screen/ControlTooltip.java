@@ -349,6 +349,7 @@ public interface ControlTooltip {
     }
     static Component getActualUse(Minecraft minecraft){
         BlockState blockState;
+        if (minecraft.player.isSleeping()) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.wake_up");
         if ((minecraft.hitResult instanceof BlockHitResult r && ((blockState = minecraft.level.getBlockState(r.getBlockPos())).getBlock() instanceof ButtonBlock || blockState.getBlock() instanceof LeverBlock || blockState.getBlock() instanceof DoorBlock || blockState.getBlock() instanceof FenceGateBlock || (blockState.getMenuProvider(minecraft.level,r.getBlockPos()) != null || minecraft.level.getBlockEntity(r.getBlockPos()) instanceof MenuProvider)))) return CONTROL_ACTION_CACHE.getUnchecked((blockState.getBlock() instanceof AbstractChestBlock<?> || blockState.getBlock() instanceof ShulkerBoxBlock || blockState.getBlock() instanceof BarrelBlock) ? "legacy.action.open" :  "key.use");
         if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof AbstractVillager v && !v.getOffers().isEmpty()) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.trade");
         for (InteractionHand hand : InteractionHand.values()) {

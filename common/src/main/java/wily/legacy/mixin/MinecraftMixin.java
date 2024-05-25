@@ -13,6 +13,7 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -49,6 +50,18 @@ public abstract class MinecraftMixin {
     @Shadow public abstract Window getWindow();
 
     @Shadow @Nullable public abstract ClientPacketListener getConnection();
+
+    @Inject(method = "startUseItem", at = @At("HEAD"))
+    private void startUseItem(CallbackInfo ci){
+        if (player != null && player.isSleeping()){
+            ClientPacketListener clientPacketListener = player.connection;
+            clientPacketListener.send(new ServerboundPlayerCommandPacket(player, ServerboundPlayerCommandPacket.Action.STOP_SLEEPING));
+        }
+    }
+    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isSleeping()Z"))
+    private boolean tick(LocalPlayer instance){
+        return false;
+    }
 
     @ModifyArg(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", ordinal = 2))
     private Screen handleKeybinds(Screen arg){

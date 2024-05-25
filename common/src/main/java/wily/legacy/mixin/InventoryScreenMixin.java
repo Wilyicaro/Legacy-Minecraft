@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.InventoryMenu;
 import org.spongepowered.asm.mixin.Final;
@@ -82,7 +83,10 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
         ci.cancel();
         ScreenUtil.renderPanel(graphics,leftPos,topPos,imageWidth,imageHeight,2f);
         ScreenUtil.renderEntityPanel(graphics,leftPos + 40 + (hasClassicCrafting() ? 0 : 50),topPos + 13,63,84,2);
+        Pose pose = minecraft.player.getPose();
+        minecraft.player.setPose(Pose.STANDING);
         InventoryScreen.renderEntityInInventoryFollowsMouse(graphics,leftPos + 40 + (hasClassicCrafting() ? 0 : 50),topPos + 13,leftPos + 103 + (hasClassicCrafting() ? 0 : 50),topPos + 97,35,0.0625f,i,j, minecraft.player);
+        minecraft.player.setPose(pose);
         if (hasClassicCrafting()) {
             graphics.drawString(this.font, this.title, leftPos + 111, topPos + 16, 0x383838, false);
             graphics.blitSprite(SMALL_ARROW,leftPos + 158,topPos + 43,16,13);

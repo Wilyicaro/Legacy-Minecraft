@@ -1,30 +1,49 @@
 package wily.legacy.client.screen;
 
+import com.google.common.collect.ImmutableList;
+import com.google.gson.JsonElement;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.Lifecycle;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.screens.ConfirmScreen;
+import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
-import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
-import net.minecraft.client.gui.screens.worldselection.PresetEditor;
+import net.minecraft.client.gui.screens.worldselection.*;
+import net.minecraft.commands.Commands;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.server.WorldLoader;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.level.DataPackConfig;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.WorldDataConfiguration;
+import net.minecraft.world.level.levelgen.WorldGenSettings;
+import org.slf4j.Logger;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.ScreenUtil;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -198,4 +217,6 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
             this.minecraft.setScreen(new PackSelectionScreen(pair.getSecond(), packRepository -> screen.tryApplyNewDataPacks(packRepository, true, d-> openDataPackSelectionScreen(screen,d)), pair.getFirst(), Component.translatable("dataPack.title")));
         }
     }
+
+
 }

@@ -149,7 +149,7 @@ public abstract class GuiMixin {
         }
         if (minecraft.getCameraEntity() instanceof LivingEntity character) {
             boolean hasRemainingTime = character.isSprinting() || character.isShiftKeyDown() || character.isCrouching() || character.isFallFlying();
-            if (((LegacyOptions) minecraft.options).animatedCharacter().get() && (hasRemainingTime || character instanceof Player p && p.getAbilities().flying)) {
+            if (((LegacyOptions) minecraft.options).animatedCharacter().get() && (hasRemainingTime || character instanceof Player p && p.getAbilities().flying) && !character.isSleeping()) {
                 animatedCharacterTime = Util.getMillis();
                 remainingAnimatedCharacterTime = hasRemainingTime ? 450 : 0;
             }

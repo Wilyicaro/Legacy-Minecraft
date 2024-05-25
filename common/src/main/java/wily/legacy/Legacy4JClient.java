@@ -195,8 +195,7 @@ public class Legacy4JClient {
                     return s.shouldCloseOnEsc();
                 }
             };
-        }else if (screen instanceof DeathScreen d)
-            return new LegacyDeathScreen(d.causeOfDeath,d.hardcore);
+        }
         return screen;
     }
     public static void init() {
