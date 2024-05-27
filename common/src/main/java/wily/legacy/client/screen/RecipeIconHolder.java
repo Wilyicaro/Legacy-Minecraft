@@ -52,8 +52,8 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
         return canCraft(getFocusedRecipe());
     }
 
-    List<R> getFocusedRecipes(){
-        if (!isFocused() || !isValidIndex() || !canScroll()) focusedRecipes = null;
+    List<R> getFocusedRecipes(boolean skipIndexValidation = false){
+        if (!isFocused() || (!skipIndexCheck && !isValidIndex()) || !canScroll()) focusedRecipes = null;
         else if (focusedRecipes == null) focusedRecipes = new ArrayList<>(getRecipes());
         return focusedRecipes == null ? getRecipes() : focusedRecipes;
     }
@@ -157,10 +157,10 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
         return getRecipes().size() >= 3;
     }
     protected boolean isValidIndex() {
-        return !getRecipes().isEmpty() && getSelectionIndex() < getRecipes().size();
+        return !getRecipes().isEmpty() && getSelectionIndex(true) < getRecipes().size();
     }
-    protected int getSelectionIndex(){
-        return selectionOffset == -1 ? getFocusedRecipes().size() - 1 : selectionOffset == 1 ? 1 : 0;
+    protected int getSelectionIndex(boolean skipIndexValidation = false){
+        return selectionOffset == -1 ? getFocusedRecipes(skipIndexValidation).size() - 1 : selectionOffset == 1 ? 1 : 0;
     }
     @Override
     public boolean mouseScrolled(double d, double e, double f, double g) {
