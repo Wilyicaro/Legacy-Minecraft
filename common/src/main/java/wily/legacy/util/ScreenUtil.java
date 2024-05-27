@@ -324,13 +324,13 @@ public class ScreenUtil {
         double yCorner = holder.getYCorner() + holder.offset.y();
         return (d -= leftPos) >= xCorner && d < (xCorner + width) && (e -= topPos) >= yCorner && e < (yCorner + height);
     }
-    public static void renderEntity(GuiGraphics guiGraphics, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, LivingEntity livingEntity) {
-        renderEntity(guiGraphics,x,y,size,partialTicks,vector3f,quaternionf,quaternionf2,livingEntity,false);
+    public static void renderEntity(GuiGraphics guiGraphics, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity) {
+        renderEntity(guiGraphics,x,y,size,partialTicks,vector3f,quaternionf,quaternionf2,entity,false);
     }
-    public static void renderEntity(GuiGraphics guiGraphics, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, LivingEntity livingEntity, boolean forceSize) {
+    public static void renderEntity(GuiGraphics guiGraphics, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity, boolean forceSize) {
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(x, y, 50.0);
-        float h = forceSize ? Math.max(1f,Math.max(livingEntity.getBbWidth(), livingEntity.getBbHeight())) : 1;
+        float h = forceSize ? Math.max(1f,Math.max(entity.getBbWidth(), entity.getBbHeight())) : 1;
         guiGraphics.pose().mulPose(new Matrix4f().scaling(size / h, size / h, -size / h));
         guiGraphics.pose().translate(vector3f.x, vector3f.y, vector3f.z);
         guiGraphics.pose().mulPose(quaternionf);
@@ -341,7 +341,7 @@ public class ScreenUtil {
             entityRenderDispatcher.overrideCameraOrientation(quaternionf2);
         }
         entityRenderDispatcher.setRenderShadow(false);
-        RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(livingEntity, 0.0, 0.0, 0.0, 0.0f, partialTicks, guiGraphics.pose(), guiGraphics.bufferSource(), 0xF000F0));
+        RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0f, partialTicks, guiGraphics.pose(), guiGraphics.bufferSource(), 0xF000F0));
         guiGraphics.flush();
         entityRenderDispatcher.setRenderShadow(true);
         guiGraphics.pose().popPose();

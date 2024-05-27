@@ -13,6 +13,7 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.Slot;
@@ -95,15 +96,13 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
     public static LegacyIconHolder entityHolder(int x, int y, int width, int height, EntityType<?> entityType){
         return new LegacyIconHolder(x,y,width,height) {
-            LivingEntity livingEntity;
+            Entity entity;
 
             @Override
             public void render(GuiGraphics graphics, int i, int j, float f) {
                 super.render(graphics, i, j, f);
-                if (livingEntity == null && Minecraft.getInstance().level != null && entityType.create(Minecraft.getInstance().level) instanceof LivingEntity e1) {
-                    livingEntity = e1;
-                }
-                renderEntity(graphics, livingEntity, i, j, f);
+                if (entity == null && Minecraft.getInstance().level != null) entity = entityType.create(Minecraft.getInstance().level);
+                if (entity != null) renderEntity(graphics, entity, i, j, f);
             }
         };
     }
@@ -197,14 +196,16 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             RenderSystem.enableDepthTest();
         }
     }
-    public void renderEntity(GuiGraphics graphics, LivingEntity livingEntity, int i, int j, float f){
-        livingEntity.yBodyRotO = livingEntity.yBodyRot = 180.0f;
-        livingEntity.setYRot(180);
-        livingEntity.yRotO = livingEntity.getYRot();
-        livingEntity.setXRot(livingEntity.xRotO = 0 );
-        livingEntity.yHeadRot = 180;
-        livingEntity.yHeadRotO = livingEntity.yHeadRot;
-        ScreenUtil.renderEntity(graphics,getX() + getWidth() / 2f,getYCorner() + Math.min(getSelectableWidth(),getSelectableHeight()),(int)Math.min(getSelectableWidth(),getSelectableHeight()),f, new Vector3f(),new Quaternionf().rotationXYZ(0.0f, (float) Math.PI/ 4, (float) Math.PI), null, livingEntity,true);
+    public void renderEntity(GuiGraphics graphics, Entity entity, int i, int j, float f){
+        entity.setYRot(180);
+        entity.yRotO = entity.getYRot();
+        entity.setXRot(entity.xRotO = 0 );
+        if (entity instanceof LivingEntity e) {
+            e.yBodyRotO = e.yBodyRot = 180.0f;
+            e.yHeadRot = 180;
+            e.yHeadRotO = e.yHeadRot;
+        }
+        ScreenUtil.renderEntity(graphics,getX() + getWidth() / 2f,getYCorner() + Math.min(getSelectableWidth(),getSelectableHeight()),(int)Math.min(getSelectableWidth(),getSelectableHeight()),f, new Vector3f(),new Quaternionf().rotationXYZ(0.0f, (float) Math.PI/ 4, (float) Math.PI), null, entity,true);
     }
     public void renderSelection(GuiGraphics graphics, int i, int j, float f){
         graphics.pose().pushPose();
