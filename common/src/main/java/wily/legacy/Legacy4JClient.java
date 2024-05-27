@@ -48,6 +48,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.GameType;
@@ -56,6 +57,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CraftingTableBlock;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
@@ -301,10 +303,9 @@ public class Legacy4JClient {
                 HitResult hit = minecraft.hitResult;
                 if (hit instanceof BlockHitResult blockHitResult) {
                     BlockState state = level.getBlockState(blockHitResult.getBlockPos());
-                    if (!state.isAir()) {
+                    if (!state.isAir() && !(state.getBlock() instanceof LiquidBlock) && state.getBlock().asItem() instanceof BlockItem) {
                         if (!knownBlocks.contains(state.getBlock())) ScreenUtil.addTip(state.getBlock().asItem().getDefaultInstance());
                         knownBlocks.add(state.getBlock());
-
                     }
                 } else if (hit instanceof EntityHitResult r){
                     Entity e = r.getEntity();
