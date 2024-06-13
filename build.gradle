@@ -51,15 +51,6 @@ allprojects {
             url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
         }
 
-        maven {
-            name = 'GitHubPackages'
-            url uri("$mod_mvngit_source")
-            credentials{
-                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-                password = project.findProperty("gpr.token") ?: System.getenv("TOKEN")
-            }
-        }
-
         exclusiveContent {
             forRepository {
                 maven {
