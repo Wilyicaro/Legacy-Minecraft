@@ -26,6 +26,7 @@ import wily.legacy.inventory.LegacyMerchantMenu;
 import wily.legacy.inventory.LegacyMerchantOffer;
 import wily.legacy.network.ServerInventoryCraftPacket;
 import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.Stocker;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,8 +39,9 @@ import static wily.legacy.util.LegacySprites.DISCOUNT_STRIKETHRUOGH_SPRITE;
 public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchantMenu> {
     private int selectedTrade = 0;
     protected final boolean[] displaySlotsWarning = new boolean[3];;
-
-    protected final List<LegacyIconHolder> merchantTradeButtons = new ArrayList<>();;
+    protected int length = 0;
+    protected int tradeOffset = 0;
+    protected final List<LegacyIconHolder> merchantTradeButtons = new ArrayList<>();
 
     private final ContainerListener listener;
 
@@ -54,6 +56,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
 
             }
         };
+
         for (int index = 0; index < 10; index++)
             addTradeButton(index);
     }
@@ -66,11 +69,11 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
             int i = merchantTradeButtons.indexOf(b);
             boolean warning = false;
             if (i < menu.merchant.getOffers().size()) {
-                MerchantOffer offer = menu.merchant.getOffers().get(i);
+                MerchantOffer offer = menu.merchant.getOffers().get(i + tradeOffset);
                 boolean matchesCostA = compactList.stream().anyMatch(item -> offer.satisfiedBy(item, offer.getCostB()) && item.getCount() >= offer.getCostA().getCount());
                 boolean matchesCostB = offer.getCostB().isEmpty() || compactList.stream().anyMatch(item -> offer.satisfiedBy(offer.getCostA(),item) && item.getCount() >= offer.getCostB().getCount());
                 warning = !matchesCostA || !matchesCostB;
-                if (i == selectedTrade){
+                if (i == selectedTrade + tradeOffset){
                     displaySlotsWarning[0] = !matchesCostA;
                     displaySlotsWarning[1] = !matchesCostB;
                     displaySlotsWarning[2] = warning;
@@ -85,14 +88,16 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
         merchantTradeButtons.add(new LegacyIconHolder(27,27){
             @Override
             public void render(GuiGraphics graphics, int i, int j, float f) {
-                if (isValidIndex())
-                    itemIcon = menu.merchant.getOffers().get(index).getResult();
+                if (isValidIndex()) {
+                    length = menu.merchant.getOffers().size();
+                    itemIcon = menu.merchant.getOffers().get(index + tradeOffset).getResult();
+                }
                 super.render(graphics, i, j, f);
-                if (isValidIndex() && ((LegacyMerchantOffer)menu.merchant.getOffers().get(index)).getRequiredLevel() > menu.merchantLevel) {
+                if (isValidIndex() && ((LegacyMerchantOffer)menu.merchant.getOffers().get(index + tradeOffset)).getRequiredLevel() > menu.merchantLevel) {
                     RenderSystem.disableDepthTest();
                     renderIcon(LegacySprites.PADLOCK, graphics, false, 16, 16);
                     RenderSystem.enableDepthTest();
-                } else if (isValidIndex() && menu.merchant.getOffers().get(index).isOutOfStock()) {
+                } else if (isValidIndex() && menu.merchant.getOffers().get(index + tradeOffset).isOutOfStock()) {
                     RenderSystem.disableDepthTest();
                     renderIcon(LegacySprites.ERROR_CROSS, graphics, false, 15, 15);
                     RenderSystem.enableDepthTest();
@@ -102,7 +107,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
             @Override
             public void renderItem(GuiGraphics graphics, int i, int j, float f) {
                 if(itemIcon.isEmpty()) return;
-                ScreenUtil.secureTranslucentRender(graphics,isValidIndex() && menu.merchant.getOffers().get(index).isOutOfStock(),0.5f, (u)-> super.renderItem(graphics, i, j, f));
+                ScreenUtil.secureTranslucentRender(graphics,isValidIndex() && menu.merchant.getOffers().get(index + tradeOffset).isOutOfStock(),0.5f, (u)-> super.renderItem(graphics, i, j, f));
             }
 
             @Override
@@ -148,12 +153,24 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
             @Override
             public boolean keyPressed(int i, int j, int k) {
                 if ((i == 263 && index == 0) || (i == 262 && index == merchantTradeButtons.size() - 1)){
-                    LegacyMerchantScreen.this.setFocused(merchantTradeButtons.get(i == 263 ? merchantTradeButtons.size() - 1 : 0));
-                    ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
+                    System.out.println("Trade Offset: " + tradeOffset + " Length: " + menu.merchant.getOffers().size());
+                    if ((i == 263 && merchantTradeButtons.size() - length == 0) || (i == 262 && index == menu.merchant.getOffers().size() - 1)){
+                        return true;
+                    } else if (i == 263 && tradeOffset > 0 || i == 262 && tradeOffset < length - 10){
+                        ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
+                        tradeOffset += i == 263 ? -1 : 1;
+                        updateSlotsDisplay();
+                    }
                     return true;
                 }
+
                 return super.keyPressed(i, j, k);
             }
+
+
+
+
+
 
             @Override
             public void setFocused(boolean bl) {
@@ -166,11 +183,11 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
 
             @Override
             public ResourceLocation getIconHolderSprite() {
-                return isValidIndex() && ((LegacyMerchantOffer)menu.merchant.getOffers().get(index)).getRequiredLevel() > menu.merchantLevel ? LegacyIconHolder.GRAY_ICON_HOLDER : super.getIconHolderSprite();
+                return isValidIndex() && ((LegacyMerchantOffer)menu.merchant.getOffers().get(index + tradeOffset)).getRequiredLevel() > menu.merchantLevel ? LegacyIconHolder.GRAY_ICON_HOLDER : super.getIconHolderSprite();
             }
             @Override
             public boolean isWarning() {
-                return super.isWarning() && isValidIndex() && ((LegacyMerchantOffer)menu.merchant.getOffers().get(index)).getRequiredLevel() <= menu.merchantLevel && !menu.merchant.getOffers().get(index).isOutOfStock();
+                return super.isWarning() && isValidIndex() && ((LegacyMerchantOffer)menu.merchant.getOffers().get(index + tradeOffset)).getRequiredLevel() <= menu.merchantLevel && !menu.merchant.getOffers().get(index + tradeOffset).isOutOfStock();
             }
 
             private boolean isValidIndex(){
@@ -180,9 +197,9 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
             @Override
             public void onPress() {
                 if (isValidIndex() && isFocused() && index == selectedTrade) {
-                    MerchantOffer offer = menu.merchant.getOffers().get(index);
+                    MerchantOffer offer = menu.merchant.getOffers().get(index + tradeOffset);
                     if (((LegacyMerchantOffer)offer).getRequiredLevel() <= menu.merchantLevel && !offer.isOutOfStock() && !displaySlotsWarning[2]) {
-                        CommonNetworkManager.sendToServer(new ServerInventoryCraftPacket(ingredientsFromStacks(offer.getCostA(),offer.getCostB()),offer.getResult(),index,hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
+                        CommonNetworkManager.sendToServer(new ServerInventoryCraftPacket(ingredientsFromStacks(offer.getCostA(),offer.getCostB()),offer.getResult(),index + tradeOffset,hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
                     }else ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT_FAIL.get(),1.0f);
                 }
             }
@@ -238,7 +255,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
     }
 
     public MerchantOffer getSelectedMerchantOffer(){
-        return selectedTrade < menu.merchant.getOffers().size()  ? menu.merchant.getOffers().get(selectedTrade) : null;
+        return selectedTrade + tradeOffset < menu.merchant.getOffers().size()  ? menu.merchant.getOffers().get(selectedTrade + tradeOffset) : null;
     }
 
     @Override
