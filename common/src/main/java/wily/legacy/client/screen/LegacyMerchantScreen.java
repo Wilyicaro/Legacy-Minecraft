@@ -153,7 +153,6 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
             @Override
             public boolean keyPressed(int i, int j, int k) {
                 if ((i == 263 && index == 0) || (i == 262 && index == merchantTradeButtons.size() - 1)){
-                    System.out.println("Trade Offset: " + tradeOffset + " Length: " + menu.merchant.getOffers().size());
                     if ((i == 263 && merchantTradeButtons.size() - length == 0) || (i == 262 && index == menu.merchant.getOffers().size() - 1)){
                         return true;
                     } else if (i == 263 && tradeOffset > 0 || i == 262 && tradeOffset < length - 10){
@@ -167,7 +166,17 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
                 return super.keyPressed(i, j, k);
             }
 
+            @Override
+            public boolean mouseScrolled(double d, double e, double f, double g) {
 
+                if ((g == 1 && tradeOffset == 0) || (g == -1 && length == merchantTradeButtons.size() + tradeOffset)){
+                    return true;
+                }
+                ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
+                tradeOffset += g == 1 ? -1 : 1;
+                updateSlotsDisplay();
+                return super.mouseScrolled(d, e, f, g);
+            }
 
 
 
