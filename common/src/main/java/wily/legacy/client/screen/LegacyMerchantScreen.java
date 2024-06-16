@@ -66,10 +66,11 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
         ServerInventoryCraftPacket.handleCompactInventoryList(compactList,Minecraft.getInstance().player.getInventory(),menu.getCarried());
         merchantTradeButtons.forEach(b->{
             b.allowFocusedItemTooltip = true;
-            int i = merchantTradeButtons.indexOf(b);
+            int i = merchantTradeButtons.indexOf(b) + tradeOffset;
             boolean warning = false;
+            System.out.println("Offers: " + menu.merchant.getOffers().size() + " i: " + i);
             if (i < menu.merchant.getOffers().size()) {
-                MerchantOffer offer = menu.merchant.getOffers().get(i + tradeOffset);
+                MerchantOffer offer = menu.merchant.getOffers().get(i);
                 boolean matchesCostA = compactList.stream().anyMatch(item -> offer.satisfiedBy(item, offer.getCostB()) && item.getCount() >= offer.getCostA().getCount());
                 boolean matchesCostB = offer.getCostB().isEmpty() || compactList.stream().anyMatch(item -> offer.satisfiedBy(offer.getCostA(),item) && item.getCount() >= offer.getCostB().getCount());
                 warning = !matchesCostA || !matchesCostB;
