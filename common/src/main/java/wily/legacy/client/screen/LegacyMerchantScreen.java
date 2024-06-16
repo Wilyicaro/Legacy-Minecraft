@@ -68,7 +68,6 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
             b.allowFocusedItemTooltip = true;
             int i = merchantTradeButtons.indexOf(b) + tradeOffset;
             boolean warning = false;
-            System.out.println("Offers: " + menu.merchant.getOffers().size() + " i: " + i);
             if (i < menu.merchant.getOffers().size()) {
                 MerchantOffer offer = menu.merchant.getOffers().get(i);
                 boolean matchesCostA = compactList.stream().anyMatch(item -> offer.satisfiedBy(item, offer.getCostB()) && item.getCount() >= offer.getCostA().getCount());
