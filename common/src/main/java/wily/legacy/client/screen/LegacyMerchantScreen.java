@@ -41,6 +41,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
     protected final boolean[] displaySlotsWarning = new boolean[3];;
     protected int length = 0;
     protected int tradeOffset = 0;
+    private long lastScrollTime = 0;
     protected final List<LegacyIconHolder> merchantTradeButtons = new ArrayList<>();
 
     private final ContainerListener listener;
@@ -64,6 +65,8 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
     private void updateSlotsDisplay(){
         List<ItemStack> compactList = new ArrayList<>();
         ServerInventoryCraftPacket.handleCompactInventoryList(compactList,Minecraft.getInstance().player.getInventory(),menu.getCarried());
+        tradeOffset = Math.min(length - 10, tradeOffset);
+        tradeOffset = Math.max(0, tradeOffset);
         merchantTradeButtons.forEach(b->{
             b.allowFocusedItemTooltip = true;
             int i = merchantTradeButtons.indexOf(b) + tradeOffset;
@@ -88,7 +91,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
         merchantTradeButtons.add(new LegacyIconHolder(27,27){
             @Override
             public void render(GuiGraphics graphics, int i, int j, float f) {
-                if (isValidIndex()) {
+                if (isValidIndex() && index + tradeOffset < menu.merchant.getOffers().size()) {
                     length = menu.merchant.getOffers().size();
                     itemIcon = menu.merchant.getOffers().get(index + tradeOffset).getResult();
                 }
@@ -159,6 +162,11 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
                         ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
                         tradeOffset += i == 263 ? -1 : 1;
                         updateSlotsDisplay();
+                    } else {
+                        ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
+                        tradeOffset = i == 262 ? 0 : length - merchantTradeButtons.size();
+                        LegacyMerchantScreen.this.setFocused(merchantTradeButtons.get(i == 263 ? merchantTradeButtons.size() - 1 : 0));
+                        updateSlotsDisplay();
                     }
                     return true;
                 }
@@ -167,10 +175,10 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
             }
 
             @Override
-            public boolean mouseScrolled(double d, double e, double f, double g) {
+            public synchronized boolean mouseScrolled(double d, double e, double f, double g) {
 
-                if ((g == 1 && tradeOffset == 0) || (g == -1 && length == merchantTradeButtons.size() + tradeOffset)){
-                    return true;
+                if ((g == 1 && tradeOffset <= 0) || (g == -1 && length <= merchantTradeButtons.size() + tradeOffset)){
+                    return super.mouseScrolled(d, e, f, g);
                 }
                 ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
                 tradeOffset += g == 1 ? -1 : 1;
@@ -200,7 +208,9 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
             }
 
             private boolean isValidIndex(){
-                return index < menu.merchant.getOffers().size();
+                tradeOffset = Math.min(length - 10, tradeOffset);
+                tradeOffset = Math.max(0, tradeOffset);
+                return index + tradeOffset < menu.merchant.getOffers().size();
             }
 
             @Override
