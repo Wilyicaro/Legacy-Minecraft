@@ -20,6 +20,9 @@ public class LiquidBlockRendererMixin {
     @Redirect(method = "tesselate",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/LiquidBlockRenderer;vertex(Lcom/mojang/blaze3d/vertex/VertexConsumer;DDDFFFFFI)V"))
     public void tesselate(LiquidBlockRenderer instance, VertexConsumer vertexConsumer, double d, double e, double f, float g, float h, float i, float j, float k, int l, BlockAndTintGetter getter, BlockPos pos, VertexConsumer arg3, BlockState state, FluidState arg5) {
         LevelReader reader = getter instanceof RenderChunkRegion r ? r.level : getter instanceof LevelAccessor a ? a : null;
-        vertexConsumer.vertex(d, e, f).color(g, h, i, arg5.is(Fluids.WATER) || arg5.is(Fluids.FLOWING_WATER) ?  LegacyBiomeOverride.getOrDefault(reader.getBiome(pos).unwrapKey()).waterTransparency() : 1.0f).uv(j, k).uv2(l).normal(0.0f, 1.0f, 0.0f).endVertex();
+        if (reader != null)
+            vertexConsumer.vertex(d, e, f).color(g, h, i, arg5.is(Fluids.WATER) || arg5.is(Fluids.FLOWING_WATER) ?  LegacyBiomeOverride.getOrDefault(reader.getBiome(pos).unwrapKey()).waterTransparency() : 1.0f).uv(j, k).uv2(l).normal(0.0f, 1.0f, 0.0f).endVertex();
+        else
+            vertexConsumer.vertex(d, e, f).color(g, h, i, 1.0f).uv(j, k).uv2(l).normal(0.0f, 1.0f, 0.0f).endVertex();
     }
 }
