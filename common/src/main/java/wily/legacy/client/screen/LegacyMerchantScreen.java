@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -42,6 +43,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
     protected int length = 0;
     protected int tradeOffset = 0;
     private long lastScrollTime = 0;
+    protected LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     protected final List<LegacyIconHolder> merchantTradeButtons = new ArrayList<>();
 
     private final ContainerListener listener;
@@ -280,9 +282,20 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
+
+        // render the scroll indicators depending on how many trades are available: Method - [public void renderScroll(GuiGraphics graphics, ScreenDirection direction, int x, int y)]
+        if (tradeOffset >= 1) {
+            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + 4, topPos + 50);
+        }
+        if (length > 10 && tradeOffset < length - 10) {
+            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + (27 * 10) + 12, topPos + 50);
+        }
+
         merchantTradeButtons.get(selectedTrade).renderSelection(guiGraphics,i,j,f);
         merchantTradeButtons.forEach(b-> b.renderTooltip(minecraft,guiGraphics,i,j));
         renderTooltip(guiGraphics,i,j);
+
+
     }
 
     @Override
