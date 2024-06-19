@@ -107,6 +107,41 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     public static LegacyCraftingScreen playerCraftingScreen(LegacyCraftingMenu abstractContainerMenu, Inventory inventory, Component component){
         return new LegacyCraftingScreen(abstractContainerMenu,inventory,component,true);
     }
+
+    @Override
+    public boolean mouseScrolled(double d, double e, double f, double scrollValue) {
+
+        boolean scrolled = super.mouseScrolled(d, e, f, scrollValue);
+        System.out.println(scrollValue);
+        if (scrollValue >= 0 && craftingButtonsOffset.get() > 0){
+            System.out.println("scrolling Left");
+            craftingButtonsOffset.add(-1,true);
+            for (RecipeIconHolder<CraftingRecipe> holder : craftingButtons) {
+                holder.setFocused(false);
+                if(holder.getRecipes().equals(recipesByTab.get(craftingTabList.selectedTab).get(craftingButtonsOffset.get()))){
+                    holder.setFocused(true);
+                    selectedCraftingButton = craftingButtons.indexOf(holder);
+                }
+                holder.updateRecipeDisplay(holder.getFocusedRecipe());
+            }
+            scrolled = true;
+        } else if (scrollValue <= 0 && craftingButtonsOffset.get() < recipesByTab.get(craftingTabList.selectedTab).size() - 12){
+            System.out.println("scrolling Right");
+            craftingButtonsOffset.add(1,true);
+            for (RecipeIconHolder<CraftingRecipe> holder : craftingButtons) {
+                holder.setFocused(false);
+                if(holder.getRecipes().equals(recipesByTab.get(craftingTabList.selectedTab).get(craftingButtonsOffset.get()))){
+                    holder.setFocused(true);
+                    selectedCraftingButton = craftingButtons.indexOf(holder);
+                }
+            }
+            scrolled = true;
+        }
+
+        return scrolled;
+    }
+
+
     protected boolean inited = false;
     public LegacyCraftingScreen(LegacyCraftingMenu abstractContainerMenu, Inventory inventory, Component component, boolean is2x2) {
         super(abstractContainerMenu, inventory, component);
@@ -238,6 +273,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             resultStack = h.itemIcon.copyWithCount(1);
             canCraft(ingredientsGrid,true);
         }));
+
         dyeBannerButtons.add(craftingButtonByPredicate(SELECT_SHIELD_BANNER, i-> i.getItem() instanceof BannerItem, h->{
             clearIngredients(ingredientsGrid);
             if (dyeBannerButtons.isEmpty()) return;
@@ -290,6 +326,10 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             }
         };
     }
+
+
+
+
     protected CustomCraftingIconHolder craftingButtonByPredicate(Component displayName, Predicate<ItemStack> isValid, Consumer<CustomCraftingIconHolder> updateRecipe){
         return new CustomCraftingIconHolder(){
             public Component getDisplayName() {
@@ -547,6 +587,9 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             }
         }return false;
     }
+
+
+
     public List<? extends LegacyIconHolder> getCraftingButtons(){
         return switch (groupTabList.selectedTab){
             case 1 -> fireworkTabList.selectedTab == 0 ? fireworkStarButtons : fireworkTabList.selectedTab == 1 ? fireworkStarFadeButtons : fireworkButtons;
