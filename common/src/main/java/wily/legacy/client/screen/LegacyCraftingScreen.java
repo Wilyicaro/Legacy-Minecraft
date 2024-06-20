@@ -32,6 +32,7 @@ import wily.legacy.client.Offset;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.network.ServerInventoryCraftPacket;
 import wily.legacy.util.PagedList;
@@ -45,6 +46,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static wily.legacy.client.screen.LegacyIconHolder.entityHolder;
 import static wily.legacy.util.LegacySprites.SMALL_ARROW;
 import static wily.legacy.client.screen.ControlTooltip.*;
 import static wily.legacy.client.screen.RecipeIconHolder.getActualItem;
@@ -108,38 +110,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         return new LegacyCraftingScreen(abstractContainerMenu,inventory,component,true);
     }
 
-    @Override
-    public boolean mouseScrolled(double d, double e, double f, double scrollValue) {
 
-        boolean scrolled = super.mouseScrolled(d, e, f, scrollValue);
-        System.out.println(scrollValue);
-        if (scrollValue >= 0 && craftingButtonsOffset.get() > 0){
-            System.out.println("scrolling Left");
-            craftingButtonsOffset.add(-1,true);
-            for (RecipeIconHolder<CraftingRecipe> holder : craftingButtons) {
-                holder.setFocused(false);
-                if(holder.getRecipes().equals(recipesByTab.get(craftingTabList.selectedTab).get(craftingButtonsOffset.get()))){
-                    holder.setFocused(true);
-                    selectedCraftingButton = craftingButtons.indexOf(holder);
-                }
-                holder.updateRecipeDisplay(holder.getFocusedRecipe());
-            }
-            scrolled = true;
-        } else if (scrollValue <= 0 && craftingButtonsOffset.get() < recipesByTab.get(craftingTabList.selectedTab).size() - 12){
-            System.out.println("scrolling Right");
-            craftingButtonsOffset.add(1,true);
-            for (RecipeIconHolder<CraftingRecipe> holder : craftingButtons) {
-                holder.setFocused(false);
-                if(holder.getRecipes().equals(recipesByTab.get(craftingTabList.selectedTab).get(craftingButtonsOffset.get()))){
-                    holder.setFocused(true);
-                    selectedCraftingButton = craftingButtons.indexOf(holder);
-                }
-            }
-            scrolled = true;
-        }
-
-        return scrolled;
-    }
 
 
     protected boolean inited = false;
@@ -568,6 +539,31 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         }
     }
 
+    @Override
+    public boolean mouseScrolled(double d, double e, double f, double scrollValue) {
+
+        boolean scrolled = super.mouseScrolled(d, e, f, scrollValue);
+        if(groupTabList.selectedTab != 0){
+            return scrolled;
+        }
+        if(getFocused() instanceof RecipeIconHolder<?> h && h.isMouseOver(d,e) && h.canScroll()){
+            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
+            return scrolled;
+        }
+        if (scrollValue >= 0 && craftingButtonsOffset.get() > 0){
+            craftingButtonsOffset.add(-1,true);
+            page.add(0);
+            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
+            scrolled = true;
+        } else if (scrollValue <= 0 && craftingButtonsOffset.get() < recipesByTab.get(craftingTabList.selectedTab).size() - 12){
+            craftingButtonsOffset.add(1,true);
+            page.add(0);
+            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
+            scrolled = true;
+        }
+
+        return scrolled;
+    }
 
     @Override
     public boolean keyPressed(int i, int j, int k) {

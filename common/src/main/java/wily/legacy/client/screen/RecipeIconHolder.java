@@ -159,10 +159,12 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
         return getRecipes().size() >= 3;
     }
     protected boolean isValidIndex() {
-        return !getRecipes().isEmpty() && getSelectionIndex() < getRecipes().size();
+        int size = getRecipes().size(); // Directly use getRecipes().size()
+        return !getRecipes().isEmpty() && getSelectionIndex() < size;
     }
     protected int getSelectionIndex(){
-        return selectionOffset == -1 ? getFocusedRecipes().size() - 1 : selectionOffset == 1 ? 1 : 0;
+        int size = getRecipes().size(); // Directly use getRecipes().size()
+        return selectionOffset == -1 ? size - 1 : selectionOffset == 1 ? 1 : 0;
     }
     @Override
     public boolean mouseScrolled(double d, double e, double f, double g) {
@@ -186,7 +188,10 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
     public void onClick(double d, double e) {
         int oldSelection = selectionOffset;
         selectionOffset = isHoveredTop ? -1 : isHoveredBottom ? 1 : 0;
-        if (oldSelection != selectionOffset) updateRecipeDisplay();
+        if (oldSelection != selectionOffset) {
+            updateRecipeDisplay();
+            ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0F);
+        }
         else super.onClick(d, e);
     }
 
