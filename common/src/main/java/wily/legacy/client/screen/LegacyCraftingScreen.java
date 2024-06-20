@@ -32,6 +32,7 @@ import wily.legacy.client.Offset;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.network.ServerInventoryCraftPacket;
 import wily.legacy.util.PagedList;
@@ -45,6 +46,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static wily.legacy.client.screen.LegacyIconHolder.entityHolder;
 import static wily.legacy.util.LegacySprites.SMALL_ARROW;
 import static wily.legacy.client.screen.ControlTooltip.*;
 import static wily.legacy.client.screen.RecipeIconHolder.getActualItem;
@@ -107,6 +109,10 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     public static LegacyCraftingScreen playerCraftingScreen(LegacyCraftingMenu abstractContainerMenu, Inventory inventory, Component component){
         return new LegacyCraftingScreen(abstractContainerMenu,inventory,component,true);
     }
+
+
+
+
     protected boolean inited = false;
     public LegacyCraftingScreen(LegacyCraftingMenu abstractContainerMenu, Inventory inventory, Component component, boolean is2x2) {
         super(abstractContainerMenu, inventory, component);
@@ -238,6 +244,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             resultStack = h.itemIcon.copyWithCount(1);
             canCraft(ingredientsGrid,true);
         }));
+
         dyeBannerButtons.add(craftingButtonByPredicate(SELECT_SHIELD_BANNER, i-> i.getItem() instanceof BannerItem, h->{
             clearIngredients(ingredientsGrid);
             if (dyeBannerButtons.isEmpty()) return;
@@ -290,6 +297,10 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             }
         };
     }
+
+
+
+
     protected CustomCraftingIconHolder craftingButtonByPredicate(Component displayName, Predicate<ItemStack> isValid, Consumer<CustomCraftingIconHolder> updateRecipe){
         return new CustomCraftingIconHolder(){
             public Component getDisplayName() {
@@ -528,6 +539,31 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         }
     }
 
+    @Override
+    public boolean mouseScrolled(double d, double e, double f, double scrollValue) {
+
+        boolean scrolled = super.mouseScrolled(d, e, f, scrollValue);
+        if(groupTabList.selectedTab != 0){
+            return scrolled;
+        }
+        if(getFocused() instanceof RecipeIconHolder<?> h && h.isMouseOver(d,e) && h.canScroll()){
+            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
+            return scrolled;
+        }
+        if (scrollValue >= 0 && craftingButtonsOffset.get() > 0){
+            craftingButtonsOffset.add(-1,true);
+            page.add(0);
+            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
+            scrolled = true;
+        } else if (scrollValue <= 0 && craftingButtonsOffset.get() < recipesByTab.get(craftingTabList.selectedTab).size() - 12){
+            craftingButtonsOffset.add(1,true);
+            page.add(0);
+            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
+            scrolled = true;
+        }
+
+        return scrolled;
+    }
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
@@ -547,6 +583,9 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             }
         }return false;
     }
+
+
+
     public List<? extends LegacyIconHolder> getCraftingButtons(){
         return switch (groupTabList.selectedTab){
             case 1 -> fireworkTabList.selectedTab == 0 ? fireworkStarButtons : fireworkTabList.selectedTab == 1 ? fireworkStarFadeButtons : fireworkButtons;
