@@ -26,7 +26,7 @@ public class Legacy4JPlatformImpl {
     }
 
     public static TagKey<Item> getCommonItemTag(String commonTag) {
-        return ItemTags.create(new ResourceLocation("forge", commonTag));
+        return ItemTags.create(ResourceLocation.fromNamespaceAndPath("forge", commonTag));
     }
 
     public static boolean isHiddenMod(Mod mod) {
