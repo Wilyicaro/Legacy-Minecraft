@@ -316,7 +316,7 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
             List<StatsBoard> statsBoards = new ArrayList<>();
             ResourceManager manager = Minecraft.getInstance().getResourceManager();
 
-            manager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1)).forEach(name->manager.getResource(new ResourceLocation(name, LEADERBOARD_LISTING)).ifPresent(((r) -> {
+            manager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1)).forEach(name->manager.getResource(ResourceLocation.fromNamespaceAndPath(name, LEADERBOARD_LISTING)).ifPresent(((r) -> {
                 try {
                     BufferedReader bufferedReader = r.openAsReader();
                     JsonObject obj = GsonHelper.parse(bufferedReader);

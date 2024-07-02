@@ -16,8 +16,8 @@ import java.util.function.Function;
 
 public class CommonNetworkManager {
 
-    public static final ResourceLocation NETWORK = new ResourceLocation(Legacy4J.MOD_ID,"network");
-    public static final ResourceLocation CLIENT_NETWORK = new ResourceLocation(Legacy4J.MOD_ID,"client_network");
+    public static final ResourceLocation NETWORK = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"network");
+    public static final ResourceLocation CLIENT_NETWORK = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"client_network");
     private static final List<Class<? extends CommonPacket>> PACKET_CLASSES = new ArrayList<>();
     private static final List<Function<RegistryFriendlyByteBuf,CommonPacket>> PACKETS_FROM_NETWORK = new ArrayList<>();
 

@@ -27,7 +27,7 @@ public class LegacyTipManager extends SimplePreparableReloadListener<List<Suppli
     @Override
     protected List<Supplier<LegacyTip>> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
         List<Supplier<LegacyTip>> loadingTips = new ArrayList<>();
-        resourceManager.getNamespaces().forEach(name->resourceManager.getResource(new ResourceLocation(name,TIPS)).ifPresent(r->{
+        resourceManager.getNamespaces().forEach(name->resourceManager.getResource(ResourceLocation.fromNamespaceAndPath(name,TIPS)).ifPresent(r->{
             try {
                 BufferedReader bufferedReader = r.openAsReader();
                 JsonObject obj = GsonHelper.parse(bufferedReader);

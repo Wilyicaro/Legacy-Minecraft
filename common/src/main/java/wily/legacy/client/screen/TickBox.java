@@ -16,8 +16,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class TickBox extends AbstractButton {
-    public static final ResourceLocation[] SPRITES = new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID, "widget/tickbox"), new ResourceLocation(Legacy4J.MOD_ID, "widget/tickbox_hovered")};
-    public static final ResourceLocation TICK = new ResourceLocation(Legacy4J.MOD_ID, "widget/tick");
+    public static final ResourceLocation[] SPRITES = new ResourceLocation[]{ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID, "widget/tickbox"), ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID, "widget/tickbox_hovered")};
+    public static final ResourceLocation TICK = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID, "widget/tick");
     protected final Function<Boolean,Component> message;
     protected Function<Boolean,Tooltip> tooltip;
     private final Consumer<TickBox> onPress;

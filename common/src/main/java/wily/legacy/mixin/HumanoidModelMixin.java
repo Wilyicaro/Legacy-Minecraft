@@ -42,7 +42,7 @@ public abstract class HumanoidModelMixin {
 
     private boolean applyEatTransform(LivingEntity livingEntity, InteractionHand hand, ItemStack itemStack, float partialTicks, HumanoidArm mainArm){
         if(isEatingWithHand(livingEntity,hand,itemStack)){
-            if (livingEntity.getUseItemRemainingTicks() >= itemStack.getUseDuration() - 1) lastEatTime = Util.getMillis();
+            if (livingEntity.getUseItemRemainingTicks() >= itemStack.getUseDuration(livingEntity) - 1) lastEatTime = Util.getMillis();
 
             boolean isRightHand = mainArm == HumanoidArm.RIGHT && hand == InteractionHand.MAIN_HAND;
             ModelPart armModel = isRightHand ? rightArm : leftArm;

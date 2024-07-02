@@ -169,7 +169,7 @@ public class Legacy4JClient {
         else if (screen instanceof JoinMultiplayerScreen)
             return new PlayGameScreen(new MainMenuScreen(),2);
         else if (screen instanceof DisconnectedScreen s)
-            return ConfirmationScreen.createInfoScreen(getReplacementScreen(s.parent), s.getTitle(),s.reason);
+            return ConfirmationScreen.createInfoScreen(getReplacementScreen(s.parent), s.getTitle(),s.details.reason());
         else if (screen instanceof AlertScreen s) {
             MultiLineLabel messageLines = MultiLineLabel.create(Minecraft.getInstance().font,s.messageText,200);
             return new ConfirmationScreen(Minecraft.getInstance().screen, 230, 97 + messageLines.getLineCount() * 12, s.getTitle(), messageLines, b -> true) {

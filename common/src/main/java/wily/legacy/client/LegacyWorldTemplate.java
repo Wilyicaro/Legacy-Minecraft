@@ -23,13 +23,13 @@ public record LegacyWorldTemplate(Component buttonName, ResourceLocation icon, R
         protected List<LegacyWorldTemplate> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
             List<LegacyWorldTemplate> templates = new ArrayList<>();
             resourceManager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1)).forEach(name->{
-                resourceManager.getResource(new ResourceLocation(name, TEMPLATES)).ifPresent(r->{
+                resourceManager.getResource(ResourceLocation.fromNamespaceAndPath(name, TEMPLATES)).ifPresent(r->{
                     try {
                         BufferedReader bufferedReader = r.openAsReader();
                         JsonObject obj = GsonHelper.parse(bufferedReader);
                         obj.asMap().forEach((s,element)->{
                             if (element instanceof JsonObject tabObj) {
-                                templates.add(new LegacyWorldTemplate(Component.translatable(s),new ResourceLocation(GsonHelper.getAsString(tabObj,"icon")),new ResourceLocation(GsonHelper.getAsString(tabObj,"templateLocation")),GsonHelper.getAsString(tabObj,"folderName"),GsonHelper.getAsBoolean(tabObj,"directJoin",false)));
+                                templates.add(new LegacyWorldTemplate(Component.translatable(s),ResourceLocation.parse(GsonHelper.getAsString(tabObj,"icon")),ResourceLocation.parse(GsonHelper.getAsString(tabObj,"templateLocation")),GsonHelper.getAsString(tabObj,"folderName"),GsonHelper.getAsBoolean(tabObj,"directJoin",false)));
                             }
                         });
                         bufferedReader.close();

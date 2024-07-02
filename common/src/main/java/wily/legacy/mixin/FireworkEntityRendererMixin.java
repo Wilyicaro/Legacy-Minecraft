@@ -23,7 +23,7 @@ import wily.legacy.Legacy4J;
 
 @Mixin(FireworkEntityRenderer.class)
 public abstract class FireworkEntityRendererMixin extends EntityRenderer<FireworkRocketEntity> {
-    private static final ResourceLocation FIREWORK_LOCATION = new ResourceLocation(Legacy4J.MOD_ID, "textures/entity/projectiles/firework.png");
+    private static final ResourceLocation FIREWORK_LOCATION = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID, "textures/entity/projectiles/firework.png");
     protected FireworkEntityRendererMixin(EntityRendererProvider.Context context) {
         super(context);
     }
@@ -64,6 +64,6 @@ public abstract class FireworkEntityRendererMixin extends EntityRenderer<Firewor
 
     }
     public void vertex(Matrix4f matrix4f, PoseStack.Pose pose, VertexConsumer vertexConsumer, int i, int j, int k, float f, float g, int l, int m, int n, int o) {
-        vertexConsumer.vertex(matrix4f, i, j, k).color(255, 255, 255, 255).uv(f, g).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(o).normal(pose, l, n, m).endVertex();
+        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(255, 255, 255, 255).setUv(f, g).setOverlay(OverlayTexture.NO_OVERLAY).setLight(o).setNormal(pose, l, n, m);
     }
 }

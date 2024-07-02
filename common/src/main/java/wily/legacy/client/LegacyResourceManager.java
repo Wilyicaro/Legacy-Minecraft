@@ -26,9 +26,9 @@ import static wily.legacy.Legacy4JClient.gammaEffect;
 
 public class LegacyResourceManager implements PreparableReloadListener {
 
-    public static final ResourceLocation GAMEPAD_MAPPINGS = new ResourceLocation(Legacy4J.MOD_ID,"gamepad_mappings.txt");
-    public static final ResourceLocation INTRO_LOCATION = new ResourceLocation(Legacy4J.MOD_ID,"intro.json");
-    public static final ResourceLocation GAMMA_LOCATION = new ResourceLocation(Legacy4J.MOD_ID,"shaders/post/gamma.json");
+    public static final ResourceLocation GAMEPAD_MAPPINGS = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"gamepad_mappings.txt");
+    public static final ResourceLocation INTRO_LOCATION = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"intro.json");
+    public static final ResourceLocation GAMMA_LOCATION = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"shaders/post/gamma.json");
 
     public static final List<ResourceLocation> INTROS = new ArrayList<>();
 
@@ -70,7 +70,7 @@ public class LegacyResourceManager implements PreparableReloadListener {
         try {
             INTROS.clear();
             JsonArray array = GsonHelper.parseArray(resourceManager.getResourceOrThrow(INTRO_LOCATION).openAsReader());
-            array.forEach(e-> INTROS.add(new ResourceLocation(e.getAsString())));
+            array.forEach(e-> INTROS.add(ResourceLocation.parse(e.getAsString())));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

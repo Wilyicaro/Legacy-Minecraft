@@ -37,24 +37,24 @@ import wily.legacy.client.screen.LegacyIconHolder;
 import java.util.function.Consumer;
 
 public class ScreenUtil {
-    public static final ResourceLocation GUI_ATLAS = new ResourceLocation("textures/atlas/gui.png");
+    public static final ResourceLocation GUI_ATLAS = ResourceLocation.withDefaultNamespace("textures/atlas/gui.png");
     private static final Minecraft mc = Minecraft.getInstance();
     public static long lastHotbarSelectionChange = -1;
     protected static LogoRenderer logoRenderer = new LogoRenderer(false);
     public static LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
-    public static final ResourceLocation MINECRAFT = new ResourceLocation(Legacy4J.MOD_ID, "title/minecraft");
-    public static final ResourceLocation PANORAMA_DAY = new ResourceLocation(Legacy4J.MOD_ID, "textures/gui/title/panorama_day.png");
-    public static final ResourceLocation PANORAMA_NIGHT = new ResourceLocation(Legacy4J.MOD_ID, "textures/gui/title/panorama_night.png");
-    public static final ResourceLocation SAVE_CHEST = new ResourceLocation(Legacy4J.MOD_ID,"hud/save_chest");
-    public static final ResourceLocation SAVE_ARROW = new ResourceLocation(Legacy4J.MOD_ID,"hud/save_arrow");
-    public static final ResourceLocation LOADING_BLOCK = new ResourceLocation(Legacy4J.MOD_ID,"widget/loading_block");
-    public static final ResourceLocation POINTER_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/pointer_panel");
-    public static final ResourceLocation PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel");
-    public static final ResourceLocation PANEL_RECESS = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel_recess");
-    public static final ResourceLocation PANEL_TRANSLUCENT_RECESS = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel_translucent_recess");
-    public static final ResourceLocation ENTITY_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/entity_panel");
-    public static final ResourceLocation SQUARE_RECESSED_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/square_recessed_panel");
-    public static final ResourceLocation SQUARE_ENTITY_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/square_entity_panel");
+    public static final ResourceLocation MINECRAFT = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID, "title/minecraft");
+    public static final ResourceLocation PANORAMA_DAY = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID, "textures/gui/title/panorama_day.png");
+    public static final ResourceLocation PANORAMA_NIGHT = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID, "textures/gui/title/panorama_night.png");
+    public static final ResourceLocation SAVE_CHEST = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"hud/save_chest");
+    public static final ResourceLocation SAVE_ARROW = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"hud/save_arrow");
+    public static final ResourceLocation LOADING_BLOCK = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"widget/loading_block");
+    public static final ResourceLocation POINTER_PANEL = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"tiles/pointer_panel");
+    public static final ResourceLocation PANEL = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"tiles/panel");
+    public static final ResourceLocation PANEL_RECESS = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"tiles/panel_recess");
+    public static final ResourceLocation PANEL_TRANSLUCENT_RECESS = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"tiles/panel_translucent_recess");
+    public static final ResourceLocation ENTITY_PANEL = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"tiles/entity_panel");
+    public static final ResourceLocation SQUARE_RECESSED_PANEL = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"tiles/square_recessed_panel");
+    public static final ResourceLocation SQUARE_ENTITY_PANEL = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"tiles/square_entity_panel");
     public static void renderPointerPanel(GuiGraphics graphics, int x, int y, int width, int height){
         RenderSystem.enableBlend();
         RenderSystem.disableDepthTest();

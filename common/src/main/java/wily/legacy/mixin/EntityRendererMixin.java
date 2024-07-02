@@ -54,9 +54,9 @@ public abstract class EntityRendererMixin {
             l = o;
         }
         VertexConsumer vertexConsumer = multiBufferSource.getBuffer(renderType);
-        vertexConsumer.vertex(matrix4f, i, j, 0).color(r,g,b,a).endVertex();
-        vertexConsumer.vertex(matrix4f, i, l, 0).color(r,g,b,a).endVertex();
-        vertexConsumer.vertex(matrix4f, k, l, 0).color(r,g,b,a).endVertex();
-        vertexConsumer.vertex(matrix4f, k, j, 0).color(r,g,b,a).endVertex();
+        vertexConsumer.addVertex(matrix4f, i, j, 0).setColor(r,g,b,a);
+        vertexConsumer.addVertex(matrix4f, i, l, 0).setColor(r,g,b,a);
+        vertexConsumer.addVertex(matrix4f, k, l, 0).setColor(r,g,b,a);
+        vertexConsumer.addVertex(matrix4f, k, j, 0).setColor(r,g,b,a);
     }
 }

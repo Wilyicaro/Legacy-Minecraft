@@ -29,7 +29,7 @@ configurations {
 dependencies {
     neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"
     modApi "dev.architectury:architectury-neoforge:${rootProject.architectury_version}"
-    api(include("io.github.libsdl4j:libsdl4j:2.28.4-1.6"))
+    api(include("io.github.libsdl4j:libsdl4j:${rootProject.libsdl4j_version}"))
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowBundle project(path: ':common', configuration: 'transformProductionNeoForge')
