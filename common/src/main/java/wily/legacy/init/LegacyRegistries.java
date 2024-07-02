@@ -148,7 +148,7 @@ public class LegacyRegistries {
                     if (!(itemStack.getItem() instanceof DyeItem) || opt.isEmpty() || opt.get().potion != Potions.WATER) {
                         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
                     }
-                    int dyeColor = new Color(color.getTextureDiffuseColors()[0],color.getTextureDiffuseColors()[1],color.getTextureDiffuseColors()[2]).getRGB();
+                    int dyeColor = new Color(color.getTextureDiffuseColor()).getRGB();
                     if (opt.get().waterColor == null) opt.get().waterColor = dyeColor;
                     else opt.get().waterColor = Legacy4J.mixColors(List.of(opt.get().waterColor,dyeColor).iterator());
                     opt.get().setChanged();

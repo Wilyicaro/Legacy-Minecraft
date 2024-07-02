@@ -12,6 +12,7 @@ import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import wily.legacy.Legacy4J;
 import wily.legacy.util.CompoundTagUtil;
@@ -31,7 +32,7 @@ public class LegacyCraftingTabListing {
     public Component displayName;
     public ResourceLocation icon;
     public DataComponentPatch itemPatch;
-    public final Map<String,List<RecipeValue<CraftingContainer, CraftingRecipe>>> craftings = new LinkedHashMap<>();
+    public final Map<String,List<RecipeValue<CraftingInput, CraftingRecipe>>> craftings = new LinkedHashMap<>();
 
 
     public LegacyCraftingTabListing(String id, Component displayName, ResourceLocation icon, DataComponentPatch itemPatch){
@@ -48,7 +49,7 @@ public class LegacyCraftingTabListing {
         protected List<LegacyCraftingTabListing> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
             List<LegacyCraftingTabListing> listings = new ArrayList<>();
             ResourceManager manager = Minecraft.getInstance().getResourceManager();
-            manager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1)).forEach(name->manager.getResource(new ResourceLocation(name, CRAFTING_TAB_LISTING)).ifPresent(r->{
+            manager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1)).forEach(name->manager.getResource(ResourceLocation.fromNamespaceAndPath(name, CRAFTING_TAB_LISTING)).ifPresent(r->{
                 try {
                     BufferedReader bufferedReader = r.openAsReader();
                     JsonObject obj = GsonHelper.parse(bufferedReader);
@@ -57,11 +58,11 @@ public class LegacyCraftingTabListing {
                             JsonElement listingElement = go.get("listing");
                             listings.stream().filter(l-> c.equals(l.id)).findFirst().ifPresentOrElse(l->{
                                 ifJsonStringNotNull(go,"displayName", Component::translatable, n-> l.displayName = n);
-                                ifJsonStringNotNull(go,"icon", ResourceLocation::new, n-> l.icon = n);
+                                ifJsonStringNotNull(go,"icon", ResourceLocation::parse, n-> l.icon = n);
                                 if (go.get("components") instanceof JsonObject compJson) l.itemPatch = JsonUtil.getComponentsFromJson(compJson);
                                 JsonUtil.addGroupedRecipeValuesFromJson(l.craftings,listingElement);
                             }, ()->{
-                                LegacyCraftingTabListing listing = new LegacyCraftingTabListing(c,getJsonStringOrNull(go,"displayName",Component::translatable),getJsonStringOrNull(go,"icon",ResourceLocation::new), go.get("components") instanceof JsonObject compJson ? JsonUtil.getComponentsFromJson(compJson) : null);
+                                LegacyCraftingTabListing listing = new LegacyCraftingTabListing(c,getJsonStringOrNull(go,"displayName",Component::translatable),getJsonStringOrNull(go,"icon",ResourceLocation::parse), go.get("components") instanceof JsonObject compJson ? JsonUtil.getComponentsFromJson(compJson) : null);
                                 JsonUtil.addGroupedRecipeValuesFromJson(listing.craftings,listingElement);
                                 listings.add(listing);
                             });

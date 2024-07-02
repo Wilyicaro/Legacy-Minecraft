@@ -2,6 +2,7 @@ package wily.legacy.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
@@ -110,6 +111,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
         this.renderTooltip(guiGraphics, i, j);
     }
+
     @Inject(method = "renderLabels",at = @At("HEAD"), cancellable = true)
     public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
         ci.cancel();
@@ -166,6 +168,15 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         }
 
         cir.setReturnValue(true);
+    }
+    @Override
+    public boolean keyPressed(int i, int j, int k) {
+        if (CommonInputs.selected(i) && shopItem + scrollOff < menu.getOffers().size()){
+            ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+            postButtonClick();
+            return true;
+        }
+        return super.keyPressed(i, j, k);
     }
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {

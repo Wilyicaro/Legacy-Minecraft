@@ -142,7 +142,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen {
     @Override
     public void setTooltipForNextRenderPass(Tooltip tooltip, ClientTooltipPositioner clientTooltipPositioner, boolean bl) {
         if (ScreenUtil.hasTooltipBoxes())
-            tooltipBoxLabel =  MultiLineLabel.createFixed(font, tooltip.toCharSequence(minecraft).stream().map(formattedCharSequence -> new MultiLineLabel.TextWithWidth(formattedCharSequence, font.width(formattedCharSequence))).toList());
+            tooltipBoxLabel =  MultiLineLabel.create(font, tooltip.message);
         else super.setTooltipForNextRenderPass(tooltip, clientTooltipPositioner, bl);
     }
 

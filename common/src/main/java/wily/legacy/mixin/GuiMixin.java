@@ -4,6 +4,7 @@ import com.google.common.collect.Ordering;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
@@ -62,7 +63,7 @@ public abstract class GuiMixin {
 
     @Shadow protected abstract Player getCameraPlayer();
 
-    @Shadow public abstract void render(GuiGraphics guiGraphics, float f);
+    @Shadow public abstract void render(GuiGraphics guiGraphics, DeltaTracker tracker);
 
     @Shadow protected abstract boolean isExperienceBarVisible();
 
@@ -76,7 +77,7 @@ public abstract class GuiMixin {
             ci.cancel();
     }
     @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
-    public void renderCrosshair(GuiGraphics guiGraphics, float partialTicks, CallbackInfo ci) {
+    public void renderCrosshair(GuiGraphics guiGraphics, DeltaTracker tracker, CallbackInfo ci) {
         if (minecraft.screen != null) {
             ci.cancel();
             return;
@@ -95,14 +96,14 @@ public abstract class GuiMixin {
         } else RenderSystem.blendFuncSeparate(sourceFactor,destFactor,sourceFactor2,destFactor2);
     }
     @Inject(method = "renderCrosshair", at = @At("RETURN"))
-    public void renderCrosshairReturn(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
+    public void renderCrosshairReturn(GuiGraphics guiGraphics, DeltaTracker tracker, CallbackInfo ci) {
         if (minecraft.screen != null)
             return;
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
         guiGraphics.pose().popPose();
     }
     @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
-    public void renderEffects(GuiGraphics guiGraphics,float partialTicks, CallbackInfo ci) {
+    public void renderEffects(GuiGraphics guiGraphics,DeltaTracker tracker, CallbackInfo ci) {
         ci.cancel();
         Collection<MobEffectInstance> collection = this.minecraft.player.getActiveEffects();
         if (minecraft.screen != null || collection.isEmpty()) {
@@ -142,11 +143,11 @@ public abstract class GuiMixin {
         guiGraphics.setColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
     @Inject(method = "renderItemHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V", ordinal = 1))
-    private void renderHotbarSelection(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
+    private void renderHotbarSelection(GuiGraphics guiGraphics, DeltaTracker tracker, CallbackInfo ci) {
         guiGraphics.blitSprite(LegacySprites.HOTBAR_SELECTION,24,24,0,23,guiGraphics.guiWidth() / 2 - 91 - 1 + minecraft.player.getInventory().selected * 20, guiGraphics.guiHeight(), 24, 1);
     }
     @Inject(method = "renderItemHotbar", at = @At("HEAD"), cancellable = true)
-    public void renderHotbar(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
+    public void renderHotbar(GuiGraphics guiGraphics, DeltaTracker tracker, CallbackInfo ci) {
         if (minecraft.screen != null) {
             ci.cancel();
             return;
@@ -176,7 +177,7 @@ public abstract class GuiMixin {
                 character.yHeadRotO = character.yHeadRot;
                 guiGraphics.pose().pushPose();
                 ScreenUtil.applyHUDScale(guiGraphics);
-                ScreenUtil.renderEntity(guiGraphics, 28f, 50f, 13, ScreenUtil.getLegacyOptions().smoothAnimatedCharacter().get() ? f : 0,new Vector3f(), new Quaternionf().rotationXYZ(0.0f, -0.43633232f, (float) Math.PI), null, character);
+                ScreenUtil.renderEntity(guiGraphics, 28f, 50f, 13, ScreenUtil.getLegacyOptions().smoothAnimatedCharacter().get() ? tracker.getGameTimeDeltaPartialTick(true) : 0,new Vector3f(), new Quaternionf().rotationXYZ(0.0f, -0.43633232f, (float) Math.PI), null, character);
                 guiGraphics.pose().popPose();
                 character.setDeltaMovement(deltaMove);
                 character.yBodyRotO = bodyRotO;
@@ -206,16 +207,16 @@ public abstract class GuiMixin {
     }
 
     @Inject(method = "renderItemHotbar", at = @At("RETURN"))
-    public void renderHotbarTail(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
+    public void renderHotbarTail(GuiGraphics guiGraphics, DeltaTracker tracker, CallbackInfo ci) {
         if (minecraft.screen != null) return;
 
         Legacy4JClient.guiBufferSourceOverride = null;
         ScreenUtil.finishHUDRender(guiGraphics);
-        if (minecraft.player != null) ControlTooltip.guiControlRenderer.render(guiGraphics,0,0,f);
+        if (minecraft.player != null) ControlTooltip.guiControlRenderer.render(guiGraphics,0,0,tracker.getGameTimeDeltaPartialTick(true));
     }
 
     @Inject(method = "renderExperienceLevel", at = @At("HEAD"), cancellable = true)
-    public void renderExperienceLevel(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
+    public void renderExperienceLevel(GuiGraphics guiGraphics, DeltaTracker tracker, CallbackInfo ci) {
         ci.cancel();
         if (minecraft.screen != null) return;
         int i = this.minecraft.player.experienceLevel;
@@ -231,7 +232,7 @@ public abstract class GuiMixin {
         }
     }
     @Inject(method = "renderOverlayMessage", at = @At(value = "HEAD"), cancellable = true)
-    public void renderOverlayMessage(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
+    public void renderOverlayMessage(GuiGraphics guiGraphics, DeltaTracker tracker, CallbackInfo ci) {
         if (minecraft.screen != null){
             ci.cancel();
             return;
@@ -240,7 +241,7 @@ public abstract class GuiMixin {
         guiGraphics.pose().translate(0, 63 - ScreenUtil.getHUDSize() - (this.lastToolHighlight.isEmpty() || this.toolHighlightTimer <= 0 ? 0 : (Math.min(4,lastToolHighlight.getTooltipLines(Item.TooltipContext.of(minecraft.level),minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum()) - 1) * 9),0);
     }
     @Inject(method = "renderOverlayMessage", at = @At(value = "RETURN"))
-    public void renderOverlayMessageReturn(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
+    public void renderOverlayMessageReturn(GuiGraphics guiGraphics, DeltaTracker tracker, CallbackInfo ci) {
         if (minecraft.screen != null) return;
 
         ScreenUtil.finishHUDRender(guiGraphics);
@@ -295,8 +296,8 @@ public abstract class GuiMixin {
     }
 
     @Inject(method = "renderSavingIndicator", at = @At("HEAD"), cancellable = true)
-    public void renderAutoSaveIndicator(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
-        if (minecraft.options.showAutosaveIndicator().get().booleanValue() && (autosaveIndicatorValue > 0 || lastAutosaveIndicatorValue > 0) && Mth.clamp(Mth.lerp(this.minecraft.getFrameTime(), this.lastAutosaveIndicatorValue, this.autosaveIndicatorValue), 0.0f, 1.0f) > 0.02)
+    public void renderAutoSaveIndicator(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
+        if (minecraft.options.showAutosaveIndicator().get().booleanValue() && (autosaveIndicatorValue > 0 || lastAutosaveIndicatorValue > 0) && Mth.clamp(Mth.lerp(deltaTracker.getGameTimeDeltaTicks(), this.lastAutosaveIndicatorValue, this.autosaveIndicatorValue), 0.0f, 1.0f) > 0.02)
             ScreenUtil.drawAutoSavingIcon(guiGraphics,guiGraphics.guiWidth() - 66,44);
         ci.cancel();
     }

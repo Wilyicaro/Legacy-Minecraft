@@ -42,7 +42,7 @@ public class LegacyAdvancementsScreen extends PanelBackgroundScreen{
     protected final ControlTooltip.Renderer controlTooltipRenderer = ControlTooltip.defaultScreen(this);
     protected boolean showDescription = false;
     protected boolean oldLegacyTooltipsValue;
-    public static final List<ResourceLocation> vanillaOrder = List.of(new ResourceLocation("story/root"),new ResourceLocation("adventure/root"),new ResourceLocation("husbandry/root"),new ResourceLocation("nether/root"),new ResourceLocation("end/root"));
+    public static final List<ResourceLocation> vanillaOrder = List.of(ResourceLocation.withDefaultNamespace("story/root"),ResourceLocation.withDefaultNamespace("adventure/root"),ResourceLocation.withDefaultNamespace("husbandry/root"),ResourceLocation.withDefaultNamespace("nether/root"),ResourceLocation.withDefaultNamespace("end/root"));
 
     public LegacyAdvancementsScreen(Screen parent, ClientAdvancements advancements) {
         super(449,252,TITLE);

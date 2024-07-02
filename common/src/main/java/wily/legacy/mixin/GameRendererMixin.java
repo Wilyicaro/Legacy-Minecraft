@@ -1,6 +1,7 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
@@ -37,11 +38,11 @@ public abstract class GameRendererMixin {
     @Shadow protected abstract void takeAutoScreenshot(Path path);
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/toasts/ToastComponent;render(Lnet/minecraft/client/gui/GuiGraphics;)V"))
-    private void render(ToastComponent instance, GuiGraphics graphics, float f, long l, boolean bl){
+    private void render(ToastComponent instance, GuiGraphics graphics, DeltaTracker tracker, boolean bl){
         if (!LegacyTipManager.tips.isEmpty()) {
             LegacyTip tip = LegacyTipManager.tips.get(0);
             tip.setX(graphics.guiWidth() - tip.getWidth() - 30);
-            tip.renderTip(graphics,0,0,f);
+            tip.renderTip(graphics,0,0,tracker.getGameTimeDeltaTicks());
             if (tip.visibility == Toast.Visibility.HIDE) LegacyTipManager.tips.remove(tip);
         }
         instance.render(graphics);
@@ -61,7 +62,7 @@ public abstract class GameRendererMixin {
             RenderSystem.enableBlend();
             RenderSystem.disableDepthTest();
             gammaEffect.passes.forEach(p-> p.getEffect().safeGetUniform("gamma").set(gamma >= 0.5f ? gamma * 1.7f : 0.5f + gamma));
-            gammaEffect.process(this.minecraft.level != null && this.minecraft.level.tickRateManager().runsNormally() ? f : 1.0f);
+            gammaEffect.process(this.minecraft.level != null && this.minecraft.level.tickRateManager().runsNormally() ? tracker.getGameTimeDeltaTicks() : 1.0f);
             RenderSystem.enableDepthTest();
             RenderSystem.disableBlend();
         }

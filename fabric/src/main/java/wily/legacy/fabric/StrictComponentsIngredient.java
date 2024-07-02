@@ -70,7 +70,7 @@ public class StrictComponentsIngredient implements CustomIngredient {
     }
 
     private static class Serializer implements CustomIngredientSerializer<StrictComponentsIngredient> {
-        private static final ResourceLocation ID = new ResourceLocation(Legacy4J.MOD_ID, "strict_components");
+        private static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID, "strict_components");
         private static final MapCodec<StrictComponentsIngredient> ALLOW_EMPTY_CODEC = createCodec(Ingredient.CODEC);
         private static final MapCodec<StrictComponentsIngredient> DISALLOW_EMPTY_CODEC = createCodec(Ingredient.CODEC_NONEMPTY);
         private static final StreamCodec<RegistryFriendlyByteBuf, StrictComponentsIngredient> PACKET_CODEC = StreamCodec.composite(

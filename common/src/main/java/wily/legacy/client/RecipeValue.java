@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public interface RecipeValue<C extends Container, T extends Recipe<C>> extends Predicate<RecipeHolder<T>> {
-    ResourceLocation TIPPED_ARROW = new ResourceLocation("tipped_arrow");
+public interface RecipeValue<C extends RecipeInput, T extends Recipe<C>> extends Predicate<RecipeHolder<T>> {
+    ResourceLocation TIPPED_ARROW = ResourceLocation.withDefaultNamespace("tipped_arrow");
     Map<ResourceLocation, IdOverride> ID_RECIPE_VALUES_OVERRIDES = new HashMap<>(Map.of(TIPPED_ARROW, (type, manager, rcps, filter) -> {
         if (rcps.get(rcps.size() -1) instanceof TippedArrowRecipe r) {
             BuiltInRegistries.POTION.holders().forEach(p -> {
@@ -41,12 +41,12 @@ public interface RecipeValue<C extends Container, T extends Recipe<C>> extends P
         }
     }));
     void addRecipes(RecipeType<T> type, RecipeManager manager, List<T> rcps, Predicate<T> filter);
-    static <C extends Container, T extends Recipe<C>> RecipeValue<C,T> create(String s){
+    static <C extends RecipeInput, T extends Recipe<C>> RecipeValue<C,T> create(String s){
         if (s.startsWith("#")) {
             String tag = s.replaceFirst("#", "");
-            if (tag.startsWith("blocks/")) return new BlockTag<>(TagKey.create(Registries.BLOCK, new ResourceLocation(tag.replaceFirst("blocks/", ""))));
-            return new ItemTag<>(TagKey.create(Registries.ITEM, new ResourceLocation(tag.replaceFirst("items/", ""))));
-        }else return new Id<>(new ResourceLocation(s));
+            if (tag.startsWith("blocks/")) return new BlockTag<>(TagKey.create(Registries.BLOCK, ResourceLocation.parse(tag.replaceFirst("blocks/", ""))));
+            return new ItemTag<>(TagKey.create(Registries.ITEM, ResourceLocation.parse(tag.replaceFirst("items/", ""))));
+        }else return new Id<>(ResourceLocation.parse(s));
     }
     interface IdOverride extends RecipeValue{
         @Override
@@ -55,25 +55,25 @@ public interface RecipeValue<C extends Container, T extends Recipe<C>> extends P
         }
     }
 
-    interface AnyMatch<C extends Container, T extends Recipe<C>> extends RecipeValue<C,T>{
+    interface AnyMatch<C extends RecipeInput, T extends Recipe<C>> extends RecipeValue<C,T>{
         @Override
         default void addRecipes(RecipeType<T> type, RecipeManager manager, List<T> rcps, Predicate<T> filter) {
             manager.getAllRecipesFor(type).stream().filter(h->h.value().getType() == type && filter.test(h.value()) && test(h)).forEach(h-> rcps.add(h.value()));
         }
     }
-    record BlockTag<C extends Container, T extends Recipe<C>>(TagKey<Block> tag) implements AnyMatch<C,T>{
+    record BlockTag<C extends RecipeInput, T extends Recipe<C>>(TagKey<Block> tag) implements AnyMatch<C,T>{
         @Override
         public boolean test(RecipeHolder<T> h) {
             return h.value().getResultItem(RegistryAccess.EMPTY).getItem() instanceof BlockItem i && i.getBlock().builtInRegistryHolder().is(tag);
         }
     }
-    record ItemTag<C extends Container, T extends Recipe<C>>(TagKey<Item> tag) implements AnyMatch<C,T>{
+    record ItemTag<C extends RecipeInput, T extends Recipe<C>>(TagKey<Item> tag) implements AnyMatch<C,T>{
         @Override
         public boolean test(RecipeHolder<T> h) {
             return h.value().getResultItem(RegistryAccess.EMPTY).is(tag);
         }
     }
-    record Id<C extends Container, T extends Recipe<C>>(ResourceLocation id) implements RecipeValue<C,T>{
+    record Id<C extends RecipeInput, T extends Recipe<C>>(ResourceLocation id) implements RecipeValue<C,T>{
         @Override
         public void addRecipes(RecipeType<T> type, RecipeManager manager, List<T> rcps, Predicate<T> filter) {
             manager.byKey(id).ifPresent(h->{ if (h.value().getType() == type && filter.test((T)h.value())) rcps.add((T)h.value());});

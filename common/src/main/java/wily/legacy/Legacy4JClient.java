@@ -35,6 +35,7 @@ import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.client.server.LanServerPinger;
 import net.minecraft.core.HolderLookup;
@@ -43,7 +44,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.HttpUtil;
@@ -169,7 +169,7 @@ public class Legacy4JClient {
         else if (screen instanceof JoinMultiplayerScreen)
             return new PlayGameScreen(new MainMenuScreen(),2);
         else if (screen instanceof DisconnectedScreen s)
-            return ConfirmationScreen.createInfoScreen(getReplacementScreen(s.parent), s.getTitle(),s.reason);
+            return ConfirmationScreen.createInfoScreen(getReplacementScreen(s.parent), s.getTitle(),s.details.reason());
         else if (screen instanceof AlertScreen s) {
             MultiLineLabel messageLines = MultiLineLabel.create(Minecraft.getInstance().font,s.messageText,200);
             return new ConfirmationScreen(Minecraft.getInstance().screen, 230, 97 + messageLines.getLineCount() * 12, s.getTitle(), messageLines, b -> true) {
@@ -397,7 +397,7 @@ public class Legacy4JClient {
             }
         },saveDirName);
     }
-    public static void registerExtraModels(Consumer<ResourceLocation> register){
+    public static void registerExtraModels(Consumer<ModelResourceLocation> register){
 
     }
     public static Pair<Integer,Component> tryParsePort(String string) {

@@ -199,7 +199,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().addCompound(()-> new Component[]{ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(true),ControlTooltip.SPACE,ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon(true)},()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.group"));
         ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> page.max > 0 ? ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true)}) : ControllerBinding.RIGHT_STICK.bindingState.getIcon(true) : null,()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.page"));
         this.inventory = inventory;
-        craftingTabList.addTabButton(43,0,new ResourceLocation("white_banner"),null,Component.empty(),t-> resetElements());
+        craftingTabList.addTabButton(43,0,ResourceLocation.withDefaultNamespace("white_banner"),null,Component.empty(),t-> resetElements());
         for (LoomTabListing listing : LoomTabListing.list) {
             if (!listing.isValid()) continue;
 
@@ -380,10 +380,10 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
             h.offset = new Offset(0.5,0.5,0);
         }
     }
-    record BannerRecipe(List<Ingredient> previewIngredients,List<Ingredient> displayIngredients, NonNullList<Ingredient> ingredients, ItemStack resultStack, ResourceKey<BannerPattern> pattern, DyeColor color) implements Recipe<CraftingContainer>{
+    record BannerRecipe(List<Ingredient> previewIngredients,List<Ingredient> displayIngredients, NonNullList<Ingredient> ingredients, ItemStack resultStack, ResourceKey<BannerPattern> pattern, DyeColor color) implements Recipe<RecipeInput>{
 
         @Override
-        public boolean matches(CraftingContainer container, Level level) {
+        public boolean matches(RecipeInput container, Level level) {
             return true;
         }
         @Override
@@ -391,7 +391,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
             return ingredients;
         }
         @Override
-        public ItemStack assemble(CraftingContainer container, HolderLookup.Provider provider) {
+        public ItemStack assemble(RecipeInput container, HolderLookup.Provider provider) {
             return resultStack;
         }
         @Override

@@ -84,8 +84,8 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
             }
         }
     }
-    @Redirect(method = "handleNetherPortalClient", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;isPauseScreen()Z"))
-    public boolean handleNetherPortalClient(Screen instance) {
+    @Redirect(method = "handleConfusionTransitionEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;isPauseScreen()Z"))
+    public boolean handleConfusionTransitionEffectClient(Screen instance) {
         return true;
     }
     @Inject(method = "serverAiStep", at = @At("RETURN"))

@@ -81,7 +81,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     protected final TabList craftingTabList = new TabList(new PagedList<>(page,7));
     protected final TabList fireworkTabList = new TabList();
     protected final TabList dyeTabList = new TabList();
-    protected final TabList groupTabList = new TabList().add(0,0,42, 42, 4, new ResourceLocation("crafting_table"),null,Component.empty(),null,b->repositionElements()).add(0,0,42, 42, 4, new ResourceLocation("firework_rocket"),null,Component.empty(),null,b->resetElements()).add(0,0,42, 42, 4, new ResourceLocation("cyan_dye"),null,Component.empty(),null,b->resetElements());
+    protected final TabList groupTabList = new TabList().add(0,0,42, 42, 4, ResourceLocation.withDefaultNamespace("crafting_table"),null,Component.empty(),null,b->repositionElements()).add(0,0,42, 42, 4, ResourceLocation.withDefaultNamespace("firework_rocket"),null,Component.empty(),null,b->resetElements()).add(0,0,42, 42, 4, ResourceLocation.withDefaultNamespace("cyan_dye"),null,Component.empty(),null,b->resetElements());
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     private final boolean[] warningSlots;
     protected final ContainerListener listener = new ContainerListener() {
@@ -157,13 +157,13 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         CompoundTag explosionTag = new CompoundTag();
         redStarTag.put("Explosion",explosionTag);
         explosionTag.putIntArray("Colors", List.of(DyeColor.RED.getFireworkColor()));
-        fireworkTabList.add(0,0,0,43,0,new ResourceLocation("firework_star"),null, Component.empty(),null, b-> resetElements());
-        fireworkTabList.add(0,0,0,43,0,new ResourceLocation("firework_star"), DataComponentPatch.builder().set(DataComponents.FIREWORK_EXPLOSION,new FireworkExplosion(FireworkExplosion.Shape.SMALL_BALL,IntList.of(DyeColor.RED.getFireworkColor()),IntList.of(),false,false)).build(), Component.empty(),null, b-> resetElements());
-        fireworkTabList.add(0,0,0,43,0,new ResourceLocation("firework_rocket"),null, Component.empty(),null, b-> resetElements());
-        dyeTabList.add(0,0,0,43,0,new ResourceLocation("leather_chestplate"), DyedItemColor.applyDyes(Items.LEATHER_CHESTPLATE.getDefaultInstance(),List.of((DyeItem) Items.GREEN_DYE)).getComponentsPatch(), Component.empty(),null, b-> resetElements());
+        fireworkTabList.add(0,0,0,43,0,ResourceLocation.withDefaultNamespace("firework_star"),null, Component.empty(),null, b-> resetElements());
+        fireworkTabList.add(0,0,0,43,0,ResourceLocation.withDefaultNamespace("firework_star"), DataComponentPatch.builder().set(DataComponents.FIREWORK_EXPLOSION,new FireworkExplosion(FireworkExplosion.Shape.SMALL_BALL,IntList.of(DyeColor.RED.getFireworkColor()),IntList.of(),false,false)).build(), Component.empty(),null, b-> resetElements());
+        fireworkTabList.add(0,0,0,43,0,ResourceLocation.withDefaultNamespace("firework_rocket"),null, Component.empty(),null, b-> resetElements());
+        dyeTabList.add(0,0,0,43,0,ResourceLocation.withDefaultNamespace("leather_chestplate"), DyedItemColor.applyDyes(Items.LEATHER_CHESTPLATE.getDefaultInstance(),List.of((DyeItem) Items.GREEN_DYE)).getComponentsPatch(), Component.empty(),null, b-> resetElements());
         dyeTabList.add(0,0,0,43,0,groupTabList.tabButtons.get(2).icon,null, Component.empty(),null, b-> resetElements());
-        dyeTabList.add(0,0,0,43,0,new ResourceLocation("white_banner"),null, Component.empty(),null, b-> resetElements());
-        if (!is2x2) dyeTabList.add(0,0,0,43,0,new ResourceLocation("decorated_pot"),null, Component.empty(),null, b-> resetElements());
+        dyeTabList.add(0,0,0,43,0,ResourceLocation.withDefaultNamespace("white_banner"),null, Component.empty(),null, b-> resetElements());
+        if (!is2x2) dyeTabList.add(0,0,0,43,0,ResourceLocation.withDefaultNamespace("decorated_pot"),null, Component.empty(),null, b-> resetElements());
         Consumer<CustomCraftingIconHolder> fireworkStarUpdateRecipe = h->{
             clearIngredients(ingredientsGrid);
             if (fireworkStarButtons.isEmpty()) return;

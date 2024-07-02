@@ -194,17 +194,9 @@ public class MainMenuScreen extends RenderableVListScreen {
 
     @Environment(EnvType.CLIENT)
     record WarningLabel(Font font, MultiLineLabel label, int x, int y) {
-        public void render(GuiGraphics guiGraphics, int i) {
-            MultiLineLabel var10000 = this.label;
-            int var10002 = this.x;
-            int var10003 = this.y;
-            Objects.requireNonNull(this.font);
-            var10000.renderBackgroundCentered(guiGraphics, var10002, var10003, 9, 2, 2097152 | Math.min(i, 1426063360));
-            var10000 = this.label;
-            var10002 = this.x;
-            var10003 = this.y;
-            Objects.requireNonNull(this.font);
-            var10000.renderCentered(guiGraphics, var10002, var10003, 9, 16777215 | i);
+        public void render(GuiGraphics guiGraphics, int alpha) {
+//            this.label.renderBackgroundCentered(guiGraphics, this.x, this.y, 9, 2, 0x200000 | Math.min(alpha, 0x55000000));
+            this.label.renderCentered(guiGraphics, this.x, this.y, 9, 0xFFFFFF | alpha);
         }
     }
 }

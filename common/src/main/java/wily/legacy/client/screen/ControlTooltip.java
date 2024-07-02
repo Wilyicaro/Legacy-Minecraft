@@ -106,7 +106,7 @@ public interface ControlTooltip {
         WII_U,
         SWITCH,
         STEAM;
-        public final ResourceLocation font = new ResourceLocation(Legacy4J.MOD_ID, name().toLowerCase(Locale.ENGLISH) + "_components");
+        public final ResourceLocation font = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID, name().toLowerCase(Locale.ENGLISH) + "_components");
         public final Component displayName = Component.translatable("legacy.controls.controller."+name().toLowerCase(Locale.ENGLISH));
         public final Style style = Style.EMPTY.withFont(font);
         public boolean isKeyboard(){
@@ -384,7 +384,7 @@ public interface ControlTooltip {
             if (minecraft.hitResult instanceof BlockHitResult r && minecraft.hitResult.getType() != HitResult.Type.MISS && (blockState = minecraft.level.getBlockState(r.getBlockPos())).getBlock() instanceof JukeboxBlock && blockState.getValue(HAS_RECORD)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.eject");
             if (actualItem.getItem() instanceof FoodOnAStickItem<?> i && minecraft.player.getControlledVehicle() instanceof ItemSteerable && minecraft.player.getControlledVehicle().getType() == i.canInteractWith) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.boost");
             if (actualItem.getItem() instanceof LeadItem){
-                if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Mob m && m.canBeLeashed(minecraft.player)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.leash");
+                if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Mob m && m.canBeLeashed()) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.leash");
                 if (minecraft.hitResult instanceof BlockHitResult r && minecraft.hitResult.getType() != HitResult.Type.MISS && minecraft.level.getBlockState(r.getBlockPos()).is(BlockTags.FENCES)) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.attach");
             }
             if (actualItem.getItem() instanceof NameTagItem && actualItem.get(DataComponents.CUSTOM_NAME) != null && minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof LivingEntity e && !(e instanceof Player) && e.isAlive()) return CONTROL_ACTION_CACHE.getUnchecked("legacy.action.name");

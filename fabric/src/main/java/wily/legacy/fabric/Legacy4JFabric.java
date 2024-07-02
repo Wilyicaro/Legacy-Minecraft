@@ -14,7 +14,7 @@ public class Legacy4JFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        Legacy4J.registerBuiltInPacks((path, name, displayName, position, enabledByDefault) -> ResourceManagerHelperImpl.registerBuiltinResourcePack(new ResourceLocation(Legacy4J.MOD_ID, name),path, FabricLoader.getInstance().getModContainer(Legacy4J.MOD_ID).orElseThrow(), displayName, enabledByDefault ? ResourcePackActivationType.DEFAULT_ENABLED : ResourcePackActivationType.NORMAL));
+        Legacy4J.registerBuiltInPacks((path, name, displayName, position, enabledByDefault) -> ResourceManagerHelperImpl.registerBuiltinResourcePack(ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID, name),path, FabricLoader.getInstance().getModContainer(Legacy4J.MOD_ID).orElseThrow(), displayName, enabledByDefault ? ResourcePackActivationType.DEFAULT_ENABLED : ResourcePackActivationType.NORMAL));
         Legacy4J.init();
         CustomIngredientSerializer.register(StrictComponentsIngredient.SERIALIZER);
     }

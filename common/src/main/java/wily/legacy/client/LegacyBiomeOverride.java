@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 public class LegacyBiomeOverride {
     public static final Map<ResourceLocation,LegacyBiomeOverride> map = new HashMap<>();
     private static final String BIOME_OVERRIDES = "biome_overrides.json";
-    public static final ResourceLocation DEFAULT_LOCATION = new ResourceLocation("default");
+    public static final ResourceLocation DEFAULT_LOCATION = ResourceLocation.withDefaultNamespace("default");
     public static final LegacyBiomeOverride DEFAULT = new LegacyBiomeOverride(){
         public float waterTransparency() {
             return this.waterTransparency == null ? 1.0f : waterTransparency;
@@ -66,7 +66,7 @@ public class LegacyBiomeOverride {
             Map<ResourceLocation,LegacyBiomeOverride> overrides = new HashMap<>();
             overrides.put(DEFAULT_LOCATION,DEFAULT);
             ResourceManager manager = Minecraft.getInstance().getResourceManager();
-            manager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1)).forEach(name->manager.getResource(new ResourceLocation(name,BIOME_OVERRIDES)).ifPresent(r->{
+            manager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1)).forEach(name->manager.getResource(ResourceLocation.fromNamespaceAndPath(name,BIOME_OVERRIDES)).ifPresent(r->{
                 try {
                     BufferedReader bufferedReader = r.openAsReader();
                     JsonObject obj = GsonHelper.parse(bufferedReader);
@@ -74,7 +74,7 @@ public class LegacyBiomeOverride {
                     if (ioElement instanceof JsonObject jsonObject)
                         jsonObject.asMap().forEach((s,e)-> {
                             if (e instanceof JsonObject o){
-                                LegacyBiomeOverride override = overrides.computeIfAbsent(new ResourceLocation(s), resourceLocation-> new LegacyBiomeOverride());
+                                LegacyBiomeOverride override = overrides.computeIfAbsent(ResourceLocation.parse(s), resourceLocation-> new LegacyBiomeOverride());
                                 override.icon = JsonUtil.getItemFromJson(o,true).get();
                                 Integer i;
                                 if ((i = optionalJsonColor(o, "water_color", null)) != null) override.waterColor = i;

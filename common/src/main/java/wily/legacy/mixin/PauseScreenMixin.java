@@ -81,7 +81,7 @@ public class PauseScreenMixin extends Screen {
             minecraft.gui.autosaveIndicatorValue = 1.0F;
         }
         if (minecraft.gui.autosaveIndicatorValue > 0.002){
-            minecraft.gui.renderSavingIndicator(guiGraphics,f);
+            minecraft.gui.renderSavingIndicator(guiGraphics,minecraft.getTimer());
         }
     }
 

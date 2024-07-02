@@ -45,7 +45,7 @@ import static wily.legacy.util.LegacySprites.PACK_HIGHLIGHTED;
 import static wily.legacy.util.LegacySprites.PACK_SELECTED;
 
 public class PackSelector extends AbstractWidget {
-    public static final ResourceLocation DEFAULT_ICON = new ResourceLocation("textures/misc/unknown_pack.png");
+    public static final ResourceLocation DEFAULT_ICON = ResourceLocation.withDefaultNamespace("textures/misc/unknown_pack.png");
     public PackSelectionModel model;
     private final Map<String, ResourceLocation> packIcons = Maps.newHashMap();
     private final Map<String, ResourceLocation> packBackgrounds = Maps.newHashMap();
@@ -256,7 +256,7 @@ public class PackSelector extends AbstractWidget {
                 if (ioSupplier == null)
                     return fallback;
                 String string = pack.getId();
-                ResourceLocation resourceLocation3 = new ResourceLocation("minecraft", icon + "/" + Util.sanitizeName(string, ResourceLocation::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(string) + "/icon");
+                ResourceLocation resourceLocation3 = ResourceLocation.withDefaultNamespace(icon + "/" + Util.sanitizeName(string, ResourceLocation::validPathChar) + "/" + Hashing.sha1().hashUnencodedChars(string) + "/icon");
                 InputStream inputStream = ioSupplier.get();
                 try {
                     NativeImage nativeImage = NativeImage.read(inputStream);
@@ -283,7 +283,7 @@ public class PackSelector extends AbstractWidget {
         return this.packIcons.computeIfAbsent(pack.getId(), string -> this.loadPackIcon(Minecraft.getInstance().getTextureManager(), pack, "pack.png",DEFAULT_ICON));
     }
     public ResourceLocation getPackBackground(Pack pack) {
-        return this.packBackgrounds.computeIfAbsent(pack.getId(), string -> pack.getId().equals("vanilla") ? new ResourceLocation("background.png"): this.loadPackIcon(Minecraft.getInstance().getTextureManager(), pack, "background.png",null));
+        return this.packBackgrounds.computeIfAbsent(pack.getId(), string -> pack.getId().equals("vanilla") ? ResourceLocation.withDefaultNamespace("background.png"): this.loadPackIcon(Minecraft.getInstance().getTextureManager(), pack, "background.png",null));
     }
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {

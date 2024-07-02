@@ -124,7 +124,7 @@ public abstract class GuiGraphicsMixin {
     }
     @Inject(method = "renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;IIII)V", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"))
     private void renderItem(LivingEntity livingEntity, Level level, ItemStack itemStack, int i, int j, int k, int l, CallbackInfo ci){
-        float g = (float)itemStack.getPopTime() - minecraft.getFrameTime();
+        float g = (float)itemStack.getPopTime() - minecraft.getTimer().getGameTimeDeltaTicks();
         if (g > 0.0F && (minecraft.screen == null || minecraft.screen instanceof EffectRenderingInventoryScreen<?>)) {
             float h = 1.0F + g / 5.0F;
             pose().translate((float)(i + 8), (float)(j + 12), 0.0F);

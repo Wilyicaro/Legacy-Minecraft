@@ -42,7 +42,7 @@ public class KnownListing<T> {
             try (BufferedReader bufferedReader = Files.newBufferedReader(this.path, Charsets.UTF_8);){
                 JsonArray array = GsonHelper.parseArray(bufferedReader);
                 array.forEach(e-> {
-                    if (e instanceof JsonPrimitive p && p.isString()) list.add(new ResourceLocation(p.getAsString()));
+                    if (e instanceof JsonPrimitive p && p.isString()) list.add(ResourceLocation.parse(p.getAsString()));
                 });
             } catch (Exception exception) {
                 LOGGER.error("Failed to read {}, known "+registrar.key().location().getPath()+" will be reset", listingFile, exception);
