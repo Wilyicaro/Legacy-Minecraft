@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "items": ["dark_oak_wood","oak_wood","acacia_wood","birch_wood","jungle_wood","spruce_wood","mangrove_wood","cherry_wood"],
+    "tip": "block.minecraft.wood.tip"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "item": "#axes",
+    "tip": "item.minecraft.axe.tip"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "items": ["dark_oak_log","oak_log","acacia_log","birch_log","jungle_log","spruce_log","mangrove_log","cherry_log"],
+    "tip": "block.minecraft.log.tip"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "${mod_authors}"
+  ],
+  "contributors": [
+    "${mod_credits}",
+    "omo50"
+  ],
+  "contact": {
+    "sources": "${mod_source}",
+    "issues": "${mod_issues}"
+  },
+  "license": "${mod_license}",
+  "icon": "logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "wily.legacy.fabric.Legacy4JFabric"
+    ],
+    "client": [
+      "wily.legacy.fabric.Legacy4JFabricClient"
+    ]
+  },
+  "mixins": [
+    "legacy.mixins.json",
+    "legacy-common.mixins.json"
+  ],
+  "depends": {
+    "fabric": "*",
+    "minecraft": ">=1.20.2"
+  },
+  "breaks": {
+    "bedrockwaters": "*",
+    "forcecloseworldloadingscreen": "*",
+    "rrls": "*",
+    "bedrockify": "*",
+    "embeddium": "*"
+  },
+  "conflicts": {
+    "vulkanmod": "*",
+    "lemclienthelper": "*",
+    "sodium-extra": "*",
+    "reeses-sodium-options": "*"
+  }
+}

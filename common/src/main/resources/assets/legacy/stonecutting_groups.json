@@ -1,0 +1,8 @@
+{
+  "groups": {
+    "slabs": ["#slabs"],
+    "stairs:": ["#stairs"],
+    "walls": ["#walls"],
+    "blocks": ["#blocks/mineable/pickaxe"]
+  }
+}

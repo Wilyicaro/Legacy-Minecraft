@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "item": "#trim_templates",
+    "tip": "item.minecraft.armor_trim_smithing_template.tip"
+  }
+}

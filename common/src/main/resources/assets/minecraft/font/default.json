@@ -1,0 +1,11 @@
+{
+	"providers": [
+        {
+			"type": "bitmap",
+			"file": "minecraft:font/icons.png",
+			"ascent": 10,
+			"height": 10,
+			"chars": ["\uD83C\uDF56\uD83D\uDC58"]
+        }
+    ]   
+}

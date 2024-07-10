@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "items": ["minecraft:iron_ingot","minecraft:gold_ingot","minecraft:netherite_ingot"],
+    "tip": "item.minecraft.ingot.tip"
+  }
+}

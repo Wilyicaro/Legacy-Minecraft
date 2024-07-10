@@ -1,0 +1,12 @@
+{
+  "overrides": [
+    {
+      "item": "#forge:stained_glass",
+      "tip": "block.minecraft.stained_glass.tip"
+    },
+    {
+      "item": "forge:stained_glass_panes",
+      "tip": "block.minecraft.stained_glass_pane.tip"
+    }
+  ]
+}
