@@ -3,6 +3,7 @@ package wily.legacy.forge;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
@@ -57,5 +58,9 @@ public class Legacy4JForgeClient {
     }
     public static Player getClientPlayer(){
         return Minecraft.getInstance().player;
+    }
+
+    public static<T extends CustomPacketPayload> void sendToServer(T packetHandler) {
+        Legacy4JForge.NETWORK.send(packetHandler, Minecraft.getInstance().getConnection().getConnection());
     }
 }

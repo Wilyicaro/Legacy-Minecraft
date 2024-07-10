@@ -187,7 +187,7 @@ public class Legacy4JPlatformImpl {
         Legacy4JForge.NETWORK.send(packetHandler, serverPlayer.connection.getConnection());
     }
     public static<T extends CustomPacketPayload> void sendToServer(T packetHandler) {
-        Legacy4JForge.NETWORK.send(packetHandler, Legacy4JForgeClient.getClientPlayer().connection.getConnection());
+        Legacy4JForgeClient.sendToServer(packetHandler);
     }
 
 }
