@@ -38,6 +38,9 @@ public abstract class SimpleLayoutRenderable implements Renderable, LayoutElemen
     }
     public void init(){
     }
+    public boolean isHovered(double mouseX, double mouseY){
+        return ScreenUtil.isMouseOver(mouseX,mouseY,getX(),getY(),getWidth(),getHeight());
+    }
     public void setX(int i) {
         x = i;
     }

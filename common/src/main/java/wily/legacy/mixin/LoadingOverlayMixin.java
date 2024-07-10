@@ -41,11 +41,11 @@ public class LoadingOverlayMixin extends Overlay {
     private long initTime = Util.getMillis();
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        float timer = (Util.getMillis() - initTime) / 3200f;
         if (!loadIntroLocation){
-            LegacyResourceManager.registerIntroLocations(minecraft.getResourceManager());
             loadIntroLocation = true;
+            LegacyResourceManager.registerIntroLocations(minecraft.getResourceManager());
         }
+        float timer = (Util.getMillis() - initTime) / 3200f;
         if (!finishedIntro && timer % INTROS.size() >= INTROS.size() - 0.01f && reload.isDone()) finishedIntro = true;
         if (!finishedIntro) {
             if ((InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_RETURN) || ControllerBinding.DOWN_BUTTON.bindingState.pressed) && reload.isDone() && minecraft.screen != null) finishedIntro = true;
@@ -68,7 +68,7 @@ public class LoadingOverlayMixin extends Overlay {
             }
             float g = this.fadeOutStart > -1L ? (float)(m - this.fadeOutStart) / 1000.0f : -1.0f;
             h = this.fadeInStart > -1L ? (float)(m - this.fadeInStart) / 500.0f : -1.0f;
-            if ((minecraft.isGameLoadFinished() && reload.isDone()) && minecraft.screen != null) this.minecraft.screen.render(guiGraphics, 0, 0, f);
+            if ((minecraft.isGameLoadFinished() && reload.isDone()) && minecraft.screen != null) this.minecraft.screen.renderWithTooltip(guiGraphics, 0, 0, f);
             else {
                 GlStateManager._clearColor(0, 0, 0, 1.0f);
                 GlStateManager._clear(16384, Minecraft.ON_OSX);

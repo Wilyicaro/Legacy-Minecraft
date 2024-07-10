@@ -52,21 +52,21 @@ import java.util.concurrent.ThreadPoolExecutor;
 import static wily.legacy.client.screen.CreationList.addIconButton;
 
 public class ServerRenderableList extends RenderableVList {
-    static final ResourceLocation INCOMPATIBLE = new ResourceLocation("server_list/incompatible");
-    static final ResourceLocation UNREACHABLE = new ResourceLocation("server_list/unreachable");
-    static final ResourceLocation PING_1 = new ResourceLocation("server_list/ping_1");
-    static final ResourceLocation PING_2 = new ResourceLocation("server_list/ping_2");
-    static final ResourceLocation PING_3 = new ResourceLocation("server_list/ping_3");
-    static final ResourceLocation PING_4 = new ResourceLocation("server_list/ping_4");
-    static final ResourceLocation PING_5 = new ResourceLocation("server_list/ping_5");
-    static final ResourceLocation PINGING_1 = new ResourceLocation("server_list/pinging_1");
-    static final ResourceLocation PINGING_2 = new ResourceLocation("server_list/pinging_2");
-    static final ResourceLocation PINGING_3 = new ResourceLocation("server_list/pinging_3");
-    static final ResourceLocation PINGING_4 = new ResourceLocation("server_list/pinging_4");
-    static final ResourceLocation PINGING_5 = new ResourceLocation("server_list/pinging_5");
-    static final Logger LOGGER = LogUtils.getLogger();
+    static final ResourceLocation INCOMPATIBLE = ResourceLocation.withDefaultNamespace("server_list/incompatible");
+    static final ResourceLocation UNREACHABLE = ResourceLocation.withDefaultNamespace("server_list/unreachable");
+    static final ResourceLocation PING_1 = ResourceLocation.withDefaultNamespace("server_list/ping_1");
+    static final ResourceLocation PING_2 = ResourceLocation.withDefaultNamespace("server_list/ping_2");
+    static final ResourceLocation PING_3 = ResourceLocation.withDefaultNamespace("server_list/ping_3");
+    static final ResourceLocation PING_4 = ResourceLocation.withDefaultNamespace("server_list/ping_4");
+    static final ResourceLocation PING_5 = ResourceLocation.withDefaultNamespace("server_list/ping_5");
+    static final ResourceLocation PINGING_1 = ResourceLocation.withDefaultNamespace("server_list/pinging_1");
+    static final ResourceLocation PINGING_2 = ResourceLocation.withDefaultNamespace("server_list/pinging_2");
+    static final ResourceLocation PINGING_3 = ResourceLocation.withDefaultNamespace("server_list/pinging_3");
+    static final ResourceLocation PINGING_4 = ResourceLocation.withDefaultNamespace("server_list/pinging_4");
+    static final ResourceLocation PINGING_5 = ResourceLocation.withDefaultNamespace("server_list/pinging_5");
+    protected static final Logger LOGGER = LogUtils.getLogger();
     static final ThreadPoolExecutor THREAD_POOL = new ScheduledThreadPoolExecutor(5, new ThreadFactoryBuilder().setNameFormat("Server Pinger #%d").setDaemon(true).setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(LOGGER)).build());
-    private static final ResourceLocation ICON_MISSING = new ResourceLocation("textures/misc/unknown_server.png");
+    private static final ResourceLocation ICON_MISSING = ResourceLocation.withDefaultNamespace("textures/misc/unknown_server.png");
     static final Component SCANNING_LABEL = Component.translatable("lanServer.scanning");
     static final Component CANT_RESOLVE_TEXT = Component.translatable("multiplayer.status.cannot_resolve").withStyle(style -> style.withColor(-65536));
     static final Component CANT_CONNECT_TEXT = Component.translatable("multiplayer.status.cannot_connect").withStyle(style -> style.withColor(-65536));
@@ -76,8 +76,8 @@ public class ServerRenderableList extends RenderableVList {
     static final Component ONLINE_STATUS = Component.translatable("multiplayer.status.online");
     private static final Component LAN_SERVER_HEADER = Component.translatable("lanServer.title");
     private static final Component HIDDEN_ADDRESS_TEXT = Component.translatable("selectServer.hiddenAddress");
-    private PlayGameScreen screen;
-    private final Minecraft minecraft;
+    protected PlayGameScreen screen;
+    protected final Minecraft minecraft;
 
     public final ServerList servers;
     @Nullable
@@ -104,6 +104,9 @@ public class ServerRenderableList extends RenderableVList {
         }
         super.init(screen, leftPos, topPos, listWidth, listHeight);
     }
+    public boolean hasOnlineFriends(){
+        return false;
+    }
     private Component getMultiplayerDisabledReason() {
         if (this.minecraft.allowsMultiplayer()) {
             return null;
@@ -118,12 +121,17 @@ public class ServerRenderableList extends RenderableVList {
             }
         }
     }
+    public static void drawIcon(GuiGraphics guiGraphics, int i, int j, ResourceLocation resourceLocation) {
+        RenderSystem.enableBlend();
+        guiGraphics.blit(resourceLocation, i + 5, j + 5, 0.0f, 0.0f, 20, 20, 20, 20);
+        RenderSystem.disableBlend();
+    }
     public void updateServers(){
         renderables.clear();
-        addIconButton(this,new ResourceLocation(Legacy4J.MOD_ID,"creation_list/add_server"),Component.translatable("legacy.menu.add_server"), c-> this.minecraft.setScreen(new ServerEditScreen(screen, new ServerData(I18n.get("selectServer.defaultName"), "", ServerData.Type.OTHER), true)));
+        addIconButton(this,ResourceLocation.tryBuild(Legacy4J.MOD_ID,"creation_list/add_server"),Component.translatable("legacy.menu.add_server"), c-> this.minecraft.setScreen(new ServerEditScreen(screen, new ServerData(I18n.get("selectServer.defaultName"), "", ServerData.Type.OTHER), true)));
         Component component = this.getMultiplayerDisabledReason();
         Tooltip tooltip = component != null ? Tooltip.create(component) : null;
-        addIconButton(this,new ResourceLocation(Legacy4J.MOD_ID,"creation_list/realms"), Component.translatable("menu.online"), b-> minecraft.setScreen(new RealmsMainScreen(screen)),tooltip);
+        addIconButton(this,ResourceLocation.tryBuild(Legacy4J.MOD_ID,"creation_list/realms"), Component.translatable("menu.online"), b-> minecraft.setScreen(new RealmsMainScreen(screen)),tooltip);
         for (int i = 0; i < servers.size(); i++) {
             int index = i;
             ServerData server = servers.get(i);
@@ -139,9 +147,6 @@ public class ServerRenderableList extends RenderableVList {
                 @Override
                 protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
                     super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
-                    List<Component> list2;
-                    Component component2;
-                    ResourceLocation resourceLocation;
                     if (server.state() == ServerData.State.INITIAL) {
                         server.setState(ServerData.State.PINGING);
                         server.motd = CommonComponents.EMPTY;
@@ -199,7 +204,7 @@ public class ServerRenderableList extends RenderableVList {
                             this.updateServerList();
                         }
                     }
-                    this.drawIcon(guiGraphics, getX(), getY(), icon.textureLocation());
+                    drawIcon(guiGraphics, getX(), getY(), icon.textureLocation());
                     int s = mouseX - getX();
                     int t = mouseY - getY();
                     if (statusIconTooltip != null && s >= width - 15 && s <= width - 5 && t >= 2 && t <= 10) {
@@ -268,11 +273,6 @@ public class ServerRenderableList extends RenderableVList {
                     screen.getServers().save();
                 }
 
-                protected void drawIcon(GuiGraphics guiGraphics, int i, int j, ResourceLocation resourceLocation) {
-                    RenderSystem.enableBlend();
-                    guiGraphics.blit(resourceLocation, i + 5, j + 5, 0.0f, 0.0f, 20, 20, 20, 20);
-                    RenderSystem.disableBlend();
-                }
 
                 private boolean uploadServerIcon(@Nullable byte[] bs) {
                     if (bs == null) {

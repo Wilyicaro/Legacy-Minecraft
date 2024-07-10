@@ -1,7 +1,6 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -16,10 +15,7 @@ import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.RegistryLayer;
-import net.minecraft.server.commands.PublishCommand;
-import net.minecraft.util.HttpUtil;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.levelgen.WorldDimensions;
@@ -31,23 +27,21 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.CommonColor;
+import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyWorldSettings;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
-import wily.legacy.init.LegacySoundEvents;
+import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.ScreenUtil;
 
-import java.nio.file.Path;
 import java.util.*;
 
-import static wily.legacy.Legacy4JClient.publishUnloadedServer;
 import static wily.legacy.client.screen.ControlTooltip.*;
-import static wily.legacy.client.screen.ControlTooltip.CONTROL_ACTION_CACHE;
 
 @Mixin(CreateWorldScreen.class)
-public abstract class CreateWorldScreenMixin extends Screen{
-    public ControlTooltip.Renderer controlTooltipRenderer = ControlTooltip.defaultScreen(this);
+public abstract class CreateWorldScreenMixin extends Screen implements ControlTooltip.Event{
     @Shadow @Final private WorldCreationUiState uiState;
     @Shadow @Final private static Component GAME_MODEL_LABEL;
     @Shadow @Final private static Component NAME_LABEL;
@@ -57,13 +51,9 @@ public abstract class CreateWorldScreenMixin extends Screen{
     @Shadow public abstract void popScreen();
 
     protected boolean trustPlayers;
-    protected boolean onlineOnStart = false;
-    private int port = HttpUtil.getAvailablePort();
     protected Panel panel;
-
+    protected PublishScreen publishScreen;
     protected PackSelector resourcePackSelector;
-
-    private Path tempDataPackDir;
 
     protected CreateWorldScreenMixin(Component component) {
         super(component);
@@ -77,8 +67,15 @@ public abstract class CreateWorldScreenMixin extends Screen{
         uiState.setDifficulty(((LegacyOptions)minecraft.options).createWorldDifficulty().get());
         panel = new Panel(p-> (width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 160 : 0))) / 2, p-> (height - p.height) / 2,245,228);
         resourcePackSelector = PackSelector.resources(panel.x + 13, panel.y + 106, 220,45, !ScreenUtil.hasTooltipBoxes());
-        controlTooltipRenderer.add(()-> getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{getKeyIcon(InputConstants.KEY_LSHIFT,true), PLUS,getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true)}) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(true), ()-> getFocused() == resourcePackSelector ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.resource_packs_screen") : null);
+        publishScreen = new PublishScreen(this, uiState.getGameMode().gameType);
     }
+
+    @Override
+    public void added() {
+        super.added();
+        ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? COMPOUND_ICON_FUNCTION.apply(new Icon[]{getKeyIcon(InputConstants.KEY_LSHIFT), PLUS_ICON,getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT)}) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), ()-> getFocused() == resourcePackSelector ? getAction("legacy.action.resource_packs_screen") : null);
+    }
+
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
@@ -90,36 +87,20 @@ public abstract class CreateWorldScreenMixin extends Screen{
         uiState.addListener(worldCreationUiState -> nameEdit.setTooltip(Tooltip.create(Component.translatable("selectWorld.targetFolder", Component.literal(worldCreationUiState.getTargetFolder()).withStyle(ChatFormatting.ITALIC)))));
         setInitialFocus(nameEdit);
         addRenderableWidget(nameEdit);
-        LegacySliderButton<WorldCreationUiState.SelectedGameMode> gameModeButton = addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 51, 220,16, b -> b.getDefaultMessage(GAME_MODEL_LABEL,b.getObjectValue().displayName),()->Tooltip.create(uiState.getGameMode().getInfo()),uiState.getGameMode(),()-> List.of(WorldCreationUiState.SelectedGameMode.SURVIVAL, WorldCreationUiState.SelectedGameMode.HARDCORE, WorldCreationUiState.SelectedGameMode.CREATIVE), b->uiState.setGameMode(b.objectValue)));
+        LegacySliderButton<WorldCreationUiState.SelectedGameMode> gameModeButton = addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 51, 220,16, b -> b.getDefaultMessage(GAME_MODEL_LABEL,b.getObjectValue().displayName),b->Tooltip.create(uiState.getGameMode().getInfo()),uiState.getGameMode(),()-> List.of(WorldCreationUiState.SelectedGameMode.SURVIVAL, WorldCreationUiState.SelectedGameMode.HARDCORE, WorldCreationUiState.SelectedGameMode.CREATIVE), b->uiState.setGameMode(b.getObjectValue())));
         uiState.addListener(worldCreationUiState -> gameModeButton.active = !worldCreationUiState.isDebug());
-        LegacySliderButton<Difficulty> difficultyButton = addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 77, 220,16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getObjectValue().getDisplayName()),()->Tooltip.create(uiState.getDifficulty().getInfo()),uiState.getDifficulty(),()-> Arrays.asList(Difficulty.values()), b->uiState.setDifficulty(b.objectValue)));
-        uiState.addListener(worldCreationUiState -> difficultyButton.active = !uiState.isHardcore());
-        EditBox portEdit = addRenderableWidget(new EditBox(minecraft.font, panel.x + 124, panel.y + 151,100,20,Component.translatable("lanServer.port")));
-        portEdit.visible = onlineOnStart;
-
-        portEdit.setHint(Component.literal("" + this.port).withStyle(ChatFormatting.DARK_GRAY));
-        addRenderableWidget(Button.builder(Component.translatable( "createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), b-> trustPlayers = b))).bounds(panel.x + 13, panel.y + 172,220,20).build());
-        Button createButton = addRenderableWidget(Button.builder(Component.translatable("selectWorld.create"), button -> this.onCreate()).bounds(panel.x + 13, panel.y + 197,220,20).build());
-        addRenderableWidget(new TickBox(panel.x+ 14, panel.y+155,100,onlineOnStart, b-> Component.translatable("menu.shareToLan"), b->null, button -> {
-            if (!(portEdit.visible = onlineOnStart = button.selected)) {
-                createButton.active = true;
-                portEdit.setValue("");
-            }
-        }));
-        portEdit.setResponder(string -> {
-            Pair<Integer,Component> p = Legacy4JClient.tryParsePort(string);
-            if(p.getFirst() != null) port = p.getFirst();
-            portEdit.setHint(Component.literal("" + this.port).withStyle(ChatFormatting.DARK_GRAY));
-            if (p.getSecond() == null) {
-                portEdit.setTextColor(0xE0E0E0);
-                portEdit.setTooltip(null);
-                createButton.active = true;
-            } else {
-                portEdit.setTextColor(0xFF5555);
-                portEdit.setTooltip(Tooltip.create(p.getSecond()));
-                createButton.active = false;
-            }
+        LegacySliderButton<Difficulty> difficultyButton = addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 77, 220,16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getObjectValue().getDisplayName()),b->Tooltip.create(uiState.getDifficulty().getInfo()),uiState.getDifficulty(),()-> Arrays.asList(Difficulty.values()), b->uiState.setDifficulty(b.getObjectValue())));
+        uiState.addListener(worldCreationUiState -> {
+            difficultyButton.setObjectValue(uiState.getDifficulty());
+            difficultyButton.active = !uiState.isHardcore();
         });
+
+        addRenderableWidget(Button.builder(Component.translatable( "createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), b-> trustPlayers = b))).bounds(panel.x + 13, panel.y + 172,220,20).build());
+        addRenderableWidget(Button.builder(Component.translatable("selectWorld.create"), button -> this.onCreate()).bounds(panel.x + 13, panel.y + 197,220,20).build());
+        addRenderableWidget(new TickBox(panel.x+ 14, panel.y+155,220,publishScreen.publish, b-> PublishScreen.PUBLISH, b->null, button -> {
+            if (button.selected) minecraft.setScreen(publishScreen);
+            button.selected = publishScreen.publish = false;
+        }));
         resourcePackSelector.setX(panel.x + 13);
         resourcePackSelector.setY(panel.y + 106);
         addRenderableWidget(resourcePackSelector);
@@ -145,16 +126,12 @@ public abstract class CreateWorldScreenMixin extends Screen{
 
     }
     private void onLoad() {
-        minecraft.execute(()->{
-            if (minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer().isReady()){
-                if (!ScreenUtil.getLegacyOptions().autoSave().get()) Legacy4JClient.deleteLevelWhenExitWithoutSaving = true;
-                if (onlineOnStart) {
-                    MutableComponent component = publishUnloadedServer(minecraft, uiState.getGameMode().gameType, trustPlayers && uiState.isAllowCommands(), this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed");
-                    ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setTrustPlayers(trustPlayers);
-                    if (resourcePackSelector.hasChanged()) ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setSelectedResourcePacks(resourcePackSelector.getSelectedIds());
-                    this.minecraft.gui.getChat().addMessage(component);
-                }
-        }});
+        Legacy4JClient.startServerConsumer = s->{
+            if (ScreenUtil.getLegacyOptions().autoSaveInterval().get() == 0) Legacy4JClient.deleteLevelWhenExitWithoutSaving = true;
+            ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setTrustPlayers(trustPlayers);
+            publishScreen.publish(s);
+            if (resourcePackSelector.hasChanged()) ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setSelectedResourcePacks(resourcePackSelector.getSelectedIds());
+        };
     }
     
     private static void confirmWorldCreation(Minecraft minecraft, CreateWorldScreen createWorldScreen, Lifecycle lifecycle, Runnable runnable, boolean bl2) {
@@ -170,7 +147,6 @@ public abstract class CreateWorldScreenMixin extends Screen{
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         ScreenUtil.renderDefaultBackground(guiGraphics,false);
         resourcePackSelector.renderTooltipBox(guiGraphics,panel);
-        controlTooltipRenderer.render(guiGraphics, i, j, f);
     }
     @Override
     public boolean mouseScrolled(double d, double e, double f, double g) {
@@ -181,7 +157,7 @@ public abstract class CreateWorldScreenMixin extends Screen{
         this.renderBackground(guiGraphics, i, j, f);
         for (Renderable renderable : this.renderables)
             renderable.render(guiGraphics, i, j, f);
-        guiGraphics.drawString(font,NAME_LABEL, panel.x + 14, panel.y + 15, 0x383838,false);
+        guiGraphics.drawString(font,NAME_LABEL, panel.x + 14, panel.y + 15, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
     }
 
     @Override
@@ -193,7 +169,7 @@ public abstract class CreateWorldScreenMixin extends Screen{
 
     @Override
     public void onClose() {
-        ScreenUtil.playSimpleUISound(LegacySoundEvents.BACK.get(),1.0f);
+        ScreenUtil.playSimpleUISound(LegacyRegistries.BACK.get(),1.0f);
         popScreen();
     }
 }

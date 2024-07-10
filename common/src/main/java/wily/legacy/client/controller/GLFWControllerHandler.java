@@ -2,7 +2,7 @@ package wily.legacy.client.controller;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
-import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.ControlType;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.BufferedReader;
@@ -28,16 +28,16 @@ public class GLFWControllerHandler implements Controller.Handler{
     }
 
     @Override
-    public boolean init() {
+    public void init() {
         if (!init){
             tryDownloadAndApplyNewMappings();
             init = true;
         }
-        return true;
     }
 
     @Override
-    public void update() {
+    public boolean update() {
+        return true;
     }
 
     @Override
@@ -60,16 +60,17 @@ public class GLFWControllerHandler implements Controller.Handler{
             }
 
             @Override
-            public ControlTooltip.Type getType() {
+            public ControlType getType() {
                 if (getName() != null) {
-                    if (name.contains("PS3")) return ControlTooltip.Type.PS3;
-                    else if (name.contains("PS4") || name.contains("PS5")) return ControlTooltip.Type.PS4;
-                    else if (name.contains("Xbox 360")) return ControlTooltip.Type.x360;
-                    else if (name.contains("Xbox One")) return ControlTooltip.Type.xONE;
-                    else if (name.contains("Nintendo Switch")) return ControlTooltip.Type.SWITCH;
-                    else if (name.contains("Wii U")) return ControlTooltip.Type.WII_U;
+                    if (name.contains("PS3")) return ControlType.PS3;
+                    else if (name.contains("PS4")) return ControlType.PS4;
+                    else if (name.contains("PS5")) return ControlType.PS5;
+                    else if (name.contains("Xbox 360")) return ControlType.x360;
+                    else if (name.contains("Xbox One")) return ControlType.xONE;
+                    else if (name.contains("Nintendo Switch")) return ControlType.SWITCH;
+                    else if (name.contains("Wii U")) return ControlType.WII_U;
                 }
-                return ControlTooltip.Type.x360;
+                return ControlType.x360;
             }
 
             @Override
@@ -89,10 +90,6 @@ public class GLFWControllerHandler implements Controller.Handler{
 
             @Override
             public void setLED(byte r, byte g, byte b) {
-            }
-
-            @Override
-            public void close() {
             }
         };
     }

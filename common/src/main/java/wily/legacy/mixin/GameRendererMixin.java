@@ -1,25 +1,42 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.Util;
+import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.screen.LegacyMenuAccess;
+import wily.legacy.player.PlayerYBobbing;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
+import wily.legacy.util.ScreenUtil;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,41 +47,83 @@ import static wily.legacy.Legacy4JClient.gammaEffect;
 
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
-    @Shadow @Final private Minecraft minecraft;
+    @Shadow @Final
+    Minecraft minecraft;
 
     @Shadow private boolean hasWorldScreenshot;
 
     @Shadow protected abstract void takeAutoScreenshot(Path path);
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/toasts/ToastComponent;render(Lnet/minecraft/client/gui/GuiGraphics;)V"))
-    private void render(ToastComponent instance, GuiGraphics graphics, float f, long l, boolean bl){
-        if (!LegacyTipManager.tips.isEmpty()) {
-            LegacyTip tip = LegacyTipManager.tips.get(0);
+    @Shadow @Final private Camera mainCamera;
+
+    @Shadow private boolean renderHand;
+
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;flush()V"))
+    private void render(GuiGraphics graphics, DeltaTracker tracker){
+        if (!minecraft.isGameLoadFinished()) return;
+        LegacyTip tip = LegacyTipManager.getActualTip();
+        if (!LegacyTipManager.tips.isEmpty() || tip != null) {
+            if (tip == null) tip = LegacyTipManager.getUpdateTip();
             tip.setX(graphics.guiWidth() - tip.getWidth() - 30);
-            tip.renderTip(graphics,0,0,f);
-            if (tip.visibility == Toast.Visibility.HIDE) LegacyTipManager.tips.remove(tip);
+            tip.render(graphics,0,0,tracker.getRealtimeDeltaTicks());
+            if (tip.visibility == Toast.Visibility.HIDE) LegacyTipManager.getUpdateTip();
         }
-        instance.render(graphics);
+        if (minecraft.options.showAutosaveIndicator().get().booleanValue() && (minecraft.gui.autosaveIndicatorValue > 0 || minecraft.gui.lastAutosaveIndicatorValue > 0) && Mth.clamp(Mth.lerp(tracker.getRealtimeDeltaTicks(), minecraft.gui.lastAutosaveIndicatorValue, minecraft.gui.autosaveIndicatorValue), 0.0f, 1.0f) > 0.02)
+            ScreenUtil.drawAutoSavingIcon(graphics,graphics.guiWidth() - 66,44);
         if (GLFW.glfwGetInputMode(minecraft.getWindow().getWindow(),GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerManager.isCursorDisabled) {
             RenderSystem.disableDepthTest();
             RenderSystem.enableBlend();
             graphics.pose().pushPose();
-            graphics.pose().translate(Legacy4JClient.controllerManager.getPointerX(), Legacy4JClient.controllerManager.getPointerY(), 0);
+            graphics.pose().translate(Legacy4JClient.controllerManager.getPointerX() + LegacyTipManager.getTipXDiff(), Legacy4JClient.controllerManager.getPointerY(), 0);
             graphics.blitSprite(minecraft.getWindow().getScreenWidth() >= 1920 ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
             graphics.pose().popPose();
             RenderSystem.disableBlend();
             RenderSystem.enableDepthTest();
         }
-        float gamma = ((LegacyOptions)minecraft.options).legacyGamma().get().floatValue();
-        if (gammaEffect != null && gamma != 0.5) {
+        if (gammaEffect != null && ScreenUtil.getLegacyOptions().displayLegacyGamma().get()) {
+            float gamma = ScreenUtil.getLegacyOptions().legacyGamma().get().floatValue();
             graphics.flush();
             RenderSystem.enableBlend();
             RenderSystem.disableDepthTest();
-            gammaEffect.passes.forEach(p-> p.getEffect().safeGetUniform("gamma").set(gamma >= 0.5f ? gamma * 1.7f : 0.5f + gamma));
-            gammaEffect.process(this.minecraft.level != null && this.minecraft.level.tickRateManager().runsNormally() ? f : 1.0f);
+            gammaEffect.passes.forEach(p-> p.getEffect().safeGetUniform("gamma").set(gamma >= 0.5f ? gamma * 1.7f : 0.35f + gamma));
+            gammaEffect.process(tracker.getRealtimeDeltaTicks());
             RenderSystem.enableDepthTest();
             RenderSystem.disableBlend();
         }
+        graphics.flush();
+    }
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"))
+    private void render(Gui instance, GuiGraphics guiGraphics, DeltaTracker deltaTracker){
+        if (((LegacyOptions)minecraft.options).displayHUD().get()) instance.render(guiGraphics,deltaTracker);
+    }
+    @Inject(method = "bobView", at = @At("RETURN"))
+    private void bobView(PoseStack poseStack, float f, CallbackInfo ci){
+        if (this.minecraft.getCameraEntity() instanceof PlayerYBobbing p) poseStack.mulPose(Axis.XP.rotationDegrees(p.getAngle(f)));
+    }
+    @Inject(method = "shouldRenderBlockOutline", at = @At("HEAD"), cancellable = true)
+    private void renderLevel(CallbackInfoReturnable<Boolean> cir){
+        if (!((LegacyOptions)minecraft.options).displayHUD().get()) cir.setReturnValue(false);
+    }
+    @Redirect(method = "renderLevel", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/GameRenderer;renderHand:Z"))
+    private boolean renderLevel(GameRenderer instance){
+        return renderHand && ((LegacyOptions)minecraft.options).displayHand().get();
+    }
+    @ModifyVariable(method = "renderLevel", at = @At(value = "STORE", remap = false),ordinal = 1)
+    private Matrix4f renderLevel(Matrix4f original){
+        Matrix4f matrix4f = new Matrix4f();
+        if (ScreenUtil.getLegacyOptions().flyingViewRolling().get() && minecraft.player != null && minecraft.player.isFallFlying()){
+            float f = minecraft.isPaused() ? 0 : minecraft.getTimer().getGameTimeDeltaPartialTick(true);
+            Vec3 vec3 =  minecraft.player.getViewVector(f);
+            Vec3 vec32 =  minecraft.player.getDeltaMovementLerped(f);
+            double d = vec32.horizontalDistanceSqr();
+            double e = vec3.horizontalDistanceSqr();
+            if (d > 0.0 && e > 0.0) {
+                int dir = (int) Math.signum(vec32.x * vec3.z - vec32.z * vec3.x);
+                float z = (float) (Math.min(Math.PI / 8, Math.acos((vec32.x * vec3.x + vec32.z * vec3.z) / Math.sqrt(d * e)) / 2.5));
+                if (z > 0) matrix4f.rotationZ(dir*z);
+            }
+        }
+        return matrix4f.rotateXYZ(mainCamera.getXRot() * 0.017453292F, mainCamera.getYRot() * 0.017453292F + 3.1415927F,0);
     }
     @Redirect(method = "tryTakeScreenshotIfNeeded",at = @At(value = "FIELD", opcode = Opcodes.GETFIELD, target = "Lnet/minecraft/client/renderer/GameRenderer;hasWorldScreenshot:Z"))
     private boolean canTakeWorldIcon(GameRenderer instance) {

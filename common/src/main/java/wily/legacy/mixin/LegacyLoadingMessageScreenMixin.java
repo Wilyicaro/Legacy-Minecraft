@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.client.screen.ControlTooltip;
 
 import static wily.legacy.Legacy4JClient.legacyLoadingScreen;
 
@@ -21,4 +22,5 @@ public class LegacyLoadingMessageScreenMixin extends Screen {
         legacyLoadingScreen.prepareRender(minecraft,width, height,getTitle(), null,0,false);
         legacyLoadingScreen.render(guiGraphics,i,j,f);
     }
+
 }

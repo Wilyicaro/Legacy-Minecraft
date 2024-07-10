@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.client.controller.ControllerBinding;
@@ -25,7 +26,7 @@ import wily.legacy.client.screen.ControlTooltip;
 import java.util.List;
 
 @Mixin(BookViewScreen.class)
-public abstract class BookViewScreenMixin extends Screen implements Controller.Event {
+public abstract class BookViewScreenMixin extends Screen implements Controller.Event,ControlTooltip.Event {
 
     @Shadow protected abstract void updateButtonVisibility();
 
@@ -50,9 +51,16 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
     @Shadow public abstract @Nullable Style getClickedComponentStyleAt(double d, double e);
 
     private BookPanel panel = new BookPanel(this);
-    private ControlTooltip.Renderer controlTooltipRender = ControlTooltip.defaultScreen(this)
-            .add(()->ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(true), ()-> currentPage != 0 ? ControlTooltip.CONTROL_ACTION_CACHE.getUnchecked("legacy.action.previous_page") : null)
-            .add(()->ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon(true), ()-> this.currentPage < this.getNumPages() - 1 ? ControlTooltip.CONTROL_ACTION_CACHE.getUnchecked( "legacy.action.next_page") : null);
+
+    @Override
+    public void added() {
+        super.added();
+        ControlTooltip.Renderer.of(this)
+                .add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(), ()-> currentPage != 0 ? ControlTooltip.getAction("legacy.action.previous_page") : null)
+                .add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon(), ()-> this.currentPage < this.getNumPages() - 1 ? ControlTooltip.getAction( "legacy.action.next_page") : null);
+    }
+
+
     protected BookViewScreenMixin(Component component) {
         super(component);
     }
@@ -90,8 +98,6 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         if (style != null) {
             guiGraphics.renderComponentHoverEffect(this.font, style, i, j);
         }
-        controlTooltipRender.render(guiGraphics, i, j, f);
-
     }
     @Override
     public void bindingStateTick(BindingState state) {
@@ -101,7 +107,7 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
     }
     @Inject(method = "keyPressed",at = @At("HEAD"), cancellable = true)
     public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
-        if (ControlTooltip.getActiveType().isKeyboard() && (i == InputConstants.KEY_RIGHT || i == InputConstants.KEY_LEFT)){
+        if (ControlType.getActiveType().isKbm() && (i == InputConstants.KEY_RIGHT || i == InputConstants.KEY_LEFT)){
             (i == InputConstants.KEY_RIGHT ? forwardButton : backButton).keyPressed(InputConstants.KEY_RETURN,0,0);
             cir.setReturnValue(true);
             return;
@@ -115,7 +121,7 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
             return;
         }
         int i = (int) Math.floor(d - panel.x - 20);
-        int j = (int) Math.floor(d - panel.y - 37);
+        int j = (int) Math.floor(e - panel.y - 37);
         if (i < 0 || j < 0) {
             cir.setReturnValue(null);
             return;

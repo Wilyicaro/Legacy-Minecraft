@@ -12,10 +12,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.achievement.StatsScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ServerboundClientCommandPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -26,11 +26,14 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.CommonColor;
+import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.network.CommonNetworkManager;
+import wily.legacy.network.CommonNetwork;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.player.LegacyPlayerInfo;
 import wily.legacy.util.JsonUtil;
@@ -53,15 +56,19 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
     public static final Component USERNAME = Component.translatable("legacy.menu.leaderboard.username");
     public static final Component MY_SCORE = Component.translatable("legacy.menu.leaderboard.filter.my_score");
     public static final Component NO_RESULTS = Component.translatable("legacy.menu.leaderboard.no_results");
-    protected final RenderableVList renderableVList = new RenderableVList();
-    protected final ControlTooltip.Renderer controlTooltipRenderer = ControlTooltip.defaultScreen(this);
+    protected final RenderableVList renderableVList = new RenderableVList().layoutSpacing(l-> 1);
     protected boolean myScore = false;
     protected List<LegacyPlayerInfo> actualRankBoard = Collections.emptyList();
     public LeaderboardsScreen(Screen parent) {
         super(568,275, CommonComponents.EMPTY);
-        controlTooltipRenderer.add(()->ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X,true) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(true),()-> ControlTooltip.CONTROL_ACTION_CACHE.getUnchecked("legacy.action.change_filter"));
         this.parent = parent;
         rebuildRenderableVList(Minecraft.getInstance());
+    }
+
+    @Override
+    public void addControlTooltips(ControlTooltip.Renderer renderer) {
+        super.addControlTooltips(renderer);
+        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(),()-> ControlTooltip.getAction("legacy.action.change_filter"));
     }
 
     public static void refreshStatsBoards(Minecraft minecraft){
@@ -106,7 +113,7 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
             return true;
         }
         if (i == InputConstants.KEY_LBRACKET || i == InputConstants.KEY_RBRACKET){
-            if (!statsBoards.get(selectedStatBoard).renderables.isEmpty()){
+            if (selectedStatBoard < statsBoards.size() && !statsBoards.get(selectedStatBoard).renderables.isEmpty()){
                 int newPage = changedPage(i == InputConstants.KEY_LBRACKET ? -lastStatsInScreen : statsInScreen);
                 if (newPage != page){
                     lastStatsInScreen = statsInScreen;
@@ -115,7 +122,14 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
                 }
             }
         }
+        if (renderableVList.keyPressed(i,true)) return true;
         return super.keyPressed(i, j, k);
+    }
+
+    @Override
+    public boolean mouseScrolled(double d, double e, double f, double g) {
+        renderableVList.mouseScrolled(g);
+        return super.mouseScrolled(d, e, f, g);
     }
 
     public void rebuildRenderableVList(Minecraft minecraft){
@@ -135,21 +149,23 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
                     guiGraphics.drawString(font,getMessage(),getX() + 120 -(font.width(getMessage())) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
                     guiGraphics.drawString(font,getMessage(),getX() + 120 -(font.width(getMessage())) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
                     int added = 0;
-
+                    Component hoveredValue = null;
                     for (int index = page; index < statsBoards.get(selectedStatBoard).statsList.size(); index++) {
                         if (added >= statsInScreen)break;
                         Stat<?> stat = statsBoards.get(selectedStatBoard).statsList.get(index);
-                        String value = stat.format((Legacy4JClient.isModEnabledOnServer() ? info.getStatsMap() : minecraft.player.getStats().stats).getInt(stat));
+                        Component value = ControlTooltip.CONTROL_ICON_FUNCTION.apply(stat.format((Legacy4JClient.isModEnabledOnServer() ? info.getStatsMap() : minecraft.player.getStats().stats).getInt(stat)), Style.EMPTY);
                         SimpleLayoutRenderable renderable = statsBoards.get(selectedStatBoard).renderables.get(index);
-                        guiGraphics.drawString(font,value,renderable.getX() + (renderable.getWidth() - font.width(value)) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
-
+                        int w = font.width(value);
+                        ScreenUtil.renderScrollingString(guiGraphics,font, value,renderable.getX() + Math.max(0,renderable.getWidth() - w) / 2, getY(),renderable.getX() + Math.min(renderable.getWidth(),(renderable.getWidth() - w)/ 2 + getWidth()), getY() + getHeight(), ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()),true);
+                        if (ScreenUtil.isMouseOver(i,j,renderable.getX() + Math.max(0,renderable.getWidth() - w) / 2, getY(),Math.min(renderable.getWidth(),w), getHeight())) hoveredValue = value;
                         added++;
                     }
+                    if (hoveredValue != null) guiGraphics.renderTooltip(font,hoveredValue,i,j);
                 }
 
                 @Override
                 protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-
+                    defaultButtonNarrationText(narrationElementOutput);
                 }
             });
         }
@@ -157,7 +173,7 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
     @Override
     protected void init() {
         super.init();
-        if (Legacy4JClient.isModEnabledOnServer()) CommonNetworkManager.sendToServer(new PlayerInfoSync(0,minecraft.player));
+        if (Legacy4JClient.isModEnabledOnServer()) CommonNetwork.sendToServer(new PlayerInfoSync(0,minecraft.player));
         else minecraft.getConnection().send(new ServerboundClientCommandPacket(ServerboundClientCommandPacket.Action.REQUEST_STATS));
         addRenderableOnly((guiGraphics, i, j, f) -> {
             ScreenUtil.renderPointerPanel(guiGraphics,panel.x + 8,panel.y - 18,166,18);
@@ -186,10 +202,10 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(panel.x + (panel.width - 211) / 2f, panel.y - 12,0);
                 guiGraphics.pose().scale(0.5f,0.5f,0.5f);
-                guiGraphics.drawString(font,ControlTooltip.getActiveType().isKeyboard() ?ControlTooltip.COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true),ControlTooltip.SPACE, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true)}) : ControllerBinding.LEFT_STICK.bindingState.getIcon(true),4, 0,0xFFFFFF);
+                (ControlType.getActiveType().isKbm() ? ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.LEFT_STICK.bindingState.getIcon()).render(guiGraphics,4,0,false, false);
                 if (statsInScreen < statsBoards.get(selectedStatBoard).renderables.size()) {
-                    Component pageControl = ControlTooltip.COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET, true) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(true), ControlTooltip.SPACE, ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET, true) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon(true)});
-                    guiGraphics.drawString(font, pageControl, 422 - font.width(pageControl) - 8, 0, 0xFFFFFF);
+                    ControlTooltip.Icon pageControl = ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon()});
+                    pageControl.render(guiGraphics,422 - pageControl.render(guiGraphics,0,0,false,true) - 8, 0,false,false);
                 }
                 guiGraphics.pose().popPose();
                 RenderSystem.disableBlend();
@@ -197,12 +213,12 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
                     guiGraphics.pose().pushPose();
                     guiGraphics.pose().translate(panel.x + (panel.width - font.width(NO_RESULTS) * 1.5f)/2f, panel.y + (panel.height - 13.5f) / 2f,0);
                     guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-                    guiGraphics.drawString(font,NO_RESULTS,0,0,0x383838,false);
+                    guiGraphics.drawString(font,NO_RESULTS,0,0, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
                     guiGraphics.pose().popPose();
                     return;
                 }
-                guiGraphics.drawString(font,RANK,panel.x + 40, panel.y + 20,0x383838,false);
-                guiGraphics.drawString(font,USERNAME,panel.x + 108, panel.y + 20,0x383838,false);
+                guiGraphics.drawString(font,RANK,panel.x + 40, panel.y + 20,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+                guiGraphics.drawString(font,USERNAME,panel.x + 108, panel.y + 20,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
                 int totalWidth = 0;
                 statsInScreen = 0;
                 for (int index = page; index < board.renderables.size(); index++) {
@@ -213,12 +229,15 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
                 }
                 if (statsInScreen == 0) return;
                 int x = (351 - totalWidth) / (statsInScreen + 1);
+                Integer hovered = null;
                 for (int index = page; index < page + statsInScreen; index++) {
                     SimpleLayoutRenderable r = board.renderables.get(index);
                     r.setPosition(panel.x + 182 + x,panel.y + 22 - r.height / 2);
                     r.render(guiGraphics,i,j,f);
+                    if (r.isHovered(i,j)) hovered = index;
                     x+= r.getWidth() + (351 - totalWidth) / statsInScreen;
                 }
+                if (hovered != null) guiGraphics.renderTooltip(font, board.statsList.get(hovered).getValue() instanceof EntityType<?> e ? e.getDescription() : board.statsList.get(hovered).getValue() instanceof ItemLike item && item.asItem() != Items.AIR ? item.asItem().getDescription() : ControlTooltip.getAction("stat." + board.statsList.get(hovered).getValue().toString().replace(':', '.')), i, j);
             }
         });
         renderableVList.init(this,panel.x + 9,panel.y + 39,551,226);
@@ -229,17 +248,10 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
         renderTransparentBackground(guiGraphics);
     }
 
-    @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        controlTooltipRenderer.render(guiGraphics, i, j, f);
-    }
-
-
     public void onStatsUpdated() {
         if (!Legacy4JClient.isModEnabledOnServer()){
             refreshStatsBoards(minecraft);
-            if (minecraft.screen instanceof LeaderboardsScreen s && LeaderboardsScreen.statsBoards.get(s.selectedStatBoard).statsList.isEmpty()) minecraft.executeIfPossible(()-> s.changeStatBoard(false));
+            if (LeaderboardsScreen.statsBoards.get(selectedStatBoard).statsList.isEmpty()) minecraft.executeIfPossible(()-> changeStatBoard(false));
         }
     }
 
@@ -273,7 +285,7 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(l.getX() + 1,l.getY(),0);
                 guiGraphics.pose().scale(2/3f,2/3f,2/3f);
-                guiGraphics.drawString(Minecraft.getInstance().font,name,0,0,0x383838,false);
+                guiGraphics.drawString(Minecraft.getInstance().font,name,0,0,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
                 guiGraphics.pose().popPose();
             }));
 
@@ -316,7 +328,7 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
             List<StatsBoard> statsBoards = new ArrayList<>();
             ResourceManager manager = Minecraft.getInstance().getResourceManager();
 
-            manager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1)).forEach(name->manager.getResource(new ResourceLocation(name, LEADERBOARD_LISTING)).ifPresent(((r) -> {
+            JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(ResourceLocation.tryBuild(name, LEADERBOARD_LISTING)).ifPresent(((r) -> {
                 try {
                     BufferedReader bufferedReader = r.openAsReader();
                     JsonObject obj = GsonHelper.parse(bufferedReader);

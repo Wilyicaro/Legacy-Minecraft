@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.CommonColor;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
@@ -54,7 +55,7 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
     @Inject(method = "init",at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
-        CONFIRM_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"container/beacon_check");
+        CONFIRM_SPRITE = ResourceLocation.tryBuild(Legacy4J.MOD_ID,"container/beacon_check");
         imageWidth = 260;
         imageHeight = 255;
         super.init();
@@ -100,16 +101,16 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
     @Inject(method = "renderLabels",at = @At("HEAD"), cancellable = true)
     public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        guiGraphics.drawString(this.font, PRIMARY_EFFECT_LABEL, 9 + (121 - font.width(PRIMARY_EFFECT_LABEL)) /2, 13, 0x383838, false);
-        guiGraphics.drawString(this.font, SECONDARY_EFFECT_LABEL, 133 + (121 - font.width(SECONDARY_EFFECT_LABEL)) /2, 13, 0x383838, false);
+        guiGraphics.drawString(this.font, PRIMARY_EFFECT_LABEL, 9 + (121 - font.width(PRIMARY_EFFECT_LABEL)) /2, 13, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        guiGraphics.drawString(this.font, SECONDARY_EFFECT_LABEL, 133 + (121 - font.width(SECONDARY_EFFECT_LABEL)) /2, 13, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
     private static final Item[] DISPLAY_ITEMS = new Item[]{Items.NETHERITE_INGOT,Items.EMERALD,Items.DIAMOND,Items.GOLD_INGOT,Items.IRON_INGOT};
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
-        ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 8,topPos + 9,120, 115,2f);
-        ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 132,topPos + 9,120, 115,2f);
+        guiGraphics.blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
+        guiGraphics.blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 8,topPos + 9,120, 115);
+        guiGraphics.blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 132,topPos + 9,120, 115);
         guiGraphics.blitSprite(LegacySprites.BEACON_1,leftPos + 32, topPos + 39, 20, 19);
         guiGraphics.blitSprite(LegacySprites.BEACON_2,leftPos + 32, topPos + 69, 20, 19);
         guiGraphics.blitSprite(LegacySprites.BEACON_3,leftPos + 32, topPos + 97, 20, 19);

@@ -2,6 +2,7 @@ package wily.legacy.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
@@ -21,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.client.CommonColor;
 import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.inventory.LegacyMerchantOffer;
 import wily.legacy.util.LegacySprites;
@@ -116,13 +118,13 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         int k = this.menu.getTraderLevel();
         if (k > 0 && k <= 5 && this.menu.showProgressBar()) {
             Component component = Component.translatable("merchant.title", this.title, Component.translatable("merchant.level." + k));
-            guiGraphics.drawString(this.font, component, 131 + (189 - this.font.width(component)) / 2, 10, 0x383838, false);
+            guiGraphics.drawString(this.font, component, 131 + (189 - this.font.width(component)) / 2, 10, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         } else {
-            guiGraphics.drawString(this.font, this.title, 131 + (189 - this.font.width(title)) / 2, 10, 0x383838, false);
+            guiGraphics.drawString(this.font, this.title, 131 + (189 - this.font.width(title)) / 2, 10, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         }
 
-        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 0x383838, false);
-        guiGraphics.drawString(this.font, TRADES_LABEL, 7 + (105 - this.font.width(TRADES_LABEL)) / 2, 10, 0x383838, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        guiGraphics.drawString(this.font, TRADES_LABEL, 7 + (105 - this.font.width(TRADES_LABEL)) / 2, 10, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
     @Inject(method = "mouseClicked",at = @At("HEAD"), cancellable = true)
     public void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
@@ -167,10 +169,21 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
 
         cir.setReturnValue(true);
     }
+
+    @Override
+    public boolean keyPressed(int i, int j, int k) {
+        if (CommonInputs.selected(i) && shopItem + scrollOff < menu.getOffers().size()){
+            ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+            postButtonClick();
+            return true;
+        }
+        return super.keyPressed(i, j, k);
+    }
+
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
-        ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 7,topPos + 21,105,165,2f);
+        guiGraphics.blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
+        guiGraphics.blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 7,topPos + 21,105,165);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 219.5,topPos + 42.5,0);
         guiGraphics.pose().scale(1.5f,1.5f,1.0f);
@@ -185,9 +198,9 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP,0,-11);
         }else guiGraphics.setColor(1.0f,1.0f,1.0f,0.5f);
         RenderSystem.enableBlend();
-        ScreenUtil.renderSquareRecessedPanel(guiGraphics,0, 0,13,165,2f);
+        guiGraphics.blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0, 0,13,165);
         guiGraphics.pose().translate(-2f, -1f + (menu.getOffers().size() > 9 ?  151.5f * scrollOff / (menu.getOffers().size() - 9) : 0), 0f);
-        ScreenUtil.renderPanel(guiGraphics,0,0, 16,16,3f);
+        guiGraphics.blitSprite(LegacySprites.PANEL,0,0, 16,16);
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
         guiGraphics.pose().popPose();
@@ -202,6 +215,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             guiGraphics.blitSprite(LegacySprites.EXPERIENCE_BAR_BACKGROUND, 0, 0, 0, 161, 4);
             int m = VillagerData.getMinXpPerLevel(k);
             if (l < m || !VillagerData.canLevelUp(k)) {
+                guiGraphics.pose().popPose();
                 return;
             }
             float v = 161.0f / (float)(VillagerData.getMaxXpPerLevel(k) - m);

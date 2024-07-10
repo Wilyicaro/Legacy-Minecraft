@@ -56,13 +56,14 @@ public abstract class IntegratedServerMixin extends MinecraftServer {
             getProfiler().pop();
         }
     }
+
     @Redirect(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/client/server/IntegratedServer;paused:Z", opcode = Opcodes.GETFIELD, ordinal = 1))
     public boolean tickServer(IntegratedServer instance) {
-        return instance.isPaused() && ((LegacyOptions) minecraft.options).autoSave().get();
+        return instance.isPaused() && ((LegacyOptions) minecraft.options).autoSaveInterval().get() > 0;
     }
     @Inject(method = "stopServer", at = @At(value = "HEAD"), cancellable = true)
     public void stopServer(CallbackInfo ci) {
-        if (!((LegacyOptions) minecraft.options).autoSave().get()){
+        if (((LegacyOptions) minecraft.options).autoSaveInterval().get() == 0 && !Legacy4JClient.manualSave){
             ci.cancel();
             if (Legacy4JClient.deleteLevelWhenExitWithoutSaving){
                 try {

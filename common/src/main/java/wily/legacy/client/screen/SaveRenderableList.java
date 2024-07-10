@@ -50,14 +50,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public class SaveRenderableList extends RenderableVList {
-    static final ResourceLocation ERROR_HIGHLIGHTED = new ResourceLocation("world_list/error_highlighted");
-    static final ResourceLocation ERROR = new ResourceLocation("world_list/error");
-    static final ResourceLocation MARKED_JOIN_HIGHLIGHTED = new ResourceLocation("world_list/marked_join_highlighted");
-    static final ResourceLocation MARKED_JOIN = new ResourceLocation("world_list/marked_join");
-    static final ResourceLocation WARNING_HIGHLIGHTED = new ResourceLocation("world_list/warning_highlighted");
-    static final ResourceLocation WARNING = new ResourceLocation("world_list/warning");
-    static final ResourceLocation JOIN_HIGHLIGHTED = new ResourceLocation("world_list/join_highlighted");
-    static final ResourceLocation JOIN = new ResourceLocation("world_list/join");
+    static final ResourceLocation ERROR_HIGHLIGHTED = ResourceLocation.withDefaultNamespace("world_list/error_highlighted");
+    static final ResourceLocation ERROR = ResourceLocation.withDefaultNamespace("world_list/error");
+    static final ResourceLocation MARKED_JOIN_HIGHLIGHTED = ResourceLocation.withDefaultNamespace("world_list/marked_join_highlighted");
+    static final ResourceLocation MARKED_JOIN = ResourceLocation.withDefaultNamespace("world_list/marked_join");
+    static final ResourceLocation WARNING_HIGHLIGHTED = ResourceLocation.withDefaultNamespace("world_list/warning_highlighted");
+    static final ResourceLocation WARNING = ResourceLocation.withDefaultNamespace("world_list/warning");
+    static final ResourceLocation JOIN_HIGHLIGHTED = ResourceLocation.withDefaultNamespace("world_list/join_highlighted");
+    static final ResourceLocation JOIN = ResourceLocation.withDefaultNamespace("world_list/join");
     static final Logger LOGGER = LogUtils.getLogger();
     static final Component FROM_NEWER_TOOLTIP_1 = Component.translatable("selectWorld.tooltip.fromNewerVersion1").withStyle(ChatFormatting.RED);
     static final Component FROM_NEWER_TOOLTIP_2 = Component.translatable("selectWorld.tooltip.fromNewerVersion2").withStyle(ChatFormatting.RED);
@@ -291,7 +291,7 @@ public class SaveRenderableList extends RenderableVList {
     }
 
     public static void handleLevelLoadFailure(Minecraft minecraft, Component component) {
-        minecraft.setScreen(new ConfirmationScreen(new MainMenuScreen(), Component.translatable("selectWorld.futureworld.error.title"), component, (b)->{}){
+        minecraft.setScreen(new ConfirmationScreen(new TitleScreen(), Component.translatable("selectWorld.futureworld.error.title"), component, (b)->{}){
             protected void initButtons() {
                 okButton = addRenderableWidget(Button.builder(Component.translatable("gui.ok"),(b)-> onClose()).bounds(panel.x + 15, panel.y + panel.height - 30,200,20).build());
             }

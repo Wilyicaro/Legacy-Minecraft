@@ -10,12 +10,14 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.multiplayer.ClientAdvancements;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.Offset;
+import wily.legacy.client.CommonColor;
+import wily.legacy.client.ControlType;
+import wily.legacy.util.Offset;
+import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.network.ClientAdvancementsPacket;
 import wily.legacy.util.LegacySprites;
@@ -39,20 +41,18 @@ public class LegacyAdvancementsScreen extends PanelBackgroundScreen{
     protected AdvancementNode selectedRoot;
     protected AdvancementNode selectedAdvancement;
     private final ClientAdvancements advancements;
-    protected final ControlTooltip.Renderer controlTooltipRenderer = ControlTooltip.defaultScreen(this);
     protected boolean showDescription = false;
     protected boolean oldLegacyTooltipsValue;
-    public static final List<ResourceLocation> vanillaOrder = List.of(new ResourceLocation("story/root"),new ResourceLocation("adventure/root"),new ResourceLocation("husbandry/root"),new ResourceLocation("nether/root"),new ResourceLocation("end/root"));
+    public static final List<ResourceLocation> vanillaOrder = List.of(ResourceLocation.withDefaultNamespace("story/root"),ResourceLocation.withDefaultNamespace("adventure/root"),ResourceLocation.withDefaultNamespace("husbandry/root"),ResourceLocation.withDefaultNamespace("nether/root"),ResourceLocation.withDefaultNamespace("end/root"));
 
     public LegacyAdvancementsScreen(Screen parent, ClientAdvancements advancements) {
         super(449,252,TITLE);
-        controlTooltipRenderer.tooltips.remove(0);
-        controlTooltipRenderer.add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_X,true) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(true),()-> CONTROL_ACTION_CACHE.getUnchecked( "legacy.action.show_description"));
         this.parent = parent;
         this.advancements = advancements;
         StreamSupport.stream(getAdvancements().roots().spliterator(),false).sorted(Comparator.comparingInt(n->vanillaOrder.contains(n.holder().id()) ? vanillaOrder.indexOf(n.holder().id()): Integer.MAX_VALUE)).forEach(n-> n.advancement().display().ifPresent( d-> {
-            tabList.addTabButton(43,0, BuiltInRegistries.ITEM.getKey(d.getIcon().getItem()),d.getIcon().getComponentsPatch(),d.getTitle(),b-> {
+            tabList.addTabButton(43,0, LegacyTabButton.iconOf(d.getIcon()),d.getTitle(),b-> {
                 this.selectedRoot = n;
+                selectedAdvancement = null;
                 repositionElements();
             });
             renderableVLists.put(n, new RenderableVList().layoutSpacing(l->4));
@@ -61,6 +61,7 @@ public class LegacyAdvancementsScreen extends PanelBackgroundScreen{
         tabList.resetSelectedTab();
         getAdvancements().nodes().stream().filter(n-> !n.advancement().isRoot()).sorted(Comparator.comparingInt(LegacyAdvancementsScreen::getRootDistance)).forEach(node-> addAdvancementButton(node.root(),node));
     }
+
     public static int getRootDistance(AdvancementNode advancementNode) {
         AdvancementNode advancementNode2 = advancementNode;
         AdvancementNode advancementNode3;
@@ -74,16 +75,14 @@ public class LegacyAdvancementsScreen extends PanelBackgroundScreen{
     protected void addAdvancementButton(AdvancementNode root, AdvancementNode node){
         node.advancement().display().ifPresent(info-> {
             AbstractWidget w;
+            AdvancementHolder h;
+            AdvancementProgress p = null;
+            boolean unlocked = (h = advancements.get(node.holder().id())) != null && (p = advancements.progress.getOrDefault(h, null)) != null && p.isDone();
+
             renderableVLists.get(root).addRenderable(w = new AbstractWidget(0, 0, 38, 38, info.getTitle()) {
 
                 @Override
                 protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                    boolean unlocked = false;
-                    AdvancementHolder h;
-                    if ((h = advancements.get(node.holder().id())) != null) {
-                        AdvancementProgress p = advancements.progress.getOrDefault(h, null);
-                        unlocked = p != null && p.isDone();
-                    }
                     if (isFocused()) {
                         selectedAdvancement = node;
                         guiGraphics.pose().pushPose();
@@ -93,7 +92,7 @@ public class LegacyAdvancementsScreen extends PanelBackgroundScreen{
                     }
                     RenderSystem.enableBlend();
                     if (!unlocked) guiGraphics.setColor(1.0f, 1.0f, 1.0f, 0.5f);
-                    ScreenUtil.renderPanel(guiGraphics, getX(), getY(), getWidth(), getHeight(), 3f);
+                    guiGraphics.blitSprite(LegacySprites.PANEL, getX(), getY(), getWidth(), getHeight());
                     RenderSystem.disableDepthTest();
                     if (!unlocked)
                         guiGraphics.blitSprite(LegacySprites.PADLOCK, getX() + (getWidth() - 32) / 2, getY() + (getHeight() - 32) / 2, 32, 32);
@@ -111,11 +110,18 @@ public class LegacyAdvancementsScreen extends PanelBackgroundScreen{
 
                 @Override
                 protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-
+                    defaultButtonNarrationText(narrationElementOutput);
                 }
             });
-            w.setTooltip(Tooltip.create(info.getDescription()));
+            Component progressText = p == null ? null : p.getProgressText();
+            w.setTooltip(progressText == null ? Tooltip.create(info.getDescription()) : new MultilineTooltip(List.of(info.getDescription().getVisualOrderText(),progressText.getVisualOrderText())));
         });
+    }
+    @Override
+    public void bindingStateTick(BindingState state) {
+        if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s && s.pressed && s.canClick()){
+            tabList.controlPage(page,s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
+        }
     }
 
     @Override
@@ -124,12 +130,12 @@ public class LegacyAdvancementsScreen extends PanelBackgroundScreen{
         super.init();
         panel.y +=18;
         addRenderableOnly(((guiGraphics, i, j, f) ->{
-            guiGraphics.drawString(font,getTitle(),panel.x + (panel.width - font.width(getTitle()))/ 2,panel.y + 10,0x383838,false);
+            guiGraphics.drawString(font,showDescription ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle(),panel.x + (panel.width - font.width(showDescription ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle()))/ 2,panel.y + 10, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
             if (selectedRoot != null) selectedRoot.advancement().display().flatMap(DisplayInfo::getBackground).ifPresent(b -> guiGraphics.blit(b,panel.x + 14, panel.y + 24,0,0,422,23,16,16));
-            ScreenUtil.renderPanelTranslucentRecess(guiGraphics,panel.x + 12, panel.y + 22, 426, 27,2f);
+            ScreenUtil.renderPanelTranslucentRecess(guiGraphics,panel.x + 12, panel.y + 22, 426, 27);
             if (selectedAdvancement != null) selectedAdvancement.advancement().display().ifPresent(info-> guiGraphics.drawString(font,info.getTitle(),panel.x + (panel.width - font.width(info.getTitle()))/ 2,panel.y + 32,0xFFFFFF));
             RenderSystem.disableBlend();
-            ScreenUtil.renderPanelRecess(guiGraphics,panel.x + 12, panel.y + 50, 426, 186,2f);
+            guiGraphics.blitSprite(LegacySprites.PANEL_RECESS,panel.x + 12, panel.y + 50, 426, 186);
         }));
         tabList.init(panel.x,panel.y - 37,panel.width,(b,i)->{
             int index = tabList.tabButtons.indexOf(b);
@@ -148,13 +154,23 @@ public class LegacyAdvancementsScreen extends PanelBackgroundScreen{
         }
         if (selectedRoot != null && renderableVLists.get(selectedRoot).keyPressed(i,false)) return true;
         if (tabList.controlTab(i)) return true;
+        if (hasShiftDown()) tabList.controlPage(page,i == 263 , i == 262);
         return super.keyPressed(i, j, k);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        controlTooltipRenderer.render(guiGraphics,i,j,f);
+    public boolean mouseScrolled(double d, double e, double f, double g) {
+        if (selectedRoot != null) renderableVLists.get(selectedRoot).mouseScrolled(g);
+        return super.mouseScrolled(d, e, f, g);
+    }
+
+    @Override
+    public void addControlTooltips(Renderer renderer) {
+        super.addControlTooltips(renderer);
+        renderer.tooltips.remove(0);
+        renderer.
+                add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(),()-> getAction( "legacy.action.show_description")).
+                add(()-> page.max > 0 ? ControlType.getActiveType().isKbm() ? COMPOUND_ICON_FUNCTION.apply(new Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.RIGHT_STICK.bindingState.getIcon() : null,()->getAction("legacy.action.page"));
     }
 
     @Override

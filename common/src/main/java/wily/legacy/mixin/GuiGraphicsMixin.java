@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.joml.Matrix4f;
@@ -22,13 +21,12 @@ import org.joml.Vector2ic;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyTipManager;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
@@ -51,6 +49,14 @@ public abstract class GuiGraphicsMixin {
     @Shadow public abstract void blit(ResourceLocation resourceLocation, int i, int j, float f, float g, int k, int l, int m, int n);
 
     @Shadow public abstract void blit(ResourceLocation resourceLocation, int i, int j, int k, int l, int m, int n);
+    @ModifyVariable(method = "enableScissor", at = @At(value = "HEAD"), index = 1, argsOnly = true)
+    private int enableScissor(int value){
+        return value + Math.round(LegacyTipManager.getTipXDiff());
+    }
+    @ModifyVariable(method = "enableScissor", at = @At(value = "HEAD"), index = 3, argsOnly = true)
+    private int enableScissorXW(int value){
+        return value + Math.round(LegacyTipManager.getTipXDiff());
+    }
 
     @Inject(method = "bufferSource", at = @At("HEAD"), cancellable = true)
     private void bufferSource(CallbackInfoReturnable<MultiBufferSource.BufferSource> cir){
@@ -124,7 +130,7 @@ public abstract class GuiGraphicsMixin {
     }
     @Inject(method = "renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;IIII)V", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"))
     private void renderItem(LivingEntity livingEntity, Level level, ItemStack itemStack, int i, int j, int k, int l, CallbackInfo ci){
-        float g = (float)itemStack.getPopTime() - minecraft.getFrameTime();
+        float g = (float)itemStack.getPopTime() - minecraft.getTimer().getGameTimeDeltaTicks();
         if (g > 0.0F && (minecraft.screen == null || minecraft.screen instanceof EffectRenderingInventoryScreen<?>)) {
             float h = 1.0F + g / 5.0F;
             pose().translate((float)(i + 8), (float)(j + 12), 0.0F);
@@ -132,5 +138,9 @@ public abstract class GuiGraphicsMixin {
             pose().translate((float)(-(i + 8)), (float)(-(j + 12)), 0.0F);
             if (minecraft.player != null  && !minecraft.player.getInventory().items.contains(itemStack)) itemStack.setPopTime(itemStack.getPopTime() - 1);
         }
+    }
+    @ModifyArg(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V", ordinal = 0), index = 2)
+    private float renderTooltipInternal(float z){
+        return 800;
     }
 }

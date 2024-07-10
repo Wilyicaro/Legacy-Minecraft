@@ -29,7 +29,7 @@ public class CreationList extends RenderableVList{
     public CreationList() {
         layoutSpacing(l->0);
         minecraft = Minecraft.getInstance();
-        addIconButton(this,new ResourceLocation(Legacy4J.MOD_ID,"creation_list/create_world"),Component.translatable("legacy.menu.create_world"), c-> CreateWorldScreen.openFresh(this.minecraft, screen));
+        addIconButton(this,ResourceLocation.tryBuild(Legacy4J.MOD_ID,"creation_list/create_world"),Component.translatable("legacy.menu.create_world"), c-> CreateWorldScreen.openFresh(this.minecraft, screen));
         LegacyWorldTemplate.list.forEach(t-> addIconButton(this,t.icon(),t.buttonName(), c-> {
             try {
                 String name = Legacy4JClient.importSaveFile(minecraft,minecraft.getResourceManager().getResourceOrThrow(t.worldTemplate()).open(),t.folderName());

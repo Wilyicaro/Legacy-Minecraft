@@ -30,10 +30,12 @@ public class RecipeBookComponentMixin {
     @Mutable
     @Shadow @Final protected GhostRecipe ghostRecipe;
 
-    @Shadow protected RecipeBookMenu<?> menu;
+
     @Shadow protected Minecraft minecraft;
+    @Shadow protected RecipeBookMenu<?, ?> menu;
+
     @Inject(method = "init", at = @At(value = "RETURN"))
-    private void init(int i, int j, Minecraft minecraft, boolean bl, RecipeBookMenu<?> recipeBookMenu, CallbackInfo ci){
+    private void init(int i, int j, Minecraft minecraft, boolean bl, RecipeBookMenu<?,?> recipeBookMenu, CallbackInfo ci){
         ghostRecipe = new DisplayRecipe();
     }
     @Redirect(method = "setupGhostRecipe", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/recipebook/GhostRecipe;addIngredient(Lnet/minecraft/world/item/crafting/Ingredient;II)V"))
@@ -41,9 +43,9 @@ public class RecipeBookComponentMixin {
         ((DisplayRecipe)ghostRecipe).addIngredient(ingredient, list.get(0));
     }
 
-    @Redirect(method = "addItemToSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/recipebook/GhostRecipe;addIngredient(Lnet/minecraft/world/item/crafting/Ingredient;II)V"))
-    public void addItemToSlot(GhostRecipe instance, Ingredient ingredient, int i, int j,Iterator<Ingredient> iterator, int index) {
-        ((DisplayRecipe)ghostRecipe).addIngredient(ingredient, menu.slots.get(index));
+    @Redirect(method = "addItemToSlot(Lnet/minecraft/world/item/crafting/Ingredient;IIII)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/recipebook/GhostRecipe;addIngredient(Lnet/minecraft/world/item/crafting/Ingredient;II)V"))
+    public void addItemToSlot(GhostRecipe instance, Ingredient ingredient, int i, int j,Ingredient ingredient1, int i1) {
+        ((DisplayRecipe)ghostRecipe).addIngredient(ingredient, menu.slots.get(i1));
     }
     @Inject(method = "renderGhostRecipeTooltip", at = @At("HEAD"), cancellable = true)
     private void renderGhostRecipeTooltip(GuiGraphics guiGraphics, int leftPos, int topPos, int k, int l, CallbackInfo info) {

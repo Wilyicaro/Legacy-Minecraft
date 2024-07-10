@@ -1,11 +1,8 @@
 package wily.legacy.mixin;
 
 import com.mojang.datafixers.kinds.App;
-import com.mojang.datafixers.kinds.Applicative;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -18,9 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.inventory.LegacyMerchantOffer;
 
@@ -34,9 +29,9 @@ public abstract class MerchantOfferMixin implements LegacyMerchantOffer {
     private int requiredLevel;
     @Redirect(method = "<clinit>", at = @At(value = "INVOKE", target = "Lcom/mojang/serialization/codecs/RecordCodecBuilder;create(Ljava/util/function/Function;)Lcom/mojang/serialization/Codec;"),remap = false)
     private static Codec<MerchantOffer> init(Function<RecordCodecBuilder.Instance<MerchantOffer>, ? extends App<RecordCodecBuilder.Mu<MerchantOffer>,MerchantOffer>> builder){
-        return RecordCodecBuilder.create(instance -> instance.group(ItemCost.CODEC.fieldOf("buy").forGetter(merchantOffer -> merchantOffer.getItemCostA()), ItemCost.CODEC.lenientOptionalFieldOf("buyB").forGetter(MerchantOffer::getItemCostB), ItemStack.CODEC.fieldOf("sell").forGetter(MerchantOffer::getResult), Codec.INT.lenientOptionalFieldOf("uses", 0).forGetter(MerchantOffer::getUses), Codec.INT.lenientOptionalFieldOf("maxUses", 4).forGetter(MerchantOffer::getMaxUses), Codec.BOOL.lenientOptionalFieldOf("rewardExp", true).forGetter(MerchantOffer::shouldRewardExp), Codec.INT.lenientOptionalFieldOf("specialPrice", 0).forGetter(MerchantOffer::getSpecialPriceDiff), Codec.INT.lenientOptionalFieldOf("demand", 0).forGetter(MerchantOffer::getDemand), Codec.FLOAT.lenientOptionalFieldOf("priceMultiplier", Float.valueOf(0.0f)).forGetter(merchantOffer -> Float.valueOf(merchantOffer.getPriceMultiplier())), Codec.INT.lenientOptionalFieldOf("xp", 1).forGetter(MerchantOffer::getXp),Codec.INT.lenientOptionalFieldOf("requiredLevel", 0).forGetter(o->((LegacyMerchantOffer)o).getRequiredLevel())).apply(instance, (a, b, c, d, e, f, g, h, i, j, k)-> {
+        return RecordCodecBuilder.create(instance -> instance.group(ItemCost.CODEC.fieldOf("buy").forGetter(MerchantOffer::getItemCostA), ItemCost.CODEC.lenientOptionalFieldOf("buyB").forGetter(MerchantOffer::getItemCostB), ItemStack.CODEC.fieldOf("sell").forGetter(MerchantOffer::getResult), Codec.INT.lenientOptionalFieldOf("uses", 0).forGetter(MerchantOffer::getUses), Codec.INT.lenientOptionalFieldOf("maxUses", 4).forGetter(MerchantOffer::getMaxUses), Codec.BOOL.lenientOptionalFieldOf("rewardExp", true).forGetter(MerchantOffer::shouldRewardExp), Codec.INT.lenientOptionalFieldOf("specialPrice", 0).forGetter(MerchantOffer::getSpecialPriceDiff), Codec.INT.lenientOptionalFieldOf("demand", 0).forGetter(MerchantOffer::getDemand), Codec.FLOAT.lenientOptionalFieldOf("priceMultiplier", Float.valueOf(0.0f)).forGetter(merchantOffer -> Float.valueOf(merchantOffer.getPriceMultiplier())), Codec.INT.lenientOptionalFieldOf("xp", 1).forGetter(MerchantOffer::getXp),Codec.INT.lenientOptionalFieldOf("requiredLevel", 0).forGetter(o->((LegacyMerchantOffer)o).getRequiredLevel())).apply(instance, (a, b, c, d, e, f, g, h, i, j, k)-> {
             MerchantOffer offer = new MerchantOffer(a,b,c,d,e,f,g,h,i,j);
-            ((LegacyMerchantOffer)offer).setRequiredLevel(j);
+            ((LegacyMerchantOffer)offer).setRequiredLevel(k);
             return offer;
         }));
     }

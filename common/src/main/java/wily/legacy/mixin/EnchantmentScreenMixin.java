@@ -8,6 +8,8 @@ import net.minecraft.client.gui.screens.inventory.EnchantmentNames;
 import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraft.client.model.BookModel;
 import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -23,17 +25,18 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.LegacySprites;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import static wily.legacy.Legacy4J.MOD_ID;
 
 @Mixin(EnchantmentScreen.class)
 public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<EnchantmentMenu> {
-    private static final ResourceLocation ENCHANTMENT_BUTTON_EMPTY = new ResourceLocation(MOD_ID, "container/enchantment_button_empty");
-    private static final ResourceLocation ENCHANTMENT_BUTTON_ACTIVE = new ResourceLocation(MOD_ID, "container/enchantment_button_active");
-    private static final ResourceLocation ENCHANTMENT_BUTTON_SELECTED = new ResourceLocation(MOD_ID, "container/enchantment_button_selected");
+    private static final ResourceLocation ENCHANTMENT_BUTTON_EMPTY = ResourceLocation.tryBuild(MOD_ID, "container/enchantment_button_empty");
+    private static final ResourceLocation ENCHANTMENT_BUTTON_ACTIVE = ResourceLocation.tryBuild(MOD_ID, "container/enchantment_button_active");
+    private static final ResourceLocation ENCHANTMENT_BUTTON_SELECTED = ResourceLocation.tryBuild(MOD_ID, "container/enchantment_button_selected");
 
     @Shadow protected abstract void renderBook(GuiGraphics arg, int i, int j, float g);
 
@@ -79,8 +82,8 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderPanel(guiGraphics,leftPos,topPos, imageWidth,imageHeight,2f);
-        ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 79,  topPos+ 22, 123, 66,2f);
+        guiGraphics.blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos, imageWidth,imageHeight);
+        guiGraphics.blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 79,  topPos+ 22, 123, 66);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 2,topPos + 4,0);
         guiGraphics.pose().scale(1.25f,1.25f,1.25f);
@@ -124,21 +127,21 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
-        f = this.minecraft.getFrameTime();
         super.render(guiGraphics, i, j, f);
         this.renderTooltip(guiGraphics, i, j);
         boolean bl = this.minecraft.player.getAbilities().instabuild;
         int k = this.menu.getGoldCount();
         for (int l = 0; l < 3; ++l) {
             int m = this.menu.costs[l];
-            Enchantment enchantment = Enchantment.byId(this.menu.enchantClue[l]);
+            Optional<Holder.Reference<Enchantment>> optional = this.minecraft.level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolder(this.menu.enchantClue[l]);
             int n = this.menu.levelClue[l];
             int o = l + 1;
             double t = i - (leftPos + 80.5);
             double u = j - (topPos + 23.5 + 21 * l);
-            if (!(t >= 0 && u >= 0 && t < 120 && u < 21) || m <= 0 || n < 0 || enchantment == null) continue;
+            if (!(t >= 0 && u >= 0 && t < 120 && u < 21) || m <= 0 || n < 0 || optional.isEmpty()) continue;
             ArrayList<Component> list = Lists.newArrayList();
-            list.add(Component.translatable("container.enchant.clue", enchantment.getFullname(n)).withStyle(ChatFormatting.WHITE));
+            optional.get().value();
+            list.add(Component.translatable("container.enchant.clue", Enchantment.getFullname(optional.get(), n)).withStyle(ChatFormatting.WHITE));
             if (!bl) {
                 list.add(CommonComponents.EMPTY);
                 if (this.minecraft.player.experienceLevel < m) {

@@ -9,12 +9,11 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.renderer.texture.SpriteContents;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -22,9 +21,9 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -36,51 +35,29 @@ import wily.legacy.client.screen.LegacyIconHolder;
 
 import java.util.function.Consumer;
 
+import static wily.legacy.Legacy4JClient.isModEnabledOnServer;
+
 public class ScreenUtil {
-    public static final ResourceLocation GUI_ATLAS = new ResourceLocation("textures/atlas/gui.png");
+    public static final ResourceLocation GUI_ATLAS = ResourceLocation.withDefaultNamespace("textures/atlas/gui.png");
     private static final Minecraft mc = Minecraft.getInstance();
     public static long lastHotbarSelectionChange = -1;
     protected static LogoRenderer logoRenderer = new LogoRenderer(false);
     public static LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
-    public static final ResourceLocation MINECRAFT = new ResourceLocation(Legacy4J.MOD_ID, "title/minecraft");
-    public static final ResourceLocation PANORAMA_DAY = new ResourceLocation(Legacy4J.MOD_ID, "textures/gui/title/panorama_day.png");
-    public static final ResourceLocation PANORAMA_NIGHT = new ResourceLocation(Legacy4J.MOD_ID, "textures/gui/title/panorama_night.png");
-    public static final ResourceLocation SAVE_CHEST = new ResourceLocation(Legacy4J.MOD_ID,"hud/save_chest");
-    public static final ResourceLocation SAVE_ARROW = new ResourceLocation(Legacy4J.MOD_ID,"hud/save_arrow");
-    public static final ResourceLocation LOADING_BLOCK = new ResourceLocation(Legacy4J.MOD_ID,"widget/loading_block");
-    public static final ResourceLocation POINTER_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/pointer_panel");
-    public static final ResourceLocation PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel");
-    public static final ResourceLocation PANEL_RECESS = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel_recess");
-    public static final ResourceLocation PANEL_TRANSLUCENT_RECESS = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel_translucent_recess");
-    public static final ResourceLocation ENTITY_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/entity_panel");
-    public static final ResourceLocation SQUARE_RECESSED_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/square_recessed_panel");
-    public static final ResourceLocation SQUARE_ENTITY_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/square_entity_panel");
+    public static final ResourceLocation MINECRAFT = ResourceLocation.tryBuild(Legacy4J.MOD_ID, "textures/gui/title/minecraft.png");
+    public static final ResourceLocation PANORAMA_DAY = ResourceLocation.tryBuild(Legacy4J.MOD_ID, "textures/gui/title/panorama_day.png");
+    public static final ResourceLocation PANORAMA_NIGHT = ResourceLocation.tryBuild(Legacy4J.MOD_ID, "textures/gui/title/panorama_night.png");
+
     public static void renderPointerPanel(GuiGraphics graphics, int x, int y, int width, int height){
         RenderSystem.enableBlend();
         RenderSystem.disableDepthTest();
-        graphics.blitSprite(POINTER_PANEL,x,y,width,height);
+        graphics.blitSprite(LegacySprites.POINTER_PANEL,x,y,width,height);
         RenderSystem.enableDepthTest();
         RenderSystem.disableBlend();
     }
-    public static void renderPanel(GuiGraphics graphics, int x, int y, int width, int height, float dp){
-      renderTiles(PANEL,graphics,x,y,width,height,dp);
-    }
-    public static void renderPanelRecess(GuiGraphics graphics, int x, int y, int width, int height, float dp){
-        renderTiles(PANEL_RECESS,graphics,x,y,width,height,dp);
-    }
-    public static void renderPanelTranslucentRecess(GuiGraphics graphics, int x, int y, int width, int height, float dp){
+    public static void renderPanelTranslucentRecess(GuiGraphics graphics, int x, int y, int width, int height){
         RenderSystem.enableBlend();
-        renderTiles(PANEL_TRANSLUCENT_RECESS,graphics,x,y,width,height,dp);
+        graphics.blitSprite(LegacySprites.PANEL_TRANSLUCENT_RECESS,x,y,width,height);
         RenderSystem.disableBlend();
-    }
-    public static void renderEntityPanel(GuiGraphics graphics, int x, int y, int width, int height, float dp){
-        renderTiles(ENTITY_PANEL,graphics,x,y,width,height,dp);
-    }
-    public static void renderSquareEntityPanel(GuiGraphics graphics, int x, int y, int width, int height, float dp){
-        renderTiles(SQUARE_ENTITY_PANEL,graphics,x,y,width,height,dp);
-    }
-    public static void renderSquareRecessedPanel(GuiGraphics graphics, int x, int y, int width, int height, float dp){
-        renderTiles(SQUARE_RECESSED_PANEL,graphics,x,y,width,height,dp);
     }
     public static void renderTiles(ResourceLocation location,GuiGraphics graphics, int x, int y, int width, int height, float dp){
         mc.getTextureManager().getTexture(GUI_ATLAS).bind();
@@ -97,12 +74,12 @@ public class ScreenUtil {
     public static void drawAutoSavingIcon(GuiGraphics graphics,int x, int y) {
         graphics.pose().pushPose();
         graphics.pose().scale(0.5F,0.5F,1);
-        graphics.blitSprite(SAVE_CHEST,x * 2,y * 2,48,48);
+        graphics.blitSprite(LegacySprites.SAVE_CHEST,x * 2,y * 2,48,48);
         graphics.pose().popPose();
         graphics.pose().pushPose();
         double heightAnim = (Util.getMillis() / 50D) % 11;
         graphics.pose().translate(x + 5.5,y - 8 - (heightAnim > 5 ? 10 - heightAnim : heightAnim),0);
-        graphics.blitSprite(SAVE_ARROW,0,0,13,16);
+        graphics.blitSprite(LegacySprites.SAVE_ARROW,0,0,13,16);
         graphics.pose().popPose();
     }
     public static void renderDefaultBackground(GuiGraphics guiGraphics){
@@ -114,20 +91,21 @@ public class ScreenUtil {
     public static boolean getActualLevelNight(){
         return (mc.getSingleplayerServer() != null&& mc.getSingleplayerServer().overworld() != null && mc.getSingleplayerServer().overworld().isNight()) || (mc.level!= null && mc.level.isNight());
     }
-    public static void renderDefaultBackground(GuiGraphics guiGraphics, boolean loading, boolean title){
-        if (mc.level == null || loading)
-            renderPanoramaBackground(guiGraphics, loading && getActualLevelNight());
+    public static void renderDefaultBackground(GuiGraphics guiGraphics, boolean forcePanorama, boolean title){
+        if (mc.level == null || forcePanorama)
+            renderPanoramaBackground(guiGraphics, forcePanorama && getActualLevelNight());
         else mc.screen.renderTransparentBackground(guiGraphics);
         if (title) {
-            TextureAtlasSprite sprite = Minecraft.getInstance().getGuiSprites().textureAtlas.texturesByName.get(MINECRAFT);
-            if (sprite == null)
+            if (Minecraft.getInstance().getResourceManager().getResource(MINECRAFT).isEmpty())
                 logoRenderer.renderLogo(guiGraphics, mc.screen == null ? 0 : mc.screen.width, 1.0F);
-            else try (SpriteContents contents = sprite.contents()) {
+            else {
+                RenderSystem.enableBlend();
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate((guiGraphics.guiWidth() - 285.5f) / 2, 30,0);
                 guiGraphics.pose().scale(0.5f,0.5f,0.5f);
-                    guiGraphics.blitSprite(MINECRAFT,(guiGraphics.guiWidth() - contents.width() / 2) / 2, 30, 571,138);
+                guiGraphics.blit(MINECRAFT,0, 0,0,0, 571,138,571,138);
                 guiGraphics.pose().popPose();
+                RenderSystem.disableBlend();
             }
 
         }
@@ -135,7 +113,7 @@ public class ScreenUtil {
     public static void renderPanoramaBackground(GuiGraphics guiGraphics, boolean isNight){
         RenderSystem.depthMask(false);
         Minecraft.getInstance().getTextureManager().getTexture(isNight ? PANORAMA_NIGHT : PANORAMA_DAY).setFilter(true, false);
-        guiGraphics.blit(isNight ? PANORAMA_NIGHT : PANORAMA_DAY, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() / 66.32f, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiHeight() * 820/144, guiGraphics.guiHeight());
+        guiGraphics.blit(isNight ? PANORAMA_NIGHT : PANORAMA_DAY, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() / 66.32f, 1, guiGraphics.guiWidth(), guiGraphics.guiHeight() + 2, guiGraphics.guiHeight() * 820/144, guiGraphics.guiHeight() + 2);
         RenderSystem.depthMask(true);
     }
     public static void drawOutlinedString(GuiGraphics graphics, Font font, Component component, int x, int y, int color, int outlineColor, float outline) {
@@ -144,7 +122,6 @@ public class ScreenUtil {
 
     }
     public static void drawStringOutline(GuiGraphics graphics, Font font, Component component, int x, int y, int outlineColor, float outline) {
-        outline/=2;
         float[] translations = new float[]{0,outline,-outline};
         for (float t : translations) {
             for (float t1 : translations) {
@@ -175,7 +152,7 @@ public class ScreenUtil {
         RenderSystem.disableBlend();
     }
     public static boolean hasClassicCrafting(){
-        return getLegacyOptions().classicCrafting().get();
+        return !isModEnabledOnServer() || getLegacyOptions().classicCrafting().get();
     }
     public static float getHUDScale(){
         return Math.max(1.5f,4 - getLegacyOptions().hudScale().get());
@@ -184,7 +161,7 @@ public class ScreenUtil {
         return 3f / ScreenUtil.getHUDScale()* (mc.gameMode.canHurtPlayer() ? 68 : 41);
     }
     public static double getHUDDistance(){
-        return -getLegacyOptions().hudDistance().value*(22.5D + (getLegacyOptions().inGameTooltips().get() ? 17.5D : 0));
+        return -getLegacyOptions().hudDistance().get()*(22.5D + (getLegacyOptions().inGameTooltips().get() ? 17.5D : 0));
     }
     public static float getHUDOpacity(){
         float f = (Util.getMillis() - lastHotbarSelectionChange)/ 1200f;
@@ -197,7 +174,7 @@ public class ScreenUtil {
         return getLegacyOptions().hudOpacity().get().floatValue();
     }
     public static int getDefaultTextColor(boolean forceWhite){
-        return (getLegacyOptions().forceYellowText().get() || hasProgrammerArt()) && !forceWhite ? 0xFFFF00 : 0xFFFFFF;
+        return  !forceWhite ? (getLegacyOptions().forceYellowText().get() || hasProgrammerArt()) ? 0xFFFF00 : CommonColor.HIGHLIGHTED_WIDGET_TEXT.get() : CommonColor.WIDGET_TEXT.get();
     }
     public static int getDefaultTextColor(){
         return getDefaultTextColor(false);
@@ -220,17 +197,17 @@ public class ScreenUtil {
         mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave));
     }
     public static void addTip(Entity entity){
-        if (hasTip(entity.getType())) LegacyTipManager.tips.add(new LegacyTip(entity.getType().getDescription(), ScreenUtil.getTip(entity.getType())));
+        if (hasTip(entity.getType())) LegacyTipManager.tips.add(()->new LegacyTip(entity.getType().getDescription(), ScreenUtil.getTip(entity.getType())));
         else if (entity.getPickResult() != null && !entity.getPickResult().isEmpty() && hasTip(entity.getPickResult())) addTip(entity.getPickResult());
     }
     public static void addTip(EntityType<?> entityType){
-        if (hasTip(entityType)) LegacyTipManager.tips.add(new LegacyTip(entityType.getDescription(), ScreenUtil.getTip(entityType)));
+        if (hasTip(entityType)) LegacyTipManager.tips.add(()->new LegacyTip(entityType.getDescription(), ScreenUtil.getTip(entityType)));
     }
     public static void addCustomTip(Component title, Component tip, ItemStack stack, long time){
-        LegacyTipManager.tips.add((title.getString().isEmpty() && tip.getString().isEmpty() && !stack.isEmpty() ?  new LegacyTip(stack) : new LegacyTip(title,tip).itemStack(stack)).disappearTime(time));
+        LegacyTipManager.tips.add(()->(title.getString().isEmpty() && tip.getString().isEmpty() && !stack.isEmpty() ? new LegacyTip(stack) : new LegacyTip(title,tip).itemStack(stack)).disappearTime(time));
     }
     public static void addTip(ItemStack stack){
-        if (hasTip(stack)) LegacyTipManager.tips.add(new LegacyTip(stack));
+        if (hasTip(stack)) LegacyTipManager.tips.add(()->new LegacyTip(stack));
     }
     public static Component getTip(ItemStack item){
         return hasValidTipOverride(item) ? LegacyTipOverride.getOverride(item) : Component.translatable(getTipId(item));
@@ -275,7 +252,7 @@ public class ScreenUtil {
             float alpha = l >= v - 100  ? (l <= v ? l / v: (n - l) / 200f) : 0;
             if (alpha > 0) {
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
-                graphics.blitSprite(LOADING_BLOCK, x+ (i <= 2 ? i : i >= 4 ? i == 7 ? 0 : 6 - i : 2) * 27, y + (i <= 2 ? 0 : i == 3 || i == 7 ? 1 : 2)* 27, 21, 21);
+                graphics.blitSprite(LegacySprites.LOADING_BLOCK, x+ (i <= 2 ? i : i >= 4 ? i == 7 ? 0 : 6 - i : 2) * 27, y + (i <= 2 ? 0 : i == 3 || i == 7 ? 1 : 2)* 27, 21, 21);
             }
         }
         RenderSystem.disableBlend();
@@ -324,13 +301,13 @@ public class ScreenUtil {
         double yCorner = holder.getYCorner() + holder.offset.y();
         return (d -= leftPos) >= xCorner && d < (xCorner + width) && (e -= topPos) >= yCorner && e < (yCorner + height);
     }
-    public static void renderEntity(GuiGraphics guiGraphics, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, LivingEntity livingEntity) {
-        renderEntity(guiGraphics,x,y,size,partialTicks,vector3f,quaternionf,quaternionf2,livingEntity,false);
+    public static void renderEntity(GuiGraphics guiGraphics, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity) {
+        renderEntity(guiGraphics,x,y,size,partialTicks,vector3f,quaternionf,quaternionf2,entity,false);
     }
-    public static void renderEntity(GuiGraphics guiGraphics, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, LivingEntity livingEntity, boolean forceSize) {
+    public static void renderEntity(GuiGraphics guiGraphics, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity, boolean forceSize) {
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(x, y, 50.0);
-        float h = forceSize ? Math.max(1f,Math.max(livingEntity.getBbWidth(), livingEntity.getBbHeight())) : 1;
+        float h = forceSize ? Math.max(1f,Math.max(entity.getBbWidth(), entity.getBbHeight())) : 1;
         guiGraphics.pose().mulPose(new Matrix4f().scaling(size / h, size / h, -size / h));
         guiGraphics.pose().translate(vector3f.x, vector3f.y, vector3f.z);
         guiGraphics.pose().mulPose(quaternionf);
@@ -341,16 +318,22 @@ public class ScreenUtil {
             entityRenderDispatcher.overrideCameraOrientation(quaternionf2);
         }
         entityRenderDispatcher.setRenderShadow(false);
-        RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(livingEntity, 0.0, 0.0, 0.0, 0.0f, partialTicks, guiGraphics.pose(), guiGraphics.bufferSource(), 0xF000F0));
+        RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0f, partialTicks, guiGraphics.pose(), guiGraphics.bufferSource(), 0xF000F0));
         guiGraphics.flush();
         entityRenderDispatcher.setRenderShadow(true);
         guiGraphics.pose().popPose();
         Lighting.setupFor3DItems();
     }
-
+    public static int getStandardHeight(){
+        return Math.round(mc.getWindow().getHeight() / 180f) * 180;
+    }
     public static float getTextScale(){
-        return getLegacyOptions().legacyItemTooltips().get() ? Math.max(2/3f,Math.min((float) Math.sqrt(1280f / mc.getWindow().getScreenWidth() * 720f / mc.getWindow().getScreenHeight()),4/3f)) : 1.0f;
+        return getLegacyOptions().legacyItemTooltips().get() ? Math.max(2/3f,Math.min(720f/getStandardHeight(),4/3f)) : 1.0f;
     }
 
 
+    public static Component getDimensionName(ResourceKey<Level> dimension){
+        String s = dimension.location().toLanguageKey("dimension");
+        return Component.translatable(hasTip(s) ? s : "dimension.minecraft");
+    }
 }

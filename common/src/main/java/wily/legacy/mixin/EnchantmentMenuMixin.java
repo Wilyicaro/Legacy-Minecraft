@@ -16,7 +16,7 @@ public class EnchantmentMenuMixin {
         return LegacySlotDisplay.override(originalSlot, 19, 66, new LegacySlotDisplay() {
             @Override
             public ResourceLocation getIconSprite() {
-                return LegacySprites.ENCHANTING_SLOT;
+                return originalSlot.hasItem() ? null : LegacySprites.ENCHANTING_SLOT;
             }
         });
     }

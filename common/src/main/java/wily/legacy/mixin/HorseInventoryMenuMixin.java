@@ -38,7 +38,7 @@ public class HorseInventoryMenuMixin {
     }
     @ModifyArg(method = "<init>",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/HorseInventoryMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 2))
     private Slot addSlotThird(Slot originalSlot){
-        return LegacySlotDisplay.override(originalSlot, 98 + (originalSlot.getContainerSlot() - 2) % ((AbstractChestedHorse)horse).getInventoryColumns()  * 21,21 + (originalSlot.getContainerSlot() - 2) / ((AbstractChestedHorse)horse).getInventoryColumns() * 21);
+        return LegacySlotDisplay.override(originalSlot, 98 + (originalSlot.getContainerSlot() - 1) % ((AbstractChestedHorse)horse).getInventoryColumns()  * 21,21 + (originalSlot.getContainerSlot() - 1) / ((AbstractChestedHorse)horse).getInventoryColumns() * 21);
     }
     @ModifyArg(method = "<init>",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/HorseInventoryMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 3))
     private Slot addInventorySlots(Slot originalSlot){

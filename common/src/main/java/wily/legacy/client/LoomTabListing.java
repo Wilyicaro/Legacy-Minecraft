@@ -55,7 +55,7 @@ public class LoomTabListing {
         protected List<LoomTabListing> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
             List<LoomTabListing> listings = new ArrayList<>();
             ResourceManager manager = Minecraft.getInstance().getResourceManager();
-            manager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1)).forEach(name->manager.getResource(new ResourceLocation(name, LOOM_TAB_LISTING)).ifPresent(r->{
+            JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(ResourceLocation.tryBuild(name, LOOM_TAB_LISTING)).ifPresent(r->{
                 try {
                     BufferedReader bufferedReader = r.openAsReader();
                     JsonObject obj = GsonHelper.parse(bufferedReader);
@@ -64,10 +64,10 @@ public class LoomTabListing {
                             JsonElement listingElement = go.get("listing");
                             listings.stream().filter(l-> c.equals(l.id)).findFirst().ifPresentOrElse(l->{
                                 ifJsonStringNotNull(go,"displayName", Component::translatable, n-> l.displayName = n);
-                                ifJsonStringNotNull(go,"patternIcon", ResourceLocation::new, n-> l.patternIcon = ResourceKey.create(Registries.BANNER_PATTERN, n));
+                                ifJsonStringNotNull(go,"patternIcon", ResourceLocation::parse, n-> l.patternIcon = ResourceKey.create(Registries.BANNER_PATTERN, n));
                                 addBannerPatternsFromJson(l.patterns,listingElement);
                             }, ()->{
-                                LoomTabListing listing = new LoomTabListing(c,getJsonStringOrNull(go,"displayName",Component::translatable),getJsonStringOrNull(go,"patternIcon",l-> ResourceKey.create(Registries.BANNER_PATTERN, new ResourceLocation(l))));
+                                LoomTabListing listing = new LoomTabListing(c,getJsonStringOrNull(go,"displayName",Component::translatable),getJsonStringOrNull(go,"patternIcon",l-> ResourceKey.create(Registries.BANNER_PATTERN, ResourceLocation.parse(l))));
                                 addBannerPatternsFromJson(listing.patterns,listingElement);
                                 listings.add(listing);
                             });
@@ -83,7 +83,7 @@ public class LoomTabListing {
 
         public static void addBannerPatternsFromJson(List<ResourceKey<BannerPattern>> groups, JsonElement element){
             if (element instanceof JsonArray a) a.forEach(e->{
-                if (e instanceof JsonPrimitive p && p.isString()) groups.add(ResourceKey.create(Registries.BANNER_PATTERN, new ResourceLocation(p.getAsString())));
+                if (e instanceof JsonPrimitive p && p.isString()) groups.add(ResourceKey.create(Registries.BANNER_PATTERN, ResourceLocation.parse(p.getAsString())));
             });
         }
         @Override

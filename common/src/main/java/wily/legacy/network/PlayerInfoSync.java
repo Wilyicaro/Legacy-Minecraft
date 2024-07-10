@@ -1,13 +1,12 @@
 package wily.legacy.network;
 
 import com.mojang.authlib.GameProfile;
-import dev.architectury.networking.NetworkManager;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
-import wily.legacy.Legacy4J;
+import net.minecraft.world.level.GameType;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.player.LegacyPlayer;
 import wily.legacy.player.LegacyPlayerInfo;
@@ -18,7 +17,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public record PlayerInfoSync(int type, UUID player) implements CommonPacket {
+public record PlayerInfoSync(int type, UUID player) implements CommonNetwork.Packet {
     public PlayerInfoSync(RegistryFriendlyByteBuf buf){
         this(buf.readVarInt(),buf.readUUID());
     }
@@ -47,24 +46,23 @@ public record PlayerInfoSync(int type, UUID player) implements CommonPacket {
         return rules;
     }
     @Override
-    public void apply(NetworkManager.PacketContext ctx) {
-        Player p = ctx.getPlayer();
-        if (p instanceof ServerPlayer sp) {
+    public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> p) {
+        if (p.get() instanceof ServerPlayer sp) {
             sp = sp.server.getPlayerList().getPlayer(player);
             if (sp == null) return;
-            if (type == 0) CommonNetworkManager.sendToPlayer(sp, new HostOptions(sp.server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().getId(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(sp.server.getGameRules())));
+            if (type == 0) CommonNetwork.sendToPlayer(sp, new All(sp.server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().getId(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(sp.server.getGameRules()),sp.server.getDefaultGameType()));
             else if (type <= 2) ((LegacyPlayer) sp).setCrafting(type == 1);
             else if (type <= 4) ((LegacyPlayerInfo)sp).setDisableExhaustion(type == 3);
             else if (type <= 6) ((LegacyPlayerInfo)sp).setMayFlySurvival(type == 5);
         }
     }
-    public record HostOptions(Map<UUID, LegacyPlayerInfo> players, Map<String,Object> gameRules) implements CommonPacket {
-        public HostOptions(FriendlyByteBuf buf){
+    public record All(Map<UUID, LegacyPlayerInfo> players, Map<String,Object> gameRules,GameType defaultGameType) implements CommonNetwork.Packet {
+        public All(FriendlyByteBuf buf){
             this(buf.readMap(HashMap::new, b->b.readUUID(), LegacyPlayerInfo::fromNetwork), buf.readMap(HashMap::new, FriendlyByteBuf::readUtf, b->{
                 int type = b.readVarInt();
                 if (type == 0) return b.readBoolean();
                 else return b.readVarInt();
-            }));
+            }),buf.readEnum(GameType.class));
         }
         @Override
         public void encode(RegistryFriendlyByteBuf buf) {
@@ -74,14 +72,15 @@ public record PlayerInfoSync(int type, UUID player) implements CommonPacket {
                 if (obj instanceof Boolean bol)  b.writeBoolean(bol);
                 else if (obj instanceof  Integer i) b.writeVarInt(i);
             });
+            buf.writeEnum(defaultGameType);
         }
 
         @Override
-        public void apply(NetworkManager.PacketContext ctx) {
-            Player p = ctx.getPlayer();
-            if (p.level().isClientSide){
+        public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> p) {
+            if (p.get().level().isClientSide){
+                Legacy4JClient.defaultServerGameType = defaultGameType;
                 Legacy4JClient.updateLegacyPlayerInfos(players);
-                GameRules displayRules = p.level().getGameRules();
+                GameRules displayRules = p.get().level().getGameRules();
                 GameRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
                     @Override
                     public <T extends GameRules.Value<T>> void visit(GameRules.Key<T> key, GameRules.Type<T> type) {

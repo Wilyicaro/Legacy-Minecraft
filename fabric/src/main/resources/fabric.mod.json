@@ -12,7 +12,8 @@
     "omo50"
   ],
   "contact": {
-    "sources": "${mod_source}"
+    "sources": "${mod_source}",
+    "issues": "${mod_issues}"
   },
   "license": "${mod_license}",
   "icon": "logo.png",
@@ -31,8 +32,7 @@
   ],
   "depends": {
     "fabric": "*",
-    "minecraft": ">=1.20.2",
-    "architectury": ">=${architectury_version}"
+    "minecraft": ">=1.20.2"
   },
   "breaks": {
     "bedrockwaters": "*",
@@ -45,7 +45,6 @@
     "vulkanmod": "*",
     "lemclienthelper": "*",
     "sodium-extra": "*",
-    "reeses-sodium-options": "*",
-    "modmenu": "*"
+    "reeses-sodium-options": "*"
   }
 }

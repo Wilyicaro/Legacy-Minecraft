@@ -60,7 +60,7 @@
             ]
         },
         {
-            "name": "legacy:washout",
+            "name": "gamma",
             "intarget": "swap",
             "outtarget": "minecraft:main"
         }

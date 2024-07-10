@@ -6,16 +6,16 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import wily.legacy.Legacy4J;
 import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.init.LegacySoundEvents;
-import wily.legacy.network.CommonNetworkManager;
-import wily.legacy.network.ServerInventoryCraftPacket;
+import wily.legacy.init.LegacyRegistries;
+import wily.legacy.network.CommonNetwork;
+import wily.legacy.network.ServerMenuCraftPacket;
 import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
 
@@ -106,15 +106,18 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
         if (isFocused()){
             if (canCraft()){
                 ScreenUtil.playSimpleUISound(SoundEvents.ITEM_PICKUP,1.0f);
-                CommonNetworkManager.sendToServer(new ServerInventoryCraftPacket(getIngredientsGrid(), getResultStack(),-1,Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
+                CommonNetwork.sendToServer(new ServerMenuCraftPacket(getRecipeId(),getIngredientsGrid(),-1,Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
                 updateRecipe();
-            }else ScreenUtil.playSimpleUISound(LegacySoundEvents.CRAFT_FAIL.get(),1.0f);
+            }else ScreenUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
         }
+    }
+    public ResourceLocation getRecipeId(){
+        return ServerMenuCraftPacket.EMPTY;
     }
     public boolean mouseScrolled(double d, double e, double f, double g) {
         int i = (int)Math.signum(g);
         if (isFocused() && !nextItem.isEmpty() && i > 0 || !previousItem.isEmpty() && i < 0 ){
-            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
+            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
             itemIcon = i > 0 ? nextItem : previousItem;
             updateRecipe();
             return true;
@@ -159,7 +162,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
             return true;
         }
         if (!nextItem.isEmpty() && i == 265 || !previousItem.isEmpty() && i == 264){
-            ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(), 1.0f);
+            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
             itemIcon = i == 265 ? nextItem : previousItem;
             updateRecipe();
             return true;

@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
 import wily.legacy.client.LegacyBiomeOverride;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.function.Consumer;
@@ -75,7 +76,7 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
         panel.height = Math.min(height,248);
         addRenderableOnly(panel);
         panel.init();
-        addRenderableOnly(((guiGraphics, i, j, f) -> ScreenUtil.renderPanelRecess(guiGraphics, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14, 2)));
+        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.blitSprite(LegacySprites.PANEL_RECESS, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14)));
         getRenderableVList().init(this,panel.x + 11,panel.y + 11,260, panel.height - 5);
     }
 

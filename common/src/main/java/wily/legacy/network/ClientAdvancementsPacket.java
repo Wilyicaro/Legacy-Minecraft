@@ -1,16 +1,14 @@
 package wily.legacy.network;
 
-import dev.architectury.networking.NetworkManager;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementTree;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
-public record ClientAdvancementsPacket(List<AdvancementHolder> collection) implements CommonPacket{
+public record ClientAdvancementsPacket(List<AdvancementHolder> collection) implements CommonNetwork.Packet {
     public static AdvancementTree advancementTree = new AdvancementTree();
 
     public ClientAdvancementsPacket(RegistryFriendlyByteBuf buf) {
@@ -23,7 +21,7 @@ public record ClientAdvancementsPacket(List<AdvancementHolder> collection) imple
     }
 
     @Override
-    public void apply(NetworkManager.PacketContext ctx) {
+    public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> p) {
         advancementTree.clear();
         advancementTree.addAll(collection);
     }

@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
@@ -59,9 +60,9 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         super.renderLabels(guiGraphics, i, j);
         Component ingredient = Component.translatable("legacy.container.ingredient");
-        guiGraphics.drawString(this.font, ingredient, 70 - font.width(ingredient), 32, 0x383838, false);
+        guiGraphics.drawString(this.font, ingredient, 70 - font.width(ingredient), 32, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         Component fuel = Component.translatable("legacy.container.fuel");
-        guiGraphics.drawString(this.font, fuel, 70 - font.width(fuel), 79, 0x383838, false);
+        guiGraphics.drawString(this.font, fuel, 70 - font.width(fuel), 79, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
 
     @Override
@@ -72,7 +73,7 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
+        guiGraphics.blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 77,topPos + 48,0);
         guiGraphics.pose().scale(19/13f,19/13f,1.0f);

@@ -5,18 +5,16 @@ import net.minecraft.client.gui.components.toasts.RecipeToast;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.client.Offset;
+import wily.legacy.util.LegacySprites;
+import wily.legacy.util.Offset;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
@@ -60,7 +58,7 @@ public abstract class RecipeToastMixin implements Toast {
         guiGraphics.drawString(toastComponent.getMinecraft().font, DESCRIPTION_TEXT, (width() - toastComponent.getMinecraft().font.width(DESCRIPTION_TEXT)) / 2 , 18, 0xFFFFFF);
         RecipeHolder<?> recipeHolder = this.recipes.get((int)((double)l / Math.max(1.0, 5000.0 * toastComponent.getNotificationDisplayTimeMultiplier() / (double)this.recipes.size()) % (double)this.recipes.size()));
         ScreenUtil.iconHolderRenderer.itemHolder(8,(height() - 27) / 2,27,27,recipeHolder.value().getToastSymbol(),false, Offset.ZERO).renderItem(guiGraphics,0,0,0);
-        ScreenUtil.renderPanel(guiGraphics,width() - 36,(height() - 28) / 2,28,28,2f);
+        guiGraphics.blitSprite(LegacySprites.SMALL_PANEL,width() - 36,(height() - 28) / 2,28,28);
         guiGraphics.renderItem(recipeHolder.value().getResultItem(toastComponent.getMinecraft().level.registryAccess()) ,width() - 30, (height() - 16) / 2);
         cir.setReturnValue((double)(l - this.lastChanged) >= 5000.0 * toastComponent.getNotificationDisplayTimeMultiplier() ? Toast.Visibility.HIDE : Toast.Visibility.SHOW);
     }

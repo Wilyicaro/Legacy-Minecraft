@@ -11,6 +11,6 @@ import wily.legacy.util.ScreenUtil;
 public class ClientPersistentEntitySectionManagerMixin {
     @Inject(method = "processUnloads", at = @At("HEAD"), cancellable = true)
     private void processUnloads(CallbackInfo ci){
-        if (!ScreenUtil.getLegacyOptions().autoSave().get()) ci.cancel();
+        if (ScreenUtil.getLegacyOptions().autoSaveInterval().get() == 0) ci.cancel();
     }
 }

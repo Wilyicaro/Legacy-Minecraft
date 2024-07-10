@@ -4,15 +4,12 @@
   "compatibilityLevel": "JAVA_17",
   "client": [
     "AbstractContainerScreenMixin",
-    "GuiGraphicsMixin",
     "GuiMixin",
     "MinecraftMixin",
-    "TitleScreenMixin",
     "TooltipRenderUtilMixin"
   ],
   "mixins": [
-    "ItemStackMixin",
-    "LivingEntityMixin"
+    "ItemStackMixin"
   ],
   "injectors": {
     "defaultRequire": 1

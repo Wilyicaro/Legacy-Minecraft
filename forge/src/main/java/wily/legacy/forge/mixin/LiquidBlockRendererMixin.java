@@ -18,9 +18,9 @@ import wily.legacy.client.LegacyBiomeOverride;
 
 @Mixin(LiquidBlockRenderer.class)
 public class LiquidBlockRendererMixin {
-    @Redirect(method = "tesselate",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/LiquidBlockRenderer;vertex(Lcom/mojang/blaze3d/vertex/VertexConsumer;DDDFFFFFFI)V", remap = false))
-    public void tesselate(LiquidBlockRenderer instance, VertexConsumer vertexConsumer, double d, double e, double f, float g, float h, float i, float alpha, float j, float k, int l, BlockAndTintGetter getter, BlockPos pos, VertexConsumer arg3, BlockState state, FluidState arg5) {
+    @Redirect(method = "tesselate",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/LiquidBlockRenderer;vertex(Lcom/mojang/blaze3d/vertex/VertexConsumer;FFFFFFFFIF)V", remap = false))
+    public void tesselate(LiquidBlockRenderer renderer,VertexConsumer vertexConsumer, float d, float e, float f, float g, float h, float i, float j, float k, int l, float alpha, BlockAndTintGetter getter, BlockPos pos, VertexConsumer arg3, BlockState state, FluidState arg5) {
         LevelReader reader = getter instanceof RenderChunkRegion r ? r.level : getter instanceof LevelAccessor a ? a : null;
-        vertexConsumer.vertex(d, e, f).color(g, h, i,arg5.is(FluidTags.WATER) ?  LegacyBiomeOverride.getOrDefault(reader.getBiome(pos).unwrapKey()).waterTransparency() : alpha).uv(j, k).uv2(l).normal(0.0f, 1.0f, 0.0f).endVertex();
+        vertexConsumer.addVertex(d, e, f).setColor(g, h, i,arg5.is(FluidTags.WATER) ?  LegacyBiomeOverride.getOrDefault(reader.getBiome(pos).unwrapKey()).waterTransparency() : alpha).setUv(j, k).setLight(l).setNormal(0.0f, 1.0f, 0.0f);
     }
 }

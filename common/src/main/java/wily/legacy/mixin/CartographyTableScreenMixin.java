@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.client.CommonColor;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.inventory.RenameItemMenu;
 import wily.legacy.util.ScreenUtil;
@@ -104,9 +105,9 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
 
     public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         super.renderLabels(guiGraphics, i, j);
-        guiGraphics.drawString(font,MAP_NAME,10,27,0x383838,false);
+        guiGraphics.drawString(font,MAP_NAME,10,27, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
         Component cartographyAction = getCartographyAction();
-        if (cartographyAction != null) guiGraphics.drawString(font,cartographyAction,(imageWidth - font.width(cartographyAction)) / 2,130,0x383838,false);
+        if (cartographyAction != null) guiGraphics.drawString(font,cartographyAction,(imageWidth - font.width(cartographyAction)) / 2,130,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
 
     }
 
@@ -114,15 +115,16 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    public void resize(Minecraft minecraft, int i, int j) {
+    @Override
+    public void repositionElements() {
         String string = this.name.getValue();
-        this.init(minecraft, i, j);
+        super.repositionElements();
         this.name.setValue(string);
     }
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
+        guiGraphics.blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
         name.render(guiGraphics, i, j, f);
         guiGraphics.blitSprite(LegacySprites.COMBINER_PLUS,leftPos + 14, topPos + 88,13,13);
         ItemStack input2 = menu.getSlot(1).getItem();

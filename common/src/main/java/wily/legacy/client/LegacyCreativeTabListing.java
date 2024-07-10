@@ -2,6 +2,7 @@ package wily.legacy.client;
 
 import com.google.gson.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
@@ -21,6 +22,7 @@ import net.minecraft.world.item.InstrumentItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.screen.LegacyTabButton;
 import wily.legacy.util.CompoundTagUtil;
 import wily.legacy.util.JsonUtil;
 
@@ -31,9 +33,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-public record LegacyCreativeTabListing(Component name, ResourceLocation icon, DataComponentPatch itemPatch, List<Supplier<ItemStack>> displayItems) {
+public record LegacyCreativeTabListing(Component name, Function<LegacyTabButton, Renderable> icon, List<Supplier<ItemStack>> displayItems) {
     public static final List<LegacyCreativeTabListing> list = new ArrayList<>();
     private static final String LISTING = "creative_tab_listing.json";
     public static void rebuildVanillaCreativeTabsItems(Minecraft minecraft){
@@ -42,23 +45,22 @@ public record LegacyCreativeTabListing(Component name, ResourceLocation icon, Da
     public static class Manager extends SimplePreparableReloadListener<List<LegacyCreativeTabListing>> {
 
         public Manager(){
-            JsonUtil.COMMON_ITEMS.put(new ResourceLocation("ominous_banner"), ()-> {
+            JsonUtil.COMMON_ITEMS.put(ResourceLocation.parse("ominous_banner"), ()-> {
                 if (Minecraft.getInstance().getConnection() == null) return ItemStack.EMPTY;
                 return Raid.getLeaderBannerInstance(Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN));
             });
-            BuiltInRegistries.INSTRUMENT.holders().forEach(h-> JsonUtil.COMMON_ITEMS.put(h.key().location(),()->new ItemStack(Items.GOAT_HORN.arch$holder(),1, DataComponentPatch.builder().set(DataComponents.INSTRUMENT,h).build())));
         }
         @Override
         protected List<LegacyCreativeTabListing> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
             List<LegacyCreativeTabListing> creativeTabListing = new ArrayList<>();
-            resourceManager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1)).forEach(name->{
-                resourceManager.getResource(new ResourceLocation(name,LISTING)).ifPresent(r->{
+            JsonUtil.getOrderedNamespaces(resourceManager).forEach(name->{
+                resourceManager.getResource(ResourceLocation.tryBuild(name,LISTING)).ifPresent(r->{
                     try {
                         BufferedReader bufferedReader = r.openAsReader();
                         JsonObject obj = GsonHelper.parse(bufferedReader);
                         obj.asMap().forEach((s,element)->{
                             if (element instanceof JsonObject tabObj) {
-                                LegacyCreativeTabListing l = new LegacyCreativeTabListing(Component.translatable(s),new ResourceLocation(GsonHelper.getAsString(tabObj,"icon")), tabObj.has("components") ? JsonUtil.getComponentsFromJson(tabObj.getAsJsonObject("components")) : null, new ArrayList<>());
+                                LegacyCreativeTabListing l = new LegacyCreativeTabListing(Component.translatable(s),JsonUtil.getJsonLegacyTabButtonIconOrNull(tabObj), new ArrayList<>());
                                 if (tabObj.get("listing") instanceof JsonArray a) a.forEach(e -> l.displayItems.add(JsonUtil.getItemFromJson(e,true)));
                                 creativeTabListing.add(l);
                             }
