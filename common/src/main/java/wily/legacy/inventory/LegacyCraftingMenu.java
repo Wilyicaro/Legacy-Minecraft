@@ -41,13 +41,14 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
 
     public static LegacyCraftingMenu craftingMenu(Inventory inventory, @Nullable MenuType<?> menuType, int i, BlockPos pos, int gridDimension){
         return new LegacyCraftingMenu(inventory,menuType,i,pos) {
+            CraftingRecipe customRcp;
             final CraftingContainer container = new TransientCraftingContainer(this,gridDimension,gridDimension);
             final List<Ingredient> ingredientsGrid = new ArrayList<>(Collections.nCopies(gridDimension * gridDimension,Ingredient.EMPTY));
 
             @Override
             public void onCraft(Player player, ServerMenuCraftPacket packet, ItemStack result) {
                 super.onCraft(player, packet, result);
-                player.level().getRecipeManager().byKey(packet.craftId()).ifPresent(h-> player.triggerRecipeCrafted(h,container.getItems()));
+                player.level().getRecipeManager().byKey(customRcp == null ? packet.craftId() : customRcp.getId()).ifPresent(h-> player.triggerRecipeCrafted(h,container.getItems()));
             }
 
             @Override
