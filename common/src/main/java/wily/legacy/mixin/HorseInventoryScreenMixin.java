@@ -47,5 +47,6 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
     }
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+        renderBg(guiGraphics, f, i, j);
     }
 }
