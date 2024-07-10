@@ -5,15 +5,12 @@
   "client": [
     "AbstractContainerScreenMixin",
     "ForgeGuiMixin",
-    "GuiGraphicsMixin",
     "GuiMixin",
     "MinecraftMixin",
-    "TitleScreenMixin",
     "TooltipRenderUtilMixin"
   ],
   "mixins": [
-    "ItemStackMixin",
-    "LivingEntityMixin"
+    "ItemStackMixin"
   ],
   "injectors": {
     "defaultRequire": 1

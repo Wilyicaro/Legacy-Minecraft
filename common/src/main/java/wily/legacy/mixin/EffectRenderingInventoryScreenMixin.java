@@ -50,19 +50,21 @@ public abstract class EffectRenderingInventoryScreenMixin extends AbstractContai
         int y = topPos + imageHeight - 28;
         for (MobEffectInstance mobEffectInstance : iterable) {
             ScreenUtil.renderPointerPanel(guiGraphics,x,y,bl ? 129 : 28, 28);
-            guiGraphics.drawString(this.font, this.getEffectName(mobEffectInstance), x + 25, y + 7, 0xFFFFFF);
-            guiGraphics.drawString(this.font, MobEffectUtil.formatDuration(mobEffectInstance, 1.0f, this.minecraft.level.tickRateManager().tickrate()), x + 25, y + 17, 0x7F7F7F);
+            if (bl) {
+                guiGraphics.drawString(this.font, this.getEffectName(mobEffectInstance), x + 25, y + 7, 0xFFFFFF);
+                guiGraphics.drawString(this.font, MobEffectUtil.formatDuration(mobEffectInstance, 1.0f, this.minecraft.level.tickRateManager().tickrate()), x + 25, y + 17, 0x7F7F7F);
+            }
             guiGraphics.blit(x + (bl ? 3 : 5), y + 5, 0, 18, 18, minecraft.getMobEffectTextures().get(mobEffectInstance.getEffect()));
             y -= m;
         }
         if (!bl && i >= x && i <= x + 28) {
-            int n = this.topPos;
+            int n = topPos + imageHeight - 28;
             MobEffectInstance mobEffectInstance = null;
             for (MobEffectInstance mobEffectInstance2 : iterable) {
                 if (j >= n && j <= n + m) {
                     mobEffectInstance = mobEffectInstance2;
                 }
-                n += m;
+                n -= m;
             }
             if (mobEffectInstance != null) {
                 List<Component> list = List.of(this.getEffectName(mobEffectInstance), MobEffectUtil.formatDuration(mobEffectInstance, 1.0f, this.minecraft.level.tickRateManager().tickrate()));

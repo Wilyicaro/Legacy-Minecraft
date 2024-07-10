@@ -1,34 +1,29 @@
 package wily.legacy.util;
 
 import com.google.gson.*;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import dev.architectury.registry.registries.Registrar;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.nbt.TagParser;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
-import wily.legacy.Legacy4J;
-import wily.legacy.client.RecipeValue;
+import wily.legacy.client.screen.LegacyTabButton;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.*;
+import java.util.stream.Stream;
 
 public class JsonUtil {
+    public static final Map<ResourceLocation, Supplier<ItemStack>> COMMON_ITEMS = new HashMap<>();
+    public static final Map<JsonElement,ItemStack> JSON_ITEMS = new ConcurrentHashMap<>();
     public static <T> Predicate<T> registryMatches(Registry<T> registry, JsonObject o) {
         String name = registry.key().location().getPath();
         if (!o.has(name) && !o.has(name + "s")) return t -> false;
@@ -59,28 +54,22 @@ public class JsonUtil {
     }
 
     public static BiPredicate<Item, CompoundTag> registryMatchesItem(JsonObject o){
-        CompoundTag tag;
-        if (o.get("nbt") instanceof JsonPrimitive p && p.isString()) {
-            try {
-                tag = TagParser.parseTag(p.getAsString());
-            } catch (CommandSyntaxException ex) {
-                throw new JsonSyntaxException("Invalid nbt tag: " + ex.getMessage());
-            }
-        } else tag = null;
+        CompoundTag tag = o.get("nbt") instanceof JsonPrimitive p && p.isString() ? CompoundTagUtil.parseCompoundTag(p.getAsString()) : null;
         Predicate<Item> p = registryMatches(BuiltInRegistries.ITEM,o);
         return (item, t) -> p.test(item) && NbtUtils.compareNbt(tag, t, true);
     }
-    public static ItemStack getItemFromJson(JsonElement element, boolean allowNbt){
+    public static Supplier<ItemStack> getItemFromJson(JsonElement element, boolean allowNbt){
         JsonElement itemElement = element;
-        if (element instanceof JsonObject o) itemElement = o.get("item");
-        if (itemElement instanceof JsonPrimitive j && j.isString() && BuiltInRegistries.ITEM.containsKey(new ResourceLocation(j.getAsString()))) {
-            ItemStack i = new ItemStack(BuiltInRegistries.ITEM.get(new ResourceLocation(j.getAsString())));
-            if (allowNbt && element instanceof JsonObject o && o.get("nbt") instanceof JsonPrimitive p && p.isString()) {
-                i.setTag(CompoundTagUtil.parseCompoundTag(p.getAsString()));
-            }
-            return i;
+        if (element instanceof JsonObject o){
+            if (o.has("common_item")) return COMMON_ITEMS.getOrDefault(ResourceLocation.tryParse(GsonHelper.getAsString(o, "common_item")),()-> ItemStack.EMPTY);
+            itemElement = o.get("item");
         }
-        return ItemStack.EMPTY;
+        if (itemElement instanceof JsonPrimitive j && j.isString() && BuiltInRegistries.ITEM.containsKey(new ResourceLocation(j.getAsString()))) {
+            ItemStack item = BuiltInRegistries.ITEM.get(new ResourceLocation(j.getAsString())).getDefaultInstance();
+            if (allowNbt && element instanceof JsonObject o && o.get("nbt") instanceof JsonPrimitive p) item.setTag(CompoundTagUtil.parseCompoundTag(p.getAsString()));
+            return ()-> JSON_ITEMS.computeIfAbsent(element, e-> item);
+        }
+        return ()-> ItemStack.EMPTY;
     }
 
     public static <C extends Container, T extends Recipe<C>> void addGroupedRecipeValuesFromJson(Map<String,List<RecipeValue<C,T>>> groups, JsonElement element){
@@ -104,6 +93,22 @@ public class JsonUtil {
     public static <K,V> void addMapListEntry(Map<K,List<V>> map, K key, V entry){
         map.computeIfAbsent(key,k-> new ArrayList<>()).add(entry);
     }
+    public static Function<LegacyTabButton, Renderable> getJsonLegacyTabButtonIconOrNull(JsonObject object){
+        if (!object.has("icon")) return null;
+        String type = GsonHelper.getAsString(object,"iconType","sprite");
+        switch (type){
+            case "item"-> {
+                Supplier<ItemStack> stack = getItemFromJson(object.get("icon"),true);
+                return t-> LegacyTabButton.iconOf(stack.get()).apply(t);
+            }
+            case "sprite"-> {
+                return getJsonStringOrNull(object,"icon",s->LegacyTabButton.iconOf(new ResourceLocation(s)));
+            }
+            default -> {
+                return null;
+            }
+        }
+    }
 
     public static <T> T getJsonStringOrNull(JsonObject object, String element, Function<String,T> constructor){
         String s = GsonHelper.getAsString(object,element, null);
@@ -113,5 +118,19 @@ public class JsonUtil {
     public static <T> void ifJsonStringNotNull(JsonObject object, String element, Function<String,T> constructor, Consumer<T> consumer){
         T obj = getJsonStringOrNull(object,element,constructor);
         if  (obj != null) consumer.accept(obj);
+    }
+    public static Stream<String> getOrderedNamespaces(ResourceManager manager){
+        return manager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1));
+    }
+
+    public static Integer optionalJsonColor(JsonObject object, String element, Integer fallback) {
+        return optionalJsonColor(object.get(element),fallback);
+    }
+    public static Integer optionalJsonColor(JsonElement element, Integer fallback) {
+        if (element instanceof JsonPrimitive p){
+            if (p.isString() && p.getAsString().startsWith("#")) return (int) Long.parseLong(p.getAsString().substring(1), 16);
+            return p.getAsInt();
+        }
+        return fallback;
     }
 }

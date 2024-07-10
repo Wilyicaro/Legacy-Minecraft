@@ -22,8 +22,10 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
+import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyBiomeOverride;
 import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.ArrayList;
@@ -31,10 +33,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static wily.legacy.client.screen.ControlTooltip.CONTROL_ACTION_CACHE;
+import static wily.legacy.client.screen.ControlTooltip.getAction;
 
 @Environment(value=EnvType.CLIENT)
-public class LegacyFlatWorldScreen extends PanelVListScreen {
+public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTooltip.Event {
     public static int DEFAULT_MAX_WORLD_HEIGHT = 384;
     protected MultiLineLabel tooltipBoxLabel;
     private final Consumer<FlatLevelGeneratorSettings> applySettings;
@@ -49,11 +51,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
 
     public LegacyFlatWorldScreen(Screen screen, WorldCreationUiState uiState, HolderLookup.RegistryLookup<Biome> biomeGetter, HolderLookup.RegistryLookup<StructureSet> structureGetter, Consumer<FlatLevelGeneratorSettings> consumer, FlatLevelGeneratorSettings flatLevelGeneratorSettings) {
         super(s->new Panel(p -> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 194 : 0))) / 2, p -> (s.height - p.height) / 2, 282,248),Component.translatable("createWorld.customize.flat.title"));
-        this.parent = screen;
-        controlTooltipRenderer.tooltips.set(0,ControlTooltip.create(()-> ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN,true) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(true),()->getFocused() != null ? ControlTooltip.CONTROL_ACTION_CACHE.getUnchecked(tabList.selectedTab == 0 ? "legacy.menu.create_flat_world.layer_options" : "mco.template.button.select") : null));
-        controlTooltipRenderer.tooltips.add(ControlTooltip.create(()-> ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O,true) : ControllerBinding.UP_BUTTON.bindingState.getIcon(true),()-> ControlTooltip.CONTROL_ACTION_CACHE.getUnchecked("legacy.action.presets")));
-        controlTooltipRenderer.addCompound(()-> new Component[]{ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(true),ControlTooltip.SPACE,ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon(true)},()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.select_tab"));
-        parent = Minecraft.getInstance().screen instanceof WorldMoreOptionsScreen s ? s : screen;
+        this.parent = Minecraft.getInstance().screen instanceof WorldMoreOptionsScreen s ? s : screen;
         this.uiState = uiState;
         this.applySettings = consumer;
         this.generator = flatLevelGeneratorSettings;
@@ -64,6 +62,15 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
         displayProperties.addRenderable(new TickBox(0,0,260,12, generator.decoration, b-> Component.translatable("legacy.createWorld.customize.custom.useDecorations"), b-> null, b-> generator.decoration = b.selected));
         displayProperties.addRenderable(new TickBox(0,0,260,12, generator.addLakes, b-> Component.translatable("createWorld.customize.custom.useLavaLakes"), b-> null, b-> generator.addLakes = b.selected));
     }
+
+    @Override
+    public void addControlTooltips(ControlTooltip.Renderer renderer) {
+        super.addControlTooltips(renderer);
+        renderer.set(0,ControlTooltip.create(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(),()->getFocused() != null ? getAction(tabList.selectedTab == 0 ? "legacy.menu.create_flat_world.layer_options" : "mco.template.button.select") : null)).
+                add(ControlTooltip.create(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(),()-> getAction("legacy.action.presets"))).
+                addCompound(()-> new ControlTooltip.Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(),ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon()},()->getAction("legacy.action.select_tab"));
+    }
+
     public void addStructure(Holder.Reference<StructureSet> structure){
         List<Component> descr = new ArrayList<>();
         String nameKey = "structure."+structure.key().location().toLanguageKey();
@@ -240,7 +247,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
         }));
         addRenderableOnly(panel);
         panel.init();
-        addRenderableOnly(((guiGraphics, i, j, f) -> ScreenUtil.renderPanelRecess(guiGraphics, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14, 2)));
+        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.blitSprite(LegacySprites.PANEL_RECESS, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14)));
         getRenderableVList().init(this,panel.x + 11,panel.y + 11,260, panel.height - 5);
         tabList.init(panel.x,panel.y - 24, panel.width);
         this.generator.updateLayers();

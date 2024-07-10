@@ -23,6 +23,7 @@ import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.FaviconTexture;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
@@ -63,7 +64,7 @@ public class ServerRenderableList extends RenderableVList {
     static final ResourceLocation PINGING_3 = new ResourceLocation("server_list/pinging_3");
     static final ResourceLocation PINGING_4 = new ResourceLocation("server_list/pinging_4");
     static final ResourceLocation PINGING_5 = new ResourceLocation("server_list/pinging_5");
-    static final Logger LOGGER = LogUtils.getLogger();
+    protected static final Logger LOGGER = LogUtils.getLogger();
     static final ThreadPoolExecutor THREAD_POOL = new ScheduledThreadPoolExecutor(5, new ThreadFactoryBuilder().setNameFormat("Server Pinger #%d").setDaemon(true).setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(LOGGER)).build());
     private static final ResourceLocation ICON_MISSING = new ResourceLocation("textures/misc/unknown_server.png");
     static final Component SCANNING_LABEL = Component.translatable("lanServer.scanning");
@@ -75,8 +76,8 @@ public class ServerRenderableList extends RenderableVList {
     static final Component ONLINE_STATUS = Component.translatable("multiplayer.status.online");
     private static final Component LAN_SERVER_HEADER = Component.translatable("lanServer.title");
     private static final Component HIDDEN_ADDRESS_TEXT = Component.translatable("selectServer.hiddenAddress");
-    private PlayGameScreen screen;
-    private final Minecraft minecraft;
+    protected PlayGameScreen screen;
+    protected final Minecraft minecraft;
 
     public final ServerList servers;
     @Nullable
@@ -103,6 +104,9 @@ public class ServerRenderableList extends RenderableVList {
         }
         super.init(screen, leftPos, topPos, listWidth, listHeight);
     }
+    public boolean hasOnlineFriends(){
+        return false;
+    }
     private Component getMultiplayerDisabledReason() {
         if (this.minecraft.allowsMultiplayer()) {
             return null;
@@ -116,6 +120,11 @@ public class ServerRenderableList extends RenderableVList {
                 return Component.translatable("title.multiplayer.disabled");
             }
         }
+    }
+    public static void drawIcon(GuiGraphics guiGraphics, int i, int j, ResourceLocation resourceLocation) {
+        RenderSystem.enableBlend();
+        guiGraphics.blit(resourceLocation, i + 5, j + 5, 0.0f, 0.0f, 20, 20, 20, 20);
+        RenderSystem.disableBlend();
     }
     public void updateServers(){
         renderables.clear();
@@ -154,12 +163,14 @@ public class ServerRenderableList extends RenderableVList {
                     }
                     boolean bl2 = !this.isCompatible();
                     guiGraphics.drawString(minecraft.font, getMessage(), getX() + 32 + 3, getY() + 3, 0xFFFFFF);
-                    minecraft.selectMainFont(true);
-                    List<FormattedCharSequence> list = minecraft.font.split(server.motd, Math.max(234,minecraft.font.width(server.motd) / 2));
-                    for (int p = 0; p < Math.min(list.size(), 2); ++p) {
-                        ScreenUtil.renderScrollingString(guiGraphics,minecraft.font, list.get(p), getX() + 35,  getY() + 8 + minecraft.font.lineHeight * p,getX() + 269,getY() + 19 + minecraft.font.lineHeight * p, -8355712, false);
+                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().translate(getX() + 35,  getY() + 10,0);
+                    guiGraphics.pose().scale(2/3f,2/3f,2/3f);
+                    List<FormattedCharSequence> list = minecraft.font.split(server.motd, Math.max(234,minecraft.font.width(server.motd) / 2 + 20));
+                    for (int p = 0; p < Math.min(2,list.size()); ++p) {
+                        ScreenUtil.renderScrollingString(guiGraphics,minecraft.font, list.get(p), 0,  minecraft.font.lineHeight * p,234 , 11 + minecraft.font.lineHeight * p, -8355712, false,minecraft.font.width(list.get(p))* 2/3);
                     }
-                    minecraft.selectMainFont(false);
+                    guiGraphics.pose().popPose();
                     Component component = bl2 ? server.version.copy().withStyle(ChatFormatting.RED) : server.status;
                     int q = minecraft.font.width(component);
                     guiGraphics.drawString(minecraft.font, component, getX() + 270 - q - 15 - 2, getY() + 3, -8355712, false);
@@ -201,7 +212,7 @@ public class ServerRenderableList extends RenderableVList {
                             this.updateServerList();
                         }
                     }
-                    this.drawIcon(guiGraphics, getX(), getY(), icon.textureLocation());
+                    drawIcon(guiGraphics, getX(), getY(), icon.textureLocation());
                     int s = mouseX - getX();
                     int t = mouseY - getY();
                     if (s >= width - 15 && s <= width - 5 && t >= 2 && t <= 10) {
@@ -244,12 +255,6 @@ public class ServerRenderableList extends RenderableVList {
 
                 public void updateServerList() {
                     screen.getServers().save();
-                }
-
-                protected void drawIcon(GuiGraphics guiGraphics, int i, int j, ResourceLocation resourceLocation) {
-                    RenderSystem.enableBlend();
-                    guiGraphics.blit(resourceLocation, i + 5, j + 5, 0.0f, 0.0f, 20, 20, 20, 20);
-                    RenderSystem.disableBlend();
                 }
 
                 private boolean uploadServerIcon(@Nullable byte[] bs) {
@@ -401,5 +406,4 @@ public class ServerRenderableList extends RenderableVList {
     private void join(ServerData serverData) {
         ConnectScreen.startConnecting(screen, this.minecraft, ServerAddress.parseString(serverData.ip), serverData, false);
     }
-
 }

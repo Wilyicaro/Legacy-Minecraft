@@ -9,11 +9,12 @@ import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.controller.Controller;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Comparator;
 
-public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuAccess<T>, GuiEventListener {
+public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuAccess<T>, GuiEventListener, Controller.Event {
     default void movePointerToSlotIn(ScreenDirection direction){
         if (getMenu().slots.isEmpty() || Legacy4JClient.controllerManager.isCursorDisabled || getHoveredSlot() == null) return;
         double pointerX = Legacy4JClient.controllerManager.getPointerX();
@@ -74,10 +75,12 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
     }
     ScreenRectangle getMenuRectangle();
     Slot getHoveredSlot();
-    ControlTooltip.Renderer getControlTooltipRenderer();
     default Slot findSlotAt(double d, double e){
         for (Slot slot : getMenu().slots)
             if (ScreenUtil.isHovering(slot,getMenuRectangle().left(), getMenuRectangle().top(),d,e)) return slot;
         return null;
+    }
+    default int getTipXDiff(){
+        return -132;
     }
 }

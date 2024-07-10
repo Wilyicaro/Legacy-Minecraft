@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.NoticeWithLinkScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.StringUtil;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
 import net.minecraft.world.level.validation.ContentValidationException;
@@ -27,6 +28,7 @@ public class SaveOptionsScreen extends ConfirmationScreen{
     protected void initButtons() {
         addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b-> this.minecraft.setScreen(parent)).bounds(panel.x + 15, panel.y + panel.height - 96,200,20).build());
         EditBox renameBox = new EditBox(font, width / 2 - 100,0,200, 20, Component.translatable("selectWorld.enterName"));
+        renameBox.setValue(summary.getLevelName());
         addRenderableWidget(Button.builder(Component.translatable("legacy.menu.rename_save"),b-> minecraft.setScreen(new ConfirmationScreen(parent,Component.translatable("legacy.menu.rename_save_title"),Component.translatable("legacy.menu.rename_save_message"),p->{
             String id = summary.getLevelId();
             try {
@@ -43,12 +45,12 @@ public class SaveOptionsScreen extends ConfirmationScreen{
                 this.minecraft.setScreen(NoticeWithLinkScreen.createWorldSymlinkWarningScreen(()-> minecraft.setScreen(parent)));
             }
         }){
+
             @Override
             protected void init() {
                 super.init();
                 renameBox.setResponder(s-> okButton.active = !Util.isBlank(s));
-                renameBox.setY(panel.y + 45);
-                renameBox.setValue(summary.getLevelName());
+                renameBox.setPosition(panel.x + 15,panel.y + 45);
                 addRenderableWidget(renameBox);
             }
         })).bounds(panel.x + 15, panel.getRectangle().bottom() - 74,200,20).build());

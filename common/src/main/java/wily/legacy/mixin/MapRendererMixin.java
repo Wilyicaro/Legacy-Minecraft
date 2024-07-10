@@ -8,6 +8,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.MapRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.saveddata.maps.MapDecoration;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
@@ -46,7 +47,7 @@ public abstract class MapRendererMixin {
             poseStack.pushPose();
             poseStack.translate(-0.2f,0.4f,-0.1f);
             poseStack.scale(1f, 0.95f, 1);
-            font.drawInBatch("X:%s,Y:%s,Z:%s".formatted((int)minecraft.player.getX(), (int)minecraft.player.getY(),(int)minecraft.player.getZ()), 0.0f, 0.0f, 0, false, poseStack.last().pose(), multiBufferSource, Font.DisplayMode.NORMAL, 0, i);
+            font.drawInBatch("X:%s,Y:%s,Z:%s".formatted((int)minecraft.player.getX(), (int)minecraft.player.getEyeY(),(int)minecraft.player.getZ()), 0.0f, 0.0f, 0, false, poseStack.last().pose(), multiBufferSource, Font.DisplayMode.NORMAL, 0, i);
             poseStack.popPose();
         }
         //poseStack.pushPose();
@@ -54,6 +55,9 @@ public abstract class MapRendererMixin {
         //    poseStack.translate(10, 11, 0);
         //    poseStack.scale(98 / 116f, 98 / 116f, 1);
         //}
+    }
+    private MapRenderer.MapInstance self(){
+        return ((MapRenderer.MapInstance)(Object)this);
     }
     @Inject(method = "draw", at = @At("RETURN"))
     void drawReturn(PoseStack poseStack, MultiBufferSource multiBufferSource, boolean bl, int i, CallbackInfo ci) {

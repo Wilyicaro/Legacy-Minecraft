@@ -11,6 +11,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.StonecutterRecipe;
 import wily.legacy.Legacy4J;
 import wily.legacy.util.JsonUtil;
+import wily.legacy.util.RecipeValue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -23,7 +24,7 @@ public class StoneCuttingGroupManager extends SimplePreparableReloadListener<Map
     protected Map<String,List<RecipeValue<Container,StonecutterRecipe>>> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
         Map<String,List<RecipeValue<Container,StonecutterRecipe>>> groups = new LinkedHashMap<>();
         ResourceManager manager = Minecraft.getInstance().getResourceManager();
-        manager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1)).forEach(name->manager.getResource(new ResourceLocation(name, STONECUTTING_GROUPS)).ifPresent(r->{
+        JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(new ResourceLocation(name, STONECUTTING_GROUPS)).ifPresent(r->{
             try {
                 BufferedReader bufferedReader = r.openAsReader();
                 JsonObject obj = GsonHelper.parse(bufferedReader);

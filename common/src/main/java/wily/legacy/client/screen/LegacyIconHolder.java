@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.Offset;
+import wily.legacy.util.Offset;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.ScreenUtil;
 
@@ -68,6 +68,12 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         setX(x);
         setY(y);
     }
+
+    @Override
+    public boolean isHovered(double mouseX, double mouseY) {
+        return isHovered;
+    }
+
     public LegacyIconHolder slotBounds(Slot slot){
         return slotBounds(0,0,slot);
     }
@@ -181,12 +187,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         },x,y,isWarning);
     }
     public void renderItem(GuiGraphics graphics, Runnable itemRender, int x, int y, boolean isWarning){
-        graphics.pose().pushPose();
-        graphics.pose().translate(x,y,0);
-        applyOffset(graphics);
-        graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
-        itemRender.run();
-        graphics.pose().popPose();
+        renderScaled(graphics,x,y,itemRender);
         if (isWarning) {
             RenderSystem.disableDepthTest();
             graphics.pose().pushPose();
@@ -205,7 +206,9 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             e.yHeadRot = 180;
             e.yHeadRotO = e.yHeadRot;
         }
+        graphics.enableScissor(getX(),getY(),getX() + Math.round(getSelectableWidth()),getY() + Math.round(getSelectableHeight()));
         ScreenUtil.renderEntity(graphics,getX() + getWidth() / 2f,getYCorner() + Math.min(getSelectableWidth(),getSelectableHeight()),(int)Math.min(getSelectableWidth(),getSelectableHeight()),f, new Vector3f(),new Quaternionf().rotationXYZ(0.0f, (float) Math.PI/ 4, (float) Math.PI), null, entity,true);
+        graphics.disableScissor();
     }
     public void renderSelection(GuiGraphics graphics, int i, int j, float f){
         graphics.pose().pushPose();
@@ -217,11 +220,14 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         graphics.pose().popPose();
     }
     public void renderHighlight(GuiGraphics graphics, int color, int h){
+        renderScaled(graphics,getX(),getY(), ()->graphics.fillGradient(RenderType.gui(), 0, 0, 16,16, color, color, h));
+    }
+    public void renderScaled(GuiGraphics graphics, float x, float y, Runnable render){
         graphics.pose().pushPose();
-        graphics.pose().translate(getX(),getY(),0);
+        graphics.pose().translate(x,y,0);
         applyOffset(graphics);
         graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
-        graphics.fillGradient(RenderType.gui(), 0, 0, 16,16, color, color, h);
+        render.run();
         graphics.pose().popPose();
     }
     public void renderHighlight(GuiGraphics graphics, int h){
@@ -260,7 +266,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         return false;
     }
     public void playClickSound(){
-        ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0F);
+        if (!isFocused()) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0F);
     }
     public void onClick(double d, double e){
         playClickSound();

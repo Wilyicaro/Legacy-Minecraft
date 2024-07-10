@@ -12,11 +12,16 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.Legacy4JPlatform;
+import wily.legacy.client.CommonColor;
+import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Arrays;
@@ -30,7 +35,7 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
     public ControllerMappingScreen(Screen parent, Options options) {
         super(parent, 255, 293, Component.translatable("legacy.controls.controller"));
         renderableVList.layoutSpacing(l->1);
-        panel.dp = 3f;
+        panel.panelSprite = LegacySprites.PANEL;
         KeyMapping[] keyMappings = ArrayUtils.clone(options.keyMappings);
         Arrays.sort(keyMappings);
         String lastCategory = null;
@@ -39,11 +44,11 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
                 ((LegacyKeyMapping)keyMapping).setBinding(((LegacyKeyMapping)keyMapping).getDefaultBinding());
             minecraft.setScreen(this);
         }))).size(240,20).build());
-        renderableVList.addOptions(ScreenUtil.getLegacyOptions().selectedController(),ScreenUtil.getLegacyOptions().selectedControllerHandler(),ScreenUtil.getLegacyOptions().invertControllerButtons(),ScreenUtil.getLegacyOptions().leftStickDeadZone(),ScreenUtil.getLegacyOptions().rightStickDeadZone(),ScreenUtil.getLegacyOptions().leftTriggerDeadZone(),ScreenUtil.getLegacyOptions().rightTriggerDeadZone());
+        renderableVList.addOptions(ScreenUtil.getLegacyOptions().selectedController(),ScreenUtil.getLegacyOptions().selectedControllerHandler(),ScreenUtil.getLegacyOptions().invertControllerButtons(),ScreenUtil.getLegacyOptions().leftStickDeadZone(),ScreenUtil.getLegacyOptions().rightStickDeadZone(),ScreenUtil.getLegacyOptions().leftTriggerDeadZone(),ScreenUtil.getLegacyOptions().rightTriggerDeadZone(),ScreenUtil.getLegacyOptions().controllerVirtualCursor());
         for (KeyMapping keyMapping : keyMappings) {
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category)) {
-                renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> {}))), SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> graphics.drawString(font, Component.translatable(category), l.x + 1, l.y + 4, 0x383838, false)))));
+                renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> {}))), SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> graphics.drawString(font, Component.translatable(category), l.x + 1, l.y + 4, CommonColor.INVENTORY_GRAY_TEXT.get(), false)))));
                 if (category.equals("key.categories.movement"))
                     renderableVList.addOptions(ScreenUtil.getLegacyOptions().invertYController(),ScreenUtil.getLegacyOptions().smoothMovement());
             }
@@ -54,13 +59,14 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
                 protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                     if (!isFocused() && isPressed()) selectedKey = null;
                     super.renderWidget(guiGraphics, i, j, f);
-                    Component c = isPressed() ? SELECTION : mapping.getBinding() == null ? null : mapping.getBinding().bindingState.getIcon(false);
-                    if (c == null){
-                        guiGraphics.drawString(font,NONE, getX() + width - 20 - (font.width(NONE) / 2), getY() + (height -  font.lineHeight) / 2 + 1,0xFFFFFF);
+                    Component c = isPressed() ? SELECTION : ((LegacyKeyMapping) keyMapping).getBinding() == null ? NONE : null;
+                    if (c != null){
+                        guiGraphics.drawString(font,c, getX() + width - 20 - font.width(c) / 2, getY() + (height -  font.lineHeight) / 2 + 1,0xFFFFFF);
                         return;
                     }
+                    ControlTooltip.Icon icon = ((LegacyKeyMapping) keyMapping).getBinding().bindingState.getIcon();
                     RenderSystem.enableBlend();
-                    guiGraphics.drawString(font,c, getX() + width - 20 - (font.width(c) / 2), getY() + (height -  font.lineHeight) / 2 + 1,0xFFFFFF,false);
+                    icon.render(guiGraphics, getX() + width - 20 - icon.render(guiGraphics,0,0,false,true) / 2, getY() + (height -  font.lineHeight) / 2 + 1,false,false);
                     RenderSystem.disableBlend();
                 }
                 private boolean isPressed(){
@@ -72,7 +78,7 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
                     if (Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed){
                         mapping.setBinding(mapping.getDefaultBinding());
                         options.save();
-                    } else if (!ControlTooltip.getActiveType().isKeyboard()) selectedKey = mapping;
+                    } else if (!ControlType.getActiveType().isKbm()) selectedKey = mapping;
                 }
                 @Override
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
@@ -86,6 +92,10 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
         }
     }
 
+    @Override
+    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+        ScreenUtil.renderDefaultBackground(guiGraphics,false);
+    }
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
@@ -104,6 +114,7 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
         panel.height = Math.min(height,293);
         panel.init();
         addRenderableOnly(panel);
+        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, Legacy4JPlatform.getModInfo("minecraft").getVersion() + " " + Legacy4J.VERSION.get(),panel.getX() + panel.getWidth() + 81, panel.getY() + panel.getHeight() - 7,CommonColor.INVENTORY_GRAY_TEXT.get(),false)));
         getRenderableVList().init(this,panel.x + 7,panel.y + 6,panel.width - 14,panel.height);
     }
     @Override

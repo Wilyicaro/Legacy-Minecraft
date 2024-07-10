@@ -25,11 +25,7 @@ import static wily.legacy.client.screen.ControlTooltip.MORE;
 public abstract class GuiMixin {
     @Shadow @Final protected Minecraft minecraft;
 
-    @Shadow protected int screenHeight;
-
     @Shadow public abstract Font getFont();
-
-    @Shadow protected int screenWidth;
 
     @Shadow protected int toolHighlightTimer;
 
@@ -39,9 +35,8 @@ public abstract class GuiMixin {
     public void renderSelectedItemName(GuiGraphics guiGraphics, int shift, CallbackInfo ci) {
         ci.cancel();
         if (minecraft.screen != null) return;
-
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0,ScreenUtil.getHUDDistance() - Math.max(shift, ScreenUtil.getHUDSize()),0);
+        ScreenUtil.prepareHUDRender(guiGraphics);
+        guiGraphics.pose().translate(0, -Math.max(shift, ScreenUtil.getHUDSize()),0);
         this.minecraft.getProfiler().push("selectedItemName");
         if (this.toolHighlightTimer > 0 && !this.lastToolHighlight.isEmpty()) {
             List<Component> tooltipLines = this.lastToolHighlight.getTooltipLines(minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).toList();
@@ -49,8 +44,8 @@ public abstract class GuiMixin {
                 int l;
                 Component mutableComponent = i >= 4 ? MORE : tooltipLines.get(i);
                 int width = this.getFont().width(mutableComponent);
-                int j = (this.screenWidth - width) / 2;
-                int k = this.screenHeight - getFont().lineHeight * (Math.min(4,tooltipLines.size()) - 1 - i);
+                int j = (guiGraphics.guiWidth() - width) / 2;
+                int k = guiGraphics.guiHeight() - getFont().lineHeight * (Math.min(4,tooltipLines.size()) - 1 - i);
                 if ((l = (int)((float)this.toolHighlightTimer * 256.0f / 10.0f)) > 255) {
                     l = 255;
                 }
@@ -60,7 +55,7 @@ public abstract class GuiMixin {
                     if (font == null) {
                         guiGraphics.drawString(this.getFont(), mutableComponent, j, k, 0xFFFFFF + (l << 24));
                     } else {
-                        j = (this.screenWidth - font.width(mutableComponent)) / 2;
+                        j = (guiGraphics.guiWidth() - font.width(mutableComponent)) / 2;
                         guiGraphics.drawString(font, mutableComponent, j, k, 16777215 + (l << 24));
                     }
                 }
@@ -68,7 +63,7 @@ public abstract class GuiMixin {
             }
         }
         this.minecraft.getProfiler().pop();
-        guiGraphics.pose().popPose();
+        ScreenUtil.finishHUDRender(guiGraphics);
     }
 
 }

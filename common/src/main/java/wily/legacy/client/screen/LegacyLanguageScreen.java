@@ -6,6 +6,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.LanguageManager;
 import net.minecraft.network.chat.Component;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 public class LegacyLanguageScreen extends PanelVListScreen{
@@ -48,7 +49,7 @@ public class LegacyLanguageScreen extends PanelVListScreen{
     protected void init() {
         panel.init();
         addRenderableOnly(panel);
-        addRenderableOnly(((guiGraphics, i, j, f) -> ScreenUtil.renderPanelRecess(guiGraphics,panel.x + 6, panel.y + 24, panel.width - 12, panel.height - 34,2f)));
+        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.blitSprite(LegacySprites.PANEL_RECESS,panel.x + 6, panel.y + 24, panel.width - 12, panel.height - 34)));
         getRenderableVList().init(this,panel.x + 10,panel.y + 30,panel.width - 20,panel.height - 28);
         addRenderableWidget(minecraft.options.forceUnicodeFont().createButton(minecraft.options,panel.x + 10, panel.y + 10, panel.width - 20));
     }

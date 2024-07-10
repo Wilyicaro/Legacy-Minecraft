@@ -1,7 +1,5 @@
 package wily.legacy.network;
 
-import dev.architectury.networking.NetworkManager;
-import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -10,7 +8,7 @@ import wily.legacy.inventory.LegacyCraftingMenu;
 
 import java.util.function.Supplier;
 
-public record ServerOpenClientMenuPacket(BlockPos pos, int clientMenu) implements CommonPacket{
+public record ServerOpenClientMenuPacket(BlockPos pos, int clientMenu) implements CommonNetwork.Packet {
     public ServerOpenClientMenuPacket(int clientMenu){
         this(BlockPos.ZERO,clientMenu);
     }
@@ -25,10 +23,9 @@ public record ServerOpenClientMenuPacket(BlockPos pos, int clientMenu) implement
     }
 
     @Override
-    public void apply(Supplier<NetworkManager.PacketContext> ctx) {
-        Player p = ctx.get().getPlayer();
-        if (p instanceof ServerPlayer sp){
-            MenuRegistry.openMenu(sp, LegacyCraftingMenu.getMenuProvider(pos,clientMenu == 1));
+    public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> player) {
+        if (player.get() instanceof ServerPlayer sp){
+            sp.openMenu(LegacyCraftingMenu.getMenuProvider(pos,clientMenu == 1));
         }
     }
 }

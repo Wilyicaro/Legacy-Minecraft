@@ -14,7 +14,6 @@ import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,11 +21,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
-
-import java.util.List;
 
 @Mixin(AdvancementToast.class)
 public abstract class AdvancementToastMixin implements Toast {
@@ -37,7 +36,7 @@ public abstract class AdvancementToastMixin implements Toast {
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, ToastComponent toastComponent, long l, CallbackInfoReturnable<Visibility> cir) {
-        Component holdToView = Component.translatable("legacy.menu.advancements.toast", ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_E,true) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(true));
+        Component holdToView = Component.translatable("legacy.menu.advancements.toast",(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_I) : ControllerBinding.UP_BUTTON.bindingState.getIcon()).getComponent());
         Font font= Minecraft.getInstance().font;
         DisplayInfo displayInfo = this.advancement.value().display().orElse(null);
         width = 82 + (displayInfo == null ? 0 : Math.max(font.width(holdToView), Math.max(font.width(displayInfo.getTitle()) * 3/2,font.width(displayInfo.getType().getDisplayName()))));
@@ -60,7 +59,7 @@ public abstract class AdvancementToastMixin implements Toast {
                 }
             }
             if (toastComponent.getMinecraft().player != null) PlayerFaceRenderer.draw(guiGraphics, toastComponent.getMinecraft().player.getSkin(), 7, (height() - 32) / 2, 32);
-            ScreenUtil.renderPanel(guiGraphics,width() - 38,(height() - 28) / 2,28,28,2f);
+            guiGraphics.blitSprite(LegacySprites.SMALL_PANEL,width() - 38,(height() - 28) / 2,28,28);
             guiGraphics.renderItem(displayInfo.getIcon(), width() - 32, (height() - 16) / 2);
             cir.setReturnValue((double)l >= 5000.0 * toastComponent.getNotificationDisplayTimeMultiplier() ? Toast.Visibility.HIDE : Toast.Visibility.SHOW);
             return;

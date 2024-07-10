@@ -5,10 +5,12 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.Entity;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
@@ -16,6 +18,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.player.LegacyPlayerInfo;
@@ -27,20 +30,29 @@ public abstract class EntityRendererMixin {
 
     @Inject(method = "renderNameTag", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;scale(FFF)V", shift = At.Shift.AFTER))
     protected void renderNameTag(Entity entity, Component component, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci) {
-        if (!component.equals(entity.getDisplayName()) || !ScreenUtil.getLegacyOptions().displayNameTagBorder().get()) return;
+        Minecraft minecraft = Minecraft.getInstance();
+        float thickness = Math.max(0.1f,minecraft.player.distanceTo(entity) / 16f);
+        if (!component.equals(entity.getDisplayName()) || !ScreenUtil.getLegacyOptions().displayNameTagBorder().get() || thickness >=1) return;
         String name = component.getString();
         int j = "deadmau5".equals(name) ? -10 : 0;
         int h = (int) (-font.width(component) / 2f);
-        Minecraft minecraft = Minecraft.getInstance();
         float[] color = !(entity instanceof AbstractClientPlayer p)  || minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(p.getUUID()) instanceof LegacyPlayerInfo info) || info.getPosition() == 0 ?  new float[]{0,0,0} : Legacy4JClient.getVisualPlayerColor(info);
-        poseStack.pushPose();
-        fill(RenderType.debugLineStrip(1.0),multiBufferSource, poseStack, h - 1, j - 1, h + font.width(component) + 1,j + 9, color[0],color[1],color[2],1.0f);
-        poseStack.translate(0, 8,0);
-        poseStack.scale(1,-1,1);
-        fill(RenderType.debugLineStrip(1.0),multiBufferSource, poseStack, h - 1, j - 1, h + font.width(component) + 1,j + 9, color[0],color[1],color[2],1.0f);
-        poseStack.popPose();
+        renderOutline(multiBufferSource.getBuffer(entity.isShiftKeyDown() ?  RenderType.textBackground() : RenderType.textBackgroundSeeThrough()), poseStack, h - 1.1f, j - 1.1f, font.width(component) + 2.1f,10.1f, Math.max(0.1f,minecraft.player.distanceTo(entity) / 16f), color[0],color[1],color[2],1.0f);
     }
-    public void fill(RenderType renderType, MultiBufferSource multiBufferSource,PoseStack poseStack, float i, float j, float k, float l, float r, float g, float b , float a) {
+    @Redirect(method = "renderNameTag", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;drawInBatch(Lnet/minecraft/network/chat/Component;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/gui/Font$DisplayMode;II)I", ordinal = 0))
+    protected int renderNameTag(Font instance, Component arg, float f, float g, int i, boolean bl, Matrix4f matrix4f, MultiBufferSource arg2, Font.DisplayMode arg3, int j, int k, Entity entity) {
+        Minecraft minecraft = Minecraft.getInstance();
+        float thickness = minecraft.player.distanceTo(entity) / 16f;
+        float[] color = thickness < 1 || !ScreenUtil.getLegacyOptions().displayNameTagBorder().get() ? null : !(entity instanceof AbstractClientPlayer p) || minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(p.getUUID()) instanceof LegacyPlayerInfo info) || info.getPosition() == 0 ? new float[]{0,0,0} : Legacy4JClient.getVisualPlayerColor(info);
+        return instance.drawInBatch(arg,f,g,i,bl,matrix4f,arg2,arg3,color == null ? j : FastColor.ARGB32.color(255,Math.round(color[0] * 255),Math.round(color[1] * 255),Math.round(color[2] * 255)),k);
+    }
+    public void renderOutline(VertexConsumer consumer, PoseStack poseStack, float x, float y, float width, float height,float thickness, float r, float g, float b , float a) {
+        this.fill(consumer,poseStack,x, y, x + width, y + thickness, r,g,b,a);
+        this.fill(consumer,poseStack,x, y + height - thickness, x + width, y + height, r,g,b,a);
+        this.fill(consumer,poseStack,x, y + thickness, x + thickness, y + height - thickness, r,g,b,a);
+        this.fill(consumer,poseStack,x + width - thickness, y + thickness, x + width, y + height - thickness, r,g,b,a);
+    }
+    public void fill(VertexConsumer vertexConsumer, PoseStack poseStack, float i, float j, float k, float l, float r, float g, float b , float a) {
         float o;
         Matrix4f matrix4f = poseStack.last().pose();
         if (i < k) {
@@ -53,10 +65,9 @@ public abstract class EntityRendererMixin {
             j = l;
             l = o;
         }
-        VertexConsumer vertexConsumer = multiBufferSource.getBuffer(renderType);
-        vertexConsumer.vertex(matrix4f, i, j, 0).color(r,g,b,a).endVertex();
-        vertexConsumer.vertex(matrix4f, i, l, 0).color(r,g,b,a).endVertex();
-        vertexConsumer.vertex(matrix4f, k, l, 0).color(r,g,b,a).endVertex();
-        vertexConsumer.vertex(matrix4f, k, j, 0).color(r,g,b,a).endVertex();
+        vertexConsumer.vertex(matrix4f, i, j, 0).color(r,g,b,a).uv2(LightTexture.FULL_BRIGHT).endVertex();
+        vertexConsumer.vertex(matrix4f, i, l, 0).color(r,g,b,a).uv2(LightTexture.FULL_BRIGHT).endVertex();
+        vertexConsumer.vertex(matrix4f, k, l, 0).color(r,g,b,a).uv2(LightTexture.FULL_BRIGHT).endVertex();
+        vertexConsumer.vertex(matrix4f, k, j, 0).color(r,g,b,a).uv2(LightTexture.FULL_BRIGHT).endVertex();
     }
 }

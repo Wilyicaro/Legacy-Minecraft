@@ -33,6 +33,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.screen.LegacyScrollRenderer;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
@@ -95,11 +96,11 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderPanel(guiGraphics,leftPos,topPos, imageWidth,imageHeight,2f);
-        ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 72,  topPos+ 18, 75, 75,2f);
+        guiGraphics.blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos, imageWidth,imageHeight);
+        guiGraphics.blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 72,  topPos+ 18, 75, 75);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 164.5f, topPos + 7, 0.0f);
-        ScreenUtil.renderSquareRecessedPanel(guiGraphics,0,  0, 32, 64,2f);
+        guiGraphics.blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0,  0, 32, 64);
         guiGraphics.pose().popPose();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 149.5, topPos + 18, 0f);
@@ -110,9 +111,9 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP,0,-11);
         }else guiGraphics.setColor(1.0f,1.0f,1.0f,0.5f);
         RenderSystem.enableBlend();
-        ScreenUtil.renderSquareRecessedPanel(guiGraphics,0, 0,13,75,2f);
+        guiGraphics.blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0, 0,13,75);
         guiGraphics.pose().translate(-2f, -1f + (menu.getSelectablePatterns().size() > 4 && displayPatterns ?  61.5f * startRow  / (totalRowCount() - 4) : 0), 0f);
-        ScreenUtil.renderPanel(guiGraphics,0,0, 16,16,3f);
+        guiGraphics.blitSprite(LegacySprites.PANEL,0,0, 16,16);
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
         guiGraphics.pose().popPose();

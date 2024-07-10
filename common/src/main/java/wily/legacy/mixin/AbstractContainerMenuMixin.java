@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.Legacy4J;
 
 import static wily.legacy.Legacy4J.canRepair;
 
@@ -28,9 +29,9 @@ public abstract class AbstractContainerMenuMixin {
         Slot slot;
         if ((clickType == ClickType.PICKUP || clickType == ClickType.QUICK_MOVE) && j == 1 && i >= 0 && i < slots.size() && (slot = slots.get(i)).hasItem() && !getCarried().isEmpty() && canRepair(slot.getItem(),getCarried())){
             ItemStack item = slot.getItem().getItem().getDefaultInstance();
+            item.setDamageValue(slot.getItem().getDamageValue() - (item.getMaxDamage() - getCarried().getDamageValue()));
             slot.set(item);
-            item.setDamageValue(item.getDamageValue() - (item.getMaxDamage() - getCarried().getDamageValue()));
-            setCarried(ItemStack.EMPTY);
+            if (!player.getAbilities().instabuild) setCarried(ItemStack.EMPTY);
             ci.cancel();
         }
     }

@@ -15,6 +15,6 @@ public abstract class ClientMinecraftServerMixin {
 
     @Redirect(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;ticksUntilAutosave:I", opcode = Opcodes.GETFIELD, ordinal = 1))
     private int tickServer(MinecraftServer instance){
-        return ScreenUtil.getLegacyOptions().autoSave().get() ? 1 : ticksUntilAutosave;
+        return ScreenUtil.getLegacyOptions().autoSaveInterval().get() > 0 ? ScreenUtil.getLegacyOptions().autoSaveInterval().get() * ticksUntilAutosave : 1;
     }
 }

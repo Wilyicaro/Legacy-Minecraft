@@ -13,8 +13,7 @@
   ],
   "mixins": [
     "CustomIngredientImplMixin",
-    "ItemStackMixin",
-    "LivingEntityMixin"
+    "ItemStackMixin"
   ],
   "injectors": {
     "defaultRequire": 1

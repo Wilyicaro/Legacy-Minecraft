@@ -1,8 +1,11 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.font.TextFieldHelper;
+import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookEditScreen;
 import net.minecraft.client.gui.screens.inventory.PageButton;
@@ -11,6 +14,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.StringUtil;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,17 +23,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.BookPanel;
 import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.screen.KeyboardScreen;
 
 import java.util.function.Predicate;
 
 @Mixin(BookEditScreen.class)
-public abstract class BookEditScreenMixin extends Screen implements Controller.Event {
+public abstract class BookEditScreenMixin extends Screen implements Controller.Event,ControlTooltip.Event {
     @Shadow protected abstract void clearDisplayCache();
 
     @Shadow private Button signButton;
@@ -75,10 +81,67 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
 
     @Shadow private int currentPage;
     @Shadow private boolean isModified;
-    private BookPanel panel = new BookPanel(this);
-    private ControlTooltip.Renderer controlTooltipRender = ControlTooltip.defaultScreen(this)
-            .add(()->ControlTooltip.getActiveType().isKeyboard() ? getFocused() == panel ? null : ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(true), ()-> currentPage != 0 ? ControlTooltip.CONTROL_ACTION_CACHE.getUnchecked("legacy.action.previous_page") : null)
-            .add(()->ControlTooltip.getActiveType().isKeyboard() ? getFocused() == panel ? null : ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon(true), ()-> ControlTooltip.CONTROL_ACTION_CACHE.getUnchecked(this.currentPage < this.getNumPages() - 1 ? "legacy.action.next_page" : "legacy.action.add_page"));
+    @Shadow @Final private TextFieldHelper pageEdit;
+    @Shadow @Final private TextFieldHelper titleEdit;
+    private BookPanel panel = new BookPanel(this){
+        @Override
+        public boolean charTyped(char c, int i) {
+            if (super.charTyped(c, i)) {
+                return true;
+            } else if (isSigning) {
+                boolean bl = titleEdit.charTyped(c);
+                if (bl) {
+                    updateButtonVisibility();
+                    isModified = true;
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if (SharedConstants.isAllowedChatCharacter(c)) {
+                pageEdit.insertText(Character.toString(c));
+                clearDisplayCache();
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public boolean keyPressed(int i, int j, int k) {
+            if (CommonInputs.selected(i)){
+                minecraft.setScreen(new KeyboardScreen(()->this,BookEditScreenMixin.this));
+                return true;
+            }
+            if (isSigning) {
+                return titleKeyPressed(i,j,k);
+            } else {
+                if (i == InputConstants.KEY_DOWN){
+                    if (!ControlType.getActiveType().isKbm() && minecraft.screen == BookEditScreenMixin.this) return false;
+                    int newLine = getDisplayCache().changeLine(pageEdit.getCursorPos(), 1);
+                    if (newLine == pageEdit.getCursorPos()){
+                        pageEdit.insertText("\n");
+                        pageEdit.setCursorPos(getDisplayCache().changeLine(pageEdit.getCursorPos(), 1),hasShiftDown() || (minecraft.screen instanceof KeyboardScreen s && s.shift));
+                        return true;
+                    }
+                }
+                if (bookKeyPressed(i, j, k)) {
+                    clearDisplayCache();
+                    return true;
+                } else {
+                    return super.keyPressed(i, j, k);
+                }
+            }
+        }
+    };
+
+    @Override
+    public void added() {
+        super.added();
+        ControlTooltip.Renderer.of(this)
+                .add(()-> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT)}) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(), ()-> currentPage != 0 ? ControlTooltip.getAction("legacy.action.previous_page") : null)
+                .add(()-> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon(), ()-> ControlTooltip.getAction(this.currentPage < this.getNumPages() - 1 ? "legacy.action.next_page" : "legacy.action.add_page"));
+    }
+
     protected BookEditScreenMixin(Component component) {
         super(component);
     }
@@ -95,7 +158,6 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
         cir.setReturnValue(new BookEditScreen.Pos2i(pos2i.x - panel.x - 20, pos2i.y - panel.y - 37));
     }
     @Inject(method = "convertLocalToScreen", at = @At("HEAD"), cancellable = true)
-
     private void convertLocalToScreen(BookEditScreen.Pos2i pos2i, CallbackInfoReturnable<BookEditScreen.Pos2i> cir) {
         cir.setReturnValue(new BookEditScreen.Pos2i(pos2i.x + panel.x + 20, pos2i.y + panel.y + 37));
     }
@@ -138,6 +200,13 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
     }
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
     }
+
+    @Inject(method = "tick", at = @At("RETURN"))
+    public void tick(CallbackInfo ci) {
+        super.tick();
+        if (getFocused() == null) setFocused(panel);
+    }
+
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
@@ -166,8 +235,6 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
                 this.renderCursor(guiGraphics, displayCache.cursor, displayCache.cursorAtEnd);
             }
         }
-        controlTooltipRender.render(guiGraphics, i, j, f);
-
     }
 
     @Override
@@ -178,24 +245,16 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
     }
     @Inject(method = "keyPressed",at = @At("HEAD"), cancellable = true)
     public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
-        if ((ControlTooltip.getActiveType().isKeyboard() && (i == InputConstants.KEY_RIGHT || i == InputConstants.KEY_LEFT)) && getFocused() != panel){
+        if ((hasShiftDown() && (i == InputConstants.KEY_RIGHT || i == InputConstants.KEY_LEFT)) && getFocused() != panel){
             (i == InputConstants.KEY_RIGHT ? forwardButton : backButton).keyPressed(InputConstants.KEY_RETURN,0,0);
             cir.setReturnValue(true);
             return;
         }
-        if (super.keyPressed(i, j, k)) {
-            cir.setReturnValue(true);
-        } else if (this.isSigning) {
-            cir.setReturnValue(titleKeyPressed(i,j,k));
-        } else {
-            boolean bl = this.bookKeyPressed(i, j, k);
-            if (bl) {
-                this.clearDisplayCache();
-                cir.setReturnValue(true);
-            } else {
-                cir.setReturnValue(false);
-            }
-        }
+        cir.setReturnValue(super.keyPressed(i,j,k));
+    }
+    @Inject(method = "charTyped",at = @At("HEAD"), cancellable = true)
+    public void charTyped(char c, int i, CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue(super.charTyped(c,i));
     }
 
     @Override

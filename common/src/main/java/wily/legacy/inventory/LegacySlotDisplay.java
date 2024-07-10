@@ -3,7 +3,7 @@ package wily.legacy.inventory;
 import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
-import wily.legacy.client.Offset;
+import wily.legacy.util.Offset;
 
 import java.util.function.Function;
 

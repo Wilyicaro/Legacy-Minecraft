@@ -1,18 +1,15 @@
 package wily.legacy.neoforge.mixin;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.neoforge.client.gui.overlay.ExtendedGui;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.util.ScreenUtil;
 
@@ -22,19 +19,52 @@ public abstract class ExtendedGuiMixin extends Gui {
         super(arg, arg2);
     }
 
-    @Inject(method = "setupOverlayRenderState", at = @At("RETURN"),remap = false)
-    private void setupOverlayRenderState(boolean blend, boolean depthTest, CallbackInfo ci) {
-        RenderSystem.setShaderColor(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity());
+    @Shadow public abstract Minecraft getMinecraft();
+
+    @Inject(method = "renderRecordOverlay", at = @At(value = "HEAD"), cancellable = true)
+    public void renderOverlayMessage(int width, int height, float partialTick, GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (getMinecraft().screen != null){
+            ci.cancel();
+            return;
+        }
+        ScreenUtil.prepareHUDRender(guiGraphics);
+        guiGraphics.pose().translate(0, 63 - ScreenUtil.getHUDSize() - (this.lastToolHighlight.isEmpty() || this.toolHighlightTimer <= 0 ? 0 : (Math.min(4,lastToolHighlight.getTooltipLines(minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum()) - 1) * 9),0);
     }
-    @Redirect(method = "renderRecordOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/util/FormattedCharSequence;III)I"))
-    public int renderActionBar(GuiGraphics instance, Font arg, FormattedCharSequence arg2, int i, int j, int k) {
-        if (minecraft.screen != null) return 0;
-        instance.pose().pushPose();
-        instance.pose().translate(0,ScreenUtil.getHUDDistance() - ScreenUtil.getHUDSize(),0);
-        instance.setColor(1.0f,1.0f,1.0f,ScreenUtil.getHUDOpacity());
-        int r = instance.drawString(arg,arg2,i,j + 63 - (lastToolHighlight.isEmpty() || this.toolHighlightTimer <= 0 ? 0 : (Math.min(4,lastToolHighlight.getTooltipLines(minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum()) - 1) * 9),k);
-        instance.pose().popPose();
-        instance.setColor(1.0f,1.0f,1.0f,1.0f);
-        return r;
+    @Inject(method = "renderRecordOverlay", at = @At(value = "RETURN"))
+    public void renderOverlayMessageReturn(int width, int height, float partialTick, GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (getMinecraft().screen != null) return;
+        ScreenUtil.finishHUDRender(guiGraphics);
+    }
+    @Inject(method = {"renderHealth","renderFood","renderAir","renderHealthMount"}, at = @At("HEAD"), cancellable = true)
+    public void renderHealth(int width, int height, GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (minecraft.screen != null){
+            ci.cancel();
+            return;
+        }
+        ScreenUtil.prepareHUDRender(guiGraphics);
+        guiGraphics.pose().translate(guiGraphics.guiWidth() / 2f, guiGraphics.guiHeight(),0);
+        ScreenUtil.applyHUDScale(guiGraphics);
+        guiGraphics.pose().translate(-guiGraphics.guiWidth() / 2, -guiGraphics.guiHeight(),0);
+    }
+    @Inject(method = {"renderHealth","renderFood","renderAir","renderHealthMount"}, at = @At("RETURN"))
+    public void renderHealthReturn(int width, int height, GuiGraphics guiGraphics, CallbackInfo ci) {
+        if (minecraft.screen != null) return;
+        ScreenUtil.finishHUDRender(guiGraphics);
+    }
+    @Inject(method = "renderArmor", at = @At("HEAD"), cancellable = true)
+    public void renderArmor(GuiGraphics guiGraphics, int width, int height, CallbackInfo ci) {
+        if (minecraft.screen != null){
+            ci.cancel();
+            return;
+        }
+        ScreenUtil.prepareHUDRender(guiGraphics);
+        guiGraphics.pose().translate(guiGraphics.guiWidth() / 2f, guiGraphics.guiHeight(),0);
+        ScreenUtil.applyHUDScale(guiGraphics);
+        guiGraphics.pose().translate(-guiGraphics.guiWidth() / 2, -guiGraphics.guiHeight(),0);
+    }
+    @Inject(method = "renderArmor", at = @At("RETURN"))
+    public void renderArmorReturn(GuiGraphics guiGraphics, int width, int height, CallbackInfo ci) {
+        if (minecraft.screen != null) return;
+        ScreenUtil.finishHUDRender(guiGraphics);
     }
 }

@@ -17,7 +17,6 @@ import wily.legacy.util.JsonUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -65,7 +64,7 @@ public class LegacyBiomeOverride {
             Map<ResourceLocation,LegacyBiomeOverride> overrides = new HashMap<>();
             overrides.put(DEFAULT_LOCATION,DEFAULT);
             ResourceManager manager = Minecraft.getInstance().getResourceManager();
-            manager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1)).forEach(name->manager.getResource(new ResourceLocation(name,BIOME_OVERRIDES)).ifPresent(r->{
+            JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(new ResourceLocation(name,BIOME_OVERRIDES)).ifPresent(r->{
                 try {
                     BufferedReader bufferedReader = r.openAsReader();
                     JsonObject obj = GsonHelper.parse(bufferedReader);
@@ -74,11 +73,10 @@ public class LegacyBiomeOverride {
                         jsonObject.asMap().forEach((s,e)-> {
                             if (e instanceof JsonObject o){
                                 LegacyBiomeOverride override = overrides.computeIfAbsent(new ResourceLocation(s), resourceLocation-> new LegacyBiomeOverride());
-                                ItemStack icon = JsonUtil.getItemFromJson(o,true);
-                                if (!icon.isEmpty()) override.icon = icon;
+                                override.icon = JsonUtil.getItemFromJson(o,true).get();
                                 Integer i;
-                                if ((i = optionalJsonColor(o, "water_color", null)) != null) override.waterColor = i;
-                                if ((i = optionalJsonColor(o, "water_fog_color", null)) != null) override.waterFogColor = i;
+                                if ((i = JsonUtil.optionalJsonColor(o, "water_color", null)) != null) override.waterColor = i;
+                                if ((i = JsonUtil.optionalJsonColor(o, "water_fog_color", null)) != null) override.waterFogColor = i;
                                 if (o.get("water_transparency") instanceof JsonPrimitive p && p.isNumber()) override.waterTransparency = p.getAsFloat();
                             }
                             });
@@ -88,14 +86,6 @@ public class LegacyBiomeOverride {
                 }
             }));
             return overrides;
-        }
-
-        private Integer optionalJsonColor(JsonObject o, String s, Integer fallback) {
-            if (o.get(s) instanceof JsonPrimitive p){
-                if (p.isString() && p.getAsString().startsWith("#")) return Integer.parseInt(p.getAsString().substring(1),16);
-                return p.getAsInt();
-            }
-            return fallback;
         }
 
         @Override

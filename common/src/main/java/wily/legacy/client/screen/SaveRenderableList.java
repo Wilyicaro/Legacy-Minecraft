@@ -206,7 +206,7 @@ public class SaveRenderableList extends RenderableVList {
 
                     @Override
                     protected MutableComponent createNarrationMessage() {
-                        MutableComponent component = Component.translatable("narrator.select.world_info", summary.getLevelName(), new Date(summary.getLastPlayed()), summary.getInfo());
+                        MutableComponent component = Component.translatable("narrator.select.world_info", summary.getLevelName(), new Date(summary.getLastPlayed()).toString(), summary.getInfo());
                         if (summary.isLocked()) {
                             component = CommonComponents.joinForNarration(component, WORLD_LOCKED_TOOLTIP);
                         }
@@ -291,7 +291,7 @@ public class SaveRenderableList extends RenderableVList {
     }
 
     public static void handleLevelLoadFailure(Minecraft minecraft, Component component) {
-        minecraft.setScreen(new ConfirmationScreen(new MainMenuScreen(), Component.translatable("selectWorld.futureworld.error.title"), component, (b)->{}){
+        minecraft.setScreen(new ConfirmationScreen(new TitleScreen(), Component.translatable("selectWorld.futureworld.error.title"), component, (b)->{}){
             protected void initButtons() {
                 okButton = addRenderableWidget(Button.builder(Component.translatable("gui.ok"),(b)-> onClose()).bounds(panel.x + 15, panel.y + panel.height - 30,200,20).build());
             }

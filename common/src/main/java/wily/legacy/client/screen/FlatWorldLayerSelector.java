@@ -18,8 +18,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.material.Fluids;
-import wily.legacy.Legacy4JClient;
+import wily.legacy.client.CommonColor;
 import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
 
@@ -42,7 +43,6 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
 
     public FlatWorldLayerSelector(Screen parent, Consumer<FlatWorldLayerSelector> applyLayer, int maxLayerHeight, Component component) {
         super(325,245, component);
-        Legacy4JClient.controllerManager.enableCursor();
         this.parent = parent;
         this.applyLayer = applyLayer;
         this.maxLayerHeight = maxLayerHeight;
@@ -87,7 +87,7 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
 
 
     public FlatLayerInfo getFlatLayerInfo() {
-        return new FlatLayerInfo(selectedLayer.count, selectedLayer.getItem() instanceof BlockItem b ? b.getBlock() : selectedLayer.getItem() instanceof BucketItem bucket ? bucket.arch$getFluid().defaultFluidState().createLegacyBlock().getBlock(): Blocks.AIR);
+        return new FlatLayerInfo(selectedLayer.count, selectedLayer.getItem() instanceof BlockItem b ? b.getBlock() : selectedLayer.getItem() instanceof BucketItem bucket ? bucket.content.defaultFluidState().createLegacyBlock().getBlock(): Blocks.AIR);
     }
 
     public void updateCreativeGridScroll(double d, double e, int i){
@@ -107,7 +107,7 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
         panel.init();
         fillLayerGrid();
         List<Integer> layers = IntStream.rangeClosed(1,maxLayerHeight).boxed().toList();
-        addRenderableWidget(new LegacySliderButton<>(panel.x + 21, panel.y + 167, 271, 16, (b)-> Component.translatable("legacy.menu.create_flat_world.layer_height"),()-> null,(Integer) selectedLayer.count, ()-> layers, b-> selectedLayer.setCount(b.getObjectValue())));
+        addRenderableWidget(new LegacySliderButton<>(panel.x + 21, panel.y + 167, 271, 16, (b)-> Component.translatable("legacy.menu.create_flat_world.layer_height"),(b)-> null, selectedLayer.count, ()-> layers, b-> selectedLayer.setCount(b.getObjectValue())));
         addRenderableWidget(Button.builder(Component.translatable("gui.ok"), b-> {
             applyLayer.accept(this);
             onClose();
@@ -180,9 +180,9 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         super.renderBackground(guiGraphics, i, j, f);
         panel.render(guiGraphics, i, j, f);
-        ScreenUtil.renderPanelRecess(guiGraphics,panel.x + 20, panel. y + 187, 275, 27,2f);
+        guiGraphics.blitSprite(LegacySprites.PANEL_RECESS,panel.x + 20, panel. y + 187, 275, 27);
 
-        guiGraphics.drawString(this.font, this.title,panel.x + (panel.width - font.width(title)) / 2,panel. y + 8, 0x383838, false);
+        guiGraphics.drawString(this.font, this.title,panel.x + (panel.width - font.width(title)) / 2,panel. y + 8, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         Component layerCount = Component.translatable("legacy.menu.create_flat_world.layer_count", selectedLayer.count);
         guiGraphics.drawString(this.font, layerCount,panel.x + 49 - font.width(layerCount),panel. y + 197, 0xFFFFFF, true);
         guiGraphics.drawString(this.font, selectedLayer.getItem().getDescription(),panel.x + 70,panel. y + 197, 0xFFFFFF, true);
@@ -202,9 +202,9 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP,0,-11);
         }else guiGraphics.setColor(1.0f,1.0f,1.0f,0.5f);
         RenderSystem.enableBlend();
-        ScreenUtil.renderSquareRecessedPanel(guiGraphics,0, 0,13,135,2f);
+        guiGraphics.blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0, 0,13,135);
         guiGraphics.pose().translate(-2f, -1f + (scrolledList.max > 0 ? scrolledList.get() * 121.5f / scrolledList.max : 0), 0f);
-        ScreenUtil.renderPanel(guiGraphics,0,0, 16,16,3f);
+        guiGraphics.blitSprite(LegacySprites.PANEL,0,0, 16,16);
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
         guiGraphics.pose().popPose();
@@ -225,8 +225,4 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
         return hoveredSlot;
     }
 
-    @Override
-    public ControlTooltip.Renderer getControlTooltipRenderer() {
-        return controlTooltipRenderer;
-    }
 }

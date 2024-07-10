@@ -27,7 +27,7 @@ public interface LegacyKeyMapping {
             case "legacy.key.crafting" -> name = hasPlayer && minecraft.gameMode.hasInfiniteItems() ? "selectWorld.gameMode.creative" : name;
             case "legacy.key.inventory" -> name = "key.inventory";
         }
-        return ControlTooltip.CONTROL_ACTION_CACHE.getUnchecked(name);
+        return ControlTooltip.getAction(name);
     }
     InputConstants.Key getKey();
 

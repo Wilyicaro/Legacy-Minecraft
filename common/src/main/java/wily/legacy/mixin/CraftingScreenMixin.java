@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import static wily.legacy.util.LegacySprites.ARROW;
@@ -46,7 +47,7 @@ public abstract class CraftingScreenMixin extends AbstractContainerScreen<Crafti
         titleLabelY = 11;
         super.init();
         this.widthTooNarrow = this.width < 379;
-        this.recipeBookComponent.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
+        this.recipeBookComponent.init(this.width - 10, this.height, this.minecraft, this.widthTooNarrow, this.menu);
         if (((LegacyOptions)minecraft.options).showVanillaRecipeBook().get()) {
             this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
             recipeButton = this.addRenderableWidget(new ImageButton(this.leftPos + 9, topPos + 44, 20, 18, RecipeBookComponent.RECIPE_BUTTON_SPRITES, (button) -> {
@@ -64,7 +65,7 @@ public abstract class CraftingScreenMixin extends AbstractContainerScreen<Crafti
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
+        guiGraphics.blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 105,topPos + 43,0);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);

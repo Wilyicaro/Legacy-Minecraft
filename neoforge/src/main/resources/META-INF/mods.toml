@@ -1,7 +1,7 @@
 modLoader="javafml"
 loaderVersion="[1,)"
 license="${mod_license}"
-issueTrackerURL="https://github.com/MinecraftForge/MinecraftForge/issues"
+issueTrackerURL="${mod_issues}"
 
 [[mods]]
 modId="${mod_id}"
@@ -21,18 +21,6 @@ config="${mod_id}-common.mixins.json"
 modId="minecraft"
 type="required"
 versionRange="[1.20.4,)"
-ordering="NONE"
-side="BOTH"
-[[dependencies.legacy]]
-modId="architectury"
-type="required"
-versionRange="[${architectury_version},]"
-ordering="NONE"
-side="BOTH"
-[[dependencies.legacy]]
-modId="jei"
-type="optional"
-versionRange="[${jei_version},)"
 ordering="NONE"
 side="BOTH"
 

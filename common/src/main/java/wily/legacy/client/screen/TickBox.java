@@ -10,6 +10,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.CommonColor;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.function.Consumer;
@@ -54,7 +55,7 @@ public class TickBox extends AbstractButton {
         RenderSystem.enableDepthTest();
         guiGraphics.blitSprite(SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX(), this.getY(), 12, 12);
         if (selected) guiGraphics.blitSprite(TICK, this.getX(), this.getY(), 14, 12);
-        int k = isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : 0x383838;
+        int k = isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get();
         guiGraphics.setColor(1.0f, 1.0f, 1.0f, 1.0F);
         this.renderString(guiGraphics, minecraft.font, k);
     }
