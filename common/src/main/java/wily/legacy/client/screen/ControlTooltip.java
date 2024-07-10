@@ -42,6 +42,8 @@ import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.animal.horse.Llama;
 import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.Boat;
@@ -415,7 +417,7 @@ public interface ControlTooltip {
         BlockState blockState;
         if (minecraft.player.isSleeping()) return getAction("legacy.action.wake_up");
         if ((minecraft.hitResult instanceof BlockHitResult r && ((blockState = minecraft.level.getBlockState(r.getBlockPos())).getBlock() instanceof ButtonBlock || blockState.getBlock() instanceof LeverBlock || blockState.getBlock() instanceof DoorBlock || blockState.getBlock() instanceof FenceGateBlock || (blockState.getMenuProvider(minecraft.level,r.getBlockPos()) != null || minecraft.level.getBlockEntity(r.getBlockPos()) instanceof MenuProvider)))) return getAction((blockState.getBlock() instanceof AbstractChestBlock<?> || blockState.getBlock() instanceof ShulkerBoxBlock || blockState.getBlock() instanceof BarrelBlock || blockState.getBlock() instanceof HopperBlock || blockState.getBlock() instanceof DropperBlock) ? "legacy.action.open" :  "key.use");
-        if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof AbstractVillager v && !v.getOffers().isEmpty()) return getAction("legacy.action.trade");
+        if (minecraft.hitResult instanceof EntityHitResult r && (r.getEntity() instanceof AbstractVillager m && (!(m instanceof Villager v) || v.getVillagerData().getProfession() != VillagerProfession.NONE) && !m.isTrading())) return getAction("legacy.action.trade");
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack actualItem = minecraft.player.getItemInHand(hand);
             if (minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof BedBlock) return getAction("legacy.action.sleep");
