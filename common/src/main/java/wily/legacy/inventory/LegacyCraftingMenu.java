@@ -42,19 +42,20 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
 
     public static LegacyCraftingMenu craftingMenu(Inventory inventory, @Nullable MenuType<?> menuType, int i, BlockPos pos, int gridDimension){
         return new LegacyCraftingMenu(inventory,menuType,i,pos) {
+            RecipeHolder<CraftingRecipe> customRcp;
             final CraftingContainer container = new TransientCraftingContainer(this,gridDimension,gridDimension);
             final List<Ingredient> ingredientsGrid = new ArrayList<>(Collections.nCopies(gridDimension * gridDimension,Ingredient.EMPTY));
 
             @Override
             public void onCraft(Player player, ServerMenuCraftPacket packet, ItemStack result) {
                 super.onCraft(player, packet, result);
-                player.level().getRecipeManager().byKey(packet.craftId()).ifPresent(h-> player.triggerRecipeCrafted(h,container.getItems()));
+                player.level().getRecipeManager().byKey(customRcp == null ? packet.craftId() : customRcp.id()).ifPresent(h-> player.triggerRecipeCrafted(h,container.getItems()));
             }
 
             @Override
             public ItemStack getResult(Player player, ServerMenuCraftPacket packet) {
                 CraftingInput input = container.asCraftInput();
-                if (packet.craftId().equals(ServerMenuCraftPacket.EMPTY)) return player.level().getRecipeManager().getRecipeFor(RecipeType.CRAFTING,input,player.level()).map(h-> h.value().assemble(input,player.registryAccess())).orElse(ItemStack.EMPTY);
+                if (packet.craftId().equals(ServerMenuCraftPacket.EMPTY)) return player.level().getRecipeManager().getRecipeFor(RecipeType.CRAFTING,input,player.level()).map(h-> (customRcp = h).value().assemble(input,player.registryAccess())).orElse(ItemStack.EMPTY);
                 return player.level().getRecipeManager().byKey(packet.craftId()).map(h-> h.value() instanceof CraftingRecipe rcp ? rcp.assemble(input,player.registryAccess()) : null).orElse(ItemStack.EMPTY);
             }
 
