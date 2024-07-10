@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "block": "#minecraft:wooden_buttons",
+    "tip": "block.minecraft.button.tip"
+  }
+}

@@ -5,7 +5,6 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -14,31 +13,28 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4JClient;
+import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyTip;
-import wily.legacy.client.controller.ControllerComponent;
+import wily.legacy.client.LegacyTipManager;
+import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.LegacyMenuAccess;
-import wily.legacy.inventory.LegacySlotWrapper;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Set;
 
-import static wily.legacy.client.screen.ControlTooltip.*;
-
 @Mixin(AbstractContainerScreen.class)
-public abstract class AbstractContainerScreenMixin extends Screen implements LegacyMenuAccess {
+public abstract class AbstractContainerScreenMixin extends Screen implements LegacyMenuAccess,ControlTooltip.Event {
     @Shadow protected int leftPos;
 
     @Shadow protected int topPos;
@@ -66,32 +62,29 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Shadow protected int imageWidth;
 
     @Shadow protected Slot hoveredSlot;
-    private Renderer controlTooltipRenderer = new Renderer(this).add(()-> getActiveType().isKeyboard() ? getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true) : ControllerComponent.DOWN_BUTTON.componentState.getIcon(true),()->getHoveredSlot() != null && (getHoveredSlot().hasItem() || !menu.getCarried().isEmpty()) ? CONTROL_ACTION_CACHE.getUnchecked(getHoveredSlot().hasItem() && !getHoveredSlot().getItem().is(menu.getCarried().getItem()) ? menu.getCarried().isEmpty() ? "legacy.action.take" : "legacy.action.swap" : "legacy.action.place") : null).
-            add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_ESCAPE,true) : ControllerComponent.RIGHT_BUTTON.componentState.getIcon(true),()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.exit")).
-            add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.MOUSE_BUTTON_RIGHT,true) : ControllerComponent.LEFT_BUTTON.componentState.getIcon(true),()->getHoveredSlot() != null && getHoveredSlot().getItem().getCount() > 1 ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.take_half") : null ).
-            add(()->getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true),PLUS,getKeyIcon(InputConstants.KEY_LSHIFT,true)}) : ControllerComponent.UP_BUTTON.componentState.getIcon(true),()-> getHoveredSlot() != null && getHoveredSlot().hasItem() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.quick_move") : null).
-            add(()->getActiveType().isKeyboard() ? getKeyIcon(InputConstants.KEY_W,true) : ControllerComponent.RIGHT_TRIGGER.componentState.getIcon(true),()->getHoveredSlot() != null && getHoveredSlot().hasItem() ? CONTROL_ACTION_CACHE.getUnchecked("legacy.action.whats_this") : null);
+
+    @Shadow protected abstract void init();
+
+    @ModifyArg(method = "renderLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)I"), index = 4)
+    private int renderLabels(int i){
+        return CommonColor.INVENTORY_GRAY_TEXT.get();
+    }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
-        if (LegacyMinecraftClient.keyCrafting.matches(i, j)) {
+        if (Legacy4JClient.keyCrafting.matches(i, j)) {
             this.onClose();
             cir.setReturnValue(true);
         }
         if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && ScreenUtil.hasTip(hoveredSlot.getItem())) {
             ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
-            LegacyTip oldTip = minecraft.getToasts().getToast(LegacyTip.class, Toast.NO_TOKEN);
-            if (oldTip == null) ScreenUtil.addTip(hoveredSlot.getItem().copy());
-            else oldTip.tip(ScreenUtil.getTip(hoveredSlot.getItem())).autoHeight().title(Component.translatable(hoveredSlot.getItem().getDescriptionId())).itemStack(hoveredSlot.getItem().copy());
+            LegacyTipManager.setActualTip(new LegacyTip(hoveredSlot.getItem().copy()));
         }
     }
-    @Inject(method = "slotClicked", at = @At("HEAD"))
-    private void slotClicked(Slot slot, int i, int j, ClickType clickType, CallbackInfo ci) {
-        ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
-    }
-    @Inject(method = "render", at = @At(value = "HEAD"))
-    private void renderBackground(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
-        controlTooltipRenderer.render(guiGraphics, i, j, f);
+
+    @Inject(method = "mouseClicked", at = @At("RETURN"))
+    private void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
+        if (getChildAt(d,e).isEmpty()) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
     }
     @Inject(method = "renderFloatingItem", at = @At(value = "HEAD"), cancellable = true)
     private void renderFloatingItem(GuiGraphics guiGraphics, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
@@ -110,14 +103,10 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
     private void renderSlot(GuiGraphics graphics, Slot slot, CallbackInfo ci) {
         ci.cancel();
-        Minecraft minecraft = Minecraft.getInstance();
         graphics.pose().pushPose();
         LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(slot);
-        if (slot instanceof LegacySlotWrapper wrapper) {
-            if (wrapper.hasIconHolder())
-                holder.render(graphics, 0, 0, 0);
-            holder.applyOffset(graphics);
-        }
+        holder.render(graphics, 0, 0, 0);
+        holder.applyOffset(graphics);
         graphics.pose().translate(slot.x,slot.y,0);
         graphics.pose().scale(holder.getSelectableWidth() / 16f,holder.getSelectableHeight() / 16f,holder.getSelectableHeight() / 16f);
         Pair<ResourceLocation, ResourceLocation> pair;
@@ -150,7 +139,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         }
         graphics.pose().pushPose();
         graphics.pose().translate(0.0f, 0.0f, 100.0f);
-        if (itemStack.isEmpty() && (pair = slot.getNoItemIcon()) != null) {
+        if (itemStack.isEmpty() && (pair = slot.getNoItemIcon()) != null && holder.iconSprite == null) {
             TextureAtlasSprite textureAtlasSprite = minecraft.getTextureAtlas(pair.getFirst()).apply(pair.getSecond());
             graphics.blit(0, 0, 0, 16, 16, textureAtlasSprite);
             bl2 = true;
@@ -167,15 +156,15 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     }
     @Redirect(method = "mouseClicked",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;isKeyDown(JI)Z"))
     public boolean mouseClicked(long l, int i) {
-        return InputConstants.isKeyDown(l,i) || LegacyMinecraftClient.controllerHandler.getButtonState(ControllerComponent.UP_BUTTON).pressed;
+        return InputConstants.isKeyDown(l,i) || Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).pressed;
     }
     @Redirect(method = "mouseReleased",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;hasShiftDown()Z"))
     public boolean mouseReleased(double d, double e, int i) {
-        return hasShiftDown() || LegacyMinecraftClient.controllerHandler.getButtonState(ControllerComponent.UP_BUTTON).released;
+        return hasShiftDown() || Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).released;
     }
     @Redirect(method = "mouseReleased",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;isKeyDown(JI)Z"))
     public boolean mouseReleased(long l, int i) {
-        return InputConstants.isKeyDown(l,i) || LegacyMinecraftClient.controllerHandler.getButtonState(ControllerComponent.UP_BUTTON).released;
+        return InputConstants.isKeyDown(l,i) || Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).released;
     }
 
     @Override
@@ -187,8 +176,9 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     public ScreenRectangle getMenuRectangle() {
         return new ScreenRectangle(leftPos,topPos,width,height);
     }
-    public Renderer getControlTooltipRenderer() {
-        return controlTooltipRenderer;
-    }
 
+    @Redirect(method = "renderTooltip",at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"))
+    public boolean renderTooltip(ItemStack instance) {
+        return true;
+    }
 }

@@ -9,15 +9,13 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.crafting.StonecutterRecipe;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
 import wily.legacy.util.JsonUtil;
+import wily.legacy.util.RecipeValue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class StoneCuttingGroupManager extends SimplePreparableReloadListener<Map<String,List<RecipeValue<Container,StonecutterRecipe>>>> {
     public static final Map<String,List<RecipeValue<Container,StonecutterRecipe>>> list = new LinkedHashMap<>();
@@ -26,14 +24,14 @@ public class StoneCuttingGroupManager extends SimplePreparableReloadListener<Map
     protected Map<String,List<RecipeValue<Container,StonecutterRecipe>>> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
         Map<String,List<RecipeValue<Container,StonecutterRecipe>>> groups = new LinkedHashMap<>();
         ResourceManager manager = Minecraft.getInstance().getResourceManager();
-        manager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1)).forEach(name->manager.getResource(new ResourceLocation(name, STONECUTTING_GROUPS)).ifPresent(r->{
+        JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(new ResourceLocation(name, STONECUTTING_GROUPS)).ifPresent(r->{
             try {
                 BufferedReader bufferedReader = r.openAsReader();
                 JsonObject obj = GsonHelper.parse(bufferedReader);
                 if (obj.has("groups")) JsonUtil.addGroupedRecipeValuesFromJson(groups,obj.get("groups"));
                 bufferedReader.close();
             } catch (IOException exception) {
-                LegacyMinecraft.LOGGER.warn(exception.getMessage());
+                Legacy4J.LOGGER.warn(exception.getMessage());
             }
         }));
         return groups;

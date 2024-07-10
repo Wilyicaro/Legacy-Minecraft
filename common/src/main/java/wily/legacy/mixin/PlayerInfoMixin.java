@@ -1,7 +1,10 @@
 package wily.legacy.mixin;
 
 import com.mojang.authlib.GameProfile;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.stats.Stat;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import wily.legacy.player.LegacyPlayerInfo;
@@ -19,6 +22,7 @@ public abstract class PlayerInfoMixin implements LegacyPlayerInfo {
     boolean visible = true;
     boolean disableExhaustion = false;
     boolean mayFlySurvival = false;
+    Object2IntMap<Stat<?>> statsMap = new Object2IntOpenHashMap<>();
     @Override
     public int getPosition() {
         return position;
@@ -55,5 +59,15 @@ public abstract class PlayerInfoMixin implements LegacyPlayerInfo {
     @Override
     public void setMayFlySurvival(boolean mayFly) {
         this.mayFlySurvival = mayFly;
+    }
+
+    @Override
+    public Object2IntMap<Stat<?>> getStatsMap() {
+        return statsMap;
+    }
+
+    @Override
+    public void setStatsMap(Object2IntMap<Stat<?>> statsMap) {
+        this.statsMap = statsMap;
     }
 }

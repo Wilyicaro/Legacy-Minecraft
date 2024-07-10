@@ -4,21 +4,21 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractButton;
-import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
+import wily.legacy.client.CommonColor;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class TickBox extends AbstractButton {
-    public static final ResourceLocation[] SPRITES = new ResourceLocation[]{new ResourceLocation(LegacyMinecraft.MOD_ID, "widget/tickbox"), new ResourceLocation(LegacyMinecraft.MOD_ID, "widget/tickbox_hovered")};
-    public static final ResourceLocation TICK_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID, "widget/tick");
+    public static final ResourceLocation[] SPRITES = new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID, "widget/tickbox"), new ResourceLocation(Legacy4J.MOD_ID, "widget/tickbox_hovered")};
+    public static final ResourceLocation TICK = new ResourceLocation(Legacy4J.MOD_ID, "widget/tick");
     protected final Function<Boolean,Component> message;
     protected Function<Boolean,Tooltip> tooltip;
     private final Consumer<TickBox> onPress;
@@ -54,8 +54,8 @@ public class TickBox extends AbstractButton {
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
         guiGraphics.blitSprite(SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX(), this.getY(), 12, 12);
-        if (selected) guiGraphics.blitSprite(TICK_SPRITE, this.getX(), this.getY(), 14, 12);
-        int k = isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : 0x404040;
+        if (selected) guiGraphics.blitSprite(TICK, this.getX(), this.getY(), 14, 12);
+        int k = isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get();
         guiGraphics.setColor(1.0f, 1.0f, 1.0f, 1.0F);
         this.renderString(guiGraphics, minecraft.font, k);
     }

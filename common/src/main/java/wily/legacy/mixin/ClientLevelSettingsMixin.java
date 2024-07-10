@@ -1,6 +1,7 @@
 package wily.legacy.mixin;
 
 import com.mojang.serialization.Dynamic;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.WorldDataConfiguration;
 import org.spongepowered.asm.mixin.Final;
@@ -12,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.LegacyWorldSettings;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 

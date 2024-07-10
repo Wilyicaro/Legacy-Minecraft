@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.1.2"
+    id "com.github.johnrengelman.shadow"
 }
 
 architectury {
@@ -21,51 +21,22 @@ configurations {
     runtimeClasspath.extendsFrom common
     developmentFabric.extendsFrom common
 }
+repositories {
+    maven {
+        name = "Terraformers"
+        url = "https://maven.terraformersmc.com/"
+    }
+}
 
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
-    modApi "dev.architectury:architectury-fabric:${rootProject.architectury_version}"
-
-    modCompileOnly "maven.modrinth:sodium:mc1.20.3-0.5.5"
-    //modCompileOnly "mezz.jei:jei-${jei_minecraft_version}-fabric-api:${jei_version}"
-    //modRuntimeOnly "mezz.jei:jei-${jei_minecraft_version}-fabric:${jei_version}"
+    api(include(sdl_dependency))
+    modImplementation("com.terraformersmc:modmenu:8.0.1")
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
-}
-
-processResources {
-    inputs.property "version", "${mod_version}"
-    inputs.property "mod_id", "${mod_id}"
-    inputs.property "mod_name", "${mod_name}"
-    inputs.property "mod_license", "${mod_license}"
-    inputs.property "mod_description", "${mod_description}"
-    inputs.property "mod_authors", "${mod_authors}"
-    inputs.property "mod_credits", "${mod_credits}"
-    inputs.property "mod_group", project.group
-    inputs.property "mod_source", "${mod_source}"
-    inputs.property "mc_version", "${minecraft_version}"
-    inputs.property "architectury_version", "${architectury_version}"
-    inputs.property "jei_version", "${jei_version}"
-
-    filesMatching("fabric.mod.json") {
-        expand (
-                "version" : "${mod_version}",
-                "mod_id" : "${mod_id}",
-                "mod_name" : "${mod_name}",
-                "mod_license" : "${mod_license}",
-                "mod_description" : "${mod_description}",
-                "mod_authors" : "${mod_authors}",
-                "mod_credits" : "${mod_credits}",
-                "mod_group" : project.group,
-                "mod_source" : "${mod_source}",
-                "mc_version" : "${minecraft_version}",
-                "architectury_version" : "${architectury_version}",
-                "jei_version" : "${jei_version}"
-        )
-    }
 }
 
 shadowJar {

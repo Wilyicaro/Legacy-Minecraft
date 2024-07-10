@@ -12,14 +12,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.screen.LegacyIconHolder;
-import wily.legacy.inventory.LegacySlotWrapper;
+import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(CyclingSlotBackground.class)
 public class CyclingSlotBackgroundMixin {
     @Inject(method = "renderIcon", at = @At("HEAD"), cancellable = true)
     private void renderIcon(Slot slot, ResourceLocation resourceLocation, float f, GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
-        if (slot instanceof LegacySlotWrapper) ci.cancel();
+        if (slot instanceof LegacySlotDisplay) ci.cancel();
         else return;
         LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(slot);
         guiGraphics.pose().pushPose();

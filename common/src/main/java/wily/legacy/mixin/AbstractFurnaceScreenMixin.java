@@ -13,14 +13,18 @@ import net.minecraft.world.inventory.AbstractFurnaceMenu;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.LegacySprites;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
-import static wily.legacy.client.LegacySprites.ARROW_SPRITE;
+import static wily.legacy.util.LegacySprites.ARROW;
 
 @Mixin(AbstractFurnaceScreen.class)
-public class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends AbstractContainerScreen<T> {
+public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends AbstractContainerScreen<T> {
     @Shadow private boolean widthTooNarrow;
 
     @Shadow @Final public AbstractFurnaceRecipeBookComponent recipeBookComponent;
@@ -29,8 +33,9 @@ public class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends A
     public AbstractFurnaceScreenMixin(T abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
-    @Override
-    public void init() {
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         imageWidth = 214;
         imageHeight = 215;
         inventoryLabelX = 14;
@@ -55,9 +60,9 @@ public class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends A
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         super.renderLabels(guiGraphics, i, j);
         Component ingredient = Component.translatable("legacy.container.ingredient");
-        guiGraphics.drawString(this.font, ingredient, 70 - font.width(ingredient), 32, 0x404040, false);
+        guiGraphics.drawString(this.font, ingredient, 70 - font.width(ingredient), 32, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         Component fuel = Component.translatable("legacy.container.fuel");
-        guiGraphics.drawString(this.font, fuel, 70 - font.width(fuel), 79, 0x404040, false);
+        guiGraphics.drawString(this.font, fuel, 70 - font.width(fuel), 79, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
 
     @Override
@@ -65,9 +70,10 @@ public class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends A
         renderBg(guiGraphics, f, i, j);
     }
 
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
-        ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
+        guiGraphics.blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 77,topPos + 48,0);
         guiGraphics.pose().scale(19/13f,19/13f,1.0f);
@@ -84,12 +90,12 @@ public class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends A
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 114,topPos + 48,0);
         guiGraphics.pose().scale(1.5f,1.5f,1.0f);
-        guiGraphics.blitSprite(ARROW_SPRITE,0,0,22,15);
+        guiGraphics.blitSprite(ARROW,0,0,22,15);
         guiGraphics.pose().popPose();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 114,topPos + 46.5,0);
         guiGraphics.pose().scale(0.5f,0.5f,1.0f);
-        guiGraphics.blitSprite(LegacySprites.FULL_ARROW_SPRITE,66,48,0,0,0,0,2, (int) Math.ceil(menu.getBurnProgress() * 66), 48);
+        guiGraphics.blitSprite(LegacySprites.FULL_ARROW,66,48,0,0,0,0,2, (int) Math.ceil(menu.getBurnProgress() * 66), 48);
         guiGraphics.pose().popPose();
         if (!recipeBookComponent.isVisible() && recipeButton != null && !recipeButton.isHovered()) recipeButton.setFocused(false);
     }

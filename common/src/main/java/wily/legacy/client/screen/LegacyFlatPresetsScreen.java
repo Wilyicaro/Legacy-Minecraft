@@ -11,7 +11,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorPreset;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
+import wily.legacy.client.CommonColor;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Set;
@@ -25,7 +27,7 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen{
         presetGetter.listElements().forEach(holder->{
             Set<Block> set = (holder.value()).settings().getLayersInfo().stream().map((flatLayerInfo) -> flatLayerInfo.getBlockState().getBlock()).filter((block) -> !block.isEnabled(enabledFeatures)).collect(Collectors.toSet());
             if (!set.isEmpty()) {
-                LegacyMinecraft.LOGGER.info("Discarding flat world preset {} since it contains experimental blocks {}", holder.unwrapKey().map((resourceKey) -> resourceKey.location().toString()).orElse("<unknown>"), set);
+                Legacy4J.LOGGER.info("Discarding flat world preset {} since it contains experimental blocks {}", holder.unwrapKey().map((resourceKey) -> resourceKey.location().toString()).orElse("<unknown>"), set);
             } else {
                 FlatLevelGeneratorPreset preset = holder.value();
                 renderableVList.addRenderable(new AbstractButton(0,0,263,30,Component.translatable(holder.key().location().toLanguageKey("flat_world_preset"))) {
@@ -60,15 +62,15 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen{
             }
         });
         renderableVList.layoutSpacing(l-> 0);
-        panel.dp = 3f;
+        panel.panelSprite = LegacySprites.PANEL;
     }
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         ScreenUtil.renderDefaultBackground(guiGraphics,false);
-        guiGraphics.drawString(font,getTitle(),panel.x + (panel.width - font.width(getTitle()))/2, panel.y + 9, 0x404040);
+        guiGraphics.drawString(font,getTitle(),panel.x + (panel.width - font.width(getTitle()))/2, panel.y + 9, CommonColor.INVENTORY_GRAY_TEXT.get());
         panel.render(guiGraphics,i,j,f);
-        ScreenUtil.renderPanelRecess(guiGraphics,panel.x + 6, panel.y + 20, panel.width - 12, 231,2f);
+        guiGraphics.blitSprite(LegacySprites.PANEL_RECESS,panel.x + 6, panel.y + 20, panel.width - 12, 231);
     }
 
     @Override

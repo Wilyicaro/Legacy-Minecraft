@@ -12,7 +12,6 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
@@ -23,23 +22,22 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
+import wily.legacy.client.CommonColor;
+import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyCreativeTabListing;
-import wily.legacy.client.Offset;
-import wily.legacy.client.controller.ComponentState;
-import wily.legacy.client.controller.ControllerComponent;
-import wily.legacy.client.controller.ControllerEvent;
-import wily.legacy.inventory.LegacySlotWrapper;
-import wily.legacy.util.PagedList;
-import wily.legacy.util.ScreenUtil;
-import wily.legacy.util.Stocker;
+import wily.legacy.util.*;
+import wily.legacy.client.controller.BindingState;
+import wily.legacy.client.controller.Controller;
+import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.inventory.LegacySlotDisplay;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.function.Supplier;
 
 import static wily.legacy.client.screen.ControlTooltip.*;
 
-public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeModeScreen.CreativeModeMenu> implements ControllerEvent {
+public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeModeScreen.CreativeModeMenu> implements Controller.Event,ControlTooltip.Event{
     protected Stocker.Sizeable page = new Stocker.Sizeable(0);
     protected final TabList tabList = new TabList(new PagedList<>(page,8));
     protected final Panel panel;
@@ -48,28 +46,42 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     protected boolean hasClickedOutside;
     public final List<Stocker.Sizeable> tabsScrolledList = new ArrayList<>();
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
-    protected final List<LegacyCreativeTabListing> displayListing;
+    protected final List<List<ItemStack>> displayListing = new ArrayList<>();
 
     public CreativeModeScreen(Player player) {
         super(new CreativeModeMenu(player), player.getInventory(), Component.empty());
-        ((LegacyMenuAccess<?>) this).getControlTooltipRenderer().tooltips.set(3,ControlTooltip.create(()->getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT,true),PLUS,getKeyIcon(InputConstants.KEY_LSHIFT,true)}) : ControllerComponent.UP_BUTTON.componentState.getIcon(true),()-> hoveredSlot != null && hoveredSlot.hasItem() ? CONTROL_ACTION_CACHE.getUnchecked(hoveredSlot.container == creativeModeGrid ?  "legacy.action.take_all" : "legacy.action.clear") : null));
-        ((LegacyMenuAccess<?>) this).getControlTooltipRenderer().tooltips.set(2,ControlTooltip.create(()->getActiveType().isKeyboard() ?  getKeyIcon(canClearQuickSelect() ? InputConstants.KEY_X: InputConstants.MOUSE_BUTTON_RIGHT,true) : ControllerComponent.LEFT_BUTTON.componentState.getIcon(true),()-> CONTROL_ACTION_CACHE.getUnchecked(canClearQuickSelect() ? "legacy.action.clear_quick_select" : "legacy.action.take_half")));
-        ((LegacyMenuAccess<?>)this).getControlTooltipRenderer().add(()-> page.max > 0 ? ControlTooltip.getActiveType().isKeyboard() ? COMPOUND_COMPONENT_FUNCTION.apply(new Component[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT,true),ControlTooltip.PLUS,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT,true),ControlTooltip.SPACE,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT,true)}) : ControllerComponent.RIGHT_STICK.componentState.getIcon(true) : null,()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.page"));
         LegacyCreativeTabListing.rebuildVanillaCreativeTabsItems(Minecraft.getInstance());
-        displayListing = Stream.concat(LegacyCreativeTabListing.list.stream(), BuiltInRegistries.CREATIVE_MODE_TAB.stream().filter(CreativeModeScreen::canDisplayVanillaCreativeTab).map(c->new LegacyCreativeTabListing(c.getDisplayName(), BuiltInRegistries.ITEM.getKey(c.getIconItem().getItem()), c.getIconItem().getTag(),new ArrayList<>(c.getDisplayItems())))).toList();
+        for (LegacyCreativeTabListing tab : LegacyCreativeTabListing.list) {
+            displayListing.add(tab.displayItems().stream().map(Supplier::get).filter(i-> !i.isEmpty() && i.isItemEnabled(Minecraft.getInstance().getConnection().enabledFeatures())).toList());
+            tabList.addTabButton(39, 0, tab.icon(), tab.name(), b -> fillCreativeGrid());
+        }
+        BuiltInRegistries.CREATIVE_MODE_TAB.stream().filter(CreativeModeScreen::canDisplayVanillaCreativeTab).forEach(c-> {
+            displayListing.add(List.copyOf(c.getDisplayItems()));
+            tabList.addTabButton(39, 0,LegacyTabButton.iconOf(c.getIconItem()), c.getDisplayName(), b -> fillCreativeGrid());
+        });
+
         player.containerMenu = this.menu;
         panel = new Panel(p-> (width - p.width) / 2, p-> Math.max(33,(height - 179)/ 2) ,321, 212);
         displayListing.forEach(t->{
             Stocker.Sizeable scroll = new Stocker.Sizeable(0);
-            scroll.max = t.displayItems().size() <= creativeModeGrid.getContainerSize() ? 0 : t.displayItems().size() / creativeModeGrid.getContainerSize();
+            scroll.max = t.size() <= creativeModeGrid.getContainerSize() ? 0 : t.size() / creativeModeGrid.getContainerSize();
             tabsScrolledList.add(scroll);
         });
 
-        for (LegacyCreativeTabListing tab : displayListing)
-            tabList.addTabButton(39, 0, tab.icon(), tab.itemIconTag(), tab.name(), b -> fillCreativeGrid());
     }
+
+    @Override
+    public void addControlTooltips(Renderer renderer) {
+        Event.super.addControlTooltips(renderer);
+        renderer.
+                set(3,ControlTooltip.create(()-> ControlType.getActiveType().isKbm() ? COMPOUND_ICON_FUNCTION.apply(new Icon[]{getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT), PLUS_ICON,getKeyIcon(InputConstants.KEY_LSHIFT)}) : ControllerBinding.UP_BUTTON.bindingState.getIcon(),()-> hoveredSlot != null && hoveredSlot.hasItem() ? getAction(hoveredSlot.container == creativeModeGrid ?  "legacy.action.take_all" : "legacy.action.clear") : null)).
+                set(2,ControlTooltip.create(()-> ControlType.getActiveType().isKbm() ?  getKeyIcon(canClearQuickSelect() ? InputConstants.KEY_X: InputConstants.MOUSE_BUTTON_RIGHT) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(),()-> getAction(canClearQuickSelect() ? "legacy.action.clear_quick_select" : "legacy.action.take_half"))).
+                add(()-> page.max > 0 ? ControlType.getActiveType().isKbm() ? COMPOUND_ICON_FUNCTION.apply(new Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.RIGHT_STICK.bindingState.getIcon() : null,()->getAction("legacy.action.page"));
+    }
+
+
     public boolean canClearQuickSelect(){
-        return hoveredSlot == null || !hoveredSlot.hasItem();
+        return hoveredSlot == null || hoveredSlot.container == minecraft.player.getInventory() && !hoveredSlot.hasItem();
     }
     public static EffectRenderingInventoryScreen<?> getActualCreativeScreenInstance(Minecraft minecraft){
         return ScreenUtil.getLegacyOptions().legacyCreativeTab().get() ? new CreativeModeScreen(minecraft.player) : new CreativeModeInventoryScreen(minecraft.player, minecraft.player.connection.enabledFeatures(), minecraft.options.operatorItemsTab().get());
@@ -115,7 +127,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     }
     public void fillCreativeGrid(){
         if (displayListing.isEmpty()) return;
-        List<ItemStack> list = displayListing.get(page.get() * 8 + tabList.selectedTab).displayItems();
+        List<ItemStack> list = displayListing.get(page.get() * 8 + tabList.selectedTab);
         for (int i = 0; i < creativeModeGrid.getContainerSize(); i++) {
             int index = tabsScrolledList.get(page.get() * 8 + tabList.selectedTab).get() * 50 + i;
             creativeModeGrid.setItem(i,list.size() > index ?  list.get(index) : ItemStack.EMPTY);
@@ -139,9 +151,9 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
                 scrollRenderer.renderScroll(guiGraphics,ScreenDirection.UP, 0, -11);
         }else guiGraphics.setColor(1.0f,1.0f,1.0f,0.5f);
         RenderSystem.enableBlend();
-        ScreenUtil.renderSquareRecessedPanel(guiGraphics, 0, 0,13,135,2f);
+        guiGraphics.blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0,13,135);
         guiGraphics.pose().translate(-2f, -1f + (scroll.max > 0 ? scroll.get() * 121.5f / scroll.max : 0), 0f);
-        ScreenUtil.renderPanel(guiGraphics,0,0, 16,16,3f);
+        guiGraphics.blitSprite(LegacySprites.PANEL,0,0, 16,16);
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
         guiGraphics.pose().popPose();
@@ -151,7 +163,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         Component tabTitle = tabList.tabButtons.get(tabList.selectedTab).getMessage();
-        guiGraphics.drawString(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, 12, 0x404040, false);
+        guiGraphics.drawString(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, 12, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
 
     @Override
@@ -176,6 +188,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
 
     @Override
     public boolean mouseClicked(double d, double e, int i) {
+        if (canClearQuickSelect() && i == 1) return false;
         updateCreativeGridScroll(d,e,i);
         return super.mouseClicked(d, e, i);
     }
@@ -199,21 +212,11 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
             }
         }
     }
-    protected void controlPage(boolean left, boolean right){
-        if ((left|| right) && page.max > 0){
-            int lastPage = page.get();
-            page.add(left ? -1 : 1);
-            if (lastPage != page.get()) {
-                tabList.resetSelectedTab();
-                rebuildWidgets();
-            }
-        }
-    }
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
         tabList.controlTab(i);
-        if (hasShiftDown()) controlPage(i == 263 , i == 262);
+        if (hasShiftDown() && tabList.controlPage(page,i == 263 , i == 262)) repositionElements();
         if (i == InputConstants.KEY_X && canClearQuickSelect()) {
             for (int n = 36; n < 45; ++n)
                 this.minecraft.gameMode.handleCreativeModeItemAdd(ItemStack.EMPTY, n);
@@ -222,9 +225,8 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
         return super.keyPressed(i, j, k);
     }
     protected void slotClicked(@Nullable Slot slot, int i, int j, ClickType clickType) {
-        if(slot != null) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
         boolean bl = clickType == ClickType.QUICK_MOVE;
-       clickType = i == -999 && clickType == ClickType.PICKUP ? ClickType.THROW : clickType;
+        clickType = i == -999 && clickType == ClickType.PICKUP ? ClickType.THROW : clickType;
         if (slot != null || clickType == ClickType.QUICK_CRAFT) {
             if (slot != null && !slot.mayPickup(this.minecraft.player)) {
                 return;
@@ -320,8 +322,10 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     }
 
     @Override
-    public void componentTick(ComponentState state) {
-        if (state.is(ControllerComponent.RIGHT_STICK) && state instanceof ComponentState.Stick s && s.pressed && s.canClick()) controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
+    public void bindingStateTick(BindingState state) {
+        if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s && s.pressed && s.canClick() && tabList.controlPage(page,s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y))){
+            repositionElements();
+        }
     }
 
     public static class CreativeModeMenu extends AbstractContainerMenu {
@@ -332,7 +336,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
             this.inventoryMenu = player.inventoryMenu;
             for (int h = 0; h < 5; h++) {
                 for (int x = 0; x < 10; x++) {
-                    addSlot(new LegacySlotWrapper(creativeModeGrid,h * 10 + x, 21 + x * 27, 29 + h * 27){
+                    addSlot(LegacySlotDisplay.override(new Slot(creativeModeGrid,h * 10 + x, 21 + x * 27, 29 + h * 27), new LegacySlotDisplay(){
                         public int getWidth() {
                             return 27;
                         }
@@ -340,11 +344,11 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
                         public int getHeight() {
                             return 27;
                         }
-                    });
+                    }));
                 }
             }
             for (int x = 0; x < 9; x++) {
-                addSlot(new LegacySlotWrapper(player.getInventory(), x,35 + x * 27,176){
+                addSlot(LegacySlotDisplay.override(new Slot(player.getInventory(), x,35 + x * 27,176), new LegacySlotDisplay(){
                     public int getWidth() {
                         return 27;
                     }
@@ -352,7 +356,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
                     public int getHeight() {
                         return 27;
                     }
-                });
+                }));
             }
         }
 

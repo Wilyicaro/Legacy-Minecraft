@@ -29,9 +29,11 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
 import net.minecraft.world.level.validation.ContentValidationException;
 import net.minecraft.world.level.validation.ForbiddenSymlinkInfo;
+import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.ScreenUtil;
 
@@ -50,14 +52,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public class SaveRenderableList extends RenderableVList {
-    static final ResourceLocation ERROR_HIGHLIGHTED_SPRITE = new ResourceLocation("world_list/error_highlighted");
-    static final ResourceLocation ERROR_SPRITE = new ResourceLocation("world_list/error");
-    static final ResourceLocation MARKED_JOIN_HIGHLIGHTED_SPRITE = new ResourceLocation("world_list/marked_join_highlighted");
-    static final ResourceLocation MARKED_JOIN_SPRITE = new ResourceLocation("world_list/marked_join");
-    static final ResourceLocation WARNING_HIGHLIGHTED_SPRITE = new ResourceLocation("world_list/warning_highlighted");
-    static final ResourceLocation WARNING_SPRITE = new ResourceLocation("world_list/warning");
-    static final ResourceLocation JOIN_HIGHLIGHTED_SPRITE = new ResourceLocation("world_list/join_highlighted");
-    static final ResourceLocation JOIN_SPRITE = new ResourceLocation("world_list/join");
+    static final ResourceLocation ERROR_HIGHLIGHTED = new ResourceLocation("world_list/error_highlighted");
+    static final ResourceLocation ERROR = new ResourceLocation("world_list/error");
+    static final ResourceLocation MARKED_JOIN_HIGHLIGHTED = new ResourceLocation("world_list/marked_join_highlighted");
+    static final ResourceLocation MARKED_JOIN = new ResourceLocation("world_list/marked_join");
+    static final ResourceLocation WARNING_HIGHLIGHTED = new ResourceLocation("world_list/warning_highlighted");
+    static final ResourceLocation WARNING = new ResourceLocation("world_list/warning");
+    static final ResourceLocation JOIN_HIGHLIGHTED = new ResourceLocation("world_list/join_highlighted");
+    static final ResourceLocation JOIN = new ResourceLocation("world_list/join");
     static final Logger LOGGER = LogUtils.getLogger();
     static final Component FROM_NEWER_TOOLTIP_1 = Component.translatable("selectWorld.tooltip.fromNewerVersion1").withStyle(ChatFormatting.RED);
     static final Component FROM_NEWER_TOOLTIP_2 = Component.translatable("selectWorld.tooltip.fromNewerVersion2").withStyle(ChatFormatting.RED);
@@ -66,13 +68,19 @@ public class SaveRenderableList extends RenderableVList {
     static final Component WORLD_LOCKED_TOOLTIP = Component.translatable("selectWorld.locked").withStyle(ChatFormatting.RED);
     static final Component WORLD_REQUIRES_CONVERSION = Component.translatable("selectWorld.conversion.tooltip").withStyle(ChatFormatting.RED);
     static final Component WORLD_EXPERIMENTAL = Component.translatable("selectWorld.experimental");
-
+    static final Component INCOMPATIBLE_VERSION_TOOLTIP = Component.translatable("selectWorld.incompatible.tooltip").withStyle(ChatFormatting.RED);
     protected PlayGameScreen screen;
     protected Minecraft minecraft;
     private CompletableFuture<List<LevelSummary>> pendingLevels;
     @Nullable
     public List<LevelSummary> currentlyDisplayedLevels;
     private String filter;
+    public static LoadingCache<LevelSummary, Long> sizeCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
+        @Override
+        public Long load(LevelSummary key) {
+            return FileUtils.sizeOfDirectory(Minecraft.getInstance().getLevelSource().getLevelPath(key.getLevelId()).toFile());
+        }
+    });
     public static LoadingCache<LevelSummary, FaviconTexture> iconCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
         @Override
         public FaviconTexture load(LevelSummary key) {
@@ -82,7 +90,7 @@ public class SaveRenderableList extends RenderableVList {
                 if (basicFileAttributes.isSymbolicLink()) {
                     List<ForbiddenSymlinkInfo> list = Minecraft.getInstance().directoryValidator().validateSymlink(iconFile);
                     if (!list.isEmpty()) {
-                        LegacyMinecraft.LOGGER.warn("{}", ContentValidationException.getMessage(iconFile, list));
+                        Legacy4J.LOGGER.warn("{}", ContentValidationException.getMessage(iconFile, list));
                         iconFile = null;
                     } else {
                         basicFileAttributes = Files.readAttributes(iconFile, BasicFileAttributes.class);
@@ -94,7 +102,7 @@ public class SaveRenderableList extends RenderableVList {
             } catch (NoSuchFileException noSuchFileException) {
                 iconFile = null;
             } catch (IOException iOException) {
-                LegacyMinecraft.LOGGER.error("could not validate symlink", iOException);
+                Legacy4J.LOGGER.error("could not validate symlink", iOException);
                 iconFile = null;
             }
             FaviconTexture icon = FaviconTexture.forWorld(Minecraft.getInstance().getTextureManager(), key.getLevelId());
@@ -103,7 +111,7 @@ public class SaveRenderableList extends RenderableVList {
                 try (InputStream inputStream = Files.newInputStream(iconFile)) {
                     icon.upload(NativeImage.read(inputStream));
                 } catch (Throwable throwable) {
-                    LegacyMinecraft.LOGGER.error("Invalid icon for world {}", key.getLevelId(), throwable);
+                    Legacy4J.LOGGER.error("Invalid icon for world {}", key.getLevelId(), throwable);
                 }
             } else {
                 icon.clear();
@@ -151,7 +159,7 @@ public class SaveRenderableList extends RenderableVList {
         try {
             levelCandidates = this.minecraft.getLevelSource().findLevelCandidates();
         } catch (LevelStorageException levelStorageException) {
-            LegacyMinecraft.LOGGER.error("Couldn't load level list", levelStorageException);
+            Legacy4J.LOGGER.error("Couldn't load level list", levelStorageException);
             handleLevelLoadFailure(minecraft,levelStorageException.getMessageComponent());
             return CompletableFuture.completedFuture(List.of());
         }
@@ -161,7 +169,9 @@ public class SaveRenderableList extends RenderableVList {
         }
 
         if (currentlyDisplayedLevels == null || currentlyDisplayedLevels.isEmpty()) screen.isLoading = true;
-        return this.minecraft.getLevelSource().loadLevelSummaries(levelCandidates).exceptionally(throwable -> {
+        CompletableFuture<List<LevelSummary>> completableFuture = this.minecraft.getLevelSource().loadLevelSummaries(levelCandidates);
+        completableFuture.thenAcceptAsync(l-> l.forEach(s->sizeCache.refresh(s)));
+        return completableFuture.exceptionally(throwable -> {
             this.minecraft.delayCrash(CrashReport.forThrowable(throwable, "Couldn't load level list"));
             return List.of();
         });
@@ -198,7 +208,7 @@ public class SaveRenderableList extends RenderableVList {
 
                     @Override
                     protected MutableComponent createNarrationMessage() {
-                        MutableComponent component = Component.translatable("narrator.select.world_info", summary.getLevelName(), new Date(summary.getLastPlayed()), summary.getInfo());
+                        MutableComponent component = Component.translatable("narrator.select.world_info", summary.getLevelName(), new Date(summary.getLastPlayed()).toString(), summary.getInfo());
                         if (summary.isLocked()) {
                             component = CommonComponents.joinForNarration(component, WORLD_LOCKED_TOOLTIP);
                         }
@@ -218,10 +228,10 @@ public class SaveRenderableList extends RenderableVList {
                             guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
 
                             boolean hoverIcon = ScreenUtil.isMouseOver(i, j, getX() + 5, getY() + 5, 20, height);
-                            ResourceLocation resourceLocation = hoverIcon ? JOIN_HIGHLIGHTED_SPRITE : JOIN_SPRITE;
-                            ResourceLocation resourceLocation2 = hoverIcon ? WARNING_HIGHLIGHTED_SPRITE : WARNING_SPRITE;
-                            ResourceLocation resourceLocation3 = hoverIcon ? ERROR_HIGHLIGHTED_SPRITE : ERROR_SPRITE;
-                            ResourceLocation resourceLocation4 = hoverIcon ? MARKED_JOIN_HIGHLIGHTED_SPRITE : MARKED_JOIN_SPRITE;
+                            ResourceLocation resourceLocation = hoverIcon ? JOIN_HIGHLIGHTED : JOIN;
+                            ResourceLocation resourceLocation2 = hoverIcon ? WARNING_HIGHLIGHTED : WARNING;
+                            ResourceLocation resourceLocation3 = hoverIcon ? ERROR_HIGHLIGHTED : ERROR;
+                            ResourceLocation resourceLocation4 = hoverIcon ? MARKED_JOIN_HIGHLIGHTED : MARKED_JOIN;
                             if (summary instanceof LevelSummary.SymlinkLevelSummary) {
                                 guiGraphics.blitSprite(resourceLocation3, getX(), getY(), 32, 32);
                                 guiGraphics.blitSprite(resourceLocation4, getX(), getY(), 32, 32);
@@ -278,7 +288,7 @@ public class SaveRenderableList extends RenderableVList {
     }
 
     public static void handleLevelLoadFailure(Minecraft minecraft, Component component) {
-        minecraft.setScreen(new ConfirmationScreen(new MainMenuScreen(), Component.translatable("selectWorld.futureworld.error.title"), component, (b)->{}){
+        minecraft.setScreen(new ConfirmationScreen(new TitleScreen(), Component.translatable("selectWorld.futureworld.error.title"), component, (b)->{}){
             protected void initButtons() {
                 okButton = addRenderableWidget(Button.builder(Component.translatable("gui.ok"),(b)-> onClose()).bounds(panel.x + 15, panel.y + panel.height - 30,200,20).build());
             }

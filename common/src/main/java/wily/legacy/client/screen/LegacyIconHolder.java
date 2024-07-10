@@ -13,24 +13,30 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.client.Offset;
-import wily.legacy.inventory.LegacySlotWrapper;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import wily.legacy.Legacy4J;
+import wily.legacy.util.Offset;
+import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.ScreenUtil;
 
 public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEventListener, NarratableEntry {
-    public static final ResourceLocation ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/icon_holder");
-    public static final ResourceLocation SIZEABLE_ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/sizeable_icon_holder");
-    public static final ResourceLocation SELECT_ICON_HIGHLIGHT = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/select_icon_highlight");
-    public static final ResourceLocation RED_ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/red_icon_holder");
-    public static final ResourceLocation GRAY_ICON_HOLDER = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/gray_icon_holder");
-    public static final ResourceLocation WARNING_ICON = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/icon_warning");
+    public static final ResourceLocation ICON_HOLDER = new ResourceLocation(Legacy4J.MOD_ID,"container/icon_holder");
+    public static final ResourceLocation SIZEABLE_ICON_HOLDER = new ResourceLocation(Legacy4J.MOD_ID,"container/sizeable_icon_holder");
+    public static final ResourceLocation SELECT_ICON_HIGHLIGHT = new ResourceLocation(Legacy4J.MOD_ID,"container/select_icon_highlight");
+    public static final ResourceLocation RED_ICON_HOLDER = new ResourceLocation(Legacy4J.MOD_ID,"container/red_icon_holder");
+    public static final ResourceLocation GRAY_ICON_HOLDER = new ResourceLocation(Legacy4J.MOD_ID,"container/gray_icon_holder");
+    public static final ResourceLocation WARNING_ICON = new ResourceLocation(Legacy4J.MOD_ID,"container/icon_warning");
 
     public Offset offset = Offset.ZERO;
     public ResourceLocation iconSprite = null;
+    public LegacySlotDisplay.IconHolderOverride iconHolderOverride = null;
     @NotNull
     public ItemStack itemIcon = ItemStack.EMPTY;
 
@@ -62,27 +68,49 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         setX(x);
         setY(y);
     }
-    public LegacyIconHolder slotBounds(int leftPos, int topPos, Slot slot){
-        iconSprite = slot instanceof LegacySlotWrapper s ? s.getIconSprite() : null;
-        return itemHolder(leftPos + slot.x,topPos + slot.y,slot instanceof LegacySlotWrapper s ? s.getWidth() : 18,slot instanceof LegacySlotWrapper s ? s.getHeight() : 18,ItemStack.EMPTY,false,slot instanceof LegacySlotWrapper s ? s.getOffset() : Offset.ZERO);
+
+    @Override
+    public boolean isHovered(double mouseX, double mouseY) {
+        return isHovered;
     }
-    public LegacyIconHolder itemHolder(ItemStack itemIcon, boolean isWarning){
-        this.itemIcon = itemIcon;
-        this.isWarning = isWarning;
-        allowItemDecorations = true;
-        return this;
-    }
-    public LegacyIconHolder itemHolder(ItemStack itemIcon, boolean isWarning, Offset offset){
-        this.offset = offset;
-        return itemHolder(itemIcon,isWarning);
-    }
-    public LegacyIconHolder itemHolder(int x, int y,int width, int height, ItemStack itemIcon, boolean isWarning, Offset offset){
-        setPos(x,y);
-        setBounds(width,height);
-        return itemHolder(itemIcon,isWarning,offset);
-    }
+
     public LegacyIconHolder slotBounds(Slot slot){
         return slotBounds(0,0,slot);
+    }
+    public LegacyIconHolder slotBounds(int leftPos, int topPos, Slot slot){
+        return itemHolder(leftPos + slot.x,topPos + slot.y,LegacySlotDisplay.of(slot).getWidth(),LegacySlotDisplay.of(slot).getHeight(),ItemStack.EMPTY,false,LegacySlotDisplay.of(slot).getIconSprite(),LegacySlotDisplay.of(slot).getOffset(),LegacySlotDisplay.of(slot).getIconHolderOverride());
+    }
+    public LegacyIconHolder itemHolder(ItemStack itemIcon, boolean isWarning){
+        return itemHolder(itemIcon,isWarning,Offset.ZERO);
+    }
+    public LegacyIconHolder itemHolder(ItemStack itemIcon, boolean isWarning, Offset offset){
+        return itemHolder(0,0,21,21,itemIcon,isWarning,offset);
+    }
+    public LegacyIconHolder itemHolder(int x, int y, int width, int height, ItemStack itemIcon, boolean isWarning, Offset offset){
+        return itemHolder(x,y,width,height,itemIcon,isWarning,null,offset,null);
+    }
+    public LegacyIconHolder itemHolder(int x, int y, int width, int height, ItemStack itemIcon, boolean isWarning, ResourceLocation iconSprite, Offset offset, LegacySlotDisplay.IconHolderOverride override){
+        setPos(x,y);
+        setBounds(width,height);
+        this.iconSprite = iconSprite;
+        this.iconHolderOverride = override;
+        this.itemIcon = itemIcon;
+        this.isWarning = isWarning;
+        this.allowItemDecorations = true;
+        this.offset = offset;
+        return this;
+    }
+    public static LegacyIconHolder entityHolder(int x, int y, int width, int height, EntityType<?> entityType){
+        return new LegacyIconHolder(x,y,width,height) {
+            Entity entity;
+
+            @Override
+            public void render(GuiGraphics graphics, int i, int j, float f) {
+                super.render(graphics, i, j, f);
+                if (entity == null && Minecraft.getInstance().level != null) entity = entityType.create(Minecraft.getInstance().level);
+                if (entity != null) renderEntity(graphics, entity, i, j, f);
+            }
+        };
     }
     public double getMiddleX(){
         return getXCorner() + offset.x() + getWidth() / 2f;
@@ -119,17 +147,20 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         this.isWarning = warning;
     }
     public ResourceLocation getIconHolderSprite(){
-        return isWarning() ? RED_ICON_HOLDER : isSizeable() ? SIZEABLE_ICON_HOLDER : ICON_HOLDER;
+        return iconHolderOverride == null ? isWarning() ? RED_ICON_HOLDER : isSizeable() ? SIZEABLE_ICON_HOLDER : ICON_HOLDER : iconHolderOverride.sprite();
     }
 
     @Override
     public void render(GuiGraphics graphics, int i, int j, float f) {
         isHovered = ScreenUtil.isMouseOver(i, j, getXCorner(), getYCorner(), width, height);
-        graphics.pose().pushPose();
-        graphics.pose().translate(getXCorner(),getYCorner(),0);
-        applyOffset(graphics);
-        graphics.blitSprite(getIconHolderSprite(), 0, 0, getWidth(), getHeight());
-        graphics.pose().popPose();
+        ResourceLocation sprite = getIconHolderSprite();
+        if (sprite != null){
+            graphics.pose().pushPose();
+            graphics.pose().translate(getXCorner(),getYCorner(),0);
+            applyOffset(graphics);
+            graphics.blitSprite(sprite, 0, 0, getWidth(), getHeight());
+            graphics.pose().popPose();
+        }
         if (iconSprite != null) {
             renderIcon(iconSprite, graphics, canSizeIcon(), 16, 16);
         }
@@ -140,8 +171,8 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         graphics.pose().translate(getX(), getY(),0);
         applyOffset(graphics);
         if (scaled) {
-            graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
-        }else graphics.pose().translate((getSelectableWidth() - 16) / 2,(getSelectableHeight() - 16) / 2,0);
+            graphics.pose().scale(getSelectableWidth() / width,getSelectableHeight() / height,getSelectableHeight() / 16f);
+        }else graphics.pose().translate((getSelectableWidth() - width) / 2,(getSelectableHeight() - height) / 2,0);
         graphics.blitSprite(location, 0, 0, width, height);
         graphics.pose().popPose();
     }
@@ -156,12 +187,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         },x,y,isWarning);
     }
     public void renderItem(GuiGraphics graphics, Runnable itemRender, int x, int y, boolean isWarning){
-        graphics.pose().pushPose();
-        graphics.pose().translate(x,y,0);
-        applyOffset(graphics);
-        graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
-        itemRender.run();
-        graphics.pose().popPose();
+        renderScaled(graphics,x,y,itemRender);
         if (isWarning) {
             RenderSystem.disableDepthTest();
             graphics.pose().pushPose();
@@ -170,6 +196,19 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             graphics.pose().popPose();
             RenderSystem.enableDepthTest();
         }
+    }
+    public void renderEntity(GuiGraphics graphics, Entity entity, int i, int j, float f){
+        entity.setYRot(180);
+        entity.yRotO = entity.getYRot();
+        entity.setXRot(entity.xRotO = 0 );
+        if (entity instanceof LivingEntity e) {
+            e.yBodyRotO = e.yBodyRot = 180.0f;
+            e.yHeadRot = 180;
+            e.yHeadRotO = e.yHeadRot;
+        }
+        graphics.enableScissor(getX(),getY(),getX() + Math.round(getSelectableWidth()),getY() + Math.round(getSelectableHeight()));
+        ScreenUtil.renderEntity(graphics,getX() + getWidth() / 2f,getYCorner() + Math.min(getSelectableWidth(),getSelectableHeight()),(int)Math.min(getSelectableWidth(),getSelectableHeight()),f, new Vector3f(),new Quaternionf().rotationXYZ(0.0f, (float) Math.PI/ 4, (float) Math.PI), null, entity,true);
+        graphics.disableScissor();
     }
     public void renderSelection(GuiGraphics graphics, int i, int j, float f){
         graphics.pose().pushPose();
@@ -181,11 +220,14 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         graphics.pose().popPose();
     }
     public void renderHighlight(GuiGraphics graphics, int color, int h){
+        renderScaled(graphics,getX(),getY(), ()->graphics.fillGradient(RenderType.gui(), 0, 0, 16,16, color, color, h));
+    }
+    public void renderScaled(GuiGraphics graphics, float x, float y, Runnable render){
         graphics.pose().pushPose();
-        graphics.pose().translate(getX(),getY(),0);
+        graphics.pose().translate(x,y,0);
         applyOffset(graphics);
         graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
-        graphics.fillGradient(RenderType.gui(), 0, 0, 16,16, color, color, h);
+        render.run();
         graphics.pose().popPose();
     }
     public void renderHighlight(GuiGraphics graphics, int h){
@@ -224,7 +266,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         return false;
     }
     public void playClickSound(){
-        ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0F);
+        if (!isFocused()) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0F);
     }
     public void onClick(double d, double e){
         playClickSound();

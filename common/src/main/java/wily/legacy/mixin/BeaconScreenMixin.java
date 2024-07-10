@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.BeaconScreen;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
@@ -18,8 +19,11 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.client.LegacySprites;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.Legacy4J;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
@@ -47,9 +51,10 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    @Override
-    public void init() {
-        CONFIRM_SPRITE = new ResourceLocation(LegacyMinecraft.MOD_ID,"container/beacon_check");
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
+        CONFIRM_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"container/beacon_check");
         imageWidth = 260;
         imageHeight = 255;
         super.init();
@@ -92,21 +97,23 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
         this.addBeaconButton(beaconPowerButton2);
     }
 
-    @Override
-    public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        guiGraphics.drawString(this.font, PRIMARY_EFFECT_LABEL, 9 + (121 - font.width(PRIMARY_EFFECT_LABEL)) /2, 13, 0x404040, false);
-        guiGraphics.drawString(this.font, SECONDARY_EFFECT_LABEL, 133 + (121 - font.width(SECONDARY_EFFECT_LABEL)) /2, 13, 0x404040, false);
+    @Inject(method = "renderLabels",at = @At("HEAD"), cancellable = true)
+    public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+        ci.cancel();
+        guiGraphics.drawString(this.font, PRIMARY_EFFECT_LABEL, 9 + (121 - font.width(PRIMARY_EFFECT_LABEL)) /2, 13, 0x383838, false);
+        guiGraphics.drawString(this.font, SECONDARY_EFFECT_LABEL, 133 + (121 - font.width(SECONDARY_EFFECT_LABEL)) /2, 13, 0x383838, false);
     }
     private static final Item[] DISPLAY_ITEMS = new Item[]{Items.NETHERITE_INGOT,Items.EMERALD,Items.DIAMOND,Items.GOLD_INGOT,Items.IRON_INGOT};
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
-        ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
-        ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 8,topPos + 9,120, 115,2f);
-        ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 132,topPos + 9,120, 115,2f);
-        guiGraphics.blitSprite(LegacySprites.BEACON_1_SPRITE,leftPos + 32, topPos + 39, 20, 19);
-        guiGraphics.blitSprite(LegacySprites.BEACON_2_SPRITE,leftPos + 32, topPos + 69, 20, 19);
-        guiGraphics.blitSprite(LegacySprites.BEACON_3_SPRITE,leftPos + 32, topPos + 97, 20, 19);
-        guiGraphics.blitSprite(LegacySprites.BEACON_4_SPRITE,leftPos + 180, topPos + 42, 20, 19);
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
+        guiGraphics.blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
+        guiGraphics.blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 8,topPos + 9,120, 115);
+        guiGraphics.blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 132,topPos + 9,120, 115);
+        guiGraphics.blitSprite(LegacySprites.BEACON_1,leftPos + 32, topPos + 39, 20, 19);
+        guiGraphics.blitSprite(LegacySprites.BEACON_2,leftPos + 32, topPos + 69, 20, 19);
+        guiGraphics.blitSprite(LegacySprites.BEACON_3,leftPos + 32, topPos + 97, 20, 19);
+        guiGraphics.blitSprite(LegacySprites.BEACON_4,leftPos + 180, topPos + 42, 20, 19);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 15, topPos + 129, 100.0F);
         guiGraphics.pose().scale(7/6f, 7/6f,7/6f);

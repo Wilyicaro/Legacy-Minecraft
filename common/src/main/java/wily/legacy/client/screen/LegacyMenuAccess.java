@@ -8,16 +8,17 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4JClient;
+import wily.legacy.client.controller.Controller;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Comparator;
 
-public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuAccess<T>, GuiEventListener {
+public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuAccess<T>, GuiEventListener, Controller.Event {
     default void movePointerToSlotIn(ScreenDirection direction){
-        if (getMenu().slots.isEmpty() || LegacyMinecraftClient.controllerHandler.isCursorDisabled || getHoveredSlot() == null) return;
-        double pointerX = LegacyMinecraftClient.controllerHandler.getPointerX();
-        double pointerY = LegacyMinecraftClient.controllerHandler.getPointerY();
+        if (getMenu().slots.isEmpty() || Legacy4JClient.controllerManager.isCursorDisabled || getHoveredSlot() == null) return;
+        double pointerX = Legacy4JClient.controllerManager.getPointerX();
+        double pointerY = Legacy4JClient.controllerManager.getPointerY();
         int height = getRectangle().height();
         int width = getRectangle().width();
         boolean horizontal = direction.getAxis() == ScreenAxis.HORIZONTAL;
@@ -57,13 +58,13 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
         if (s == null || (s == getHoveredSlot() && !allowHovered) || !s.isActive()) return false;
         Minecraft minecraft = Minecraft.getInstance();
         LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(getMenuRectangle().left(), getMenuRectangle().top(), s);
-        LegacyMinecraftClient.controllerHandler.setPointerPos(holder.getMiddleX() * ((double)minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth()), holder.getMiddleY() * ((double)minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()));
+        Legacy4JClient.controllerManager.setPointerPos(holder.getMiddleX() * ((double)minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth()), holder.getMiddleY() * ((double)minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()));
         return true;
     }
     default void movePointerToNextSlot(){
-        if (getMenu().slots.isEmpty() || LegacyMinecraftClient.controllerHandler.isCursorDisabled || getHoveredSlot() == null) return;
-        double pointerX = LegacyMinecraftClient.controllerHandler.getPointerX();
-        double pointerY = LegacyMinecraftClient.controllerHandler.getPointerY();
+        if (getMenu().slots.isEmpty() || Legacy4JClient.controllerManager.isCursorDisabled || getHoveredSlot() == null) return;
+        double pointerX = Legacy4JClient.controllerManager.getPointerX();
+        double pointerY = Legacy4JClient.controllerManager.getPointerY();
         if (getMenu().slots.size() == 1 && movePointerToSlot(getMenu().slots.get(0))) return;
         getMenu().slots.stream().min(Comparator.comparingInt(s->{
             LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(getMenuRectangle().left(),getMenuRectangle().top(),s);
@@ -74,10 +75,12 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
     }
     ScreenRectangle getMenuRectangle();
     Slot getHoveredSlot();
-    ControlTooltip.Renderer getControlTooltipRenderer();
     default Slot findSlotAt(double d, double e){
         for (Slot slot : getMenu().slots)
             if (ScreenUtil.isHovering(slot,getMenuRectangle().left(), getMenuRectangle().top(),d,e)) return slot;
         return null;
+    }
+    default int getTipXDiff(){
+        return -132;
     }
 }

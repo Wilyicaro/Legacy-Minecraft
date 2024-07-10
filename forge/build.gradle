@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "7.1.2"
+    id "com.github.johnrengelman.shadow"
 }
 
 architectury {
@@ -32,42 +32,12 @@ dependencies {
     forge "net.minecraftforge:forge:${rootProject.forge_version}"
     // Remove the next line if you don't want to depend on the API
     modApi "dev.architectury:architectury-forge:${rootProject.architectury_version}"
+    api(include(sdl_dependency))
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 }
 
-processResources {
-    inputs.property "version", "${mod_version}"
-    inputs.property "mod_id", "${mod_id}"
-    inputs.property "mod_name", "${mod_name}"
-    inputs.property "mod_license", "${mod_license}"
-    inputs.property "mod_description", "${mod_description}"
-    inputs.property "mod_authors", "${mod_authors}"
-    inputs.property "mod_credits", "${mod_credits}"
-    inputs.property "mod_group", project.group
-    inputs.property "mod_source", "${mod_source}"
-    inputs.property "mc_version", "${minecraft_version}"
-    inputs.property "architectury_version", "${architectury_version}"
-    inputs.property "jei_version", "${jei_version}"
-
-    filesMatching("META-INF/mods.toml") {
-        expand (
-                "version" : "${mod_version}",
-                "mod_id" : "${mod_id}",
-                "mod_name" : "${mod_name}",
-                "mod_license" : "${mod_license}",
-                "mod_description" : "${mod_description}",
-                "mod_authors" : "${mod_authors}",
-                "mod_credits" : "${mod_credits}",
-                "mod_group" : project.group,
-                "mod_source" : "${mod_source}",
-                "mc_version" : "${minecraft_version}",
-                "architectury_version" : "${architectury_version}",
-                "jei_version" : "${jei_version}"
-        )
-    }
-}
 
 shadowJar {
     exclude "fabric.mod.json"

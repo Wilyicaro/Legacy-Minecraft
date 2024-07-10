@@ -9,14 +9,12 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
-import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyWorldTemplate;
 import wily.legacy.util.ScreenUtil;
 
@@ -24,16 +22,17 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 public class CreationList extends RenderableVList{
+    static final String TUTORIAL_FOLDER_NAME = "Tutorial";
     private PlayGameScreen screen;
     protected final Minecraft minecraft;
 
     public CreationList() {
         layoutSpacing(l->0);
         minecraft = Minecraft.getInstance();
-        addIconButton(this,new ResourceLocation(LegacyMinecraft.MOD_ID,"creation_list/create_world"),Component.translatable("legacy.menu.create_world"),c-> CreateWorldScreen.openFresh(this.minecraft, screen));
+        addIconButton(this,new ResourceLocation(Legacy4J.MOD_ID,"creation_list/create_world"),Component.translatable("legacy.menu.create_world"), c-> CreateWorldScreen.openFresh(this.minecraft, screen));
         LegacyWorldTemplate.list.forEach(t-> addIconButton(this,t.icon(),t.buttonName(), c-> {
             try {
-                String name = LegacyMinecraftClient.importSaveFile(minecraft,minecraft.getResourceManager().getResourceOrThrow(t.worldTemplate()).open(),t.folderName());
+                String name = Legacy4JClient.importSaveFile(minecraft,minecraft.getResourceManager().getResourceOrThrow(t.worldTemplate()).open(),t.folderName());
                 if (t.directJoin()) minecraft.createWorldOpenFlows().loadLevel(screen,name);
                 else {
                     LevelStorageSource.LevelStorageAccess access = minecraft.getLevelSource().createAccess(name);
@@ -52,7 +51,6 @@ public class CreationList extends RenderableVList{
         if (screen instanceof PlayGameScreen s) this.screen = s;
         super.init(screen, leftPos, topPos, listWidth, listHeight);
     }
-
     public static void addIconButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress){
         addIconButton(list,iconSprite,message,onPress,null);
     }

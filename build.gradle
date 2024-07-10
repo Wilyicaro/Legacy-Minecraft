@@ -1,9 +1,10 @@
 import java.text.SimpleDateFormat
 
 plugins {
-    id "architectury-plugin" version "3.4-SNAPSHOT"
-    id "dev.architectury.loom" version "1.4+" apply false
+    id "architectury-plugin" version "3.4+"
+    id "dev.architectury.loom" version "1.6-SNAPSHOT" apply false
     id "me.shedaniel.unified-publishing" version "0.1.+" apply false
+    id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
 }
 
 architectury {
@@ -19,10 +20,10 @@ subprojects {
 
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-        // The following line declares the mojmap mappings, you may use other mappings as well
         mappings loom.officialMojangMappings()
-        // The following line declares the yarn mappings you may select this one as well.
-        // mappings "net.fabricmc:yarn:1.19.2+build.3:v2"
+    }
+    repositories {
+        maven { url "https://maven.neoforged.net/releases/" }
     }
 }
 
@@ -36,29 +37,26 @@ allprojects {
     group = rootProject.maven_group
 
 
+
     repositories {
+        maven {
+            url "https://jm.gserv.me/repository/maven-public/"
+        }
+        maven {
+            url "https://maven.isxander.dev/releases"
+        }
         maven {
             url "https://www.cursemaven.com"
         }
         maven {
-            // location of a maven mirror for JEI files, as a fallback
-            name = "ModMaven"
-            url = "https://modmaven.k-4u.nl"
-        }
-        maven {
-            name = "Fuzs Mod Resources"
-            url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
-        }
-        repositories {
-            maven {
-                name = 'GitHubPackages'
-                url uri("$mod_mvngit_source")
-                credentials{
-                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-                    password = project.findProperty("gpr.token") ?: System.getenv("TOKEN")
-                }
+            name = 'GitHubPackages'
+            url uri("$mod_mvngit_source")
+            credentials{
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.token") ?: System.getenv("TOKEN")
             }
         }
+
         exclusiveContent {
             forRepository {
                 maven {
@@ -72,6 +70,13 @@ allprojects {
         }
         jcenter()
         maven { url "https://jitpack.io" }
+    }
+    java {
+
+        withSourcesJar()
+
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     tasks.withType(JavaCompile) {
@@ -109,7 +114,7 @@ subprojects {
                     def lines = processedLine.split(" -")
                     changes << "\n**${lines[0]}**  "
                     lines[0] = ""
-                    lines.each {s-> changes << "\n-" + s + "  "}
+                    lines.each {s-> changes << "\n- " + s + "  "}
                 }
             }
             changes << "\n[Click here for complete changelog]($mod_source/commits/$branch)"
@@ -128,11 +133,29 @@ subprojects {
     assemble.dependsOn renameJarForPublication
     var modPlatformName = project.name.capitalize()
 
-
+    processResources {
+        def properties =[
+                "version" : "${mod_version}",
+                "mod_id" : "${mod_id}",
+                "mod_name" : "${mod_name}",
+                "mod_license" : "${mod_license}",
+                "mod_description" : "${mod_description}",
+                "mod_authors" : "${mod_authors}",
+                "mod_credits" : "${mod_credits}",
+                "mod_group" : project.group,
+                "mod_source" : "${mod_source}",
+                "mod_issues" : "${mod_issues}",
+                "mc_version" : "${minecraft_version}"
+        ]
+        filesMatching(["META-INF/mods.toml","META-INF/neoforge.mods.toml","fabric.mod.json"]) {
+            expand properties
+        }
+        inputs.properties(properties)
+    }
     unifiedPublishing {
         project {
             def isFabric = project.name ==  "fabric"
-            displayName = "Legacy Minecraft [$modPlatformName] $project.version"
+            displayName = "Legacy4J [$modPlatformName] $project.version"
             releaseType = "$stage"
             changelog = releaseChangelog()
             gameVersions = ["$minecraft_version"]

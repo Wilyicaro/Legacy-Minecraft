@@ -19,17 +19,22 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.ArrayList;
 
-import static wily.legacy.LegacyMinecraft.MOD_ID;
+import static wily.legacy.Legacy4J.MOD_ID;
 
 @Mixin(EnchantmentScreen.class)
 public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<EnchantmentMenu> {
-    private static final ResourceLocation ENCHANTMENT_BUTTON_EMPTY_SPRITE = new ResourceLocation(MOD_ID, "container/enchantment_button_empty");
-    private static final ResourceLocation ENCHANTMENT_BUTTON_ACTIVE_SPRITE = new ResourceLocation(MOD_ID, "container/enchantment_button_active");
-    private static final ResourceLocation ENCHANTMENT_BUTTON_SELECTED_SPRITE = new ResourceLocation(MOD_ID, "container/enchantment_button_selected");
+    private static final ResourceLocation ENCHANTMENT_BUTTON_EMPTY = new ResourceLocation(MOD_ID, "container/enchantment_button_empty");
+    private static final ResourceLocation ENCHANTMENT_BUTTON_ACTIVE = new ResourceLocation(MOD_ID, "container/enchantment_button_active");
+    private static final ResourceLocation ENCHANTMENT_BUTTON_SELECTED = new ResourceLocation(MOD_ID, "container/enchantment_button_selected");
 
     @Shadow protected abstract void renderBook(GuiGraphics arg, int i, int j, float g);
 
@@ -43,8 +48,9 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         super(abstractContainerMenu, inventory, component);
     }
 
-    @Override
-    public void init() {
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         this.bookModel = new BookModel(this.minecraft.getEntityModels().bakeLayer(ModelLayers.BOOK));
         imageWidth = 215;
         imageHeight = 217;
@@ -59,20 +65,23 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    public boolean mouseClicked(double d, double e, int i) {
+    @Inject(method = "mouseClicked",at = @At("HEAD"), cancellable = true)
+    public void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
         for (int l = 0; l < 3; ++l) {
             double f = d - (leftPos + 80.5);
             double g = e - (topPos + 23.5 + 21 * l);
             if (!(f >= 0.0) || !(g >= 0.0) || !(f < 120) || !(g < 21) || !this.menu.clickMenuButton(this.minecraft.player, l)) continue;
             this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, l);
-            return true;
+            cir.setReturnValue(true);
+            return;
         }
-        return super.mouseClicked(d, e, i);
+       cir.setReturnValue(super.mouseClicked(d, e, i));
     }
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
-        ScreenUtil.renderPanel(guiGraphics,leftPos,topPos, imageWidth,imageHeight,2f);
-        ScreenUtil.renderSquareRecessedPanel(guiGraphics,leftPos + 79,  topPos+ 22, 123, 66,2f);
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
+        guiGraphics.blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos, imageWidth,imageHeight);
+        guiGraphics.blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 79,  topPos+ 22, 123, 66);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 2,topPos + 4,0);
         guiGraphics.pose().scale(1.25f,1.25f,1.25f);
@@ -85,7 +94,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         for (int n = 0; n < 3; ++n) {
             guiGraphics.pose().translate(0f,21f,0f);
             int enchantCost = this.menu.costs[n];
-            guiGraphics.blitSprite(ENCHANTMENT_BUTTON_EMPTY_SPRITE, 0, 0, 120, 21);
+            guiGraphics.blitSprite(ENCHANTMENT_BUTTON_EMPTY, 0, 0, 120, 21);
             guiGraphics.blitSprite(DISABLED_LEVEL_SPRITES[n], -1, -1, 24, 24);
             if (enchantCost == 0)
                 continue;
@@ -100,10 +109,10 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
                 double t = i - (leftPos + 80.5);
                 double u = j - (topPos + 23.5 + 21 * n);
                 if (t >= 0 && u >= 0 && t < 120 && u < 21) {
-                    guiGraphics.blitSprite(ENCHANTMENT_BUTTON_SELECTED_SPRITE, 0, 0, 120, 21);
+                    guiGraphics.blitSprite(ENCHANTMENT_BUTTON_SELECTED, 0, 0, 120, 21);
                     s = 0xFFFF80;
                 } else {
-                    guiGraphics.blitSprite(ENCHANTMENT_BUTTON_ACTIVE_SPRITE, 0, 0, 120, 21);
+                    guiGraphics.blitSprite(ENCHANTMENT_BUTTON_ACTIVE, 0, 0, 120, 21);
                 }
                 guiGraphics.blitSprite(ENABLED_LEVEL_SPRITES[n], -1, -1, 24, 24);
                 guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, s);
@@ -113,8 +122,9 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         }
         guiGraphics.pose().popPose();
     }
-    @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    @Inject(method = "render",at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        ci.cancel();
         f = this.minecraft.getFrameTime();
         super.render(guiGraphics, i, j, f);
         this.renderTooltip(guiGraphics, i, j);
