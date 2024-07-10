@@ -1,37 +1,24 @@
 modLoader="javafml"
-loaderVersion="[1,)"
+loaderVersion="[47,)"
 license="${mod_license}"
-issueTrackerURL="https://github.com/MinecraftForge/MinecraftForge/issues"
+issueTrackerURL="${mod_issues}"
 
 [[mods]]
 modId="${mod_id}"
 version="${version}"
 displayName="${mod_name}"
 credits="${mod_credits}"
-displayURL="https://www.curseforge.com/minecraft/mc-mods/better-furnaces-reforged/"
+displayURL="${mod_source}"
 logoFile="logo.png"
 authors="${mod_authors}"
 description="${mod_description}"
 
-
-[[dependencies.betterfurnacesreforged]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="[1.20.2,)"
-    ordering="NONE"
-    side="BOTH"
-[[dependencies.betterfurnacesreforged]]
-modId="architectury"
+[[dependencies.legacy]]
+modId="minecraft"
 mandatory=true
-versionRange="[${architectury_version},]"
+versionRange="[1.20,)"
 ordering="NONE"
 side="BOTH"
-[[dependencies.betterfurnacesreforged]]
-   modId="jei"
-   mandatory=false
-   versionRange="[${jei_version},)"
-   ordering="NONE"
-   side="BOTH"
 
 
 

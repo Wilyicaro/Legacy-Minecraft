@@ -4,12 +4,13 @@ import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.toasts.SystemToast;
-import net.minecraft.client.gui.screens.NoticeWithLinkScreen;
+import net.minecraft.client.gui.screens.SymlinkWarningScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
 import net.minecraft.world.level.validation.ContentValidationException;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 
 import java.io.IOException;
 
@@ -18,14 +19,15 @@ public class SaveOptionsScreen extends ConfirmationScreen{
     private LevelSummary summary;
 
     public SaveOptionsScreen(PlayGameScreen parent, LevelSummary summary) {
-        super(parent, 230, 143, Component.translatable("legacy.menu.save_options"), Component.translatable("legacy.menu.save_options_message"), (b)->{});
+        super(parent, 230, 165, Component.translatable("legacy.menu.save_options"), Component.translatable("legacy.menu.save_options_message"), (b)->{});
         this.summary = summary;
     }
 
     @Override
     protected void initButtons() {
-        addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b-> this.minecraft.setScreen(parent)).bounds(panel.x + 15, panel.y + panel.height - 74,200,20).build());
+        addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b-> this.minecraft.setScreen(parent)).bounds(panel.x + 15, panel.y + panel.height - 96,200,20).build());
         EditBox renameBox = new EditBox(font, width / 2 - 100,0,200, 20, Component.translatable("selectWorld.enterName"));
+        renameBox.setValue(summary.getLevelName());
         addRenderableWidget(Button.builder(Component.translatable("legacy.menu.rename_save"),b-> minecraft.setScreen(new ConfirmationScreen(parent,Component.translatable("legacy.menu.rename_save_title"),Component.translatable("legacy.menu.rename_save_message"),p->{
             String id = summary.getLevelId();
             try {
@@ -38,19 +40,27 @@ public class SaveOptionsScreen extends ConfirmationScreen{
                 SystemToast.onWorldAccessFailure(this.minecraft, id);
                 parent.saveRenderableList.reloadSaveList();
             } catch (ContentValidationException contentValidationException) {
-                LegacyMinecraft.LOGGER.warn("{}", contentValidationException.getMessage());
-                this.minecraft.setScreen(NoticeWithLinkScreen.createWorldSymlinkWarningScreen(parent));
+                Legacy4J.LOGGER.warn("{}", contentValidationException.getMessage());
+                this.minecraft.setScreen(new SymlinkWarningScreen(parent));
             }
         }){
+
             @Override
             protected void init() {
                 super.init();
                 renameBox.setResponder(s-> okButton.active = !Util.isBlank(s));
-                renameBox.setY(panel.y + 45);
-                renameBox.setValue(summary.getLevelName());
+                renameBox.setPosition(panel.x + 15,panel.y + 45);
                 addRenderableWidget(renameBox);
             }
-        })).bounds(panel.x + 15, panel.getRectangle().bottom() - 52,200,20).build());
-        addRenderableWidget(Button.builder(Component.translatable("selectWorld.delete"),b-> minecraft.setScreen(new ConfirmationScreen(parent,230,120, Component.translatable("selectWorld.delete"), Component.translatable("selectWorld.deleteQuestion"), b1->parent.saveRenderableList.deleteSave(summary)))).bounds(panel.x + 15, panel.getRectangle().bottom() - 30,200,20).build());
+        })).bounds(panel.x + 15, panel.getRectangle().bottom() - 74,200,20).build());
+        addRenderableWidget(Button.builder(Component.translatable("selectWorld.delete"),b-> minecraft.setScreen(new ConfirmationScreen(parent,230,120, Component.translatable("selectWorld.delete"), Component.translatable("selectWorld.deleteQuestion"), b1->parent.saveRenderableList.deleteSave(summary)))).bounds(panel.x + 15, panel.getRectangle().bottom() - 52,200,20).build());
+
+        addRenderableWidget(Button.builder(Component.translatable("legacy.menu.copySave"),b-> minecraft.setScreen(new ConfirmationScreen(parent,230,120, Component.translatable("legacy.menu.copySave"), Component.translatable("legacy.menu.copySaveMessage"), b1->{
+            String id = summary.getLevelId();
+            Legacy4JClient.copySaveFile(minecraft, this.minecraft.getLevelSource().getLevelPath(id),summary.getLevelName());
+            parent.saveRenderableList.reloadSaveList();
+            minecraft.setScreen(parent);
+
+        }))).bounds(panel.x + 15, panel.getRectangle().bottom() - 30,200,20).build());
     }
 }

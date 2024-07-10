@@ -6,7 +6,7 @@ import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import wily.legacy.LegacyMinecraftClient;
+import wily.legacy.Legacy4JClient;
 
 import java.util.Map;
 import java.util.Optional;
@@ -17,7 +17,7 @@ public interface PresetEditorMixin {
 
     @Redirect(method = "<clinit>",at = @At(value = "INVOKE", target = "Ljava/util/Map;of(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/Map;"))
     private static Map<Optional<ResourceKey<WorldPreset>>, PresetEditor> init(Object k1, Object v1, Object k2, Object v2){
-        return LegacyMinecraftClient.VANILLA_PRESET_EDITORS;
+        return Legacy4JClient.VANILLA_PRESET_EDITORS;
 
     }
 }

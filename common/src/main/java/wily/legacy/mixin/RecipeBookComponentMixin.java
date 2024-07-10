@@ -9,7 +9,7 @@ import net.minecraft.world.inventory.RecipeBookMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.Recipe;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -37,7 +37,7 @@ public class RecipeBookComponentMixin {
         ghostRecipe = new DisplayRecipe();
     }
     @Redirect(method = "setupGhostRecipe", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/recipebook/GhostRecipe;addIngredient(Lnet/minecraft/world/item/crafting/Ingredient;II)V"))
-    public void setupGhostRecipe(GhostRecipe instance, Ingredient ingredient, int i, int j,RecipeHolder<?> recipeHolder, List<Slot> list) {
+    public void setupGhostRecipe(GhostRecipe instance, Ingredient ingredient, int i, int j, Recipe<?> recipe, List<Slot> list) {
         ((DisplayRecipe)ghostRecipe).addIngredient(ingredient, list.get(0));
     }
 

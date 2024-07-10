@@ -1,5 +1,7 @@
 package wily.legacy.client;
 
+import net.minecraft.resources.ResourceLocation;
+
 import java.util.List;
 
 public interface LegacyWorldSettings {

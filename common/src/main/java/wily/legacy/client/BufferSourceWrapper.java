@@ -7,10 +7,10 @@ import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 
 public class BufferSourceWrapper extends MultiBufferSource.BufferSource {
-    public final BufferSource source;
+    public final MultiBufferSource.BufferSource source;
     private RenderType overrideRenderTpe;
 
-    public BufferSourceWrapper(BufferSource source){
+    public BufferSourceWrapper(MultiBufferSource.BufferSource source){
         super(source.builder,source.fixedBuffers);
         this.source = source;
     }
@@ -26,7 +26,7 @@ public class BufferSourceWrapper extends MultiBufferSource.BufferSource {
     }
     public static BufferSourceWrapper of(BufferSource source, RenderType overrideType){
         BufferSourceWrapper wrapper = new BufferSourceWrapper(source);
-        wrapper.setOverrideRenderTpe(overrideType);
+        wrapper.setOverrideRenderType(overrideType);
         return wrapper;
     }
 
@@ -45,7 +45,7 @@ public class BufferSourceWrapper extends MultiBufferSource.BufferSource {
         source.endBatch(renderType);
     }
 
-    public void setOverrideRenderTpe(RenderType overrideRenderTpe) {
+    public void setOverrideRenderType(RenderType overrideRenderTpe) {
         this.overrideRenderTpe = overrideRenderTpe;
     }
 

@@ -30,21 +30,23 @@ import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.resources.IoSupplier;
 import org.joml.Math;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
+import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyGuiGraphics;
+import wily.legacy.init.LegacyRegistries;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
 
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static wily.legacy.client.LegacySprites.PACK_HIGHLIGHTED_SPRITE;
-import static wily.legacy.client.LegacySprites.PACK_SELECTED_SPRITE;
+import static wily.legacy.util.LegacySprites.PACK_HIGHLIGHTED;
+import static wily.legacy.util.LegacySprites.PACK_SELECTED;
 
 public class PackSelector extends AbstractWidget {
     public static final ResourceLocation DEFAULT_ICON = new ResourceLocation("textures/misc/unknown_pack.png");
@@ -122,11 +124,13 @@ public class PackSelector extends AbstractWidget {
                 return true;
             }
             if (i == 263) {
-                if (selectedIndex == scrolledList.get()) updateScroll(-1);
+                if (selectedIndex == scrolledList.get()) updateScroll(-1,true);
                 setSelectedPack(selectedIndex - 1);
+                ScreenUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
             } else if (i == 262) {
-                if (selectedIndex == scrolledList.get() + getMaxPacks() - 1) updateScroll(1);
+                if (selectedIndex == scrolledList.get() + getMaxPacks() - 1) updateScroll(1,true);
                 setSelectedPack(selectedIndex + 1);
+                ScreenUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
             }
         }
         return super.keyPressed(i, j, k);
@@ -171,6 +175,12 @@ public class PackSelector extends AbstractWidget {
             else packRepository.setSelected(getSelectedIds());
         }
     }
+    public void applyChanges(boolean reload, Runnable runnable, Runnable elseRun){
+        if (hasChanged()) {
+            applyChanges(reload);
+            runnable.run();
+        }else elseRun.run();
+    }
     public static void reloadResourcesChanges(PackSelector selector){
         selector.minecraft.options.updateResourcePacks(selector.packRepository);
     }
@@ -205,15 +215,14 @@ public class PackSelector extends AbstractWidget {
 
 
     @Override
-    public boolean mouseScrolled(double d, double e, double f, double g) {
-        if (updateScroll((int) Math.signum(g))) return true;
-        return super.mouseScrolled(d, e, f, g);
+    public boolean mouseScrolled(double d, double e, double g) {
+        if (updateScroll((int) Math.signum(g),false)) return true;
+        return super.mouseScrolled(d, e, g);
     }
-    public boolean updateScroll(int i){
+    public boolean updateScroll(int i, boolean cyclic){
         if (scrolledList.max > 0) {
-            if ((scrolledList.get() <= scrolledList.max && i > 0) || (scrolledList.get() >= 0 && i < 0)) {
-                scrolledList.set(scrolledList.get() + i,true);
-                return true;
+            if ((scrolledList.get() <= scrolledList.max && i > 0) || (scrolledList.get() >= 0 && i < 0)) {;
+                return scrolledList.add(i,cyclic) != 0;
             }
         }
         return false;
@@ -225,20 +234,20 @@ public class PackSelector extends AbstractWidget {
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
         Font font = minecraft.font;
-        ScreenUtil.renderPanelRecess(guiGraphics,getX() -1,getY()+ font.lineHeight -1 , width + 2,height + 2 - minecraft.font.lineHeight  ,2);
+        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,getX() -1,getY()+ font.lineHeight -1 , width + 2,height + 2 - minecraft.font.lineHeight);
         List<Pack> displayPacks = getDisplayPacks();
         int visibleCount = 0;
         RenderSystem.enableBlend();
         for (int index = 0; index < displayPacks.size(); index++) {
             if (visibleCount>=getMaxPacks()) break;
             guiGraphics.blit(getPackIcon(displayPacks.get(scrolledList.get() + index)), getX() + 21 + 30 * index,getY() + font.lineHeight + 4,0.0f, 0.0f, 28, 28, 28, 28);
-            if (model.selected.contains(displayPacks.get(scrolledList.get() + index)))  guiGraphics.blitSprite(PACK_SELECTED_SPRITE, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
+            if (model.selected.contains(displayPacks.get(scrolledList.get() + index)))  LegacyGuiGraphics.of(guiGraphics).blitSprite(PACK_SELECTED, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
             if (scrolledList.get() + index == selectedIndex)
-                guiGraphics.blitSprite(PACK_HIGHLIGHTED_SPRITE, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
+                LegacyGuiGraphics.of(guiGraphics).blitSprite(PACK_HIGHLIGHTED, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
             visibleCount++;
         }
         RenderSystem.disableBlend();
-        guiGraphics.drawString(font,getMessage(),getX() + 1,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : 0x404040,isHoveredOrFocused());
+        guiGraphics.drawString(font,getMessage(),getX() + 1,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused());
         if (scrolledList.max > 0){
             if (scrolledList.get() < scrolledList.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
             if (scrolledList.get() > 0) scrollRenderer.renderScroll(guiGraphics,ScreenDirection.LEFT,getX() + 8, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
@@ -270,7 +279,7 @@ public class PackSelector extends AbstractWidget {
             }
             return resourceLocation;
         } catch (Exception exception) {
-            LegacyMinecraft.LOGGER.warn("Failed to load icon from pack {}", pack.getId(), exception);
+            Legacy4J.LOGGER.warn("Failed to load icon from pack {}", pack.getId(), exception);
             return fallback;
         }
     }

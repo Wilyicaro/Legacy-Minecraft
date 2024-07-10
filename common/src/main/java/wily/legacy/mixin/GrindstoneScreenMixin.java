@@ -7,13 +7,18 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.GrindstoneMenu;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.client.LegacyGuiGraphics;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
-import static wily.legacy.client.LegacySprites.ARROW_SPRITE;
-import static wily.legacy.client.LegacySprites.ERROR_CROSS_SPRITE;
+import static wily.legacy.util.LegacySprites.ARROW;
+import static wily.legacy.util.LegacySprites.ERROR_CROSS;
 
 @Mixin(GrindstoneScreen.class)
-public class GrindstoneScreenMixin extends AbstractContainerScreen<GrindstoneMenu> {
+public abstract class GrindstoneScreenMixin extends AbstractContainerScreen<GrindstoneMenu> {
     public GrindstoneScreenMixin(GrindstoneMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
@@ -30,19 +35,19 @@ public class GrindstoneScreenMixin extends AbstractContainerScreen<GrindstoneMen
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderBg(guiGraphics, f, i, j);
+    public void renderBackground(GuiGraphics guiGraphics) {
     }
 
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
-        ScreenUtil.renderPanel(guiGraphics,leftPos,topPos, imageWidth,imageHeight,2f);
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
+        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos, imageWidth,imageHeight);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 85,topPos + 50,0);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        guiGraphics.blitSprite(ARROW_SPRITE,0,0,22,15);
+        LegacyGuiGraphics.of(guiGraphics).blitSprite(ARROW,0,0,22,15);
         if ((this.menu.getSlot(0).hasItem() || this.menu.getSlot(1).hasItem()) && !this.menu.getSlot(2).hasItem())
-            guiGraphics.blitSprite(ERROR_CROSS_SPRITE, 2, 0, 15, 15);
+            LegacyGuiGraphics.of(guiGraphics).blitSprite(ERROR_CROSS, 2, 0, 15, 15);
         guiGraphics.pose().popPose();
     }
 }

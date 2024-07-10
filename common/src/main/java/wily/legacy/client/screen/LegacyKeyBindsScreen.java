@@ -12,8 +12,12 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
-import wily.legacy.client.controller.ControllerComponent;
+import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JPlatform;
+import wily.legacy.client.CommonColor;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Arrays;
@@ -26,7 +30,7 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
     public LegacyKeyBindsScreen(Screen parent, Options options) {
         super(parent, 255, 293, Component.translatable("controls.keybinds.title"));
         renderableVList.layoutSpacing(l->1);
-        panel.dp = 3f;
+        panel.panelSprite = LegacySprites.PANEL;
         KeyMapping[] keyMappings = ArrayUtils.clone(options.keyMappings);
         Arrays.sort(keyMappings);
         String lastCategory = null;
@@ -38,20 +42,21 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
         for (KeyMapping keyMapping : keyMappings) {
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category))
-                renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> {}))), SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> graphics.drawString(font, Component.translatable(category), l.x + 1, l.y + 4, 0x404040, false)))));
+                renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> {}))), SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> graphics.drawString(font, Component.translatable(category), l.x + 1, l.y + 4, CommonColor.INVENTORY_GRAY_TEXT.get(), false)))));
             lastCategory = keyMapping.getCategory();
             renderableVList.addRenderable(new AbstractButton(0,0,240,20,((LegacyKeyMapping)keyMapping).getDisplayName()) {
                 @Override
                 protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                     if (!isFocused() && isPressed()) selectedKey = null;
                     super.renderWidget(guiGraphics, i, j, f);
-                    Component c = isPressed() ? SELECTION : ControlTooltip.getKeyIcon(((LegacyKeyMapping) keyMapping).getKey().getValue(),false);
-                    if (c == null){
-                        guiGraphics.drawString(font,NONE, getX() + width - 16 - font.width(NONE), getY() + (height -  font.lineHeight) / 2 + 1,0xFFFFFF);
+                    ControlTooltip.Icon icon = ControlTooltip.getKeyIcon(((LegacyKeyMapping) keyMapping).getKey().getValue());
+                    Component c = isPressed() ? SELECTION : icon == null ? NONE : null;
+                    if (c != null){
+                        guiGraphics.drawString(font,NONE, getX() + width - 20 - font.width(NONE) / 2, getY() + (height -  font.lineHeight) / 2 + 1,0xFFFFFF);
                         return;
                     }
                     RenderSystem.enableBlend();
-                    guiGraphics.drawString(font,c, getX() + width - 16 - font.width(c), getY() + (height -  font.lineHeight) / 2 + 1,0xFFFFFF,false);
+                    icon.render(guiGraphics, getX() + width - 20 - icon.render(guiGraphics,0,0,false,true) / 2, getY() + (height -  font.lineHeight) / 2 + 1,false,false);
                     RenderSystem.disableBlend();
                 }
                 private boolean isPressed(){
@@ -59,7 +64,7 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
                 }
                 @Override
                 public void onPress() {
-                    if (Screen.hasShiftDown() || ControllerComponent.LEFT_STICK_BUTTON.componentState.pressed) setAndUpdateKey(keyMapping, keyMapping.getDefaultKey());
+                    if (Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed) setAndUpdateKey(keyMapping, keyMapping.getDefaultKey());
                     else selectedKey = keyMapping;
                 }
                 @Override
@@ -99,10 +104,16 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
     }
 
     @Override
+    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+        ScreenUtil.renderDefaultBackground(guiGraphics,false);
+    }
+
+    @Override
     protected void init() {
         panel.height = Math.min(height,293);
         panel.init();
         addRenderableOnly(panel);
+        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, Legacy4JPlatform.getModInfo("minecraft").getVersion() + " " + Legacy4J.VERSION.get(),panel.getX() + panel.getWidth() + 81, panel.getY() + panel.getHeight() - 7,CommonColor.INVENTORY_GRAY_TEXT.get(),false)));
         getRenderableVList().init(this,panel.x + 7,panel.y + 6,panel.width - 14,panel.height);
     }
 }

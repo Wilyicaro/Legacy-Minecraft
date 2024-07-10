@@ -5,8 +5,10 @@ import net.minecraft.client.GameNarrator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
+import wily.legacy.client.LegacyGuiGraphics;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.util.ScreenUtil;
@@ -15,21 +17,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static wily.legacy.client.LegacySprites.LOADING_BACKGROUND_SPRITE;
-import static wily.legacy.client.LegacySprites.LOADING_BAR_SPRITE;
+import static wily.legacy.util.LegacySprites.LOADING_BACKGROUND;
+import static wily.legacy.util.LegacySprites.LOADING_BAR;
 
-public class LegacyLoadingScreen extends LegacyScreen {
+public class LegacyLoadingScreen extends Screen{
     public static final List<Supplier<LegacyTip>> usingLoadingTips = new ArrayList<>(LegacyTipManager.loadingTips);
     public static LegacyTip actualLoadingTip;
-    protected int progress;
-    protected Component lastLoadingHeader;
+    public int progress;
+    public Component lastLoadingHeader;
     protected Component lastLoadingStage;
     public boolean genericLoading;
 
     protected RandomSource random = RandomSource.create();
     public LegacyLoadingScreen() {
         super(GameNarrator.NO_TITLE);
-        controlTooltipRenderer.tooltips.clear();
     }
     public LegacyLoadingScreen(Component loadingHeader, Component loadingStage) {
         this();
@@ -60,13 +61,16 @@ public class LegacyLoadingScreen extends LegacyScreen {
         }
         return actualLoadingTip;
     }
+
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(guiGraphics,true, true);
+    public boolean shouldCloseOnEsc() {
+        return false;
     }
+
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         RenderSystem.disableDepthTest();
+        ScreenUtil.renderDefaultBackground(guiGraphics,true, true);
         super.render(guiGraphics, i, j, f);
         int x = width / 2 - 160;
         int y = height / 2 + 16;
@@ -74,9 +78,9 @@ public class LegacyLoadingScreen extends LegacyScreen {
             if (progress != -1) {
                 if (lastLoadingStage != null)
                     guiGraphics.drawString(minecraft.font, lastLoadingStage, x, height / 2 + 4, 16777215);
-                guiGraphics.blitSprite(LOADING_BACKGROUND_SPRITE, x, y, 320, 10);
+                LegacyGuiGraphics.of(guiGraphics).blitSprite(LOADING_BACKGROUND, x, y, 320, 10);
                 if (progress >= 0)
-                    guiGraphics.blitSprite(LOADING_BAR_SPRITE, x + 1, y + 1, (int) (318 * (progress / 100F)), 8);
+                    LegacyGuiGraphics.of(guiGraphics).blitSprite(LOADING_BAR, x + 1, y + 1, (int) (318 * Math.max(0,Math.min(progress / 100F,1))), 8);
                 LegacyTip tip = getLoadingTip();
                 if (tip != null) {
                     tip.setX((width - tip.width) / 2);
@@ -88,7 +92,7 @@ public class LegacyLoadingScreen extends LegacyScreen {
 
         guiGraphics.pose().scale(2.0F,2.0F,1.0F);
         if (lastLoadingHeader != null)
-            ScreenUtil.drawOutlinedString(guiGraphics, minecraft.font, lastLoadingHeader, (width - minecraft.font.width(lastLoadingHeader) * 2) / 4, (height / 4 - 13), 0xFFFFFF, 0, 1);
+            ScreenUtil.drawOutlinedString(guiGraphics, minecraft.font, lastLoadingHeader, (width - minecraft.font.width(lastLoadingHeader) * 2) / 4, (height / 4 - 13), 0xFFFFFF, 0, 0.5f);
         guiGraphics.pose().scale(0.5F,0.5F,1.0F);
         RenderSystem.enableDepthTest();
     }

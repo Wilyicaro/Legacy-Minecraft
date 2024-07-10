@@ -1,5 +1,6 @@
 package wily.legacy.mixin;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AnvilScreen;
@@ -12,7 +13,11 @@ import net.minecraft.world.inventory.AnvilMenu;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import wily.legacy.client.LegacySprites;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.client.LegacyGuiGraphics;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(AnvilScreen.class)
@@ -39,7 +44,17 @@ public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
     public AnvilScreenMixin(AnvilMenu itemCombinerMenu, Inventory inventory, Component component, ResourceLocation resourceLocation) {
         super(itemCombinerMenu, inventory, component, resourceLocation);
     }
-    public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
+
+    @Override
+    public void repositionElements() {
+        String string = this.name.getValue();
+        super.repositionElements();
+        this.name.setValue(string);
+    }
+
+    @Inject(method = "renderLabels",at = @At("HEAD"), cancellable = true)
+    public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         super.renderLabels(guiGraphics, i, j);
         int k = this.menu.getCost();
         if (k > 0) {
@@ -62,7 +77,9 @@ public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
             }
         }
     }
-    public void subInit() {
+    @Inject(method = "subInit",at = @At("HEAD"), cancellable = true)
+    public void subInit(CallbackInfo ci) {
+        ci.cancel();
         this.name = new EditBox(this.font, leftPos + 72, topPos + 26, 120, 18, Component.translatable("container.repair"));
         this.name.setCanLoseFocus(false);
         this.name.setTextColor(-1);
@@ -76,29 +93,29 @@ public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderBg(guiGraphics, f, i, j);
+    public void renderBackground(GuiGraphics guiGraphics) {
     }
 
-    @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
-        ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
+        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 13.5, topPos + 9.5,0f);
         guiGraphics.pose().scale(2.5f,2.5f,2.5f);
-        guiGraphics.blitSprite(LegacySprites.ANVIL_HAMMER_SPRITE,0,0,15,15);
+        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ANVIL_HAMMER,0,0,15,15);
         guiGraphics.pose().popPose();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 53, topPos + 60,0f);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        guiGraphics.blitSprite(LegacySprites.COMBINER_PLUS_SPRITE,0,0,13,13);
+        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.COMBINER_PLUS,0,0,13,13);
         guiGraphics.pose().popPose();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 122, topPos + 59,0f);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        guiGraphics.blitSprite(LegacySprites.ARROW_SPRITE,0,0,22,15);
+        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ARROW,0,0,22,15);
         if ((this.menu.getSlot(0).hasItem() || this.menu.getSlot(1).hasItem()) && !this.menu.getSlot(this.menu.getResultSlot()).hasItem())
-            guiGraphics.blitSprite(LegacySprites.ERROR_CROSS_SPRITE, 4, 0, 15, 15);
+            LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
         guiGraphics.pose().popPose();
     }
 }

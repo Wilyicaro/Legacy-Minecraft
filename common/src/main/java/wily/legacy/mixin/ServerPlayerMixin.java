@@ -1,10 +1,13 @@
 package wily.legacy.mixin;
 
 import com.mojang.authlib.GameProfile;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
+import net.minecraft.stats.ServerStatsCounter;
+import net.minecraft.stats.Stat;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Final;
@@ -21,6 +24,8 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     @Shadow @Final public ServerPlayerGameMode gameMode;
 
     @Shadow public abstract void onUpdateAbilities();
+
+    @Shadow public abstract ServerStatsCounter getStats();
 
     int position = -1;
     boolean classicCrafting = true;
@@ -87,6 +92,16 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     @Override
     public boolean isVisible() {
         return !super.isInvisible();
+    }
+
+    @Override
+    public Object2IntMap<Stat<?>> getStatsMap() {
+        return getStats().stats;
+    }
+
+    @Override
+    public void setStatsMap(Object2IntMap<Stat<?>> statsMap) {
+
     }
 
     @Override

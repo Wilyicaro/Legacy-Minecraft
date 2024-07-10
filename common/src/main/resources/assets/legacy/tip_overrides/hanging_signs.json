@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "item": "#hanging_signs",
+    "tip": "block.minecraft.hanging_sign.tip"
+  }
+}

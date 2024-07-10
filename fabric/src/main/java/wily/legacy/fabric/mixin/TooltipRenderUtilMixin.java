@@ -1,5 +1,7 @@
 package wily.legacy.fabric.mixin;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import org.spongepowered.asm.mixin.Mixin;

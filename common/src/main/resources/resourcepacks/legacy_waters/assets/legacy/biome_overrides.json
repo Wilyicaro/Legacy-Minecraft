@@ -123,9 +123,6 @@
     "eroded_badlands": {
       "water_color": "#497F99"
     },
-    "badlands_plateau": {
-      "water_color": "#55809E"
-    },
     "wooded_badlands": {
       "water_color": "#55809E"
     },
@@ -137,6 +134,9 @@
     },
     "ocean": {
       "water_color": "#1787D4"
+    },
+    "cherry_grove": {
+      "water_color": "#44AFF5"
     },
     "plains": {
       "water_color": "#44AFF5"
@@ -157,9 +157,6 @@
       "water_color": "#2590A8"
     },
     "savanna_plateau": {
-      "water_color": "#2590A8"
-    },
-    "shattered_savanna_plateau": {
       "water_color": "#2590A8"
     },
     "stone_beach": {

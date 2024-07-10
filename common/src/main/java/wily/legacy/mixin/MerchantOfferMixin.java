@@ -5,7 +5,6 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.inventory.LegacyMerchantOffer;
@@ -22,10 +21,6 @@ public class MerchantOfferMixin implements LegacyMerchantOffer {
     @Inject(method = "createTag", at = @At("RETURN"))
     private void createTag(CallbackInfoReturnable<CompoundTag> cir){
         cir.getReturnValue().putInt("requiredLevel", requiredLevel);
-    }
-    @Inject(method = "copy", at = @At("RETURN"))
-    private void copy(CallbackInfoReturnable<MerchantOffer> cir){
-       ((LegacyMerchantOffer) cir.getReturnValue()).setRequiredLevel(requiredLevel);
     }
     @Override
     public void setRequiredLevel(int requiredLevel) {

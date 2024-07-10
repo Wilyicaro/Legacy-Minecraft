@@ -18,32 +18,31 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.LegacyMinecraftClient;
-import wily.legacy.client.LegacySprites;
-import wily.legacy.client.controller.ControllerComponent;
+import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyGuiGraphics;
+import wily.legacy.init.LegacyRegistries;
+import wily.legacy.util.LegacySprites;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
-import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static wily.legacy.client.LegacySprites.UNSELECT_HIGHLIGHTED_SPRITE;
-import static wily.legacy.client.LegacySprites.UNSELECT_SPRITE;
+import static wily.legacy.util.LegacySprites.UNSELECT_HIGHLIGHTED;
+import static wily.legacy.util.LegacySprites.UNSELECT;
 
 @Mixin(PackSelectionScreen.class)
-public abstract class PackSelectionScreenMixin extends Screen {
+public abstract class PackSelectionScreenMixin extends Screen implements ControlTooltip.Event {
     private static final Component INCOMPATIBLE_TITLE = Component.translatable("pack.incompatible").withStyle(ChatFormatting.RED);
     private static final Component INCOMPATIBLE_CONFIRM_TITLE = Component.translatable("pack.incompatible.confirm.title");
     private static final Component AVAILABLE_PACK = Component.translatable("pack.selected.title");
     private static final Component SELECTED_PACK = Component.translatable("pack.available.title");
-    protected int lastFocused = -1;
     @Shadow @Final private PackSelectionModel model;
     @Shadow protected abstract void reload();
 
     @Shadow private Button doneButton;
-    public ControlTooltip.Renderer controlTooltipRenderer = ControlTooltip.defaultScreen(this);
 
     private Panel panel = Panel.centered(this,410,240);
     private RenderableVList selectedPacksList = new RenderableVList().layoutSpacing(l->0);
@@ -54,42 +53,20 @@ public abstract class PackSelectionScreenMixin extends Screen {
     private PackSelectionScreen self(){
         return(PackSelectionScreen)(Object) this;
     }
-    public void clearFocus() {
-        if (lastFocused >= 0 && LegacyMinecraftClient.controllerHandler.isCursorDisabled) return;
-        lastFocused = -1;
-        super.clearFocus();
-    }
 
-    public void repositionElements() {
-        lastFocused = getFocused() != null ? children().indexOf(getFocused()) : -1;
-        super.repositionElements();
-    }
-    @Override
-    public void init() {
+    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        ci.cancel();
         super.init();
         panel.init();
         unselectedPacksList.init(this,panel.x + 15, panel.y + 30, 180, 210);
         selectedPacksList.init(this,panel.x + 215, panel.y + 30, 180, 210);
         this.doneButton = Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).build();
-        if (lastFocused >= 0 && lastFocused < children.size()) setInitialFocus(children.get(lastFocused));
-    }
-    @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(guiGraphics);
-        panel.render(guiGraphics, i, j, f);
-        RenderSystem.enableBlend();
-        guiGraphics.setColor(1.0f,1.0f,1.0f,0.6f);
-        ScreenUtil.renderPanelRecess(guiGraphics,panel.x + 10, panel.y + 10, 190, 220,2f);
-        guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
-        RenderSystem.disableBlend();
-        ScreenUtil.renderPanelRecess(guiGraphics,panel.x + 210, panel.y + 10, 190, 220,2f);
-        guiGraphics.drawString(this.font, SELECTED_PACK, panel.x + 10 + (190 - font.width(SELECTED_PACK)) / 2, panel.y + 18, 0x404040,false);
-        guiGraphics.drawString(this.font, AVAILABLE_PACK, panel.x + 210 + (190 - font.width(AVAILABLE_PACK)) / 2, panel.y + 18, 0x404040, false);
-        controlTooltipRenderer.render(guiGraphics, i, j, f);
     }
 
+
     @Inject(method = "<init>", at = @At("RETURN"))
-    public void init(CallbackInfo info){
+    public void initConstruct(CallbackInfo info){
         reload();
     }
 
@@ -102,7 +79,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
     }
     @Inject(method = "onClose", at = @At("RETURN"))
     public void onClose(CallbackInfo info){
-        ScreenUtil.playSimpleUISound(LegacySoundEvents.BACK.get(),1.0f);
+        ScreenUtil.playSimpleUISound(LegacyRegistries.BACK.get(),1.0f);
     }
     private void addPacks(RenderableVList list,Stream<PackSelectionModel.Entry> stream){
         list.renderables.clear();
@@ -126,30 +103,30 @@ public abstract class PackSelectionScreenMixin extends Screen {
                         int q = mouseY - getY();
                         if (e.canSelect()) {
                             if (p < 32) {
-                                guiGraphics.blitSprite(LegacySprites.JOIN_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.JOIN_HIGHLIGHTED, getX(), getY(), 32, 32);
                             } else {
-                                guiGraphics.blitSprite(LegacySprites.JOIN_SPRITE, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.JOIN, getX(), getY(), 32, 32);
                             }
                         } else {
                             if (e.canUnselect()) {
                                 if (p < 16) {
-                                    guiGraphics.blitSprite(UNSELECT_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(UNSELECT_HIGHLIGHTED, getX(), getY(), 32, 32);
                                 } else {
-                                    guiGraphics.blitSprite(UNSELECT_SPRITE, getX(), getY(), 32, 32);
+                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(UNSELECT, getX(), getY(), 32, 32);
                                 }
                             }
                             if (e.canMoveUp()) {
                                 if (p < 32 && p > 16 && q < 16) {
-                                    guiGraphics.blitSprite(LegacySprites.TRANSFER_MOVE_UP_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TRANSFER_MOVE_UP_HIGHLIGHTED, getX(), getY(), 32, 32);
                                 } else {
-                                    guiGraphics.blitSprite(LegacySprites.TRANSFER_MOVE_UP_SPRITE, getX(), getY(), 32, 32);
+                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TRANSFER_MOVE_UP, getX(), getY(), 32, 32);
                                 }
                             }
                             if (e.canMoveDown()) {
                                 if (p < 32 && p > 16 && q > 16) {
-                                    guiGraphics.blitSprite(LegacySprites.TRANSFER_MOVE_DOWN_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TRANSFER_MOVE_DOWN_HIGHLIGHTED, getX(), getY(), 32, 32);
                                 } else {
-                                    guiGraphics.blitSprite(LegacySprites.TRANSFER_MOVE_DOWN_SPRITE, getX(), getY(), 32, 32);
+                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TRANSFER_MOVE_DOWN, getX(), getY(), 32, 32);
                                 }
                             }
                         }
@@ -200,15 +177,19 @@ public abstract class PackSelectionScreenMixin extends Screen {
                     }));
                 }
                 public boolean keyPressed(int i, int j, int k) {
-                    if (Screen.hasShiftDown() || ControllerComponent.LEFT_BUTTON.componentState.pressed) {
+                    if (Screen.hasShiftDown() || ControllerBinding.LEFT_BUTTON.bindingState.pressed) {
                         switch (i) {
                             case 265 -> {
+                                int oldFocused = getFocused() == null ? -1 : children().indexOf(getFocused());
                                 if (e.canMoveUp()) e.moveUp();
-                                return true;
+                                if (oldFocused >= 0 && oldFocused < children.size()) PackSelectionScreenMixin.this.setFocused(children().get(oldFocused));
+                                return false;
                             }
                             case 264 -> {
+                                int oldFocused = getFocused() == null ? -1 : children().indexOf(getFocused());
                                 if (e.canMoveDown()) e.moveDown();
-                                return true;
+                                if (oldFocused >= 0 && oldFocused < children.size()) PackSelectionScreenMixin.this.setFocused(children().get(oldFocused));
+                                return false;
                             }
                         }
                     }
@@ -225,10 +206,10 @@ public abstract class PackSelectionScreenMixin extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e, double f, double g) {
-        if (ScreenUtil.isMouseOver(d,e,panel.x + 10, panel.y + 10, 190, 220)) unselectedPacksList.mouseScrolled(d,e,f,g);
-        else if (ScreenUtil.isMouseOver(d,e,panel.x + 210, panel.y + 10, 190, 220)) selectedPacksList.mouseScrolled(d,e,f,g);
-        return super.mouseScrolled(d, e, f, g);
+    public boolean mouseScrolled(double d, double e, double g) {
+        if (ScreenUtil.isMouseOver(d,e,panel.x + 10, panel.y + 10, 190, 220)) unselectedPacksList.mouseScrolled(g);
+        else if (ScreenUtil.isMouseOver(d,e,panel.x + 210, panel.y + 10, 190, 220)) selectedPacksList.mouseScrolled(g);
+        return super.mouseScrolled(d, e, g);
     }
 
     @Override
@@ -240,6 +221,16 @@ public abstract class PackSelectionScreenMixin extends Screen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        ScreenUtil.renderDefaultBackground(guiGraphics);
+        panel.render(guiGraphics, 0,0,0);
+        RenderSystem.enableBlend();
+        guiGraphics.setColor(1.0f,1.0f,1.0f,0.6f);
+        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 10, panel.y + 10, 190, 220);
+        guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
+        RenderSystem.disableBlend();
+        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 210, panel.y + 10, 190, 220);
+        guiGraphics.drawString(this.font, SELECTED_PACK, panel.x + 10 + (190 - font.width(SELECTED_PACK)) / 2, panel.y + 18, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+        guiGraphics.drawString(this.font, AVAILABLE_PACK, panel.x + 210 + (190 - font.width(AVAILABLE_PACK)) / 2, panel.y + 18, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         super.render(guiGraphics, i, j, f);
     }
 }

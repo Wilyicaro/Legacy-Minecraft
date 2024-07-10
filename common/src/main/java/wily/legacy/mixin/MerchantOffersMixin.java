@@ -1,5 +1,6 @@
 package wily.legacy.mixin;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.trading.MerchantOffer;
@@ -17,7 +18,7 @@ public class MerchantOffersMixin {
     private void write(FriendlyByteBuf buf, CallbackInfo info){
         info.cancel();
         buf.writeCollection((MerchantOffers)(Object)this, (friendlyByteBuf, merchantOffer) -> {
-            ItemStack result = merchantOffer.getResult();
+            ItemStack result = merchantOffer.getResult().copy();
             result.getOrCreateTag().putInt("requiredLevel",((LegacyMerchantOffer)merchantOffer).getRequiredLevel());
             friendlyByteBuf.writeItem(merchantOffer.getBaseCostA());
             friendlyByteBuf.writeItem(result);
@@ -49,7 +50,8 @@ public class MerchantOffersMixin {
                 merchantOffer.setToOutOfStock();
             }
             merchantOffer.setSpecialPriceDiff(l);
-            ((LegacyMerchantOffer)merchantOffer).setRequiredLevel(itemStack3.getOrCreateTag().getInt("requiredLevel"));
+            CompoundTag tag = itemStack3.getTag();
+            ((LegacyMerchantOffer)merchantOffer).setRequiredLevel(tag == null ? 0 : tag.getInt("requiredLevel"));
             itemStack3.removeTagKey("requiredLevel");
             return merchantOffer;
         }));

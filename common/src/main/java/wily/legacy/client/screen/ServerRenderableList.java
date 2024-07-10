@@ -23,6 +23,7 @@ import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.FaviconTexture;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
@@ -37,8 +38,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import wily.legacy.LegacyMinecraft;
-import wily.legacy.client.LegacySprites;
+import wily.legacy.Legacy4J;
+import wily.legacy.client.LegacyGuiGraphics;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import java.net.UnknownHostException;
@@ -51,19 +53,19 @@ import java.util.concurrent.ThreadPoolExecutor;
 import static wily.legacy.client.screen.CreationList.addIconButton;
 
 public class ServerRenderableList extends RenderableVList {
-    static final ResourceLocation INCOMPATIBLE_SPRITE = new ResourceLocation("server_list/incompatible");
-    static final ResourceLocation UNREACHABLE_SPRITE = new ResourceLocation("server_list/unreachable");
-    static final ResourceLocation PING_1_SPRITE = new ResourceLocation("server_list/ping_1");
-    static final ResourceLocation PING_2_SPRITE = new ResourceLocation("server_list/ping_2");
-    static final ResourceLocation PING_3_SPRITE = new ResourceLocation("server_list/ping_3");
-    static final ResourceLocation PING_4_SPRITE = new ResourceLocation("server_list/ping_4");
-    static final ResourceLocation PING_5_SPRITE = new ResourceLocation("server_list/ping_5");
-    static final ResourceLocation PINGING_1_SPRITE = new ResourceLocation("server_list/pinging_1");
-    static final ResourceLocation PINGING_2_SPRITE = new ResourceLocation("server_list/pinging_2");
-    static final ResourceLocation PINGING_3_SPRITE = new ResourceLocation("server_list/pinging_3");
-    static final ResourceLocation PINGING_4_SPRITE = new ResourceLocation("server_list/pinging_4");
-    static final ResourceLocation PINGING_5_SPRITE = new ResourceLocation("server_list/pinging_5");
-    static final Logger LOGGER = LogUtils.getLogger();
+    static final ResourceLocation INCOMPATIBLE = new ResourceLocation(Legacy4J.MOD_ID,"server_list/incompatible");
+    static final ResourceLocation UNREACHABLE = new ResourceLocation(Legacy4J.MOD_ID,"server_list/unreachable");
+    static final ResourceLocation PING_1 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/ping_1");
+    static final ResourceLocation PING_2 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/ping_2");
+    static final ResourceLocation PING_3 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/ping_3");
+    static final ResourceLocation PING_4 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/ping_4");
+    static final ResourceLocation PING_5 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/ping_5");
+    static final ResourceLocation PINGING_1 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/pinging_1");
+    static final ResourceLocation PINGING_2 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/pinging_2");
+    static final ResourceLocation PINGING_3 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/pinging_3");
+    static final ResourceLocation PINGING_4 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/pinging_4");
+    static final ResourceLocation PINGING_5 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/pinging_5");
+    protected static final Logger LOGGER = LogUtils.getLogger();
     static final ThreadPoolExecutor THREAD_POOL = new ScheduledThreadPoolExecutor(5, new ThreadFactoryBuilder().setNameFormat("Server Pinger #%d").setDaemon(true).setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(LOGGER)).build());
     private static final ResourceLocation ICON_MISSING = new ResourceLocation("textures/misc/unknown_server.png");
     static final Component SCANNING_LABEL = Component.translatable("lanServer.scanning");
@@ -75,8 +77,8 @@ public class ServerRenderableList extends RenderableVList {
     static final Component ONLINE_STATUS = Component.translatable("multiplayer.status.online");
     private static final Component LAN_SERVER_HEADER = Component.translatable("lanServer.title");
     private static final Component HIDDEN_ADDRESS_TEXT = Component.translatable("selectServer.hiddenAddress");
-    private PlayGameScreen screen;
-    private final Minecraft minecraft;
+    protected PlayGameScreen screen;
+    protected final Minecraft minecraft;
 
     public final ServerList servers;
     @Nullable
@@ -99,15 +101,16 @@ public class ServerRenderableList extends RenderableVList {
             this.lanServerDetector = new LanServerDetection.LanServerDetector(this.lanServerList);
             this.lanServerDetector.start();
         } catch (Exception exception) {
-            LegacyMinecraft.LOGGER.warn("Unable to start LAN server detection: {}", exception.getMessage());
+            Legacy4J.LOGGER.warn("Unable to start LAN server detection: {}", exception.getMessage());
         }
         super.init(screen, leftPos, topPos, listWidth, listHeight);
+    }
+    public boolean hasOnlineFriends(){
+        return false;
     }
     private Component getMultiplayerDisabledReason() {
         if (this.minecraft.allowsMultiplayer()) {
             return null;
-        } else if (this.minecraft.isNameBanned()) {
-            return Component.translatable("title.multiplayer.disabled.banned.name");
         } else {
             BanDetails banDetails = this.minecraft.multiplayerBan();
             if (banDetails != null) {
@@ -117,12 +120,17 @@ public class ServerRenderableList extends RenderableVList {
             }
         }
     }
+    public static void drawIcon(GuiGraphics guiGraphics, int i, int j, ResourceLocation resourceLocation) {
+        RenderSystem.enableBlend();
+        guiGraphics.blit(resourceLocation, i + 5, j + 5, 0.0f, 0.0f, 20, 20, 20, 20);
+        RenderSystem.disableBlend();
+    }
     public void updateServers(){
         renderables.clear();
-        addIconButton(this,new ResourceLocation(LegacyMinecraft.MOD_ID,"creation_list/add_server"),Component.translatable("legacy.menu.add_server"), c-> this.minecraft.setScreen(new ServerEditScreen(screen, new ServerData(I18n.get("selectServer.defaultName"), "", ServerData.Type.OTHER), true)));
+        addIconButton(this,new ResourceLocation(Legacy4J.MOD_ID,"creation_list/add_server"),Component.translatable("legacy.menu.add_server"), c-> this.minecraft.setScreen(new ServerEditScreen(screen, new ServerData(I18n.get("selectServer.defaultName"), "", false), true)));
         Component component = this.getMultiplayerDisabledReason();
         Tooltip tooltip = component != null ? Tooltip.create(component) : null;
-        addIconButton(this,new ResourceLocation(LegacyMinecraft.MOD_ID,"creation_list/realms"), Component.translatable("menu.online"), b-> minecraft.setScreen(new RealmsMainScreen(screen)),tooltip);
+        addIconButton(this,new ResourceLocation(Legacy4J.MOD_ID,"creation_list/realms"), Component.translatable("menu.online"), b-> minecraft.setScreen(new RealmsMainScreen(screen)),tooltip);
         for (int i = 0; i < servers.size(); i++) {
             int index = i;
             ServerData server = servers.get(i);
@@ -154,21 +162,23 @@ public class ServerRenderableList extends RenderableVList {
                     }
                     boolean bl2 = !this.isCompatible();
                     guiGraphics.drawString(minecraft.font, getMessage(), getX() + 32 + 3, getY() + 3, 0xFFFFFF);
-                    minecraft.selectMainFont(true);
-                    List<FormattedCharSequence> list = minecraft.font.split(server.motd, Math.max(234,minecraft.font.width(server.motd) / 2));
-                    for (int p = 0; p < Math.min(list.size(), 2); ++p) {
-                        ScreenUtil.renderScrollingString(guiGraphics,minecraft.font, list.get(p), getX() + 35,  getY() + 8 + minecraft.font.lineHeight * p,getX() + 269,getY() + 19 + minecraft.font.lineHeight * p, -8355712, false);
+                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().translate(getX() + 35,  getY() + 10,0);
+                    guiGraphics.pose().scale(2/3f,2/3f,2/3f);
+                    List<FormattedCharSequence> list = minecraft.font.split(server.motd, Math.max(234,minecraft.font.width(server.motd) / 2 + 20));
+                    for (int p = 0; p < Math.min(2,list.size()); ++p) {
+                        ScreenUtil.renderScrollingString(guiGraphics,minecraft.font, list.get(p), 0,  minecraft.font.lineHeight * p,234 , 11 + minecraft.font.lineHeight * p, -8355712, false,minecraft.font.width(list.get(p))* 2/3);
                     }
-                    minecraft.selectMainFont(false);
+                    guiGraphics.pose().popPose();
                     Component component = bl2 ? server.version.copy().withStyle(ChatFormatting.RED) : server.status;
                     int q = minecraft.font.width(component);
                     guiGraphics.drawString(minecraft.font, component, getX() + 270 - q - 15 - 2, getY() + 3, -8355712, false);
                     if (bl2) {
-                        resourceLocation = INCOMPATIBLE_SPRITE;
+                        resourceLocation = INCOMPATIBLE;
                         component2 = INCOMPATIBLE_STATUS;
                         list2 = server.playerList;
                     } else if (this.pingCompleted()) {
-                        resourceLocation = server.ping < 0L ? UNREACHABLE_SPRITE : (server.ping < 150L ? PING_5_SPRITE : (server.ping < 300L ? PING_4_SPRITE : (server.ping < 600L ? PING_3_SPRITE : (server.ping < 1000L ? PING_2_SPRITE : PING_1_SPRITE))));
+                        resourceLocation = server.ping < 0L ? UNREACHABLE : (server.ping < 150L ? PING_5 : (server.ping < 300L ? PING_4 : (server.ping < 600L ? PING_3 : (server.ping < 1000L ? PING_2 : PING_1))));
                         if (server.ping < 0L) {
                             component2 = NO_CONNECTION_STATUS;
                             list2 = Collections.emptyList();
@@ -182,16 +192,16 @@ public class ServerRenderableList extends RenderableVList {
                             r = 8 - r;
                         }
                         resourceLocation = switch (r) {
-                            default -> PINGING_1_SPRITE;
-                            case 1 -> PINGING_2_SPRITE;
-                            case 2 -> PINGING_3_SPRITE;
-                            case 3 -> PINGING_4_SPRITE;
-                            case 4 -> PINGING_5_SPRITE;
+                            default -> PINGING_1;
+                            case 1 -> PINGING_2;
+                            case 2 -> PINGING_3;
+                            case 3 -> PINGING_4;
+                            case 4 -> PINGING_5;
                         };
                         component2 = PINGING_STATUS;
                         list2 = Collections.emptyList();
                     }
-                    guiGraphics.blitSprite(resourceLocation, getX() + width - 15, getY() + 3, 10, 8);
+                    LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation, getX() + width - 15, getY() + 3, 10, 8);
                     byte[] bs = server.getIconBytes();
                     if (!Arrays.equals(bs, this.lastIconBytes)) {
                         if (this.uploadServerIcon(bs)) {
@@ -201,7 +211,7 @@ public class ServerRenderableList extends RenderableVList {
                             this.updateServerList();
                         }
                     }
-                    this.drawIcon(guiGraphics, getX(), getY(), icon.textureLocation());
+                    drawIcon(guiGraphics, getX(), getY(), icon.textureLocation());
                     int s = mouseX - getX();
                     int t = mouseY - getY();
                     if (s >= width - 15 && s <= width - 5 && t >= 2 && t <= 10) {
@@ -214,22 +224,22 @@ public class ServerRenderableList extends RenderableVList {
                         int u = mouseX - getX();
                         int v = mouseY - getY();
                         if (u < 32 && u > 16) {
-                            guiGraphics.blitSprite(LegacySprites.JOIN_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                            LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.JOIN_HIGHLIGHTED, getX(), getY(), 32, 32);
                         } else {
-                            guiGraphics.blitSprite(LegacySprites.JOIN_SPRITE, getX(), getY(), 32, 32);
+                            LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.JOIN, getX(), getY(), 32, 32);
                         }
                         if (index > 0) {
                             if (u < 16 && v < 16) {
-                                guiGraphics.blitSprite(LegacySprites.MOVE_UP_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_UP_HIGHLIGHTED, getX(), getY(), 32, 32);
                             } else {
-                                guiGraphics.blitSprite(LegacySprites.MOVE_UP_SPRITE, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_UP, getX(), getY(), 32, 32);
                             }
                         }
                         if (index < screen.getServers().size() - 1) {
                             if (u < 16 && v > 16) {
-                                guiGraphics.blitSprite(LegacySprites.MOVE_DOWN_HIGHLIGHTED_SPRITE, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_DOWN_HIGHLIGHTED, getX(), getY(), 32, 32);
                             } else {
-                                guiGraphics.blitSprite(LegacySprites.MOVE_DOWN_SPRITE, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_DOWN, getX(), getY(), 32, 32);
                             }
                         }
                     }
@@ -244,12 +254,6 @@ public class ServerRenderableList extends RenderableVList {
 
                 public void updateServerList() {
                     screen.getServers().save();
-                }
-
-                protected void drawIcon(GuiGraphics guiGraphics, int i, int j, ResourceLocation resourceLocation) {
-                    RenderSystem.enableBlend();
-                    guiGraphics.blit(resourceLocation, i + 5, j + 5, 0.0f, 0.0f, 20, 20, 20, 20);
-                    RenderSystem.disableBlend();
                 }
 
                 private boolean uploadServerIcon(@Nullable byte[] bs) {
@@ -332,7 +336,7 @@ public class ServerRenderableList extends RenderableVList {
                         mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
                         mutableComponent.append(Component.translatable("multiplayer.status.ping.narration", server.ping));
                         mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
-                        mutableComponent.append(Component.translatable("multiplayer.status.motd.narration", server.motd));
+                            mutableComponent.append(Component.translatable("multiplayer.status.motd.narration", server.motd));
                         if (server.players != null) {
                             mutableComponent.append(CommonComponents.NARRATION_SEPARATOR);
                             mutableComponent.append(Component.translatable("multiplayer.status.player_count.narration", server.players.online(), server.players.max()));
@@ -396,10 +400,9 @@ public class ServerRenderableList extends RenderableVList {
         }
     }
     private void joinLanServer(LanServer lanServer) {
-        join(new ServerData(lanServer.getMotd(),lanServer.getAddress(),ServerData.Type.LAN));
+        join(new ServerData(lanServer.getMotd(),lanServer.getAddress(),true));
     }
     private void join(ServerData serverData) {
         ConnectScreen.startConnecting(screen, this.minecraft, ServerAddress.parseString(serverData.ip), serverData, false);
     }
-
 }

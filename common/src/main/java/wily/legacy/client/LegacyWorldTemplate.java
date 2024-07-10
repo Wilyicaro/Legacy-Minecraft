@@ -1,18 +1,19 @@
 package wily.legacy.client;
 
 import com.google.gson.JsonObject;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
-import wily.legacy.LegacyMinecraft;
+import wily.legacy.Legacy4J;
+import wily.legacy.util.JsonUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public record LegacyWorldTemplate(Component buttonName, ResourceLocation icon, ResourceLocation worldTemplate, String folderName, boolean directJoin) {
@@ -22,7 +23,7 @@ public record LegacyWorldTemplate(Component buttonName, ResourceLocation icon, R
         @Override
         protected List<LegacyWorldTemplate> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
             List<LegacyWorldTemplate> templates = new ArrayList<>();
-            resourceManager.getNamespaces().forEach(name->{
+            JsonUtil.getOrderedNamespaces(resourceManager).forEach(name->{
                 resourceManager.getResource(new ResourceLocation(name, TEMPLATES)).ifPresent(r->{
                     try {
                         BufferedReader bufferedReader = r.openAsReader();
@@ -34,7 +35,7 @@ public record LegacyWorldTemplate(Component buttonName, ResourceLocation icon, R
                         });
                         bufferedReader.close();
                     } catch (IOException var8) {
-                        LegacyMinecraft.LOGGER.warn(var8.getMessage());
+                        Legacy4J.LOGGER.warn(var8.getMessage());
                     }
                 });
             });

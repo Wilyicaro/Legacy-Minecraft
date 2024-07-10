@@ -12,7 +12,11 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
+import wily.legacy.client.LegacyBiomeOverride;
+import wily.legacy.client.LegacyGuiGraphics;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.function.Consumer;
@@ -39,9 +43,17 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
             @Override
             protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                 super.renderWidget(guiGraphics, i, j, f);
+                ItemStack s = LegacyBiomeOverride.getOrDefault(biome.unwrapKey()).icon();
+                if (!s.isEmpty()){
+                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().translate(getX() + 26, getY() + 5,0);
+                    guiGraphics.pose().scale(1.25f,1.25f,1.25f);
+                    guiGraphics.renderItem(s,0, 0);
+                    guiGraphics.pose().popPose();
+                }
                 RenderSystem.enableBlend();
-                guiGraphics.blitSprite(TickBox.SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);
-                if (selectedBiome == biome) guiGraphics.blitSprite(TickBox.TICK_SPRITE, this.getX() + 6, this.getY()  + (height - 12) / 2, 14, 12);
+                LegacyGuiGraphics.of(guiGraphics).blitSprite(TickBox.SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);
+                if (selectedBiome == biome) LegacyGuiGraphics.of(guiGraphics).blitSprite(TickBox.TICK, this.getX() + 6, this.getY()  + (height - 12) / 2, 14, 12);
                 RenderSystem.disableBlend();
             }
             @Override
@@ -65,7 +77,7 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
         panel.height = Math.min(height,248);
         addRenderableOnly(panel);
         panel.init();
-        addRenderableOnly(((guiGraphics, i, j, f) -> ScreenUtil.renderPanelRecess(guiGraphics, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14, 2)));
+        addRenderableOnly(((guiGraphics, i, j, f) -> LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14)));
         getRenderableVList().init(this,panel.x + 11,panel.y + 11,260, panel.height - 5);
     }
 

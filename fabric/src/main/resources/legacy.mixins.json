@@ -5,13 +5,13 @@
   "plugin": "wily.legacy.LegacyMixinPlugin",
   "client": [
     "AbstractContainerScreenMixin",
-    "GuiGraphicsMixin",
     "GuiMixin",
     "LiquidBlockRendererMixin",
     "PresetEditorMixin",
     "TooltipRenderUtilMixin"
   ],
   "mixins": [
+    "CustomIngredientImplMixin",
     "ItemStackMixin"
   ],
   "injectors": {

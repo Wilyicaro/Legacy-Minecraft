@@ -15,13 +15,13 @@ import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import wily.legacy.client.LegacySprites;
+import wily.legacy.client.LegacyGuiGraphics;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(SmithingScreen.class)
 public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMenu> {
 
-    @Shadow @Final private static Vector3f ARMOR_STAND_TRANSLATION;
 
     @Shadow @Final private static Quaternionf ARMOR_STAND_ANGLE;
 
@@ -53,26 +53,25 @@ public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMen
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderBg(guiGraphics, f, i, j);
+    public void renderBackground(GuiGraphics guiGraphics) {
     }
 
     @Override
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
-        ScreenUtil.renderPanel(guiGraphics, leftPos, topPos, imageWidth, imageHeight, 2f);
+        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL, leftPos, topPos, imageWidth, imageHeight);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 13.5, topPos + 9.5,0f);
         guiGraphics.pose().scale(2.5f,2.5f,2.5f);
-        guiGraphics.blitSprite(LegacySprites.SMITHING_HAMMER_SPRITE,0,0,15,15);
+        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMITHING_HAMMER,0,0,15,15);
         guiGraphics.pose().popPose();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 82, topPos + 59,0f);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        guiGraphics.blitSprite(LegacySprites.ARROW_SPRITE,0,0,22,15);
+        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ARROW,0,0,22,15);
         if (hasRecipeError())
-            guiGraphics.blitSprite(LegacySprites.ERROR_CROSS_SPRITE, 4, 0, 15, 15);
+            LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
         guiGraphics.pose().popPose();
-        InventoryScreen.renderEntityInInventory(guiGraphics, this.leftPos + 182, this.topPos + 95, 35, ARMOR_STAND_TRANSLATION, ARMOR_STAND_ANGLE, null, this.armorStandPreview);
+        InventoryScreen.renderEntityInInventory(guiGraphics, this.leftPos + 182, this.topPos + 95, 35, ARMOR_STAND_ANGLE, null, this.armorStandPreview);
     }
 
     @Override

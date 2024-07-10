@@ -7,21 +7,26 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractButton;
-import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
-import wily.legacy.client.controller.ControllerComponent;
+import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyBiomeOverride;
+import wily.legacy.client.LegacyGuiGraphics;
+import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.ArrayList;
@@ -29,11 +34,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static wily.legacy.client.screen.ControlTooltip.CONTROL_ACTION_CACHE;
+import static wily.legacy.client.screen.ControlTooltip.getAction;
 
 @Environment(value=EnvType.CLIENT)
-public class LegacyFlatWorldScreen extends PanelVListScreen {
+public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTooltip.Event {
     public static int DEFAULT_MAX_WORLD_HEIGHT = 384;
+    protected MultiLineLabel tooltipBoxLabel;
     private final Consumer<FlatLevelGeneratorSettings> applySettings;
     protected final WorldCreationUiState uiState;
     FlatLevelGeneratorSettings generator;
@@ -45,11 +51,8 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
     protected final List<Holder<StructureSet>> structuresOverrides;
 
     public LegacyFlatWorldScreen(Screen screen, WorldCreationUiState uiState, HolderLookup.RegistryLookup<Biome> biomeGetter, HolderLookup.RegistryLookup<StructureSet> structureGetter, Consumer<FlatLevelGeneratorSettings> consumer, FlatLevelGeneratorSettings flatLevelGeneratorSettings) {
-        super(screen,282,248,Component.translatable("createWorld.customize.flat.title"));
-        controlTooltipRenderer.tooltips.set(0,ControlTooltip.create(()-> ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN,true) : ControllerComponent.DOWN_BUTTON.componentState.getIcon(true),()->getFocused() != null ? ControlTooltip.CONTROL_ACTION_CACHE.getUnchecked(tabList.selectedTab == 0 ? "legacy.menu.create_flat_world.layer_options" : "mco.template.button.select") : null));
-        controlTooltipRenderer.tooltips.add(ControlTooltip.create(()-> ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O,true) : ControllerComponent.UP_BUTTON.componentState.getIcon(true),()-> ControlTooltip.CONTROL_ACTION_CACHE.getUnchecked("legacy.action.presets")));
-        controlTooltipRenderer.addCompound(()-> new Component[]{ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET,true) : ControllerComponent.LEFT_BUMPER.componentState.getIcon(true),ControlTooltip.SPACE,ControlTooltip.getActiveType().isKeyboard() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET,true) : ControllerComponent.RIGHT_BUMPER.componentState.getIcon(true)},()->CONTROL_ACTION_CACHE.getUnchecked("legacy.action.select_tab"));
-        parent = Minecraft.getInstance().screen instanceof WorldMoreOptionsScreen s ? s : screen;
+        super(s->new Panel(p -> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 194 : 0))) / 2, p -> (s.height - p.height) / 2, 282,248),Component.translatable("createWorld.customize.flat.title"));
+        this.parent = Minecraft.getInstance().screen instanceof WorldMoreOptionsScreen s ? s : screen;
         this.uiState = uiState;
         this.applySettings = consumer;
         this.generator = flatLevelGeneratorSettings;
@@ -60,14 +63,33 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
         displayProperties.addRenderable(new TickBox(0,0,260,12, generator.decoration, b-> Component.translatable("legacy.createWorld.customize.custom.useDecorations"), b-> null, b-> generator.decoration = b.selected));
         displayProperties.addRenderable(new TickBox(0,0,260,12, generator.addLakes, b-> Component.translatable("createWorld.customize.custom.useLavaLakes"), b-> null, b-> generator.addLakes = b.selected));
     }
+
+    @Override
+    public void addControlTooltips(ControlTooltip.Renderer renderer) {
+        super.addControlTooltips(renderer);
+        renderer.set(0,ControlTooltip.create(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(),()->getFocused() != null ? getAction(tabList.selectedTab == 0 ? "legacy.menu.create_flat_world.layer_options" : "mco.template.button.select") : null)).
+                add(ControlTooltip.create(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(),()-> getAction("legacy.action.presets"))).
+                addCompound(()-> new ControlTooltip.Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(),ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon()},()->getAction("legacy.action.select_tab"));
+    }
+
     public void addStructure(Holder.Reference<StructureSet> structure){
-        displayProperties.addRenderable(new TickBox(0,0,260,12,structuresOverrides.contains(structure), b-> Component.translatable("structure."+structure.key().location().toLanguageKey()), b-> null, b-> {
+        List<Component> descr = new ArrayList<>();
+        String nameKey = "structure."+structure.key().location().toLanguageKey();
+        String descriptionKey = nameKey+".description";
+        if (ScreenUtil.hasTip(nameKey)) descr.add(Component.translatable(nameKey));
+        if (ScreenUtil.hasTip(descriptionKey)){
+            descr.add(ControlTooltip.SPACE);
+            descr.add(Component.translatable(descriptionKey));
+        }
+        Tooltip t = descr.isEmpty() ? null : new MultilineTooltip(descr,182);
+        displayProperties.addRenderable(new TickBox(0,0,260,12,structuresOverrides.contains(structure), b-> descr.isEmpty() ? Component.empty() : descr.get(0), b-> t, b-> {
             if (b.selected) structuresOverrides.add(structure);
             else structuresOverrides.remove(structure);
         }));
     }
     public void addBiome(Holder.Reference<Biome> biome){
-        displayBiomes.addRenderable(new AbstractButton(0,0,260,30, Component.translatable("biome."+biome.key().location().toLanguageKey())) {
+        AbstractButton b;
+        displayBiomes.addRenderable(b = new AbstractButton(0,0,260,30, Component.translatable("biome."+biome.key().location().toLanguageKey())) {
             @Override
             public void onPress() {
                 generator.biome = biome;
@@ -76,9 +98,17 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
             @Override
             protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                 super.renderWidget(guiGraphics, i, j, f);
+                ItemStack s = LegacyBiomeOverride.getOrDefault(biome.unwrapKey()).icon();
+                if (!s.isEmpty()){
+                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().translate(getX() + 26, getY() + 5,0);
+                    guiGraphics.pose().scale(1.25f,1.25f,1.25f);
+                    guiGraphics.renderItem(s,0, 0);
+                    guiGraphics.pose().popPose();
+                }
                 RenderSystem.enableBlend();
-                guiGraphics.blitSprite(TickBox.SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);
-                if (generator.biome == biome) guiGraphics.blitSprite(TickBox.TICK_SPRITE, this.getX() + 6, this.getY()  + (height - 12) / 2, 14, 12);
+                LegacyGuiGraphics.of(guiGraphics).blitSprite(TickBox.SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);
+                if (generator.biome == biome) LegacyGuiGraphics.of(guiGraphics).blitSprite(TickBox.TICK, this.getX() + 6, this.getY()  + (height - 12) / 2, 14, 12);
                 RenderSystem.disableBlend();
             }
             @Override
@@ -92,6 +122,14 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
 
             }
         });
+        List<Component> descr = new ArrayList<>();
+        descr.add(b.getMessage());
+        String descriptionKey = "biome."+biome.key().location().toLanguageKey()+".description";
+        if (ScreenUtil.hasTip(descriptionKey)){
+            descr.add(ControlTooltip.SPACE);
+            descr.add(Component.translatable(descriptionKey));
+        }
+        b.setTooltip(new MultilineTooltip(descr,182));
     }
     public void addLayer(FlatLayerInfo flatLayerInfo){
         addLayer(flatLayerInfo,0,false);
@@ -100,7 +138,8 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
         addLayer(flatLayerInfo,index,true);
     }
     public void addLayer(FlatLayerInfo flatLayerInfo, int index,boolean update){
-        displayLayers.renderables.add(index,new AbstractButton(0,0,260,30,flatLayerInfo.getBlockState().getBlock().getName()) {
+        AbstractButton b;
+        displayLayers.renderables.add(index,b = new AbstractButton(0,0,260,30,flatLayerInfo.getBlockState().getBlock().getName()) {
             @Override
             protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                 super.renderWidget(guiGraphics, i, j, f);
@@ -117,6 +156,12 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
                 int l = this.getX() + this.getWidth();
                 ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true);
             }
+
+            @Override
+            public boolean keyPressed(int i, int j, int k) {
+                return super.keyPressed(i, j, k);
+            }
+
             @Override
             public void onPress() {
                 int allHeight = getAllLayersHeight();
@@ -147,6 +192,14 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
 
             }
         });
+        ItemStack s = flatLayerInfo.getBlockState().getBlock().asItem().getDefaultInstance();
+        List<Component> descr = new ArrayList<>();
+        descr.add(b.getMessage());
+        if (ScreenUtil.hasTip(s)){
+            descr.add(ControlTooltip.SPACE);
+            descr.add(ScreenUtil.getTip(s));
+        }
+        b.setTooltip(new MultilineTooltip(descr,182));
         if (update)
             generator.getLayersInfo().add(displayLayers.renderables.size() - 1 - index,flatLayerInfo);
     }
@@ -161,7 +214,12 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
         displayLayers.renderables.remove(index);
         generator.getLayersInfo().remove(generator.getLayersInfo().size() - 1 - index);
     }
-
+    @Override
+    public void setTooltipForNextRenderPass(Tooltip tooltip, ClientTooltipPositioner clientTooltipPositioner, boolean bl) {
+        if (ScreenUtil.hasTooltipBoxes())
+            tooltipBoxLabel =  MultiLineLabel.createFixed(font, tooltip.toCharSequence(minecraft).stream().map(formattedCharSequence -> new MultiLineLabel.TextWithWidth(formattedCharSequence, font.width(formattedCharSequence))).toList());
+        else super.setTooltipForNextRenderPass(tooltip, clientTooltipPositioner, bl);
+    }
     public FlatLevelGeneratorSettings settings() {
         return this.generator;
     }
@@ -181,9 +239,16 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
     protected void init() {
         addRenderableWidget(tabList);
         panel.height = Math.min(height - 48,248);
+        addRenderableOnly(((guiGraphics, i, j, f) -> {
+            if (ScreenUtil.hasTooltipBoxes()) {
+                if (tooltipBoxLabel != null && getChildAt(i,j).map(g-> g instanceof AbstractWidget w ? w.getTooltip() : null).isEmpty() && (!(getFocused() instanceof AbstractWidget w) || w.getTooltip() == null)) tooltipBoxLabel = null;
+                ScreenUtil.renderPointerPanel(guiGraphics,panel.x + panel.width - 2, panel.y + 5,194,panel.height - 10);
+                if (tooltipBoxLabel != null) tooltipBoxLabel.renderLeftAligned(guiGraphics, panel.x + panel.width + 3, panel.y + 13,12,0xFFFFFF);
+            }
+        }));
         addRenderableOnly(panel);
         panel.init();
-        addRenderableOnly(((guiGraphics, i, j, f) -> ScreenUtil.renderPanelRecess(guiGraphics, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14, 2)));
+        addRenderableOnly(((guiGraphics, i, j, f) -> LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14)));
         getRenderableVList().init(this,panel.x + 11,panel.y + 11,260, panel.height - 5);
         tabList.init(panel.x,panel.y - 24, panel.width);
         this.generator.updateLayers();
@@ -194,9 +259,9 @@ public class LegacyFlatWorldScreen extends PanelVListScreen {
         return displayLayers;
     }
     @Override
-    public boolean mouseScrolled(double d, double e, double f, double g) {
-        getRenderableVList().mouseScrolled(d,e,f,g);
-        return super.mouseScrolled(d, e, f, g);
+    public boolean mouseScrolled(double d, double e, double g) {
+        getRenderableVList().mouseScrolled(g);
+        return super.mouseScrolled(d, e, g);
     }
 
     @Override

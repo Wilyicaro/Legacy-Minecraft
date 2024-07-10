@@ -6,10 +6,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenAxis;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.resources.ResourceLocation;
-import wily.legacy.client.LegacySprites;
+import wily.legacy.client.LegacyGuiGraphics;
+import wily.legacy.util.LegacySprites;
 
 public class LegacyScrollRenderer {
-    public static final ResourceLocation[] SCROLL_SPRITES = new ResourceLocation[]{LegacySprites.SCROLL_UP, LegacySprites.SCROLL_DOWN, LegacySprites.SCROLL_LEFT, LegacySprites.SCROLL_RIGHT};
+    public static final ResourceLocation[] SCROLLS = new ResourceLocation[]{LegacySprites.SCROLL_UP, LegacySprites.SCROLL_DOWN, LegacySprites.SCROLL_LEFT, LegacySprites.SCROLL_RIGHT};
     public final long[] lastScrolled = new long[4];
     public long lastScroll = 0;
     public ScreenDirection lastDirection;
@@ -27,7 +28,7 @@ public class LegacyScrollRenderer {
             float fade = Math.min(1.0f,f < 0.5f ? 1 - f * 2f : (f - 0.5f) * 2f);
             RenderSystem.setShaderColor(1.0f,1.0f,1.0f, fade);
         }
-        graphics.blitSprite(SCROLL_SPRITES[direction.ordinal()],x,y, h ? 6 : 13, h ? 11 : 7);
+        LegacyGuiGraphics.of(graphics).blitSprite(SCROLLS[direction.ordinal()],x,y, h ? 6 : 13, h ? 11 : 7);
         if (l > 0) RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
     }
