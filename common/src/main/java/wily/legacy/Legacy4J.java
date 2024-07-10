@@ -278,8 +278,6 @@ public class Legacy4J {
         }
         ((LegacyPlayerInfo)p).setPosition(pos);
         CommonNetwork.sendToPlayer(p, new PlayerInfoSync.All(Map.of(p.getUUID(),(LegacyPlayerInfo)p), Collections.emptyMap(),p.server.getDefaultGameType()));
-        if (!p.server.isDedicatedServer()) Legacy4JClient.serverPlayerJoin(p);
-
     }
     public static void copySaveToDirectory(InputStream stream, File directory){
         try (ZipInputStream inputStream = new ZipInputStream(stream))
