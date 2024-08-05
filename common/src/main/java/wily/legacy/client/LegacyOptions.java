@@ -43,6 +43,7 @@ public interface LegacyOptions {
     OptionInstance<Integer> selectedControllerHandler();
     OptionInstance<Integer> cursorMode();
     OptionInstance<Boolean> controllerVirtualCursor();
+    OptionInstance<Boolean> controllerUnfocusedInput();
     OptionInstance<Boolean> legacyCreativeBlockPlacing();
     OptionInstance<Difficulty> createWorldDifficulty();
     OptionInstance<Boolean> smoothAnimatedCharacter();

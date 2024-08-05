@@ -79,7 +79,7 @@ public  class ControllerManager {
         GLFW.glfwSetCursorPos(window.getWindow(),minecraft.mouseHandler.xpos = Math.max(0,Math.min(x,window.getScreenWidth())),minecraft.mouseHandler.ypos = Math.max(0,Math.min(y,window.getScreenHeight())));
     }
     public synchronized void updateBindings() {
-        updateBindings(minecraft.isWindowActive() ? connectedController : Controller.EMPTY);
+        updateBindings(ScreenUtil.getLegacyOptions().controllerUnfocusedInput().get() || minecraft.isWindowActive() ? connectedController : Controller.EMPTY);
     }
 
     public synchronized void updateBindings(Controller controller) {

@@ -143,6 +143,7 @@
  "legacy.options.autoSaveWhenPause": "Autosave When Pausing",
  "legacy.options.cursorMode": "Cursor Mode",
  "legacy.options.controllerVirtualCursor": "Virtual Cursor",
+ "legacy.options.controllerUnfocusedInput": "Unfocused Input",
  "legacy.options.legacyCreativeBlockPlacing": "Legacy Creative Block Placing",
  "legacy.menu.updateMessage": "Welcome back! You may not have noticed but there is an update available!",
  "legacy.menu.save_options": "Save Options",

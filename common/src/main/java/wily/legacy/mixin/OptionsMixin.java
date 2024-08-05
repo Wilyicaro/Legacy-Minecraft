@@ -98,6 +98,7 @@ public abstract class OptionsMixin implements LegacyOptions {
     private OptionInstance<Boolean> legacyCreativeBlockPlacing;
     private OptionInstance<Integer> cursorMode;
     private OptionInstance<Boolean> controllerVirtualCursor;
+    private OptionInstance<Boolean> controllerUnfocusedInput;
     private OptionInstance<Difficulty> createWorldDifficulty;
     private OptionInstance<Boolean> smoothAnimatedCharacter;
     private OptionInstance<Integer> selectedControllerHandler;
@@ -158,6 +159,7 @@ public abstract class OptionsMixin implements LegacyOptions {
         });
         cursorMode =  new OptionInstance<>("legacy.options.cursorMode", OptionInstance.noTooltip(), (c, i)-> Component.translatable("options.generic_value",c,Component.translatable(i == 0 ? "options.guiScale.auto" : i == 1 ? "team.visibility.always" : "team.visibility.never")), new OptionInstance.IntRange(0, 2), 0, d -> {});
         controllerVirtualCursor = OptionInstance.createBoolean("legacy.options.controllerVirtualCursor", false);
+        controllerUnfocusedInput = OptionInstance.createBoolean("legacy.options.controllerUnfocusedInput", false);
         leftStickDeadZone = new OptionInstance<>("legacy.options.leftStickDeadZone", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 0.25, d -> {});
         rightStickDeadZone = new OptionInstance<>("legacy.options.rightStickDeadZone", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 0.34, d -> {});
         leftTriggerDeadZone = new OptionInstance<>("legacy.options.leftTriggerDeadZone", OptionInstance.noTooltip(), OptionsMixin::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 0.2, d -> {});
@@ -368,6 +370,9 @@ public abstract class OptionsMixin implements LegacyOptions {
     }
     public OptionInstance<Boolean> controllerVirtualCursor() {
         return controllerVirtualCursor;
+    }
+    public OptionInstance<Boolean> controllerUnfocusedInput() {
+        return controllerUnfocusedInput;
     }
     public OptionInstance<Boolean> autoResolution() {
         return autoResolution;

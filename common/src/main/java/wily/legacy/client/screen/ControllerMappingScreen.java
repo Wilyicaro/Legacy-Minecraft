@@ -44,7 +44,7 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
                 ((LegacyKeyMapping)keyMapping).setBinding(((LegacyKeyMapping)keyMapping).getDefaultBinding());
             minecraft.setScreen(this);
         }))).size(240,20).build());
-        renderableVList.addOptions(ScreenUtil.getLegacyOptions().selectedController(),ScreenUtil.getLegacyOptions().selectedControllerHandler(),ScreenUtil.getLegacyOptions().invertControllerButtons(),ScreenUtil.getLegacyOptions().leftStickDeadZone(),ScreenUtil.getLegacyOptions().rightStickDeadZone(),ScreenUtil.getLegacyOptions().leftTriggerDeadZone(),ScreenUtil.getLegacyOptions().rightTriggerDeadZone(),ScreenUtil.getLegacyOptions().controllerVirtualCursor());
+        renderableVList.addOptions(ScreenUtil.getLegacyOptions().selectedController(),ScreenUtil.getLegacyOptions().selectedControllerHandler(),ScreenUtil.getLegacyOptions().invertControllerButtons(),ScreenUtil.getLegacyOptions().leftStickDeadZone(),ScreenUtil.getLegacyOptions().rightStickDeadZone(),ScreenUtil.getLegacyOptions().leftTriggerDeadZone(),ScreenUtil.getLegacyOptions().rightTriggerDeadZone(),ScreenUtil.getLegacyOptions().controllerVirtualCursor(),ScreenUtil.getLegacyOptions().controllerUnfocusedInput());
         for (KeyMapping keyMapping : keyMappings) {
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category)) {
