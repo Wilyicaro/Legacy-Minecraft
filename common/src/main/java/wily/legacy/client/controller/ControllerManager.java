@@ -47,7 +47,7 @@ public  class ControllerManager {
 
     public static void updatePlayerCamera(BindingState.Axis stick, Controller handler){
         Minecraft minecraft = Minecraft.getInstance();
-        if (!minecraft.mouseHandler.isMouseGrabbed() || !minecraft.isWindowActive() || !stick.pressed || minecraft.player == null) return;
+        if (!minecraft.mouseHandler.isMouseGrabbed() || (!minecraft.isWindowActive() && !ScreenUtil.getLegacyOptions().controllerVirtualCursor().get()) || !stick.pressed || minecraft.player == null) return;
         double f = Math.pow(minecraft.options.sensitivity().get() * (double)0.6f + (double)0.2f,3) * 7.5f * (minecraft.player.isScoping() ? 0.125: 1.0);
         minecraft.player.turn(stick.getSmoothX() * f,stick.getSmoothY() * f * (ScreenUtil.getLegacyOptions().invertYController().get() ? -1 : 1));
     }
