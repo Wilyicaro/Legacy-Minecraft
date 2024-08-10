@@ -189,7 +189,7 @@
  "menu.options": "Помощь и настройки",
  "gamerule.globalMapPlayerIcon": "Иконка игрока на глобальной карте",
  "gamerule.globalMapPlayerIcon.description": "Разрешить отображение иконок игроков на всех созданных картах.",
- "options.resourcepack": "Наборы текстур",
+ "options.resourcepack": "Наборы ресурсов",
  "legacy.connect.initializing": "Инициализация сервера",
  "connect.connecting": "Подключение",
  "legacy.loading_spawn_area": "Загрузка зоны возрождения",
