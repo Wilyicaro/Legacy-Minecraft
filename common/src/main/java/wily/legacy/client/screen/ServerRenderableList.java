@@ -5,6 +5,7 @@ import com.mojang.authlib.minecraft.BanDetails;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
 import com.mojang.realmsclient.RealmsMainScreen;
 import net.minecraft.ChatFormatting;
@@ -13,14 +14,12 @@ import net.minecraft.SharedConstants;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.ConnectScreen;
-import net.minecraft.client.gui.screens.FaviconTexture;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
@@ -30,6 +29,7 @@ import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.server.LanServer;
 import net.minecraft.client.server.LanServerDetection;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
@@ -120,9 +120,9 @@ public class ServerRenderableList extends RenderableVList {
             }
         }
     }
-    public static void drawIcon(GuiGraphics guiGraphics, int i, int j, ResourceLocation resourceLocation) {
+    public static void drawIcon(PoseStack poseStack, int i, int j, ResourceLocation resourceLocation) {
         RenderSystem.enableBlend();
-        guiGraphics.blit(resourceLocation, i + 5, j + 5, 0.0f, 0.0f, 20, 20, 20, 20);
+        poseStack.blit(resourceLocation, i + 5, j + 5, 0.0f, 0.0f, 20, 20, 20, 20);
         RenderSystem.disableBlend();
     }
     public void updateServers(){
@@ -138,8 +138,8 @@ public class ServerRenderableList extends RenderableVList {
             addRenderable(new AbstractButton(0,0,270,30,Component.literal(server.name)) {
                 private byte @Nullable [] lastIconBytes;
                 @Override
-                protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-                    super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+                protected void renderWidget(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+                    super.renderWidget(poseStack, mouseX, mouseY, partialTicks);
                     List<Component> list2;
                     Component component2;
                     ResourceLocation resourceLocation;
@@ -161,18 +161,18 @@ public class ServerRenderableList extends RenderableVList {
                         });
                     }
                     boolean bl2 = !this.isCompatible();
-                    guiGraphics.drawString(minecraft.font, getMessage(), getX() + 32 + 3, getY() + 3, 0xFFFFFF);
-                    guiGraphics.pose().pushPose();
-                    guiGraphics.pose().translate(getX() + 35,  getY() + 10,0);
-                    guiGraphics.pose().scale(2/3f,2/3f,2/3f);
+                    poseStack.drawString(minecraft.font, getMessage(), getX() + 32 + 3, getY() + 3, 0xFFFFFF);
+                    poseStack.pose().pushPose();
+                    poseStack.pose().translate(getX() + 35,  getY() + 10,0);
+                    poseStack.pose().scale(2/3f,2/3f,2/3f);
                     List<FormattedCharSequence> list = minecraft.font.split(server.motd, Math.max(234,minecraft.font.width(server.motd) / 2 + 20));
                     for (int p = 0; p < Math.min(2,list.size()); ++p) {
-                        ScreenUtil.renderScrollingString(guiGraphics,minecraft.font, list.get(p), 0,  minecraft.font.lineHeight * p,234 , 11 + minecraft.font.lineHeight * p, -8355712, false,minecraft.font.width(list.get(p))* 2/3);
+                        ScreenUtil.renderScrollingString(poseStack,minecraft.font, list.get(p), 0,  minecraft.font.lineHeight * p,234 , 11 + minecraft.font.lineHeight * p, -8355712, false,minecraft.font.width(list.get(p))* 2/3);
                     }
-                    guiGraphics.pose().popPose();
+                    poseStack.pose().popPose();
                     Component component = bl2 ? server.version.copy().withStyle(ChatFormatting.RED) : server.status;
                     int q = minecraft.font.width(component);
-                    guiGraphics.drawString(minecraft.font, component, getX() + 270 - q - 15 - 2, getY() + 3, -8355712, false);
+                    poseStack.drawString(minecraft.font, component, getX() + 270 - q - 15 - 2, getY() + 3, -8355712, false);
                     if (bl2) {
                         resourceLocation = INCOMPATIBLE;
                         component2 = INCOMPATIBLE_STATUS;
@@ -201,7 +201,7 @@ public class ServerRenderableList extends RenderableVList {
                         component2 = PINGING_STATUS;
                         list2 = Collections.emptyList();
                     }
-                    LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation, getX() + width - 15, getY() + 3, 10, 8);
+                    LegacyGuiGraphics.of(poseStack).blitSprite(resourceLocation, getX() + width - 15, getY() + 3, 10, 8);
                     byte[] bs = server.getIconBytes();
                     if (!Arrays.equals(bs, this.lastIconBytes)) {
                         if (this.uploadServerIcon(bs)) {
@@ -211,35 +211,35 @@ public class ServerRenderableList extends RenderableVList {
                             this.updateServerList();
                         }
                     }
-                    drawIcon(guiGraphics, getX(), getY(), icon.textureLocation());
+                    drawIcon(poseStack, getX(), getY(), icon.textureLocation());
                     int s = mouseX - getX();
                     int t = mouseY - getY();
                     if (s >= width - 15 && s <= width - 5 && t >= 2 && t <= 10) {
-                        guiGraphics.renderTooltip(minecraft.font,component2, mouseX,mouseY);
+                        poseStack.renderTooltip(minecraft.font,component2, mouseX,mouseY);
                     } else if (s >= width - q - 15 - 2 && s <= width - 15 - 2 && t >= 2 && t <= 10) {
-                        guiGraphics.renderComponentTooltip(minecraft.font,list2, mouseX,mouseY);
+                        poseStack.renderComponentTooltip(minecraft.font,list2, mouseX,mouseY);
                     }
                     if (minecraft.options.touchscreen().get().booleanValue() || isHovered) {
-                        guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
+                        poseStack.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
                         int u = mouseX - getX();
                         int v = mouseY - getY();
                         if (u < 32 && u > 16) {
-                            LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.JOIN_HIGHLIGHTED, getX(), getY(), 32, 32);
+                            LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.JOIN_HIGHLIGHTED, getX(), getY(), 32, 32);
                         } else {
-                            LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.JOIN, getX(), getY(), 32, 32);
+                            LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.JOIN, getX(), getY(), 32, 32);
                         }
                         if (index > 0) {
                             if (u < 16 && v < 16) {
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_UP_HIGHLIGHTED, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.MOVE_UP_HIGHLIGHTED, getX(), getY(), 32, 32);
                             } else {
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_UP, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.MOVE_UP, getX(), getY(), 32, 32);
                             }
                         }
                         if (index < screen.getServers().size() - 1) {
                             if (u < 16 && v > 16) {
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_DOWN_HIGHLIGHTED, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.MOVE_DOWN_HIGHLIGHTED, getX(), getY(), 32, 32);
                             } else {
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MOVE_DOWN, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.MOVE_DOWN, getX(), getY(), 32, 32);
                             }
                         }
                     }
@@ -269,7 +269,7 @@ public class ServerRenderableList extends RenderableVList {
                     }
                     return true;
                 }
-                protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+                protected void renderScrollingString(PoseStack poseStack, Font font, int i, int j) {
                 }
 
                 @Override
@@ -358,13 +358,13 @@ public class ServerRenderableList extends RenderableVList {
                 AbstractButton lanButton;
                 addRenderable(lanButton = new AbstractButton(0,0,270,30,Component.literal(lanServer.getMotd())) {
                     @Override
-                    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                        guiGraphics.drawString(minecraft.font, LAN_SERVER_HEADER, getX() + 32 + 3, getY() + 1, 0xFFFFFF, false);
-                        guiGraphics.drawString(minecraft.font, lanServer.getMotd(), getX() + 32 + 3, getY() + 12, -8355712, false);
+                    protected void renderScrollingString(PoseStack poseStack, Font font, int i, int j) {
+                        poseStack.drawString(minecraft.font, LAN_SERVER_HEADER, getX() + 32 + 3, getY() + 1, 0xFFFFFF, false);
+                        poseStack.drawString(minecraft.font, lanServer.getMotd(), getX() + 32 + 3, getY() + 12, -8355712, false);
                         if (minecraft.options.hideServerAddress) {
-                            guiGraphics.drawString(minecraft.font, HIDDEN_ADDRESS_TEXT, getX() + 32 + 3,getY() + 12 + 11, 0x303030, false);
+                            poseStack.drawString(minecraft.font, HIDDEN_ADDRESS_TEXT, getX() + 32 + 3,getY() + 12 + 11, 0x303030, false);
                         } else {
-                            guiGraphics.drawString(minecraft.font, lanServer.getAddress(), getX() + 32 + 3, getY() + 12 + 11, 0x303030, false);
+                            poseStack.drawString(minecraft.font, lanServer.getAddress(), getX() + 32 + 3, getY() + 12 + 11, 0x303030, false);
                         }
                     }
 
@@ -382,11 +382,11 @@ public class ServerRenderableList extends RenderableVList {
                     this.minecraft.getNarrator().say(Component.translatable("multiplayer.lan.server_found", Component.empty().append(LAN_SERVER_HEADER).append(CommonComponents.SPACE).append(lanServer.getMotd())));
             }
         }else {
-            addRenderable(SimpleLayoutRenderable.create(270,30,(r)-> ((guiGraphics, i, j, f) -> {
+            addRenderable(SimpleLayoutRenderable.create(270,30,(r)-> ((poseStack, i, j, f) -> {
                 int p = r.y + (r.height - minecraft.font.lineHeight) / 2;
-                guiGraphics.drawString(this.minecraft.font, SCANNING_LABEL, this.minecraft.screen.width / 2 - this.minecraft.font.width(SCANNING_LABEL) / 2, p, 0xFFFFFF, false);
+                poseStack.drawString(this.minecraft.font, SCANNING_LABEL, this.minecraft.screen.width / 2 - this.minecraft.font.width(SCANNING_LABEL) / 2, p, 0xFFFFFF, false);
                 String string = LoadingDotsText.get(Util.getMillis());
-                guiGraphics.drawString(this.minecraft.font, string, this.minecraft.screen.width / 2 - this.minecraft.font.width(string) / 2, p + this.minecraft.font.lineHeight, -8355712, false);
+                poseStack.drawString(this.minecraft.font, string, this.minecraft.screen.width / 2 - this.minecraft.font.width(string) / 2, p + this.minecraft.font.lineHeight, -8355712, false);
             })));
         }
     }

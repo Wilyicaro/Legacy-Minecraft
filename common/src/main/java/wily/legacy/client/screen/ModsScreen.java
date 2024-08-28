@@ -5,8 +5,8 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -76,8 +76,8 @@ public class ModsScreen extends PanelVListScreen{
                 }
 
                 @Override
-                protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                    super.renderWidget(guiGraphics, i, j, f);
+                protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
+                    super.renderWidget(poseStack, i, j, f);
                     if (isFocused()) focusedMod = mod;
                     RenderSystem.enableBlend();
                     SizedLocation logo = modLogosCache.computeIfAbsent(mod, m-> {
@@ -92,14 +92,14 @@ public class ModsScreen extends PanelVListScreen{
                         if (mod.getId().equals("minecraft")) defaultLogo = PackSelector.loadPackIcon(minecraft.getTextureManager(),minecraft.getResourcePackRepository().getPack("vanilla"),"pack.png",defaultLogo);
                         return new SizedLocation(defaultLogo,1,1);
                         });
-                    if (logo != null) guiGraphics.blit(logo.location,getX() + 5, getY() + 5, 0,0, logo.getScaledWidth(20),20,logo.getScaledWidth(20),20);
+                    if (logo != null) poseStack.blit(logo.location,getX() + 5, getY() + 5, 0,0, logo.getScaledWidth(20),20,logo.getScaledWidth(20),20);
 
                     RenderSystem.disableBlend();
                 }
                 @Override
-                protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+                protected void renderScrollingString(PoseStack poseStack, Font font, int i, int j) {
                     SizedLocation logo = modLogosCache.get(mod);
-                    ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(),this.getX() + 10 + (logo == null ? 20 : logo.getScaledWidth(20)), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j,true);
+                    ScreenUtil.renderScrollingString(poseStack, font, this.getMessage(),this.getX() + 10 + (logo == null ? 20 : logo.getScaledWidth(20)), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j,true);
                 }
                 @Override
                 protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -110,22 +110,22 @@ public class ModsScreen extends PanelVListScreen{
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(guiGraphics,false);
+    public void renderDefaultBackground(PoseStack poseStack, int i, int j, float f) {
+        ScreenUtil.renderDefaultBackground(poseStack,false);
         if (ScreenUtil.hasTooltipBoxes()) {
-            tooltipBox.render(guiGraphics,i,j,f);
+            tooltipBox.render(poseStack,i,j,f);
             if (focusedMod != null) {
                 MultiLineLabel label = modLabelsCache.getUnchecked(focusedMod);
                 scrollableRenderer.scrolled.max = Math.max(0,label.getLineCount() - (tooltipBox.getHeight() - 50) / 12);
                 SizedLocation logo = modLogosCache.get(focusedMod);
                 int x = panel.x + panel.width + (logo == null ? 5 : logo.getScaledWidth(28) + 10);
                 if (logo != null)
-                    guiGraphics.blit(logo.location, panel.x + panel.width + 5, panel.y + 10, 0.0f, 0.0f, logo.getScaledWidth(28), 28, logo.getScaledWidth(28), 28);
+                    poseStack.blit(logo.location, panel.x + panel.width + 5, panel.y + 10, 0.0f, 0.0f, logo.getScaledWidth(28), 28, logo.getScaledWidth(28), 28);
                 if (logo == null || logo.getScaledWidth(28) < 120) {
-                    ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.id", focusedMod.getId()), x, panel.y + 12, panel.x + panel.width + 185, panel.y + 24, 0xFFFFFF, true);
-                    ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.version",focusedMod.getVersion()), x, panel.y + 24, panel.x + panel.width + 185, panel.y + 36, 0xFFFFFF, true);
+                    ScreenUtil.renderScrollingString(poseStack, font, Component.translatable("legacy.menu.mods.id", focusedMod.getId()), x, panel.y + 12, panel.x + panel.width + 185, panel.y + 24, 0xFFFFFF, true);
+                    ScreenUtil.renderScrollingString(poseStack, font, Component.translatable("legacy.menu.mods.version",focusedMod.getVersion()), x, panel.y + 24, panel.x + panel.width + 185, panel.y + 36, 0xFFFFFF, true);
                 }
-                scrollableRenderer.render(guiGraphics, panel.x + panel.width + 5, panel.y + 38, tooltipBox.getWidth() - 16, tooltipBox.getHeight() - 50, () -> label.renderLeftAligned(guiGraphics, panel.x + panel.width + 5, panel.y + 41, 12, 0xFFFFFF));
+                scrollableRenderer.render(poseStack, panel.x + panel.width + 5, panel.y + 38, tooltipBox.getWidth() - 16, tooltipBox.getHeight() - 50, () -> label.renderLeftAligned(poseStack, panel.x + panel.width + 5, panel.y + 41, 12, 0xFFFFFF));
             }
         }
     }
@@ -138,7 +138,7 @@ public class ModsScreen extends PanelVListScreen{
 
     @Override
     public void renderableVListInit() {
-        addRenderableOnly(((guiGraphics, i, j, f) -> LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14)));
+        addRenderableOnly(((poseStack, i, j, f) -> LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14)));
         tooltipBox.init();
         getRenderableVList().init(this,panel.x + 11,panel.y + 11,260, panel.height - 5);
     }

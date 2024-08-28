@@ -1,6 +1,6 @@
 package wily.legacy.mixin;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.HorseInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -38,7 +38,7 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
     }
 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics graphics, float f, int i, int j, CallbackInfo ci) {
+    public void renderBg(PoseStack graphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
         LegacyGuiGraphics.of(graphics).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
         LegacyGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL,leftPos + 34,topPos + 20,63,63);
@@ -47,6 +47,6 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
 
     }
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void renderBackground(PoseStack poseStack) {
     }
 }

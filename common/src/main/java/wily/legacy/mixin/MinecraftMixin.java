@@ -1,13 +1,13 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.realmsclient.client.RealmsClient;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.toasts.AdvancementToast;
 import net.minecraft.client.gui.components.toasts.Toast;
@@ -233,7 +233,7 @@ public abstract class MinecraftMixin {
         return (1.125 - ScreenUtil.getLegacyOptions().interfaceResolution().get() / 4);
     }
     @Inject(method = "setInitialScreen", at = @At("HEAD"), cancellable = true)
-    private void addInitialScreens(RealmsClient realmsClient, ReloadInstance reloadInstance, GameConfig.QuickPlayData quickPlayData, CallbackInfo ci) {
+    private void addInitialScreens(RealmsClient realmsClient, ReloadInstance reloadInstance, CallbackInfo ci) {
         ci.cancel();
         Legacy4JClient.SECURE_EXECUTOR.executeWhen(()-> {
             if (!Legacy4JClient.isGameLoadFinished) return false;
@@ -252,9 +252,9 @@ public abstract class MinecraftMixin {
                     return false;
                 }
 
-                public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-                    super.render(guiGraphics, i, j, f);
-                    ScreenUtil.drawAutoSavingIcon(guiGraphics, panel.x + 127, panel.y + 36);
+                public void render(PoseStack poseStack, int i, int j, float f) {
+                    super.render(poseStack, i, j, f);
+                    ScreenUtil.drawAutoSavingIcon(poseStack, panel.x + 127, panel.y + 36);
                 }
             }); return true;
         });

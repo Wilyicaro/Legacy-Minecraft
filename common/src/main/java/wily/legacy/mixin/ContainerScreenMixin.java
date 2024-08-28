@@ -1,6 +1,6 @@
 package wily.legacy.mixin;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -23,7 +23,7 @@ public abstract class ContainerScreenMixin extends AbstractContainerScreen {
         super(abstractContainerMenu, inventory, component);
     }
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void renderBackground(PoseStack poseStack) {
     }
     public void init() {
         int k = ((menu instanceof ChestMenu m ? m.getRowCount() : menu  instanceof HopperMenu ? 1 : 3) - 3) * 21;
@@ -38,8 +38,8 @@ public abstract class ContainerScreenMixin extends AbstractContainerScreen {
     }
 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    public void renderBg(PoseStack poseStack, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
     }
 }

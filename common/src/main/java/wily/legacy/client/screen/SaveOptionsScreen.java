@@ -4,11 +4,9 @@ import net.minecraft.Util;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.toasts.SystemToast;
-import net.minecraft.client.gui.screens.SymlinkWarningScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
-import net.minecraft.world.level.validation.ContentValidationException;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 

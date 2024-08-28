@@ -1,12 +1,12 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.LogoRenderer;
-import net.minecraft.client.gui.components.SplashRenderer;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.screens.ConfirmScreen;
+import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.CommonComponents;
@@ -32,15 +32,14 @@ import wily.legacy.util.ScreenUtil;
 import java.io.IOException;
 
 @Mixin(TitleScreen.class)
-public abstract class TitleScreenMixin extends Screen implements ControlTooltip.Event{
+public abstract class TitleScreenMixin extends Screen implements ControlTooltip.Event {
     @Shadow @Final private static Logger LOGGER;
 
     @Shadow protected abstract boolean checkDemoWorldPresence();
 
     @Shadow protected abstract void confirmDemo(boolean bl);
 
-    @Shadow @Nullable private SplashRenderer splash;
-    private RenderableVList renderableVList = new RenderableVList().layoutSpacing(l->5);
+    private RenderableVList renderableVList = new RenderableVList().layoutSpacing(l -> 5);
 
     protected TitleScreenMixin(Component component) {
         super(component);
@@ -56,7 +55,6 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.options"), b -> minecraft.setScreen(new HelpOptionsScreen(this))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
     }
-
 
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     protected void init(CallbackInfo ci) {
@@ -125,14 +123,14 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     }
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    public void render(PoseStack poseStack, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderDefaultBackground(guiGraphics,true,true);
-        super.render(guiGraphics, i, j, f);
+        ScreenUtil.renderDefaultBackground(poseStack,true,true);
+        super.render(poseStack, i, j, f);
 
         if (this.splash != null) {
             Legacy4JClient.legacyFont = false;
-            this.splash.render(guiGraphics, this.width, this.font, 255 << 24);
+            this.splash.render(poseStack, this.width, this.font, 255 << 24);
             Legacy4JClient.legacyFont = true;
         }
     }

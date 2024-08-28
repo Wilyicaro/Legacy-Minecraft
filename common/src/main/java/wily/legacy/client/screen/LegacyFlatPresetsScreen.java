@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
@@ -33,19 +33,19 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen{
                 FlatLevelGeneratorPreset preset = holder.value();
                 renderableVList.addRenderable(new AbstractButton(0,0,263,30,Component.translatable(holder.key().location().toLanguageKey("flat_world_preset"))) {
                     @Override
-                    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                        super.renderWidget(guiGraphics, i, j, f);
-                        guiGraphics.pose().pushPose();
-                        guiGraphics.pose().translate(getX() + 5, getY() + 5,0);
-                        guiGraphics.pose().scale(1.25f,1.25f,1.25f);
-                        guiGraphics.renderItem(preset.displayItem().value().getDefaultInstance(),0, 0);
-                        guiGraphics.pose().popPose();
+                    protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
+                        super.renderWidget(poseStack, i, j, f);
+                        poseStack.pose().pushPose();
+                        poseStack.pose().translate(getX() + 5, getY() + 5,0);
+                        poseStack.pose().scale(1.25f,1.25f,1.25f);
+                        poseStack.renderItem(preset.displayItem().value().getDefaultInstance(),0, 0);
+                        poseStack.pose().popPose();
                     }
                     @Override
-                    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+                    protected void renderScrollingString(PoseStack poseStack, Font font, int i, int j) {
                         int k = this.getX() + 33;
                         int l = this.getX() + this.getWidth();
-                        ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true);
+                        ScreenUtil.renderScrollingString(poseStack, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true);
                     }
                     @Override
                     public void onPress() {
@@ -67,11 +67,11 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen{
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(guiGraphics,false);
-        guiGraphics.drawString(font,getTitle(),panel.x + (panel.width - font.width(getTitle()))/2, panel.y + 9, CommonColor.INVENTORY_GRAY_TEXT.get());
-        panel.render(guiGraphics,i,j,f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 6, panel.y + 20, panel.width - 12, 231);
+    public void renderDefaultBackground(PoseStack poseStack, int i, int j, float f) {
+        ScreenUtil.renderDefaultBackground(poseStack,false);
+        poseStack.drawString(font,getTitle(),panel.x + (panel.width - font.width(getTitle()))/2, panel.y + 9, CommonColor.INVENTORY_GRAY_TEXT.get());
+        panel.render(poseStack,i,j,f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 6, panel.y + 20, panel.width - 12, 231);
     }
 
     @Override

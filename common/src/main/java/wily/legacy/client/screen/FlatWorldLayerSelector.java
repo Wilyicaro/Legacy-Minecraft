@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
@@ -155,55 +155,55 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void render(PoseStack poseStack, int i, int j, float f) {
+        super.render(poseStack, i, j, f);
         setHoveredSlot(null);
         menu.slots.forEach(s-> {
             LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(panel.x, panel.y, s);
             if (!s.getItem().isEmpty())
                 holder.itemIcon = s.getItem();
-            holder.render(guiGraphics,i,j,f);
+            holder.render(poseStack,i,j,f);
             if (holder.isHovered) {
-                if (s.isHighlightable()) holder.renderHighlight(guiGraphics);
+                if (s.isHighlightable()) holder.renderHighlight(poseStack);
                 setHoveredSlot(s);
             }
         });
         if (hoveredSlot != null && !hoveredSlot.getItem().isEmpty())
-            guiGraphics.renderTooltip(font, hoveredSlot.getItem(), i, j);
+            poseStack.renderTooltip(font, hoveredSlot.getItem(), i, j);
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(guiGraphics,false);
-        panel.render(guiGraphics, i, j, f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 20, panel. y + 187, 275, 27);
+    public void renderDefaultBackground(PoseStack poseStack, int i, int j, float f) {
+        ScreenUtil.renderDefaultBackground(poseStack,false);
+        panel.render(poseStack, i, j, f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 20, panel. y + 187, 275, 27);
 
-        guiGraphics.drawString(this.font, this.title,panel.x + (panel.width - font.width(title)) / 2,panel. y + 8, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        poseStack.drawString(this.font, this.title,panel.x + (panel.width - font.width(title)) / 2,panel. y + 8, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         Component layerCount = Component.translatable("legacy.menu.create_flat_world.layer_count", selectedLayer.count);
-        guiGraphics.drawString(this.font, layerCount,panel.x + 49 - font.width(layerCount),panel. y + 197, 0xFFFFFF, true);
-        guiGraphics.drawString(this.font, selectedLayer.getItem().getDescription(),panel.x + 70,panel. y + 197, 0xFFFFFF, true);
+        poseStack.drawString(this.font, layerCount,panel.x + 49 - font.width(layerCount),panel. y + 197, 0xFFFFFF, true);
+        poseStack.drawString(this.font, selectedLayer.getItem().getDescription(),panel.x + 70,panel. y + 197, 0xFFFFFF, true);
 
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(panel.x + 50, panel.y + 190,0);
-        guiGraphics.pose().scale(1.25f,1.25f,1.25f);
-        guiGraphics.renderItem(selectedLayer,0, 0);
-        guiGraphics.pose().popPose();
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(panel.x + 50, panel.y + 190,0);
+        poseStack.pose().scale(1.25f,1.25f,1.25f);
+        poseStack.renderItem(selectedLayer,0, 0);
+        poseStack.pose().popPose();
 
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(panel.x + 299.5, panel.y + 23, 0f);
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(panel.x + 299.5, panel.y + 23, 0f);
         if (scrolledList.max > 0) {
             if (scrolledList.get() != scrolledList.max)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, 0, 139);
+                scrollRenderer.renderScroll(poseStack, ScreenDirection.DOWN, 0, 139);
             if (scrolledList.get() > 0)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP,0,-11);
-        }else guiGraphics.setColor(1.0f,1.0f,1.0f,0.5f);
+                scrollRenderer.renderScroll(poseStack, ScreenDirection.UP,0,-11);
+        }else poseStack.setColor(1.0f,1.0f,1.0f,0.5f);
         RenderSystem.enableBlend();
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0, 0,13,135);
-        guiGraphics.pose().translate(-2f, -1f + (scrolledList.max > 0 ? scrolledList.get() * 121.5f / scrolledList.max : 0), 0f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
-        guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0, 0,13,135);
+        poseStack.pose().translate(-2f, -1f + (scrolledList.max > 0 ? scrolledList.get() * 121.5f / scrolledList.max : 0), 0f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL,0,0, 16,16);
+        poseStack.setColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
-        guiGraphics.pose().popPose();
+        poseStack.pose().popPose();
     }
 
     @Override

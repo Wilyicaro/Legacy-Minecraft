@@ -1,9 +1,9 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.GameNarrator;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -68,32 +68,32 @@ public class LegacyLoadingScreen extends Screen{
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void render(PoseStack poseStack, int i, int j, float f) {
         RenderSystem.disableDepthTest();
-        ScreenUtil.renderDefaultBackground(guiGraphics,true, true);
-        super.render(guiGraphics, i, j, f);
+        ScreenUtil.renderDefaultBackground(poseStack,true, true);
+        super.render(poseStack, i, j, f);
         int x = width / 2 - 160;
         int y = height / 2 + 16;
         if (!genericLoading) {
             if (progress != -1) {
                 if (lastLoadingStage != null)
-                    guiGraphics.drawString(minecraft.font, lastLoadingStage, x, height / 2 + 4, 16777215);
-                LegacyGuiGraphics.of(guiGraphics).blitSprite(LOADING_BACKGROUND, x, y, 320, 10);
+                    poseStack.drawString(minecraft.font, lastLoadingStage, x, height / 2 + 4, 16777215);
+                LegacyGuiGraphics.of(poseStack).blitSprite(LOADING_BACKGROUND, x, y, 320, 10);
                 if (progress >= 0)
-                    LegacyGuiGraphics.of(guiGraphics).blitSprite(LOADING_BAR, x + 1, y + 1, (int) (318 * Math.max(0,Math.min(progress / 100F,1))), 8);
+                    LegacyGuiGraphics.of(poseStack).blitSprite(LOADING_BAR, x + 1, y + 1, (int) (318 * Math.max(0,Math.min(progress / 100F,1))), 8);
                 LegacyTip tip = getLoadingTip();
                 if (tip != null) {
                     tip.setX((width - tip.width) / 2);
                     tip.setY(y + 8 + ((height - (y + 8)) - tip.height) / 2);
-                    tip.render(guiGraphics, i, j, f);
+                    tip.render(poseStack, i, j, f);
                 }
             }
-        }else ScreenUtil.drawGenericLoading(guiGraphics,(width - 75 )/ 2, height / 2);
+        }else ScreenUtil.drawGenericLoading(poseStack,(width - 75 )/ 2, height / 2);
 
-        guiGraphics.pose().scale(2.0F,2.0F,1.0F);
+        poseStack.pose().scale(2.0F,2.0F,1.0F);
         if (lastLoadingHeader != null)
-            ScreenUtil.drawOutlinedString(guiGraphics, minecraft.font, lastLoadingHeader, (width - minecraft.font.width(lastLoadingHeader) * 2) / 4, (height / 4 - 13), 0xFFFFFF, 0, 0.5f);
-        guiGraphics.pose().scale(0.5F,0.5F,1.0F);
+            ScreenUtil.drawOutlinedString(poseStack, minecraft.font, lastLoadingHeader, (width - minecraft.font.width(lastLoadingHeader) * 2) / 4, (height / 4 - 13), 0xFFFFFF, 0, 0.5f);
+        poseStack.pose().scale(0.5F,0.5F,1.0F);
         RenderSystem.enableDepthTest();
     }
 }

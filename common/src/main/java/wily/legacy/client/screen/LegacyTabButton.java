@@ -1,9 +1,9 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
@@ -51,48 +51,48 @@ public class LegacyTabButton extends AbstractButton {
         onPress.accept(this);
     }
     public static Function<LegacyTabButton,Renderable> iconOf(Item item){
-        return t-> (guiGraphics, i, j, f) -> t.renderItemIcon(item.getDefaultInstance(),guiGraphics);
+        return t-> (poseStack, i, j, f) -> t.renderItemIcon(item.getDefaultInstance(),poseStack);
     }
     public static Function<LegacyTabButton,Renderable> iconOf(ItemStack stack){
-        return t-> (guiGraphics, i, j, f) -> t.renderItemIcon(stack,guiGraphics);
+        return t-> (poseStack, i, j, f) -> t.renderItemIcon(stack,poseStack);
     }
     public static Function<LegacyTabButton,Renderable> iconOf(ResourceLocation sprite){
-        return t-> (guiGraphics, i, j, f) -> t.renderIconSprite(sprite,guiGraphics);
+        return t-> (poseStack, i, j, f) -> t.renderIconSprite(sprite,poseStack);
     }
-    public  void renderString(GuiGraphics guiGraphics, Font font, int i, boolean shadow){
-        guiGraphics.drawString(font,getMessage(),getX() + (width - font.width(getMessage())) / 2,getY() + (height - 7) / 2,i,shadow);
+    public  void renderString(PoseStack poseStack, Font font, int i, boolean shadow){
+        poseStack.drawString(font,getMessage(),getX() + (width - font.width(getMessage())) / 2,getY() + (height - 7) / 2,i,shadow);
     }
-    public  void renderIconSprite(ResourceLocation icon, GuiGraphics guiGraphics){
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(icon, getX() + width / 2 - 12, getY() + height / 2 - 12, 24, 24);
+    public  void renderIconSprite(ResourceLocation icon, PoseStack poseStack){
+        LegacyGuiGraphics.of(poseStack).blitSprite(icon, getX() + width / 2 - 12, getY() + height / 2 - 12, 24, 24);
     }
-    public  void renderItemIcon(ItemStack itemIcon, GuiGraphics guiGraphics){
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(getX() + width / 2f - 12, getY() + height / 2f - 12, 0);
-        guiGraphics.pose().scale(1.5f, 1.5f, 1.5f);
-        guiGraphics.renderItem(itemIcon, 0, 0);
-        guiGraphics.pose().popPose();
+    public  void renderItemIcon(ItemStack itemIcon, PoseStack poseStack){
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(getX() + width / 2f - 12, getY() + height / 2f - 12, 0);
+        poseStack.pose().scale(1.5f, 1.5f, 1.5f);
+        poseStack.renderItem(itemIcon, 0, 0);
+        poseStack.pose().popPose();
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+    protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
         Minecraft minecraft = Minecraft.getInstance();
-        guiGraphics.setColor(1.0f, 1.0f, 1.0f, this.alpha);
+        poseStack.setColor(1.0f, 1.0f, 1.0f, this.alpha);
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
-        guiGraphics.pose().pushPose();
+        poseStack.pose().pushPose();
         Offset translate = offset.apply(this);
         if (!translate.equals(Offset.ZERO)) {
-            translate.apply(guiGraphics.pose());
+            translate.apply(poseStack.pose());
             isHovered = isMouseOver(i,j);
         }
-        if (selected) guiGraphics.pose().translate(0F,0f,1F);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(SPRITES[type][selected ? 0 : 1], getX(), getY(), getWidth(), this.getHeight());
-        if (!selected) guiGraphics.pose().translate(0,-1,0);
+        if (selected) poseStack.pose().translate(0F,0f,1F);
+        LegacyGuiGraphics.of(poseStack).blitSprite(SPRITES[type][selected ? 0 : 1], getX(), getY(), getWidth(), this.getHeight());
+        if (!selected) poseStack.pose().translate(0,-1,0);
         if (active) {
-            if (icon == null) this.renderString(guiGraphics, minecraft.font, CommonColor.INVENTORY_GRAY_TEXT.get() | Mth.ceil(this.alpha * 255.0f) << 24);
-            else icon.apply(this).render(guiGraphics,i,j,f);
+            if (icon == null) this.renderString(poseStack, minecraft.font, CommonColor.INVENTORY_GRAY_TEXT.get() | Mth.ceil(this.alpha * 255.0f) << 24);
+            else icon.apply(this).render(poseStack,i,j,f);
         }
-        guiGraphics.pose().popPose();
+        poseStack.pose().popPose();
     }
 
     public boolean isMouseOver(double d, double e) {
@@ -112,7 +112,7 @@ public class LegacyTabButton extends AbstractButton {
     }
 
     @Override
-    public void renderString(GuiGraphics guiGraphics, Font font, int i) {
-        renderString(guiGraphics,font,i,false);
+    public void renderString(PoseStack poseStack, Font font, int i) {
+        renderString(poseStack,font,i,false);
     }
 }

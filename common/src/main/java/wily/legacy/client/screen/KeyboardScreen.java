@@ -2,17 +2,17 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
@@ -153,9 +153,9 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        if (getFocused() instanceof CharButton c) c.renderTooltip(guiGraphics, i, j, f);
+    public void render(PoseStack poseStack, int i, int j, float f) {
+        super.render(poseStack, i, j, f);
+        if (getFocused() instanceof CharButton c) c.renderTooltip(poseStack, i, j, f);
     }
 
     @Override
@@ -176,25 +176,25 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.renderDefaultBackground(guiGraphics, i, j, f);
+    public void renderDefaultBackground(PoseStack poseStack, int i, int j, float f) {
+        super.renderDefaultBackground(poseStack, i, j, f);
         RenderSystem.enableBlend();
-        guiGraphics.setColor(1f,1f,1f,0.8f);
-        panel.render(guiGraphics,i,j,f);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(panel.getX() + 4.5f,panel.getY() + 25.5,0);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0,0,53, 123);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,panel.getWidth() - 62,0,53, 123);
-        guiGraphics.pose().translate(-4.5f,0,0);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,(panel.getWidth() - 267) / 2,-1,267, 125);
-        guiGraphics.pose().popPose();
+        poseStack.setColor(1f,1f,1f,0.8f);
+        panel.render(poseStack,i,j,f);
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(panel.getX() + 4.5f,panel.getY() + 25.5,0);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0,0,53, 123);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,panel.getWidth() - 62,0,53, 123);
+        poseStack.pose().translate(-4.5f,0,0);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL_RECESS,(panel.getWidth() - 267) / 2,-1,267, 125);
+        poseStack.pose().popPose();
         RenderSystem.disableBlend();
-        guiGraphics.setColor(1f,1f,1f,1f);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(panel.getX() + (panel.getWidth() - font.width(KEYBOARD) * 1.5f) / 2,panel.getY() + 8,0);
-        guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        guiGraphics.drawString(font,KEYBOARD,0,0, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-        guiGraphics.pose().popPose();
+        poseStack.setColor(1f,1f,1f,1f);
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(panel.getX() + (panel.getWidth() - font.width(KEYBOARD) * 1.5f) / 2,panel.getY() + 8,0);
+        poseStack.pose().scale(1.5f,1.5f,1.5f);
+        poseStack.drawString(font,KEYBOARD,0,0, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+        poseStack.pose().popPose();
     }
 
     public record CharButtonBuilder(int width, String chars, String shiftChars, ControllerBinding binding, ResourceLocation iconSprite, SoundEvent downSound){
@@ -221,7 +221,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
             return chars.contains(String.valueOf(c)) || (shiftChars != null && shiftChars.contains(String.valueOf(c)));
         }
 
-        public void renderTooltip(GuiGraphics guiGraphics, int i, int j, float f){
+        public void renderTooltip(PoseStack poseStack, int i, int j, float f){
             if (pressTime >= 6 && getSelectedChars().length() > 1){
                 int width = 18;
                 char[] chars = getSelectedChars().toCharArray();
@@ -230,14 +230,14 @@ public class KeyboardScreen extends OverlayPanelScreen {
                     width += font.width(s) + (i1 == 0 ? 0 : 2);
                 }
                 int diffX = 0;
-                ScreenUtil.renderPointerPanel(guiGraphics, getX() + (getWidth() - width) / 2, getY() - 17,width,15);
+                ScreenUtil.renderPointerPanel(poseStack, getX() + (getWidth() - width) / 2, getY() - 17,width,15);
                 for (char c : chars) {
                     String s = String.valueOf(c);
-                    guiGraphics.drawString(font,s,getX() + (getWidth() - width) / 2 + diffX + 9, getY() - 14,c == getSelectedChar() ? 0xFFFF00 : 0xFFFFFF);
+                    poseStack.drawString(font,s,getX() + (getWidth() - width) / 2 + diffX + 9, getY() - 14,c == getSelectedChar() ? 0xFFFF00 : 0xFFFFFF);
                     diffX += font.width(s) + 2;
                 }
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT,getX() + (getWidth() - width) / 2 + 2, getY() - 15);
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT,getX() + (getWidth() - width) / 2 + width -9, getY() - 15);
+                scrollRenderer.renderScroll(poseStack, ScreenDirection.LEFT,getX() + (getWidth() - width) / 2 + 2, getY() - 15);
+                scrollRenderer.renderScroll(poseStack, ScreenDirection.RIGHT,getX() + (getWidth() - width) / 2 + width -9, getY() - 15);
             }
         }
 
@@ -305,10 +305,10 @@ public class KeyboardScreen extends OverlayPanelScreen {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-            LegacyGuiGraphics.of(guiGraphics).blitSprite(getSprite(),getX(),getY(),getWidth(),getHeight());
+        protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
+            LegacyGuiGraphics.of(poseStack).blitSprite(getSprite(),getX(),getY(),getWidth(),getHeight());
             RenderSystem.enableBlend();
-            renderString(guiGraphics,Minecraft.getInstance().font, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
+            renderString(poseStack,Minecraft.getInstance().font, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
             RenderSystem.disableBlend();
         }
         public ResourceLocation getSprite(){
@@ -376,18 +376,18 @@ public class KeyboardScreen extends OverlayPanelScreen {
             }
         }
 
-        protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+        protected void renderScrollingString(PoseStack poseStack, Font font, int i, int j) {
             int bindingOffset = 0;
 
-            if (binding != null && Legacy4JClient.controllerManager.connectedController != null) bindingOffset = binding.bindingState.getIcon().render(guiGraphics,getX() + i, getY() + (getHeight() - 9) / 2 + 1,true,false);
+            if (binding != null && Legacy4JClient.controllerManager.connectedController != null) bindingOffset = binding.bindingState.getIcon().render(poseStack,getX() + i, getY() + (getHeight() - 9) / 2 + 1,true,false);
 
-            if (iconSprite == null) renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + i + bindingOffset, this.getY(), this.getX() + this.getWidth() - i, this.getY() + this.getHeight(), j);
+            if (iconSprite == null) renderScrollingString(poseStack, font, this.getMessage(), this.getX() + i + bindingOffset, this.getY(), this.getX() + this.getWidth() - i, this.getY() + this.getHeight(), j);
             else {
                 TextureAtlasSprite sprite = Legacy4JClient.sprites.textureAtlas.texturesByName.getOrDefault(iconSprite,null);
                 if (sprite == null) return;
                 try (SpriteContents contents = sprite.contents()){
                     RenderSystem.enableBlend();
-                    LegacyGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + (getWidth() - contents.width()) / 2 + Math.max(0,i + bindingOffset -  (getWidth() - contents.width()) / 2), getY() + (getHeight() - contents.height()) / 2,contents.width(),contents.height());
+                    LegacyGuiGraphics.of(poseStack).blitSprite(iconSprite, getX() + (getWidth() - contents.width()) / 2 + Math.max(0,i + bindingOffset -  (getWidth() - contents.width()) / 2), getY() + (getHeight() - contents.height()) / 2,contents.width(),contents.height());
                     RenderSystem.disableBlend();
                 }
             }

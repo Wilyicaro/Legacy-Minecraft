@@ -1,6 +1,6 @@
 package wily.legacy.mixin;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.GrindstoneScreen;
 import net.minecraft.network.chat.Component;
@@ -35,19 +35,19 @@ public abstract class GrindstoneScreenMixin extends AbstractContainerScreen<Grin
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void renderBackground(PoseStack poseStack) {
     }
 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    public void renderBg(PoseStack poseStack, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos, imageWidth,imageHeight);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 85,topPos + 50,0);
-        guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(ARROW,0,0,22,15);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos, imageWidth,imageHeight);
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(leftPos + 85,topPos + 50,0);
+        poseStack.pose().scale(1.5f,1.5f,1.5f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(ARROW,0,0,22,15);
         if ((this.menu.getSlot(0).hasItem() || this.menu.getSlot(1).hasItem()) && !this.menu.getSlot(2).hasItem())
-            LegacyGuiGraphics.of(guiGraphics).blitSprite(ERROR_CROSS, 2, 0, 15, 15);
-        guiGraphics.pose().popPose();
+            LegacyGuiGraphics.of(poseStack).blitSprite(ERROR_CROSS, 2, 0, 15, 15);
+        poseStack.pose().popPose();
     }
 }

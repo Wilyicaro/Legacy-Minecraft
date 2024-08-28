@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
@@ -58,9 +58,9 @@ public class ConfirmationScreen extends OverlayPanelScreen{
         okButton = addRenderableWidget(Button.builder(Component.translatable("gui.ok"),b-> {if (okAction.test(b)) onClose();}).bounds(panel.x + (panel.width - 200) / 2, panel.y + panel.height - 30,200,20).build());
     }
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        ScreenUtil.renderScrollingString(guiGraphics,font,title,panel.x + 15, panel.y + 15,panel.x + panel.width - 15, panel.y + 26, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-        messageLabel.renderLeftAlignedNoShadow(guiGraphics,panel.x + 15, panel.y + messageYOffset, 12, CommonColor.INVENTORY_GRAY_TEXT.get());
+    public void render(PoseStack poseStack, int i, int j, float f) {
+        super.render(poseStack, i, j, f);
+        ScreenUtil.renderScrollingString(poseStack,font,title,panel.x + 15, panel.y + 15,panel.x + panel.width - 15, panel.y + 26, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+        messageLabel.renderLeftAlignedNoShadow(poseStack,panel.x + 15, panel.y + messageYOffset, 12, CommonColor.INVENTORY_GRAY_TEXT.get());
     }
 }

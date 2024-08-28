@@ -1,6 +1,6 @@
 package wily.legacy.mixin;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -51,7 +51,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
         }
     }
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void renderBackground(PoseStack poseStack) {
     }
     @Inject(method = "init",at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
@@ -79,7 +79,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
     }
 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics graphics, float f, int i, int j, CallbackInfo ci) {
+    public void renderBg(PoseStack graphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
         LegacyGuiGraphics.of(graphics).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
         LegacyGuiGraphics.of(graphics).blitSprite(LegacySprites.ENTITY_PANEL,leftPos + 40 + (ScreenUtil.hasClassicCrafting() ? 0 : 50),topPos + 13,63,84);
@@ -94,9 +94,9 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
         if (!recipeBookComponent.isVisible() && recipeButton != null && !recipeButton.isHovered()) recipeButton.setFocused(false);
     }
     @Inject(method = "renderLabels",at = @At("HEAD"), cancellable = true)
-    public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+    public void renderLabels(PoseStack poseStack, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        poseStack.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
 
     public boolean canReplace() {

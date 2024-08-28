@@ -1,9 +1,9 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.ReceivingLevelScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.*;
@@ -43,9 +43,9 @@ public abstract class ClientPacketListenerMixin {
         Component respawn = Component.translatable("menu.respawning");
         minecraft.setScreen(new ReceivingLevelScreen(){
             @Override
-            public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-                Legacy4JClient.legacyLoadingScreen.prepareRender(minecraft,guiGraphics.guiWidth(),guiGraphics.guiHeight(),respawn,null,0,true);
-                Legacy4JClient.legacyLoadingScreen.render(guiGraphics, i, j, f);
+            public void render(PoseStack poseStack, int i, int j, float f) {
+                Legacy4JClient.legacyLoadingScreen.prepareRender(minecraft,poseStack.guiWidth(),poseStack.guiHeight(),respawn,null,0,true);
+                Legacy4JClient.legacyLoadingScreen.render(poseStack, i, j, f);
             }
         });
     }

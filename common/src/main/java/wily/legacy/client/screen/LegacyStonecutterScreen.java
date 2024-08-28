@@ -1,8 +1,8 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -107,28 +107,28 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
         craftingButtonsOffset.max = Math.max(0,recipesByGroup.size() - 12);
     }
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void renderBackground(PoseStack poseStack) {
     }
-    public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        guiGraphics.drawString(this.font, title,(imageWidth - font.width(title)) / 2, 17, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        guiGraphics.drawString(this.font, this.playerInventoryTitle, (355 + 160 - font.width(playerInventoryTitle))/ 2, 109, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+    public void renderLabels(PoseStack poseStack, int i, int j) {
+        poseStack.drawString(this.font, title,(imageWidth - font.width(title)) / 2, 17, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        poseStack.drawString(this.font, this.playerInventoryTitle, (355 + 160 - font.width(playerInventoryTitle))/ 2, 109, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
     @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 9,topPos + 103,163,105);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 176,topPos + 103,163,105);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(ARROW,leftPos + 79,topPos + 158,22,15);
-        if (craftingButtonsOffset.get() > 0) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + 5, topPos + 45);
-        if (craftingButtonsOffset.max > 0 && craftingButtonsOffset.get() < craftingButtonsOffset.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + 337, topPos + 45);
+    public void renderBg(PoseStack poseStack, float f, int i, int j) {
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 9,topPos + 103,163,105);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 176,topPos + 103,163,105);
+        LegacyGuiGraphics.of(poseStack).blitSprite(ARROW,leftPos + 79,topPos + 158,22,15);
+        if (craftingButtonsOffset.get() > 0) scrollRenderer.renderScroll(poseStack, ScreenDirection.LEFT, leftPos + 5, topPos + 45);
+        if (craftingButtonsOffset.max > 0 && craftingButtonsOffset.get() < craftingButtonsOffset.max) scrollRenderer.renderScroll(poseStack, ScreenDirection.RIGHT, leftPos + 337, topPos + 45);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        craftingButtons.get(selectedCraftingButton).renderSelection(guiGraphics,i,j,f);
-        craftingButtons.forEach(h-> h.renderTooltip(minecraft,guiGraphics,i,j));
-        renderTooltip(guiGraphics, i, j);
+    public void render(PoseStack poseStack, int i, int j, float f) {
+        super.render(poseStack, i, j, f);
+        craftingButtons.get(selectedCraftingButton).renderSelection(poseStack,i,j,f);
+        craftingButtons.forEach(h-> h.renderTooltip(minecraft,poseStack,i,j));
+        renderTooltip(poseStack, i, j);
     }
 
     @Override
@@ -155,7 +155,7 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
             RecipeIconHolder<StonecutterRecipe> h;
             craftingButtons.add(h = new RecipeIconHolder<>(leftPos + 13 + i * 27, topPos + 38) {
                 @Override
-                public void render(GuiGraphics graphics, int i, int j, float f) {
+                public void render(PoseStack graphics, int i, int j, float f) {
                     if (isFocused()) selectedCraftingButton = index;
                     super.render(graphics, i, j, f);
                 }
@@ -199,7 +199,7 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                 }
 
                 @Override
-                public void renderTooltip(Minecraft minecraft, GuiGraphics graphics, int i, int j) {
+                public void renderTooltip(Minecraft minecraft, PoseStack graphics, int i, int j) {
                     super.renderTooltip(minecraft, graphics, i, j);
                     if (isFocused()) {
                         if (!ingredientSlot.isEmpty() && ScreenUtil.isMouseOver(i,j, leftPos + 38, topPos + 149, 36,36))
@@ -210,7 +210,7 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                 }
 
                 @Override
-                public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
+                public void renderSelection(PoseStack graphics, int i, int j, float f) {
                     boolean warning = !canCraft(getFocusedRecipe());
                     ScreenUtil.iconHolderRenderer.itemHolder(leftPos+38,topPos+149,36,36, getActualItem(ingredientSlot.get(0)), !onlyCraftableRecipes && !ingredientSlot.get(0).isEmpty() && warning, DISPLAY_OFFSET).render(graphics, i, j, f);
                     ScreenUtil.iconHolderRenderer.itemHolder(leftPos+110,topPos+149,36,36,getFocusedResult(), warning, DISPLAY_OFFSET).render(graphics, i, j, f);

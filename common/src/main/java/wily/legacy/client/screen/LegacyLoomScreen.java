@@ -1,8 +1,8 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
@@ -94,7 +94,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         }
 
         @Override
-        public void render(GuiGraphics graphics, int i, int j, float f) {
+        public void render(PoseStack graphics, int i, int j, float f) {
             if (isFocused()) selectedCraftingButton = getCraftingButtons().indexOf(this);
             super.render(graphics, i, j, f);
         }
@@ -231,15 +231,15 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         super.setFocused(guiEventListener);
     }
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
+    protected void renderLabels(PoseStack poseStack, int i, int j) {
         Component title = craftingTabList.selectedTab != 0 ? craftingTabList.tabButtons.get(craftingTabList.selectedTab).getMessage() : getFocused() instanceof CustomRecipeIconHolder h ? h.getDisplayName() : Component.empty();
-        guiGraphics.drawString(this.font, title,((craftingTabList.selectedTab != 0 ? imageWidth : imageWidth / 2) - font.width(title)) / 2,17, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        if (menu.inventoryActive) guiGraphics.drawString(this.font, this.playerInventoryTitle, (355 + 160 - font.width(playerInventoryTitle))/ 2, 114, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        else guiGraphics.drawString(this.font, PREVIEW, (355 + 160 - font.width(PREVIEW))/ 2, 114, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        guiGraphics.pose().translate(-leftPos,-topPos,0);
-        getCraftingButtons().forEach(b-> b.render(guiGraphics,i,j,0));
-        if (selectedCraftingButton < getCraftingButtons().size()) getCraftingButtons().get(selectedCraftingButton).renderSelection(guiGraphics, i, j, 0);
-        guiGraphics.pose().translate(leftPos,topPos,0);
+        poseStack.drawString(this.font, title,((craftingTabList.selectedTab != 0 ? imageWidth : imageWidth / 2) - font.width(title)) / 2,17, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        if (menu.inventoryActive) poseStack.drawString(this.font, this.playerInventoryTitle, (355 + 160 - font.width(playerInventoryTitle))/ 2, 114, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        else poseStack.drawString(this.font, PREVIEW, (355 + 160 - font.width(PREVIEW))/ 2, 114, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        poseStack.pose().translate(-leftPos,-topPos,0);
+        getCraftingButtons().forEach(b-> b.render(poseStack,i,j,0));
+        if (selectedCraftingButton < getCraftingButtons().size()) getCraftingButtons().get(selectedCraftingButton).renderSelection(poseStack, i, j, 0);
+        poseStack.pose().translate(leftPos,topPos,0);
     }
     @Override
     public void bindingStateTick(BindingState state) {
@@ -321,7 +321,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
             RecipeIconHolder<BannerRecipe> h;
             craftingButtons.add(h = new RecipeIconHolder<>(leftPos + 13 + i * 27, topPos + 38) {
                 @Override
-                public void render(GuiGraphics graphics, int i, int j, float f) {
+                public void render(PoseStack graphics, int i, int j, float f) {
                     if (isFocused()) selectedCraftingButton = index;
                     super.render(graphics, i, j, f);
                 }
@@ -419,29 +419,29 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void renderBackground(PoseStack poseStack) {
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
-        craftingTabList.render(guiGraphics, i, j, f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL, leftPos, topPos, imageWidth, imageHeight);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 9, topPos + 103, 163, 105);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 176, topPos + 103, 163, 105);
+    protected void renderBg(PoseStack poseStack, float f, int i, int j) {
+        craftingTabList.render(poseStack, i, j, f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SMALL_PANEL, leftPos, topPos, imageWidth, imageHeight);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 9, topPos + 103, 163, 105);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 176, topPos + 103, 163, 105);
         if (!menu.inventoryActive && !previewStack.isEmpty()){
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(leftPos + 220.5, topPos + 130.5,0);
-            guiGraphics.pose().scale(4.25f,4.25f,4.25f);
-            guiGraphics.renderItem(previewStack,0,0);
-            guiGraphics.pose().popPose();
+            poseStack.pose().pushPose();
+            poseStack.pose().translate(leftPos + 220.5, topPos + 130.5,0);
+            poseStack.pose().scale(4.25f,4.25f,4.25f);
+            poseStack.renderItem(previewStack,0,0);
+            poseStack.pose().popPose();
         }
-        if (craftingTabList.selectedTab == 0) LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 176, topPos + 8, 163, 93);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(SMALL_ARROW, leftPos + 97, topPos + 161, 16, 13);
+        if (craftingTabList.selectedTab == 0) LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 176, topPos + 8, 163, 93);
+        LegacyGuiGraphics.of(poseStack).blitSprite(SMALL_ARROW, leftPos + 97, topPos + 161, 16, 13);
         if (craftingTabList.selectedTab != 0) {
             if (craftingButtonsOffset.get() > 0)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + 5, topPos + 45);
+                scrollRenderer.renderScroll(poseStack, ScreenDirection.LEFT, leftPos + 5, topPos + 45);
             if (craftingButtonsOffset.max > 0 && craftingButtonsOffset.get() < craftingButtonsOffset.max)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + 337, topPos + 45);
+                scrollRenderer.renderScroll(poseStack, ScreenDirection.RIGHT, leftPos + 337, topPos + 45);
         }
     }
 
@@ -467,27 +467,27 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         return craftingTabList.selectedTab == 0 ? selectBannerButton : craftingButtons;
     }
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
+    public void render(PoseStack poseStack, int i, int j, float f) {
+        super.render(poseStack, i, j, f);
         for (int index = 0; index < ingredientsGrid.size(); index++)
-            ScreenUtil.iconHolderRenderer.itemHolder(leftPos + 21 + index % 3 * 23, topPos +  133 + index / 3 * 23, 23, 23, getActualItem(ingredientsGrid.get(index)), !getActualItem(ingredientsGrid.get(index)).isEmpty() &&  warningSlots[index], new Offset(0.5, 0.5, 0)).render(guiGraphics, i, j, f);;
-        ScreenUtil.iconHolderRenderer.itemHolder(leftPos +  124, topPos + 151, 36, 36, resultStack, getFocused() instanceof RecipeIconHolder<?> r && r.isValidIndex() && !r.canCraft(), new Offset(0.5, 0, 0)).render(guiGraphics, i, j, f);
+            ScreenUtil.iconHolderRenderer.itemHolder(leftPos + 21 + index % 3 * 23, topPos +  133 + index / 3 * 23, 23, 23, getActualItem(ingredientsGrid.get(index)), !getActualItem(ingredientsGrid.get(index)).isEmpty() &&  warningSlots[index], new Offset(0.5, 0.5, 0)).render(poseStack, i, j, f);;
+        ScreenUtil.iconHolderRenderer.itemHolder(leftPos +  124, topPos + 151, 36, 36, resultStack, getFocused() instanceof RecipeIconHolder<?> r && r.isValidIndex() && !r.canCraft(), new Offset(0.5, 0, 0)).render(poseStack, i, j, f);
         if (!resultStack.isEmpty()) {
             Component resultName = resultStack.getHoverName();
-            ScreenUtil.renderScrollingString(guiGraphics, font, resultName, leftPos + 11 + Math.max(163 - font.width(resultName), 0) / 2, topPos + 114, leftPos + 170, topPos + 125, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            ScreenUtil.renderScrollingString(poseStack, font, resultName, leftPos + 11 + Math.max(163 - font.width(resultName), 0) / 2, topPos + 114, leftPos + 170, topPos + 125, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
             if (craftingTabList.selectedTab == 0){
                 List<Component> list = resultStack.getTooltipLines(minecraft.player, TooltipFlag.NORMAL);
                 for (int i1 = 0; i1 < list.size(); i1++) {
                     if (26 + i1 * 13 >= 93) break;
                     Component c = list.get(i1);
-                    ScreenUtil.renderScrollingString(guiGraphics, font, c.copy().setStyle(Style.EMPTY), leftPos + 180, topPos + 15 + i1 * 13, leftPos + 335, topPos + 26 + i1 * 13, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                    ScreenUtil.renderScrollingString(poseStack, font, c.copy().setStyle(Style.EMPTY), leftPos + 180, topPos + 15 + i1 * 13, leftPos + 335, topPos + 26 + i1 * 13, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
                 }
             }
-            if (ScreenUtil.isMouseOver(i,j,leftPos + 124, topPos + 151,36,36)) guiGraphics.renderTooltip(font, resultStack,i,j);
+            if (ScreenUtil.isMouseOver(i,j,leftPos + 124, topPos + 151,36,36)) poseStack.renderTooltip(font, resultStack,i,j);
         }
-        for (int index = 0; index < ingredientsGrid.size(); index++) if (!getActualItem(ingredientsGrid.get(index)).isEmpty() && ScreenUtil.isMouseOver(i,j,leftPos +  21 + index % 3 * 23, topPos + 133 + index / 3 * 23,23,23)) guiGraphics.renderTooltip(font,getActualItem(ingredientsGrid.get(index)),i,j);
-        getCraftingButtons().forEach(h -> h.renderTooltip(minecraft, guiGraphics, i, j));
+        for (int index = 0; index < ingredientsGrid.size(); index++) if (!getActualItem(ingredientsGrid.get(index)).isEmpty() && ScreenUtil.isMouseOver(i,j,leftPos +  21 + index % 3 * 23, topPos + 133 + index / 3 * 23,23,23)) poseStack.renderTooltip(font,getActualItem(ingredientsGrid.get(index)),i,j);
+        getCraftingButtons().forEach(h -> h.renderTooltip(minecraft, poseStack, i, j));
 
-        renderTooltip(guiGraphics, i, j);
+        renderTooltip(poseStack, i, j);
     }
 }

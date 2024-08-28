@@ -2,8 +2,8 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.advancements.*;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -61,8 +61,8 @@ public class LegacyAdvancementsScreen extends PanelBackgroundScreen{
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderTransparentBackground(guiGraphics);
+    public void renderDefaultBackground(PoseStack poseStack, int i, int j, float f) {
+        ScreenUtil.renderTransparentBackground(poseStack);
     }
 
     public static int getRootDistance(Advancement advancement) {
@@ -86,29 +86,29 @@ public class LegacyAdvancementsScreen extends PanelBackgroundScreen{
         renderableVLists.get(root).addRenderable(w = new AbstractWidget(0, 0, 38, 38, info.getTitle()) {
 
             @Override
-            protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+            protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
                 if (isFocused()) {
                     selectedAdvancement = node;
-                    guiGraphics.pose().pushPose();
-                    guiGraphics.pose().translate(-1.5f, -1.5f, 0);
-                    LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_HIGHLIGHT, getX(), getY(), 41, 41);
-                    guiGraphics.pose().popPose();
+                    poseStack.pose().pushPose();
+                    poseStack.pose().translate(-1.5f, -1.5f, 0);
+                    LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL_HIGHLIGHT, getX(), getY(), 41, 41);
+                    poseStack.pose().popPose();
                 }
                 RenderSystem.enableBlend();
-                if (!unlocked) guiGraphics.setColor(1.0f, 1.0f, 1.0f, 0.5f);
-                LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL, getX(), getY(), getWidth(), getHeight());
+                if (!unlocked) poseStack.setColor(1.0f, 1.0f, 1.0f, 0.5f);
+                LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL, getX(), getY(), getWidth(), getHeight());
                 RenderSystem.disableDepthTest();
                 if (!unlocked)
-                    LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PADLOCK, getX() + (getWidth() - 32) / 2, getY() + (getHeight() - 32) / 2, 32, 32);
+                    LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PADLOCK, getX() + (getWidth() - 32) / 2, getY() + (getHeight() - 32) / 2, 32, 32);
                 RenderSystem.enableDepthTest();
                 RenderSystem.disableBlend();
-                guiGraphics.setColor(1.0f, 1.0f, 1.0f, 1.0f);
+                poseStack.setColor(1.0f, 1.0f, 1.0f, 1.0f);
                 if (!unlocked) return;
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(getX() + (getWidth() - 32) / 2f, getY() + (getHeight() - 32) / 2f, 0);
-                guiGraphics.pose().scale(2f, 2f, 2f);
-                guiGraphics.renderFakeItem(info.getIcon(), 0, 0);
-                guiGraphics.pose().popPose();
+                poseStack.pose().pushPose();
+                poseStack.pose().translate(getX() + (getWidth() - 32) / 2f, getY() + (getHeight() - 32) / 2f, 0);
+                poseStack.pose().scale(2f, 2f, 2f);
+                poseStack.renderFakeItem(info.getIcon(), 0, 0);
+                poseStack.pose().popPose();
             }
 
 
@@ -132,13 +132,13 @@ public class LegacyAdvancementsScreen extends PanelBackgroundScreen{
         addRenderableWidget(tabList);
         super.init();
         panel.y +=18;
-        addRenderableOnly(((guiGraphics, i, j, f) ->{
-            guiGraphics.drawString(font,showDescription ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle(),panel.x + (panel.width - font.width(showDescription ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle()))/ 2,panel.y + 10, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-            if (selectedRoot != null) Optional.ofNullable(selectedRoot.getDisplay()).map(DisplayInfo::getBackground).ifPresent(b -> guiGraphics.blit(b,panel.x + 14, panel.y + 24,0,0,422,23,16,16));
-            ScreenUtil.renderPanelTranslucentRecess(guiGraphics,panel.x + 12, panel.y + 22, 426, 27);
-            if (selectedAdvancement != null) Optional.ofNullable(selectedAdvancement.getDisplay()).ifPresent(info-> guiGraphics.drawString(font,info.getTitle(),panel.x + (panel.width - font.width(info.getTitle()))/ 2,panel.y + 32,0xFFFFFF));
+        addRenderableOnly(((poseStack, i, j, f) ->{
+            poseStack.drawString(font,showDescription ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle(),panel.x + (panel.width - font.width(showDescription ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle()))/ 2,panel.y + 10, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+            if (selectedRoot != null) Optional.ofNullable(selectedRoot.getDisplay()).map(DisplayInfo::getBackground).ifPresent(b -> poseStack.blit(b,panel.x + 14, panel.y + 24,0,0,422,23,16,16));
+            ScreenUtil.renderPanelTranslucentRecess(poseStack,panel.x + 12, panel.y + 22, 426, 27);
+            if (selectedAdvancement != null) Optional.ofNullable(selectedAdvancement.getDisplay()).ifPresent(info-> poseStack.drawString(font,info.getTitle(),panel.x + (panel.width - font.width(info.getTitle()))/ 2,panel.y + 32,0xFFFFFF));
             RenderSystem.disableBlend();
-            LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 12, panel.y + 50, 426, 186);
+            LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 12, panel.y + 50, 426, 186);
         }));
         tabList.init(panel.x,panel.y - 37,panel.width,(b,i)->{
             int index = tabList.tabButtons.indexOf(b);

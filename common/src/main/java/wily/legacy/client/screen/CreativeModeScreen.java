@@ -2,8 +2,8 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.CreativeInventoryListener;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
@@ -136,39 +136,39 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void renderBackground(PoseStack poseStack) {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 296.5f, topPos + 27.5f, 0f);
+    public void render(PoseStack poseStack, int i, int j, float f) {
+        super.render(poseStack, i, j, f);
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(leftPos + 296.5f, topPos + 27.5f, 0f);
         Stocker.Sizeable scroll = tabsScrolledList.get(page.get() * 8 + tabList.selectedTab);
         if (scroll.max > 0) {
             if (scroll.get() != scroll.max)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN,0, 139);
+                scrollRenderer.renderScroll(poseStack, ScreenDirection.DOWN,0, 139);
             if (scroll.get() > 0)
-                scrollRenderer.renderScroll(guiGraphics,ScreenDirection.UP, 0, -11);
-        }else guiGraphics.setColor(1.0f,1.0f,1.0f,0.5f);
+                scrollRenderer.renderScroll(poseStack,ScreenDirection.UP, 0, -11);
+        }else poseStack.setColor(1.0f,1.0f,1.0f,0.5f);
         RenderSystem.enableBlend();
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0,13,135);
-        guiGraphics.pose().translate(-2f, -1f + (scroll.max > 0 ? scroll.get() * 121.5f / scroll.max : 0), 0f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
-        guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0,13,135);
+        poseStack.pose().translate(-2f, -1f + (scroll.max > 0 ? scroll.get() * 121.5f / scroll.max : 0), 0f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL,0,0, 16,16);
+        poseStack.setColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
-        guiGraphics.pose().popPose();
-        this.renderTooltip(guiGraphics, i, j);
+        poseStack.pose().popPose();
+        this.renderTooltip(poseStack, i, j);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
+    protected void renderLabels(PoseStack poseStack, int i, int j) {
         Component tabTitle = tabList.tabButtons.get(tabList.selectedTab).getMessage();
-        guiGraphics.drawString(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, 12, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        poseStack.drawString(this.font, tabTitle, (imageWidth - font.width(tabTitle)) / 2, 12, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
 
     @Override
-    protected void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+    protected void renderBg(PoseStack poseStack, float f, int i, int j) {
 
     }
 

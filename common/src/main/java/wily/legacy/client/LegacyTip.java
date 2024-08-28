@@ -1,8 +1,8 @@
 package wily.legacy.client;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
@@ -102,8 +102,8 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
     }
 
     @Override
-    public Visibility render(GuiGraphics guiGraphics, ToastComponent toastComponent, long l) {
-        renderTip(guiGraphics,0,0,0,l);
+    public Visibility render(PoseStack poseStack, ToastComponent toastComponent, long l) {
+        renderTip(poseStack,0,0,0,l);
         return visibility;
     }
 
@@ -113,18 +113,18 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderTip(guiGraphics, i, j, f,Util.getMillis() - createdTime);
+    public void render(PoseStack poseStack, int i, int j, float f) {
+        renderTip(poseStack, i, j, f,Util.getMillis() - createdTime);
     }
-    public void renderTip(GuiGraphics guiGraphics, int i, int j, float f, float l) {
+    public void renderTip(PoseStack poseStack, int i, int j, float f, float l) {
         if (canRemove.get() || l >= disappearTime) visibility = Visibility.HIDE;
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(getX(),getY(),800);
-        ScreenUtil.renderPointerPanel(guiGraphics,0,0,getWidth(),getHeight());
-        if (!title.getString().isEmpty()) guiGraphics.drawString(minecraft.font,title,13,13,0xFFFFFF);
-        if (centered) tipLabel.renderCentered(guiGraphics,width / 2, title.getString().isEmpty() ? 13 : 25,12,0xFFFFFF);
-        else tipLabel.renderLeftAlignedNoShadow(guiGraphics,13,title.getString().isEmpty() ? 13 : 25, 12,0xFFFFFF);
-        if (holder != null) holder.render(guiGraphics,i,j,f);
-        guiGraphics.pose().popPose();
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(getX(),getY(),800);
+        ScreenUtil.renderPointerPanel(poseStack,0,0,getWidth(),getHeight());
+        if (!title.getString().isEmpty()) poseStack.drawString(minecraft.font,title,13,13,0xFFFFFF);
+        if (centered) tipLabel.renderCentered(poseStack,width / 2, title.getString().isEmpty() ? 13 : 25,12,0xFFFFFF);
+        else tipLabel.renderLeftAlignedNoShadow(poseStack,13,title.getString().isEmpty() ? 13 : 25, 12,0xFFFFFF);
+        if (holder != null) holder.render(poseStack,i,j,f);
+        poseStack.pose().popPose();
     }
 }

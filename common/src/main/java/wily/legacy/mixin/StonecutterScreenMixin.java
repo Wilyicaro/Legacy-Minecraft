@@ -1,8 +1,8 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
@@ -48,7 +48,7 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void renderBackground(PoseStack poseStack) {
     }
     @Redirect(method = "isScrollBarActive",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/StonecutterMenu;getNumRecipes()I"))
     private int isScrollBarActive(StonecutterMenu instance){
@@ -71,27 +71,27 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
     }
 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    public void renderBg(PoseStack poseStack, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 70,  topPos+ 18, 75, 75);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 148.5, topPos + 18, 0f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 70,  topPos+ 18, 75, 75);
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(leftPos + 148.5, topPos + 18, 0f);
         if (isScrollBarActive() && getOffscreenRows() > 0) {
             if (getOffscreenRows() != startIndex)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, 0, 79);
+                scrollRenderer.renderScroll(poseStack, ScreenDirection.DOWN, 0, 79);
             if (startIndex > 0)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP,0,-11);
-        }else guiGraphics.setColor(1.0f,1.0f,1.0f,0.5f);
+                scrollRenderer.renderScroll(poseStack, ScreenDirection.UP,0,-11);
+        }else poseStack.setColor(1.0f,1.0f,1.0f,0.5f);
         RenderSystem.enableBlend();
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0, 0,13,75);
-        guiGraphics.pose().translate(-2f, -1f + (this.isScrollBarActive() ?  61.5f * startIndex / getOffscreenRows() : 0), 0f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
-        guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0, 0,13,75);
+        poseStack.pose().translate(-2f, -1f + (this.isScrollBarActive() ?  61.5f * startIndex / getOffscreenRows() : 0), 0f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL,0,0, 16,16);
+        poseStack.setColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
-        guiGraphics.pose().popPose();
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 71.5f,topPos + 19.5f,0);
+        poseStack.pose().popPose();
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(leftPos + 71.5f,topPos + 19.5f,0);
         if (this.displayRecipes) {
             List<StonecutterRecipe> list = this.menu.getRecipes();
             block0: for (int p = 0; p < 4; ++p) {
@@ -101,12 +101,12 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
                     if (s >= list.size()) break block0;
                     int t = q * 18;
                     int u = p * 18;
-                    LegacyGuiGraphics.of(guiGraphics).blitSprite(s == menu.getSelectedRecipeIndex() ? BUTTON_SLOT_SELECTED : (ScreenUtil.isMouseOver(i,j,leftPos + 73.5f + t,topPos + 19.5f + u,18,18)? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, 18, 18);
-                    guiGraphics.renderItem(list.get(s).getResultItem(this.minecraft.level.registryAccess()), 1 + t, 1 + u);
+                    LegacyGuiGraphics.of(poseStack).blitSprite(s == menu.getSelectedRecipeIndex() ? BUTTON_SLOT_SELECTED : (ScreenUtil.isMouseOver(i,j,leftPos + 73.5f + t,topPos + 19.5f + u,18,18)? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, 18, 18);
+                    poseStack.renderItem(list.get(s).getResultItem(this.minecraft.level.registryAccess()), 1 + t, 1 + u);
                 }
             }
         }
-        guiGraphics.pose().popPose();
+        poseStack.pose().popPose();
     }
     @Inject(method = "mouseClicked",at = @At("HEAD"), cancellable = true)
     public void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
@@ -129,9 +129,9 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
         cir.setReturnValue(super.mouseClicked(d, e, i));
     }
     @Inject(method = "renderTooltip",at = @At("HEAD"), cancellable = true)
-    public void renderTooltip(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+    public void renderTooltip(PoseStack poseStack, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        super.renderTooltip(guiGraphics, i, j);
+        super.renderTooltip(poseStack, i, j);
         if (this.displayRecipes) {
             List<StonecutterRecipe> list = this.menu.getRecipes();
             block0: for (int p = 0; p < 4; ++p) {
@@ -139,7 +139,7 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
                     int r = p + this.startIndex;
                     int s = r * 4 + q;
                     if (s >= list.size()) break block0;
-                    if (ScreenUtil.isMouseOver(i,j,leftPos + 73.5f + q * 18,topPos + 19.5f + p * 18,18,18)) guiGraphics.renderTooltip(this.font, list.get(s).getResultItem(this.minecraft.level.registryAccess()), i, j);
+                    if (ScreenUtil.isMouseOver(i,j,leftPos + 73.5f + q * 18,topPos + 19.5f + p * 18,18,18)) poseStack.renderTooltip(this.font, list.get(s).getResultItem(this.minecraft.level.registryAccess()), i, j);
                 }
             }
         }

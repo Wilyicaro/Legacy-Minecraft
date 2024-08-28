@@ -1,7 +1,7 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.BeaconScreen;
@@ -49,7 +49,7 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void renderBackground(PoseStack poseStack) {
     }
 
     @Inject(method = "init",at = @At("HEAD"), cancellable = true)
@@ -61,9 +61,9 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
         this.beaconButtons.clear();
         this.addBeaconButton(self().new BeaconConfirmButton(this.leftPos + 202, this.topPos + 127){
             @Override
-            protected void renderIcon(GuiGraphics guiGraphics) {
+            protected void renderIcon(PoseStack poseStack) {
                 RenderSystem.enableBlend();
-                LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_CONFIRM,this.getX() + 2, this.getY() + 2, 18, 18);
+                LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.BEACON_CONFIRM,this.getX() + 2, this.getY() + 2, 18, 18);
                 RenderSystem.disableBlend();
             }
         });
@@ -98,29 +98,29 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
     }
 
     @Inject(method = "renderLabels",at = @At("HEAD"), cancellable = true)
-    public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+    public void renderLabels(PoseStack poseStack, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        guiGraphics.drawString(this.font, PRIMARY_EFFECT_LABEL, 9 + (121 - font.width(PRIMARY_EFFECT_LABEL)) /2, 13, 0x383838, false);
-        guiGraphics.drawString(this.font, SECONDARY_EFFECT_LABEL, 133 + (121 - font.width(SECONDARY_EFFECT_LABEL)) /2, 13, 0x383838, false);
+        poseStack.drawString(this.font, PRIMARY_EFFECT_LABEL, 9 + (121 - font.width(PRIMARY_EFFECT_LABEL)) /2, 13, 0x383838, false);
+        poseStack.drawString(this.font, SECONDARY_EFFECT_LABEL, 133 + (121 - font.width(SECONDARY_EFFECT_LABEL)) /2, 13, 0x383838, false);
     }
     private static final Item[] DISPLAY_ITEMS = new Item[]{Items.NETHERITE_INGOT,Items.EMERALD,Items.DIAMOND,Items.GOLD_INGOT,Items.IRON_INGOT};
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    public void renderBg(PoseStack poseStack, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 8,topPos + 9,120, 115);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 132,topPos + 9,120, 115);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_1,leftPos + 32, topPos + 39, 20, 19);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_2,leftPos + 32, topPos + 69, 20, 19);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_3,leftPos + 32, topPos + 97, 20, 19);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_4,leftPos + 180, topPos + 42, 20, 19);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 15, topPos + 129, 100.0F);
-        guiGraphics.pose().scale(7/6f, 7/6f,7/6f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 8,topPos + 9,120, 115);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 132,topPos + 9,120, 115);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.BEACON_1,leftPos + 32, topPos + 39, 20, 19);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.BEACON_2,leftPos + 32, topPos + 69, 20, 19);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.BEACON_3,leftPos + 32, topPos + 97, 20, 19);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.BEACON_4,leftPos + 180, topPos + 42, 20, 19);
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(leftPos + 15, topPos + 129, 100.0F);
+        poseStack.pose().scale(7/6f, 7/6f,7/6f);
         for (Item displayItem : DISPLAY_ITEMS) {
-            guiGraphics.renderItem(new ItemStack(displayItem), 0, 0);
-            guiGraphics.pose().translate(18,0,0);
+            poseStack.renderItem(new ItemStack(displayItem), 0, 0);
+            poseStack.pose().translate(18,0,0);
         }
-        guiGraphics.pose().popPose();
+        poseStack.pose().popPose();
     }
 }

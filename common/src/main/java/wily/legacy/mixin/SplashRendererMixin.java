@@ -1,12 +1,12 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.gui.components.SplashRenderer;
+import net.minecraft.client.gui.screens.LoadingOverlay;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(SplashRenderer.class)
+@Mixin(LoadingOverlay.class)
 public class SplashRendererMixin {
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;scale(FFF)V"))
     public void render(PoseStack instance, float x, float y, float z) {

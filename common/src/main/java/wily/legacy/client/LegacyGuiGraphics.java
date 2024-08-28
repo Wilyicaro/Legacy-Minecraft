@@ -1,8 +1,8 @@
 package wily.legacy.client;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -18,11 +18,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public interface LegacyGuiGraphics {
     Map<TextureAtlasSprite, Map<String,ResourceLocation>> spriteTilesCache = new ConcurrentHashMap<>();
 
-    static LegacyGuiGraphics of(GuiGraphics guiGraphics) {
-        return (LegacyGuiGraphics) guiGraphics;
+    static LegacyGuiGraphics of(PoseStack poseStack) {
+        return (LegacyGuiGraphics) poseStack;
     }
 
-    GuiGraphics self();
+    PoseStack self();
     default void blitSprite(ResourceLocation resourceLocation, int i, int j, int k, int l) {
         this.blitSprite(resourceLocation, i, j, 0, k, l);
     }

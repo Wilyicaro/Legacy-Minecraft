@@ -1,8 +1,8 @@
 package wily.legacy.mixin;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.EnchantmentNames;
 import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
@@ -37,7 +37,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
     private static final ResourceLocation ENCHANTMENT_BUTTON_ACTIVE = new ResourceLocation(MOD_ID, "enchantment_button_active");
     private static final ResourceLocation ENCHANTMENT_BUTTON_SELECTED = new ResourceLocation(MOD_ID, "enchantment_button_selected");
 
-    @Shadow protected abstract void renderBook(GuiGraphics arg, int i, int j, float g);
+    @Shadow protected abstract void renderBook(PoseStack arg, int i, int j, float g);
     private static final ResourceLocation[] ENABLED_LEVEL_SPRITES = new ResourceLocation[]{new ResourceLocation(MOD_ID,"enchanting_table/level_1"), new ResourceLocation(MOD_ID,"enchanting_table/level_2"), new ResourceLocation(MOD_ID,"enchanting_table/level_3")};
     private static final ResourceLocation[] DISABLED_LEVEL_SPRITES = new ResourceLocation[]{new ResourceLocation(MOD_ID,"enchanting_table/level_1_disabled"), new ResourceLocation(MOD_ID,"enchanting_table/level_2_disabled"), new ResourceLocation(MOD_ID,"enchanting_table/level_3_disabled")};
 
@@ -61,7 +61,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void renderBackground(PoseStack poseStack) {
     }
     @Inject(method = "mouseClicked",at = @At("HEAD"), cancellable = true)
     public void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
@@ -76,24 +76,24 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
        cir.setReturnValue(super.mouseClicked(d, e, i));
     }
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    public void renderBg(PoseStack poseStack, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos, imageWidth,imageHeight);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 79,  topPos+ 22, 123, 66);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 2,topPos + 4,0);
-        guiGraphics.pose().scale(1.25f,1.25f,1.25f);
-        this.renderBook(guiGraphics, 0, 0, f);
-        guiGraphics.pose().popPose();
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos, imageWidth,imageHeight);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 79,  topPos+ 22, 123, 66);
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(leftPos + 2,topPos + 4,0);
+        poseStack.pose().scale(1.25f,1.25f,1.25f);
+        this.renderBook(poseStack, 0, 0, f);
+        poseStack.pose().popPose();
         EnchantmentNames.getInstance().initSeed(this.menu.getEnchantmentSeed());
         int m = this.menu.getGoldCount();
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 80.5f,topPos+ 2.5f,0f);
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(leftPos + 80.5f,topPos+ 2.5f,0f);
         for (int n = 0; n < 3; ++n) {
-            guiGraphics.pose().translate(0f,21f,0f);
+            poseStack.pose().translate(0f,21f,0f);
             int enchantCost = this.menu.costs[n];
-            LegacyGuiGraphics.of(guiGraphics).blitSprite(ENCHANTMENT_BUTTON_EMPTY, 0, 0, 120, 21);
-            LegacyGuiGraphics.of(guiGraphics).blitSprite(DISABLED_LEVEL_SPRITES[n], -1, -1, 24, 24);
+            LegacyGuiGraphics.of(poseStack).blitSprite(ENCHANTMENT_BUTTON_EMPTY, 0, 0, 120, 21);
+            LegacyGuiGraphics.of(poseStack).blitSprite(DISABLED_LEVEL_SPRITES[n], -1, -1, 24, 24);
             if (enchantCost == 0)
                 continue;
             String string = "" + enchantCost;
@@ -101,31 +101,31 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
             FormattedText formattedText = EnchantmentNames.getInstance().getRandomName(this.font, r);
             int s = 6839882;
             if (!(m >= n + 1 && this.minecraft.player.experienceLevel >= enchantCost || this.minecraft.player.getAbilities().instabuild)) {
-                guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, (s & 0xFEFEFE) >> 1);
+                poseStack.drawWordWrap(this.font, formattedText, 24, 3, r, (s & 0xFEFEFE) >> 1);
                 s = 4226832;
             } else {
                 double t = i - (leftPos + 80.5);
                 double u = j - (topPos + 23.5 + 21 * n);
                 if (t >= 0 && u >= 0 && t < 120 && u < 21) {
-                    LegacyGuiGraphics.of(guiGraphics).blitSprite(ENCHANTMENT_BUTTON_SELECTED, 0, 0, 120, 21);
+                    LegacyGuiGraphics.of(poseStack).blitSprite(ENCHANTMENT_BUTTON_SELECTED, 0, 0, 120, 21);
                     s = 0xFFFF80;
                 } else {
-                    LegacyGuiGraphics.of(guiGraphics).blitSprite(ENCHANTMENT_BUTTON_ACTIVE, 0, 0, 120, 21);
+                    LegacyGuiGraphics.of(poseStack).blitSprite(ENCHANTMENT_BUTTON_ACTIVE, 0, 0, 120, 21);
                 }
-                LegacyGuiGraphics.of(guiGraphics).blitSprite(ENABLED_LEVEL_SPRITES[n], -1, -1, 24, 24);
-                guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, s);
+                LegacyGuiGraphics.of(poseStack).blitSprite(ENABLED_LEVEL_SPRITES[n], -1, -1, 24, 24);
+                poseStack.drawWordWrap(this.font, formattedText, 24, 3, r, s);
                 s = 8453920;
             }
-            guiGraphics.drawString(this.font, string, 120 - this.font.width(string), 12, s);
+            poseStack.drawString(this.font, string, 120 - this.font.width(string), 12, s);
         }
-        guiGraphics.pose().popPose();
+        poseStack.pose().popPose();
     }
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    public void render(PoseStack poseStack, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         f = this.minecraft.getFrameTime();
-        super.render(guiGraphics, i, j, f);
-        this.renderTooltip(guiGraphics, i, j);
+        super.render(poseStack, i, j, f);
+        this.renderTooltip(poseStack, i, j);
         boolean bl = this.minecraft.player.getAbilities().instabuild;
         int k = this.menu.getGoldCount();
         for (int l = 0; l < 3; ++l) {
@@ -149,7 +149,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
                     list.add(mutableComponent2.withStyle(ChatFormatting.GRAY));
                 }
             }
-            guiGraphics.renderComponentTooltip(this.font, list, i, j);
+            poseStack.renderComponentTooltip(this.font, list, i, j);
             break;
         }
     }

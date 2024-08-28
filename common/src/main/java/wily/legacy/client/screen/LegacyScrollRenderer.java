@@ -1,8 +1,8 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenAxis;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.resources.ResourceLocation;
@@ -19,7 +19,7 @@ public class LegacyScrollRenderer {
         lastDirection = direction;
         lastScroll = (lastScrolled[direction.ordinal()] = Util.getMillis());
     }
-    public void renderScroll(GuiGraphics graphics, ScreenDirection direction, int x, int y){
+    public void renderScroll(PoseStack graphics, ScreenDirection direction, int x, int y){
         boolean h =direction.getAxis() == ScreenAxis.HORIZONTAL;
         RenderSystem.enableBlend();
         long l = lastScrolled[direction.ordinal()];

@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
@@ -81,7 +81,7 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
         }
     }
     @Override
-    public void render(GuiGraphics graphics, int i, int j, float f) {
+    public void render(PoseStack graphics, int i, int j, float f) {
         for (int index = 0; index < tabButtons.size(); index++) {
             LegacyTabButton tabButton = tabButtons.get(index);
             tabButton.selected = selectedTab == index;

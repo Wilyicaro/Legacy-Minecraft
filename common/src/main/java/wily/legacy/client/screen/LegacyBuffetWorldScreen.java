@@ -1,11 +1,11 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
@@ -41,26 +41,26 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
             }
 
             @Override
-            protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                super.renderWidget(guiGraphics, i, j, f);
+            protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
+                super.renderWidget(poseStack, i, j, f);
                 ItemStack s = LegacyBiomeOverride.getOrDefault(biome.unwrapKey()).icon();
                 if (!s.isEmpty()){
-                    guiGraphics.pose().pushPose();
-                    guiGraphics.pose().translate(getX() + 26, getY() + 5,0);
-                    guiGraphics.pose().scale(1.25f,1.25f,1.25f);
-                    guiGraphics.renderItem(s,0, 0);
-                    guiGraphics.pose().popPose();
+                    poseStack.pose().pushPose();
+                    poseStack.pose().translate(getX() + 26, getY() + 5,0);
+                    poseStack.pose().scale(1.25f,1.25f,1.25f);
+                    poseStack.renderItem(s,0, 0);
+                    poseStack.pose().popPose();
                 }
                 RenderSystem.enableBlend();
-                LegacyGuiGraphics.of(guiGraphics).blitSprite(TickBox.SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);
-                if (selectedBiome == biome) LegacyGuiGraphics.of(guiGraphics).blitSprite(TickBox.TICK, this.getX() + 6, this.getY()  + (height - 12) / 2, 14, 12);
+                LegacyGuiGraphics.of(poseStack).blitSprite(TickBox.SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);
+                if (selectedBiome == biome) LegacyGuiGraphics.of(poseStack).blitSprite(TickBox.TICK, this.getX() + 6, this.getY()  + (height - 12) / 2, 14, 12);
                 RenderSystem.disableBlend();
             }
             @Override
-            protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+            protected void renderScrollingString(PoseStack poseStack, Font font, int i, int j) {
                 int k = this.getX() + 54;
                 int l = this.getX() + this.getWidth();
-                ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true);
+                ScreenUtil.renderScrollingString(poseStack, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true);
             }
             @Override
             protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -69,15 +69,15 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
         });
     }
 
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(guiGraphics,false);
+    public void renderBackground(PoseStack poseStack, int i, int j, float f) {
+        ScreenUtil.renderDefaultBackground(poseStack,false);
     }
     @Override
     protected void init() {
         panel.height = Math.min(height,248);
         addRenderableOnly(panel);
         panel.init();
-        addRenderableOnly(((guiGraphics, i, j, f) -> LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14)));
+        addRenderableOnly(((poseStack, i, j, f) -> LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14)));
         getRenderableVList().init(this,panel.x + 11,panel.y + 11,260, panel.height - 5);
     }
 

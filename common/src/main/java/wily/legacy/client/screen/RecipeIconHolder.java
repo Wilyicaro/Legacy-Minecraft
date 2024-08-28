@@ -2,9 +2,9 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -41,14 +41,14 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
         allowItemDecorations = false;
     }
     @Override
-    public void render(GuiGraphics graphics, int i, int j, float f) {
+    public void render(PoseStack graphics, int i, int j, float f) {
         isHoveredTop = isFocused() && getFocusedRecipes().size() > 2 && isMouseOver(i,j,-1);
         isHoveredBottom = isFocused() && getFocusedRecipes().size() >= 2 && isMouseOver(i,j,1);
         itemIcon = isValidIndex() ? getFocusedRecipes().get(0).getResultItem(minecraft.level.registryAccess()) : ItemStack.EMPTY;
         super.render(graphics, i, j, f);
     }
     @Override
-    public void renderItem(GuiGraphics graphics, int i, int j, float f) {
+    public void renderItem(PoseStack graphics, int i, int j, float f) {
         if (!isValidIndex()) return;
         ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(0)),0.5f, (u)->super.renderItem(graphics,i,j,f));
     }
@@ -73,7 +73,7 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
         super.setFocused(bl);
     }
     @Override
-    public void renderTooltip(Minecraft minecraft, GuiGraphics graphics, int i, int j) {
+    public void renderTooltip(Minecraft minecraft, PoseStack graphics, int i, int j) {
         super.renderTooltip(minecraft, graphics, i, j);
         if (!isFocused()) return;
         if (getFocusedRecipes().size() <= 1) return;
@@ -137,7 +137,7 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
         return ingredient.isEmpty() || ingredient.getItems().length == 0 ? ItemStack.EMPTY : ingredient.getItems()[(int) ((Util.getMillis() / 800)% ingredient.getItems().length)];
     }
     @Override
-    public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
+    public void renderSelection(PoseStack graphics, int i, int j, float f) {
         if (isValidIndex()) {
             graphics.pose().pushPose();
             graphics.pose().translate(getXCorner() - 4.5f, getYCorner(), 0f);

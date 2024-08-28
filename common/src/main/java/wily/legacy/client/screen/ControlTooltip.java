@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -13,7 +14,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
@@ -132,7 +132,7 @@ public interface ControlTooltip {
     }
 
     interface Icon {
-        int render(GuiGraphics graphics, int x, int y, boolean allowPressed, boolean simulate);
+        int render(PoseStack graphics, int x, int y, boolean allowPressed, boolean simulate);
 
         static Icon of(Component component){
             return (graphics, x, y, allowPressed, simulate) -> {
@@ -170,7 +170,7 @@ public interface ControlTooltip {
         }
 
         @Override
-        public int render(GuiGraphics graphics, int x, int y, boolean allowPressed, boolean simulate){
+        public int render(PoseStack graphics, int x, int y, boolean allowPressed, boolean simulate){
             Component c = getComponent(allowPressed);
             Component co = getOverlayComponent(allowPressed);
             Font font = Minecraft.getInstance().font;
@@ -281,26 +281,26 @@ public interface ControlTooltip {
             return minecraft.screen != null;
         }
         @Override
-        public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        public void render(PoseStack poseStack, int i, int j, float f) {
             if (!ScreenUtil.getLegacyOptions().inGameTooltips().get() && minecraft.screen == null) return;
             int xDiff = 0;
             RenderSystem.disableDepthTest();
             RenderSystem.enableBlend();
-            guiGraphics.setColor(1.0f,1.0f,1.0f,Math.max(minecraft.screen == null ? 0.0f : 0.2f,  ScreenUtil.getHUDOpacity()));
-            guiGraphics.pose().pushPose();
+            poseStack.setColor(1.0f,1.0f,1.0f,Math.max(minecraft.screen == null ? 0.0f : 0.2f,  ScreenUtil.getHUDOpacity()));
+            poseStack.pose().pushPose();
             double hudDiff = (1 - ScreenUtil.getLegacyOptions().hudDistance().get()) * 60D;
-            guiGraphics.pose().translate(-Math.min(hudDiff,30), Math.min(hudDiff,16),0);
+            poseStack.pose().translate(-Math.min(hudDiff,30), Math.min(hudDiff,16),0);
             for (ControlTooltip tooltip : tooltips) {
                 Icon icon;
                 Component action;
                 int controlWidth;
-                if ((icon = tooltip.getIcon()) == null || (action = tooltip.getAction()) == null || (controlWidth = icon.render(guiGraphics,32 + xDiff, guiGraphics.guiHeight() - 29,allowPressed(),false)) <= 0) continue;
-                guiGraphics.drawString(minecraft.font,action,32 + xDiff + 2 + controlWidth, guiGraphics.guiHeight() - 29, CommonColor.WIDGET_TEXT.get());
+                if ((icon = tooltip.getIcon()) == null || (action = tooltip.getAction()) == null || (controlWidth = icon.render(poseStack,32 + xDiff, poseStack.guiHeight() - 29,allowPressed(),false)) <= 0) continue;
+                poseStack.drawString(minecraft.font,action,32 + xDiff + 2 + controlWidth, poseStack.guiHeight() - 29, CommonColor.WIDGET_TEXT.get());
                 xDiff +=controlWidth + minecraft.font.width(action) + 12;
                 RenderSystem.disableBlend();
             }
-            guiGraphics.pose().popPose();
-            guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
+            poseStack.pose().popPose();
+            poseStack.setColor(1.0f,1.0f,1.0f,1.0f);
             RenderSystem.disableBlend();
             RenderSystem.enableDepthTest();
         }

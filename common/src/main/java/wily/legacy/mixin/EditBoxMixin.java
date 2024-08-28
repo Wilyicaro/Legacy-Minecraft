@@ -1,7 +1,7 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
@@ -43,13 +43,13 @@ public abstract class EditBoxMixin extends AbstractWidget {
     }
 
     @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V"))
-    private void renderWidget(GuiGraphics instance, int i, int j, int k, int l, int m){
+    private void renderWidget(PoseStack instance, int i, int j, int k, int l, int m){
     }
     @Inject(method = "renderWidget", at = @At("HEAD"))
-    private void renderWidget(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci){
+    private void renderWidget(PoseStack poseStack, int i, int j, float f, CallbackInfo ci){
         if (isBordered()) {
-            LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TEXT_FIELD, getX(), getY(), getWidth(), getHeight());
-            if (isHoveredOrFocused()) LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HIGHLIGHTED_TEXT_FIELD, getX() - 1, getY() - 1, getWidth() + 2, getHeight() + 2);
+            LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.TEXT_FIELD, getX(), getY(), getWidth(), getHeight());
+            if (isHoveredOrFocused()) LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.HIGHLIGHTED_TEXT_FIELD, getX() - 1, getY() - 1, getWidth() + 2, getHeight() + 2);
         }
     }
 }

@@ -1,7 +1,7 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
 import net.minecraft.client.gui.screens.inventory.PageButton;
@@ -75,12 +75,12 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         setFocused(panel);
         this.updateButtonVisibility();
     }
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void renderBackground(PoseStack poseStack, int i, int j, float f) {
     }
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    public void render(PoseStack poseStack, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
-        super.render(guiGraphics, i, j, f);
+        super.render(poseStack, i, j, f);
 
         if (this.cachedPage != this.currentPage) {
             FormattedText formattedText = this.bookAccess.getPage(this.currentPage);
@@ -88,15 +88,15 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
             this.pageMsg = Component.translatable("book.pageIndicator", this.currentPage + 1, Math.max(this.getNumPages(), 1));
         }
         this.cachedPage = this.currentPage;
-        guiGraphics.drawString(this.font, this.pageMsg, panel.x + panel.width - 24 - font.width(pageMsg), panel.y + 22, 0, false);
+        poseStack.drawString(this.font, this.pageMsg, panel.x + panel.width - 24 - font.width(pageMsg), panel.y + 22, 0, false);
         int n = Math.min(176 / this.font.lineHeight, this.cachedPageComponents.size());
         for (int o = 0; o < n; ++o) {
             FormattedCharSequence formattedCharSequence = this.cachedPageComponents.get(o);
-            guiGraphics.drawString(this.font, formattedCharSequence, panel.x + 20, panel.y + 37 + o * this.font.lineHeight, 0, false);
+            poseStack.drawString(this.font, formattedCharSequence, panel.x + 20, panel.y + 37 + o * this.font.lineHeight, 0, false);
         }
         Style style = this.getClickedComponentStyleAt(i, j);
         if (style != null) {
-            guiGraphics.renderComponentHoverEffect(this.font, style, i, j);
+            poseStack.renderComponentHoverEffect(this.font, style, i, j);
         }
     }
     @Override

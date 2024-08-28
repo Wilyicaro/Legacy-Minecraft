@@ -1,6 +1,6 @@
 package wily.legacy.mixin;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CartographyTableScreen;
@@ -100,11 +100,11 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
     }
 
 
-    public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        super.renderLabels(guiGraphics, i, j);
-        guiGraphics.drawString(font,MAP_NAME,10,27,0x383838,false);
+    public void renderLabels(PoseStack poseStack, int i, int j) {
+        super.renderLabels(poseStack, i, j);
+        poseStack.drawString(font,MAP_NAME,10,27,0x383838,false);
         Component cartographyAction = getCartographyAction();
-        if (cartographyAction != null) guiGraphics.drawString(font,cartographyAction,(imageWidth - font.width(cartographyAction)) / 2,130,0x383838,false);
+        if (cartographyAction != null) poseStack.drawString(font,cartographyAction,(imageWidth - font.width(cartographyAction)) / 2,130,0x383838,false);
 
     }
 
@@ -115,25 +115,25 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
         this.name.setValue(string);
     }
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    public void renderBg(PoseStack poseStack, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
-        name.render(guiGraphics, i, j, f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.COMBINER_PLUS,leftPos + 14, topPos + 88,13,13);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
+        name.render(poseStack, i, j, f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.COMBINER_PLUS,leftPos + 14, topPos + 88,13,13);
         ItemStack input2 = menu.getSlot(1).getItem();
         boolean bl = input2.is(Items.MAP);
         boolean bl2 = input2.is(Items.PAPER);
         boolean bl3 = input2.is(Items.GLASS_PANE);
         ItemStack input = menu.getSlot(0).getItem();
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ARROW,leftPos + 36, topPos + 87,22,15);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.ARROW,leftPos + 36, topPos + 87,22,15);
         if (input.is(Items.FILLED_MAP)) {
             MapItemSavedData mapItemSavedData = MapItem.getSavedData(MapItem.getMapId(input), this.minecraft.level);
             if (mapItemSavedData != null && (mapItemSavedData.locked && (bl2 || bl3) || bl2 && mapItemSavedData.scale >= 4))
-                LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ERROR_CROSS, leftPos + 40, topPos + 87, 15, 15);
-            LegacyGuiGraphics.of(guiGraphics).blitSprite(bl ? LegacySprites.CARTOGRAPHY_TABLE_COPY : bl2 ? LegacySprites.CARTOGRAPHY_TABLE_ZOOM : bl3 ? LegacySprites.CARTOGRAPHY_TABLE_LOCKED : LegacySprites.CARTOGRAPHY_TABLE_MAP,leftPos + 70, topPos + 61,66,66);
+                LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.ERROR_CROSS, leftPos + 40, topPos + 87, 15, 15);
+            LegacyGuiGraphics.of(poseStack).blitSprite(bl ? LegacySprites.CARTOGRAPHY_TABLE_COPY : bl2 ? LegacySprites.CARTOGRAPHY_TABLE_ZOOM : bl3 ? LegacySprites.CARTOGRAPHY_TABLE_LOCKED : LegacySprites.CARTOGRAPHY_TABLE_MAP,leftPos + 70, topPos + 61,66,66);
         }else{
-            LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.CARTOGRAPHY_TABLE,leftPos + 70, topPos + 61,66,66);
+            LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.CARTOGRAPHY_TABLE,leftPos + 70, topPos + 61,66,66);
         }
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ARROW,leftPos + 139, topPos + 87,22,15);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.ARROW,leftPos + 139, topPos + 87,22,15);
     }
 }

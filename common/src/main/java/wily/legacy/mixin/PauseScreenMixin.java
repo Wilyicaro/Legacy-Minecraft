@@ -1,7 +1,7 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -66,10 +66,10 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event{
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), button -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
     }
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    public void render(PoseStack poseStack, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderDefaultBackground(guiGraphics);
-        super.render(guiGraphics, i, j, f);
+        ScreenUtil.renderDefaultBackground(poseStack);
+        super.render(poseStack, i, j, f);
     }
 
     @Inject(method = "init",at = @At("HEAD"), cancellable = true)

@@ -1,7 +1,7 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
@@ -36,7 +36,7 @@ public abstract class AbstractButtonMixin extends AbstractWidget {
         return ScreenUtil.getDefaultTextColor(!isHoveredOrFocused() || Util.getMillis() - lastTimePressed <= 150);
     }
     @Inject(method = "renderWidget", at = @At("HEAD"))
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    protected void renderWidget(PoseStack poseStack, int i, int j, float f, CallbackInfo ci) {
         alpha = active ? 1 : 0.8f;
     }
     @Inject(method = "getTextureY", at = @At("HEAD"), cancellable = true)

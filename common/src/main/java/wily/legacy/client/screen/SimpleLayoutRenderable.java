@@ -1,6 +1,6 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
@@ -24,15 +24,15 @@ public abstract class SimpleLayoutRenderable implements Renderable, LayoutElemen
     }
     public static SimpleLayoutRenderable create(Function<SimpleLayoutRenderable,Renderable> simpleRender){
         return new SimpleLayoutRenderable() {
-            public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-                simpleRender.apply(this).render(guiGraphics,i,j,f);
+            public void render(PoseStack poseStack, int i, int j, float f) {
+                simpleRender.apply(this).render(poseStack,i,j,f);
             }
         };
     }
     public static SimpleLayoutRenderable create(int width, int height,Function<SimpleLayoutRenderable,Renderable> simpleRender){
         return new SimpleLayoutRenderable(width,height) {
-            public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-                simpleRender.apply(this).render(guiGraphics,i,j,f);
+            public void render(PoseStack poseStack, int i, int j, float f) {
+                simpleRender.apply(this).render(poseStack,i,j,f);
             }
         };
     }

@@ -1,9 +1,9 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -48,17 +48,17 @@ public class TickBox extends AbstractButton {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+    protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
         setAlpha(active ? 1.0F : 0.5F);
         Minecraft minecraft = Minecraft.getInstance();
-        guiGraphics.setColor(1.0f, 1.0f, 1.0f, this.alpha);
+        poseStack.setColor(1.0f, 1.0f, 1.0f, this.alpha);
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX(), this.getY(), 12, 12);
-        if (selected) LegacyGuiGraphics.of(guiGraphics).blitSprite(TICK, this.getX(), this.getY(), 14, 12);
+        LegacyGuiGraphics.of(poseStack).blitSprite(SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX(), this.getY(), 12, 12);
+        if (selected) LegacyGuiGraphics.of(poseStack).blitSprite(TICK, this.getX(), this.getY(), 14, 12);
         int k = isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get();
-        guiGraphics.setColor(1.0f, 1.0f, 1.0f, 1.0F);
-        this.renderString(guiGraphics, minecraft.font, k);
+        poseStack.setColor(1.0f, 1.0f, 1.0f, 1.0F);
+        this.renderString(poseStack, minecraft.font, k);
     }
 
 
@@ -81,7 +81,7 @@ public class TickBox extends AbstractButton {
     }
 
     @Override
-    public void renderString(GuiGraphics guiGraphics, Font font, int i) {
-        ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 14, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), i,isHoveredOrFocused());
+    public void renderString(PoseStack poseStack, Font font, int i) {
+        ScreenUtil.renderScrollingString(poseStack, font, this.getMessage(), this.getX() + 14, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), i,isHoveredOrFocused());
     }
 }

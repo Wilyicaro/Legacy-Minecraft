@@ -1,6 +1,6 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import wily.legacy.client.controller.Controller;
@@ -13,19 +13,19 @@ public class LegacyScreen extends Screen implements Controller.Event, ControlToo
     protected LegacyScreen(Component component) {
         super(component);
     }
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f){
-        ScreenUtil.renderDefaultBackground(guiGraphics);
+    public void renderDefaultBackground(PoseStack poseStack, int i, int j, float f){
+        ScreenUtil.renderDefaultBackground(poseStack);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderDefaultBackground(guiGraphics, i, j, f);
-        super.render(guiGraphics, i, j, f);
+    public void render(PoseStack poseStack, int i, int j, float f) {
+        renderDefaultBackground(poseStack, i, j, f);
+        super.render(poseStack, i, j, f);
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
-        renderDefaultBackground(guiGraphics,0,0,0);
+    public void renderBackground(PoseStack poseStack) {
+        renderDefaultBackground(poseStack,0,0,0);
     }
 
     @Override

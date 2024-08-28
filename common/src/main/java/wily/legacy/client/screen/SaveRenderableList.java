@@ -7,18 +7,19 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.CrashReport;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.screens.*;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -27,8 +28,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.LevelStorageException;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
-import net.minecraft.world.level.validation.ContentValidationException;
-import net.minecraft.world.level.validation.ForbiddenSymlinkInfo;
 import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -83,17 +82,17 @@ public class SaveRenderableList extends RenderableVList {
             return FileUtils.sizeOfDirectory(Minecraft.getInstance().getLevelSource().getLevelPath(key.getLevelId()).toFile());
         }
     });
-    public static LoadingCache<LevelSummary, FaviconTexture> iconCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
+    public static LoadingCache<LevelSummary, DynamicTexture> iconCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
         @Override
-        public FaviconTexture load(LevelSummary key) {
+        public DynamicTexture load(LevelSummary key) {
             Path iconFile = key.getIcon();
             try {
                 BasicFileAttributes basicFileAttributes = Files.readAttributes(iconFile, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
                 if (basicFileAttributes.isSymbolicLink()) {
-                    List<ForbiddenSymlinkInfo> list = new ArrayList<>();
+                    List<String> list = new ArrayList<>();
                     Minecraft.getInstance().getLevelSource().getWorldDirValidator().validateSymlink(iconFile, list);
                     if (!list.isEmpty()) {
-                        Legacy4J.LOGGER.warn("{}", ContentValidationException.getMessage(iconFile, list));
+                        Legacy4J.LOGGER.warn("{}", String.join(", ", list));
                         iconFile = null;
                     } else {
                         basicFileAttributes = Files.readAttributes(iconFile, BasicFileAttributes.class);
@@ -108,16 +107,23 @@ public class SaveRenderableList extends RenderableVList {
                 Legacy4J.LOGGER.error("could not validate symlink", iOException);
                 iconFile = null;
             }
-            FaviconTexture icon = FaviconTexture.forWorld(Minecraft.getInstance().getTextureManager(), key.getLevelId());
+
+            DynamicTexture icon = new DynamicTexture(16, 16, true);
+            TextureManager textureManager = Minecraft.getInstance().getTextureManager();
+            ResourceLocation iconLocation = new ResourceLocation("legacy", "worlds/" + key.getLevelId() + "/icon");
+            textureManager.register(iconLocation, icon);
+
             boolean bl = iconFile != null && Files.isRegularFile(iconFile);
             if (bl) {
                 try (InputStream inputStream = Files.newInputStream(iconFile)) {
-                    icon.upload(NativeImage.read(inputStream));
+                    NativeImage image = NativeImage.read(inputStream);
+                    icon.setPixels(image);
+                    image.close();
                 } catch (Throwable throwable) {
                     Legacy4J.LOGGER.error("Invalid icon for world {}", key.getLevelId(), throwable);
                 }
             } else {
-                icon.clear();
+                icon.setPixels(null);
             }
             return icon;
         }
@@ -222,13 +228,13 @@ public class SaveRenderableList extends RenderableVList {
                     }
 
                     @Override
-                    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                        super.renderWidget(guiGraphics, i, j, f);
+                    protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
+                        super.renderWidget(poseStack, i, j, f);
                         RenderSystem.enableBlend();
-                        guiGraphics.blit(iconCache.getUnchecked(summary).textureLocation(), getX() + 5, getY() + 5, 0, 0, 20, 20, 20, 20);
+                        poseStack.blit(iconCache.getUnchecked(summary).textureLocation(), getX() + 5, getY() + 5, 0, 0, 20, 20, 20, 20);
                         RenderSystem.disableBlend();
                         if (minecraft.options.touchscreen().get().booleanValue() || isHovered) {
-                            guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
+                            poseStack.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
 
                             boolean hoverIcon = ScreenUtil.isMouseOver(i, j, getX() + 5, getY() + 5, 20, height);
                             ResourceLocation resourceLocation = hoverIcon ? JOIN_HIGHLIGHTED : JOIN;
@@ -236,42 +242,42 @@ public class SaveRenderableList extends RenderableVList {
                             ResourceLocation resourceLocation3 = hoverIcon ? ERROR_HIGHLIGHTED : ERROR;
                             ResourceLocation resourceLocation4 = hoverIcon ? MARKED_JOIN_HIGHLIGHTED : MARKED_JOIN;
                             if (summary instanceof LevelSummary.SymlinkLevelSummary) {
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX(), getY(), 32, 32);
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation4, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(poseStack).blitSprite(resourceLocation3, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(poseStack).blitSprite(resourceLocation4, getX(), getY(), 32, 32);
                                 return;
                             }
                             if (summary.isLocked()) {
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(poseStack).blitSprite(resourceLocation3, getX(), getY(), 32, 32);
                                 if (hoverIcon) {
                                     screen.setTooltipForNextRenderPass(minecraft.font.split(WORLD_LOCKED_TOOLTIP, 175));
                                 }
                             } else if (summary.requiresManualConversion()) {
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(poseStack).blitSprite(resourceLocation3, getX(), getY(), 32, 32);
                                 if (hoverIcon) {
                                     screen.setTooltipForNextRenderPass(minecraft.font.split(WORLD_REQUIRES_CONVERSION, 175));
                                 }
                             } else if (summary.markVersionInList()) {
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation4, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(poseStack).blitSprite(resourceLocation4, getX(), getY(), 32, 32);
                                 if (summary.askToOpenWorld()) {
-                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX(), getY(), 32, 32);
+                                    LegacyGuiGraphics.of(poseStack).blitSprite(resourceLocation3, getX(), getY(), 32, 32);
                                     if (hoverIcon) {
                                         screen.setTooltipForNextRenderPass(ImmutableList.of(FROM_NEWER_TOOLTIP_1.getVisualOrderText(), FROM_NEWER_TOOLTIP_2.getVisualOrderText()));
                                     }
                                 } else if (!SharedConstants.getCurrentVersion().isStable()) {
-                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation2, getX(), getY(), 32, 32);
+                                    LegacyGuiGraphics.of(poseStack).blitSprite(resourceLocation2, getX(), getY(), 32, 32);
                                     if (hoverIcon) {
                                         screen.setTooltipForNextRenderPass(ImmutableList.of(SNAPSHOT_TOOLTIP_1.getVisualOrderText(), SNAPSHOT_TOOLTIP_2.getVisualOrderText()));
                                     }
                                 }
                             } else {
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(poseStack).blitSprite(resourceLocation, getX(), getY(), 32, 32);
                             }
                         }
                     }
 
                     @Override
-                    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                        ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
+                    protected void renderScrollingString(PoseStack poseStack, Font font, int i, int j) {
+                        ScreenUtil.renderScrollingString(poseStack, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
                     }
 
                     @Override

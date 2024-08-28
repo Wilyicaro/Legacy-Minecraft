@@ -1,11 +1,11 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.SharedConstants;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.font.TextFieldHelper;
-import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookEditScreen;
 import net.minecraft.client.gui.screens.inventory.PageButton;
@@ -64,9 +64,9 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
     private static final Component EXIT_BOOK_MESSAGE = Component.translatable("legacy.menu.exit_book_message");
     @Shadow protected abstract BookEditScreen.DisplayCache getDisplayCache();
 
-    @Shadow protected abstract void renderHighlight(GuiGraphics arg, Rect2i[] args);
+    @Shadow protected abstract void renderHighlight(PoseStack arg, Rect2i[] args);
 
-    @Shadow protected abstract void renderCursor(GuiGraphics arg, BookEditScreen.Pos2i arg2, boolean bl);
+    @Shadow protected abstract void renderCursor(PoseStack arg, BookEditScreen.Pos2i arg2, boolean bl);
 
     @Shadow @Final private static FormattedCharSequence BLACK_CURSOR;
     @Shadow @Final private static FormattedCharSequence GRAY_CURSOR;
@@ -196,7 +196,7 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
         setFocused(panel);
         this.updateButtonVisibility();
     }
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void renderBackground(PoseStack poseStack, int i, int j, float f) {
     }
 
     @Inject(method = "tick", at = @At("RETURN"))
@@ -206,31 +206,31 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
     }
 
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    public void render(PoseStack poseStack, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
-        super.render(guiGraphics, i, j, f);
+        super.render(poseStack, i, j, f);
         int n;
         int o;
         if (this.isSigning) {
             boolean bl = this.frameTick / 6 % 2 == 0;
             FormattedCharSequence formattedCharSequence = FormattedCharSequence.composite(FormattedCharSequence.forward(this.title, Style.EMPTY), bl ? BLACK_CURSOR : GRAY_CURSOR);
-            guiGraphics.drawString(this.font, EDIT_TITLE_LABEL, panel.x + 20, panel.y + 37, 0, false);
-            guiGraphics.drawString(this.font, formattedCharSequence, panel.x + 20, panel.y + 50, 0, false);
-            guiGraphics.drawString(this.font, this.ownerText, panel.x + 20, panel.y + 61, 0, false);
-            guiGraphics.drawWordWrap(this.font, FINALIZE_WARNING_LABEL, panel.x + 20, panel.y + 85, 159, 0);
+            poseStack.drawString(this.font, EDIT_TITLE_LABEL, panel.x + 20, panel.y + 37, 0, false);
+            poseStack.drawString(this.font, formattedCharSequence, panel.x + 20, panel.y + 50, 0, false);
+            poseStack.drawString(this.font, this.ownerText, panel.x + 20, panel.y + 61, 0, false);
+            poseStack.drawWordWrap(this.font, FINALIZE_WARNING_LABEL, panel.x + 20, panel.y + 85, 159, 0);
         } else {
-            guiGraphics.drawString(this.font, this.pageMsg, panel.x + panel.width - 24 - font.width(pageMsg), panel.y + 22, 0, false);
+            poseStack.drawString(this.font, this.pageMsg, panel.x + panel.width - 24 - font.width(pageMsg), panel.y + 22, 0, false);
             BookEditScreen.DisplayCache displayCache = this.getDisplayCache();
             BookEditScreen.LineInfo[] var15 = displayCache.lines;
             n = var15.length;
 
             for(o = 0; o < n; ++o) {
                 BookEditScreen.LineInfo lineInfo = var15[o];
-                guiGraphics.drawString(this.font, lineInfo.asComponent, lineInfo.x, lineInfo.y, -16777216, false);
+                poseStack.drawString(this.font, lineInfo.asComponent, lineInfo.x, lineInfo.y, -16777216, false);
             }
             if (panel.isFocused()) {
-                this.renderHighlight(guiGraphics, displayCache.selection);
-                this.renderCursor(guiGraphics, displayCache.cursor, displayCache.cursorAtEnd);
+                this.renderHighlight(poseStack, displayCache.selection);
+                this.renderCursor(poseStack, displayCache.cursor, displayCache.cursorAtEnd);
             }
         }
     }

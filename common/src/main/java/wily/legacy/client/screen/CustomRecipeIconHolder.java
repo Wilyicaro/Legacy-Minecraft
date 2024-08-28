@@ -1,8 +1,8 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -125,7 +125,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
         return false;
     }
     @Override
-    public void render(GuiGraphics graphics, int i, int j, float f) {
+    public void render(PoseStack graphics, int i, int j, float f) {
         if (itemIcon.isEmpty() || isFocused()) {
             nextItem = nextItem();
             previousItem = previousItem();
@@ -143,7 +143,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
         return !stack.isEmpty() && minecraft.player.getInventory().items.stream().filter(s-> ItemStack.isSameItemSameTags(s,stack)).mapToInt(ItemStack::getCount).sum() >= stack.getCount();
     }
     @Override
-    public void renderItem(GuiGraphics graphics, int i, int j, float f) {
+    public void renderItem(PoseStack graphics, int i, int j, float f) {
         ScreenUtil.secureTranslucentRender(graphics,!itemIcon.isEmpty() && !hasItem(itemIcon),0.5f,(u)-> renderItem(graphics,itemIcon,getX(),getY(),false));
     }
     public boolean canAddIngredient(){
@@ -171,7 +171,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
     }
 
     @Override
-    public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
+    public void renderSelection(PoseStack graphics, int i, int j, float f) {
         super.renderSelection(graphics, i, j, f);
         if (!itemIcon.isEmpty() && hasItem(itemIcon) && minecraft.screen instanceof LegacyMenuAccess<?> a){
             Slot s = a.getMenu().getSlot(findInventoryMatchSlot());

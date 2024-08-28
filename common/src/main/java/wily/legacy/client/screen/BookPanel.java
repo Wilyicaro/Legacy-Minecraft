@@ -1,8 +1,8 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
 import net.minecraft.client.gui.ComponentPath;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
@@ -21,25 +21,25 @@ public class BookPanel extends WidgetPanel implements GuiEventListener, Narratab
         this.screen = screen;
     }
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(getX(),getY(),0);
-        guiGraphics.pose().scale(getWidth() / 146f,getHeight() / 180f,1f);
-        guiGraphics.blit(BookViewScreen.BOOK_LOCATION,0,0,20,1,146,180);
-        guiGraphics.pose().popPose();
+    public void render(PoseStack poseStack, int i, int j, float f) {
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(getX(),getY(),0);
+        poseStack.pose().scale(getWidth() / 146f,getHeight() / 180f,1f);
+        poseStack.blit(BookViewScreen.BOOK_LOCATION,0,0,20,1,146,180);
+        poseStack.pose().popPose();
     }
     public PageButton createLegacyPageButton(int i, int j, boolean bl, Button.OnPress onPress, boolean bl2){
         return new PageButton(i,j,bl,onPress,bl2){
             private long lastPressTime;
             @Override
-            public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+            public void renderWidget(PoseStack poseStack, int i, int j, float f) {
                 isHovered = Util.getMillis() - lastPressTime <= 300 || clicked(i,j);
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(getX(),getY(),1.5f);
-                guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-                guiGraphics.pose().translate(-getX(),-getY(),1.5f);
-                super.renderWidget(guiGraphics, i, j, f);
-                guiGraphics.pose().popPose();
+                poseStack.pose().pushPose();
+                poseStack.pose().translate(getX(),getY(),1.5f);
+                poseStack.pose().scale(1.5f,1.5f,1.5f);
+                poseStack.pose().translate(-getX(),-getY(),1.5f);
+                super.renderWidget(poseStack, i, j, f);
+                poseStack.pose().popPose();
             }
 
             @Override

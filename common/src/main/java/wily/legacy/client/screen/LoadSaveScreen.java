@@ -1,8 +1,8 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
@@ -211,21 +211,21 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.renderDefaultBackground(guiGraphics, i, j, f);
-        resourcePackSelector.renderTooltipBox(guiGraphics,panel);
-        panel.render(guiGraphics,i,j,f);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.5f,0,0);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL,panel.x + 12, panel.y + 9, 32,32);
-        guiGraphics.pose().popPose();
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0,0.5f,0);
-        guiGraphics.blit(SaveRenderableList.iconCache.getUnchecked(summary).textureLocation(),panel.x + 14, panel.y + 10, 0,0,29,29,29,29);
-        guiGraphics.drawString(font,summary.getLevelName(),panel.x + 48, panel.y + 12, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-        guiGraphics.drawString(font,Component.translatable("legacy.menu.load_save.created_in", (summary.hasCheats() ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()),panel.x + 48, panel.y + 29, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-        guiGraphics.pose().popPose();
-        guiGraphics.drawString(font,Component.translatable("commands.seed.success",((LegacyWorldSettings)(Object)summary.getSettings()).getDisplaySeed()),panel.x + 13, panel.y + 49, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+    public void renderDefaultBackground(PoseStack poseStack, int i, int j, float f) {
+        super.renderDefaultBackground(poseStack, i, j, f);
+        resourcePackSelector.renderTooltipBox(poseStack,panel);
+        panel.render(poseStack,i,j,f);
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(0.5f,0,0);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL,panel.x + 12, panel.y + 9, 32,32);
+        poseStack.pose().popPose();
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(0,0.5f,0);
+        poseStack.blit(SaveRenderableList.iconCache.getUnchecked(summary).textureLocation(),panel.x + 14, panel.y + 10, 0,0,29,29,29,29);
+        poseStack.drawString(font,summary.getLevelName(),panel.x + 48, panel.y + 12, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+        poseStack.drawString(font,Component.translatable("legacy.menu.load_save.created_in", (summary.hasCheats() ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()),panel.x + 48, panel.y + 29, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+        poseStack.pose().popPose();
+        poseStack.drawString(font,Component.translatable("commands.seed.success",((LegacyWorldSettings)(Object)summary.getSettings()).getDisplaySeed()),panel.x + 13, panel.y + 49, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
     }
 
     public static void loadWorld(Screen screen, Minecraft minecraft, LevelSummary summary) {

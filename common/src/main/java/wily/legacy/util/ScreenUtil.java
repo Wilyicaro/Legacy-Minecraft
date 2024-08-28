@@ -3,10 +3,10 @@ package wily.legacy.util;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -49,19 +49,19 @@ public class ScreenUtil {
     public static final ResourceLocation PANORAMA_DAY = new ResourceLocation(Legacy4J.MOD_ID, "textures/gui/title/panorama_day.png");
     public static final ResourceLocation PANORAMA_NIGHT = new ResourceLocation(Legacy4J.MOD_ID, "textures/gui/title/panorama_night.png");
 
-    public static void renderPointerPanel(GuiGraphics graphics, int x, int y, int width, int height){
+    public static void renderPointerPanel(PoseStack graphics, int x, int y, int width, int height){
         RenderSystem.enableBlend();
         RenderSystem.disableDepthTest();
         LegacyGuiGraphics.of(graphics).blitSprite(LegacySprites.POINTER_PANEL,x,y,width,height);
         RenderSystem.enableDepthTest();
         RenderSystem.disableBlend();
     }
-    public static void renderPanelTranslucentRecess(GuiGraphics graphics, int x, int y, int width, int height){
+    public static void renderPanelTranslucentRecess(PoseStack graphics, int x, int y, int width, int height){
         RenderSystem.enableBlend();
         LegacyGuiGraphics.of(graphics).blitSprite(LegacySprites.PANEL_TRANSLUCENT_RECESS,x,y,width,height);
         RenderSystem.disableBlend();
     }
-    public static void renderTiles(ResourceLocation location,GuiGraphics graphics, int x, int y, int width, int height, float dp){
+    public static void renderTiles(ResourceLocation location,PoseStack graphics, int x, int y, int width, int height, float dp){
         mc.getTextureManager().getTexture(GUI_ATLAS).bind();
         GlStateManager._texParameter(3553, 10241, 9729);
         //GlStateManager._texParameter(3553, 10240, 9729);
@@ -73,7 +73,7 @@ public class ScreenUtil {
         graphics.pose().popPose();
         GlStateManager._texParameter(3553, 10241, 9728);
     }
-    public static void drawAutoSavingIcon(GuiGraphics graphics,int x, int y) {
+    public static void drawAutoSavingIcon(PoseStack graphics,int x, int y) {
         graphics.pose().pushPose();
         graphics.pose().scale(0.5F,0.5F,1);
         LegacyGuiGraphics.of(graphics).blitSprite(LegacySprites.SAVE_CHEST,x * 2,y * 2,48,48);
@@ -84,46 +84,46 @@ public class ScreenUtil {
         LegacyGuiGraphics.of(graphics).blitSprite(LegacySprites.SAVE_ARROW,0,0,13,16);
         graphics.pose().popPose();
     }
-    public static void renderDefaultBackground(GuiGraphics guiGraphics){
-        renderDefaultBackground(guiGraphics,false,true);
+    public static void renderDefaultBackground(PoseStack poseStack){
+        renderDefaultBackground(poseStack,false,true);
     }
-    public static void renderDefaultBackground(GuiGraphics guiGraphics, boolean title){
-        renderDefaultBackground(guiGraphics,false,title);
+    public static void renderDefaultBackground(PoseStack poseStack, boolean title){
+        renderDefaultBackground(poseStack,false,title);
     }
     public static boolean getActualLevelNight(){
         return (mc.getSingleplayerServer() != null&& mc.getSingleplayerServer().overworld() != null && mc.getSingleplayerServer().overworld().isNight()) || (mc.level!= null && mc.level.isNight());
     }
-    public static void renderDefaultBackground(GuiGraphics guiGraphics, boolean forcePanorama, boolean title){
+    public static void renderDefaultBackground(PoseStack poseStack, boolean forcePanorama, boolean title){
         if (mc.level == null || forcePanorama)
-            renderPanoramaBackground(guiGraphics, forcePanorama && getActualLevelNight());
-        else renderTransparentBackground(guiGraphics);
+            renderPanoramaBackground(poseStack, forcePanorama && getActualLevelNight());
+        else renderTransparentBackground(poseStack);
         if (title) {
             if (Minecraft.getInstance().getResourceManager().getResource(MINECRAFT).isEmpty())
-                logoRenderer.renderLogo(guiGraphics, mc.screen == null ? 0 : mc.screen.width, 1.0F);
+                logoRenderer.renderLogo(poseStack, mc.screen == null ? 0 : mc.screen.width, 1.0F);
             else {
                 RenderSystem.enableBlend();
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate((guiGraphics.guiWidth() - 285.5f) / 2, 30,0);
-                guiGraphics.pose().scale(0.5f,0.5f,0.5f);
-                guiGraphics.blit(MINECRAFT,0, 0,0,0, 571,138,571,138);
-                guiGraphics.pose().popPose();
+                poseStack.pose().pushPose();
+                poseStack.pose().translate((poseStack.guiWidth() - 285.5f) / 2, 30,0);
+                poseStack.pose().scale(0.5f,0.5f,0.5f);
+                poseStack.blit(MINECRAFT,0, 0,0,0, 571,138,571,138);
+                poseStack.pose().popPose();
                 RenderSystem.disableBlend();
             }
 
         }
     }
-    public static void renderPanoramaBackground(GuiGraphics guiGraphics, boolean isNight){
+    public static void renderPanoramaBackground(PoseStack poseStack, boolean isNight){
         RenderSystem.depthMask(false);
         Minecraft.getInstance().getTextureManager().getTexture(isNight ? PANORAMA_NIGHT : PANORAMA_DAY).setFilter(true, false);
-        guiGraphics.blit(isNight ? PANORAMA_NIGHT : PANORAMA_DAY, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() / 66.32f, 1, guiGraphics.guiWidth(), guiGraphics.guiHeight() + 2, guiGraphics.guiHeight() * 820/144, guiGraphics.guiHeight() + 2);
+        poseStack.blit(isNight ? PANORAMA_NIGHT : PANORAMA_DAY, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() / 66.32f, 1, poseStack.guiWidth(), poseStack.guiHeight() + 2, poseStack.guiHeight() * 820/144, poseStack.guiHeight() + 2);
         RenderSystem.depthMask(true);
     }
-    public static void drawOutlinedString(GuiGraphics graphics, Font font, Component component, int x, int y, int color, int outlineColor, float outline) {
+    public static void drawOutlinedString(PoseStack graphics, Font font, Component component, int x, int y, int color, int outlineColor, float outline) {
         drawStringOutline(graphics,font,component,x,y,outlineColor,outline);
         graphics.drawString(font,component, x, y, color,false);
 
     }
-    public static void drawStringOutline(GuiGraphics graphics, Font font, Component component, int x, int y, int outlineColor, float outline) {
+    public static void drawStringOutline(PoseStack graphics, Font font, Component component, int x, int y, int outlineColor, float outline) {
         float[] translations = new float[]{0,outline,-outline};
         for (float t : translations) {
             for (float t1 : translations) {
@@ -139,16 +139,16 @@ public class ScreenUtil {
     public static boolean isMouseOver(double mouseX, double mouseY, double x, double y, int width, int height){
         return mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height;
     }
-    public static void applyHUDScale(GuiGraphics graphics){
+    public static void applyHUDScale(PoseStack graphics){
         graphics.pose().scale(3f / getHUDScale(), 3f / getHUDScale() ,3f / getHUDScale());
     }
-    public static void prepareHUDRender(GuiGraphics graphics){
+    public static void prepareHUDRender(PoseStack graphics){
         graphics.pose().pushPose();
         graphics.setColor(1.0f,1.0f,1.0f,getHUDOpacity());
         graphics.pose().translate(0,getHUDDistance(),0);
         RenderSystem.enableBlend();
     }
-    public static void finishHUDRender(GuiGraphics graphics){
+    public static void finishHUDRender(PoseStack graphics){
         graphics.pose().popPose();
         graphics.setColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
@@ -245,7 +245,7 @@ public class ScreenUtil {
         return (LegacyOptions) mc.options;
     }
 
-    public static void drawGenericLoading(GuiGraphics graphics,int x, int y) {
+    public static void drawGenericLoading(PoseStack graphics,int x, int y) {
         RenderSystem.enableBlend();
         for (int i = 0; i < 8; i++) {
             int v = (i + 1) * 100;
@@ -260,13 +260,13 @@ public class ScreenUtil {
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
     }
-    public static void renderScrollingString(GuiGraphics guiGraphics, Font font, Component component, int j, int k, int l, int m, int n, boolean shadow) {
-        renderScrollingString(guiGraphics,font,component.getVisualOrderText(),j,k,l,m,n,shadow);
+    public static void renderScrollingString(PoseStack poseStack, Font font, Component component, int j, int k, int l, int m, int n, boolean shadow) {
+        renderScrollingString(poseStack,font,component.getVisualOrderText(),j,k,l,m,n,shadow);
     }
-    public static void renderScrollingString(GuiGraphics guiGraphics, Font font, FormattedCharSequence charSequence, int j, int k, int l, int m, int n, boolean shadow) {
-        renderScrollingString(guiGraphics,font,charSequence,j,k,l,m,n,shadow,font.width(charSequence));
+    public static void renderScrollingString(PoseStack poseStack, Font font, FormattedCharSequence charSequence, int j, int k, int l, int m, int n, boolean shadow) {
+        renderScrollingString(poseStack,font,charSequence,j,k,l,m,n,shadow,font.width(charSequence));
     }
-    public static void renderScrollingString(GuiGraphics guiGraphics, Font font, FormattedCharSequence charSequence, int j, int k, int l, int m, int n, boolean shadow, int stringWidth) {
+    public static void renderScrollingString(PoseStack poseStack, Font font, FormattedCharSequence charSequence, int j, int k, int l, int m, int n, boolean shadow, int stringWidth) {
         int p = (k + m - font.lineHeight) / 2 + 1;
         int q = l - j;
         if (stringWidth > q) {
@@ -275,14 +275,14 @@ public class ScreenUtil {
             double e = Math.max((double)r * 0.5, 3.0);
             double f = Math.sin(1.5707963267948966 * Math.cos(Math.PI * 2 * d / e)) / 2.0 + 0.5;
             double g = Mth.lerp(f, 0.0, r);
-            guiGraphics.enableScissor(j, k, l, m);
-            guiGraphics.drawString(font, charSequence, j - (int)g, p, n,shadow);
-            guiGraphics.disableScissor();
+            poseStack.enableScissor(j, k, l, m);
+            poseStack.drawString(font, charSequence, j - (int)g, p, n,shadow);
+            poseStack.disableScissor();
         } else {
-            guiGraphics.drawString(font, charSequence, j, p, n,shadow);
+            poseStack.drawString(font, charSequence, j, p, n,shadow);
         }
     }
-    public static void secureTranslucentRender(GuiGraphics graphics, boolean translucent, float alpha, Consumer<Boolean> render){
+    public static void secureTranslucentRender(PoseStack graphics, boolean translucent, float alpha, Consumer<Boolean> render){
         if (!translucent){
             render.accept(false);
             return;
@@ -303,16 +303,16 @@ public class ScreenUtil {
         double yCorner = holder.getYCorner() + holder.offset.y();
         return (d -= leftPos) >= xCorner && d < (xCorner + width) && (e -= topPos) >= yCorner && e < (yCorner + height);
     }
-    public static void renderEntity(GuiGraphics guiGraphics, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity) {
-        renderEntity(guiGraphics,x,y,size,partialTicks,vector3f,quaternionf,quaternionf2,entity,false);
+    public static void renderEntity(PoseStack poseStack, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity) {
+        renderEntity(poseStack,x,y,size,partialTicks,vector3f,quaternionf,quaternionf2,entity,false);
     }
-    public static void renderEntity(GuiGraphics guiGraphics, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity, boolean forceSize) {
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(x, y, 50.0);
+    public static void renderEntity(PoseStack poseStack, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity, boolean forceSize) {
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(x, y, 50.0);
         float h = forceSize ? Math.max(1f,Math.max(entity.getBbWidth(), entity.getBbHeight())) : 1;
-        guiGraphics.pose().mulPoseMatrix(new Matrix4f().scaling(size / h, size / h, -size / h));
-        guiGraphics.pose().translate(vector3f.x, vector3f.y, vector3f.z);
-        guiGraphics.pose().mulPose(quaternionf);
+        poseStack.pose().mulPoseMatrix(new Matrix4f().scaling(size / h, size / h, -size / h));
+        poseStack.pose().translate(vector3f.x, vector3f.y, vector3f.z);
+        poseStack.pose().mulPose(quaternionf);
         Lighting.setupForEntityInInventory();
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         if (quaternionf2 != null) {
@@ -320,16 +320,16 @@ public class ScreenUtil {
             entityRenderDispatcher.overrideCameraOrientation(quaternionf2);
         }
         entityRenderDispatcher.setRenderShadow(false);
-        RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0f, partialTicks, guiGraphics.pose(), guiGraphics.bufferSource(), 0xF000F0));
-        guiGraphics.flush();
+        RenderSystem.runAsFancy(() -> entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, 0.0f, partialTicks, poseStack.pose(), poseStack.bufferSource(), 0xF000F0));
+        poseStack.flush();
         entityRenderDispatcher.setRenderShadow(true);
-        guiGraphics.pose().popPose();
+        poseStack.pose().popPose();
         Lighting.setupFor3DItems();
     }
-    public static void renderEntityInInventoryFollowsMouse(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, float f, float g, float h, LivingEntity livingEntity) {
+    public static void renderEntityInInventoryFollowsMouse(PoseStack poseStack, int i, int j, int k, int l, int m, float f, float g, float h, LivingEntity livingEntity) {
         float n = (float)(i + k) / 2.0f;
         float o = (float)(j + l) / 2.0f;
-        guiGraphics.enableScissor(i, j, k, l);
+        poseStack.enableScissor(i, j, k, l);
         float p = (float)Math.atan((n - g) / 40.0f);
         float q = (float)Math.atan((o - h) / 40.0f);
         Quaternionf quaternionf = new Quaternionf().rotateZ((float)Math.PI);
@@ -346,13 +346,13 @@ public class ScreenUtil {
         livingEntity.yHeadRot = livingEntity.getYRot();
         livingEntity.yHeadRotO = livingEntity.getYRot();
         Vector3f vector3f = new Vector3f(0.0f, livingEntity.getBbHeight() / 2.0f + f, 0.0f);
-        renderEntity(guiGraphics, n, o, m,1, vector3f, quaternionf, quaternionf2, livingEntity);
+        renderEntity(poseStack, n, o, m,1, vector3f, quaternionf, quaternionf2, livingEntity);
         livingEntity.yBodyRot = r;
         livingEntity.setYRot(s);
         livingEntity.setXRot(t);
         livingEntity.yHeadRotO = u;
         livingEntity.yHeadRot = v;
-        guiGraphics.disableScissor();
+        poseStack.disableScissor();
     }
     public static int getStandardHeight(){
         return Math.round(mc.getWindow().getHeight() / 180f) * 180;
@@ -366,7 +366,7 @@ public class ScreenUtil {
         String s = dimension.location().toLanguageKey("dimension");
         return Component.translatable(hasTip(s) ? s : "dimension.minecraft");
     }
-    public static void renderTransparentBackground(GuiGraphics graphics){
+    public static void renderTransparentBackground(PoseStack graphics){
         graphics.fillGradient(0,0,graphics.guiWidth(),graphics.guiHeight(), -1073741824, -805306368);;
     }
 }

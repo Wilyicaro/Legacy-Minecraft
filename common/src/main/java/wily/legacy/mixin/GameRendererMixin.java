@@ -6,7 +6,6 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.renderer.GameRenderer;
@@ -53,7 +52,7 @@ public abstract class GameRendererMixin {
     @Shadow private boolean renderHand;
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;flush()V"))
-    private void render(GuiGraphics graphics, float f){
+    private void render(PoseStack graphics, float f){
         if (!Legacy4JClient.isGameLoadFinished) return;
         LegacyTip tip = LegacyTipManager.getActualTip();
         if (!LegacyTipManager.tips.isEmpty() || tip != null) {
@@ -87,8 +86,8 @@ public abstract class GameRendererMixin {
         graphics.flush();
     }
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;render(Lnet/minecraft/client/gui/GuiGraphics;F)V"))
-    private void render(Gui instance, GuiGraphics guiGraphics, float f){
-        if (((LegacyOptions)minecraft.options).displayHUD().get()) instance.render(guiGraphics,f);
+    private void render(Gui instance, PoseStack poseStack, float f){
+        if (((LegacyOptions)minecraft.options).displayHUD().get()) instance.render(poseStack,f);
     }
     @Inject(method = "bobView", at = @At("RETURN"))
     private void bobView(PoseStack poseStack, float f, CallbackInfo ci){

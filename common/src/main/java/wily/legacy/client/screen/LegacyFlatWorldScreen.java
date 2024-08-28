@@ -2,11 +2,11 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
@@ -96,26 +96,26 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
             }
 
             @Override
-            protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                super.renderWidget(guiGraphics, i, j, f);
+            protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
+                super.renderWidget(poseStack, i, j, f);
                 ItemStack s = LegacyBiomeOverride.getOrDefault(biome.unwrapKey()).icon();
                 if (!s.isEmpty()){
-                    guiGraphics.pose().pushPose();
-                    guiGraphics.pose().translate(getX() + 26, getY() + 5,0);
-                    guiGraphics.pose().scale(1.25f,1.25f,1.25f);
-                    guiGraphics.renderItem(s,0, 0);
-                    guiGraphics.pose().popPose();
+                    poseStack.pose().pushPose();
+                    poseStack.pose().translate(getX() + 26, getY() + 5,0);
+                    poseStack.pose().scale(1.25f,1.25f,1.25f);
+                    poseStack.renderItem(s,0, 0);
+                    poseStack.pose().popPose();
                 }
                 RenderSystem.enableBlend();
-                LegacyGuiGraphics.of(guiGraphics).blitSprite(TickBox.SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);
-                if (generator.biome == biome) LegacyGuiGraphics.of(guiGraphics).blitSprite(TickBox.TICK, this.getX() + 6, this.getY()  + (height - 12) / 2, 14, 12);
+                LegacyGuiGraphics.of(poseStack).blitSprite(TickBox.SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);
+                if (generator.biome == biome) LegacyGuiGraphics.of(poseStack).blitSprite(TickBox.TICK, this.getX() + 6, this.getY()  + (height - 12) / 2, 14, 12);
                 RenderSystem.disableBlend();
             }
             @Override
-            protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+            protected void renderScrollingString(PoseStack poseStack, Font font, int i, int j) {
                 int k = this.getX() + 54;
                 int l = this.getX() + this.getWidth();
-                ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true);
+                ScreenUtil.renderScrollingString(poseStack, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true);
             }
             @Override
             protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -141,20 +141,20 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         AbstractButton b;
         displayLayers.renderables.add(index,b = new AbstractButton(0,0,260,30,flatLayerInfo.getBlockState().getBlock().getName()) {
             @Override
-            protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                super.renderWidget(guiGraphics, i, j, f);
-                guiGraphics.drawString(font,Component.translatable("legacy.menu.create_flat_world.layer_count",flatLayerInfo.getHeight()),getX() + 12, getY() + 1 + (height - font.lineHeight) / 2, 0xFFFFFF);
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(getX() + 39, getY() + 5,0);
-                guiGraphics.pose().scale(1.25f,1.25f,1.25f);
-                guiGraphics.renderItem(flatLayerInfo.getBlockState().getBlock().asItem().getDefaultInstance(),0, 0);
-                guiGraphics.pose().popPose();
+            protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
+                super.renderWidget(poseStack, i, j, f);
+                poseStack.drawString(font,Component.translatable("legacy.menu.create_flat_world.layer_count",flatLayerInfo.getHeight()),getX() + 12, getY() + 1 + (height - font.lineHeight) / 2, 0xFFFFFF);
+                poseStack.pose().pushPose();
+                poseStack.pose().translate(getX() + 39, getY() + 5,0);
+                poseStack.pose().scale(1.25f,1.25f,1.25f);
+                poseStack.renderItem(flatLayerInfo.getBlockState().getBlock().asItem().getDefaultInstance(),0, 0);
+                poseStack.pose().popPose();
             }
             @Override
-            protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+            protected void renderScrollingString(PoseStack poseStack, Font font, int i, int j) {
                 int k = this.getX() + 67;
                 int l = this.getX() + this.getWidth();
-                ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true);
+                ScreenUtil.renderScrollingString(poseStack, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true);
             }
 
             @Override
@@ -231,24 +231,24 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(guiGraphics,false);
+    public void renderDefaultBackground(PoseStack poseStack, int i, int j, float f) {
+        ScreenUtil.renderDefaultBackground(poseStack,false);
     }
 
     @Override
     protected void init() {
         addRenderableWidget(tabList);
         panel.height = Math.min(height - 48,248);
-        addRenderableOnly(((guiGraphics, i, j, f) -> {
+        addRenderableOnly(((poseStack, i, j, f) -> {
             if (ScreenUtil.hasTooltipBoxes()) {
                 if (tooltipBoxLabel != null && getChildAt(i,j).map(g-> g instanceof AbstractWidget w ? w.getTooltip() : null).isEmpty() && (!(getFocused() instanceof AbstractWidget w) || w.getTooltip() == null)) tooltipBoxLabel = null;
-                ScreenUtil.renderPointerPanel(guiGraphics,panel.x + panel.width - 2, panel.y + 5,194,panel.height - 10);
-                if (tooltipBoxLabel != null) tooltipBoxLabel.renderLeftAligned(guiGraphics, panel.x + panel.width + 3, panel.y + 13,12,0xFFFFFF);
+                ScreenUtil.renderPointerPanel(poseStack,panel.x + panel.width - 2, panel.y + 5,194,panel.height - 10);
+                if (tooltipBoxLabel != null) tooltipBoxLabel.renderLeftAligned(poseStack, panel.x + panel.width + 3, panel.y + 13,12,0xFFFFFF);
             }
         }));
         addRenderableOnly(panel);
         panel.init();
-        addRenderableOnly(((guiGraphics, i, j, f) -> LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14)));
+        addRenderableOnly(((poseStack, i, j, f) -> LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14)));
         getRenderableVList().init(this,panel.x + 11,panel.y + 11,260, panel.height - 5);
         tabList.init(panel.x,panel.y - 24, panel.width);
         this.generator.updateLayers();

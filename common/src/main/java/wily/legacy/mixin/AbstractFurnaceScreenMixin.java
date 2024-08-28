@@ -1,6 +1,6 @@
 package wily.legacy.mixin;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractFurnaceScreen;
@@ -60,45 +60,45 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
         else if (recipeBookComponent.isVisible()) recipeBookComponent.toggleVisibility();
     }
     @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        super.renderLabels(guiGraphics, i, j);
+    protected void renderLabels(PoseStack poseStack, int i, int j) {
+        super.renderLabels(poseStack, i, j);
         Component ingredient = Component.translatable("legacy.container.ingredient");
-        guiGraphics.drawString(this.font, ingredient, 70 - font.width(ingredient), 32, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        poseStack.drawString(this.font, ingredient, 70 - font.width(ingredient), 32, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         Component fuel = Component.translatable("legacy.container.fuel");
-        guiGraphics.drawString(this.font, fuel, 70 - font.width(fuel), 79, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        poseStack.drawString(this.font, fuel, 70 - font.width(fuel), 79, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void renderBackground(PoseStack poseStack) {
     }
 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    public void renderBg(PoseStack poseStack, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 77,topPos + 48,0);
-        guiGraphics.pose().scale(19/13f,19/13f,1.0f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.LIT,0,0, 13, 13);
-        guiGraphics.pose().popPose();
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 75.5,topPos + 46.5,0);
-        guiGraphics.pose().scale(19/39f,19/39f,1.0f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(leftPos + 77,topPos + 48,0);
+        poseStack.pose().scale(19/13f,19/13f,1.0f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.LIT,0,0, 13, 13);
+        poseStack.pose().popPose();
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(leftPos + 75.5,topPos + 46.5,0);
+        poseStack.pose().scale(19/39f,19/39f,1.0f);
         if (menu.isLit()) {
             int n = Mth.ceil(Mth.clamp(menu.getLitProgress()/ 13f,0,1) * 39.0f) + 1;
-            LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.LIT_PROGRESS, 42, 42, 0, 42 - n, 0, 42 - n, 42, n);
+            LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.LIT_PROGRESS, 42, 42, 0, 42 - n, 0, 42 - n, 42, n);
         }
-        guiGraphics.pose().popPose();
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 114,topPos + 48,0);
-        guiGraphics.pose().scale(1.5f,1.5f,1.0f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(ARROW,0,0,22,15);
-        guiGraphics.pose().popPose();
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 114,topPos + 46.5,0);
-        guiGraphics.pose().scale(0.5f,0.5f,1.0f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.FULL_ARROW,66,48,0,0,0,0,2, (int) Math.ceil(Mth.clamp(menu.getBurnProgress() / 24f ,0,1)* 66), 48);
-        guiGraphics.pose().popPose();
+        poseStack.pose().popPose();
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(leftPos + 114,topPos + 48,0);
+        poseStack.pose().scale(1.5f,1.5f,1.0f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(ARROW,0,0,22,15);
+        poseStack.pose().popPose();
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(leftPos + 114,topPos + 46.5,0);
+        poseStack.pose().scale(0.5f,0.5f,1.0f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.FULL_ARROW,66,48,0,0,0,0,2, (int) Math.ceil(Mth.clamp(menu.getBurnProgress() / 24f ,0,1)* 66), 48);
+        poseStack.pose().popPose();
         if (!recipeBookComponent.isVisible() && recipeButton != null && !recipeButton.isHovered()) recipeButton.setFocused(false);
     }
 }

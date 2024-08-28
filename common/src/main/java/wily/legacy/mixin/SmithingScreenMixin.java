@@ -1,6 +1,6 @@
 package wily.legacy.mixin;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.inventory.CyclingSlotBackground;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.inventory.ItemCombinerScreen;
@@ -33,7 +33,7 @@ public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMen
 
     @Shadow @Final private CyclingSlotBackground additionalIcon;
 
-    @Shadow protected abstract void renderOnboardingTooltips(GuiGraphics arg, int i, int j);
+    @Shadow protected abstract void renderOnboardingTooltips(PoseStack arg, int i, int j);
 
     @Shadow protected abstract boolean hasRecipeError();
 
@@ -53,33 +53,33 @@ public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMen
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void renderBackground(PoseStack poseStack) {
     }
 
     @Override
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL, leftPos, topPos, imageWidth, imageHeight);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 13.5, topPos + 9.5,0f);
-        guiGraphics.pose().scale(2.5f,2.5f,2.5f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMITHING_HAMMER,0,0,15,15);
-        guiGraphics.pose().popPose();
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 82, topPos + 59,0f);
-        guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ARROW,0,0,22,15);
+    public void renderBg(PoseStack poseStack, float f, int i, int j) {
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SMALL_PANEL, leftPos, topPos, imageWidth, imageHeight);
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(leftPos + 13.5, topPos + 9.5,0f);
+        poseStack.pose().scale(2.5f,2.5f,2.5f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SMITHING_HAMMER,0,0,15,15);
+        poseStack.pose().popPose();
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(leftPos + 82, topPos + 59,0f);
+        poseStack.pose().scale(1.5f,1.5f,1.5f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.ARROW,0,0,22,15);
         if (hasRecipeError())
-            LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
-        guiGraphics.pose().popPose();
-        InventoryScreen.renderEntityInInventory(guiGraphics, this.leftPos + 182, this.topPos + 95, 35, ARMOR_STAND_ANGLE, null, this.armorStandPreview);
+            LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
+        poseStack.pose().popPose();
+        InventoryScreen.renderEntityInInventory(poseStack, this.leftPos + 182, this.topPos + 95, 35, ARMOR_STAND_ANGLE, null, this.armorStandPreview);
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        this.templateIcon.render(this.menu, guiGraphics, f, this.leftPos, this.topPos);
-        this.baseIcon.render(this.menu, guiGraphics, f, this.leftPos, this.topPos);
-        this.additionalIcon.render(this.menu, guiGraphics, f, this.leftPos, this.topPos);
-        renderOnboardingTooltips(guiGraphics,i,j);
+    public void render(PoseStack poseStack, int i, int j, float f) {
+        super.render(poseStack, i, j, f);
+        this.templateIcon.render(this.menu, poseStack, f, this.leftPos, this.topPos);
+        this.baseIcon.render(this.menu, poseStack, f, this.leftPos, this.topPos);
+        this.additionalIcon.render(this.menu, poseStack, f, this.leftPos, this.topPos);
+        renderOnboardingTooltips(poseStack,i,j);
     }
 }

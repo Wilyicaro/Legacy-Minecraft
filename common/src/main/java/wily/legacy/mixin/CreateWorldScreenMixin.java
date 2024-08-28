@@ -1,10 +1,10 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
@@ -146,12 +146,12 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         if (resourcePackSelector.scrollableRenderer.mouseScrolled(f)) return true;
         return super.mouseScrolled(d, e, f);
     }
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(guiGraphics,false);
-        resourcePackSelector.renderTooltipBox(guiGraphics,panel);
+    public void render(PoseStack poseStack, int i, int j, float f) {
+        ScreenUtil.renderDefaultBackground(poseStack,false);
+        resourcePackSelector.renderTooltipBox(poseStack,panel);
         for (Renderable renderable : this.renderables)
-            renderable.render(guiGraphics, i, j, f);
-        guiGraphics.drawString(font,NAME_LABEL, panel.x + 14, panel.y + 15, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+            renderable.render(poseStack, i, j, f);
+        poseStack.drawString(font,NAME_LABEL, panel.x + 14, panel.y + 15, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
     }
 
     @Override

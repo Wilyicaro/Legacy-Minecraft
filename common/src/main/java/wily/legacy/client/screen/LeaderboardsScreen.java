@@ -6,9 +6,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
@@ -66,8 +66,8 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
         rebuildRenderableVList(Minecraft.getInstance());
     }
 
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderTransparentBackground(guiGraphics);
+    public void renderDefaultBackground(PoseStack poseStack, int i, int j, float f) {
+        ScreenUtil.renderTransparentBackground(poseStack);
     }
 
     @Override
@@ -147,12 +147,12 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
             String rank =i + 1 + "";
             renderableVList.renderables.add(new AbstractWidget(0,0,551,20,Component.literal(info.legacyMinecraft$getProfile().getName())) {
                 @Override
-                protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+                protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
                     int y = getY() + (getHeight() - font.lineHeight) / 2 + 1;
-                    LegacyGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.LEADERBOARD_BUTTON_HIGHLIGHTED : LegacySprites.LEADERBOARD_BUTTON,getX(),getY(),getWidth(),getHeight());
-                    guiGraphics.drawString(font,rank,getX() + 40 - font.width(rank) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
-                    guiGraphics.drawString(font,getMessage(),getX() + 120 -(font.width(getMessage())) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
-                    guiGraphics.drawString(font,getMessage(),getX() + 120 -(font.width(getMessage())) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                    LegacyGuiGraphics.of(poseStack).blitSprite(isHoveredOrFocused() ? LegacySprites.LEADERBOARD_BUTTON_HIGHLIGHTED : LegacySprites.LEADERBOARD_BUTTON,getX(),getY(),getWidth(),getHeight());
+                    poseStack.drawString(font,rank,getX() + 40 - font.width(rank) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                    poseStack.drawString(font,getMessage(),getX() + 120 -(font.width(getMessage())) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                    poseStack.drawString(font,getMessage(),getX() + 120 -(font.width(getMessage())) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
                     int added = 0;
                     Component hoveredValue = null;
                     for (int index = page; index < statsBoards.get(selectedStatBoard).statsList.size(); index++) {
@@ -161,11 +161,11 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
                         Component value = ControlTooltip.CONTROL_ICON_FUNCTION.apply(stat.format((Legacy4JClient.isModEnabledOnServer() ? info.getStatsMap() : minecraft.player.getStats().stats).getInt(stat)),Style.EMPTY);
                         SimpleLayoutRenderable renderable = statsBoards.get(selectedStatBoard).renderables.get(index);
                         int w = font.width(value);
-                        ScreenUtil.renderScrollingString(guiGraphics,font, value,renderable.getX() + Math.max(0,renderable.getWidth() - w) / 2, getY(),renderable.getX() + Math.min(renderable.getWidth(),(renderable.getWidth() - w)/ 2 + getWidth()), getY() + getHeight(), ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()),true);
+                        ScreenUtil.renderScrollingString(poseStack,font, value,renderable.getX() + Math.max(0,renderable.getWidth() - w) / 2, getY(),renderable.getX() + Math.min(renderable.getWidth(),(renderable.getWidth() - w)/ 2 + getWidth()), getY() + getHeight(), ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()),true);
                         if (ScreenUtil.isMouseOver(i,j,renderable.getX() + Math.max(0,renderable.getWidth() - w) / 2, getY(),Math.min(renderable.getWidth(),w), getHeight())) hoveredValue = value;
                         added++;
                     }
-                    if (hoveredValue != null) guiGraphics.renderTooltip(font,hoveredValue,i,j);
+                    if (hoveredValue != null) poseStack.renderTooltip(font,hoveredValue,i,j);
                 }
 
                 @Override
@@ -180,50 +180,50 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
         super.init();
         if (Legacy4JClient.isModEnabledOnServer()) CommonNetwork.sendToServer(new PlayerInfoSync(0,minecraft.player));
         else minecraft.getConnection().send(new ServerboundClientCommandPacket(ServerboundClientCommandPacket.Action.REQUEST_STATS));
-        addRenderableOnly((guiGraphics, i, j, f) -> {
-            ScreenUtil.renderPointerPanel(guiGraphics,panel.x + 8,panel.y - 18,166,18);
-            ScreenUtil.renderPointerPanel(guiGraphics,panel.x + (panel.width - 211) / 2,panel.y - 18,211,18);
-            ScreenUtil.renderPointerPanel(guiGraphics,panel.x +  panel.width - 174 ,panel.y - 18,166,18);
+        addRenderableOnly((poseStack, i, j, f) -> {
+            ScreenUtil.renderPointerPanel(poseStack,panel.x + 8,panel.y - 18,166,18);
+            ScreenUtil.renderPointerPanel(poseStack,panel.x + (panel.width - 211) / 2,panel.y - 18,211,18);
+            ScreenUtil.renderPointerPanel(poseStack,panel.x +  panel.width - 174 ,panel.y - 18,166,18);
             if (!statsBoards.isEmpty() && selectedStatBoard < statsBoards.size()){
                 StatsBoard board = statsBoards.get(selectedStatBoard);
-                guiGraphics.pose().pushPose();
+                poseStack.pose().pushPose();
                 Component filter = Component.translatable("legacy.menu.leaderboard.filter", myScore ? MY_SCORE : LegacyKeyBindsScreen.NONE);
-                guiGraphics.pose().translate(panel.x + 91 - font.width(filter) / 4f, panel.y - 12,0);
-                guiGraphics.pose().scale(2/3f,2/3f,2/3f);
-                guiGraphics.drawString(font,filter,0, 0,0xFFFFFF);
-                guiGraphics.pose().popPose();
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(panel.x + (panel.width - font.width(board.displayName) / 2f) / 2, panel.y - 12,0);
-                guiGraphics.pose().scale(2/3f,2/3f,2/3f);
-                guiGraphics.drawString(font,board.displayName,0, 0,0xFFFFFF);
-                guiGraphics.pose().popPose();
-                guiGraphics.pose().pushPose();
+                poseStack.pose().translate(panel.x + 91 - font.width(filter) / 4f, panel.y - 12,0);
+                poseStack.pose().scale(2/3f,2/3f,2/3f);
+                poseStack.drawString(font,filter,0, 0,0xFFFFFF);
+                poseStack.pose().popPose();
+                poseStack.pose().pushPose();
+                poseStack.pose().translate(panel.x + (panel.width - font.width(board.displayName) / 2f) / 2, panel.y - 12,0);
+                poseStack.pose().scale(2/3f,2/3f,2/3f);
+                poseStack.drawString(font,board.displayName,0, 0,0xFFFFFF);
+                poseStack.pose().popPose();
+                poseStack.pose().pushPose();
                 Component entries = Component.translatable("legacy.menu.leaderboard.entries",actualRankBoard.size());
-                guiGraphics.pose().translate(panel.x + 477 - font.width(entries) / 4f, panel.y - 12,0);
-                guiGraphics.pose().scale(2/3f,2/3f,2/3f);
-                guiGraphics.drawString(font,entries,0, 0,0xFFFFFF);
-                guiGraphics.pose().popPose();
+                poseStack.pose().translate(panel.x + 477 - font.width(entries) / 4f, panel.y - 12,0);
+                poseStack.pose().scale(2/3f,2/3f,2/3f);
+                poseStack.drawString(font,entries,0, 0,0xFFFFFF);
+                poseStack.pose().popPose();
                 RenderSystem.enableBlend();
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(panel.x + (panel.width - 211) / 2f, panel.y - 12,0);
-                guiGraphics.pose().scale(0.5f,0.5f,0.5f);
-                (ControlType.getActiveType().isKbm() ? ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.LEFT_STICK.bindingState.getIcon()).render(guiGraphics,4,0,false, false);
+                poseStack.pose().pushPose();
+                poseStack.pose().translate(panel.x + (panel.width - 211) / 2f, panel.y - 12,0);
+                poseStack.pose().scale(0.5f,0.5f,0.5f);
+                (ControlType.getActiveType().isKbm() ? ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.LEFT_STICK.bindingState.getIcon()).render(poseStack,4,0,false, false);
                 if (statsInScreen < statsBoards.get(selectedStatBoard).renderables.size()) {
                     ControlTooltip.Icon pageControl = ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon()});
-                    pageControl.render(guiGraphics,422 - pageControl.render(guiGraphics,0,0,false,true) - 8, 0,false,false);
+                    pageControl.render(poseStack,422 - pageControl.render(poseStack,0,0,false,true) - 8, 0,false,false);
                 }
-                guiGraphics.pose().popPose();
+                poseStack.pose().popPose();
                 RenderSystem.disableBlend();
                 if (board.statsList.isEmpty()) {
-                    guiGraphics.pose().pushPose();
-                    guiGraphics.pose().translate(panel.x + (panel.width - font.width(NO_RESULTS) * 1.5f)/2f, panel.y + (panel.height - 13.5f) / 2f,0);
-                    guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-                    guiGraphics.drawString(font,NO_RESULTS,0,0, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-                    guiGraphics.pose().popPose();
+                    poseStack.pose().pushPose();
+                    poseStack.pose().translate(panel.x + (panel.width - font.width(NO_RESULTS) * 1.5f)/2f, panel.y + (panel.height - 13.5f) / 2f,0);
+                    poseStack.pose().scale(1.5f,1.5f,1.5f);
+                    poseStack.drawString(font,NO_RESULTS,0,0, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+                    poseStack.pose().popPose();
                     return;
                 }
-                guiGraphics.drawString(font,RANK,panel.x + 40, panel.y + 20,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-                guiGraphics.drawString(font,USERNAME,panel.x + 108, panel.y + 20,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+                poseStack.drawString(font,RANK,panel.x + 40, panel.y + 20,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+                poseStack.drawString(font,USERNAME,panel.x + 108, panel.y + 20,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
                 int totalWidth = 0;
                 statsInScreen = 0;
                 for (int index = page; index < board.renderables.size(); index++) {
@@ -238,11 +238,11 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
                 for (int index = page; index < page + statsInScreen; index++) {
                     SimpleLayoutRenderable r = board.renderables.get(index);
                     r.setPosition(panel.x + 182 + x,panel.y + 22 - r.height / 2);
-                    r.render(guiGraphics,i,j,f);
+                    r.render(poseStack,i,j,f);
                     if (r.isHovered(i,j)) hovered = index;
                     x+= r.getWidth() + (351 - totalWidth) / statsInScreen;
                 }
-                if (hovered != null) guiGraphics.renderTooltip(font, board.statsList.get(hovered).getValue() instanceof EntityType<?> e ? e.getDescription() : board.statsList.get(hovered).getValue() instanceof ItemLike item && item.asItem() != Items.AIR ? item.asItem().getDescription() : ControlTooltip.getAction("stat." + board.statsList.get(hovered).getValue().toString().replace(':', '.')), i, j);
+                if (hovered != null) poseStack.renderTooltip(font, board.statsList.get(hovered).getValue() instanceof EntityType<?> e ? e.getDescription() : board.statsList.get(hovered).getValue() instanceof ItemLike item && item.asItem() != Items.AIR ? item.asItem().getDescription() : ControlTooltip.getAction("stat." + board.statsList.get(hovered).getValue().toString().replace(':', '.')), i, j);
             }
         });
         renderableVList.init(this,panel.x + 9,panel.y + 39,551,226);
@@ -282,12 +282,12 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
                 return LegacyIconHolder.entityHolder(0,0,24,24, e);
             }
             Component name = Component.translatable("stat." + stat.getValue().toString().replace(':', '.'));
-            return SimpleLayoutRenderable.create(Minecraft.getInstance().font.width(name) * 2/3 + 2,7, (l)->((guiGraphics, i, j, f) -> {
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(l.getX() + 1,l.getY(),0);
-                guiGraphics.pose().scale(2/3f,2/3f,2/3f);
-                guiGraphics.drawString(Minecraft.getInstance().font,name,0,0,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-                guiGraphics.pose().popPose();
+            return SimpleLayoutRenderable.create(Minecraft.getInstance().font.width(name) * 2/3 + 2,7, (l)->((poseStack, i, j, f) -> {
+                poseStack.pose().pushPose();
+                poseStack.pose().translate(l.getX() + 1,l.getY(),0);
+                poseStack.pose().scale(2/3f,2/3f,2/3f);
+                poseStack.drawString(Minecraft.getInstance().font,name,0,0,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+                poseStack.pose().popPose();
             }));
 
         }

@@ -1,9 +1,9 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -92,48 +92,48 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
             if (!e.getExtendedDescription().getString().isEmpty()) description.add(e.getExtendedDescription());
             AbstractButton button = new AbstractButton(0,0,180,30,e.getTitle()) {
                 @Override
-                protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-                    super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
+                protected void renderWidget(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+                    super.renderWidget(poseStack, mouseX, mouseY, partialTicks);
                     RenderSystem.enableBlend();
-                    guiGraphics.blit(e.getIconTexture(), getX() + 5, getY() + 5, 0.0f, 0.0f, 20, 20, 20, 20);
+                    poseStack.blit(e.getIconTexture(), getX() + 5, getY() + 5, 0.0f, 0.0f, 20, 20, 20, 20);
                     RenderSystem.disableBlend();
                     if ((minecraft.options.touchscreen().get().booleanValue() || isHovered) && showHoverOverlay()) {
-                        guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
+                        poseStack.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
                         int p = mouseX - getX();
                         int q = mouseY - getY();
                         if (e.canSelect()) {
                             if (p < 32) {
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.JOIN_HIGHLIGHTED, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.JOIN_HIGHLIGHTED, getX(), getY(), 32, 32);
                             } else {
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.JOIN, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.JOIN, getX(), getY(), 32, 32);
                             }
                         } else {
                             if (e.canUnselect()) {
                                 if (p < 16) {
-                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(UNSELECT_HIGHLIGHTED, getX(), getY(), 32, 32);
+                                    LegacyGuiGraphics.of(poseStack).blitSprite(UNSELECT_HIGHLIGHTED, getX(), getY(), 32, 32);
                                 } else {
-                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(UNSELECT, getX(), getY(), 32, 32);
+                                    LegacyGuiGraphics.of(poseStack).blitSprite(UNSELECT, getX(), getY(), 32, 32);
                                 }
                             }
                             if (e.canMoveUp()) {
                                 if (p < 32 && p > 16 && q < 16) {
-                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TRANSFER_MOVE_UP_HIGHLIGHTED, getX(), getY(), 32, 32);
+                                    LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.TRANSFER_MOVE_UP_HIGHLIGHTED, getX(), getY(), 32, 32);
                                 } else {
-                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TRANSFER_MOVE_UP, getX(), getY(), 32, 32);
+                                    LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.TRANSFER_MOVE_UP, getX(), getY(), 32, 32);
                                 }
                             }
                             if (e.canMoveDown()) {
                                 if (p < 32 && p > 16 && q > 16) {
-                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TRANSFER_MOVE_DOWN_HIGHLIGHTED, getX(), getY(), 32, 32);
+                                    LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.TRANSFER_MOVE_DOWN_HIGHLIGHTED, getX(), getY(), 32, 32);
                                 } else {
-                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TRANSFER_MOVE_DOWN, getX(), getY(), 32, 32);
+                                    LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.TRANSFER_MOVE_DOWN, getX(), getY(), 32, 32);
                                 }
                             }
                         }
                     }
                 }
-                protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                    ScreenUtil.renderScrollingString(guiGraphics,font,getMessage(),getX() + 30,getY(),getX() + width - 2,getY() + height,e.getCompatibility().isCompatible() ? ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()): 0xFF0000,true);
+                protected void renderScrollingString(PoseStack poseStack, Font font, int i, int j) {
+                    ScreenUtil.renderScrollingString(poseStack,font,getMessage(),getX() + 30,getY(),getX() + width - 2,getY() + height,e.getCompatibility().isCompatible() ? ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()): 0xFF0000,true);
                 }
 
                 @Override
@@ -220,17 +220,17 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(guiGraphics);
-        panel.render(guiGraphics, 0,0,0);
+    public void render(PoseStack poseStack, int i, int j, float f) {
+        ScreenUtil.renderDefaultBackground(poseStack);
+        panel.render(poseStack, 0,0,0);
         RenderSystem.enableBlend();
-        guiGraphics.setColor(1.0f,1.0f,1.0f,0.6f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 10, panel.y + 10, 190, 220);
-        guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
+        poseStack.setColor(1.0f,1.0f,1.0f,0.6f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 10, panel.y + 10, 190, 220);
+        poseStack.setColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 210, panel.y + 10, 190, 220);
-        guiGraphics.drawString(this.font, SELECTED_PACK, panel.x + 10 + (190 - font.width(SELECTED_PACK)) / 2, panel.y + 18, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-        guiGraphics.drawString(this.font, AVAILABLE_PACK, panel.x + 210 + (190 - font.width(AVAILABLE_PACK)) / 2, panel.y + 18, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        super.render(guiGraphics, i, j, f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 210, panel.y + 10, 190, 220);
+        poseStack.drawString(this.font, SELECTED_PACK, panel.x + 10 + (190 - font.width(SELECTED_PACK)) / 2, panel.y + 18, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+        poseStack.drawString(this.font, AVAILABLE_PACK, panel.x + 210 + (190 - font.width(AVAILABLE_PACK)) / 2, panel.y + 18, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        super.render(poseStack, i, j, f);
     }
 }

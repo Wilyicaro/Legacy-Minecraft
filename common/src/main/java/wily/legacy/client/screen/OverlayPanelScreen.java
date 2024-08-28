@@ -1,6 +1,6 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -18,18 +18,18 @@ public abstract class OverlayPanelScreen extends PanelBackgroundScreen{
 
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        if (transparentBackground) guiGraphics.fillGradient(0,0,guiGraphics.guiWidth(),guiGraphics.guiHeight(), -1073741824, -805306368);;
+    public void renderDefaultBackground(PoseStack poseStack, int i, int j, float f) {
+        if (transparentBackground) poseStack.fillGradient(0,0,poseStack.guiWidth(),poseStack.guiHeight(), -1073741824, -805306368);;
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void render(PoseStack poseStack, int i, int j, float f) {
         if (parent != null){
-            parent.render(guiGraphics, 0, 0, f);
+            parent.render(poseStack, 0, 0, f);
             deferredTooltipRendering = null;
         }
-        guiGraphics.pose().translate(0,0, 1200);
-        super.render(guiGraphics, i, j, f);
+        poseStack.pose().translate(0,0, 1200);
+        super.render(poseStack, i, j, f);
     }
 
     @Override

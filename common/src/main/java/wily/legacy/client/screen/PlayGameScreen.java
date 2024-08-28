@@ -1,9 +1,9 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -40,7 +40,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     private static final Component SAFETY_CONTENT = Component.translatable("multiplayerWarning.message");
     private static final Component SAFETY_CHECK = Component.translatable("multiplayerWarning.check");
     public boolean isLoading = false;
-    protected final TabList tabList = new TabList().add(30,0,Component.translatable("legacy.menu.load"), b-> repositionElements()).add(30,1,Component.translatable("legacy.menu.create"), b-> repositionElements()).add(30,2,t-> (guiGraphics, i, j, f) -> t.renderString(guiGraphics,font,canNotifyOnlineFriends() ? 0xFFFFFF : CommonColor.INVENTORY_GRAY_TEXT.get(),canNotifyOnlineFriends()),Component.translatable("legacy.menu.join"), b-> {
+    protected final TabList tabList = new TabList().add(30,0,Component.translatable("legacy.menu.load"), b-> repositionElements()).add(30,1,Component.translatable("legacy.menu.create"), b-> repositionElements()).add(30,2,t-> (poseStack, i, j, f) -> t.renderString(poseStack,font,canNotifyOnlineFriends() ? 0xFFFFFF : CommonColor.INVENTORY_GRAY_TEXT.get(),canNotifyOnlineFriends()),Component.translatable("legacy.menu.join"), b-> {
         if (this.minecraft.options.skipMultiplayerWarning)
             repositionElements();
         else minecraft.setScreen(new ConfirmationScreen(this,SAFETY_TITLE,Component.translatable("legacy.menu.multiplayer_warning").append("\n").append(SAFETY_CONTENT)){
@@ -88,15 +88,15 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(guiGraphics,false);
-        tabList.render(guiGraphics,i,j,f);
-        panel.render(guiGraphics,i,j,f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 9, panel.y + 9, panel.width - 18, panel.height - 18 - (tabList.selectedTab == 0 ? 21 : 0));
+    public void renderDefaultBackground(PoseStack poseStack, int i, int j, float f) {
+        ScreenUtil.renderDefaultBackground(poseStack,false);
+        tabList.render(poseStack,i,j,f);
+        panel.render(poseStack,i,j,f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 9, panel.y + 9, panel.width - 18, panel.height - 18 - (tabList.selectedTab == 0 ? 21 : 0));
         if (tabList.selectedTab == 0){
             if (saveRenderableList.currentlyDisplayedLevels != null) {
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(panel.x + 11.25f, panel.y + panel.height - 22.75, 0);
+                poseStack.pose().pushPose();
+                poseStack.pose().translate(panel.x + 11.25f, panel.y + panel.height - 22.75, 0);
                 long storage = new File("/").getTotalSpace();
                 long fixedStorage = SaveRenderableList.sizeCache.asMap().values().stream().max(Comparator.comparingLong(l->l)).orElse(0L) * (saveRenderableList.currentlyDisplayedLevels.size() + 1);
                 long storageSize = fixedStorage != 0 ? Math.min(storage,fixedStorage) : storage;
@@ -104,18 +104,18 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
                     Long size;
                     if ((size = SaveRenderableList.sizeCache.getIfPresent(level)) == null) continue;
                     float scaledSize = size * (panel.width - 21f)/ storageSize;
-                    guiGraphics.pose().pushPose();
-                    guiGraphics.pose().scale(scaledSize,1,1);
-                    guiGraphics.fill(0, 0, 1, 11,getFocused() instanceof AbstractButton b && saveRenderableList.renderables.contains(b) && saveRenderableList.renderables.indexOf(b) == saveRenderableList.currentlyDisplayedLevels.indexOf(level) ? CommonColor.SELECTED_STORAGE_SAVE.get() : CommonColor.STORAGE_SAVE.get());
-                    guiGraphics.pose().popPose();
-                    guiGraphics.pose().translate(scaledSize, 0, 0);
+                    poseStack.pose().pushPose();
+                    poseStack.pose().scale(scaledSize,1,1);
+                    poseStack.fill(0, 0, 1, 11,getFocused() instanceof AbstractButton b && saveRenderableList.renderables.contains(b) && saveRenderableList.renderables.indexOf(b) == saveRenderableList.currentlyDisplayedLevels.indexOf(level) ? CommonColor.SELECTED_STORAGE_SAVE.get() : CommonColor.STORAGE_SAVE.get());
+                    poseStack.pose().popPose();
+                    poseStack.pose().translate(scaledSize, 0, 0);
                 }
-                guiGraphics.pose().popPose();
+                poseStack.pose().popPose();
             }
-            ScreenUtil.renderPanelTranslucentRecess(guiGraphics, panel.x + 9, panel.y + panel.height - 25, panel.width - 18 , 16);
+            ScreenUtil.renderPanelTranslucentRecess(poseStack, panel.x + 9, panel.y + panel.height - 25, panel.width - 18 , 16);
         }
         if (isLoading)
-            ScreenUtil.drawGenericLoading(guiGraphics, panel.x + 112 ,
+            ScreenUtil.drawGenericLoading(poseStack, panel.x + 112 ,
                     panel.y + 66);
     }
 

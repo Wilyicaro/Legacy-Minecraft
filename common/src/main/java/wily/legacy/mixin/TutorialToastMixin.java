@@ -1,6 +1,6 @@
 package wily.legacy.mixin;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.toasts.RecipeToast;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.TutorialToast;
@@ -13,7 +13,7 @@ import wily.legacy.util.ScreenUtil;
 @Mixin(TutorialToast.class)
 public abstract class TutorialToastMixin implements Toast {
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lnet/minecraft/resources/ResourceLocation;IIIIII)V"))
-    public void render(GuiGraphics instance, ResourceLocation resourceLocation, int i, int j, int k, int l, int m, int n) {
+    public void render(PoseStack instance, ResourceLocation resourceLocation, int i, int j, int k, int l, int m, int n) {
         ScreenUtil.renderPointerPanel(instance,i,j,m,n);
     }
 }

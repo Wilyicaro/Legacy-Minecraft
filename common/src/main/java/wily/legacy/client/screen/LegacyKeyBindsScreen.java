@@ -2,10 +2,10 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -46,17 +46,17 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
             lastCategory = keyMapping.getCategory();
             renderableVList.addRenderable(new AbstractButton(0,0,240,20,((LegacyKeyMapping)keyMapping).getDisplayName()) {
                 @Override
-                protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+                protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
                     if (!isFocused() && isPressed()) selectedKey = null;
-                    super.renderWidget(guiGraphics, i, j, f);
+                    super.renderWidget(poseStack, i, j, f);
                     ControlTooltip.Icon icon = ControlTooltip.getKeyIcon(((LegacyKeyMapping) keyMapping).getKey().getValue());
                     Component c = isPressed() ? SELECTION : icon == null ? NONE : null;
                     if (c != null){
-                        guiGraphics.drawString(font,NONE, getX() + width - 20 - font.width(NONE) / 2, getY() + (height -  font.lineHeight) / 2 + 1,0xFFFFFF);
+                        poseStack.drawString(font,NONE, getX() + width - 20 - font.width(NONE) / 2, getY() + (height -  font.lineHeight) / 2 + 1,0xFFFFFF);
                         return;
                     }
                     RenderSystem.enableBlend();
-                    icon.render(guiGraphics, getX() + width - 20 - icon.render(guiGraphics,0,0,false,true) / 2, getY() + (height -  font.lineHeight) / 2 + 1,false,false);
+                    icon.render(poseStack, getX() + width - 20 - icon.render(poseStack,0,0,false,true) / 2, getY() + (height -  font.lineHeight) / 2 + 1,false,false);
                     RenderSystem.disableBlend();
                 }
                 private boolean isPressed(){
@@ -68,8 +68,8 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
                     else selectedKey = keyMapping;
                 }
                 @Override
-                protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                    ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 8, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j,true);
+                protected void renderScrollingString(PoseStack poseStack, Font font, int i, int j) {
+                    ScreenUtil.renderScrollingString(poseStack, font, this.getMessage(), this.getX() + 8, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j,true);
                 }
                 @Override
                 protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -104,8 +104,8 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(guiGraphics,false);
+    public void renderDefaultBackground(PoseStack poseStack, int i, int j, float f) {
+        ScreenUtil.renderDefaultBackground(poseStack,false);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
         panel.height = Math.min(height,293);
         panel.init();
         addRenderableOnly(panel);
-        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, Legacy4JPlatform.getModInfo("minecraft").getVersion() + " " + Legacy4J.VERSION.get(),panel.getX() + panel.getWidth() + 81, panel.getY() + panel.getHeight() - 7,CommonColor.INVENTORY_GRAY_TEXT.get(),false)));
+        addRenderableOnly(((poseStack, i, j, f) -> poseStack.drawString(font, Legacy4JPlatform.getModInfo("minecraft").getVersion() + " " + Legacy4J.VERSION.get(),panel.getX() + panel.getWidth() + 81, panel.getY() + panel.getHeight() - 7,CommonColor.INVENTORY_GRAY_TEXT.get(),false)));
         getRenderableVList().init(this,panel.x + 7,panel.y + 6,panel.width - 14,panel.height);
     }
 }

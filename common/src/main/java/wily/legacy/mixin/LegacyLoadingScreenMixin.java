@@ -1,6 +1,6 @@
 package wily.legacy.mixin;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
@@ -29,7 +29,7 @@ public class LegacyLoadingScreenMixin extends Screen {
 
 
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    public void render(PoseStack poseStack, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         Component lastLoadingHeader = null;
         Component lastLoadingStage = null;
@@ -54,6 +54,6 @@ public class LegacyLoadingScreenMixin extends Screen {
             lastLoadingHeader = p.status;
         }
         legacyLoadingScreen.prepareRender(minecraft,width, height,lastLoadingHeader,lastLoadingStage,progress,genericLoading);
-        legacyLoadingScreen.render(guiGraphics,i,j,f);
+        legacyLoadingScreen.render(poseStack,i,j,f);
     }
 }

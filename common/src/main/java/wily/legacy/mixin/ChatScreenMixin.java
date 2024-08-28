@@ -1,9 +1,9 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.CommandSuggestions;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
@@ -69,14 +69,14 @@ public abstract class ChatScreenMixin extends Screen implements Controller.Event
         return true;
     }
     @Redirect(method = "render",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;render(Lnet/minecraft/client/gui/GuiGraphics;II)V"))
-    private void render(CommandSuggestions instance, GuiGraphics guiGraphics, int i, int j){
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0,(int)(ScreenUtil.getHUDDistance() - 56),200);
-        instance.render(guiGraphics,i,j);
-        guiGraphics.pose().popPose();
+    private void render(CommandSuggestions instance, PoseStack poseStack, int i, int j){
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(0,(int)(ScreenUtil.getHUDDistance() - 56),200);
+        instance.render(poseStack,i,j);
+        poseStack.pose().popPose();
     }
     @Redirect(method = "render",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V"))
-    private void render(GuiGraphics instance, int i, int j, int k, int l, int m){
+    private void render(PoseStack instance, int i, int j, int k, int l, int m){
 
     }
 
