@@ -19,7 +19,7 @@
  "legacy.menu.audio": "オーディオ",
  "legacy.menu.graphics": "グラフィック",
  "legacy.menu.user_interface": "ユーザー インターフェース",
- "legacy.menu.autoSave_message": "このゲームではオートセーブ機能を利用できます。オートセーブの実行中は上のオートセーブ アイコンが表示されます。\n\nオートセーブ アイコンの表示中にデバイスの電源を切らないでください,
+ "legacy.menu.autoSave_message": "このゲームではオートセーブ機能を利用できます。オートセーブの実行中は上のオートセーブ アイコンが表示されます。\n\nオートセーブ アイコンの表示中にデバイスの電源を切らないでください。"
  "legacy.menu.reset_defaults": "デフォルトにリセット",
  "legacy.menu.reset_settings": "設定を元に戻す",
  "legacy.menu.reset_message": "本当に設定を最初の状態に戻してもよろしいですか?",
