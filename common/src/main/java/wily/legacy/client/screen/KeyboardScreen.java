@@ -127,8 +127,12 @@ public class KeyboardScreen extends OverlayPanelScreen {
         renderer.add(()-> ControlType.getActiveType().isKbm() ? null : ControllerBinding.RIGHT_STICK.bindingState.getIcon(), ()-> ControlTooltip.getAction("legacy.action.move_keyboard"));
     }
 
+    private static boolean isSpaceOrEnterPressed(int keyCode) {
+        return keyCode == InputConstants.KEY_SPACE || keyCode == InputConstants.KEY_RETURN;
+    }
+
     public static boolean isOpenKey(int i){
-        return CommonInputs.selected(i) && i != InputConstants.KEY_SPACE;
+        return isSpaceOrEnterPressed(i) && i != InputConstants.KEY_SPACE;
     }
     public static KeyboardScreen fromEditBox(int ordinal, Screen parent){
         return new KeyboardScreen(()->getScreenActualEditBox(ordinal,parent),parent);
@@ -368,7 +372,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
         @Override
         public boolean keyReleased(int i, int j, int k) {
-            if (this.active && this.visible && CommonInputs.selected(i) && pressTime > 0) {
+            if (this.active && this.visible && isSpaceOrEnterPressed(i) && pressTime > 0) {
                 this.onRelease();
                 return true;
             } else {
