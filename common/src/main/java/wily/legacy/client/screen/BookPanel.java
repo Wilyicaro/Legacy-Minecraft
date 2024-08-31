@@ -22,11 +22,11 @@ public class BookPanel extends WidgetPanel implements GuiEventListener, Narratab
     }
     @Override
     public void render(PoseStack poseStack, int i, int j, float f) {
-        poseStack.pose().pushPose();
-        poseStack.pose().translate(getX(),getY(),0);
-        poseStack.pose().scale(getWidth() / 146f,getHeight() / 180f,1f);
+        poseStack.pushPose();
+        poseStack.translate(getX(),getY(),0);
+        poseStack.scale(getWidth() / 146f,getHeight() / 180f,1f);
         poseStack.blit(BookViewScreen.BOOK_LOCATION,0,0,20,1,146,180);
-        poseStack.pose().popPose();
+        poseStack.popPose();
     }
     public PageButton createLegacyPageButton(int i, int j, boolean bl, Button.OnPress onPress, boolean bl2){
         return new PageButton(i,j,bl,onPress,bl2){
@@ -34,12 +34,12 @@ public class BookPanel extends WidgetPanel implements GuiEventListener, Narratab
             @Override
             public void renderWidget(PoseStack poseStack, int i, int j, float f) {
                 isHovered = Util.getMillis() - lastPressTime <= 300 || clicked(i,j);
-                poseStack.pose().pushPose();
-                poseStack.pose().translate(getX(),getY(),1.5f);
-                poseStack.pose().scale(1.5f,1.5f,1.5f);
-                poseStack.pose().translate(-getX(),-getY(),1.5f);
+                poseStack.pushPose();
+                poseStack.translate(getX(),getY(),1.5f);
+                poseStack.scale(1.5f,1.5f,1.5f);
+                poseStack.translate(-getX(),-getY(),1.5f);
                 super.renderWidget(poseStack, i, j, f);
-                poseStack.pose().popPose();
+                poseStack.popPose();
             }
 
             @Override

@@ -185,20 +185,20 @@ public class KeyboardScreen extends OverlayPanelScreen {
         RenderSystem.enableBlend();
         poseStack.setColor(1f,1f,1f,0.8f);
         panel.render(poseStack,i,j,f);
-        poseStack.pose().pushPose();
-        poseStack.pose().translate(panel.getX() + 4.5f,panel.getY() + 25.5,0);
+        poseStack.pushPose();
+        poseStack.translate(panel.getX() + 4.5f,panel.getY() + 25.5,0);
         LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0,0,53, 123);
         LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,panel.getWidth() - 62,0,53, 123);
-        poseStack.pose().translate(-4.5f,0,0);
+        poseStack.translate(-4.5f,0,0);
         LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL_RECESS,(panel.getWidth() - 267) / 2,-1,267, 125);
-        poseStack.pose().popPose();
+        poseStack.popPose();
         RenderSystem.disableBlend();
         poseStack.setColor(1f,1f,1f,1f);
-        poseStack.pose().pushPose();
-        poseStack.pose().translate(panel.getX() + (panel.getWidth() - font.width(KEYBOARD) * 1.5f) / 2,panel.getY() + 8,0);
-        poseStack.pose().scale(1.5f,1.5f,1.5f);
+        poseStack.pushPose();
+        poseStack.translate(panel.getX() + (panel.getWidth() - font.width(KEYBOARD) * 1.5f) / 2,panel.getY() + 8,0);
+        poseStack.scale(1.5f,1.5f,1.5f);
         poseStack.drawString(font,KEYBOARD,0,0, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-        poseStack.pose().popPose();
+        poseStack.popPose();
     }
 
     public record CharButtonBuilder(int width, String chars, String shiftChars, ControllerBinding binding, ResourceLocation iconSprite, SoundEvent downSound){

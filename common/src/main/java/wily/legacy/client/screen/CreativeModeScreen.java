@@ -142,8 +142,8 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     @Override
     public void render(PoseStack poseStack, int i, int j, float f) {
         super.render(poseStack, i, j, f);
-        poseStack.pose().pushPose();
-        poseStack.pose().translate(leftPos + 296.5f, topPos + 27.5f, 0f);
+        poseStack.pushPose();
+        poseStack.translate(leftPos + 296.5f, topPos + 27.5f, 0f);
         Stocker.Sizeable scroll = tabsScrolledList.get(page.get() * 8 + tabList.selectedTab);
         if (scroll.max > 0) {
             if (scroll.get() != scroll.max)
@@ -153,11 +153,11 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
         }else poseStack.setColor(1.0f,1.0f,1.0f,0.5f);
         RenderSystem.enableBlend();
         LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0,13,135);
-        poseStack.pose().translate(-2f, -1f + (scroll.max > 0 ? scroll.get() * 121.5f / scroll.max : 0), 0f);
+        poseStack.translate(-2f, -1f + (scroll.max > 0 ? scroll.get() * 121.5f / scroll.max : 0), 0f);
         LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL,0,0, 16,16);
         poseStack.setColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
-        poseStack.pose().popPose();
+        poseStack.popPose();
         this.renderTooltip(poseStack, i, j);
     }
 

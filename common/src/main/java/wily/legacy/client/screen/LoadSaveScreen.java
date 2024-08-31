@@ -215,16 +215,16 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         super.renderDefaultBackground(poseStack, i, j, f);
         resourcePackSelector.renderTooltipBox(poseStack,panel);
         panel.render(poseStack,i,j,f);
-        poseStack.pose().pushPose();
-        poseStack.pose().translate(0.5f,0,0);
+        poseStack.pushPose();
+        poseStack.translate(0.5f,0,0);
         LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL,panel.x + 12, panel.y + 9, 32,32);
-        poseStack.pose().popPose();
-        poseStack.pose().pushPose();
-        poseStack.pose().translate(0,0.5f,0);
+        poseStack.popPose();
+        poseStack.pushPose();
+        poseStack.translate(0,0.5f,0);
         poseStack.blit(SaveRenderableList.iconCache.getUnchecked(summary).textureLocation(),panel.x + 14, panel.y + 10, 0,0,29,29,29,29);
         poseStack.drawString(font,summary.getLevelName(),panel.x + 48, panel.y + 12, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
         poseStack.drawString(font,Component.translatable("legacy.menu.load_save.created_in", (summary.hasCheats() ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()),panel.x + 48, panel.y + 29, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-        poseStack.pose().popPose();
+        poseStack.popPose();
         poseStack.drawString(font,Component.translatable("commands.seed.success",((LegacyWorldSettings)(Object)summary.getSettings()).getDisplaySeed()),panel.x + 13, panel.y + 49, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
     }
 

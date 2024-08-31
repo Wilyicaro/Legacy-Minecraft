@@ -186,27 +186,27 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
             ScreenUtil.renderPointerPanel(poseStack,panel.x +  panel.width - 174 ,panel.y - 18,166,18);
             if (!statsBoards.isEmpty() && selectedStatBoard < statsBoards.size()){
                 StatsBoard board = statsBoards.get(selectedStatBoard);
-                poseStack.pose().pushPose();
+                poseStack.pushPose();
                 Component filter = Component.translatable("legacy.menu.leaderboard.filter", myScore ? MY_SCORE : LegacyKeyBindsScreen.NONE);
-                poseStack.pose().translate(panel.x + 91 - font.width(filter) / 4f, panel.y - 12,0);
-                poseStack.pose().scale(2/3f,2/3f,2/3f);
+                poseStack.translate(panel.x + 91 - font.width(filter) / 4f, panel.y - 12,0);
+                poseStack.scale(2/3f,2/3f,2/3f);
                 poseStack.drawString(font,filter,0, 0,0xFFFFFF);
-                poseStack.pose().popPose();
-                poseStack.pose().pushPose();
-                poseStack.pose().translate(panel.x + (panel.width - font.width(board.displayName) / 2f) / 2, panel.y - 12,0);
-                poseStack.pose().scale(2/3f,2/3f,2/3f);
+                poseStack.popPose();
+                poseStack.pushPose();
+                poseStack.translate(panel.x + (panel.width - font.width(board.displayName) / 2f) / 2, panel.y - 12,0);
+                poseStack.scale(2/3f,2/3f,2/3f);
                 poseStack.drawString(font,board.displayName,0, 0,0xFFFFFF);
-                poseStack.pose().popPose();
-                poseStack.pose().pushPose();
+                poseStack.popPose();
+                poseStack.pushPose();
                 Component entries = Component.translatable("legacy.menu.leaderboard.entries",actualRankBoard.size());
-                poseStack.pose().translate(panel.x + 477 - font.width(entries) / 4f, panel.y - 12,0);
-                poseStack.pose().scale(2/3f,2/3f,2/3f);
+                poseStack.translate(panel.x + 477 - font.width(entries) / 4f, panel.y - 12,0);
+                poseStack.scale(2/3f,2/3f,2/3f);
                 poseStack.drawString(font,entries,0, 0,0xFFFFFF);
-                poseStack.pose().popPose();
+                poseStack.popPose();
                 RenderSystem.enableBlend();
-                poseStack.pose().pushPose();
-                poseStack.pose().translate(panel.x + (panel.width - 211) / 2f, panel.y - 12,0);
-                poseStack.pose().scale(0.5f,0.5f,0.5f);
+                poseStack.pushPose();
+                poseStack.translate(panel.x + (panel.width - 211) / 2f, panel.y - 12,0);
+                poseStack.scale(0.5f,0.5f,0.5f);
                 (ControlType.getActiveType().isKbm() ? ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.LEFT_STICK.bindingState.getIcon()).render(poseStack,4,0,false, false);
                 if (statsInScreen < statsBoards.get(selectedStatBoard).renderables.size()) {
                     ControlTooltip.Icon pageControl = ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon()});
@@ -215,11 +215,11 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
                 poseStack.pose().popPose();
                 RenderSystem.disableBlend();
                 if (board.statsList.isEmpty()) {
-                    poseStack.pose().pushPose();
-                    poseStack.pose().translate(panel.x + (panel.width - font.width(NO_RESULTS) * 1.5f)/2f, panel.y + (panel.height - 13.5f) / 2f,0);
-                    poseStack.pose().scale(1.5f,1.5f,1.5f);
+                    poseStack.pushPose();
+                    poseStack.translate(panel.x + (panel.width - font.width(NO_RESULTS) * 1.5f)/2f, panel.y + (panel.height - 13.5f) / 2f,0);
+                    poseStack.scale(1.5f,1.5f,1.5f);
                     poseStack.drawString(font,NO_RESULTS,0,0, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-                    poseStack.pose().popPose();
+                    poseStack.popPose();
                     return;
                 }
                 poseStack.drawString(font,RANK,panel.x + 40, panel.y + 20,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
@@ -283,11 +283,11 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
             }
             Component name = Component.translatable("stat." + stat.getValue().toString().replace(':', '.'));
             return SimpleLayoutRenderable.create(Minecraft.getInstance().font.width(name) * 2/3 + 2,7, (l)->((poseStack, i, j, f) -> {
-                poseStack.pose().pushPose();
-                poseStack.pose().translate(l.getX() + 1,l.getY(),0);
-                poseStack.pose().scale(2/3f,2/3f,2/3f);
+                poseStack.pushPose();
+                poseStack.translate(l.getX() + 1,l.getY(),0);
+                poseStack.scale(2/3f,2/3f,2/3f);
                 poseStack.drawString(Minecraft.getInstance().font,name,0,0,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-                poseStack.pose().popPose();
+                poseStack.popPose();
             }));
 
         }

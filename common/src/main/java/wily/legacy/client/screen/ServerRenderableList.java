@@ -162,14 +162,14 @@ public class ServerRenderableList extends RenderableVList {
                     }
                     boolean bl2 = !this.isCompatible();
                     poseStack.drawString(minecraft.font, getMessage(), getX() + 32 + 3, getY() + 3, 0xFFFFFF);
-                    poseStack.pose().pushPose();
-                    poseStack.pose().translate(getX() + 35,  getY() + 10,0);
-                    poseStack.pose().scale(2/3f,2/3f,2/3f);
+                    poseStack.pushPose();
+                    poseStack.translate(getX() + 35,  getY() + 10,0);
+                    poseStack.scale(2/3f,2/3f,2/3f);
                     List<FormattedCharSequence> list = minecraft.font.split(server.motd, Math.max(234,minecraft.font.width(server.motd) / 2 + 20));
                     for (int p = 0; p < Math.min(2,list.size()); ++p) {
                         ScreenUtil.renderScrollingString(poseStack,minecraft.font, list.get(p), 0,  minecraft.font.lineHeight * p,234 , 11 + minecraft.font.lineHeight * p, -8355712, false,minecraft.font.width(list.get(p))* 2/3);
                     }
-                    poseStack.pose().popPose();
+                    poseStack.popPose();
                     Component component = bl2 ? server.version.copy().withStyle(ChatFormatting.RED) : server.status;
                     int q = minecraft.font.width(component);
                     poseStack.drawString(minecraft.font, component, getX() + 270 - q - 15 - 2, getY() + 3, -8355712, false);

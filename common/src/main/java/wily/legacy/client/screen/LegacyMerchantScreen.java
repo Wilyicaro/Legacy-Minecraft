@@ -148,10 +148,10 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
                         } else {
                             graphics.renderItemDecorations(font, baseCostA, -12, 0, baseCostA.getCount() == 1 ? "1" : null);
                             graphics.renderItemDecorations(font, costA, 0, 0, costA.getCount() == 1 ? "1" : null);
-                            graphics.pose().pushPose();
-                            graphics.pose().translate(0.0f, 0.0f, 300.0f);
+                            graphics.pushPose();
+                            graphics.translate(0.0f, 0.0f, 300.0f);
                             LegacyGuiGraphics.of(graphics).blitSprite(DISCOUNT_STRIKETHRUOGH_SPRITE, -5, +12, 0, 9, 2);
-                            graphics.pose().popPose();
+                            graphics.popPose();
                         }
                     }, iconHolder.getX(),iconHolder.getY(),iconHolder.isWarning());
                 }
@@ -286,9 +286,9 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
         if (k >= 5) {
             return;
         }
-        poseStack.pose().pushPose();
-        poseStack.pose().translate(leftPos + (imageWidth - 1.5f* 161) / 2,topPos + 28,0);
-        poseStack.pose().scale(1.5f,1.5f,1.5f);
+        poseStack.pushPose();
+        poseStack.translate(leftPos + (imageWidth - 1.5f* 161) / 2,topPos + 28,0);
+        poseStack.scale(1.5f,1.5f,1.5f);
         LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.EXPERIENCE_BAR_BACKGROUND, 0, 0, 0, 161, 4);
         int m = VillagerData.getMinXpPerLevel(k);
         if (l < m || !VillagerData.canLevelUp(k)) {
@@ -302,7 +302,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
             int q = Math.min(Mth.floor((float)p * f), 161 - o);
             LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.EXPERIENCE_BAR_RESULT, 161, 4, o, 0, o, 0, 0, q, 4);
         }
-        poseStack.pose().popPose();
+        poseStack.popPose();
     }
     @Override
     public void renderLabels(PoseStack poseStack, int i, int j) {
@@ -328,13 +328,13 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
         LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
         LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 12,topPos + 79,110,93);
         LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 126,topPos + 79,157,93);
-        poseStack.pose().pushPose();
-        poseStack.pose().translate(leftPos + 47,topPos + 131,0);
-        poseStack.pose().scale(1.5f,1.5f,1.5f);
+        poseStack.pushPose();
+        poseStack.translate(leftPos + 47,topPos + 131,0);
+        poseStack.scale(1.5f,1.5f,1.5f);
         LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.ARROW,0,0,22,15);
         if (getSelectedMerchantOffer() != null && getSelectedMerchantOffer().isOutOfStock())
             LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
-        poseStack.pose().popPose();
+        poseStack.popPose();
         if (getSelectedMerchantOffer() instanceof LegacyMerchantOffer o && o.getRequiredLevel() > menu.merchantLevel)
             LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PADLOCK, leftPos + 56,  topPos + 134, 16, 16);
         if (menu.showProgressBar)

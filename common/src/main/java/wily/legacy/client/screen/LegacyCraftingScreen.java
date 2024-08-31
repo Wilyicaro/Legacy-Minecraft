@@ -382,20 +382,20 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                             if (i1 > 4) break;
                             ItemStack ing = compactItemStackList.get(i1);
                             ScreenUtil.iconHolderRenderer.itemHolder(180, 124 + 15 * i1, 14, 14, ing, false, Offset.ZERO).render(poseStack, i, j, 0);
-                            poseStack.pose().pushPose();
-                            poseStack.pose().translate(198, 128 + 15 * i1, 0);
-                            poseStack.pose().scale(2 / 3f, 2 / 3f, 2 / 3f);
+                            poseStack.pushPose();
+                            poseStack.translate(198, 128 + 15 * i1, 0);
+                            poseStack.scale(2 / 3f, 2 / 3f, 2 / 3f);
                             poseStack.drawString(font, ing.getHoverName(), 0, 0, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-                            poseStack.pose().popPose();
+                            poseStack.popPose();
                         }
                     }
                 }
             }
         }
-        poseStack.pose().translate(-leftPos,-topPos,0);
+        poseStack.translate(-leftPos,-topPos,0);
         getCraftingButtons().forEach(b-> b.render(poseStack,i,j,0));
         if (selectedCraftingButton < getCraftingButtons().size()) getCraftingButtons().get(selectedCraftingButton).renderSelection(poseStack, i, j, 0);
-        poseStack.pose().translate(leftPos,topPos,0);
+        poseStack.translate(leftPos,topPos,0);
     }
 
     @Override

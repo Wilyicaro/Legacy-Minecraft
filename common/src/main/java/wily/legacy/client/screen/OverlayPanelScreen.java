@@ -28,7 +28,7 @@ public abstract class OverlayPanelScreen extends PanelBackgroundScreen{
             parent.render(poseStack, 0, 0, f);
             deferredTooltipRendering = null;
         }
-        poseStack.pose().translate(0,0, 1200);
+        poseStack.translate(0,0, 1200);
         super.render(poseStack, i, j, f);
     }
 

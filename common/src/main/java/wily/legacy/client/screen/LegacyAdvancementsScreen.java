@@ -89,10 +89,10 @@ public class LegacyAdvancementsScreen extends PanelBackgroundScreen{
             protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
                 if (isFocused()) {
                     selectedAdvancement = node;
-                    poseStack.pose().pushPose();
-                    poseStack.pose().translate(-1.5f, -1.5f, 0);
+                    poseStack.pushPose();
+                    poseStack.translate(-1.5f, -1.5f, 0);
                     LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL_HIGHLIGHT, getX(), getY(), 41, 41);
-                    poseStack.pose().popPose();
+                    poseStack.popPose();
                 }
                 RenderSystem.enableBlend();
                 if (!unlocked) poseStack.setColor(1.0f, 1.0f, 1.0f, 0.5f);
@@ -104,11 +104,11 @@ public class LegacyAdvancementsScreen extends PanelBackgroundScreen{
                 RenderSystem.disableBlend();
                 poseStack.setColor(1.0f, 1.0f, 1.0f, 1.0f);
                 if (!unlocked) return;
-                poseStack.pose().pushPose();
-                poseStack.pose().translate(getX() + (getWidth() - 32) / 2f, getY() + (getHeight() - 32) / 2f, 0);
-                poseStack.pose().scale(2f, 2f, 2f);
+                poseStack.pushPose();
+                poseStack.translate(getX() + (getWidth() - 32) / 2f, getY() + (getHeight() - 32) / 2f, 0);
+                poseStack.scale(2f, 2f, 2f);
                 poseStack.renderFakeItem(info.getIcon(), 0, 0);
-                poseStack.pose().popPose();
+                poseStack.popPose();
             }
 
 

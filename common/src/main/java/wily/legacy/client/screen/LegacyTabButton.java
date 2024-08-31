@@ -66,11 +66,11 @@ public class LegacyTabButton extends AbstractButton {
         LegacyGuiGraphics.of(poseStack).blitSprite(icon, getX() + width / 2 - 12, getY() + height / 2 - 12, 24, 24);
     }
     public  void renderItemIcon(ItemStack itemIcon, PoseStack poseStack){
-        poseStack.pose().pushPose();
-        poseStack.pose().translate(getX() + width / 2f - 12, getY() + height / 2f - 12, 0);
-        poseStack.pose().scale(1.5f, 1.5f, 1.5f);
+        poseStack.pushPose();
+        poseStack.translate(getX() + width / 2f - 12, getY() + height / 2f - 12, 0);
+        poseStack.scale(1.5f, 1.5f, 1.5f);
         poseStack.renderItem(itemIcon, 0, 0);
-        poseStack.pose().popPose();
+        poseStack.popPose();
     }
 
     @Override
@@ -79,7 +79,7 @@ public class LegacyTabButton extends AbstractButton {
         poseStack.setColor(1.0f, 1.0f, 1.0f, this.alpha);
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
-        poseStack.pose().pushPose();
+        poseStack.pushPose();
         Offset translate = offset.apply(this);
         if (!translate.equals(Offset.ZERO)) {
             translate.apply(poseStack.pose());
@@ -92,7 +92,7 @@ public class LegacyTabButton extends AbstractButton {
             if (icon == null) this.renderString(poseStack, minecraft.font, CommonColor.INVENTORY_GRAY_TEXT.get() | Mth.ceil(this.alpha * 255.0f) << 24);
             else icon.apply(this).render(poseStack,i,j,f);
         }
-        poseStack.pose().popPose();
+        poseStack.popPose();
     }
 
     public boolean isMouseOver(double d, double e) {

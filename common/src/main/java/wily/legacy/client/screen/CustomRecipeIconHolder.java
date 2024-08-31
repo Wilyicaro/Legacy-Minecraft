@@ -177,12 +177,12 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
             Slot s = a.getMenu().getSlot(findInventoryMatchSlot());
             ScreenUtil.iconHolderRenderer.slotBounds(a.getMenuRectangle().left(),a.getMenuRectangle().top(),s).renderHighlight(graphics);
         }
-        graphics.pose().pushPose();
+        graphics.pushPose();
         applyOffset(graphics);
         if (!previousItem.isEmpty() && previousItem!=itemIcon || !nextItem.isEmpty() && nextItem!=itemIcon){
             getScrollRenderer().renderScroll(graphics, ScreenDirection.UP,getX() + 5,getY() - 14);
             getScrollRenderer().renderScroll(graphics, ScreenDirection.DOWN,getX() + 5,getY() + 31);
         }
-        graphics.pose().popPose();
+        graphics.popPose();
     }
 }

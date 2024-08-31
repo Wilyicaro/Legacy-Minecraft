@@ -156,11 +156,11 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         isHovered = ScreenUtil.isMouseOver(i, j, getXCorner(), getYCorner(), width, height);
         ResourceLocation sprite = getIconHolderSprite();
         if (sprite != null){
-            graphics.pose().pushPose();
-            graphics.pose().translate(getXCorner(),getYCorner(),0);
+            graphics.pushPose();
+            graphics.translate(getXCorner(),getYCorner(),0);
             applyOffset(graphics);
             LegacyGuiGraphics.of(graphics).blitSprite(sprite, 0, 0, getWidth(), getHeight());
-            graphics.pose().popPose();
+            graphics.popPose();
         }
         if (iconSprite != null) {
             renderIcon(iconSprite, graphics, canSizeIcon(), 16, 16);
@@ -168,14 +168,14 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         renderItem(graphics,i,j,f);
     }
     public void renderIcon(ResourceLocation location,PoseStack graphics, boolean scaled, int width, int height){
-        graphics.pose().pushPose();
-        graphics.pose().translate(getX(), getY(),0);
+        graphics.pushPose();
+        graphics.translate(getX(), getY(),0);
         applyOffset(graphics);
         if (scaled) {
-            graphics.pose().scale(getSelectableWidth() / width,getSelectableHeight() / height,getSelectableHeight() / 16f);
-        }else graphics.pose().translate((getSelectableWidth() - width) / 2,(getSelectableHeight() - height) / 2,0);
+            graphics.scale(getSelectableWidth() / width,getSelectableHeight() / height,getSelectableHeight() / 16f);
+        }else graphics.translate((getSelectableWidth() - width) / 2,(getSelectableHeight() - height) / 2,0);
         LegacyGuiGraphics.of(graphics).blitSprite(location, 0, 0, width, height);
-        graphics.pose().popPose();
+        graphics.popPose();
     }
     public void renderItem(PoseStack graphics, int i, int j, float f){
         renderItem(graphics,itemIcon,getX(),getY(),isWarning());
@@ -191,10 +191,10 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         renderScaled(graphics,x,y,itemRender);
         if (isWarning) {
             RenderSystem.disableDepthTest();
-            graphics.pose().pushPose();
+            graphics.pushPose();
             applyOffset(graphics);
             LegacyGuiGraphics.of(graphics).blitSprite(WARNING_ICON,x,y,8,8);
-            graphics.pose().popPose();
+            graphics.popPose();
             RenderSystem.enableDepthTest();
         }
     }
@@ -212,24 +212,24 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         graphics.disableScissor();
     }
     public void renderSelection(PoseStack graphics, int i, int j, float f){
-        graphics.pose().pushPose();
-        graphics.pose().translate(getXCorner() - 4.5f, getYCorner() - 4.5f, 0f);
+        graphics.pushPose();
+        graphics.translate(getXCorner() - 4.5f, getYCorner() - 4.5f, 0f);
         applyOffset(graphics);
         RenderSystem.disableDepthTest();
         LegacyGuiGraphics.of(graphics).blitSprite(SELECT_ICON_HIGHLIGHT,0,0,36,36);
         RenderSystem.enableDepthTest();
-        graphics.pose().popPose();
+        graphics.popPose();
     }
     public void renderHighlight(PoseStack graphics, int color, int h){
         renderScaled(graphics,getX(),getY(), ()->graphics.fillGradient(RenderType.gui(), 0, 0, 16,16, color, color, h));
     }
     public void renderScaled(PoseStack graphics, float x, float y, Runnable render){
-        graphics.pose().pushPose();
-        graphics.pose().translate(x,y,0);
+        graphics.pushPose();
+        graphics.translate(x,y,0);
         applyOffset(graphics);
-        graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
+        graphics.scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
         render.run();
-        graphics.pose().popPose();
+        graphics.popPose();
     }
     public void renderHighlight(PoseStack graphics, int h){
         renderHighlight(graphics,-2130706433,h);

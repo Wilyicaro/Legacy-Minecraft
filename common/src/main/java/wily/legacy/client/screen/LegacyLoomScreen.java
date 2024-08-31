@@ -236,10 +236,10 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         poseStack.drawString(this.font, title,((craftingTabList.selectedTab != 0 ? imageWidth : imageWidth / 2) - font.width(title)) / 2,17, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         if (menu.inventoryActive) poseStack.drawString(this.font, this.playerInventoryTitle, (355 + 160 - font.width(playerInventoryTitle))/ 2, 114, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         else poseStack.drawString(this.font, PREVIEW, (355 + 160 - font.width(PREVIEW))/ 2, 114, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        poseStack.pose().translate(-leftPos,-topPos,0);
+        poseStack.translate(-leftPos,-topPos,0);
         getCraftingButtons().forEach(b-> b.render(poseStack,i,j,0));
         if (selectedCraftingButton < getCraftingButtons().size()) getCraftingButtons().get(selectedCraftingButton).renderSelection(poseStack, i, j, 0);
-        poseStack.pose().translate(leftPos,topPos,0);
+        poseStack.translate(leftPos,topPos,0);
     }
     @Override
     public void bindingStateTick(BindingState state) {
@@ -429,11 +429,11 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 9, topPos + 103, 163, 105);
         LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 176, topPos + 103, 163, 105);
         if (!menu.inventoryActive && !previewStack.isEmpty()){
-            poseStack.pose().pushPose();
-            poseStack.pose().translate(leftPos + 220.5, topPos + 130.5,0);
-            poseStack.pose().scale(4.25f,4.25f,4.25f);
+            poseStack.pushPose();
+            poseStack.translate(leftPos + 220.5, topPos + 130.5,0);
+            poseStack.scale(4.25f,4.25f,4.25f);
             poseStack.renderItem(previewStack,0,0);
-            poseStack.pose().popPose();
+            poseStack.popPose();
         }
         if (craftingTabList.selectedTab == 0) LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 176, topPos + 8, 163, 93);
         LegacyGuiGraphics.of(poseStack).blitSprite(SMALL_ARROW, leftPos + 97, topPos + 161, 16, 13);

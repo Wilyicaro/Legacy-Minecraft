@@ -64,6 +64,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyGuiGraphics;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.util.JsonUtil;
@@ -181,20 +182,20 @@ public interface ControlTooltip {
             lastPressed = pressed();
 
             if (!simulate && c != null) {
-                graphics.drawString(font,c,x + (co == null || cw > cow ? 0 : (cow - cw) / 2),y,0xFFFFFF,false);
+                guiGraphics.self().drawString(font, c, x + (co == null || cw > cow ? 0 : (cow - cw) / 2), y, 0xFFFFFF, false);
             }
             if (!simulate && co != null){
                 float rel = startPressTime == 0 ? 0 : canLoop() ? getPressInterval() % 1 : Math.min(getPressInterval(),1);
                 float d = 1 - Math.max(0,(rel >= 0.5f ? 1 - rel: rel) * 2/5);
 
-                graphics.pose().pushPose();
-                graphics.pose().translate(x + (c == null || cow > cw ? (cow - cow * d) / 2 : (cw  - cow * d) / 2f),y + (9 - 9 * d) / 2 ,0);
-                graphics.pose().scale(d,d,d);
+                graphics.pushPose();
+                graphics.translate(x + (c == null || cow > cw ? (cow - cow * d) / 2 : (cw - cow * d) / 2f), y + (9 - 9 * d) / 2, 0);
+                graphics.scale(d, d, d);
                 float alpha = RenderSystem.getShaderColor()[3];
-                graphics.setColor(1.0f,1.0f,1.0f,alpha * (0.8f + (rel >= 0.5f ? 0.2f : 0)));
-                graphics.drawString(font,co,0,0,0xFFFFFF,false);
-                graphics.setColor(1.0f,1.0f,1.0f,alpha);
-                graphics.pose().popPose();
+                guiGraphics.setColor(1.0f, 1.0f, 1.0f, alpha * (0.8f + (rel >= 0.5f ? 0.2f : 0)));
+                guiGraphics.self().drawString(font, co, 0, 0, 0xFFFFFF, false);
+                guiGraphics.setColor(1.0f, 1.0f, 1.0f, alpha);
+                graphics.popPose();
             }
             return Math.max(cw,cow);
         }

@@ -45,11 +45,11 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
                 super.renderWidget(poseStack, i, j, f);
                 ItemStack s = LegacyBiomeOverride.getOrDefault(biome.unwrapKey()).icon();
                 if (!s.isEmpty()){
-                    poseStack.pose().pushPose();
-                    poseStack.pose().translate(getX() + 26, getY() + 5,0);
-                    poseStack.pose().scale(1.25f,1.25f,1.25f);
+                    poseStack.pushPose();
+                    poseStack.translate(getX() + 26, getY() + 5,0);
+                    poseStack.scale(1.25f,1.25f,1.25f);
                     poseStack.renderItem(s,0, 0);
-                    poseStack.pose().popPose();
+                    poseStack.popPose();
                 }
                 RenderSystem.enableBlend();
                 LegacyGuiGraphics.of(poseStack).blitSprite(TickBox.SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);

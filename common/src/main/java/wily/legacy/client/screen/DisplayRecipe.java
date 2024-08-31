@@ -32,10 +32,10 @@ public class DisplayRecipe extends GhostRecipe {
         for (int k = 0; k < this.ingredients.size(); ++k) {
             GhostIngredient ghostIngredient = this.ingredients.get(k);
             LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(ingredientSlots.get(k));
-            poseStack.pose().pushPose();
-            poseStack.pose().translate(ghostIngredient.getX() + leftPos, ghostIngredient.getY() + topPos, 0);
+            poseStack.pushPose();
+            poseStack.translate(ghostIngredient.getX() + leftPos, ghostIngredient.getY() + topPos, 0);
             holder.applyOffset(poseStack);
-            poseStack.pose().scale(holder.getSelectableWidth() / 16f,holder.getSelectableHeight() / 16f,holder.getSelectableHeight() / 16f);
+            poseStack.scale(holder.getSelectableWidth() / 16f,holder.getSelectableHeight() / 16f,holder.getSelectableHeight() / 16f);
 
             poseStack.fill(0, 0, 16, 16, 0x30FF0000);
             ItemStack itemStack = ghostIngredient.getItem();
@@ -43,7 +43,7 @@ public class DisplayRecipe extends GhostRecipe {
             poseStack.fill(RenderType.guiGhostRecipeOverlay(), 0, 0, 16,16, 0x30FFFFFF);
             if (k == 0)
                 poseStack.renderItemDecorations(minecraft.font, itemStack, 0, 0);
-            poseStack.pose().popPose();
+            poseStack.popPose();
         }
     }
 }

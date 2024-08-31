@@ -90,10 +90,10 @@ public class LegacyLoadingScreen extends Screen{
             }
         }else ScreenUtil.drawGenericLoading(poseStack,(width - 75 )/ 2, height / 2);
 
-        poseStack.pose().scale(2.0F,2.0F,1.0F);
+        poseStack.scale(2.0F,2.0F,1.0F);
         if (lastLoadingHeader != null)
             ScreenUtil.drawOutlinedString(poseStack, minecraft.font, lastLoadingHeader, (width - minecraft.font.width(lastLoadingHeader) * 2) / 4, (height / 4 - 13), 0xFFFFFF, 0, 0.5f);
-        poseStack.pose().scale(0.5F,0.5F,1.0F);
+        poseStack.scale(0.5F,0.5F,1.0F);
         RenderSystem.enableDepthTest();
     }
 }

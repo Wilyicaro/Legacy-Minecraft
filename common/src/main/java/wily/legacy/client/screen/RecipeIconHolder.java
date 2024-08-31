@@ -139,25 +139,25 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
     @Override
     public void renderSelection(PoseStack graphics, int i, int j, float f) {
         if (isValidIndex()) {
-            graphics.pose().pushPose();
-            graphics.pose().translate(getXCorner() - 4.5f, getYCorner(), 0f);
+            graphics.pushPose();
+            graphics.translate(getXCorner() - 4.5f, getYCorner(), 0f);
             applyOffset(graphics);
             RenderSystem.disableDepthTest();
             if (getFocusedRecipes().size() == 2) {
                 LegacyGuiGraphics.of(graphics).blitSprite(LegacySprites.CRAFTING_2_SLOTS_SELECTION, 0, -12, 36, 78);
             }else if (getFocusedRecipes().size() > 2)
                 LegacyGuiGraphics.of(graphics).blitSprite(LegacySprites.CRAFTING_SELECTION, 0, -39, 36, 105);
-            graphics.pose().popPose();
+            graphics.popPose();
             if (getFocusedRecipes().size() >= 2){
                 ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(1)), 0.5f, (u)-> renderItem(graphics, getFocusedRecipes().get(1).getResultItem(minecraft.level.registryAccess()),getX(),getY() + 27,false));
                 if (getFocusedRecipes().size() >= 3) ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(getFocusedRecipes().size() - 1)), 0.5f, (u)-> renderItem(graphics, getFocusedRecipes().get(getFocusedRecipes().size() - 1).getResultItem(minecraft.level.registryAccess()),getX(),getY() - 27,false));
             }
             RenderSystem.enableDepthTest();
         }
-        graphics.pose().pushPose();
-        graphics.pose().translate(0,selectionOffset * 27,0);
+        graphics.pushPose();
+        graphics.translate(0,selectionOffset * 27,0);
         super.renderSelection(graphics,i,j,f);
-        graphics.pose().popPose();
+        graphics.popPose();
     }
     protected boolean canScroll(){
         return getRecipes().size() >= 3;

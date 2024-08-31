@@ -35,11 +35,11 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen{
                     @Override
                     protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
                         super.renderWidget(poseStack, i, j, f);
-                        poseStack.pose().pushPose();
-                        poseStack.pose().translate(getX() + 5, getY() + 5,0);
-                        poseStack.pose().scale(1.25f,1.25f,1.25f);
+                        poseStack.pushPose();
+                        poseStack.translate(getX() + 5, getY() + 5,0);
+                        poseStack.scale(1.25f,1.25f,1.25f);
                         poseStack.renderItem(preset.displayItem().value().getDefaultInstance(),0, 0);
-                        poseStack.pose().popPose();
+                        poseStack.popPose();
                     }
                     @Override
                     protected void renderScrollingString(PoseStack poseStack, Font font, int i, int j) {

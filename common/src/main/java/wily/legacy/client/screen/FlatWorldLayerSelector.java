@@ -183,14 +183,14 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
         poseStack.drawString(this.font, layerCount,panel.x + 49 - font.width(layerCount),panel. y + 197, 0xFFFFFF, true);
         poseStack.drawString(this.font, selectedLayer.getItem().getDescription(),panel.x + 70,panel. y + 197, 0xFFFFFF, true);
 
-        poseStack.pose().pushPose();
-        poseStack.pose().translate(panel.x + 50, panel.y + 190,0);
-        poseStack.pose().scale(1.25f,1.25f,1.25f);
+        poseStack.pushPose();
+        poseStack.translate(panel.x + 50, panel.y + 190,0);
+        poseStack.scale(1.25f,1.25f,1.25f);
         poseStack.renderItem(selectedLayer,0, 0);
-        poseStack.pose().popPose();
+        poseStack.popPose();
 
-        poseStack.pose().pushPose();
-        poseStack.pose().translate(panel.x + 299.5, panel.y + 23, 0f);
+        poseStack.pushPose();
+        poseStack.translate(panel.x + 299.5, panel.y + 23, 0f);
         if (scrolledList.max > 0) {
             if (scrolledList.get() != scrolledList.max)
                 scrollRenderer.renderScroll(poseStack, ScreenDirection.DOWN, 0, 139);
@@ -203,7 +203,7 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
         LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL,0,0, 16,16);
         poseStack.setColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
-        poseStack.pose().popPose();
+        poseStack.popPose();
     }
 
     @Override
