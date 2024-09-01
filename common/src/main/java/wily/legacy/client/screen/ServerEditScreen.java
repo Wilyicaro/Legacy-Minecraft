@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
@@ -60,9 +60,9 @@ public class ServerEditScreen extends ConfirmationScreen{
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        super.render(guiGraphics, i, j, f);
-        guiGraphics.drawString(this.font, ipBox.getMessage(), panel.x + 15, panel.y + 73, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+    public void render(PoseStack poseStack, int i, int j, float f) {
+        super.render(poseStack, i, j, f);
+        poseStack.drawString(this.font, ipBox.getMessage(), panel.x + 15, panel.y + 73, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
     }
 
     private void updateAddButtonStatus() {

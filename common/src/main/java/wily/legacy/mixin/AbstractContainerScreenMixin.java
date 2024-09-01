@@ -1,10 +1,10 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -65,7 +65,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     @Shadow protected abstract void init();
 
-    @ModifyArg(method = "renderLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)I"), index = 4)
+    @ModifyArg(method = "renderLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;draw(Lcom/mojang/blaze3d/vertex/PoseStack;Ljava/lang/String;FFI)I"), index = 4)
     private int renderLabels(int i){
         return CommonColor.INVENTORY_GRAY_TEXT.get();
     }
@@ -87,13 +87,13 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         if (getChildAt(d,e).isEmpty()) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
     }
     @Inject(method = "renderFloatingItem", at = @At(value = "HEAD"), cancellable = true)
-    private void renderFloatingItem(GuiGraphics guiGraphics, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(i, j, 232.0f);
-        guiGraphics.pose().scale(27/18f, 27/18f, 27/18f);
-        guiGraphics.renderItem(itemStack, 0, 0);
-        guiGraphics.renderItemDecorations(Minecraft.getInstance().font, itemStack, 0, (this.draggingItem.isEmpty() ? 0 : -8), string);
-        guiGraphics.pose().popPose();
+    private void renderFloatingItem(PoseStack poseStack, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(i, j, 232.0f);
+        poseStack.pose().scale(27/18f, 27/18f, 27/18f);
+        poseStack.renderItem(itemStack, 0, 0);
+        poseStack.renderItemDecorations(Minecraft.getInstance().font, itemStack, 0, (this.draggingItem.isEmpty() ? 0 : -8), string);
+        poseStack.pose().popPose();
         ci.cancel();
     }
     @Inject(method = "isHovering(Lnet/minecraft/world/inventory/Slot;DD)Z", at = @At("HEAD"), cancellable = true)
@@ -101,7 +101,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         cir.setReturnValue(ScreenUtil.isHovering(slot,leftPos,topPos,d,e));
     }
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
-    private void renderSlot(GuiGraphics graphics, Slot slot, CallbackInfo ci) {
+    private void renderSlot(PoseStack graphics, Slot slot, CallbackInfo ci) {
         ci.cancel();
         graphics.pose().pushPose();
         LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(slot);

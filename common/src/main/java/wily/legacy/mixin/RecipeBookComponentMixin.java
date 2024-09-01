@@ -1,7 +1,7 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.recipebook.GhostRecipe;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
@@ -46,7 +46,7 @@ public class RecipeBookComponentMixin {
         ((DisplayRecipe)ghostRecipe).addIngredient(ingredient, menu.slots.get(index));
     }
     @Inject(method = "renderGhostRecipeTooltip", at = @At("HEAD"), cancellable = true)
-    private void renderGhostRecipeTooltip(GuiGraphics guiGraphics, int leftPos, int topPos, int k, int l, CallbackInfo info) {
+    private void renderGhostRecipeTooltip(PoseStack poseStack, int leftPos, int topPos, int k, int l, CallbackInfo info) {
         info.cancel();
         ItemStack itemStack = null;
         for (int m = 0; m < this.ghostRecipe.size(); ++m) {
@@ -57,7 +57,7 @@ public class RecipeBookComponentMixin {
             itemStack = ghostRecipe.get(m).getItem();
         }
         if (itemStack != null && minecraft.screen != null) {
-            guiGraphics.renderComponentTooltip(this.minecraft.font, Screen.getTooltipFromItem(this.minecraft, itemStack), k, l);
+            poseStack.renderComponentTooltip(this.minecraft.font, Screen.getTooltipFromItem(this.minecraft, itemStack), k, l);
         }
     }
 }

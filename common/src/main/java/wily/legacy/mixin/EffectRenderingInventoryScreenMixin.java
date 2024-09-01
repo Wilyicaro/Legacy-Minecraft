@@ -1,7 +1,7 @@
 package wily.legacy.mixin;
 
 import com.google.common.collect.Ordering;
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
@@ -32,9 +32,9 @@ public abstract class EffectRenderingInventoryScreenMixin extends AbstractContai
     }
 
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    public void render(PoseStack poseStack, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
-        super.render(guiGraphics, i, j, f);
+        super.render(poseStack, i, j, f);
         int x = this.leftPos + this.imageWidth + 3;
         int l = this.width - x;
         Collection<MobEffectInstance> collection = this.minecraft.player.getActiveEffects();
@@ -49,12 +49,12 @@ public abstract class EffectRenderingInventoryScreenMixin extends AbstractContai
         List<MobEffectInstance> iterable = Ordering.natural().sortedCopy(collection);
         int y = topPos + imageHeight - 28;
         for (MobEffectInstance mobEffectInstance : iterable) {
-            ScreenUtil.renderPointerPanel(guiGraphics,x,y,bl ? 129 : 28, 28);
+            ScreenUtil.renderPointerPanel(poseStack,x,y,bl ? 129 : 28, 28);
             if (bl) {
-                guiGraphics.drawString(this.font, this.getEffectName(mobEffectInstance), x + 25, y + 7, 0xFFFFFF);
-                guiGraphics.drawString(this.font, MobEffectUtil.formatDuration(mobEffectInstance, 1.0f), x + 25, y + 17, 0x7F7F7F);
+                poseStack.drawString(this.font, this.getEffectName(mobEffectInstance), x + 25, y + 7, 0xFFFFFF);
+                poseStack.drawString(this.font, MobEffectUtil.formatDuration(mobEffectInstance, 1.0f), x + 25, y + 17, 0x7F7F7F);
             }
-            guiGraphics.blit(x + (bl ? 3 : 5), y + 5, 0, 18, 18, minecraft.getMobEffectTextures().get(mobEffectInstance.getEffect()));
+            poseStack.blit(x + (bl ? 3 : 5), y + 5, 0, 18, 18, minecraft.getMobEffectTextures().get(mobEffectInstance.getEffect()));
             y -= m;
         }
         if (!bl && i >= x && i <= x + 28) {
@@ -68,7 +68,7 @@ public abstract class EffectRenderingInventoryScreenMixin extends AbstractContai
             }
             if (mobEffectInstance != null) {
                 List<Component> list = List.of(this.getEffectName(mobEffectInstance), MobEffectUtil.formatDuration(mobEffectInstance, 1.0f));
-                guiGraphics.renderTooltip(this.font, list, Optional.empty(), i, j);
+                poseStack.renderTooltip(this.font, list, Optional.empty(), i, j);
             }
         }
 

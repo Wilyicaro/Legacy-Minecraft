@@ -1,9 +1,8 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.network.chat.Component;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.init.LegacyRegistries;
@@ -55,9 +54,9 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
     }
 
     @Override
-    public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void renderWidget(PoseStack poseStack, int i, int j, float f) {
         setMessage(messageGetter.apply(this));
-        super.renderWidget(guiGraphics, i, j, f);
+        super.renderWidget(poseStack, i, j, f);
     }
 
     public void setFocused(boolean bl) {

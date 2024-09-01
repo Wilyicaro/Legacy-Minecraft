@@ -1,9 +1,9 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.BossHealthOverlay;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -30,7 +30,7 @@ public abstract class BossHealthOverlayMixin {
     private static final ResourceLocation[] OVERLAY_PROGRESS_SPRITES = new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/notched_6_progress"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/notched_10_progress"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/notched_12_progress"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/notched_20_progress")};
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)I"))
-    public int drawString(GuiGraphics graphics, Font font, Component component, int i, int j, int k) {
+    public int drawString(PoseStack graphics, Font font, Component component, int i, int j, int k) {
         graphics.pose().pushPose();
         graphics.pose().translate((graphics.guiWidth() - font.width(component) * 2/3f) / 2,j,0);
         graphics.pose().scale(2/3f,2/3f,2/3f);
@@ -41,7 +41,7 @@ public abstract class BossHealthOverlayMixin {
     }
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, CallbackInfo ci) {
+    public void render(PoseStack poseStack, CallbackInfo ci) {
         if (minecraft.screen != null) {
             ci.cancel();
             return;
@@ -51,7 +51,7 @@ public abstract class BossHealthOverlayMixin {
 
     }
     @Inject(method = "render", at = @At("RETURN"))
-    public void renderReturn(GuiGraphics guiGraphics, CallbackInfo ci) {
+    public void renderReturn(PoseStack poseStack, CallbackInfo ci) {
         if (minecraft.screen != null) return;
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f, 1.0f);
         RenderSystem.disableBlend();
@@ -60,32 +60,32 @@ public abstract class BossHealthOverlayMixin {
     public int render(int i) {
         return 28;
     }
-    @Inject(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At("HEAD"))
-    private void drawBar(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, CallbackInfo ci) {
-        guiGraphics.pose().pushPose();
+    @Inject(method = "drawBar(Lcom/mojang/blaze3d/vertex/PoseStack;IILnet/minecraft/world/BossEvent;)V", at = @At("HEAD"))
+    private void drawBar(PoseStack poseStack, int i, int j, BossEvent bossEvent, CallbackInfo ci) {
+        poseStack.pose().pushPose();
         RenderSystem.enableBlend();
-        guiGraphics.pose().translate((guiGraphics.guiWidth() - 203) / 2f,j,0);
-        guiGraphics.pose().scale(0.5f,0.5f,0.5f);
+        poseStack.pose().translate((poseStack.guiWidth() - 203) / 2f,j,0);
+        poseStack.pose().scale(0.5f,0.5f,0.5f);
     }
-    @Inject(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At("RETURN"))
-    private void drawBarReturn(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, CallbackInfo ci) {
+    @Inject(method = "drawBar(Lcom/mojang/blaze3d/vertex/PoseStack;IILnet/minecraft/world/BossEvent;)V", at = @At("RETURN"))
+    private void drawBarReturn(PoseStack poseStack, int i, int j, BossEvent bossEvent, CallbackInfo ci) {
         RenderSystem.disableBlend();
-        guiGraphics.pose().popPose();
+        poseStack.pose().popPose();
     }
-    @Redirect(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/BossHealthOverlay;drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;II)V", ordinal = 0))
-    private void drawBar(BossHealthOverlay instance, GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, int k, int l) {
-        drawBar(guiGraphics,0,0,bossEvent,406,BAR_BACKGROUND_SPRITES,OVERLAY_BACKGROUND_SPRITES);
+    @Redirect(method = "drawBar(Lcom/mojang/blaze3d/vertex/PoseStack;IILnet/minecraft/world/BossEvent;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/BossHealthOverlay;drawBar(Lcom/mojang/blaze3d/vertex/PoseStack;IILnet/minecraft/world/BossEvent;II)V", ordinal = 0))
+    private void drawBar(BossHealthOverlay instance, PoseStack poseStack, int i, int j, BossEvent bossEvent, int k, int l) {
+        drawBar(poseStack,0,0,bossEvent,406,BAR_BACKGROUND_SPRITES,OVERLAY_BACKGROUND_SPRITES);
     }
-    @Redirect(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/BossHealthOverlay;drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;II)V",ordinal = 1))
-    private void drawBarProgress(BossHealthOverlay instance, GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, int k, int l) {
-        guiGraphics.pose().translate(3f,0,0);
-        drawBar(guiGraphics,0,0,bossEvent, lerpDiscrete(bossEvent.getProgress(), 0, 400),BAR_PROGRESS_SPRITES,OVERLAY_PROGRESS_SPRITES);
+    @Redirect(method = "drawBar(Lcom/mojang/blaze3d/vertex/PoseStack;IILnet/minecraft/world/BossEvent;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/BossHealthOverlay;drawBar(Lcom/mojang/blaze3d/vertex/PoseStack;IILnet/minecraft/world/BossEvent;II)V", ordinal = 1))
+    private void drawBarProgress(BossHealthOverlay instance, PoseStack poseStack, int i, int j, BossEvent bossEvent, int k, int l) {
+        poseStack.pose().translate(3f,0,0);
+        drawBar(poseStack,0,0,bossEvent, lerpDiscrete(bossEvent.getProgress(), 0, 400),BAR_PROGRESS_SPRITES,OVERLAY_PROGRESS_SPRITES);
     }
-    private void drawBar(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, int k, ResourceLocation[] resourceLocations, ResourceLocation[] resourceLocations2) {
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocations[bossEvent.getColor().ordinal()], k <= 400 ? 400 : 406, 15, 0, 0, i, j, k, 15);
+    private void drawBar(PoseStack poseStack, int i, int j, BossEvent bossEvent, int k, ResourceLocation[] resourceLocations, ResourceLocation[] resourceLocations2) {
+        LegacyGuiGraphics.of(poseStack).blitSprite(resourceLocations[bossEvent.getColor().ordinal()], k <= 400 ? 400 : 406, 15, 0, 0, i, j, k, 15);
         if (bossEvent.getOverlay() != BossEvent.BossBarOverlay.PROGRESS) {
             RenderSystem.enableBlend();
-            LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocations2[bossEvent.getOverlay().ordinal() - 1], k <= 400 ? 400 : 406, 15, 0, 0, i, j, k, 15);
+            LegacyGuiGraphics.of(poseStack).blitSprite(resourceLocations2[bossEvent.getOverlay().ordinal() - 1], k <= 400 ? 400 : 406, 15, 0, 0, i, j, k, 15);
             RenderSystem.disableBlend();
         }
 

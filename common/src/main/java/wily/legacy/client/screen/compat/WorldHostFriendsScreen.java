@@ -2,6 +2,7 @@ package wily.legacy.client.screen.compat;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.gaming32.worldhost.WorldHost;
 import io.github.gaming32.worldhost.WorldHostComponents;
 import io.github.gaming32.worldhost.gui.screen.AddFriendScreen;
@@ -10,7 +11,6 @@ import io.github.gaming32.worldhost.versions.Components;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
@@ -111,14 +111,14 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
                 }
 
                 @Override
-                public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-                    super.render(guiGraphics, i, j, f);
-                    LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL,panel.getX() + panel.getWidth() - 47, panel.getY() + 9, 32,32);
+                public void render(PoseStack poseStack, int i, int j, float f) {
+                    super.render(poseStack, i, j, f);
+                    LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL,panel.getX() + panel.getWidth() - 47, panel.getY() + 9, 32,32);
                     if (friend != null){
-                        guiGraphics.pose().pushPose();
-                        guiGraphics.pose().translate(1.5f,1.5f,0);
-                        PlayerFaceRenderer.draw(guiGraphics, minecraft.getSkinManager().getInsecureSkinLocation(friend), panel.getX() + panel.getWidth() - 47, panel.getY() + 9, 29);
-                        guiGraphics.pose().popPose();
+                        poseStack.pose().pushPose();
+                        poseStack.pose().translate(1.5f,1.5f,0);
+                        PlayerFaceRenderer.draw(poseStack, minecraft.getSkinManager().getInsecureSkinLocation(friend), panel.getX() + panel.getWidth() - 47, panel.getY() + 9, 29);
+                        poseStack.pose().popPose();
                     }
                 }
 
@@ -153,14 +153,14 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
                 skin.get();
                 renderableVList.addRenderable(new AbstractButton(0, 0, 230, 30, Component.literal(WorldHost.getName(profile))) {
                     @Override
-                    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                        super.renderWidget(guiGraphics, i, j, f);
-                        PlayerFaceRenderer.draw(guiGraphics, skin.get(), getX() + 5, getY() + 5, 20);
+                    protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
+                        super.renderWidget(poseStack, i, j, f);
+                        PlayerFaceRenderer.draw(poseStack, skin.get(), getX() + 5, getY() + 5, 20);
                     }
 
                     @Override
-                    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                        ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 30, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
+                    protected void renderScrollingString(PoseStack poseStack, Font font, int i, int j) {
+                        ScreenUtil.renderScrollingString(poseStack, font, this.getMessage(), getX() + 30, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
                     }
 
                     @Override
@@ -197,8 +197,8 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
 
     }
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        panel.render(guiGraphics,i,j,f);
-        guiGraphics.drawString(font,getTitle(),panel.x + 11, panel.y + 8, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+    public void renderDefaultBackground(PoseStack poseStack, int i, int j, float f) {
+        panel.render(poseStack,i,j,f);
+        poseStack.drawString(font,getTitle(),panel.x + 11, panel.y + 8, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
 }

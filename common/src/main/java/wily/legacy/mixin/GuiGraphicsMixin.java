@@ -3,7 +3,6 @@ package wily.legacy.mixin;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
@@ -28,11 +27,11 @@ import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
 
-@Mixin(GuiGraphics.class)
+@Mixin(GuiComponent.class)
 public abstract class GuiGraphicsMixin implements LegacyGuiGraphics {
     @Override
-    public GuiGraphics self() {
-        return (GuiGraphics) (Object) this;
+    public PoseStack self() {
+        return (PoseStack) (Object) this;
     }
 
     @Shadow @Final private PoseStack pose;
@@ -84,7 +83,7 @@ public abstract class GuiGraphicsMixin implements LegacyGuiGraphics {
         return instance.positionTooltip(guiWidth(),guiHeight,x,y, (int) (width * ScreenUtil.getTextScale()), (int) (height * ScreenUtil.getTextScale()));
     }
     @Redirect(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipComponent;renderImage(Lnet/minecraft/client/gui/Font;IILnet/minecraft/client/gui/GuiGraphics;)V"))
-    private void renderTooltipInternal(ClientTooltipComponent instance, Font font, int i, int j, GuiGraphics guiGraphics){
+    private void renderTooltipInternal(ClientTooltipComponent instance, Font font, int i, int j, PoseStack guiGraphics){
         instance.renderImage(font, (int)(i / ScreenUtil.getTextScale()),(int)(j / ScreenUtil.getTextScale()),guiGraphics);
     }
     @Redirect(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipComponent;renderText(Lnet/minecraft/client/gui/Font;IILorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V"))

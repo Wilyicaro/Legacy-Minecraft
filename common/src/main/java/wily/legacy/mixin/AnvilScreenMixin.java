@@ -1,7 +1,7 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AnvilScreen;
 import net.minecraft.client.gui.screens.inventory.ItemCombinerScreen;
@@ -53,9 +53,9 @@ public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
     }
 
     @Inject(method = "renderLabels",at = @At("HEAD"), cancellable = true)
-    public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+    public void renderLabels(PoseStack poseStack, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        super.renderLabels(guiGraphics, i, j);
+        super.renderLabels(poseStack, i, j);
         int k = this.menu.getCost();
         if (k > 0) {
             Component component;
@@ -73,7 +73,7 @@ public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
             }
             if (component != null) {
                 int m = this.imageWidth - 8 - this.font.width(component) - 2;
-                guiGraphics.drawString(this.font, component, m, 90, l);
+                poseStack.drawString(this.font, component, m, 90, l);
             }
         }
     }
@@ -93,29 +93,29 @@ public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
     }
 
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void renderBackground(PoseStack poseStack) {
     }
 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
-    public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    public void renderBg(PoseStack poseStack, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 13.5, topPos + 9.5,0f);
-        guiGraphics.pose().scale(2.5f,2.5f,2.5f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ANVIL_HAMMER,0,0,15,15);
-        guiGraphics.pose().popPose();
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 53, topPos + 60,0f);
-        guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.COMBINER_PLUS,0,0,13,13);
-        guiGraphics.pose().popPose();
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 122, topPos + 59,0f);
-        guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ARROW,0,0,22,15);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(leftPos + 13.5, topPos + 9.5,0f);
+        poseStack.pose().scale(2.5f,2.5f,2.5f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.ANVIL_HAMMER,0,0,15,15);
+        poseStack.pose().popPose();
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(leftPos + 53, topPos + 60,0f);
+        poseStack.pose().scale(1.5f,1.5f,1.5f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.COMBINER_PLUS,0,0,13,13);
+        poseStack.pose().popPose();
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(leftPos + 122, topPos + 59,0f);
+        poseStack.pose().scale(1.5f,1.5f,1.5f);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.ARROW,0,0,22,15);
         if ((this.menu.getSlot(0).hasItem() || this.menu.getSlot(1).hasItem()) && !this.menu.getSlot(this.menu.getResultSlot()).hasItem())
-            LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
-        guiGraphics.pose().popPose();
+            LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
+        poseStack.pose().popPose();
     }
 }

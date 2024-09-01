@@ -1,6 +1,6 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
@@ -18,8 +18,8 @@ public class LegacyLanguageScreen extends PanelVListScreen{
         manager.getLanguages().forEach(((s, languageInfo) -> {
             renderableVList.addRenderable(new AbstractButton(0,0,260,20,languageInfo.toComponent()) {
                 @Override
-                protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                    super.renderWidget(guiGraphics, i, j, f);
+                protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
+                    super.renderWidget(poseStack, i, j, f);
                     if (manager.getSelected().equals(s)) setFocused(true);
                 }
 
@@ -50,7 +50,7 @@ public class LegacyLanguageScreen extends PanelVListScreen{
     protected void init() {
         panel.init();
         addRenderableOnly(panel);
-        addRenderableOnly(((guiGraphics, i, j, f) -> LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 6, panel.y + 24, panel.width - 12, panel.height - 34)));
+        addRenderableOnly(((poseStack, i, j, f) -> LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 6, panel.y + 24, panel.width - 12, panel.height - 34)));
         getRenderableVList().init(this,panel.x + 10,panel.y + 30,panel.width - 20,panel.height - 28);
         addRenderableWidget(minecraft.options.forceUnicodeFont().createButton(minecraft.options,panel.x + 10, panel.y + 10, panel.width - 20));
     }

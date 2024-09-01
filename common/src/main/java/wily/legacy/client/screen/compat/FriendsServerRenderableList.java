@@ -2,18 +2,18 @@ package wily.legacy.client.screen.compat;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.gaming32.worldhost.FriendsListUpdate;
 import io.github.gaming32.worldhost.WorldHost;
 import io.github.gaming32.worldhost.mixin.ServerStatusPingerAccessor;
 import io.github.gaming32.worldhost.versions.Components;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.screens.FaviconTexture;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.chat.Component;
@@ -79,25 +79,25 @@ public class FriendsServerRenderableList extends ServerRenderableList {
                     }
 
                     @Override
-                    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                        ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
+                    protected void renderScrollingString(PoseStack poseStack, Font font, int i, int j) {
+                        ScreenUtil.renderScrollingString(poseStack, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
                     }
 
                     @Override
-                    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float f) {
-                        super.renderWidget(guiGraphics, mouseX, mouseY, f);
+                    protected void renderWidget(PoseStack poseStack, int mouseX, int mouseY, float f) {
+                        super.renderWidget(poseStack, mouseX, mouseY, f);
                         updateServerInfo();
                         byte[] bs = serverData.getIconBytes();
                         if (!Arrays.equals(bs, this.lastIconBytes)) {
                             if (this.uploadServerIcon(bs)) this.lastIconBytes = bs;
                             else serverData.setIconBytes(null);
                         }
-                        if (serverData.getIconBytes() == null) PlayerFaceRenderer.draw(guiGraphics, minecraft.getSkinManager().getInsecureSkinLocation(profile),getX() + 5, getY() + 5, 20);
-                        else drawIcon(guiGraphics, getX(), getY(),icon.textureLocation());
+                        if (serverData.getIconBytes() == null) PlayerFaceRenderer.draw(poseStack, minecraft.getSkinManager().getInsecureSkinLocation(profile),getX() + 5, getY() + 5, 20);
+                        else drawIcon(poseStack, getX(), getY(),icon.textureLocation());
                         if (minecraft.options.touchscreen().get().booleanValue() || isHovered) {
-                            guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
+                            poseStack.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
                             int u = mouseX - getX();
-                            LegacyGuiGraphics.of(guiGraphics).blitSprite(u < 30 && u > 5 ? LegacySprites.JOIN_HIGHLIGHTED : LegacySprites.JOIN, getX(), getY(), 32, 32);
+                            LegacyGuiGraphics.of(poseStack).blitSprite(u < 30 && u > 5 ? LegacySprites.JOIN_HIGHLIGHTED : LegacySprites.JOIN, getX(), getY(), 32, 32);
                         }
                     }
 

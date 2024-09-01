@@ -1,6 +1,6 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import wily.legacy.client.LegacyGuiGraphics;
@@ -44,8 +44,8 @@ public class Panel extends SimpleLayoutRenderable {
             }
 
             @Override
-            public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-                ScreenUtil.renderPointerPanel(guiGraphics,getX(),getY(),getWidth(),getHeight());
+            public void render(PoseStack poseStack, int i, int j, float f) {
+                ScreenUtil.renderPointerPanel(poseStack,getX(),getY(),getWidth(),getHeight());
             }
         };
         return p;
@@ -54,7 +54,7 @@ public class Panel extends SimpleLayoutRenderable {
         setX(updatedX.apply(this));
         setY(updatedY.apply(this));
     }
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(panelSprite, x, y, width, height);
+    public void render(PoseStack poseStack, int i, int j, float f) {
+        LegacyGuiGraphics.of(poseStack).blitSprite(panelSprite, x, y, width, height);
     }
 }

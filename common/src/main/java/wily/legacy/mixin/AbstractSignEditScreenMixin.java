@@ -3,10 +3,9 @@ package wily.legacy.mixin;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.font.TextFieldHelper;
-import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
 import net.minecraft.client.gui.screens.inventory.HangingSignEditScreen;
@@ -62,7 +61,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
         }
     };
 
-    @Shadow protected abstract void renderSign(GuiGraphics arg);
+    @Shadow protected abstract void renderSign(PoseStack arg);
 
     @Shadow @Final private SignBlockEntity sign;
 
@@ -100,20 +99,20 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
     }
 
     @Redirect(method = "renderSignText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I", ordinal = 1))
-    private int renderSignText(GuiGraphics instance, Font arg, String string, int i, int j, int k, boolean bl){
+    private int renderSignText(PoseStack instance, Font arg, String string, int i, int j, int k, boolean bl){
         return getFocused() == panel ? instance.drawString(arg,string,i,j,k,bl) : -1;
     }
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    public void render(PoseStack poseStack, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
-        super.render(guiGraphics, i, j, f);
+        super.render(poseStack, i, j, f);
         Lighting.setupForFlatItems();
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate((width - font.width(title)*1.5f)/ 2f, height / 2f - 96, 0);
-        guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        guiGraphics.drawString(this.font, this.title, 0, 0, 16777215);
-        guiGraphics.pose().popPose();
-        this.renderSign(guiGraphics);
+        poseStack.pose().pushPose();
+        poseStack.pose().translate((width - font.width(title)*1.5f)/ 2f, height / 2f - 96, 0);
+        poseStack.pose().scale(1.5f,1.5f,1.5f);
+        poseStack.drawString(this.font, this.title, 0, 0, 16777215);
+        poseStack.pose().popPose();
+        this.renderSign(poseStack);
         Lighting.setupFor3DItems();
     }
     @Inject(method = "keyPressed",at = @At("HEAD"), cancellable = true)
@@ -136,7 +135,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
         if (!canSaveChanges) ci.cancel();
     }
     @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
+    public void renderBackground(PoseStack poseStack) {
     }
 
 }

@@ -8,15 +8,15 @@ import com.google.common.hash.Hashing;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.packs.PackSelectionModel;
@@ -97,10 +97,10 @@ public class PackSelector extends AbstractWidget {
     public void updateTooltip(){
         if (hasTooltip) setTooltip(Tooltip.create(selectedPack.getDescription(), selectedPack.getTitle()));
     }
-    public void renderTooltipBox(GuiGraphics guiGraphics, Panel panel){
-        renderTooltipBox(guiGraphics,panel.x + panel.width - 2, panel.y + 5, 161, panel.height - 10);
+    public void renderTooltipBox(PoseStack poseStack, Panel panel){
+        renderTooltipBox(poseStack,panel.x + panel.width - 2, panel.y + 5, 161, panel.height - 10);
     }
-    public void renderTooltipBox(GuiGraphics graphics, int x, int y, int width, int height){
+    public void renderTooltipBox(PoseStack graphics, int x, int y, int width, int height){
         if (!ScreenUtil.hasTooltipBoxes()) return;
         ScreenUtil.renderPointerPanel(graphics,x, y,width,height);
         if (selectedPack != null){
@@ -232,25 +232,25 @@ public class PackSelector extends AbstractWidget {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+    protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
         Font font = minecraft.font;
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,getX() -1,getY()+ font.lineHeight -1 , width + 2,height + 2 - minecraft.font.lineHeight);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.PANEL_RECESS,getX() -1,getY()+ font.lineHeight -1 , width + 2,height + 2 - minecraft.font.lineHeight);
         List<Pack> displayPacks = getDisplayPacks();
         int visibleCount = 0;
         RenderSystem.enableBlend();
         for (int index = 0; index < displayPacks.size(); index++) {
             if (visibleCount>=getMaxPacks()) break;
-            guiGraphics.blit(getPackIcon(displayPacks.get(scrolledList.get() + index)), getX() + 21 + 30 * index,getY() + font.lineHeight + 4,0.0f, 0.0f, 28, 28, 28, 28);
-            if (model.selected.contains(displayPacks.get(scrolledList.get() + index)))  LegacyGuiGraphics.of(guiGraphics).blitSprite(PACK_SELECTED, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
+            poseStack.blit(getPackIcon(displayPacks.get(scrolledList.get() + index)), getX() + 21 + 30 * index,getY() + font.lineHeight + 4,0.0f, 0.0f, 28, 28, 28, 28);
+            if (model.selected.contains(displayPacks.get(scrolledList.get() + index)))  LegacyGuiGraphics.of(poseStack).blitSprite(PACK_SELECTED, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
             if (scrolledList.get() + index == selectedIndex)
-                LegacyGuiGraphics.of(guiGraphics).blitSprite(PACK_HIGHLIGHTED, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
+                LegacyGuiGraphics.of(poseStack).blitSprite(PACK_HIGHLIGHTED, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
             visibleCount++;
         }
         RenderSystem.disableBlend();
-        guiGraphics.drawString(font,getMessage(),getX() + 1,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused());
+        poseStack.drawString(font,getMessage(),getX() + 1,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused());
         if (scrolledList.max > 0){
-            if (scrolledList.get() < scrolledList.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
-            if (scrolledList.get() > 0) scrollRenderer.renderScroll(guiGraphics,ScreenDirection.LEFT,getX() + 8, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
+            if (scrolledList.get() < scrolledList.max) scrollRenderer.renderScroll(poseStack, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
+            if (scrolledList.get() > 0) scrollRenderer.renderScroll(poseStack,ScreenDirection.LEFT,getX() + 8, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
         }
     }
     public static ResourceLocation loadPackIcon(TextureManager textureManager, Pack pack, String icon, ResourceLocation fallback) {

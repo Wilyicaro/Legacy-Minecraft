@@ -1,8 +1,8 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -33,17 +33,17 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     }
 
     @Inject(method = "renderWithTooltip",at = @At("HEAD"))
-    private void renderWithTooltip(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci){
+    private void renderWithTooltip(PoseStack poseStack, int i, int j, float f, CallbackInfo ci){
         LegacyTipManager.tipDiffPercentage = Math.max(-0.5f,Math.min(LegacyTipManager.tipDiffPercentage + (LegacyTipManager.getActualTip() == null ? -0.1f : 0.08f) * minecraft.getDeltaFrameTime(),1.5f));
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(LegacyTipManager.getTipXDiff(),0,0);
+        poseStack.pose().pushPose();
+        poseStack.pose().translate(LegacyTipManager.getTipXDiff(),0,0);
     }
     @Inject(method = "renderWithTooltip",at = @At("RETURN"))
-    private void renderWithTooltipReturn(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci){
-        guiGraphics.pose().translate(-LegacyTipManager.getTipXDiff(),0,0);
-        guiGraphics.flush();
-        ControlTooltip.Renderer.of(this).render(guiGraphics,i,j,f);
-        guiGraphics.pose().popPose();
+    private void renderWithTooltipReturn(PoseStack poseStack, int i, int j, float f, CallbackInfo ci){
+        poseStack.pose().translate(-LegacyTipManager.getTipXDiff(),0,0);
+        poseStack.flush();
+        ControlTooltip.Renderer.of(this).render(poseStack,i,j,f);
+        poseStack.pose().popPose();
     }
 
 
@@ -56,8 +56,8 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
         ScreenUtil.playSimpleUISound(LegacyRegistries.BACK.get(),1.0f);
     }
     @Inject(method = "renderBackground",at = @At("HEAD"), cancellable = true)
-    public void renderBackground(GuiGraphics guiGraphics, CallbackInfo ci) {
-        ScreenUtil.renderDefaultBackground(guiGraphics,false);
+    public void renderBackground(PoseStack poseStack, CallbackInfo ci) {
+        ScreenUtil.renderDefaultBackground(poseStack,false);
         ci.cancel();
     }
     @Inject(method = "hasShiftDown",at = @At("HEAD"), cancellable = true)

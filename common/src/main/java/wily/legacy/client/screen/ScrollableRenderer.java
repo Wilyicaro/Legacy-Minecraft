@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import org.joml.Math;
 import wily.legacy.util.Stocker;
@@ -17,14 +17,14 @@ public class ScrollableRenderer {
         scrollRenderer = renderer;
     }
     public final LegacyScrollRenderer scrollRenderer;
-    public void render(GuiGraphics graphics, int x, int y, int width, int height, Runnable scrollable){
+    public void render(PoseStack graphics, int x, int y, int width, int height, Runnable scrollable){
         graphics.enableScissor(x,y, x + width, y + height);
-        graphics.pose().pushPose();
+        graphics.pushPose();
         float s = Math.min(1.0f,(Util.getMillis() - scrollRenderer.lastScroll) / 480f);
         visualLabelY += (scrolled.get() - visualLabelY) * s;
-        graphics.pose().translate(0, -visualLabelY * 12,0);
+        graphics.translate(0, -visualLabelY * 12,0);
         scrollable.run();
-        graphics.pose().popPose();
+        graphics.popPose();
         graphics.disableScissor();
         if (scrolled.max > 0){
             if (scrolled.get() < scrolled.max) scrollRenderer.renderScroll(graphics, ScreenDirection.DOWN,x + width - 13, y + 3 + height);

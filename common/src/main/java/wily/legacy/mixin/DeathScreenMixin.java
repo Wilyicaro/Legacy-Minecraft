@@ -1,8 +1,8 @@
 
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
@@ -78,25 +78,25 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
         }
     }
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    public void render(PoseStack poseStack, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         float alpha = Math.min((Util.getMillis() - screenInit) / 1200f,1.0f);
-        guiGraphics.fill(0, 0, guiGraphics.guiWidth(),guiGraphics.guiHeight(), 3672076 | Mth.ceil(alpha * 160.0F) << 24);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate((this.width - font.width(title) * 2) / 2f, height / 4f + 20,0);
-        guiGraphics.pose().scale(2.0F, 2.0F, 2.0F);
-        ScreenUtil.drawOutlinedString(guiGraphics,this.font, this.title, 0,0, 16777215,0,0.5f);
-        guiGraphics.pose().popPose();
+        poseStack.fill(0, 0, poseStack.guiWidth(),poseStack.guiHeight(), 3672076 | Mth.ceil(alpha * 160.0F) << 24);
+        poseStack.pose().pushPose();
+        poseStack.pose().translate((this.width - font.width(title) * 2) / 2f, height / 4f + 20,0);
+        poseStack.pose().scale(2.0F, 2.0F, 2.0F);
+        ScreenUtil.drawOutlinedString(poseStack,this.font, this.title, 0,0, 16777215,0,0.5f);
+        poseStack.pose().popPose();
         if (this.causeOfDeath != null) {
-            guiGraphics.drawCenteredString(this.font, this.causeOfDeath, this.width / 2, height / 2 - 24, 16777215);
-            if (j > height / 2 - 24 && j < height / 2 - 15) guiGraphics.renderComponentHoverEffect(this.font, this.getClickedComponentStyleAt(i), i, j);
+            poseStack.drawCenteredString(this.font, this.causeOfDeath, this.width / 2, height / 2 - 24, 16777215);
+            if (j > height / 2 - 24 && j < height / 2 - 15) poseStack.renderComponentHoverEffect(this.font, this.getClickedComponentStyleAt(i), i, j);
         }
 
         if (this.exitToTitleButton != null && this.minecraft.getReportingContext().hasDraftReport()) {
-            guiGraphics.blit(AbstractWidget.WIDGETS_LOCATION, this.exitToTitleButton.getX() + this.exitToTitleButton.getWidth() - 17, this.exitToTitleButton.getY() + 3, 182, 24, 15, 15);
+            poseStack.blit(AbstractWidget.WIDGETS_LOCATION, this.exitToTitleButton.getX() + this.exitToTitleButton.getWidth() - 17, this.exitToTitleButton.getY() + 3, 182, 24, 15, 15);
         }
         for (Renderable renderable : this.renderables)
-            renderable.render(guiGraphics, i, j, f);
+            renderable.render(poseStack, i, j, f);
     }
 
 }

@@ -1,6 +1,6 @@
 package wily.legacy.mixin;
 
-import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.toasts.RecipeToast;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
@@ -40,7 +40,7 @@ public abstract class RecipeToastMixin implements Toast {
         if (!ScreenUtil.hasClassicCrafting()) ci.cancel();
     }
     @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, ToastComponent toastComponent, long l, CallbackInfoReturnable<Visibility> cir) {
+    public void render(PoseStack poseStack, ToastComponent toastComponent, long l, CallbackInfoReturnable<Visibility> cir) {
         if (this.changed) {
             this.lastChanged = l;
             this.changed = false;
@@ -50,17 +50,17 @@ public abstract class RecipeToastMixin implements Toast {
             return;
         }
 
-        ScreenUtil.renderPointerPanel(guiGraphics,0,0,width(),height());
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate((width() - 1.5 * toastComponent.getMinecraft().font.width(TITLE_TEXT)) / 2, 5,0);
-        guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-        guiGraphics.drawString(toastComponent.getMinecraft().font, TITLE_TEXT, 0,0, 0xFFFFFF);
-        guiGraphics.pose().popPose();
-        guiGraphics.drawString(toastComponent.getMinecraft().font, DESCRIPTION_TEXT, (width() - toastComponent.getMinecraft().font.width(DESCRIPTION_TEXT)) / 2 , 18, 0xFFFFFF);
+        ScreenUtil.renderPointerPanel(poseStack,0,0,width(),height());
+        poseStack.pose().pushPose();
+        poseStack.pose().translate((width() - 1.5 * toastComponent.getMinecraft().font.width(TITLE_TEXT)) / 2, 5,0);
+        poseStack.pose().scale(1.5f,1.5f,1.5f);
+        poseStack.drawString(toastComponent.getMinecraft().font, TITLE_TEXT, 0,0, 0xFFFFFF);
+        poseStack.pose().popPose();
+        poseStack.drawString(toastComponent.getMinecraft().font, DESCRIPTION_TEXT, (width() - toastComponent.getMinecraft().font.width(DESCRIPTION_TEXT)) / 2 , 18, 0xFFFFFF);
         Recipe<?> recipeHolder = this.recipes.get((int)((double)l / Math.max(1.0, 5000.0 * toastComponent.getNotificationDisplayTimeMultiplier() / (double)this.recipes.size()) % (double)this.recipes.size()));
-        ScreenUtil.iconHolderRenderer.itemHolder(8,(height() - 27) / 2,27,27,recipeHolder.getToastSymbol(),false, Offset.ZERO).renderItem(guiGraphics,0,0,0);
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,width() - 36,(height() - 28) / 2,28,28);
-        guiGraphics.renderItem(recipeHolder.getResultItem(toastComponent.getMinecraft().level.registryAccess()) ,width() - 30, (height() - 16) / 2);
+        ScreenUtil.iconHolderRenderer.itemHolder(8,(height() - 27) / 2,27,27,recipeHolder.getToastSymbol(),false, Offset.ZERO).renderItem(poseStack,0,0,0);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.SMALL_PANEL,width() - 36,(height() - 28) / 2,28,28);
+        poseStack.renderItem(recipeHolder.getResultItem(toastComponent.getMinecraft().level.registryAccess()) ,width() - 30, (height() - 16) / 2);
         cir.setReturnValue((double)(l - this.lastChanged) >= 5000.0 * toastComponent.getNotificationDisplayTimeMultiplier() ? Toast.Visibility.HIDE : Toast.Visibility.SHOW);
     }
 }

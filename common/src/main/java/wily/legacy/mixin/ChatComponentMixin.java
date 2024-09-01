@@ -1,8 +1,8 @@
 package wily.legacy.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.util.Mth;
@@ -34,13 +34,13 @@ public abstract class ChatComponentMixin {
         return CommonColor.CHAT_BACKGROUND.get() + i;
     }
     @Inject(method = "render",at = @At(value = "HEAD"), cancellable = true)
-    private void stopRender(GuiGraphics guiGraphics, int i, int j, int k, CallbackInfo ci) {
+    private void stopRender(PoseStack poseStack, int i, int j, int k, CallbackInfo ci) {
         if (minecraft.screen != null && !isChatFocused()) ci.cancel();
     }
     @Inject(method = "render",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", shift = At.Shift.AFTER, ordinal = 0))
-    private void changeRenderY(GuiGraphics guiGraphics, int i, int j, int k, CallbackInfo ci) {
+    private void changeRenderY(PoseStack poseStack, int i, int j, int k, CallbackInfo ci) {
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
-        guiGraphics.pose().translate(0.0F, ScreenUtil.getHUDDistance() - 42,0.0F);
+        poseStack.pose().translate(0.0F, ScreenUtil.getHUDDistance() - 42,0.0F);
     }
     @Inject(method = "screenToChatY",at = @At("HEAD"), cancellable = true)
     private void screenToChatY(double d, CallbackInfoReturnable<Double> cir) {

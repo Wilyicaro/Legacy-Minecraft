@@ -3,9 +3,9 @@ package wily.legacy.client.screen;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
@@ -84,11 +84,11 @@ public class HostOptionsScreen extends PanelVListScreen implements Controller.Ev
         return super.keyPressed(i, j, k);
     }
 
-    public static void drawPlayerIcon(GameProfile profile, GuiGraphics guiGraphics, int x, int y){
+    public static void drawPlayerIcon(GameProfile profile, PoseStack poseStack, int x, int y){
         float[] color = Legacy4JClient.getVisualPlayerColor(((LegacyPlayerInfo)Minecraft.getInstance().getConnection().getPlayerInfo(profile.getId())));
-        guiGraphics.setColor(color[0],color[1],color[2],1.0f);
+        poseStack.setColor(color[0],color[1],color[2],1.0f);
         RenderSystem.enableBlend();
-        LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.MAP_PLAYER,x,y, 20,20);
+        LegacyGuiGraphics.of(poseStack).blitSprite(LegacySprites.MAP_PLAYER,x,y, 20,20);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
     }
@@ -116,10 +116,10 @@ public class HostOptionsScreen extends PanelVListScreen implements Controller.Ev
                     return false;
                 }
                 @Override
-                public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-                    panel.render(guiGraphics,i,j,f);
-                    drawPlayerIcon(profile,guiGraphics, panel.x + 7,panel.y + 5);
-                    guiGraphics.drawString(font,profile.getName(),panel.x + 31, panel.y + 12, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+                public void renderDefaultBackground(PoseStack poseStack, int i, int j, float f) {
+                    panel.render(poseStack,i,j,f);
+                    drawPlayerIcon(profile,poseStack, panel.x + 7,panel.y + 5);
+                    poseStack.drawString(font,profile.getName(),panel.x + 31, panel.y + 12, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
                 }
             };
             List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
@@ -151,14 +151,14 @@ public class HostOptionsScreen extends PanelVListScreen implements Controller.Ev
             if (!includeClient && Objects.equals(profile.getName(), Minecraft.getInstance().player.getGameProfile().getName())) continue;
             renderableVList.addRenderable(new AbstractButton(0,0, 230, 30,Component.literal(profile.getName())) {
                 @Override
-                protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+                protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
                     if (isHoveredOrFocused()) shouldFade = true;
-                    super.renderWidget(guiGraphics, i, j, f);
-                    drawPlayerIcon(profile, guiGraphics,getX() + 6, getY() + 5);
+                    super.renderWidget(poseStack, i, j, f);
+                    drawPlayerIcon(profile, poseStack,getX() + 6, getY() + 5);
                 }
                 @Override
-                protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                    ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 68, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j,true);
+                protected void renderScrollingString(PoseStack poseStack, Font font, int i, int j) {
+                    ScreenUtil.renderScrollingString(poseStack, font, this.getMessage(), getX() + 68, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j,true);
                 }
                 @Override
                 public void onPress() {
@@ -207,8 +207,8 @@ public class HostOptionsScreen extends PanelVListScreen implements Controller.Ev
                 }
 
                 @Override
-                public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-                    panel.render(guiGraphics,i,j,f);
+                public void renderDefaultBackground(PoseStack poseStack, int i, int j, float f) {
+                    panel.render(poseStack,i,j,f);
                 }
             };
             screen.parent = this;
@@ -273,13 +273,13 @@ public class HostOptionsScreen extends PanelVListScreen implements Controller.Ev
     }
 
     @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+    public void renderDefaultBackground(PoseStack poseStack, int i, int j, float f) {
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f, alpha);
         RenderSystem.enableBlend();
-        panel.render(guiGraphics,i,j,f);
+        panel.render(poseStack,i,j,f);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
-        guiGraphics.drawString(font,title,panel.x + 11, panel.y + 8, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        poseStack.drawString(font,title,panel.x + 11, panel.y + 8, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
 
     protected static float getDefaultOpacity() {

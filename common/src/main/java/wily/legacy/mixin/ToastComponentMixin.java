@@ -2,7 +2,6 @@ package wily.legacy.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,7 +22,7 @@ public abstract class ToastComponentMixin {
     @Shadow @Final private int index;
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    private void render(int i, GuiGraphics guiGraphics, CallbackInfoReturnable<Boolean> cir){
+    private void render(int i, PoseStack poseStack, CallbackInfoReturnable<Boolean> cir){
         if (!Legacy4JClient.isGameLoadFinished) cir.setReturnValue(false);
     }
 
