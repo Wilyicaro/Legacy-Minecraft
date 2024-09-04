@@ -29,13 +29,15 @@ public interface RecipeMenu {
         boolean canCraft = true;
         List<ItemStack> compactList = new ArrayList<>();
         handleCompactInventoryList(compactList,inventory,carriedItem);
-        for (Ingredient ing : ingredients) {
+        main: for (Ingredient ing : ingredients) {
             if (ing.isEmpty()) continue;
-            Optional<ItemStack> match = compactList.stream().filter(item -> !item.isEmpty() && ing.test(item.copyWithCount(1))).findFirst();
-            if (match.isEmpty()) {
-                canCraft = false;
-                break;
-            } else match.get().shrink(1);
+            for (int i = 0; i < LegacyIngredient.of(ing).getCount(); i++) {
+                Optional<ItemStack> match = compactList.stream().filter(item -> !item.isEmpty() && ing.test(item.copyWithCount(1))).findFirst();
+                if (match.isEmpty()) {
+                    canCraft = false;
+                    break main;
+                } else match.get().shrink(1);
+            }
         }
         return canCraft;
     }
@@ -51,16 +53,19 @@ public interface RecipeMenu {
         while (canCraft(ingredients,player.getInventory(),player.containerMenu.getCarried()) && ((packet.max() && tries <= result.getMaxStackSize() * 36) || tries == 0)) {
             tries++;
             ingredients.forEach(ing -> {
-                if (!player.containerMenu.getCarried().isEmpty() && ing.test(player.containerMenu.getCarried().copyWithCount(1))) {
-                    player.containerMenu.getCarried().shrink(1);
-                    return;
-                }
-                for (int i = 0; i < player.containerMenu.slots.size(); i++) {
-                    Slot slot = player.containerMenu.getSlot(i);
-                    if (slot.container != player.getInventory() || !slot.hasItem() || !ing.test(slot.getItem().copyWithCount(1))) continue;
-                    ItemStack item = player.getInventory().getItem(slot.getContainerSlot());
-                    item.shrink(1);
-                    break;
+                if (ing.isEmpty()) return;
+                for (int c = 0; c < LegacyIngredient.of(ing).getCount(); c++) {
+                    if (!player.containerMenu.getCarried().isEmpty() && ing.test(player.containerMenu.getCarried().copyWithCount(1))) {
+                        player.containerMenu.getCarried().shrink(1);
+                        continue;
+                    }
+                    for (int i = 0; i < player.containerMenu.slots.size(); i++) {
+                        Slot slot = player.containerMenu.getSlot(i);
+                        if (slot.container != player.getInventory() || !slot.hasItem() || !ing.test(slot.getItem().copyWithCount(1))) continue;
+                        ItemStack item = player.getInventory().getItem(slot.getContainerSlot());
+                        item.shrink(1);
+                        break;
+                    }
                 }
             });
             onCraft(player, packet, result);

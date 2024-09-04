@@ -33,7 +33,7 @@ dependencies {
     modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
     api(include(sdl_dependency))
-    modCompileOnly("com.terraformersmc:modmenu:10.0.0-beta.1")
+    modImplementation("com.terraformersmc:modmenu:11.0.1")
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }

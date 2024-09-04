@@ -64,7 +64,7 @@ public class LegacyBiomeOverride {
             Map<ResourceLocation,LegacyBiomeOverride> overrides = new HashMap<>();
             overrides.put(DEFAULT_LOCATION,DEFAULT);
             ResourceManager manager = Minecraft.getInstance().getResourceManager();
-            JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(ResourceLocation.tryBuild(name,BIOME_OVERRIDES)).ifPresent(r->{
+            JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(ResourceLocation.fromNamespaceAndPath(name,BIOME_OVERRIDES)).ifPresent(r->{
                 try {
                     BufferedReader bufferedReader = r.openAsReader();
                     JsonObject obj = GsonHelper.parse(bufferedReader);

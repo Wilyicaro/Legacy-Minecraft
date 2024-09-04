@@ -31,29 +31,25 @@ public class FriendsServerRenderableList extends ServerRenderableList {
     boolean ping = false;
     protected final FriendsListUpdate friendsListUpdate = friends -> updateServers();
 
-    @Override
-    public void init(Screen screen, int leftPos, int topPos, int listWidth, int listHeight) {
-        super.init(screen, leftPos, topPos, listWidth, listHeight);
-        if (ping) {
-            WorldHost.pingFriends();
-            WorldHost.ONLINE_FRIEND_UPDATES.add(friendsListUpdate);
-            Legacy4J.SECURE_EXECUTOR.executeWhen(() -> {
-                if (!(minecraft.screen instanceof PlayGameScreen)) {
-                    WorldHost.ONLINE_FRIEND_UPDATES.remove(friendsListUpdate);
-                    return true;
-                }
-                return false;
-            });
-            ping = true;
-        }
+    public void added() {
+        WorldHost.ONLINE_FRIEND_UPDATES.add(friendsListUpdate);
     }
+    @Override
+    public void removed() {
+        super.removed();
+        WorldHost.ONLINE_FRIEND_UPDATES.remove(friendsListUpdate);
+    }
+
     public boolean hasOnlineFriends(){
         return !WorldHost.ONLINE_FRIENDS.isEmpty();
     }
     @Override
     public void updateServers() {
+        if (!ping) {
+            WorldHost.pingFriends();
+            ping = true;
+        }
         super.updateServers();
-
         Util.backgroundExecutor().execute(()-> {
             WorldHost.ONLINE_FRIENDS.forEach(((uuid, id) -> {
                 AbstractButton onlineButton;

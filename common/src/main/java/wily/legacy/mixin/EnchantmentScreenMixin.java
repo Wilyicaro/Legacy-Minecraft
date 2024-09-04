@@ -34,9 +34,9 @@ import static wily.legacy.Legacy4J.MOD_ID;
 
 @Mixin(EnchantmentScreen.class)
 public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<EnchantmentMenu> {
-    private static final ResourceLocation ENCHANTMENT_BUTTON_EMPTY = ResourceLocation.tryBuild(MOD_ID, "container/enchantment_button_empty");
-    private static final ResourceLocation ENCHANTMENT_BUTTON_ACTIVE = ResourceLocation.tryBuild(MOD_ID, "container/enchantment_button_active");
-    private static final ResourceLocation ENCHANTMENT_BUTTON_SELECTED = ResourceLocation.tryBuild(MOD_ID, "container/enchantment_button_selected");
+    private static final ResourceLocation ENCHANTMENT_BUTTON_EMPTY = ResourceLocation.fromNamespaceAndPath(MOD_ID, "container/enchantment_button_empty");
+    private static final ResourceLocation ENCHANTMENT_BUTTON_ACTIVE = ResourceLocation.fromNamespaceAndPath(MOD_ID, "container/enchantment_button_active");
+    private static final ResourceLocation ENCHANTMENT_BUTTON_SELECTED = ResourceLocation.fromNamespaceAndPath(MOD_ID, "container/enchantment_button_selected");
 
     @Shadow protected abstract void renderBook(GuiGraphics arg, int i, int j, float g);
 

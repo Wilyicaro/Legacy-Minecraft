@@ -55,7 +55,7 @@ public class LoomTabListing {
         protected List<LoomTabListing> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
             List<LoomTabListing> listings = new ArrayList<>();
             ResourceManager manager = Minecraft.getInstance().getResourceManager();
-            JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(ResourceLocation.tryBuild(name, LOOM_TAB_LISTING)).ifPresent(r->{
+            JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(ResourceLocation.fromNamespaceAndPath(name, LOOM_TAB_LISTING)).ifPresent(r->{
                 try {
                     BufferedReader bufferedReader = r.openAsReader();
                     JsonObject obj = GsonHelper.parse(bufferedReader);

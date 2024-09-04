@@ -9,11 +9,18 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Overlay;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ReloadInstance;
+import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.Legacy4J;
+import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyResourceManager;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.ScreenUtil;
@@ -24,7 +31,7 @@ import java.util.function.Consumer;
 import static wily.legacy.client.LegacyResourceManager.INTROS;
 
 @Mixin(LoadingOverlay.class)
-public class LoadingOverlayMixin extends Overlay {
+public abstract class LoadingOverlayMixin extends Overlay {
     @Unique
     private static boolean finishedIntro = false;
     @Unique
@@ -39,8 +46,10 @@ public class LoadingOverlayMixin extends Overlay {
     @Shadow @Final private boolean fadeIn;
     @Shadow private long fadeInStart;
     private long initTime = Util.getMillis();
-    @Override
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+    private static ResourceLocation BACKGROUND = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"textures/gui/intro/background.png");
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        ci.cancel();
         if (!loadIntroLocation){
             loadIntroLocation = true;
             LegacyResourceManager.registerIntroLocations(minecraft.getResourceManager());
@@ -48,10 +57,11 @@ public class LoadingOverlayMixin extends Overlay {
         float timer = (Util.getMillis() - initTime) / 3200f;
         if (!finishedIntro && timer % INTROS.size() >= INTROS.size() - 0.01f && reload.isDone()) finishedIntro = true;
         if (!finishedIntro) {
-            if ((InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_RETURN) || ControllerBinding.DOWN_BUTTON.bindingState.pressed) && reload.isDone() && minecraft.screen != null) finishedIntro = true;
+            if ((InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_RETURN) || GLFW.glfwGetMouseButton(minecraft.getWindow().getWindow(),GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS || ControllerBinding.DOWN_BUTTON.bindingState.pressed) && reload.isDone() && minecraft.screen != null) finishedIntro = true;
             if (timer % INTROS.size() >= INTROS.size() - 0.01f) finishedIntro = true;
 
             guiGraphics.fill(RenderType.guiOverlay(), 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFFFFFFFF);
+            guiGraphics.blit(BACKGROUND, 0, 0,0,0, guiGraphics.guiWidth(), guiGraphics.guiHeight(),guiGraphics.guiWidth(), guiGraphics.guiHeight());
             RenderSystem.enableBlend();
             float last = (float) Math.ceil(timer) - timer;
             guiGraphics.setColor(1.0f, 1.0f, 1.0f, last <= 0.4f ? last * 2.5f : last > 0.6f ? (1 - last) * 2.5f : 1.0f);

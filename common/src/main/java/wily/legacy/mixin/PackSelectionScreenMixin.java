@@ -1,7 +1,9 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -19,12 +21,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.ControlType;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
 import wily.legacy.util.ScreenUtil;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -43,6 +47,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
 
     @Shadow private Button doneButton;
 
+    @Shadow @Final private Path packDir;
     private Panel panel = Panel.centered(this,410,240);
     private RenderableVList selectedPacksList = new RenderableVList().layoutSpacing(l->0);
     private RenderableVList unselectedPacksList = new RenderableVList().layoutSpacing(l->0);
@@ -67,6 +72,12 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     public void repositionElements(CallbackInfo ci) {
         super.repositionElements();
         ci.cancel();
+    }
+
+    @Override
+    public void added() {
+        super.added();
+        ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), ()-> ControlTooltip.getAction("legacy.action.open_directory"));
     }
 
     @Override
@@ -234,6 +245,10 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     public boolean keyPressed(int i, int j, int k) {
         if (unselectedPacksList.keyPressed(i,true)) return true;
         if (selectedPacksList.keyPressed(i,true)) return true;
+        if (i == InputConstants.KEY_O){
+            Util.getPlatform().openPath(this.packDir);
+            return true;
+        }
         return super.keyPressed(i, j, k);
     }
 

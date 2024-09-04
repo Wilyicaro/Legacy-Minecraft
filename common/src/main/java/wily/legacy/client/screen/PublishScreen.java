@@ -12,7 +12,7 @@ import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.GameType;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.Legacy4JPlatform;
-import wily.legacy.client.LegacyWorldSettings;
+import wily.legacy.client.LegacyClientWorldSettings;
 
 import java.util.function.Consumer;
 
@@ -52,8 +52,8 @@ public class PublishScreen extends ConfirmationScreen{
         this.portEdit.setValue(string);
     }
     @Override
-    protected void initButtons() {
-        super.initButtons();
+    protected void init() {
+        super.init();
         portEdit = new EditBox(font, panel.x + panel.width / 2 - 100,panel.y + 45,200, 20,PORT_INFO_TEXT);
         portEdit.setHint(Component.literal("" + this.port).withStyle(ChatFormatting.DARK_GRAY));
         portEdit.setMaxLength(128);
@@ -77,7 +77,7 @@ public class PublishScreen extends ConfirmationScreen{
     }
     public void publish(IntegratedServer server){
         if (!publish) return;
-        this.minecraft.gui.getChat().addMessage(publishUnloadedServer(minecraft, gameTypeSlider.getObjectValue(), server.getWorldData().isAllowCommands() && ((LegacyWorldSettings)server.getWorldData()).trustPlayers(), this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed"));
+        this.minecraft.gui.getChat().addMessage(publishUnloadedServer(minecraft, gameTypeSlider.getObjectValue(), server.getWorldData().isAllowCommands() && ((LegacyClientWorldSettings)server.getWorldData()).trustPlayers(), this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed"));
     }
 
 

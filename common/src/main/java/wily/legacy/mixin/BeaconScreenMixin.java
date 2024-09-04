@@ -55,7 +55,7 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
     @Inject(method = "init",at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
-        CONFIRM_SPRITE = ResourceLocation.tryBuild(Legacy4J.MOD_ID,"container/beacon_check");
+        CONFIRM_SPRITE = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"container/beacon_check");
         imageWidth = 260;
         imageHeight = 255;
         super.init();

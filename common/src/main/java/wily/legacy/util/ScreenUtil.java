@@ -10,19 +10,18 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.locale.Language;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -41,11 +40,14 @@ public class ScreenUtil {
     public static final ResourceLocation GUI_ATLAS = ResourceLocation.withDefaultNamespace("textures/atlas/gui.png");
     private static final Minecraft mc = Minecraft.getInstance();
     public static long lastHotbarSelectionChange = -1;
+    public static long animatedCharacterTime;
+    public static long remainingAnimatedCharacterTime;
     protected static LogoRenderer logoRenderer = new LogoRenderer(false);
     public static LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
-    public static final ResourceLocation MINECRAFT = ResourceLocation.tryBuild(Legacy4J.MOD_ID, "textures/gui/title/minecraft.png");
-    public static final ResourceLocation PANORAMA_DAY = ResourceLocation.tryBuild(Legacy4J.MOD_ID, "textures/gui/title/panorama_day.png");
-    public static final ResourceLocation PANORAMA_NIGHT = ResourceLocation.tryBuild(Legacy4J.MOD_ID, "textures/gui/title/panorama_night.png");
+    public static final ResourceLocation MINECRAFT = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID, "textures/gui/title/minecraft.png");
+    public static final ResourceLocation PANORAMA_DAY = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID, "textures/gui/title/panorama_day.png");
+    public static final ResourceLocation PANORAMA_NIGHT = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID, "textures/gui/title/panorama_night.png");
+    public static final ResourceLocation MENU_BACKGROUND = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID, "textures/gui/menu_background.png");
 
     public static void renderPointerPanel(GuiGraphics graphics, int x, int y, int width, int height){
         RenderSystem.enableBlend();
@@ -158,7 +160,7 @@ public class ScreenUtil {
         return Math.max(1.5f,4 - getLegacyOptions().hudScale().get());
     }
     public static float getHUDSize(){
-        return 3f / ScreenUtil.getHUDScale()* (mc.gameMode.canHurtPlayer() ? 68 : 41);
+        return 6 + 3f / ScreenUtil.getHUDScale() * (35 + (mc.gameMode.canHurtPlayer() ?  Math.max(2,Mth.ceil((Math.max(mc.player.getAttributeValue(Attributes.MAX_HEALTH), Math.max(mc.gui.displayHealth, mc.player.getHealth())) + mc.player.getAbsorptionAmount()) / 20f) + (mc.player.getArmorValue() > 0 ? 1 : 0))* 10 : 0));
     }
     public static double getHUDDistance(){
         return -getLegacyOptions().hudDistance().get()*(22.5D + (getLegacyOptions().inGameTooltips().get() ? 17.5D : 0));
@@ -174,7 +176,7 @@ public class ScreenUtil {
         return getLegacyOptions().hudOpacity().get().floatValue();
     }
     public static int getDefaultTextColor(boolean forceWhite){
-        return  !forceWhite ? (getLegacyOptions().forceYellowText().get() || hasProgrammerArt()) ? 0xFFFF00 : CommonColor.HIGHLIGHTED_WIDGET_TEXT.get() : CommonColor.WIDGET_TEXT.get();
+        return !forceWhite ? CommonColor.HIGHLIGHTED_WIDGET_TEXT.get() : CommonColor.WIDGET_TEXT.get();
     }
     public static int getDefaultTextColor(){
         return getDefaultTextColor(false);
@@ -182,63 +184,20 @@ public class ScreenUtil {
     public static boolean hasProgrammerArt(){
         return mc.getResourcePackRepository().getSelectedPacks().stream().anyMatch(p->p.getId().equals("programmer_art"));
     }
-    public static void playSimpleUISound(SoundEvent sound, float grave, float volume){
-        playSimpleUISound(sound,grave,volume,false);
+    public static void playSimpleUISound(SoundEvent sound, float volume, float pitch, boolean randomPitch){
+        RandomSource source = SoundInstance.createUnseededRandom();
+        mc.getSoundManager().play(new SimpleSoundInstance(sound.getLocation(), SoundSource.MASTER, volume,pitch + (randomPitch ? (source.nextFloat() - 0.5f) / 10 : 0), source, false, 0, SoundInstance.Attenuation.NONE, 0.0, 0.0, 0.0, true));
     }
-    public static void playSimpleUISound(SoundEvent sound, float grave, float volume,boolean pauseRepeatedSounds){
-        if (pauseRepeatedSounds) mc.getSoundManager().stop(sound.getLocation(), SoundSource.MASTER);
-        mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave, volume));
+    public static void playSimpleUISound(SoundEvent sound, float pitch, boolean randomPitch){
+        playSimpleUISound(sound,1.0f, pitch,randomPitch);
     }
-    public static void playSimpleUISound(SoundEvent sound, float grave){
-        playSimpleUISound(sound,grave,false);
+    public static void playSimpleUISound(SoundEvent sound, float pitch){
+        playSimpleUISound(sound, pitch,false);
     }
-    public static void playSimpleUISound(SoundEvent sound, float grave, boolean pauseRepeatedSounds){
-        if (pauseRepeatedSounds)mc.getSoundManager().stop(sound.getLocation(), SoundSource.MASTER);
-        mc.getSoundManager().play(SimpleSoundInstance.forUI(sound, grave));
+    public static void playSimpleUISound(SoundEvent sound, boolean randomPitch){
+        playSimpleUISound(sound,1.0f,randomPitch);
     }
-    public static void addTip(Entity entity){
-        if (hasTip(entity.getType())) LegacyTipManager.tips.add(()->new LegacyTip(entity.getType().getDescription(), ScreenUtil.getTip(entity.getType())));
-        else if (entity.getPickResult() != null && !entity.getPickResult().isEmpty() && hasTip(entity.getPickResult())) addTip(entity.getPickResult());
-    }
-    public static void addTip(EntityType<?> entityType){
-        if (hasTip(entityType)) LegacyTipManager.tips.add(()->new LegacyTip(entityType.getDescription(), ScreenUtil.getTip(entityType)));
-    }
-    public static void addCustomTip(Component title, Component tip, ItemStack stack, long time){
-        LegacyTipManager.tips.add(()->(title.getString().isEmpty() && tip.getString().isEmpty() && !stack.isEmpty() ? new LegacyTip(stack) : new LegacyTip(title,tip).itemStack(stack)).disappearTime(time));
-    }
-    public static void addTip(ItemStack stack){
-        if (hasTip(stack)) LegacyTipManager.tips.add(()->new LegacyTip(stack));
-    }
-    public static Component getTip(ItemStack item){
-        return hasValidTipOverride(item) ? LegacyTipOverride.getOverride(item) : Component.translatable(getTipId(item));
-    }
-    public static Component getTip(EntityType<?> type){
-        return hasValidTipOverride(type) ? LegacyTipOverride.getOverride(type) : Component.translatable(getTipId(type));
-    }
-    public static boolean hasTip(ItemStack item){
-        return hasTip(getTipId(item)) || hasValidTipOverride(item);
-    }
-    public static boolean hasValidTipOverride(ItemStack item){
-        return !LegacyTipOverride.getOverride(item).getString().isEmpty() && hasTip(((TranslatableContents)LegacyTipOverride.getOverride(item).getContents()).getKey());
-    }
-    public static boolean hasValidTipOverride(EntityType<?> type){
-        return !LegacyTipOverride.getOverride(type).getString().isEmpty() && hasTip(((TranslatableContents)LegacyTipOverride.getOverride(type).getContents()).getKey());
-    }
-    public static boolean hasTip(String s){
-        return Language.getInstance().has(s);
-    }
-    public static boolean hasTip(EntityType<?> s){
-        return hasTip(getTipId(s)) || hasValidTipOverride(s);
-    }
-    public static String getTipId(ItemStack item){
-        return item.getDescriptionId() + ".tip";
-    }
-    public static String getTipId(EntityType<?> item){
-        return item.getDescriptionId() + ".tip";
-    }
-    public static Component getTip(ResourceLocation location){
-        return Component.translatable(location.toLanguageKey() +".tip");
-    }
+
     public static LegacyOptions getLegacyOptions(){
         return (LegacyOptions) mc.options;
     }
@@ -331,9 +290,12 @@ public class ScreenUtil {
         return getLegacyOptions().legacyItemTooltips().get() ? Math.max(2/3f,Math.min(720f/getStandardHeight(),4/3f)) : 1.0f;
     }
 
+    public static float getChatSafeZone(){
+        return 29 * ScreenUtil.getLegacyOptions().hudDistance().get().floatValue();
+    }
 
     public static Component getDimensionName(ResourceKey<Level> dimension){
         String s = dimension.location().toLanguageKey("dimension");
-        return Component.translatable(hasTip(s) ? s : "dimension.minecraft");
+        return Component.translatable(LegacyTipManager.hasTip(s) ? s : "dimension.minecraft");
     }
 }

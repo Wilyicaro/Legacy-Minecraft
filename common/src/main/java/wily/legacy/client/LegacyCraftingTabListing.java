@@ -46,7 +46,7 @@ public class LegacyCraftingTabListing {
         protected List<LegacyCraftingTabListing> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
             List<LegacyCraftingTabListing> listings = new ArrayList<>();
             ResourceManager manager = Minecraft.getInstance().getResourceManager();
-            JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(ResourceLocation.tryBuild(name, CRAFTING_TAB_LISTING)).ifPresent(r->{
+            JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(ResourceLocation.fromNamespaceAndPath(name, CRAFTING_TAB_LISTING)).ifPresent(r->{
                 try {
                     BufferedReader bufferedReader = r.openAsReader();
                     JsonObject obj = GsonHelper.parse(bufferedReader);

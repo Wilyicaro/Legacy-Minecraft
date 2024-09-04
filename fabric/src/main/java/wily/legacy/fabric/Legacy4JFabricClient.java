@@ -31,7 +31,7 @@ public class Legacy4JFabricClient implements ClientModInitializer {
         Legacy4JClient.registerReloadListeners(l->managerHelper.registerReloadListener(new IdentifiableResourceReloadListener() {
             @Override
             public ResourceLocation getFabricId() {
-                return ResourceLocation.tryBuild(Legacy4J.MOD_ID,l.getName().toLowerCase(Locale.ENGLISH) + l.hashCode());
+                return ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,l.getName().toLowerCase(Locale.ENGLISH) + l.hashCode());
             }
 
             @Override

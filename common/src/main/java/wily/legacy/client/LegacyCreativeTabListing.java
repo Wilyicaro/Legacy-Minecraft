@@ -40,12 +40,16 @@ public record LegacyCreativeTabListing(Component name, Function<LegacyTabButton,
     public static final List<LegacyCreativeTabListing> list = new ArrayList<>();
     private static final String LISTING = "creative_tab_listing.json";
     public static void rebuildVanillaCreativeTabsItems(Minecraft minecraft){
-        if (minecraft.player != null) CreativeModeTabs.tryRebuildTabContents(minecraft.player.connection.enabledFeatures(), minecraft.options.operatorItemsTab().get(), minecraft.player.level().registryAccess());
+        if (minecraft.getConnection() != null && CreativeModeTabs.tryRebuildTabContents(minecraft.getConnection().enabledFeatures(), minecraft.options.operatorItemsTab().get(), minecraft.getConnection().registryAccess())){
+            List<ItemStack> list = List.copyOf(CreativeModeTabs.searchTab().getDisplayItems());
+            minecraft.getConnection().searchTrees().updateCreativeTooltips(minecraft.getConnection().registryAccess(), list);
+            minecraft.getConnection().searchTrees().updateCreativeTags(list);
+        }
     }
     public static class Manager extends SimplePreparableReloadListener<List<LegacyCreativeTabListing>> {
 
         public Manager(){
-            JsonUtil.COMMON_ITEMS.put(ResourceLocation.parse("ominous_banner"), ()-> {
+            JsonUtil.COMMON_ITEMS.put(ResourceLocation.withDefaultNamespace("ominous_banner"), ()-> {
                 if (Minecraft.getInstance().getConnection() == null) return ItemStack.EMPTY;
                 return Raid.getLeaderBannerInstance(Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN));
             });
@@ -54,7 +58,7 @@ public record LegacyCreativeTabListing(Component name, Function<LegacyTabButton,
         protected List<LegacyCreativeTabListing> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
             List<LegacyCreativeTabListing> creativeTabListing = new ArrayList<>();
             JsonUtil.getOrderedNamespaces(resourceManager).forEach(name->{
-                resourceManager.getResource(ResourceLocation.tryBuild(name,LISTING)).ifPresent(r->{
+                resourceManager.getResource(ResourceLocation.fromNamespaceAndPath(name,LISTING)).ifPresent(r->{
                     try {
                         BufferedReader bufferedReader = r.openAsReader();
                         JsonObject obj = GsonHelper.parse(bufferedReader);

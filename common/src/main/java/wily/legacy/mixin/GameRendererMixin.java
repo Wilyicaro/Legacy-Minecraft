@@ -3,17 +3,15 @@ package wily.legacy.mixin;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.Util;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
-import net.minecraft.client.gui.components.toasts.ToastComponent;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
@@ -21,7 +19,6 @@ import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -30,8 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.screen.ControlTooltip;
-import wily.legacy.client.screen.LegacyMenuAccess;
+import wily.legacy.network.TopMessage;
 import wily.legacy.player.PlayerYBobbing;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.LegacyTip;
@@ -58,6 +54,8 @@ public abstract class GameRendererMixin {
 
     @Shadow private boolean renderHand;
 
+    @Shadow private ItemStack itemActivationItem;
+
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;flush()V"))
     private void render(GuiGraphics graphics, DeltaTracker tracker){
         if (!minecraft.isGameLoadFinished()) return;
@@ -68,8 +66,11 @@ public abstract class GameRendererMixin {
             tip.render(graphics,0,0,tracker.getRealtimeDeltaTicks());
             if (tip.visibility == Toast.Visibility.HIDE) LegacyTipManager.getUpdateTip();
         }
-        if (minecraft.options.showAutosaveIndicator().get().booleanValue() && (minecraft.gui.autosaveIndicatorValue > 0 || minecraft.gui.lastAutosaveIndicatorValue > 0) && Mth.clamp(Mth.lerp(tracker.getRealtimeDeltaTicks(), minecraft.gui.lastAutosaveIndicatorValue, minecraft.gui.autosaveIndicatorValue), 0.0f, 1.0f) > 0.02)
-            ScreenUtil.drawAutoSavingIcon(graphics,graphics.guiWidth() - 66,44);
+        if (minecraft.options.showAutosaveIndicator().get().booleanValue() && (minecraft.gui.autosaveIndicatorValue > 0 || minecraft.gui.lastAutosaveIndicatorValue > 0) && Mth.clamp(Mth.lerp(tracker.getRealtimeDeltaTicks(), minecraft.gui.lastAutosaveIndicatorValue, minecraft.gui.autosaveIndicatorValue), 0.0f, 1.0f) > 0.02) {
+            RenderSystem.disableDepthTest();
+            ScreenUtil.drawAutoSavingIcon(graphics, graphics.guiWidth() - 66, 44);
+            RenderSystem.enableDepthTest();
+        }
         if (GLFW.glfwGetInputMode(minecraft.getWindow().getWindow(),GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerManager.isCursorDisabled) {
             RenderSystem.disableDepthTest();
             RenderSystem.enableBlend();
@@ -85,12 +86,28 @@ public abstract class GameRendererMixin {
             graphics.flush();
             RenderSystem.enableBlend();
             RenderSystem.disableDepthTest();
-            gammaEffect.passes.forEach(p-> p.getEffect().safeGetUniform("gamma").set(gamma >= 0.5f ? gamma * 1.7f : 0.35f + gamma));
+            gammaEffect.passes.forEach(p-> p.getEffect().safeGetUniform("gamma").set(gamma >= 0.5f ? (gamma - 0.5f) * 1.4f + 1.08f : gamma * 1.26f + 0.45f));
             gammaEffect.process(tracker.getRealtimeDeltaTicks());
             RenderSystem.enableDepthTest();
             RenderSystem.disableBlend();
         }
         graphics.flush();
+    }
+    @Inject(method = "tick", at = @At("RETURN"))
+    private void tick(CallbackInfo ci){
+        if (itemActivationItem == null && Legacy4JClient.itemActivationRenderReplacement != null) Legacy4JClient.itemActivationRenderReplacement = null;
+    }
+    @Redirect(method = "renderItemActivationAnimation", at = @At(value = "NEW", target = "()Lcom/mojang/blaze3d/vertex/PoseStack;"))
+    private PoseStack renderItemActivationAnimation(GuiGraphics graphics){
+        return graphics.pose();
+    }
+    @Inject(method = "renderItemActivationAnimation", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawManaged(Ljava/lang/Runnable;)V"), cancellable = true)
+    private void renderItemActivationAnimation(GuiGraphics guiGraphics, float f, CallbackInfo ci){
+        if (Legacy4JClient.itemActivationRenderReplacement != null){
+            ci.cancel();
+            guiGraphics.drawManaged(()->Legacy4JClient.itemActivationRenderReplacement.render(guiGraphics,0,0,f));
+            guiGraphics.pose().popPose();
+        }
     }
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"))
     private void render(Gui instance, GuiGraphics guiGraphics, DeltaTracker deltaTracker){
@@ -98,7 +115,7 @@ public abstract class GameRendererMixin {
     }
     @Inject(method = "bobView", at = @At("RETURN"))
     private void bobView(PoseStack poseStack, float f, CallbackInfo ci){
-        if (this.minecraft.getCameraEntity() instanceof PlayerYBobbing p) poseStack.mulPose(Axis.XP.rotationDegrees(p.getAngle(f)));
+        if (this.minecraft.getCameraEntity() instanceof PlayerYBobbing p && !minecraft.player.getAbilities().flying) poseStack.mulPose(Axis.XP.rotationDegrees(p.getAngle(f)));
     }
     @Inject(method = "shouldRenderBlockOutline", at = @At("HEAD"), cancellable = true)
     private void renderLevel(CallbackInfoReturnable<Boolean> cir){

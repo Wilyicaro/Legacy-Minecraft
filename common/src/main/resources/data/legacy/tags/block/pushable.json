@@ -1,0 +1,8 @@
+{
+  "values": [
+    "minecraft:chest",
+    "minecraft:trapped_chest",
+    "minecraft:daylight_detector",
+    "#minecraft:cauldrons"
+  ]
+}

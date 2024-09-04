@@ -23,7 +23,7 @@ import wily.legacy.Legacy4J;
 
 @Mixin(FireworkEntityRenderer.class)
 public abstract class FireworkEntityRendererMixin extends EntityRenderer<FireworkRocketEntity> {
-    private static final ResourceLocation FIREWORK_LOCATION = ResourceLocation.tryBuild(Legacy4J.MOD_ID, "textures/entity/projectiles/firework.png");
+    private static final ResourceLocation FIREWORK_LOCATION = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID, "textures/entity/projectiles/firework.png");
     protected FireworkEntityRendererMixin(EntityRendererProvider.Context context) {
         super(context);
     }

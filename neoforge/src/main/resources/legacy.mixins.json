@@ -3,7 +3,6 @@
   "package": "wily.legacy.neoforge.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "AbstractContainerScreenMixin",
     "GuiMixin",
     "MinecraftMixin",
     "TooltipRenderUtilMixin"

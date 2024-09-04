@@ -17,6 +17,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.Legacy4JClient;
+import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(BossHealthOverlay.class)
@@ -25,13 +27,17 @@ public abstract class BossHealthOverlayMixin {
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)I"))
     public int drawString(GuiGraphics graphics, Font font, Component component, int i, int j, int k) {
-        graphics.pose().pushPose();
-        graphics.pose().translate((graphics.guiWidth() - font.width(component) * 2/3f) / 2,j,0);
-        graphics.pose().scale(2/3f,2/3f,2/3f);
-        graphics.pose().translate(-i,-j,0);
-        int draw = graphics.drawString(font,component,i,j,k);
-        graphics.pose().popPose();
-        return draw;
+        Legacy4JClient.applyFontOverrideIf(minecraft.getWindow().getHeight() <= 720, LegacyIconHolder.MOJANGLES_11_FONT, b->{
+            Legacy4JClient.forceVanillaFontShadowColor = true;
+            graphics.pose().pushPose();
+            graphics.pose().translate(graphics.guiWidth() / 2f,j,0);
+            if (!b) graphics.pose().scale(2/3f,2/3f,2/3f);
+            graphics.pose().translate(-font.width(component) / 2f,0,0);
+            graphics.drawString(font,component,0,0,k);
+            graphics.pose().popPose();
+            Legacy4JClient.forceVanillaFontShadowColor = false;
+        });
+        return 0;
     }
 
     @Shadow protected abstract void drawBar(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, int k, ResourceLocation[] resourceLocations, ResourceLocation[] resourceLocations2);
@@ -53,7 +59,7 @@ public abstract class BossHealthOverlayMixin {
     }
     @ModifyVariable(method = "render", at = @At(value = "STORE", ordinal = 0), ordinal = 1)
     public int render(int i) {
-        return 28;
+        return (int) (12 + 16 * ScreenUtil.getLegacyOptions().hudDistance().get());
     }
     @Inject(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At("HEAD"))
     private void drawBar(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, CallbackInfo ci) {

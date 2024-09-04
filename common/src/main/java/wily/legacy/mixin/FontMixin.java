@@ -18,6 +18,6 @@ public class FontMixin {
 
     @Redirect(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Font$StringRenderOutput;dimFactor:F", opcode = Opcodes.PUTFIELD))
     private void init(Font.StringRenderOutput instance, float value){
-        dimFactor = dropShadow ? Legacy4JClient.legacyFont ? 0f : 0.25f : 1.0f;
+        dimFactor = dropShadow ? Legacy4JClient.legacyFont && !Legacy4JClient.forceVanillaFontShadowColor ? 0f : 0.25f : 1.0f;
     }
 }

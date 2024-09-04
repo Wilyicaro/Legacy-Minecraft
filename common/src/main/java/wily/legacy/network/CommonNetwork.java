@@ -37,10 +37,13 @@ public interface CommonNetwork {
         public void executeWhen(BooleanSupplier supplier){
             queue.add(supplier);
         }
+        public void clear(){
+            queue.clear();
+        }
 
     }
-    ResourceLocation NETWORK = ResourceLocation.tryBuild(Legacy4J.MOD_ID,"network");
-    ResourceLocation CLIENT_NETWORK = ResourceLocation.tryBuild(Legacy4J.MOD_ID,"client_network");
+    ResourceLocation NETWORK = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"network");
+    ResourceLocation CLIENT_NETWORK = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"client_network");
     List<Class<? extends Packet>> PACKET_CLASSES = new ArrayList<>();
     List<Function<RegistryFriendlyByteBuf, Packet>> PACKETS_FROM_NETWORK = new ArrayList<>();
 
@@ -84,8 +87,9 @@ public interface CommonNetwork {
         register(TipCommand.Packet.class, TipCommand.Packet::decode);
         register(TipCommand.EntityPacket.class, TipCommand.EntityPacket::new);
         register(ClientAdvancementsPacket.class, ClientAdvancementsPacket::new);
-        register(ClientEntityDataSyncPacket.class, ClientEntityDataSyncPacket::new);
+        register(ClientAnimalInLoveSyncPacket.class, ClientAnimalInLoveSyncPacket::new);
         register(ServerPlayerMissHitPacket.class, ServerPlayerMissHitPacket::new);
+        register(TopMessage.Packet.class, TopMessage.Packet::create);
     }
 
     static void register(Class<? extends Packet> commonPacketClass, Function<RegistryFriendlyByteBuf, Packet> function){

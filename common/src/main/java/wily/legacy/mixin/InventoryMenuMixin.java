@@ -42,7 +42,7 @@ public class InventoryMenuMixin {
         int i = 39 - originalSlot.getContainerSlot();
         return LegacySlotDisplay.override(originalSlot, 14, 14 + i * 21,new LegacySlotDisplay(){
             public ResourceLocation getIconSprite() {
-                return originalSlot.getItem().isEmpty() ? ResourceLocation.tryBuild(Legacy4J.MOD_ID,"container/"+ SLOT_IDS[i].getName()+ "_slot") : null;
+                return originalSlot.getItem().isEmpty() ? ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"container/"+ SLOT_IDS[i].getName()+ "_slot") : null;
             }
             public Offset getOffset() {
                 return ScreenUtil.hasClassicCrafting() ? Offset.ZERO : EQUIP_SLOT_OFFSET;

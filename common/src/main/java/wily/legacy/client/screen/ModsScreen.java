@@ -3,6 +3,7 @@ package wily.legacy.client.screen;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.Font;
@@ -17,9 +18,11 @@ import net.minecraft.util.FormattedCharSequence;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.Legacy4JPlatform;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ModInfo;
 import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.Stocker;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -36,6 +39,8 @@ public class ModsScreen extends PanelVListScreen{
         }
     }
     protected final Panel tooltipBox = Panel.tooltipBoxOf(panel,192);
+    protected final Stocker.Sizeable sorting = new Stocker.Sizeable(0,1);
+    public static final Component ALPHABETICAL = Component.translatable("legacy.menu.sorting.alphabetical");
 
     protected ModInfo focusedMod;
     protected final LoadingCache<ModInfo, List<FormattedCharSequence>> modLabelsCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
@@ -63,7 +68,12 @@ public class ModsScreen extends PanelVListScreen{
     public ModsScreen(Screen parent) {
         super(parent,282,240, Component.empty());
         renderableVList.layoutSpacing(l->0);
-        Legacy4JPlatform.getMods().forEach(mod->{
+        fillMods();
+    }
+    public void fillMods(){
+        Collection<ModInfo> mods = Legacy4JPlatform.getMods();
+        if (sorting.get() != 0) mods = mods.stream().sorted(Comparator.comparing(ModInfo::getName)).toList();
+        mods.forEach(mod->{
             if (mod.isHidden()) return;
             renderableVList.addRenderable(new AbstractButton(0,0,260,30, Component.literal(mod.getName())) {
                 @Override
@@ -87,8 +97,8 @@ public class ModsScreen extends PanelVListScreen{
                                 return new SizedLocation(minecraft.getTextureManager().register(opt.get().toLowerCase(Locale.ENGLISH), new DynamicTexture(image)),image.getWidth(),image.getHeight());
                             } catch (IOException e) {
                             }
-                        ResourceLocation defaultLogo = PackSelector.DEFAULT_ICON;
-                        if (mod.getId().equals("minecraft")) defaultLogo = PackSelector.loadPackIcon(minecraft.getTextureManager(),minecraft.getResourcePackRepository().getPack("vanilla"),"pack.png",defaultLogo);
+                        ResourceLocation defaultLogo = Assort.Selector.DEFAULT_ICON;
+                        if (mod.getId().equals("minecraft")) defaultLogo = Assort.Selector.getPackIcon(minecraft.getResourcePackRepository().getPack("vanilla"));
                         return new SizedLocation(defaultLogo,1,1);
                     });
                     if (logo != null) guiGraphics.blit(logo.location,getX() + 5, getY() + 5, 0,0, logo.getScaledWidth(20),20,logo.getScaledWidth(20),20);
@@ -146,5 +156,22 @@ public class ModsScreen extends PanelVListScreen{
     protected void init() {
         panel.height = Math.min(height,248);
         super.init();
+    }
+
+    @Override
+    public boolean keyPressed(int i, int j, int k) {
+        if (i == InputConstants.KEY_X && sorting.add(1,true) != 0){
+            renderableVList.renderables.clear();
+            fillMods();
+            repositionElements();
+            return true;
+        }
+        return super.keyPressed(i, j, k);
+    }
+
+    @Override
+    public void addControlTooltips(ControlTooltip.Renderer renderer) {
+        super.addControlTooltips(renderer);
+        renderer.add(()->ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), ()-> Component.translatable("legacy.menu.sorting", this.sorting.get() == 0 ? LegacyKeyBindsScreen.NONE : ALPHABETICAL));
     }
 }

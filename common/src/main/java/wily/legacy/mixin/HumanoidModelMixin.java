@@ -33,11 +33,10 @@ public abstract class HumanoidModelMixin {
     @Inject(method = ("setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V"), at = @At("TAIL"))
     private void setupAnim(LivingEntity livingEntity, float f, float g, float h, float i, float j, CallbackInfo info){
         if (!livingEntity.hasItemInSlot(EquipmentSlot.MAINHAND) && livingEntity.isShiftKeyDown() && livingEntity.isFallFlying()) {
-            (livingEntity.getMainArm() == HumanoidArm.RIGHT ? this.rightArm : leftArm).xRot = (float) (Math.PI);
-            AnimationUtils.bobModelPart((livingEntity.getMainArm() == HumanoidArm.RIGHT ? this.rightArm : leftArm), h + 0.2F, 1.0F);
+            (livingEntity.getMainArm() == HumanoidArm.RIGHT ? this.rightArm : leftArm).xRot = (float) (Math.PI) + (livingEntity.getMainArm() == HumanoidArm.RIGHT ? 1.0f : -1.0f) * Mth.sin(f * 0.067F) * 0.05F;
         }
         applyEatTransform(livingEntity, InteractionHand.MAIN_HAND, livingEntity.getMainHandItem(), h, livingEntity.getMainArm());
-        applyEatTransform(livingEntity, InteractionHand.OFF_HAND, livingEntity.getOffhandItem(), h, livingEntity.getMainArm());
+        applyEatTransform(livingEntity, InteractionHand.OFF_HAND, livingEntity.getOffhandItem(), h, livingEntity.getMainArm().getOpposite());
     }
 
     private boolean applyEatTransform(LivingEntity livingEntity, InteractionHand hand, ItemStack itemStack, float partialTicks, HumanoidArm mainArm){

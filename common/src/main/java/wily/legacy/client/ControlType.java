@@ -30,7 +30,7 @@ public interface ControlType  {
         return createDefault(name,false);
     }
     static ControlType createDefault(String name, boolean kbm){
-        ControlType type = create(ResourceLocation.tryBuild(Legacy4J.MOD_ID,name),null,kbm);
+        ControlType type = create(ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,name),null,kbm);
         defaultTypes.add(type);
         return type;
     }

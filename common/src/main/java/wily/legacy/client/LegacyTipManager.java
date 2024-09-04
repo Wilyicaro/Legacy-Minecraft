@@ -5,15 +5,21 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.ItemStack;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.screen.LegacyLoadingScreen;
 import wily.legacy.client.screen.LegacyMenuAccess;
+import wily.legacy.util.ScreenUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,7 +43,7 @@ public class LegacyTipManager extends SimplePreparableReloadListener<List<Suppli
         return lastTip;
     }
     public static float getTipXDiff(){
-        return Minecraft.getInstance().screen instanceof LegacyMenuAccess<?> a ? Math.min(0,Math.max(a.getTipXDiff(),50 - a.getMenuRectangle().left()) * Math.max(0,Math.min(tipDiffPercentage,1))) : 0;
+        return ScreenUtil.getLegacyOptions().hints().get() && Minecraft.getInstance().screen instanceof LegacyMenuAccess<?> a ? Math.min(0,Math.max(a.getTipXDiff(),50 - a.getMenuRectangle().left()) * Math.max(0,Math.min(tipDiffPercentage,1))) : 0;
     }
     public static void setActualTip(LegacyTip tip) {
         lastTip = actualTip;
@@ -51,12 +57,92 @@ public class LegacyTipManager extends SimplePreparableReloadListener<List<Suppli
         }
         return actualTip;
     }
+    public static boolean setTip(Supplier<LegacyTip> tipSupplier){
+        if (tipSupplier != null) {
+            setActualTip(tipSupplier.get());
+            return true;
+        }
+        return false;
+    }
+    public static void addTip(Supplier<LegacyTip> tipSupplier){
+        if (tipSupplier != null) tips.add(tipSupplier);
+    }
+
+    public static void addTip(Entity entity){
+        addTip(getTip(entity));
+    }
+
+    public static void addTip(EntityType<?> entityType){
+        addTip(getTip(entityType));
+    }
+
+    public static LegacyTip getCustomTip(Component title, Component tip, ItemStack stack, long time){
+        return (title.getString().isEmpty() && tip.getString().isEmpty() && !stack.isEmpty() ? new LegacyTip(stack) : new LegacyTip(title,tip).itemStack(stack)).disappearTime(time);
+    }
+
+    public static void addTip(ItemStack stack){
+        if (hasTip(stack)) tips.add(()->new LegacyTip(stack));
+    }
+
+    public static Supplier<LegacyTip> getTip(ItemStack item){
+        return hasTip(item) ? ()-> new LegacyTip(item) : null;
+    }
+
+    public static Supplier<LegacyTip> getTip(Entity entity) {
+        if (hasTip(entity.getType())) return ()-> new LegacyTip(entity.getType().getDescription(), getTipComponent(entity.getType()));
+        else if (entity.getPickResult() != null && !entity.getPickResult().isEmpty() && hasTip(entity.getPickResult())) return getTip(entity.getPickResult());
+        else return null;
+    }
+
+    public static Supplier<LegacyTip> getTip(EntityType<?> entityType){
+        return hasTip(entityType) ? ()->new LegacyTip(entityType.getDescription(), getTipComponent(entityType)) : null;
+    }
+
+    public static Component getTipComponent(ItemStack item){
+        return hasValidTipOverride(item) ? LegacyTipOverride.getOverride(item) : Component.translatable(getTipId(item));
+    }
+
+    public static Component getTipComponent(EntityType<?> type){
+        return hasValidTipOverride(type) ? LegacyTipOverride.getOverride(type) : Component.translatable(getTipId(type));
+    }
+
+    public static boolean hasTip(ItemStack item){
+        return hasTip(getTipId(item)) || hasValidTipOverride(item);
+    }
+
+    public static boolean hasValidTipOverride(ItemStack item){
+        return !LegacyTipOverride.getOverride(item).getString().isEmpty() && hasTip(((TranslatableContents)LegacyTipOverride.getOverride(item).getContents()).getKey());
+    }
+
+    public static boolean hasValidTipOverride(EntityType<?> type){
+        return !LegacyTipOverride.getOverride(type).getString().isEmpty() && hasTip(((TranslatableContents)LegacyTipOverride.getOverride(type).getContents()).getKey());
+    }
+
+    public static boolean hasTip(String s){
+        return Language.getInstance().has(s);
+    }
+
+    public static boolean hasTip(EntityType<?> s){
+        return hasTip(getTipId(s)) || hasValidTipOverride(s);
+    }
+
+    public static String getTipId(ItemStack item){
+        return item.getDescriptionId() + ".tip";
+    }
+
+    public static String getTipId(EntityType<?> item){
+        return item.getDescriptionId() + ".tip";
+    }
+
+    public static Component getTipComponent(ResourceLocation location){
+        return Component.translatable(location.toLanguageKey() +".tip");
+    }
 
 
     @Override
     protected List<Supplier<LegacyTip>> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
         List<Supplier<LegacyTip>> loadingTips = new ArrayList<>();
-        resourceManager.getNamespaces().forEach(name->resourceManager.getResource(ResourceLocation.tryBuild(name,TIPS)).ifPresent(r->{
+        resourceManager.getNamespaces().forEach(name->resourceManager.getResource(ResourceLocation.fromNamespaceAndPath(name,TIPS)).ifPresent(r->{
             try {
                 BufferedReader bufferedReader = r.openAsReader();
                 JsonObject obj = GsonHelper.parse(bufferedReader);

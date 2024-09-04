@@ -55,7 +55,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
 
     @Inject(method = "changeFocus",at = @At("HEAD"))
     private void changeFocus(ComponentPath componentPath, CallbackInfo ci){
-        ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),1.0f);
+        ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
     }
     @Inject(method = "onClose",at = @At("HEAD"))
     private void onClose(CallbackInfo ci){
@@ -64,7 +64,9 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     @Inject(method = "renderTransparentBackground",at = @At("HEAD"), cancellable = true)
     public void renderTransparentBackground(GuiGraphics graphics, CallbackInfo ci) {
         ci.cancel();
-        graphics.fillGradient(0,0,graphics.guiWidth(),graphics.guiHeight(), -1073741824, -805306368);
+        RenderSystem.enableBlend();
+        graphics.blit(ScreenUtil.MENU_BACKGROUND,0,0,0,0,graphics.guiWidth(),graphics.guiHeight(),graphics.guiWidth(),graphics.guiHeight());
+        RenderSystem.disableBlend();
     }
     @Inject(method = "renderBackground",at = @At("HEAD"), cancellable = true)
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {

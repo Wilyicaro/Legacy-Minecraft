@@ -73,8 +73,8 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     }
     @Redirect(method = "handleContainerSetSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/AbstractContainerMenu;setItem(IILnet/minecraft/world/item/ItemStack;)V", ordinal = 0))
     public void handleContainerSetSlot(AbstractContainerMenu instance, int i, int j, ItemStack itemStack) {
-        if (Minecraft.getInstance().screen instanceof CreativeModeScreen) {
-            Minecraft.getInstance().player.inventoryMenu.setItem(i,j,itemStack);
+        if (minecraft.screen instanceof CreativeModeScreen) {
+            minecraft.player.inventoryMenu.setItem(i,j,itemStack);
         }else{
             instance.setItem(i,j,itemStack);
         }

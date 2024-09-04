@@ -24,7 +24,7 @@ public record LegacyWorldTemplate(Component buttonName, ResourceLocation icon, R
         protected List<LegacyWorldTemplate> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
             List<LegacyWorldTemplate> templates = new ArrayList<>();
             JsonUtil.getOrderedNamespaces(resourceManager).forEach(name->{
-                resourceManager.getResource(ResourceLocation.tryBuild(name, TEMPLATES)).ifPresent(r->{
+                resourceManager.getResource(ResourceLocation.fromNamespaceAndPath(name, TEMPLATES)).ifPresent(r->{
                     try {
                         BufferedReader bufferedReader = r.openAsReader();
                         JsonObject obj = GsonHelper.parse(bufferedReader);

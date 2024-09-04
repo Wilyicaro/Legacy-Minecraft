@@ -54,10 +54,11 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
     protected int page = 0;
     public static final Component RANK = Component.translatable("legacy.menu.leaderboard.rank");
     public static final Component USERNAME = Component.translatable("legacy.menu.leaderboard.username");
+    public static final Component OVERALL = Component.translatable("legacy.menu.leaderboard.filter.overall");
     public static final Component MY_SCORE = Component.translatable("legacy.menu.leaderboard.filter.my_score");
     public static final Component NO_RESULTS = Component.translatable("legacy.menu.leaderboard.no_results");
     protected final RenderableVList renderableVList = new RenderableVList().layoutSpacing(l-> 1);
-    protected boolean myScore = false;
+    protected final Stocker.Sizeable filter = new Stocker.Sizeable(0,1);
     protected List<LegacyPlayerInfo> actualRankBoard = Collections.emptyList();
     public LeaderboardsScreen(Screen parent) {
         super(568,275, CommonComponents.EMPTY);
@@ -104,7 +105,7 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (i == InputConstants.KEY_X){
-            myScore = !myScore;
+            filter.add(1,true);
             rebuildRenderableVList(minecraft);
             repositionElements();
         }
@@ -135,10 +136,9 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
     public void rebuildRenderableVList(Minecraft minecraft){
         renderableVList.renderables.clear();
         if (minecraft.getConnection() == null ||  statsBoards.get(selectedStatBoard).statsList.isEmpty()) return;
-        actualRankBoard = Legacy4JClient.isModEnabledOnServer() ? minecraft.getConnection().getOnlinePlayers().stream().map(p-> ((LegacyPlayerInfo)p)).filter(info-> info.getStatsMap().object2IntEntrySet().stream().filter(s-> statsBoards.get(selectedStatBoard).statsList.contains(s.getKey())).mapToInt(Object2IntMap.Entry::getIntValue).sum() > 0).sorted(Comparator.comparingInt(info->((LegacyPlayerInfo)info).getStatsMap().object2IntEntrySet().stream().filter(s-> statsBoards.get(selectedStatBoard).statsList.contains(s.getKey())).mapToInt(Object2IntMap.Entry::getIntValue).sum()).reversed()).toList() : List.of((LegacyPlayerInfo) minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID()));
+        actualRankBoard = Legacy4JClient.isModEnabledOnServer() && filter.get() != 1 ? minecraft.getConnection().getOnlinePlayers().stream().map(p-> ((LegacyPlayerInfo)p)).filter(info-> info.getStatsMap().object2IntEntrySet().stream().filter(s-> statsBoards.get(selectedStatBoard).statsList.contains(s.getKey())).mapToInt(Object2IntMap.Entry::getIntValue).sum() > 0).sorted(filter.get() == 0 ? Comparator.comparingInt(info-> ((LegacyPlayerInfo)info).getStatsMap().object2IntEntrySet().stream().filter(s-> statsBoards.get(selectedStatBoard).statsList.contains(s.getKey())).mapToInt(Object2IntMap.Entry::getIntValue).sum()).reversed() : Comparator.comparing((LegacyPlayerInfo l) -> l.legacyMinecraft$getProfile().getName())).toList() : List.of((LegacyPlayerInfo) minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID()));
         for (int i = 0; i < actualRankBoard.size(); i++) {
             LegacyPlayerInfo info = actualRankBoard.get(i);
-            if (myScore && !minecraft.player.getUUID().equals(info.legacyMinecraft$getProfile().getId())) continue;
             String rank =i + 1 + "";
             renderableVList.renderables.add(new AbstractWidget(0,0,551,20,Component.literal(info.legacyMinecraft$getProfile().getName())) {
                 @Override
@@ -182,7 +182,7 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
             if (!statsBoards.isEmpty() && selectedStatBoard < statsBoards.size()){
                 StatsBoard board = statsBoards.get(selectedStatBoard);
                 guiGraphics.pose().pushPose();
-                Component filter = Component.translatable("legacy.menu.leaderboard.filter", myScore ? MY_SCORE : LegacyKeyBindsScreen.NONE);
+                Component filter = Component.translatable("legacy.menu.leaderboard.filter", this.filter.get() == 0 ? OVERALL :  MY_SCORE);
                 guiGraphics.pose().translate(panel.x + 91 - font.width(filter) / 4f, panel.y - 12,0);
                 guiGraphics.pose().scale(2/3f,2/3f,2/3f);
                 guiGraphics.drawString(font,filter,0, 0,0xFFFFFF);
@@ -328,7 +328,7 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
             List<StatsBoard> statsBoards = new ArrayList<>();
             ResourceManager manager = Minecraft.getInstance().getResourceManager();
 
-            JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(ResourceLocation.tryBuild(name, LEADERBOARD_LISTING)).ifPresent(((r) -> {
+            JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(ResourceLocation.fromNamespaceAndPath(name, LEADERBOARD_LISTING)).ifPresent(((r) -> {
                 try {
                     BufferedReader bufferedReader = r.openAsReader();
                     JsonObject obj = GsonHelper.parse(bufferedReader);

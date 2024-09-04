@@ -48,7 +48,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
         canRemove(()-> initScreen != minecraft.screen);
     }
     public LegacyTip(ItemStack stack){
-        this(Component.translatable(stack.getDescriptionId()),ScreenUtil.getTip(stack));
+        this(Component.translatable(stack.getDescriptionId()), LegacyTipManager.getTipComponent(stack));
         itemStack(stack);
     }
     public LegacyTip canRemove(Supplier<Boolean> canRemove){
@@ -122,8 +122,8 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
         guiGraphics.pose().translate(getX(),getY(),800);
         ScreenUtil.renderPointerPanel(guiGraphics,0,0,getWidth(),getHeight());
         if (!title.getString().isEmpty()) guiGraphics.drawString(minecraft.font,title,13,13,0xFFFFFF);
-        if (centered) tipLabel.renderCentered(guiGraphics,width / 2, title.getString().isEmpty() ? 13 : 25,12,0xFFFFFF);
-        else tipLabel.renderLeftAlignedNoShadow(guiGraphics,13,title.getString().isEmpty() ? 13 : 25, 12,0xFFFFFF);
+        if (centered) tipLabel.renderCentered(guiGraphics,width / 2, title.getString().isEmpty() ? 13 : 25,12,CommonColor.WIDGET_TEXT.get());
+        else tipLabel.renderLeftAlignedNoShadow(guiGraphics,13,title.getString().isEmpty() ? 13 : 25, 12,CommonColor.WIDGET_TEXT.get());
         if (holder != null) holder.render(guiGraphics,i,j,f);
         guiGraphics.pose().popPose();
     }

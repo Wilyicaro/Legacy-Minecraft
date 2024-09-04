@@ -27,7 +27,7 @@ public class Legacy4JFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        Legacy4J.registerBuiltInPacks((path, name, displayName, position, enabledByDefault) -> ResourceManagerHelperImpl.registerBuiltinResourcePack(ResourceLocation.tryBuild(Legacy4J.MOD_ID, name),path, FabricLoader.getInstance().getModContainer(Legacy4J.MOD_ID).orElseThrow(), displayName, enabledByDefault ? ResourcePackActivationType.DEFAULT_ENABLED : ResourcePackActivationType.NORMAL));
+        Legacy4J.registerBuiltInPacks((path, name, displayName, position, enabledByDefault) -> ResourceManagerHelperImpl.registerBuiltinResourcePack(ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID, name),path, FabricLoader.getInstance().getModContainer(Legacy4J.MOD_ID).orElseThrow(), displayName, enabledByDefault ? ResourcePackActivationType.DEFAULT_ENABLED : ResourcePackActivationType.NORMAL));
         CommonNetwork.registerPayloads(new CommonNetwork.PayloadRegister(){
             @Override
             public <T extends CustomPacketPayload> void register(boolean client, CustomPacketPayload.Type<T> type, StreamCodec<RegistryFriendlyByteBuf, T> codec, CommonNetwork.Consumer<T> apply) {
@@ -47,7 +47,6 @@ public class Legacy4JFabric implements ModInitializer {
         ServerTickEvents.START_SERVER_TICK.register(Legacy4J::preServerTick);
         ServerLifecycleEvents.AFTER_SAVE.register((l, fl, f)-> Legacy4J.serverSave(l));
         CommandRegistrationCallback.EVENT.register(Legacy4J::registerCommands);
-        CustomIngredientSerializer.register(StrictComponentsIngredient.SERIALIZER);
         DefaultItemComponentEvents.MODIFY.register(c-> Legacy4J.changeItemDefaultComponents((i,b)-> c.modify(i,bc-> b.accept(bc::set))));
     }
 }

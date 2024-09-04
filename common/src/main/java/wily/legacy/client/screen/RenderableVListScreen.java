@@ -10,7 +10,7 @@ import wily.legacy.Legacy4JClient;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class RenderableVListScreen extends LegacyScreen {
+public class RenderableVListScreen extends LegacyScreen implements RenderableVList.Access{
     protected final RenderableVList renderableVList = new RenderableVList().layoutSpacing(l->5);
 
     public RenderableVListScreen(Component component, Consumer<RenderableVList> vListBuild) {
@@ -26,6 +26,10 @@ public class RenderableVListScreen extends LegacyScreen {
         return Button.builder(component, button -> this.minecraft.setScreen(supplier.get()));
     }
 
+    @Override
+    public RenderableVList getRenderableVList() {
+        return renderableVList;
+    }
 
     public void repositionElements() {
         super.repositionElements();
@@ -38,6 +42,11 @@ public class RenderableVListScreen extends LegacyScreen {
 
     @Override
     protected void init() {
+        renderableVListInit();
+    }
+
+    @Override
+    public void renderableVListInit() {
         renderableVList.init(this,width / 2 - 112,this.height / 3 + 10,225,0);
     }
 }

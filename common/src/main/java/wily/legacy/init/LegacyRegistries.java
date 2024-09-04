@@ -45,15 +45,15 @@ public class LegacyRegistries {
 
     public static final RegisterListing.Holder<BlockEntityType<WaterCauldronBlockEntity>> WATER_CAULDRON_BLOCK_ENTITY = BLOCK_ENTITIES_REGISTER.add("water_cauldron",()-> BlockEntityType.Builder.of(WaterCauldronBlockEntity::new, Blocks.WATER_CAULDRON).build(null));
 
-    public static final RegisterListing.Holder<SoundEvent> SCROLL = SOUND_EVENT_REGISTER.add("random.scroll",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(Legacy4J.MOD_ID,"random.scroll")));
-    public static final RegisterListing.Holder<SoundEvent> CRAFT_FAIL = SOUND_EVENT_REGISTER.add("random.craft_fail",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(Legacy4J.MOD_ID,"random.craft_fail")));
-    public static final RegisterListing.Holder<SoundEvent> BACK = SOUND_EVENT_REGISTER.add("random.back",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(Legacy4J.MOD_ID,"random.back")));
-    public static final RegisterListing.Holder<SoundEvent> FOCUS = SOUND_EVENT_REGISTER.add("random.focus",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(Legacy4J.MOD_ID,"random.focus")));
-    public static final RegisterListing.Holder<SoundEvent> ACTION = SOUND_EVENT_REGISTER.add("random.action",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(Legacy4J.MOD_ID,"random.action")));
-    public static final RegisterListing.Holder<SoundEvent> SHIFT_LOCK = SOUND_EVENT_REGISTER.add("random.shift_lock",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(Legacy4J.MOD_ID,"random.shift_lock")));
-    public static final RegisterListing.Holder<SoundEvent> SHIFT_UNLOCK = SOUND_EVENT_REGISTER.add("random.shift_unlock",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(Legacy4J.MOD_ID,"random.shift_unlock")));
-    public static final RegisterListing.Holder<SoundEvent> SPACE = SOUND_EVENT_REGISTER.add("random.space",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(Legacy4J.MOD_ID,"random.space")));
-    public static final RegisterListing.Holder<SoundEvent> BACKSPACE = SOUND_EVENT_REGISTER.add("random.backspace",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(Legacy4J.MOD_ID,"random.backspace")));
+    public static final RegisterListing.Holder<SoundEvent> SCROLL = SOUND_EVENT_REGISTER.add("random.scroll",()->SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"random.scroll")));
+    public static final RegisterListing.Holder<SoundEvent> CRAFT_FAIL = SOUND_EVENT_REGISTER.add("random.craft_fail",()->SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"random.craft_fail")));
+    public static final RegisterListing.Holder<SoundEvent> BACK = SOUND_EVENT_REGISTER.add("random.back",()->SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"random.back")));
+    public static final RegisterListing.Holder<SoundEvent> FOCUS = SOUND_EVENT_REGISTER.add("random.focus",()->SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"random.focus")));
+    public static final RegisterListing.Holder<SoundEvent> ACTION = SOUND_EVENT_REGISTER.add("random.action",()->SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"random.action")));
+    public static final RegisterListing.Holder<SoundEvent> SHIFT_LOCK = SOUND_EVENT_REGISTER.add("random.shift_lock",()->SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"random.shift_lock")));
+    public static final RegisterListing.Holder<SoundEvent> SHIFT_UNLOCK = SOUND_EVENT_REGISTER.add("random.shift_unlock",()->SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"random.shift_unlock")));
+    public static final RegisterListing.Holder<SoundEvent> SPACE = SOUND_EVENT_REGISTER.add("random.space",()->SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"random.space")));
+    public static final RegisterListing.Holder<SoundEvent> BACKSPACE = SOUND_EVENT_REGISTER.add("random.backspace",()->SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"random.backspace")));
 
 
     public static boolean isInvalidCauldron(BlockState blockState, Level level, BlockPos blockPos){

@@ -158,7 +158,7 @@ subprojects {
             displayName = "Legacy4J [$modPlatformName] $project.version"
             releaseType = "$stage"
             changelog = releaseChangelog()
-            gameVersions = ["$minecraft_version"]
+            gameVersions = ["$minecraft_version","1.21.1"]
             gameLoaders = ["$project.name"]
             if (isFabric) gameLoaders.addAll "quilt"
             mainPublication renameJarForPublication
@@ -168,9 +168,8 @@ subprojects {
                 curseforge {
                     token = CURSE_API_KEY
                     id = rootProject.curseforge_id
-                    gameVersions.addAll(["Java 17", "Java 18"])
+                    gameVersions.addAll(["Java 21"])
                     relations{
-                        depends "architectury-api"
                         if (isFabric) depends "fabric-api"
                     }
                 }
@@ -184,7 +183,6 @@ subprojects {
                     id = rootProject.modrinth_id
                     version = "$project.version+$project.name"
                     relations{
-                        depends "architectury-api"
                         if (isFabric) depends "fabric-api"
                     }
                 }

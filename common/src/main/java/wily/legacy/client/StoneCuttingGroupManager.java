@@ -26,7 +26,7 @@ public class StoneCuttingGroupManager extends SimplePreparableReloadListener<Map
     protected Map<String,List<RecipeValue<SingleRecipeInput,StonecutterRecipe>>> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
         Map<String,List<RecipeValue<SingleRecipeInput,StonecutterRecipe>>> groups = new LinkedHashMap<>();
         ResourceManager manager = Minecraft.getInstance().getResourceManager();
-        JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(ResourceLocation.tryBuild(name, STONECUTTING_GROUPS)).ifPresent(r->{
+        JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(ResourceLocation.fromNamespaceAndPath(name, STONECUTTING_GROUPS)).ifPresent(r->{
             try {
                 BufferedReader bufferedReader = r.openAsReader();
                 JsonObject obj = GsonHelper.parse(bufferedReader);
