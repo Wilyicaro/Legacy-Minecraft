@@ -10,13 +10,14 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.controller.Controller;
+import wily.legacy.client.controller.ControllerManager;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Comparator;
 
 public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuAccess<T>, GuiEventListener, Controller.Event {
     default void movePointerToSlotIn(ScreenDirection direction){
-        if (getMenu().slots.isEmpty() || Legacy4JClient.controllerManager.isCursorDisabled || getHoveredSlot() == null) return;
+        if (getMenu().slots.isEmpty() || Legacy4JClient.controllerManager.isCursorDisabled || findHoveredSlot() == null) return;
         double pointerX = Legacy4JClient.controllerManager.getPointerX();
         double pointerY = Legacy4JClient.controllerManager.getPointerY();
         int height = getRectangle().height();
@@ -55,7 +56,7 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
         return movePointerToSlot(s,true);
     }
     default boolean movePointerToSlot(Slot s, boolean allowHovered){
-        if (s == null || (s == getHoveredSlot() && !allowHovered) || !s.isActive()) return false;
+        if (s == null || (!allowHovered && s == findHoveredSlot()) || !s.isActive()) return false;
         Minecraft minecraft = Minecraft.getInstance();
         LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(getMenuRectangle().left(), getMenuRectangle().top(), s);
         Legacy4JClient.controllerManager.setPointerPos(holder.getMiddleX() * ((double)minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth()), holder.getMiddleY() * ((double)minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()));
@@ -79,6 +80,9 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
         for (Slot slot : getMenu().slots)
             if (ScreenUtil.isHovering(slot,getMenuRectangle().left(), getMenuRectangle().top(),d,e)) return slot;
         return null;
+    }
+    default Slot findHoveredSlot(){
+        return findSlotAt(Legacy4JClient.controllerManager.getPointerX(),Legacy4JClient.controllerManager.getPointerY());
     }
     default int getTipXDiff(){
         return -132;

@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,6 +35,8 @@ public abstract class GuiMixin {
     private ItemStack lastToolHighlight;
 
     @Shadow protected abstract void drawBackdrop(GuiGraphics guiGraphics, Font font, int i, int j, int k);
+
+    @Shadow protected long healthBlinkTime;
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)I", ordinal = 0))
     public int renderOverlayMessage(GuiGraphics guiGraphics, Font font, Component component, int i, int j, int k) {
@@ -81,4 +84,8 @@ public abstract class GuiMixin {
         ScreenUtil.finishHUDRender(guiGraphics);
     }
 
+    @Redirect(method="renderPlayerHealth", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD, ordinal = 1))
+    private void renderPlayerHealth(Gui instance, long value) {
+        healthBlinkTime = value - 5;
+    }
 }

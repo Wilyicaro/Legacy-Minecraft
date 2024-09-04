@@ -57,7 +57,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
     }
     @Redirect(method = "aiStep", at = @At(value = "FIELD",target = "Lnet/minecraft/client/player/LocalPlayer;crouching:Z", opcode = Opcodes.PUTFIELD, ordinal = 0))
     public void aiStepCrouching(LocalPlayer instance, boolean value) {
-        crouching = value && (onGround() || !isInWater()) && !getAbilities().flying;
+        crouching = value && (onGround() || !isInWater()) && !getAbilities().flying && !isFallFlying();
     }
     @Inject(method = "aiStep", at = @At(value = "FIELD",target = "Lnet/minecraft/world/entity/player/Abilities;flying:Z",opcode = Opcodes.PUTFIELD, ordinal = 1, shift = At.Shift.AFTER))
     public void aiStepStopCrouching(CallbackInfo ci) {
@@ -69,11 +69,11 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
     }
     @Redirect(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;setSprinting(Z)V", ordinal = 3))
     public void aiStepSprintingWater(LocalPlayer instance, boolean b) {
-        if (!Legacy4JClient.isModEnabledOnServer() || isAffectedByFluids() || !this.input.hasForwardImpulse() || !this.hasEnoughFoodToStartSprinting()) instance.setSprinting(b);
+        if (!Legacy4JClient.isModEnabledOnServer() || !this.input.hasForwardImpulse() || !this.hasEnoughFoodToStartSprinting()) instance.setSprinting(b);
     }
     @Redirect(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V"))
-    public void aiStepShift(LocalPlayer instance, Vec3 vec3) {
-        if (Legacy4JClient.isModEnabledOnServer()) move(MoverType.SELF,vec3.with(Direction.Axis.Y,(vec3.y - getDeltaMovement().y) * 3));
+    public void aiStepFlyUpDown(LocalPlayer instance, Vec3 vec3) {
+        if (Legacy4JClient.isModEnabledOnServer()) move(MoverType.SELF,vec3.with(Direction.Axis.Y,(vec3.y - getDeltaMovement().y) * (input.jumping ? (0.42f + getJumpBoostPower()) * 6 : 3)));
         else setDeltaMovement(vec3);
     }
     @Redirect(method = "aiStep", at = @At(value = "FIELD",target = "Lnet/minecraft/client/player/Input;shiftKeyDown:Z", ordinal = 3))
@@ -104,15 +104,15 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
 
     @Override
     public void moveRelative(float f, Vec3 vec3) {
-        if (Legacy4JClient.isModEnabledOnServer() && getAbilities().flying && isCreative() && !isSprinting()) this.setDeltaMovement(getDeltaMovement().add(getWorldRelativeMovement(f,vec3)));
+        if (Legacy4JClient.isModEnabledOnServer() && getAbilities().flying && isCreative() && !isSprinting()) this.setDeltaMovement(getDeltaMovement().add(getWorldRelativeMovement(f,vec3,(keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown()) && input.leftImpulse == 0 ? 90 : 45)));
         else super.moveRelative(f, vec3);
     }
-    public Vec3 getWorldRelativeMovement(float f, Vec3 vec3){
+    public Vec3 getWorldRelativeMovement(float f, Vec3 vec3, int relRot){
         double d = vec3.lengthSqr();
         if (d < 1.0E-7) {
             return Vec3.ZERO;
         } else {
-            float angle = Math.round(getYRot() / 45) * 45;
+            float angle = Math.round(getYRot() / relRot) * relRot;
             Vec3 vec32 = (d > 1.0 ? vec3.normalize() : vec3).scale(f);
             float h = Mth.sin(angle * 0.017453292F);
             float i = Mth.cos(angle * 0.017453292F);
@@ -125,7 +125,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
         if (!Legacy4JClient.isModEnabledOnServer()) return;
         if (this.getAbilities().flying && this.isControlledCamera()) {
             if (keyFlyDown.isDown() && !keyFlyUp.isDown() || !keyFlyDown.isDown() && keyFlyUp.isDown() || keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown())
-                move(MoverType.SELF,getWorldRelativeMovement(1.0f,new Vec3((keyFlyLeft.isDown() ? 1.5 : keyFlyRight.isDown() ? -1.5 : 0) * this.getAbilities().getFlyingSpeed(),(keyFlyUp.isDown() ? 1.5 : keyFlyDown.isDown() ? -1.5 : 0) * this.getAbilities().getFlyingSpeed(),0)));
+                setDeltaMovement(getDeltaMovement().add(0,(keyFlyUp.isDown() ? 1.5 : keyFlyDown.isDown() ? -1.5 : 0) * this.getAbilities().getFlyingSpeed(),0));
             if (getXRot() != 0 && (!lastOnGround || getXRot() < 0) && input.hasForwardImpulse() && isSprinting()) move(MoverType.SELF,new Vec3(0,-(getXRot() / 90) * input.forwardImpulse * getFlyingSpeed() * 2, 0));
         }
     }
@@ -137,11 +137,13 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
     public void serverAiStep(CallbackInfo ci) {
         if (!Legacy4JClient.isModEnabledOnServer()) return;
         if (this.isControlledCamera() && this.getAbilities().flying) {
+            if (keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown()) xxa+= (keyFlyLeft.isDown() ? 12 : -12) * this.getAbilities().getFlyingSpeed();
             if (getXRot() != 0 && input.hasForwardImpulse() && isSprinting()) zza*=Math.max(0.1f,1 - Math.abs(getXRot() / 90));
         }
     }
     @Inject(method = "rideTick", at = @At("HEAD"))
     public void rideTick(CallbackInfo ci) {
+        if (!Legacy4JClient.isModEnabledOnServer()) return;
         if (wantsToStopRiding() && this.isPassenger()) minecraft.options.keyShift.setDown(false);
     }
 }

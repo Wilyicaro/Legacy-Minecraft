@@ -13,7 +13,6 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
-import wily.legacy.client.LegacyOptions;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
@@ -125,46 +124,74 @@ public class RenderableVList {
         return rowAmount;
     }
 
-
     public void mouseScrolled(double g) {
-        int scroll = (int) -Math.signum(g);
-        if ((canScrollDown && scroll > 0) || (scrolledList.get() > 0 && scroll < 0)){
-            int setScroll = Math.max(0,scrolledList.get() + getLineAmount(scroll));
+        mouseScrolled((int) -Math.signum(g) > 0);
+    }
+    public void mouseScrolled(boolean down) {
+        if ((canScrollDown && down) || (scrolledList.get() > 0 && !down)){
+            int setScroll = Math.max(0,scrolledList.get() + getLineAmount(down ? 1 : -1));
             if (setScroll != scrolledList.get()) {
-                scrollRenderer.updateScroll(scroll > 0 ? ScreenDirection.DOWN : ScreenDirection.UP);
+                scrollRenderer.updateScroll(down ? ScreenDirection.DOWN : ScreenDirection.UP);
                 scrolledList.set(setScroll);
                 screen.repositionElements();
             }
         }
     }
+    public boolean isFocused(ScreenDirection direction, boolean allowExternalListener){
+        ComponentPath path = getDirectionalNextFocusPath(direction);
+        return path == null || allowExternalListener && !renderables.contains(path.component());
+    }
     public boolean isFocused(ScreenDirection direction){
-        ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(direction));
-        return renderables.contains(screen.getFocused()) && (path == null || path.component() == screen.getFocused());
+        return isFocused(direction,false);
+    }
+    public ComponentPath getDirectionalNextFocusPath(ScreenDirection direction){
+        return screen.nextFocusPathInDirection(screen.getFocused().getRectangle(),direction,screen.getFocused(),new FocusNavigationEvent.ArrowNavigation(direction));
+    }
+    public void setLastFocusInDirection(ScreenDirection direction){
+        if (screen.getFocused() != null) {
+            ComponentPath path;
+            while ((path = getDirectionalNextFocusPath(direction)) != null) screen.setFocused(path.component());
+        }
     }
     public boolean keyPressed(int i, boolean cyclic){
+        if (screen.getFocused() == null || !renderables.contains(screen.getFocused())) return false;
         if (renderablesCount > 1) {
             if (i == InputConstants.KEY_DOWN) {
-                if (isFocused(ScreenDirection.DOWN)) {
+                ComponentPath path = getDirectionalNextFocusPath(ScreenDirection.DOWN);
+                if (path == null || !renderables.contains(path.component())) {
                     if (canScrollDown) {
-                        while (canScrollDown && isFocused(ScreenDirection.DOWN)) mouseScrolled( -1);
-                    } else if (cyclic) {
+                        while (canScrollDown && isFocused(ScreenDirection.DOWN,true)) mouseScrolled(true);
+                    } else if (cyclic && path == null) {
                         if (scrolledList.get() > 0) {
                             scrolledList.set(0);
                             screen.repositionElements();
+                            setLastFocusInDirection(ScreenDirection.DOWN);
                         }
-                        screen.setFocused(null);
                     }
                 }
             }
             if (i == InputConstants.KEY_UP) {
-                if (isFocused(ScreenDirection.UP)) {
+                ComponentPath path = getDirectionalNextFocusPath(ScreenDirection.UP);
+                if (path == null || !renderables.contains(path.component())) {
                     if (scrolledList.get() > 0) {
-                        while (scrolledList.get() > 0 && isFocused(ScreenDirection.UP)) mouseScrolled( 1);
-                    } else if (cyclic){
+                        while (scrolledList.get() > 0 && isFocused(ScreenDirection.UP,true)) mouseScrolled(false);
+                    } else if (cyclic && path == null){
                         while (canScrollDown)
-                            mouseScrolled( -1);
-                        screen.setFocused(null);
+                            mouseScrolled(true);
                     }
+                }
+            }
+            if (listHeight > 0) {
+                GuiEventListener lastFocus = screen.getFocused();
+                if (i == InputConstants.KEY_PAGEDOWN) {
+                    if (isFocused(ScreenDirection.DOWN)) while (screen.children().contains(lastFocus) && canScrollDown) mouseScrolled(true);
+                    setLastFocusInDirection(ScreenDirection.DOWN);
+                    return true;
+                }
+                if (i == InputConstants.KEY_PAGEUP) {
+                    if (isFocused(ScreenDirection.UP)) while (screen.children().contains(lastFocus) && scrolledList.get() > 0) mouseScrolled(false);
+                    setLastFocusInDirection(ScreenDirection.UP);
+                    return true;
                 }
             }
             if (forceWidth) return false;
@@ -173,12 +200,15 @@ public class RenderableVList {
                 if (i == InputConstants.KEY_LEFT && isFocused(ScreenDirection.UP) || i == InputConstants.KEY_RIGHT && isFocused(ScreenDirection.DOWN)) keyPressed(i == InputConstants.KEY_LEFT ? InputConstants.KEY_UP : InputConstants.KEY_DOWN,false);
                 if (focused >= 0 && focused < renderables.size() && renderables.get(focused) instanceof GuiEventListener newFocus){
                     screen.setFocused(newFocus);
-                    ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),1.0f);
+                    ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
                     return true;
                 }
             }
         }
         return false;
     }
-
+    public interface Access {
+        void renderableVListInit();
+        RenderableVList getRenderableVList();
+    }
 }

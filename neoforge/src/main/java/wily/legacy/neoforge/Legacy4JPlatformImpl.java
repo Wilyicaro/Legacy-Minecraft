@@ -4,19 +4,18 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.fml.loading.LoadingModList;
 import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
-import net.neoforged.neoforge.common.crafting.NBTIngredient;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -122,12 +121,6 @@ public class Legacy4JPlatformImpl {
         }) : null;
     }
 
-    public static Ingredient getNBTIngredient(ItemStack... stacks) {
-        return stacks[0].getTag() == null ? Ingredient.of(stacks) : NBTIngredient.of(false,stacks[0].getTag(), Arrays.stream(stacks).map(ItemStack::getItem).toArray(ItemLike[]::new));
-    }
-    public static Ingredient getStrictNBTIngredient(ItemStack stack) {
-        return NBTIngredient.of(true, stack.getTag(), stack.serializeAttachments(), stack.getItem());
-    }
     public static <T,V extends T> RegisterListing.Holder<V> deferredToRegisterHolder(DeferredHolder<T,V> holder){
         return new RegisterListing.Holder<>() {
             @Override
@@ -191,4 +184,13 @@ public class Legacy4JPlatformImpl {
     public static<T extends CustomPacketPayload> void sendToServer(T packetHandler) {
         PacketDistributor.SERVER.noArg().send(packetHandler);
     }
+
+    public static Fluid getBucketFluid(BucketItem item) {
+        return item.getFluid();
+    }
+
+    public static boolean isPackHidden(Pack pack) {
+        return false;
+    }
+
 }

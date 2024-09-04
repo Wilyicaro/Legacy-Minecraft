@@ -41,7 +41,7 @@ public abstract class OverlayPanelScreen extends PanelBackgroundScreen{
     @Override
     public void tick() {
         super.tick();
-        if (panel != null) parent.tick();
+        if (parent != null) parent.tick();
     }
 
     @Override

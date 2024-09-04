@@ -28,6 +28,7 @@ import wily.legacy.Legacy4JPlatform;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LoomTabListing;
+import wily.legacy.inventory.NBTIngredient;
 import wily.legacy.network.CommonNetwork;
 import wily.legacy.util.*;
 import wily.legacy.client.controller.BindingState;
@@ -56,6 +57,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
     protected ItemStack previewStack = ItemStack.EMPTY;
     public static final Component SELECT_BANNER_TAB = Component.translatable("legacy.container.tab.select_banner");
     public static final Component PREVIEW = Component.translatable("legacy.container.preview");
+    protected final ScrollableRenderer scrollableRenderer = new ScrollableRenderer();
     protected final List<RecipeIconHolder<BannerRecipe>> craftingButtons = new ArrayList<>();
     protected final List<CustomRecipeIconHolder> selectBannerButton = List.of(new CustomRecipeIconHolder(){
 
@@ -110,7 +112,8 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         void updateRecipe() {
             clearIngredients(ingredientsGrid);
             resultStack = itemIcon.copyWithCount(1);
-            ingredientsGrid.set(4, Legacy4JPlatform.getStrictNBTIngredient(resultStack));
+            ingredientsGrid.set(4, NBTIngredient.of(true,resultStack,1));
+            scrollableRenderer.scrolled.set(0);
         }
 
         @Override
@@ -131,7 +134,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
             selectedIngredients.clear();
             if (craftingTabList.selectedTab != 0 && !selectedStack.isEmpty()) {
                 previewStack = selectedStack.copy();
-                selectedIngredients.add(Legacy4JPlatform.getStrictNBTIngredient(selectedStack));
+                selectedIngredients.add(NBTIngredient.of(true,selectedStack));
                 if (!selectedPatterns.isEmpty()) {
                     CompoundTag beTag = previewStack.getOrCreateTagElement("BlockEntityTag");
                     ListTag patternsTag = beTag.getList("Patterns", 10);
@@ -148,7 +151,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                         }
                     });
                 }
-                Ingredient previewIng = Legacy4JPlatform.getStrictNBTIngredient(previewStack);
+                Ingredient previewIng = NBTIngredient.of(true,previewStack);
                 LoomTabListing.list.get(craftingTabList.selectedTab - 1).patterns.forEach(p -> {
                     BannerPattern pattern = BuiltInRegistries.BANNER_PATTERN.get(p);
                     recipesByGroup.add(Arrays.stream(DyeColor.values()).map(color -> {
@@ -476,11 +479,12 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
             ScreenUtil.renderScrollingString(guiGraphics, font, resultName, leftPos + 11 + Math.max(163 - font.width(resultName), 0) / 2, topPos + 114, leftPos + 170, topPos + 125, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
             if (craftingTabList.selectedTab == 0){
                 List<Component> list = resultStack.getTooltipLines(minecraft.player, TooltipFlag.NORMAL);
-                for (int i1 = 0; i1 < list.size(); i1++) {
-                    if (26 + i1 * 13 >= 93) break;
-                    Component c = list.get(i1);
-                    ScreenUtil.renderScrollingString(guiGraphics, font, c.copy().withColor(CommonColor.INVENTORY_GRAY_TEXT.get()), leftPos + 180, topPos + 15 + i1 * 13, leftPos + 335, topPos + 26 + i1 * 13, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-                }
+                scrollableRenderer.scrolled.max = Math.max(0,list.size()-6);
+                scrollableRenderer.render(guiGraphics,leftPos + 180, topPos + 15, 152, 74,()->{
+                    for (int i1 = 0; i1 < list.size(); i1++) {
+                        ScreenUtil.renderScrollingString(guiGraphics, font, list.get(i1).copy().withColor(CommonColor.INVENTORY_GRAY_TEXT.get()), leftPos + 180, topPos + 15 + i1 * 13, leftPos + 335, topPos + 26 + i1 * 13, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                    }
+                });
             }
             if (ScreenUtil.isMouseOver(i,j,leftPos + 124, topPos + 151,36,36)) guiGraphics.renderTooltip(font, resultStack,i,j);
         }

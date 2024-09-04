@@ -183,7 +183,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
                         scrollRenderer.updateScroll(i == 263 ? ScreenDirection.LEFT : ScreenDirection.RIGHT);
                         updateSlotsDisplay();
                     }
-                    ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+                    ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
                     return true;
                 }
                 return super.keyPressed(i, j, k);

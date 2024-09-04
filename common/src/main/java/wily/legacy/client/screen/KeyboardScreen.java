@@ -409,8 +409,8 @@ public class KeyboardScreen extends OverlayPanelScreen {
         });
         if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis a && state.canClick(20)){
             if (state.canClick()) ScreenUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
-            xDiff = Math.max(0,Math.min(panel.getX() + Math.round(a.x), width - panel.getWidth())) - panel.updatedX.apply(panel);
-            yDiff = Math.max(0,Math.min(panel.getY() + Math.round(a.y), height - panel.getHeight())) - panel.updatedY.apply(panel);
+            xDiff = Math.max(0,Math.min(panel.getX() + Math.round(a.x*4), width - panel.getWidth())) - panel.updatedX.apply(panel);
+            yDiff = Math.max(0,Math.min(panel.getY() + Math.round(a.y*4), height - panel.getHeight())) - panel.updatedY.apply(panel);
             repositionElements();
         }
     }

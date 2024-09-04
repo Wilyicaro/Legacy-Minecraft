@@ -3,6 +3,7 @@ package wily.legacy.mixin;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.InteractionHand;
@@ -18,7 +19,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ItemInHandRenderer.class)
 public class ItemInHandRendererMixin {
     @Shadow @Final private Minecraft minecraft;
-
+    @Inject(method = "renderPlayerArm", at = @At(value = "HEAD"), cancellable = true)
+    private void renderPlayerArm(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, float f, float g, HumanoidArm humanoidArm, CallbackInfo ci){
+        if (minecraft.player == null || minecraft.player.isRemoved()) ci.cancel();
+    }
+    @Inject(method = "renderMapHand", at = @At(value = "HEAD"), cancellable = true)
+    private void renderMapHand(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, HumanoidArm humanoidArm, CallbackInfo ci){
+        if (minecraft.player == null || minecraft.player.isRemoved()) ci.cancel();
+    }
     @Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", shift = At.Shift.AFTER))
     private void renderItemInHand(AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, MultiBufferSource multiBufferSource, int j, CallbackInfo ci) {
         int screenWidth = minecraft.getWindow().getScreenWidth();

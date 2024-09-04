@@ -4,8 +4,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.impl.recipe.ingredient.builtin.NbtIngredient;
+import net.fabricmc.fabric.impl.resource.loader.FabricResourcePackProfile;
 import net.fabricmc.fabric.impl.tag.convention.TagRegistration;
+import net.fabricmc.fabric.mixin.transfer.BucketItemAccessor;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.Person;
@@ -14,10 +15,11 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.NotNull;
 import wily.legacy.util.RegisterListing;
 import wily.legacy.util.ModInfo;
@@ -119,13 +121,6 @@ public class Legacy4JPlatformImpl {
         }) : null;
     }
 
-    public static Ingredient getNBTIngredient(ItemStack... stacks) {
-        return stacks[0].getTag() == null ? Ingredient.of(stacks) : new NbtIngredient(Ingredient.of(stacks),stacks[0].getTag(),false).toVanilla();
-    }
-    public static Ingredient getStrictNBTIngredient(ItemStack stack) {
-        return new NbtIngredient(Ingredient.of(stack),stack.getTag(),true).toVanilla();
-    }
-
     public static <T> RegisterListing<T> createLegacyRegister(String namespace, Registry<T> registry) {
         return new RegisterListing<>() {
             private final List<Holder<T>> REGISTER_LIST = new ArrayList<>();
@@ -193,6 +188,14 @@ public class Legacy4JPlatformImpl {
         FriendlyByteBuf buf = PacketByteBufs.create();
         packetHandler.write(buf);
         ClientPlayNetworking.send(packetHandler.id(),buf);
+    }
+
+    public static Fluid getBucketFluid(BucketItem item) {
+        return ((BucketItemAccessor)item).fabric_getFluid();
+    }
+
+    public static boolean isPackHidden(Pack pack) {
+        return ((FabricResourcePackProfile)pack).fabric_isHidden();
     }
 
 

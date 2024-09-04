@@ -6,10 +6,12 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.neoforge.client.gui.overlay.ExtendedGui;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.util.ScreenUtil;
 
@@ -66,5 +68,9 @@ public abstract class ExtendedGuiMixin extends Gui {
     public void renderArmorReturn(GuiGraphics guiGraphics, int width, int height, CallbackInfo ci) {
         if (minecraft.screen != null) return;
         ScreenUtil.finishHUDRender(guiGraphics);
+    }
+    @Redirect(method="renderHealth", at = @At(value = "FIELD", target = "Lnet/neoforged/neoforge/client/gui/overlay/ExtendedGui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD, ordinal = 1))
+    private void renderHealth(ExtendedGui instance, long value) {
+        healthBlinkTime = value - 5;
     }
 }
