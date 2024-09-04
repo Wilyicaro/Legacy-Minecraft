@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.material.Fluids;
+import wily.legacy.Legacy4JPlatform;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyGuiGraphics;
 import wily.legacy.inventory.LegacySlotDisplay;
@@ -88,7 +89,7 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
 
 
     public FlatLayerInfo getFlatLayerInfo() {
-        return new FlatLayerInfo(selectedLayer.count, selectedLayer.getItem() instanceof BlockItem b ? b.getBlock() : selectedLayer.getItem() instanceof BucketItem bucket ? bucket.content.defaultFluidState().createLegacyBlock().getBlock(): Blocks.AIR);
+        return new FlatLayerInfo(selectedLayer.count, selectedLayer.getItem() instanceof BlockItem b ? b.getBlock() : selectedLayer.getItem() instanceof BucketItem bucket ? Legacy4JPlatform.getBucketFluid(bucket).defaultFluidState().createLegacyBlock().getBlock(): Blocks.AIR);
     }
 
     public void updateCreativeGridScroll(double d, double e, int i){

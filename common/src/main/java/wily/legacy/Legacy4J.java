@@ -27,8 +27,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.init.*;
+import wily.legacy.inventory.LegacyIngredient;
 import wily.legacy.network.*;
 import wily.legacy.player.LegacyPlayerInfo;
+import wily.legacy.util.ArmorStandPose;
 
 import java.awt.*;
 import java.io.File;
@@ -37,6 +39,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -56,7 +60,7 @@ public class Legacy4J {
     public static LegacyServerProperties serverProperties;
 
     public static final String MOD_ID = "legacy";
-    public static final Supplier<String> VERSION =  ()-> Legacy4JPlatform.getModInfo(MOD_ID).getVersion();
+    public static final Supplier<String> VERSION = ()-> Legacy4JPlatform.getModInfo(MOD_ID).getVersion();
 
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
@@ -64,8 +68,8 @@ public class Legacy4J {
         LegacyRegistries.register();
         LegacyGameRules.init();
         CommonNetwork.register();
-
-
+        ArmorStandPose.init();
+        LegacyIngredient.init();
     }
     public static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection environment){
         TipCommand.register(dispatcher,context);
@@ -280,6 +284,7 @@ public class Legacy4J {
         }
         ((LegacyPlayerInfo)p).setPosition(pos);
         CommonNetwork.sendToPlayer(p, new PlayerInfoSync.All(Map.of(p.getUUID(),(LegacyPlayerInfo)p), Collections.emptyMap(),p.server.getDefaultGameType()));
+        if (!p.server.isDedicatedServer()) Legacy4JClient.serverPlayerJoin(p);
     }
     public static void copySaveToDirectory(InputStream stream, File directory){
         try (ZipInputStream inputStream = new ZipInputStream(stream))

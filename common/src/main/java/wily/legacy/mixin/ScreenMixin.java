@@ -49,7 +49,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
 
     @Inject(method = "changeFocus",at = @At("HEAD"))
     private void changeFocus(ComponentPath componentPath, CallbackInfo ci){
-        ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),1.0f);
+        ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
     }
     @Inject(method = "onClose",at = @At("HEAD"))
     private void onClose(CallbackInfo ci){

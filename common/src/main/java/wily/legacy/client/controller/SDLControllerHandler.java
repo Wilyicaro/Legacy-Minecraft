@@ -1,5 +1,6 @@
 package wily.legacy.client.controller;
 
+import dev.isxander.sdl3java.api.SDL_bool;
 import dev.isxander.sdl3java.api.SdlInit;
 import dev.isxander.sdl3java.api.SdlSubSystemConst;
 import dev.isxander.sdl3java.api.gamepad.*;
@@ -18,7 +19,9 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.LegacyLoadingScreen;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.CompletableFuture;
@@ -39,6 +42,10 @@ public class SDLControllerHandler implements Controller.Handler{
     public String getName() {
         return "SDL3 (isXander's libsdl4j)";
     }
+    @Override
+    public String getId() {
+        return "sdl3";
+    }
     public static SDLControllerHandler getInstance(){
         return INSTANCE;
     }
@@ -50,12 +57,16 @@ public class SDLControllerHandler implements Controller.Handler{
             if (!nativesFile.exists()){
                 minecraft.executeBlocking(()-> {
                     Screen s = minecraft.screen;
+                    ((LegacyOptions)minecraft.options).selectedControllerHandler().set(ControllerManager.handlers.indexOf(GLFWControllerHandler.getInstance()));
+                    minecraft.options.save();
                     minecraft.setScreen(new ConfirmationScreen(s, Component.translatable("legacy.menu.download_natives",getName()), Controller.Handler.DOWNLOAD_MESSAGE, b -> {
                         AtomicLong fileSize = new AtomicLong(1);
                         LegacyLoadingScreen screen = new LegacyLoadingScreen(Controller.Handler.DOWNLOADING_NATIVES, CommonComponents.EMPTY){
                             @Override
                             public void tick() {
                                 if (progress == 100) {
+                                    ((LegacyOptions)minecraft.options).selectedControllerHandler().set(ControllerManager.handlers.indexOf(getInstance()));
+                                    minecraft.options.save();
                                     minecraft.setScreen(s);
                                     return;
                                 }
@@ -77,14 +88,7 @@ public class SDLControllerHandler implements Controller.Handler{
                                 throw new RuntimeException(e);
                             }
                         });
-                    }){
-                        @Override
-                        public void onClose() {
-                            ((LegacyOptions)minecraft.options).selectedControllerHandler().set(0);
-                            minecraft.options.save();
-                            super.onClose();
-                        }
-                    });
+                    }));
                 });
                 return;
             }else SdlNativeLibraryLoader.loadLibSDL3FromFilePathNow(nativesFile.getPath());
@@ -180,7 +184,7 @@ public class SDLControllerHandler implements Controller.Handler{
     public boolean isValidController(int jid) {
         actualIds = SdlGamepad.SDL_GetGamepads();
         if (actualIds.length <= jid) return false;
-        return SdlGamepad.SDL_IsGamepad(actualIds[jid]);
+        return SdlGamepad.SDL_IsGamepad(actualIds[jid]) == SDL_bool.SDL_TRUE;
     }
 
     @Override

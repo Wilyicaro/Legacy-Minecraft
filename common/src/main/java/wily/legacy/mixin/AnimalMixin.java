@@ -7,17 +7,22 @@ import net.minecraft.world.level.Level;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.network.ClientEntityDataSyncPacket;
+import wily.legacy.network.ClientAnimalInLoveSyncPacket;
 
 @Mixin(Animal.class)
 public abstract class AnimalMixin extends AgeableMob {
+    @Unique
+    int lastInlove = 0;
 
     @Shadow public abstract void setInLoveTime(int i);
+
+    @Shadow private int inLove;
 
     protected AnimalMixin(EntityType<? extends AgeableMob> entityType, Level level) {
         super(entityType, level);
@@ -28,7 +33,8 @@ public abstract class AnimalMixin extends AgeableMob {
     }
     @Inject(method = "aiStep", at = @At("HEAD"))
     public void aiStep(CallbackInfo ci) {
-      ClientEntityDataSyncPacket.syncEntity(this);
+        if (lastInlove != inLove) ClientAnimalInLoveSyncPacket.sync((Animal)(Object) this);
+        lastInlove = inLove;
     }
     @Inject(method = "canFallInLove", at = @At("HEAD"), cancellable = true)
     public void aiStep(CallbackInfoReturnable<Boolean> cir) {

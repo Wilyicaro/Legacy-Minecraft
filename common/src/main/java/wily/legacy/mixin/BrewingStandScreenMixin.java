@@ -21,9 +21,9 @@ import wily.legacy.util.ScreenUtil;
 
 @Mixin(BrewingStandScreen.class)
 public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<BrewingStandMenu> {
-    private static final ResourceLocation FUEL_LENGTH_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"container/fuel_length");
-    private static final ResourceLocation BREW_PROGRESS_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"container/brew_progress");
-    private static final ResourceLocation BUBBLES_SPRITE = new ResourceLocation(Legacy4J.MOD_ID,"container/bubbles");
+    private static final ResourceLocation FUEL_LENGTH_SPRITE = new ResourceLocation("container/brewing_stand/fuel_length");
+    private static final ResourceLocation BREW_PROGRESS_SPRITE = new ResourceLocation("container/brewing_stand/brew_progress");
+    private static final ResourceLocation BUBBLES_SPRITE = new ResourceLocation("container/brewing_stand/bubbles");
 
     @Shadow @Final private static int[] BUBBLELENGTHS;
 

@@ -31,6 +31,7 @@ import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyGuiGraphics;
 import wily.legacy.client.LoomTabListing;
+import wily.legacy.inventory.NBTIngredient;
 import wily.legacy.network.CommonNetwork;
 import wily.legacy.util.*;
 import wily.legacy.client.controller.BindingState;
@@ -113,7 +114,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         void updateRecipe() {
             clearIngredients(ingredientsGrid);
             resultStack = itemIcon.copyWithCount(1);
-            ingredientsGrid.set(4, Legacy4JPlatform.getStrictNBTIngredient(resultStack));
+            ingredientsGrid.set(4, NBTIngredient.of(true,resultStack));
         }
 
         @Override
@@ -134,7 +135,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
             selectedIngredients.clear();
             if (craftingTabList.selectedTab != 0 && !selectedStack.isEmpty()) {
                 previewStack = selectedStack.copy();
-                selectedIngredients.add(Legacy4JPlatform.getStrictNBTIngredient(selectedStack));
+                selectedIngredients.add(NBTIngredient.of(true,selectedStack));
                 if (!selectedPatterns.isEmpty()) {
                     CompoundTag beTag = previewStack.getOrCreateTagElement("BlockEntityTag");
                     ListTag patternsTag = beTag.getList("Patterns", 10);
@@ -151,7 +152,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                         }
                     });
                 }
-                Ingredient previewIng = Legacy4JPlatform.getStrictNBTIngredient(previewStack);
+                Ingredient previewIng = NBTIngredient.of(true,previewStack);
                 LoomTabListing.list.get(craftingTabList.selectedTab - 1).patterns.forEach(p -> {
                     BannerPattern pattern = BuiltInRegistries.BANNER_PATTERN.get(p);
                     recipesByGroup.add(Arrays.stream(DyeColor.values()).map(color -> {

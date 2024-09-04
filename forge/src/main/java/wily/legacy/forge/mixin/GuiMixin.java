@@ -25,11 +25,7 @@ import static wily.legacy.client.screen.ControlTooltip.MORE;
 public abstract class GuiMixin {
     @Shadow @Final protected Minecraft minecraft;
 
-    @Shadow protected int screenHeight;
-
     @Shadow public abstract Font getFont();
-
-    @Shadow protected int screenWidth;
 
     @Shadow protected int toolHighlightTimer;
 

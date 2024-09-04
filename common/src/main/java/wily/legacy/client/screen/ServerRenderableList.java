@@ -23,7 +23,6 @@ import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.FaviconTexture;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
@@ -53,18 +52,18 @@ import java.util.concurrent.ThreadPoolExecutor;
 import static wily.legacy.client.screen.CreationList.addIconButton;
 
 public class ServerRenderableList extends RenderableVList {
-    static final ResourceLocation INCOMPATIBLE = new ResourceLocation(Legacy4J.MOD_ID,"server_list/incompatible");
-    static final ResourceLocation UNREACHABLE = new ResourceLocation(Legacy4J.MOD_ID,"server_list/unreachable");
-    static final ResourceLocation PING_1 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/ping_1");
-    static final ResourceLocation PING_2 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/ping_2");
-    static final ResourceLocation PING_3 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/ping_3");
-    static final ResourceLocation PING_4 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/ping_4");
-    static final ResourceLocation PING_5 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/ping_5");
-    static final ResourceLocation PINGING_1 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/pinging_1");
-    static final ResourceLocation PINGING_2 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/pinging_2");
-    static final ResourceLocation PINGING_3 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/pinging_3");
-    static final ResourceLocation PINGING_4 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/pinging_4");
-    static final ResourceLocation PINGING_5 = new ResourceLocation(Legacy4J.MOD_ID,"server_list/pinging_5");
+    static final ResourceLocation INCOMPATIBLE = new ResourceLocation("server_list/incompatible");
+    static final ResourceLocation UNREACHABLE = new ResourceLocation("server_list/unreachable");
+    static final ResourceLocation PING_1 = new ResourceLocation("server_list/ping_1");
+    static final ResourceLocation PING_2 = new ResourceLocation("server_list/ping_2");
+    static final ResourceLocation PING_3 = new ResourceLocation("server_list/ping_3");
+    static final ResourceLocation PING_4 = new ResourceLocation("server_list/ping_4");
+    static final ResourceLocation PING_5 = new ResourceLocation("server_list/ping_5");
+    static final ResourceLocation PINGING_1 = new ResourceLocation("server_list/pinging_1");
+    static final ResourceLocation PINGING_2 = new ResourceLocation("server_list/pinging_2");
+    static final ResourceLocation PINGING_3 = new ResourceLocation("server_list/pinging_3");
+    static final ResourceLocation PINGING_4 = new ResourceLocation("server_list/pinging_4");
+    static final ResourceLocation PINGING_5 = new ResourceLocation("server_list/pinging_5");
     protected static final Logger LOGGER = LogUtils.getLogger();
     static final ThreadPoolExecutor THREAD_POOL = new ScheduledThreadPoolExecutor(5, new ThreadFactoryBuilder().setNameFormat("Server Pinger #%d").setDaemon(true).setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(LOGGER)).build());
     private static final ResourceLocation ICON_MISSING = new ResourceLocation("textures/misc/unknown_server.png");
@@ -107,6 +106,15 @@ public class ServerRenderableList extends RenderableVList {
     }
     public boolean hasOnlineFriends(){
         return false;
+    }
+
+    public void added(){
+    }
+    public void removed(){
+        if (lanServerDetector != null) {
+            lanServerDetector.interrupt();
+            lanServerDetector = null;
+        }
     }
     private Component getMultiplayerDisabledReason() {
         if (this.minecraft.allowsMultiplayer()) {

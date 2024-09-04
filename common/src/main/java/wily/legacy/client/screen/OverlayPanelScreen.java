@@ -3,6 +3,7 @@ package wily.legacy.client.screen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import wily.legacy.util.ScreenUtil;
 
 import java.util.function.Function;
 
@@ -19,7 +20,7 @@ public abstract class OverlayPanelScreen extends PanelBackgroundScreen{
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        if (transparentBackground) guiGraphics.fillGradient(0,0,guiGraphics.guiWidth(),guiGraphics.guiHeight(), -1073741824, -805306368);;
+        if (transparentBackground) ScreenUtil.renderTransparentBackground(guiGraphics);
     }
 
     @Override

@@ -45,7 +45,7 @@ public abstract class ChatScreenMixin extends Screen implements Controller.Event
 
     @Redirect(method = "init",at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/ChatScreen;input:Lnet/minecraft/client/gui/components/EditBox;", opcode = Opcodes.PUTFIELD))
     private void init(ChatScreen instance, EditBox value){
-        this.input = new EditBox(this.minecraft.fontFilterFishy, 2,height - value.getHeight() + (int)(ScreenUtil.getHUDDistance() - 56), width - 4, 20, (Component)Component.translatable("chat.editBox")){
+        this.input = new EditBox(this.minecraft.fontFilterFishy, 4 + Math.round(ScreenUtil.getChatSafeZone()),height - value.getHeight() + (int)(ScreenUtil.getHUDDistance() - 56), width - (8 + Math.round(ScreenUtil.getChatSafeZone()) * 2), 20, Component.translatable("chat.editBox")){
 
             @Override
             protected MutableComponent createNarrationMessage() {

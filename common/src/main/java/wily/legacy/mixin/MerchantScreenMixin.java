@@ -185,8 +185,9 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     public void renderBackground(GuiGraphics guiGraphics) {
     }
 
-    @Inject(method = "renderBg",at = @At("HEAD"))
+    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBackground(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+        ci.cancel();
         LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
         LegacyGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 7,topPos + 21,105,165);
         guiGraphics.pose().pushPose();

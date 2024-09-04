@@ -7,12 +7,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.crafting.PartialNBTIngredient;
-import net.minecraftforge.common.crafting.StrictNBTIngredient;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -127,12 +124,6 @@ public class Legacy4JPlatformImpl {
         }) : null;
     }
 
-    public static Ingredient getNBTIngredient(ItemStack... stacks) {
-        return stacks[0].getTag() == null ? Ingredient.of(stacks) : PartialNBTIngredient.of(stacks[0].getTag(), Arrays.stream(stacks).map(ItemStack::getItem).toArray(ItemLike[]::new));
-    }
-    public static Ingredient getStrictNBTIngredient(ItemStack stack) {
-        return StrictNBTIngredient.of(stack);
-    }
     public static <T> RegisterListing.Holder<T> deferredToRegisterHolder(RegistryObject<T> holder){
         return new RegisterListing.Holder<>() {
             @Override
@@ -201,4 +192,7 @@ public class Legacy4JPlatformImpl {
         PacketDistributor.SERVER.noArg().send(NetworkDirection.PLAY_TO_SERVER.buildPacket(Pair.of(buf,0), packetHandler.id()).getThis());
     }
 
+    public static Fluid getBucketFluid(BucketItem item) {
+        return item.getFluid();
+    }
 }

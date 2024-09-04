@@ -1,38 +1,60 @@
 package wily.legacy.client.screen;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.LanguageManager;
 import net.minecraft.network.chat.Component;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacyGuiGraphics;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+
+import java.util.Locale;
 
 public class LegacyLanguageScreen extends PanelVListScreen{
     public static final Component WARNING_LABEL = Component.translatable("options.languageAccuracyWarning");
     protected String selectedLang;
     public LegacyLanguageScreen(Screen parent, LanguageManager manager) {
         super(parent, 255, 240, Component.translatable("controls.keybinds.title"));
-        manager.getLanguages().forEach(((s, languageInfo) -> {
-            renderableVList.addRenderable(new AbstractButton(0,0,260,20,languageInfo.toComponent()) {
-                @Override
-                protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                    super.renderWidget(guiGraphics, i, j, f);
-                    if (manager.getSelected().equals(s)) setFocused(true);
-                }
+        String autoCode = getSystemLanguageCode();
+        renderableVList.addRenderable(new AbstractButton(0,0,260,20,Component.translatable("legacy.menu.system_language")) {
+            @Override
+            protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+                super.renderWidget(guiGraphics, i, j, f);
+                if (manager.getSelected().equals(autoCode)) setFocused(true);
+            }
 
-                @Override
-                public void onPress() {
-                    selectedLang = s;
-                }
-                @Override
-                protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-                    defaultButtonNarrationText(narrationElementOutput);
-                }
-            });
-        }));
+            @Override
+            public void onPress() {
+                selectedLang = autoCode;
+            }
+            @Override
+            protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+                defaultButtonNarrationText(narrationElementOutput);
+            }
+        });
+        manager.getLanguages().forEach(((s, languageInfo) -> renderableVList.addRenderable(new AbstractButton(0,0,260,20,languageInfo.toComponent()) {
+            @Override
+            protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+                super.renderWidget(guiGraphics, i, j, f);
+                if (manager.getSelected().equals(s)) setFocused(true);
+            }
+
+            @Override
+            public void onPress() {
+                selectedLang = s;
+            }
+            @Override
+            protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+                defaultButtonNarrationText(narrationElementOutput);
+            }
+        })));
+    }
+    public static String getSystemLanguageCode(){
+        String auto = Locale.getDefault().toString().toLowerCase(Locale.ENGLISH);
+        return Minecraft.getInstance().getLanguageManager().getLanguages().containsKey(auto) ? auto : "en_us";
     }
 
     @Override

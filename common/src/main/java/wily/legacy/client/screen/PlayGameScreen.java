@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 
 import static wily.legacy.client.screen.ControlTooltip.getAction;
 
-public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.Event{
+public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.Event,RenderableVList.Access{
     private static final Component SAFETY_TITLE = Component.translatable("multiplayerWarning.header").withStyle(ChatFormatting.BOLD);
     private static final Component SAFETY_CONTENT = Component.translatable("multiplayerWarning.message");
     private static final Component SAFETY_CHECK = Component.translatable("multiplayerWarning.check");
@@ -45,13 +45,13 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             repositionElements();
         else minecraft.setScreen(new ConfirmationScreen(this,SAFETY_TITLE,Component.translatable("legacy.menu.multiplayer_warning").append("\n").append(SAFETY_CONTENT)){
             @Override
-            protected void initButtons() {
-                addRenderableWidget(Button.builder(SAFETY_CHECK, b-> {
-                    minecraft.options.skipMultiplayerWarning = true;
-                    minecraft.options.save();
+            protected void addButtons() {
+                renderableVList.addRenderable(Button.builder(SAFETY_CHECK, b-> {
+                    this.minecraft.options.skipMultiplayerWarning = true;
+                    this.minecraft.options.save();
                     onClose();
                 }).bounds(panel.x + (panel.width - 200) / 2, panel.y + panel.height - 52,200,20).build());
-                okButton = addRenderableWidget(Button.builder(Component.translatable("gui.ok"),b-> {if (okAction.test(b)) onClose();}).bounds(panel.x + (panel.width - 200) / 2, panel.y + panel.height - 30,200,20).build());
+                renderableVList.addRenderable(okButton = Button.builder(Component.translatable("gui.ok"),b-> {if (okAction.test(b)) onClose();}).bounds(panel.x + (panel.width - 200) / 2, panel.y + panel.height - 30,200,20).build());
             }
         });
     });
@@ -74,17 +74,28 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     public PlayGameScreen(Screen parent) {
         this(parent,0);
     }
-
     protected boolean canNotifyOnlineFriends(){
         return serverRenderableList.hasOnlineFriends() && Util.getMillis() % 1000 < 500;
     }
+
+    @Override
+    public void added() {
+        super.added();
+        serverRenderableList.added();
+    }
+
     @Override
     protected void init() {
         panel.height = Math.min(256,height-52);
         addWidget(tabList);
         panel.init();
-        getRenderableVList().init(this,panel.x + 15,panel.y + 15,270, panel.height - 10 - (tabList.selectedTab == 0 ? 21 : 0));
+        renderableVListInit();
         tabList.init(panel.x,panel.y - 24,panel.width);
+    }
+
+    @Override
+    public void renderableVListInit() {
+        getRenderableVList().init(this,panel.x + 15,panel.y + 15,270, panel.height - 10 - (tabList.selectedTab == 0 ? 21 : 0));
     }
 
     @Override
@@ -98,12 +109,11 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(panel.x + 11.25f, panel.y + panel.height - 22.75, 0);
                 long storage = new File("/").getTotalSpace();
-                long fixedStorage = SaveRenderableList.sizeCache.asMap().values().stream().max(Comparator.comparingLong(l->l)).orElse(0L) * (saveRenderableList.currentlyDisplayedLevels.size() + 1);
-                long storageSize = fixedStorage != 0 ? Math.min(storage,fixedStorage) : storage;
+                guiGraphics.enableScissor(panel.x + 11, panel.y + panel.height - 23,panel.x + 11 + panel.width - 24, panel.y + panel.height - 10);
                 for (LevelSummary level : saveRenderableList.currentlyDisplayedLevels) {
                     Long size;
                     if ((size = SaveRenderableList.sizeCache.getIfPresent(level)) == null) continue;
-                    float scaledSize = size * (panel.width - 21f)/ storageSize;
+                    float scaledSize = Math.max(1,size * (panel.width - 21f)/ storage);
                     guiGraphics.pose().pushPose();
                     guiGraphics.pose().scale(scaledSize,1,1);
                     guiGraphics.fill(0, 0, 1, 11,getFocused() instanceof AbstractButton b && saveRenderableList.renderables.contains(b) && saveRenderableList.renderables.indexOf(b) == saveRenderableList.currentlyDisplayedLevels.indexOf(level) ? CommonColor.SELECTED_STORAGE_SAVE.get() : CommonColor.STORAGE_SAVE.get());
@@ -111,6 +121,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
                     guiGraphics.pose().translate(scaledSize, 0, 0);
                 }
                 guiGraphics.pose().popPose();
+                guiGraphics.disableScissor();
             }
             ScreenUtil.renderPanelTranslucentRecess(guiGraphics, panel.x + 9, panel.y + panel.height - 25, panel.width - 18 , 16);
         }
@@ -131,10 +142,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         if (this.saveRenderableList != null) {
             SaveRenderableList.resetIconCache();
         }
-        if (serverRenderableList.lanServerDetector != null) {
-            serverRenderableList.lanServerDetector.interrupt();
-            serverRenderableList.lanServerDetector = null;
-        }
+        serverRenderableList.removed();
         this.pinger.removeAll();
     }
     @Override
@@ -161,8 +169,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        tabList.controlTab(i);
-        tabList.directionalControlTab(i);
+        if (tabList.controlTab(i) || tabList.directionalControlTab(i))  return true;
         if (super.keyPressed(i, j, k)) {
             return true;
         }
@@ -170,6 +177,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             if (tabList.selectedTab == 0) {
                 saveRenderableList.reloadSaveList();
             } else if (tabList.selectedTab == 2) {
+                serverRenderableList.servers.load();
                 serverRenderableList.updateServers();
             }
             this.rebuildWidgets();

@@ -18,26 +18,32 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyGuiGraphics;
+import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(BossHealthOverlay.class)
 public abstract class BossHealthOverlayMixin {
     @Shadow @Final private Minecraft minecraft;
-    private static final ResourceLocation[] BAR_BACKGROUND_SPRITES = new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/pink_background"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/blue_background"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/red_background"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/green_background"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/yellow_background"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/purple_background"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/white_background")};
-    private static final ResourceLocation[] BAR_PROGRESS_SPRITES = new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/pink_progress"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/blue_progress"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/red_progress"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/green_progress"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/yellow_progress"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/purple_progress"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/white_progress")};
-    private static final ResourceLocation[] OVERLAY_BACKGROUND_SPRITES = new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/notched_6_background"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/notched_10_background"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/notched_12_background"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/notched_20_background")};
-    private static final ResourceLocation[] OVERLAY_PROGRESS_SPRITES = new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/notched_6_progress"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/notched_10_progress"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/notched_12_progress"), new ResourceLocation(Legacy4J.MOD_ID,"boss_bar/notched_20_progress")};
+    private static final ResourceLocation[] BAR_BACKGROUND_SPRITES = new ResourceLocation[]{new ResourceLocation("boss_bar/pink_background"), new ResourceLocation("boss_bar/blue_background"), new ResourceLocation("boss_bar/red_background"), new ResourceLocation("boss_bar/green_background"), new ResourceLocation("boss_bar/yellow_background"), new ResourceLocation("boss_bar/purple_background"), new ResourceLocation("boss_bar/white_background")};
+    private static final ResourceLocation[] BAR_PROGRESS_SPRITES = new ResourceLocation[]{new ResourceLocation("boss_bar/pink_progress"), new ResourceLocation("boss_bar/blue_progress"), new ResourceLocation("boss_bar/red_progress"), new ResourceLocation("boss_bar/green_progress"), new ResourceLocation("boss_bar/yellow_progress"), new ResourceLocation("boss_bar/purple_progress"), new ResourceLocation("boss_bar/white_progress")};
+    private static final ResourceLocation[] OVERLAY_BACKGROUND_SPRITES = new ResourceLocation[]{new ResourceLocation("boss_bar/notched_6_background"), new ResourceLocation("boss_bar/notched_10_background"), new ResourceLocation("boss_bar/notched_12_background"), new ResourceLocation("boss_bar/notched_20_background")};
+    private static final ResourceLocation[] OVERLAY_PROGRESS_SPRITES = new ResourceLocation[]{new ResourceLocation("boss_bar/notched_6_progress"), new ResourceLocation("boss_bar/notched_10_progress"), new ResourceLocation("boss_bar/notched_12_progress"), new ResourceLocation("boss_bar/notched_20_progress")};
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)I"))
     public int drawString(GuiGraphics graphics, Font font, Component component, int i, int j, int k) {
-        graphics.pose().pushPose();
-        graphics.pose().translate((graphics.guiWidth() - font.width(component) * 2/3f) / 2,j,0);
-        graphics.pose().scale(2/3f,2/3f,2/3f);
-        graphics.pose().translate(-i,-j,0);
-        int draw = graphics.drawString(font,component,i,j,k);
-        graphics.pose().popPose();
-        return draw;
+        Legacy4JClient.applyFontOverrideIf(minecraft.getWindow().getHeight() <= 720, LegacyIconHolder.MOJANGLES_11_FONT, b->{
+            Legacy4JClient.forceVanillaFontShadowColor = true;
+            graphics.pose().pushPose();
+            graphics.pose().translate(graphics.guiWidth() / 2f,j,0);
+            if (!b) graphics.pose().scale(2/3f,2/3f,2/3f);
+            graphics.pose().translate(-font.width(component) / 2f,0,0);
+            graphics.drawString(font,component,0,0,k);
+            graphics.pose().popPose();
+            Legacy4JClient.forceVanillaFontShadowColor = false;
+        });
+        return 0;
     }
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
@@ -58,7 +64,7 @@ public abstract class BossHealthOverlayMixin {
     }
     @ModifyVariable(method = "render", at = @At(value = "STORE", ordinal = 0), ordinal = 1)
     public int render(int i) {
-        return 28;
+        return (int) (12 + 16 * ScreenUtil.getLegacyOptions().hudDistance().get());
     }
     @Inject(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At("HEAD"))
     private void drawBar(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, CallbackInfo ci) {

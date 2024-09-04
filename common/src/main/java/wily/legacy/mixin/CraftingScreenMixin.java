@@ -49,7 +49,7 @@ public abstract class CraftingScreenMixin extends AbstractContainerScreen<Crafti
         titleLabelY = 11;
         super.init();
         this.widthTooNarrow = this.width < 379;
-        this.recipeBookComponent.init(this.width - 10, this.height, this.minecraft, this.widthTooNarrow, this.menu);
+        this.recipeBookComponent.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
         if (((LegacyOptions)minecraft.options).showVanillaRecipeBook().get()) {
             this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
             recipeButton = this.addRenderableWidget(new ImageButton(this.leftPos + 5, this.topPos + 44, 20, 18, 0, 0, 19, RECIPE_BUTTON_LOCATION, button -> {

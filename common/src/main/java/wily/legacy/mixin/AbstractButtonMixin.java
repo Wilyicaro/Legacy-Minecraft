@@ -1,21 +1,30 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.client.LegacyGuiGraphics;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(AbstractButton.class)
-public abstract class AbstractButtonMixin extends AbstractWidget {
+public abstract class
+AbstractButtonMixin extends AbstractWidget {
+    @Shadow public abstract void renderString(GuiGraphics guiGraphics, Font font, int i);
+
     @Unique
     long lastTimePressed;
 
@@ -31,16 +40,16 @@ public abstract class AbstractButtonMixin extends AbstractWidget {
     private void onPress(int i, int j, int k, CallbackInfoReturnable<Boolean> cir){
         lastTimePressed = Util.getMillis();
     }
-    @ModifyVariable(method = "renderWidget", at = @At(value = "STORE"), ordinal = 2)
-    protected int renderWidget(int k) {
-        return ScreenUtil.getDefaultTextColor(!isHoveredOrFocused() || Util.getMillis() - lastTimePressed <= 150);
-    }
-    @Inject(method = "renderWidget", at = @At("HEAD"))
+    @Inject(method = "renderWidget", at = @At("HEAD"), cancellable = true)
     protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
-        alpha = active ? 1 : 0.8f;
-    }
-    @Inject(method = "getTextureY", at = @At("HEAD"), cancellable = true)
-    protected void renderWidget(CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(46 + (isHoveredOrFocused() ? 2 : 1) * 20);
+        ci.cancel();
+        Minecraft minecraft = Minecraft.getInstance();
+        guiGraphics.setColor(1.0F, 1.0F, 1.0F, this.alpha);
+        RenderSystem.enableBlend();
+        RenderSystem.enableDepthTest();
+        LegacyGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ?LegacySprites.BUTTON_HIGHLIGHTED : LegacySprites.BUTTON , this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        int k = ScreenUtil.getDefaultTextColor(!isHoveredOrFocused() || Util.getMillis() - lastTimePressed <= 150);
+        this.renderString(guiGraphics, minecraft.font, k | Mth.ceil(this.alpha * 255.0F) << 24);
     }
 }

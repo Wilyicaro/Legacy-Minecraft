@@ -1,7 +1,5 @@
 package wily.legacy.forge;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.PathPackResources;
 import net.minecraft.server.packs.repository.Pack;
@@ -26,7 +24,6 @@ import wily.legacy.network.CommonNetwork;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.function.Function;
 
 @Mod(Legacy4J.MOD_ID)
 @Mod.EventBusSubscriber(modid = Legacy4J.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)

@@ -1,6 +1,5 @@
 package wily.legacy.mixin;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.serialization.Lifecycle;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -13,29 +12,36 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationContext;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
+import net.minecraft.client.gui.screens.worldselection.WorldOpenFlows;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.RegistryLayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.WorldDimensions;
+import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.PrimaryLevelData;
+import org.apache.commons.io.FileUtils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.*;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacyClientWorldSettings;
 import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.ScreenUtil;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
-
-import static wily.legacy.client.screen.ControlTooltip.*;
 
 @Mixin(CreateWorldScreen.class)
 public abstract class CreateWorldScreenMixin extends Screen implements ControlTooltip.Event{
@@ -47,10 +53,12 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
     @Shadow public abstract void popScreen();
 
+    @Shadow protected abstract Optional<LevelStorageSource.LevelStorageAccess> createNewWorldDirectory();
+
     protected boolean trustPlayers;
     protected Panel panel;
     protected PublishScreen publishScreen;
-    protected PackSelector resourcePackSelector;
+    protected Assort.Selector resourceAssortSelector;
 
     protected CreateWorldScreenMixin(Component component) {
         super(component);
@@ -63,14 +71,14 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     public void initReturn(Minecraft minecraft, Screen screen, WorldCreationContext worldCreationContext, Optional optional, OptionalLong optionalLong, CallbackInfo ci){
         uiState.setDifficulty(((LegacyOptions)minecraft.options).createWorldDifficulty().get());
         panel = new Panel(p-> (width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 160 : 0))) / 2, p-> (height - p.height) / 2,245,228);
-        resourcePackSelector = PackSelector.resources(panel.x + 13, panel.y + 106, 220,45, !ScreenUtil.hasTooltipBoxes());
+        resourceAssortSelector = Assort.Selector.resources(panel.x + 13, panel.y + 106, 220,45, !ScreenUtil.hasTooltipBoxes());
         publishScreen = new PublishScreen(this, uiState.getGameMode().gameType);
     }
 
     @Override
     public void added() {
         super.added();
-        ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? COMPOUND_ICON_FUNCTION.apply(new Icon[]{getKeyIcon(InputConstants.KEY_LSHIFT), PLUS_ICON,getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT)}) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), ()-> getFocused() == resourcePackSelector ? getAction("legacy.action.resource_packs_screen") : null);
+        resourceAssortSelector.addControlTooltips(this,ControlTooltip.Renderer.of(this));
     }
 
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
@@ -98,9 +106,9 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
             if (button.selected) minecraft.setScreen(publishScreen);
             button.selected = publishScreen.publish = false;
         }));
-        resourcePackSelector.setX(panel.x + 13);
-        resourcePackSelector.setY(panel.y + 106);
-        addRenderableWidget(resourcePackSelector);
+        resourceAssortSelector.setX(panel.x + 13);
+        resourceAssortSelector.setY(panel.y + 106);
+        addRenderableWidget(resourceAssortSelector);
         this.uiState.onChanged();
     }
 
@@ -117,20 +125,39 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         Lifecycle lifecycle2 = layeredRegistryAccess.compositeAccess().allRegistriesLifecycle();
         Lifecycle lifecycle3 = lifecycle2.add(lifecycle);
         boolean bl = lifecycle2 == Lifecycle.stable();
-        Runnable create = ()-> confirmWorldCreation(this.minecraft, self(), lifecycle3, () -> this.createNewWorld(complete.specialWorldProperty(), layeredRegistryAccess, lifecycle3), bl);
-        resourcePackSelector.applyChanges(true, ()->minecraft.reloadResourcePacks().thenRun(create), create);
-        onLoad();
-
+        confirmWorldCreation(this.minecraft, self(), lifecycle3, ()-> {
+            this.createNewWorld(complete.specialWorldProperty(), layeredRegistryAccess, lifecycle3);
+            resourceAssortSelector.applyResourceChanges(this::onLoad);
+        }, bl);
     }
     private void onLoad() {
-        Legacy4JClient.startServerConsumer = s->{
-            if (ScreenUtil.getLegacyOptions().autoSaveInterval().get() == 0) Legacy4JClient.deleteLevelWhenExitWithoutSaving = true;
-            ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setTrustPlayers(trustPlayers);
-            publishScreen.publish(s);
-            if (resourcePackSelector.hasChanged()) ((LegacyWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setSelectedResourcePacks(resourcePackSelector.getSelectedIds());
+        Legacy4JClient.serverPlayerJoinConsumer = s->{
+            ((LegacyClientWorldSettings)s.server.getWorldData()).setTrustPlayers(trustPlayers);
+            s.server.getPlayerList().sendPlayerPermissionLevel(s);
+            publishScreen.publish((IntegratedServer) s.server);
+            ((LegacyClientWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setSelectedResourceAssort(resourceAssortSelector.getSelectedAssort());
         };
     }
-    
+    @Redirect(method = "createNewWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;createWorldOpenFlows()Lnet/minecraft/client/gui/screens/worldselection/WorldOpenFlows;"))
+    private WorldOpenFlows createNewWorld(Minecraft instance) {
+        return new WorldOpenFlows(minecraft,Legacy4JClient.currentWorldSource);
+    }
+    @Redirect(method = "createNewWorldDirectory", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelStorageSource;createAccess(Ljava/lang/String;)Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;"))
+    private LevelStorageSource.LevelStorageAccess createNewWorldDirectory(LevelStorageSource instance, String path) throws IOException {
+        LevelStorageSource.LevelStorageAccess access = instance.createAccess(path);
+        if (Files.exists(access.getDimensionPath(Level.OVERWORLD))) {
+            try {
+                FileUtils.deleteDirectory(access.getDimensionPath(Level.OVERWORLD).toFile());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return access;
+    }
+    @Redirect(method = "createNewWorldDirectory", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getLevelSource()Lnet/minecraft/world/level/storage/LevelStorageSource;"))
+    private LevelStorageSource createNewWorldDirectory(Minecraft instance) {
+        return Legacy4JClient.currentWorldSource;
+    }
     private static void confirmWorldCreation(Minecraft minecraft, CreateWorldScreen createWorldScreen, Lifecycle lifecycle, Runnable runnable, boolean bl2) {
         if (bl2 || lifecycle == Lifecycle.stable()) {
             runnable.run();
@@ -142,13 +169,13 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e, double f) {
-        if (resourcePackSelector.scrollableRenderer.mouseScrolled(f)) return true;
-        return super.mouseScrolled(d, e, f);
+    public boolean mouseScrolled(double d, double e, double g) {
+        if (resourceAssortSelector.scrollableRenderer.mouseScrolled(g)) return true;
+        return super.mouseScrolled(d, e, g);
     }
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         ScreenUtil.renderDefaultBackground(guiGraphics,false);
-        resourcePackSelector.renderTooltipBox(guiGraphics,panel);
+        resourceAssortSelector.renderTooltipBox(guiGraphics,panel);
         for (Renderable renderable : this.renderables)
             renderable.render(guiGraphics, i, j, f);
         guiGraphics.drawString(font,NAME_LABEL, panel.x + 14, panel.y + 15, CommonColor.INVENTORY_GRAY_TEXT.get(),false);

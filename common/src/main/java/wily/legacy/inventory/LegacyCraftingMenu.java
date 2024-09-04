@@ -2,12 +2,14 @@ package wily.legacy.inventory;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
@@ -88,35 +90,29 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
             public ItemStack getResult(Player player, ServerMenuCraftPacket packet) {
                 return player.level().registryAccess().lookup(Registries.BANNER_PATTERN).flatMap(b->
                         b.get(ResourceKey.create(Registries.BANNER_PATTERN, packet.craftId())).map(p-> {
-                                    if (packet.customIngredients().size() > 1 && packet.customIngredients().size() <= 3){;
-                                        ItemStack banner = packet.customIngredients().get(0).getItems()[0].copy();
-                                        CompoundTag beTag = banner.getOrCreateTagElement("BlockEntityTag");
-                                        ListTag patternsTag = beTag.getList("Patterns", 10);
-                                        if (!beTag.contains("Patterns", 9)) beTag.put("Patterns", patternsTag);
-                                        CompoundTag patternTag = new CompoundTag();
-                                        patternsTag.add(patternTag);
-                                        patternTag.putString("Pattern", p.value().getHashname());
-                                        patternTag.putInt("Color", ((DyeItem) packet.customIngredients().get(packet.customIngredients().size() < 3 ? 1 : 2).getItems()[0].getItem()).getDyeColor().getId());
-                                        return banner;
+                                    if (packet.customIngredients().size() > 1 && packet.customIngredients().size() <= 3){
+                                        Ingredient extraIng;
+                                        if ((extraIng = getBannerPatternExtraIngredient(p.key())).isEmpty() || packet.customIngredients().get(1).equals(extraIng)) {
+                                            ItemStack banner = packet.customIngredients().get(0).getItems()[0].copy();
+                                            CompoundTag beTag = banner.getOrCreateTagElement("BlockEntityTag");
+                                            ListTag patternsTag = beTag.getList("Patterns", 10);
+                                            if (!beTag.contains("Patterns", 9)) beTag.put("Patterns", patternsTag);
+                                            CompoundTag patternTag = new CompoundTag();
+                                            patternsTag.add(patternTag);
+                                            patternTag.putString("Pattern", p.value().getHashname());
+                                            patternTag.putInt("Color", ((DyeItem) packet.customIngredients().get(extraIng.isEmpty() ? 1 : 2).getItems()[0].getItem()).getDyeColor().getId());
+                                            return banner;
+                                        }
                                     }
                                     return ItemStack.EMPTY;
                                 }
                         )).orElse(ItemStack.EMPTY);
-            }
-
-            @Override
-            public List<Ingredient> getIngredients(Player player, ServerMenuCraftPacket packet) {
-                if (packet.customIngredients().size() < 3) return super.getIngredients(player,packet);
-                List<Ingredient> ings = new ArrayList<>(packet.customIngredients());
-                ings.set(1,getBannerPatternExtraIngredient(ResourceKey.create(Registries.BANNER_PATTERN, packet.craftId())));
-                return ings;
             }
         };
     }
     public static LegacyCraftingMenu loomMenu(int window, Inventory inventory){
         return loomMenu(window,inventory,null);
     }
-
     public static LegacyCraftingMenu stoneCutterMenu(int window, Inventory inventory, BlockPos blockPos){
         return new LegacyCraftingMenu(inventory, LegacyRegistries.STONECUTTER_PANEL_MENU.get(),window,blockPos){
             long lastSoundTime;
@@ -170,6 +166,8 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
             LOOM_PATTERN_EXTRA_INGREDIENT_CACHE.put(pattern,patternIng);
             return patternIng;
     }
+
+
     public void addInventorySlotGrid(Container container, int startIndex, int x, int y, int rows){
         for (int j = 0; j < rows; j++) {
             for (int k = 0; k < 9; k++) {

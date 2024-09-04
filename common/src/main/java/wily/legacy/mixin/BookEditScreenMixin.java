@@ -14,6 +14,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.StringUtil;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -104,9 +105,10 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
                 return false;
             }
         }
+
         @Override
         public boolean keyPressed(int i, int j, int k) {
-            if (CommonInputs.selected(i)){
+            if (KeyboardScreen.isOpenKey(i)){
                 minecraft.setScreen(new KeyboardScreen(()->this,BookEditScreenMixin.this));
                 return true;
             }
@@ -248,14 +250,13 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
             cir.setReturnValue(true);
             return;
         }
-        if (super.keyPressed(i, j, k)) {
-            cir.setReturnValue(true);
-        }
+        cir.setReturnValue(super.keyPressed(i,j,k));
     }
     @Inject(method = "charTyped",at = @At("HEAD"), cancellable = true)
     public void charTyped(char c, int i, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(super.charTyped(c,i));
     }
+
     @Override
     public boolean isPauseScreen() {
         return false;

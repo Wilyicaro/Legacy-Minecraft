@@ -2,8 +2,12 @@ package wily.legacy.client;
 
 import net.minecraft.client.OptionInstance;
 import net.minecraft.world.Difficulty;
+import wily.legacy.Legacy4JPlatform;
+
+import java.io.File;
 
 public interface LegacyOptions {
+    File legacyOptionsFile = Legacy4JPlatform.getConfigDirectory().resolve("legacy_options.txt").toFile();
 
     OptionInstance<Double> hudDistance();
     OptionInstance<Double> hudOpacity();
@@ -14,12 +18,14 @@ public interface LegacyOptions {
     OptionInstance<Double> terrainFogEnd();
     OptionInstance<Integer> hudScale();
     OptionInstance<Boolean> legacyCreativeTab();
+    OptionInstance<Boolean> searchCreativeTab();
     OptionInstance<Boolean> displayHUD();
     OptionInstance<Boolean> displayHand();
     OptionInstance<Boolean> animatedCharacter();
     OptionInstance<Boolean> classicCrafting();
     OptionInstance<Boolean> autoResolution();
     OptionInstance<Integer> autoSaveInterval();
+    OptionInstance<Boolean> autoSaveWhenPaused();
     OptionInstance<Boolean> smoothMovement();
     OptionInstance<Boolean> showVanillaRecipeBook();
     OptionInstance<Boolean> displayLegacyGamma();
@@ -43,6 +49,7 @@ public interface LegacyOptions {
     OptionInstance<Integer> selectedControllerHandler();
     OptionInstance<Integer> cursorMode();
     OptionInstance<Boolean> controllerVirtualCursor();
+    OptionInstance<Boolean> unfocusedInputs();
     OptionInstance<Boolean> legacyCreativeBlockPlacing();
     OptionInstance<Difficulty> createWorldDifficulty();
     OptionInstance<Boolean> smoothAnimatedCharacter();

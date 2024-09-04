@@ -32,6 +32,9 @@ public abstract class EntityMixin {
     @Shadow public abstract float getXRot();
 
     @Shadow public abstract float getYRot();
+
+    @Shadow public abstract boolean isUnderWater();
+
     @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", at = @At("HEAD"))
     private void startRiding(Entity entity, boolean force, CallbackInfoReturnable<Boolean> cir) {
         this.ridingEntityXRotDelta = 0.0F;
@@ -73,5 +76,9 @@ public abstract class EntityMixin {
     @Redirect(method = "collide", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;onGround()Z"))
     protected boolean getFlyingSpeed(Entity instance) {
         return instance.onGround() || instance instanceof Player p && p.getAbilities().flying;
+    }
+    @Redirect(method = "updateSwimming", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isUnderWater()Z"))
+    protected boolean updateSwimming(Entity instance) {
+        return (!instance.level().isClientSide || Legacy4JClient.isModEnabledOnServer() || isUnderWater()) && instance.isInWater();
     }
 }

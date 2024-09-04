@@ -228,6 +228,7 @@ public abstract class MinecraftMixin {
         if (ScreenUtil.getLegacyOptions().autoResolution().get()){
             if (height == 1080) return 0.999623452;
             else if (height % 720 != 0) return 1.001d;
+
             return 1d;
         }
         return (1.125 - ScreenUtil.getLegacyOptions().interfaceResolution().get() / 4);
@@ -237,26 +238,28 @@ public abstract class MinecraftMixin {
         ci.cancel();
         Legacy4JClient.SECURE_EXECUTOR.executeWhen(()-> {
             if (!Legacy4JClient.isGameLoadFinished) return false;
-            setScreen(new ConfirmationScreen(new TitleScreen(), 275, 130, Component.empty(), Component.translatable("legacy.menu.autoSave_message")) {
-                protected void initButtons() {
-                    panel.y += 25;
-                    messageYOffset = 68;
-                    transparentBackground = false;
-                    okButton = addRenderableWidget(Button.builder(Component.translatable("gui.ok"), b -> {
-                        if (okAction.test(b)) onClose();
-                    }).bounds(panel.x + (panel.width - 220) / 2, panel.y + panel.height - 40, 220, 20).build());
-                }
+            setScreen(new ConfirmationScreen(new TitleScreen(),275,130,Component.empty(), Component.translatable("legacy.menu.autoSave_message")){
+            protected void addButtons() {
+                transparentBackground = false;
+                messageYOffset = 68;
+                renderableVList.addRenderable(okButton = Button.builder(Component.translatable("gui.ok"), b-> {if (okAction.test(b)) onClose();}).build());
+            }
+            @Override
+            public void renderableVListInit(){
+                panel.y+=25;
+                renderableVList.init(this,panel.x + (panel.width - 220) / 2, panel.y + panel.height - 40,220,0);
+            }
 
-                @Override
-                public boolean shouldCloseOnEsc() {
-                    return false;
-                }
+            @Override
+            public boolean shouldCloseOnEsc() {
+                return false;
+            }
 
-                public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-                    super.render(guiGraphics, i, j, f);
-                    ScreenUtil.drawAutoSavingIcon(guiGraphics, panel.x + 127, panel.y + 36);
-                }
-            }); return true;
-        });
+            public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+                super.render(guiGraphics, i, j, f);
+                ScreenUtil.drawAutoSavingIcon(guiGraphics,panel.x + 127, panel.y + 36);
+            }
+        }); return true;
+    });
     }
 }

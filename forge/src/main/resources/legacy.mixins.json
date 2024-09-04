@@ -3,9 +3,9 @@
   "package": "wily.legacy.forge.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "AbstractContainerScreenMixin",
     "ForgeGuiMixin",
     "GuiMixin",
+    "LiquidBlockRendererMixin",
     "MinecraftMixin",
     "TooltipRenderUtilMixin"
   ],

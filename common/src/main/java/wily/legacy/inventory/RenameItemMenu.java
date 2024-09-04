@@ -2,7 +2,6 @@ package wily.legacy.inventory;
 
 import net.minecraft.SharedConstants;
 import net.minecraft.Util;
-import net.minecraft.util.StringUtil;
 
 public interface RenameItemMenu {
     void setResultItemName(String name);

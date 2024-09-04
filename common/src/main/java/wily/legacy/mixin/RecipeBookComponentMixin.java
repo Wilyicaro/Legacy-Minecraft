@@ -10,6 +10,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -20,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.screen.DisplayRecipe;
 import wily.legacy.client.screen.LegacyIconHolder;
+import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Iterator;
@@ -32,9 +34,18 @@ public class RecipeBookComponentMixin {
 
     @Shadow protected RecipeBookMenu<?> menu;
     @Shadow protected Minecraft minecraft;
+
+    @Shadow private int xOffset;
+
+    @Shadow private boolean widthTooNarrow;
+
     @Inject(method = "init", at = @At(value = "RETURN"))
     private void init(int i, int j, Minecraft minecraft, boolean bl, RecipeBookMenu<?> recipeBookMenu, CallbackInfo ci){
         ghostRecipe = new DisplayRecipe();
+    }
+    @Redirect(method = "initVisuals", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/recipebook/RecipeBookComponent;xOffset:I", opcode = Opcodes.PUTFIELD))
+    private void initVisuals(RecipeBookComponent instance, int value){
+        xOffset = this.widthTooNarrow ? 0 : minecraft.screen instanceof LegacyMenuAccess<?> a ? a.getMenuRectangle().width() / 2 - 2: 86;
     }
     @Redirect(method = "setupGhostRecipe", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/recipebook/GhostRecipe;addIngredient(Lnet/minecraft/world/item/crafting/Ingredient;II)V"))
     public void setupGhostRecipe(GhostRecipe instance, Ingredient ingredient, int i, int j, Recipe<?> recipe, List<Slot> list) {
