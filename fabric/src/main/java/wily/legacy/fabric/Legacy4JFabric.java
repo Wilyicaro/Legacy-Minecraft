@@ -10,7 +10,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.fabric.impl.resource.loader.ResourceManagerHelperImpl;
 import net.fabricmc.loader.api.FabricLoader;
@@ -47,7 +46,6 @@ public class Legacy4JFabric implements ModInitializer {
         ServerTickEvents.START_SERVER_TICK.register(Legacy4J::preServerTick);
         ServerLifecycleEvents.AFTER_SAVE.register((l, fl, f)-> Legacy4J.serverSave(l));
         CommandRegistrationCallback.EVENT.register(Legacy4J::registerCommands);
-        CustomIngredientSerializer.register(StrictComponentsIngredient.SERIALIZER);
         DefaultItemComponentEvents.MODIFY.register(c-> Legacy4J.changeItemDefaultComponents((i,b)-> c.modify(i,bc-> b.accept(bc::set))));
     }
 }

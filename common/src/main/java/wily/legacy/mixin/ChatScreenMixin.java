@@ -53,8 +53,8 @@ public class ChatScreenMixin extends Screen implements Controller.Event, Control
     private void init(ChatScreen instance, EditBox value){
         this.input = value;
         value.setHeight(20);
-        value.setPosition(2,height - value.getHeight() + (int)(ScreenUtil.getHUDDistance() - 56));
-        value.setWidth(width - 4);
+        value.setPosition(4 + Math.round(ScreenUtil.getChatSafeZone()),height - value.getHeight() + (int)(ScreenUtil.getHUDDistance() - 56));
+        value.setWidth(width - (8 + Math.round(ScreenUtil.getChatSafeZone()) * 2));
     }
     @Redirect(method = "init",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;setBordered(Z)V"))
     private void setBordered(EditBox instance, boolean bl){
@@ -73,6 +73,14 @@ public class ChatScreenMixin extends Screen implements Controller.Event, Control
     @ModifyArg(method = "render",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"), index = 1)
     private float render(float value){
         return (int)(ScreenUtil.getHUDDistance() - 56);
+    }
+    @ModifyArg(method = "render",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;render(Lnet/minecraft/client/gui/GuiGraphics;II)V"),index = 2)
+    private int render(int i){
+        return i - (int)(ScreenUtil.getHUDDistance() - 56);
+    }
+    @ModifyArg(method = "mouseClicked",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;mouseClicked(DDI)Z"),index = 1)
+    private double mouseClicked(double d){
+        return d - (int)(ScreenUtil.getHUDDistance() - 56);
     }
     @Redirect(method = "render",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V"))
     private void render(GuiGraphics instance, int i, int j, int k, int l, int m){

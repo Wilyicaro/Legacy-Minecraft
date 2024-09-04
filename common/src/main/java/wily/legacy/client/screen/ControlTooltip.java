@@ -20,6 +20,7 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
 import net.minecraft.client.gui.screens.inventory.BookEditScreen;
+import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -437,11 +438,11 @@ public interface ControlTooltip {
             }
             if (minecraft.hitResult instanceof BlockHitResult r && !actualItem.isEmpty() && minecraft.level.getBlockEntity(r.getBlockPos()) instanceof CampfireBlockEntity e && e.getCookableRecipe(actualItem).isPresent()) return getAction("legacy.action.cook");
             if (actualItem.getItem() instanceof BrushItem && minecraft.hitResult instanceof BlockHitResult r && r.getType() != HitResult.Type.MISS && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof BrushableBlock) return getAction("legacy.action.brush");
-            if (actualItem.getItem() instanceof Equipable) return getAction(actualItem.getItem() instanceof ShieldItem ? "legacy.action.block" : "legacy.action.equip");
+            if (actualItem.getItem() instanceof Equipable e && (!e.getEquipmentSlot().equals(EquipmentSlot.BODY) || minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Mob m && m.isBodyArmorItem(actualItem))) return getAction(actualItem.getItem() instanceof ShieldItem ? "legacy.action.block" : "legacy.action.equip");
             if (actualItem.getItem() instanceof EmptyMapItem || actualItem.getItem() instanceof FishingRodItem) return getAction("key.use");
             if (actualItem.getItem() instanceof FireworkRocketItem && (minecraft.player.isFallFlying() || minecraft.hitResult instanceof BlockHitResult && minecraft.hitResult.getType() != HitResult.Type.MISS)) return getAction("legacy.action.launch");
             if (actualItem.getItem() instanceof ShearsItem ){
-                if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Sheep s && s.isBaby() && !s.isSheared()) return getAction("legacy.action.shear");
+                if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Sheep s && !s.isBaby() && !s.isSheared()) return getAction("legacy.action.shear");
                 else if (minecraft.hitResult instanceof BlockHitResult r && r.getType() != HitResult.Type.MISS && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof PumpkinBlock) return getAction("legacy.action.carve");
             }
             if (minecraft.hitResult instanceof BlockHitResult r && minecraft.hitResult.getType() != HitResult.Type.MISS && (blockState = minecraft.level.getBlockState(r.getBlockPos())).getBlock() instanceof JukeboxBlock && blockState.getValue(HAS_RECORD)) return getAction("legacy.action.eject");
@@ -463,9 +464,9 @@ public interface ControlTooltip {
                 return getAction("legacy.action.charge");
             }
             HitResult bucketHitResult;
-            if (actualItem.getItem() instanceof BucketItem i && mayInteractItemAt(minecraft,actualItem,bucketHitResult = (i.content == Fluids.EMPTY ? Item.getPlayerPOVHitResult(minecraft.level, minecraft.player,ClipContext.Fluid.SOURCE_ONLY) : minecraft.hitResult))){
+            if (actualItem.getItem() instanceof BucketItem i && mayInteractItemAt(minecraft,actualItem,bucketHitResult = (i.equals(Items.BUCKET) ? Item.getPlayerPOVHitResult(minecraft.level, minecraft.player,ClipContext.Fluid.SOURCE_ONLY) : minecraft.hitResult))){
                 BlockState state;
-                if (i.content != Fluids.EMPTY) return getAction((state = minecraft.level.getBlockState(((BlockHitResult)bucketHitResult).getBlockPos())).getBlock() instanceof LiquidBlockContainer || state.getBlock() instanceof AbstractCauldronBlock ? "legacy.action.fill" : "legacy.action.empty");
+                if (!i.equals(Items.BUCKET)) return getAction((state = minecraft.level.getBlockState(((BlockHitResult)bucketHitResult).getBlockPos())).getBlock() instanceof LiquidBlockContainer || state.getBlock() instanceof AbstractCauldronBlock && CauldronInteraction.EMPTY.map().containsKey(i) ? "legacy.action.fill" : "legacy.action.empty");
                 else if (minecraft.level.getBlockState(((BlockHitResult)bucketHitResult).getBlockPos()).getBlock() instanceof BucketPickup) return getAction("legacy.action.collect");
             }
             if (minecraft.player.getItemInHand(hand).getItem() instanceof SaddleItem && minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Saddleable s && s.isSaddleable() && !s.isSaddled()) return getAction("legacy.action.saddle");

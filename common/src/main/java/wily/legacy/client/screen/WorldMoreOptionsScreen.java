@@ -16,6 +16,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.WorldDataConfiguration;
 import wily.legacy.client.CommonColor;
@@ -32,7 +33,7 @@ import java.util.function.Predicate;
 import static wily.legacy.client.screen.ControlTooltip.getAction;
 
 public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlTooltip.Event{
-    protected MultiLineLabel tooltipBoxLabel;
+    protected List<FormattedCharSequence> tooltipBoxLabel;
     protected ScrollableRenderer scrollableRenderer =  new ScrollableRenderer(new LegacyScrollRenderer());
 
     protected final TabList tabList = new TabList().add(29,0,Component.translatable("createWorld.tab.world.title"), t-> rebuildWidgets()).add(29,2,Component.translatable("legacy.menu.game_options"), t-> rebuildWidgets());
@@ -151,8 +152,8 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     @Override
     public void setTooltipForNextRenderPass(Tooltip tooltip, ClientTooltipPositioner clientTooltipPositioner, boolean bl) {
         if (ScreenUtil.hasTooltipBoxes()) {
-            tooltipBoxLabel = MultiLineLabel.createFixed(font, tooltip.toCharSequence(minecraft).stream().map(formattedCharSequence -> new MultiLineLabel.TextWithWidth(formattedCharSequence, font.width(formattedCharSequence))).toList());
-            scrollableRenderer.scrolled.max = Math.max(0,tooltipBoxLabel.getLineCount() - (tooltipBox.getHeight() - 44) / 12);
+            tooltipBoxLabel = tooltip.toCharSequence(minecraft);
+            scrollableRenderer.scrolled.max = Math.max(0,tooltipBoxLabel.size() - (tooltipBox.getHeight() - 44) / 12);
         }else super.setTooltipForNextRenderPass(tooltip, clientTooltipPositioner, bl);
     }
 
@@ -186,7 +187,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             }
             tooltipBox.render(guiGraphics,i,j,f);
             if (tooltipBoxLabel != null) {
-                scrollableRenderer.render(guiGraphics,panel.x + panel.width + 3, panel.y + 13,tooltipBox.width - 10, tooltipBox.getHeight() - 44, ()-> tooltipBoxLabel.renderLeftAligned(guiGraphics, panel.x + panel.width + 3, panel.y + 13, 12, 0xFFFFFF));
+                scrollableRenderer.render(guiGraphics,panel.x + panel.width + 3, panel.y + 13,tooltipBox.width - 10, tooltipBox.getHeight() - 44, ()-> tooltipBoxLabel.forEach(c-> guiGraphics.drawString(font,c, panel.x + panel.width + 3, panel.y + 13 + tooltipBoxLabel.indexOf(c) * 12, 0xFFFFFF)));
             }
         }
     }

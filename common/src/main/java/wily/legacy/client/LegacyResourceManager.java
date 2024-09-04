@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Unit;
@@ -35,11 +36,12 @@ public class LegacyResourceManager implements PreparableReloadListener {
     public static final ResourceLocation GAMEPAD_MAPPINGS = new ResourceLocation(Legacy4J.MOD_ID,"gamepad_mappings.txt");
     public static final ResourceLocation INTRO_LOCATION = new ResourceLocation(Legacy4J.MOD_ID,"intro.json");
     public static final ResourceLocation GAMMA_LOCATION = new ResourceLocation(Legacy4J.MOD_ID,"shaders/post/gamma.json");
+    public static final ResourceLocation DEFAULT_KEYBOARD_LAYOUT_LOCATION = new ResourceLocation(Legacy4J.MOD_ID,"keyboard_layout/en_us.json");
+
     public static final String CONTROL_TYPES = "control_types.json";
     public static final String COMMON_COLORS = "common_colors.json";
     public static final String DEFAULT_KBM_ICONS = "control_tooltips/icons/kbm.json";
     public static final String DEFAULT_CONTROLLER_ICONS = "control_tooltips/icons/controller.json";
-    public static final String DEFAULT_KEYBOARD_LAYOUT = "keyboard_layouts/en_us.json";
 
     public static final List<ResourceLocation> INTROS = new ArrayList<>();
 
@@ -78,6 +80,7 @@ public class LegacyResourceManager implements PreparableReloadListener {
             ControlType.typesMap.clear();
             ControlType.types.clear();
             CommonColor.COMMON_COLORS.forEach((s,c)->c.reset());
+            resourceManager.getResource(DEFAULT_KEYBOARD_LAYOUT_LOCATION).ifPresent(LegacyResourceManager::setKeyboardLayout);
             JsonUtil.getOrderedNamespaces(resourceManager).forEach(name->{
                 resourceManager.getResource(new ResourceLocation(name, CONTROL_TYPES)).ifPresent(r->{
                     try {
@@ -128,24 +131,26 @@ public class LegacyResourceManager implements PreparableReloadListener {
                     if (value.isKbm()) addKbmIcons(resourceManager,location,value.getIcons()::put);
                     else addControllerIcons(resourceManager, location, value.getIcons()::put);
                 }
-
-                try {
-                    JsonObject obj = GsonHelper.parse(resourceManager.getResource(new ResourceLocation(name,"keyboard_layout/" + minecraft.getLanguageManager().getSelected()+ ".json")).orElse(resourceManager.getResourceOrThrow(new ResourceLocation(Legacy4J.MOD_ID,DEFAULT_KEYBOARD_LAYOUT))).openAsReader());
-                    keyboardButtonBuilders.clear();
-                    shiftBinding = obj.has("shiftBinding") ? ControllerBinding.CODEC.byName(obj.get("shiftBinding").getAsString()) : ControllerBinding.LEFT_STICK_BUTTON;
-                    obj.getAsJsonArray("layout").forEach(e->{
-                        if (e instanceof JsonObject o){
-                            keyboardButtonBuilders.add(new KeyboardScreen.CharButtonBuilder(GsonHelper.getAsInt(o,"width",25),GsonHelper.getAsString(o,"chars"),GsonHelper.getAsString(o,"shiftChars",null),JsonUtil.getJsonStringOrNull(o,"binding",ControllerBinding.CODEC::byName),JsonUtil.getJsonStringOrNull(o,"icon",ResourceLocation::new),JsonUtil.getJsonStringOrNull(o,"soundEvent",s-> BuiltInRegistries.SOUND_EVENT.get(new ResourceLocation(s)))));
-                        }else if (e instanceof JsonPrimitive p) keyboardButtonBuilders.add(new KeyboardScreen.CharButtonBuilder(25,p.getAsString(),null,null,null,null));
-                    });
-                } catch (IOException e) {
-                    Legacy4J.LOGGER.warn(e.getMessage());
-                }
+                resourceManager.getResource(new ResourceLocation(name,"keyboard_layout/" + minecraft.getLanguageManager().getSelected()+ ".json")).ifPresent(LegacyResourceManager::setKeyboardLayout);
             });
 
             profilerFiller2.pop();
             profilerFiller2.endTick();
         }, executor2);
+    }
+    public static void setKeyboardLayout(Resource resource){
+        try {
+            JsonObject obj = GsonHelper.parse(resource.openAsReader());
+            keyboardButtonBuilders.clear();
+            shiftBinding = obj.has("shiftBinding") ? ControllerBinding.CODEC.byName(obj.get("shiftBinding").getAsString()) : ControllerBinding.LEFT_STICK_BUTTON;
+            obj.getAsJsonArray("layout").forEach(e->{
+                if (e instanceof JsonObject o){
+                    keyboardButtonBuilders.add(new KeyboardScreen.CharButtonBuilder(GsonHelper.getAsInt(o,"width",25),GsonHelper.getAsString(o,"chars"),GsonHelper.getAsString(o,"shiftChars",null),JsonUtil.getJsonStringOrNull(o,"binding",ControllerBinding.CODEC::byName),JsonUtil.getJsonStringOrNull(o,"icon",ResourceLocation::new),JsonUtil.getJsonStringOrNull(o,"soundEvent",s-> BuiltInRegistries.SOUND_EVENT.get(new ResourceLocation(s)))));
+                }else if (e instanceof JsonPrimitive p) keyboardButtonBuilders.add(new KeyboardScreen.CharButtonBuilder(25,p.getAsString(),null,null,null,null));
+            });
+        } catch (IOException e) {
+            Legacy4J.LOGGER.warn(e.getMessage());
+        }
     }
     public static void addIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String,JsonObject> addIcon){
         resourceManager.getResource(location).ifPresent(r->{

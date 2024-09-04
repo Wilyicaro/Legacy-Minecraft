@@ -9,11 +9,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.util.ScreenUtil;
 
@@ -33,6 +35,8 @@ public abstract class GuiMixin {
     @Shadow protected int toolHighlightTimer;
 
     @Shadow protected ItemStack lastToolHighlight;
+
+    @Shadow private long healthBlinkTime;
 
     @Inject(method = "renderSelectedItemName(Lnet/minecraft/client/gui/GuiGraphics;I)V", at = @At("HEAD"), cancellable = true, remap = false)
     public void renderSelectedItemName(GuiGraphics guiGraphics, int shift, CallbackInfo ci) {
@@ -83,5 +87,9 @@ public abstract class GuiMixin {
     public void renderHealthReturn(GuiGraphics guiGraphics, CallbackInfo ci) {
         if (minecraft.screen != null) return;
         ScreenUtil.finishHUDRender(guiGraphics);
+    }
+    @Redirect(method="renderHealthLevel", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD, ordinal = 1))
+    private void renderPlayerHealth(Gui instance, long value) {
+        healthBlinkTime = value - 5;
     }
 }

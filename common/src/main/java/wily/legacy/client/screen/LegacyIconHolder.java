@@ -10,7 +10,6 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
@@ -22,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.util.Offset;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.ScreenUtil;
@@ -33,7 +33,10 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     public static final ResourceLocation RED_ICON_HOLDER = new ResourceLocation(Legacy4J.MOD_ID,"container/red_icon_holder");
     public static final ResourceLocation GRAY_ICON_HOLDER = new ResourceLocation(Legacy4J.MOD_ID,"container/gray_icon_holder");
     public static final ResourceLocation WARNING_ICON = new ResourceLocation(Legacy4J.MOD_ID,"container/icon_warning");
+    public static final ResourceLocation SLOT_HIGHLIGHT = new ResourceLocation(Legacy4J.MOD_ID,"container/slot_highlight");
 
+    public static final ResourceLocation MOJANGLES_11_FONT = new ResourceLocation(Legacy4J.MOD_ID,"default_11");
+    
     public Offset offset = Offset.ZERO;
     public ResourceLocation iconSprite = null;
     public LegacySlotDisplay.IconHolderOverride iconHolderOverride = null;
@@ -211,36 +214,37 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         graphics.disableScissor();
     }
     public void renderSelection(GuiGraphics graphics, int i, int j, float f){
-        graphics.pose().pushPose();
-        graphics.pose().translate(getXCorner() - 4.5f, getYCorner() - 4.5f, 0f);
-        applyOffset(graphics);
-        RenderSystem.disableDepthTest();
-        graphics.blitSprite(SELECT_ICON_HIGHLIGHT,0,0,36,36);
-        RenderSystem.enableDepthTest();
-        graphics.pose().popPose();
-    }
-    public void renderHighlight(GuiGraphics graphics, int color, int h){
-        renderScaled(graphics,getX(),getY(), ()->graphics.fillGradient(RenderType.gui(), 0, 0, 16,16, color, color, h));
+        renderChild(graphics,getXCorner() - 4.5f, getYCorner() - 4.5f,()->{
+            RenderSystem.disableDepthTest();
+            graphics.blitSprite(SELECT_ICON_HIGHLIGHT,0,0,36,36);
+            RenderSystem.enableDepthTest();
+        });
     }
     public void renderScaled(GuiGraphics graphics, float x, float y, Runnable render){
+        renderChild(graphics,x,y,()->{
+            graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
+            render.run();
+        });
+    }
+    public void renderChild(GuiGraphics graphics, float x, float y, Runnable render){
         graphics.pose().pushPose();
         graphics.pose().translate(x,y,0);
         applyOffset(graphics);
-        graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
         render.run();
         graphics.pose().popPose();
     }
-    public void renderHighlight(GuiGraphics graphics, int h){
-        renderHighlight(graphics,-2130706433,h);
-    }
     public void renderHighlight(GuiGraphics graphics){
-        renderHighlight(graphics,0);
+        renderScaled(graphics,getX(),getY(),()-> {
+            RenderSystem.enableBlend();
+            graphics.blitSprite(SLOT_HIGHLIGHT, 0, 0, 16, 16);
+            RenderSystem.disableBlend();
+        });
     }
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics,int i, int j){
         if (isHovered || (allowFocusedItemTooltip && isFocused())) renderTooltip(minecraft,graphics,itemIcon, !isHovered ? (int) getMiddleX() : i,!isHovered ? (int) getMiddleY() : j);
     }
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics,ItemStack stack, int i, int j){
-        if (!stack.isEmpty()) graphics.renderTooltip(minecraft.font, stack, i, j);
+        if (!stack.isEmpty()) Legacy4JClient.applyFontOverrideIf(minecraft.getWindow().getHeight() <= 720,MOJANGLES_11_FONT,b->graphics.renderTooltip(minecraft.font, stack, i, j));
     }
     public boolean isHoveredOrFocused(){
         return isHovered || isFocused();

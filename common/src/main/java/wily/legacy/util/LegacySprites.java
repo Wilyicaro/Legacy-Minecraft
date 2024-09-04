@@ -82,6 +82,7 @@ public class LegacySprites {
     public static final ResourceLocation POINTER_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/pointer_panel");
     public static final ResourceLocation PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel");
     public static final ResourceLocation SMALL_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/small_panel");
+    public static final ResourceLocation CREATIVE_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/creative_panel");
     public static final ResourceLocation PANEL_RECESS = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel_recess");
     public static final ResourceLocation PANEL_TRANSLUCENT_RECESS = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel_translucent_recess");
     public static final ResourceLocation ENTITY_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/entity_panel");

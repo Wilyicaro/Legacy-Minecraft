@@ -65,6 +65,9 @@ public interface Controller {
         Component LOADING_NATIVES = Component.translatable("legacy.menu.loading_natives");
 
         String getName();
+
+        String getId();
+
         void init();
         boolean update();
         void setup(ControllerManager manager);
@@ -83,6 +86,10 @@ public interface Controller {
             @Override
             public String getName() {
                 return I18n.get("options.off");
+            }
+            @Override
+            public String getId() {
+                return "none";
             }
             @Override
             public void init() {

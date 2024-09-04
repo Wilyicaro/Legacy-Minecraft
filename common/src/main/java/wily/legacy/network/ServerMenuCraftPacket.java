@@ -7,6 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import wily.legacy.inventory.LegacyIngredient;
 import wily.legacy.inventory.RecipeMenu;
 
 import java.util.Collections;
@@ -15,7 +16,7 @@ import java.util.function.Supplier;
 
 public record ServerMenuCraftPacket(ResourceLocation craftId, List<Ingredient> customIngredients, int button, boolean max) implements CommonNetwork.Packet {
     public ServerMenuCraftPacket(RegistryFriendlyByteBuf buf){
-        this(buf.readResourceLocation(), buf.readList(i->Ingredient.CONTENTS_STREAM_CODEC.decode(buf)),buf.readVarInt(), buf.readBoolean());
+        this(buf.readResourceLocation(), buf.readList(i-> LegacyIngredient.CODEC.decode(buf).toIngredient()),buf.readVarInt(), buf.readBoolean());
     }
     public static final ResourceLocation EMPTY = new ResourceLocation("empty");
     public ServerMenuCraftPacket(List<Ingredient> ingredients, int button, boolean max){
@@ -31,7 +32,7 @@ public record ServerMenuCraftPacket(ResourceLocation craftId, List<Ingredient> c
     @Override
     public void encode(RegistryFriendlyByteBuf buf) {
         buf.writeResourceLocation(craftId);
-        buf.writeCollection(customIngredients,(r, i)->Ingredient.CONTENTS_STREAM_CODEC.encode(buf,i));
+        buf.writeCollection(customIngredients,(r, i)->LegacyIngredient.CODEC.encode(buf, LegacyIngredient.of(i)));
         buf.writeVarInt(button);
         buf.writeBoolean(max);
     }

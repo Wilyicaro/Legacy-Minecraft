@@ -107,7 +107,7 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
 
         @Override
         public boolean keyPressed(int i, int j, int k) {
-            if (CommonInputs.selected(i)){
+            if (KeyboardScreen.isOpenKey(i)){
                 minecraft.setScreen(new KeyboardScreen(()->this,BookEditScreenMixin.this));
                 return true;
             }

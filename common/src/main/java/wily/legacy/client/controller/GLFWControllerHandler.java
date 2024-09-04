@@ -19,6 +19,10 @@ public class GLFWControllerHandler implements Controller.Handler{
     public String getName() {
         return "GLFW";
     }
+    @Override
+    public String getId() {
+        return "glfw";
+    }
 
     private static final GLFWControllerHandler INSTANCE = new GLFWControllerHandler();
 
@@ -61,7 +65,8 @@ public class GLFWControllerHandler implements Controller.Handler{
 
             @Override
             public ControlType getType() {
-                if (getName() != null) {
+                String name = getName();
+                if (name != null) {
                     if (name.contains("PS3")) return ControlType.PS3;
                     else if (name.contains("PS4")) return ControlType.PS4;
                     else if (name.contains("PS5")) return ControlType.PS5;

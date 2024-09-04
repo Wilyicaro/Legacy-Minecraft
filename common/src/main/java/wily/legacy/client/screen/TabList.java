@@ -112,15 +112,15 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
     public boolean controlTab(int i){
         return controlTab(i,InputConstants.KEY_LBRACKET,InputConstants.KEY_RBRACKET);
     }
-    public void directionalControlTab(int i){
-        controlTab(i,InputConstants.KEY_LEFT,InputConstants.KEY_RIGHT);
+    public boolean directionalControlTab(int i){
+        return controlTab(i,InputConstants.KEY_LEFT,InputConstants.KEY_RIGHT);
     }
 
     public boolean controlTab(int i, int leftButton, int rightButton){
         return controlTab(i == leftButton, i == rightButton);
     }
     public boolean controlTab(boolean left, boolean right){
-        if (!left && !right) return false;
+        if (!left && !right || tabButtons.isEmpty()) return false;
         Optional<LegacyTabButton> opt = tabButtons.stream().filter(LegacyTabButton::isActive).min(Comparator.comparingInt(t -> {
             int diff = tabButtons.indexOf(t) - selectedTab;
             return left ? diff < 0 ? -diff : tabButtons.size() * 2 - diff : diff > 0 ? diff : tabButtons.size() * 2 + diff;
@@ -128,7 +128,7 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
         if (opt.isPresent()){
             if (tabButtons.indexOf(opt.get()) != selectedTab){
                 opt.get().onPress();
-                ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),1.0f);
+                ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
                 return true;
             }
         }
@@ -147,7 +147,7 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
     public void numberControlTab(int i){
         if (i <= 57 && i > 48 && i - 49 < tabButtons.size()) {
             tabButtons.get(i - 49).onPress();
-            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),1.0f);
+            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
         }
     }
     @Override

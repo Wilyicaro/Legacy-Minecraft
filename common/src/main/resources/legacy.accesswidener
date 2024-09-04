@@ -147,9 +147,20 @@ accessible class net/minecraft/client/gui/screens/MenuScreens$ScreenConstructor
 accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
 accessible class net/minecraft/world/inventory/MenuType$MenuSupplier
 accessible method net/minecraft/world/inventory/MenuType <init> (Lnet/minecraft/world/inventory/MenuType$MenuSupplier;Lnet/minecraft/world/flag/FeatureFlagSet;)V
-accessible field net/minecraft/world/item/BucketItem content Lnet/minecraft/world/level/material/Fluid;
 accessible field net/minecraft/world/item/CreativeModeTabs OP_BLOCKS Lnet/minecraft/resources/ResourceKey;
 accessible field net/minecraft/client/gui/screens/Screen deferredTooltipRendering Lnet/minecraft/client/gui/screens/Screen$DeferredTooltipRendering;
 accessible method net/minecraft/client/gui/Font getFontSet (Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/gui/font/FontSet;
 accessible field net/minecraft/client/gui/components/CommandSuggestions suggestions Lnet/minecraft/client/gui/components/CommandSuggestions$SuggestionsList;
 transitive-accessible class net/minecraft/client/renderer/RenderType$CompositeRenderType
+accessible method net/minecraft/client/Minecraft startUseItem ()V
+accessible field net/minecraft/client/gui/Gui displayHealth I
+accessible method net/minecraft/client/gui/components/events/ContainerEventHandler nextFocusPathInDirection (Lnet/minecraft/client/gui/navigation/ScreenRectangle;Lnet/minecraft/client/gui/navigation/ScreenDirection;Lnet/minecraft/client/gui/components/events/GuiEventListener;Lnet/minecraft/client/gui/navigation/FocusNavigationEvent;)Lnet/minecraft/client/gui/ComponentPath;
+accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData <init> (IIBZZZLnet/minecraft/resources/ResourceKey;)V
+accessible method net/minecraft/client/gui/font/providers/BitmapProvider <init> (Lcom/mojang/blaze3d/platform/NativeImage;Lnet/minecraft/client/gui/font/CodepointMap;)V
+accessible class net/minecraft/client/gui/font/providers/BitmapProvider$Glyph
+accessible method net/minecraft/client/gui/font/providers/BitmapProvider$Glyph <init> (FLcom/mojang/blaze3d/platform/NativeImage;IIIIII)V
+extendable method net/minecraft/client/gui/font/providers/BitmapProvider$Glyph <init> (FLcom/mojang/blaze3d/platform/NativeImage;IIIIII)V
+accessible method net/minecraft/world/level/GameRules$IntegerValue create (I)Lnet/minecraft/world/level/GameRules$Type;
+extendable class net/minecraft/world/item/crafting/Ingredient
+accessible method net/minecraft/world/item/crafting/Ingredient <init> (Ljava/util/stream/Stream;)V
+accessible field net/minecraft/client/Minecraft pausePartialTick F

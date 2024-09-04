@@ -225,15 +225,6 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                     super.renderSelection(graphics, i, j, f);
                 }
 
-                @Override
-                public boolean mouseScrolled(double d, double e, double f, double g) {
-                    if (isFocused() && canScroll()) {
-                        Collections.rotate(getFocusedRecipes(), (int) Math.signum(g));
-                        return true;
-                    }
-                    return false;
-                }
-
             });
             h.offset = CRAFTING_OFFSET;
             h.allowItemDecorations = false;

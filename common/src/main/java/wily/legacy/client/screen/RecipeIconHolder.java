@@ -101,7 +101,7 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
                 renderer.updateScroll(i == 263 ? ScreenDirection.LEFT : ScreenDirection.RIGHT);
                 focusedRecipes = null;
             }
-            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             return true;
         }
         return false;
@@ -113,6 +113,7 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
             selectionOffset = 0;
             toggleCraftableRecipes();
             updateRecipeDisplay();
+            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             return true;
         }
         int oldSelection = selectionOffset;
@@ -122,7 +123,7 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
             if (i == InputConstants.KEY_DOWN && getRecipes().size() >= 2)
                 selectionOffset = Math.min(selectionOffset + 1, 1);
             if (oldSelection != selectionOffset || canScroll()) {
-                ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+                ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
                 if (oldSelection == selectionOffset && selectionOffset != 0)
                     Collections.rotate(getFocusedRecipes(), -selectionOffset);
                 updateRecipeDisplay(getFocusedRecipe());
@@ -206,7 +207,7 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
                 craft();
                 updateRecipeDisplay(getFocusedRecipe());
             }else {
-                if (minecraft.player.containerMenu instanceof LegacyCraftingMenu m && !m.showedNotEnoughIngredientsHint){
+                if (minecraft.player.containerMenu instanceof LegacyCraftingMenu m && !m.showedNotEnoughIngredientsHint && ScreenUtil.getLegacyOptions().hints().get()){
                     m.showedNotEnoughIngredientsHint = true;
                     LegacyTipManager.setActualTip(new LegacyTip(CommonComponents.EMPTY,NOT_ENOUGH_INGREDIENTS));
                 }

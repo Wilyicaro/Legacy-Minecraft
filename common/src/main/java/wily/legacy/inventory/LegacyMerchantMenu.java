@@ -17,6 +17,7 @@ import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.ServerMenuCraftPacket;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,14 +36,7 @@ public class LegacyMerchantMenu extends LegacyCraftingMenu {
     }
 
     public static List<Ingredient> ingredientsFromStacks(ItemStack... s){
-        if (s.length == 0) return Collections.emptyList();
-        List<Ingredient> ings = new ArrayList<>();
-        for (ItemStack stack : s) {
-            Ingredient ing = Legacy4JPlatform.getStrictComponentsIngredient(stack);
-            for (int i = 0; i < stack.getCount(); i++)
-                ings.add(ing);
-        }
-        return ings;
+        return Arrays.stream(s).map(i-> (Ingredient)DataComponentIngredient.of(true,i)).toList();
     }
 
     @Override

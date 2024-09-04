@@ -17,6 +17,7 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import wily.legacy.Legacy4JPlatform;
+import wily.legacy.inventory.DataComponentIngredient;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,7 @@ public interface RecipeValue<C extends Container, T extends Recipe<C>> extends P
                     result.set(DataComponents.POTION_CONTENTS,contents);
                     NonNullList<Ingredient> ings = NonNullList.create();
                     for (int i = 0; i < 8; i++) ings.add(Ingredient.of(Items.ARROW.getDefaultInstance()));
-                    ings.add(4, Legacy4JPlatform.getStrictComponentsIngredient(potion));
+                    ings.add(4, DataComponentIngredient.of(true,potion));
                     RecipeHolder<?> rcp = new RecipeHolder<>(h.id(),overrideCustomRecipe(r,ings,result));
                     if (filter.test(rcp)) rcps.add(rcp);
                 });

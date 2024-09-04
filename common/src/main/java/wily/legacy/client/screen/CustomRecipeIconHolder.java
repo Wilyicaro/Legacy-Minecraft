@@ -117,7 +117,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
     public boolean mouseScrolled(double d, double e, double f, double g) {
         int i = (int)Math.signum(g);
         if (isFocused() && !nextItem.isEmpty() && i > 0 || !previousItem.isEmpty() && i < 0 ){
-            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             itemIcon = i > 0 ? nextItem : previousItem;
             updateRecipe();
             return true;
@@ -162,7 +162,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
             return true;
         }
         if (!nextItem.isEmpty() && i == 265 || !previousItem.isEmpty() && i == 264){
-            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             itemIcon = i == 265 ? nextItem : previousItem;
             updateRecipe();
             return true;

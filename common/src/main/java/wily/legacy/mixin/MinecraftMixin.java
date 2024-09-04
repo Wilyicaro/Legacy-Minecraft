@@ -40,7 +40,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
@@ -221,11 +220,15 @@ public abstract class MinecraftMixin {
     @Inject(method = "addInitialScreens", at = @At("HEAD"))
     private void addInitialScreens(List<Function<Runnable, Screen>> list, CallbackInfo ci) {
         list.add(r-> new ConfirmationScreen(new TitleScreen(),275,130,Component.empty(), Component.translatable("legacy.menu.autoSave_message")){
-            protected void initButtons() {
-                panel.y+=25;
-                messageYOffset = 68;
+            protected void addButtons() {
                 transparentBackground = false;
-                okButton = addRenderableWidget(Button.builder(Component.translatable("gui.ok"), b-> {if (okAction.test(b)) onClose();}).bounds(panel.x + (panel.width - 220) / 2, panel.y + panel.height - 40,220,20).build());
+                messageYOffset = 68;
+                renderableVList.addRenderable(okButton = Button.builder(Component.translatable("gui.ok"), b-> {if (okAction.test(b)) onClose();}).build());
+            }
+            @Override
+            public void renderableVListInit(){
+                panel.y+=25;
+                renderableVList.init(this,panel.x + (panel.width - 220) / 2, panel.y + panel.height - 40,220,0);
             }
 
             @Override

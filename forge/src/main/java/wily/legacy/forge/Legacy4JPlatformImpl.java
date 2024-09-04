@@ -4,12 +4,16 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.common.crafting.ingredients.DifferenceIngredient;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -120,12 +124,6 @@ public class Legacy4JPlatformImpl {
         }) : null;
     }
 
-    public static Ingredient getComponentsIngredient(ItemStack... stacks) {
-        return stacks[0].getComponents().isEmpty() ? Ingredient.of(stacks) : DataComponentIngredient.of(false,stacks[0].getComponents(), Arrays.stream(stacks).map(ItemStack::getItem).toArray(ItemLike[]::new));
-    }
-    public static Ingredient getStrictComponentsIngredient(ItemStack stack) {
-        return DataComponentIngredient.of(true, stack.getComponents(), stack.getItem());
-    }
     public static <T> RegisterListing.Holder<T> deferredToRegisterHolder(RegistryObject<T> holder){
         return new RegisterListing.Holder<>() {
             @Override
@@ -188,6 +186,14 @@ public class Legacy4JPlatformImpl {
     }
     public static<T extends CustomPacketPayload> void sendToServer(T packetHandler) {
         Legacy4JForgeClient.sendToServer(packetHandler);
+    }
+
+    public static Fluid getBucketFluid(BucketItem item) {
+        return item.getFluid();
+    }
+
+    public static boolean isPackHidden(Pack pack) {
+        return false;
     }
 
 }

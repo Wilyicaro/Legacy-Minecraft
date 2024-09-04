@@ -16,35 +16,35 @@ public class ExitConfirmationScreen extends ConfirmationScreen{
     }
 
     @Override
-    protected void initButtons() {
-        if (minecraft.hasSingleplayerServer() && ScreenUtil.getLegacyOptions().autoSaveInterval().get() == 0)
-            addRenderableWidget(Button.builder(Component.translatable("legacy.menu.exit_and_save"),b-> exit(minecraft,true)).bounds(panel.x + 15, panel.y + panel.height -52,200,20).build());
-        else panel.height-=22;
-        addRenderableWidget(Button.builder(Component.translatable("gui.cancel"), b-> this.onClose()).bounds(panel.x + 15, panel.y + panel.height - (minecraft.hasSingleplayerServer() && ScreenUtil.getLegacyOptions().autoSaveInterval().get() == 0 ? 74 : 52),200,20).build());
-        addRenderableWidget(Button.builder(Component.translatable(minecraft.hasSingleplayerServer() && ScreenUtil.getLegacyOptions().autoSaveInterval().get() == 0 ? "legacy.menu.exit_without_save" : "menu.quit"), b-> exit(minecraft,false)).bounds(panel.x + 15, panel.y + panel.height - 30,200,20).build());
+    protected void addButtons() {
+        renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b-> this.onClose()).build());
+        if (minecraft.hasSingleplayerServer()) {
+            renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.exit_and_save"), b -> exit(minecraft, true)).build());
+            renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.exit_without_save"), b-> minecraft.setScreen(new ConfirmationScreen(this,Component.translatable("legacy.menu.exit_without_save_title"),Component.translatable("legacy.menu.exit_without_save_message"), b1-> exit(minecraft, false)))).build());
+        }else renderableVList.addRenderable(Button.builder(Component.translatable( "menu.quit"), b-> exit(minecraft, false)).build());
+        if (renderableVList.renderables.size() <= 2) panel.height-=22;
     }
     public static void exit(Minecraft minecraft, boolean save) {
-        if (minecraft.screen instanceof ConfirmationScreen s && s.parent instanceof TitleScreen){
+        if (minecraft.getConnection() == null){
             minecraft.stop();
             return;
         }
-        if (save) {
-            Legacy4JClient.manualSave = true;
-            Legacy4JClient.retakeWorldIcon = true;
-        }
+
+        if (save) Legacy4JClient.saveExit = Legacy4JClient.retakeWorldIcon = true;
 
         if (minecraft.level != null) {
             minecraft.level.disconnect();
         }
         minecraft.getSoundManager().stop();
 
-        minecraft.disconnect(new LegacyLoadingScreen( Component.translatable(save ? "menu.savingLevel": "disconnect.quitting"),Component.empty()));
+        minecraft.disconnect(new LegacyLoadingScreen(Component.translatable(save ? "menu.savingLevel": "disconnect.quitting"),Component.empty()));
+        Assort.applyDefaultResourceAssort();
         ServerData serverData = minecraft.getCurrentServer();
         TitleScreen mainMenuScreen = new TitleScreen();
         if (serverData != null && serverData.isRealm()) {
             minecraft.setScreen(new RealmsMainScreen(mainMenuScreen));
         } else {
             minecraft.setScreen(mainMenuScreen);
-        }
+        };
     }
 }
