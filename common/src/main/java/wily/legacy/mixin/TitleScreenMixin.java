@@ -11,9 +11,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.levelgen.WorldOptions;
-import net.minecraft.world.level.levelgen.presets.WorldPresets;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
 import org.jetbrains.annotations.Nullable;
@@ -24,6 +22,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.controller.ControllerManager;
 import wily.legacy.client.screen.*;
@@ -32,7 +31,7 @@ import wily.legacy.util.ScreenUtil;
 import java.io.IOException;
 
 @Mixin(TitleScreen.class)
-public abstract class TitleScreenMixin extends Screen implements ControlTooltip.Event{
+public abstract class TitleScreenMixin extends Screen implements ControlTooltip.Event,RenderableVList.Access{
     @Shadow @Final private static Logger LOGGER;
 
     @Shadow protected abstract boolean checkDemoWorldPresence();
@@ -62,7 +61,17 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     protected void init(CallbackInfo ci) {
         ci.cancel();
         super.init();
-        renderableVList.init(this,width / 2 - 112,this.height / 3 + 10,225,0);
+        renderableVListInit();
+    }
+
+    @Override
+    public RenderableVList getRenderableVList() {
+        return renderableVList;
+    }
+
+    @Override
+    public void renderableVListInit() {
+        getRenderableVList().init(this,width / 2 - 112,this.height / 3 + 10,225,0);
     }
 
     private void createNormalMenuOptions() {
@@ -74,11 +83,14 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     private void createDemoMenuOptions() {
         boolean bl = this.checkDemoWorldPresence();
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.playdemo"), (button) -> {
-            if (bl) {
-                this.minecraft.createWorldOpenFlows().loadLevel(this,"Demo_World");
-            } else {
-                this.minecraft.createWorldOpenFlows().createFreshLevel("Demo_World", MinecraftServer.DEMO_SETTINGS, WorldOptions.DEMO_OPTIONS, WorldPresets::createNormalWorldDimensions);
+            if (!bl) {
+                try {
+                    Legacy4JClient.importSaveFile(minecraft, minecraft.getResourceManager().getResourceOrThrow(new ResourceLocation(Legacy4J.MOD_ID,"tutorial/tutorial.mcsave")).open(), "Demo_World");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
+            this.minecraft.createWorldOpenFlows().loadLevel(this,"Demo_World");
 
         }).build());
         Button secondButton;
@@ -116,6 +128,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     }
     @Inject(method = "added", at = @At("RETURN"))
     public void added(CallbackInfo ci) {
+        this.splash = this.minecraft.getSplashManager().getSplash();
         ControllerManager.getHandler().init();
     }
     @Override

@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class PanelVListScreen extends PanelBackgroundScreen{
+public class PanelVListScreen extends PanelBackgroundScreen implements RenderableVList.Access{
     protected final RenderableVList renderableVList = new RenderableVList();
     public Consumer<PanelVListScreen> onClose = s->{};
     public PanelVListScreen(Function<Screen,Panel> panelConstructor, Component component) {

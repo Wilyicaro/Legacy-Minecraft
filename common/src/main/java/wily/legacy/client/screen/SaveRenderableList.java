@@ -33,7 +33,6 @@ import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import wily.legacy.Legacy4J;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.ScreenUtil;
 
@@ -289,8 +288,8 @@ public class SaveRenderableList extends RenderableVList {
 
     public static void handleLevelLoadFailure(Minecraft minecraft, Component component) {
         minecraft.setScreen(new ConfirmationScreen(new TitleScreen(), Component.translatable("selectWorld.futureworld.error.title"), component, (b)->{}){
-            protected void initButtons() {
-                okButton = addRenderableWidget(Button.builder(Component.translatable("gui.ok"),(b)-> onClose()).bounds(panel.x + 15, panel.y + panel.height - 30,200,20).build());
+            protected void addButtons() {
+                renderableVList.addRenderable(okButton = Button.builder(Component.translatable("gui.ok"),(b)-> onClose()).bounds(panel.x + 15, panel.y + panel.height - 30,200,20).build());
             }
         });
     }

@@ -1,6 +1,5 @@
 package wily.legacy.util;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -15,7 +14,7 @@ import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import wily.legacy.Legacy4JPlatform;
+import wily.legacy.inventory.NBTIngredient;
 
 import java.util.HashMap;
 import java.util.List;
@@ -35,8 +34,8 @@ public interface RecipeValue<C extends Container, T extends Recipe<C>> extends P
                     PotionUtils.setPotion(result, p);
                     NonNullList<Ingredient> ings = NonNullList.create();
                     for (int i = 0; i < 8; i++) ings.add(Ingredient.of(Items.ARROW.getDefaultInstance()));
-                    ings.add(4, Legacy4JPlatform.getNBTIngredient(potion));
-                    RecipeHolder<?> rcp = new RecipeHolder<>(h.id(),overrideCustomRecipe(r,ings, result));
+                    ings.add(4, NBTIngredient.of(true,potion));
+                    RecipeHolder<?> rcp = new RecipeHolder<>(h.id(),overrideCustomRecipe(r,ings,result));
                     if (filter.test(rcp)) rcps.add(rcp);
                 });
             }
@@ -53,7 +52,6 @@ public interface RecipeValue<C extends Container, T extends Recipe<C>> extends P
             public NonNullList<Ingredient> getIngredients() {
                 return ings;
             }
-
             @Override
             public ItemStack getResultItem(RegistryAccess provider) {
                 return result;

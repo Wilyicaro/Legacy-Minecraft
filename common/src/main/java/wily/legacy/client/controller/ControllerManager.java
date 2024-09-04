@@ -32,7 +32,19 @@ public  class ControllerManager {
     public boolean resetCursor = false;
     public boolean canChangeSlidersValue = true;
     final Minecraft minecraft;
-    public static final List<Controller.Handler> handlers = List.of(GLFWControllerHandler.getInstance(), SDLControllerHandler.getInstance(), Controller.Handler.EMPTY);
+    public static final List<Controller.Handler> handlers = List.of(Controller.Handler.EMPTY, GLFWControllerHandler.getInstance(), SDLControllerHandler.getInstance());
+
+    public static Controller.Handler handlerById(String id){
+        try {
+            int v = Integer.parseInt(id);
+            return v == 0 ? GLFWControllerHandler.getInstance() : v == 1 ? SDLControllerHandler.getInstance() : Controller.Handler.EMPTY;
+        } catch (NumberFormatException i) {
+        }
+        for (Controller.Handler handler : handlers) {
+            if (handler.getId().equals(id)) return handler;
+        }
+        return Controller.Handler.EMPTY;
+    }
 
     public static final Component CONTROLLER_DETECTED = Component.translatable("legacy.controller.detected");
     public static final Component CONTROLLER_DISCONNECTED = Component.translatable("legacy.controller.disconnected");
@@ -49,7 +61,11 @@ public  class ControllerManager {
         Minecraft minecraft = Minecraft.getInstance();
         if (!minecraft.mouseHandler.isMouseGrabbed() || !minecraft.isWindowActive() || !stick.pressed || minecraft.player == null) return;
         double f = Math.pow(minecraft.options.sensitivity().get() * (double)0.6f + (double)0.2f,3) * 7.5f * (minecraft.player.isScoping() ? 0.125: 1.0);
-        minecraft.player.turn(stick.getSmoothX() * f,stick.getSmoothY() * f * (ScreenUtil.getLegacyOptions().invertYController().get() ? -1 : 1));
+        minecraft.player.turn(sqr(stick.getSmoothX()) * f,sqr(stick.getSmoothY()) * f * (ScreenUtil.getLegacyOptions().invertYController().get() ? -1 : 1));
+    }
+
+    public static float sqr(float f){
+        return f * f * Math.signum(f);
     }
 
     public void setup(){
@@ -116,6 +132,8 @@ public  class ControllerManager {
                 simulateKeyAction(s-> s.is(ControllerBinding.LEFT_BUTTON),InputConstants.KEY_X, state);
                 simulateKeyAction(s->s.is(ControllerBinding.UP_BUTTON),InputConstants.KEY_O, state);
                 simulateKeyAction(s->s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_W, state);
+                simulateKeyAction(s->s.is(ControllerBinding.LEFT_TRIGGER),InputConstants.KEY_PAGEUP, state);
+                simulateKeyAction(s->s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_PAGEDOWN, state);
                 simulateKeyAction(s->s.is(ControllerBinding.RIGHT_BUMPER),InputConstants.KEY_RBRACKET, state);
                 simulateKeyAction(s->s.is(ControllerBinding.LEFT_BUMPER),InputConstants.KEY_LBRACKET, state);
                 if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis stick && Math.abs(stick.y) > Math.abs(stick.x) && state.pressed && state.canClick())
@@ -162,7 +180,7 @@ public  class ControllerManager {
                         a.movePointerToSlotIn(ScreenDirection.LEFT);
                 }else if (state.is(ControllerBinding.LEFT_STICK) && state.released) a.movePointerToSlot(a.findSlotAt(getPointerX(),getPointerY()));
             }
-            if (minecraft.player == null) continue;
+
             KeyMapping.ALL.forEach((key, value) -> {
                 if (!state.matches(value)) return;
                 Screen screen;

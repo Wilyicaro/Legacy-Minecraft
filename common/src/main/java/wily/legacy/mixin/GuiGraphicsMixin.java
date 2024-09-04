@@ -139,4 +139,8 @@ public abstract class GuiGraphicsMixin {
             if (minecraft.player != null  && !minecraft.player.getInventory().items.contains(itemStack)) itemStack.setPopTime(itemStack.getPopTime() - 1);
         }
     }
+    @ModifyArg(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V", ordinal = 0), index = 2)
+    private float renderTooltipInternal(float z){
+        return 800;
+    }
 }

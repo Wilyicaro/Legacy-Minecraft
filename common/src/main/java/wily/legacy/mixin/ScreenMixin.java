@@ -1,11 +1,13 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,10 +15,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyTipManager;
+import wily.legacy.client.controller.Controller;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.KeyboardScreen;
+import wily.legacy.client.screen.LeaderboardsScreen;
+import wily.legacy.client.screen.OverlayPanelScreen;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.ScreenUtil;
 
@@ -34,7 +40,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
 
     @Inject(method = "renderWithTooltip",at = @At("HEAD"))
     private void renderWithTooltip(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci){
-        LegacyTipManager.tipDiffPercentage = Math.max(-0.5f,Math.min(LegacyTipManager.tipDiffPercentage + (LegacyTipManager.getActualTip() == null ? -0.1f : 0.08f) * minecraft.getDeltaFrameTime(),1.5f));
+        LegacyTipManager.tipDiffPercentage = Math.max(-0.5f,Math.min(LegacyTipManager.tipDiffPercentage + (LegacyTipManager.getActualTip() == null ? -0.1f : 0.08f) * f,1.5f));
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(LegacyTipManager.getTipXDiff(),0,0);
     }
@@ -46,10 +52,9 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
         guiGraphics.pose().popPose();
     }
 
-
     @Inject(method = "changeFocus",at = @At("HEAD"))
     private void changeFocus(ComponentPath componentPath, CallbackInfo ci){
-        ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),1.0f);
+        ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
     }
     @Inject(method = "onClose",at = @At("HEAD"))
     private void onClose(CallbackInfo ci){
@@ -63,7 +68,9 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     @Inject(method = "renderTransparentBackground",at = @At("HEAD"), cancellable = true)
     public void renderTransparentBackground(GuiGraphics graphics, CallbackInfo ci) {
         ci.cancel();
-        graphics.fillGradient(0,0,graphics.guiWidth(),graphics.guiHeight(), -1073741824, -805306368);
+        RenderSystem.enableBlend();
+        graphics.blit(ScreenUtil.MENU_BACKGROUND,0,0,0,0,graphics.guiWidth(),graphics.guiHeight(),graphics.guiWidth(),graphics.guiHeight());
+        RenderSystem.disableBlend();
     }
     @Inject(method = "hasShiftDown",at = @At("HEAD"), cancellable = true)
     private static void hasShiftDown(CallbackInfoReturnable<Boolean> cir){

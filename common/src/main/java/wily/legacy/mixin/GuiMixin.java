@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
@@ -20,6 +21,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PlayerRideableJumping;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Score;
@@ -36,31 +38,30 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.BufferSourceWrapper;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.network.TopMessage;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.util.ScreenUtil;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+
 
 @Mixin(Gui.class)
 
 public abstract class GuiMixin implements ControlTooltip.Event {
     @Shadow @Final protected Minecraft minecraft;
+    @Shadow
+    private ItemStack lastToolHighlight;
+    @Shadow
+    public int toolHighlightTimer;
     @Final
-
     @Shadow public abstract Font getFont();
 
-    @Shadow protected float autosaveIndicatorValue;
-
-    @Shadow protected float lastAutosaveIndicatorValue;
-
     private int lastHotbarSelection = -1;
-    private long animatedCharacterTime;
-    private long remainingAnimatedCharacterTime;
 
     @Shadow protected abstract Player getCameraPlayer();
-
-    @Shadow public abstract void render(GuiGraphics guiGraphics, float f);
 
     @Redirect(method = "renderSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getPopTime()I"))
     public int renderSlot(ItemStack instance) {
@@ -150,17 +151,18 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         if (minecraft.getCameraEntity() instanceof LivingEntity character) {
             boolean hasRemainingTime = character.isSprinting() || character.isCrouching() || character.isFallFlying() || character.isVisuallySwimming() || !(character instanceof Player);
             if (((LegacyOptions) minecraft.options).animatedCharacter().get() && (hasRemainingTime || character instanceof Player p && p.getAbilities().flying) && !character.isSleeping()) {
-                animatedCharacterTime = Util.getMillis();
-                remainingAnimatedCharacterTime = hasRemainingTime ? 450 : 0;
+                ScreenUtil.animatedCharacterTime = Util.getMillis();
+                ScreenUtil.remainingAnimatedCharacterTime = hasRemainingTime ? 450 : 0;
             }
-            if (Util.getMillis() - animatedCharacterTime <= remainingAnimatedCharacterTime) {
+            if (Util.getMillis() - ScreenUtil.animatedCharacterTime <= ScreenUtil.remainingAnimatedCharacterTime) {
                 float xRot = character.getXRot();
                 float xRotO = character.xRotO;
-                if (!character.isFallFlying()) character.setXRot(character.xRotO = 0);
+                if (!character.isFallFlying()) character.setXRot(character.xRotO = -2.5f);
                 guiGraphics.pose().pushPose();
+                guiGraphics.pose().translate(32f,18,0);
                 ScreenUtil.applyHUDScale(guiGraphics);
                 f = ScreenUtil.getLegacyOptions().smoothAnimatedCharacter().get() ? f : 0;
-                ScreenUtil.renderEntity(guiGraphics, 28f, 50f, 13, f,new Vector3f(), new Quaternionf().rotationXYZ(0, -(Mth.lerp(f, character.yBodyRotO, character.yBodyRot) * (float)(Math.PI/180f)) + (float) (Math.PI * 7/8f), (float) Math.PI), null, character);
+                ScreenUtil.renderEntity(guiGraphics, 10f, 36f, 12, f,new Vector3f(), new Quaternionf().rotationXYZ(-5* Mth.PI/180f, (165 -Mth.lerp(f, character.yBodyRotO, character.yBodyRot)) * Mth.PI/180f, Mth.PI), null, character);
                 guiGraphics.pose().popPose();
                 character.setXRot(xRot);
                 character.xRotO = xRotO;
@@ -229,6 +231,8 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         Legacy4JClient.guiBufferSourceOverride = null;
         ScreenUtil.finishHUDRender(guiGraphics);
         if (minecraft.player != null) ControlTooltip.Renderer.of(this).render(guiGraphics,0,0,f);
+        renderTopText(guiGraphics,TopMessage.small,21,1.0f,false);
+        renderTopText(guiGraphics,TopMessage.medium,37,1.5f,false);
     }
 
     @Redirect(method = "renderExperienceBar", at = @At(value = "FIELD", target = "Lnet/minecraft/client/player/LocalPlayer;experienceLevel:I", ordinal = 0))
@@ -239,7 +243,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
             int hudScale = ScreenUtil.getLegacyOptions().hudScale().get();
             boolean is720p = minecraft.getWindow().getHeight() % 720 == 0;
             guiGraphics.pose().translate(guiGraphics.guiWidth() / 2,guiGraphics.guiHeight() - 36f,0);
-            if (!is720p && hudScale != 1) guiGraphics.pose().scale(7/8f,7/8f,3/4f);
+            if (!is720p && hudScale != 1) guiGraphics.pose().scale(7/8f,7/8f,7/8f);
             ScreenUtil.drawOutlinedString(guiGraphics,getFont(), Component.literal(exp),-this.getFont().width(exp) / 2,-2,8453920,0,is720p && hudScale == 3 || !is720p && hudScale == 2 || hudScale == 1 ? 1/2f : 2/3f);
             this.minecraft.getProfiler().pop();
         }
@@ -298,5 +302,28 @@ public abstract class GuiMixin implements ControlTooltip.Event {
     public void renderAutoSaveIndicator(GuiGraphics guiGraphics, CallbackInfo ci) {
         ci.cancel();
     }
+    public void renderTopText(GuiGraphics guiGraphics,TopMessage component, int height, float scale, boolean shadow){
+        if (component != null) {
+            RenderSystem.disableDepthTest();
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(guiGraphics.guiWidth() / 2f,height,0);
+            guiGraphics.pose().scale(scale,scale,scale);
+            guiGraphics.pose().translate(-minecraft.font.width(component.message()) / 2f,0,0);
+            guiGraphics.drawString(minecraft.font,component.message(),0,0,component.baseColor(),shadow);
+            guiGraphics.pose().popPose();
+            RenderSystem.enableDepthTest();
+        }
+    }
 
+    @Redirect(method = "tick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"))
+    private boolean tick(ItemStack instance) {
+        return !getTooltip(instance).equals(getTooltip(minecraft.player.getInventory().getSelected()));
+    }
+    @Redirect(method = "tick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/OptionInstance;get()Ljava/lang/Object;"))
+    private Object tick(OptionInstance<Double> instance) {
+        return Math.min(4,getTooltip(minecraft.player.getInventory().getSelected()).size()) * instance.get();
+    }
+    private List<Component> getTooltip(ItemStack stack){
+        return stack.getTooltipLines(minecraft.player, TooltipFlag.NORMAL);
+    }
 }

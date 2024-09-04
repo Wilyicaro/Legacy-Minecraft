@@ -23,7 +23,6 @@ import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.FaviconTexture;
 import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.multiplayer.ServerSelectionList;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
@@ -106,6 +105,15 @@ public class ServerRenderableList extends RenderableVList {
     }
     public boolean hasOnlineFriends(){
         return false;
+    }
+
+    public void added(){
+    }
+    public void removed(){
+        if (lanServerDetector != null) {
+            lanServerDetector.interrupt();
+            lanServerDetector = null;
+        }
     }
     private Component getMultiplayerDisabledReason() {
         if (this.minecraft.allowsMultiplayer()) {

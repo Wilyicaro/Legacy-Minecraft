@@ -170,7 +170,6 @@ subprojects {
                     id = rootProject.curseforge_id
                     gameVersions.addAll(["Java 17", "Java 18"])
                     relations{
-                        depends "architectury-api"
                         if (isFabric) depends "fabric-api"
                     }
                 }
@@ -184,7 +183,6 @@ subprojects {
                     id = rootProject.modrinth_id
                     version = "$project.version+$project.name"
                     relations{
-                        depends "architectury-api"
                         if (isFabric) depends "fabric-api"
                     }
                 }

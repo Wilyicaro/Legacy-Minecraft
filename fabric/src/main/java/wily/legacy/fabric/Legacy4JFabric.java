@@ -1,8 +1,11 @@
 package wily.legacy.fabric;
 
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
@@ -12,6 +15,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.network.CommonNetwork;
 
 import java.util.function.Function;
@@ -25,7 +29,7 @@ public class Legacy4JFabric implements ModInitializer {
         CommonNetwork.registerPayloads(new CommonNetwork.PayloadRegister(){
             @Override
             public <T extends CustomPacketPayload> void register(boolean client, ResourceLocation type, Function<FriendlyByteBuf, T> codec, CommonNetwork.Consumer<T> consumer) {
-                if (client) ServerPlayNetworking.registerGlobalReceiver(type, (m, l, h, b, s) -> consumer.apply(codec.apply(b),Legacy4J.SECURE_EXECUTOR,()->h.player));
+                if (client) ServerPlayNetworking.registerGlobalReceiver(type, (m,l,h,b,s) -> consumer.apply(codec.apply(b),Legacy4J.SECURE_EXECUTOR,()->h.player));
             }
         });
         Legacy4J.init();
