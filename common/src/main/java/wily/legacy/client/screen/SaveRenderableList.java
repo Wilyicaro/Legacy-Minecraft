@@ -14,12 +14,15 @@ import net.minecraft.CrashReport;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -79,7 +82,18 @@ public class SaveRenderableList extends RenderableVList {
     public static LoadingCache<LevelSummary, Long> sizeCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
         @Override
         public Long load(LevelSummary key) {
-            return FileUtils.sizeOfDirectory(Minecraft.getInstance().getLevelSource().getLevelPath(key.getLevelId()).toFile());
+            return FileUtils.sizeOfDirectory(Minecraft.getInstance().getLevelSource().getBaseDir().resolve(key.getLevelId()).toFile());
+        }
+    });
+    public static LoadingCache<LevelSummary, Long> sizeCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
+        @Override
+        public Long load(LevelSummary key) {
+            try {
+                return FileUtils.sizeOfDirectory(Minecraft.getInstance().getLevelSource().getBaseDir().resolve(key.getLevelId()).toFile());
+            } catch (IOException e) {
+                LOGGER.error("Failed to get directory size for level: {}", key.getLevelId(), e);
+                return 0L;
+            }
         }
     });
     public static LoadingCache<LevelSummary, DynamicTexture> iconCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
@@ -90,7 +104,6 @@ public class SaveRenderableList extends RenderableVList {
                 BasicFileAttributes basicFileAttributes = Files.readAttributes(iconFile, BasicFileAttributes.class, LinkOption.NOFOLLOW_LINKS);
                 if (basicFileAttributes.isSymbolicLink()) {
                     List<String> list = new ArrayList<>();
-                    Minecraft.getInstance().getLevelSource().getWorldDirValidator().validateSymlink(iconFile, list);
                     if (!list.isEmpty()) {
                         Legacy4J.LOGGER.warn("{}", String.join(", ", list));
                         iconFile = null;
@@ -231,21 +244,25 @@ public class SaveRenderableList extends RenderableVList {
                     protected void renderWidget(PoseStack poseStack, int i, int j, float f) {
                         super.renderWidget(poseStack, i, j, f);
                         RenderSystem.enableBlend();
-                        poseStack.blit(iconCache.getUnchecked(summary).textureLocation(), getX() + 5, getY() + 5, 0, 0, 20, 20, 20, 20);
+                        RenderSystem.setShaderTexture(0, iconCache.getUnchecked(summary).getId());
+                        blit(poseStack, getX() + 5, getY() + 5, 0, 0, 20, 20, 20, 20);
                         RenderSystem.disableBlend();
                         if (minecraft.options.touchscreen().get().booleanValue() || isHovered) {
-                            poseStack.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
+                            LegacyGuiGraphics guiGraphics = LegacyGuiGraphics.of(poseStack);
+                            fill(poseStack, getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
 
                             boolean hoverIcon = ScreenUtil.isMouseOver(i, j, getX() + 5, getY() + 5, 20, height);
                             ResourceLocation resourceLocation = hoverIcon ? JOIN_HIGHLIGHTED : JOIN;
                             ResourceLocation resourceLocation2 = hoverIcon ? WARNING_HIGHLIGHTED : WARNING;
                             ResourceLocation resourceLocation3 = hoverIcon ? ERROR_HIGHLIGHTED : ERROR;
                             ResourceLocation resourceLocation4 = hoverIcon ? MARKED_JOIN_HIGHLIGHTED : MARKED_JOIN;
+/* SymLink doesn't exist in 1.19.4 & older.
                             if (summary instanceof LevelSummary.SymlinkLevelSummary) {
                                 LegacyGuiGraphics.of(poseStack).blitSprite(resourceLocation3, getX(), getY(), 32, 32);
                                 LegacyGuiGraphics.of(poseStack).blitSprite(resourceLocation4, getX(), getY(), 32, 32);
                                 return;
                             }
+*/
                             if (summary.isLocked()) {
                                 LegacyGuiGraphics.of(poseStack).blitSprite(resourceLocation3, getX(), getY(), 32, 32);
                                 if (hoverIcon) {
@@ -320,7 +337,7 @@ public class SaveRenderableList extends RenderableVList {
             return;
         }
         if (summary instanceof LevelSummary.SymlinkLevelSummary) {
-            this.minecraft.setScreen(new SymlinkWarningScreen(this.screen));
+//          this.minecraft.setScreen(new SymlinkWarningScreen(this.screen));
             return;
         }
         LevelSummary.BackupStatus backupStatus = summary.backupStatus();
@@ -342,7 +359,7 @@ public class SaveRenderableList extends RenderableVList {
                         LOGGER.error("Failed to backup level {}", levelId, iOException);
                     } catch (ContentValidationException contentValidationException) {
                         LOGGER.warn("{}", contentValidationException.getMessage());
-                        this.minecraft.setScreen(new SymlinkWarningScreen(this.screen));
+//                      this.minecraft.setScreen(new SymlinkWarningScreen(this.screen));
                     }
                 }
                 this.loadWorld(summary);

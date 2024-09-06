@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyCommonInputs;
 import wily.legacy.client.LegacyGuiGraphics;
 import wily.legacy.client.LegacyResourceManager;
 import wily.legacy.client.controller.BindingState;
@@ -127,12 +128,8 @@ public class KeyboardScreen extends OverlayPanelScreen {
         renderer.add(()-> ControlType.getActiveType().isKbm() ? null : ControllerBinding.RIGHT_STICK.bindingState.getIcon(), ()-> ControlTooltip.getAction("legacy.action.move_keyboard"));
     }
 
-    private static boolean isSpaceOrEnterPressed(int keyCode) {
-        return keyCode == InputConstants.KEY_SPACE || keyCode == InputConstants.KEY_RETURN;
-    }
-
-    public static boolean isOpenKey(int i){
-        return isSpaceOrEnterPressed(i) && i != InputConstants.KEY_SPACE;
+    public static boolean isOpenKey(int keyCode) {
+        return LegacyCommonInputs.selected(keyCode) && keyCode != InputConstants.KEY_SPACE;
     }
     public static KeyboardScreen fromEditBox(int ordinal, Screen parent){
         return new KeyboardScreen(()->getScreenActualEditBox(ordinal,parent),parent);
@@ -372,7 +369,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
         @Override
         public boolean keyReleased(int i, int j, int k) {
-            if (this.active && this.visible && isSpaceOrEnterPressed(i) && pressTime > 0) {
+            if (this.active && this.visible && LegacyCommonInputs.selected(i) && pressTime > 0) {
                 this.onRelease();
                 return true;
             } else {
