@@ -184,7 +184,7 @@
  "legacy.key.flyDown" : "下へ飛行",
  "legacy.key.flyUp" : "上へ飛行",
  "legacy.key.toggleCursor" : "Toggle Cursor",
- "options.key.toggleSneak": "Toggle sneak",
+ "options.key.toggleSneak": "Toggle Sneak",
  "options.key.toggleSprint": "Toggle Sprint",
  "menu.options": "ヘルプとオプション",
  "gamerule.globalMapPlayerIcon": "Global Map Player Icon",
