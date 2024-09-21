@@ -12,7 +12,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.MobEffectTextureManager;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.numbers.NumberFormat;
 import net.minecraft.network.chat.numbers.StyledFormat;
@@ -23,7 +22,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PlayerRideableJumping;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.scores.Objective;
@@ -57,10 +55,6 @@ import java.util.Objects;
 
 public abstract class GuiMixin implements ControlTooltip.Event {
     @Shadow @Final protected Minecraft minecraft;
-    @Shadow
-    private ItemStack lastToolHighlight;
-    @Shadow
-    public int toolHighlightTimer;
     @Final
     @Shadow
     private static Comparator<? super PlayerScoreEntry> SCORE_DISPLAY_ORDER;

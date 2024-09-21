@@ -7,7 +7,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.SpriteContents;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
 import wily.legacy.client.CommonColor;
@@ -27,7 +26,7 @@ public class LegacyLoadingScreen extends Screen{
     public static LegacyTip actualLoadingTip;
     public int progress;
     public Component lastLoadingHeader;
-    protected Component lastLoadingStage;
+    public Component lastLoadingStage;
     public boolean genericLoading;
 
     protected RandomSource random = RandomSource.create();
@@ -71,7 +70,7 @@ public class LegacyLoadingScreen extends Screen{
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(guiGraphics,true, true);
+        ScreenUtil.renderDefaultBackground(guiGraphics,true, true, false);
     }
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {

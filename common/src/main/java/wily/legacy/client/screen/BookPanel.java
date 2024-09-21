@@ -48,11 +48,6 @@ public class BookPanel extends WidgetPanel implements GuiEventListener, Narratab
                 lastPressTime = Util.getMillis();
             }
 
-            @Override
-            public void setFocused(boolean bl) {
-                if (bl) screen.setFocused(BookPanel.this);
-            }
-
             @Nullable
             @Override
             public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {

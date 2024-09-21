@@ -30,7 +30,7 @@ public class PublishScreen extends ConfirmationScreen{
     private int port = HttpUtil.getAvailablePort();
 
     public static boolean hasWorldHost(){
-        return Legacy4JPlatform.isModLoaded(Legacy4JPlatform.isForgeLike() ? "world_host" : "world-host");
+        return Legacy4JPlatform.isModLoaded(Legacy4JPlatform.getLoader().isForgeLike() ? "world_host" : "world-host");
     }
 
     public PublishScreen(Screen parent, GameType gameType, Consumer<PublishScreen> okAction) {

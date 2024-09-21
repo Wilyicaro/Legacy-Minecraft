@@ -3,7 +3,9 @@
   "package": "wily.legacy.neoforge.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
+    "ExtendedGuiMixin",
     "GuiMixin",
+    "LiquidBlockRendererMixin",
     "MinecraftMixin",
     "TooltipRenderUtilMixin"
   ],

@@ -1,6 +1,5 @@
 package wily.legacy.client.controller;
 
-import dev.isxander.sdl3java.api.SDL_bool;
 import dev.isxander.sdl3java.api.SdlInit;
 import dev.isxander.sdl3java.api.SdlSubSystemConst;
 import dev.isxander.sdl3java.api.gamepad.*;
@@ -184,7 +183,7 @@ public class SDLControllerHandler implements Controller.Handler{
     public boolean isValidController(int jid) {
         actualIds = SdlGamepad.SDL_GetGamepads();
         if (actualIds.length <= jid) return false;
-        return SdlGamepad.SDL_IsGamepad(actualIds[jid]) == SDL_bool.SDL_TRUE;
+        return SdlGamepad.SDL_IsGamepad(actualIds[jid]);
     }
 
     @Override

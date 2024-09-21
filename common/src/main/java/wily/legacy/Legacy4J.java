@@ -263,7 +263,10 @@ public class Legacy4J {
     public static void registerBuiltInPacks(PackRegistry registry){
         registry.register("legacy_waters",true);
         registry.register("console_aspects",false);
-        if (Legacy4JPlatform.isForgeLike()) registry.register("programmer_art","programmer_art", Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP,false);
+        if (Legacy4JPlatform.getLoader().isForgeLike()) {
+            registry.register("programmer_art", "programmer_art", Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP, false);
+            registry.register("high_contrast", "high_contrast", Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
+        }
     }
 
     public static void onServerPlayerJoin(ServerPlayer p){

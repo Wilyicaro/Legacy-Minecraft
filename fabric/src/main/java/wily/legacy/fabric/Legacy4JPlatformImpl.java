@@ -21,6 +21,7 @@ import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.NotNull;
+import wily.legacy.Legacy4JPlatform;
 import wily.legacy.util.RegisterListing;
 import wily.legacy.util.ModInfo;
 
@@ -172,8 +173,8 @@ public class Legacy4JPlatformImpl {
         };
     }
 
-    public static boolean isForgeLike() {
-        return false;
+    public static Legacy4JPlatform.Loader getLoader() {
+        return Legacy4JPlatform.Loader.FABRIC;
     }
     public static boolean isClient() {
         return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
@@ -197,6 +198,5 @@ public class Legacy4JPlatformImpl {
     public static boolean isPackHidden(Pack pack) {
         return ((FabricResourcePackProfile)pack).fabric_isHidden();
     }
-
 
 }
