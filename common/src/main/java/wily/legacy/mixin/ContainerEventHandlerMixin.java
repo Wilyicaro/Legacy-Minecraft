@@ -30,7 +30,7 @@ public interface ContainerEventHandlerMixin extends GuiEventListener {
             return ComponentPath.path((ContainerEventHandler) this, this.nextFocusPathInDirection(screenRectangle, screenDirection, null, arrowNavigation));
         } else {
             ScreenRectangle oldRec = guiEventListener.getRectangle();
-            ComponentPath path =  ComponentPath.path((ContainerEventHandler) this, this.nextFocusPathInDirection(oldRec, arrowNavigation.direction(), guiEventListener, arrowNavigation));
+            ComponentPath path = ComponentPath.path((ContainerEventHandler) this, this.nextFocusPathInDirection(oldRec, arrowNavigation.direction(), guiEventListener, arrowNavigation));
             if (path != null) return path;
             ScreenRectangle screenRec = getRectangle();
             ScreenRectangle rec = new ScreenRectangle(arrowNavigation.direction().getAxis() == ScreenAxis.HORIZONTAL ? arrowNavigation.direction().isPositive() ? 0 : screenRec.width() : oldRec.left() + oldRec.width()/2,arrowNavigation.direction().getAxis() == ScreenAxis.VERTICAL ? arrowNavigation.direction().isPositive() ? 0 : screenRec.height() : oldRec.top() + oldRec.height()/2,0,0);

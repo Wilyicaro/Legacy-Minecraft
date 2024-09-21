@@ -36,7 +36,7 @@ public abstract class LivingEntityMixin extends Entity {
     }
     @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
     public void hurt(DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> cir) {
-        if (!level().isClientSide && !level().getServer().isPvpAllowed() && (this instanceof OwnableEntity o && damageSource.getDirectEntity() != null && damageSource.getDirectEntity().equals(o.getOwner()) || ((Object)this) instanceof IronGolem i && i.isPlayerCreated() || ((Object)this) instanceof SnowGolem)){
+        if (!level().isClientSide && !level().getServer().isPvpAllowed() && damageSource.getDirectEntity() instanceof Player && (this instanceof OwnableEntity o && damageSource.getDirectEntity().equals(o.getOwner()) || ((Object)this) instanceof IronGolem i && i.isPlayerCreated() || ((Object)this) instanceof SnowGolem)){
             cir.setReturnValue(false);
         }
     }

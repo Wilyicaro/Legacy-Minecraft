@@ -90,6 +90,6 @@ public abstract class GuiMixin {
     }
     @Redirect(method="renderHealthLevel", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD, ordinal = 1))
     private void renderPlayerHealth(Gui instance, long value) {
-        healthBlinkTime = value - 5;
+        healthBlinkTime = value - 6;
     }
 }

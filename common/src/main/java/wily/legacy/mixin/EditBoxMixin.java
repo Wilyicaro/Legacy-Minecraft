@@ -68,15 +68,7 @@ public abstract class EditBoxMixin extends AbstractWidget {
         guiGraphics.blitSprite(SPRITES.get(this.isActive(), false), i, j, k, l);
         if (isHoveredOrFocused()) guiGraphics.blitSprite(SPRITES.get(this.isActive(), true), i - 1, j - 1, k + 2, l + 2);
     }
-    @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;III)I", ordinal = 1))
-    public int renderWidget(GuiGraphics instance, Font arg, String string, int i, int j, int k) {
-        instance.pose().pushPose();
-        instance.pose().translate(i-(cursorPos == 0 ? 3 : 4),j+8.5f,0);
-        instance.pose().scale(6,1.5f,1f);
-        instance.fill(0,0,1,1, CommonColor.WIDGET_TEXT.get() | 0xFF000000);
-        instance.pose().popPose();
-        return 0;
-    }
+
     @ModifyArg(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(Lnet/minecraft/client/renderer/RenderType;IIIII)V", ordinal = 0), index = 5)
     public int renderWidget(int i) {
         return CommonColor.WIDGET_TEXT.get() | 0xFF000000;

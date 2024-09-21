@@ -90,10 +90,8 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 }));
             });
             onClose = ()->{
-                if (!dataRepository.getSelectedIds().equals(selectedExperiments)) {
-                    dataRepository.setSelected(selectedExperiments);
-                    parent.tryApplyNewDataPacks(dataRepository, false, w -> minecraft.setScreen(this));
-                }
+                dataRepository.setSelected(selectedExperiments);
+                parent.tryApplyNewDataPacks(dataRepository, false, w -> minecraft.setScreen(this));
             };
         }
         renderableVList.addRenderable(Button.builder(Component.translatable("selectWorld.dataPacks"), button -> openDataPackSelectionScreen(parent, parent.getUiState().getSettings().dataConfiguration())).build());

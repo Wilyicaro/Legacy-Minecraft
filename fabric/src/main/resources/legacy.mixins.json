@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_17",
   "plugin": "wily.legacy.LegacyMixinPlugin",
   "client": [
+    "EditBoxMixin",
     "GuiMixin",
     "LiquidBlockRendererMixin",
     "PresetEditorMixin",

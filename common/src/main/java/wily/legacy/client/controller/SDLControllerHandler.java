@@ -183,7 +183,7 @@ public class SDLControllerHandler implements Controller.Handler{
     public boolean isValidController(int jid) {
         actualIds = SdlGamepad.SDL_GetGamepads();
         if (actualIds.length <= jid) return false;
-        return SdlGamepad.SDL_IsGamepad(actualIds[jid]) == 1;
+        return SdlGamepad.SDL_IsGamepad(actualIds[jid]);
     }
 
     @Override

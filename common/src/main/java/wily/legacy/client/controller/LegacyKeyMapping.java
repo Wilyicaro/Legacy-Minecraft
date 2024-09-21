@@ -13,6 +13,11 @@ public interface LegacyKeyMapping {
         setDefaultBinding(buttonGetter.apply(self().getDefaultKey()));
         return self();
     }
+
+    static LegacyKeyMapping of(KeyMapping key){
+        return (LegacyKeyMapping) key;
+    }
+
     default KeyMapping self(){
         return (KeyMapping) this;
     }

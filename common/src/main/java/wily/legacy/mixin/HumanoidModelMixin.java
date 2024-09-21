@@ -1,7 +1,6 @@
 package wily.legacy.mixin;
 
-import net.minecraft.Util;
-import net.minecraft.client.model.AnimationUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.util.Mth;
@@ -27,7 +26,6 @@ public abstract class HumanoidModelMixin {
     @Shadow @Final public ModelPart head;
 
     @Shadow @Final public ModelPart leftArm;
-    private long lastEatTime = -1;
 
 
     @Inject(method = ("setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V"), at = @At("TAIL"))
@@ -39,16 +37,13 @@ public abstract class HumanoidModelMixin {
         applyEatTransform(livingEntity, InteractionHand.OFF_HAND, livingEntity.getOffhandItem(), h, livingEntity.getMainArm().getOpposite());
     }
 
-    private boolean applyEatTransform(LivingEntity livingEntity, InteractionHand hand, ItemStack itemStack, float partialTicks, HumanoidArm mainArm){
+    private boolean applyEatTransform(LivingEntity livingEntity, InteractionHand hand, ItemStack itemStack, float bob, HumanoidArm arm){
         if(isEatingWithHand(livingEntity,hand,itemStack)){
-            if (livingEntity.getUseItemRemainingTicks() >= itemStack.getUseDuration(livingEntity) - 1) lastEatTime = Util.getMillis();
-
-            boolean isRightHand = mainArm == HumanoidArm.RIGHT && hand == InteractionHand.MAIN_HAND;
+            boolean isRightHand = arm == HumanoidArm.RIGHT;
             ModelPart armModel = isRightHand ? rightArm : leftArm;
-            float r = Math.min(1,(Util.getMillis() - lastEatTime) / 200f);
-            armModel.xRot =  r * -1.4f + (r > 0.8f ? (Mth.cos(partialTicks*1.5f) *0.15f) : 0);
+            float r = Math.min((livingEntity.getTicksUsingItem() + Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(!Minecraft.getInstance().level.tickRateManager().isEntityFrozen(livingEntity))) / itemStack.getUseDuration(livingEntity) * 6,1);
+            armModel.xRot =  r * -1.4f + (r > 0.8f ? (Mth.cos(bob * 1.7f) * 0.08f) : 0);
             armModel.yRot =  (isRightHand ? -0.45f : 0.45f) * r;
-
             return true;
         }
         return false;

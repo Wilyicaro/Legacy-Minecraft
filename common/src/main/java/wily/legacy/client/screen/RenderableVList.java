@@ -101,7 +101,6 @@ public class RenderableVList {
                     w.setWidth(listWidth);
                 if (r instanceof GuiEventListener g) {
                     screen.children.add(g);
-                    if (g.isFocused()) screen.setFocused(g);
                 }
                 if (r instanceof NarratableEntry e)
                     screen.narratables.add(e);

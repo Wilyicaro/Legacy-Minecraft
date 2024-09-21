@@ -3,7 +3,8 @@
   "package": "wily.legacy.forge.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-     "GuiMixin",
+    "EditBoxMixin",
+    "GuiMixin",
     "LiquidBlockRendererMixin",
     "MinecraftMixin",
     "TooltipRenderUtilMixin"

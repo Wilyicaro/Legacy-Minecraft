@@ -17,6 +17,6 @@ public class Legacy4JClientImpl {
     }
 
     public static Screen getConfigScreen(ModInfo mod, Screen screen) {
-        return ModList.get().getModContainerById(mod.getId()).flatMap(m->  IConfigScreenFactory.getForMod(m.getModInfo())).map(s -> s.createScreen(Minecraft.getInstance(), screen)).orElse(null);
+        return ModList.get().getModContainerById(mod.getId()).flatMap(m-> IConfigScreenFactory.getForMod(m.getModInfo()).map(s -> s.createScreen(m, screen))).orElse(null);
     }
 }

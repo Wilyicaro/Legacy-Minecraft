@@ -27,6 +27,7 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.*;
 import org.jetbrains.annotations.Nullable;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.Legacy4JPlatform;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
@@ -381,9 +382,11 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                                 ItemStack ing = compactItemStackList.get(i1);
                                 ScreenUtil.iconHolderRenderer.itemHolder(leftPos + 180, topPos + 124 + 15 * i1, 14, 14, ing, false, Offset.ZERO).render(guiGraphics, i, j, 0);
                                 guiGraphics.pose().pushPose();
-                                guiGraphics.pose().translate(leftPos + 198,topPos + 128 + 15 * i1, 0);
-                                guiGraphics.pose().scale(2 / 3f, 2 / 3f, 2 / 3f);
-                                guiGraphics.drawString(font, ing.getHoverName(), 0, 0, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                                guiGraphics.pose().translate(leftPos + 198, topPos + 128 + 15 * i1, 0);
+                                Legacy4JClient.applyFontOverrideIf(minecraft.getWindow().getHeight() <= 720, LegacyIconHolder.MOJANGLES_11_FONT, b-> {
+                                    if (!b) guiGraphics.pose().scale(2 / 3f, 2 / 3f, 2 / 3f);
+                                    guiGraphics.drawString(font, ing.getHoverName(), 0, 0, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                                });
                                 guiGraphics.pose().popPose();
                             }});
                         guiGraphics.pose().translate(leftPos,topPos,0);

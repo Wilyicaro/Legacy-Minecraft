@@ -32,6 +32,8 @@ import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraft.util.GsonHelper;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.joml.Math;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JPlatform;
@@ -68,8 +70,8 @@ public record Assort(String id, int version, Component displayName, Component de
     public static final Component REMOVE_ASSORT = Component.translatable("legacy.menu.remove_assort");
     public static Gson GSON = new GsonBuilder().create();
 
-    public static final Assort MINECRAFT = registerDefaultResource("minecraft",Component.translatable("legacy.menu.assorts.minecraft"),Component.translatable("legacy.menu.assorts.minecraft.description"),null,ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"icon/background"),Collections.emptyList());
-    public static final Assort MINECRAFT_CLASSIC_TEXTURES = registerDefaultResource("minecraft_classic",Component.translatable("legacy.menu.assorts.minecraft_classic"),Component.translatable("legacy.menu.assorts.minecraft_classic.description"),ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"icon/minecraft_classic"),ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"icon/minecraft_classic_background"),List.of("programmer_art"));
+    public static final Assort MINECRAFT = registerDefaultResource("minecraft",Component.translatable("legacy.menu.assorts.minecraft"),Component.translatable("legacy.menu.assorts.minecraft.description"),null,ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"icon/background"),Legacy4JPlatform.getMinecraftResourceAssort());
+    public static final Assort MINECRAFT_CLASSIC_TEXTURES = registerDefaultResource("minecraft_classic",Component.translatable("legacy.menu.assorts.minecraft_classic"),Component.translatable("legacy.menu.assorts.minecraft_classic.description"),ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"icon/minecraft_classic"),ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"icon/minecraft_classic_background"),Legacy4JPlatform.getMinecraftClassicResourceAssort());
 
     public static final Stocker<String> defaultResourceAssort = Stocker.of(MINECRAFT.id);
 
@@ -115,10 +117,13 @@ public record Assort(String id, int version, Component displayName, Component de
             }
         } catch (IOException e) {
         }
-        if (order.isEmpty()) defaultAssorts.forEach(a-> order.add(a.id));
+        for (int i = defaultAssorts.size() - 1; i >= 0; i--) {
+            Assort a = defaultAssorts.get(i);
+            if (!order.contains(a.id)) order.add(0,a.id);
+        }
         List<Assort> list = new ArrayList<>();
         try (Stream<Path> s = Files.walk(path).sorted(Comparator.comparingInt(p-> {
-            int i = order.indexOf(p.getFileName().toString());
+            int i = order.indexOf(FilenameUtils.getBaseName(p.getFileName().toString()));
             return i < 0 ? order.size() : i;
         }))) {
             for (Path p : ((Iterable<Path>) s::iterator)) {
@@ -131,6 +136,10 @@ public record Assort(String id, int version, Component displayName, Component de
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+        for (int i = defaultAssorts.size() - 1; i >= 0; i--) {
+            Assort a = defaultAssorts.get(i);
+            if (!list.contains(a)) list.add(0,a);
         }
         selected.set(defaultAssort);
         return list;
@@ -145,7 +154,8 @@ public record Assort(String id, int version, Component displayName, Component de
             } catch (IOException e) {
                 Legacy4J.LOGGER.warn("Failed to make assorts directory {}",path,e);
             }
-        }
+        }else FileUtils.listFiles(path.toFile(), new String[]{"json"},true).forEach(File::delete);
+
         List<String> order = new ArrayList<>();
         for (Assort assort : assorts) {
             order.add(assort.id);
@@ -183,8 +193,12 @@ public record Assort(String id, int version, Component displayName, Component de
         return a;
     }
     public static void applyDefaultResourceAssort(){
+        List<String> oldSelection = getSelectableIds(Minecraft.getInstance().getResourcePackRepository());
         Minecraft.getInstance().getResourcePackRepository().setSelected(getDefaultResourceAssort().packs());
-        Minecraft.getInstance().options.updateResourcePacks(Minecraft.getInstance().getResourcePackRepository());
+        if (!oldSelection.equals(getSelectableIds(Minecraft.getInstance().getResourcePackRepository()))) {
+            Minecraft.getInstance().reloadResourcePacks();
+            updateSavedResourcePacks();
+        }
     }
     public static void updateSavedResourcePacks(){
         Minecraft.getInstance().options.resourcePacks.clear();
@@ -193,6 +207,9 @@ public record Assort(String id, int version, Component displayName, Component de
             if (p.getCompatibility().isCompatible()) Minecraft.getInstance().options.resourcePacks.add(p.getId());
             else Minecraft.getInstance().options.incompatibleResourcePacks.add(p.getId());
         });
+    }
+    public static List<String> getSelectedIds(PackRepository packRepository){
+        return packRepository.getSelectedPacks().stream().map(Pack::getId).toList();
     }
     public static List<String> getSelectableIds(PackRepository packRepository){
         return packRepository.getSelectedPacks().stream().filter(pack -> !Legacy4JPlatform.isPackHidden(pack)).map(Pack::getId).toList();
@@ -221,7 +238,7 @@ public record Assort(String id, int version, Component displayName, Component de
         public int selectedIndex;
         private final PackRepository packRepository;
         private final Minecraft minecraft;
-        protected final Collection<String> oldSelection;
+        protected final List<String> oldSelection;
         protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
         public final ScrollableRenderer scrollableRenderer  = new ScrollableRenderer(scrollRenderer);
         public final BiFunction<Component,Integer,MultiLineLabel> labelsCache = Util.memoize((c,i)->MultiLineLabel.create(Minecraft.getInstance().font,c,i));
@@ -253,7 +270,7 @@ public record Assort(String id, int version, Component displayName, Component de
             this.assorts = assorts;
             minecraft = Minecraft.getInstance();
             this.packRepository = packRepository;
-            oldSelection = packRepository.getSelectedIds();
+            oldSelection = getSelectedIds(packRepository);
             scrolledList = new Stocker.Sizeable(0);
             if (assorts.size() > getMaxPacks())
                 scrolledList.max = assorts.size() - getMaxPacks();
@@ -373,21 +390,24 @@ public record Assort(String id, int version, Component displayName, Component de
         public void applyResourceChanges(Runnable runnable){
             packRepository.setSelected(savedAssort.packs());
             minecraft.setScreen(new LegacyLoadingScreen());
-            if (!oldSelection.equals(packRepository.getSelectedIds())) {
+            if (!oldSelection.equals(getSelectedIds(packRepository))) {
                 updateSavedResourcePacks();
                 Minecraft.getInstance().reloadResourcePacks().thenRun(runnable);
             }else runnable.run();
         }
         public static void reloadResourcesChanges(Selector selector){
-            selector.minecraft.options.updateResourcePacks(selector.packRepository);
+            if (!selector.oldSelection.equals(getSelectedIds(selector.packRepository))) {
+                updateSavedResourcePacks();
+                Minecraft.getInstance().reloadResourcePacks();
+            }
         }
         public void openPackSelectionScreen(){
             if (minecraft.screen != null) {
                 Screen screen = minecraft.screen;
                 packRepository.setSelected(getSelectedAssort().packs());
-                Collection<String> oldSelection = packRepository.getSelectedIds();
+                List<String> oldSelection = getSelectedIds(packRepository);
                 minecraft.setScreen(new PackSelectionScreen(packRepository, p-> {
-                    if (!oldSelection.equals(p.getSelectedIds())) {
+                    if (!oldSelection.equals(getSelectedIds(p))) {
                         assorts.set(assorts.indexOf(getSelectedAssort()), getSelectedAssort().withPacks(List.copyOf(getSelectableIds(p))));
                         updateSavedAssort();
                         save();
@@ -450,7 +470,7 @@ public record Assort(String id, int version, Component displayName, Component de
             RenderSystem.enableBlend();
             for (int index = 0; index < assorts.size(); index++) {
                 if (visibleCount>=getMaxPacks()) break;
-                Assort assort = assorts.get(scrolledList.get() + index);
+                Assort assort = assorts.get(Math.min(assorts.size() - 1, scrolledList.get() + index));
                 if (assort.iconSprite().isPresent()) guiGraphics.blitSprite(assort.iconSprite().get(),getX() + 21 + 30 * index,getY() + font.lineHeight + 4,28,28);
                 else guiGraphics.blit(assort.isValidPackDisplay(packRepository) ? getPackIcon(packRepository.getPack(assort.getDisplayPackId())) : DEFAULT_ICON, getX() + 21 + 30 * index,getY() + font.lineHeight + 4,0.0f, 0.0f, 28, 28, 28, 28);
                 if (scrolledList.get() + index == selectedIndex)

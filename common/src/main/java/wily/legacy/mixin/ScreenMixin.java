@@ -7,7 +7,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,14 +14,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyTipManager;
-import wily.legacy.client.controller.Controller;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.KeyboardScreen;
-import wily.legacy.client.screen.LeaderboardsScreen;
-import wily.legacy.client.screen.OverlayPanelScreen;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.ScreenUtil;
 
@@ -76,7 +71,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     @Inject(method = "renderPanorama",at = @At("HEAD"), cancellable = true)
     public void renderPanorama(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderDefaultBackground(guiGraphics,true,false);
+        ScreenUtil.renderDefaultBackground(guiGraphics,true,false, true);
     }
     @Inject(method = "hasShiftDown",at = @At("HEAD"), cancellable = true)
     private static void hasShiftDown(CallbackInfoReturnable<Boolean> cir){

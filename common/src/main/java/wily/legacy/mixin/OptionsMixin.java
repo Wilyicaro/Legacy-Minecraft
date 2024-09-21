@@ -40,6 +40,7 @@ import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.client.screen.Assort;
 import wily.legacy.network.CommonNetwork;
 import wily.legacy.network.PlayerInfoSync;
+import wily.legacy.network.TopMessage;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -161,7 +162,9 @@ public abstract class OptionsMixin implements LegacyOptions {
         displayHand = OptionInstance.createBoolean("legacy.options.displayHand",true);
         legacyCreativeTab = OptionInstance.createBoolean("legacy.options.creativeTab", true);
         searchCreativeTab = OptionInstance.createBoolean("legacy.options.searchCreativeTab", false);
-        autoSaveInterval = new OptionInstance<>("legacy.options.autoSaveInterval", OptionInstance.noTooltip(),(c,i)-> i == 0 ? genericValueLabel(c,Component.translatable("options.off")) :Component.translatable( "legacy.options.mins_value",c, i * 5),new OptionInstance.IntRange(0,24),1, i->{if (minecraft.hasSingleplayerServer()) minecraft.getSingleplayerServer().onTickRateChanged();});
+        autoSaveInterval = new OptionInstance<>("legacy.options.autoSaveInterval", OptionInstance.noTooltip(),(c,i)-> i == 0 ? genericValueLabel(c,Component.translatable("options.off")) :Component.translatable( "legacy.options.mins_value",c, i * 5),new OptionInstance.IntRange(0,24),1, i->{
+            if (minecraft.hasSingleplayerServer()) minecraft.getSingleplayerServer().onTickRateChanged();
+        });
         autoSaveWhenPaused = OptionInstance.createBoolean("legacy.options.autoSaveWhenPaused",false);
         inGameTooltips = OptionInstance.createBoolean("legacy.options.gameTooltips", true);
         tooltipBoxes = OptionInstance.createBoolean("legacy.options.tooltipBoxes", true);
@@ -307,11 +310,12 @@ public abstract class OptionsMixin implements LegacyOptions {
             Legacy4J.LOGGER.error("Failed to load options", e);
         }
     }
-    @Inject(method = "loadSelectedResourcePacks",at = @At("HEAD"))
+    @Inject(method = "loadSelectedResourcePacks",at = @At("HEAD"), cancellable = true)
     private void loadSelectedResourcePacks(PackRepository packRepository, CallbackInfo ci){
         Assort.init();
         packRepository.setSelected(Assort.getDefaultResourceAssort().packs());
         Assort.updateSavedResourcePacks();
+        ci.cancel();
     }
     @Inject(method = "load",at = @At("RETURN"))
     private void load(CallbackInfo ci){

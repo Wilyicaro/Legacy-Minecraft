@@ -3,13 +3,18 @@ package wily.legacy.client.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.multiplayer.ServerStatusPinger;
+import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.client.server.LanServer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.storage.LevelSummary;
@@ -26,7 +31,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Supplier;
@@ -38,6 +42,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     private static final Component SAFETY_TITLE = Component.translatable("multiplayerWarning.header").withStyle(ChatFormatting.BOLD);
     private static final Component SAFETY_CONTENT = Component.translatable("multiplayerWarning.message");
     private static final Component SAFETY_CHECK = Component.translatable("multiplayerWarning.check");
+    public static final Component DIRECT_CONNECTION = Component.translatable("selectServer.direct");
     public boolean isLoading = false;
     protected final TabList tabList = new TabList().add(30,0,Component.translatable("legacy.menu.load"), b-> repositionElements()).add(30,1,Component.translatable("legacy.menu.create"), b-> repositionElements()).add(30,2,t-> (guiGraphics, i, j, f) -> t.renderString(guiGraphics,font,canNotifyOnlineFriends() ? 0xFFFFFF : CommonColor.INVENTORY_GRAY_TEXT.get(),canNotifyOnlineFriends()),Component.translatable("legacy.menu.join"), b-> {
         if (this.minecraft.options.skipMultiplayerWarning)
@@ -63,6 +68,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         super.addControlTooltips(renderer);
         Supplier<Boolean> saveOptions = ()-> saveRenderableList.renderables.stream().anyMatch(r-> r instanceof GuiEventListener l && l.isFocused());
         renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(),()->saveOptions.get() || serverRenderableList.renderables.stream().anyMatch(r-> serverRenderableList.renderables.indexOf(r) > 1 && r instanceof GuiEventListener l && l.isFocused()) ? getAction(saveOptions.get() ? "legacy.menu.save_options" : "legacy.menu.server_options") : null);
+        renderer.add(()-> tabList.selectedTab != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(),()->DIRECT_CONNECTION);
     }
     public PlayGameScreen(Screen parent, int initialTab) {
         super(s-> Panel.centered(s,300,256,0,12),Component.translatable("legacy.menu.play_game"));
@@ -172,7 +178,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         if (super.keyPressed(i, j, k)) {
             return true;
         }
-        if (i == 294) {
+        if (i == InputConstants.KEY_F5) {
             if (tabList.selectedTab == 0) {
                 saveRenderableList.reloadSaveList();
             } else if (tabList.selectedTab == 2) {
@@ -180,6 +186,38 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
                 serverRenderableList.updateServers();
             }
             this.rebuildWidgets();
+            return true;
+        }
+        if (i == InputConstants.KEY_X && tabList.selectedTab == 2){
+            EditBox serverBox = new EditBox(Minecraft.getInstance().font, 0,0,200,20,DIRECT_CONNECTION);
+            minecraft.setScreen(new ConfirmationScreen(this, serverBox.getMessage(),Component.translatable("addServer.enterIp"), b1->  ConnectScreen.startConnecting(this, minecraft, ServerAddress.parseString(serverBox.getValue()), new ServerData("","", ServerData.Type.OTHER), false,null)){
+                boolean released = false;
+                @Override
+                protected void addButtons() {
+                    super.addButtons();
+                    okButton.active = false;
+                }
+
+                @Override
+                public boolean charTyped(char c, int i) {
+                    if (!released) return false;
+                    return super.charTyped(c, i);
+                }
+
+                @Override
+                public boolean keyReleased(int i2, int j, int k) {
+                    if (i2 == i) released = true;
+                    return super.keyReleased(i2, j, k);
+                }
+
+                @Override
+                protected void init() {
+                    super.init();
+                    serverBox.setPosition(panel.getX() + 15, panel.getY() + 45);
+                    serverBox.setResponder(s-> okButton.active = ServerAddress.isValidAddress(s));
+                    addRenderableWidget(serverBox);
+                }
+            });
             return true;
         }
         return false;
@@ -201,7 +239,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.import_save"), Component.translatable("legacy.menu.import_save_message", string), (b) -> {
                 list.forEach(p -> {
                     try {
-                        Legacy4JClient.importSaveFile(minecraft, new FileInputStream(p.toFile()), FileNameUtils.getBaseName(p.getFileName().toString()));
+                        Legacy4JClient.importSaveFile(new FileInputStream(p.toFile()),minecraft.getLevelSource(), FileNameUtils.getBaseName(p.getFileName().toString()));
                     } catch (FileNotFoundException e) {
                         throw new RuntimeException(e);
                     }

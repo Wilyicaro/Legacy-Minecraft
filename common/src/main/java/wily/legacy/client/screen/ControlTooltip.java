@@ -262,6 +262,12 @@ public interface ControlTooltip {
             tooltips.set(ordinal,tooltip);
             return this;
         }
+        public Renderer add(KeyMapping mapping){
+            return add(LegacyKeyMapping.of(mapping));
+        }
+        public Renderer add(KeyMapping mapping, Supplier<Component> action){
+            return add(create(LegacyKeyMapping.of(mapping),action));
+        }
         public Renderer add(LegacyKeyMapping mapping){
             return add(mapping,mapping::getDisplayName);
         }
@@ -360,12 +366,12 @@ public interface ControlTooltip {
     class GuiManager implements PreparableReloadListener {
         public static final List<ControlTooltip> controlTooltips = new ArrayList<>();
         public static void applyGUIControlTooltips(Renderer renderer, Minecraft minecraft){
-            renderer.add((LegacyKeyMapping) minecraft.options.keyJump,()-> minecraft.player.isUnderWater() ? getAction("legacy.action.swim_up") : null).add((LegacyKeyMapping) Minecraft.getInstance().options.keyInventory).add((LegacyKeyMapping) Legacy4JClient.keyCrafting).add((LegacyKeyMapping) Minecraft.getInstance().options.keyUse,()-> getActualUse(minecraft)).add((LegacyKeyMapping) Minecraft.getInstance().options.keyAttack,()->getMainAction(minecraft));
+            renderer.add(minecraft.options.keyJump,()-> minecraft.player.isUnderWater() ? getAction("legacy.action.swim_up") : null).add(Minecraft.getInstance().options.keyInventory).add(Legacy4JClient.keyCrafting).add(Minecraft.getInstance().options.keyUse,()-> getActualUse(minecraft)).add(Minecraft.getInstance().options.keyAttack,()->getMainAction(minecraft));
             renderer.tooltips.addAll(controlTooltips);
-            renderer.add((LegacyKeyMapping) minecraft.options.keyShift,()->  minecraft.player.isPassenger() ? getAction(minecraft.player.getVehicle() instanceof LivingEntity ? "legacy.action.dismount" : "legacy.action.exit") : null).add((LegacyKeyMapping) minecraft.options.keyPickItem,()-> getPickAction(minecraft));
+            renderer.add(minecraft.options.keyShift,()-> minecraft.player.isPassenger() ? getAction(minecraft.player.getVehicle() instanceof LivingEntity ? "legacy.action.dismount" : "legacy.action.exit") : null).add(minecraft.options.keyPickItem,()-> getPickAction(minecraft));
         }
         protected ControlTooltip guiControlTooltipFromJson(JsonObject o){
-            LegacyKeyMapping mapping = (LegacyKeyMapping)KeyMapping.ALL.get(GsonHelper.getAsString(o, "keyMapping"));
+            LegacyKeyMapping mapping = LegacyKeyMapping.of(KeyMapping.ALL.get(GsonHelper.getAsString(o, "keyMapping")));
             BiPredicate<Item, DataComponentPatch> itemPredicate = o.has("heldItem") ? o.get("heldItem") instanceof JsonObject obj ? JsonUtil.registryMatchesItem(obj) : o.get("heldItem").getAsBoolean() ? (i, t)-> i != null && i != Items.AIR : (i, t)-> false : (i, t)-> true;
             Predicate<Block> blockPredicate = o.has("hitBlock") ? o.get("hitBlock") instanceof JsonObject obj ? JsonUtil.registryMatches(BuiltInRegistries.BLOCK,obj) : o.get("hitBlock").getAsBoolean() ? b-> !b.defaultBlockState().isAir() : b-> false : b-> true;
             Predicate<EntityType<?>> entityPredicate = o.has("hitEntity") ? o.get("hitEntity") instanceof JsonObject obj ? JsonUtil.registryMatches(BuiltInRegistries.ENTITY_TYPE,obj) : staticPredicate(o.get("hitEntity").getAsBoolean()) : e-> true;
