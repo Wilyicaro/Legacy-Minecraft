@@ -1,0 +1,7 @@
+{
+  "pack": {
+    "description": "High Contrast Legacy4J Expansion",
+    "pack_format": 16,
+    "supported_formats": [ 16, 999 ]
+  }
+}

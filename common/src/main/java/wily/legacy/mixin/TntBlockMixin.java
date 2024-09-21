@@ -21,11 +21,11 @@ public class TntBlockMixin {
 
     @Inject(method = "explode(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/LivingEntity;)V", at = @At("HEAD"), cancellable = true)
     private static void explode(Level level, BlockPos blockPos, LivingEntity livingEntity, CallbackInfo ci) {
-        if (!level.getGameRules().getBoolean(LegacyGameRules.TNT_EXPLODES) || level.getEntitiesOfClass(PrimedTnt.class,tntDetectBounding.move(blockPos)).size() >= level.getGameRules().getRule(LegacyGameRules.TNT_LIMIT).get()) ci.cancel();
+        if (!level.getGameRules().getBoolean(LegacyGameRules.TNT_EXPLODES) || level.getGameRules().getRule(LegacyGameRules.TNT_LIMIT).get() > 0 && level.getEntitiesOfClass(PrimedTnt.class,tntDetectBounding.move(blockPos)).size() >= level.getGameRules().getRule(LegacyGameRules.TNT_LIMIT).get()) ci.cancel();
     }
     @Inject(method = "wasExploded", at = @At("HEAD"), cancellable = true)
     private void wasExploded(Level level, BlockPos blockPos, Explosion explosion, CallbackInfo ci) {
-        if (!level.getGameRules().getBoolean(LegacyGameRules.TNT_EXPLODES) || level.getEntitiesOfClass(PrimedTnt.class,tntDetectBounding.move(blockPos)).size() >= level.getGameRules().getRule(LegacyGameRules.TNT_LIMIT).get()) ci.cancel();
+        if (!level.getGameRules().getBoolean(LegacyGameRules.TNT_EXPLODES) || level.getGameRules().getRule(LegacyGameRules.TNT_LIMIT).get() > 0 && level.getEntitiesOfClass(PrimedTnt.class,tntDetectBounding.move(blockPos)).size() >= level.getGameRules().getRule(LegacyGameRules.TNT_LIMIT).get()) ci.cancel();
     }
     @Inject(method = "neighborChanged", at = @At("HEAD"), cancellable = true)
     protected void neighborChanged(BlockState blockState, Level level, BlockPos blockPos, Block block, BlockPos blockPos2, boolean bl, CallbackInfo ci) {

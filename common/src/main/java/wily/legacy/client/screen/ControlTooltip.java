@@ -262,6 +262,12 @@ public interface ControlTooltip {
             tooltips.set(ordinal,tooltip);
             return this;
         }
+        public Renderer add(KeyMapping mapping){
+            return add(LegacyKeyMapping.of(mapping));
+        }
+        public Renderer add(KeyMapping mapping, Supplier<Component> action){
+            return add(create(LegacyKeyMapping.of(mapping),action));
+        }
         public Renderer add(LegacyKeyMapping mapping){
             return add(mapping,mapping::getDisplayName);
         }

@@ -25,6 +25,7 @@ import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
+import wily.legacy.Legacy4JPlatform;
 import wily.legacy.util.ModInfo;
 import wily.legacy.util.RegisterListing;
 
@@ -173,8 +174,8 @@ public class Legacy4JPlatformImpl {
         };
     }
 
-    public static boolean isForgeLike() {
-        return true;
+    public static Legacy4JPlatform.Loader getLoader() {
+        return Legacy4JPlatform.Loader.FORGE;
     }
     public static boolean isClient() {
         return FMLEnvironment.dist.isClient();

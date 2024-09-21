@@ -26,7 +26,7 @@ public class TopMessage {
 
     public record Packet(SendType type, Component message) implements CommonNetwork.Packet {
 
-        public static Packet create(RegistryFriendlyByteBuf buf){
+        public static Packet decode(RegistryFriendlyByteBuf buf){
             SendType type = buf.readEnum(SendType.class);
             return new Packet(type,type.clear() ? null : ComponentSerialization.STREAM_CODEC.decode(buf));
         }

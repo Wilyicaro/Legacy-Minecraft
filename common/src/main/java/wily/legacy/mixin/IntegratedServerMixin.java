@@ -28,6 +28,7 @@ import wily.legacy.client.LegacyClientWorldSettings;
 import wily.legacy.util.ScreenUtil;
 
 import java.net.Proxy;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BooleanSupplier;
 
 @Mixin(IntegratedServer.class)
@@ -56,16 +57,12 @@ public abstract class IntegratedServerMixin extends MinecraftServer {
 
     @Redirect(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/client/server/IntegratedServer;paused:Z", opcode = Opcodes.GETFIELD, ordinal = 1))
     public boolean tickServer(IntegratedServer instance) {
-        return instance.isPaused() && ((LegacyOptions) minecraft.options).autoSaveWhenPaused().get();
+        return instance.isPaused() && ((LegacyOptions) minecraft.options).autoSaveWhenPaused().get() && ((LegacyOptions) minecraft.options).autoSaveInterval().get() > 0 && !minecraft.isDemo();
     }
 
     @Override
     public boolean isUnderSpawnProtection(ServerLevel serverLevel, BlockPos blockPos, Player player) {
         if (!isSingleplayerOwner(player.getGameProfile()) && !((LegacyClientWorldSettings)worldData).trustPlayers()) return true;
         return super.isUnderSpawnProtection(serverLevel, blockPos, player);
-    }
-    @Inject(method = "saveEverything", at = @At("RETURN"))
-    public void saveEverything(boolean bl, boolean bl2, boolean bl3, CallbackInfoReturnable<Boolean> cir) {
-        Legacy4JClient.saveLevel(storageSource);
     }
 }

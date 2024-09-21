@@ -4,7 +4,6 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.core.Rotations;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
@@ -31,7 +30,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.init.*;
-import wily.legacy.inventory.DataComponentIngredient;
 import wily.legacy.inventory.LegacyIngredient;
 import wily.legacy.network.*;
 import wily.legacy.player.LegacyPlayerInfo;
@@ -263,7 +261,10 @@ public class Legacy4J {
     public static void registerBuiltInPacks(PackRegistry registry){
         registry.register("legacy_waters",true);
         registry.register("console_aspects",false);
-        if (Legacy4JPlatform.isForgeLike()) registry.register("programmer_art","programmer_art", Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP,false);
+        if (Legacy4JPlatform.getLoader().isForgeLike()) {
+            registry.register("programmer_art", "programmer_art", Component.translatable("legacy.builtin.console_programmer"), Pack.Position.TOP, false);
+            registry.register("high_contrast", "high_contrast", Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
+        }
     }
     public interface ComponentsBuilderModifier{
         <T> void set(DataComponentType<T> type, T value);

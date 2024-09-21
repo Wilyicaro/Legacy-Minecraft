@@ -38,11 +38,6 @@ public abstract class AdvancementToastMixin implements Toast {
     @Shadow private boolean playedSound;
 
     @Shadow @Final private AdvancementHolder advancement;
-    @Inject(method = "<init>", at = @At("RETURN"))
-    public void init(AdvancementHolder advancementHolder, CallbackInfo ci) {
-        if (advancementHolder.id().getPath().equals("adventure/voluntary_exile")) Legacy4JClient.displayEffectActivationAnimation(MobEffects.RAID_OMEN);
-        else if (advancementHolder.id().getPath().equals("adventure/hero_of_the_village")) Legacy4JClient.displayEffectActivationAnimation(MobEffects.HERO_OF_THE_VILLAGE);
-    }
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, ToastComponent toastComponent, long l, CallbackInfoReturnable<Visibility> cir) {
         Component holdToView = Component.translatable("legacy.menu.advancements.toast",(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_I) : ControllerBinding.UP_BUTTON.bindingState.getIcon()).getComponent());

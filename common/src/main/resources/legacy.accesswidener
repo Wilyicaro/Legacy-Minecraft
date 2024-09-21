@@ -158,9 +158,30 @@ accessible method net/minecraft/client/gui/components/events/ContainerEventHandl
 accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData <init> (IIBZZZLnet/minecraft/resources/ResourceKey;)V
 accessible method net/minecraft/client/gui/font/providers/BitmapProvider <init> (Lcom/mojang/blaze3d/platform/NativeImage;Lnet/minecraft/client/gui/font/CodepointMap;)V
 accessible class net/minecraft/client/gui/font/providers/BitmapProvider$Glyph
+extendable class net/minecraft/client/gui/font/providers/BitmapProvider$Glyph
 accessible method net/minecraft/client/gui/font/providers/BitmapProvider$Glyph <init> (FLcom/mojang/blaze3d/platform/NativeImage;IIIIII)V
-extendable method net/minecraft/client/gui/font/providers/BitmapProvider$Glyph <init> (FLcom/mojang/blaze3d/platform/NativeImage;IIIIII)V
 accessible method net/minecraft/world/level/GameRules$IntegerValue create (I)Lnet/minecraft/world/level/GameRules$Type;
 extendable class net/minecraft/world/item/crafting/Ingredient
 accessible method net/minecraft/world/item/crafting/Ingredient <init> (Ljava/util/stream/Stream;)V
+accessible field net/minecraft/client/Minecraft profileKeyPairManager Lnet/minecraft/client/multiplayer/ProfileKeyPairManager;
+mutable field net/minecraft/client/Minecraft profileKeyPairManager Lnet/minecraft/client/multiplayer/ProfileKeyPairManager;
+accessible field net/minecraft/client/resources/SplashManager user Lnet/minecraft/client/User;
+mutable field net/minecraft/client/resources/SplashManager user Lnet/minecraft/client/User;
+accessible field net/minecraft/client/Minecraft user Lnet/minecraft/client/User;
+mutable field net/minecraft/client/Minecraft user Lnet/minecraft/client/User;
+accessible field net/minecraft/client/Minecraft profileFuture Ljava/util/concurrent/CompletableFuture;
+mutable field net/minecraft/client/Minecraft profileFuture Ljava/util/concurrent/CompletableFuture;
+accessible field net/minecraft/client/Minecraft authenticationService Lcom/mojang/authlib/yggdrasil/YggdrasilAuthenticationService;
+accessible field net/minecraft/client/Minecraft userApiService Lcom/mojang/authlib/minecraft/UserApiService;
+mutable field net/minecraft/client/Minecraft userApiService Lcom/mojang/authlib/minecraft/UserApiService;
+accessible field net/minecraft/client/Minecraft userPropertiesFuture Ljava/util/concurrent/CompletableFuture;
+mutable field net/minecraft/client/Minecraft userPropertiesFuture Ljava/util/concurrent/CompletableFuture;
+accessible field net/minecraft/client/Minecraft telemetryManager Lnet/minecraft/client/telemetry/ClientTelemetryManager;
+mutable field net/minecraft/client/Minecraft telemetryManager Lnet/minecraft/client/telemetry/ClientTelemetryManager;
+accessible field net/minecraft/client/Minecraft reportingContext Lnet/minecraft/client/multiplayer/chat/report/ReportingContext;
+mutable field net/minecraft/client/Minecraft reportingContext Lnet/minecraft/client/multiplayer/chat/report/ReportingContext;
+accessible field net/minecraft/client/Minecraft realmsDataFetcher Lcom/mojang/realmsclient/gui/RealmsDataFetcher;
+mutable field net/minecraft/client/Minecraft realmsDataFetcher Lcom/mojang/realmsclient/gui/RealmsDataFetcher;
+accessible field com/mojang/realmsclient/RealmsAvailability future Ljava/util/concurrent/CompletableFuture;
+mutable field com/mojang/realmsclient/RealmsAvailability future Ljava/util/concurrent/CompletableFuture;
 accessible field net/minecraft/client/Minecraft pausePartialTick F
