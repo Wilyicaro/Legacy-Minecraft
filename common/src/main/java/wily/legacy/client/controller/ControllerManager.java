@@ -116,7 +116,7 @@ public  class ControllerManager {
 
             if (state.is(ControllerBinding.START) && state.justPressed)
                 if (minecraft.screen == null) minecraft.pauseGame(false);
-                else if (minecraft.screen instanceof AbstractContainerScreen<?>) minecraft.screen.onClose();
+                else if (minecraft.screen instanceof AbstractContainerScreen<?> || minecraft.screen instanceof PauseScreen) minecraft.screen.onClose();
 
             s : if (minecraft.screen != null) {
                 if (state.pressed && state.canClick()) {

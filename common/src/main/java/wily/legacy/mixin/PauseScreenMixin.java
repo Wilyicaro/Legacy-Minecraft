@@ -16,7 +16,7 @@ import wily.legacy.client.screen.*;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(PauseScreen.class)
-public class PauseScreenMixin extends Screen implements ControlTooltip.Event{
+public class PauseScreenMixin extends Screen implements ControlTooltip.Event,RenderableVList.Access{
     private Component SAVE_GAME = Component.translatable("legacy.menu.save");
     private Component SAVE_GAME_MESSAGE = Component.translatable("legacy.menu.save_message");
     private Component ENABLE_AUTO_SAVE = Component.translatable("legacy.menu.enable_autosave");
@@ -51,7 +51,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event{
         );
         minecraft = Minecraft.getInstance();
         if (minecraft.level != null && minecraft.hasSingleplayerServer())
-            renderableVList.addRenderable(Button.builder(ScreenUtil.getLegacyOptions().autoSaveInterval().get() > 0 ? DISABLE_AUTO_SAVE : SAVE_GAME, button -> minecraft.setScreen(new ConfirmationScreen(this,ScreenUtil.getLegacyOptions().autoSaveInterval().get() > 0 ? DISABLE_AUTO_SAVE: SAVE_GAME,ScreenUtil.getLegacyOptions().autoSaveInterval().get() > 0 ? DISABLE_AUTO_SAVE_MESSAGE : SAVE_GAME_MESSAGE, b->{
+            renderableVList.addRenderable(Button.builder(ScreenUtil.getLegacyOptions().autoSaveInterval().get() > 0 && !minecraft.isDemo() ? DISABLE_AUTO_SAVE : SAVE_GAME, button -> minecraft.setScreen(new ConfirmationScreen(this,ScreenUtil.getLegacyOptions().autoSaveInterval().get() > 0 ? DISABLE_AUTO_SAVE: SAVE_GAME,ScreenUtil.getLegacyOptions().autoSaveInterval().get() > 0 ? DISABLE_AUTO_SAVE_MESSAGE : SAVE_GAME_MESSAGE, b->{
                 if (ScreenUtil.getLegacyOptions().autoSaveInterval().get() > 0){
                     setAutoSave(0,button);
                     minecraft.setScreen(PauseScreenMixin.this);
@@ -65,6 +65,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event{
             }))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), button -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
     }
+
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
@@ -75,7 +76,19 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event{
     @Inject(method = "init",at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
+        renderableVListInit();
+        if (minecraft.isDemo()) ((Button)renderableVList.renderables.get(4)).active = false;
+        else if (minecraft.level != null && minecraft.hasSingleplayerServer()) setAutoSave(ScreenUtil.getLegacyOptions().autoSaveInterval().get(),(Button)renderableVList.renderables.get(4));
+
+    }
+
+    @Override
+    public void renderableVListInit() {
         renderableVList.init(this,width / 2 - 112,this.height / 3 + 10,225,0);
-        if (minecraft.level != null && minecraft.hasSingleplayerServer()) setAutoSave(ScreenUtil.getLegacyOptions().autoSaveInterval().get(),(Button)renderableVList.renderables.get(4));
+    }
+
+    @Override
+    public RenderableVList getRenderableVList() {
+        return renderableVList;
     }
 }

@@ -40,7 +40,6 @@ import static wily.legacy.client.screen.ControlTooltip.*;
 
 public class LoadSaveScreen extends PanelBackgroundScreen {
     public static final Component GAME_MODEL_LABEL = Component.translatable("selectWorld.gameMode");
-    private final boolean deleteOnClose;
     public BiConsumer<GameRules, MinecraftServer> applyGameRules = (r,s)-> {};
     protected final LevelStorageSource.LevelStorageAccess access;
     protected final LegacySliderButton<GameType> gameTypeSlider;
@@ -57,9 +56,8 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     protected final PublishScreen publishScreen;
     public static final List<GameType> GAME_TYPES = Arrays.stream(GameType.values()).toList();
 
-    public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean deleteOnClose) {
+    public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access) {
         super(s-> new Panel(p-> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 160 : 0))) / 2, p-> (s.height - p.height) / 2 + 24,245,233), Component.translatable("legacy.menu.load_save.load"));
-        this.deleteOnClose = deleteOnClose;
         this.parent = screen;
         this.summary = summary;
         this.access = access;
@@ -75,8 +73,8 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         trustPlayers = ((LegacyClientWorldSettings)(Object)summary.getSettings()).trustPlayers();
         resourceAssortSelector = Assort.Selector.resources(panel.x + 13, panel.y + 112, 220,45, !ScreenUtil.hasTooltipBoxes(),((LegacyClientWorldSettings)(Object)summary.getSettings()).getSelectedResourceAssort());
     }
-    public LoadSaveScreen(Screen screen, LevelSummary summary) {
-        this(screen,summary, getSummaryAccess(summary),false);
+    public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource source) {
+        this(screen,summary, getSummaryAccess(source,summary));
     }
 
     @Override
@@ -85,9 +83,11 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         resourceAssortSelector.addControlTooltips(this,renderer);
     }
 
-    public static LevelStorageSource.LevelStorageAccess getSummaryAccess(LevelSummary summary){
+    public static LevelStorageSource.LevelStorageAccess getSummaryAccess(LevelStorageSource source, LevelSummary summary){
         try {
-            return Minecraft.getInstance().getLevelSource().createAccess(summary.getLevelId());
+            LevelStorageSource.LevelStorageAccess access = source.createAccess(summary.getLevelId());
+            access.close();
+            return access;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -116,8 +116,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         addRenderableWidget(resourceAssortSelector);
     }
 
-    private void onLoad() throws IOException {
-        access.close();
+    public void onLoad() throws IOException {
         dimensionsToReset.forEach(l-> {
             if (l == Level.OVERWORLD) return;
             try {
@@ -130,7 +129,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         if (!originalSelectedPacks.isEmpty()) Minecraft.getInstance().getResourcePackRepository().setSelected(originalSelectedPacks);
     }
     private void completeLoad(){
-        loadWorld(this,minecraft,summary);
+        loadWorld(this,minecraft,Legacy4JClient.currentWorldSource,access.getLevelId());
         Legacy4JClient.serverPlayerJoinConsumer = s-> {
             if (dimensionsToReset.contains(Level.END)) s.server.getLevel(Level.END).setDragonFight(new EndDragonFight(minecraft.getSingleplayerServer().getLevel(Level.END),minecraft.getSingleplayerServer().getWorldData().worldGenOptions().seed(), EndDragonFight.Data.DEFAULT));
             s.server.setDefaultGameType(gameTypeSlider.getObjectValue());
@@ -142,18 +141,6 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
             ((LegacyClientWorldSettings)s.server.getWorldData()).setSelectedResourceAssort(resourceAssortSelector.getSelectedAssort());
             if (changedGameType && summary.getGameMode() != gameTypeSlider.getObjectValue()) s.setGameMode(gameTypeSlider.getObjectValue());
         };
-    }
-
-    @Override
-    public void onClose() {
-        try {
-            if (deleteOnClose)
-                access.deleteLevel();
-            access.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        super.onClose();
     }
 
     public static void deleteLevelDimension(LevelStorageSource.LevelStorageAccess access, ResourceKey<Level> dimension) throws IOException {
@@ -219,16 +206,8 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         guiGraphics.drawString(font,Component.translatable("commands.seed.success",((LegacyClientWorldSettings)(Object)summary.getSettings()).getDisplaySeed()),panel.x + 13, panel.y + 49, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
     }
 
-    public static void loadWorld(Screen screen, Minecraft minecraft, LevelSummary summary) {
+    public static void loadWorld(Screen screen, Minecraft minecraft, LevelStorageSource source, String levelId) {
         SaveRenderableList.resetIconCache();
-        if (minecraft.getLevelSource().levelExists(summary.getLevelId())) {
-            minecraft.forceSetScreen(new GenericDirtMessageScreen(Component.translatable("selectWorld.data_read")));
-            try (LevelStorageSource.LevelStorageAccess access = Minecraft.getInstance().getLevelSource().createAccess(summary.getLevelId())) {
-                Legacy4JClient.copySaveBtwSources(access,Legacy4JClient.currentWorldSource);
-            } catch (IOException e) {
-                Legacy4J.LOGGER.warn("Could not copy this save to current world directory: {}",e.getMessage());
-            }
-            new WorldOpenFlows(Minecraft.getInstance(),Legacy4JClient.currentWorldSource).loadLevel(screen, summary.getLevelId());
-        }
+        new WorldOpenFlows(minecraft,source).loadLevel(screen,levelId);
     }
 }

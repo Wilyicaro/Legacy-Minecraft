@@ -28,7 +28,7 @@ public class LegacyLoadingScreen extends Screen{
     public static LegacyTip actualLoadingTip;
     public int progress;
     public Component lastLoadingHeader;
-    protected Component lastLoadingStage;
+    public Component lastLoadingStage;
     public boolean genericLoading;
 
     protected RandomSource random = RandomSource.create();
@@ -73,7 +73,7 @@ public class LegacyLoadingScreen extends Screen{
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         RenderSystem.disableDepthTest();
-        ScreenUtil.renderDefaultBackground(guiGraphics,true, true);
+        ScreenUtil.renderDefaultBackground(guiGraphics,true, true, false);
         super.render(guiGraphics, i, j, f);
         int x = width / 2 - 160;
         int y = height / 2 + 16;

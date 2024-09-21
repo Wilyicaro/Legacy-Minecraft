@@ -312,11 +312,12 @@ public abstract class OptionsMixin implements LegacyOptions {
             Legacy4J.LOGGER.error("Failed to load options", e);
         }
     }
-    @Inject(method = "loadSelectedResourcePacks",at = @At("HEAD"))
+    @Inject(method = "loadSelectedResourcePacks",at = @At("HEAD"), cancellable = true)
     private void loadSelectedResourcePacks(PackRepository packRepository, CallbackInfo ci){
         Assort.init();
         packRepository.setSelected(Assort.getDefaultResourceAssort().packs());
         Assort.updateSavedResourcePacks();
+        ci.cancel();
     }
     @Inject(method = "load",at = @At("RETURN"))
     private void load(CallbackInfo ci){

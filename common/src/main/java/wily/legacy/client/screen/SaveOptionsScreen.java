@@ -57,7 +57,7 @@ public class SaveOptionsScreen extends ConfirmationScreen{
 
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.copySave"),b-> minecraft.setScreen(new ConfirmationScreen(parent,230,120, Component.translatable("legacy.menu.copySave"), Component.translatable("legacy.menu.copySaveMessage"), b1->{
             String id = summary.getLevelId();
-            Legacy4JClient.copySaveFile(minecraft, minecraft.getLevelSource().getLevelPath(id),summary.getLevelName());
+            Legacy4JClient.copySaveFile(minecraft.getLevelSource().getLevelPath(id),minecraft.getLevelSource(),id);
             parent.saveRenderableList.reloadSaveList();
             minecraft.setScreen(parent);
 

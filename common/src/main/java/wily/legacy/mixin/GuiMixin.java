@@ -3,6 +3,7 @@ package wily.legacy.mixin;
 import com.google.common.collect.Ordering;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
@@ -40,7 +41,6 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.BufferSourceWrapper;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.network.TopMessage;
-import wily.legacy.util.LegacySprites;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.util.ScreenUtil;
 
@@ -53,10 +53,7 @@ import java.util.Objects;
 
 public abstract class GuiMixin implements ControlTooltip.Event {
     @Shadow @Final protected Minecraft minecraft;
-    @Shadow
-    private ItemStack lastToolHighlight;
-    @Shadow
-    public int toolHighlightTimer;
+
     @Final
     @Shadow public abstract Font getFont();
 
@@ -188,13 +185,12 @@ public abstract class GuiMixin implements ControlTooltip.Event {
     private void displayScoreboardSidebar(GuiGraphics guiGraphics, Objective objective, CallbackInfo ci) {
         ci.cancel();
         Scoreboard scoreboard = objective.getScoreboard();
-        Collection<Score> collection = scoreboard.getPlayerScores(objective);
-        List<Score> scores = collection.stream().filter((scorex) -> scorex.getOwner() != null && !scorex.getOwner().startsWith("#")).limit(15L).toList();;
+        List<Score> scores = scoreboard.getPlayerScores(objective).stream().filter((scorex) -> scorex.getOwner() != null && !scorex.getOwner().startsWith("#")).limit(15L).toList();;
         Component component = objective.getDisplayName();
         int i = this.getFont().width(component);
         int k = this.getFont().width(": ");
         int j = Math.max(i,scores.stream().mapToInt(lv-> {
-            int w = getFont().width(lv.getObjective().getFormattedDisplayName());
+            int w = getFont().width("" + ChatFormatting.RED + lv.getScore());
             return this.getFont().width(PlayerTeam.formatNameForTeam(scoreboard.getPlayersTeam(lv.getOwner()), Component.literal(lv.getOwner()))) + (w > 0 ? k + w : 0);
         }).max().orElse(0));
 
@@ -219,11 +215,9 @@ public abstract class GuiMixin implements ControlTooltip.Event {
             Objects.requireNonNull(this.getFont());
             int u = m - x * 9;
             guiGraphics.drawString(this.getFont(), PlayerTeam.formatNameForTeam(scoreboard.getPlayersTeam(lv.getOwner()), Component.literal(lv.getOwner())), o, u, -1, false);
-            Component score = lv.getObjective().getFormattedDisplayName();
+            String score = "" + ChatFormatting.RED + lv.getScore();
             guiGraphics.drawString(this.getFont(), score, p - getFont().width(score), u, -1, false);
         }
-
-
     }
     @Inject(method = "renderHotbar", at = @At("RETURN"))
     public void renderHotbarTail(float f, GuiGraphics guiGraphics, CallbackInfo ci) {

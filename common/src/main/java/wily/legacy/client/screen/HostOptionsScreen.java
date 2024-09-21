@@ -12,6 +12,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Difficulty;
@@ -23,7 +24,9 @@ import wily.legacy.Legacy4JPlatform;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyGuiGraphics;
+import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
+import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.network.CommonNetwork;
@@ -40,7 +43,7 @@ import java.util.function.Supplier;
 
 import static wily.legacy.client.screen.LoadSaveScreen.GAME_MODEL_LABEL;
 
-public class HostOptionsScreen extends PanelVListScreen implements Controller.Event,ControlTooltip.Event{
+public class HostOptionsScreen extends PanelVListScreen {
     public static final Component HOST_OPTIONS = Component.translatable("legacy.menu.host_options");
     public static final Component PLAYERS_INVITE = Component.translatable("legacy.menu.players_invite");
     protected final Component title;
@@ -48,7 +51,7 @@ public class HostOptionsScreen extends PanelVListScreen implements Controller.Ev
     protected boolean shouldFade = false;
 
     public static final List<GameRules.Key<GameRules.BooleanValue>> WORLD_RULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK,LegacyGameRules.TNT_EXPLODES,GameRules.RULE_DAYLIGHT,GameRules.RULE_KEEPINVENTORY,GameRules.RULE_DOMOBSPAWNING,GameRules.RULE_MOBGRIEFING, LegacyGameRules.GLOBAL_MAP_PLAYER_ICON));
-    public static final List<GameRules.Key<GameRules.BooleanValue>> OTHER_RULES = new ArrayList<>(List.of(GameRules.RULE_WEATHER_CYCLE,GameRules.RULE_DOMOBLOOT,GameRules.RULE_DOBLOCKDROPS,GameRules.RULE_NATURAL_REGENERATION));
+    public static final List<GameRules.Key<GameRules.BooleanValue>> OTHER_RULES = new ArrayList<>(List.of(GameRules.RULE_WEATHER_CYCLE,GameRules.RULE_DOMOBLOOT,GameRules.RULE_DOBLOCKDROPS,GameRules.RULE_NATURAL_REGENERATION,GameRules.RULE_DO_IMMEDIATE_RESPAWN));
 
     public HostOptionsScreen(Component title) {
         super(s-> Panel.centered(s,250,190,0,20),HOST_OPTIONS);
@@ -62,6 +65,7 @@ public class HostOptionsScreen extends PanelVListScreen implements Controller.Ev
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
         renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), ()-> minecraft.hasSingleplayerServer() ? !minecraft.getSingleplayerServer().isPublished() ? PublishScreen.PUBLISH : PublishScreen.hasWorldHost() ? WorldHostFriendsScreen.INVITE_FRIENDS : null : null);
+        renderer.add(()->ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(),()-> LegacyKeyMapping.of(Minecraft.getInstance().options.keyChat).getDisplayName());
     }
 
     public HostOptionsScreen() {
@@ -76,7 +80,31 @@ public class HostOptionsScreen extends PanelVListScreen implements Controller.Ev
     }
 
     @Override
+    public void bindingStateTick(BindingState state) {
+        if (state.is(LegacyKeyMapping.of(Legacy4JClient.keyHostOptions).getBinding()) && state.onceClick(true)) onClose();
+    }
+
+    @Override
     public boolean keyPressed(int i, int j, int k) {
+        if (Legacy4JClient.keyHostOptions.matches(i,j)){
+            onClose();
+            return true;
+        }
+        if (i== InputConstants.KEY_O){
+            minecraft.setScreen(new ChatScreen(""){
+                boolean released = false;
+                public boolean charTyped(char c, int i) {
+                    if (!released) return false;
+                    return super.charTyped(c, i);
+                }
+                @Override
+                public boolean keyReleased(int i2, int j, int k) {
+                    if (i2 == i) released = true;
+                    return super.keyReleased(i2, j, k);
+                }
+            });
+            return true;
+        }
         if (i == InputConstants.KEY_X && minecraft.hasSingleplayerServer()){
             if (!minecraft.getSingleplayerServer().isPublished()) minecraft.setScreen(new PublishScreen(this, minecraft.getSingleplayerServer().getDefaultGameType(), s -> s.publish(minecraft.getSingleplayerServer())));
             else if (PublishScreen.hasWorldHost()) minecraft.setScreen(new WorldHostFriendsScreen(this));

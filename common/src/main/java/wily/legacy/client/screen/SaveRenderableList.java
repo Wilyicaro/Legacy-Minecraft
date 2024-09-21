@@ -33,6 +33,7 @@ import org.apache.commons.io.FileUtils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyGuiGraphics;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.ScreenUtil;
@@ -235,35 +236,35 @@ public class SaveRenderableList extends RenderableVList {
                             ResourceLocation resourceLocation3 = hoverIcon ? ERROR_HIGHLIGHTED : ERROR;
                             ResourceLocation resourceLocation4 = hoverIcon ? MARKED_JOIN_HIGHLIGHTED : MARKED_JOIN;
                             if (summary instanceof LevelSummary.SymlinkLevelSummary) {
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX(), getY(), 32, 32);
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation4, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
+                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation4, getX() + 5, getY() + 5, 20, 20);
                                 return;
                             }
                             if (summary.isLocked()) {
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
                                 if (hoverIcon) {
                                     screen.setTooltipForNextRenderPass(minecraft.font.split(WORLD_LOCKED_TOOLTIP, 175));
                                 }
                             } else if (summary.requiresManualConversion()) {
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
                                 if (hoverIcon) {
                                     screen.setTooltipForNextRenderPass(minecraft.font.split(WORLD_REQUIRES_CONVERSION, 175));
                                 }
                             } else if (summary.markVersionInList()) {
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation4, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation4, getX() + 5, getY() + 5, 20, 20);
                                 if (summary.askToOpenWorld()) {
-                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX(), getY(), 32, 32);
+                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
                                     if (hoverIcon) {
                                         screen.setTooltipForNextRenderPass(ImmutableList.of(FROM_NEWER_TOOLTIP_1.getVisualOrderText(), FROM_NEWER_TOOLTIP_2.getVisualOrderText()));
                                     }
                                 } else if (!SharedConstants.getCurrentVersion().isStable()) {
-                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation2, getX(), getY(), 32, 32);
+                                    LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation2, getX() + 5, getY() + 5, 20, 20);
                                     if (hoverIcon) {
                                         screen.setTooltipForNextRenderPass(ImmutableList.of(SNAPSHOT_TOOLTIP_1.getVisualOrderText(), SNAPSHOT_TOOLTIP_2.getVisualOrderText()));
                                     }
                                 }
                             } else {
-                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation, getX(), getY(), 32, 32);
+                                LegacyGuiGraphics.of(guiGraphics).blitSprite(resourceLocation, getX() + 5, getY() + 5, 20, 20);
                             }
                         }
                     }
@@ -358,9 +359,16 @@ public class SaveRenderableList extends RenderableVList {
         }
     }
     private void loadWorld(LevelSummary summary) {
-        if (((LegacyOptions)minecraft.options).directSaveLoad().get())
-            LoadSaveScreen.loadWorld(screen,minecraft,summary);
-        else minecraft.setScreen(new LoadSaveScreen(screen, summary));
+        if (((LegacyOptions)minecraft.options).directSaveLoad().get()){
+            Legacy4JClient.copySaveBtwSources(LoadSaveScreen.getSummaryAccess(Minecraft.getInstance().getLevelSource(),summary),Legacy4JClient.currentWorldSource);
+            LoadSaveScreen.loadWorld(screen,minecraft, Legacy4JClient.currentWorldSource,summary.getLevelId());
+        }else minecraft.setScreen(new LoadSaveScreen(screen, summary, Legacy4JClient.currentWorldSource){
+            @Override
+            public void onLoad() throws IOException {
+                Legacy4JClient.copySaveBtwSources(LoadSaveScreen.getSummaryAccess(Minecraft.getInstance().getLevelSource(),summary),Legacy4JClient.currentWorldSource);
+                super.onLoad();
+            }
+        });
     }
 
 

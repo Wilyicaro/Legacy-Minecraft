@@ -31,7 +31,7 @@ public record TopMessage(Component message, int baseColor) {
         public Packet(SendType type, Component component){
             this(type,new TopMessage(component));
         }
-        public static Packet create(FriendlyByteBuf buf){
+        public static Packet decode(FriendlyByteBuf buf){
             SendType type = buf.readEnum(SendType.class);
             return new Packet(type,type.clear() ? null : new TopMessage(buf.readComponent(),buf.readVarInt()));
         }

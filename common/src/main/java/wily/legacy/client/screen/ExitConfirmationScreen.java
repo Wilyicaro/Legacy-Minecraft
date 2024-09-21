@@ -18,7 +18,7 @@ public class ExitConfirmationScreen extends ConfirmationScreen{
     @Override
     protected void addButtons() {
         renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b-> this.onClose()).build());
-        if (minecraft.hasSingleplayerServer()) {
+        if (minecraft.hasSingleplayerServer() && !minecraft.isDemo()) {
             renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.exit_and_save"), b -> exit(minecraft, true)).build());
             renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.exit_without_save"), b-> minecraft.setScreen(new ConfirmationScreen(this,Component.translatable("legacy.menu.exit_without_save_title"),Component.translatable("legacy.menu.exit_without_save_message"), b1-> exit(minecraft, false)))).build());
         }else renderableVList.addRenderable(Button.builder(Component.translatable( "menu.quit"), b-> exit(minecraft, false)).build());

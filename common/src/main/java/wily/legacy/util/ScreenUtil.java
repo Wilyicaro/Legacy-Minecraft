@@ -9,6 +9,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
@@ -86,15 +87,15 @@ public class ScreenUtil {
         graphics.pose().popPose();
     }
     public static void renderDefaultBackground(GuiGraphics guiGraphics){
-        renderDefaultBackground(guiGraphics,false,true);
+        renderDefaultBackground(guiGraphics,false,true, true);
     }
     public static void renderDefaultBackground(GuiGraphics guiGraphics, boolean title){
-        renderDefaultBackground(guiGraphics,false,title);
+        renderDefaultBackground(guiGraphics,false,title, true);
     }
     public static boolean getActualLevelNight(){
         return (mc.getSingleplayerServer() != null&& mc.getSingleplayerServer().overworld() != null && mc.getSingleplayerServer().overworld().isNight()) || (mc.level!= null && mc.level.isNight());
     }
-    public static void renderDefaultBackground(GuiGraphics guiGraphics, boolean forcePanorama, boolean title){
+    public static void renderDefaultBackground(GuiGraphics guiGraphics, boolean forcePanorama, boolean title, boolean username){
         if (mc.level == null || forcePanorama)
             renderPanoramaBackground(guiGraphics, forcePanorama && getActualLevelNight());
         else renderTransparentBackground(guiGraphics);
@@ -110,8 +111,13 @@ public class ScreenUtil {
                 guiGraphics.pose().popPose();
                 RenderSystem.disableBlend();
             }
-
         }
+        if (username) renderUsername(guiGraphics);
+    }
+    public static void renderUsername(GuiGraphics graphics){
+        if (mc.level != null) return;
+        String username = MCAccount.isOfflineUser() ? I18n.get("legacy.menu.offline_user",mc.getUser().getName()) : mc.getUser().getName();
+        graphics.drawString(mc.font, username, graphics.guiWidth() - 33 - mc.font.width(username), graphics.guiHeight() - 27, 0xFFFFFF);
     }
     public static void renderPanoramaBackground(GuiGraphics guiGraphics, boolean isNight){
         RenderSystem.depthMask(false);

@@ -58,7 +58,7 @@
   "legacy.controls.controller.wii_u": "Edición Wii U",
   "legacy.controls.controller.switch": "Edición Switch",
   "legacy.controls.controller.steam": "Edición Steam de cloud54",
-  "legacy.controls.controller.keyboard": "Edición Java",
+  "legacy.controls.controller.kbm": "Edición Java",
   "legacy.weather_state.clear": "Despejado",
   "legacy.weather_state.rain": "Lluvia",
   "legacy.weather_state.thunder": "Tormenta",

@@ -20,7 +20,10 @@ public abstract class OverlayPanelScreen extends PanelBackgroundScreen{
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        if (transparentBackground) ScreenUtil.renderTransparentBackground(guiGraphics);
+        if (transparentBackground) {
+            ScreenUtil.renderTransparentBackground(guiGraphics);
+            ScreenUtil.renderUsername(guiGraphics);
+        }
     }
 
     @Override

@@ -1,22 +1,16 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.SplashRenderer;
-import net.minecraft.client.gui.components.toasts.SystemToast;
-import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.storage.LevelStorageSource;
-import net.minecraft.world.level.storage.LevelSummary;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,6 +18,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.ControlType;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.ControllerManager;
 import wily.legacy.client.screen.*;
 import wily.legacy.util.ScreenUtil;
@@ -32,12 +28,6 @@ import java.io.IOException;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen implements ControlTooltip.Event,RenderableVList.Access{
-    @Shadow @Final private static Logger LOGGER;
-
-    @Shadow protected abstract boolean checkDemoWorldPresence();
-
-    @Shadow protected abstract void confirmDemo(boolean bl);
-
     @Shadow @Nullable private SplashRenderer splash;
     private RenderableVList renderableVList = new RenderableVList().layoutSpacing(l->5);
 
@@ -47,9 +37,15 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
 
     @Inject(method = "<init>(ZLnet/minecraft/client/gui/components/LogoRenderer;)V", at = @At("RETURN"))
     public void init(boolean bl, LogoRenderer logoRenderer, CallbackInfo ci) {
-        minecraft = Minecraft.getInstance();
-        if (minecraft.isDemo()) createDemoMenuOptions();
-        else this.createNormalMenuOptions();
+        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.play_game"), (button) -> {
+            if (minecraft.isDemo()){
+                try {
+                    LoadSaveScreen.loadWorld(this,minecraft,Legacy4JClient.currentWorldSource,Legacy4JClient.importSaveFile(minecraft.getResourceManager().getResourceOrThrow(new ResourceLocation(Legacy4J.MOD_ID,"tutorial/tutorial.mcsave")).open(), Legacy4JClient.currentWorldSource,"Tutorial"));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }else minecraft.setScreen(new PlayGameScreen(this));
+        }).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("options.language"), b -> minecraft.setScreen(new LegacyLanguageScreen(this, this.minecraft.getLanguageManager()))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.options"), b -> minecraft.setScreen(new HelpOptionsScreen(this))).build());
@@ -74,73 +70,28 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         getRenderableVList().init(this,width / 2 - 112,this.height / 3 + 10,225,0);
     }
 
-    private void createNormalMenuOptions() {
-        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.play_game"), (button) -> {
-            this.minecraft.setScreen(new PlayGameScreen(this));
-        }).build());
-    }
 
-    private void createDemoMenuOptions() {
-        boolean bl = this.checkDemoWorldPresence();
-        renderableVList.addRenderable(Button.builder(Component.translatable("menu.playdemo"), (button) -> {
-            if (!bl) {
-                try {
-                    Legacy4JClient.importSaveFile(minecraft, minecraft.getResourceManager().getResourceOrThrow(new ResourceLocation(Legacy4J.MOD_ID,"tutorial/tutorial.mcsave")).open(), "Demo_World");
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            this.minecraft.createWorldOpenFlows().loadLevel(this,"Demo_World");
-
-        }).build());
-        Button secondButton;
-        renderableVList.addRenderable(secondButton = Button.builder(Component.translatable("menu.resetdemo"), (button) -> {
-            LevelStorageSource levelStorageSource = this.minecraft.getLevelSource();
-
-            try {
-                LevelStorageSource.LevelStorageAccess levelStorageAccess = levelStorageSource.createAccess("Demo_World");
-
-                try {
-                    LevelSummary levelSummary = levelStorageAccess.getSummary();
-                    if (levelSummary != null) {
-                        this.minecraft.setScreen(new ConfirmScreen(this::confirmDemo, Component.translatable("selectWorld.deleteQuestion"), Component.translatable("selectWorld.deleteWarning", new Object[]{levelSummary.getLevelName()}), Component.translatable("selectWorld.deleteButton"), CommonComponents.GUI_CANCEL));
-                    }
-                } catch (Throwable var7) {
-                    try {
-                        levelStorageAccess.close();
-                    } catch (Throwable var6) {
-                        var7.addSuppressed(var6);
-                    }
-
-                    throw var7;
-                }
-
-                if (levelStorageAccess != null) {
-                    levelStorageAccess.close();
-                }
-            } catch (IOException var8) {
-                SystemToast.onWorldAccessFailure(this.minecraft, "Demo_World");
-                LOGGER.warn("Failed to access demo world", var8);
-            }
-
-        }).build());
-        secondButton.active = bl;
-    }
     @Inject(method = "added", at = @At("RETURN"))
     public void added(CallbackInfo ci) {
-        this.splash = this.minecraft.getSplashManager().getSplash();
+        ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(),()->ControlTooltip.getAction("legacy.menu.choose_user"));
+        this.splash = Minecraft.getInstance().getSplashManager().getSplash();
         ControllerManager.getHandler().init();
     }
+
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (renderableVList.keyPressed(i,true)) return true;
+        if (i == InputConstants.KEY_X){
+            minecraft.setScreen(new ChooseUserScreen(this));
+            return true;
+        }
         return super.keyPressed(i, j, k);
     }
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderDefaultBackground(guiGraphics,true,true);
+        ScreenUtil.renderDefaultBackground(guiGraphics,true,true, false);
         super.render(guiGraphics, i, j, f);
 
         if (this.splash != null) {

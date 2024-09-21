@@ -83,7 +83,8 @@ public interface CommonNetwork {
         register(ClientAdvancementsPacket.class, ClientAdvancementsPacket::new);
         register(ClientAnimalInLoveSyncPacket.class, ClientAnimalInLoveSyncPacket::new);
         register(ServerPlayerMissHitPacket.class, ServerPlayerMissHitPacket::new);
-        register(TopMessage.Packet.class, TopMessage.Packet::create);
+        register(TopMessage.Packet.class, TopMessage.Packet::decode);
+        register(ClientEffectActivationPacket.class, ClientEffectActivationPacket::new);
     }
 
     static void register(Class<? extends Packet> commonPacketClass, Function<FriendlyByteBuf, Packet> function){
