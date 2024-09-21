@@ -32,13 +32,13 @@ public class CreationList extends RenderableVList{
         addIconButton(this,new ResourceLocation(Legacy4J.MOD_ID,"creation_list/create_world"),Component.translatable("legacy.menu.create_world"), c-> CreateWorldScreen.openFresh(this.minecraft, screen));
         LegacyWorldTemplate.list.forEach(t-> addIconButton(this,t.icon(),t.buttonName(), c-> {
             try {
-                String name = Legacy4JClient.importSaveFile(minecraft,minecraft.getResourceManager().getResourceOrThrow(t.worldTemplate()).open(),t.folderName());
-                if (t.directJoin()) minecraft.createWorldOpenFlows().loadLevel(screen,name);
+                String name = Legacy4JClient.importSaveFile(minecraft.getResourceManager().getResourceOrThrow(t.worldTemplate()).open(), minecraft.getLevelSource()::levelExists,Legacy4JClient.currentWorldSource,t.folderName());
+                if (t.directJoin()) LoadSaveScreen.loadWorld(screen,minecraft,Legacy4JClient.currentWorldSource,name);
                 else {
-                    LevelStorageSource.LevelStorageAccess access = minecraft.getLevelSource().createAccess(name);
+                    LevelStorageSource.LevelStorageAccess access = Legacy4JClient.currentWorldSource.createAccess(name);
                     LevelSummary summary = access.getSummary();
-                    if (summary != null)
-                        minecraft.setScreen(new LoadSaveScreen(screen,summary, access,true));
+                    access.close();
+                    minecraft.setScreen(new LoadSaveScreen(screen,summary,access));
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

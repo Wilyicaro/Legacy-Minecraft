@@ -15,15 +15,12 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
-import net.minecraft.world.effect.MobEffects;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.ControlTooltip;
@@ -36,11 +33,6 @@ public abstract class AdvancementToastMixin implements Toast {
     @Shadow private boolean playedSound;
 
     @Shadow @Final private AdvancementHolder advancement;
-    @Inject(method = "<init>", at = @At("RETURN"))
-    public void init(AdvancementHolder advancementHolder, CallbackInfo ci) {
-        if (advancementHolder.id().getPath().equals("adventure/voluntary_exile")) Legacy4JClient.displayEffectActivationAnimation(MobEffects.BAD_OMEN);
-        else if (advancementHolder.id().getPath().equals("adventure/hero_of_the_village")) Legacy4JClient.displayEffectActivationAnimation(MobEffects.HERO_OF_THE_VILLAGE);
-    }
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, ToastComponent toastComponent, long l, CallbackInfoReturnable<Visibility> cir) {
         Component holdToView = Component.translatable("legacy.menu.advancements.toast",(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_I) : ControllerBinding.UP_BUTTON.bindingState.getIcon()).getComponent());

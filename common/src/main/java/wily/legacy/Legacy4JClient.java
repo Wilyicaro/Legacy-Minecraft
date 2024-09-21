@@ -83,6 +83,7 @@ import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.network.ServerOpenClientMenuPacket;
 import wily.legacy.player.LegacyPlayerInfo;
 import wily.legacy.util.JsonUtil;
+import wily.legacy.util.MCAccount;
 import wily.legacy.util.ModInfo;
 import wily.legacy.util.ScreenUtil;
 
@@ -96,6 +97,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static wily.legacy.Legacy4J.MOD_ID;
@@ -221,7 +223,7 @@ public class Legacy4JClient {
             MultiLineLabel messageLines = MultiLineLabel.create(Minecraft.getInstance().font,s.description,200);
             return new ConfirmationScreen(Minecraft.getInstance().screen, 230, 141 + messageLines.getLineCount() * 12 + (s.promptForCacheErase ? 14 : 0), s.getTitle(), messageLines, b -> true) {
                 boolean eraseCache = false;
-                protected void initButtons() {
+                protected void addButtons() {
                     if (s.promptForCacheErase) addRenderableWidget(new TickBox(panel.x + 15, panel.y + panel.height - 88,eraseCache,b->Component.translatable("selectWorld.backupEraseCache"),b->null,b-> eraseCache = b.selected));
                     okButton = addRenderableWidget(Button.builder(Component.translatable("selectWorld.backupJoinConfirmButton"), b -> s.listener.proceed(true, eraseCache)).bounds(panel.x + 15, panel.y + panel.height - 74, 200, 20).build());
                     addRenderableWidget(Button.builder(Component.translatable("selectWorld.backupJoinSkipButton"), b -> s.listener.proceed(false, eraseCache)).bounds(panel.x + 15, panel.y + panel.height - 52, 200, 20).build());
@@ -343,6 +345,7 @@ public class Legacy4JClient {
         knownBlocks = new KnownListing<>(BuiltInRegistries.BLOCK,Minecraft.getInstance().gameDirectory.toPath());
         knownEntities = new KnownListing<>(BuiltInRegistries.ENTITY_TYPE,Minecraft.getInstance().gameDirectory.toPath());
         currentWorldSource = LevelStorageSource.createDefault(Minecraft.getInstance().gameDirectory.toPath().resolve("current-world"));
+        MCAccount.loadAll();
     }
     public static boolean isModEnabledOnServer(){
         Minecraft minecraft = Minecraft.getInstance();
@@ -408,27 +411,34 @@ public class Legacy4JClient {
         minecraft.options.save();
         canLoadVanillaOptions = true;
     }
-    public static String manageAvailableSaveDirName(Minecraft minecraft, Consumer<File> copy, String saveDirName){
+    public static String manageAvailableSaveDirName(Consumer<File> copy, Predicate<String> exists, LevelStorageSource source, String levelId){
+        String destId = manageAvailableName(exists,levelId);
+        copy.accept(source.getLevelPath(destId).toFile());
+        return destId;
+    }
+    public static String manageAvailableName(Predicate<String> exists, String saveDirName){
         StringBuilder builder = new StringBuilder(saveDirName);
-        int levelRepeat = 0;
-        while (minecraft.getLevelSource().levelExists(builder +(levelRepeat > 0 ? String.format(" (%s)",levelRepeat) : "")))
-            levelRepeat++;
-        if (levelRepeat > 0)
-            builder.append(String.format(" (%s)",levelRepeat));
-        copy.accept(new File(minecraft.gameDirectory, "saves/" + builder));
+        int repeat = 0;
+        while (exists.test(builder +(repeat > 0 ? String.format(" (%s)",repeat) : "")))
+            repeat++;
+        if (repeat > 0)
+            builder.append(String.format(" (%s)",repeat));
         return builder.toString();
     }
-    public static String importSaveFile(Minecraft minecraft, InputStream saveInputStream, String saveDirName){
-        return manageAvailableSaveDirName(minecraft, f-> Legacy4J.copySaveToDirectory(saveInputStream,f),saveDirName);
+    public static String importSaveFile(InputStream saveInputStream,Predicate<String> exists, LevelStorageSource source, String saveDirName){
+        return manageAvailableSaveDirName(f-> Legacy4J.copySaveToDirectory(saveInputStream,f),exists,source,saveDirName);
     }
-    public static String copySaveFile(Minecraft minecraft, Path savePath, String saveDirName){
-        return manageAvailableSaveDirName(minecraft, f-> {
+    public static String importSaveFile(InputStream saveInputStream, LevelStorageSource source, String saveDirName){
+        return importSaveFile(saveInputStream,source::levelExists,source,saveDirName);
+    }
+    public static String copySaveFile(Path savePath, LevelStorageSource source, String saveDirName){
+        return manageAvailableSaveDirName(f-> {
             try {
                 FileUtils.copyDirectory(savePath.toFile(),f);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        },saveDirName);
+        },source::levelExists,source,saveDirName);
     }
     public static void copySaveBtwSources(LevelStorageSource.LevelStorageAccess sendSource, LevelStorageSource destSource){
         try (LevelStorageSource.LevelStorageAccess access = destSource.createAccess(sendSource.getLevelId())) {

@@ -71,6 +71,6 @@ public abstract class ExtendedGuiMixin extends Gui {
     }
     @Redirect(method="renderHealth", at = @At(value = "FIELD", target = "Lnet/neoforged/neoforge/client/gui/overlay/ExtendedGui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD, ordinal = 1))
     private void renderHealth(ExtendedGui instance, long value) {
-        healthBlinkTime = value - 5;
+        healthBlinkTime = value - 6;
     }
 }

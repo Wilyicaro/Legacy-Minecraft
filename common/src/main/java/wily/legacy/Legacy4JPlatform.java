@@ -8,14 +8,14 @@ import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluid;
 import wily.legacy.util.RegisterListing;
 import wily.legacy.util.ModInfo;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class Legacy4JPlatform {
     @ExpectPlatform
@@ -48,8 +48,14 @@ public class Legacy4JPlatform {
     public static <T> RegisterListing<T> createLegacyRegister(String namespace, Registry<T> registry) {
         throw new AssertionError();
     }
+    public enum Loader {
+        FABRIC,FORGE,NEOFORGE;
+        public boolean isForgeLike(){
+            return this == FORGE || this == NEOFORGE;
+        }
+    }
     @ExpectPlatform
-    public static boolean isForgeLike() {
+    public static Loader getLoader() {
         throw new AssertionError();
     }
     @ExpectPlatform
@@ -67,6 +73,15 @@ public class Legacy4JPlatform {
     @ExpectPlatform
     public static<T extends CustomPacketPayload> void sendToServer(T packetHandler) {
         throw new AssertionError();
+    }
+    public static List<String> getMinecraftResourceAssort(){
+        return new ArrayList<>(List.of("minecraft",getLoader().isForgeLike() ? "mod_resources" : "fabric","legacy:legacy_waters"));
+    }
+    public static List<String> getMinecraftClassicResourceAssort(){
+        List<String> assort = getMinecraftResourceAssort();
+        assort.add(assort.size() - 1,"programmer_art");
+        if (getLoader().isForgeLike())  assort.add(assort.size() - 1,"legacy:programmer_art");
+        return assort;
     }
 }
 

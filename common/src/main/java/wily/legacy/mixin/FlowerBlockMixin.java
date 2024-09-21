@@ -33,6 +33,7 @@ public abstract class FlowerBlockMixin extends BushBlock implements Bonemealable
 
     @Override
     public boolean isValidBonemealTarget(LevelReader levelReader, BlockPos blockPos, BlockState blockState) {
+        if (blockState.is(Blocks.WITHER_ROSE)) return false;
         for(int xd = -1; xd <= 1; ++xd) {
             for (int zd = -1; zd <= 1; ++zd) {
                 if (zd == 0 && xd == 0) continue;

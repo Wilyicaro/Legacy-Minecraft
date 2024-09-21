@@ -71,6 +71,6 @@ public abstract class ForgeGuiMixin extends Gui {
     }
     @Redirect(method="renderHealth", at = @At(value = "FIELD", target = "Lnet/minecraftforge/client/gui/overlay/ForgeGui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD, ordinal = 1))
     private void renderHealth(ForgeGui instance, long value) {
-        healthBlinkTime = value - 5;
+        healthBlinkTime = value - 6;
     }
 }

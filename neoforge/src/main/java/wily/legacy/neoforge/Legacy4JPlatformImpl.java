@@ -25,6 +25,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforgespi.language.IModFileInfo;
 import net.neoforged.neoforgespi.language.IModInfo;
 import org.jetbrains.annotations.NotNull;
+import wily.legacy.Legacy4JPlatform;
 import wily.legacy.util.ModInfo;
 import wily.legacy.util.RegisterListing;
 
@@ -176,8 +177,8 @@ public class Legacy4JPlatformImpl {
         };
     }
 
-    public static boolean isForgeLike() {
-        return true;
+    public static Legacy4JPlatform.Loader getLoader() {
+        return Legacy4JPlatform.Loader.NEOFORGE;
     }
     public static boolean isClient() {
         return FMLEnvironment.dist.isClient();

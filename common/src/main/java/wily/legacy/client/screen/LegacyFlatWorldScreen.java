@@ -7,7 +7,11 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
@@ -24,6 +28,7 @@ import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
+import org.jetbrains.annotations.Nullable;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyBiomeOverride;
 import wily.legacy.client.LegacyTipManager;
@@ -51,6 +56,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
     protected final RenderableVList displayBiomes = new RenderableVList().layoutSpacing(l->0);
     protected final RenderableVList displayProperties = new RenderableVList();
     protected final List<Holder<StructureSet>> structuresOverrides;
+    protected AbstractButton movingLayer;
 
     public LegacyFlatWorldScreen(Screen screen, WorldCreationUiState uiState, HolderLookup.RegistryLookup<Biome> biomeGetter, HolderLookup.RegistryLookup<StructureSet> structureGetter, Consumer<FlatLevelGeneratorSettings> consumer, FlatLevelGeneratorSettings flatLevelGeneratorSettings) {
         super(s->new Panel(p -> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 194 : 0))) / 2, p -> (s.height - p.height) / 2, 282,248),Component.translatable("createWorld.customize.flat.title"));
@@ -70,9 +76,13 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.set(0,ControlTooltip.create(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(),()->getFocused() != null ? getAction(tabList.selectedTab == 0 ? "legacy.menu.create_flat_world.layer_options" : "mco.template.button.select") : null)).
-                add(ControlTooltip.create(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(),()-> getAction("legacy.action.presets"))).
-                addCompound(()-> new ControlTooltip.Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(),ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon()},()->getAction("legacy.action.select_tab"));
+        renderer.set(0,ControlTooltip.create(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(),()->getFocused() != null ? getAction(tabList.selectedTab == 0 ? movingLayer != null ? "legacy.action.place" : "legacy.menu.create_flat_world.layer_options" : "mco.template.button.select") : null)).
+                add(()-> movingLayer != null || tabList.selectedTab != 0 || getFocused() == null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(),()-> getAction("legacy.action.move_layer")).
+                add(()-> movingLayer != null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(),()-> getAction("legacy.action.presets")).
+                addCompound(()-> new ControlTooltip.Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(),ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon()},()-> movingLayer != null ? null : getAction("legacy.action.select_tab")).
+                add(()-> movingLayer == null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_PAGEUP) : ControllerBinding.LEFT_TRIGGER.bindingState.getIcon(),()-> getAction("legacy.action.page_up")).
+                add(()-> movingLayer == null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_PAGEDOWN) : ControllerBinding.RIGHT_TRIGGER.bindingState.getIcon(),()-> getAction("legacy.action.page_down")).
+                addCompound(()-> ControlType.getActiveType().isKbm() ? new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_UP),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_DOWN)}  : new ControlTooltip.Icon[]{ControllerBinding.LEFT_STICK.bindingState.getIcon()}, ()-> movingLayer == null ? null : ControlTooltip.getAction("legacy.action.move_up_down"));
     }
 
     public void addStructure(Holder.Reference<StructureSet> structure){
@@ -161,12 +171,26 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
             }
 
             @Override
+            public void setFocused(boolean bl) {
+                if (bl && movingLayer != null && movingLayer != this) return;
+                super.setFocused(bl);
+            }
+
+            @Override
             public boolean keyPressed(int i, int j, int k) {
+                if (i == InputConstants.KEY_X){
+                    movingLayer = this;
+                    return true;
+                }
                 return super.keyPressed(i, j, k);
             }
 
             @Override
             public void onPress() {
+                if (movingLayer != null){
+                    if (isFocused()) movingLayer = null;
+                    return;
+                }
                 int allHeight = getAllLayersHeight();
                 int layerIndex = displayLayers.renderables.indexOf(this);
                 minecraft.setScreen(new ConfirmationScreen(LegacyFlatWorldScreen.this,Component.translatable("legacy.menu.create_flat_world.layer_options"), Component.translatable("legacy.menu.create_flat_world.layer_message"),b->{}){
@@ -192,7 +216,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
 
             @Override
             protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-
+                defaultButtonNarrationText(narrationElementOutput);
             }
         });
         ItemStack s = flatLayerInfo.getBlockState().getBlock().asItem().getDefaultInstance();
@@ -216,6 +240,17 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
     public void removeLayer(int index){
         displayLayers.renderables.remove(index);
         generator.getLayersInfo().remove(generator.getLayersInfo().size() - 1 - index);
+    }
+    public void switchLayers(AbstractButton selected, AbstractButton aimPlace){
+        int selectedIndex = displayLayers.renderables.indexOf(selected);
+        int aimIndex = displayLayers.renderables.indexOf(aimPlace);
+        displayLayers.renderables.set(aimIndex,selected);
+        displayLayers.renderables.set(selectedIndex,aimPlace);
+        FlatLayerInfo selectedLayer = generator.getLayersInfo().get(generator.getLayersInfo().size() - 1 - selectedIndex);
+        FlatLayerInfo aimLayer = generator.getLayersInfo().get(generator.getLayersInfo().size() - 1 - aimIndex);
+        generator.getLayersInfo().set(generator.getLayersInfo().size() - 1 - selectedIndex,aimLayer);
+        generator.getLayersInfo().set(generator.getLayersInfo().size() - 1 - aimIndex,selectedLayer);
+        repositionElements();
     }
     @Override
     public void setTooltipForNextRenderPass(Tooltip tooltip, ClientTooltipPositioner clientTooltipPositioner, boolean bl) {
@@ -268,10 +303,21 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
     }
 
     @Override
+    public void setFocused(@Nullable GuiEventListener guiEventListener) {
+        super.setFocused(guiEventListener);
+        if (movingLayer != null && getFocused() instanceof AbstractButton b2 && displayLayers.renderables.contains(b2) && getFocused() != movingLayer) {
+            super.setFocused(movingLayer);
+            switchLayers(movingLayer, b2);
+        }
+    }
+
+    @Override
     public boolean keyPressed(int i, int j, int k) {
-        tabList.controlTab(i);
-        if (i == InputConstants.KEY_O)
-            minecraft.setScreen(new LegacyFlatPresetsScreen(this,uiState.getSettings().worldgenLoadContext().lookupOrThrow(Registries.FLAT_LEVEL_GENERATOR_PRESET),uiState.getSettings().dataConfiguration().enabledFeatures(), f-> setPreset(f.value().settings())));
+        if (movingLayer == null) {
+            if (tabList.controlTab(i)) return true;
+            if (i == InputConstants.KEY_O)
+                minecraft.setScreen(new LegacyFlatPresetsScreen(this, uiState.getSettings().worldgenLoadContext().lookupOrThrow(Registries.FLAT_LEVEL_GENERATOR_PRESET), uiState.getSettings().dataConfiguration().enabledFeatures(), f -> setPreset(f.value().settings())));
+        }
         return super.keyPressed(i, j, k);
     }
 

@@ -126,16 +126,16 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                         int q = mouseY - getY();
                         if (e.canSelect()) {
                             if (p < 32) {
-                                guiGraphics.blitSprite(LegacySprites.JOIN_HIGHLIGHTED, getX(), getY(), 32, 32);
+                                guiGraphics.blitSprite(LegacySprites.JOIN_HIGHLIGHTED,getX() + 5, getY() + 5, 20, 20);
                             } else {
-                                guiGraphics.blitSprite(LegacySprites.JOIN, getX(), getY(), 32, 32);
+                                guiGraphics.blitSprite(LegacySprites.JOIN,getX() + 5, getY() + 5, 20, 20);
                             }
                         } else {
                             if (e.canUnselect()) {
                                 if (p < 16) {
-                                    guiGraphics.blitSprite(UNSELECT_HIGHLIGHTED, getX(), getY(), 32, 32);
+                                    guiGraphics.blitSprite(UNSELECT_HIGHLIGHTED,getX() + 5, getY() + 5, 20, 20);
                                 } else {
-                                    guiGraphics.blitSprite(UNSELECT, getX(), getY(), 32, 32);
+                                    guiGraphics.blitSprite(UNSELECT,getX() + 5, getY() + 5, 20, 20);
                                 }
                             }
                             if (e.canMoveUp()) {
