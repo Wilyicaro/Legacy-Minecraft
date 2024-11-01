@@ -1,21 +1,25 @@
 package wily.legacy.client;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.gson.*;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.PostChain;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
+import org.apache.commons.io.FilenameUtils;
 import wily.legacy.Legacy4J;
-import wily.legacy.Legacy4JPlatform;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.ControllerManager;
 import wily.legacy.client.screen.ControlTooltip;
@@ -25,6 +29,7 @@ import wily.legacy.util.JsonUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
@@ -32,11 +37,13 @@ import java.util.function.BiConsumer;
 import static wily.legacy.Legacy4JClient.gammaEffect;
 
 public class LegacyResourceManager implements PreparableReloadListener {
+    public static final LoadingCache<ResourceLocation, Optional<RenderType>> GLOW_LAYERS = CacheBuilder.newBuilder().build(CacheLoader.from(l-> Optional.of(ResourceLocation.fromNamespaceAndPath(l.getNamespace(), FilenameUtils.removeExtension(l.getPath()) + "_glow." + FilenameUtils.getExtension(l.getPath()))).map(g-> Minecraft.getInstance().getResourceManager().getResource(g).isPresent() ? RenderType.eyes(g) : null)));
 
     public static final ResourceLocation GAMEPAD_MAPPINGS = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"gamepad_mappings.txt");
     public static final ResourceLocation INTRO_LOCATION = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"intro.json");
     public static final ResourceLocation GAMMA_LOCATION = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"shaders/post/gamma.json");
     public static final ResourceLocation DEFAULT_KEYBOARD_LAYOUT_LOCATION = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"keyboard_layout/en_us.json");
+    public static final ResourceLocation PLAYER_IDENTIFIERS_LOCATION = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"player_identifiers.json");
 
     public static final String CONTROL_TYPES = "control_types.json";
     public static final String COMMON_COLORS = "common_colors.json";
@@ -50,14 +57,11 @@ public class LegacyResourceManager implements PreparableReloadListener {
     @Override
     public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller profilerFiller, ProfilerFiller profilerFiller2, Executor executor, Executor executor2) {
         return preparationBarrier.wait(Unit.INSTANCE).thenRunAsync(() -> {
+            GLOW_LAYERS.invalidateAll();
             Minecraft minecraft = Minecraft.getInstance();
             profilerFiller2.startTick();
             profilerFiller2.push("listener");
-            PackRepository repo = minecraft.getResourcePackRepository();
-            if ((Legacy4JPlatform.isModLoaded("sodium") || Legacy4JPlatform.isModLoaded("rubidium")) && repo.getSelectedIds().contains("legacy:legacy_waters")){
-                repo.removePack("legacy:legacy_waters");
-                minecraft.reloadResourcePacks();
-            }
+
             resourceManager.getResource(GAMEPAD_MAPPINGS).ifPresent(r->{
                 try {
                     ControllerManager.getHandler().applyGamePadMappingsFromBuffer(r.openAsReader());
@@ -76,6 +80,15 @@ public class LegacyResourceManager implements PreparableReloadListener {
                 Legacy4J.LOGGER.warn("Failed to parse shader: {}", GAMMA_LOCATION, jsonSyntaxException);
             }
             registerIntroLocations(resourceManager);
+
+            PlayerIdentifier.list.clear();
+            resourceManager.getResourceStack(PLAYER_IDENTIFIERS_LOCATION).forEach(r->{
+                try {
+                    GsonHelper.parseArray(r.openAsReader()).forEach(e-> PlayerIdentifier.CODEC.parse(JsonOps.INSTANCE, e).result().ifPresent(p-> PlayerIdentifier.list.put(p.index(),p)));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
             ControlType.typesMap.clear();
             ControlType.types.clear();
@@ -138,6 +151,7 @@ public class LegacyResourceManager implements PreparableReloadListener {
             profilerFiller2.endTick();
         }, executor2);
     }
+
     public static void setKeyboardLayout(Resource resource){
         try {
             JsonObject obj = GsonHelper.parse(resource.openAsReader());
@@ -183,4 +197,5 @@ public class LegacyResourceManager implements PreparableReloadListener {
             Legacy4J.LOGGER.error(e.getMessage());
         }
     }
+
 }

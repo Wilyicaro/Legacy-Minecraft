@@ -2,24 +2,71 @@ package wily.legacy.forge;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.BiomeColors;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.*;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import org.jetbrains.annotations.Nullable;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyBiomeOverride;
+
+import java.util.Optional;
 
 
 @Mod.EventBusSubscriber(modid = Legacy4J.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class Legacy4JForgeClient {
+
+    public static final IClientFluidTypeExtensions CLIENT_WATER_FLUID_TYPE = new IClientFluidTypeExtensions() {
+        private static final ResourceLocation UNDERWATER_LOCATION = ResourceLocation.withDefaultNamespace("textures/misc/underwater.png"), WATER_STILL = ResourceLocation.withDefaultNamespace("block/water_still"), WATER_FLOW = ResourceLocation.withDefaultNamespace("block/water_flow"), WATER_OVERLAY = ResourceLocation.withDefaultNamespace("block/water_overlay");
+
+        @Override
+        public ResourceLocation getStillTexture() {
+            return WATER_STILL;
+        }
+
+        @Override
+        public ResourceLocation getFlowingTexture() {
+            return WATER_FLOW;
+        }
+
+        @Nullable
+        @Override
+        public ResourceLocation getOverlayTexture() {
+            return WATER_OVERLAY;
+        }
+
+        @Override
+        public ResourceLocation getRenderOverlayTexture(Minecraft mc) {
+            return UNDERWATER_LOCATION;
+        }
+
+        @Override
+        public int getTintColor() {
+            return 0xFF3F76E4;
+        }
+
+        @Override
+        public int getTintColor(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
+            return LegacyBiomeOverride.getOrDefault(Minecraft.getInstance().level.getBiome(pos).unwrapKey()).getWaterARGBOrDefault(BiomeColors.getAverageWaterColor(getter,pos));
+        }
+    };
     public static void init(){
         Legacy4JClient.init();
         Legacy4JClient.registerReloadListeners(((ReloadableResourceManager)Minecraft.getInstance().getResourceManager())::registerReloadListener);
@@ -58,9 +105,5 @@ public class Legacy4JForgeClient {
     }
     public static Player getClientPlayer(){
         return Minecraft.getInstance().player;
-    }
-
-    public static<T extends CustomPacketPayload> void sendToServer(T packetHandler) {
-        Legacy4JForge.NETWORK.send(packetHandler, Minecraft.getInstance().getConnection().getConnection());
     }
 }

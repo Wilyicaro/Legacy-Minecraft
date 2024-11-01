@@ -28,7 +28,8 @@
   },
   "mixins": [
     "legacy.mixins.json",
-    "legacy-common.mixins.json"
+    "legacy-common.mixins.json",
+    "legacy.sodium.mixins.json"
   ],
   "depends": {
     "fabric": "*",

@@ -2,6 +2,7 @@ package wily.legacy.client.controller;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.util.StringRepresentable;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Locale;
@@ -18,14 +19,14 @@ public enum ControllerBinding implements StringRepresentable {
     BACK(InputConstants.KEY_H),
     GUIDE,
     START(InputConstants.KEY_ESCAPE),
-    LEFT_STICK(c-> BindingState.Axis.createStick(c,()-> ScreenUtil.getLegacyOptions().leftStickDeadZone().get().floatValue(),(a, s)->{}),false),
-    RIGHT_STICK(c-> BindingState.Axis.createStick(c,()->ScreenUtil.getLegacyOptions().rightStickDeadZone().get().floatValue(), ControllerManager::updatePlayerCamera),false),
+    LEFT_STICK(c-> BindingState.Axis.createStick(c,()->LegacyOption.leftStickDeadZone.get().floatValue(),(a, s)->{}),false),
+    RIGHT_STICK(c-> BindingState.Axis.createStick(c,()->LegacyOption.rightStickDeadZone.get().floatValue(), ControllerManager::updatePlayerCamera),false),
     LEFT_STICK_BUTTON(InputConstants.KEY_F5),
     RIGHT_STICK_BUTTON(InputConstants.KEY_LSHIFT),
     LEFT_BUMPER(InputConstants.KEY_PAGEDOWN),
     RIGHT_BUMPER(InputConstants.KEY_PAGEUP),
-    LEFT_TRIGGER(c-> BindingState.Axis.createTrigger(c,()->ScreenUtil.getLegacyOptions().leftTriggerDeadZone().get().floatValue()), InputConstants.MOUSE_BUTTON_RIGHT),
-    RIGHT_TRIGGER(c-> BindingState.Axis.createTrigger(c,()->ScreenUtil.getLegacyOptions().rightTriggerDeadZone().get().floatValue()), InputConstants.MOUSE_BUTTON_LEFT),
+    LEFT_TRIGGER(c-> BindingState.Axis.createTrigger(c,()-> LegacyOption.leftTriggerDeadZone.get().floatValue()), InputConstants.MOUSE_BUTTON_RIGHT),
+    RIGHT_TRIGGER(c-> BindingState.Axis.createTrigger(c,()->LegacyOption.rightTriggerDeadZone.get().floatValue()), InputConstants.MOUSE_BUTTON_LEFT),
     DPAD_UP(InputConstants.KEY_UP),
     DPAD_DOWN(InputConstants.KEY_DOWN),
     DPAD_LEFT(InputConstants.KEY_LEFT),
@@ -63,7 +64,7 @@ public enum ControllerBinding implements StringRepresentable {
         return getMappedBinding(this);
     }
     public static ControllerBinding getMappedBinding(ControllerBinding component){
-        boolean invert = ScreenUtil.getLegacyOptions().invertControllerButtons().get();
+        boolean invert = LegacyOption.invertControllerButtons.get();
         return switch (component){
             case DOWN_BUTTON -> invert ? RIGHT_BUTTON : component;
             case RIGHT_BUTTON -> invert ? DOWN_BUTTON : component;

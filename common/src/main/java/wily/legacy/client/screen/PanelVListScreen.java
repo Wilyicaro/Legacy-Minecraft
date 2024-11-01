@@ -1,8 +1,5 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.OptionInstance;
-import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -19,21 +16,13 @@ public class PanelVListScreen extends PanelBackgroundScreen implements Renderabl
         super(imageWidth, imageHeight, component);
         this.parent = parent;
     }
-    public PanelVListScreen(Screen parent, int imageWidth, int imageHeight, Component component, Renderable... renderables) {
-        this(parent,imageWidth, imageHeight, component);
-        renderableVList.addRenderables(renderables);
-    }
-    public PanelVListScreen(Screen parent, int imageWidth, int imageHeight, Component component, OptionInstance<?>... optionInstances) {
-        this(parent,imageWidth, imageHeight, component);
-        renderableVList.addOptions(optionInstances);
-    }
     @Override
     protected void init() {
         super.init();
         renderableVListInit();
     }
     public void renderableVListInit(){
-        getRenderableVList().init(this,panel.x + 10,panel.y + 10,panel.width - 20,panel.height);
+        getRenderableVList().init(this,panel.x + 10,panel.y + 10,panel.width - 20,panel.height-20);
     }
     @Override
     public void onClose() {

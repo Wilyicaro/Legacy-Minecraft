@@ -58,7 +58,7 @@ public class KnownListing<T> {
             list.forEach(l->a.add(l.toString()));
             GsonHelper.writeValue(new JsonWriter(bufferedWriter),a, String::compareTo);
         } catch (IOException iOException) {
-            LOGGER.error("Failed to write {}, new known "+ registry.key().location().getPath()+ "won't be present", listingFile, iOException);
+            LOGGER.error("Failed to write {}, new known "+ registry.key().location().getPath()+ " won't be present", listingFile, iOException);
         }
     }
 

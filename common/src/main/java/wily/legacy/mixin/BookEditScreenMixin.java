@@ -144,7 +144,7 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
     protected BookEditScreenMixin(Component component) {
         super(component);
     }
-    @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/font/TextFieldHelper;<init>(Ljava/util/function/Supplier;Ljava/util/function/Consumer;Ljava/util/function/Supplier;Ljava/util/function/Consumer;Ljava/util/function/Predicate;)V"), index = 4)
+    @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/font/TextFieldHelper;<init>(Ljava/util/function/Supplier;Ljava/util/function/Consumer;Ljava/util/function/Supplier;Ljava/util/function/Consumer;Ljava/util/function/Predicate;)V", ordinal = 0), index = 4)
     private Predicate<String> changeTextFieldHelperWidth(Predicate<String> predicate){
         return string-> string.length() < 2304 && this.font.wordWrapHeight(string, 159) <= 176;
     }

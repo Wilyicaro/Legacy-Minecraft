@@ -9,8 +9,8 @@ import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.init.LegacyGameRules;
-import wily.legacy.player.LegacyPlayer;
-import wily.legacy.player.LegacyPlayerInfo;
+import wily.legacy.entity.LegacyPlayer;
+import wily.legacy.entity.LegacyPlayerInfo;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -59,7 +59,7 @@ public record PlayerInfoSync(int type, UUID player) implements CommonNetwork.Pac
         public All(Map<String,Object> gameRules){
             this(Collections.emptyMap(),gameRules,GameType.SURVIVAL);
         }
-        public static final List<GameRules.Key<GameRules.BooleanValue>> NON_OP_GAMERULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK, LegacyGameRules.TNT_EXPLODES,GameRules.RULE_DOMOBLOOT,GameRules.RULE_DOBLOCKDROPS,GameRules.RULE_NATURAL_REGENERATION,LegacyGameRules.GLOBAL_MAP_PLAYER_ICON));
+        public static final List<GameRules.Key<GameRules.BooleanValue>> NON_OP_GAMERULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK, LegacyGameRules.TNT_EXPLODES,GameRules.RULE_DOMOBLOOT,GameRules.RULE_DOBLOCKDROPS,GameRules.RULE_NATURAL_REGENERATION,LegacyGameRules.GLOBAL_MAP_PLAYER_ICON,GameRules.RULE_DO_IMMEDIATE_RESPAWN));
         public All(FriendlyByteBuf buf){
             this(buf.readMap(HashMap::new, b->b.readUUID(), LegacyPlayerInfo::fromNetwork), buf.readMap(HashMap::new, FriendlyByteBuf::readUtf, b->{
                 int type = b.readVarInt();

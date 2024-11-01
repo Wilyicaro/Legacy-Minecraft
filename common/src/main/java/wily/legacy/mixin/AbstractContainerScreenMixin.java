@@ -26,6 +26,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
+import wily.legacy.client.controller.ControllerManager;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.LegacyIconHolder;
@@ -92,7 +93,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Inject(method = "renderFloatingItem", at = @At(value = "HEAD"), cancellable = true)
     private void renderFloatingItem(GuiGraphics guiGraphics, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(i, j, 232.0f);
+        guiGraphics.pose().translate(Legacy4JClient.controllerManager.getPointerX() - leftPos - 10, Legacy4JClient.controllerManager.getPointerY() - topPos - 10, 432.0f);
         guiGraphics.pose().scale(27/18f, 27/18f, 27/18f);
         guiGraphics.renderItem(itemStack, 0, 0);
         guiGraphics.renderItemDecorations(Minecraft.getInstance().font, itemStack, 0, (this.draggingItem.isEmpty() ? 0 : -8), string);

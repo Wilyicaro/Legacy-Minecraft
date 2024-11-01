@@ -10,6 +10,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractFurnaceMenu;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,9 +19,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacyOption;
+import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
 
 import static wily.legacy.util.LegacySprites.ARROW;
 
@@ -33,6 +35,13 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
     public AbstractFurnaceScreenMixin(T abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
+
+    @Override
+    public void added() {
+        super.added();
+        ControlTooltip.Renderer.of(this).replace(3,i-> i, c-> hoveredSlot == null || hoveredSlot.getItem().isEmpty() || hoveredSlot.container != minecraft.player.getInventory() ? c : menu.canSmelt(hoveredSlot.getItem()) ? ControlTooltip.getAction("legacy.action.move_ingredient") : AbstractFurnaceBlockEntity.isFuel(hoveredSlot.getItem()) ? ControlTooltip.getAction("legacy.action.move_fuel") : c);
+    }
+
     @Inject(method = "init",at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
@@ -45,7 +54,7 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
         super.init();
         this.widthTooNarrow = this.width < 379;
         this.recipeBookComponent.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
-        if (((LegacyOptions)minecraft.options).showVanillaRecipeBook().get()) {
+        if (LegacyOption.showVanillaRecipeBook.get()) {
             this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
             recipeButton = this.addRenderableWidget(new ImageButton(this.leftPos + 49, topPos + 49, 20, 18, RecipeBookComponent.RECIPE_BUTTON_SPRITES, (button) -> {
                 this.recipeBookComponent.toggleVisibility();

@@ -22,8 +22,8 @@ import net.minecraft.world.level.GameType;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.PlayerIdentifier;
 import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.Controller;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
 import wily.legacy.client.controller.ControllerBinding;
@@ -31,7 +31,7 @@ import wily.legacy.network.CommonNetwork;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.network.PlayerInfoSync;
-import wily.legacy.player.LegacyPlayerInfo;
+import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.*;
@@ -63,7 +63,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
         renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), ()-> minecraft.hasSingleplayerServer() ? !minecraft.getSingleplayerServer().isPublished() ? PublishScreen.PUBLISH : PublishScreen.hasWorldHost() ? WorldHostFriendsScreen.INVITE_FRIENDS : null : null);
-        renderer.add(()->ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(),()->LegacyKeyMapping.of(Minecraft.getInstance().options.keyChat).getDisplayName());
+        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(),()->minecraft.getChatStatus().isChatAllowed(minecraft.isLocalServer()) ? LegacyKeyMapping.of(Minecraft.getInstance().options.keyChat).getDisplayName() : null);
     }
 
     public HostOptionsScreen() {
@@ -123,10 +123,11 @@ public class HostOptionsScreen extends PanelVListScreen {
     }
 
     public static void drawPlayerIcon(GameProfile profile, GuiGraphics guiGraphics, int x, int y){
-        float[] color = Legacy4JClient.getVisualPlayerColor(((LegacyPlayerInfo)Minecraft.getInstance().getConnection().getPlayerInfo(profile.getId())));
+        LegacyPlayerInfo info = (LegacyPlayerInfo)Minecraft.getInstance().getConnection().getPlayerInfo(profile.getId());
+        float[] color = Legacy4JClient.getVisualPlayerColor(info);
         guiGraphics.setColor(color[0],color[1],color[2],1.0f);
         RenderSystem.enableBlend();
-        guiGraphics.blitSprite(LegacySprites.MAP_PLAYER,x,y, 20,20);
+        guiGraphics.blitSprite(PlayerIdentifier.of(info.getIdentifierIndex()).optionsMapSprite(),x,y, 20,20);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
     }
@@ -140,7 +141,7 @@ public class HostOptionsScreen extends PanelVListScreen {
                 @Override
                 protected void init() {
                     panel.init();
-                    renderableVList.init(this,panel.x + 8,panel.y + 27,panel.width - 16,panel.height);
+                    renderableVList.init(this,panel.x + 8,panel.y + 27,panel.width - 16,panel.height - 16);
                 }
 
                 @Override
@@ -213,7 +214,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.hasSingleplayerServer()) return minecraft.getSingleplayerServer().getPlayerList().getPlayers().stream().map(Player::getGameProfile).toList();
         if (minecraft.player != null && !minecraft.player.connection.getOnlinePlayers().isEmpty())
-            return minecraft.player.connection.getOnlinePlayers().stream().sorted(Comparator.comparingInt((p -> minecraft.isLocalPlayer(p.getProfile().getId()) ? 0 : ((LegacyPlayerInfo)p).getPosition()))).map(PlayerInfo::getProfile).toList();
+            return minecraft.player.connection.getOnlinePlayers().stream().sorted(Comparator.comparingInt((p -> minecraft.isLocalPlayer(p.getProfile().getId()) ? 0 : ((LegacyPlayerInfo)p).getIdentifierIndex()))).map(PlayerInfo::getProfile).toList();
         return Collections.emptyList();
     }
 
@@ -222,7 +223,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         CommonNetwork.sendToServer(new PlayerInfoSync(0,minecraft.player));
         panel.init();
         addHostOptionsButton();
-        renderableVList.init(this,panel.x + 10,panel.y + 22,panel.width - 20,panel.height - 8);
+        renderableVList.init(this,panel.x + 10,panel.y + 22,panel.width - 20,panel.height - 20);
     }
     protected void addHostOptionsButton(){
         if (!minecraft.player.hasPermissions(2) && !minecraft.hasSingleplayerServer()) return;
@@ -236,7 +237,7 @@ public class HostOptionsScreen extends PanelVListScreen {
             @Override
             protected void init() {
                 panel.init();
-                renderableVList.init(this,panel.x + 8,panel.y + 8,panel.width - 16,panel.height);
+                renderableVList.init(this,panel.x + 8,panel.y + 8,panel.width - 16,panel.height - 16);
             }
             public void onClose() {
                 super.onClose();

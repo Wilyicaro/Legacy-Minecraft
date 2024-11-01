@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
@@ -318,9 +318,9 @@ public class SaveRenderableList extends RenderableVList {
                 }));
             } else {
                 SaveRenderableList.this.reloadSaveList();
-                if (((LegacyOptions)minecraft.options).directSaveLoad().get()){
+                if (LegacyOption.directSaveLoad.get()){
                     Legacy4JClient.copySaveBtwSources(LoadSaveScreen.getSummaryAccess(Minecraft.getInstance().getLevelSource(),summary),Legacy4JClient.currentWorldSource);
-                    LoadSaveScreen.loadWorld(screen,minecraft, Legacy4JClient.currentWorldSource,summary.getLevelId());
+                    LoadSaveScreen.loadWorld(screen,minecraft,Legacy4JClient.currentWorldSource,summary);
                 }else minecraft.setScreen(new LoadSaveScreen(screen, summary, Legacy4JClient.currentWorldSource){
                     @Override
                     public void onLoad() throws IOException {

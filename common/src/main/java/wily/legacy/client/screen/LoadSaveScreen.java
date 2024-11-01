@@ -38,6 +38,7 @@ import static wily.legacy.client.screen.ControlTooltip.*;
 
 public class LoadSaveScreen extends PanelBackgroundScreen {
     public static final Component GAME_MODEL_LABEL = Component.translatable("selectWorld.gameMode");
+    protected final boolean isLocked;
     public BiConsumer<GameRules, MinecraftServer> applyGameRules = (r,s)-> {};
     protected final LevelStorageSource.LevelStorageAccess access;
     protected final LegacySliderButton<GameType> gameTypeSlider;
@@ -49,13 +50,13 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     protected boolean changedGameType = false;
     public final LevelSummary summary;
     protected final Assort.Selector resourceAssortSelector;
-    protected Collection<String> originalSelectedPacks = Collections.emptyList();
     protected final TickBox onlineTickBox;
     protected final PublishScreen publishScreen;
     public static final List<GameType> GAME_TYPES = Arrays.stream(GameType.values()).toList();
 
-    public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access) {
+    public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean isLocked) {
         super(s-> new Panel(p-> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 160 : 0))) / 2, p-> (s.height - p.height) / 2 + 24,245,233), Component.translatable("legacy.menu.load_save.load"));
+        this.isLocked = isLocked;
         this.parent = screen;
         this.summary = summary;
         this.access = access;
@@ -68,11 +69,11 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
             button.selected = publishScreen.publish = false;
         });
         allowCommands = summary.hasCommands();
-        trustPlayers = ((LegacyClientWorldSettings)(Object)summary.getSettings()).trustPlayers();
-        resourceAssortSelector = Assort.Selector.resources(panel.x + 13, panel.y + 112, 220,45, !ScreenUtil.hasTooltipBoxes(),((LegacyClientWorldSettings)(Object)summary.getSettings()).getSelectedResourceAssort());
+        trustPlayers = LegacyClientWorldSettings.of(summary.getSettings()).trustPlayers();
+        (resourceAssortSelector = Assort.Selector.resources(panel.x + 13, panel.y + 112, 220,45, !ScreenUtil.hasTooltipBoxes(),LegacyClientWorldSettings.of(summary.getSettings()).getSelectedResourceAssort())).active = !this.isLocked;
     }
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource source) {
-        this(screen,summary, getSummaryAccess(source,summary));
+        this(screen,summary, getSummaryAccess(source,summary),false);
     }
     @Override
     public void addControlTooltips(Renderer renderer) {
@@ -94,7 +95,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     protected void init() {
         panel.init();
         gameTypeSlider.setPosition(panel.x + 13, panel.y + 65);
-        addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 90, 220,16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getObjectValue().getDisplayName()),b->Tooltip.create(difficulty.getInfo()), difficulty,()-> Arrays.asList(Difficulty.values()), b-> difficulty = b.getObjectValue())).active = !((LegacyClientWorldSettings)(Object)summary.getSettings()).isDifficultyLocked() && !summary.isHardcore();
+        addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 90, 220,16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getObjectValue().getDisplayName()),b->Tooltip.create(difficulty.getInfo()), difficulty,()-> Arrays.asList(Difficulty.values()), b-> difficulty = b.getObjectValue())).active = !LegacyClientWorldSettings.of(summary.getSettings()).isDifficultyLocked() && !summary.isHardcore();
         addRenderableWidget(Button.builder(Component.translatable( "createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(this))).bounds(panel.x + 13, panel.y + 178,220,20).build());
         Button loadButton = addRenderableWidget(Button.builder(Component.translatable("legacy.menu.load_save.load"), button -> {
             try {
@@ -122,20 +123,20 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
                 throw new RuntimeException(e);
             }
         });
-        resourceAssortSelector.applyResourceChanges(this::completeLoad);
-        if (!originalSelectedPacks.isEmpty()) Minecraft.getInstance().getResourcePackRepository().setSelected(originalSelectedPacks);
+        completeLoad();
     }
     private void completeLoad(){
-        loadWorld(this,minecraft,Legacy4JClient.currentWorldSource,access.getLevelId());
+        LegacyClientWorldSettings.of(summary.getSettings()).setSelectedResourceAssort(resourceAssortSelector.getSelectedAssort());
+        loadWorld(this,minecraft,Legacy4JClient.currentWorldSource,summary);
         Legacy4JClient.serverPlayerJoinConsumer = s-> {
             if (dimensionsToReset.contains(Level.END)) s.server.getLevel(Level.END).setDragonFight(new EndDragonFight(minecraft.getSingleplayerServer().getLevel(Level.END),minecraft.getSingleplayerServer().getWorldData().worldGenOptions().seed(), EndDragonFight.Data.DEFAULT));
             s.server.setDefaultGameType(gameTypeSlider.getObjectValue());
             s.server.setDifficulty(difficulty, false);
             applyGameRules.accept(s.server.getGameRules(), minecraft.getSingleplayerServer());
             publishScreen.publish((IntegratedServer) s.server);
-            ((LegacyClientWorldSettings)s.server.getWorldData()).setAllowCommands(allowCommands);
+            LegacyClientWorldSettings.of(s.server.getWorldData()).setAllowCommands(allowCommands);
             s.server.getPlayerList().sendPlayerPermissionLevel(s);
-            ((LegacyClientWorldSettings)s.server.getWorldData()).setSelectedResourceAssort(resourceAssortSelector.getSelectedAssort());
+            LegacyClientWorldSettings.of(s.server.getWorldData()).setSelectedResourceAssort(resourceAssortSelector.getSelectedAssort());
             if (changedGameType && summary.getGameMode() != gameTypeSlider.getObjectValue()) s.setGameMode(gameTypeSlider.getObjectValue());
         };
     }
@@ -204,11 +205,18 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         guiGraphics.drawString(font,summary.getLevelName(),panel.x + 48, panel.y + 12, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
         guiGraphics.drawString(font,Component.translatable("legacy.menu.load_save.created_in", (summary.hasCommands() ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()),panel.x + 48, panel.y + 29, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
         guiGraphics.pose().popPose();
-        guiGraphics.drawString(font,Component.translatable("commands.seed.success",((LegacyClientWorldSettings)(Object)summary.getSettings()).getDisplaySeed()),panel.x + 13, panel.y + 49, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+        if (!isLocked) guiGraphics.drawString(font,Component.translatable("commands.seed.success",LegacyClientWorldSettings.of(summary.getSettings()).getDisplaySeed()),panel.x + 13, panel.y + 49, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
     }
 
     public static void loadWorld(Screen screen, Minecraft minecraft, LevelStorageSource source, String levelId) {
+        try (LevelStorageSource.LevelStorageAccess access = source.createAccess(levelId)){
+            loadWorld(screen,minecraft,source,access.getSummary(access.getDataTag()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void loadWorld(Screen screen, Minecraft minecraft, LevelStorageSource source, LevelSummary summary) {
         SaveRenderableList.resetIconCache();
-        new WorldOpenFlows(minecraft,source).openWorld(levelId, ()-> minecraft.setScreen(screen));
+        Assort.Selector.applyResourceChanges(minecraft,Assort.getSelectedIds(minecraft.getResourcePackRepository()),LegacyClientWorldSettings.of(summary.getSettings()).getSelectedResourceAssort().packs(),()->new WorldOpenFlows(minecraft,source).openWorld(summary.getLevelId(), ()-> minecraft.setScreen(screen)));
     }
 }

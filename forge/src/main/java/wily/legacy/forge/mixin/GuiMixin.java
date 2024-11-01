@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
@@ -41,7 +42,7 @@ public abstract class GuiMixin {
     @Inject(method = "renderSelectedItemName(Lnet/minecraft/client/gui/GuiGraphics;I)V", at = @At("HEAD"), cancellable = true, remap = false)
     public void renderSelectedItemName(GuiGraphics guiGraphics, int shift, CallbackInfo ci) {
         ci.cancel();
-        if (minecraft.screen != null) return;
+        if (minecraft.screen != null || ScreenUtil.getSelectedItemTooltipLines() == 0) return;
         ScreenUtil.prepareHUDRender(guiGraphics);
         guiGraphics.pose().translate(0, -Math.max(shift, ScreenUtil.getHUDSize()),0);
         this.minecraft.getProfiler().push("selectedItemName");
@@ -49,10 +50,10 @@ public abstract class GuiMixin {
             List<Component> tooltipLines = this.lastToolHighlight.getTooltipLines(Item.TooltipContext.of(minecraft.level),minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).toList();
             for (int i = 0; i < tooltipLines.size(); i++) {
                 int l;
-                Component mutableComponent = i >= 4 ? MORE : tooltipLines.get(i);
+                Component mutableComponent = i >= ScreenUtil.getSelectedItemTooltipLines() - 1 && LegacyOption.itemTooltipEllipsis.get() ? MORE : tooltipLines.get(i);
                 int width = this.getFont().width(mutableComponent);
                 int j = (guiGraphics.guiWidth() - width) / 2;
-                int k = guiGraphics.guiHeight() - getFont().lineHeight * (Math.min(4,tooltipLines.size()) - 1 - i);
+                int k = guiGraphics.guiHeight() - getFont().lineHeight * (Math.min(ScreenUtil.getSelectedItemTooltipLines(),tooltipLines.size()) - 1 - i);
                 if ((l = (int)((float)this.toolHighlightTimer * 256.0f / 10.0f)) > 255) {
                     l = 255;
                 }
@@ -66,7 +67,7 @@ public abstract class GuiMixin {
                         guiGraphics.drawString(font, mutableComponent, j, k, 16777215 + (l << 24));
                     }
                 }
-                if (i >= 4) break;
+                if (i >= ScreenUtil.getSelectedItemTooltipLines() - 1) break;
             }
         }
         this.minecraft.getProfiler().pop();

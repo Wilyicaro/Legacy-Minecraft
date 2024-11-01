@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.player.PlayerYBobbing;
+import wily.legacy.entity.PlayerYBobbing;
 
 @Mixin(Player.class)
 public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing {

@@ -1,6 +1,7 @@
 package wily.legacy.mixin;
 
 import com.mojang.serialization.Dynamic;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.WorldDataConfiguration;
 import org.spongepowered.asm.mixin.Final;
@@ -21,17 +22,17 @@ public class ClientLevelSettingsMixin implements LegacyClientWorldSettings {
     boolean difficultyLocked = false;
     boolean trustPlayers = true;
 
-    Assort selectedResourceAssort = Assort.MINECRAFT;
+    String selectedResourceAssort = Assort.MINECRAFT.id();
     @Inject(method = "parse", at = @At("RETURN"))
     private static void parse(Dynamic<?> dynamic, WorldDataConfiguration worldDataConfiguration, CallbackInfoReturnable<LevelSettings> cir) {
-        ((LegacyClientWorldSettings) (Object)cir.getReturnValue()).setDifficultyLocked(dynamic.get("DifficultyLocked").asBoolean(false));
-        ((LegacyClientWorldSettings) (Object)cir.getReturnValue()).setTrustPlayers(dynamic.get("TrustPlayers").asBoolean(true));
-        ((LegacyClientWorldSettings) (Object)cir.getReturnValue()).setDisplaySeed(dynamic.get("WorldGenSettings").orElseEmptyMap().get("seed").asLong(0));
-        ((LegacyClientWorldSettings) (Object)cir.getReturnValue()).setSelectedResourceAssort(Assort.resourceById(dynamic.get("SelectedResourceAssort").asString(Assort.MINECRAFT.id())));
+        LegacyClientWorldSettings.of(cir.getReturnValue()).setDifficultyLocked(dynamic.get("DifficultyLocked").asBoolean(false));
+        LegacyClientWorldSettings.of(cir.getReturnValue()).setTrustPlayers(dynamic.get("TrustPlayers").asBoolean(true));
+        LegacyClientWorldSettings.of(cir.getReturnValue()).setDisplaySeed(dynamic.get("WorldGenSettings").orElseEmptyMap().get("seed").asLong(0));
+        LegacyClientWorldSettings.of(cir.getReturnValue()).setSelectedResourceAssort(Assort.resourceById(dynamic.get("SelectedResourceAssort").asString(Assort.MINECRAFT.id())));
     }
     @Inject(method = "copy", at = @At("RETURN"))
     private void copy(CallbackInfoReturnable<LevelSettings> cir) {
-        LegacyClientWorldSettings settings = ((LegacyClientWorldSettings) (Object)cir.getReturnValue());
+        LegacyClientWorldSettings settings = LegacyClientWorldSettings.of(cir.getReturnValue());
         settings.setDifficultyLocked(isDifficultyLocked());
         settings.setTrustPlayers(trustPlayers());
         settings.setDisplaySeed(getDisplaySeed());
@@ -73,11 +74,11 @@ public class ClientLevelSettingsMixin implements LegacyClientWorldSettings {
 
     @Override
     public void setSelectedResourceAssort(Assort assort) {
-        selectedResourceAssort = assort;
+        selectedResourceAssort = assort.id();
     }
 
     @Override
     public Assort getSelectedResourceAssort() {
-        return selectedResourceAssort;
+        return Assort.resourceById(selectedResourceAssort);
     }
 }

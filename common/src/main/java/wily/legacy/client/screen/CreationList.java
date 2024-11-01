@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 public class CreationList extends RenderableVList{
-    static final String TUTORIAL_FOLDER_NAME = "Tutorial";
     private PlayGameScreen screen;
     protected final Minecraft minecraft;
 
@@ -30,16 +29,12 @@ public class CreationList extends RenderableVList{
         layoutSpacing(l->0);
         minecraft = Minecraft.getInstance();
         addIconButton(this,ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"creation_list/create_world"),Component.translatable("legacy.menu.create_world"), c-> CreateWorldScreen.openFresh(this.minecraft, screen));
-        LegacyWorldTemplate.list.forEach(t-> addIconButton(this,t.icon(),t.buttonName(), c-> {
-            try {
-                String name = Legacy4JClient.importSaveFile(minecraft.getResourceManager().getResourceOrThrow(t.worldTemplate()).open(), minecraft.getLevelSource()::levelExists,Legacy4JClient.currentWorldSource,t.folderName());
-                if (t.directJoin()) LoadSaveScreen.loadWorld(screen,minecraft,Legacy4JClient.currentWorldSource,name);
-                else {
-                    LevelStorageSource.LevelStorageAccess access = Legacy4JClient.currentWorldSource.createAccess(name);
-                    LevelSummary summary = access.getSummary(access.getDataTag());
-                    access.close();
-                    minecraft.setScreen(new LoadSaveScreen(screen,summary,access));
-                }
+        LegacyWorldTemplate.list.forEach(t-> addIconButton(this,t.icon(),t.buttonMessage(), c-> {
+            try (LevelStorageSource.LevelStorageAccess access = Legacy4JClient.currentWorldSource.createAccess(Legacy4JClient.importSaveFile(minecraft.getResourceManager().getResourceOrThrow(t.worldTemplate()).open(), minecraft.getLevelSource()::levelExists,Legacy4JClient.currentWorldSource,t.folderName()))) {
+                LevelSummary summary = access.getSummary(access.getDataTag());
+                access.close();
+                if (t.directJoin()) LoadSaveScreen.loadWorld(screen,minecraft,Legacy4JClient.currentWorldSource,summary);
+                else minecraft.setScreen(new LoadSaveScreen(screen,summary,access,t.isLocked()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -85,10 +80,5 @@ public class CreationList extends RenderableVList{
         });
         button.setTooltip(tooltip);
     }
-
-    public PlayGameScreen getScreen() {
-        return this.screen;
-    }
-
 
 }

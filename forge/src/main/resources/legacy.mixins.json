@@ -5,9 +5,8 @@
   "client": [
     "EditBoxMixin",
     "GuiMixin",
-    "LiquidBlockRendererMixin",
-    "MinecraftMixin",
-    "TooltipRenderUtilMixin"
+    "ForgeModMixin",
+    "MinecraftMixin"
   ],
   "mixins": [
     "ItemStackMixin"

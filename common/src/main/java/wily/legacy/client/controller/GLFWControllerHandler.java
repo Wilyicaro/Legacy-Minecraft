@@ -9,11 +9,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class GLFWControllerHandler implements Controller.Handler{
     private boolean init = false;
-    GLFWGamepadState gamepadState;
 
     @Override
     public String getName() {
@@ -25,7 +26,6 @@ public class GLFWControllerHandler implements Controller.Handler{
     }
 
     private static final GLFWControllerHandler INSTANCE = new GLFWControllerHandler();
-
 
     public static GLFWControllerHandler getInstance(){
         return INSTANCE;
@@ -45,17 +45,9 @@ public class GLFWControllerHandler implements Controller.Handler{
     }
 
     @Override
-    public void setup(ControllerManager manager) {
-        gamepadState = GLFWGamepadState.calloc();
-        if (GLFW.glfwGetGamepadState(ScreenUtil.getLegacyOptions().selectedController().get(), gamepadState))
-            manager.updateBindings();
-        gamepadState.free();
-    }
-
-    @Override
     public Controller getController(int jid) {
-
         return new Controller() {
+            GLFWGamepadState gamepadState;
             String name;
             @Override
             public String getName() {
@@ -89,12 +81,11 @@ public class GLFWControllerHandler implements Controller.Handler{
             }
 
             @Override
-            public boolean hasLED() {
-                return false;
-            }
-
-            @Override
-            public void setLED(byte r, byte g, byte b) {
+            public void manageBindings(Runnable run) {
+                gamepadState = GLFWGamepadState.calloc();
+                if (GLFW.glfwGetGamepadState(jid, gamepadState))
+                    Controller.super.manageBindings(run);
+                gamepadState.free();
             }
         };
     }

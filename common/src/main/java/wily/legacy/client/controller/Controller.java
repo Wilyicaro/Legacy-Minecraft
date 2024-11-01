@@ -21,13 +21,34 @@ public interface Controller {
     ControlType getType();
     boolean buttonPressed(int i);
     float axisValue(int i);
-    boolean hasLED();
-    void setLED(byte r, byte g, byte b);
+    default boolean hasLED(){
+        return false;
+    }
+    default void setLED(byte r, byte g, byte b){}
     default void connect(ControllerManager manager){
+        manager.isControllerTheLastInput = true;
         if (!manager.isCursorDisabled && manager.minecraft.screen != null) manager.minecraft.execute(()-> manager.minecraft.screen.repositionElements());
         manager.minecraft.getToasts().addToast(new LegacyTip(CONTROLLER_DETECTED, Component.literal(getName())).disappearTime(4500));
     }
+
+    default void rumble(short low_frequency_rumble, short high_frequency_rumble, int duration_ms){}
+
+    default void rumbleTriggers(short left_rumble, short right_rumble, int duration_ms){}
+
+    default int getTouchpadsCount(){
+        return 0;
+    }
+
+    default int getTouchpadFingersCount(int touchpad){
+        return 0;
+    }
+
+    default boolean hasFingerInTouchpad(int touchpad, int finger, Byte state, Float x, Float y, Float pressure){
+        return false;
+    }
+
     default void disconnect(ControllerManager manager){
+        manager.isControllerTheLastInput = false;
         if (manager.isCursorDisabled && manager.getCursorMode() != 2) manager.enableCursor();
         manager.updateBindings(Controller.EMPTY);
         manager.connectedController = null;
@@ -51,12 +72,7 @@ public interface Controller {
             return 0;
         }
         @Override
-        public boolean hasLED() {
-            return false;
-        }
-        @Override
-        public void setLED(byte r, byte g, byte b) {
-
+        public void manageBindings(Runnable run) {
         }
     };
     interface Handler {
@@ -70,7 +86,9 @@ public interface Controller {
 
         void init();
         boolean update();
-        void setup(ControllerManager manager);
+        default void setup(ControllerManager manager) {
+            manager.connectedController.manageBindings(manager::updateBindings);
+        }
         Controller getController(int jid);
         boolean isValidController(int jid);
         int getBindingIndex(ControllerBinding component);
@@ -118,6 +136,11 @@ public interface Controller {
             }
         };
     }
+
+    default void manageBindings(Runnable run){
+        run.run();
+    }
+
     interface Event {
         Event EMPTY = new Event() {};
 
@@ -128,6 +151,7 @@ public interface Controller {
         default void controllerTick(Controller controller){
 
         }
+
         default void bindingStateTick(BindingState state){
 
         }

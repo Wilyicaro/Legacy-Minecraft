@@ -16,6 +16,7 @@ import net.minecraft.util.FormattedCharSequence;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.util.Offset;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.ControllerBinding;
@@ -33,7 +34,7 @@ import java.util.stream.StreamSupport;
 
 import static wily.legacy.client.screen.ControlTooltip.*;
 
-public class LegacyAdvancementsScreen extends PanelBackgroundScreen{
+public class LegacyAdvancementsScreen extends PanelBackgroundScreen {
     public static final Component TITLE = Component.translatable("gui.advancements");
     protected final Stocker.Sizeable page = new Stocker.Sizeable(0);
     protected final TabList tabList = new TabList(new PagedList<>(page,10));
@@ -143,7 +144,7 @@ public class LegacyAdvancementsScreen extends PanelBackgroundScreen{
             b.setWidth(45);
             b.offset = (t1) -> new Offset(-1 * tabList.tabButtons.indexOf(b), t1.selected ? 0 : 4.5, 0);
         });
-        if (renderableVLists.containsKey(selectedRoot)) renderableVLists.get(selectedRoot).init(this,panel.x + 17, panel.y + 55, 420,196);
+        if (renderableVLists.containsKey(selectedRoot)) renderableVLists.get(selectedRoot).init(this,panel.x + 17, panel.y + 55, 416,176);
     }
 
     @Override
@@ -176,14 +177,14 @@ public class LegacyAdvancementsScreen extends PanelBackgroundScreen{
     @Override
     public void added() {
         super.added();
-        oldLegacyTooltipsValue =ScreenUtil.getLegacyOptions().legacyItemTooltips().get();
-        ScreenUtil.getLegacyOptions().legacyItemTooltips().set(false);
+        oldLegacyTooltipsValue = LegacyOption.legacyItemTooltips.get();
+        LegacyOption.legacyItemTooltips.set(false);
     }
 
     @Override
     public void removed() {
         super.removed();
-        ScreenUtil.getLegacyOptions().legacyItemTooltips().set(oldLegacyTooltipsValue);
+        LegacyOption.legacyItemTooltips.set(oldLegacyTooltipsValue);
     }
     @Override
     public void setTooltipForNextRenderPass(List<FormattedCharSequence> list, ClientTooltipPositioner clientTooltipPositioner, boolean bl) {

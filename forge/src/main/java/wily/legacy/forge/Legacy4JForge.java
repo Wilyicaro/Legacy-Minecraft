@@ -45,14 +45,16 @@ public class Legacy4JForge {
     public static Channel<CustomPacketPayload> NETWORK;
 
     public Legacy4JForge() {
+
         MOD_EVENT_BUS = FMLJavaModLoadingContext.get().getModEventBus();
-        PayloadFlow<RegistryFriendlyByteBuf,CustomPacketPayload> flow =ChannelBuilder.named(Legacy4J.MOD_ID).payloadChannel().play().serverbound();
+        PayloadFlow<RegistryFriendlyByteBuf,CustomPacketPayload> flow = ChannelBuilder.named(Legacy4J.MOD_ID).payloadChannel().play().bidirectional();
         CommonNetwork.registerPayloads(new CommonNetwork.PayloadRegister() {
             @Override
             public <T extends CustomPacketPayload> void register(boolean client, CustomPacketPayload.Type<T> type, StreamCodec<RegistryFriendlyByteBuf, T> codec, CommonNetwork.Consumer<T> apply) {
-                if (client) flow.serverbound().add(type,codec,(m,c)-> apply.apply(m,Legacy4J.SECURE_EXECUTOR,c::getSender));
-                else flow.clientbound().add(type,codec,(m,c)-> apply.apply(m,Legacy4JClient.SECURE_EXECUTOR,Legacy4JForgeClient::getClientPlayer)).build();
+                if (client) flow.serverbound().addMain(type,codec,(m,c)-> apply.apply(m,Legacy4J.SECURE_EXECUTOR,c::getSender));
+                else flow.clientbound().addMain(type,codec,(m,c)-> apply.apply(m,Legacy4JClient.SECURE_EXECUTOR,Legacy4JForgeClient::getClientPlayer));
             }
+
         });
         NETWORK = flow.build();
 
@@ -63,16 +65,14 @@ public class Legacy4JForge {
             if (e.getLevel() instanceof ServerLevel l) Legacy4J.serverSave(l.getServer());
         });
         MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false, RegisterCommandsEvent.class, e-> Legacy4J.registerCommands(e.getDispatcher(),e.getBuildContext(),e.getCommandSelection()));
+        MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL,false, GatherComponentsEvent.class, e-> Legacy4J.changeItemDefaultComponents((i,b)->{
+            if (e.getOwner() == i) b.accept(e::register);
+        }));
         Legacy4J.init();
 
         if (FMLEnvironment.dist == Dist.CLIENT) Legacy4JForgeClient.init();
     }
-    @SubscribeEvent
-    public static void modifyItemDefaultComponents(GatherComponentsEvent event) {
-        Legacy4J.changeItemDefaultComponents((i,b)->{
-            if (event.getOwner() == i) b.accept(event::register);
-        });
-    }
+
     @SubscribeEvent
     public static void setup(FMLCommonSetupEvent event) {
         Legacy4J.setup();

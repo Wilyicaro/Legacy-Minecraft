@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.init.LegacyRegistries;
@@ -207,7 +208,7 @@ public abstract class RecipeIconHolder<R extends Recipe<?>> extends LegacyIconHo
                 craft();
                 updateRecipeDisplay(getFocusedRecipe());
             }else {
-                if (minecraft.player.containerMenu instanceof LegacyCraftingMenu m && !m.showedNotEnoughIngredientsHint && ScreenUtil.getLegacyOptions().hints().get()){
+                if (minecraft.player.containerMenu instanceof LegacyCraftingMenu m && !m.showedNotEnoughIngredientsHint && LegacyOption.hints.get()){
                     m.showedNotEnoughIngredientsHint = true;
                     LegacyTipManager.setActualTip(new LegacyTip(CommonComponents.EMPTY,NOT_ENOUGH_INGREDIENTS));
                 }

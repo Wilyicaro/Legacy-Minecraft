@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import wily.legacy.inventory.LegacyCraftingMenu;
-import wily.legacy.player.LegacyPlayer;
+import wily.legacy.entity.LegacyPlayer;
 
 @Mixin(StonecutterBlock.class)
 public class StonecutterBlockMixin {

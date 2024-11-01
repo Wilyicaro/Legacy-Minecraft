@@ -81,7 +81,7 @@ public class ChooseUserScreen extends PanelVListScreen {
             guiGraphics.blitSprite(LegacySprites.PANEL_RECESS,panel.getX() + 10, panel.getY() + 13, panel.getWidth() - 20, panel.getHeight() - 26);
             guiGraphics.drawString(font,getTitle(),panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panel.y + 20, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         }));
-        renderableVList.init(this,panel.x + 15,panel.y + 32,panel.width - 30,panel.height - 32);
+        renderableVList.init(this,panel.x + 15,panel.y + 32,panel.width - 30,panel.height - 34);
     }
 
     public static ConfirmationScreen passwordScreen(Screen parent, Consumer<String> pass){

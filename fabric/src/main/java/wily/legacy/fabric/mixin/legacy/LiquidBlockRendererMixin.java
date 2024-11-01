@@ -1,4 +1,4 @@
-package wily.legacy.fabric.mixin;
+package wily.legacy.fabric.mixin.legacy;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;

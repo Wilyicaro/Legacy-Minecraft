@@ -1,4 +1,4 @@
-package wily.legacy.fabric.mixin;
+package wily.legacy.fabric.mixin.legacy;
 
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
 import net.minecraft.resources.ResourceKey;

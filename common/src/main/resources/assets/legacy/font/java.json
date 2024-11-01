@@ -1059,6 +1059,20 @@
         },
         {
             "type": "bitmap",
+            "file": "legacy:component/kbm/enter_key.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u0335"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/enter_key_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\u1335"]
+        },
+        {
+            "type": "bitmap",
             "file": "legacy:component/kbm/left_shift_key.png",
             "ascent": 11,
             "height": 15,

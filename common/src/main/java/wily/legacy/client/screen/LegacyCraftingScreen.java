@@ -29,10 +29,7 @@ import net.minecraft.world.level.block.entity.*;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.Legacy4JPlatform;
-import wily.legacy.client.CommonColor;
-import wily.legacy.client.ControlType;
-import wily.legacy.client.LegacyCraftingTabListing;
-import wily.legacy.client.LegacyTipManager;
+import wily.legacy.client.*;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.inventory.DataComponentIngredient;
 import wily.legacy.inventory.LegacyIngredient;
@@ -144,7 +141,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             craftingTabList.addTabButton(43,0,listing.icon,listing.displayName, t->resetElements());
 
         }
-        if (ScreenUtil.getLegacyOptions().vanillaTabs().get()) manager.getAllRecipesFor(RecipeType.CRAFTING).stream().collect(Collectors.groupingBy(h->h.value().category(),()->new TreeMap<>(Comparator.comparingInt(Enum::ordinal)),Collectors.groupingBy(h->h.value().getGroup().isEmpty() ? h.id().toString() : h.value().getGroup()))).forEach((category, m)->{
+        if (LegacyOption.vanillaTabs.get()) manager.getAllRecipesFor(RecipeType.CRAFTING).stream().collect(Collectors.groupingBy(h->h.value().category(),()->new TreeMap<>(Comparator.comparingInt(Enum::ordinal)),Collectors.groupingBy(h->h.value().getGroup().isEmpty() ? h.id().toString() : h.value().getGroup()))).forEach((category, m)->{
             if (m.isEmpty()) return;
             List<List<RecipeHolder<CraftingRecipe>>> groups = new ArrayList<>();
             m.values().forEach(l->{
@@ -364,7 +361,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                     List<FormattedCharSequence> l = font.split(LegacyTipManager.getTipComponent(h.getFocusedResult()), 152);
                     scrollableRenderer.scrolled.max = Math.max(0,l.size()-7);
                     guiGraphics.pose().translate(-leftPos,-topPos,0);
-                    scrollableRenderer.render(guiGraphics,leftPos + 181, topPos + 108,152,80,()->{
+                    scrollableRenderer.render(guiGraphics,leftPos + 181, topPos + 105,152,80,()->{
                         for (int i1 = 0; i1 < l.size(); i1++)
                             guiGraphics.drawString(font, l.get(i1), leftPos + 181, topPos + 108 + i1 * 12, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
                     });

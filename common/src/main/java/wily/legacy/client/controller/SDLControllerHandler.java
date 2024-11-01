@@ -1,9 +1,12 @@
 package wily.legacy.client.controller;
 
+import com.sun.jna.ptr.ByteByReference;
+import com.sun.jna.ptr.FloatByReference;
 import dev.isxander.sdl3java.api.SdlInit;
 import dev.isxander.sdl3java.api.SdlSubSystemConst;
 import dev.isxander.sdl3java.api.gamepad.*;
 import dev.isxander.sdl3java.api.joystick.SDL_JoystickID;
+import dev.isxander.sdl3java.api.joystick.SdlJoystick;
 import dev.isxander.sdl3java.api.version.SdlVersionConst;
 import dev.isxander.sdl3java.jna.SdlNativeLibraryLoader;
 import net.minecraft.Util;
@@ -14,7 +17,7 @@ import net.minecraft.network.chat.Component;
 import org.apache.commons.io.FileUtils;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.ControlType;
-import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.LegacyLoadingScreen;
 
@@ -56,7 +59,7 @@ public class SDLControllerHandler implements Controller.Handler{
             if (!nativesFile.exists()){
                 minecraft.executeBlocking(()-> {
                     Screen s = minecraft.screen;
-                    ((LegacyOptions)minecraft.options).selectedControllerHandler().set(ControllerManager.handlers.indexOf(GLFWControllerHandler.getInstance()));
+                    LegacyOption.selectedControllerHandler.set(ControllerManager.handlers.indexOf(GLFWControllerHandler.getInstance()));
                     minecraft.options.save();
                     minecraft.setScreen(new ConfirmationScreen(s, Component.translatable("legacy.menu.download_natives",getName()), Controller.Handler.DOWNLOAD_MESSAGE, b -> {
                         AtomicLong fileSize = new AtomicLong(1);
@@ -64,7 +67,7 @@ public class SDLControllerHandler implements Controller.Handler{
                             @Override
                             public void tick() {
                                 if (progress == 100) {
-                                    ((LegacyOptions)minecraft.options).selectedControllerHandler().set(ControllerManager.handlers.indexOf(getInstance()));
+                                    LegacyOption.selectedControllerHandler.set(ControllerManager.handlers.indexOf(getInstance()));
                                     minecraft.options.save();
                                     minecraft.setScreen(s);
                                     return;
@@ -117,12 +120,9 @@ public class SDLControllerHandler implements Controller.Handler{
     public boolean update() {
         if (!init) return false;
         SdlGamepad.SDL_UpdateGamepads();
+        SdlJoystick.SDL_UpdateJoysticks();
+        actualIds = SdlGamepad.SDL_GetGamepads();
         return true;
-    }
-
-    @Override
-    public void setup(ControllerManager manager) {
-        manager.updateBindings();
     }
 
     @Override
@@ -172,6 +172,30 @@ public class SDLControllerHandler implements Controller.Handler{
             }
 
             @Override
+            public void rumble(short low_frequency_rumble, short high_frequency_rumble, int duration_ms){
+                SdlGamepad.SDL_RumbleGamepad(controller,low_frequency_rumble,high_frequency_rumble,duration_ms);
+            }
+            @Override
+            public void rumbleTriggers(short left_rumble, short right_rumble, int duration_ms){
+                SdlGamepad.SDL_RumbleGamepadTriggers(controller,left_rumble,right_rumble,duration_ms);
+            }
+
+            @Override
+            public int getTouchpadsCount(){
+                return SdlGamepad.SDL_GetNumGamepadTouchpads(controller);
+            }
+
+            @Override
+            public int getTouchpadFingersCount(int touchpad){
+                return SdlGamepad.SDL_GetNumGamepadTouchpadFingers(controller,touchpad);
+            }
+
+            @Override
+            public boolean hasFingerInTouchpad(int touchpad, int finger, Byte state, Float x, Float y, Float pressure){
+                return SdlGamepad.SDL_GetGamepadTouchpadFinger(controller,touchpad,finger,state == null ? null : new ByteByReference(state),x == null ? null : new FloatByReference(x),y == null ? null : new FloatByReference(y),pressure == null ? null : new FloatByReference(pressure)) == 1;
+            }
+
+            @Override
             public void disconnect(ControllerManager manager) {
                 Controller.super.disconnect(manager);
                 SdlGamepad.SDL_CloseGamepad(controller);
@@ -181,7 +205,6 @@ public class SDLControllerHandler implements Controller.Handler{
 
     @Override
     public boolean isValidController(int jid) {
-        actualIds = SdlGamepad.SDL_GetGamepads();
         if (actualIds.length <= jid) return false;
         return SdlGamepad.SDL_IsGamepad(actualIds[jid]);
     }

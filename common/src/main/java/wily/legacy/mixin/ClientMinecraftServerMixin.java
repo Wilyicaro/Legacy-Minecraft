@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.ScreenUtil;
 
@@ -39,17 +40,17 @@ public abstract class ClientMinecraftServerMixin {
 
     @Inject(method = "computeNextAutosaveInterval", at = @At("RETURN"), cancellable = true)
     private void tickServer(CallbackInfoReturnable<Integer> cir){
-        cir.setReturnValue(ScreenUtil.getLegacyOptions().autoSaveInterval().get() > 0 ? ScreenUtil.getLegacyOptions().autoSaveInterval().get() * cir.getReturnValue() : 1);
+        cir.setReturnValue(LegacyOption.autoSaveInterval.get() > 0 ? LegacyOption.autoSaveInterval.get() * cir.getReturnValue() : 1);
     }
     @Inject(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;ticksUntilAutosave:I", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER))
     private void tickServer(BooleanSupplier booleanSupplier, CallbackInfo ci){
-        if (ScreenUtil.getLegacyOptions().autoSaveInterval().get() > 0 && ticksUntilAutosave >= 0 && ticksUntilAutosave <= 100) {
+        if (LegacyOption.autoSaveInterval.get() > 0 && ticksUntilAutosave >= 0 && ticksUntilAutosave <= 100) {
             if (ticksUntilAutosave % 20 == 0) TopMessage.medium = Component.translatable("legacy.menu.autosave_countdown", ticksUntilAutosave / 20).withColor(CommonColor.INVENTORY_GRAY_TEXT.get());
         }else TopMessage.medium = null;
     }
     @Redirect(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;ticksUntilAutosave:I", opcode = Opcodes.GETFIELD, ordinal = 1))
     private int tickServer(MinecraftServer instance){
-        return ScreenUtil.getLegacyOptions().autoSaveInterval().get() > 0 && !Minecraft.getInstance().isDemo() ? ticksUntilAutosave : 1;
+        return LegacyOption.autoSaveInterval.get() > 0 && !Minecraft.getInstance().isDemo() ? ticksUntilAutosave : 1;
     }
     @Inject(method = "stopServer", at = @At("RETURN"))
     private void stopServer(CallbackInfo ci){

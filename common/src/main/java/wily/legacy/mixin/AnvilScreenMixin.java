@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.client.CommonColor;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
@@ -64,16 +65,16 @@ public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
         int k = this.menu.getCost();
         if (k > 0) {
             Component component;
-            int l = 8453920;
+            int l = CommonColor.EXPERIENCE_TEXT.get();
             if (k >= 40 && !this.minecraft.player.getAbilities().instabuild) {
                 component = TOO_EXPENSIVE_TEXT;
-                l = 0xFF6060;
+                l = CommonColor.ANVIL_ERROR_TEXT.get();
             } else if (!this.menu.getSlot(2).hasItem()) {
                 component = null;
             } else {
                 component = Component.translatable("container.repair.cost", k);
                 if (!this.menu.getSlot(2).mayPickup(this.player)) {
-                    l = 0xFF6060;
+                    l = CommonColor.ANVIL_ERROR_TEXT.get();
                 }
             }
             if (component != null) {

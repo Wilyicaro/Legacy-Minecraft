@@ -1,4 +1,4 @@
-package wily.legacy.fabric.mixin;
+package wily.legacy.fabric.mixin.legacy;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.ItemStack;

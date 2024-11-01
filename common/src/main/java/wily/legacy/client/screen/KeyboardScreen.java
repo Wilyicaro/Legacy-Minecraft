@@ -127,28 +127,27 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     public static boolean isOpenKey(int i){
-        return CommonInputs.selected(i) && i != InputConstants.KEY_SPACE;
-    }
-    public static KeyboardScreen fromEditBox(int ordinal, Screen parent){
-        return new KeyboardScreen(()->getScreenActualEditBox(ordinal,parent),parent);
+        return i == InputConstants.KEY_NUMPADENTER && !Legacy4JClient.controllerManager.isControllerTheLastInput || i == InputConstants.KEY_RETURN && Legacy4JClient.controllerManager.isControllerTheLastInput;
     }
 
-    public static EditBox getScreenActualEditBox(int ordinal, Screen screen){
-        return ordinal < screen.children().size() && screen.children.get(ordinal) instanceof EditBox e ? e : null;
+    public static KeyboardScreen fromStaticListener(GuiEventListener listener, Screen parent){
+        return new KeyboardScreen(()->listener,parent);
     }
+
     @Override
     protected void init() {
-        if (parent != null) {
-            parent.resize(minecraft, width, height);
-            parent.setFocused(listenerSupplier.get());
-        }
         panel.init();
         panel.setX(panel.getX() + xDiff);
         panel.setY(panel.getY() + yDiff);
-        renderableVList.init(this, panel.getX() + (panel.getWidth() - 259) / 2,panel.getY() + 28,268,135);
+        renderableVList.init(this, panel.getX() + (panel.getWidth() - 259) / 2,panel.getY() + 28,268,124);
         leftKeyBar.init(this, panel.getX() + 6,panel.getY() + 27,50,0);
         rightKeyBar.init(this, panel.getX() + panel.getWidth() - 56,panel.getY() + 27,50,0);
         if (getFocused() == null && !renderableVList.renderables.isEmpty() && renderableVList.renderables.get(0) instanceof GuiEventListener l) setFocused(l);
+    }
+
+    @Override
+    public void resize(Minecraft minecraft, int i, int j) {
+        onClose();
     }
 
     @Override

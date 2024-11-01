@@ -22,6 +22,7 @@ import net.minecraftforge.fml.loading.LoadingModList;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
 import net.minecraftforge.forgespi.language.IModFileInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
@@ -183,10 +184,10 @@ public class Legacy4JPlatformImpl {
 
 
     public static<T extends CustomPacketPayload> void sendToPlayer(ServerPlayer serverPlayer, T packetHandler) {
-        Legacy4JForge.NETWORK.send(packetHandler, serverPlayer.connection.getConnection());
+        Legacy4JForge.NETWORK.send(packetHandler, PacketDistributor.PLAYER.with(serverPlayer));
     }
     public static<T extends CustomPacketPayload> void sendToServer(T packetHandler) {
-        Legacy4JForgeClient.sendToServer(packetHandler);
+        Legacy4JForge.NETWORK.send(packetHandler,PacketDistributor.SERVER.noArg());
     }
 
     public static Fluid getBucketFluid(BucketItem item) {

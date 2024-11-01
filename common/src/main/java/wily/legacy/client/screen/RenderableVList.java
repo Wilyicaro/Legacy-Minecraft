@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public class RenderableVList {
     protected final Stocker<Integer> scrolledList = Stocker.of(0);
@@ -60,7 +61,10 @@ public class RenderableVList {
         return addOptions(-1,optionInstances);
     }
     public RenderableVList addOptions(int indexOffset, OptionInstance<?>... optionInstances){
-        return addRenderables(indexOffset,Arrays.stream(optionInstances).map(i-> i.createButton(Minecraft.getInstance().options, 0,0,0)).toList().toArray(AbstractWidget[]::new));
+        return addOptions(indexOffset,Arrays.stream(optionInstances));
+    }
+    public RenderableVList addOptions(int indexOffset, Stream<OptionInstance<?>> optionInstances){
+        return addRenderables(indexOffset,optionInstances.map(i-> i.createButton(Minecraft.getInstance().options, 0,0,0)).toList().toArray(AbstractWidget[]::new));
     }
     public RenderableVList layoutSpacing(Function<LayoutElement,Integer> layoutSeparation){
         this.layoutSeparation = layoutSeparation;
@@ -76,9 +80,9 @@ public class RenderableVList {
         boolean allowScroll = listHeight > 0;
         if (allowScroll) screen.renderables.add(((guiGraphics, i, j, f) -> {
             if (scrolledList.get() > 0)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, leftPos + listWidth - 40, topPos + listHeight - 27);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, leftPos + listWidth - 29, topPos + listHeight - 8);
             if (canScrollDown)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN,leftPos+ listWidth - 24, topPos + listHeight - 27);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN,leftPos+ listWidth - 13, topPos + listHeight - 8);
         }));
         canScrollDown = false;
         int yDiff = 0;
@@ -88,7 +92,7 @@ public class RenderableVList {
             int x = leftPos + xDiff;
             int y = topPos + yDiff;
             Renderable r = renderables.get(i);
-            if (!allowScroll || !(r instanceof LayoutElement l) || y + l.getHeight() + 30 <= topPos + listHeight) {
+            if (!allowScroll || !(r instanceof LayoutElement l) || y + l.getHeight() + (i == renderables.size() - 1 && scrolledList.get() == 0 ? 0 : 12) <= topPos + listHeight) {
                 if (r instanceof LayoutElement l) {
                     l.setX(x);
                     l.setY(y);

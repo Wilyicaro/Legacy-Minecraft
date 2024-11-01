@@ -19,6 +19,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
@@ -250,6 +251,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         generator.getLayersInfo().set(generator.getLayersInfo().size() - 1 - selectedIndex,aimLayer);
         generator.getLayersInfo().set(generator.getLayersInfo().size() - 1 - aimIndex,selectedLayer);
         repositionElements();
+        ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
     }
     @Override
     public void setTooltipForNextRenderPass(Tooltip tooltip, ClientTooltipPositioner clientTooltipPositioner, boolean bl) {

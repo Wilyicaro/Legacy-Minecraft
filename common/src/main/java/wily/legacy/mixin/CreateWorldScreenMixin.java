@@ -32,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.client.LegacyClientWorldSettings;
 import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacyRegistries;
@@ -68,7 +68,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
     @Inject(method = "<init>",at = @At("RETURN"))
     public void initReturn(Minecraft minecraft, Screen screen, WorldCreationContext worldCreationContext, Optional optional, OptionalLong optionalLong, CallbackInfo ci){
-        uiState.setDifficulty(((LegacyOptions)minecraft.options).createWorldDifficulty().get());
+        uiState.setDifficulty(LegacyOption.createWorldDifficulty.get());
         panel = new Panel(p-> (width - (p.width + (ScreenUtil.hasTooltipBoxes() ? 160 : 0))) / 2, p-> (height - p.height) / 2,245,228);
         resourceAssortSelector = Assort.Selector.resources(panel.x + 13, panel.y + 106, 220,45, !ScreenUtil.hasTooltipBoxes());
         publishScreen = new PublishScreen(this, uiState.getGameMode().gameType);
@@ -126,15 +126,16 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         boolean bl = lifecycle2 == Lifecycle.stable();
         confirmWorldCreation(this.minecraft, self(), lifecycle3, ()-> {
             this.createNewWorld(complete.specialWorldProperty(), layeredRegistryAccess, lifecycle3);
-            resourceAssortSelector.applyResourceChanges(this::onLoad);
+            resourceAssortSelector.applyChanges(true);
+            onLoad();
         }, bl);
     }
     private void onLoad() {
         Legacy4JClient.serverPlayerJoinConsumer = s->{
-            ((LegacyClientWorldSettings)s.server.getWorldData()).setTrustPlayers(trustPlayers);
+            LegacyClientWorldSettings.of(s.server.getWorldData()).setTrustPlayers(trustPlayers);
             s.server.getPlayerList().sendPlayerPermissionLevel(s);
             publishScreen.publish((IntegratedServer) s.server);
-            ((LegacyClientWorldSettings)minecraft.getSingleplayerServer().getWorldData()).setSelectedResourceAssort(resourceAssortSelector.getSelectedAssort());
+            LegacyClientWorldSettings.of(minecraft.getSingleplayerServer().getWorldData()).setSelectedResourceAssort(resourceAssortSelector.getSelectedAssort());
         };
     }
     @Redirect(method = "createNewWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;createWorldOpenFlows()Lnet/minecraft/client/gui/screens/worldselection/WorldOpenFlows;"))

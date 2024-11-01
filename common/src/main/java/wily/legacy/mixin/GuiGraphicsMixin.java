@@ -16,7 +16,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.joml.Matrix4f;
 import org.joml.Vector2ic;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -30,6 +29,7 @@ import wily.legacy.client.LegacyTipManager;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -49,6 +49,15 @@ public abstract class GuiGraphicsMixin {
     @Shadow public abstract void blit(ResourceLocation resourceLocation, int i, int j, float f, float g, int k, int l, int m, int n);
 
     @Shadow public abstract void blit(ResourceLocation resourceLocation, int i, int j, int k, int l, int m, int n);
+
+    @Shadow @Final private MultiBufferSource.BufferSource bufferSource;
+
+    @Shadow public abstract int guiHeight();
+
+    GuiGraphics self(){
+        return (GuiGraphics) (Object) this;
+    }
+
     @ModifyVariable(method = "enableScissor", at = @At(value = "HEAD"), index = 1, argsOnly = true)
     private int enableScissor(int value){
         return value + Math.round(LegacyTipManager.getTipXDiff());
@@ -70,35 +79,47 @@ public abstract class GuiGraphicsMixin {
     private void renderItemDecorationsTail(Font font, ItemStack itemStack, int i, int j, String string, CallbackInfo ci){
         Legacy4JClient.legacyFont = true;
     }
-    @Inject(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawManaged(Ljava/lang/Runnable;)V", shift = At.Shift.AFTER))
+    @Inject(method = "renderTooltipInternal", at = @At("HEAD"), cancellable = true)
     private void renderTooltipInternal(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner, CallbackInfo ci){
-        pose.pushPose();
-        pose.scale(ScreenUtil.getTextScale(), ScreenUtil.getTextScale(),1.0f);
+        ci.cancel();
+        if (list.isEmpty()) return;
+        int k = 0;
+        int l = 0;
+
+        for (ClientTooltipComponent tooltipComponent : list) {
+            k = Math.max(tooltipComponent.getWidth(font),k);
+            l+= tooltipComponent.getHeight();
+        }
+
+        Vector2ic vector2ic = clientTooltipPositioner.positionTooltip(this.guiWidth(), this.guiHeight(), i, j, (int) (k*ScreenUtil.getTextScale()), (int) (l*ScreenUtil.getTextScale()));
+        int p = vector2ic.x();
+        int q = vector2ic.y();
+        this.pose.pushPose();
+        if (p == (int)Legacy4JClient.controllerManager.getPointerX() && q == (int)Legacy4JClient.controllerManager.getPointerY()) this.pose.translate(Legacy4JClient.controllerManager.getPointerX() - i, Legacy4JClient.controllerManager.getPointerY() - j,0.0f);
+        ScreenUtil.renderPointerPanel(self(),p - (int)(5 * ScreenUtil.getTextScale()),q - (int)(9 * ScreenUtil.getTextScale()),(int)((k + 11) *  ScreenUtil.getTextScale()),(int)((l + 16) * ScreenUtil.getTextScale()));
+        this.pose.translate(p, q, 400.0F);
+        this.pose.scale(ScreenUtil.getTextScale(), ScreenUtil.getTextScale(),1.0f);
+        int s = 0;
+
+        int t;
+        ClientTooltipComponent tooltipComponent;
+        for(t = 0; t < list.size(); ++t) {
+            tooltipComponent = list.get(t);
+            tooltipComponent.renderText(font, 0, s, this.pose.last().pose(), this.bufferSource);
+            s += tooltipComponent.getHeight();
+        }
+
+        s = q;
+
+        for(t = 0; t < list.size(); ++t) {
+            tooltipComponent = list.get(t);
+            tooltipComponent.renderImage(font, 0, s, self());
+            s += tooltipComponent.getHeight();
+        }
+
+        this.pose.popPose();
     }
-    @Inject(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;popPose()V"))
-    private void renderTooltipInternalPop(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner, CallbackInfo ci){
-        pose.popPose();
-    }
-    @Redirect(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;positionTooltip(IIIIII)Lorg/joml/Vector2ic;"))
-    private Vector2ic renderTooltipInternal(ClientTooltipPositioner instance, int guiWidth, int guiHeight, int x, int y, int width, int height){
-        return instance.positionTooltip(guiWidth(),guiHeight,x,y, (int) (width * ScreenUtil.getTextScale()), (int) (height * ScreenUtil.getTextScale()));
-    }
-    @Redirect(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipComponent;renderImage(Lnet/minecraft/client/gui/Font;IILnet/minecraft/client/gui/GuiGraphics;)V"))
-    private void renderTooltipInternal(ClientTooltipComponent instance, Font font, int i, int j, GuiGraphics guiGraphics){
-        instance.renderImage(font, (int)(i / ScreenUtil.getTextScale()),(int)(j / ScreenUtil.getTextScale()),guiGraphics);
-    }
-    @Redirect(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipComponent;renderText(Lnet/minecraft/client/gui/Font;IILorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V"))
-    private void renderTooltipInternal(ClientTooltipComponent instance, Font font, int i, int j, Matrix4f matrix4f, MultiBufferSource.BufferSource bufferSource){
-        instance.renderText(font, (int)(i / ScreenUtil.getTextScale()),(int)(j / ScreenUtil.getTextScale()),matrix4f,bufferSource);
-    }
-    @Redirect(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipComponent;getHeight()I", ordinal = 1))
-    private int renderTooltipInternal(ClientTooltipComponent instance){
-        return Math.round(instance.getHeight() * ScreenUtil.getTextScale());
-    }
-    @Redirect(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipComponent;getHeight()I", ordinal = 2))
-    private int renderTooltipInternalImageHeight(ClientTooltipComponent instance){
-        return Math.round(instance.getHeight() * ScreenUtil.getTextScale());
-    }
+
     @Inject(method = "blitTiledSprite",at = @At("HEAD"), cancellable = true)
     private void blitTiledSprite(TextureAtlasSprite textureAtlasSprite, int i, int j, int k, int l, int m, int n, int o, int p, int q, int r, int s, CallbackInfo ci) {
         ci.cancel();

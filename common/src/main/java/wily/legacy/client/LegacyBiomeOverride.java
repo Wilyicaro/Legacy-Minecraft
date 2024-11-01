@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.ItemStack;
@@ -53,6 +54,10 @@ public class LegacyBiomeOverride {
     }
     public Integer waterColor() {
         return waterColor == null ? DEFAULT.waterColor : waterColor;
+    }
+
+    public int getWaterARGBOrDefault(int defaultColor){
+        return FastColor.ARGB32.color((int) (waterTransparency()*255),waterColor() == null ? defaultColor : waterColor());
     }
     public Integer waterFogColor() {
         return waterFogColor == null ? DEFAULT.waterFogColor : waterFogColor;

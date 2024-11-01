@@ -59,17 +59,7 @@ public class ChatScreenMixin extends Screen implements Controller.Event, Control
     @Redirect(method = "init",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;setBordered(Z)V"))
     private void setBordered(EditBox instance, boolean bl){
     }
-    @Redirect(method = "keyPressed",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V"))
-    private void keyPressed(Minecraft instance, Screen old){
-    }
-    @Redirect(method = "keyPressed",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/ChatScreen;handleChatInput(Ljava/lang/String;Z)V"))
-    private void keyPressed(ChatScreen instance, String string, boolean bl, int i, int j, int k){
-        if (ControllerBinding.DOWN_BUTTON.bindingState.pressed) input.keyPressed(i, j, k);
-        else{
-            handleChatInput(string, bl);
-            onClose();
-        }
-    }
+
     @ModifyArg(method = "render",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"), index = 1)
     private float render(float value){
         return (int)(ScreenUtil.getHUDDistance() - 56);

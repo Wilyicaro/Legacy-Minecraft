@@ -12,4 +12,8 @@ public interface LegacyClientWorldSettings {
     void setAllowCommands(boolean allow);
     void setSelectedResourceAssort(Assort assort);
     Assort getSelectedResourceAssort();
+
+    static LegacyClientWorldSettings of(Object object){
+        return (LegacyClientWorldSettings) object;
+    }
 }

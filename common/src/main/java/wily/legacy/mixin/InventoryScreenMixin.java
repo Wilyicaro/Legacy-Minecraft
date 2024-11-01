@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.client.screen.ReplaceableScreen;
@@ -64,7 +64,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
             super.init();
             this.widthTooNarrow = this.width < 379;
             this.recipeBookComponent.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
-            if (((LegacyOptions) minecraft.options).showVanillaRecipeBook().get() && ScreenUtil.hasClassicCrafting()) {
+            if (LegacyOption.showVanillaRecipeBook.get() && ScreenUtil.hasClassicCrafting()) {
                 this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
                 recipeButton = this.addRenderableWidget(new ImageButton(this.leftPos + 180, topPos + 71, 20, 18, RecipeBookComponent.RECIPE_BUTTON_SPRITES, (button) -> {
                     this.recipeBookComponent.toggleVisibility();

@@ -1,15 +1,12 @@
 package wily.legacy.mixin;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.font.TextFieldHelper;
-import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
-import net.minecraft.client.gui.screens.inventory.HangingSignEditScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.StandingSignBlock;
 import net.minecraft.world.level.block.WallSignBlock;
@@ -30,8 +27,6 @@ import wily.legacy.client.screen.WidgetPanel;
 
 @Mixin(AbstractSignEditScreen.class)
 public abstract class AbstractSignEditScreenMixin extends Screen implements ControlTooltip.Event {
-    @Unique
-    boolean canSaveChanges = true;
 
     private WidgetPanel panel = new WidgetPanel(this,100,100){
         @Override
@@ -42,8 +37,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
 
         @Override
         public boolean keyPressed(int i, int j, int k) {
-            if (i == InputConstants.KEY_RETURN) {
-                canSaveChanges = false;
+            if (KeyboardScreen.isOpenKey(i)) {
                 minecraft.setScreen(new KeyboardScreen(isSign() ? 60 : -100,()->this,AbstractSignEditScreenMixin.this));
                 return true;
             }
@@ -51,7 +45,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
                 line = line - 1;
                 signField.setCursorToEnd();
                 return true;
-            } else if (i != 264 && i != 335) {
+            } else if (i != 264 && i != 257) {
                 return signField.keyPressed(i) || super.keyPressed(i, j, k);
             } else if (line < 3) {
                 line = line + 1;
@@ -126,18 +120,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
     }
 
     @Override
-    public void added() {
-        super.added();
-        canSaveChanges = true;
-    }
-
-    @Inject(method = "removed",at = @At("HEAD"), cancellable = true)
-    public void removed(CallbackInfo ci) {
-        if (!canSaveChanges) ci.cancel();
-    }
-    @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-
     }
 
 }

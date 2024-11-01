@@ -81,7 +81,13 @@ public class FlatWorldLayerSelector extends PanelBackgroundScreen implements Leg
         });
         scrolledList.max = layerItems.size() <= layerSelectionGrid.getContainerSize() ? 0 : layerItems.size() / layerSelectionGrid.getContainerSize();
     }
-    public FlatWorldLayerSelector(Screen parent, FlatLayerInfo editLayer,Consumer<FlatWorldLayerSelector> applyLayer, int maxLayerHeight, Component component) {
+
+    @Override
+    public void addControlTooltips(ControlTooltip.Renderer renderer) {
+        ControlTooltip.setupDefaultScreen(renderer,this);
+    }
+
+    public FlatWorldLayerSelector(Screen parent, FlatLayerInfo editLayer, Consumer<FlatWorldLayerSelector> applyLayer, int maxLayerHeight, Component component) {
         this(parent,applyLayer,maxLayerHeight,component);
         selectedLayer = new ItemStack(editLayer.getBlockState().getBlock().asItem(),editLayer.getHeight());
     }

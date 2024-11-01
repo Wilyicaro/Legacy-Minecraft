@@ -23,8 +23,6 @@ public abstract class HumanoidModelMixin {
 
     @Shadow @Final public ModelPart rightArm;
 
-    @Shadow @Final public ModelPart head;
-
     @Shadow @Final public ModelPart leftArm;
 
 

@@ -8,11 +8,12 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.chat.Component;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.util.ScreenUtil;
 
 public class ExitConfirmationScreen extends ConfirmationScreen{
     public ExitConfirmationScreen(Screen parent) {
-        super(parent, 230, 156, Component.translatable("menu.quit"), Minecraft.getInstance().hasSingleplayerServer() && ScreenUtil.getLegacyOptions().autoSaveInterval().get() == 0 ? Component.translatable("legacy.menu.exit_message") : Minecraft.getInstance().screen instanceof TitleScreen ? Component.translatable("legacy.menu.gameExitMessage") : Component.translatable("legacy.menu.server_exit_message"), b-> {});
+        super(parent, 230, 156, Component.translatable("menu.quit"), Minecraft.getInstance().hasSingleplayerServer() && LegacyOption.autoSaveInterval.get() == 0 ? Component.translatable("legacy.menu.exit_message") : Minecraft.getInstance().screen instanceof TitleScreen ? Component.translatable("legacy.menu.gameExitMessage") : Component.translatable("legacy.menu.server_exit_message"), b-> {});
     }
 
     @Override

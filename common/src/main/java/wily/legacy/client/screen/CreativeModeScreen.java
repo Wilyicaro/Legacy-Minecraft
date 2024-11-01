@@ -32,6 +32,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyCreativeTabListing;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.util.*;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
@@ -98,7 +99,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
             displayListing.add(displayItems);
             tabList.addTabButton(39, 0,LegacyTabButton.iconOf(c.getIconItem()), c.getDisplayName(), b -> pressCommonTab());
         });
-        if (ScreenUtil.getLegacyOptions().searchCreativeTab().get()) {
+        if (LegacyOption.searchCreativeTab.get()) {
             displayListing.add(List.copyOf(CreativeModeTabs.searchTab().getDisplayItems()));
             tabList.addTabButton(39, 0, LegacyTabButton.iconOf(SEARCH_SPRITE), searchBox.getMessage(), b -> {
                 canRemoveSearch = arrangement.get() != 2 && !canRemoveSearch;
@@ -133,7 +134,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
         return hoveredSlot == null || hoveredSlot.container == minecraft.player.getInventory() && !hoveredSlot.hasItem();
     }
     public static EffectRenderingInventoryScreen<?> getActualCreativeScreenInstance(Minecraft minecraft){
-        return ScreenUtil.getLegacyOptions().legacyCreativeTab().get() ? new CreativeModeScreen(minecraft.player) : new CreativeModeInventoryScreen(minecraft.player, minecraft.player.connection.enabledFeatures(), minecraft.options.operatorItemsTab().get());
+        return LegacyOption.legacyCreativeTab.get() ? new CreativeModeScreen(minecraft.player) : new CreativeModeInventoryScreen(minecraft.player, minecraft.player.connection.enabledFeatures(), minecraft.options.operatorItemsTab().get());
     }
     public void removed() {
         super.removed();
@@ -143,7 +144,7 @@ public class CreativeModeScreen extends EffectRenderingInventoryScreen<CreativeM
     }
     public static boolean canDisplayVanillaCreativeTab(CreativeModeTab c){
         ResourceLocation location = BuiltInRegistries.CREATIVE_MODE_TAB.getKey(c);
-        return c.shouldDisplay() && (c.getType() == CreativeModeTab.Type.CATEGORY || c.getType() == CreativeModeTab.Type.HOTBAR) && location != null && (ScreenUtil.getLegacyOptions().vanillaTabs().get() || !location.getNamespace().equals("minecraft") || location.equals(CreativeModeTabs.OP_BLOCKS.location()));
+        return c.shouldDisplay() && (c.getType() == CreativeModeTab.Type.CATEGORY || c.getType() == CreativeModeTab.Type.HOTBAR) && location != null && (LegacyOption.vanillaTabs.get() || !location.getNamespace().equals("minecraft") || location.equals(CreativeModeTabs.OP_BLOCKS.location()));
     }
 
     @Override

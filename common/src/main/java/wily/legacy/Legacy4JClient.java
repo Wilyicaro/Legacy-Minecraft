@@ -7,7 +7,6 @@ import com.mojang.serialization.JsonOps;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.Options;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.gui.ComponentPath;
@@ -79,12 +78,15 @@ import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.client.*;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.client.controller.ControllerManager;
+import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.client.screen.*;
+import wily.legacy.client.screen.compat.IrisCompat;
+import wily.legacy.client.screen.compat.SodiumCompat;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.CommonNetwork;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.network.ServerOpenClientMenuPacket;
-import wily.legacy.player.LegacyPlayerInfo;
+import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.JsonUtil;
 import wily.legacy.util.MCAccount;
 import wily.legacy.util.ModInfo;
@@ -94,10 +96,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -115,16 +114,16 @@ public class Legacy4JClient {
             return Minecraft.getInstance().player != null;
         }
     };
+    public static final List<Runnable> whenResetOptions = new ArrayList<>();
     public static String lastLoadedVersion = "";
     public static LevelStorageSource currentWorldSource;
     public static boolean legacyFont = true;
     public static boolean forceVanillaFontShadowColor = false;
-    public static boolean canLoadVanillaOptions = true;
     public static ResourceLocation defaultFontOverride = null;
     public static boolean manualSave = false;
     public static boolean saveExit = false;
     public static boolean retakeWorldIcon = false;
-    public static final Map<Component, Component> OPTION_BOOLEAN_CAPTION = Map.of(Component.translatable("key.sprint"),Component.translatable("options.key.toggleSprint"),Component.translatable("key.sneak"),Component.translatable("options.key.toggleSneak"));
+    public static final Map<Component, Component> booleanOptionCaptionOverride = new HashMap<>(Map.of(Component.translatable("key.sprint"),Component.translatable("options.key.toggleSprint"),Component.translatable("key.sneak"),Component.translatable("options.key.toggleSneak")));
     public static LegacyLoadingScreen legacyLoadingScreen = new LegacyLoadingScreen();
     public static MultiBufferSource.BufferSource guiBufferSourceOverride = null;
     public static Renderable itemActivationRenderReplacement = null;
@@ -147,18 +146,16 @@ public class Legacy4JClient {
     public static Consumer<ServerPlayer> serverPlayerJoinConsumer;
 
     public static PostChain gammaEffect;
-    public static int[] MAP_PLAYER_COLORS = new int[]{0xFFFFFF,0x00FF4C,0xFF2119,0x6385FF,0xFF63D9,0xFF9C00,0xFFFB19,0x63FFE4};
+
     public static float[] getVisualPlayerColor(LegacyPlayerInfo info){
-        return getVisualPlayerColor(info.getPosition() >= 0 ? info.getPosition() : info.legacyMinecraft$getProfile().getId().hashCode());
+        return getVisualPlayerColor(info.getIdentifierIndex() >= 0 ? info.getIdentifierIndex() : info.legacyMinecraft$getProfile().getId().hashCode());
     }
     public static float[] getVisualPlayerColor(int i){
-        i = Math.abs(i);
-        int baseColor = MAP_PLAYER_COLORS[i % MAP_PLAYER_COLORS.length];
-        if (i < MAP_PLAYER_COLORS.length) return new float[]{(baseColor >> 16 & 255) / 255f,(baseColor >> 8 & 255) / 255f,(baseColor & 255) / 255f};
-        float f = ((i - MAP_PLAYER_COLORS.length) % 101) / 250f;
-        float r = ((baseColor >> 16 & 255) * (0.8f + f)) / 255f;
-        float g = ((baseColor >> 8 & 255) * (0.8f +(f * 1.2f))) / 255f;
-        float b = ((baseColor & 255) * (0.8f +(f / 2f))) / 255f;
+        PlayerIdentifier playerIdentifier = PlayerIdentifier.of(i);
+        if (PlayerIdentifier.list.containsKey(i)) return new float[]{(playerIdentifier.color() >> 16 & 255) / 255f,(playerIdentifier.color() >> 8 & 255) / 255f,(playerIdentifier.color() & 255) / 255f};
+        float r = ((playerIdentifier.color() >> 16 & 255) * (0.8f + (i%15) /30f)) / 255f;
+        float g = ((playerIdentifier.color() >> 8 & 255) * (1.2f - (i%16) /32f)) / 255f;
+        float b = ((playerIdentifier.color() & 255) * (0.8f + (i%17) /34f)) / 255f;
         return new float[]{r,g,b};
     }
     public static void updateLegacyPlayerInfos(Map<UUID, LegacyPlayerInfo> map){
@@ -288,7 +285,7 @@ public class Legacy4JClient {
 
     }
     public static void postTick(Minecraft minecraft){
-        if (minecraft.level != null && minecraft.screen == null && ((LegacyOptions)minecraft.options).hints().get() && LegacyTipManager.getActualTip() == null) {
+        if (minecraft.level != null && minecraft.screen == null && LegacyOption.hints.get() && LegacyTipManager.getActualTip() == null) {
             HitResult hit = minecraft.hitResult;
             if (hit instanceof BlockHitResult blockHitResult) {
                 BlockState state = minecraft.level.getBlockState(blockHitResult.getBlockPos());
@@ -303,7 +300,7 @@ public class Legacy4JClient {
     }
     public static void preTick(Minecraft minecraft){
         SECURE_EXECUTOR.executeAll();
-        if (((LegacyOptions)minecraft.options).unfocusedInputs().get()) minecraft.setWindowActive(true);
+        if (LegacyOption.unfocusedInputs.get()) minecraft.setWindowActive(true);
         while (keyCrafting.consumeClick()){
             if (minecraft.gameMode != null && minecraft.gameMode.hasInfiniteItems()) {
                 minecraft.setScreen(CreativeModeScreen.getActualCreativeScreenInstance(minecraft));
@@ -359,7 +356,7 @@ public class Legacy4JClient {
     }
     public static boolean isModEnabledOnServer(){
         Minecraft minecraft = Minecraft.getInstance();
-        return minecraft.getConnection() != null && minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID()) instanceof LegacyPlayerInfo i && i.getPosition() >= 0;
+        return minecraft.getConnection() != null && minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID()) instanceof LegacyPlayerInfo i && i.getIdentifierIndex() >= 0;
     }
     public static int getEffectiveRenderDistance(){
         return Minecraft.getInstance().options.getEffectiveRenderDistance();
@@ -378,6 +375,9 @@ public class Legacy4JClient {
         registerRenderType(RenderType.cutoutMipped(), SHRUB.get());
         registerRenderType(RenderType.translucent(), Blocks.WATER);
         controllerManager.setup();
+        LegacyOption.loadAll();
+        if (Legacy4JPlatform.isModLoaded("sodium")) SodiumCompat.init();
+        if (Legacy4JPlatform.isModLoaded("iris")) IrisCompat.init();
     }
     public static void registerBlockColors(BiConsumer<BlockColor, Block> registry){
         registry.accept((blockState, blockAndTintGetter, blockPos, i) -> blockAndTintGetter == null || blockPos == null ? GrassColor.getDefaultColor() : BiomeColors.getAverageGrassColor(blockAndTintGetter, blockPos),SHRUB.get());
@@ -415,12 +415,17 @@ public class Legacy4JClient {
     public static KeyMapping keyFlyDown = new KeyMapping( MOD_ID +".key.flyDown", InputConstants.KEY_DOWN, "key.categories.movement");
     public static KeyMapping keyFlyLeft = new KeyMapping( MOD_ID +".key.flyLeft", InputConstants.KEY_LEFT, "key.categories.movement");
     public static KeyMapping keyFlyRight = new KeyMapping( MOD_ID +".key.flyRight", InputConstants.KEY_RIGHT, "key.categories.movement");
-    public static void resetVanillaOptions(Minecraft minecraft){
-        canLoadVanillaOptions = false;
-        minecraft.options = new Options(minecraft,minecraft.gameDirectory);
+
+    public static void resetOptions(Minecraft minecraft){
+        whenResetOptions.forEach(Runnable::run);
+        for (KeyMapping keyMapping : minecraft.options.keyMappings) {
+            keyMapping.setKey(keyMapping.getDefaultKey());
+            LegacyKeyMapping.of(keyMapping).setBinding(LegacyKeyMapping.of(keyMapping).getDefaultBinding());
+        }
+        LegacyOption.list.forEach(LegacyOption::reset);
         minecraft.options.save();
-        canLoadVanillaOptions = true;
     }
+
     public static String manageAvailableSaveDirName(Consumer<File> copy,Predicate<String> exists, LevelStorageSource source, String levelId){
         String destId = manageAvailableName(exists,levelId);
         copy.accept(source.getLevelPath(destId).toFile());

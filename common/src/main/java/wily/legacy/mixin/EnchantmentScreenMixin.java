@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.client.CommonColor;
 import wily.legacy.util.LegacySprites;
 
 import java.util.ArrayList;
@@ -103,22 +104,22 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
             String string = "" + enchantCost;
             int r = 86 - this.font.width(string);
             FormattedText formattedText = EnchantmentNames.getInstance().getRandomName(this.font, r);
-            int s = 6839882;
+            int s = CommonColor.ENCHANTMENT_TEXT.get();
             if (!(m >= n + 1 && this.minecraft.player.experienceLevel >= enchantCost || this.minecraft.player.getAbilities().instabuild)) {
                 guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, (s & 0xFEFEFE) >> 1);
-                s = 4226832;
+                s = CommonColor.INSUFFICIENT_EXPERIENCE_TEXT.get();
             } else {
                 double t = i - (leftPos + 80.5);
                 double u = j - (topPos + 23.5 + 21 * n);
                 if (t >= 0 && u >= 0 && t < 120 && u < 21) {
                     guiGraphics.blitSprite(ENCHANTMENT_BUTTON_SELECTED, 0, 0, 120, 21);
-                    s = 0xFFFF80;
+                    s = CommonColor.HIGHLIGHTED_ENCHANTMENT_TEXT.get();
                 } else {
                     guiGraphics.blitSprite(ENCHANTMENT_BUTTON_ACTIVE, 0, 0, 120, 21);
                 }
                 guiGraphics.blitSprite(ENABLED_LEVEL_SPRITES[n], -1, -1, 24, 24);
                 guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, s);
-                s = 8453920;
+                s = CommonColor.EXPERIENCE_TEXT.get();
             }
             guiGraphics.drawString(this.font, string, 120 - this.font.width(string), 12, s);
         }

@@ -4,18 +4,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.LanguageManager;
 import net.minecraft.network.chat.Component;
-import wily.legacy.Legacy4J;
 import wily.legacy.util.LegacySprites;
 
 import java.util.Locale;
 
-public class LegacyLanguageScreen extends PanelVListScreen{
+public class LegacyLanguageScreen extends PanelVListScreen {
     public static final Component WARNING_LABEL = Component.translatable("options.languageAccuracyWarning");
     protected String selectedLang;
-    public LegacyLanguageScreen(Screen parent, LanguageManager manager) {
+    public LegacyLanguageScreen(net.minecraft.client.gui.screens.Screen parent, LanguageManager manager) {
         super(parent, 255, 240, Component.translatable("controls.keybinds.title"));
         String autoCode = getSystemLanguageCode();
         renderableVList.addRenderable(new AbstractButton(0,0,260,20,Component.translatable("legacy.menu.system_language")) {
@@ -72,7 +70,7 @@ public class LegacyLanguageScreen extends PanelVListScreen{
         panel.init();
         addRenderableOnly(panel);
         addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.blitSprite(LegacySprites.PANEL_RECESS,panel.x + 6, panel.y + 24, panel.width - 12, panel.height - 34)));
-        getRenderableVList().init(this,panel.x + 10,panel.y + 30,panel.width - 20,panel.height - 28);
+        getRenderableVList().init(this,panel.x + 10,panel.y + 30,panel.width - 20,panel.height - 46);
         addRenderableWidget(minecraft.options.forceUnicodeFont().createButton(minecraft.options,panel.x + 10, panel.y + 10, panel.width - 20));
     }
 }

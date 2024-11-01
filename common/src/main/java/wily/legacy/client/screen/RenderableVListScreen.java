@@ -1,5 +1,6 @@
 package wily.legacy.client.screen;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -22,8 +23,8 @@ public class RenderableVListScreen extends LegacyScreen implements RenderableVLi
         this.parent = parent;
         vListBuild.accept(renderableVList);
     }
-    public Button.Builder openScreenButton(Component component, Supplier<Screen> supplier) {
-        return Button.builder(component, button -> this.minecraft.setScreen(supplier.get()));
+    public static Button.Builder openScreenButton(Component component, Supplier<Screen> supplier) {
+        return Button.builder(component, button -> Minecraft.getInstance().setScreen(supplier.get()));
     }
 
     @Override

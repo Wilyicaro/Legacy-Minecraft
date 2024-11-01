@@ -40,9 +40,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.*;
 import wily.legacy.network.CommonNetwork;
@@ -131,7 +130,7 @@ public abstract class MinecraftMixin {
     }
     @Redirect(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
     private InteractionResult startUseItemReturn(MultiPlayerGameMode instance, LocalPlayer localPlayer, InteractionHand arg, BlockHitResult arg2){
-        if (((LegacyOptions)options).legacyCreativeBlockPlacing().get() && rightClickDelay == 4 && player.getAbilities().instabuild && ControlTooltip.canPlace(self(),arg)) {
+        if (LegacyOption.legacyCreativeBlockPlacing.get() && rightClickDelay == 4 && player.getAbilities().instabuild && ControlTooltip.canPlace(self(),arg)) {
             if (lastPlayerBlockUsePos == null) lastPlayerBlockUsePos = player.position();
             rightClickDelay = 0;
         }
@@ -166,6 +165,11 @@ public abstract class MinecraftMixin {
     @ModifyArg(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", ordinal = 2))
     private Screen handleKeybinds(Screen arg){
         return new LegacyAdvancementsScreen(null,getConnection().getAdvancements());
+    }
+    @Redirect(method = "setScreen",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;removed()V"))
+    private void removedScreen(Screen instance, Screen newScreen){
+        if (newScreen instanceof OverlayPanelScreen s && s.parent == instance) return;
+        instance.removed();
     }
     @Inject(method = "setScreen",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;added()V"))
     private void addedScreen(Screen screen, CallbackInfo ci){
@@ -205,18 +209,18 @@ public abstract class MinecraftMixin {
     }
     @ModifyArg(method = "resizeDisplay",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/Window;setGuiScale(D)V"))
     public double resizeDisplay(double d) {
-        int h = (ScreenUtil.getLegacyOptions().autoResolution().get() ? ScreenUtil.getStandardHeight() : getWindow().getHeight());
+        int h = (LegacyOption.autoResolution.get() ? ScreenUtil.getStandardHeight() : getWindow().getHeight());
         return h / 360d * getTweakedHeightScale(h);
     }
     @Unique
     public double getTweakedHeightScale(int height) {
-        if (ScreenUtil.getLegacyOptions().autoResolution().get()){
+        if (LegacyOption.autoResolution.get()){
             if (height == 1080) return 0.999623452;
             else if (height % 720 != 0) return 1.001d;
 
             return 1d;
         }
-        return (1.125 - ScreenUtil.getLegacyOptions().interfaceResolution().get() / 4);
+        return (1.125 - LegacyOption.interfaceResolution.get() / 4);
     }
     @Inject(method = "addInitialScreens", at = @At("HEAD"))
     private void addInitialScreens(List<Function<Runnable, Screen>> list, CallbackInfo ci) {

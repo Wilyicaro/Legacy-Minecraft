@@ -24,20 +24,21 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
     private int slidingMul = 1;
     private int lastSliderInput = -1;
     protected T objectValue;
-    public LegacySliderButton(int i, int j, int k, int l, Function<LegacySliderButton<T>,Component> messageGetter, Function<LegacySliderButton<T>,Tooltip> tooltipSupplier, T initialValue, Function<LegacySliderButton<T>,T> valueGetter, Function<T, Double> valueSetter, Consumer<LegacySliderButton<T>>  onChange) {
+    public LegacySliderButton(int i, int j, int k, int l, Function<LegacySliderButton<T>,Component> messageGetter, Function<LegacySliderButton<T>,Tooltip> tooltipSupplier, T initialValue, Function<LegacySliderButton<T>,T> valueGetter, Function<T, Double> valueSetter, Consumer<LegacySliderButton<T>> onChange) {
         super(i, j, k, l, Component.empty(), valueSetter.apply(initialValue));
         this.messageGetter = messageGetter;
         this.valueGetter = valueGetter;
         this.valueSetter = valueSetter;
         this.onChange = onChange;
         this.tooltipSupplier = tooltipSupplier;
-        objectValue = valueGetter.apply(this);
+        objectValue = initialValue;
         updateMessage();
     }
-
-    public LegacySliderButton(int i, int j, int k, int l, Function<LegacySliderButton<T>,Component> messageGetter, Function<LegacySliderButton<T>,Tooltip> tooltipSupplier, T initialValue, Supplier<List<T>> values, Consumer<LegacySliderButton<T>>  onChange) {
+    public LegacySliderButton(int i, int j, int k, int l, Function<LegacySliderButton<T>,Component> messageGetter, Function<LegacySliderButton<T>,Tooltip> tooltipSupplier, T initialValue, Supplier<List<T>> values, Consumer<LegacySliderButton<T>> onChange) {
         this(i, j, k, l, messageGetter, tooltipSupplier, initialValue, b-> values.get().get((int) Math.round(b.value * (values.get().size() - 1))),t->Math.max(0d,values.get().indexOf(t))/ (values.get().size() - 1),onChange);
-        objectValue = initialValue;
+    }
+    public static LegacySliderButton<Integer> createFromIntRange(int i, int j, int k, int l, Function<LegacySliderButton<Integer>,Component> messageGetter, Function<LegacySliderButton<Integer>,Tooltip> tooltipSupplier, Integer initialValue, int min, int max, Consumer<LegacySliderButton<Integer>> onChange) {
+        return new LegacySliderButton<>(i, j, k, l, messageGetter, tooltipSupplier, initialValue, b-> min + (int) Math.round(b.value * (max - min)),t->Math.max(0d,Math.min((double)(t-min) / (max-min),1d)),onChange);
     }
     public Component getDefaultMessage(Component caption, Component visibleValue){
         return caption.copy().append(": ").append(visibleValue);

@@ -1,4 +1,4 @@
-package wily.legacy.fabric.mixin;
+package wily.legacy.fabric.mixin.legacy;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;

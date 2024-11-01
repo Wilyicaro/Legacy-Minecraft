@@ -1,21 +1,24 @@
-package wily.legacy.player;
+package wily.legacy.entity;
 
 import com.mojang.authlib.GameProfile;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundAwardStatsPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stat;
-import net.minecraft.stats.StatType;
+import wily.legacy.mixin.ServerPlayerMixin;
 
 public interface LegacyPlayerInfo {
+    static LegacyPlayerInfo of(Object obj) {
+        return (LegacyPlayerInfo) obj;
+    }
+
     default GameProfile legacyMinecraft$getProfile(){
         return null;
     }
-    int getPosition();
-    void setPosition(int i);
+    int getIdentifierIndex();
+    void setIdentifierIndex(int i);
     boolean isVisible();
     void setVisibility(boolean visible);
     boolean isExhaustionDisabled();
@@ -28,17 +31,17 @@ public interface LegacyPlayerInfo {
 
     static LegacyPlayerInfo fromNetwork(FriendlyByteBuf buf){
         return new LegacyPlayerInfo() {
-            int pos = buf.readVarInt();
+            int index = buf.readVarInt();
             boolean invisible = buf.readBoolean();
             boolean exhaustion = buf.readBoolean();
             boolean mayFly = buf.readBoolean();
 
             Object2IntMap<Stat<?>> statsMap = ClientboundAwardStatsPacket.STAT_VALUES_STREAM_CODEC.decode((RegistryFriendlyByteBuf) buf);
-            public int getPosition() {
-                return pos;
+            public int getIdentifierIndex() {
+                return index;
             }
-            public void setPosition(int i) {
-                pos = i;
+            public void setIdentifierIndex(int i) {
+                index = i;
             }
             public boolean isVisible() {
                 return invisible;
@@ -69,14 +72,14 @@ public interface LegacyPlayerInfo {
         };
     }
     default void toNetwork(RegistryFriendlyByteBuf buf){
-        buf.writeVarInt(getPosition());
+        buf.writeVarInt(getIdentifierIndex());
         buf.writeBoolean(isVisible());
         buf.writeBoolean(isExhaustionDisabled());
         buf.writeBoolean(mayFlySurvival());
         ClientboundAwardStatsPacket.STAT_VALUES_STREAM_CODEC.encode(buf,getStatsMap());
     }
     default void copyFrom(LegacyPlayerInfo info){
-        this.setPosition(info.getPosition());
+        this.setIdentifierIndex(info.getIdentifierIndex());
         this.setVisibility(info.isVisible());
         this.setDisableExhaustion(info.isExhaustionDisabled());
         this.setMayFlySurvival(info.mayFlySurvival());

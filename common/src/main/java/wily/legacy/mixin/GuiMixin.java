@@ -41,7 +41,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.BufferSourceWrapper;
-import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.screen.ControlTooltip;
@@ -80,7 +80,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
     }
     @Inject(method = "renderVignette", at = @At("HEAD"), cancellable = true)
     public void renderVignette(GuiGraphics guiGraphics, Entity entity, CallbackInfo ci) {
-        if (minecraft.screen != null || !((LegacyOptions)minecraft.options).vignette().get())
+        if (minecraft.screen != null || !LegacyOption.vignette.get())
             ci.cancel();
     }
     @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
@@ -97,10 +97,8 @@ public abstract class GuiMixin implements ControlTooltip.Event {
     }
     @Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;)V"))
     public void renderCrosshairBlendFunc(GlStateManager.SourceFactor sourceFactor, GlStateManager.DestFactor destFactor, GlStateManager.SourceFactor sourceFactor2, GlStateManager.DestFactor destFactor2, GuiGraphics guiGraphics) {
-        if (((LegacyOptions)minecraft.options).hudOpacity().get() < 1.0) {
-            guiGraphics.setColor(1.0f, 1.0f, 1.0f, ScreenUtil.getHUDOpacity());
-            RenderSystem.enableBlend();
-        } else RenderSystem.blendFuncSeparate(sourceFactor,destFactor,sourceFactor2,destFactor2);
+        if (LegacyOption.invertedCrosshair.get()) RenderSystem.blendFuncSeparate(sourceFactor,destFactor,sourceFactor2,destFactor2);
+        else if (LegacyOption.hudOpacity.get() < 1.0f) guiGraphics.setColor(1.0f, 1.0f, 1.0f, ScreenUtil.getHUDOpacity());
     }
     @Inject(method = "renderCrosshair", at = @At("RETURN"))
     public void renderCrosshairReturn(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
@@ -161,7 +159,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         }
         if (minecraft.getCameraEntity() instanceof LivingEntity character) {
             boolean hasRemainingTime = character.isSprinting() || character.isCrouching() || character.isFallFlying() || character.isVisuallySwimming() || !(character instanceof Player);
-            if (((LegacyOptions) minecraft.options).animatedCharacter().get() && (hasRemainingTime || character instanceof Player p && p.getAbilities().flying) && !character.isSleeping()) {
+            if (LegacyOption.animatedCharacter.get() && (hasRemainingTime || character instanceof Player p && p.getAbilities().flying) && !character.isSleeping()) {
                 ScreenUtil.animatedCharacterTime = Util.getMillis();
                 ScreenUtil.remainingAnimatedCharacterTime = hasRemainingTime ? 450 : 0;
             }
@@ -172,7 +170,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(32f,18,0);
                 ScreenUtil.applyHUDScale(guiGraphics);
-                float f = ScreenUtil.getLegacyOptions().smoothAnimatedCharacter().get() ? deltaTracker.getGameTimeDeltaPartialTick(true) : 0;
+                float f = LegacyOption.smoothAnimatedCharacter.get() ? deltaTracker.getGameTimeDeltaPartialTick(true) : 0;
                 ScreenUtil.renderEntity(guiGraphics, 10f, 36f, 12, f,new Vector3f(), new Quaternionf().rotationXYZ(-5* Mth.PI/180f, (165 -Mth.lerp(f, character.yBodyRotO, character.yBodyRot)) * Mth.PI/180f, Mth.PI), null, character);
                 guiGraphics.pose().popPose();
                 character.setXRot(xRot);
@@ -257,7 +255,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
             ScreenUtil.applyHUDScale(guiGraphics);
             this.minecraft.getProfiler().push("expLevel");
             String exp = "" + i;
-            int hudScale = ScreenUtil.getLegacyOptions().hudScale().get();
+            int hudScale = LegacyOption.hudScale.get();
             boolean is720p = minecraft.getWindow().getHeight() % 720 == 0;
             guiGraphics.pose().translate(0,-36f,0);
             if (!is720p && hudScale != 1) guiGraphics.pose().scale(7/8f,7/8f,7/8f);
@@ -273,7 +271,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
             return;
         }
         ScreenUtil.prepareHUDRender(guiGraphics);
-        guiGraphics.pose().translate(0, 63 - ScreenUtil.getHUDSize() - (this.lastToolHighlight.isEmpty() || this.toolHighlightTimer <= 0 ? 0 : (Math.min(4,lastToolHighlight.getTooltipLines(Item.TooltipContext.of(minecraft.level),minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum()) - 1) * 9),0);
+        guiGraphics.pose().translate(0, 63 - ScreenUtil.getHUDSize() - (this.lastToolHighlight.isEmpty() || this.toolHighlightTimer <= 0 || ScreenUtil.getSelectedItemTooltipLines() == 0 ? 0 : (Math.min(ScreenUtil.getSelectedItemTooltipLines() + 1,lastToolHighlight.getTooltipLines(Item.TooltipContext.of(minecraft.level),minecraft.player, TooltipFlag.NORMAL).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum()) - 1) * 9),0);
     }
     @Inject(method = "renderOverlayMessage", at = @At(value = "RETURN"))
     public void renderOverlayMessageReturn(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {

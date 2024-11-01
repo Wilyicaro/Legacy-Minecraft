@@ -20,12 +20,12 @@ public abstract class ClientPrimaryLevelDataMixin implements LegacyClientWorldSe
     @Shadow private LevelSettings settings;
 
     public boolean trustPlayers() {
-        return ((LegacyClientWorldSettings)(Object)settings).trustPlayers();
+        return LegacyClientWorldSettings.of(settings).trustPlayers();
     }
 
     @Override
     public void setTrustPlayers(boolean trust) {
-        ((LegacyClientWorldSettings)(Object)settings).setTrustPlayers(trust);
+        LegacyClientWorldSettings.of(settings).setTrustPlayers(trust);
     }
 
     @Override
@@ -36,12 +36,12 @@ public abstract class ClientPrimaryLevelDataMixin implements LegacyClientWorldSe
     @Override
     public void setDifficultyLocked(boolean locked) {
         difficultyLocked = locked;
-        ((LegacyClientWorldSettings)(Object)settings).setDifficultyLocked(locked);
+        LegacyClientWorldSettings.of(settings).setDifficultyLocked(locked);
     }
 
     @Override
     public void setAllowCommands(boolean allow) {
-        ((LegacyClientWorldSettings)(Object)settings).setAllowCommands(allow);
+        LegacyClientWorldSettings.of(settings).setAllowCommands(allow);
     }
     @Inject(method = "setTagData",at = @At("TAIL"))
     private void setTagData(RegistryAccess registryAccess, CompoundTag compoundTag, CompoundTag compoundTag2, CallbackInfo ci) {
@@ -49,21 +49,21 @@ public abstract class ClientPrimaryLevelDataMixin implements LegacyClientWorldSe
         compoundTag.putString("SelectedResourceAssort",getSelectedResourceAssort().id());
     }
     public long getDisplaySeed() {
-        return ((LegacyClientWorldSettings)(Object)settings).getDisplaySeed();
+        return LegacyClientWorldSettings.of(settings).getDisplaySeed();
     }
 
     @Override
     public void setDisplaySeed(long s) {
-        ((LegacyClientWorldSettings)(Object)settings).setDisplaySeed(s);
+        LegacyClientWorldSettings.of(settings).setDisplaySeed(s);
     }
 
     @Override
     public Assort getSelectedResourceAssort() {
-        return ((LegacyClientWorldSettings)(Object)settings).getSelectedResourceAssort();
+        return LegacyClientWorldSettings.of(settings).getSelectedResourceAssort();
     }
 
     @Override
     public void setSelectedResourceAssort(Assort assort) {
-        ((LegacyClientWorldSettings)(Object)settings).setSelectedResourceAssort(assort);
+        LegacyClientWorldSettings.of(settings).setSelectedResourceAssort(assort);
     }
 }

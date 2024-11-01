@@ -183,3 +183,4 @@ accessible field net/minecraft/client/Minecraft realmsDataFetcher Lcom/mojang/re
 mutable field net/minecraft/client/Minecraft realmsDataFetcher Lcom/mojang/realmsclient/gui/RealmsDataFetcher;
 accessible field com/mojang/realmsclient/RealmsAvailability future Ljava/util/concurrent/CompletableFuture;
 mutable field com/mojang/realmsclient/RealmsAvailability future Ljava/util/concurrent/CompletableFuture;
+accessible method net/minecraft/world/inventory/AbstractFurnaceMenu canSmelt (Lnet/minecraft/world/item/ItemStack;)Z

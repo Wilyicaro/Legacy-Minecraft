@@ -37,6 +37,21 @@ public interface CommonNetwork {
         public void executeWhen(BooleanSupplier supplier){
             queue.add(supplier);
         }
+        public void executeNowIfPossible(BooleanSupplier supplier){
+            if (!supplier.getAsBoolean()) executeWhen(supplier);
+        }
+        static BooleanSupplier createBooleanRunnable(Runnable action, BooleanSupplier supplier){
+            return ()->{
+                boolean execute = supplier.getAsBoolean();
+                if (execute){
+                    action.run();
+                    return true;
+                }return false;
+            };
+        }
+        public void executeNowIfPossible(Runnable action, BooleanSupplier supplier){
+            executeNowIfPossible(createBooleanRunnable(action,supplier));
+        }
         public void clear(){
             queue.clear();
         }
@@ -91,6 +106,7 @@ public interface CommonNetwork {
         register(ServerPlayerMissHitPacket.class, ServerPlayerMissHitPacket::new);
         register(TopMessage.Packet.class, TopMessage.Packet::decode);
         register(ClientEffectActivationPacket.class, ClientEffectActivationPacket::new);
+        register(ClientMerchantTradingPacket.class, ClientMerchantTradingPacket::new);
     }
 
     static void register(Class<? extends Packet> commonPacketClass, Function<RegistryFriendlyByteBuf, Packet> function){

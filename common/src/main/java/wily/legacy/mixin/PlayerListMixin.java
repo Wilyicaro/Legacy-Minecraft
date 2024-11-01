@@ -17,8 +17,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4J;
-import wily.legacy.player.LegacyPlayer;
-import wily.legacy.player.LegacyPlayerInfo;
+import wily.legacy.entity.LegacyPlayer;
+import wily.legacy.entity.LegacyPlayerInfo;
 
 import java.util.Optional;
 

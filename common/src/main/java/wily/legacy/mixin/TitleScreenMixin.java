@@ -48,7 +48,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         }).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("options.language"), b -> minecraft.setScreen(new LegacyLanguageScreen(this, this.minecraft.getLanguageManager()))).build());
-        renderableVList.addRenderable(Button.builder(Component.translatable("menu.options"), b -> minecraft.setScreen(new HelpOptionsScreen(this))).build());
+        renderableVList.addRenderable(Button.builder(Component.translatable("menu.options"), b -> minecraft.setScreen(new HelpAndOptionsScreen(this))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
     }
 
@@ -74,8 +74,12 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     @Inject(method = "added", at = @At("RETURN"))
     public void added(CallbackInfo ci) {
         ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(),()->ControlTooltip.getAction("legacy.menu.choose_user"));
-        this.splash = Minecraft.getInstance().getSplashManager().getSplash();
+        if (splash == null) this.splash = Minecraft.getInstance().getSplashManager().getSplash();
         ControllerManager.getHandler().init();
+    }
+    @Inject(method = "removed", at = @At("RETURN"))
+    public void removed(CallbackInfo ci) {
+        splash = null;
     }
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
@@ -97,11 +101,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         ci.cancel();
         super.render(guiGraphics, i, j, f);
 
-        if (this.splash != null) {
-            Legacy4JClient.legacyFont = false;
-            this.splash.render(guiGraphics, this.width, this.font, 255 << 24);
-            Legacy4JClient.legacyFont = true;
-        }
+        if (this.splash != null) this.splash.render(guiGraphics, this.width, this.font, 255 << 24);
     }
 
 

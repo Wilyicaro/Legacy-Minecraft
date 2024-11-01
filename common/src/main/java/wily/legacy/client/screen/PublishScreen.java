@@ -77,7 +77,7 @@ public class PublishScreen extends ConfirmationScreen{
     }
     public void publish(IntegratedServer server){
         if (!publish) return;
-        this.minecraft.gui.getChat().addMessage(publishUnloadedServer(minecraft, gameTypeSlider.getObjectValue(), server.getWorldData().isAllowCommands() && ((LegacyClientWorldSettings)server.getWorldData()).trustPlayers(), this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed"));
+        this.minecraft.gui.getChat().addMessage(publishUnloadedServer(minecraft, gameTypeSlider.getObjectValue(), server.getWorldData().isAllowCommands() && LegacyClientWorldSettings.of(server.getWorldData()).trustPlayers(), this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed"));
     }
 
 

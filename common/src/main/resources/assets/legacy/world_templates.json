@@ -1,8 +1,9 @@
-{
-  "legacy.menu.play_tutorial": {
+[
+  {
+    "buttonMessage": {"translate": "legacy.menu.play_tutorial"},
     "icon": "legacy:creation_list/tutorial",
     "templateLocation": "legacy:tutorial/tutorial.mcsave",
     "folderName": "Tutorial",
     "directJoin": true
   }
-}
+]

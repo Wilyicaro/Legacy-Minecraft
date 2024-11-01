@@ -63,7 +63,7 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
     @Override
     protected void init() {
         panel.init();
-        renderableVList.init(this,panel.x + 10,panel.y + 22,panel.width - 20,panel.height - 8);
+        renderableVList.init(this,panel.x + 10,panel.y + 22,panel.width - 20,panel.height - 28);
     }
 
     @Override

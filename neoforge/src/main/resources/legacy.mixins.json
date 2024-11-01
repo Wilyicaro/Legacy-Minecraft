@@ -5,11 +5,10 @@
   "client": [
     "EditBoxMixin",
     "GuiMixin",
-    "LiquidBlockRendererMixin",
-    "MinecraftMixin",
-    "TooltipRenderUtilMixin"
+    "MinecraftMixin"
   ],
   "mixins": [
+    "ClientNeoForgeModMixin",
     "ItemStackMixin"
   ],
   "injectors": {

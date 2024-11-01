@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
+import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -160,26 +161,26 @@ public class ScreenUtil {
         RenderSystem.disableBlend();
     }
     public static boolean hasClassicCrafting(){
-        return !isModEnabledOnServer() || getLegacyOptions().classicCrafting().get();
+        return !isModEnabledOnServer() || LegacyOption.classicCrafting.get();
     }
     public static float getHUDScale(){
-        return Math.max(1.5f,4 - getLegacyOptions().hudScale().get());
+        return Math.max(1.5f,4 - LegacyOption.hudScale.get());
     }
     public static float getHUDSize(){
         return 6 + 3f / ScreenUtil.getHUDScale() * (35 + (mc.gameMode.canHurtPlayer() ?  Math.max(2,Mth.ceil((Math.max(mc.player.getAttributeValue(Attributes.MAX_HEALTH), Math.max(mc.gui.displayHealth, mc.player.getHealth())) + mc.player.getAbsorptionAmount()) / 20f) + (mc.player.getArmorValue() > 0 ? 1 : 0))* 10 : 0));
     }
     public static double getHUDDistance(){
-        return -getLegacyOptions().hudDistance().get()*(22.5D + (getLegacyOptions().inGameTooltips().get() ? 17.5D : 0));
+        return -LegacyOption.hudDistance.get()*(22.5D + (LegacyOption.inGameTooltips.get() ? 17.5D : 0));
     }
     public static float getHUDOpacity(){
         float f = (Util.getMillis() - lastHotbarSelectionChange)/ 1200f;
         return getInterfaceOpacity() <= 0.8f ?Math.min(0.8f,getInterfaceOpacity() + (1 -getInterfaceOpacity()) * (f >= 3f ? Math.max(4 - f,0) : 1)) : getInterfaceOpacity();
     }
     public static boolean hasTooltipBoxes(){
-        return getLegacyOptions().tooltipBoxes().get();
+        return LegacyOption.tooltipBoxes.get();
     }
     public static float getInterfaceOpacity(){
-        return getLegacyOptions().hudOpacity().get().floatValue();
+        return LegacyOption.hudOpacity.get().floatValue();
     }
     public static int getDefaultTextColor(boolean forceWhite){
         return !forceWhite ? CommonColor.HIGHLIGHTED_WIDGET_TEXT.get() : CommonColor.WIDGET_TEXT.get();
@@ -202,10 +203,6 @@ public class ScreenUtil {
     }
     public static void playSimpleUISound(SoundEvent sound, boolean randomPitch){
         playSimpleUISound(sound,1.0f,randomPitch);
-    }
-
-    public static LegacyOptions getLegacyOptions(){
-        return (LegacyOptions) mc.options;
     }
 
     public static void drawGenericLoading(GuiGraphics graphics,int x, int y) {
@@ -289,19 +286,27 @@ public class ScreenUtil {
         guiGraphics.pose().popPose();
         Lighting.setupFor3DItems();
     }
+    public static void renderLocalPlayerHead(GuiGraphics guiGraphics, int x, int y, int size) {
+        if (mc.player == null) return;
+        PlayerFaceRenderer.draw(guiGraphics, mc.player.getSkin(), x, y, size);
+    }
     public static int getStandardHeight(){
         return Math.round(mc.getWindow().getHeight() / 180f) * 180;
     }
     public static float getTextScale(){
-        return getLegacyOptions().legacyItemTooltips().get() ? Math.max(2/3f,Math.min(720f/getStandardHeight(),4/3f)) : 1.0f;
+        return LegacyOption.legacyItemTooltips.get() ? Math.max(2/3f,Math.min(720f/getStandardHeight(),4/3f)) : 1.0f;
     }
 
     public static float getChatSafeZone(){
-        return 29 * ScreenUtil.getLegacyOptions().hudDistance().get().floatValue();
+        return 29 * LegacyOption.hudDistance.get().floatValue();
     }
 
     public static Component getDimensionName(ResourceKey<Level> dimension){
         String s = dimension.location().toLanguageKey("dimension");
         return Component.translatable(LegacyTipManager.hasTip(s) ? s : "dimension.minecraft");
+    }
+
+    public static int getSelectedItemTooltipLines(){
+        return LegacyOption.selectedItemTooltipLines.get() == 0 ? 0 : LegacyOption.selectedItemTooltipLines.get() + (LegacyOption.itemTooltipEllipsis.get() ? 1 : 0);
     }
 }

@@ -75,6 +75,7 @@
     "key.keyboard.f10":{"key": 299,"icon": "\u0299\u1299"},
     "key.keyboard.f11":{"key": 300,"icon": "\u0300\u1300"},
     "key.keyboard.f12":{"key": 301,"icon": "\u0301\u1301"},
+    "key.keyboard.keypad.enter":{"key": 335,"icon": "\u0335\u1335"},
     "key.keyboard.left.shift":{"key": 340,"icon": "\u0340\u1340"},
     "key.keyboard.left.control":{"key": 341,"icon": "\u0341\u1341"},
     "key.keyboard.left.alt":{"key": 342,"icon": "\u0341\u1342"},

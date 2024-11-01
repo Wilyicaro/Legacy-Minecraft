@@ -100,7 +100,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     @Override
     public void renderableVListInit() {
-        getRenderableVList().init(this,panel.x + 15,panel.y + 15,270, panel.height - 10 - (tabList.selectedTab == 0 ? 21 : 0));
+        getRenderableVList().init(this,panel.x + 15,panel.y + 15,270, panel.height - 30 - (tabList.selectedTab == 0 ? 21 : 0));
     }
 
     @Override

@@ -4,10 +4,13 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.Direction;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.dispenser.BlockSource;
+import net.minecraft.core.dispenser.OptionalDispenseItemBehavior;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -23,7 +26,9 @@ import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
+import net.minecraft.world.level.block.TntBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.apache.commons.io.FileUtils;
@@ -33,13 +38,14 @@ import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.init.*;
 import wily.legacy.inventory.LegacyIngredient;
 import wily.legacy.network.*;
-import wily.legacy.player.LegacyPlayerInfo;
+import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.ArmorStandPose;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -59,8 +65,6 @@ public class Legacy4J {
         }
     };
 
-    public static LegacyServerProperties serverProperties;
-
     public static final String MOD_ID = "legacy";
     public static final Supplier<String> VERSION = ()-> Legacy4JPlatform.getModInfo(MOD_ID).getVersion();
 
@@ -75,6 +79,19 @@ public class Legacy4J {
     }
     public static void registerCommands(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection environment){
         TipCommand.register(dispatcher,context);
+    }
+    public static <T> Map<String, Field> getAccessibleFieldsMap(Class<T> fieldsClass, String... fields){
+        Map<String,Field> map = new HashMap<>();
+        for (String s : fields) {
+            try {
+                Field field = fieldsClass.getDeclaredField(s);
+                field.setAccessible(true);
+                map.put(s, field);
+            } catch (NoSuchFieldException var1) {
+                throw new IllegalStateException("Couldn't get field %s for %s".formatted(s, fieldsClass), var1);
+            }
+        }
+        return map;
     }
     public static void setup(){
         Map<Item, CauldronInteraction> emptyCauldron = CauldronInteraction.EMPTY.map();
@@ -194,6 +211,23 @@ public class Legacy4J {
             }
             return ItemInteractionResult.sidedSuccess(level.isClientSide);
         }));
+        DispenserBlock.registerBehavior(Blocks.TNT, new OptionalDispenseItemBehavior() {
+            @Override
+            protected ItemStack execute(BlockSource blockSource, ItemStack itemStack) {
+                setSuccess(blockSource.level().getGameRules().getBoolean(LegacyGameRules.TNT_EXPLODES));
+                if (isSuccess()){
+                    TntBlock.explode(blockSource.level(),blockSource.pos());
+                    blockSource.level().gameEvent(null, GameEvent.ENTITY_PLACE, blockSource.pos());
+                    itemStack.shrink(1);
+                }
+                return itemStack;
+            }
+
+            @Override
+            protected void playAnimation(BlockSource blockSource, Direction direction) {
+                if (isSuccess()) super.playAnimation(blockSource, direction);
+            }
+        });
     }
     public static boolean canRepair(ItemStack repairItem, ItemStack ingredient){
         return repairItem.is(ingredient.getItem()) && repairItem.getCount() == 1 && ingredient.getCount() == 1 && repairItem.getItem().components().has(DataComponents.DAMAGE) && !repairItem.isEnchanted() && !ingredient.isEnchanted();
@@ -280,13 +314,13 @@ public class Legacy4J {
         main : while (b) {
             b = false;
             for (ServerPlayer player : p.server.getPlayerList().getPlayers())
-                if (player != p && ((LegacyPlayerInfo)player).getPosition() == pos){
+                if (player != p && ((LegacyPlayerInfo)player).getIdentifierIndex() == pos){
                     pos++;
                     b = true;
                     continue main;
                 }
         }
-        ((LegacyPlayerInfo)p).setPosition(pos);
+        ((LegacyPlayerInfo)p).setIdentifierIndex(pos);
         CommonNetwork.sendToPlayer(p, new PlayerInfoSync.All(Map.of(p.getUUID(),(LegacyPlayerInfo)p), Collections.emptyMap(),p.server.getDefaultGameType()));
         if (!p.server.isDedicatedServer()) Legacy4JClient.serverPlayerJoin(p);
     }

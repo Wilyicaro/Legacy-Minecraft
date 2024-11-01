@@ -26,9 +26,8 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.LegacyOptions;
-import wily.legacy.network.TopMessage;
-import wily.legacy.player.PlayerYBobbing;
+import wily.legacy.client.LegacyOption;
+import wily.legacy.entity.PlayerYBobbing;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
@@ -81,8 +80,8 @@ public abstract class GameRendererMixin {
             RenderSystem.disableBlend();
             RenderSystem.enableDepthTest();
         }
-        if (gammaEffect != null && ScreenUtil.getLegacyOptions().displayLegacyGamma().get()) {
-            float gamma = ScreenUtil.getLegacyOptions().legacyGamma().get().floatValue();
+        if (gammaEffect != null && LegacyOption.displayLegacyGamma.get()) {
+            float gamma = LegacyOption.legacyGamma.get().floatValue();
             graphics.flush();
             RenderSystem.enableBlend();
             RenderSystem.disableDepthTest();
@@ -111,7 +110,7 @@ public abstract class GameRendererMixin {
     }
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"))
     private void render(Gui instance, GuiGraphics guiGraphics, DeltaTracker deltaTracker){
-        if (((LegacyOptions)minecraft.options).displayHUD().get()) instance.render(guiGraphics,deltaTracker);
+        if (LegacyOption.displayHUD.get()) instance.render(guiGraphics,deltaTracker);
     }
     @Inject(method = "bobView", at = @At("RETURN"))
     private void bobView(PoseStack poseStack, float f, CallbackInfo ci){
@@ -119,16 +118,16 @@ public abstract class GameRendererMixin {
     }
     @Inject(method = "shouldRenderBlockOutline", at = @At("HEAD"), cancellable = true)
     private void renderLevel(CallbackInfoReturnable<Boolean> cir){
-        if (!((LegacyOptions)minecraft.options).displayHUD().get()) cir.setReturnValue(false);
+        if (!LegacyOption.displayHUD.get()) cir.setReturnValue(false);
     }
     @Redirect(method = "renderLevel", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/GameRenderer;renderHand:Z"))
     private boolean renderLevel(GameRenderer instance){
-        return renderHand && ((LegacyOptions)minecraft.options).displayHand().get();
+        return renderHand && LegacyOption.displayHand.get();
     }
     @ModifyVariable(method = "renderLevel", at = @At(value = "STORE", remap = false),ordinal = 1)
     private Matrix4f renderLevel(Matrix4f original){
         Matrix4f matrix4f = new Matrix4f();
-        if (ScreenUtil.getLegacyOptions().flyingViewRolling().get() && minecraft.player != null && minecraft.player.isFallFlying()){
+        if (LegacyOption.flyingViewRolling.get() && minecraft.player != null && minecraft.player.isFallFlying()){
             float f = minecraft.isPaused() ? 0 : minecraft.getTimer().getGameTimeDeltaPartialTick(true);
             Vec3 vec3 =  minecraft.player.getViewVector(f);
             Vec3 vec32 =  minecraft.player.getDeltaMovementLerped(f);

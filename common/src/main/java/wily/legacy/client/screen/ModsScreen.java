@@ -10,7 +10,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -29,7 +28,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ModsScreen extends PanelVListScreen{
+public class ModsScreen extends PanelVListScreen {
     protected final Map<ModInfo, SizedLocation> modLogosCache = new ConcurrentHashMap<>();
     protected ScrollableRenderer scrollableRenderer =  new ScrollableRenderer(new LegacyScrollRenderer());
 
@@ -65,7 +64,7 @@ public class ModsScreen extends PanelVListScreen{
             return tooltip.toCharSequence(minecraft);
         }
     });
-    public ModsScreen(Screen parent) {
+    public ModsScreen(net.minecraft.client.gui.screens.Screen parent) {
         super(parent,282,240, Component.empty());
         renderableVList.layoutSpacing(l->0);
         fillMods();
@@ -79,7 +78,7 @@ public class ModsScreen extends PanelVListScreen{
                 @Override
                 public void onPress() {
                     if (isFocused()){
-                        Screen config = Legacy4JClient.getConfigScreen(mod,ModsScreen.this);
+                        net.minecraft.client.gui.screens.Screen config = Legacy4JClient.getConfigScreen(mod,ModsScreen.this);
                         if (config != null) minecraft.setScreen(config);
                     }
                 }
@@ -149,7 +148,7 @@ public class ModsScreen extends PanelVListScreen{
     public void renderableVListInit() {
         addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.blitSprite(LegacySprites.PANEL_RECESS, panel.x + 7, panel.y + 7, panel.width - 14, panel.height - 14)));
         tooltipBox.init();
-        getRenderableVList().init(this,panel.x + 11,panel.y + 11,260, panel.height - 5);
+        getRenderableVList().init(this,panel.x + 11,panel.y + 11,260, panel.height - 22);
     }
 
     @Override

@@ -66,6 +66,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.util.JsonUtil;
@@ -98,16 +99,21 @@ public interface ControlTooltip {
     Icon getIcon();
     @Nullable
     Component getAction();
-    Component MORE = Component.literal("...").withStyle(ChatFormatting.DARK_GRAY);
+    Component MORE = Component.literal("...").withStyle(ChatFormatting.GRAY);
     Component SPACE = Component.literal("  ");
     Component PLUS = Component.literal("+");
     Icon SPACE_ICON = Icon.of(SPACE);
     Icon PLUS_ICON = Icon.of(PLUS);
+
+    static boolean hasKeyboard(Screen screen){
+        return (screen.getFocused() instanceof EditBox || screen.getFocused() instanceof BookPanel && screen instanceof BookEditScreen || screen.getFocused() instanceof WidgetPanel && screen instanceof AbstractSignEditScreen);
+    }
+
     static Component getSelectMessage(Screen screen){
-        return screen.getFocused() == null ? null : getAction((screen.getFocused() instanceof EditBox || screen.getFocused() instanceof BookPanel && screen instanceof BookEditScreen || screen.getFocused() instanceof WidgetPanel && screen instanceof AbstractSignEditScreen) && !Screen.hasShiftDown() ? "legacy.action.keyboard_screen" : screen.getFocused() instanceof AbstractSliderButton b  ? b.canChangeValue ? "legacy.action.lock" : "legacy.action.unlock" : "mco.template.button.select");
+        return screen.getFocused() == null ? null : getAction(hasKeyboard(screen) ? "legacy.action.show_keyboard" : screen.getFocused() instanceof AbstractSliderButton b  ? b.canChangeValue ? "legacy.action.lock" : "legacy.action.unlock" : "mco.template.button.select");
     }
     static ControlTooltip.Renderer setupDefaultScreen(Renderer renderer, Screen screen){
-        return renderer.add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(),()->getSelectMessage(screen)).add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.bindingState.getIcon(),()->screen.shouldCloseOnEsc() ? getAction("gui.back") : null);
+        return renderer.add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(hasKeyboard(screen) ? InputConstants.KEY_NUMPADENTER :  InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(),()->getSelectMessage(screen)).add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.bindingState.getIcon(),()->screen.shouldCloseOnEsc() ? getAction("gui.back") : null);
     }
     static ControlTooltip.Renderer setupDefaultContainerScreen(Renderer renderer, LegacyMenuAccess<?> a){
         return renderer.
@@ -262,6 +268,10 @@ public interface ControlTooltip {
             tooltips.set(ordinal,tooltip);
             return this;
         }
+        public Renderer replace(int ordinal, Function<Icon,Icon> control, Function<Component,Component>  action){
+            ControlTooltip old = tooltips.get(ordinal);
+            return set(ordinal,ControlTooltip.create(()->control.apply(old.getIcon()),()->action.apply(old.getAction())));
+        }
         public Renderer add(KeyMapping mapping){
             return add(LegacyKeyMapping.of(mapping));
         }
@@ -289,13 +299,13 @@ public interface ControlTooltip {
         }
         @Override
         public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-            if (!ScreenUtil.getLegacyOptions().inGameTooltips().get() && minecraft.screen == null) return;
+            if (!LegacyOption.inGameTooltips.get() && minecraft.screen == null) return;
             int xDiff = 0;
             RenderSystem.disableDepthTest();
             RenderSystem.enableBlend();
             guiGraphics.setColor(1.0f,1.0f,1.0f,Math.max(minecraft.screen == null ? 0.0f : 0.2f,  ScreenUtil.getHUDOpacity()));
             guiGraphics.pose().pushPose();
-            double hudDiff = (1 - ScreenUtil.getLegacyOptions().hudDistance().get()) * 60D;
+            double hudDiff = (1 - LegacyOption.hudDistance.get()) * 60D;
             guiGraphics.pose().translate(-Math.min(hudDiff,30), Math.min(hudDiff,16),0);
             for (ControlTooltip tooltip : tooltips) {
                 Icon icon;

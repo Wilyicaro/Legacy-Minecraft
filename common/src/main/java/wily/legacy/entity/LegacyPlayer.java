@@ -1,4 +1,4 @@
-package wily.legacy.player;
+package wily.legacy.entity;
 
 public interface LegacyPlayer {
 

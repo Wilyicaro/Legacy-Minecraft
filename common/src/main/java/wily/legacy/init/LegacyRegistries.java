@@ -61,7 +61,6 @@ public class LegacyRegistries {
         return blockState.is(Blocks.WATER_CAULDRON) && (opt = level.getBlockEntity(blockPos, LegacyRegistries.WATER_CAULDRON_BLOCK_ENTITY.get())).isPresent() && (opt.get().potion != Potions.WATER || opt.get().waterColor != null);
     }
     public static void register(){
-        if (Legacy4J.serverProperties != null && !Legacy4J.serverProperties.legacyRegistries) return;
         BLOCK_REGISTER.register();
         BLOCK_ENTITIES_REGISTER.register();
         BLOCK_ITEMS_REGISTER.register();

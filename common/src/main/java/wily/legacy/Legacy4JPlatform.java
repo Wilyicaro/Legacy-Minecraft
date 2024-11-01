@@ -80,7 +80,7 @@ public class Legacy4JPlatform {
         throw new AssertionError();
     }
     public static List<String> getMinecraftResourceAssort(){
-        return new ArrayList<>(List.of("minecraft",getLoader().isForgeLike() ? "mod_resources" : "fabric","legacy:legacy_waters"));
+        return new ArrayList<>(List.of("vanilla",getLoader().isForgeLike() ? "mod_resources" : "fabric","legacy:legacy_waters"));
     }
     public static List<String> getMinecraftClassicResourceAssort(){
         List<String> assort = getMinecraftResourceAssort();

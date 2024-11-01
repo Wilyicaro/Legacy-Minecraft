@@ -7,7 +7,7 @@ import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.stats.Stat;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import wily.legacy.player.LegacyPlayerInfo;
+import wily.legacy.entity.LegacyPlayerInfo;
 
 @Mixin(PlayerInfo.class)
 public abstract class PlayerInfoMixin implements LegacyPlayerInfo {
@@ -24,11 +24,11 @@ public abstract class PlayerInfoMixin implements LegacyPlayerInfo {
     boolean mayFlySurvival = false;
     Object2IntMap<Stat<?>> statsMap = new Object2IntOpenHashMap<>();
     @Override
-    public int getPosition() {
+    public int getIdentifierIndex() {
         return position;
     }
     @Override
-    public void setPosition(int i) {
+    public void setIdentifierIndex(int i) {
         position = i;
     }
 

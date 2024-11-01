@@ -747,20 +747,28 @@ public interface MCAccount {
         };
     }
     static CompletableFuture<User> login(LegacyLoadingScreen screen, String code, String password, Stocker<String> refresh, Executor executor){
-        return updateStage(MCAccount.acquireMSAccessToken(code,refresh.get() != null,executor), screen,ACQUIRING_MSACCESS_TOKEN,20).
+        CompletableFuture<User> login = updateStage(MCAccount.acquireMSAccessToken(code,refresh.get() != null,executor), screen,ACQUIRING_MSACCESS_TOKEN,20).
                 thenComposeAsync(s-> {
                     refresh.set(encryptToken(password,s.getSecond()));
                     return updateStage(MCAccount.acquireXboxAccessToken(s.getFirst(), executor), screen, ACQUIRING_XBOX_ACCESS_TOKEN, 40);
                 }).
                 thenComposeAsync(s-> updateStage(MCAccount.acquireXboxXstsToken(s,executor),screen,ACQUIRING_XBOX_XSTS_TOKEN,60)).
                 thenComposeAsync(s-> updateStage(MCAccount.acquireMCAccessToken(s.get("Token"),s.get("uhs"),executor),screen,ACQUIRING_MC_ACCESS_TOKEN,80)).
-                thenComposeAsync(s-> updateStage(MCAccount.login(s,executor),screen,FINALIZING,100)).
-                exceptionally(throwable -> {
-                    Minecraft.getInstance().getToasts().addToast(new LegacyTip(Component.translatable("legacy.menu.choose_user.failed",Component.translatable("legacy.menu.choose_user.failed." + (throwable instanceof ConnectTimeoutException ? "timeout" : (throwable != null && throwable.getCause().getMessage().equals("NOT_FOUND: Not Found") ? "notPurchased" : "unauthorized"))).withStyle(ChatFormatting.RED)),140,46).centered());
-                    if (throwable != null) Legacy4J.LOGGER.error(throwable.getMessage());
-                    Minecraft.getInstance().executeBlocking(screen::onClose);
-                    return null;
-                });
+                thenComposeAsync(s-> updateStage(MCAccount.login(s,executor),screen,FINALIZING,100));
+
+        login.exceptionally(throwable -> {
+            Minecraft.getInstance().getToasts().addToast(new LegacyTip(Component.translatable("legacy.menu.choose_user.failed",Component.translatable("legacy.menu.choose_user.failed." + (throwable instanceof ConnectTimeoutException ? "timeout" : (throwable != null && throwable.getCause().getMessage().equals("NOT_FOUND: Not Found") ? "notPurchased" : "unauthorized"))).withStyle(ChatFormatting.RED)),140,46).centered());
+            if (throwable != null) Legacy4J.LOGGER.error(throwable.getMessage());
+            Minecraft.getInstance().executeBlocking(screen::onClose);
+            return null;
+        });
+        return login;
+    }
+    static User loginFail(LegacyLoadingScreen screen, Throwable throwable) {
+        Minecraft.getInstance().getToasts().addToast(new LegacyTip(Component.translatable("legacy.menu.choose_user.failed", Component.translatable("legacy.menu.choose_user.failed." + (throwable instanceof ConnectTimeoutException ? "timeout" : (throwable != null && throwable.getCause().getMessage().equals("NOT_FOUND: Not Found") ? "notPurchased" : "unauthorized"))).withStyle(ChatFormatting.RED)), 140, 46).centered());
+        if (throwable != null) Legacy4J.LOGGER.error(throwable.getMessage());
+        Minecraft.getInstance().executeBlocking(screen::onClose);
+        return null;
     }
     static CompletableFuture<MCAccount> create(Runnable onClose, String password){
         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -843,6 +851,10 @@ public interface MCAccount {
      * @param user New Minecraft User
      */
     static void setUser(User user){
+        if (user == null) {
+            LOGGER.warn("Something went wrong, the User cannot be set to null");
+            return;
+        }
         Minecraft.getInstance().user = Minecraft.getInstance().getSplashManager().user = user;
         Minecraft.getInstance().profileFuture = CompletableFuture.supplyAsync(() -> Minecraft.getInstance().getMinecraftSessionService().fetchProfile(user.getProfileId(), true), Util.nonCriticalIoPool());
         UserApiService userApiService = user.getType() != User.Type.MSA ? UserApiService.OFFLINE : Minecraft.getInstance().authenticationService.createUserApiService(user.getAccessToken());

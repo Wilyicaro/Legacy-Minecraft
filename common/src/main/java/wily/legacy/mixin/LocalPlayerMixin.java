@@ -8,10 +8,9 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.level.block.ObserverBlock;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
@@ -110,16 +109,24 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
         else super.moveRelative(f, vec3);
     }
     public Vec3 getWorldRelativeMovement(float f, Vec3 vec3, int relRot){
+        vec3 = getNormal(vec3,Math.toRadians(relRot));
         double d = vec3.lengthSqr();
         if (d < 1.0E-7) {
             return Vec3.ZERO;
         } else {
-            float angle = Math.round(getYRot() / relRot) * relRot;
             Vec3 vec32 = (d > 1.0 ? vec3.normalize() : vec3).scale(f);
-            float h = Mth.sin(angle * 0.017453292F);
-            float i = Mth.cos(angle * 0.017453292F);
-            return new Vec3(vec32.x * (double)i - vec32.z * (double)h, vec32.y, vec32.z * (double)i + vec32.x * (double)h);
+            double angle = Math.toRadians(Math.round(getYRot() / relRot) * relRot);
+            double sin = Math.sin(angle);
+            double cos = Math.cos(angle);
+            return new Vec3(vec32.x * cos - vec32.z * sin, vec32.y, vec32.z * cos + vec32.x * sin);
         }
+    }
+
+    private static Vec3 getNormal(Vec3 vec3, double relRot){
+        double angleRad = Math.atan2(vec3.z, vec3.x);
+        double quantizedAngle = Math.round(angleRad / relRot) * relRot;
+        double length = vec3.length();
+        return new Vec3(length*Math.cos(quantizedAngle), vec3.y,length*Math.sin(quantizedAngle));
     }
 
     @Inject(method = "aiStep", at = @At(value = "RETURN"))

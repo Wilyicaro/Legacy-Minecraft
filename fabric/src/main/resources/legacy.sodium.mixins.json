@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "wily.legacy.fabric.mixin.sodium",
+  "compatibilityLevel": "JAVA_17",
+  "plugin": "wily.legacy.fabric.mixin.LegacySodiumMixinPlugin",
+  "client": [
+    "FluidRendererFactoryMixin"
+  ],
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

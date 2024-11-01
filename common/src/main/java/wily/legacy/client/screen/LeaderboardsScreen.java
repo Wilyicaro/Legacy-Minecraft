@@ -35,7 +35,7 @@ import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.network.CommonNetwork;
 import wily.legacy.network.PlayerInfoSync;
-import wily.legacy.player.LegacyPlayerInfo;
+import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.JsonUtil;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;

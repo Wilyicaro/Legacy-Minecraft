@@ -3,6 +3,7 @@ package wily.legacy.mixin;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -34,6 +35,12 @@ public abstract class EntityMixin {
     @Shadow public abstract float getYRot();
 
     @Shadow public abstract boolean isUnderWater();
+
+    @Shadow private boolean onGround;
+
+    @Shadow public abstract boolean onGround();
+
+    @Shadow protected abstract Vec3 collide(Vec3 arg);
 
     @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", at = @At("HEAD"))
     private void startRiding(Entity entity, boolean force, CallbackInfoReturnable<Boolean> cir) {
@@ -73,9 +80,13 @@ public abstract class EntityMixin {
         this.setXRot(this.getXRot() + ridingEntityXRotDeltaSmooth);
     }
 
-    @Redirect(method = "collide", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;onGround()Z"))
-    protected boolean getFlyingSpeed(Entity instance) {
-        return instance.onGround() || instance instanceof Player p && p.getAbilities().flying;
+    @Redirect(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;"))
+    protected Vec3 move(Entity instance, Vec3 vec31) {
+        boolean lastOnGround = onGround;
+        onGround = onGround || instance instanceof Player p && p.getAbilities().flying;
+        Vec3 collision = collide(vec31);
+        onGround = lastOnGround;
+        return collision;
     }
     @Redirect(method = "updateSwimming", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isUnderWater()Z"))
     protected boolean updateSwimming(Entity instance) {

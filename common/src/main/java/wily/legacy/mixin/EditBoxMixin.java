@@ -8,7 +8,6 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import org.objectweb.asm.Opcodes;
@@ -18,6 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.KeyboardScreen;
@@ -47,18 +47,19 @@ public abstract class EditBoxMixin extends AbstractWidget {
     public EditBoxMixin(int i, int j, int k, int l, Component component) {
         super(i, j, k, l, component);
     }
-    @Inject(method = "keyPressed", at = @At("HEAD"))
+    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir){
         Screen screen = Minecraft.getInstance().screen;
-        if (!Screen.hasShiftDown() && KeyboardScreen.isOpenKey(i) && screen != null && screen.children().contains(this)){
-            Minecraft.getInstance().setScreen(KeyboardScreen.fromEditBox(screen.children().indexOf(this),screen));
+        if (KeyboardScreen.isOpenKey(i) && screen != null){
+            Minecraft.getInstance().setScreen(KeyboardScreen.fromStaticListener(this,screen));
+            cir.setReturnValue(true);
         }
     }
     @Inject(method = "onClick", at = @At("HEAD"), cancellable = true)
     private void onClick(double d, double e, CallbackInfo ci){
         Screen screen = Minecraft.getInstance().screen;
-        if ((Screen.hasShiftDown() || ControllerBinding.DOWN_BUTTON.bindingState.pressed) && screen.children().contains(this)) {
-            Minecraft.getInstance().setScreen(KeyboardScreen.fromEditBox(screen.children().indexOf(this), screen));
+        if (Screen.hasShiftDown() || Legacy4JClient.controllerManager.isControllerTheLastInput) {
+            Minecraft.getInstance().setScreen(KeyboardScreen.fromStaticListener(this, screen));
             ci.cancel();
         }
     }

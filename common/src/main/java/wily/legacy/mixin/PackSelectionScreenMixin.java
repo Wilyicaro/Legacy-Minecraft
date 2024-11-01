@@ -63,8 +63,8 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
         ci.cancel();
         super.init();
         panel.init();
-        unselectedPacksList.init(this,panel.x + 15, panel.y + 30, 180, 210);
-        selectedPacksList.init(this,panel.x + 215, panel.y + 30, 180, 210);
+        unselectedPacksList.init(this,panel.x + 15, panel.y + 30, 180, 180);
+        selectedPacksList.init(this,panel.x + 215, panel.y + 30, 180, 180);
         this.doneButton = Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).build();
     }
 

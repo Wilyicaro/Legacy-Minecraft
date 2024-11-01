@@ -1,4 +1,4 @@
-package wily.legacy.player;
+package wily.legacy.entity;
 
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;

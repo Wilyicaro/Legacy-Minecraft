@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.util.ScreenUtil;
 
@@ -59,7 +60,7 @@ public abstract class BossHealthOverlayMixin {
     }
     @ModifyVariable(method = "render", at = @At(value = "STORE", ordinal = 0), ordinal = 1)
     public int render(int i) {
-        return (int) (12 + 16 * ScreenUtil.getLegacyOptions().hudDistance().get());
+        return (int) (12 + 16 * LegacyOption.hudDistance.get());
     }
     @Inject(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At("HEAD"))
     private void drawBar(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, CallbackInfo ci) {

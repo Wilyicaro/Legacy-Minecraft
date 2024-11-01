@@ -9,7 +9,7 @@ import net.minecraft.world.item.trading.MerchantOffers;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import wily.legacy.inventory.LegacyMerchantMenu;
-import wily.legacy.player.LegacyPlayer;
+import wily.legacy.entity.LegacyPlayer;
 
 import java.util.OptionalInt;
 @Mixin(Merchant.class)

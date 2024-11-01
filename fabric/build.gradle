@@ -34,6 +34,8 @@ dependencies {
 
     api(include(sdl_dependency))
     modImplementation("com.terraformersmc:modmenu:11.0.1")
+    modImplementation("maven.modrinth:sodium:mc1.21-0.6.0-beta.2-fabric")
+    modImplementation("maven.modrinth:iris:1.8.0-beta.4+1.21-fabric")
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }

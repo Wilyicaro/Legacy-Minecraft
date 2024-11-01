@@ -57,8 +57,8 @@ import java.util.stream.Stream;
 import static wily.legacy.client.screen.ControlTooltip.*;
 import static wily.legacy.util.LegacySprites.PACK_HIGHLIGHTED;
 
-public record Assort(String id, int version, Component displayName, Component description, Optional<ResourceLocation> iconSprite, Optional<ResourceLocation> backgroundSprite, List<String> packs) {
-    public static final Codec<Assort> CODEC = RecordCodecBuilder.create(i-> i.group(Codec.STRING.fieldOf("id").forGetter(Assort::id),Codec.INT.optionalFieldOf("version",0).forGetter(Assort::version), ComponentSerialization.CODEC.fieldOf("name").forGetter(Assort::displayName),ComponentSerialization.CODEC.fieldOf("description").forGetter(Assort::description),ResourceLocation.CODEC.optionalFieldOf("icon").forGetter(Assort::iconSprite),ResourceLocation.CODEC.optionalFieldOf("background").forGetter(Assort::backgroundSprite),Codec.STRING.listOf().fieldOf("packs").forGetter(Assort::packs)).apply(i,Assort::new));
+public record Assort(String id, int version, Component displayName, Component description, Optional<ResourceLocation> iconSprite, Optional<ResourceLocation> backgroundSprite, List<String> packs, Optional<String> displayPack) {
+    public static final Codec<Assort> CODEC = RecordCodecBuilder.create(i-> i.group(Codec.STRING.fieldOf("id").forGetter(Assort::id),Codec.INT.optionalFieldOf("version",0).forGetter(Assort::version), ComponentSerialization.CODEC.fieldOf("name").forGetter(Assort::displayName),ComponentSerialization.CODEC.fieldOf("description").forGetter(Assort::description),ResourceLocation.CODEC.optionalFieldOf("icon").forGetter(Assort::iconSprite),ResourceLocation.CODEC.optionalFieldOf("background").forGetter(Assort::backgroundSprite),Codec.STRING.listOf().fieldOf("packs").forGetter(Assort::packs),Codec.STRING.optionalFieldOf("displayPack").forGetter(Assort::displayPack)).apply(i,Assort::new));
     public static final Codec<List<Assort>> LIST_CODEC = CODEC.listOf();
     public static final List<Assort> resourceAssorts = new ArrayList<>();
     public static final List<Assort> defaultResourceAssorts = new ArrayList<>();
@@ -70,8 +70,8 @@ public record Assort(String id, int version, Component displayName, Component de
     public static final Component REMOVE_ASSORT = Component.translatable("legacy.menu.remove_assort");
     public static Gson GSON = new GsonBuilder().create();
 
-    public static final Assort MINECRAFT = registerDefaultResource("minecraft",Component.translatable("legacy.menu.assorts.minecraft"),Component.translatable("legacy.menu.assorts.minecraft.description"),null,ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"icon/background"),Legacy4JPlatform.getMinecraftResourceAssort());
-    public static final Assort MINECRAFT_CLASSIC_TEXTURES = registerDefaultResource("minecraft_classic",Component.translatable("legacy.menu.assorts.minecraft_classic"),Component.translatable("legacy.menu.assorts.minecraft_classic.description"),ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"icon/minecraft_classic"),ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"icon/minecraft_classic_background"),Legacy4JPlatform.getMinecraftClassicResourceAssort());
+    public static final Assort MINECRAFT = registerDefaultResource("minecraft",1,Component.translatable("legacy.menu.assorts.minecraft"),Component.translatable("legacy.menu.assorts.minecraft.description"),null,ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"icon/background"),Legacy4JPlatform.getMinecraftResourceAssort(),"vanilla");
+    public static final Assort MINECRAFT_CLASSIC_TEXTURES = registerDefaultResource("minecraft_classic",0,Component.translatable("legacy.menu.assorts.minecraft_classic"),Component.translatable("legacy.menu.assorts.minecraft_classic.description"),ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"icon/minecraft_classic"),ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"icon/minecraft_classic_background"),Legacy4JPlatform.getMinecraftClassicResourceAssort(),null);
 
     public static final Stocker<String> defaultResourceAssort = Stocker.of(MINECRAFT.id);
 
@@ -84,7 +84,7 @@ public record Assort(String id, int version, Component displayName, Component de
         return obj instanceof Assort a && a.id.equals(id);
     }
     public Assort withPacks(List<String> packs){
-        return new Assort(id,version,displayName,description,iconSprite,backgroundSprite,packs);
+        return new Assort(id,version,displayName,description,iconSprite,backgroundSprite,packs,displayPack);
     }
 
     public static void init() {
@@ -139,7 +139,9 @@ public record Assort(String id, int version, Component displayName, Component de
         }
         for (int i = defaultAssorts.size() - 1; i >= 0; i--) {
             Assort a = defaultAssorts.get(i);
-            if (!list.contains(a)) list.add(0,a);
+            int index = list.indexOf(a);
+            if (index < 0) list.add(0,a);
+            else if (a.version > list.get(index).version) list.set(index,a);
         }
         selected.set(defaultAssort);
         return list;
@@ -185,8 +187,8 @@ public record Assort(String id, int version, Component displayName, Component de
         resourceAssorts.add(a);
         return a;
     }
-    public static Assort registerDefaultResource(String id, Component displayName, Component description, ResourceLocation iconSprite, ResourceLocation backgroundSprite, List<String> packs){
-        return registerDefaultResource(new Assort(id,0,displayName,description,Optional.ofNullable(iconSprite),Optional.ofNullable(backgroundSprite),packs));
+    public static Assort registerDefaultResource(String id,int version, Component displayName, Component description, ResourceLocation iconSprite, ResourceLocation backgroundSprite, List<String> packs,String displayPack){
+        return registerDefaultResource(new Assort(id,version,displayName,description,Optional.ofNullable(iconSprite),Optional.ofNullable(backgroundSprite),packs,Optional.ofNullable(displayPack)));
     }
     public static Assort registerDefaultResource(Assort a){;
         defaultResourceAssorts.add(a);
@@ -220,7 +222,7 @@ public record Assort(String id, int version, Component displayName, Component de
         return packRepository.getPack(id) != null;
     }
     public String getDisplayPackId(){
-        return equals(MINECRAFT) ? "vanilla" : packs.isEmpty() ? null : packs.get(packs.size() - 1);
+        return displayPack.orElse(packs.isEmpty() ? null : packs.get(packs.size() - 1));
     }
     public static class Selector extends AbstractWidget {
         public static final String TEMPLATE_ASSORT = "template_assort";
@@ -244,7 +246,7 @@ public record Assort(String id, int version, Component displayName, Component de
         public final BiFunction<Component,Integer,MultiLineLabel> labelsCache = Util.memoize((c,i)->MultiLineLabel.create(Minecraft.getInstance().font,c,i));
 
         public static Selector resources(int i, int j, int k, int l, boolean hasTooltip) {
-            return new Selector(i,j,k,l, Component.translatable("legacy.menu.assorts.resources"), getAction("legacy.action.resource_packs_screen"),resourceAssorts, Minecraft.getInstance().hasSingleplayerServer() ? ((LegacyClientWorldSettings)Minecraft.getInstance().getSingleplayerServer().getWorldData()).getSelectedResourceAssort() : resourceById(defaultResourceAssort.get()), Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), Selector::reloadResourcesChanges,hasTooltip){
+            return new Selector(i,j,k,l, Component.translatable("legacy.menu.assorts.resources"), getAction("legacy.action.show_resource_packs"),resourceAssorts, Minecraft.getInstance().hasSingleplayerServer() ? LegacyClientWorldSettings.of(Minecraft.getInstance().getSingleplayerServer().getWorldData()).getSelectedResourceAssort() : resourceById(defaultResourceAssort.get()), Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), Selector::reloadResourcesChanges,hasTooltip){
 
                 @Override
                 public void applyChanges(boolean reloadAndSave) {
@@ -257,8 +259,7 @@ public record Assort(String id, int version, Component displayName, Component de
             };
         }
         public static Selector resources(int i, int j, int k, int l, boolean hasTooltip, Assort selectedAssort) {
-            return new Selector(i,j,k,l, Component.translatable("legacy.menu.assorts.resources"), getAction("legacy.action.resource_packs_screen"),resourceAssorts, selectedAssort, Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), Selector::reloadResourcesChanges,hasTooltip){
-            };
+            return new Selector(i,j,k,l, Component.translatable("legacy.menu.assorts.resources"), getAction("legacy.action.show_resource_packs"),resourceAssorts, selectedAssort, Minecraft.getInstance().getResourcePackRepository(),Minecraft.getInstance().getResourcePackDirectory(), Selector::reloadResourcesChanges,hasTooltip);
         }
         public Selector(int i, int j, int k, int l, Component component,Component screenComponent,List<Assort> assorts, Assort savedAssort, PackRepository packRepository, Path packPath, Consumer<Selector> reloadChanges, boolean hasTooltip) {
             super(i, j, k, l,component);
@@ -275,6 +276,9 @@ public record Assort(String id, int version, Component displayName, Component de
             if (assorts.size() > getMaxPacks())
                 scrolledList.max = assorts.size() - getMaxPacks();
             setSelectedIndex(savedAssort == null ? 0 : assorts.indexOf(savedAssort));
+            while (selectedIndex >= scrolledList.get() + getMaxPacks()){
+                if (scrolledList.add(1) == 0) break;
+            }
             updateTooltip();
         }
 
@@ -311,7 +315,7 @@ public record Assort(String id, int version, Component displayName, Component de
 
         @Override
         public boolean keyPressed(int i, int j, int k) {
-            if (isHoveredOrFocused()) {
+            if (isHoveredOrFocused() && active) {
                 if (i == InputConstants.KEY_X){
                     openPackSelectionScreen();
                     return true;
@@ -343,10 +347,11 @@ public record Assort(String id, int version, Component displayName, Component de
                                 nameBox.setHint(name);
                                 minecraft.setScreen(new ConfirmationScreen(parent, ADD_ASSORT, Component.translatable("legacy.menu.assort_name"), p -> {
                                     minecraft.setScreen(new PackSelectionScreen(packRepository, r -> {
-                                        Assort.resourceAssorts.add(new Assort(id, 0,nameBox.getValue().isBlank() ? name : Component.literal(nameBox.getValue()),Component.translatable("legacy.menu.assorts.template.description"),Optional.empty(),Optional.empty(), getSelectableIds(packRepository)));
+                                        Assort.resourceAssorts.add(new Assort(id, 0,nameBox.getValue().isBlank() ? name : Component.literal(nameBox.getValue()),Component.translatable("legacy.menu.assorts.template.description"),Optional.empty(),Optional.empty(), getSelectableIds(packRepository), Optional.empty()));
                                         save();
                                         updateSavedAssort();
                                         minecraft.setScreen(screen);
+                                        packRepository.setSelected(Assort.Selector.this.oldSelection);
                                     }, packPath, getMessage()));
                                 }) {
                                     @Override
@@ -378,23 +383,25 @@ public record Assort(String id, int version, Component displayName, Component de
             if (selectedIndex == index) return;
             this.selectedIndex = Stocker.cyclic(0,index,assorts.size());
             scrollableRenderer.scrolled.set(0);
-            scrollableRenderer.scrolled.max = Math.max(0,labelsCache.apply(getSelectedAssort().description(),145).getLineCount() - (getSelectedAssort().backgroundSprite.isEmpty() && !getSelectedAssort().packs.isEmpty() && packRepository.getPack(getSelectedAssort().getDisplayPackId()) != null ? 20 : 7));
+            scrollableRenderer.scrolled.max = Math.max(0,labelsCache.apply(getSelectedAssort().description(),145).getLineCount() - (getSelectedAssort().backgroundSprite.orElse(getSelectedAssort().isValidPackDisplay(packRepository) ? getPackBackground(packRepository.getPack(getSelectedAssort().getDisplayPackId())) : null) == null ? 20 : 7));
             updateTooltip();
         }
 
         public void applyChanges(boolean reloadAndSave){
             packRepository.setSelected(savedAssort.packs());
-            if (Minecraft.getInstance().hasSingleplayerServer()) ((LegacyClientWorldSettings)Minecraft.getInstance().getSingleplayerServer().getWorldData()).setSelectedResourceAssort(savedAssort);
+            if (Minecraft.getInstance().hasSingleplayerServer()) LegacyClientWorldSettings.of(Minecraft.getInstance().getSingleplayerServer().getWorldData()).setSelectedResourceAssort(savedAssort);
             if (reloadAndSave) reloadChanges.accept(this);
         }
-        public void applyResourceChanges(Runnable runnable){
-            packRepository.setSelected(savedAssort.packs());
+
+        public static void applyResourceChanges(Minecraft minecraft, Collection<String> oldSelection, Collection<String> newSelection, Runnable runnable){
+            minecraft.getResourcePackRepository().setSelected(newSelection);
             minecraft.setScreen(new LegacyLoadingScreen());
-            if (!oldSelection.equals(getSelectedIds(packRepository))) {
+            if (!oldSelection.equals(getSelectedIds(minecraft.getResourcePackRepository()))) {
                 updateSavedResourcePacks();
                 Minecraft.getInstance().reloadResourcePacks().thenRun(runnable);
             }else runnable.run();
         }
+
         public static void reloadResourcesChanges(Selector selector){
             if (!selector.oldSelection.equals(getSelectedIds(selector.packRepository))) {
                 updateSavedResourcePacks();
@@ -413,6 +420,7 @@ public record Assort(String id, int version, Component displayName, Component de
                         save();
                     }
                     minecraft.setScreen(screen);
+                    packRepository.setSelected(this.oldSelection);
                 }, packPath, getMessage()));
             }
         }

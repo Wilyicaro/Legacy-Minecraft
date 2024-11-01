@@ -20,10 +20,7 @@ public class LegacyMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        boolean sodium = Legacy4JPlatform.isLoadingMod("rubidium") || Legacy4JPlatform.isLoadingMod("sodium");
-        if ((mixinClassName.equals("LiquidRendererMixin") || mixinClassName.equals("ClientLevelMixin")) && sodium) return false;
-        if (mixinClassName.equals("BlockColorsMixin")) return sodium;
-        if (Legacy4JPlatform.isLoadingMod("nostalgic_tweaks") && mixinClassName.equals("ItemInHandRendererSwayMixin")) return false;
+        if (Legacy4JPlatform.isLoadingMod("nostalgic_tweaks") && mixinClassName.endsWith("ItemInHandRendererSwayMixin")) return false;
         return true;
     }
 

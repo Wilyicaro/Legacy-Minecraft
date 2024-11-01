@@ -62,7 +62,7 @@ public abstract class AdvancementToastMixin implements Toast {
                     toastComponent.getMinecraft().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.0f));
                 }
             }
-            if (toastComponent.getMinecraft().player != null) PlayerFaceRenderer.draw(guiGraphics, toastComponent.getMinecraft().player.getSkin(), 7, (height() - 32) / 2, 32);
+            ScreenUtil.renderLocalPlayerHead(guiGraphics,7, (height() - 32) / 2, 32);
             guiGraphics.blitSprite(LegacySprites.SMALL_PANEL,width() - 38,(height() - 28) / 2,28,28);
             guiGraphics.renderItem(displayInfo.getIcon(), width() - 32, (height() - 16) / 2);
             cir.setReturnValue((double)l >= 5000.0 * toastComponent.getNotificationDisplayTimeMultiplier() ? Toast.Visibility.HIDE : Toast.Visibility.SHOW);

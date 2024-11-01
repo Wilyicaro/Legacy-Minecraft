@@ -1,14 +1,13 @@
 {
   "required": true,
-  "package": "wily.legacy.fabric.mixin",
+  "package": "wily.legacy.fabric.mixin.legacy",
   "compatibilityLevel": "JAVA_17",
   "plugin": "wily.legacy.LegacyMixinPlugin",
   "client": [
     "EditBoxMixin",
     "GuiMixin",
     "LiquidBlockRendererMixin",
-    "PresetEditorMixin",
-    "TooltipRenderUtilMixin"
+    "PresetEditorMixin"
   ],
   "mixins": [
     "ItemStackMixin"

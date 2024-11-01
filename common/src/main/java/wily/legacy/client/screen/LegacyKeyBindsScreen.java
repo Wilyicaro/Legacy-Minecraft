@@ -3,6 +3,7 @@ package wily.legacy.client.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -26,7 +27,7 @@ import java.util.Objects;
 public class LegacyKeyBindsScreen extends PanelVListScreen{
     protected KeyMapping selectedKey = null;
     public static final Component SELECTION = Component.literal("...");
-    public static final Component NONE = Component.translatable("legacy.controls.none");
+    public static final Component NONE = Component.translatable("legacy.options.none");
     public LegacyKeyBindsScreen(Screen parent, Options options) {
         super(parent, 255, 293, Component.translatable("controls.keybinds.title"));
         renderableVList.layoutSpacing(l->1);
@@ -37,8 +38,10 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.reset_defaults"),button -> minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.reset_keyBinds"),Component.translatable("legacy.menu.reset_keyBinds_message"), b-> {
             for (KeyMapping keyMapping : keyMappings)
                 minecraft.options.setKey(keyMapping, keyMapping.getDefaultKey());
+            options.save();
             minecraft.setScreen(this);
         }))).size(240,20).build());
+        renderableVList.addOptions(Minecraft.getInstance().options.toggleCrouch(),Minecraft.getInstance().options.toggleSprint());
         for (KeyMapping keyMapping : keyMappings) {
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category))
@@ -88,8 +91,8 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
         }
         return super.mouseClicked(d, e, i);
     }
-    public void setAndUpdateKey(KeyMapping key, InputConstants.Key input){
-        minecraft.options.setKey(key,input);
+    public static void setAndUpdateKey(KeyMapping key, InputConstants.Key input){
+        Minecraft.getInstance().options.setKey(key,input);
         KeyMapping.resetMapping();
     }
 
@@ -114,6 +117,6 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
         panel.init();
         addRenderableOnly(panel);
         addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, Legacy4JPlatform.getModInfo("minecraft").getVersion() + " " + Legacy4J.VERSION.get(),panel.getX() + panel.getWidth() + 81, panel.getY() + panel.getHeight() - 7,CommonColor.INVENTORY_GRAY_TEXT.get(),false)));
-        getRenderableVList().init(this,panel.x + 7,panel.y + 6,panel.width - 14,panel.height);
+        getRenderableVList().init(this,panel.x + 7,panel.y + 6,panel.width - 14,panel.height-20);
     }
 }

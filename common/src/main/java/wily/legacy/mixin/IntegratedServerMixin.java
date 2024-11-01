@@ -21,14 +21,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.client.LegacyClientWorldSettings;
-import wily.legacy.util.ScreenUtil;
 
 import java.net.Proxy;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.BooleanSupplier;
 
 @Mixin(IntegratedServer.class)
@@ -57,12 +54,12 @@ public abstract class IntegratedServerMixin extends MinecraftServer {
 
     @Redirect(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/client/server/IntegratedServer;paused:Z", opcode = Opcodes.GETFIELD, ordinal = 1))
     public boolean tickServer(IntegratedServer instance) {
-        return instance.isPaused() && ((LegacyOptions) minecraft.options).autoSaveWhenPaused().get() && ((LegacyOptions) minecraft.options).autoSaveInterval().get() > 0 && !minecraft.isDemo();
+        return instance.isPaused() && LegacyOption.autoSaveWhenPaused.get() && LegacyOption.autoSaveInterval.get() > 0 && !minecraft.isDemo();
     }
 
     @Override
     public boolean isUnderSpawnProtection(ServerLevel serverLevel, BlockPos blockPos, Player player) {
-        if (!isSingleplayerOwner(player.getGameProfile()) && !((LegacyClientWorldSettings)worldData).trustPlayers()) return true;
+        if (!isSingleplayerOwner(player.getGameProfile()) && !LegacyClientWorldSettings.of(worldData).trustPlayers()) return true;
         return super.isUnderSpawnProtection(serverLevel, blockPos, player);
     }
 }

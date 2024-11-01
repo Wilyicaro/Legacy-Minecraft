@@ -103,6 +103,11 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
                                 }
                         )).orElse(ItemStack.EMPTY);
             }
+
+            @Override
+            public List<ItemStack> getRemainingItems(Player player, ServerMenuCraftPacket packet) {
+                return packet.customIngredients().size() < 3 ? super.getRemainingItems(player,packet) : List.of(packet.customIngredients().get(1).getItems()[0]);
+            }
         };
     }
     public static LegacyCraftingMenu loomMenu(int window, Inventory inventory){
