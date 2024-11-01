@@ -37,7 +37,7 @@ import java.util.function.BiConsumer;
 import static wily.legacy.Legacy4JClient.gammaEffect;
 
 public class LegacyResourceManager implements PreparableReloadListener {
-    public static final LoadingCache<ResourceLocation, Optional<RenderType>> GLOW_LAYERS = CacheBuilder.newBuilder().build(CacheLoader.from(l-> Optional.of(ResourceLocation.fromNamespaceAndPath(l.getNamespace(), FilenameUtils.removeExtension(l.getPath()) + "_glow." + FilenameUtils.getExtension(l.getPath()))).map(g-> Minecraft.getInstance().getResourceManager().getResource(g).isPresent() ? RenderType.eyes(g) : null)));
+    public static final LoadingCache<ResourceLocation, Optional<RenderType>> GLOW_LAYERS = CacheBuilder.newBuilder().build(CacheLoader.from(l-> Optional.of(ResourceLocation.fromNamespaceAndPath(l.getNamespace(), FilenameUtils.removeExtension(l.getPath()) + "_glow." + FilenameUtils.getExtension(l.getPath()))).map(g-> Minecraft.getInstance().getResourceManager().getResource(g).isPresent() ? RenderType.entityTranslucentEmissive(g) : null)));
 
     public static final ResourceLocation GAMEPAD_MAPPINGS = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"gamepad_mappings.txt");
     public static final ResourceLocation INTRO_LOCATION = ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"intro.json");

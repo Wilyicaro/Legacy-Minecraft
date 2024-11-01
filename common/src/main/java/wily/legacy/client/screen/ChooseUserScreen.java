@@ -61,7 +61,7 @@ public class ChooseUserScreen extends PanelVListScreen {
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (i == InputConstants.KEY_X){
-            minecraft.setScreen(accountScreen(DIRECT_LOGIN,this,false, mcAccount -> mcAccount.login(this,null)));
+            minecraft.setScreen(accountScreen(DIRECT_LOGIN,this,false, this::manageLogin));
             return true;
         }
         return super.keyPressed(i, j, k);
@@ -149,6 +149,12 @@ public class ChooseUserScreen extends PanelVListScreen {
         };
     }
 
+    public void manageLogin(MCAccount account){
+        if (account.isEncrypted())
+            minecraft.setScreen(passwordScreen(ChooseUserScreen.this, s -> account.login(ChooseUserScreen.this, s)));
+        else account.login(ChooseUserScreen.this, null);
+    }
+
     protected void addAccountButtons(){
         Minecraft minecraft =  Minecraft.getInstance();
         CreationList.addIconButton(renderableVList, ResourceLocation.fromNamespaceAndPath(Legacy4J.MOD_ID,"icon/add_user"),ADD_ACCOUNT,b->minecraft.setScreen(accountScreen(ADD_ACCOUNT, this,true,a-> {
@@ -176,7 +182,7 @@ public class ChooseUserScreen extends PanelVListScreen {
 
                 @Override
                 public boolean mouseClicked(double d, double e, int i) {
-                    if (ScreenUtil.isMouseOver(d,e,getX()+5,getY()+5,20,20)) login();
+                    if (ScreenUtil.isMouseOver(d,e,getX()+5,getY()+5,20,20)) manageLogin(account);
                     return super.mouseClicked(d, e, i);
                 }
 
@@ -208,12 +214,7 @@ public class ChooseUserScreen extends PanelVListScreen {
 
                 @Override
                 public void onPress() {
-                    if (isFocused()) login();
-                }
-                public void login(){
-                    if (account.isEncrypted())
-                        minecraft.setScreen(passwordScreen(ChooseUserScreen.this, s -> account.login(ChooseUserScreen.this, s)));
-                    else account.login(ChooseUserScreen.this, null);
+                    if (isFocused()) manageLogin(account);
                 }
 
                 @Override

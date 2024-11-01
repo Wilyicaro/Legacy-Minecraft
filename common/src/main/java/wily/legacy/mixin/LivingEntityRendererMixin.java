@@ -50,6 +50,6 @@ public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEnt
     }
     @Inject(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/EntityModel;renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V", shift = At.Shift.AFTER))
     public void renderGlowLayer(LivingEntity livingEntity, float f, float g, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci) {
-        LegacyResourceManager.GLOW_LAYERS.getUnchecked(getTextureLocation(livingEntity)).ifPresent(r-> getModel().renderToBuffer(poseStack, multiBufferSource.getBuffer(r), 15728640, OverlayTexture.NO_OVERLAY));
+        LegacyResourceManager.GLOW_LAYERS.getUnchecked(getTextureLocation(livingEntity)).ifPresent(r-> getModel().renderToBuffer(poseStack, multiBufferSource.getBuffer(r), i, OverlayTexture.NO_OVERLAY));
     }
 }
