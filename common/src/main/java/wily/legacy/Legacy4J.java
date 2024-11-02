@@ -21,6 +21,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
@@ -31,6 +32,7 @@ import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.TntBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.Vec3;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -229,6 +231,29 @@ public class Legacy4J {
             }
         });
     }
+
+    public static Vec3 getRelativeMovement(LivingEntity entity, float f, Vec3 vec3, int relRot){
+        vec3 = getNormal(vec3,Math.toRadians(relRot));
+        double d = vec3.lengthSqr();
+        if (d < 1.0E-7) {
+            return Vec3.ZERO;
+        } else {
+            Vec3 vec32 = (d > 1.0 ? vec3.normalize() : vec3).scale(f);
+            double angle = Math.toRadians(relRot == 0 ? entity.getYRot() : Math.round(entity.getYRot() / relRot) * relRot);
+            double sin = Math.sin(angle);
+            double cos = Math.cos(angle);
+            return new Vec3(vec32.x * cos - vec32.z * sin, vec32.y, vec32.z * cos + vec32.x * sin);
+        }
+    }
+
+    public static Vec3 getNormal(Vec3 vec3, double relRot){
+        if (relRot == 0) return vec3;
+        double angleRad = Math.atan2(vec3.z, vec3.x);
+        double quantizedAngle = Math.round(angleRad / relRot) * relRot;
+        double length = vec3.length();
+        return new Vec3(length*Math.cos(quantizedAngle), vec3.y,length*Math.sin(quantizedAngle));
+    }
+
     public static boolean canRepair(ItemStack repairItem, ItemStack ingredient){
         return repairItem.is(ingredient.getItem()) && repairItem.getCount() == 1 && ingredient.getCount() == 1 && repairItem.getItem().components().has(DataComponents.DAMAGE) && !repairItem.isEnchanted() && !ingredient.isEnchanted();
     }

@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOption;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin {
@@ -49,7 +50,7 @@ public abstract class EntityMixin {
     }
     @Inject(method = "rideTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;positionRider(Lnet/minecraft/world/entity/Entity;)V", shift = At.Shift.AFTER))
     private void modifyYawAndPitch(CallbackInfo ci) {
-        if (this.getVehicle().getControllingPassenger() == (Object) this || getVehicle() instanceof LivingEntity) return;
+        if (this.getVehicle().getControllingPassenger() == (Object) this || LegacyOption.vehicleCameraRotation.get() == LegacyOption.VehicleCameraRotation.NONE || !(getVehicle() instanceof LivingEntity && LegacyOption.vehicleCameraRotation.get().isForLivingEntities() || !(getVehicle() instanceof LivingEntity) && LegacyOption.vehicleCameraRotation.get().isForNonLivingEntities())) return;
 
         this.ridingEntityYRotDelta = this.ridingEntityYRotDelta + (this.getVehicle().getYRot() - this.getVehicle().yRotO);
 

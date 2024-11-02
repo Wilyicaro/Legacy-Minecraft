@@ -60,7 +60,7 @@ public class SDLControllerHandler implements Controller.Handler{
                 minecraft.executeBlocking(()-> {
                     Screen s = minecraft.screen;
                     LegacyOption.selectedControllerHandler.set(ControllerManager.handlers.indexOf(GLFWControllerHandler.getInstance()));
-                    minecraft.options.save();
+                    LegacyOption.saveAll();
                     minecraft.setScreen(new ConfirmationScreen(s, Component.translatable("legacy.menu.download_natives",getName()), Controller.Handler.DOWNLOAD_MESSAGE, b -> {
                         AtomicLong fileSize = new AtomicLong(1);
                         LegacyLoadingScreen screen = new LegacyLoadingScreen(Controller.Handler.DOWNLOADING_NATIVES, CommonComponents.EMPTY){
@@ -68,7 +68,7 @@ public class SDLControllerHandler implements Controller.Handler{
                             public void tick() {
                                 if (progress == 100) {
                                     LegacyOption.selectedControllerHandler.set(ControllerManager.handlers.indexOf(getInstance()));
-                                    minecraft.options.save();
+                                    LegacyOption.saveAll();
                                     minecraft.setScreen(s);
                                     return;
                                 }
@@ -95,7 +95,7 @@ public class SDLControllerHandler implements Controller.Handler{
                 return;
             }else SdlNativeLibraryLoader.loadLibSDL3FromFilePathNow(nativesFile.getPath());
 
-            if (SdlInit.SDL_Init(SdlSubSystemConst.SDL_INIT_JOYSTICK | SdlSubSystemConst.SDL_INIT_GAMEPAD) < 0) {
+            if (!SdlInit.SDL_Init(SdlSubSystemConst.SDL_INIT_JOYSTICK | SdlSubSystemConst.SDL_INIT_GAMEPAD)) {
                 Legacy4J.LOGGER.warn("SDL Game Controller failed to start!");
                 return;
             }
@@ -111,8 +111,8 @@ public class SDLControllerHandler implements Controller.Handler{
         String arch = System.getProperty("os.arch");
         return (switch (Util.getPlatform()){
             case WINDOWS -> arch.contains("64") ? "libsdl4j-natives-%s-windows64.dll" : "libsdl4j-natives-%s-windows32.dll";
-            case OSX -> arch.contains("arm") || arch.contains("aarch") ? "libsdl4j-natives-%s-macos-aarch64.dylib" : "libsdl4j-natives-%s-macos-x86_64.dylib";
-            default -> "libsdl4j-natives-%s-linux64.so";
+            case OSX -> "libsdl4j-natives-%s-macos-universal.dylib";
+            default -> arch.contains("aarch") || arch.contains("arm") ? "libsdl4j-natives-%s-aarch64.so" : "libsdl4j-natives-%s-linux64.so";
         }).formatted(SDL_VERSION);
     }
 
@@ -153,7 +153,7 @@ public class SDLControllerHandler implements Controller.Handler{
 
             @Override
             public boolean buttonPressed(int i) {
-                return SdlGamepad.SDL_GetGamepadButton(controller,i) == 1;
+                return SdlGamepad.SDL_GetGamepadButton(controller,i);
             }
 
             @Override
@@ -172,11 +172,11 @@ public class SDLControllerHandler implements Controller.Handler{
             }
 
             @Override
-            public void rumble(short low_frequency_rumble, short high_frequency_rumble, int duration_ms){
+            public void rumble(char low_frequency_rumble, char high_frequency_rumble, int duration_ms){
                 SdlGamepad.SDL_RumbleGamepad(controller,low_frequency_rumble,high_frequency_rumble,duration_ms);
             }
             @Override
-            public void rumbleTriggers(short left_rumble, short right_rumble, int duration_ms){
+            public void rumbleTriggers(char left_rumble, char right_rumble, int duration_ms){
                 SdlGamepad.SDL_RumbleGamepadTriggers(controller,left_rumble,right_rumble,duration_ms);
             }
 
@@ -192,7 +192,7 @@ public class SDLControllerHandler implements Controller.Handler{
 
             @Override
             public boolean hasFingerInTouchpad(int touchpad, int finger, Byte state, Float x, Float y, Float pressure){
-                return SdlGamepad.SDL_GetGamepadTouchpadFinger(controller,touchpad,finger,state == null ? null : new ByteByReference(state),x == null ? null : new FloatByReference(x),y == null ? null : new FloatByReference(y),pressure == null ? null : new FloatByReference(pressure)) == 1;
+                return SdlGamepad.SDL_GetGamepadTouchpadFinger(controller,touchpad,finger,state == null ? null : new ByteByReference(state),x == null ? null : new FloatByReference(x),y == null ? null : new FloatByReference(y),pressure == null ? null : new FloatByReference(pressure));
             }
 
             @Override

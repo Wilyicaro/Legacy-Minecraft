@@ -10,7 +10,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
@@ -21,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 
 import static wily.legacy.Legacy4JClient.*;
@@ -105,28 +105,8 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
 
     @Override
     public void moveRelative(float f, Vec3 vec3) {
-        if (Legacy4JClient.isModEnabledOnServer() && getAbilities().flying && isCreative() && !isSprinting()) this.setDeltaMovement(getDeltaMovement().add(getWorldRelativeMovement(f,vec3,(keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown()) && input.leftImpulse == 0 ? 90 : 45)));
+        if (Legacy4JClient.isModEnabledOnServer() && getAbilities().flying && isCreative() && !isSprinting()) this.setDeltaMovement(getDeltaMovement().add(Legacy4J.getRelativeMovement(this,f,vec3,(keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown()) && input.leftImpulse == 0 ? 90 : 45)));
         else super.moveRelative(f, vec3);
-    }
-    public Vec3 getWorldRelativeMovement(float f, Vec3 vec3, int relRot){
-        vec3 = getNormal(vec3,Math.toRadians(relRot));
-        double d = vec3.lengthSqr();
-        if (d < 1.0E-7) {
-            return Vec3.ZERO;
-        } else {
-            Vec3 vec32 = (d > 1.0 ? vec3.normalize() : vec3).scale(f);
-            double angle = Math.toRadians(Math.round(getYRot() / relRot) * relRot);
-            double sin = Math.sin(angle);
-            double cos = Math.cos(angle);
-            return new Vec3(vec32.x * cos - vec32.z * sin, vec32.y, vec32.z * cos + vec32.x * sin);
-        }
-    }
-
-    private static Vec3 getNormal(Vec3 vec3, double relRot){
-        double angleRad = Math.atan2(vec3.z, vec3.x);
-        double quantizedAngle = Math.round(angleRad / relRot) * relRot;
-        double length = vec3.length();
-        return new Vec3(length*Math.cos(quantizedAngle), vec3.y,length*Math.sin(quantizedAngle));
     }
 
     @Inject(method = "aiStep", at = @At(value = "RETURN"))

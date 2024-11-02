@@ -17,6 +17,7 @@ import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.Difficulty;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.Legacy4J;
@@ -27,6 +28,7 @@ import wily.legacy.client.controller.ControllerManager;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.client.controller.SDLControllerHandler;
 import wily.legacy.client.screen.Assort;
+import wily.legacy.client.screen.LegacyKeyBindsScreen;
 import wily.legacy.network.CommonNetwork;
 import wily.legacy.network.PlayerInfoSync;
 
@@ -156,6 +158,32 @@ public interface LegacyOption<T> {
     OptionInstance<Boolean> lockControlTypeChange = register(create("lockControlTypeChange", s->OptionInstance.createBoolean(s,false)));
     OptionInstance<Integer> selectedItemTooltipLines = register(create("selectedItemTooltipLines", s->new OptionInstance<>(s, OptionInstance.noTooltip(), Options::genericValueLabel, new OptionInstance.IntRange(0,6), 4, d -> {})));
     OptionInstance<Boolean> itemTooltipEllipsis = register(create("itemTooltipEllipsis", s->OptionInstance.createBoolean(s,true)));
+    OptionInstance<VehicleCameraRotation> vehicleCameraRotation = register(create("vehicleCameraRotation",s->new OptionInstance<>(s, d->null, (c, d) -> d.displayName, new OptionInstance.Enum<>(Arrays.asList(VehicleCameraRotation.values()), Codec.INT.xmap(i-> VehicleCameraRotation.values()[i], VehicleCameraRotation::ordinal)), VehicleCameraRotation.ONLY_NON_LIVING_ENTITIES, d -> {})));
+
+    enum VehicleCameraRotation implements StringRepresentable {
+        NONE("none", LegacyKeyBindsScreen.NONE),ALL_ENTITIES("all_entities"),ONLY_NON_LIVING_ENTITIES("only_non_living_entities"),ONLY_LIVING_ENTITIES("only_living_entities");
+        public static final EnumCodec<VehicleCameraRotation> CODEC = StringRepresentable.fromEnum(VehicleCameraRotation::values);
+        private final String name;
+        public final Component displayName;
+
+        VehicleCameraRotation(String name, Component displayName){
+            this.name = name;
+            this.displayName = displayName;
+        }
+        VehicleCameraRotation(String name){
+            this(name,Component.translatable("legacy.options.vehicleCameraRotation."+name));
+        }
+        public boolean isForLivingEntities(){
+            return this == ALL_ENTITIES || this == ONLY_LIVING_ENTITIES;
+        }
+        public boolean isForNonLivingEntities(){
+            return this == ALL_ENTITIES || this == ONLY_NON_LIVING_ENTITIES;
+        }
+        @Override
+        public String getSerializedName() {
+            return name;
+        }
+    }
 
     static void saveAll(){
         saveAll(legacyOptionsFile);

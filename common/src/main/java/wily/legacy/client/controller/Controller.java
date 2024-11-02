@@ -31,9 +31,9 @@ public interface Controller {
         manager.minecraft.getToasts().addToast(new LegacyTip(CONTROLLER_DETECTED, Component.literal(getName())).disappearTime(4500));
     }
 
-    default void rumble(short low_frequency_rumble, short high_frequency_rumble, int duration_ms){}
+    default void rumble(char low_frequency_rumble, char high_frequency_rumble, int duration_ms){}
 
-    default void rumbleTriggers(short left_rumble, short right_rumble, int duration_ms){}
+    default void rumbleTriggers(char left_rumble, char right_rumble, int duration_ms){}
 
     default int getTouchpadsCount(){
         return 0;
