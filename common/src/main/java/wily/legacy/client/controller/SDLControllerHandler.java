@@ -12,6 +12,7 @@ import dev.isxander.sdl3java.jna.SdlNativeLibraryLoader;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.io.FileUtils;
@@ -57,7 +58,7 @@ public class SDLControllerHandler implements Controller.Handler{
             Minecraft minecraft = Minecraft.getInstance();
             if (nativesFile == null) nativesFile = new File(minecraft.gameDirectory,"natives/" + getNativesFile());
             if (!nativesFile.exists()){
-                minecraft.executeBlocking(()-> {
+                if (minecraft.screen instanceof TitleScreen) minecraft.executeBlocking(()-> {
                     Screen s = minecraft.screen;
                     LegacyOption.selectedControllerHandler.set(ControllerManager.handlers.indexOf(GLFWControllerHandler.getInstance()));
                     LegacyOption.saveAll();
@@ -110,9 +111,9 @@ public class SDLControllerHandler implements Controller.Handler{
     public static String getNativesFile(){
         String arch = System.getProperty("os.arch");
         return (switch (Util.getPlatform()){
-            case WINDOWS -> arch.contains("64") ? "libsdl4j-natives-%s-windows64.dll" : "libsdl4j-natives-%s-windows32.dll";
+            case WINDOWS -> arch.contains("64") ? "libsdl4j-natives-%s-windows-x86_64.dll" : "libsdl4j-natives-%s-windows-x86.dll";
             case OSX -> "libsdl4j-natives-%s-macos-universal.dylib";
-            default -> arch.contains("aarch") || arch.contains("arm") ? "libsdl4j-natives-%s-aarch64.so" : "libsdl4j-natives-%s-linux64.so";
+            default -> arch.contains("aarch") || arch.contains("arm") ? "libsdl4j-natives-%s-linux-aarch64.so" : "libsdl4j-natives-%s-linux-x86_64.so";
         }).formatted(SDL_VERSION);
     }
 

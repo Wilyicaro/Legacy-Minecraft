@@ -80,7 +80,7 @@
     "LoomScreenMixin",
     "MapRendererMixin",
     "MerchantScreenMixin",
-    "MinecartSoundIntanceMixin",
+    "MinecartSoundInstanceMixin",
     "MinecraftMixin",
     "MouseHandlerMixin",
     "MusicsMixin",
