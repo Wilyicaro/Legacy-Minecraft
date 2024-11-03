@@ -21,6 +21,8 @@ public class LegacyMixinPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (Legacy4JPlatform.isLoadingMod("nostalgic_tweaks") && mixinClassName.endsWith("ItemInHandRendererSwayMixin")) return false;
+        boolean hasVivecraft = Legacy4JPlatform.isLoadingMod("vivecraft");
+        if (hasVivecraft && mixinClassName.endsWith("GuiGameRendererMixin")) return false;
         return true;
     }
 

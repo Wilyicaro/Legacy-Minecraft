@@ -68,7 +68,7 @@ public abstract class ThrownTridentRendererMixin extends EntityRenderer<ThrownTr
             double d20 = d11 * d18 + Math.sin(d18 * Math.PI * 8.0D + d15) * d6 * d19;
             double d21 = d12 * d18 + Math.cos(d18 * Math.PI * 8.0D + d15) * lineYD + (0.1D + d19);
             double d22 = d13 * d18 + Math.sin(d18 * Math.PI * 8.0D + d15) * d7 * d19;
-            float f1 = 0.28F * f + 0.34F;
+            float f1 = 0.20F * f + 0.34F;
             float f2 = 0.07F * f + 0.18F;
             float f3 = 0.14F * f + 0.52F;
             consumer.addVertex(matrix4f, (float) d20, (float) d21, (float) d22).setColor(f1, f2, f3, 1.0F).setLight(light);

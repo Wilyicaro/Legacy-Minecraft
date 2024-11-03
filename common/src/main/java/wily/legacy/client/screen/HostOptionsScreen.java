@@ -322,7 +322,7 @@ public class HostOptionsScreen extends PanelVListScreen {
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        RenderSystem.setShaderColor(1.0f,1.0f,1.0f, alpha);
+        RenderSystem.setShaderColor(1.0f,1.0f,1.0f, Math.max(getDefaultOpacity(), Math.min(alpha * (shouldFade ? 1 + f * 0.04f : 1 / (1 + f * 0.04f)),1.0f)));
         RenderSystem.enableBlend();
         panel.render(guiGraphics,i,j,f);
         RenderSystem.disableBlend();

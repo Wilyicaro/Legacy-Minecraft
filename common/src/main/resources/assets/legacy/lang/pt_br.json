@@ -238,6 +238,8 @@
   "legacy.options.vehicleCameraRotation.all_entities": "Todas as Entidades",
   "legacy.options.vehicleCameraRotation.only_non_living_entities": "Somente Entidades Inanimadas",
   "legacy.options.vehicleCameraRotation.only_living_entities": "Somente Entidades Vivas",
+  "legacy.options.enhancedItemModel": "Modelo Aprimorado de Itens",
+  "legacy.options.enhancedItemModel.description": "Corrige Brecha do Modelos de Itens. Essa opção não surtirá efeito com Sodium habilitado, e pode reduzir performance.",
   "legacy.options.tooltipBoxes": "Exibir Caixas de Dicas",
   "legacy.options.creativeTab": "Interface do Criativo Legacy",
   "legacy.options.searchCreativeTab": "Aba do Criativo de Pesquisa",

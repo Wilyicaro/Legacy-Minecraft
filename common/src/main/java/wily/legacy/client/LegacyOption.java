@@ -65,13 +65,13 @@ public interface LegacyOption<T> {
     static <T> LegacyOption<T> create(String name, Function<String,OptionInstance<T>> optionInstance){
         return create(name,optionInstance.apply("legacy.options."+name));
     }
-    static <T> LegacyOption<T> create(String name, Function<String,OptionInstance<T>> optionInstance,BiConsumer<OptionInstance<T>,Options.FieldAccess> process){
+    static <T> LegacyOption<T> create(String name, Function<String,OptionInstance<T>> optionInstance,BiConsumer<LegacyOption<T>,Options.FieldAccess> process){
         return create(optionInstance.apply("legacy.options."+name),process);
     }
     static <T> LegacyOption<T> create(String name, OptionInstance<T> optionInstance){
-        return create(optionInstance,(o,a)->a.process(name,o));
+        return create(optionInstance,(o,a)->a.process(name,o.getInstance()));
     }
-    static <T> LegacyOption<T> create(OptionInstance<T> optionInstance, BiConsumer<OptionInstance<T>,Options.FieldAccess> process){
+    static <T> LegacyOption<T> create(OptionInstance<T> optionInstance, BiConsumer<LegacyOption<T>,Options.FieldAccess> process){
         T defaultValue = optionInstance.get();
         return new LegacyOption<>() {
             @Override
@@ -86,7 +86,7 @@ public interface LegacyOption<T> {
 
             @Override
             public void process(Options.FieldAccess access) {
-                process.accept(getInstance(), access);
+                process.accept(this, access);
             }
         };
     }
@@ -126,7 +126,7 @@ public interface LegacyOption<T> {
         ControllerBinding.LEFT_STICK.bindingState.block(2);
         if (Legacy4JClient.controllerManager.connectedController!= null) Legacy4JClient.controllerManager.connectedController.disconnect(Legacy4JClient.controllerManager);
         ControllerManager.getHandler().init();
-    }),(o,a)->o.set(a.process("selectedControllerHandler", o.get(), s-> ControllerManager.handlers.indexOf(ControllerManager.handlerById(s)), i-> ControllerManager.handlers.get(i).getId()))));
+    }),(o,a)->o.getInstance().set(a.process("selectedControllerHandler", o.getInstance().get(), s-> ControllerManager.handlers.indexOf(ControllerManager.handlerById(s)), i-> ControllerManager.handlers.get(i).getId()))));
     OptionInstance<Integer> cursorMode = register(create("cursorMode",s->new OptionInstance<>(s, OptionInstance.noTooltip(), (c, i)-> Component.translatable("options.generic_value",c,Component.translatable(i == 0 ? "options.guiScale.auto" : i == 1 ? "team.visibility.always" : "team.visibility.never")), new OptionInstance.IntRange(0, 2), 0, d -> {})));
     OptionInstance<Boolean> unfocusedInputs = register(create("unfocusedInputs",s->OptionInstance.createBoolean(s, false)));
     OptionInstance<Double> leftStickDeadZone = register(create("leftStickDeadZone",s->new OptionInstance<>(s, OptionInstance.noTooltip(), LegacyOption::percentValueLabel, OptionInstance.UnitDouble.INSTANCE, 0.25, d -> {})));
@@ -142,7 +142,7 @@ public interface LegacyOption<T> {
     OptionInstance<Boolean> overrideTerrainFogStart = register(create("overrideTerrainFogStart",s->OptionInstance.createBoolean(s, true)));
     OptionInstance<Integer> terrainFogStart = register(create("terrainFogStart",s->new OptionInstance<>(s, OptionInstance.noTooltip(),(c,i)-> Component.translatable("options.chunks", i), new OptionInstance.ClampingLazyMaxIntRange(2, () -> Minecraft.getInstance().options.renderDistance().get(), 0x7FFFFFFE), 4, d -> {})));
     OptionInstance<Double> terrainFogEnd = register(create("terrainFogEnd",s->new OptionInstance<>(s, OptionInstance.noTooltip(),(c, d) -> percentValueLabel(c, d*2), OptionInstance.UnitDouble.INSTANCE, 0.5, d -> {})));
-    OptionInstance<String> selectedControlType = register(create("controlType", s->new OptionInstance<>(s, OptionInstance.noTooltip(), (c, i)-> Component.translatable("options.generic_value",c,i.equals("auto")? Component.translatable("legacy.options.auto_value", ControlType.getActiveType().getDisplayName()) : ControlType.typesMap.get(i).getDisplayName()), new OptionInstance.ClampingLazyMaxIntRange(0, ControlType.types::size,Integer.MAX_VALUE).xmap(i-> i == 0 ? "auto" : ControlType.types.get(i - 1).getId().toString(), s1-> s1.equals("auto") ? 0 : (1 + ControlType.types.indexOf(ControlType.typesMap.get(s1)))), "auto", d -> {}),(o, a)->Legacy4JClient.SECURE_EXECUTOR.executeNowIfPossible(()->o.set(a.process("controllerIcons", o.get())),()->Minecraft.getInstance().isGameLoadFinished())));
+    OptionInstance<String> selectedControlType = register(create("controlType", s->new OptionInstance<>(s, OptionInstance.noTooltip(), (c, i)-> Component.translatable("options.generic_value",c,i.equals("auto")? Component.translatable("legacy.options.auto_value", ControlType.getActiveType().getDisplayName()) : ControlType.typesMap.get(i).getDisplayName()), new OptionInstance.ClampingLazyMaxIntRange(0, ControlType.types::size,Integer.MAX_VALUE).xmap(i-> i == 0 ? "auto" : ControlType.types.get(i - 1).getId().toString(), s1-> s1.equals("auto") ? 0 : (1 + ControlType.types.indexOf(ControlType.typesMap.get(s1)))), "auto", d -> {}),(o, a)->Legacy4JClient.SECURE_EXECUTOR.executeNowIfPossible(()->o.getInstance().set(a.process("controllerIcons", o.getInstance().get())),()->Minecraft.getInstance().isGameLoadFinished())));
     OptionInstance<Difficulty> createWorldDifficulty = register(create("createWorldDifficulty",new OptionInstance<>("options.difficulty", d->Tooltip.create(d.getInfo()), (c, d) -> d.getDisplayName(), new OptionInstance.Enum<>(Arrays.asList(Difficulty.values()), Codec.INT.xmap(Difficulty::byId, Difficulty::getId)), Difficulty.NORMAL, d -> {})));
     OptionInstance<Boolean> smoothMovement = register(create("smoothMovement",s->OptionInstance.createBoolean(s,true)));
     OptionInstance<Boolean> legacyCreativeBlockPlacing = register(create("legacyCreativeBlockPlacing",s->OptionInstance.createBoolean(s,true)));
@@ -159,6 +159,7 @@ public interface LegacyOption<T> {
     OptionInstance<Integer> selectedItemTooltipLines = register(create("selectedItemTooltipLines", s->new OptionInstance<>(s, OptionInstance.noTooltip(), Options::genericValueLabel, new OptionInstance.IntRange(0,6), 4, d -> {})));
     OptionInstance<Boolean> itemTooltipEllipsis = register(create("itemTooltipEllipsis", s->OptionInstance.createBoolean(s,true)));
     OptionInstance<VehicleCameraRotation> vehicleCameraRotation = register(create("vehicleCameraRotation",s->new OptionInstance<>(s, d->null, (c, d) -> d.displayName, new OptionInstance.Enum<>(Arrays.asList(VehicleCameraRotation.values()), Codec.INT.xmap(i-> VehicleCameraRotation.values()[i], VehicleCameraRotation::ordinal)), VehicleCameraRotation.ONLY_NON_LIVING_ENTITIES, d -> {})));
+    OptionInstance<Boolean> enhancedItemModel = register(create("enhancedItemModel", s->OptionInstance.createBoolean(s,OptionInstance.cachedConstantTooltip(Component.translatable("legacy.options.enhancedItemModel.description")),true, b->{ if (!Legacy4JPlatform.isModLoaded("sodium") && Minecraft.getInstance().isGameLoadFinished()) Minecraft.getInstance().reloadResourcePacks();})));
 
     enum VehicleCameraRotation implements StringRepresentable {
         NONE("none", LegacyKeyBindsScreen.NONE),ALL_ENTITIES("all_entities"),ONLY_NON_LIVING_ENTITIES("only_non_living_entities"),ONLY_LIVING_ENTITIES("only_living_entities");

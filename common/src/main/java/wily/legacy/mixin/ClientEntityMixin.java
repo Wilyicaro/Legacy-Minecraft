@@ -16,7 +16,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOption;
 
 @Mixin(Entity.class)
-public abstract class EntityMixin {
+public abstract class ClientEntityMixin {
     @Unique
     private float ridingEntityYRotDelta;
 

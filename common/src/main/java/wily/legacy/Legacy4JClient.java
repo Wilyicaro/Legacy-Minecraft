@@ -26,9 +26,11 @@ import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.client.server.LanServerPinger;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
@@ -73,6 +75,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.apache.commons.io.FileUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.client.*;
@@ -509,4 +512,34 @@ public class Legacy4JClient {
         }
     }
 
+    public static class ItemPart implements Iterable<Direction> {
+        public int x;
+        public int y;
+        public int width;
+        public int height;
+        private final List<Direction> faces = new ArrayList<>(List.of(Direction.values()));
+        public ItemPart(int x, int y, int width, int height){
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        }
+
+        public boolean contains(int x, int y){
+            return x >= this.x && y >= this.y && x < this.x + this.width && y < this.y + this.height;
+        }
+
+        public void collideWith(ItemPart collider){
+            if (this == collider) return;
+            faces.removeIf(d->d.getAxis() != Direction.Axis.Z && ((d.getAxis() == Direction.Axis.X && y + height <= collider.y + collider.height && y >= collider.y && (d == Direction.WEST ? x == collider.x + collider.width : x + width == collider.x)) || (d.getAxis() == Direction.Axis.Y && x + width <= collider.x + collider.width && x >= collider.x && (d == Direction.UP ? y == collider.y + collider.height : y + height == collider.y))));
+        }
+
+        @Override
+        public @NotNull Iterator<Direction> iterator() {
+            return faces.iterator();
+        }
+        public static boolean isTransparent(SpriteContents spriteContents, int x, int y, int width, int height) {
+            return x >= 0 && y >= 0 && x < width && y < height && spriteContents.getUniqueFrames().allMatch(i->spriteContents.isTransparent(i, x, y));
+        }
+    }
 }

@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class LegacyCraftingMenu extends AbstractContainerMenu implements RecipeMenu {
     public static final Component CRAFTING_TITLE = Component.translatable("container.crafting");
     public static final Component STONECUTTER_TITLE = Component.translatable("container.stonecutter");
-    public static final Component LOOM_TITLE = Component.translatable("container.stonecutter");
+    public static final Component LOOM_TITLE = Component.translatable("container.loom");
     public static final Map<ResourceKey<BannerPattern>,Ingredient> LOOM_PATTERN_EXTRA_INGREDIENT_CACHE = new ConcurrentHashMap<>();
     final BlockPos blockPos;
     public boolean inventoryActive = true;
@@ -68,11 +68,15 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
             @Override
             public List<Ingredient> getIngredients(Player player, ServerMenuCraftPacket packet) {
                 List<Ingredient> ings = packet.craftId().equals(ServerMenuCraftPacket.EMPTY) || !packet.customIngredients().isEmpty() ? super.getIngredients(player,packet) : player.level().getRecipeManager().byKey(packet.craftId()).map(h->(List<Ingredient>) h.value().getIngredients()).orElse(Collections.emptyList());
-                container.clearContent();
                 updateShapedIngredients(ingredientsGrid,ings,gridDimension,gridDimension,gridDimension,gridDimension);
-                for (int i = 0; i < ingredientsGrid.size(); i++)
-                    container.setItem(i, ingredientsGrid.get(i).isEmpty() ? ItemStack.EMPTY : ingredientsGrid.get(i).getItems()[0]);
                 return ings;
+            }
+
+            @Override
+            public void setupActualItems(Player player, ServerMenuCraftPacket packet, ItemStack setItem, int index) {
+               if (setItem == null)
+                   container.clearContent();
+               else container.setItem(index,setItem);
             }
         };
     }

@@ -25,14 +25,16 @@ public class DrownedModelMixin extends ZombieModel {
         if (LegacyOption.legacyDrownedAnimation.get()) {
             ci.cancel();
             if (swimAmount <= 0) return;
-            this.rightArm.xRot = (float) Math.PI;
-            this.leftArm.xRot = (float) Math.PI;
+            float a = Mth.sin(attackTime * Mth.PI);
+            float t = Mth.sin((1.0F - (1.0F - attackTime) * (1.0F - attackTime)) * Mth.PI);
+
+            this.rightArm.xRot = (float) Math.PI - a * 1.2F + t * 0.4F;
+            this.leftArm.xRot = (float) Math.PI - a * 1.2F + t * 0.4F;
             this.rightArm.yRot = (float) (Math.PI / 8);
             this.leftArm.yRot = (float) (Math.PI / 8);
 
             this.rightArm.zRot = -0.2f;
             this.leftArm.zRot = 0.2f;
-
             AnimationUtils.bobArms(rightArm, leftArm, h);
         }
     }

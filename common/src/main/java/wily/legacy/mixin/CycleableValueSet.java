@@ -29,14 +29,14 @@ public interface CycleableValueSet<T> extends OptionInstance.ValueSet<T> {
         return optionInstance -> {
             List<T> values = valueListSupplier().getSelectedList();
             if (values.size() == 2){
-                return new TickBox(i,j,k,values.indexOf(optionInstance.value) == 0,b-> Legacy4JClient.booleanOptionCaptionOverride.getOrDefault(optionInstance.caption,optionInstance.caption), b-> tooltipSupplier.apply(values.get(b ? 0 : 1)), t-> {
+                return new TickBox(i,j,k,values.indexOf(optionInstance.get()) == 0,b-> Legacy4JClient.booleanOptionCaptionOverride.getOrDefault(optionInstance.caption,optionInstance.caption), b-> tooltipSupplier.apply(values.get(b ? 0 : 1)), t-> {
                     this.valueSetter().set(optionInstance,values.get(t.selected ? 0 : 1));
                     options.save();
-                    consumer.accept(optionInstance.value);
+                    consumer.accept(optionInstance.get());
                 });
             }else {
-                return new LegacySliderButton<>(i,j,k,16, (b)-> b.getDefaultMessage(optionInstance.caption,optionInstance.toString.apply(optionInstance.value)),b->tooltipSupplier.apply(optionInstance.value),optionInstance.value,()->valueListSupplier().getSelectedList(),s->{
-                    if (optionInstance.value != s.getObjectValue()) {
+                return new LegacySliderButton<>(i,j,k,16, (b)-> b.getDefaultMessage(optionInstance.caption,optionInstance.toString.apply(optionInstance.get())),b->tooltipSupplier.apply(optionInstance.get()),optionInstance.get(),()->valueListSupplier().getSelectedList(),s->{
+                    if (optionInstance.get() != s.getObjectValue()) {
                         valueSetter().set(optionInstance, s.getObjectValue());
                         options.save();
                         consumer.accept(s.getObjectValue());

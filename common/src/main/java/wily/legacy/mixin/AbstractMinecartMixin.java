@@ -60,6 +60,10 @@ public abstract class AbstractMinecartMixin extends VehicleEntity {
     public boolean moveAlongTrack(AbstractMinecart instance) {
         return false;
     }
+    @Redirect(method = "applyNaturalSlowdown", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/AbstractMinecart;isInWater()Z"))
+    public boolean applyNaturalSlowdown(AbstractMinecart instance) {
+        return false;
+    }
     @Inject(method = "tick", at = @At("RETURN"))
     public void tick(CallbackInfo ci) {
         if (!isAlive() || this.level().isClientSide) return;

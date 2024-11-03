@@ -108,10 +108,6 @@ public abstract class GameRendererMixin {
             guiGraphics.pose().popPose();
         }
     }
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"))
-    private void render(Gui instance, GuiGraphics guiGraphics, DeltaTracker deltaTracker){
-        if (LegacyOption.displayHUD.get()) instance.render(guiGraphics,deltaTracker);
-    }
     @Inject(method = "bobView", at = @At("RETURN"))
     private void bobView(PoseStack poseStack, float f, CallbackInfo ci){
         if (this.minecraft.getCameraEntity() instanceof PlayerYBobbing p && !minecraft.player.getAbilities().flying) poseStack.mulPose(Axis.XP.rotationDegrees(p.getAngle(f)));

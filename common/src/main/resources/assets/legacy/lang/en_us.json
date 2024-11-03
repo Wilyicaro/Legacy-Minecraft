@@ -173,6 +173,8 @@
  "legacy.options.vehicleCameraRotation.all_entities": "All Entities",
  "legacy.options.vehicleCameraRotation.only_non_living_entities": "Only Non-Living Entities",
  "legacy.options.vehicleCameraRotation.only_living_entities": "Only Living Entities",
+ "legacy.options.enhancedItemModel": "Enhanced Item Model",
+ "legacy.options.enhancedItemModel.description": "Fix Item Model Gaps. This option won't have effect with Sodium enabled, and may reduce performance.",
  "legacy.menu.updateMessage": "Welcome back! You may not have noticed but there is an update available!",
  "legacy.menu.save_options": "Save Options",
  "legacy.menu.save_options_message": "What would you like to do with this save game?",
