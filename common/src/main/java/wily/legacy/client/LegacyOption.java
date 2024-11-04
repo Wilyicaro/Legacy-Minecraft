@@ -158,6 +158,7 @@ public interface LegacyOption<T> {
     OptionInstance<Boolean> lockControlTypeChange = register(create("lockControlTypeChange", s->OptionInstance.createBoolean(s,false)));
     OptionInstance<Integer> selectedItemTooltipLines = register(create("selectedItemTooltipLines", s->new OptionInstance<>(s, OptionInstance.noTooltip(), Options::genericValueLabel, new OptionInstance.IntRange(0,6), 4, d -> {})));
     OptionInstance<Boolean> itemTooltipEllipsis = register(create("itemTooltipEllipsis", s->OptionInstance.createBoolean(s,true)));
+    OptionInstance<Integer> selectedItemTooltipSpacing = register(create("selectedItemTooltipSpacing", s->new OptionInstance<>(s, OptionInstance.noTooltip(), Options::genericValueLabel, new OptionInstance.IntRange(8,12), 12, d -> {})));
     OptionInstance<VehicleCameraRotation> vehicleCameraRotation = register(create("vehicleCameraRotation",s->new OptionInstance<>(s, d->null, (c, d) -> d.displayName, new OptionInstance.Enum<>(Arrays.asList(VehicleCameraRotation.values()), Codec.INT.xmap(i-> VehicleCameraRotation.values()[i], VehicleCameraRotation::ordinal)), VehicleCameraRotation.ONLY_NON_LIVING_ENTITIES, d -> {})));
     OptionInstance<Boolean> enhancedItemModel = register(create("enhancedItemModel", s->OptionInstance.createBoolean(s,OptionInstance.cachedConstantTooltip(Component.translatable("legacy.options.enhancedItemModel.description")),true, b->{ if (!Legacy4JPlatform.isModLoaded("sodium") && Minecraft.getInstance().isGameLoadFinished()) Minecraft.getInstance().reloadResourcePacks();})));
 

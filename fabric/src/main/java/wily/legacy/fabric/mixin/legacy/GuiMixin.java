@@ -53,12 +53,12 @@ public abstract class GuiMixin {
                 Component mutableComponent = i >= ScreenUtil.getSelectedItemTooltipLines() - 1 && LegacyOption.itemTooltipEllipsis.get() ? MORE : tooltipLines.get(i);
                 int width = this.getFont().width(mutableComponent);
                 int j = (guiGraphics.guiWidth() - width) / 2;
-                int k = guiGraphics.guiHeight() - getFont().lineHeight * (Math.min(ScreenUtil.getSelectedItemTooltipLines(),tooltipLines.size()) - 1 - i);
+                int k = guiGraphics.guiHeight() - LegacyOption.selectedItemTooltipSpacing.get() * (Math.min(ScreenUtil.getSelectedItemTooltipLines(),tooltipLines.size()) - 1 - i);
                 if ((l = (int)((float)this.toolHighlightTimer * 256.0f / 10.0f)) > 255) {
                     l = 255;
                 }
                 if (l > 0) {
-                    guiGraphics.fill(j - 2, k - 2, j + width + 2, k + this.getFont().lineHeight + 2, this.minecraft.options.getBackgroundColor(0));
+                    guiGraphics.fill(j - 2, k - 2, j + width + 2, k + LegacyOption.selectedItemTooltipSpacing.get() + 2, this.minecraft.options.getBackgroundColor(0));
                     guiGraphics.drawString(this.getFont(), mutableComponent, j, k, 0xFFFFFF + (l << 24));
                 }
                 if (i >= ScreenUtil.getSelectedItemTooltipLines() - 1) break;

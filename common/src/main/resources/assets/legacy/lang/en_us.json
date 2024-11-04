@@ -169,6 +169,7 @@
  "legacy.options.loyaltyLines": "Display Loyalty Effect",
  "legacy.options.selectedItemTooltipLines": "Selected Item Tooltip Lines",
  "legacy.options.itemTooltipEllipsis": "Selected Item Tooltip Ellipsis",
+ "legacy.options.selectedItemTooltipSpacing": "Selected Item Tooltip Spacing",
  "legacy.options.vehicleCameraRotation": "Vehicle Camera Rotation",
  "legacy.options.vehicleCameraRotation.all_entities": "All Entities",
  "legacy.options.vehicleCameraRotation.only_non_living_entities": "Only Non-Living Entities",

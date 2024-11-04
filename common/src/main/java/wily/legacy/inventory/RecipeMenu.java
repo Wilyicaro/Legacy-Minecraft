@@ -54,7 +54,7 @@ public interface RecipeMenu {
             setupActualItems(player,packet,null,-1);
             for (int index = 0; index < ingredients.size(); index++) {
                 Ingredient ing = ingredients.get(index);
-                if (ing.isEmpty()) return;
+                if (ing.isEmpty()) continue;
                 int count = LegacyIngredient.of(ing).getCount();;
                 for (int c = 0; c < count; c++) {
                     if (!player.containerMenu.getCarried().isEmpty() && ing.test(player.containerMenu.getCarried().copyWithCount(1))) {

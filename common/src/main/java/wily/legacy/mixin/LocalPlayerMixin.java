@@ -103,12 +103,6 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
 
     }
 
-    @Override
-    public void moveRelative(float f, Vec3 vec3) {
-        if (Legacy4JClient.isModEnabledOnServer() && getAbilities().flying && isCreative() && !isSprinting()) this.setDeltaMovement(getDeltaMovement().add(Legacy4J.getRelativeMovement(this,f,vec3,(keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown()) && input.leftImpulse == 0 ? 90 : 45)));
-        else super.moveRelative(f, vec3);
-    }
-
     @Inject(method = "aiStep", at = @At(value = "RETURN"))
     public void setYFlightElevation(CallbackInfo ci) {
         if (!Legacy4JClient.isModEnabledOnServer()) return;

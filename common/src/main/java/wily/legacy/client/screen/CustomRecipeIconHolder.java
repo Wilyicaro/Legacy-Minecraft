@@ -9,9 +9,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.level.Level;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.CommonNetwork;
@@ -101,6 +103,15 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder{
     public abstract boolean canCraft();
     public abstract List<Ingredient> getIngredientsGrid();
     public abstract ItemStack getResultStack();
+
+    public ItemStack assembleCraftingResult(Level level, CraftingContainer container){
+        container.clearContent();
+        for (int i = 0; i < getIngredientsGrid().size(); i++) {
+            if (!getIngredientsGrid().get(i).isEmpty()) container.setItem(i,getIngredientsGrid().get(i).getItems()[0]);
+        }
+        CraftingInput input = container.asCraftInput();
+        return level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING,input,level).map(r->r.value().assemble(input,level.registryAccess())).orElse(ItemStack.EMPTY);
+    }
     @Override
     public void onPress() {
         if (isFocused()){

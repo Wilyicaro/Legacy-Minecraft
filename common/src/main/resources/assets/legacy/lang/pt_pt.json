@@ -420,6 +420,7 @@
   "legacy.options.loyaltyLines": "Exibir Efeito de Lealdade",
   "legacy.options.selectedItemTooltipLines": "Linhas da Dica do Item Selecionado",
   "legacy.options.itemTooltipEllipsis": "Reticências da Dica do Item Selecionado",
+  "legacy.options.selectedItemTooltipSpacing": "Espaçamento da Dica do Item Selecionado",
   "selectWorld.newWorld": "Novo Mundo",
   "selectWorld.create" : "Criar Novo Mundo",
   "options.difficulty.normal" : "Normal",

@@ -19,6 +19,8 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.inventory.TransientCraftingContainer;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.component.FireworkExplosion;
@@ -60,6 +62,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     private boolean onlyCraftableRecipes = false;
     protected Stocker.Sizeable infoType = new Stocker.Sizeable(0,2);
     protected final List<Ingredient> ingredientsGrid;
+    protected final CraftingContainer container;
     protected ItemStack resultStack = ItemStack.EMPTY;
     public static final Component INGREDIENTS = Component.translatable("legacy.container.ingredients");
     public static final Component COLOR_TAB = Component.translatable("legacy.container.tab.color");
@@ -122,6 +125,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         this.is2x2 = is2x2;
         gridDimension = is2x2 ? 2 : 3;
         ingredientsGrid = new ArrayList<>(Collections.nCopies(gridDimension * gridDimension,Ingredient.EMPTY));
+        container = new TransientCraftingContainer(abstractContainerMenu,gridDimension,gridDimension);
         warningSlots = new boolean[gridDimension * gridDimension];
         if (Minecraft.getInstance().level == null) return;
         manager = Minecraft.getInstance().level.getRecipeManager();
@@ -210,12 +214,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             if (dyeItemButtons.isEmpty()) return;
             ItemStack item = dyeItemButtons.get(0).itemIcon.isEmpty() ? Items.WHITE_BED.getDefaultInstance() : dyeItemButtons.get(0).itemIcon.copyWithCount(1);
             LegacyCraftingMenu.updateShapedIngredients(ingredientsGrid,List.of(Ingredient.EMPTY,Ingredient.of(dyeItemButtons.get(1).itemIcon),Ingredient.EMPTY, DataComponentIngredient.of(true,item)),gridDimension,2,2,2);
-            DyeItem dye = dyeItemButtons.get(1).itemIcon.getItem() instanceof DyeItem i ? i : (DyeItem) Items.WHITE_DYE;
-            ResourceLocation location = BuiltInRegistries.ITEM.getKey(item.getItem());
-            String path = location.getPath();
-            ResourceLocation id = location.withPath(path.contains(dye.getDyeColor().getName()) ? path : dye.getDyeColor().getName() + "_" + (Arrays.stream(DyeColor.values()).anyMatch(s-> path.contains(s.getName())) ? path.substring(path.indexOf("_") + 1) : path));
-            Item result = BuiltInRegistries.ITEM.get(id);
-            resultStack = dyeItemButtons.get(0).itemIcon.isEmpty() || result == Items.AIR ? item : item.transmuteCopy(result,1);
+            resultStack = dyeItemButtons.get(0).itemIcon.isEmpty() ? item : h.assembleCraftingResult(Minecraft.getInstance().level,container);
             canCraft(ingredientsGrid,true);
         };
         List<ItemStack> dyes = Arrays.stream(DyeColor.values()).map(c-> DyeItem.byColor(c).getDefaultInstance()).toList();

@@ -1,5 +1,6 @@
 package wily.legacy.mixin;
 
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -12,8 +13,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOption;
+
+import static wily.legacy.Legacy4JClient.keyFlyLeft;
+import static wily.legacy.Legacy4JClient.keyFlyRight;
 
 @Mixin(Entity.class)
 public abstract class ClientEntityMixin {
@@ -38,8 +43,6 @@ public abstract class ClientEntityMixin {
     @Shadow public abstract boolean isUnderWater();
 
     @Shadow private boolean onGround;
-
-    @Shadow public abstract boolean onGround();
 
     @Shadow protected abstract Vec3 collide(Vec3 arg);
 
@@ -92,5 +95,13 @@ public abstract class ClientEntityMixin {
     @Redirect(method = "updateSwimming", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isUnderWater()Z"))
     protected boolean updateSwimming(Entity instance) {
         return (!instance.level().isClientSide || Legacy4JClient.isModEnabledOnServer() || isUnderWater()) && instance.isInWater();
+    }
+
+    @Inject(method = "moveRelative", at = @At("HEAD"), cancellable = true)
+    public void moveRelative(float f, Vec3 vec3, CallbackInfo ci) {
+        if (((Object)this) instanceof LocalPlayer p && Legacy4JClient.isModEnabledOnServer() && p.getAbilities().flying && p.isCreative() && !p.isSprinting()){
+            p.setDeltaMovement(p.getDeltaMovement().add(Legacy4J.getRelativeMovement(p,f,vec3,(keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown()) && p.input.leftImpulse == 0 ? 90 : 45)));
+            ci.cancel();
+        }
     }
 }
