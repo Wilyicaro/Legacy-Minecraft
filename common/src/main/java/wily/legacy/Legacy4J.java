@@ -72,6 +72,8 @@ public class Legacy4J {
 
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
+    public static MinecraftServer currentServer;
+
     public static void init(){
         LegacyRegistries.register();
         LegacyGameRules.init();

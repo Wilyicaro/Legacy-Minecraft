@@ -62,6 +62,7 @@ public abstract class MapItemSavedDataMixin {
     }
     @Inject(method = "createFresh", at = @At("HEAD"), cancellable = true)
     private static void createFresh(double d, double e, byte b, boolean bl, boolean bl2, ResourceKey<Level> resourceKey, CallbackInfoReturnable<MapItemSavedData> cir) {
+        if (Legacy4J.currentServer != null && !Legacy4J.currentServer.getGameRules().getBoolean(LegacyGameRules.LEGACY_MAP_GRID)) return;
         int i = 128 * (1 << b);
         cir.setReturnValue(new MapItemSavedData((((int)d + (i / 2) * Mth.sign(d)) / i) * i, (((int)e + (i / 2) * Mth.sign(e)) / i) * i, b, bl, bl2, false, resourceKey));
     }

@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import wily.legacy.Legacy4J;
+import wily.legacy.init.LegacyGameRules;
 
 @Mixin(EmptyMapItem.class)
 public class EmptyMapItemMixin {
@@ -27,6 +28,6 @@ public class EmptyMapItemMixin {
         ItemStack map = player.getItemInHand(interactionHand);
         CompoundTag custom = map.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
         map.consume(1,player);
-        return MapItem.create(level, arg, i, custom.getByte("map_scale"), b, bl);
+        return MapItem.create(level, arg, i, custom.contains("map_scale") ? custom.getByte("map_scale") : (byte) level.getGameRules().getInt(LegacyGameRules.DEFAULT_MAP_SIZE), b, bl);
     }
 }

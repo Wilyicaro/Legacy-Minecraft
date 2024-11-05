@@ -111,7 +111,7 @@ public abstract class GuiGraphicsMixin {
             s += tooltipComponent.getHeight();
         }
 
-        s = q;
+        s = 0;
 
         for(t = 0; t < list.size(); ++t) {
             tooltipComponent = list.get(t);

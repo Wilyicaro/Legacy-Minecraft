@@ -1,8 +1,14 @@
 package wily.legacy.mixin;
 
+import com.mojang.datafixers.DataFixer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.Services;
+import net.minecraft.server.WorldStem;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
+import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.storage.LevelStorageSource;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -11,6 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4J;
 import wily.legacy.init.LegacyGameRules;
+
+import java.net.Proxy;
 
 @Mixin(MinecraftServer.class)
 public abstract class MinecraftServerMixin {
@@ -25,5 +33,10 @@ public abstract class MinecraftServerMixin {
     @Inject(method = "stopServer", at = @At("RETURN"))
     public void stopServer(CallbackInfo ci) {
         Legacy4J.SECURE_EXECUTOR.clear();
+    }
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void init(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, Services services, ChunkProgressListenerFactory chunkProgressListenerFactory, CallbackInfo ci){
+        Legacy4J.currentServer = (MinecraftServer) (Object) this;
     }
 }
