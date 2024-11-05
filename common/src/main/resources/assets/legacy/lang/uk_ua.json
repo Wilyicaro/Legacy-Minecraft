@@ -130,7 +130,7 @@
  "legacy.options.interfaceResolution": "Роздільність інтерфейсу",
  "legacy.options.interfaceSensitivity": "Чутливість інтерфейсу",
  "legacy.options.displayNameTagBorder": "Відображати межу тегу імені",
- "legacy.options.legacyItemTooltips": "Класичне масштабування підказок предметів",
+ "legacy.options.legacyItemTooltipsScaling": "Класичне масштабування підказок предметів",
  "legacy.options.tooltipBoxes": "Відображати спливаючі підказки",
  "legacy.options.animatedCharacter": "Анімований персонаж",
  "legacy.options.smoothAnimatedCharacter": "Плавний анімований персонаж",

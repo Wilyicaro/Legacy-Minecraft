@@ -107,8 +107,13 @@ subprojects {
             def time = dateFormat.format(new Date())
             def changes = new StringBuilder()
             changes << "## " + stage.capitalize() + " $version  \nUpdated at **$time**.  \n**Changelog**  "
-            def proc = "git log --max-count=1 --pretty=format:%s".execute()
-            proc.in.eachLine{ line -> changes << line}
+            def proc = "git log --max-count=4 --pretty=format:%s".execute()
+            proc.in.eachLine { line ->
+                def processedLine = line.toString()
+                def lines = processedLine.split(" -")
+                changes << "\n**${lines[0]}**  "
+                lines.each {s-> if (s != lines[0]) changes << "\n- " + s + "  "}
+            }
             changes << "\n[Click here for complete changelog]($mod_source/commits/$branch)"
             proc.waitFor()
             return changes.toString()

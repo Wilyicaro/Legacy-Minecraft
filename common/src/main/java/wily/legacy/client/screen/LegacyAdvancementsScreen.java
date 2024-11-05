@@ -178,13 +178,13 @@ public class LegacyAdvancementsScreen extends PanelBackgroundScreen {
     public void added() {
         super.added();
         oldLegacyTooltipsValue = LegacyOption.legacyItemTooltips.get();
-        LegacyOption.legacyItemTooltips.set(false);
+        LegacyOption.legacyItemTooltipScaling.set(false);
     }
 
     @Override
     public void removed() {
         super.removed();
-        LegacyOption.legacyItemTooltips.set(oldLegacyTooltipsValue);
+        LegacyOption.legacyItemTooltipScaling.set(oldLegacyTooltipsValue);
     }
     @Override
     public void setTooltipForNextRenderPass(List<FormattedCharSequence> list, ClientTooltipPositioner clientTooltipPositioner, boolean bl) {

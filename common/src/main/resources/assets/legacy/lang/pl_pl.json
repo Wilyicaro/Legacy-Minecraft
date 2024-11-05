@@ -90,7 +90,7 @@
  "legacy.options.interfaceResolution": "Jakość interfejsu",
  "legacy.options.interfaceSensitivity": "Czułość interfejsu",
  "legacy.options.displayNameTagBorder": "Wyświetlaj ramkę nazwy graczy",
- "legacy.options.legacyItemTooltips": "Stary rozmiar podpowiedzi",
+ "legacy.options.legacyItemTooltipsScaling": "Stary rozmiar podpowiedzi",
  "legacy.options.tooltipBoxes": "Wyświetl okienka podpowiedzi",
  "legacy.options.animatedCharacter": "Animacja postaci",
  "legacy.options.smoothAnimatedCharacter": "Płynna animacja postaci",

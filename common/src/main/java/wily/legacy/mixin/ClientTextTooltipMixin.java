@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.client.LegacyOption;
 
 @Mixin(ClientTextTooltip.class)
 
@@ -20,11 +21,12 @@ public class ClientTextTooltipMixin {
 
     @Inject(method = "renderText", at = @At("HEAD"), cancellable = true)
     public void renderText(Font font, int i, int j, Matrix4f matrix4f, MultiBufferSource.BufferSource bufferSource, CallbackInfo ci) {
+        if (!LegacyOption.legacyItemTooltips.get()) return;
         ci.cancel();
         font.drawInBatch(this.text, (float)i, (float)j, -1, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0, 15728880);
     }
     @Inject(method = "getHeight", at = @At("HEAD"), cancellable = true)
     public void getHeight(CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(12);
+        if (LegacyOption.legacyItemTooltips.get()) cir.setReturnValue(12);
     }
 }

@@ -119,6 +119,7 @@ public interface LegacyOption<T> {
     OptionInstance<Boolean> showVanillaRecipeBook = register(create("showVanillaRecipeBook",s->OptionInstance.createBoolean(s, false)));
     OptionInstance<Boolean> displayNameTagBorder = register(create("displayNameTagBorder",s->OptionInstance.createBoolean(s, true)));
     OptionInstance<Boolean> legacyItemTooltips = register(create("legacyItemTooltips",s->OptionInstance.createBoolean(s, true)));
+    OptionInstance<Boolean> legacyItemTooltipScaling = register(create("legacyItemTooltipsScaling",s->OptionInstance.createBoolean(s, true)));
     OptionInstance<Boolean> invertYController = register(create("invertYController",s->OptionInstance.createBoolean(s, false)));
     OptionInstance<Boolean> invertControllerButtons = register(create("invertControllerButtons",s->OptionInstance.createBoolean("legacy.options.invertControllerButtons", false, (b)-> ControllerBinding.RIGHT_BUTTON.bindingState.block(2))));
     OptionInstance<Integer> selectedController = register(create("selectedController",s->new OptionInstance<>(s, OptionInstance.noTooltip(), (c, i)-> Component.translatable("options.generic_value",c,Component.literal(i+1 + (Legacy4JClient.controllerManager.connectedController == null ? "" : " (%s)".formatted(Legacy4JClient.controllerManager.connectedController.getName())))),  new OptionInstance.IntRange(0, 15), 0, d -> { if (Legacy4JClient.controllerManager.connectedController!= null) Legacy4JClient.controllerManager.connectedController.disconnect(Legacy4JClient.controllerManager);})));

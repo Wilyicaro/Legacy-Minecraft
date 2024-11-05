@@ -130,7 +130,7 @@
  "legacy.options.interfaceResolution": "Interface Resolution",
  "legacy.options.interfaceSensitivity": "Interface Sensitivity",
  "legacy.options.displayNameTagBorder": "Display Name Tag Border",
- "legacy.options.legacyItemTooltips": "Legacy Item Tooltips Scaling",
+ "legacy.options.legacyItemTooltipsScaling": "Legacy Item Tooltips Scaling",
  "legacy.options.tooltipBoxes": "Display Tooltip Boxes",
  "legacy.options.animatedCharacter": "キャラクターを動かす",
  "legacy.options.smoothAnimatedCharacter": "Smooth Animated Character",

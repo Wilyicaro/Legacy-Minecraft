@@ -184,18 +184,18 @@ public class LeaderboardsScreen extends PanelBackgroundScreen {
                 Legacy4JClient.applyFontOverrideIf(minecraft.getWindow().getHeight() <= 720, LegacyIconHolder.MOJANGLES_11_FONT, b-> {
                     guiGraphics.pose().pushPose();
                     Component filter = Component.translatable("legacy.menu.leaderboard.filter", this.filter.get() == 0 ? OVERALL :  MY_SCORE);
-                    guiGraphics.pose().translate(panel.x + 91 - font.width(filter) / 4f, panel.y - 12, 0);
-                    if (!b) guiGraphics.pose().scale(2 / 3f, 2 / 3f, 2 / 3f);
+                    guiGraphics.pose().translate(panel.x + 91 - font.width(filter) / 3f, panel.y - 12, 0);
+                    if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
                     guiGraphics.drawString(font, filter, 0, 0, 0xFFFFFF);
                     guiGraphics.pose().popPose();
                     guiGraphics.pose().pushPose();
-                    guiGraphics.pose().translate(panel.x + (panel.width - font.width(board.displayName) / 2f) / 2, panel.y - 12,0);
+                    guiGraphics.pose().translate(panel.x + (panel.width - font.width(board.displayName) * 2/3f) / 2, panel.y - 12,0);
                     if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
                     guiGraphics.drawString(font,board.displayName,0, 0,0xFFFFFF);
                     guiGraphics.pose().popPose();
                     guiGraphics.pose().pushPose();
                     Component entries = Component.translatable("legacy.menu.leaderboard.entries",actualRankBoard.size());
-                    guiGraphics.pose().translate(panel.x + 477 - font.width(entries) / 4f, panel.y - 12,0);
+                    guiGraphics.pose().translate(panel.x + 477 - font.width(entries) / 3f, panel.y - 12,0);
                     if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
                     guiGraphics.drawString(font,entries,0, 0,0xFFFFFF);
                     guiGraphics.pose().popPose();

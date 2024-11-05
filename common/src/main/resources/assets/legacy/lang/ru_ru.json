@@ -130,7 +130,7 @@
  "legacy.options.interfaceResolution": "Разрешение интерфейса",
  "legacy.options.interfaceSensitivity": "Чувствительность управления в меню",
  "legacy.options.displayNameTagBorder": "Показать рамку имени",
- "legacy.options.legacyItemTooltips": "Масштабирование старых подсказок предметов",
+ "legacy.options.legacyItemTooltipsScaling": "Масштабирование старых подсказок предметов",
  "legacy.options.tooltipBoxes": "Показать рамки подсказок",
  "legacy.options.animatedCharacter": "Анимация персонажа",
  "legacy.options.smoothAnimatedCharacter": "Плавная анимация персонажа",

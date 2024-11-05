@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOption;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.util.ScreenUtil;
 
@@ -81,6 +82,7 @@ public abstract class GuiGraphicsMixin {
     }
     @Inject(method = "renderTooltipInternal", at = @At("HEAD"), cancellable = true)
     private void renderTooltipInternal(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner, CallbackInfo ci){
+        if (!LegacyOption.legacyItemTooltips.get()) return;
         ci.cancel();
         if (list.isEmpty()) return;
         int k = 0;
@@ -96,7 +98,7 @@ public abstract class GuiGraphicsMixin {
         int q = vector2ic.y();
         this.pose.pushPose();
         if (p == (int)Legacy4JClient.controllerManager.getPointerX() && q == (int)Legacy4JClient.controllerManager.getPointerY()) this.pose.translate(Legacy4JClient.controllerManager.getPointerX() - i, Legacy4JClient.controllerManager.getPointerY() - j,0.0f);
-        ScreenUtil.renderPointerPanel(self(),p - (int)(5 * ScreenUtil.getTextScale()),q - (int)(9 * ScreenUtil.getTextScale()),(int)((k + 11) *  ScreenUtil.getTextScale()),(int)((l + 16) * ScreenUtil.getTextScale()));
+        ScreenUtil.renderPointerPanel(self(),p - Math.round(5 * ScreenUtil.getTextScale()),q - Math.round(9 * ScreenUtil.getTextScale()),Math.round((k + 11) *  ScreenUtil.getTextScale()),Math.round((l + 13) * ScreenUtil.getTextScale()));
         this.pose.translate(p, q, 400.0F);
         this.pose.scale(ScreenUtil.getTextScale(), ScreenUtil.getTextScale(),1.0f);
         int s = 0;

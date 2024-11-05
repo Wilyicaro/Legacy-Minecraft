@@ -90,7 +90,7 @@
   "legacy.options.interfaceResolution": "Resolución de la Interfaz",
   "legacy.options.interfaceSensitivity": "Sensibilidad de la Interfaz",
   "legacy.options.displayNameTagBorder": "Mostrar Borde de Etiqueta de Nombre",
-  "legacy.options.legacyItemTooltips": "Escala de Consejos de Objetos Antiguos",
+  "legacy.options.legacyItemTooltipsScaling": "Escala de Consejos de Objetos Antiguos",
   "legacy.options.tooltipBoxes": "Mostrar Cuadros de Consejos",
   "legacy.options.animatedCharacter": "Personaje Animado",
   "legacy.options.smoothAnimatedCharacter": "Personaje Animado Suave",
