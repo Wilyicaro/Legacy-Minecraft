@@ -51,7 +51,7 @@ public abstract class EditBoxMixin extends AbstractWidget {
     private void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir){
         Screen screen = Minecraft.getInstance().screen;
         if (KeyboardScreen.isOpenKey(i) && screen != null){
-            Minecraft.getInstance().setScreen(KeyboardScreen.fromStaticListener(this,screen));
+            Minecraft.getInstance().setScreen(KeyboardScreen.fromStaticListener(this,screen).positionBasedOn(this));
             cir.setReturnValue(true);
         }
     }
@@ -59,7 +59,7 @@ public abstract class EditBoxMixin extends AbstractWidget {
     private void onClick(double d, double e, CallbackInfo ci){
         Screen screen = Minecraft.getInstance().screen;
         if (Screen.hasShiftDown() || Legacy4JClient.controllerManager.isControllerTheLastInput) {
-            Minecraft.getInstance().setScreen(KeyboardScreen.fromStaticListener(this, screen));
+            Minecraft.getInstance().setScreen(KeyboardScreen.fromStaticListener(this, screen).positionBasedOn(this));
             ci.cancel();
         }
     }

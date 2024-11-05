@@ -91,6 +91,7 @@
     "OptionsMixin",
     "PackSelectionScreenMixin",
     "ParticleEngineMixin",
+    "ParticleMixin",
     "PauseScreenMixin",
     "PlayerInfoMixin",
     "PlayerRendererMixin",

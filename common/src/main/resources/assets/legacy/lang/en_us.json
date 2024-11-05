@@ -176,6 +176,7 @@
  "legacy.options.vehicleCameraRotation.only_living_entities": "Only Living Entities",
  "legacy.options.enhancedItemModel": "Enhanced Item Model",
  "legacy.options.enhancedItemModel.description": "Fix Item Model Gaps. This option won't have effect with Sodium enabled, and may reduce performance.",
+ "legacy.options.defaultParticlePhysics": "Default Particle Physics",
  "legacy.menu.updateMessage": "Welcome back! You may not have noticed but there is an update available!",
  "legacy.menu.save_options": "Save Options",
  "legacy.menu.save_options_message": "What would you like to do with this save game?",

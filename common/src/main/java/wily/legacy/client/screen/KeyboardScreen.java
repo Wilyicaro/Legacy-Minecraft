@@ -11,6 +11,7 @@ import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
@@ -35,6 +36,7 @@ import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -60,7 +62,10 @@ public class KeyboardScreen extends OverlayPanelScreen {
         this(60, listener,parent);
     }
     public KeyboardScreen(int yOffset, Supplier<GuiEventListener> listener, Screen parent){
-        this(s-> new Panel(p->p.centeredLeftPos(s),p-> p.centeredTopPos(s) + yOffset, 385, 154), listener,parent);
+        this((s,p)->p.centeredLeftPos(s),(s,p)-> Math.min(p.centeredTopPos(s) + yOffset,s.height-p.height), listener,parent);
+    }
+    public KeyboardScreen(BiFunction<Screen,Panel,Integer> leftPosGetter, BiFunction<Screen,Panel,Integer> topPosGetter, Supplier<GuiEventListener> listener, Screen parent){
+        this(s-> new Panel(p->leftPosGetter.apply(s,p), p-> topPosGetter.apply(s,p), 385, 154), listener,parent);
     }
     public KeyboardScreen(Function<Screen,Panel> panelConstructor, Supplier<GuiEventListener> listener, Screen parent) {
         super(panelConstructor, CommonComponents.EMPTY);
@@ -117,7 +122,11 @@ public class KeyboardScreen extends OverlayPanelScreen {
                 onClose();
             }
         });
+    }
 
+    public KeyboardScreen positionBasedOn(LayoutElement element){
+        panel.x = Math.max(0,Math.min(element.getX() + (panel.width - element.getWidth()) / 2,width - panel.width));
+        return this;
     }
 
     @Override
@@ -131,7 +140,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     public static KeyboardScreen fromStaticListener(GuiEventListener listener, Screen parent){
-        return new KeyboardScreen(()->listener,parent);
+        return listener instanceof LayoutElement e ? new KeyboardScreen((s,p)->Math.max(0,Math.min(e.getX() + (e.getWidth() - p.width) / 2,s.width - p.width)), (s,p)->Math.max(0,Math.min(s.height - (e.getY() + e.getHeight()) >= p.height ? e.getY() + e.getHeight() + 4 : e.getY() - p.getHeight() - 4, s.height - p.height)),()->listener,parent) : new KeyboardScreen(()->listener,parent);
     }
 
     @Override

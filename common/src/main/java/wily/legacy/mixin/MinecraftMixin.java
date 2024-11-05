@@ -83,6 +83,9 @@ public abstract class MinecraftMixin {
 
     @Shadow @Final public Gui gui;
 
+    @Unique
+    Screen oldScreen;
+
     private Minecraft self(){
         return (Minecraft)(Object)this;
     }
@@ -176,16 +179,22 @@ public abstract class MinecraftMixin {
         ControlTooltip.Event.of(screen).setupControlTooltips();
         LegacyTipManager.tipDiffPercentage = 0;
     }
+    @Redirect(method = "setScreen",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;init(Lnet/minecraft/client/Minecraft;II)V"))
+    private void initScreen(Screen instance, Minecraft minecraft, int i, int j){
+        if (oldScreen instanceof OverlayPanelScreen s && s.parent == instance) instance.resize(minecraft,i,j);
+        else instance.init(minecraft,i,j);
+    }
     @Inject(method = "setScreen",at = @At("HEAD"), cancellable = true)
     public void setScreen(Screen screen, CallbackInfo ci) {
+        oldScreen = this.screen;
         Screen replacement = Legacy4JClient.getReplacementScreen(screen);
         if (replacement != screen) {
             ci.cancel();
             setScreen(replacement);
             return;
         }
-        if (Minecraft.getInstance().screen == null && Minecraft.getInstance().level != null && screen != null && (screen instanceof PauseScreen || !screen.isPauseScreen()) ) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
-        if (screen == null) ControlTooltip.Event.of(gui).setupControlTooltips();
+        if (Minecraft.getInstance().screen == null && Minecraft.getInstance().level != null && screen != null && (screen instanceof PauseScreen || !screen.isPauseScreen())) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+        if (screen == null && level != null) ControlTooltip.Event.of(gui).setupControlTooltips();
     }
     @Redirect(method = "updateScreenAndTick",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/sounds/SoundManager;stop()V"))
     public void updateScreenAndTick(SoundManager instance) {

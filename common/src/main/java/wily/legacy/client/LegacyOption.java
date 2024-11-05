@@ -161,6 +161,7 @@ public interface LegacyOption<T> {
     OptionInstance<Integer> selectedItemTooltipSpacing = register(create("selectedItemTooltipSpacing", s->new OptionInstance<>(s, OptionInstance.noTooltip(), Options::genericValueLabel, new OptionInstance.IntRange(8,12), 12, d -> {})));
     OptionInstance<VehicleCameraRotation> vehicleCameraRotation = register(create("vehicleCameraRotation",s->new OptionInstance<>(s, d->null, (c, d) -> d.displayName, new OptionInstance.Enum<>(Arrays.asList(VehicleCameraRotation.values()), Codec.INT.xmap(i-> VehicleCameraRotation.values()[i], VehicleCameraRotation::ordinal)), VehicleCameraRotation.ONLY_NON_LIVING_ENTITIES, d -> {})));
     OptionInstance<Boolean> enhancedItemModel = register(create("enhancedItemModel", s->OptionInstance.createBoolean(s,OptionInstance.cachedConstantTooltip(Component.translatable("legacy.options.enhancedItemModel.description")),true, b->{ if (!Legacy4JPlatform.isModLoaded("sodium") && Minecraft.getInstance().isGameLoadFinished()) Minecraft.getInstance().reloadResourcePacks();})));
+    OptionInstance<Boolean> defaultParticlePhysics = register(create("defaultParticlePhysics",s-> OptionInstance.createBoolean(s, true)));
 
     enum VehicleCameraRotation implements StringRepresentable {
         NONE("none", LegacyKeyBindsScreen.NONE),ALL_ENTITIES("all_entities"),ONLY_NON_LIVING_ENTITIES("only_non_living_entities"),ONLY_LIVING_ENTITIES("only_living_entities");
