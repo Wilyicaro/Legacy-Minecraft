@@ -157,26 +157,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
             ci.cancel();
             return;
         }
-        if (minecraft.getCameraEntity() instanceof LivingEntity character) {
-            boolean hasRemainingTime = character.isSprinting() || character.isCrouching() || character.isFallFlying() || character.isVisuallySwimming() || !(character instanceof Player);
-            if (LegacyOption.animatedCharacter.get() && (hasRemainingTime || character instanceof Player p && p.getAbilities().flying) && !character.isSleeping()) {
-                ScreenUtil.animatedCharacterTime = Util.getMillis();
-                ScreenUtil.remainingAnimatedCharacterTime = hasRemainingTime ? 450 : 0;
-            }
-            if (Util.getMillis() - ScreenUtil.animatedCharacterTime <= ScreenUtil.remainingAnimatedCharacterTime) {
-                float xRot = character.getXRot();
-                float xRotO = character.xRotO;
-                if (!character.isFallFlying()) character.setXRot(character.xRotO = -2.5f);
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(32f,18,0);
-                ScreenUtil.applyHUDScale(guiGraphics);
-                float f = LegacyOption.smoothAnimatedCharacter.get() ? deltaTracker.getGameTimeDeltaPartialTick(true) : 0;
-                ScreenUtil.renderEntity(guiGraphics, 10f, 36f, 12, f,new Vector3f(), new Quaternionf().rotationXYZ(-5* Mth.PI/180f, (165 -Mth.lerp(f, character.yBodyRotO, character.yBodyRot)) * Mth.PI/180f, Mth.PI), null, character);
-                guiGraphics.pose().popPose();
-                character.setXRot(xRot);
-                character.xRotO = xRotO;
-            }
-        }
+        ScreenUtil.renderAnimatedCharacter(guiGraphics, deltaTracker);
         int newSelection = minecraft.player != null ? minecraft.player.getInventory().selected : -1;
         if (lastHotbarSelection >= 0 && lastHotbarSelection != newSelection) ScreenUtil.lastHotbarSelectionChange = Util.getMillis();
         lastHotbarSelection = newSelection;
@@ -184,10 +165,6 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         guiGraphics.pose().translate(guiGraphics.guiWidth()/2f, guiGraphics.guiHeight(),0.0F);
         ScreenUtil.applyHUDScale(guiGraphics);
         guiGraphics.pose().translate(-guiGraphics.guiWidth()/2,-guiGraphics.guiHeight(),0);
-        Player player = this.getCameraPlayer();
-        if (player == null) {
-            return;
-        }
         if (ScreenUtil.getHUDOpacity() < 1.0) {
             Legacy4JClient.guiBufferSourceOverride = BufferSourceWrapper.translucent(guiGraphics.bufferSource());
         }

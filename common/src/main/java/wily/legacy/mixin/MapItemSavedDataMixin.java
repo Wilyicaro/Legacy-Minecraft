@@ -34,6 +34,18 @@ public abstract class MapItemSavedDataMixin {
 
     @Shadow protected abstract void addDecoration(Holder<MapDecorationType> arg, LevelAccessor arg2, String string, double d, double e, double f, Component arg3);
 
+    @Shadow @Final public int centerX;
+
+    @Shadow @Final public int centerZ;
+
+    @Shadow @Final public byte scale;
+
+    @Shadow @Final private boolean trackingPosition;
+
+    @Shadow @Final private boolean unlimitedTracking;
+
+    @Shadow @Final public ResourceKey<Level> dimension;
+
     public MapItemSavedData self(){
         return (MapItemSavedData) (Object) this;
     }
@@ -65,5 +77,11 @@ public abstract class MapItemSavedDataMixin {
         if (Legacy4J.currentServer != null && !Legacy4J.currentServer.getGameRules().getBoolean(LegacyGameRules.LEGACY_MAP_GRID)) return;
         int i = 128 * (1 << b);
         cir.setReturnValue(new MapItemSavedData((((int)d + (i / 2) * Mth.sign(d)) / i) * i, (((int)e + (i / 2) * Mth.sign(e)) / i) * i, b, bl, bl2, false, resourceKey));
+    }
+    @Inject(method = "scaled", at = @At("HEAD"), cancellable = true)
+    public void scaled(CallbackInfoReturnable<MapItemSavedData> cir) {
+        if (Legacy4J.currentServer != null && !Legacy4J.currentServer.getGameRules().getBoolean(LegacyGameRules.LEGACY_MAP_GRID)) return;
+        int i = 128 * (1 << (scale));
+        cir.setReturnValue(MapItemSavedData.createFresh(this.centerX - (i / 2) * Mth.sign(this.centerX), this.centerZ - (i / 2) * Mth.sign(this.centerZ), (byte)Mth.clamp(this.scale + 1, 0, 4), this.trackingPosition, this.unlimitedTracking, this.dimension));
     }
 }

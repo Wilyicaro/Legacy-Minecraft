@@ -38,6 +38,7 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.reset_defaults"),button -> minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.reset_keyBinds"),Component.translatable("legacy.menu.reset_keyBinds_message"), b-> {
             for (KeyMapping keyMapping : keyMappings)
                 minecraft.options.setKey(keyMapping, keyMapping.getDefaultKey());
+            KeyMapping.resetMapping();
             options.save();
             minecraft.setScreen(this);
         }))).size(240,20).build());

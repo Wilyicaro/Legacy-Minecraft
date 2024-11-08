@@ -424,8 +424,8 @@ public class Legacy4JClient {
         for (KeyMapping keyMapping : minecraft.options.keyMappings) {
             keyMapping.setKey(keyMapping.getDefaultKey());
             LegacyKeyMapping.of(keyMapping).setBinding(LegacyKeyMapping.of(keyMapping).getDefaultBinding());
+            KeyMapping.resetMapping();
         }
-        LegacyOption.list.forEach(LegacyOption::reset);
         minecraft.options.save();
     }
 
@@ -459,8 +459,8 @@ public class Legacy4JClient {
         },source::levelExists,source,saveDirName);
     }
     public static void copySaveBtwSources(LevelStorageSource.LevelStorageAccess sendSource, LevelStorageSource destSource){
-        try (LevelStorageSource.LevelStorageAccess access = destSource.createAccess(sendSource.getLevelId())) {
-            File destLevelDirectory = access.getLevelDirectory().path().toFile();
+        try {
+            File destLevelDirectory = destSource.getLevelPath(sendSource.getLevelId()).toFile();
             if (destLevelDirectory.exists()) FileUtils.deleteQuietly(destLevelDirectory);
             FileUtils.copyDirectory(sendSource.getLevelDirectory().path().toFile(), destLevelDirectory, p -> !p.getName().equals("session.lock"));
         } catch (IOException e) {

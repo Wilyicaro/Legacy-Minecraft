@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -22,7 +23,9 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -308,5 +311,28 @@ public class ScreenUtil {
 
     public static int getSelectedItemTooltipLines(){
         return LegacyOption.selectedItemTooltipLines.get() == 0 ? 0 : LegacyOption.selectedItemTooltipLines.get() + (LegacyOption.itemTooltipEllipsis.get() ? 1 : 0);
+    }
+
+    public static void renderAnimatedCharacter(GuiGraphics guiGraphics, DeltaTracker deltaTracker){
+        if (mc.getCameraEntity() instanceof LivingEntity character) {
+            boolean hasRemainingTime = character.isSprinting() || character.isCrouching() || character.isFallFlying() || character.isVisuallySwimming() || !(character instanceof Player);
+            if (LegacyOption.animatedCharacter.get() && (hasRemainingTime || character instanceof Player p && p.getAbilities().flying) && !character.isSleeping()) {
+                ScreenUtil.animatedCharacterTime = Util.getMillis();
+                ScreenUtil.remainingAnimatedCharacterTime = hasRemainingTime ? 450 : 0;
+            }
+            if (Util.getMillis() - ScreenUtil.animatedCharacterTime <= ScreenUtil.remainingAnimatedCharacterTime) {
+                float xRot = character.getXRot();
+                float xRotO = character.xRotO;
+                if (!character.isFallFlying()) character.setXRot(character.xRotO = -2.5f);
+                guiGraphics.pose().pushPose();
+                guiGraphics.pose().translate(32f,18,0);
+                ScreenUtil.applyHUDScale(guiGraphics);
+                float f = LegacyOption.smoothAnimatedCharacter.get() ? deltaTracker.getGameTimeDeltaPartialTick(true) : 0;
+                ScreenUtil.renderEntity(guiGraphics, 10f, 36f, 12, f,new Vector3f(), new Quaternionf().rotationXYZ(-5* Mth.PI/180f, (165 -Mth.lerp(f, character.yBodyRotO, character.yBodyRot)) * Mth.PI/180f, Mth.PI), null, character);
+                guiGraphics.pose().popPose();
+                character.setXRot(xRot);
+                character.xRotO = xRotO;
+            }
+        }
     }
 }

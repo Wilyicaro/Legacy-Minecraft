@@ -82,9 +82,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     }
 
     public static LevelStorageSource.LevelStorageAccess getSummaryAccess(LevelStorageSource source, LevelSummary summary){
-        try {
-            LevelStorageSource.LevelStorageAccess access = source.createAccess(summary.getLevelId());
-            access.close();
+        try (LevelStorageSource.LevelStorageAccess access = source.createAccess(summary.getLevelId())) {
             return access;
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -30,6 +30,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOption;
@@ -142,17 +143,15 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     private WorldOpenFlows createNewWorld(Minecraft instance) {
         return new WorldOpenFlows(minecraft,Legacy4JClient.currentWorldSource);
     }
-    @Redirect(method = "createNewWorldDirectory", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelStorageSource;createAccess(Ljava/lang/String;)Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;"))
-    private LevelStorageSource.LevelStorageAccess createNewWorldDirectory(LevelStorageSource instance, String path) throws IOException {
-        LevelStorageSource.LevelStorageAccess access = instance.createAccess(path);
-        if (Files.exists(access.getLevelDirectory().path())) {
-            try {
-                FileUtils.deleteDirectory(access.getLevelDirectory().path().toFile());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+    @Inject(method = "createNewWorldDirectory", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelStorageSource;createAccess(Ljava/lang/String;)Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;"))
+    private void createNewWorldDirectory(CallbackInfoReturnable<Optional<LevelStorageSource.LevelStorageAccess>> cir) {
+        try {
+            LevelStorageSource.LevelStorageAccess access = Legacy4JClient.currentWorldSource.createAccess(uiState.getTargetFolder());
+            access.close();
+            if (Files.exists(access.getLevelDirectory().path())) FileUtils.deleteDirectory(access.getLevelDirectory().path().toFile());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return access;
     }
     @Redirect(method = "createNewWorldDirectory", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getLevelSource()Lnet/minecraft/world/level/storage/LevelStorageSource;"))
     private LevelStorageSource createNewWorldDirectory(Minecraft instance) {

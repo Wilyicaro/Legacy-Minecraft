@@ -105,6 +105,7 @@
     "SliderableValueSetMixin",
     "SlotMixin",
     "SmithingScreenMixin",
+    "SpectatorGuiMixin",
     "SplashRendererMixin",
     "StonecutterScreenMixin",
     "ThrownTridentRendererMixin",
