@@ -1,0 +1,229 @@
+{
+  "overrides": {
+    "bamboo_jungle": {
+      "item": "bamboo"
+    },
+    "bamboo_jungle_hills": {
+      "item": "jungle_sapling"
+    },
+    "beach": {
+      "item": "sand"
+    },
+    "birch_forest": {
+      "item": "birch_log"
+    },
+    "old_growth_birch_forest": {
+      "item": "birch_log"
+    },
+    "snowy_beach": {
+      "item": "snow"
+    },
+    "cold_ocean": {
+      "item": "legacy:water"
+    },
+    "snowy_taiga": {
+      "item": "spruce_log"
+    },
+    "deep_cold_ocean": {
+      "item": "legacy:water"
+    },
+    "deep_frozen_ocean": {
+      "item": "legacy:water"
+    },
+    "deep_lukewarm_ocean": {
+      "item": "legacy:water"
+    },
+    "deep_ocean": {
+      "item": "legacy:water"
+    },
+    "deep_warm_ocean": {
+      "item": "legacy:water"
+    },
+    "desert": {
+      "item": "sand"
+    },
+    "windswept_hills": {
+      "item": "stone"
+    },
+    "mountain_edge": {
+      "item": "stone"
+    },
+    "windswept_gravelly_hills": {
+      "item": "gravel"
+    },
+    "stony_shore": {
+      "item": "gravel"
+    },
+    "windswept_forest": {
+      "item": "stone"
+    },
+    "flower_forest": {
+      "item": "rose_bush"
+    },
+    "forest": {
+      "item": "stone"
+    },
+    "frozen_ocean": {
+      "item": "ice"
+    },
+    "frozen_river": {
+      "item": "ice"
+    },
+    "nether_wastes": {
+      "item": "netherrack"
+    },
+    "warped_forest": {
+      "item": "warped_nylium"
+    },
+    "crimson_forest": {
+      "item": "crimson_nylium"
+    },
+    "soul_sand_valley": {
+      "item": "soul_soil"
+    },
+    "basalt_deltas": {
+      "item": "basalt"
+    },
+    "ice_mountains": {
+      "item": "snow_block"
+    },
+    "snowy_plains": {
+      "item": "snow"
+    },
+    "snowy_slopes": {
+      "item": "snow_block"
+    },
+    "ice_spikes": {
+      "item": "packed_ice"
+    },
+    "jungle": {
+      "item": "jungle_sapling"
+    },
+    "sparse_jungle": {
+      "item": "jungle_leaves"
+    },
+    "lukewarm_ocean": {
+      "item": "legacy:water"
+    },
+    "old_growth_spruce_taiga": {
+      "item": "spruce_log"
+    },
+    "giant_spruce_taiga_hills": {
+      "item": "podzol"
+    },
+    "old_growth_pine_taiga": {
+      "item": "spruce_log"
+    },
+    "giant_tree_taiga_hills": {
+      "item": "podzol"
+    },
+    "badlands": {
+      "item": "terracotta"
+    },
+    "eroded_badlands": {
+      "item": "red_sand"
+    },
+    "wooded_badlands": {
+      "item": "white_terracotta"
+    },
+    "mushroom_fields": {
+      "item": "mycelium"
+    },
+    "mushroom_fields_shore": {
+      "item": "mycelium"
+    },
+    "ocean": {
+      "item": "legacy:water"
+    },
+    "grove": {
+      "item": "stone"
+    },
+    "cherry_grove": {
+      "item": "cherry_leaves"
+    },
+    "plains": {
+      "item": "grass_block"
+    },
+    "river": {
+      "item": "legacy:water"
+    },
+    "dark_forest": {
+      "item": "dark_oak_log"
+    },
+    "dark_forest_hills": {
+      "item": "dark_oak_log"
+    },
+    "savanna": {
+      "item": "legacy:shrub"
+    },
+    "windswept_savanna": {
+      "item": "acacia_log"
+    },
+    "savanna_plateau": {
+      "item": "legacy:shrub"
+    },
+    "stone_beach": {
+      "item": "stone"
+    },
+    "sunflower_plains": {
+      "item": "sunflower"
+    },
+    "swamp": {
+      "item": "lily_pad"
+    },
+    "mangrove_swamp": {
+      "item": "mangrove_roots"
+    },
+    "taiga": {
+      "item": "spruce_leaves"
+    },
+    "taiga_mountains": {
+      "item": "spruce_leaves"
+    },
+    "frozen_peaks": {
+      "item": "packed_ice"
+    },
+    "stony_peaks": {
+      "item": "calcite"
+    },
+    "jagged_peaks": {
+      "item": "emerald_ore"
+    },
+    "meadow": {
+      "item": "azure_bluet"
+    },
+    "deep_dark": {
+      "item": "sculk"
+    },
+    "the_end": {
+      "item": "end_stone"
+    },
+    "end_barrens": {
+      "item": "end_stone"
+    },
+    "end_highlands": {
+      "item": "end_stone"
+    },
+    "end_midlands": {
+      "item": "end_stone"
+    },
+    "small_end_islands": {
+      "item": "end_stone"
+    },
+    "lush_caves": {
+      "item": "glow_berries"
+    },
+    "dripstone_caves": {
+      "item": "pointed_dripstone"
+    },
+    "warm_ocean": {
+      "item": "legacy:water"
+    },
+    "the_void": {
+      "item": "barrier"
+    },
+    "pale_garden": {
+      "item": "creaking_heart"
+    }
+  }
+}

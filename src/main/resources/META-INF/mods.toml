@@ -1,0 +1,27 @@
+modLoader = "javafml"
+loaderVersion = "[47,)"
+license="${mod_license}"
+issueTrackerURL="${mod_issues}"
+
+[[mods]]
+modId="${mod_id}"
+version="${version}"
+displayName="${mod_name}"
+displayURL="${mod_source}"
+logoFile="logo.png"
+authors="${mod_authors}"
+description="${mod_description}"
+
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[${mc_version_range}]"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "factory_api"
+mandatory = true
+versionRange = "[${factory_api_version},)"
+ordering = "AFTER"
+side = "BOTH"

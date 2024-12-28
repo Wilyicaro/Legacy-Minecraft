@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "${mod_authors}"
+  ],
+  "contributors": [
+    "${mod_credits}",
+    "omo50"
+  ],
+  "contact": {
+    "sources": "${mod_source}",
+    "issues": "${mod_issues}"
+  },
+  "license": "${mod_license}",
+  "icon": "logo.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "wily.legacy.Legacy4J::init"
+    ],
+    "client": [
+      "wily.legacy.Legacy4JClient::init"
+    ]
+  },
+  "accessWidener": "${aw}",
+  "mixins": [
+    "${mod_id}.mixins.json"
+  ],
+  "depends": {
+    "fabric": "*",
+    "factory_api": ">=${factory_api_version}",
+    "minecraft": ["${mc_version_range}"]
+  },
+  "suggests": {
+    "factocrafty": ">=0.0.0.6"
+  }
+}

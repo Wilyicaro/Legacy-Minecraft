@@ -1,0 +1,18 @@
+{
+    "blend": {
+        "func": "add",
+        "srcrgb": "one",
+        "dstrgb": "zero"
+    },
+    "vertex": /*? if <1.21.2 {*//*"gamma"*//*?} else {*/"program/gamma"/*?}*/,
+    "fragment": /*? if <1.21.2 {*//*"gamma"*//*?} else {*/"program/new_gamma"/*?}*/,
+    "attributes": [ "Position" ],
+    "samplers": [
+        { "name": /*? if <1.21.2 {*//*"DiffuseSampler"*//*?} else {*/"InSampler"/*?}*/ }
+    ],
+    "uniforms": [
+        { "name": "gamma",       "type": "float",     "count": 1,  "values": [ 2.0] },
+        { "name": "ProjMat",       "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+        { "name": "InSize",        "type": "float",     "count": 2,  "values": [ 1.0, 1.0 ] }
+    ]
+}

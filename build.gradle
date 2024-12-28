@@ -1,0 +1,322 @@
+import java.text.SimpleDateFormat
+import groovy.json.JsonSlurper
+import groovy.json.JsonParserType
+import groovy.json.JsonOutput
+plugins {
+    id "dev.architectury.loom"
+    id "me.modmuss50.mod-publish-plugin" version "0.7.4"
+    id 'maven-publish'
+}
+
+base.archivesName = project.archives_base_name
+version = stonecutter.current.version + "-" + mod_version
+group = rootProject.maven_group
+def loader = property("loom.platform")
+
+repositories {
+    maven { url "https://maven.neoforged.net/releases/" }
+
+    maven {
+        url "https://jm.gserv.me/repository/maven-public/"
+    }
+    maven {
+        url "https://maven.isxander.dev/releases"
+    }
+    maven {
+        url "https://www.cursemaven.com"
+    }
+    maven {
+        name = 'GitHubPackages'
+        url uri("$mod_mvngit_source")
+        credentials{
+            username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.token") ?: System.getenv("TOKEN")
+        }
+    }
+
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+    maven { url "https://jitpack.io" }
+
+    maven {
+        name = "Terraformers"
+        url = "https://maven.terraformersmc.com/"
+    }
+
+    maven{url = "https://maven.su5ed.dev/releases"}
+}
+configurations.configureEach {
+    resolutionStrategy {
+        force("net.fabricmc:fabric-loader:${fabric_loader_version}")
+    }
+}
+dependencies {
+    minecraft "com.mojang:minecraft:${stonecutter.current.version}"
+    mappings loom.officialMojangMappings()
+    api(include(sdl_dependency))
+    modApi "wily.factory_api:factory_api-${loader}:${stonecutter.current.version}-${factory_api_version}"
+    modCompileOnly("maven.modrinth:world-host:${world_host_version}")
+    modCompileOnly("maven.modrinth:vivecraft:${vivecraft_version}")
+
+    if (loader == "fabric" || stonecutter.eval(stonecutter.current.version, ">=1.21") && loader == "neoforge"){
+        modCompileOnly("maven.modrinth:sodium:${sodium_version}")
+        modCompileOnly("maven.modrinth:iris:${iris_version}")
+    }
+
+    if (loader == "fabric") {
+        modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+        modApi "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+        modCompileOnly("com.terraformersmc:modmenu:${modmenu_version}")
+
+    } else if (loader == "forge") {
+        forge "net.minecraftforge:forge:${stonecutter.current.version}-${forge_version}"
+    } else if (loader == "neoforge") {
+        neoForge "net.neoforged:neoforge:${neoforge_version}"
+    }
+
+    if (loader == "neoforge" && stonecutter.eval(stonecutter.current.version, ">=1.21")) {
+        modCompileOnly("org.sinytra.forgified-fabric-api:fabric-rendering-data-attachment-v1:0.3.48+73761d2e19")
+        modCompileOnly("org.sinytra.forgified-fabric-api:fabric-block-view-api-v2:1.0.10+9afaaf8c19")
+    }
+
+    if (loader == "forge" || loader == "neoforge") {
+        forgeRuntimeLibrary sdl_dependency
+    }
+
+}
+
+def aw = "${mod_id}-${stonecutter.eval(stonecutter.current.version, ">=1.21.2") ? 1212 : 120}.accesswidener"
+
+loom {
+    accessWidenerPath.set(getRootProject().file("src/main/resources/${aw}"))
+
+    if (loader == "forge") forge {
+        convertAccessWideners.set(true)
+        mixinConfigs("${mod_id}.mixins.json")
+    }
+    mixin {
+        useLegacyMixinAp = true
+        defaultRefmapName = "${mod_id}.refmap.json"
+    }
+}
+
+def isJava21 = stonecutter.eval(stonecutter.current.version, ">=1.20.5")
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    options.release = isJava21 ? 21 : 17
+}
+
+java {
+    withSourcesJar()
+    sourceCompatibility = isJava21 ? JavaVersion.VERSION_21 : JavaVersion.VERSION_17
+    targetCompatibility = isJava21 ? JavaVersion.VERSION_21 : JavaVersion.VERSION_17
+}
+remapJar {
+    if (loader == "neoforge") atAccessWideners.add aw
+}
+ext {
+    releaseChangelog = {
+        def dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm")
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
+        def branch
+        if (System.env.BRANCH_NAME) {
+            branch = System.env.BRANCH_NAME
+            branch = branch.substring(branch.lastIndexOf("/") + 1)
+        } else {
+            branch = "git rev-parse --abbrev-ref HEAD".execute().in.text.trim()
+        }
+        if (branch == "HEAD") {
+            branch = "git rev-parse --short HEAD".execute().in.text.trim()
+        }
+        def time = dateFormat.format(new Date())
+        def changes = new StringBuilder()
+        changes << "## " + stage.capitalize() + " $version  \nUpdated at **$time**.  \n**Changelog**  "
+        def proc = "git log --max-count=4 --pretty=format:%s".execute()
+        proc.in.eachLine { line ->
+                def processedLine = line.toString()
+                def lines = processedLine.split(" -")
+                changes << "\n**${lines[0]}**  "
+                lines.each {s-> if (s != lines[0]) changes << "\n- " + s + "  "}
+        }
+        changes << "\n[Click here for complete changelog]($mod_source/commits/$branch)"
+        proc.waitFor()
+        return changes.toString()
+    }
+}
+
+processResources {
+    def version_range = mc_version_range
+
+    if (loader == "fabric") {
+        version_range = version_range.split(",").join("\",\"")
+    }
+    def properties = [
+            "version" : mod_version,
+            "mod_id" : mod_id,
+            "mod_name" : mod_name,
+            "mod_license" : mod_license,
+            "mod_description" : mod_description,
+            "mod_authors" : mod_authors,
+            "mod_group" : project.group,
+            "mod_credits" : mod_credits,
+            "mod_source" : mod_source,
+            "mod_issues" : mod_issues,
+            "neoforge_version" : neoforge_version,
+            "forge_version" : forge_version,
+            "mc_version_range" : version_range,
+            "mc_version" : stonecutter.current.version,
+            "aw": aw,
+            "factory_api_version": factory_api_version
+    ]
+    if (loader == "fabric" || loader == "forge" || loader == "neoforge") {
+        if (loader != "fabric") {
+            exclude "fabric.mod.json"
+            exclude "${mod_id}-fabric.mixins.json"
+        } else exclude "${mod_id}-forge_like.mixins.json"
+        if (loader != "forge") exclude "META-INF/mods.toml"
+        if (loader != "neoforge") {
+            exclude "META-INF/neoforge.mods.toml"
+            exclude "${mod_id}-neoforge.mixins.json"
+        }
+        filesMatching(loader == "fabric" ? "fabric.mod.json" : loader == "forge" ? "META-INF/mods.toml" : "META-INF/neoforge.mods.toml") {
+            expand properties
+        }
+    }
+
+    def parser = new JsonSlurper().setType(JsonParserType.LAX)
+
+    filesMatching("**/*.json5"){
+        String noComments = JsonOutput.prettyPrint(JsonOutput.toJson(parser.parse(it.file)))
+        File newFile = new File(outputs.files.asPath,it.path.substring(0,it.path.length() - 1))
+        if (!noComments.isBlank()){
+            newFile.getParentFile().mkdirs()
+            newFile.write(noComments)
+        }
+        it.exclude()
+    }
+    inputs.properties(properties)
+    if (loader == "neoforge" && stonecutter.eval(stonecutter.current.version, "<=1.20.4")){
+        filesMatching("META-INF/neoforge.mods.toml"){
+            it.copyTo(new File(outputs.files.asPath,"META-INF/mods.toml"))
+            it.exclude()
+        }
+    }
+}
+
+tasks.register('renameJarForPublication', Zip) {
+    dependsOn remapJar
+    from remapJar.archiveFile.map { zipTree(it) }
+    archiveExtension = "jar"
+    metadataCharset "UTF-8"
+    destinationDirectory = base.libsDirectory
+    archiveClassifier = loader
+}
+
+assemble.dependsOn renameJarForPublication
+
+var modPlatformName = loader.capitalize()
+
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "${project.mod_id}-${loader}"
+            version = version
+
+            pom {
+                name = "${mod_name} [${modPlatformName}]"
+                description = "${mod_description}"
+                url = "${mod_source}"
+                scm {
+                    url = "${mod_source}"
+                    connection = "${mod_source}".replace("https", "scm:git:git").concat(".git")
+                    developerConnection = "${mod_source}".replace("https://github.com/", "scm:git:git@github.com:").concat(".git")
+                }
+                issueManagement {
+                    system = 'github'
+                    url = "${mod_issues}"
+                }
+                licenses {
+                    license {
+                        name = 'MPL-2'
+                        url = 'https://www.mozilla.org/en-US/MPL/2.0/'
+                    }
+                }
+                developers {
+                    developer {
+                        id = "${mod_authors}".toLowerCase()
+                        name = "${mod_authors}"
+                    }
+                }
+            }
+            // this is necessary when not using 'from components.java', otherwise dependencies block will still be empty at this point
+            afterEvaluate {
+                // exclude certain dependencies when publishing to maven
+                // from https://stackoverflow.com/a/50121790
+                pom.withXml {
+                    asNode().dependencies.dependency.each { dep ->
+                        // use this approach to make excluding dependencies from Curse Maven more convenient
+                        if (["curse.maven:","dev.architectury:"].stream().anyMatch(mod -> "${dep.groupId.last().value().last()}:${dep.artifactId.last().value().last()}".startsWith(mod))) {
+                            assert dep.parent().remove(dep)
+                        }
+                    }
+                }
+            }
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            name = 'GitHubPackages'
+            url uri("$mod_mvngit_source")
+            credentials{
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.token") ?: System.getenv("TOKEN")
+            }
+        }
+    }
+}
+
+publishMods {
+
+    def isFabric = loader == "fabric"
+    displayName = "$mod_name [$modPlatformName] $project.version"
+    type = STABLE
+    changelog = releaseChangelog()
+    modLoaders.add(loader)
+    if (isFabric) modLoaders.add "quilt"
+    file = renameJarForPublication.archiveFile
+    def versions = mc_version_range.split(",")
+
+    curseforge {
+        minecraftVersions.addAll versions
+        if (isJava21) javaVersions.add(JavaVersion.VERSION_21)
+        else javaVersions.addAll(JavaVersion.VERSION_17,JavaVersion.VERSION_18)
+        clientRequired = true
+        serverRequired = true
+        accessToken = project.findProperty("CURSE_API_KEY") ?: System.getenv("CURSE_API_KEY")
+        projectId = curseforge_id
+        requires("factory_api")
+        if (isFabric) requires("fabric-api")
+    }
+
+    modrinth {
+        minecraftVersions.addAll versions
+        accessToken = project.findProperty("gpr.token") ?: System.getenv("MODRINTH_TOKEN")
+        projectId = modrinth_id
+        publishMods.version = "$project.version+$loader"
+        requires("factory_api")
+        if (isFabric) requires("fabric-api")
+    }
+
+}

@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "model",
+    "model": "legacy:item/water",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -1271835729
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "refmap": "legacy.refmap.json",
+  "required": true,
+  "package": "wily.legacy.mixin.sodium",
+  "compatibilityLevel": "JAVA_17",
+  "plugin": "wily.legacy.mixin.LegacySodiumMixinPlugin",
+  "client": [
+    //? if >=1.21 && (fabric || neoforge) {
+    "FluidRendererFactoryMixin"
+    //?}
+  ],
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

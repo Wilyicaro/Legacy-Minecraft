@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    //? if <1.21.2 {
+    /*{
+      "item": "minecraft:cobweb"
+    }
+    *///?} else {
+    "minecraft:cobweb"
+    //?}
+  ],
+  "result": {
+    "id": "minecraft:string",
+    "count": 9
+  }
+}

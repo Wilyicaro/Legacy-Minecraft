@@ -1,0 +1,13 @@
+{
+  "model": {
+    "type": "model",
+    "model": "legacy:item/shrub",
+    "tints": [
+      {
+        "type": "minecraft:grass",
+        "temperature": 0.5,
+        "downfall": 1.0
+      }
+    ]
+  }
+}

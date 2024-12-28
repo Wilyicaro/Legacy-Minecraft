@@ -1,0 +1,24 @@
+plugins {
+    id "dev.kikugie.stonecutter"
+    id "dev.architectury.loom" version "1.9.+" apply false
+}
+stonecutter.active "1.21.4-fabric" /* [SC] DO NOT EDIT */
+
+stonecutter.registerChiseled tasks.register("chiseledBuild", stonecutter.chiseled) { 
+    setGroup "project"
+    ofTask "build"
+}
+
+stonecutter.registerChiseled tasks.register("chiseledPublishMods", stonecutter.chiseled) {
+    setGroup "project"
+    ofTask "publishMods"
+}
+stonecutter.registerChiseled tasks.register("chiseledPublishToGitHubPackages", stonecutter.chiseled) {
+    setGroup "project"
+    ofTask "publishAllPublicationsToGitHubPackagesRepository"
+}
+
+stonecutter.parameters {
+    def loader = node.property("loom.platform").toString()
+    ["fabric","forge","neoforge"].forEach {v-> it.const(v, loader == v)}
+}

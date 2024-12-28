@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "item": "#minecraft:stairs",
+    "tip": "block.minecraft.stairs.tip"
+  }
+}

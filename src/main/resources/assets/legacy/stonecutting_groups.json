@@ -1,0 +1,6 @@
+{
+  "slabs": ["#slabs"],
+  "stairs:": ["#stairs"],
+  "walls": ["#walls"],
+  "blocks": {"type": "block_tag", "value": "mineable/pickaxe"}
+}

@@ -1,0 +1,29 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license="${mod_license}"
+issueTrackerURL="${mod_issues}"
+
+[[mods]]
+modId="${mod_id}"
+version="${version}"
+displayName="${mod_name}"
+displayURL="${mod_source}"
+logoFile="logo.png"
+authors="${mod_authors}"
+description="${mod_description}"
+[[mixins]]
+config="${mod_id}.mixins.json"
+
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+type="required"
+versionRange = "[${mc_version_range}]"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "factory_api"
+type="required"
+versionRange = "[${factory_api_version},)"
+ordering = "AFTER"
+side = "BOTH"
