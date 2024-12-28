@@ -17,7 +17,7 @@ public abstract class MinecartFurnaceMixin extends AbstractMinecart {
     }
 
     @Inject(method = "getMaxSpeed", at = @At("HEAD"), cancellable = true)
-    protected void getMaxSpeed(/*? if >=1.21.2 {*/ ServerLevel level,/*?}*/ CallbackInfoReturnable<Double> cir) {
-        cir.setReturnValue(super.getMaxSpeed(/*? if >=1.21.2 {*/level/*?}*/) /  2);
+    protected void getMaxSpeed(/*? if >=1.21.2 {*/ /*ServerLevel level,*//*?}*/ CallbackInfoReturnable<Double> cir) {
+        cir.setReturnValue(super.getMaxSpeed(/*? if >=1.21.2 {*//*level*//*?}*/) /  2);
     }
 }

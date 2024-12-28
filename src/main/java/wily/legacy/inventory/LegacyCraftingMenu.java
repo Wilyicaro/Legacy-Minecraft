@@ -91,17 +91,17 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
 
     public static List<Optional<Ingredient>> getRecipeOptionalIngredients(Recipe<?> recipe){
         //? if <1.21.2 {
-        /*return convertIngredientsToOptional(recipe.getIngredients());
-        *///?} else {
-        return recipe instanceof ShapedRecipe rcp ? rcp.getIngredients() : recipe instanceof ShapelessRecipe sr ? sr.placementInfo().ingredients().stream().map(Optional::of).toList() : recipe instanceof StonecutterRecipe stonecutterRecipe ? Collections.singletonList(Optional.of(stonecutterRecipe.input())) : Collections.emptyList();
-        //?}
+        return convertIngredientsToOptional(recipe.getIngredients());
+        //?} else {
+        /*return recipe instanceof ShapedRecipe rcp ? rcp.getIngredients() : recipe instanceof ShapelessRecipe sr ? sr.placementInfo().ingredients().stream().map(Optional::of).toList() : recipe instanceof StonecutterRecipe stonecutterRecipe ? Collections.singletonList(Optional.of(stonecutterRecipe.input())) : Collections.emptyList();
+        *///?}
     }
 
     //? if <1.21.2 {
-    /*static List<Optional<Ingredient>> convertIngredientsToOptional(List<Ingredient> ingredients){
+    static List<Optional<Ingredient>> convertIngredientsToOptional(List<Ingredient> ingredients){
         return ingredients.stream().map(i-> i.isEmpty() ? Optional.<Ingredient>empty() : Optional.of(i)).toList();
     }
-    *///?}
+    //?}
 
     public static LegacyCraftingMenu playerCraftingMenu(int window, Inventory inventory){
         return craftingMenu(inventory, LegacyRegistries.PLAYER_CRAFTING_PANEL_MENU.get(),window,null,2);
@@ -226,8 +226,8 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
     }
 
 
-    public /*? if >=1.21.2 {*/ResourceKey<Recipe<?>>/*?} else {*//*ResourceLocation*//*?}*/ getRecipeKey(ResourceLocation id){
-        return /*? if >=1.21.2 {*/ResourceKey.create(Registries.RECIPE,id)/*?} else {*//*id*//*?}*/;
+    public /*? if >=1.21.2 {*//*ResourceKey<Recipe<?>>*//*?} else {*/ResourceLocation/*?}*/ getRecipeKey(ResourceLocation id){
+        return /*? if >=1.21.2 {*//*ResourceKey.create(Registries.RECIPE,id)*//*?} else {*/id/*?}*/;
     }
 
     public void addInventorySlotGrid(Container container, int startIndex, int x, int y, int rows){

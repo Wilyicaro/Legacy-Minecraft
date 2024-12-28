@@ -1,8 +1,8 @@
 package wily.legacy.mixin.base;
 
 //? if >=1.21.2 {
-import com.mojang.blaze3d.resource.CrossFrameResourcePool;
-//?}
+/*import com.mojang.blaze3d.resource.CrossFrameResourcePool;
+*///?}
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -64,8 +64,8 @@ public abstract class GameRendererMixin {
     @Shadow private ItemStack itemActivationItem;
 
     //? if >=1.21.2 {
-    @Shadow @Final private CrossFrameResourcePool resourcePool;
-    //?}
+    /*@Shadow @Final private CrossFrameResourcePool resourcePool;
+    *///?}
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;flush()V"))
     private void render(GuiGraphics graphics){
@@ -98,8 +98,8 @@ public abstract class GameRendererMixin {
             graphics.flush();
             RenderSystem.enableBlend();
             RenderSystem.disableDepthTest();
-            gammaEffect.passes.forEach(p-> p./*? if <1.21.2 {*//*getEffect*//*?} else {*/getShader/*?}*/().safeGetUniform("gamma").set(gamma >= 0.5f ? (gamma - 0.5f) * 1.12f + 1.08f : gamma * 0.96f + 0.6f));
-            gammaEffect.process(/*? if <1.21.2 {*//*FactoryAPIClient.getPartialTick()*//*?} else {*/this.minecraft.getMainRenderTarget(), this.resourcePool/*?}*/);
+            gammaEffect.passes.forEach(p-> p./*? if <1.21.2 {*/getEffect/*?} else {*//*getShader*//*?}*/().safeGetUniform("gamma").set(gamma >= 0.5f ? (gamma - 0.5f) * 1.12f + 1.08f : gamma * 0.96f + 0.6f));
+            gammaEffect.process(/*? if <1.21.2 {*/FactoryAPIClient.getPartialTick()/*?} else {*//*this.minecraft.getMainRenderTarget(), this.resourcePool*//*?}*/);
             RenderSystem.enableDepthTest();
             RenderSystem.disableBlend();
         }
@@ -110,13 +110,13 @@ public abstract class GameRendererMixin {
         if (itemActivationItem == null && Legacy4JClient.itemActivationRenderReplacement != null) Legacy4JClient.itemActivationRenderReplacement = null;
     }
     //? if >=1.20.5 && <1.21.2 {
-    /*@Redirect(method = "renderItemActivationAnimation", at = @At(value = "NEW", target = "()Lcom/mojang/blaze3d/vertex/PoseStack;"))
+    @Redirect(method = "renderItemActivationAnimation", at = @At(value = "NEW", target = "()Lcom/mojang/blaze3d/vertex/PoseStack;"))
     private PoseStack renderItemActivationAnimation(GuiGraphics graphics){
         return graphics.pose();
     }
-    *///?}
+    //?}
     //? if >=1.20.5 {
-    @Inject(method = "renderItemActivationAnimation", at = @At(value = "INVOKE", target = /*? if <1.21.2 {*//*"Lnet/minecraft/client/gui/GuiGraphics;drawManaged(Ljava/lang/Runnable;)V"*//*?} else {*/"Lnet/minecraft/client/gui/GuiGraphics;drawSpecial(Ljava/util/function/Consumer;)V"/*?}*/), cancellable = true)
+    @Inject(method = "renderItemActivationAnimation", at = @At(value = "INVOKE", target = /*? if <1.21.2 {*/"Lnet/minecraft/client/gui/GuiGraphics;drawManaged(Ljava/lang/Runnable;)V"/*?} else {*//*"Lnet/minecraft/client/gui/GuiGraphics;drawSpecial(Ljava/util/function/Consumer;)V"*//*?}*/), cancellable = true)
     private void renderItemActivationAnimation(GuiGraphics guiGraphics, float f, CallbackInfo ci){
         if (Legacy4JClient.itemActivationRenderReplacement != null){
             ci.cancel();
@@ -146,7 +146,7 @@ public abstract class GameRendererMixin {
         return renderHand && LegacyOption.displayHand.get();
     }
     //? if >=1.20.5 {
-    @ModifyVariable(method = "renderLevel", at = @At(value = "STORE", remap = false),ordinal = /*? if <1.21.2 {*//*1*//*?} else {*/2/*?}*/)
+    @ModifyVariable(method = "renderLevel", at = @At(value = "STORE", remap = false),ordinal = /*? if <1.21.2 {*/1/*?} else {*//*2*//*?}*/)
     private Matrix4f renderLevel(Matrix4f original){
         float rot = getFlyingViewRollingRotation();
         if (rot != 0) {
@@ -196,9 +196,9 @@ public abstract class GameRendererMixin {
         );
     }
     //? if <1.21.2 {
-    /*@Inject(method = "resize",at = @At("RETURN"))
+    @Inject(method = "resize",at = @At("RETURN"))
     public void resize(int i, int j, CallbackInfo ci) {
         if (Legacy4JClient.gammaEffect != null) Legacy4JClient.gammaEffect.resize(i,j);
     }
-    *///?}
+    //?}
 }

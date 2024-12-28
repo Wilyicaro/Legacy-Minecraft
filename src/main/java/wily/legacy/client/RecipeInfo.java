@@ -27,8 +27,8 @@ import net.minecraft.core.component.DataComponents;
 //?}
 import net.minecraft.world.level.block.Block;
 //? if <1.21.2 {
-/*import net.minecraft.world.level.block.SuspiciousEffectHolder;
-*///?}
+import net.minecraft.world.level.block.SuspiciousEffectHolder;
+//?}
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.RegisterListing;
 import wily.factoryapi.base.StackIngredient;
@@ -152,7 +152,7 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
 
         ResourceLocation TIPPED_ARROW = FactoryAPI.createVanillaLocation("tipped_arrow");
         //? if <1.21.2
-        /*ResourceLocation SUSPICIOUS_STEW = FactoryAPI.createVanillaLocation("suspicious_stew");*/
+        ResourceLocation SUSPICIOUS_STEW = FactoryAPI.createVanillaLocation("suspicious_stew");
         Map<ResourceLocation, IdOverride> ID_RECIPE_INFO_OVERRIDES = new HashMap<>(Map.of(TIPPED_ARROW, (validRecipes, recipeAdder) -> BuiltInRegistries.POTION.asHolderIdMap().forEach(p -> {
             if (p.value().getEffects().isEmpty() && !p./*? if <1.20.5 {*//*value().*//*?}*/equals(Potions.WATER)) return;
             ItemStack potion = Legacy4J.setItemStackPotion(Items.LINGERING_POTION.getDefaultInstance(),p);
@@ -167,20 +167,20 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
                 Legacy4J.addPotionTooltip(p, description, 1.0F/*? if >=1.20.3 {*/, Minecraft.getInstance().level.tickRateManager().tickrate()/*?}*/);
                 return description.get(0);
             }));
-        })/*? if <1.21.2 {*//*,SUSPICIOUS_STEW,(validRecipes, recipeAdder)-> BuiltInRegistries.ITEM.getTag(ItemTags.SMALL_FLOWERS).ifPresent(s->s.forEach(h->{
+        })/*? if <1.21.2 {*/,SUSPICIOUS_STEW,(validRecipes, recipeAdder)-> BuiltInRegistries.ITEM.getTag(ItemTags.SMALL_FLOWERS).ifPresent(s->s.forEach(h->{
             ItemStack result = Items.SUSPICIOUS_STEW.getDefaultInstance();
             SuspiciousEffectHolder suspiciousEffectHolder = SuspiciousEffectHolder.tryGet(h.value());
             if (suspiciousEffectHolder != null) {
                 //? if <=1.20.1 {
-                /^SuspiciousStewItem.saveMobEffect(result, suspiciousEffectHolder.getSuspiciousEffect(), suspiciousEffectHolder.getEffectDuration());
-                ^///?} else if <1.20.5 {
-                /^SuspiciousStewItem.saveMobEffects(result, suspiciousEffectHolder.getSuspiciousEffects());
-                ^///?} else {
+                /*SuspiciousStewItem.saveMobEffect(result, suspiciousEffectHolder.getSuspiciousEffect(), suspiciousEffectHolder.getEffectDuration());
+                *///?} else if <1.20.5 {
+                /*SuspiciousStewItem.saveMobEffects(result, suspiciousEffectHolder.getSuspiciousEffects());
+                *///?} else {
                 result.set(DataComponents.SUSPICIOUS_STEW_EFFECTS, suspiciousEffectHolder.getSuspiciousEffects());
                 //?}
             }
             recipeAdder.accept(RecipeInfo.create(SUSPICIOUS_STEW,null,List.of(Optional.of(Ingredient.of(Items.BROWN_MUSHROOM)),Optional.of(Ingredient.of(Items.RED_MUSHROOM)),Optional.of(Ingredient.of(h.value())),Optional.of(Ingredient.of(Items.BOWL))),result));
-        }))*//*?}*/));
+        }))/*?}*/));
 
         default <T> void addRecipes(Iterable<RecipeInfo<T>> validRecipes, Consumer<RecipeInfo<T>> recipeAdder) {
             for (RecipeInfo<T> validRecipe : validRecipes) {

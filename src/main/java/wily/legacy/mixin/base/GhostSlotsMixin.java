@@ -1,5 +1,5 @@
 //? if >=1.21.2 {
-package wily.legacy.mixin.base;
+/*package wily.legacy.mixin.base;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import net.minecraft.client.Minecraft;
@@ -44,4 +44,4 @@ public class GhostSlotsMixin {
         });
     }
 }
-//?}
+*///?}

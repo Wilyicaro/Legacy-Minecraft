@@ -1,5 +1,8 @@
 package wily.legacy.client;
 
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
+import com.google.common.io.ByteSource;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -53,7 +56,7 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
         Path path = getPath();
         boolean exists = Files.exists(path);
         String checksum;
-        if (exists && checkSum().isEmpty() || (checksum = readCheckSum(path)) == null || checkSum().get().equals(checksum)) return;
+        if (exists && checkSum().isEmpty() || (exists && checkSum().get().equals(readFileCheckSum(path))) || (checksum = readCheckSum(path)) == null || !checkSum().get().equals(checksum)) return;
         try (InputStream stream = downloadURI.get().toURL().openStream()) {
             if (exists) Files.delete(path);
             Files.createDirectories(path.getParent());
@@ -68,6 +71,15 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
             return reader.readLine().trim();
         } catch (IOException e) {
             Legacy4J.LOGGER.warn("Error when reading checksum from world template {}: {}",path,e.getMessage());
+            return null;
+        }
+    }
+    public String readFileCheckSum(Path path){
+        ByteSource byteSource = com.google.common.io.Files.asByteSource(path.toFile());
+        try {
+            return byteSource.hash(Hashing.md5()).toString();
+        } catch (IOException e) {
+            Legacy4J.LOGGER.warn("Error when reading existing checksum from world template {}: {}",path,e.getMessage());
             return null;
         }
     }

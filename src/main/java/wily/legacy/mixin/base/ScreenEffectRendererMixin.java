@@ -31,11 +31,11 @@ public abstract class ScreenEffectRendererMixin {
     }
 
     @Shadow
-    private static void renderTex(TextureAtlasSprite textureAtlasSprite, PoseStack poseStack/*? if >=1.21.4 {*/, MultiBufferSource multiBufferSource/*?}*/) {
+    private static void renderTex(TextureAtlasSprite textureAtlasSprite, PoseStack poseStack/*? if >=1.21.4 {*//*, MultiBufferSource multiBufferSource*//*?}*/) {
     }
 
-    @Redirect(method = "renderScreenEffect", at = @At(value = "INVOKE", target = /*? if <1.21.4 {*//*"Lnet/minecraft/client/renderer/ScreenEffectRenderer;renderTex(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lcom/mojang/blaze3d/vertex/PoseStack;)V"*//*?} else {*/"Lnet/minecraft/client/renderer/ScreenEffectRenderer;renderTex(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V"/*?}*/))
-    private static void renderScreenEffect(TextureAtlasSprite f, PoseStack f1/*? if >=1.21.4 {*/, MultiBufferSource multiBufferSource/*?}*/, Minecraft minecraft) {
+    @Redirect(method = "renderScreenEffect", at = @At(value = "INVOKE", target = /*? if <1.21.4 {*/"Lnet/minecraft/client/renderer/ScreenEffectRenderer;renderTex(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lcom/mojang/blaze3d/vertex/PoseStack;)V"/*?} else {*//*"Lnet/minecraft/client/renderer/ScreenEffectRenderer;renderTex(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V"*//*?}*/))
+    private static void renderScreenEffect(TextureAtlasSprite f, PoseStack f1/*? if >=1.21.4 {*//*, MultiBufferSource multiBufferSource*//*?}*/, Minecraft minecraft) {
         BlockState state = getViewBlockingState(minecraft.player);
         List<BakedQuad> quads = minecraft.getBlockRenderer().getBlockModelShaper().getBlockModel(state).getQuads(state, Direction.UP, minecraft.player.getRandom());
         if (!quads.isEmpty()) {
@@ -44,7 +44,7 @@ public abstract class ScreenEffectRendererMixin {
             int color = minecraft.getBlockColors().getColor(state, minecraft.level, minecraft.player.blockPosition(), quad.getTintIndex());
             RenderSystem.setShaderColor(FactoryScreenUtil.getRed(color), FactoryScreenUtil.getGreen(color), FactoryScreenUtil.getBlue(color), 1.0f);
         }
-        renderTex(f,f1/*? if >=1.21.4 {*/, multiBufferSource/*?}*/);
+        renderTex(f,f1/*? if >=1.21.4 {*//*, multiBufferSource*//*?}*/);
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f, 1.0f);
     }
 }

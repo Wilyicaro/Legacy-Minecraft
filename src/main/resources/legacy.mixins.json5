@@ -9,15 +9,15 @@
     "GustParticleMixin",
     //?}
     //? if <1.21.2 {
-    /*"AbstractFurnaceRecipeBookComponentMixin",
+    "AbstractFurnaceRecipeBookComponentMixin",
     "ClientExplosionMixin",
-    *///?} else {
-    "GhostSlotsMixin",
+    //?} else {
+    /*"GhostSlotsMixin",
     "OldMinecartBehaviourMixin",
     "ServerExplosionMixin",
     "MapDecorationRenderStateMixin",
     "AbstractRecipeBookScreenMixin",
-    //?}
+    *///?}
     //? if <1.20.5 && (forge || neoforge) {
     /*"ForgeGuiMixin",
     *///?}
@@ -141,8 +141,8 @@
     "RecordItemMixin",
     *///?}
     //? if <1.21.2 {
-    /*"RecipeManagerAccessor",
-    *///?}
+    "RecipeManagerAccessor",
+    //?}
     "AbstractContainerMenuMixin",
     "AbstractMinecartMixin",
     "AbstractVillagerMixin",

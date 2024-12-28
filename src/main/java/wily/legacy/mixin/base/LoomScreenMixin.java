@@ -130,7 +130,7 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
                 LegacySlotDisplay.override(s, 14 + s.getContainerSlot() * 21,185);
             }
         }
-        this.flag = this.minecraft.getEntityModels().bakeLayer(ModelLayers./*? if <1.21.4 {*//*BANNER*//*?} else {*/STANDING_BANNER_FLAG/*?}*/).getChild("flag");
+        this.flag = this.minecraft.getEntityModels().bakeLayer(ModelLayers./*? if <1.21.4 {*/BANNER/*?} else {*//*STANDING_BANNER_FLAG*//*?}*/).getChild("flag");
     }
     @Redirect(method = "renderPattern", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;scale(FFF)V", ordinal = 1))
     private void renderPattern(PoseStack instance, float posestack$pose, float f, float f1) {

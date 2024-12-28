@@ -115,7 +115,7 @@ public abstract class MinecraftMixin {
     *///?}
 
     //? if <1.21.4 {
-    /*@Inject(method = "pickBlock", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "pickBlock", at = @At("HEAD"), cancellable = true)
     private void pickBlock(CallbackInfo ci){
         if (player != null && hitResult != null && hitResult.getType() == HitResult.Type.ENTITY && !player.getAbilities().instabuild) {
             Entity entity = ((EntityHitResult) this.hitResult).getEntity();
@@ -129,7 +129,7 @@ public abstract class MinecraftMixin {
             ci.cancel();
         }
     }
-    *///?}
+    //?}
 
     @Inject(method = "handleKeybinds", at = @At("HEAD"))
     private void handleKeybinds(CallbackInfo ci) {

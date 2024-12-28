@@ -118,12 +118,12 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, ScreenUtil.getHUDOpacity());
     }
     //? if <1.21.2 {
-    /*@Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;)V"/^? if forge || neoforge {^//^, remap = false^//^?}^/))
+    @Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;)V"/*? if forge || neoforge {*//*, remap = false*//*?}*/))
     public void renderCrosshairBlendFunc(GlStateManager.SourceFactor sourceFactor, GlStateManager.DestFactor destFactor, GlStateManager.SourceFactor sourceFactor2, GlStateManager.DestFactor destFactor2, GuiGraphics guiGraphics) {
         if (LegacyOption.invertedCrosshair.get()) RenderSystem.blendFuncSeparate(sourceFactor,destFactor,sourceFactor2,destFactor2);
     }
-    *///?} else {
-    @ModifyArg(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIII)V"))
+    //?} else {
+    /*@ModifyArg(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIII)V"))
     public Function<ResourceLocation, RenderType> renderCrosshair(Function<ResourceLocation, RenderType> function) {
         return LegacyOption.invertedCrosshair.get() ? function : RenderType::guiTextured;
     }
@@ -131,7 +131,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
     public Function<ResourceLocation, RenderType> renderCrosshairAttackIndicator(Function<ResourceLocation, RenderType> function) {
         return LegacyOption.invertedCrosshair.get() ? function : RenderType::guiTextured;
     }
-    //?}
+    *///?}
     @Inject(method = "renderCrosshair", at = @At("RETURN"))
     public void renderCrosshairReturn(GuiGraphics guiGraphics/*? if >=1.21 {*/, DeltaTracker deltaTracker/*?}*/, CallbackInfo ci) {
         if (minecraft.screen != null)
@@ -180,7 +180,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
     //? if >1.20.1 {
-    @Inject(method = /*? if >=1.20.5 {*/"renderItemHotbar"/*?} else {*//*"renderHotbar"*//*?}*/, at = @At(value = "INVOKE", target = /*? if <1.21.2 {*//*"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V"*//*?} else {*/"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIII)V"/*?}*/, ordinal = 1))
+    @Inject(method = /*? if >=1.20.5 {*/"renderItemHotbar"/*?} else {*//*"renderHotbar"*//*?}*/, at = @At(value = "INVOKE", target = /*? if <1.21.2 {*/"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V"/*?} else {*//*"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIII)V"*//*?}*/, ordinal = 1))
     private void renderHotbarSelection(/*? if <1.20.5 {*//*float f, *//*?}*/GuiGraphics guiGraphics/*? if >=1.20.5 {*/, DeltaTracker deltaTracker/*?}*/, CallbackInfo ci) {
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HOTBAR_SELECTION,24,24,0,23,guiGraphics.guiWidth() / 2 - 91 - 1 + minecraft.player.getInventory().selected * 20, guiGraphics.guiHeight(), 0,24, 1);
     }

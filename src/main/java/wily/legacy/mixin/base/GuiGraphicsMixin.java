@@ -52,14 +52,14 @@ public abstract class GuiGraphicsMixin {
     }
 
     //? if <1.21.4 {
-    /*@Redirect(method = "enableScissor", at = @At(value = "NEW", target = "(IIII)Lnet/minecraft/client/gui/navigation/ScreenRectangle;"))
+    @Redirect(method = "enableScissor", at = @At(value = "NEW", target = "(IIII)Lnet/minecraft/client/gui/navigation/ScreenRectangle;"))
     private ScreenRectangle enableScissor(int i, int j, int k, int l, int x, int y, int xd, int yd){
         Matrix4f matrix4f = this.pose.last().pose();
         Vector3f vector3f = matrix4f.transformPosition(x, y, 0.0F, new Vector3f());
         Vector3f vector3f2 = matrix4f.transformPosition(xd, yd, 0.0F, new Vector3f());
         return new ScreenRectangle(Mth.floor(vector3f.x), Mth.floor(vector3f.y), Mth.floor(vector3f2.x - vector3f.x), Mth.floor(vector3f2.y - vector3f.y));
     }
-    *///?}
+    //?}
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("HEAD"))
     private void renderItemDecorationsHead(Font font, ItemStack itemStack, int i, int j, String string, CallbackInfo ci){
         Legacy4JClient.legacyFont = false;
@@ -69,7 +69,7 @@ public abstract class GuiGraphicsMixin {
         Legacy4JClient.legacyFont = true;
     }
     @Inject(method = "renderTooltipInternal", at = @At("HEAD"), cancellable = true)
-    private void renderTooltipInternal(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner,/*? if >=1.21.2 {*/ ResourceLocation location,/*?}*/ CallbackInfo ci){
+    private void renderTooltipInternal(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner,/*? if >=1.21.2 {*/ /*ResourceLocation location,*//*?}*/ CallbackInfo ci){
         if (!LegacyOption.legacyItemTooltips.get()) return;
         ci.cancel();
         if (list.isEmpty()) return;
@@ -78,7 +78,7 @@ public abstract class GuiGraphicsMixin {
 
         for (ClientTooltipComponent tooltipComponent : list) {
             k = Math.max(tooltipComponent.getWidth(font),k);
-            l+= tooltipComponent.getHeight(/*? if >=1.21.2 {*/font/*?}*/);
+            l+= tooltipComponent.getHeight(/*? if >=1.21.2 {*//*font*//*?}*/);
         }
 
         Vector2ic vector2ic = clientTooltipPositioner.positionTooltip(this.guiWidth(), this.guiHeight(), i, j, (int) (k*ScreenUtil.getTextScale()), (int) (l*ScreenUtil.getTextScale()));
@@ -97,15 +97,15 @@ public abstract class GuiGraphicsMixin {
         for(t = 0; t < list.size(); ++t) {
             tooltipComponent = list.get(t);
             tooltipComponent.renderText(font, 0, s, this.pose.last().pose(), this.bufferSource);
-            s += tooltipComponent.getHeight(/*? if >=1.21.2 {*/font/*?}*/);
+            s += tooltipComponent.getHeight(/*? if >=1.21.2 {*//*font*//*?}*/);
         }
 
         s = 0;
 
         for(t = 0; t < list.size(); ++t) {
             tooltipComponent = list.get(t);
-            tooltipComponent.renderImage(font, 0, s,/*? if >=1.21.2 {*/k, l,/*?}*/ self());
-            s += tooltipComponent.getHeight(/*? if >=1.21.2 {*/font/*?}*/);
+            tooltipComponent.renderImage(font, 0, s,/*? if >=1.21.2 {*//*k, l,*//*?}*/ self());
+            s += tooltipComponent.getHeight(/*? if >=1.21.2 {*//*font*//*?}*/);
         }
         RenderSystem.enableDepthTest();
         this.pose.popPose();
@@ -127,7 +127,7 @@ public abstract class GuiGraphicsMixin {
         return 800;
     }
 
-    @Redirect(method = /*? if <1.21.2 {*//*"renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V"*//*?} else {*/"renderItemCount"/*?}*/, at = @At(value = "INVOKE", target = "Ljava/lang/String;valueOf(I)Ljava/lang/String;"))
+    @Redirect(method = /*? if <1.21.2 {*/"renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V"/*?} else {*//*"renderItemCount"*//*?}*/, at = @At(value = "INVOKE", target = "Ljava/lang/String;valueOf(I)Ljava/lang/String;"))
     private String renderItemDecorationsTail(int i, Font font, ItemStack itemStack){
         return i > itemStack.getMaxStackSize() && LegacyOption.legacyOverstackedItems.get() ? I18n.get("legacy.container.overstack",itemStack.getMaxStackSize()) : String.valueOf(i);
     }

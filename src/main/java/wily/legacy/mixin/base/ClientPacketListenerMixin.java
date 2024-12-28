@@ -86,7 +86,7 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
     }
 
 
-    @Redirect(method = /*? if <1.21.2 {*//*"handleContainerSetSlot"*//*?} else {*/"handleSetCursorItem"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/AbstractContainerMenu;setCarried(Lnet/minecraft/world/item/ItemStack;)V"))
+    @Redirect(method = /*? if <1.21.2 {*/"handleContainerSetSlot"/*?} else {*//*"handleSetCursorItem"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/AbstractContainerMenu;setCarried(Lnet/minecraft/world/item/ItemStack;)V"))
     public void handleContainerSetSlot(AbstractContainerMenu instance, ItemStack itemStack) {
         if (minecraft.screen instanceof CreativeModeScreen) return;
         instance.setCarried(itemStack);

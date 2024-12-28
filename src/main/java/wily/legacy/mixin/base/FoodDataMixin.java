@@ -13,8 +13,8 @@ import wily.legacy.entity.LegacyPlayerInfo;
 
 @Mixin(FoodData.class)
 public class FoodDataMixin {
-    @Redirect(method = "tick", at = @At(value = "INVOKE", target = /*? if <1.21.2 {*//*"Lnet/minecraft/world/level/Level;getDifficulty()Lnet/minecraft/world/Difficulty;"*//*?} else {*/"Lnet/minecraft/server/level/ServerLevel;getDifficulty()Lnet/minecraft/world/Difficulty;"/*?}*/))
-    public Difficulty tick(/*? if <1.21.2 {*//*Level instance, Player player*//*?} else {*/ServerLevel instance, ServerPlayer player/*?}*/) {
+    @Redirect(method = "tick", at = @At(value = "INVOKE", target = /*? if <1.21.2 {*/"Lnet/minecraft/world/level/Level;getDifficulty()Lnet/minecraft/world/Difficulty;"/*?} else {*//*"Lnet/minecraft/server/level/ServerLevel;getDifficulty()Lnet/minecraft/world/Difficulty;"*//*?}*/))
+    public Difficulty tick(/*? if <1.21.2 {*/Level instance, Player player/*?} else {*//*ServerLevel instance, ServerPlayer player*//*?}*/) {
         return player instanceof LegacyPlayerInfo p && p.isExhaustionDisabled() ? Difficulty.PEACEFUL : instance.getDifficulty();
     }
 }

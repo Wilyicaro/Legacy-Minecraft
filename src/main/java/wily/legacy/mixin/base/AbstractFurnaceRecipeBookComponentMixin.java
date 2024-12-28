@@ -1,5 +1,5 @@
 //? if <1.21.2 {
-/*package wily.legacy.mixin.base;
+package wily.legacy.mixin.base;
 
 import net.minecraft.client.gui.screens.recipebook.AbstractFurnaceRecipeBookComponent;
 import net.minecraft.client.gui.screens.recipebook.GhostRecipe;
@@ -22,18 +22,18 @@ import java.util.List;
 public class AbstractFurnaceRecipeBookComponentMixin extends RecipeBookComponent{
 
     @Redirect(method = "setupGhostRecipe", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/recipebook/GhostRecipe;addIngredient(Lnet/minecraft/world/item/crafting/Ingredient;II)V", ordinal = 0))
-    public void setupGhostRecipeResultSlot(GhostRecipe instance, Ingredient ingredient, int i, int j, /^? if >1.20.1 {^/RecipeHolder<?>/^?} else {^//^Recipe<?>^//^?}^/ recipe, List<Slot> list) {
+    public void setupGhostRecipeResultSlot(GhostRecipe instance, Ingredient ingredient, int i, int j, /*? if >1.20.1 {*/RecipeHolder<?>/*?} else {*//*Recipe<?>*//*?}*/ recipe, List<Slot> list) {
         ((DisplayRecipe)ghostRecipe).addIngredient(ingredient, list.get(2));
     }
     @Redirect(method = "setupGhostRecipe", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/recipebook/GhostRecipe;addIngredient(Lnet/minecraft/world/item/crafting/Ingredient;II)V", ordinal = 1))
-    public void setupGhostRecipeFuelSlot(GhostRecipe instance, Ingredient ingredient, int i, int j, /^? if >1.20.1 {^/RecipeHolder<?>/^?} else {^//^Recipe<?>^//^?}^/ recipe, List<Slot> list) {
+    public void setupGhostRecipeFuelSlot(GhostRecipe instance, Ingredient ingredient, int i, int j, /*? if >1.20.1 {*/RecipeHolder<?>/*?} else {*//*Recipe<?>*//*?}*/ recipe, List<Slot> list) {
         ((DisplayRecipe)ghostRecipe).addIngredient(ingredient, list.get(1));
     }
     @Redirect(method = "setupGhostRecipe", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/recipebook/GhostRecipe;addIngredient(Lnet/minecraft/world/item/crafting/Ingredient;II)V", ordinal = 2))
-    public void setupGhostRecipeInputSlot(GhostRecipe instance, Ingredient ingredient, int i, int j, /^? if >1.20.1 {^/RecipeHolder<?>/^?} else {^//^Recipe<?>^//^?}^/ recipe, List<Slot> list) {
-        NonNullList<Ingredient> nonNullList = recipe/^? if >1.20.1 {^/.value()/^?}^/.getIngredients();
+    public void setupGhostRecipeInputSlot(GhostRecipe instance, Ingredient ingredient, int i, int j, /*? if >1.20.1 {*/RecipeHolder<?>/*?} else {*//*Recipe<?>*//*?}*/ recipe, List<Slot> list) {
+        NonNullList<Ingredient> nonNullList = recipe/*? if >1.20.1 {*/.value()/*?}*/.getIngredients();
         ((DisplayRecipe)ghostRecipe).addIngredient(ingredient, list.get(nonNullList.indexOf(ingredient)));
     }
 
 }
-*///?}
+//?}

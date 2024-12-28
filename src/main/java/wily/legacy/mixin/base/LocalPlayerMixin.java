@@ -6,11 +6,11 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 //? if <1.21.2 {
-/*import net.minecraft.client.player.Input;
- *///?} else {
-import net.minecraft.client.player.ClientInput;
+import net.minecraft.client.player.Input;
+ //?} else {
+/*import net.minecraft.client.player.ClientInput;
 import net.minecraft.world.entity.player.Input;
-//?}
+*///?}
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.MoverType;
@@ -37,7 +37,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
 
     @Shadow protected abstract boolean isControlledCamera();
 
-    @Shadow public /*? if >=1.21.2 {*/ClientInput/*?} else {*//*Input*//*?}*/ input;
+    @Shadow public /*? if >=1.21.2 {*//*ClientInput*//*?} else {*/Input/*?}*/ input;
 
     @Shadow @Final protected Minecraft minecraft;
 
@@ -73,38 +73,38 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
     public boolean aiStepSprinting(LocalPlayer instance) {
         return false;
     }
-    @Redirect(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;setSprinting(Z)V", ordinal = /*? if <1.21.4 {*//*3*//*?} else {*/4/*?}*/))
+    @Redirect(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;setSprinting(Z)V", ordinal = /*? if <1.21.4 {*/3/*?} else {*//*4*//*?}*/))
     public void aiStepSprintingWater(LocalPlayer instance, boolean b) {
         if (!FactoryAPIClient.hasModOnServer || !this.input.hasForwardImpulse() || !this.hasEnoughFoodToStartSprinting()) instance.setSprinting(b);
     }
     @Redirect(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V"))
     public void aiStepFlyUpDown(LocalPlayer instance, Vec3 vec3) {
-        if (FactoryAPIClient.hasModOnServer) move(MoverType.SELF,vec3.with(Direction.Axis.Y,(vec3.y - getDeltaMovement().y) * (input./*? if >=1.21.2 {*/keyPresses.jump()/*?} else {*//*jumping*//*?}*/ ? (/*? if <1.20.5 {*//*0.42f*//*?} else {*/this.getAttributeValue(Attributes.JUMP_STRENGTH)/*?}*/ + getJumpBoostPower()) * 6 : 3)));
+        if (FactoryAPIClient.hasModOnServer) move(MoverType.SELF,vec3.with(Direction.Axis.Y,(vec3.y - getDeltaMovement().y) * (input./*? if >=1.21.2 {*//*keyPresses.jump()*//*?} else {*/jumping/*?}*/ ? (/*? if <1.20.5 {*//*0.42f*//*?} else {*/this.getAttributeValue(Attributes.JUMP_STRENGTH)/*?}*/ + getJumpBoostPower()) * 6 : 3)));
         else setDeltaMovement(vec3);
     }
-    @Redirect(method = "aiStep", at = @At(/*? if <1.21.2 {*//*value = "FIELD",target = "Lnet/minecraft/client/player/Input;shiftKeyDown:Z"*//*?} else {*/value = "INVOKE",target = "Lnet/minecraft/world/entity/player/Input;shift()Z"/*?}*/, ordinal = 3))
+    @Redirect(method = "aiStep", at = @At(/*? if <1.21.2 {*/value = "FIELD",target = "Lnet/minecraft/client/player/Input;shiftKeyDown:Z"/*?} else {*//*value = "INVOKE",target = "Lnet/minecraft/world/entity/player/Input;shift()Z"*//*?}*/, ordinal = 3))
     public boolean aiStepShift(Input instance) {
         if (!lastOnGround && !isSpectator()){
             checkSupportingBlock(true,null);
             lastOnGround = mainSupportingBlockPos.isPresent();
         }
-        return instance./*? if >=1.21.2 {*/shift()/*?} else {*//*shiftKeyDown*//*?}*/ && (!FactoryAPIClient.hasModOnServer || (!instance./*? if >=1.21.2 {*/jump()/*?} else {*//*jumping*//*?}*/ && !lastOnGround));
+        return instance./*? if >=1.21.2 {*//*shift()*//*?} else {*/shiftKeyDown/*?}*/ && (!FactoryAPIClient.hasModOnServer || (!instance./*? if >=1.21.2 {*//*jump()*//*?} else {*/jumping/*?}*/ && !lastOnGround));
     }
-    @Redirect(method = "aiStep", at = @At(/*? if <1.21.2 {*//*value = "FIELD",target = "Lnet/minecraft/client/player/Input;jumping:Z"*//*?} else {*/value = "INVOKE",target = "Lnet/minecraft/world/entity/player/Input;jump()Z"/*?}*/, ordinal = 4))
+    @Redirect(method = "aiStep", at = @At(/*? if <1.21.2 {*/value = "FIELD",target = "Lnet/minecraft/client/player/Input;jumping:Z"/*?} else {*//*value = "INVOKE",target = "Lnet/minecraft/world/entity/player/Input;jump()Z"*//*?}*/, ordinal = 4))
     public boolean aiStepJump(Input instance) {
-        return instance./*? if >=1.21.2 {*/jump()/*?} else {*//*jumping*//*?}*/ && (!FactoryAPIClient.hasModOnServer || !isSprinting() || getXRot() <= 0 || !lastOnGround);
+        return instance./*? if >=1.21.2 {*//*jump()*//*?} else {*/jumping/*?}*/ && (!FactoryAPIClient.hasModOnServer || !isSprinting() || getXRot() <= 0 || !lastOnGround);
     }
 
     @Override
     public float maxUpStep() {
-        return (FactoryAPIClient.hasModOnServer && input./*? if >=1.21.2 {*/keyPresses.jump()/*?} else {*//*jumping*//*?}*/ && isSprinting() && getAbilities().flying ? 0.5f : 0) + super.maxUpStep();
+        return (FactoryAPIClient.hasModOnServer && input./*? if >=1.21.2 {*//*keyPresses.jump()*//*?} else {*/jumping/*?}*/ && isSprinting() && getAbilities().flying ? 0.5f : 0) + super.maxUpStep();
     }
 
     @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;aiStep()V"))
     public void setYElytraFlightElevation(CallbackInfo ci) {
         if (!FactoryAPIClient.hasModOnServer) return;
         if (isFallFlying() && getAbilities().mayfly && getAbilities().invulnerable && this.isControlledCamera() && jumping)
-            setDeltaMovement(getDeltaMovement().with(Direction.Axis.Y, input./*? if >=1.21.2 {*/keyPresses.jump()/*?} else {*//*jumping*//*?}*/ ? this.getAbilities().getFlyingSpeed() * 12 : 0));
+            setDeltaMovement(getDeltaMovement().with(Direction.Axis.Y, input./*? if >=1.21.2 {*//*keyPresses.jump()*//*?} else {*/jumping/*?}*/ ? this.getAbilities().getFlyingSpeed() * 12 : 0));
 
     }
 

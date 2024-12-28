@@ -10,8 +10,8 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeInventoryListener;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 //? if <=1.21.2 {
-/*import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
-*///?}
+import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
+//?}
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 //? if >=1.20.5 {
 import net.minecraft.core.component.DataComponents;
@@ -55,7 +55,7 @@ import java.util.function.Supplier;
 
 import static wily.legacy.client.screen.ControlTooltip.*;
 
-public class CreativeModeScreen extends /*? if <=1.21.2 {*//*EffectRenderingInventoryScreen*//*?} else {*/AbstractContainerScreen/*?}*/<CreativeModeScreen.CreativeModeMenu> implements Controller.Event,ControlTooltip.Event{
+public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInventoryScreen/*?} else {*//*AbstractContainerScreen*//*?}*/<CreativeModeScreen.CreativeModeMenu> implements Controller.Event,ControlTooltip.Event{
     protected Stocker.Sizeable page = new Stocker.Sizeable(0);
     protected final TabList tabList = new TabList(new PagedList<>(page,8));
     protected final Panel panel;
@@ -308,7 +308,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*//*EffectRenderingInve
         if (i == InputConstants.KEY_X && canClearQuickSelect()) {
             for (int n = 36; n < 45; ++n) {
                 //? if >=1.21.2
-                this.minecraft.player.inventoryMenu.getSlot(n).set(ItemStack.EMPTY);
+                /*this.minecraft.player.inventoryMenu.getSlot(n).set(ItemStack.EMPTY);*/
                 this.minecraft.gameMode.handleCreativeModeItemAdd(ItemStack.EMPTY, n);
             }
             return true;

@@ -116,7 +116,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             @Override
             public void render(GuiGraphics graphics, int i, int j, float f) {
                 super.render(graphics, i, j, f);
-                if (entity == null && Minecraft.getInstance().level != null) entity = entityType.create(Minecraft.getInstance().level/*? if >=1.21.2 {*/, null/*?}*/);
+                if (entity == null && Minecraft.getInstance().level != null) entity = entityType.create(Minecraft.getInstance().level/*? if >=1.21.2 {*//*, null*//*?}*/);
                 if (entity != null) renderEntity(graphics, entity, i, j, f);
             }
         };

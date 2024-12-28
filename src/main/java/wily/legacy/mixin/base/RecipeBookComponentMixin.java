@@ -22,9 +22,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? if <1.21.2 {
-/*import wily.legacy.client.screen.DisplayRecipe;
+import wily.legacy.client.screen.DisplayRecipe;
 import net.minecraft.client.gui.screens.recipebook.GhostRecipe;
-*///?}
+//?}
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.util.ScreenUtil;
@@ -35,13 +35,13 @@ import java.util.List;
 @Mixin(RecipeBookComponent.class)
 public class RecipeBookComponentMixin {
     //? if <1.21.2 {
-    /*@Mutable
+    @Mutable
     @Shadow @Final protected GhostRecipe ghostRecipe;
-    *///?}
+    //?}
 
 
     @Shadow protected Minecraft minecraft;
-    @Shadow protected /*? if <1.20.5 {*/ /*RecipeBookMenu<?> *//*?} else if <1.21.2 {*/ /*RecipeBookMenu<?, ?> *//*?} else {*/ @Final RecipeBookMenu/*?}*/ menu;
+    @Shadow protected /*? if <1.20.5 {*/ /*RecipeBookMenu<?> *//*?} else if <1.21.2 {*/ RecipeBookMenu<?, ?> /*?} else {*/ /*@Final RecipeBookMenu*//*?}*/ menu;
 
     @Shadow private int xOffset;
 
@@ -53,20 +53,20 @@ public class RecipeBookComponentMixin {
     }
 
     //? if <1.21.2 {
-    /*@Inject(method = "init", at = @At(value = "RETURN"))
-    private void init(int i, int j, Minecraft minecraft, boolean bl, /^? if <1.20.5 {^/ /^RecipeBookMenu<?> ^//^?} else {^/ RecipeBookMenu<?, ?> /^?}^/ recipeBookMenu, CallbackInfo ci){
+    @Inject(method = "init", at = @At(value = "RETURN"))
+    private void init(int i, int j, Minecraft minecraft, boolean bl, /*? if <1.20.5 {*/ /*RecipeBookMenu<?> *//*?} else {*/ RecipeBookMenu<?, ?> /*?}*/ recipeBookMenu, CallbackInfo ci){
         ghostRecipe = new DisplayRecipe();
     }
     @Redirect(method = "setupGhostRecipe", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/recipebook/GhostRecipe;addIngredient(Lnet/minecraft/world/item/crafting/Ingredient;II)V"))
-    public void setupGhostRecipe(GhostRecipe instance, Ingredient ingredient, int i, int j, /^? if >1.20.1 {^/RecipeHolder<?>/^?} else {^//^Recipe<?>^//^?}^/ recipe, List<Slot> list) {
+    public void setupGhostRecipe(GhostRecipe instance, Ingredient ingredient, int i, int j, /*? if >1.20.1 {*/RecipeHolder<?>/*?} else {*//*Recipe<?>*//*?}*/ recipe, List<Slot> list) {
         ((DisplayRecipe)ghostRecipe).addIngredient(ingredient, list.get(0));
     }
     //? if <1.20.5 {
-    /^@Redirect(method = "addItemToSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/recipebook/GhostRecipe;addIngredient(Lnet/minecraft/world/item/crafting/Ingredient;II)V"))
+    /*@Redirect(method = "addItemToSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/recipebook/GhostRecipe;addIngredient(Lnet/minecraft/world/item/crafting/Ingredient;II)V"))
     public void addItemToSlot(GhostRecipe instance, Ingredient ingredient, int i, int j, Iterator<Ingredient> iterator, int index) {
         ((DisplayRecipe)ghostRecipe).addIngredient(ingredient, menu.slots.get(index));
     }
-    ^///?} else {
+    *///?} else {
     @Redirect(method = "addItemToSlot(Lnet/minecraft/world/item/crafting/Ingredient;IIII)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/recipebook/GhostRecipe;addIngredient(Lnet/minecraft/world/item/crafting/Ingredient;II)V"))
     public void addItemToSlot(GhostRecipe instance, Ingredient ingredient, int i, int j,Ingredient ingredient1, int i1) {
         ((DisplayRecipe)ghostRecipe).addIngredient(ingredient, menu.slots.get(i1));
@@ -87,5 +87,5 @@ public class RecipeBookComponentMixin {
             guiGraphics.renderComponentTooltip(this.minecraft.font, Screen.getTooltipFromItem(this.minecraft, itemStack), k, l);
         }
     }
-    *///?}
+    //?}
 }

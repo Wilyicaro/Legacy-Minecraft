@@ -79,7 +79,7 @@ public class LegacyCreativeTabListing implements LegacyTabInfo {
         public Manager(){
             DynamicUtil.COMMON_ITEMS.put(FactoryAPI.createVanillaLocation("ominous_banner"), ()-> {
                 if (Minecraft.getInstance().getConnection() == null) return ItemStack.EMPTY;
-                return Raid./*? >=1.21.2 {*/ getOminousBannerInstance/*?} else {*//*getLeaderBannerInstance*//*?}*/(/*? if >=1.20.5 {*/Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN)/*?}*/);
+                return Raid./*? >=1.21.2 {*/ /*getOminousBannerInstance*//*?} else {*/getLeaderBannerInstance/*?}*/(/*? if >=1.20.5 {*/Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN)/*?}*/);
             });
         }
         @Override

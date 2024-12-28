@@ -144,7 +144,7 @@ public class ScreenUtil {
     }
     public static void renderPanoramaBackground(GuiGraphics guiGraphics, boolean isNight){
         RenderSystem.depthMask(false);
-        guiGraphics.blit(/*? if >=1.21.2 {*/RenderType::guiTexturedOverlay,/*?}*/ isNight ? PANORAMA_NIGHT : PANORAMA_DAY, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() / 66.32f, 1, guiGraphics.guiWidth(), guiGraphics.guiHeight() + 2, guiGraphics.guiHeight() * 820/144, guiGraphics.guiHeight() + 2);
+        guiGraphics.blit(/*? if >=1.21.2 {*//*RenderType::guiTexturedOverlay,*//*?}*/ isNight ? PANORAMA_NIGHT : PANORAMA_DAY, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() / 66.32f, 1, guiGraphics.guiWidth(), guiGraphics.guiHeight() + 2, guiGraphics.guiHeight() * 820/144, guiGraphics.guiHeight() + 2);
         RenderSystem.depthMask(true);
     }
     public static void drawOutlinedString(GuiGraphics graphics, Font font, Component component, int x, int y, int color, int outlineColor, float outline) {
@@ -175,9 +175,9 @@ public class ScreenUtil {
         graphics.pose().pushPose();
         FactoryGuiGraphics.of(graphics).setColor(1.0f,1.0f,1.0f,getHUDOpacity());
         //? if >=1.21.2 {
-        graphics.flush();
+        /*graphics.flush();
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,getHUDOpacity());
-        //?}
+        *///?}
         graphics.pose().translate(0,getHUDDistance(),0);
         RenderSystem.enableBlend();
     }
@@ -185,9 +185,9 @@ public class ScreenUtil {
         graphics.pose().popPose();
         FactoryGuiGraphics.of(graphics).setColor(1.0f,1.0f,1.0f,1.0f);
         //? if >=1.21.2 {
-        graphics.flush();
+        /*graphics.flush();
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
-        //?}
+        *///?}
         RenderSystem.disableBlend();
     }
     public static boolean hasClassicCrafting(){
@@ -226,7 +226,7 @@ public class ScreenUtil {
     }
     public static void playSimpleUISound(SoundEvent sound, float volume, float pitch, boolean randomPitch){
         RandomSource source = SoundInstance.createUnseededRandom();
-        mc.getSoundManager().play(new SimpleSoundInstance(sound./*? if <1.21.2 {*//*getLocation*//*?} else {*/location/*?}*/(), SoundSource.MASTER, volume,pitch + (randomPitch ? (source.nextFloat() - 0.5f) / 10 : 0), source, false, 0, SoundInstance.Attenuation.NONE, 0.0, 0.0, 0.0, true));
+        mc.getSoundManager().play(new SimpleSoundInstance(sound./*? if <1.21.2 {*/getLocation/*?} else {*//*location*//*?}*/(), SoundSource.MASTER, volume,pitch + (randomPitch ? (source.nextFloat() - 0.5f) / 10 : 0), source, false, 0, SoundInstance.Attenuation.NONE, 0.0, 0.0, 0.0, true));
     }
     public static void playSimpleUISound(SoundEvent sound, float pitch, boolean randomPitch){
         playSimpleUISound(sound,1.0f, pitch,randomPitch);
@@ -317,7 +317,7 @@ public class ScreenUtil {
         }
 
         entityRenderDispatcher.setRenderShadow(false);
-        entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, /*? if <1.21.2 {*//*0.0f,*//*?}*/ partialTicks, guiGraphics.pose(), FactoryGuiGraphics.of(guiGraphics).getBufferSource(), 0xF000F0);
+        entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, /*? if <1.21.2 {*/0.0f,/*?}*/ partialTicks, guiGraphics.pose(), FactoryGuiGraphics.of(guiGraphics).getBufferSource(), 0xF000F0);
         guiGraphics.flush();
         entityRenderDispatcher.setRenderShadow(true);
         guiGraphics.pose().popPose();

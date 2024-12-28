@@ -1,5 +1,5 @@
 //? if <1.21.2 {
-/*package wily.legacy.client.screen;
+package wily.legacy.client.screen;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
@@ -48,4 +48,4 @@ public class DisplayRecipe extends GhostRecipe {
         }
     }
 }
-*///?}
+//?}

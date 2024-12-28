@@ -7,10 +7,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.components.toasts.Toast;
 //? if <1.21.2 {
-/*import net.minecraft.client.gui.components.toasts.ToastComponent;
-*///?} else {
-import net.minecraft.client.gui.components.toasts.ToastManager;
-//?}
+import net.minecraft.client.gui.components.toasts.ToastComponent;
+//?} else {
+/*import net.minecraft.client.gui.components.toasts.ToastManager;
+*///?}
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -107,14 +107,14 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
     }
 
     @Override
-    public /*? if <1.21.2 {*//*Visibility*//*?} else {*/void/*?}*/ render(GuiGraphics guiGraphics, /*? if <1.21.2 {*//*ToastComponent toastComponent*//*?} else {*/Font font/*?}*/, long l) {
+    public /*? if <1.21.2 {*/Visibility/*?} else {*//*void*//*?}*/ render(GuiGraphics guiGraphics, /*? if <1.21.2 {*/ToastComponent toastComponent/*?} else {*//*Font font*//*?}*/, long l) {
         renderTip(guiGraphics,0,0,0,l);
         //? if <1.21.2 {
-        /*return visibility;
-        *///?}
+        return visibility;
+        //?}
     }
     //? if >=1.21.2 {
-    @Override
+    /*@Override
     public Visibility getWantedVisibility() {
         return visibility;
     }
@@ -122,11 +122,11 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
     @Override
     public void update(ToastManager toastManager, long l) {
     }
-    //?}
+    *///?}
 
     @Override
-    public int /*? if <1.21.2 {*//*slotCount*//*?} else {*/occcupiedSlotCount/*?}*/() {
-        return Math.min(5,Toast.super./*? if <1.21.2 {*//*slotCount*//*?} else {*/occcupiedSlotCount/*?}*/());
+    public int /*? if <1.21.2 {*/slotCount/*?} else {*//*occcupiedSlotCount*//*?}*/() {
+        return Math.min(5,Toast.super./*? if <1.21.2 {*/slotCount/*?} else {*//*occcupiedSlotCount*//*?}*/());
     }
 
     @Override

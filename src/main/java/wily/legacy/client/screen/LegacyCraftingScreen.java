@@ -149,7 +149,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             craftingTabList.addTabButton(43,0,listing.icon(),listing.name(), t->resetElements());
 
         }
-        if (LegacyOption.vanillaTabs.get()) allRecipes.stream().collect(Collectors.groupingBy(h->h.get().category(),()->new TreeMap<>(Comparator.comparingInt(Enum::ordinal)),Collectors.groupingBy(h->h.get()./*? <1.21.2 {*//*getGroup*//*?} else {*/group/*?}*/().isEmpty() ? h.getId().toString() : h.get()./*? <1.21.2 {*//*getGroup*//*?} else {*/group/*?}*/()))).forEach((category, m)->{
+        if (LegacyOption.vanillaTabs.get()) allRecipes.stream().collect(Collectors.groupingBy(h->h.get().category(),()->new TreeMap<>(Comparator.comparingInt(Enum::ordinal)),Collectors.groupingBy(h->h.get()./*? <1.21.2 {*/getGroup/*?} else {*//*group*//*?}*/().isEmpty() ? h.getId().toString() : h.get()./*? <1.21.2 {*/getGroup/*?} else {*//*group*//*?}*/()))).forEach((category, m)->{
             if (m.isEmpty()) return;
             List<List<RecipeInfo<CraftingRecipe>>> groups = new ArrayList<>();
             m.values().forEach(l->{
@@ -243,7 +243,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
 
         dyeArmorButtons.add(craftingButtonByPredicate(Component.translatable("legacy.container.tab.armour"), i-> /*? if <1.20.5 {*//*i.getItem() instanceof DyeableLeatherItem*//*?} else {*/i.is(ItemTags.DYEABLE)/*?}*/,dyeArmorUpdateRecipe));
         dyeArmorButtons.add(craftingButtonByList(LegacyComponents.COLOR_TAB, dyes,dyeArmorUpdateRecipe).enableAddIngredients());
-        dyeItemButtons.add(craftingButtonByPredicate(Component.translatable("entity.minecraft.item"),i-> i.getItem() instanceof BedItem || (i.getItem() instanceof BlockItem b &&  b.getBlock() instanceof ShulkerBoxBlock/*? if >=1.21.4 {*/ || i.getItem() instanceof BundleItem/*?}*/),dyeItemUpdateRecipe));
+        dyeItemButtons.add(craftingButtonByPredicate(Component.translatable("entity.minecraft.item"),i-> i.getItem() instanceof BedItem || (i.getItem() instanceof BlockItem b &&  b.getBlock() instanceof ShulkerBoxBlock/*? if >=1.21.4 {*/ /*|| i.getItem() instanceof BundleItem*//*?}*/),dyeItemUpdateRecipe));
         dyeItemButtons.add(craftingButtonByList(LegacyComponents.COLOR_TAB, dyes,dyeItemUpdateRecipe));
         if (!is2x2) bannerButtons.add(craftingButtonByRecipes(LegacyComponents.CREATE_BANNER_TAB, Arrays.stream(DyeColor.values()).flatMap(c-> allRecipes.stream().filter(new RecipeInfo.Filter.ItemId(BuiltInRegistries.ITEM.getKey(BannerBlock.byColor(c).asItem())))).toList()));
         bannerButtons.add(craftingButtonByPredicate(LegacyComponents.COPY_BANNER, i-> i.getItem() instanceof BannerItem && Legacy4J.itemHasValidPatterns(i), h->{
@@ -633,8 +633,8 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     @Override
     public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
         //? if >=1.21.2 {
-        if (this.getChildAt(d, e).filter((guiEventListener) -> guiEventListener.mouseScrolled(d, e, f, g)).isPresent()) return true;
-        //?}
+        /*if (this.getChildAt(d, e).filter((guiEventListener) -> guiEventListener.mouseScrolled(d, e, f, g)).isPresent()) return true;
+        *///?}
         if (super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g)) return true;
         if (scrollableRenderer.mouseScrolled(g)) return true;
         int scroll = (int)Math.signum(g);

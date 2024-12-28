@@ -1,13 +1,13 @@
 package wily.legacy.client;
 
 //? if >=1.21.2 {
-import wily.factoryapi.base.client.FactoryRenderStateExtension;
+/*import wily.factoryapi.base.client.FactoryRenderStateExtension;
 import net.minecraft.client.renderer.entity.state.ThrownTridentRenderState;
-//?}
+*///?}
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.projectile.ThrownTrident;
 
-public class LoyaltyLinesRenderState /*? if >=1.21.2 {*/implements FactoryRenderStateExtension<ThrownTrident>/*?}*/ {
+public class LoyaltyLinesRenderState /*? if >=1.21.2 {*//*implements FactoryRenderStateExtension<ThrownTrident>*//*?}*/ {
     public boolean canRender;
     public double x;
     public double y;
@@ -16,14 +16,14 @@ public class LoyaltyLinesRenderState /*? if >=1.21.2 {*/implements FactoryRender
     public int clientSideReturnTridentTickCount;
     public double horizontalMovementFactor;
 
-    public static LoyaltyLinesRenderState of(/*? if <1.21.2 {*//*ThrownTrident thrownTrident, float partialTicks*//*?} else {*/ThrownTridentRenderState renderState/*?}*/){
+    public static LoyaltyLinesRenderState of(/*? if <1.21.2 {*/ThrownTrident thrownTrident, float partialTicks/*?} else {*//*ThrownTridentRenderState renderState*//*?}*/){
         //? if <1.21.2 {
-        /*LoyaltyLinesRenderState renderState = new LoyaltyLinesRenderState();
+        LoyaltyLinesRenderState renderState = new LoyaltyLinesRenderState();
         renderState.extractToRenderState(thrownTrident, partialTicks);
         return renderState;
-        *///?} else {
-        return FactoryRenderStateExtension.Accessor.of(renderState).getExtension(LoyaltyLinesRenderState.class);
-        //?}
+        //?} else {
+        /*return FactoryRenderStateExtension.Accessor.of(renderState).getExtension(LoyaltyLinesRenderState.class);
+        *///?}
     }
 
     public Class<ThrownTrident> getEntityClass() {

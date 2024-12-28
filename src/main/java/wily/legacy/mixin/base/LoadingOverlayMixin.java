@@ -66,16 +66,16 @@ public abstract class LoadingOverlayMixin extends Overlay {
 
             guiGraphics.fill(RenderType.guiOverlay(), 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFFFFFFFF);
             //? if <1.21.2 {
-            /*FactoryGuiGraphics.of(guiGraphics).blit(BACKGROUND, 0, 0,0,0, guiGraphics.guiWidth(), guiGraphics.guiHeight(),guiGraphics.guiWidth(), guiGraphics.guiHeight());
-            *///?}
+            FactoryGuiGraphics.of(guiGraphics).blit(BACKGROUND, 0, 0,0,0, guiGraphics.guiWidth(), guiGraphics.guiHeight(),guiGraphics.guiWidth(), guiGraphics.guiHeight());
+            //?}
             RenderSystem.enableBlend();
             float last = (float) Math.ceil(timer) - timer;
             FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, last <= 0.4f ? last * 2.5f : last > 0.6f ? (1 - last) * 2.5f : 1.0f);
             FactoryGuiGraphics.of(guiGraphics).blit(INTROS.get((int) (timer % INTROS.size())), (guiGraphics.guiWidth() - guiGraphics.guiHeight() * 320 / 180) / 2, 0, 0, 0, guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight(), guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight());
             FactoryGuiGraphics.of(guiGraphics).clearColor();
             //? if >=1.21.2 {
-            FactoryGuiGraphics.of(guiGraphics).blit(BACKGROUND, 0, 0,0,0, guiGraphics.guiWidth(), guiGraphics.guiHeight(),guiGraphics.guiWidth(), guiGraphics.guiHeight());
-            //?}
+            /*FactoryGuiGraphics.of(guiGraphics).blit(BACKGROUND, 0, 0,0,0, guiGraphics.guiWidth(), guiGraphics.guiHeight(),guiGraphics.guiWidth(), guiGraphics.guiHeight());
+            *///?}
             RenderSystem.disableBlend();
         }
 
@@ -90,7 +90,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
             if ((MinecraftAccessor.getInstance().hasGameLoaded() && reload.isDone()) && minecraft.screen != null) this.minecraft.screen.renderWithTooltip(guiGraphics, 0, 0, f);
             else {
                 GlStateManager._clearColor(0, 0, 0, 1.0f);
-                GlStateManager._clear(16384/*? if <1.21.2 {*//*, Minecraft.ON_OSX*//*?}*/);
+                GlStateManager._clear(16384/*? if <1.21.2 {*/, Minecraft.ON_OSX/*?}*/);
                 guiGraphics.fill(RenderType.guiOverlay(),0,0,guiGraphics.guiWidth(),guiGraphics.guiHeight(),0);
             }
             if (g < 1.0f && !reload.isDone() && MinecraftAccessor.getInstance().hasGameLoaded())

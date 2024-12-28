@@ -28,11 +28,11 @@ public class CyclingSlotBackgroundMixin {
             RenderSystem.enableBlend();
             FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,f);
             //? if <1.21.4 {
-            /*TextureAtlasSprite textureAtlasSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(resourceLocation);
+            TextureAtlasSprite textureAtlasSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(resourceLocation);
             FactoryGuiGraphics.of(guiGraphics).blit(0, 0, 0, 16, 16, textureAtlasSprite);
-            *///?} else {
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation, 0, 0, 16, 16);
-            //?}
+            //?} else {
+            /*FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation, 0, 0, 16, 16);
+            *///?}
             FactoryGuiGraphics.of(guiGraphics).clearColor();
             RenderSystem.disableBlend();
         });

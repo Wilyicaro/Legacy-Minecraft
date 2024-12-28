@@ -1,13 +1,13 @@
 package wily.legacy.network;
 
 //? if >=1.21.2 {
-import net.minecraft.core.registries.BuiltInRegistries;
+/*import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-//?} else {
-/*import wily.legacy.mixin.base.RecipeManagerAccessor;
-*///?}
+*///?} else {
+import wily.legacy.mixin.base.RecipeManagerAccessor;
+//?}
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
@@ -28,11 +28,11 @@ import java.util.function.Supplier;
 public class CommonRecipeManager {
 
     public static <R extends Recipe<?>> /*? if >1.20.1 {*/RecipeHolder<R>/*?} else {*//*R*//*?}*/ byId(ResourceLocation id, RecipeType<R> type) {
-        return (/*? if >1.20.1 {*/RecipeHolder<R>/*?} else {*//*R*//*?}*/)/*? if <1.21.2 {*//*getRecipeManager().byKey(id).orElse(null)*//*?} else {*/recipesByType.get(type).get(id)/*?}*/;
+        return (/*? if >1.20.1 {*/RecipeHolder<R>/*?} else {*//*R*//*?}*/)/*? if <1.21.2 {*/getRecipeManager().byKey(id).orElse(null)/*?} else {*//*recipesByType.get(type).get(id)*//*?}*/;
     }
 
     public static <R extends Recipe<?>> Collection</*? if >1.20.1 {*/RecipeHolder<R>/*?} else {*//*R*//*?}*/> byType(RecipeType<R> type) {
-        return /*? if <1.21.2 {*/ /*((RecipeManagerAccessor)getRecipeManager()).getRecipeByType(type)/^? if <1.20.5 {^//^.values()^//^?}^/*//*?} else {*/(Collection) recipesByType.get(type).values()/*?}*/;
+        return /*? if <1.21.2 {*/ ((RecipeManagerAccessor)getRecipeManager()).getRecipeByType(type)/*? if <1.20.5 {*//*.values()*//*?}*//*?} else {*//*(Collection) recipesByType.get(type).values()*//*?}*/;
     }
 
     public static <R extends Recipe<I>, I extends /*? if <1.20.5 {*//*Container*//*?} else {*/RecipeInput/*?}*/> Optional</*? if >1.20.1 {*/RecipeHolder<R>/*?} else {*//*R*//*?}*/> getRecipeFor(RecipeType<R> type, I input, Level level) {
@@ -47,20 +47,20 @@ public class CommonRecipeManager {
     }
 
     //? if <1.21.2 {
-    /*public static RecipeManager getRecipeManager(){
+    public static RecipeManager getRecipeManager(){
         return FactoryAPIPlatform.isClient() ? Legacy4JClient.getRecipeManager() : Legacy4J.currentServer.getRecipeManager();
     }
-    *///?}
+    //?}
 
     //? if >=1.21.2 {
-    public static Map<RecipeType<?>,Map<ResourceLocation,RecipeHolder<?>>> recipesByType = Collections.emptyMap();
+    /*public static Map<RecipeType<?>,Map<ResourceLocation,RecipeHolder<?>>> recipesByType = Collections.emptyMap();
 
 
     public record ClientPayload(Map<RecipeType<?>,Map<ResourceLocation,RecipeHolder<?>>> syncRecipeTypes) implements CommonNetwork.Payload {
         public static final CommonNetwork.Identifier<ClientPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("send_client_recipes"), ClientPayload::new);
 
         public ClientPayload(CommonNetwork.PlayBuf buf){
-            this(buf.get().readMap(b->b.readById(i-> BuiltInRegistries.RECIPE_TYPE./*? if <1.21.2 {*//*getHolder*//*?} else {*/get/*?}*/(i).get().value()), b->b.readMap(FriendlyByteBuf::readResourceLocation, b1->RecipeHolder.STREAM_CODEC.decode(buf.get()))));
+            this(buf.get().readMap(b->b.readById(i-> BuiltInRegistries.RECIPE_TYPE./^? if <1.21.2 {^/getHolder/^?} else {^//^get^//^?}^/(i).get().value()), b->b.readMap(FriendlyByteBuf::readResourceLocation, b1->RecipeHolder.STREAM_CODEC.decode(buf.get()))));
         }
 
         @Override
@@ -78,5 +78,5 @@ public class CommonRecipeManager {
             buf.get().writeMap(syncRecipeTypes, (b,t)-> b.writeById(BuiltInRegistries.RECIPE_TYPE::getId,t),(b,t)-> b.writeMap(t,FriendlyByteBuf::writeResourceLocation,(b1,h)->RecipeHolder.STREAM_CODEC.encode(buf.get(),h)));
         }
     }
-    //?}
+    *///?}
 }

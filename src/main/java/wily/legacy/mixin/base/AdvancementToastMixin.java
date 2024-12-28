@@ -8,8 +8,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.AdvancementToast;
 import net.minecraft.client.gui.components.toasts.Toast;
 //? if <1.21.2 {
-/*import net.minecraft.client.gui.components.toasts.ToastComponent;
-*///?}
+import net.minecraft.client.gui.components.toasts.ToastComponent;
+//?}
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -37,12 +37,12 @@ public abstract class AdvancementToastMixin implements Toast, AdvancementToastAc
 
     @Shadow @Final private /*? if >1.20.1 {*/AdvancementHolder/*?} else {*//*Advancement*//*?}*/ advancement;
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, /*? if <1.21.2 {*//*ToastComponent toastComponent*//*?} else {*/Font font/*?}*/, long l, /*? if <1.21.2 {*/ /*CallbackInfoReturnable<Visibility> cir*//*?} else {*/CallbackInfo ci /*?}*/) {
+    public void render(GuiGraphics guiGraphics, /*? if <1.21.2 {*/ToastComponent toastComponent/*?} else {*//*Font font*//*?}*/, long l, /*? if <1.21.2 {*/ CallbackInfoReturnable<Visibility> cir/*?} else {*//*CallbackInfo ci *//*?}*/) {
         //? if <1.21.2 {
-        /*Font font = Minecraft.getInstance().font;
-        *///?} else {
-        ci.cancel();
-        //?}
+        Font font = Minecraft.getInstance().font;
+        //?} else {
+        /*ci.cancel();
+        *///?}
         Component holdToView = Component.translatable("legacy.menu.advancements.toast",(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_I) : ControllerBinding.UP_BUTTON.bindingState.getIcon()).getComponent());
         DisplayInfo displayInfo = this.advancement./*? if >1.20.1 {*/value().display().orElse(null)/*?} else {*//*getDisplay()*//*?}*/;
         width = 82 + (displayInfo == null ? 0 : Math.max(font.width(holdToView), Math.max(font.width(displayInfo.getTitle()) * 3/2,font.width(displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName()))));
@@ -68,13 +68,13 @@ public abstract class AdvancementToastMixin implements Toast, AdvancementToastAc
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,width() - 38,(height() - 28) / 2,28,28);
             guiGraphics.renderItem(displayInfo.getIcon(), width() - 32, (height() - 16) / 2);
             //? if <1.21.2 {
-            /*cir.setReturnValue((double)l >= 5000.0 * toastComponent.getNotificationDisplayTimeMultiplier() ? Toast.Visibility.HIDE : Toast.Visibility.SHOW);
-            *///?}
+            cir.setReturnValue((double)l >= 5000.0 * toastComponent.getNotificationDisplayTimeMultiplier() ? Toast.Visibility.HIDE : Toast.Visibility.SHOW);
+            //?}
             return;
         }
         //? if <1.21.2 {
-        /*cir.setReturnValue(Toast.Visibility.HIDE);
-        *///?}
+        cir.setReturnValue(Toast.Visibility.HIDE);
+        //?}
     }
 
     @Override
@@ -93,7 +93,7 @@ public abstract class AdvancementToastMixin implements Toast, AdvancementToastAc
     }
 
     @Override
-    public int /*? if <1.21.2 {*//*slotCount*//*?} else {*/occcupiedSlotCount/*?}*/() {
+    public int /*? if <1.21.2 {*/slotCount/*?} else {*//*occcupiedSlotCount*//*?}*/() {
         return 5;
     }
 }

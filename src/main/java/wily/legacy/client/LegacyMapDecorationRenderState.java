@@ -1,5 +1,5 @@
 //? if >=1.21.2 {
-package wily.legacy.client;
+/*package wily.legacy.client;
 
 import net.minecraft.client.renderer.state.MapRenderState;
 import net.minecraft.core.Holder;
@@ -16,4 +16,4 @@ public interface LegacyMapDecorationRenderState {
         setType(decoration.type());
     }
 }
-//?}
+*///?}

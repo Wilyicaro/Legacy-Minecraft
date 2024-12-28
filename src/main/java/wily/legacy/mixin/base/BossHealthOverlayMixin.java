@@ -89,8 +89,8 @@ public abstract class BossHealthOverlayMixin {
         guiGraphics.pose().translate(3f,0,0);
         drawBar(guiGraphics,0,0,bossEvent, Mth.lerpDiscrete(bossEvent.getProgress(), 0, 400),resourceLocations,resourceLocations2);
     }
-    @Redirect(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/ResourceLocation;[Lnet/minecraft/resources/ResourceLocation;)V", at = @At(value = "INVOKE", target = /*? if <1.21.2 {*//*"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIIIIIII)V"*//*?} else {*/"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIIIIIII)V"/*?}*/))
-    private void drawBar(GuiGraphics guiGraphics, /*? if >=1.21.2 {*/Function function, /*?}*/ ResourceLocation resourceLocation, int i, int j, int k, int l, int m, int n, int o, int p) {
+    @Redirect(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/ResourceLocation;[Lnet/minecraft/resources/ResourceLocation;)V", at = @At(value = "INVOKE", target = /*? if <1.21.2 {*/"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIIIIIII)V"/*?} else {*//*"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIIIIIII)V"*//*?}*/))
+    private void drawBar(GuiGraphics guiGraphics, /*? if >=1.21.2 {*//*Function function, *//*?}*/ ResourceLocation resourceLocation, int i, int j, int k, int l, int m, int n, int o, int p) {
         FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation,o <= 400 ? 400 : 406,j * 3,k,l,m,n,0,o,p * 3);
     }
     //?} else {

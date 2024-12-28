@@ -14,17 +14,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.legacy.Legacy4JClient;
 
-@Mixin(targets = /*? if <1.21.2 {*//*"net.minecraft.client.gui.components.toasts.ToastComponent$ToastInstance"*//*?} else {*/ "net.minecraft.client.gui.components.toasts.ToastManager$ToastInstance"/*?}*/)
+@Mixin(targets = /*? if <1.21.2 {*/"net.minecraft.client.gui.components.toasts.ToastComponent$ToastInstance"/*?} else {*/ /*"net.minecraft.client.gui.components.toasts.ToastManager$ToastInstance"*//*?}*/)
 public abstract class ToastComponentMixin {
 
     //? if <1.21.2 {
-    /*@Shadow protected abstract float getVisibility(long l);
-    *///?} else {
-    @Shadow private float visiblePortion;
-    //?}
+    @Shadow protected abstract float getVisibility(long l);
+    //?} else {
+    /*@Shadow private float visiblePortion;
+    *///?}
 
     @Shadow @Final private Toast toast;
-    @Shadow @Final int /*? if >=1.21.2 {*/firstSlotIndex/*?} else {*//*index*//*?}*/;
+    @Shadow @Final int /*? if >=1.21.2 {*//*firstSlotIndex*//*?} else {*/index/*?}*/;
 
     //? if <=1.20.1 {
     /*@Inject(method = "render", at = @At("HEAD"), cancellable = true)
@@ -34,7 +34,7 @@ public abstract class ToastComponentMixin {
     *///?}
 
     @Redirect(method = "render", at = @At(value = "INVOKE",target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"))
-    private void render(PoseStack instance, float f, float g, float h, /*? if >=1.21.2 {*/GuiGraphics guiGraphics, /*?}*/int i){
-        instance.translate((i - this.toast.width()) / 2f,-toast.height() + (50 + toast.height() + this./*? if >=1.21.2 {*/firstSlotIndex/*?} else {*//*index*//*?}*/ * 32f) * /*? if <1.21.2 {*//*this.getVisibility(Util.getMillis())*//*?} else {*/visiblePortion/*?}*/, h);
+    private void render(PoseStack instance, float f, float g, float h, /*? if >=1.21.2 {*//*GuiGraphics guiGraphics, *//*?}*/int i){
+        instance.translate((i - this.toast.width()) / 2f,-toast.height() + (50 + toast.height() + this./*? if >=1.21.2 {*//*firstSlotIndex*//*?} else {*/index/*?}*/ * 32f) * /*? if <1.21.2 {*/this.getVisibility(Util.getMillis())/*?} else {*//*visiblePortion*//*?}*/, h);
     }
 }

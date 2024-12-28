@@ -56,8 +56,8 @@ public abstract class ClientEntityMixin {
     @Inject(method = "rideTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;positionRider(Lnet/minecraft/world/entity/Entity;)V", shift = At.Shift.AFTER))
     private void modifyYawAndPitch(CallbackInfo ci) {
         //? if >=1.21.2 {
-        if (getVehicle() instanceof Minecart) return;
-        //?}
+        /*if (getVehicle() instanceof Minecart) return;
+        *///?}
         if (getVehicle() == null || getVehicle().getControllingPassenger() == (Object) this || LegacyOption.vehicleCameraRotation.get() == LegacyOption.VehicleCameraRotation.NONE || !(getVehicle() instanceof LivingEntity && LegacyOption.vehicleCameraRotation.get().isForLivingEntities() || !(getVehicle() instanceof LivingEntity) && LegacyOption.vehicleCameraRotation.get().isForNonLivingEntities())) return;
 
         this.ridingEntityYRotDelta = this.ridingEntityYRotDelta + (this.getVehicle().getYRot() - this.getVehicle().yRotO);

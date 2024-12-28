@@ -107,13 +107,13 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         cir.setReturnValue(ScreenUtil.isHovering(slot,leftPos,topPos,d,e));
     }
     //? if <1.21.2 {
-    /*@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isActive()Z", ordinal = 1))
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isActive()Z", ordinal = 1))
     private boolean render(Slot instance) {
         if (instance.isActive()) hoveredSlot = instance;
         return false;
     }
-    *///?} else {
-    @Inject(method = "renderSlotHighlightFront", at = @At("HEAD"), cancellable = true)
+    //?} else {
+    /*@Inject(method = "renderSlotHighlightFront", at = @At("HEAD"), cancellable = true)
     private void renderSlotHighlightFront(GuiGraphics guiGraphics, CallbackInfo ci) {
         ci.cancel();
     }
@@ -121,7 +121,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     private void renderSlotHighlightBack(GuiGraphics guiGraphics, CallbackInfo ci) {
         ci.cancel();
     }
-    //?}
+    *///?}
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
     private void renderSlot(GuiGraphics graphics, Slot slot, CallbackInfo ci) {
         ci.cancel();
@@ -163,18 +163,18 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         graphics.pose().pushPose();
         graphics.pose().translate(0.0f, 0.0f, 100.0f);
         //? if <1.21.4 {
-        /*Pair<ResourceLocation, ResourceLocation> pair;
+        Pair<ResourceLocation, ResourceLocation> pair;
         if (itemStack.isEmpty() && (pair = slot.getNoItemIcon()) != null && holder.iconSprite == null) {
             TextureAtlasSprite textureAtlasSprite = minecraft.getTextureAtlas(pair.getFirst()).apply(pair.getSecond());
             FactoryGuiGraphics.of(graphics).blit(0, 0, 0, 16, 16, textureAtlasSprite);
             bl2 = true;
         }
-        *///?} else {
-        if (itemStack.isEmpty() && slot.getNoItemIcon() != null && holder.iconSprite == null) {
+        //?} else {
+        /*if (itemStack.isEmpty() && slot.getNoItemIcon() != null && holder.iconSprite == null) {
             FactoryGuiGraphics.of(graphics).blitSprite(slot.getNoItemIcon(), 0, 0, 16, 16);
             bl2 = true;
         }
-        //?}
+        *///?}
         if (!bl2) {
             if (bl) {
                 graphics.fill(0, 0, 16, 16, -2130706433);

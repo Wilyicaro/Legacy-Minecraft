@@ -43,7 +43,7 @@
     "icon": "legacy:icon/food",
     "listing": [
       {"group": "golden", "recipes": ["golden_apple","legacy:enchanted_golden_apple","glistering_melon_slice","golden_carrot"]},
-      {"group": "stew", "recipes": ["mushroom_stew","rabbit_stew_from_brown_mushroom","rabbit_stew_from_red_mushroom","beetroot_soup",/*? if <1.21.2 {*//*"suspicious_stew"*//*?} else {*/{"type": "item_id", "value": {"id": "suspicious_stew", "onlyFirstMatch": false}}/*?}*/]},
+      {"group": "stew", "recipes": ["mushroom_stew","rabbit_stew_from_brown_mushroom","rabbit_stew_from_red_mushroom","beetroot_soup",/*? if <1.21.2 {*/"suspicious_stew"/*?} else {*//*{"type": "item_id", "value": {"id": "suspicious_stew", "onlyFirstMatch": false}}*//*?}*/]},
       "cookie", "melon",
       {"group": "seeds", "recipes": ["melon_seeds","pumpkin_seeds"]},
       "pumpkin_pie","fermented_spider_eye","blaze_powder","magma_cream","cake",

@@ -27,9 +27,9 @@ import net.minecraft.world.level.Level;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.Stocker;
 //? if >=1.21.2 {
-import net.minecraft.client.renderer.entity.state.*;
+/*import net.minecraft.client.renderer.entity.state.*;
 import wily.factoryapi.base.client.FactoryRenderStateExtension;
-//?}
+*///?}
 import net.minecraft.client.renderer.entity.layers.EyesLayer;
 import net.minecraft.client.renderer.entity.DrownedRenderer;
 import net.minecraft.client.renderer.entity.GhastRenderer;
@@ -172,8 +172,8 @@ public class Legacy4JClient {
     public static Consumer<ServerPlayer> serverPlayerJoinConsumer;
     private static final List<ItemStack> lastArmorSlots = new ArrayList<>();
     //? if <1.21.2 {
-    /*public static PostChain gammaEffect;
-    *///?}
+    public static PostChain gammaEffect;
+    //?}
 
     public static final RenderType GHAST_SHOOTING_GLOW = RenderType.eyes(FactoryAPI.createVanillaLocation("textures/entity/ghast/ghast_shooting_glow.png"));
     public static final RenderType DROWNED_GLOW = RenderType.eyes(FactoryAPI.createVanillaLocation("textures/entity/zombie/drowned_glow.png"));
@@ -184,10 +184,10 @@ public class Legacy4JClient {
 
     public static PostChain getGammaEffect(){
         //? if <1.21.2 {
-        /*return gammaEffect;
-        *///?} else {
-        return Minecraft.getInstance().getShaderManager().getPostChain(LegacyResourceManager.GAMMA_LOCATION, LevelTargetBundle.MAIN_TARGETS);
-        //?}
+        return gammaEffect;
+        //?} else {
+        /*return Minecraft.getInstance().getShaderManager().getPostChain(LegacyResourceManager.GAMMA_LOCATION, LevelTargetBundle.MAIN_TARGETS);
+        *///?}
     }
 
     public static float[] getVisualPlayerColor(int i){
@@ -339,7 +339,7 @@ public class Legacy4JClient {
             if (minecraft.player != null) {
                 if (minecraft.player.isSpectator()) {
                     if (minecraft.gui.getSpectatorGui().isMenuActive()) minecraft.gui.getSpectatorGui().onMouseScrolled(left ? -1 : 1);
-                } else /*? if <1.21.2 {*//*minecraft.player.getInventory().swapPaint(left ? 1 : -1)*//*?} else {*/ minecraft.player.getInventory().setSelectedHotbarSlot(Stocker.cyclic(0, minecraft.player.getInventory().selected + (left ? -1 : 1),9))/*?}*/;
+                } else /*? if <1.21.2 {*/minecraft.player.getInventory().swapPaint(left ? 1 : -1)/*?} else {*/ /*minecraft.player.getInventory().setSelectedHotbarSlot(Stocker.cyclic(0, minecraft.player.getInventory().selected + (left ? -1 : 1),9))*//*?}*/;
             }
         }
     }
@@ -365,7 +365,7 @@ public class Legacy4JClient {
     }
 
     public static void clientPlayerJoin(LocalPlayer p){
-        gameRules = new GameRules(/*? if >=1.21.2 {*/p.connection.enabledFeatures()/*?}*/);
+        gameRules = new GameRules(/*? if >=1.21.2 {*//*p.connection.enabledFeatures()*//*?}*/);
         LegacyCreativeTabListing.map.values().forEach(l-> l.displayItems().forEach(Supplier::get));
         LegacyCreativeTabListing.rebuildVanillaCreativeTabsItems(Minecraft.getInstance());
     }
@@ -378,10 +378,10 @@ public class Legacy4JClient {
     }
 
     //? if <1.21.2 {
-    /*public static RecipeManager getRecipeManager(){
+    public static RecipeManager getRecipeManager(){
         return Minecraft.getInstance().level.getRecipeManager();
     }
-    *///?}
+    //?}
 
     public static void init() {
         knownBlocks = new KnownListing<>(BuiltInRegistries.BLOCK,Minecraft.getInstance().gameDirectory.toPath());
@@ -426,7 +426,7 @@ public class Legacy4JClient {
             registry.accept((blockState, blockAndTintGetter, blockPos, i) -> {
                 if (blockAndTintGetter != null && blockPos != null){
                     if (blockAndTintGetter.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be){
-                        if (!be.hasWater()) return /*? if <1.20.5 {*//*PotionUtils.getColor*//*?} else if <1.21.4 {*//*PotionContents.getColor*//*?} else {*/PotionContents.getColorOptional/*?}*/(be.potion.value().getEffects())/*? if >=1.21.4 {*/.orElse(-13083194)/*?}*/;
+                        if (!be.hasWater()) return /*? if <1.20.5 {*//*PotionUtils.getColor*//*?} else if <1.21.4 {*/PotionContents.getColor/*?} else {*//*PotionContents.getColorOptional*//*?}*/(be.potion.value().getEffects())/*? if >=1.21.4 {*//*.orElse(-13083194)*//*?}*/;
                         else if (be.waterColor != null) return be.waterColor;
                     }
                     return BiomeColors.getAverageWaterColor(blockAndTintGetter, blockPos);
@@ -435,11 +435,11 @@ public class Legacy4JClient {
             }, Blocks.WATER_CAULDRON);
         });
         //? if <1.21.4 {
-        /*FactoryAPIClient.registerItemColor(registry->{
+        FactoryAPIClient.registerItemColor(registry->{
             registry.accept((item,i) ->0xFF3153AF, LegacyRegistries.WATER.get());
             registry.accept((itemStack, i) -> GrassColor.getDefaultColor(),SHRUB.get().asItem());
         });
-        *///?}
+        //?}
         FactoryAPIClient.registerMenuScreen(registry->{
             registry.register(LegacyRegistries.CRAFTING_PANEL_MENU.get(),LegacyCraftingScreen::craftingScreen);
             registry.register(LegacyRegistries.PLAYER_CRAFTING_PANEL_MENU.get(),LegacyCraftingScreen::playerCraftingScreen);
@@ -474,19 +474,19 @@ public class Legacy4JClient {
         }));
         LegacyUIElementTypes.init();
         //? if >=1.21.2 {
-        FactoryRenderStateExtension.types.add(new FactoryRenderStateExtension.Type<>(ThrownTridentRenderState.class,LoyaltyLinesRenderState::new));
+        /*FactoryRenderStateExtension.types.add(new FactoryRenderStateExtension.Type<>(ThrownTridentRenderState.class,LoyaltyLinesRenderState::new));
         FactoryRenderStateExtension.types.add(new FactoryRenderStateExtension.Type<>(FireworkRocketRenderState.class,LegacyFireworkRenderState::new));
         FactoryRenderStateExtension.types.add(new FactoryRenderStateExtension.Type<>(HumanoidRenderState.class,LegacyHumanoidRenderState::new));
         FactoryRenderStateExtension.types.add(new FactoryRenderStateExtension.Type<>(VillagerRenderState.class,LegacyVillagerRenderState::new));
-        //?}
+        *///?}
 
         FactoryAPIClient.registerRenderLayer(r->{
             if (r.getEntityRenderer(EntityType.GHAST) instanceof GhastRenderer renderer){
                 r.register(renderer, new EyesLayer<>(renderer){
                     @Override
-                    public void render(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, /*? if <1.21.2 {*//*Ghast ghast*//*?} else {*/GhastRenderState ghastRenderState/*?}*/, float f, float g/*? if <1.21.2 {*//*, float h, float j, float k, float l*//*?}*/) {
-                        if (!/*? if <1.21.2 {*//*ghast.isCharging()*//*?} else {*/ghastRenderState.isCharging/*?}*/) return;
-                        super.render(poseStack, multiBufferSource, i, /*? if <1.21.2 {*//*ghast, f, g, h, j, k, l*//*?} else {*/ghastRenderState, f, g/*?}*/);
+                    public void render(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, /*? if <1.21.2 {*/Ghast ghast/*?} else {*//*GhastRenderState ghastRenderState*//*?}*/, float f, float g/*? if <1.21.2 {*/, float h, float j, float k, float l/*?}*/) {
+                        if (!/*? if <1.21.2 {*/ghast.isCharging()/*?} else {*//*ghastRenderState.isCharging*//*?}*/) return;
+                        super.render(poseStack, multiBufferSource, i, /*? if <1.21.2 {*/ghast, f, g, h, j, k, l/*?} else {*//*ghastRenderState, f, g*//*?}*/);
                     }
                     @Override
                     public RenderType renderType() {

@@ -69,7 +69,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     }
 
     @Inject(method = "<init>",at = @At("RETURN"))
-    public void initReturn(Minecraft minecraft, Screen screen, WorldCreationContext worldCreationContext, Optional optional, OptionalLong optionalLong,/*? if >=1.21.2 {*/ CreateWorldCallback createWorldCallback, /*?}*/ CallbackInfo ci){
+    public void initReturn(Minecraft minecraft, Screen screen, WorldCreationContext worldCreationContext, Optional optional, OptionalLong optionalLong,/*? if >=1.21.2 {*/ /*CreateWorldCallback createWorldCallback, *//*?}*/ CallbackInfo ci){
         uiState.setDifficulty(LegacyOption.createWorldDifficulty.get());
         panel = Panel.createPanel(this, p-> (width - (p.width + (ScreenUtil.hasTooltipBoxes(UIDefinition.Accessor.of(this)) ? 160 : 0))) / 2, p-> (height - p.height) / 2, 245, 228);
         resourceAssortSelector = Assort.Selector.resources(panel.x + 13, panel.y + 106, 220,45, !ScreenUtil.hasTooltipBoxes());
@@ -118,7 +118,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         rebuildWidgets();
     }
 
-    @Inject(method = /*? if >=1.21.2 {*/ "createWorldAndCleanup"/*?} else {*//*"createNewWorld"*//*?}*/,at = @At("RETURN"))
+    @Inject(method = /*? if >=1.21.2 {*/ /*"createWorldAndCleanup"*//*?} else {*/"createNewWorld"/*?}*/,at = @At("RETURN"))
     private void onCreate(CallbackInfo ci) {
         Legacy4JClient.serverPlayerJoinConsumer = s->{
             LegacyClientWorldSettings.of(s.server.getWorldData()).setTrustPlayers(trustPlayers);
@@ -134,9 +134,9 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     }
 
     @Inject(method = "createNewWorldDirectory", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelStorageSource;createAccess(Ljava/lang/String;)Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;"))
-    private /*? >=1.21.2 {*/static/*?}*/ void createNewWorldDirectory(/*? >=1.21.2 {*/Minecraft minecraft, String string, @Nullable Path path, /*?}*/CallbackInfoReturnable<Optional<LevelStorageSource.LevelStorageAccess>> cir) {
+    private /*? >=1.21.2 {*//*static*//*?}*/ void createNewWorldDirectory(/*? >=1.21.2 {*//*Minecraft minecraft, String string, @Nullable Path path, *//*?}*/CallbackInfoReturnable<Optional<LevelStorageSource.LevelStorageAccess>> cir) {
         try {
-            LevelStorageSource.LevelStorageAccess access = Legacy4JClient.currentWorldSource.createAccess(/*? <1.21.2 {*//*uiState.getTargetFolder()*//*?} else {*/string/*?}*/);
+            LevelStorageSource.LevelStorageAccess access = Legacy4JClient.currentWorldSource.createAccess(/*? <1.21.2 {*/uiState.getTargetFolder()/*?} else {*//*string*//*?}*/);
             access.close();
             if (Files.exists(access.getDimensionPath(Level.OVERWORLD))) FileUtils.deleteDirectory(access.getDimensionPath(Level.OVERWORLD).toFile());
         } catch (IOException e) {
@@ -145,7 +145,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     }
 
     @Redirect(method = "createNewWorldDirectory", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getLevelSource()Lnet/minecraft/world/level/storage/LevelStorageSource;"))
-    private /*? if >=1.21.2 {*/static/*?}*/ LevelStorageSource createNewWorldDirectory(Minecraft instance) {
+    private /*? if >=1.21.2 {*//*static*//*?}*/ LevelStorageSource createNewWorldDirectory(Minecraft instance) {
         return Legacy4JClient.currentWorldSource;
     }
 

@@ -119,11 +119,11 @@ public class LegacyTabButton extends AbstractButton {
         narrationElementOutput.add(NarratedElementType.TITLE, Component.translatable("gui.narrate.tab", this.getMessage().getString()));
     }
     //? if <1.21.4 {
-    /*@Override
+    @Override
     protected boolean clicked(double d, double e) {
         return isMouseOver(d,e);
     }
-    *///?}
+    //?}
     @Override
     public void renderString(GuiGraphics guiGraphics, Font font, int i) {
         renderString(guiGraphics,font,i,false);

@@ -54,8 +54,8 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 //? if >=1.21.2 {
-import net.minecraft.world.item.crafting.RecipePropertySet;
-//?}
+/*import net.minecraft.world.item.crafting.RecipePropertySet;
+*///?}
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.CampfireBlockEntity;
@@ -159,7 +159,7 @@ public interface ControlTooltip {
     }
 
     static boolean isBundle(ItemStack stack){
-        return /*? if <1.21.2 {*//*stack.getItem() instanceof BundleItem*//*?} else {*/stack.is(ItemTags.BUNDLES)/*?}*/;
+        return /*? if <1.21.2 {*/stack.getItem() instanceof BundleItem/*?} else {*//*stack.is(ItemTags.BUNDLES)*//*?}*/;
     }
     static boolean isBundleAndAcceptItem(ItemStack stack, ItemStack itemToAccept){
         return isBundle(stack) && BundleItem.getFullnessDisplay(stack) < 1 && !itemToAccept.isEmpty() && itemToAccept.getItem().canFitInsideContainerItems();
@@ -472,7 +472,7 @@ public interface ControlTooltip {
     static Component getPickAction(Minecraft minecraft){
         ItemStack result;
         BlockState b;
-        if ((minecraft.hitResult instanceof EntityHitResult r &&  (result = r.getEntity().getPickResult()) != null || minecraft.hitResult instanceof BlockHitResult h && h.getType() != HitResult.Type.MISS && !(result = (b = minecraft.level.getBlockState(h.getBlockPos()))/*? if <1.21.4 {*//*.getBlock()*//*?}*/.getCloneItemStack(minecraft.level,h.getBlockPos(),/*? if >=1.21.4 {*/true/*?} else {*//*b*//*?}*/)).isEmpty()) && (minecraft.gameMode.hasInfiniteItems() || minecraft.player.getInventory().findSlotMatchingItem(result) != -1))
+        if ((minecraft.hitResult instanceof EntityHitResult r &&  (result = r.getEntity().getPickResult()) != null || minecraft.hitResult instanceof BlockHitResult h && h.getType() != HitResult.Type.MISS && !(result = (b = minecraft.level.getBlockState(h.getBlockPos()))/*? if <1.21.4 {*/.getBlock()/*?}*/.getCloneItemStack(minecraft.level,h.getBlockPos(),/*? if >=1.21.4 {*//*true*//*?} else {*/b/*?}*/)).isEmpty()) && (minecraft.gameMode.hasInfiniteItems() || minecraft.player.getInventory().findSlotMatchingItem(result) != -1))
             return minecraft.hitResult instanceof EntityHitResult ? LegacyComponents.PICK_ENTITY : ((LegacyKeyMapping) minecraft.options.keyPickItem).getDisplayName();
 
         return null;
@@ -508,9 +508,9 @@ public interface ControlTooltip {
                 if (blockState.getValue(ComposterBlock.LEVEL) == 8) return LegacyComponents.COLLECT;
                 else if (blockState.getValue(ComposterBlock.LEVEL) < 7 && ComposterBlock.COMPOSTABLES.containsKey(actualItem.getItem())) return LegacyComponents.FILL;
             }
-            if (minecraft.hitResult instanceof BlockHitResult r && !actualItem.isEmpty() && minecraft.level.getBlockEntity(r.getBlockPos()) instanceof CampfireBlockEntity e && /*? if <1.21.2 {*//*e.getCookableRecipe(actualItem).isPresent()*//*?} else {*/minecraft.level.recipeAccess().propertySet(RecipePropertySet.FURNACE_INPUT).test(actualItem)/*?}*/) return LegacyComponents.COOK;
+            if (minecraft.hitResult instanceof BlockHitResult r && !actualItem.isEmpty() && minecraft.level.getBlockEntity(r.getBlockPos()) instanceof CampfireBlockEntity e && /*? if <1.21.2 {*/e.getCookableRecipe(actualItem).isPresent()/*?} else {*//*minecraft.level.recipeAccess().propertySet(RecipePropertySet.FURNACE_INPUT).test(actualItem)*//*?}*/) return LegacyComponents.COOK;
             if (actualItem.getItem() instanceof BrushItem && minecraft.hitResult instanceof BlockHitResult r && r.getType() != HitResult.Type.MISS && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof BrushableBlock) return LegacyComponents.BRUSH;
-            if (/*? if <1.21.2 {*//*actualItem.getItem() instanceof Equipable e*//*?} else {*/actualItem.has(DataComponents.EQUIPPABLE)/*?}*/ && (/*? if <1.20.5 {*//*actualItem.getItem() instanceof HorseArmorItem*//*?} else if <1.21.2 {*//*!e.getEquipmentSlot().equals(EquipmentSlot.BODY)*//*?} else {*/!actualItem.get(DataComponents.EQUIPPABLE).slot().equals(EquipmentSlot.BODY) /*?}*/ || minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Mob m && /*? if <1.20.5 {*//*m instanceof AbstractHorse h && h.isArmor(actualItem)*//*?} else if <1.21.2 {*//*m.isBodyArmorItem(actualItem)*//*?} else {*/ m.isEquippableInSlot(actualItem,EquipmentSlot.BODY)/*?}*/)) return actualItem.getItem() instanceof ShieldItem ? LegacyComponents.BLOCK : LegacyComponents.EQUIP;
+            if (/*? if <1.21.2 {*/actualItem.getItem() instanceof Equipable e/*?} else {*//*actualItem.has(DataComponents.EQUIPPABLE)*//*?}*/ && (/*? if <1.20.5 {*//*actualItem.getItem() instanceof HorseArmorItem*//*?} else if <1.21.2 {*/!e.getEquipmentSlot().equals(EquipmentSlot.BODY)/*?} else {*//*!actualItem.get(DataComponents.EQUIPPABLE).slot().equals(EquipmentSlot.BODY) *//*?}*/ || minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Mob m && /*? if <1.20.5 {*//*m instanceof AbstractHorse h && h.isArmor(actualItem)*//*?} else if <1.21.2 {*/m.isBodyArmorItem(actualItem)/*?} else {*/ /*m.isEquippableInSlot(actualItem,EquipmentSlot.BODY)*//*?}*/)) return actualItem.getItem() instanceof ShieldItem ? LegacyComponents.BLOCK : LegacyComponents.EQUIP;
             if (actualItem.getItem() instanceof EmptyMapItem || actualItem.getItem() instanceof FishingRodItem) return LegacyComponents.USE;
             if (actualItem.getItem() instanceof FireworkRocketItem && (minecraft.player.isFallFlying() || minecraft.hitResult instanceof BlockHitResult && minecraft.hitResult.getType() != HitResult.Type.MISS)) return LegacyComponents.LAUNCH;
             if (actualItem.getItem() instanceof ShearsItem ){
@@ -544,7 +544,7 @@ public interface ControlTooltip {
                 else if (minecraft.level.getBlockState(((BlockHitResult)bucketHitResult).getBlockPos()).getBlock() instanceof BucketPickup) return LegacyComponents.COLLECT;
             }
             if (minecraft.player.getItemInHand(hand).getItem() instanceof SaddleItem && minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Saddleable s && s.isSaddleable() && !s.isSaddled()) return LegacyComponents.SADDLE;
-            if ((isEdible(actualItem) && minecraft.player.canEat(false)) || actualItem.getItem() instanceof PotionItem) return actualItem.getUseAnimation() == /*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.DRINK ? LegacyComponents.DRINK : LegacyComponents.EAT;
+            if ((isEdible(actualItem) && minecraft.player.canEat(false)) || actualItem.getItem() instanceof PotionItem) return actualItem.getUseAnimation() == /*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/.DRINK ? LegacyComponents.DRINK : LegacyComponents.EAT;
             if (canTill(minecraft, hand)) return LegacyComponents.TILL;
             if (minecraft.player.getItemInHand(hand).getItem() instanceof AxeItem && minecraft.hitResult instanceof BlockHitResult r && AxeItem.STRIPPABLES.get(minecraft.level.getBlockState(r.getBlockPos()).getBlock()) != null) return LegacyComponents.PEEL_BARK;
             if (minecraft.player.getItemInHand(hand).getItem() instanceof ShovelItem && minecraft.hitResult instanceof BlockHitResult r && ShovelItem.FLATTENABLES.get(minecraft.level.getBlockState(r.getBlockPos()).getBlock()) != null) return LegacyComponents.DIG_PATH;
@@ -552,7 +552,7 @@ public interface ControlTooltip {
         if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof AbstractHorse h && h.isTamed() && minecraft.player.isSecondaryUseActive()) return LegacyComponents.OPEN;
         if (minecraft.hitResult instanceof EntityHitResult r && r.getEntity().canAddPassenger(minecraft.player) && minecraft.player.canRide(r.getEntity())){
             if (r.getEntity() instanceof Boat) return LegacyComponents.SAIL;
-            else if (r.getEntity() instanceof AbstractMinecart m && /*? if <1.21.2 {*//*m.getMinecartType() == AbstractMinecart.Type.RIDEABLE*//*?} else {*/m.isRideable()/*?}*/) return LegacyComponents.RIDE;
+            else if (r.getEntity() instanceof AbstractMinecart m && /*? if <1.21.2 {*/m.getMinecartType() == AbstractMinecart.Type.RIDEABLE/*?} else {*//*m.isRideable()*//*?}*/) return LegacyComponents.RIDE;
             else if (r.getEntity() instanceof Saddleable s && !r.getEntity().isVehicle() && ((!(r.getEntity() instanceof AbstractHorse) && s.isSaddled()) || r.getEntity() instanceof AbstractHorse h && !minecraft.player.isSecondaryUseActive() && (h.isTamed() && !h.isFood(minecraft.player.getMainHandItem()) || minecraft.player.getMainHandItem().isEmpty()))) return LegacyComponents.MOUNT;
         }
         return null;
@@ -574,7 +574,7 @@ public interface ControlTooltip {
     static boolean canPlace(Minecraft minecraft, InteractionHand hand){
         ItemStack usedItem = minecraft.player.getItemInHand(hand);
         BlockPlaceContext c;
-        return minecraft.hitResult != null && minecraft.hitResult.getType() != HitResult.Type.MISS && !usedItem.isEmpty() && ((usedItem.getItem() instanceof SpawnEggItem e && (!(minecraft.hitResult instanceof EntityHitResult r) || r.getEntity().getType() == e.getType(/*? if >=1.21.4 {*/minecraft.level.registryAccess(), /*?}*/usedItem/*? if <1.20.5 {*//*.getTag()*//*?}*/))) || minecraft.hitResult instanceof BlockHitResult r && (usedItem.getItem() instanceof BlockItem b && (c =new BlockPlaceContext(minecraft.player,hand,usedItem,r)).canPlace() && b.getPlacementState(c) != null));
+        return minecraft.hitResult != null && minecraft.hitResult.getType() != HitResult.Type.MISS && !usedItem.isEmpty() && ((usedItem.getItem() instanceof SpawnEggItem e && (!(minecraft.hitResult instanceof EntityHitResult r) || r.getEntity().getType() == e.getType(/*? if >=1.21.4 {*//*minecraft.level.registryAccess(), *//*?}*/usedItem/*? if <1.20.5 {*//*.getTag()*//*?}*/))) || minecraft.hitResult instanceof BlockHitResult r && (usedItem.getItem() instanceof BlockItem b && (c =new BlockPlaceContext(minecraft.player,hand,usedItem,r)).canPlace() && b.getPlacementState(c) != null));
     }
     static boolean canTill(Minecraft minecraft, InteractionHand hand){
         if (!(minecraft.player.getItemInHand(hand).getItem() instanceof HoeItem && minecraft.hitResult instanceof BlockHitResult r)) return false;

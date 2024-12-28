@@ -9,8 +9,8 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ThrownTridentRenderer;
 //? if >=1.21.2 {
-import net.minecraft.client.renderer.entity.state.ThrownTridentRenderState;
-//?}
+/*import net.minecraft.client.renderer.entity.state.ThrownTridentRenderState;
+*///?}
 import net.minecraft.world.entity.projectile.ThrownTrident;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,14 +22,14 @@ import wily.legacy.client.LegacyOption;
 import wily.legacy.client.LoyaltyLinesRenderState;
 
 @Mixin(ThrownTridentRenderer.class)
-public abstract class ThrownTridentRendererMixin extends EntityRenderer<ThrownTrident/*? if >=1.21.2 {*/, ThrownTridentRenderState/*?}*/> {
+public abstract class ThrownTridentRendererMixin extends EntityRenderer<ThrownTrident/*? if >=1.21.2 {*//*, ThrownTridentRenderState*//*?}*/> {
     protected ThrownTridentRendererMixin(EntityRendererProvider.Context context) {
         super(context);
     }
 
-    @Inject(method = /*? if <1.21.2 {*//*"render(Lnet/minecraft/world/entity/projectile/ThrownTrident;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"*//*?} else {*/ "render(Lnet/minecraft/client/renderer/entity/state/ThrownTridentRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"/*?}*/,at = @At("RETURN"))
-    public void render(/*? if <1.21.2 {*//*ThrownTrident thrownTrident, float f, float g*//*?} else {*/ ThrownTridentRenderState renderState/*?}*/, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci) {
-        if (LegacyOption.loyaltyLines.get()) renderLoyaltyLines(LoyaltyLinesRenderState.of(/*? if <1.21.2 {*//*thrownTrident, g*//*?} else {*/renderState/*?}*/),poseStack,multiBufferSource, LightTexture.FULL_BLOCK);
+    @Inject(method = /*? if <1.21.2 {*/"render(Lnet/minecraft/world/entity/projectile/ThrownTrident;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"/*?} else {*/ /*"render(Lnet/minecraft/client/renderer/entity/state/ThrownTridentRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"*//*?}*/,at = @At("RETURN"))
+    public void render(/*? if <1.21.2 {*/ThrownTrident thrownTrident, float f, float g/*?} else {*/ /*ThrownTridentRenderState renderState*//*?}*/, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci) {
+        if (LegacyOption.loyaltyLines.get()) renderLoyaltyLines(LoyaltyLinesRenderState.of(/*? if <1.21.2 {*/thrownTrident, g/*?} else {*//*renderState*//*?}*/),poseStack,multiBufferSource, LightTexture.FULL_BLOCK);
     }
     @Unique
     private void renderLoyaltyLines(LoyaltyLinesRenderState renderState, PoseStack poseStack, MultiBufferSource multiBufferSource, int light) {

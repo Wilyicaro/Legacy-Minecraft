@@ -15,11 +15,11 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.StonecutterMenu;
 import net.minecraft.world.item.ItemStack;
 //? if >=1.21.2 {
-import net.minecraft.world.item.crafting.SelectableRecipe;
+/*import net.minecraft.world.item.crafting.SelectableRecipe;
 import net.minecraft.world.item.crafting.display.SlotDisplayContext;
-//?} else if >1.20.1 {
-/*import net.minecraft.world.item.crafting.RecipeHolder;
-*///?}
+*///?} else if >1.20.1 {
+import net.minecraft.world.item.crafting.RecipeHolder;
+//?}
 import net.minecraft.world.item.crafting.StonecutterRecipe;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -70,7 +70,7 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
     }
     *///?}
 
-    @Redirect(method = "isScrollBarActive",at = @At(value = "INVOKE",target = /*? if <1.21.2 {*//*"Lnet/minecraft/world/inventory/StonecutterMenu;getNumRecipes()I"*//*?} else {*/"Lnet/minecraft/world/inventory/StonecutterMenu;getNumberOfVisibleRecipes()I"/*?}*/))
+    @Redirect(method = "isScrollBarActive",at = @At(value = "INVOKE",target = /*? if <1.21.2 {*/"Lnet/minecraft/world/inventory/StonecutterMenu;getNumRecipes()I"/*?} else {*//*"Lnet/minecraft/world/inventory/StonecutterMenu;getNumberOfVisibleRecipes()I"*//*?}*/))
     private int isScrollBarActive(StonecutterMenu instance){
         return getNumRecipes() - 4;
     }
@@ -81,17 +81,17 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
 
     @Unique
     private int getNumRecipes(){
-        return menu./*? if <1.21.2 {*//*getNumRecipes*//*?} else {*/getNumberOfVisibleRecipes/*?}*/();
+        return menu./*? if <1.21.2 {*/getNumRecipes/*?} else {*//*getNumberOfVisibleRecipes*//*?}*/();
     }
 
     @Unique
-    private List</*? if <1.20.2 {*//*StonecutterRecipe*//*?} else if <1.21.2 {*//*RecipeHolder<StonecutterRecipe>*//*?} else {*/SelectableRecipe.SingleInputEntry<StonecutterRecipe>/*?}*/> getRecipes(){
-        return menu./*? if <1.21.2 {*//*getRecipes*//*?} else {*/getVisibleRecipes().entries/*?}*/();
+    private List</*? if <1.20.2 {*//*StonecutterRecipe*//*?} else if <1.21.2 {*/RecipeHolder<StonecutterRecipe>/*?} else {*//*SelectableRecipe.SingleInputEntry<StonecutterRecipe>*//*?}*/> getRecipes(){
+        return menu./*? if <1.21.2 {*/getRecipes/*?} else {*//*getVisibleRecipes().entries*//*?}*/();
     }
 
     @Unique
-    private ItemStack getResultItem(/*? if <1.20.2 {*//*StonecutterRecipe*//*?} else if <1.21.2 {*//*RecipeHolder<StonecutterRecipe>*//*?} else {*/SelectableRecipe.SingleInputEntry<StonecutterRecipe>/*?}*/ recipe){
-        return /*? if <1.21.2 {*//*recipe/^? if >1.20.1 {^/.value()/^?}^/.getResultItem(this.minecraft.level.registryAccess())*//*?} else {*/recipe.recipe().optionDisplay().resolveForFirstStack(SlotDisplayContext.fromLevel(this.minecraft.level))/*?}*/;
+    private ItemStack getResultItem(/*? if <1.20.2 {*//*StonecutterRecipe*//*?} else if <1.21.2 {*/RecipeHolder<StonecutterRecipe>/*?} else {*//*SelectableRecipe.SingleInputEntry<StonecutterRecipe>*//*?}*/ recipe){
+        return /*? if <1.21.2 {*/recipe/*? if >1.20.1 {*/.value()/*?}*/.getResultItem(this.minecraft.level.registryAccess())/*?} else {*//*recipe.recipe().optionDisplay().resolveForFirstStack(SlotDisplayContext.fromLevel(this.minecraft.level))*//*?}*/;
     }
 
     @Override

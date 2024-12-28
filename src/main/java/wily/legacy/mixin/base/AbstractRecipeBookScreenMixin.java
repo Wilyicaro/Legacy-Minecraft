@@ -1,5 +1,5 @@
 //? if >=1.21.2 {
-package wily.legacy.mixin.base;
+/*package wily.legacy.mixin.base;
 
 import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -25,4 +25,4 @@ public class AbstractRecipeBookScreenMixin {
         }
     }
 }
-//?}
+*///?}

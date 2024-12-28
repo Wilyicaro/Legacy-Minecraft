@@ -9,11 +9,11 @@ import java.util.stream.Stream;
 public class ImpossibleIngredient extends Ingredient {
     private final ItemStack[] stacks;
     public ImpossibleIngredient(ItemStack stack) {
-        super(/*? if <1.21.2 {*//*Stream.empty()*//*?} else {*/HolderSet.direct(stack.getItemHolder())/*?}*/);
+        super(/*? if <1.21.2 {*/Stream.empty()/*?} else {*//*HolderSet.direct(stack.getItemHolder())*//*?}*/);
         stacks = new ItemStack[]{stack};
     }
     //? if <1.21.2 {
-    /*@Override
+    @Override
     public boolean isEmpty() {
         return false;
     }
@@ -21,7 +21,7 @@ public class ImpossibleIngredient extends Ingredient {
     public ItemStack[] getItems() {
         return stacks;
     }
-    *///?}
+    //?}
     @Override
     public boolean test(ItemStack itemStack) {
         return false;

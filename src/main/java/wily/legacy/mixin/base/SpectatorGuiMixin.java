@@ -71,7 +71,7 @@ public abstract class SpectatorGuiMixin {
         this.renderPage(k,arg*ScreenUtil.getHUDOpacity(),f,k.guiHeight()-22,j);
     }
     //? if >1.20.1 {
-    @Inject(method = "renderPage", at = @At(value = "INVOKE", target = /*? if <1.21.2 {*//*"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V"*//*?} else {*/"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIIII)V"/*?}*/, ordinal = 1))
+    @Inject(method = "renderPage", at = @At(value = "INVOKE", target = /*? if <1.21.2 {*/"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V"/*?} else {*//*"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIIII)V"*//*?}*/, ordinal = 1))
     private void renderHotbarSelection(GuiGraphics guiGraphics, float f, int i, int j, SpectatorPage spectatorPage, CallbackInfo ci) {
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HOTBAR_SELECTION,24,24,0,23,guiGraphics.guiWidth() / 2 - 91 - 1 + spectatorPage.getSelectedSlot() ^ 20, j + 22, 0, 24, 1);
     }

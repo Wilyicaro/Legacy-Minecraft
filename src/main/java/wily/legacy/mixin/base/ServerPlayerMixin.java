@@ -135,7 +135,7 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
         Either<BedSleepingProblem,Unit> either = cir.getReturnValue();
         if (level().isDay() && either.left().isPresent() && either.left().get() == BedSleepingProblem.NOT_POSSIBLE_NOW && !this.isCreative()) {
             Vec3 vec3 = Vec3.atBottomCenterOf(blockPos);
-            if (!this.level().getEntitiesOfClass(Monster.class, new AABB(vec3.x() - 8.0, vec3.y() - 5.0, vec3.z() - 8.0, vec3.x() + 8.0, vec3.y() + 5.0, vec3.z() + 8.0), (argx) -> argx.isPreventingPlayerRest(/*? if >=1.21.2 {*/this.serverLevel(), /*?}*/this)).isEmpty()) {
+            if (!this.level().getEntitiesOfClass(Monster.class, new AABB(vec3.x() - 8.0, vec3.y() - 5.0, vec3.z() - 8.0, vec3.x() + 8.0, vec3.y() + 5.0, vec3.z() + 8.0), (argx) -> argx.isPreventingPlayerRest(/*? if >=1.21.2 {*//*this.serverLevel(), *//*?}*/this)).isEmpty()) {
                 cir.setReturnValue(Either.left(BedSleepingProblem.NOT_SAFE));
             }
         }

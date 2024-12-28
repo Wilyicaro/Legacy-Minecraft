@@ -11,11 +11,11 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.FireworkEntityRenderer;
 //? if >=1.21.2 {
-import net.minecraft.client.renderer.entity.state.FireworkRocketRenderState;
+/*import net.minecraft.client.renderer.entity.state.FireworkRocketRenderState;
 import wily.factoryapi.base.client.FactoryRenderStateExtension;
 import net.minecraft.client.model.ArrowModel;
 import wily.legacy.client.LegacyFireworkRenderState;
-//?}
+*///?}
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -31,13 +31,13 @@ import wily.factoryapi.FactoryAPI;
 import wily.legacy.Legacy4J;
 
 @Mixin(FireworkEntityRenderer.class)
-public abstract class FireworkEntityRendererMixin extends EntityRenderer<FireworkRocketEntity/*? if >=1.21.2 {*/, FireworkRocketRenderState/*?}*/> {
+public abstract class FireworkEntityRendererMixin extends EntityRenderer<FireworkRocketEntity/*? if >=1.21.2 {*//*, FireworkRocketRenderState*//*?}*/> {
     private static final ResourceLocation FIREWORK_LOCATION = Legacy4J.createModLocation( "textures/entity/projectiles/firework.png");
     protected FireworkEntityRendererMixin(EntityRendererProvider.Context context) {
         super(context);
     }
     //? if <1.21.2 {
-    /*@Inject(method = "getTextureLocation(Lnet/minecraft/world/entity/projectile/FireworkRocketEntity;)Lnet/minecraft/resources/ResourceLocation;",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getTextureLocation(Lnet/minecraft/world/entity/projectile/FireworkRocketEntity;)Lnet/minecraft/resources/ResourceLocation;",at = @At("HEAD"), cancellable = true)
     public void getTextureLocation(FireworkRocketEntity fireworkRocketEntity, CallbackInfoReturnable<ResourceLocation> cir) {
         cir.setReturnValue(FIREWORK_LOCATION);
     }
@@ -76,13 +76,13 @@ public abstract class FireworkEntityRendererMixin extends EntityRenderer<Firewor
     @Unique
     public void vertex(Matrix4f matrix4f, PoseStack.Pose pose, VertexConsumer vertexConsumer, int i, int j, int k, float f, float g, int l, int m, int n, int o) {
         //? if <1.20.5 {
-        /^vertexConsumer.vertex(matrix4f, i, j, k).color(255, 255, 255, 255).uv(f, g).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(o).normal(pose.normal(), l, n, m).endVertex();
-        ^///?} else {
+        /*vertexConsumer.vertex(matrix4f, i, j, k).color(255, 255, 255, 255).uv(f, g).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(o).normal(pose.normal(), l, n, m).endVertex();
+        *///?} else {
         vertexConsumer.addVertex(matrix4f, i, j, k).setColor(255, 255, 255, 255).setUv(f, g).setOverlay(OverlayTexture.NO_OVERLAY).setLight(o).setNormal(pose, l, n, m);
         //?}
     }
-    *///?} else {
-    @Unique
+    //?} else {
+    /*@Unique
     private ArrowModel model;
 
     @Inject(method = "<init>", at = @At("RETURN"))
@@ -106,5 +106,5 @@ public abstract class FireworkEntityRendererMixin extends EntityRenderer<Firewor
         super.render(fireworkRocketRenderState, poseStack, multiBufferSource, i);
     }
 
-    //?}
+    *///?}
 }

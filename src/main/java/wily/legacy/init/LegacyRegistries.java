@@ -43,12 +43,12 @@ public class LegacyRegistries {
     public static final RegisterListing.Holder<MenuType<LegacyCraftingMenu>> PLAYER_CRAFTING_PANEL_MENU = MENU_REGISTER.add("player_crafting_panel_menu", ()->new MenuType<>(LegacyCraftingMenu::playerCraftingMenu, FeatureFlags.VANILLA_SET));
     public static final RegisterListing.Holder<MenuType<LegacyCraftingMenu>> CRAFTING_PANEL_MENU = MENU_REGISTER.add("crafting_panel_menu", ()->new MenuType<>(LegacyCraftingMenu::craftingMenu, FeatureFlags.VANILLA_SET));
 
-    public static final RegisterListing.Holder<Item> WATER = ITEM_REGISTER.add("water",()-> new BlockItem(Blocks.WATER,new Item.Properties()/*? if >=1.21.2 {*/.setId(ResourceKey.create(Registries.ITEM,LegacyRegistries.WATER.getId())).overrideDescription(Blocks.WATER.getDescriptionId())/*?}*/));
-    public static final RegisterListing.Holder<Item> LAVA = ITEM_REGISTER.add("lava",()-> new BlockItem(Blocks.LAVA,new Item.Properties()/*? if >=1.21.2 {*/.setId(ResourceKey.create(Registries.ITEM,LegacyRegistries.LAVA.getId())).overrideDescription(Blocks.LAVA.getDescriptionId())/*?}*/));
+    public static final RegisterListing.Holder<Item> WATER = ITEM_REGISTER.add("water",()-> new BlockItem(Blocks.WATER,new Item.Properties()/*? if >=1.21.2 {*//*.setId(ResourceKey.create(Registries.ITEM,LegacyRegistries.WATER.getId())).overrideDescription(Blocks.WATER.getDescriptionId())*//*?}*/));
+    public static final RegisterListing.Holder<Item> LAVA = ITEM_REGISTER.add("lava",()-> new BlockItem(Blocks.LAVA,new Item.Properties()/*? if >=1.21.2 {*//*.setId(ResourceKey.create(Registries.ITEM,LegacyRegistries.LAVA.getId())).overrideDescription(Blocks.LAVA.getDescriptionId())*//*?}*/));
 
-    public static final RegisterListing.Holder<Block> SHRUB = BLOCK_ITEMS_REGISTER.add("shrub",()-> new TallGrassBlock(BlockBehaviour.Properties.of()./*? if >=1.21.2 {*/setId(ResourceKey.create(Registries.BLOCK,LegacyRegistries.SHRUB.getId()))./*?}*/mapColor(MapColor.PLANT).replaceable().noCollission().instabreak().sound(SoundType.GRASS).offsetType(BlockBehaviour.OffsetType.XYZ).ignitedByLava().pushReaction(PushReaction.DESTROY)));
+    public static final RegisterListing.Holder<Block> SHRUB = BLOCK_ITEMS_REGISTER.add("shrub",()-> new TallGrassBlock(BlockBehaviour.Properties.of()./*? if >=1.21.2 {*//*setId(ResourceKey.create(Registries.BLOCK,LegacyRegistries.SHRUB.getId())).*//*?}*/mapColor(MapColor.PLANT).replaceable().noCollission().instabreak().sound(SoundType.GRASS).offsetType(BlockBehaviour.OffsetType.XYZ).ignitedByLava().pushReaction(PushReaction.DESTROY)));
 
-    public static final RegisterListing.Holder<BlockEntityType<WaterCauldronBlockEntity>> WATER_CAULDRON_BLOCK_ENTITY = BLOCK_ENTITIES_REGISTER.add("water_cauldron",()-> /*? if <1.21.2 {*//*BlockEntityType.Builder.of*//*?} else {*/new BlockEntityType/*?}*/(WaterCauldronBlockEntity::new, /*? if >=1.21.2 {*/Set.of(Blocks.WATER_CAULDRON))/*?} else {*//*Blocks.WATER_CAULDRON).build(null)*//*?}*/);
+    public static final RegisterListing.Holder<BlockEntityType<WaterCauldronBlockEntity>> WATER_CAULDRON_BLOCK_ENTITY = BLOCK_ENTITIES_REGISTER.add("water_cauldron",()-> /*? if <1.21.2 {*/BlockEntityType.Builder.of/*?} else {*//*new BlockEntityType*//*?}*/(WaterCauldronBlockEntity::new, /*? if >=1.21.2 {*//*Set.of(Blocks.WATER_CAULDRON))*//*?} else {*/Blocks.WATER_CAULDRON).build(null)/*?}*/);
 
     public static final RegisterListing.Holder<SoundEvent> SCROLL = SOUND_EVENT_REGISTER.add("random.scroll",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.scroll")));
     public static final RegisterListing.Holder<SoundEvent> CRAFT_FAIL = SOUND_EVENT_REGISTER.add("random.craft_fail",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.craft_fail")));
@@ -69,7 +69,7 @@ public class LegacyRegistries {
         BLOCK_REGISTER.register();
         BLOCK_ENTITIES_REGISTER.register();
         BLOCK_ITEMS_REGISTER.register();
-        BLOCK_ITEMS_REGISTER.forEach(b-> ITEM_REGISTER.add(b.getId().getPath(),()-> new BlockItem(b.get(), new Item.Properties()/*? if >=1.21.2 {*/.setId(ResourceKey.create(Registries.ITEM,b.getId())).useBlockDescriptionPrefix()/*?}*/)));
+        BLOCK_ITEMS_REGISTER.forEach(b-> ITEM_REGISTER.add(b.getId().getPath(),()-> new BlockItem(b.get(), new Item.Properties()/*? if >=1.21.2 {*//*.setId(ResourceKey.create(Registries.ITEM,b.getId())).useBlockDescriptionPrefix()*//*?}*/)));
         ITEM_REGISTER.register();
         MENU_REGISTER.register();
         SOUND_EVENT_REGISTER.register();

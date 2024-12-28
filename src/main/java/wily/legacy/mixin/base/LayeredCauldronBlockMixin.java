@@ -7,8 +7,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 //? if >=1.20.5 && <1.21.2 {
-/*import net.minecraft.world.ItemInteractionResult;
- *///?}
+import net.minecraft.world.ItemInteractionResult;
+ //?}
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
@@ -51,7 +51,7 @@ public abstract class LayeredCauldronBlockMixin extends AbstractCauldronBlock im
         return super.use(blockState, level, blockPos, player, interactionHand, blockHitResult);
     }
     *///?} else {
-    protected /*? if <1.20.5 || >=1.21.2 {*/ InteractionResult /*?} else {*//*ItemInteractionResult*//*?}*/ useItemOn(ItemStack itemStack, BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+    protected /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult *//*?} else {*/ItemInteractionResult/*?}*/ useItemOn(ItemStack itemStack, BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
         if (LegacyRegistries.isInvalidCauldron(blockState,level,blockPos) && player.getItemInHand(interactionHand).getItem() instanceof BucketItem) return Legacy4J.defaultPassInteraction();
         return super.useItemOn(itemStack, blockState, level, blockPos, player, interactionHand, blockHitResult);
     }

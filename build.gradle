@@ -306,7 +306,7 @@ publishMods {
         serverRequired = true
         accessToken = project.findProperty("CURSE_API_KEY") ?: System.getenv("CURSE_API_KEY")
         projectId = curseforge_id
-        requires("factory_api")
+        requires("factory-api")
         if (isFabric) requires("fabric-api")
     }
 
@@ -315,7 +315,7 @@ publishMods {
         accessToken = project.findProperty("gpr.token") ?: System.getenv("MODRINTH_TOKEN")
         projectId = modrinth_id
         publishMods.version = "$project.version+$loader"
-        requires("factory_api")
+        requires("factory-api")
         if (isFabric) requires("fabric-api")
     }
 

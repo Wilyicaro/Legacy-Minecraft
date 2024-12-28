@@ -60,7 +60,7 @@ public class BookPanel extends WidgetPanel {
             private long lastPressTime;
             @Override
             public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                isHovered = Util.getMillis() - lastPressTime <= 300 || /*? if <1.21.4 {*//*clicked*//*?} else {*/isMouseOver/*?}*/(i,j);
+                isHovered = Util.getMillis() - lastPressTime <= 300 || /*? if <1.21.4 {*/clicked/*?} else {*//*isMouseOver*//*?}*/(i,j);
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(getX(),getY(),1.5f);
                 guiGraphics.pose().scale(1.5f,1.5f,1.5f);
@@ -82,7 +82,7 @@ public class BookPanel extends WidgetPanel {
             }
 
             @Override
-            public boolean /*? if <1.21.4 {*//*clicked*//*?} else {*/isMouseOver/*?}*/(double d, double e) {
+            public boolean /*? if <1.21.4 {*/clicked/*?} else {*//*isMouseOver*//*?}*/(double d, double e) {
                 return this.active && this.visible && d >= (double)this.getX() && e >= (double)this.getY() && d < (double)(this.getX() + this.getWidth() * 3/2) && e < (double)(this.getY() + this.getHeight() * 3/2);
             }
         };

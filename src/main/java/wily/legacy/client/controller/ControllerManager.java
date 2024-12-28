@@ -111,7 +111,7 @@ public  class ControllerManager {
             if (state.pressed) {
                 isControllerTheLastInput = true;
                 //? if >=1.21.2
-                minecraft.getFramerateLimitTracker().onInputReceived();
+                /*minecraft.getFramerateLimitTracker().onInputReceived();*/
             }
 
             if (getCursorMode() == 0 && state.pressed && !isCursorDisabled) disableCursor();

@@ -157,7 +157,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         int k = this.menu.getGoldCount();
         for (int l = 0; l < 3; ++l) {
             int m = this.menu.costs[l];
-            Optional<Holder.Reference<Enchantment>> optional = this.minecraft.level.registryAccess()./*? if <1.21.2 {*//*registryOrThrow(Registries.ENCHANTMENT).getHolder(this.menu.enchantClue[l])*//*?} else {*/lookupOrThrow(Registries.ENCHANTMENT).get(this.menu.enchantClue[l])/*?}*/;
+            Optional<Holder.Reference<Enchantment>> optional = this.minecraft.level.registryAccess()./*? if <1.21.2 {*/registryOrThrow(Registries.ENCHANTMENT).getHolder(this.menu.enchantClue[l])/*?} else {*//*lookupOrThrow(Registries.ENCHANTMENT).get(this.menu.enchantClue[l])*//*?}*/;
             int n = this.menu.levelClue[l];
             int o = l + 1;
             double t = i - (leftPos + 80.5);

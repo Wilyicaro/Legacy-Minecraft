@@ -56,8 +56,8 @@ public class WaterCauldronBlockEntity extends BlockEntity {
     public void /*? if <1.20.5 {*//*load*//*?} else {*/loadAdditional/*?}*/(CompoundTag compoundTag/*? if >=1.20.5 {*/, HolderLookup.Provider provider/*?}*/) {
         super./*? if <1.20.5 {*//*load*//*?} else {*/loadAdditional/*?}*/(compoundTag/*? if >=1.20.5 {*/, provider/*?}*/);
         if (compoundTag.contains("dyeColor")) waterColor = compoundTag.getInt("dyeColor");
-       BuiltInRegistries.POTION./*? if <1.21.2 {*//*getHolder*//*?} else {*/get/*?}*/(ResourceKey.create(Registries.POTION, ResourceLocation.tryParse(compoundTag.getString("potion")))).ifPresent(p-> potion = p);
-       BuiltInRegistries.ITEM./*? if <1.21.2 {*//*getHolder*//*?} else {*/get/*?}*/(ResourceKey.create(Registries.ITEM, ResourceLocation.tryParse(compoundTag.getString("lastItemUsed")))).ifPresent(p-> lastPotionItemUsed = p);
+       BuiltInRegistries.POTION./*? if <1.21.2 {*/getHolder/*?} else {*//*get*//*?}*/(ResourceKey.create(Registries.POTION, ResourceLocation.tryParse(compoundTag.getString("potion")))).ifPresent(p-> potion = p);
+       BuiltInRegistries.ITEM./*? if <1.21.2 {*/getHolder/*?} else {*//*get*//*?}*/(ResourceKey.create(Registries.ITEM, ResourceLocation.tryParse(compoundTag.getString("lastItemUsed")))).ifPresent(p-> lastPotionItemUsed = p);
     }
 
     @Override

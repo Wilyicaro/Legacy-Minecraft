@@ -28,7 +28,7 @@ import wily.legacy.Legacy4J;
 public abstract class AbstractMinecartMixin extends Entity {
     //? if <1.21.2 {
     
-    /*@Shadow protected abstract void comeOffTrack();
+    @Shadow protected abstract void comeOffTrack();
 
     @Shadow public abstract void activateMinecart(int i, int j, int k, boolean bl);
 
@@ -119,7 +119,7 @@ public abstract class AbstractMinecartMixin extends Entity {
         cir.setReturnValue(8d / 20d);
     }
 
-    *///?}
+    //?}
 
     public AbstractMinecartMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);

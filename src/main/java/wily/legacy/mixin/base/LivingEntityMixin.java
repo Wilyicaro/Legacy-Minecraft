@@ -24,7 +24,7 @@ public abstract class LivingEntityMixin extends Entity {
         super(entityType, level);
     }
 
-    @Redirect(method = /*? if <1.21.2 {*//*"travel"*//*?} else {*/"travelInAir"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;onGround()Z", ordinal = /*? if <1.21.2 {*//*2*//*?} else {*/0/*?}*/))
+    @Redirect(method = /*? if <1.21.2 {*/"travel"/*?} else {*//*"travelInAir"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;onGround()Z", ordinal = /*? if <1.21.2 {*/2/*?} else {*//*0*//*?}*/))
     public boolean travelFlight(LivingEntity instance) {
         return !isLegacyFlying() && onGround();
     }
@@ -32,20 +32,20 @@ public abstract class LivingEntityMixin extends Entity {
     private boolean isLegacyFlying(){
         return ((LivingEntity)(Object)this instanceof Player p && p.getAbilities().flying && (!level().isClientSide || FactoryAPIClient.hasModOnServer));
     }
-    @Redirect(method = /*? if <1.21.2 {*//*"travel"*//*?} else {*/"travelInAir"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setDeltaMovement(DDD)V", ordinal = /*? if <1.21.2 {*//*3*//*?} else {*/1/*?}*/))
+    @Redirect(method = /*? if <1.21.2 {*/"travel"/*?} else {*//*"travelInAir"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setDeltaMovement(DDD)V", ordinal = /*? if <1.21.2 {*/3/*?} else {*//*1*//*?}*/))
     public void travelFlight(LivingEntity instance, double x, double y, double z) {
         setDeltaMovement((isLegacyFlying() ? 0.6 : 1) * x,(isLegacyFlying() ? 0.546 : 1) * y,(isLegacyFlying() ? 0.6 : 1) * z);
     }
-    @Inject(method =  /*? if <1.21.2 {*//*"hurt"*//*?} else {*/"hurtServer"/*?}*/, at = @At("HEAD"), cancellable = true)
-    public void hurt(/*? if >=1.21.2 {*/ServerLevel level, /*?}*/ DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method =  /*? if <1.21.2 {*/"hurt"/*?} else {*//*"hurtServer"*//*?}*/, at = @At("HEAD"), cancellable = true)
+    public void hurt(/*? if >=1.21.2 {*//*ServerLevel level, *//*?}*/ DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> cir) {
         if (!level().isClientSide && !level().getServer().isPvpAllowed() && damageSource.getDirectEntity() instanceof Player && (this instanceof OwnableEntity o && damageSource.getDirectEntity().equals(o.getOwner()) || ((Object)this) instanceof IronGolem i && i.isPlayerCreated() || ((Object)this) instanceof SnowGolem)){
             cir.setReturnValue(false);
         }
     }
     //? if >=1.21.2 {
-    @Redirect(method = "calculateEntityAnimation", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isAlive()Z"))
+    /*@Redirect(method = "calculateEntityAnimation", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isAlive()Z"))
     public boolean render(LivingEntity instance){
         return true;
     }
-    //?}
+    *///?}
 }

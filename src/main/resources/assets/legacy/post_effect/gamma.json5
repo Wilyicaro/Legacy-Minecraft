@@ -1,6 +1,6 @@
 {
     //? if <1.21.2 {
-    /*"targets": [
+    "targets": [
         "swap"
     ],
     "passes": [
@@ -15,8 +15,8 @@
             "outtarget": "minecraft:main"
         }
     ],
-    *///?} else {
-    "targets": {
+    //?} else {
+    /*"targets": {
         "swap": {}
     },
     "passes": [
@@ -41,5 +41,5 @@
             "output": "minecraft:main"
         }
     ],
-    //?}
+    *///?}
 }

@@ -24,8 +24,8 @@ import net.minecraft.stats.Stats;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionResult;
 //? if >=1.20.5 && <1.21.2 {
-/*import net.minecraft.world.ItemInteractionResult;
-*///?}
+import net.minecraft.world.ItemInteractionResult;
+//?}
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.alchemy.Potion;
@@ -41,10 +41,10 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.util.ItemAccessor;
 *///?}
 //? if <1.21.2 {
-/*import net.minecraft.world.entity.MobSpawnType;
-*///?} else {
-import net.minecraft.world.entity.EntitySpawnReason;
-//?}
+import net.minecraft.world.entity.MobSpawnType;
+//?} else {
+/*import net.minecraft.world.entity.EntitySpawnReason;
+*///?}
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.block.Blocks;
@@ -132,8 +132,8 @@ public class Legacy4J {
             r.register(false,TipCommand.EntityPayload.ID);
             r.register(false,TopMessage.Payload.ID);
             //? if >=1.21.2 {
-            r.register(false, CommonRecipeManager.ClientPayload.ID);
-            //?}
+            /*r.register(false, CommonRecipeManager.ClientPayload.ID);
+            *///?}
         });
         ArmorStandPose.init();
         //? if >=1.20.5 {
@@ -167,15 +167,15 @@ public class Legacy4J {
         return map;
     }
 
-    public static /*? if <1.20.5 || >=1.21.2 {*/ InteractionResult /*?} else {*//*ItemInteractionResult*//*?}*/ defaultPassInteraction() {
-        return /*? if <1.20.5 || >=1.21.2 {*/ InteractionResult.PASS/*?} else {*/ /*ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION*//*?}*/;
+    public static /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult *//*?} else {*/ItemInteractionResult/*?}*/ defaultPassInteraction() {
+        return /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult.PASS*//*?} else {*/ ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION/*?}*/;
     }
 
-    public static /*? if <1.20.5 || >=1.21.2 {*/ InteractionResult /*?} else {*//*ItemInteractionResult*//*?}*/ successInteraction() {
-        return /*? if <1.20.5 || >=1.21.2 {*/ InteractionResult.SUCCESS/*?} else {*/ /*ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION*//*?}*/;
+    public static /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult *//*?} else {*/ItemInteractionResult/*?}*/ successInteraction() {
+        return /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult.SUCCESS*//*?} else {*/ ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION/*?}*/;
     }
-    public static /*? if <1.20.5 || >=1.21.2 {*/ InteractionResult /*?} else {*//*ItemInteractionResult*//*?}*/ consumeInteraction() {
-        return /*? if <1.20.5 || >=1.21.2 {*/ InteractionResult.CONSUME/*?} else {*/ /*ItemInteractionResult.CONSUME*//*?}*/;
+    public static /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult *//*?} else {*/ItemInteractionResult/*?}*/ consumeInteraction() {
+        return /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult.CONSUME*//*?} else {*/ ItemInteractionResult.CONSUME/*?}*/;
     }
 
     public static void setup(){
@@ -311,10 +311,10 @@ public class Legacy4J {
         DefaultDispenseItemBehavior defaultDispenseItemBehavior = new DefaultDispenseItemBehavior() {
             public ItemStack execute(BlockSource blockSource, ItemStack itemStack) {
                 Direction direction = blockSource./*? if >1.20.1 {*/state/*?} else {*//*getBlockState*//*?}*/().getValue(DispenserBlock.FACING);
-                EntityType<?> entityType = ((SpawnEggItem)itemStack.getItem()).getType(/*? if >=1.21.4 {*/blockSource.level().registryAccess(), /*?}*//*? if <1.20.5 {*//*null*//*?} else {*/itemStack/*?}*/);
+                EntityType<?> entityType = ((SpawnEggItem)itemStack.getItem()).getType(/*? if >=1.21.4 {*//*blockSource.level().registryAccess(), *//*?}*//*? if <1.20.5 {*//*null*//*?} else {*/itemStack/*?}*/);
 
                 try {
-                    if (entityType.spawn(blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/(), itemStack, null, blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/().relative(direction), /*? if <1.21.3 {*//*MobSpawnType*//*?} else {*/EntitySpawnReason/*?}*/.DISPENSER, direction != Direction.UP, false) != null){
+                    if (entityType.spawn(blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/(), itemStack, null, blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/().relative(direction), /*? if <1.21.3 {*/MobSpawnType/*?} else {*//*EntitySpawnReason*//*?}*/.DISPENSER, direction != Direction.UP, false) != null){
                         itemStack.shrink(1);
                         blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/().gameEvent(null, GameEvent.ENTITY_PLACE, blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/());
                     }
@@ -495,8 +495,8 @@ public class Legacy4J {
 
     public static void onServerStart(MinecraftServer server){
         //? if >=1.21.2 {
-        CommonRecipeManager.recipesByType = server.getRecipeManager().getRecipes().stream().collect(Collectors.groupingBy(h->h.value().getType(),Collectors.toMap(h->h.id().location(), Function.identity())));
-        //?}
+        /*CommonRecipeManager.recipesByType = server.getRecipeManager().getRecipes().stream().collect(Collectors.groupingBy(h->h.value().getType(),Collectors.toMap(h->h.id().location(), Function.identity())));
+        *///?}
         playerInitialPayloads = createPlayerInitialPayloads(server);
     }
 
@@ -509,8 +509,8 @@ public class Legacy4J {
         HashSet<CommonNetwork.Payload> payloads = new HashSet<>();
         payloads.add(new ClientAdvancementsPayload(/*? if >1.20.1 {*/List.copyOf(server.getAdvancements().getAllAdvancements())/*?} else {*//*server.getAdvancements().getAllAdvancements().stream().collect(Collectors.toMap(Advancement::getId, Advancement::deconstruct))*//*?}*/));
         //? if >=1.21.2 {
-        payloads.add(new CommonRecipeManager.ClientPayload(CommonRecipeManager.recipesByType));
-        //?}
+        /*payloads.add(new CommonRecipeManager.ClientPayload(CommonRecipeManager.recipesByType));
+        *///?}
         return payloads;
     }
 
