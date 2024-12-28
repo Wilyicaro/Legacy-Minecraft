@@ -48,7 +48,6 @@ public abstract class OptionsMixin {
 
     @Inject(method = "loadSelectedResourcePacks",at = @At("HEAD"), cancellable = true)
     private void loadSelectedResourcePacks(PackRepository packRepository, CallbackInfo ci){
-        LegacyOption.loadAll();
         Assort.init();
         packRepository.setSelected(Assort.getDefaultResourceAssort().packs());
         Assort.updateSavedResourcePacks();

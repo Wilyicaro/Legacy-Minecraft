@@ -411,6 +411,7 @@ public class Legacy4JClient {
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES,controlTooltipGuiManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES,leaderBoardListingManager);
         FactoryAPIClient.setup(m->{
+            LegacyOption.loadAll();
             FactoryAPIClient.registerRenderType(RenderType.cutoutMipped(), SHRUB.get());
             FactoryAPIClient.registerRenderType(RenderType.translucent(), Blocks.WATER);
             controllerManager.setup();
