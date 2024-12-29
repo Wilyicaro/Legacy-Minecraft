@@ -4,7 +4,8 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.Minecart;
+import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.Legacy4J;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOption;
 
 import static wily.legacy.Legacy4JClient.keyFlyLeft;
@@ -48,6 +48,8 @@ public abstract class ClientEntityMixin {
 
     @Shadow protected abstract Vec3 collide(Vec3 arg);
 
+    @Shadow public abstract Level level();
+
     @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", at = @At("HEAD"))
     private void startRiding(Entity entity, boolean force, CallbackInfoReturnable<Boolean> cir) {
         this.ridingEntityXRotDelta = 0.0F;
@@ -56,7 +58,7 @@ public abstract class ClientEntityMixin {
     @Inject(method = "rideTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;positionRider(Lnet/minecraft/world/entity/Entity;)V", shift = At.Shift.AFTER))
     private void modifyYawAndPitch(CallbackInfo ci) {
         //? if >=1.21.2 {
-        /*if (getVehicle() instanceof Minecart) return;
+        /*if (getVehicle() instanceof AbstractMinecart && AbstractMinecart.useExperimentalMovement(level())) return;
         *///?}
         if (getVehicle() == null || getVehicle().getControllingPassenger() == (Object) this || LegacyOption.vehicleCameraRotation.get() == LegacyOption.VehicleCameraRotation.NONE || !(getVehicle() instanceof LivingEntity && LegacyOption.vehicleCameraRotation.get().isForLivingEntities() || !(getVehicle() instanceof LivingEntity) && LegacyOption.vehicleCameraRotation.get().isForNonLivingEntities())) return;
 

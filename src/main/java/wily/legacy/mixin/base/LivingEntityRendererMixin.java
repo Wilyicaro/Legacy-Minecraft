@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -23,8 +24,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.FactoryAPIClient;import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.LegacyOption;
-import wily.legacy.client.LegacyResourceManager;
 
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEntity/*? if >=1.21.2 {*//*, LivingEntityRenderState*//*?}*/> {
@@ -59,5 +61,28 @@ public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEnt
             this.itemRenderer.renderStatic(Items.EMERALD.getDefaultInstance(), ItemDisplayContext.GROUND, i, OverlayTexture.NO_OVERLAY, poseStack, multiBufferSource, Minecraft.getInstance().level, 0);
             poseStack.popPose();
         }
+    }
+    //? if <=1.20.6 {
+    /*@Redirect(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/EntityModel;renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIFFFF)V"))
+    public void renderToBufferFireColor(EntityModel instance, PoseStack poseStack, VertexConsumer consumer, int light, int overlay, float r, float g, float b, float a, LivingEntity livingEntity, float f, float partialTick){
+        boolean fireTint = LegacyOption.legacyEntityFireTint.get() && livingEntity.isOnFire() && livingEntity.displayFireAnimation();
+        instance.renderToBuffer(poseStack,consumer,light, overlay, r, fireTint ? g * getGreenFireOverlayDiff(livingEntity.tickCount +partialTick) : g, fireTint ? b/6 : b, a);
+    }
+    *///?} else {
+    @Redirect(method = /*? if <1.21.2 {*/"render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"/*?} else {*//*"render(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/EntityModel;renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V"))
+    public void renderToBufferFireColor(EntityModel instance, PoseStack poseStack, VertexConsumer consumer, int light, int overlay, /*? if <=1.20.6 {*//*float r, float g, float b, float a*//*?} else {*/ int color/*?}*/, /*? if <1.21.2 {*/LivingEntity livingEntity, float f, float g/*?} else {*//*LivingEntityRenderState livingEntityRenderState*//*?}*/){
+        instance.renderToBuffer(poseStack,consumer,light, overlay, LegacyOption.legacyEntityFireTint.get() && /*? if <1.21.2 {*/livingEntity.isOnFire() && livingEntity.displayFireAnimation()/*?} else {*//*livingEntityRenderState.displayFireAnimation*//*?}*/ ? FactoryScreenUtil.colorFromFloat(FactoryScreenUtil.getRed(color),FactoryScreenUtil.getGreen(color) * getGreenFireOverlayDiff(/*? if <1.21.2 {*/livingEntity.tickCount + g/*?} else {*//*livingEntityRenderState.ageInTicks*//*?}*/),FactoryScreenUtil.getBlue(color)/6,FactoryScreenUtil.getAlpha(color)) : color);
+    }
+    //?}
+
+    @Inject(method = "getOverlayCoords", at = @At("HEAD"), cancellable = true)
+    private static void getOverlayCoords(/*? if <1.21.2 {*/LivingEntity livingEntity/*?} else {*//*LivingEntityRenderState livingEntityRenderState*//*?}*/, float f, CallbackInfoReturnable<Integer> cir) {
+        if (LegacyOption.legacyEntityFireTint.get() && /*? if <1.21.2 {*/livingEntity.isOnFire() && livingEntity.displayFireAnimation()/*?} else {*//*livingEntityRenderState.displayFireAnimation*//*?}*/) cir.setReturnValue(OverlayTexture.pack(0, OverlayTexture.v(true)));
+    }
+
+    @Unique
+    private float getGreenFireOverlayDiff(float age){
+        float range = (age / 10f) % 1f;
+        return 0.6f + (range > 0.5f ? 1 - range : range) / 1.5f;
     }
 }

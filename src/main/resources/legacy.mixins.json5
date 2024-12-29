@@ -13,7 +13,7 @@
     "ClientExplosionMixin",
     //?} else {
     /*"GhostSlotsMixin",
-    "OldMinecartBehaviourMixin",
+    "OldMinecartBehaviorMixin",
     "ServerExplosionMixin",
     "MapDecorationRenderStateMixin",
     "AbstractRecipeBookScreenMixin",

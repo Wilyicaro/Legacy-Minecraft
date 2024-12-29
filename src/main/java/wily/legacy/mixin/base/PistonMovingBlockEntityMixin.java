@@ -55,7 +55,7 @@ public class PistonMovingBlockEntityMixin extends BlockEntity implements LegacyP
         if (beTypeId != null) movingBlockEntityType = FactoryAPIPlatform.getRegistryValue(beTypeId,BuiltInRegistries.BLOCK_ENTITY_TYPE);
         if (!newMovedBeTag.isEmpty()) {
             movedBeTag = newMovedBeTag;
-            if (level.isClientSide() && movingBlockEntityType != null) createRenderingBlockEntity(getLevel());
+            if (hasLevel() && getLevel().isClientSide() && movingBlockEntityType != null) createRenderingBlockEntity(getLevel());
         }
     }
     @Inject(method = "saveAdditional", at = @At("RETURN"))

@@ -120,6 +120,7 @@ public class LegacyComponents {
     public static final Component DISABLE_AUTO_SAVE_MESSAGE = Component.translatable("legacy.menu.disable_autosave_message");
     public static final Component SERVER_OPTIONS = Component.translatable("legacy.menu.server_options");
     public static final Component SERVER_OPTIONS_MESSAGE = Component.translatable("legacy.menu.server_options_message");
+    public static final Component MISSING_WORLD_TEMPLATE = Component.translatable("legacy.menu.missing_world_template");
     public static final Component GAME_OPTIONS = Component.translatable("legacy.menu.game_options");
     public static final Component WORLD_OPTIONS = Component.translatable("createWorld.tab.world.title");
     public static final Component INGREDIENTS = Component.translatable("legacy.container.ingredients");
@@ -138,4 +139,5 @@ public class LegacyComponents {
     public static final Component PREVIEW = Component.translatable("legacy.container.preview");
     public static final Component DECORATIONS = Component.translatable("legacy.createWorld.customize.superFlat.decorations");
     public static final Component LAVA_LAKES = Component.translatable("legacy.createWorld.customize.superFlat.lavaLakes");
+    public static final Component RESPAWNING = Component.translatable("legacy.menu.respawning");
 }

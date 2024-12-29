@@ -200,7 +200,7 @@ public  class ControllerManager {
                         else if (state.canReleaseKeyMapping(value)) value.setDown(false);
                         if (state.pressed) {
                             if (value == minecraft.options.keyTogglePerspective || value == minecraft.options.keyUse) state.block();
-                            else if (value == minecraft.options.keyAttack) state.onceClick(-state.getDefaultDelay() * (minecraft.player.getAbilities().invulnerable ? 3 : 5));
+                            else if (value == minecraft.options.keyAttack) state.onceClick(-state.getDefaultDelay() * (minecraft.player.getAbilities().invulnerable ? 3 : 4));
                         }
                     }
                 }

@@ -2,7 +2,6 @@
 /*package wily.legacy.mixin.base;
 
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.MinecartBehavior;
 import net.minecraft.world.entity.vehicle.OldMinecartBehavior;
@@ -17,8 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4J;
 
 @Mixin(OldMinecartBehavior.class)
-public abstract class OldMinecartBehaviourMixin extends MinecartBehavior {
-    protected OldMinecartBehaviourMixin(AbstractMinecart arg) {
+public abstract class OldMinecartBehaviorMixin extends MinecartBehavior {
+    protected OldMinecartBehaviorMixin(AbstractMinecart arg) {
         super(arg);
     }
 

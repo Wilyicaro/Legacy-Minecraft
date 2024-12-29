@@ -165,6 +165,7 @@ public interface LegacyOption<T> {
     OptionInstance<Boolean> legacyOverstackedItems = register(create("legacyOverstackedItems", s-> OptionInstance.createBoolean(s, true)));
     OptionInstance<Boolean> displayMultipleControlsFromAction = register(create("displayMultipleControlsFromAction", s-> OptionInstance.createBoolean(s, false)));
     OptionInstance<Boolean> enhancedPistonMovingRenderer = register(create("enhancedPistonMovingRenderer", s-> OptionInstance.createBoolean(s, true)));
+    OptionInstance<Boolean> legacyEntityFireTint = register(create("legacyEntityFireTint", s-> OptionInstance.createBoolean(s, true)));
 
     enum VehicleCameraRotation implements StringRepresentable {
         NONE("none", LegacyKeyBindsScreen.NONE),ALL_ENTITIES("all_entities"),ONLY_NON_LIVING_ENTITIES("only_non_living_entities"),ONLY_LIVING_ENTITIES("only_living_entities");

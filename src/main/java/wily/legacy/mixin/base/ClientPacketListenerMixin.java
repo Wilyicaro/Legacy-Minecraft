@@ -25,6 +25,7 @@ import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.client.screen.LeaderboardsScreen;
 import wily.legacy.client.screen.LegacyLoadingScreen;
 import wily.legacy.inventory.LegacyMerchantMenu;
+import wily.legacy.util.LegacyComponents;
 
 @Mixin(ClientPacketListener.class)
 public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends ClientCommonPacketListenerImpl/*?}*/ {
@@ -34,11 +35,10 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
     @Inject(method = "handleRespawn", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;cameraEntity:Lnet/minecraft/world/entity/Entity;", shift = At.Shift.AFTER))
     public void handleRespawn(ClientboundRespawnPacket clientboundRespawnPacket, CallbackInfo ci) {
         if (clientboundRespawnPacket.shouldKeep(ClientboundRespawnPacket.KEEP_ALL_DATA)) return;
-        Component respawn = Component.translatable("menu.respawning");
         minecraft.setScreen(new ReceivingLevelScreen(){
             @Override
             public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-                Legacy4JClient.legacyLoadingScreen.prepareRender(minecraft,guiGraphics.guiWidth(),guiGraphics.guiHeight(),respawn,null,0,true);
+                Legacy4JClient.legacyLoadingScreen.prepareRender(minecraft,guiGraphics.guiWidth(),guiGraphics.guiHeight(),LegacyComponents.RESPAWNING,null,0,true);
                 Legacy4JClient.legacyLoadingScreen.render(guiGraphics, i, j, f);
             }
         });
@@ -53,7 +53,7 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
     public void handleRespawn(ClientboundRespawnPacket clientboundRespawnPacket, CallbackInfo ci) {
         if (!clientboundRespawnPacket.shouldKeep(ClientboundRespawnPacket.KEEP_ALL_DATA)){
             long createdTime = Util.getMillis();
-            LegacyLoadingScreen respawningScreen = new LegacyLoadingScreen(Component.translatable("menu.respawning"),Component.empty()){
+            LegacyLoadingScreen respawningScreen = new LegacyLoadingScreen(LegacyComponents.RESPAWNING,Component.empty()){
                 @Override
                 public void tick() {
                     if (levelLoadStatusManager.levelReady() || Util.getMillis() - createdTime >= 30000) minecraft.setScreen(null);
