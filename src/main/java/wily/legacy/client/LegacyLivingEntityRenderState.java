@@ -5,9 +5,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemUseAnimation;
 import wily.factoryapi.base.client.FactoryRenderStateExtension;
 
-public class LegacyHumanoidRenderState implements FactoryRenderStateExtension<LivingEntity> {
+public class LegacyLivingEntityRenderState implements FactoryRenderStateExtension<LivingEntity> {
     public int itemUseDuration;
     public ItemUseAnimation useAnim;
+    public boolean fireImmune;
 
     @Override
     public Class<LivingEntity> getEntityClass() {
@@ -18,6 +19,7 @@ public class LegacyHumanoidRenderState implements FactoryRenderStateExtension<Li
     public void extractToRenderState(LivingEntity entity, float partialTicks) {
         itemUseDuration = entity.getUseItem().getUseDuration(entity);
         useAnim = entity.getUseItem().getUseAnimation();
+        fireImmune = entity.fireImmune();
     }
 }
 *///?}

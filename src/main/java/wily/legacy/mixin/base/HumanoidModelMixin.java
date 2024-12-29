@@ -16,7 +16,7 @@ import net.minecraft.world.item.UseAnim;
 /*import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import wily.factoryapi.base.client.FactoryRenderStateExtension;
-import wily.legacy.client.LegacyHumanoidRenderState;
+import wily.legacy.client.LegacyLivingEntityRenderState;
 *///?}
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
@@ -41,17 +41,17 @@ public abstract class HumanoidModelMixin {
     private void setupAnim(/*? if <1.21.2 {*/ LivingEntity livingEntity, float f, float g, float h, float i, float j/*?} else {*/ /*HumanoidRenderState humanoidRenderState*//*?}*/, CallbackInfo info){
         HumanoidArm mainArm = /*? if <1.21.2 {*/livingEntity.getMainArm()/*?} else {*/ /*humanoidRenderState.mainArm*//*?}*/;
         float ageInTicks = /*? if <1.21.2 {*/h/*?} else {*//*humanoidRenderState.ageInTicks*//*?}*/;
-        if (!/*? if <1.21.2 {*/livingEntity.hasItemInSlot(EquipmentSlot.MAINHAND)/*?} else {*/ /*humanoidRenderState.getMainHandItem().isEmpty()*//*?}*/ && /*? if <1.21.2 {*/livingEntity.isShiftKeyDown()/*?} else {*//*humanoidRenderState.isDiscrete*//*?}*/ && /*? if <1.21.2 {*/livingEntity.isFallFlying()/*?} else {*//*humanoidRenderState.isFallFlying*//*?}*/) {
+        if (/*? if <1.21.2 {*/!livingEntity.hasItemInSlot(EquipmentSlot.MAINHAND)/*?} else {*/ /*humanoidRenderState.getMainHandItem().isEmpty()*//*?}*/ && /*? if <1.21.2 {*/livingEntity.isShiftKeyDown()/*?} else {*//*humanoidRenderState.isDiscrete*//*?}*/ && /*? if <1.21.2 {*/livingEntity.isFallFlying()/*?} else {*//*humanoidRenderState.isFallFlying*//*?}*/) {
             (mainArm == HumanoidArm.RIGHT ? this.rightArm : leftArm).xRot = (float) (Math.PI) + (mainArm == HumanoidArm.RIGHT ? 1.0f : -1.0f) * Mth.sin(ageInTicks * 0.067F) * 0.05F;
         }
         HumanoidArm useArm = /*? if <1.21.2 {*/livingEntity.getUsedItemHand()/*?} else {*/ /*humanoidRenderState.useItemHand*//*?}*/ == InteractionHand.MAIN_HAND ? mainArm : mainArm.getOpposite();
         //? if <1.21.2
         ItemStack useItem = livingEntity.getUseItem();
-        var useAnim = /*? if <1.21.2 {*/useItem.getUseAnimation()/*?} else {*/ /*FactoryRenderStateExtension.Accessor.of(humanoidRenderState).getExtension(LegacyHumanoidRenderState.class).useAnim*//*?}*/;
+        var useAnim = /*? if <1.21.2 {*/useItem.getUseAnimation()/*?} else {*/ /*FactoryRenderStateExtension.Accessor.of(humanoidRenderState).getExtension(LegacyLivingEntityRenderState.class).useAnim*//*?}*/;
         if(/*? if <1.21.2 {*/livingEntity.getUseItemRemainingTicks() > 0/*?} else {*//*humanoidRenderState.isUsingItem*//*?}*/ &&  (useAnim == /*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/.EAT || useAnim == /*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/.DRINK)){
             boolean isRightHand = useArm == HumanoidArm.RIGHT;
             ModelPart armModel = isRightHand ? rightArm : leftArm;
-            float r = Math.min((/*? if <1.21.2 {*/livingEntity.getTicksUsingItem()/*?} else {*//*humanoidRenderState.ticksUsingItem*//*?}*/ + FactoryAPIClient.getGamePartialTick(/*? if <=1.20.2 {*//*false*//*?} else if <1.21.2 {*/Minecraft.getInstance().level.tickRateManager().isEntityFrozen(livingEntity)/*?} else {*/ /*humanoidRenderState.isFullyFrozen*//*?}*/)) / /*? if <1.21.2 {*/useItem.getUseDuration(/*? if >=1.20.5 {*/livingEntity/*?}*/)/*?} else {*//*FactoryRenderStateExtension.Accessor.of(humanoidRenderState).getExtension(LegacyHumanoidRenderState.class).itemUseDuration*//*?}*/ * 6,1);
+            float r = Math.min((/*? if <1.21.2 {*/livingEntity.getTicksUsingItem()/*?} else {*//*humanoidRenderState.ticksUsingItem*//*?}*/ + FactoryAPIClient.getGamePartialTick(/*? if <=1.20.2 {*//*false*//*?} else if <1.21.2 {*/Minecraft.getInstance().level.tickRateManager().isEntityFrozen(livingEntity)/*?} else {*/ /*humanoidRenderState.isFullyFrozen*//*?}*/)) / /*? if <1.21.2 {*/useItem.getUseDuration(/*? if >=1.20.5 {*/livingEntity/*?}*/)/*?} else {*//*FactoryRenderStateExtension.Accessor.of(humanoidRenderState).getExtension(LegacyLivingEntityRenderState.class).itemUseDuration*//*?}*/ * 6,1);
             armModel.xRot =  r * -1.4f + (r > 0.8f ? (Mth.cos(ageInTicks * 1.7f) * 0.08f) : 0);
             armModel.yRot = (isRightHand ? -0.45f : 0.45f) * r;
         }

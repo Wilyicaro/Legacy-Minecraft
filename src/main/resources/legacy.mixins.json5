@@ -190,7 +190,8 @@
     "WoodlandMansionPiecesSecondFloor",
     "FireworkStarRecipeAccessor",
     "FireworkRocketRecipeAccessor",
-    "PlayerTabOverlayMixin"
+    "PlayerTabOverlayMixin",
+    "ThrownTridentMixin"
   ],
   "injectors": {
     "defaultRequire": 1

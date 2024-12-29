@@ -162,7 +162,7 @@ public interface ControlTooltip {
         return /*? if <1.21.2 {*/stack.getItem() instanceof BundleItem/*?} else {*//*stack.is(ItemTags.BUNDLES)*//*?}*/;
     }
     static boolean isBundleAndAcceptItem(ItemStack stack, ItemStack itemToAccept){
-        return isBundle(stack) && BundleItem.getFullnessDisplay(stack) < 1 && !itemToAccept.isEmpty() && itemToAccept.getItem().canFitInsideContainerItems();
+        return isBundle(stack) && BundleItem.getFullnessDisplay(stack) <= (1-(float) itemToAccept.getCount()/itemToAccept.getMaxStackSize()) && !itemToAccept.isEmpty() && itemToAccept.getItem().canFitInsideContainerItems();
     }
 
     static ControlTooltip create(Supplier<Icon> icon, Supplier<Component> action) {

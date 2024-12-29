@@ -1,5 +1,6 @@
 package wily.legacy.client.screen;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -209,6 +210,12 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         if (!isLocked) guiGraphics.drawString(font,Component.translatable("commands.seed.success",LegacyClientWorldSettings.of(summary.getSettings()).getDisplaySeed()),panel.x + 13, panel.y + 49, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
     }
 
+    @Override
+    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        super.render(guiGraphics, i, j, f);
+        if (ScreenUtil.isMouseOver(i,j,panel.x + 14.5, panel.y + 10,29,29)) guiGraphics.renderTooltip(font,Component.translatable("selectWorld.targetFolder", Component.literal(summary.getLevelId()).withStyle(ChatFormatting.ITALIC)),i,j);
+    }
+
     public static void loadWorld(Screen screen, Minecraft minecraft, LevelStorageSource source, String levelId) {
         try (LevelStorageSource.LevelStorageAccess access = source.createAccess(levelId)){
             loadWorld(screen,minecraft,source,access.getSummary(/*? if >1.20.2 {*/access.getDataTag()/*?}*/));
@@ -216,6 +223,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
             throw new RuntimeException(e);
         }
     }
+
     public static void loadWorld(Screen screen, Minecraft minecraft, LevelStorageSource source, LevelSummary summary) {
         SaveRenderableList.resetIconCache();
         Assort.Selector.applyResourceChanges(minecraft,Assort.getSelectedIds(minecraft.getResourcePackRepository()),LegacyClientWorldSettings.of(summary.getSettings()).getSelectedResourceAssort().packs(),()->new WorldOpenFlows(minecraft,source)./*? if <1.20.3 {*//*loadLevel*//*?} else if <1.20.5 {*//*checkForBackupAndLoad*//*?} else {*/openWorld/*?}*/(/*? if <1.20.3 {*//*screen, *//*?}*/summary.getLevelId()/*? if >1.20.2 {*/, ()-> minecraft.setScreen(screen)/*?}*/));

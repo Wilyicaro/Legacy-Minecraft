@@ -463,6 +463,6 @@ public class ScreenUtil {
     }
 
     public static List<Component> getTooltip(ItemStack stack){
-        return stack.getTooltipLines(/*? if >1.20.5 {*/Item.TooltipContext.of(mc.level),/*?}*/ mc.player, TooltipFlag.NORMAL);
+        return stack.getTooltipLines(/*? if >1.20.5 {*/Item.TooltipContext.of(mc.level),/*?}*/ mc.player, LegacyOption.advancedHeldItemTooltip.get() ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL);
     }
 }

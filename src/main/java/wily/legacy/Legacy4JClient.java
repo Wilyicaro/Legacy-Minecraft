@@ -314,11 +314,13 @@ public class Legacy4JClient {
         if (minecraft.screen instanceof ReplaceableScreen r && r.canReplace()) minecraft.setScreen(r.getReplacement());
 
         if (minecraft.player != null){
-            if (!lastArmorSlots.isEmpty() && !lastArmorSlots.equals(minecraft.player.getInventory().armor)){
+            if (!lastArmorSlots.equals(minecraft.player.getInventory().armor)){
+                if (!lastArmorSlots.isEmpty()){
+                    ScreenUtil.animatedCharacterTime = Util.getMillis();
+                    ScreenUtil.remainingAnimatedCharacterTime = 1500;
+                }
                 lastArmorSlots.clear();
                 lastArmorSlots.addAll(minecraft.player.getInventory().armor);
-                ScreenUtil.animatedCharacterTime = Util.getMillis();
-                ScreenUtil.remainingAnimatedCharacterTime = 1500;
             }
         }
         if (LegacyOption.unfocusedInputs.get()) minecraft.setWindowActive(true);
@@ -483,7 +485,7 @@ public class Legacy4JClient {
         //? if >=1.21.2 {
         /*FactoryRenderStateExtension.types.add(new FactoryRenderStateExtension.Type<>(ThrownTridentRenderState.class,LoyaltyLinesRenderState::new));
         FactoryRenderStateExtension.types.add(new FactoryRenderStateExtension.Type<>(FireworkRocketRenderState.class,LegacyFireworkRenderState::new));
-        FactoryRenderStateExtension.types.add(new FactoryRenderStateExtension.Type<>(HumanoidRenderState.class,LegacyHumanoidRenderState::new));
+        FactoryRenderStateExtension.types.add(new FactoryRenderStateExtension.Type<>(LivingEntityRenderState.class,LegacyLivingEntityRenderState::new));
         FactoryRenderStateExtension.types.add(new FactoryRenderStateExtension.Type<>(VillagerRenderState.class,LegacyVillagerRenderState::new));
         *///?}
 
