@@ -37,18 +37,22 @@ public class LegacyMerchantMenu extends LegacyCraftingMenu {
         return Arrays.stream(s).map(i-> i.isEmpty() ? Optional.<Ingredient>empty() : Optional.of((Ingredient) StackIngredient.of(true,i))).toList();
     }
 
+
+    @Override
+    public boolean canCraft(List<Optional<Ingredient>> ingredients, Player player, ServerMenuCraftPayload packet) {
+        return packet.button() >= 0 && packet.button() < merchant.getOffers().size() && !merchant.getOffers().isEmpty() && !merchant.getOffers().get(packet.button()).isOutOfStock() && super.canCraft(ingredients, player, packet) ;
+    }
+
     @Override
     public void onCraft(Player player, ServerMenuCraftPayload packet, ItemStack result) {
         super.onCraft(player, packet, result);
-        if (player instanceof ServerPlayer && packet.button() >= 0 && packet.button() < merchant.getOffers().size() && !merchant.getOffers().isEmpty()){
-            MerchantOffer offer = merchant.getOffers().get(packet.button());
-            offer.getResult().onCraftedBy(player.level(),player,offer.getResult().getCount());
-            if (merchant instanceof LivingEntity e) e.playSound(merchant.getNotifyTradeSound(), 1.0f, e.getVoicePitch());
-            merchant.notifyTrade(offer);
-            player.awardStat(Stats.TRADED_WITH_VILLAGER);
-            merchant.overrideXp(merchant.getVillagerXp() + offer.getXp());
-            player.sendMerchantOffers(containerId, merchant.getOffers(), merchant instanceof Villager v ? v.getVillagerData().getLevel() : 0, merchant.getVillagerXp(), merchant.showProgressBar(), merchant.canRestock());
-        }
+        MerchantOffer offer = merchant.getOffers().get(packet.button());
+        offer.getResult().onCraftedBy(player.level(),player,offer.getResult().getCount());
+        if (merchant instanceof LivingEntity e) e.playSound(merchant.getNotifyTradeSound(), 1.0f, e.getVoicePitch());
+        merchant.notifyTrade(offer);
+        player.awardStat(Stats.TRADED_WITH_VILLAGER);
+        merchant.overrideXp(merchant.getVillagerXp() + offer.getXp());
+        player.sendMerchantOffers(containerId, merchant.getOffers(), merchant instanceof Villager v ? v.getVillagerData().getLevel() : 0, merchant.getVillagerXp(), merchant.showProgressBar(), merchant.canRestock());
     }
 
     @Override

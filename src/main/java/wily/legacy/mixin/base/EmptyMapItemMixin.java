@@ -24,12 +24,8 @@ public class EmptyMapItemMixin {
     /*@Redirect(method = "use", at = @At(value = "INVOKE",target = "Lnet/minecraft/world/item/MapItem;create(Lnet/minecraft/world/level/Level;IIBZZ)Lnet/minecraft/world/item/ItemStack;"))
     public ItemStack use(Level level, int arg, int i, byte j, boolean b, boolean bl, Level level1, Player player, InteractionHand interactionHand) {
         ItemStack map = player.getItemInHand(interactionHand);
-        ItemStack filledMap = MapItem.create(level, arg, i, (byte) level.getGameRules().getInt(LegacyGameRules.DEFAULT_MAP_SIZE), b, bl);
-        if (map.getOrCreateTag().getInt(MapItem.MAP_SCALE_TAG) != 0){
-            filledMap.getOrCreateTag().putInt(MapItem.MAP_SCALE_TAG,map.getOrCreateTag().getInt(MapItem.MAP_SCALE_TAG));
-            filledMap.onCraftedBy(level,player,1);
-        }
-        return filledMap;
+        byte newScale = map.getOrCreateTag().getByte(MapItem.MAP_SCALE_TAG);
+        return MapItem.create(level, arg, i, newScale > 0 ? newScale : (byte) level.getGameRules().getInt(LegacyGameRules.DEFAULT_MAP_SIZE), b, bl);
     }
     *///?} else {
     @Redirect(method = "use", at = @At(value = "INVOKE",target = "Lnet/minecraft/world/item/ItemStack;consume(ILnet/minecraft/world/entity/LivingEntity;)V"))

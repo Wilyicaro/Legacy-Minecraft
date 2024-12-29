@@ -132,7 +132,8 @@
     "DisconnectedScreenMixin",
     "BufferSourceAccessor",
     "BackupConfirmScreenMixin",
-    "PaintingRendererMixin"
+    "PaintingRendererMixin",
+    "PistonHeadRendererMixin"
   ],
   "mixins": [
     //? if <1.20.5 {

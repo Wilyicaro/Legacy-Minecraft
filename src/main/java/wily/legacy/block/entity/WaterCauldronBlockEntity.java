@@ -45,7 +45,7 @@ public class WaterCauldronBlockEntity extends BlockEntity {
     }
 
     public boolean hasWater(){
-        return potion./*? if <1.20.5 {*//*value().*//*?}*/equals(Potions.WATER);
+        return potion.value().equals(Potions.WATER/*? if >=1.20.5 {*/.value()/*?}*/);
     }
 
     public Packet<ClientGamePacketListener> getUpdatePacket() {
@@ -57,7 +57,7 @@ public class WaterCauldronBlockEntity extends BlockEntity {
         super./*? if <1.20.5 {*//*load*//*?} else {*/loadAdditional/*?}*/(compoundTag/*? if >=1.20.5 {*/, provider/*?}*/);
         if (compoundTag.contains("dyeColor")) waterColor = compoundTag.getInt("dyeColor");
        BuiltInRegistries.POTION./*? if <1.21.2 {*/getHolder/*?} else {*//*get*//*?}*/(ResourceKey.create(Registries.POTION, ResourceLocation.tryParse(compoundTag.getString("potion")))).ifPresent(p-> potion = p);
-       BuiltInRegistries.ITEM./*? if <1.21.2 {*/getHolder/*?} else {*//*get*//*?}*/(ResourceKey.create(Registries.ITEM, ResourceLocation.tryParse(compoundTag.getString("lastItemUsed")))).ifPresent(p-> lastPotionItemUsed = p);
+       BuiltInRegistries.ITEM./*? if <1.21.2 {*/getHolder/*?} else {*//*get*//*?}*/(ResourceKey.create(Registries.ITEM, ResourceLocation.tryParse(compoundTag.getString("lastPotionItemUsed")))).ifPresent(p-> lastPotionItemUsed = p);
     }
 
     @Override
@@ -65,6 +65,6 @@ public class WaterCauldronBlockEntity extends BlockEntity {
         super.saveAdditional(compoundTag/*? if >=1.20.5 {*/, provider/*?}*/);
         if (waterColor != null) compoundTag.putInt("dyeColor",waterColor);
         potion.unwrapKey().ifPresent(r-> compoundTag.putString("potion",r.location().toString()));
-        lastPotionItemUsed.unwrapKey().ifPresent(r-> compoundTag.putString("lastPotionUsed",r.location().toString()));
+        lastPotionItemUsed.unwrapKey().ifPresent(r-> compoundTag.putString("lastPotionItemUsed",r.location().toString()));
     }
 }

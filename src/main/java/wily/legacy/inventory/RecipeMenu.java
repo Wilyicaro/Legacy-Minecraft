@@ -43,6 +43,11 @@ public interface RecipeMenu {
         }
         return canCraft;
     }
+
+    default boolean canCraft(List<Optional<Ingredient>> ingredients, Player player, ServerMenuCraftPayload packet){
+        return canCraft(ingredients,player.getInventory(),player.containerMenu.getCarried());
+    }
+
     default List<ItemStack> getRemainingItems(Player player, ServerMenuCraftPayload packet){
         return Collections.emptyList();
     }
@@ -51,7 +56,7 @@ public interface RecipeMenu {
         int tries = 0;
         List<Optional<Ingredient>> ingredients;
         if ((ingredients = getIngredients(player,packet)).isEmpty()) return;
-        while (canCraft(ingredients,player.getInventory(),player.containerMenu.getCarried()) && ((packet.max() && tries <= 64 * 36) || tries == 0)) {
+        while (canCraft(ingredients,player,packet) && ((packet.max() && tries <= 64 * 36) || tries == 0)) {
             tries++;
             setupActualItems(player,packet,null,-1);
             for (int index = 0; index < ingredients.size(); index++) {

@@ -24,6 +24,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.Stocker;
 //? if >=1.21.2 {
@@ -107,6 +108,7 @@ import wily.legacy.client.screen.compat.SodiumCompat;
 //?}
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.init.LegacyUIElementTypes;
+import wily.legacy.inventory.LegacyPistonMovingBlockEntity;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.network.ServerOpenClientMenuPayload;
 import wily.legacy.entity.LegacyPlayerInfo;
@@ -426,7 +428,11 @@ public class Legacy4JClient {
             registry.accept((blockState, blockAndTintGetter, blockPos, i) -> blockAndTintGetter == null || blockPos == null ? GrassColor.getDefaultColor() : BiomeColors.getAverageGrassColor(blockAndTintGetter, blockPos),SHRUB.get());
             registry.accept((blockState, blockAndTintGetter, blockPos, i) -> {
                 if (blockAndTintGetter != null && blockPos != null){
-                    if (blockAndTintGetter.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be){
+                    BlockEntity blockEntity = blockAndTintGetter.getBlockEntity(blockPos);
+                    if (blockEntity instanceof LegacyPistonMovingBlockEntity e && e.getRenderingBlockEntity() != null && LegacyOption.enhancedPistonMovingRenderer.get()) {
+                        blockEntity = e.getRenderingBlockEntity();
+                    }
+                    if (blockEntity instanceof WaterCauldronBlockEntity be){
                         if (!be.hasWater()) return /*? if <1.20.5 {*//*PotionUtils.getColor*//*?} else if <1.21.4 {*/PotionContents.getColor/*?} else {*//*PotionContents.getColorOptional*//*?}*/(be.potion.value().getEffects())/*? if >=1.21.4 {*//*.orElse(-13083194)*//*?}*/;
                         else if (be.waterColor != null) return be.waterColor;
                     }

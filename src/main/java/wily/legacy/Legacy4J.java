@@ -172,7 +172,7 @@ public class Legacy4J {
     }
 
     public static /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult *//*?} else {*/ItemInteractionResult/*?}*/ successInteraction() {
-        return /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult.SUCCESS*//*?} else {*/ ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION/*?}*/;
+        return /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult.SUCCESS*//*?} else {*/ ItemInteractionResult.SUCCESS/*?}*/;
     }
     public static /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult *//*?} else {*/ItemInteractionResult/*?}*/ consumeInteraction() {
         return /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult.CONSUME*//*?} else {*/ ItemInteractionResult.CONSUME/*?}*/;

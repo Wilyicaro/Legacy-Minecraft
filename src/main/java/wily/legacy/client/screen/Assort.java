@@ -365,7 +365,7 @@ public record Assort(String id, int version, Component displayName, Component de
                             }).build());
                             AbstractButton removeButton;
                             renderableVList.addRenderable(removeButton= Button.builder(REMOVE_ASSORT,b-> {
-                                assorts.remove(getSelectedAssort());
+                                assorts.remove(getSelectedAssort().id());
                                 save();
                                 updateSavedAssort();
                                 setSelectedIndex(0);

@@ -115,7 +115,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
 
             @Override
             public @Nullable Component getAction(Context context) {
-                return context.actionOfContext(KeyContext.class, c-> c.key() == InputConstants.KEY_RETURN && !displaySlotsWarning[2] && isValidIndex() && isFocused() ? LegacyComponents.TRADE : null);
+                return context.actionOfContext(KeyContext.class, c-> c.key() == InputConstants.KEY_RETURN && !displaySlotsWarning[2] && isValidIndex() && isFocused() && ((LegacyMerchantOffer)menu.merchant.getOffers().get(getIndex())).getRequiredLevel() <= menu.merchantLevel && !menu.merchant.getOffers().get(getIndex()).isOutOfStock() ? LegacyComponents.TRADE : null);
             }
 
             @Override
@@ -123,7 +123,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
                 itemIcon = isValidIndex() ? menu.merchant.getOffers().get(getIndex()).getResult() : ItemStack.EMPTY;
                 super.render(graphics, i, j, f);
                 graphics.pose().pushPose();
-                graphics.pose().translate(0,0,232);
+                graphics.pose().translate(0,0,432);
                 if (isValidIndex() && ((LegacyMerchantOffer)menu.merchant.getOffers().get(getIndex())).getRequiredLevel() > menu.merchantLevel) {
                     renderIcon(LegacySprites.PADLOCK, graphics, false, 16, 16);
                 } else if (isValidIndex() && menu.merchant.getOffers().get(getIndex()).isOutOfStock()) {
