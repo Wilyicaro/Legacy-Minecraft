@@ -53,7 +53,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
                     this.minecraft.options.save();
                     onClose();
                 }).bounds(panel.x + (panel.width - 200) / 2, panel.y + panel.height - 52,200,20).build());
-                renderableVList.addRenderable(okButton = Button.builder(Component.translatable("gui.ok"),b-> {if (okAction.test(b)) onClose();}).bounds(panel.x + (panel.width - 200) / 2, panel.y + panel.height - 30,200,20).build());
+                renderableVList.addRenderable(okButton = Button.builder(Component.translatable("gui.ok"),b-> okAction.accept(this)).bounds(panel.x + (panel.width - 200) / 2, panel.y + panel.height - 30,200,20).build());
             }
         });
     });
@@ -201,7 +201,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         }
         if (i == InputConstants.KEY_X && tabList.selectedTab == 2){
             EditBox serverBox = new EditBox(Minecraft.getInstance().font, 0,0,200,20,DIRECT_CONNECTION);
-            minecraft.setScreen(new ConfirmationScreen(this, serverBox.getMessage(),Component.translatable("addServer.enterIp"), b1->  ConnectScreen.startConnecting(this, minecraft, ServerAddress.parseString(serverBox.getValue()), new ServerData("","",/*? if >1.20.2 {*/ ServerData.Type.OTHER/*?} else {*//*false*//*?}*/), false/*? if >=1.20.5 {*/,null/*?}*/)){
+            minecraft.setScreen(new ConfirmationScreen(this, 230, 120, serverBox.getMessage(),Component.translatable("addServer.enterIp"), b1->  ConnectScreen.startConnecting(this, minecraft, ServerAddress.parseString(serverBox.getValue()), new ServerData("","",/*? if >1.20.2 {*/ ServerData.Type.OTHER/*?} else {*//*false*//*?}*/), false/*? if >=1.20.5 {*/,null/*?}*/)){
                 boolean released = false;
                 @Override
                 protected void addButtons() {

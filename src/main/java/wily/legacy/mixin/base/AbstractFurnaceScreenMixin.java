@@ -136,8 +136,8 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
         guiGraphics.pose().translate(leftPos + 75.5,topPos + 46.5,0);
         guiGraphics.pose().scale(19/39f,19/39f,1.0f);
         if (menu.isLit()) {
-            int n = Mth.ceil(menu.getLitProgress() * 39.0f) + 1;
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.LIT_PROGRESS, 42, 42, 0, 42 - n, 0, 42 - n,0, 42, n);
+            int n = Mth.ceil(/*? if >1.20.1 {*/menu.getLitProgress()/*?} else {*//*Mth.clamp(menu.getLitProgress()/ 13f,0,1)*//*?}*/ * 39.0f) + 1;
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.LIT_PROGRESS, 42, 42, 0, 42 - n, 0, 42 - n, 42, n);
         }
         guiGraphics.pose().popPose();
         guiGraphics.pose().pushPose();
@@ -148,7 +148,7 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 114,topPos + 46.5,0);
         guiGraphics.pose().scale(0.5f,0.5f,1.0f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.FULL_ARROW,66,48,0,0,0,0,2, (int) Math.ceil(menu.getBurnProgress() * 66), 48);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.FULL_ARROW,66,48,0,0,0,2,  (int) Math.ceil(/*? if >1.20.1 {*/menu.getBurnProgress()/*?} else {*//*Mth.clamp(menu.getBurnProgress() / 24f ,0,1)*//*?}*/ * 66), 48);
         guiGraphics.pose().popPose();
         //? <1.21.2 {
         if (!recipeBookComponent.isVisible() && recipeButton != null && !recipeButton.isHovered()) recipeButton.setFocused(false);

@@ -204,7 +204,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
             }
             int allHeight = getAllLayersHeight();
             int layerIndex = displayLayers.renderables.indexOf(this);
-            minecraft.setScreen(new ConfirmationScreen(LegacyFlatWorldScreen.this,LegacyComponents.LAYER_OPTIONS, LegacyComponents.LAYER_MESSAGE,b->{}){
+            minecraft.setScreen(new ConfirmationScreen(LegacyFlatWorldScreen.this,230,120,LegacyComponents.LAYER_OPTIONS, LegacyComponents.LAYER_MESSAGE,b->{}){
                 @Override
                 protected void addButtons() {
                     renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.create_flat_world.edit_layer"), b-> {

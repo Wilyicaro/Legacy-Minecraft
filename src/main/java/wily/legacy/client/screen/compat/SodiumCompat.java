@@ -40,9 +40,9 @@ import java.util.function.Function;
 
 public class SodiumCompat {
 
-    public static final List<Function<Screen, AbstractButton>> optionsButtons = new ArrayList<>();
+    public static final List<Function<Screen, AbstractButton>> OPTIONS_BUTTONS = new ArrayList<>();
     public static OptionsScreen.Section add(OptionsScreen.Section section){
-        optionsButtons.add(s->RenderableVListScreen.openScreenButton(section.title(),()->section.build(s)).build());
+        OPTIONS_BUTTONS.add(s->RenderableVListScreen.openScreenButton(section.title(),()->section.build(s)).build());
         return section;
     }
 
@@ -51,7 +51,7 @@ public class SodiumCompat {
     public static final OptionsScreen.Section PERFORMANCE = add(new OptionsScreen.Section(SodiumGameOptionPages.performance().getName(), s-> Panel.centered(s, 250,142), new ArrayList<>(List.of(o->SodiumGameOptionPages.performance().getOptions().forEach(opt->addSodiumOptionWidgetIfPossible(o,opt))))));
     public static final OptionsScreen.Section ADVANCED = add(new OptionsScreen.Section(SodiumGameOptionPages.advanced().getName(), s-> Panel.centered(s, 250,52), new ArrayList<>(List.of(o->SodiumGameOptionPages.advanced().getOptions().forEach(opt->addSodiumOptionWidgetIfPossible(o,opt))))));
 
-    public static final OptionsScreen.Section SODIUM = OptionsScreen.Section.add(new OptionsScreen.Section(Component.literal(FactoryAPIPlatform.getModInfo("sodium").getName()), s-> Panel.centered(s, 220, optionsButtons.size()*24+16), new ArrayList<>(List.of(o-> optionsButtons.forEach(s-> o.getRenderableVList().addRenderable(s.apply(o)))))));
+    public static final OptionsScreen.Section SODIUM = OptionsScreen.Section.add(new OptionsScreen.Section(Component.literal(FactoryAPIPlatform.getModInfo("sodium").getName()), s-> Panel.centered(s, 220, OPTIONS_BUTTONS.size()*24+16), new ArrayList<>(List.of(o-> OPTIONS_BUTTONS.forEach(s-> o.getRenderableVList().addRenderable(s.apply(o)))))));
 
     public static final Map<String,Field> SODIUM_SLIDER_CONTROL_FIELDS = Legacy4J.getAccessibleFieldsMap(SliderControl.class,"min","max","mode");
     public static final Map<String,Field> SODIUM_CYCLING_CONTROL_FIELDS = Legacy4J.getAccessibleFieldsMap(CyclingControl.class,"allowedValues","names");

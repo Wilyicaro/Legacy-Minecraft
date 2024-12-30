@@ -23,7 +23,7 @@ public class SaveOptionsScreen extends ConfirmationScreen{
     private LevelSummary summary;
 
     public SaveOptionsScreen(PlayGameScreen parent, LevelSummary summary) {
-        super(parent, 230, 165, LegacyComponents.SAVE_OPTIONS, LegacyComponents.SAVE_OPTIONS_MESSAGE, (b)->{});
+        super(parent, 230, 129, LegacyComponents.SAVE_OPTIONS, LegacyComponents.SAVE_OPTIONS_MESSAGE, (b)->{});
         this.parent = parent;
         this.summary = summary;
     }
@@ -58,9 +58,9 @@ public class SaveOptionsScreen extends ConfirmationScreen{
                 addRenderableWidget(renameBox);
             }
         })).bounds(panel.x + 15, panel.getRectangle().bottom() - 74,200,20).build());
-        renderableVList.addRenderable(Button.builder(Component.translatable("selectWorld.delete"),b-> minecraft.setScreen(new ConfirmationScreen(parent,230,120, Component.translatable("selectWorld.delete"), Component.translatable("selectWorld.deleteQuestion"), b1->parent.saveRenderableList.deleteSave(summary)))).bounds(panel.x + 15, panel.getRectangle().bottom() - 52,200,20).build());
+        renderableVList.addRenderable(Button.builder(Component.translatable("selectWorld.delete"),b-> minecraft.setScreen(new ConfirmationScreen(parent, Component.translatable("selectWorld.delete"), Component.translatable("selectWorld.deleteQuestion"), b1->parent.saveRenderableList.deleteSave(summary)))).bounds(panel.x + 15, panel.getRectangle().bottom() - 52,200,20).build());
 
-        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.copySave"),b-> minecraft.setScreen(new ConfirmationScreen(parent,230,120, Component.translatable("legacy.menu.copySave"), Component.translatable("legacy.menu.copySaveMessage"), b1->{
+        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.copySave"),b-> minecraft.setScreen(new ConfirmationScreen(parent, Component.translatable("legacy.menu.copySave"), Component.translatable("legacy.menu.copySaveMessage"), b1->{
             String id = summary.getLevelId();
             Legacy4JClient.copySaveFile(minecraft.getLevelSource().getBaseDir().resolve(id),minecraft.getLevelSource(),id);
             parent.saveRenderableList.reloadSaveList();

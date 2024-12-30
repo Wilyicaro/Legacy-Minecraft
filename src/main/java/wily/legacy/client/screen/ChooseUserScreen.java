@@ -48,7 +48,7 @@ public class ChooseUserScreen extends PanelVListScreen {
     public static final Pattern usernamePattern = Pattern.compile("[A-Za-z0-9_]{2,16}");
 
     public ChooseUserScreen(Screen parent) {
-        super(parent, 260,190, CHOOSE_USER);
+        super(parent, s-> Panel.centered(s, 260,215,0,10), CHOOSE_USER);
         renderableVList.layoutSpacing(i->0);
         addAccountButtons();
     }
@@ -83,14 +83,14 @@ public class ChooseUserScreen extends PanelVListScreen {
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.getX() + 10, panel.getY() + 13, panel.getWidth() - 20, panel.getHeight() - 26);
             guiGraphics.drawString(font,getTitle(),panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panel.y + 20, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         }));
-        renderableVList.init(panel.x + 15,panel.y + 32,panel.width - 30,panel.height - 34);
+        getRenderableVList().init(panel.x + 15,panel.y + 32,panel.width - 30,panel.height - 50);
     }
 
     public static ConfirmationScreen passwordScreen(Screen parent, Consumer<String> pass){
         EditBox passWordBox = new EditBox(Minecraft.getInstance().font, 0,0,200,20,Component.translatable("legacy.menu.choose_user.add.encryption.password"));
         TickBox tickBox = new TickBox(0,0,true, bol->VISIBLE_PASSWORD,bol-> null, t->passWordBox.setFormatter((s,i)-> FormattedCharSequence.forward(t.selected ? s : "*".repeat(s.length()), Style.EMPTY)));
         tickBox.onPress();
-        return new ConfirmationScreen(parent, passWordBox.getMessage(),Component.translatable("legacy.menu.choose_user.add.encryption.password_message"), b1-> pass.accept(passWordBox.getValue())){
+        return new ConfirmationScreen(parent,230, 120,passWordBox.getMessage(),Component.translatable("legacy.menu.choose_user.add.encryption.password_message"), b1-> pass.accept(passWordBox.getValue())){
             @Override
             protected void addButtons() {
                 super.addButtons();
@@ -127,7 +127,7 @@ public class ChooseUserScreen extends PanelVListScreen {
                 }).build());
                 renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.choose_user.offline"), b-> {
                     EditBox usernameBox = new EditBox(Minecraft.getInstance().font, 0,0,200,20,Component.translatable("legacy.menu.choose_user.offline.username"));
-                    minecraft.setScreen(new ConfirmationScreen(this, usernameBox.getMessage(),Component.translatable("legacy.menu.choose_user.offline.username_message"), b1-> press.accept(MCAccount.create(new GameProfile(UUID.nameUUIDFromBytes(("offline:"+usernameBox.getValue()).getBytes()),usernameBox.getValue()),false,null,null))){
+                    minecraft.setScreen(new ConfirmationScreen(this, 230, 120, usernameBox.getMessage(),Component.translatable("legacy.menu.choose_user.offline.username_message"), b1-> press.accept(MCAccount.create(new GameProfile(UUID.nameUUIDFromBytes(("offline:"+usernameBox.getValue()).getBytes()),usernameBox.getValue()),false,null,null))){
                         @Override
                         protected void addButtons() {
                             super.addButtons();
@@ -191,7 +191,7 @@ public class ChooseUserScreen extends PanelVListScreen {
                 @Override
                 public boolean keyPressed(int i, int j, int k) {
                     if (i == InputConstants.KEY_O) {
-                        minecraft.setScreen(new ConfirmationScreen(ChooseUserScreen.this, ACCOUNT_OPTIONS, ACCOUNT_OPTIONS_MESSAGE, b -> {}){
+                        minecraft.setScreen(new ConfirmationScreen(ChooseUserScreen.this, 230, 120, ACCOUNT_OPTIONS, ACCOUNT_OPTIONS_MESSAGE, b -> {}){
                             @Override
                             protected void addButtons() {
                                 renderableVList.addRenderable(Button.builder(CommonComponents.GUI_CANCEL, b-> onClose()).build());

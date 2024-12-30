@@ -9,7 +9,7 @@ import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeInventoryListener;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
-//? if <=1.21.2 {
+//? if <1.21.2 {
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 //?}
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -240,6 +240,9 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         RenderSystem.disableBlend();
         guiGraphics.pose().popPose();
         this.renderTooltip(guiGraphics, i, j);
+        //? if >=1.21.2 {
+        /*ScreenUtil.renderContainerEffects(guiGraphics,leftPos,topPos,imageWidth,imageHeight,i,j);
+        *///?}
     }
 
     @Override

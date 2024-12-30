@@ -133,7 +133,8 @@
     "BufferSourceAccessor",
     "BackupConfirmScreenMixin",
     "PaintingRendererMixin",
-    "PistonHeadRendererMixin"
+    "PistonHeadRendererMixin",
+    "WinScreenMixin"
   ],
   "mixins": [
     //? if <1.20.5 {

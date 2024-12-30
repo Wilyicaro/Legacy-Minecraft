@@ -254,8 +254,7 @@ public class Legacy4JClient {
         else if (screen instanceof DisconnectedScreen s)
             return ConfirmationScreen.createInfoScreen(getReplacementScreen(DisconnectedScreenAccessor.of(s).getParent()), s.getTitle(),DisconnectedScreenAccessor.of(s).getReason());
         else if (screen instanceof AlertScreen s) {
-            MultiLineLabel messageLines = MultiLineLabel.create(Minecraft.getInstance().font,s.messageText,200);
-            return new ConfirmationScreen(Minecraft.getInstance().screen, 230, 97 + messageLines.getLineCount() * 12, s.getTitle(), messageLines, b -> true) {
+            return new ConfirmationScreen(Minecraft.getInstance().screen, 230, 97, s.getTitle(), s.messageText, LegacyScreen::onClose) {
                 protected void addButtons() {
                     renderableVList.addRenderable(okButton = Button.builder(Component.translatable("gui.ok"), b -> s.callback.run()).bounds(panel.x + 15, panel.y + panel.height - 30, 200, 20).build());
                 }
@@ -264,8 +263,7 @@ public class Legacy4JClient {
                 }
             };
         }else if (screen instanceof BackupConfirmScreen s) {
-            MultiLineLabel messageLines = MultiLineLabel.create(Minecraft.getInstance().font,BackupConfirmScreenAccessor.of(s).getDescription(),200);
-            return new ConfirmationScreen(Minecraft.getInstance().screen, 230, 141 + messageLines.getLineCount() * 12 + (BackupConfirmScreenAccessor.of(s).hasCacheErase() ? 14 : 0), s.getTitle(), messageLines, b -> true) {
+            return new ConfirmationScreen(Minecraft.getInstance().screen, 230, 141 + (BackupConfirmScreenAccessor.of(s).hasCacheErase() ? 14 : 0), s.getTitle(), BackupConfirmScreenAccessor.of(s).getDescription(), LegacyScreen::onClose) {
                 boolean eraseCache = false;
                 protected void addButtons() {
                     if (BackupConfirmScreenAccessor.of(s).hasCacheErase()) renderableVList.addRenderable(new TickBox(panel.x + 15, panel.y + panel.height - 88,eraseCache,b->Component.translatable("selectWorld.backupEraseCache"),b->null,b-> eraseCache = b.selected));

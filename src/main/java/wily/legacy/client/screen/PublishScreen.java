@@ -34,11 +34,11 @@ public class PublishScreen extends ConfirmationScreen{
     }
 
     public PublishScreen(Screen parent, GameType gameType, Consumer<PublishScreen> okAction) {
-        super(parent, 230, 145, LAN_SERVER, Component.translatable("lanServer.port"), b-> {});
-        this.okAction = b-> {
+        super(parent, 230, 109, LAN_SERVER, Component.translatable("lanServer.port"), b-> {});
+        this.okAction = s-> {
             publish = true;
             okAction.accept(this);
-            return true;
+            s.onClose();
         };
         gameTypeSlider = new LegacySliderButton<>(0,0, 200,16, b -> b.getDefaultMessage(GAME_MODEL_LABEL,b.getObjectValue().getLongDisplayName()),b->Tooltip.create(Component.translatable("selectWorld.gameMode."+b.getObjectValue().getName()+ ".info")),gameType,()->GAME_TYPES, b->{});
     }

@@ -18,7 +18,7 @@ public class ServerEditScreen extends ConfirmationScreen{
     public ServerEditScreen(PlayGameScreen parent, ServerData serverData, boolean add) {
         super(parent, 230, 187, Component.translatable("addServer.title"), Component.translatable("addServer.enterName"), (b)->{});
         this.serverData = serverData;
-        okAction =  b->{
+        okAction =  s->{
             serverData.name = nameBox.getValue();
             serverData.ip = ipBox.getValue();
             if (add){
@@ -31,7 +31,7 @@ public class ServerEditScreen extends ConfirmationScreen{
             }
             parent.getServers().save();
             parent.serverRenderableList.updateServers();
-            return true;
+            onClose();
         };
     }
     @Override

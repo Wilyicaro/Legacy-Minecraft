@@ -12,9 +12,9 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOption;
 import wily.legacy.util.ScreenUtil;
 
-public class ExitConfirmationScreen extends ConfirmationScreen{
+public class ExitConfirmationScreen extends ConfirmationScreen {
     public ExitConfirmationScreen(Screen parent) {
-        super(parent, 230,  hasSaveSystem(Minecraft.getInstance()) ? 156 : 133, Component.translatable("menu.quit"), Minecraft.getInstance().hasSingleplayerServer() && LegacyOption.autoSaveInterval.get() == 0 ? Component.translatable("legacy.menu.exit_message") : Minecraft.getInstance().screen instanceof TitleScreen ? Component.translatable("legacy.menu.gameExitMessage") : Component.translatable("legacy.menu.server_exit_message"), b-> {});
+        super(parent, 230, hasSaveSystem(Minecraft.getInstance()) ? 120 : 97, Component.translatable("menu.quit"), Minecraft.getInstance().hasSingleplayerServer() && LegacyOption.autoSaveInterval.get() == 0 ? Component.translatable("legacy.menu.exit_message") : Minecraft.getInstance().screen instanceof TitleScreen ? Component.translatable("legacy.menu.gameExitMessage") : Component.translatable("legacy.menu.server_exit_message"), b-> {});
     }
 
     @Override

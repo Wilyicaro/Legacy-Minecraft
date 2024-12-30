@@ -73,6 +73,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.inventory.RenameItemMenu;
@@ -138,7 +139,7 @@ public interface ControlTooltip {
                 add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.bindingState.getIcon(),()-> LegacyComponents.EXIT).
                 add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.MOUSE_BUTTON_RIGHT) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(),()->getMouseRightAction(a)).
                 add(()-> ControlType.getActiveType().isKbm() ? COMPOUND_ICON_FUNCTION.apply(new Icon[]{getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT), PLUS_ICON,getKeyIcon(InputConstants.KEY_LSHIFT)}) : ControllerBinding.UP_BUTTON.bindingState.getIcon(),()-> a.getHoveredSlot() != null && a.getHoveredSlot().hasItem() ? LegacyComponents.QUICK_MOVE : null).
-                add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_W) : ControllerBinding.RIGHT_TRIGGER.bindingState.getIcon(),()->a.getHoveredSlot() != null && a.getHoveredSlot().hasItem() ? LegacyComponents.WHATS_THIS : null).
+                add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_W) : ControllerBinding.RIGHT_TRIGGER.bindingState.getIcon(),()->a.getHoveredSlot() != null && a.getHoveredSlot().hasItem() && LegacyTipManager.hasTip(a.getHoveredSlot().getItem()) ? LegacyComponents.WHATS_THIS : null).
                 add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT) : ControllerBinding.LEFT_TRIGGER.bindingState.getIcon(),()-> a.getMenu().getCarried().getCount() > 1 ? LegacyComponents.DISTRIBUTE : null);
     }
 

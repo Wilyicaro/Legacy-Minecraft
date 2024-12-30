@@ -7,7 +7,7 @@ import wily.legacy.client.screen.RenderableVListScreen;
 
 public class IrisCompat {
     public static void init(){
-        SodiumCompat.optionsButtons.add(s-> RenderableVListScreen.openScreenButton(Component.translatable("options.iris.shaderPackSelection"),()->new ShaderPackScreen(s)).build());
+        SodiumCompat.OPTIONS_BUTTONS.add(s-> RenderableVListScreen.openScreenButton(Component.translatable("options.iris.shaderPackSelection"),()->new ShaderPackScreen(s)).build());
     }
 }
 //?}

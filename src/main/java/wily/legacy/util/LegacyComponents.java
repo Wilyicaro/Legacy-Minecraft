@@ -140,4 +140,10 @@ public class LegacyComponents {
     public static final Component DECORATIONS = Component.translatable("legacy.createWorld.customize.superFlat.decorations");
     public static final Component LAVA_LAKES = Component.translatable("legacy.createWorld.customize.superFlat.lavaLakes");
     public static final Component RESPAWNING = Component.translatable("legacy.menu.respawning");
+    public static final Component OPEN_LINK_TITLE = Component.translatable("legacy.menu.open_link_title");
+    public static final Component OPEN_LINK_MESSAGE = Component.translatable("legacy.menu.open_link_message");
+    public static final Component RESET_KNOWN_ENTITIES_TITLE = Component.translatable("legacy.menu.reset_known_entities");
+    public static final Component RESET_KNOWN_ENTITIES_MESSAGE = Component.translatable("legacy.menu.reset_known_entities_message");
+    public static final Component RESET_KNOWN_BLOCKS_TITLE = Component.translatable("legacy.menu.reset_known_blocks");
+    public static final Component RESET_KNOWN_BLOCKS_MESSAGE = Component.translatable("legacy.menu.reset_known_blocks_message");
 }

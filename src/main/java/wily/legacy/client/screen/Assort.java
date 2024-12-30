@@ -333,7 +333,7 @@ public record Assort(String id, int version, Component displayName, Component de
                 }
                 if (i == InputConstants.KEY_O){
                     Screen screen = Minecraft.getInstance().screen;
-                    minecraft.setScreen(new ConfirmationScreen(minecraft.screen,230,155,ASSORT_OPTIONS,ASSORT_OPTIONS_MESSAGE,b->{}){
+                    minecraft.setScreen(new ConfirmationScreen(minecraft.screen,230,119,ASSORT_OPTIONS,ASSORT_OPTIONS_MESSAGE,b->{}){
                         @Override
                         protected void addButtons() {
                             renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b-> this.onClose()).build());
@@ -346,7 +346,7 @@ public record Assort(String id, int version, Component displayName, Component de
                                 EditBox nameBox = new EditBox(minecraft.font, width / 2 - 100,0,200, 20, Component.translatable("legacy.menu.assort_name"));
                                 Component name = Component.translatable("legacy.menu.assorts.template",repeat);
                                 nameBox.setHint(name);
-                                minecraft.setScreen(new ConfirmationScreen(parent, ADD_ASSORT, Component.translatable("legacy.menu.assort_name"), p -> {
+                                minecraft.setScreen(new ConfirmationScreen(parent, 230, 120, ADD_ASSORT, Component.translatable("legacy.menu.assort_name"), p -> {
                                     minecraft.setScreen(new PackSelectionScreen(packRepository, r -> {
                                         Assort.resourceAssorts.put(id,new Assort(id, 0,nameBox.getValue().isBlank() ? name : Component.literal(nameBox.getValue()),Component.translatable("legacy.menu.assorts.template.description"),Optional.empty(),Optional.empty(), getSelectableIds(packRepository), Optional.empty()));
                                         save();

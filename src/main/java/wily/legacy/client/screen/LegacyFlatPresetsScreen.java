@@ -49,7 +49,7 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen{
                     }
                     @Override
                     public void onPress() {
-                        minecraft.setScreen(new ConfirmationScreen(LegacyFlatPresetsScreen.this,230,156,Component.translatable("legacy.menu.create_flat_world.load_preset"),Component.translatable("legacy.menu.create_flat_world.load_preset_message"),b->{
+                        minecraft.setScreen(new ConfirmationScreen(LegacyFlatPresetsScreen.this, Component.translatable("legacy.menu.create_flat_world.load_preset"),Component.translatable("legacy.menu.create_flat_world.load_preset_message"),b->{
                             applyPreset.accept(holder);
                             minecraft.setScreen(parent);
                         }));

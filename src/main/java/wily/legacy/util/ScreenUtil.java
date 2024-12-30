@@ -1,6 +1,7 @@
 package wily.legacy.util;
 
 import com.google.common.collect.Ordering;
+import com.mojang.blaze3d.font.GlyphInfo;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -10,6 +11,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
+import net.minecraft.client.gui.font.FontSet;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.resources.language.I18n;
@@ -115,20 +117,22 @@ public class ScreenUtil {
         if (mc.level == null || accessor.getBoolean("forcePanorama",forcePanorama))
             renderPanoramaBackground(guiGraphics, forcePanorama && getActualLevelNight());
         else /*? if <=1.20.1 {*//*renderTransparentBackground(guiGraphics)*//*?} else {*/accessor.getScreen().renderTransparentBackground(guiGraphics)/*?}*/;
-        if (accessor.getBoolean("hasTitle", title)) {
-            if (Minecraft.getInstance().getResourceManager().getResource(MINECRAFT).isEmpty())
-                logoRenderer.renderLogo(guiGraphics, guiGraphics.guiWidth(), 1.0F);
-            else {
-                RenderSystem.enableBlend();
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate((guiGraphics.guiWidth() - 285.5f) / 2, 30,0);
-                guiGraphics.pose().scale(0.5f,0.5f,0.5f);
-                FactoryGuiGraphics.of(guiGraphics).blit(MINECRAFT,0, 0,0,0, 571,138,571,138);
-                guiGraphics.pose().popPose();
-                RenderSystem.disableBlend();
-            }
-        }
+        if (accessor.getBoolean("hasTitle", title)) renderLogo(guiGraphics);
         if (accessor.getBoolean("hasUsername", username)) renderUsername(guiGraphics);
+    }
+
+    public static void renderLogo(GuiGraphics guiGraphics){
+        if (Minecraft.getInstance().getResourceManager().getResource(MINECRAFT).isEmpty())
+            logoRenderer.renderLogo(guiGraphics, guiGraphics.guiWidth(), 1.0F);
+        else {
+            RenderSystem.enableBlend();
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate((guiGraphics.guiWidth() - 285.5f) / 2, 30,0);
+            guiGraphics.pose().scale(0.5f,0.5f,0.5f);
+            FactoryGuiGraphics.of(guiGraphics).blit(MINECRAFT,0, 0,0,0, 571,138,571,138);
+            guiGraphics.pose().popPose();
+            RenderSystem.disableBlend();
+        }
     }
 
     public static void renderTransparentBackground(GuiGraphics graphics){
@@ -147,19 +151,24 @@ public class ScreenUtil {
         guiGraphics.blit(/*? if >=1.21.2 {*//*RenderType::guiTexturedOverlay,*//*?}*/ isNight ? PANORAMA_NIGHT : PANORAMA_DAY, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() / 66.32f, 1, guiGraphics.guiWidth(), guiGraphics.guiHeight() + 2, guiGraphics.guiHeight() * 820/144, guiGraphics.guiHeight() + 2);
         RenderSystem.depthMask(true);
     }
-    public static void drawOutlinedString(GuiGraphics graphics, Font font, Component component, int x, int y, int color, int outlineColor, float outline) {
-        drawStringOutline(graphics,font,component,x,y,outlineColor,outline);
-        graphics.drawString(font,component, x, y, color,false);
 
+    public static void drawOutlinedString(GuiGraphics graphics, Font font, Component component, int x, int y, int color, int outlineColor, float outline) {
+        drawOutlinedString(graphics, font, component.getVisualOrderText(), x, y, color, outlineColor, outline);
     }
-    public static void drawStringOutline(GuiGraphics graphics, Font font, Component component, int x, int y, int outlineColor, float outline) {
+
+    public static void drawOutlinedString(GuiGraphics graphics, Font font, FormattedCharSequence formattedCharSequence, int x, int y, int color, int outlineColor, float outline) {
+        drawStringOutline(graphics,font,formattedCharSequence, x,y,outlineColor,outline);
+        graphics.drawString(font,formattedCharSequence, x, y, color,false);
+    }
+
+    public static void drawStringOutline(GuiGraphics graphics, Font font, FormattedCharSequence formattedCharSequence, int x, int y, int outlineColor, float outline) {
         float[] translations = new float[]{0,outline,-outline};
         for (float t : translations) {
             for (float t1 : translations) {
                 if (t != 0 || t1 != 0) {
                     graphics.pose().pushPose();
                     graphics.pose().translate(t,t1,0F);
-                    graphics.drawString(font, component, x, y, outlineColor, false);
+                    graphics.drawString(font, formattedCharSequence, x, y, outlineColor, false);
                     graphics.pose().popPose();
                 }
             }
