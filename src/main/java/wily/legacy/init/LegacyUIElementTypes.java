@@ -23,6 +23,7 @@ import net.minecraft.world.inventory.EnchantmentMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -43,7 +44,7 @@ import java.util.List;
 
 public class LegacyUIElementTypes {
     private static final Container emptyFakeContainer = new SimpleContainer();
-    public static final ResourceLocation ENCHANTING_TABLE_BOOK = ResourceLocation.withDefaultNamespace("textures/entity/enchanting_table_book.png");
+    public static final ResourceLocation ENCHANTING_TABLE_BOOK = FactoryAPI.createVanillaLocation("textures/entity/enchanting_table_book.png");
 
     public static final UIDefinitionManager.ElementType PUT_LEGACY_SLOT = UIDefinitionManager.ElementType.registerConditional("put_legacy_slot", UIDefinitionManager.ElementType.createIndexable(slots->(uiDefinition, accessorFunction, elementName, element) -> {
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeContainer", (s, d)->d.asListOpt(d1->DynamicUtil.getItemFromDynamic(d1, true)).result().map(l-> UIDefinition.createBeforeInit(elementName, (a)-> a.putStaticElement(s,new SimpleContainer(l.stream().map(ArbitrarySupplier::get).toArray(ItemStack[]::new))))).orElse(null));
@@ -179,7 +180,6 @@ public class LegacyUIElementTypes {
             oFlip.set(flip.get());
             oOpen.set(open.get());
             open.set(open.get() - 0.2F);
-            Legacy4J.LOGGER.warn("ATA");
 
             open.set(Mth.clamp(open.get(), 0.0F, 1.0F));
             float f1 = (flipT.get() - flip.get()) * 0.4F;
@@ -205,7 +205,7 @@ public class LegacyUIElementTypes {
             float f5 = Mth.clamp(Mth.frac(f1 + 0.75F) * 1.6F - 0.3F, 0.0F, 1.0F);
             bookModel.get().setupAnim(0.0F, f4, f5, g);
             VertexConsumer vertexconsumer = FactoryGuiGraphics.of(guiGraphics).getBufferSource().getBuffer(bookModel.get().renderType(ENCHANTING_TABLE_BOOK));
-            bookModel.get().renderToBuffer(guiGraphics.pose(), vertexconsumer, 15728880, OverlayTexture.NO_OVERLAY);
+            bookModel.get().renderToBuffer(guiGraphics.pose(), vertexconsumer, 15728880, OverlayTexture.NO_OVERLAY/*? <1.20.5 {*//*, 1.0F, 1.0F, 1.0F, 1.0F*//*?}*/);
             FactoryGuiGraphics.of(guiGraphics).getBufferSource().endBatch();
             guiGraphics.flush();
             guiGraphics.pose().popPose();

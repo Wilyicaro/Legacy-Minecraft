@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base.client.book;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.font.TextFieldHelper;
