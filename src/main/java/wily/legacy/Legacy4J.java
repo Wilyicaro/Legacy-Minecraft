@@ -351,7 +351,7 @@ public class Legacy4J {
     }
 
     public static float getItemDamageModifier(ItemStack stack){
-        if (LegacyConfig.legacyCombat.get()){
+        if (LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacyCombat)){
             if (stack.getItem() instanceof SwordItem) return 1;
             else if (stack.getItem() instanceof ShovelItem) return -0.5f;
             else if (stack.getItem() instanceof PickaxeItem) return 1;

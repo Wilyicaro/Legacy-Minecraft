@@ -66,7 +66,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
 
     @Inject(method = "resetAttackStrengthTicker", at = @At(value = "HEAD"), cancellable = true)
     protected void resetAttackStrengthTicker(CallbackInfo ci) {
-        if (LegacyConfig.legacyCombat.get()) ci.cancel();
+        if (LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacyCombat)) ci.cancel();
     }
 
     @Redirect(method = "attack", at = @At(value = "INVOKE", target = /*? if <1.20.5 {*//*"Lnet/minecraft/world/entity/player/Player;getAttributeValue(Lnet/minecraft/world/entity/ai/attributes/Attribute;)D"*//*?} else {*/"Lnet/minecraft/world/entity/player/Player;getAttributeValue(Lnet/minecraft/core/Holder;)D"/*?}*/))
@@ -76,7 +76,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
 
     @ModifyVariable(method = "attack", at = @At(value = "STORE"), ordinal = 3)
     protected boolean modifyAttackDamage(boolean original) {
-        return !LegacyConfig.legacyCombat.get() && original;
+        return !LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacyCombat) && original;
     }
 
 }

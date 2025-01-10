@@ -10,6 +10,7 @@ import net.minecraft.util.GsonHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import wily.factoryapi.FactoryAPI;
+import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.network.CommonNetwork;
@@ -221,6 +222,10 @@ public interface LegacyConfig<T> extends Bearer<T> {
     LegacyConfig<Boolean> legacyCombat = COMMON_STORAGE.register(createCommonBoolean("legacyCombat", ()-> new LegacyConfigDisplay<>(LegacyConfig.legacyCombat.getKey()), true, b-> {}));
     LegacyConfig<Boolean> legacySwordBlocking = COMMON_STORAGE.register(createCommonBoolean("legacySwordBlocking", ()-> new LegacyConfigDisplay<>(LegacyConfig.legacySwordBlocking.getKey()), false, b-> {}));
 
+
+    static boolean hasCommonConfigEnabled(LegacyConfig<Boolean> config) {
+        return config.get() && (!FactoryAPI.isClient() || FactoryAPIClient.hasModOnServer);
+    }
 
     static <T> void decodeConfigs(Map<String,? extends LegacyConfig<?>> configs, Dynamic<T> dynamic, Consumer<LegacyConfig<?>> afterDecode){
         dynamic.asMapOpt().result().ifPresent(m->m.forEach(p-> p.getFirst().asString().result().ifPresent(s-> {

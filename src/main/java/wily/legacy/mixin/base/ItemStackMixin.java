@@ -71,12 +71,12 @@ public abstract class ItemStackMixin {
 
     @Redirect(method = "addModifierTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/attributes/AttributeModifier;is(Lnet/minecraft/resources/ResourceLocation;)Z"))
     private boolean addModifierTooltip(AttributeModifier instance, ResourceLocation location) {
-        return !LegacyConfig.legacyCombat.get() && instance.is(location);
+        return !LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacyCombat) && instance.is(location);
     }
 
     @Inject(method = "addModifierTooltip", at = @At("HEAD"), cancellable = true)
     private void addModifierTooltip(Consumer<Component> consumer, Player player, Holder<Attribute> holder, AttributeModifier attributeModifier, CallbackInfo ci) {
-        if (LegacyConfig.legacyCombat.get() && attributeModifier.is(Item.BASE_ATTACK_SPEED_ID)) ci.cancel();
+        if (LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacyCombat) && attributeModifier.is(Item.BASE_ATTACK_SPEED_ID)) ci.cancel();
     }
 
     @Redirect(method = "addModifierTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/attributes/AttributeModifier;amount()D"))
@@ -96,7 +96,7 @@ public abstract class ItemStackMixin {
         forEachModifier(equipmentSlotGroup, (holder, attributeModifier)->{
             if (noSpace.get()){
                 consumer.accept(CommonComponents.EMPTY);
-                if (!LegacyConfig.legacyCombat.get()) consumer.accept(Component.translatable("item.modifiers." + equipmentSlotGroup.getSerializedName()).withStyle(ChatFormatting.GRAY));
+                if (!LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacyCombat)) consumer.accept(Component.translatable("item.modifiers." + equipmentSlotGroup.getSerializedName()).withStyle(ChatFormatting.GRAY));
                 noSpace.set(false);
             }
             this.addModifierTooltip(consumer, player, holder, attributeModifier);

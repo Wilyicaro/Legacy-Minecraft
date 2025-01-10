@@ -23,13 +23,13 @@ public class SwordItemMixin extends Item {
 
     @Override
     public int getUseDuration(ItemStack itemStack/*? if >=1.20.5 {*/, LivingEntity livingEntity/*?}*/) {
-        if (LegacyConfig.legacySwordBlocking.get()) return 7200;
+        if (LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacySwordBlocking)) return 7200;
         return super.getUseDuration(itemStack/*? if >=1.20.5 {*/, livingEntity/*?}*/);
     }
 
     //? <=1.21.1 {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
-        if (LegacyConfig.legacySwordBlocking.get()) {
+        if (LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacySwordBlocking)) {
             player.startUsingItem(interactionHand);
             return InteractionResultHolder.consume( player.getItemInHand(interactionHand));
         }
@@ -47,7 +47,7 @@ public class SwordItemMixin extends Item {
 
     @Override
     public /*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/ getUseAnimation(ItemStack itemStack) {
-        if (LegacyConfig.legacySwordBlocking.get()) return /*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/.BLOCK;
+        if (LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacySwordBlocking)) return /*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/.BLOCK;
         return super.getUseAnimation(itemStack);
     }
 }

@@ -76,7 +76,6 @@ import static wily.legacy.client.screen.ControlTooltip.MORE;
 
 
 @Mixin(Gui.class)
-
 public abstract class GuiMixin implements ControlTooltip.Event {
     @Shadow @Final
     private Minecraft minecraft;
@@ -108,14 +107,14 @@ public abstract class GuiMixin implements ControlTooltip.Event {
             ci.cancel();
     }
 
-    @Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/OptionInstance;get()Ljava/lang/Object;"))
+    @Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/OptionInstance;get()Ljava/lang/Object;", ordinal = 1))
     public Object renderCrosshair(OptionInstance<AttackIndicatorStatus> instance) {
-        return LegacyConfig.legacyCombat.get() ? AttackIndicatorStatus.OFF : instance.get();
+        return LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacyCombat) ? AttackIndicatorStatus.OFF : instance.get();
     }
 
     @Redirect(method = /*? if >=1.20.5 {*/"renderItemHotbar"/*?} else {*//*"renderHotbar"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/OptionInstance;get()Ljava/lang/Object;"))
     public Object renderItemHotbar(OptionInstance<AttackIndicatorStatus> instance) {
-        return LegacyConfig.legacyCombat.get() ? AttackIndicatorStatus.OFF : instance.get();
+        return LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacyCombat) ? AttackIndicatorStatus.OFF : instance.get();
     }
 
     @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)

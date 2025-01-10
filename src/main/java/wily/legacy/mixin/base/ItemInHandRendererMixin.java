@@ -122,7 +122,7 @@ public abstract class ItemInHandRendererMixin {
 
     @Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;applyItemArmTransform(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/entity/HumanoidArm;F)V", shift = At.Shift.AFTER, ordinal = 4))
     private void renderArmWithItemBlockAnim(AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, MultiBufferSource multiBufferSource, int j, CallbackInfo ci) {
-        if (LegacyConfig.legacySwordBlocking.get()) {
+        if (LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacySwordBlocking)) {
             boolean bl = interactionHand == InteractionHand.MAIN_HAND;
             HumanoidArm humanoidArm = bl ? abstractClientPlayer.getMainArm() : abstractClientPlayer.getMainArm().getOpposite();
             this.applyItemArmAttackTransform(poseStack, humanoidArm, h);

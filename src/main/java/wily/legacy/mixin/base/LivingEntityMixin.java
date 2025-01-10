@@ -61,6 +61,6 @@ public abstract class LivingEntityMixin extends Entity {
     //?}
     @Inject(method = "getDamageAfterArmorAbsorb", at = @At("RETURN"), cancellable = true)
     protected void getDamageAfterArmorAbsorb(DamageSource damageSource, float f, CallbackInfoReturnable<Float> cir) {
-        if (!damageSource.is(DamageTypeTags.BYPASSES_ARMOR) && LegacyConfig.legacySwordBlocking.get() && useItem.getItem() instanceof SwordItem) cir.setReturnValue(cir.getReturnValue()/2);
+        if (!damageSource.is(DamageTypeTags.BYPASSES_ARMOR) && LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacySwordBlocking) && useItem.getItem() instanceof SwordItem) cir.setReturnValue(cir.getReturnValue()/2);
     }
 }
