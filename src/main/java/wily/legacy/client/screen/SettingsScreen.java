@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class SettingsScreen extends RenderableVListScreen {
-    public static final List<Function<Screen,AbstractButton>> SETTINGS_BUTTONS = OptionsScreen.Section.list.stream().map(section-> (Function<Screen,AbstractButton>) s->RenderableVListScreen.openScreenButton(section.title(),()->section.build(s)).build()).collect(Collectors.toList());
+    public static final List<Function<Screen,AbstractButton>> SETTINGS_BUTTONS = OptionsScreen.Section.list.stream().map(section-> (Function<Screen,AbstractButton>) s->section.createButtonBuilder(s).build()).collect(Collectors.toList());
 
     protected SettingsScreen(Screen parent) {
         super(parent,Component.translatable("legacy.menu.settings"), r->{});

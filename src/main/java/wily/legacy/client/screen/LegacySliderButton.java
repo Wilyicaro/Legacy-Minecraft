@@ -4,6 +4,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.navigation.CommonInputs;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.init.LegacyRegistries;
@@ -12,6 +13,7 @@ import wily.legacy.util.ScreenUtil;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 public class LegacySliderButton<T> extends AbstractSliderButton {
@@ -34,18 +36,31 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
         objectValue = initialValue;
         updateMessage();
     }
+
+    public static <T> LegacySliderButton<T> createFromInt(int i, int j, int k, int l, Function<LegacySliderButton<T>,Component> messageGetter, Function<LegacySliderButton<T>,Tooltip> tooltipSupplier, T initialValue, Function<Integer,T> valueGetter, Function<T, Integer> valueSetter, Supplier<Integer> valuesSize, Consumer<LegacySliderButton<T>> onChange) {
+        return new LegacySliderButton<>(i, j, k, l, messageGetter, tooltipSupplier, initialValue, b-> valueGetter.apply((int) Math.round(b.value * (valuesSize.get() - 1))),t->Math.max(0d,valueSetter.apply(t))/ (valuesSize.get() - 1),onChange);
+    }
+
     public LegacySliderButton(int i, int j, int k, int l, Function<LegacySliderButton<T>,Component> messageGetter, Function<LegacySliderButton<T>,Tooltip> tooltipSupplier, T initialValue, Supplier<List<T>> values, Consumer<LegacySliderButton<T>> onChange) {
         this(i, j, k, l, messageGetter, tooltipSupplier, initialValue, b-> values.get().get((int) Math.round(b.value * (values.get().size() - 1))),t->Math.max(0d,values.get().indexOf(t))/ (values.get().size() - 1),onChange);
     }
+
+    public static LegacySliderButton<Integer> createFromIntRange(int i, int j, int k, int l, Function<LegacySliderButton<Integer>,Component> messageGetter, Function<LegacySliderButton<Integer>,Tooltip> tooltipSupplier, Integer initialValue, int min, IntSupplier max, Consumer<LegacySliderButton<Integer>> onChange) {
+        return new LegacySliderButton<>(i, j, k, l, messageGetter, tooltipSupplier, initialValue, b-> min + (int) Math.round(b.value * (max.getAsInt() - min)),t->Math.max(0d,Math.min((double)(t-min) / (max.getAsInt()-min),1d)),onChange);
+    }
+
     public static LegacySliderButton<Integer> createFromIntRange(int i, int j, int k, int l, Function<LegacySliderButton<Integer>,Component> messageGetter, Function<LegacySliderButton<Integer>,Tooltip> tooltipSupplier, Integer initialValue, int min, int max, Consumer<LegacySliderButton<Integer>> onChange) {
-        return new LegacySliderButton<>(i, j, k, l, messageGetter, tooltipSupplier, initialValue, b-> min + (int) Math.round(b.value * (max - min)),t->Math.max(0d,Math.min((double)(t-min) / (max-min),1d)),onChange);
+        return createFromIntRange(i,j,k,l,messageGetter,tooltipSupplier,initialValue,min,()->max,onChange);
     }
+
     public Component getDefaultMessage(Component caption, Component visibleValue){
-        return caption.copy().append(": ").append(visibleValue);
+        return CommonComponents.optionNameValue(caption,visibleValue);
     }
+
     public T getObjectValue(){
         return objectValue == null ? valueGetter.apply(this) : objectValue;
     }
+
     public double getValue(){
         return value;
     }
@@ -65,6 +80,7 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
         super.setFocused(bl);
         if (bl) canChangeValue = Legacy4JClient.controllerManager.canChangeSlidersValue;
     }
+
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (!active) return false;
@@ -90,14 +106,17 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
         }
         return false;
     }
+
     public boolean keyReleased(int i, int j, int k) {
         if (this.canChangeValue && (i == 263 || i== 262)) slidingMul = 1;
         return false;
     }
+
     public void setObjectValue(T objectValue){
         this.objectValue = objectValue;
         value = valueSetter.apply(objectValue);
     }
+
     @Override
     protected void applyValue() {
         T oldValue = objectValue;

@@ -179,16 +179,16 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
             }
         });
     }
-    public static void addControllerIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String,ControlTooltip.ComponentIcon> addIcon){
+    public static void addControllerIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon){
         addIcons(resourceManager,location,(s,o)->{
             ControllerBinding binding = ControllerBinding.CODEC.byName(s);
-            addIcon.accept(s,ControlTooltip.ComponentIcon.create(()->binding.getMapped().bindingState.pressed, JsonUtil.getJsonStringOrNull(o,"icon",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"iconOverlay",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"tipIcon",v-> v.charAt(0)),()-> !binding.getMapped().bindingState.isBlocked(), ControlType::getActiveControllerType));
+            addIcon.accept(s, ControlTooltip.LegacyIcon.create(()->binding.getMapped().bindingState.pressed, JsonUtil.getJsonStringOrNull(o,"icon",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"iconOverlay",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"tipIcon", v-> v.charAt(0)),()-> !binding.getMapped().bindingState.isBlocked(), ControlType::getActiveControllerType));
         });
     }
-    public static void addKbmIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String,ControlTooltip.ComponentIcon> addIcon){
+    public static void addKbmIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon){
         addIcons(resourceManager,location,(s,o)->{
             InputConstants.Key key = InputConstants.getKey(s);
-            ControlTooltip.ComponentIcon icon = ControlTooltip.ComponentIcon.create(key, JsonUtil.getJsonStringOrNull(o,"icon",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"iconOverlay",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"tipIcon",v-> v.charAt(0)));
+            ControlTooltip.LegacyIcon icon = ControlTooltip.LegacyIcon.create(key, JsonUtil.getJsonStringOrNull(o,"icon",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"iconOverlay",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"tipIcon", v-> v.charAt(0)));
             addIcon.accept(key.getName(), icon);
         });
     }

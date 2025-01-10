@@ -34,7 +34,7 @@ public class PublishScreen extends ConfirmationScreen{
     }
 
     public PublishScreen(Screen parent, GameType gameType, Consumer<PublishScreen> okAction) {
-        super(parent, 230, 109, LAN_SERVER, Component.translatable("lanServer.port"), b-> {});
+        super(parent, 230, 145, LAN_SERVER, Component.translatable("lanServer.port"), b-> {});
         this.okAction = s-> {
             publish = true;
             okAction.accept(this);

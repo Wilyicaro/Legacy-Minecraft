@@ -6,13 +6,18 @@ import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+//? <1.20.5 {
+/*import net.minecraft.client.gui.screens.OptionsScreen;
+*///?} else {
+import net.minecraft.client.gui.screens.options.OptionsScreen;
+//?}
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -22,10 +27,26 @@ import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.ListMap;
 import wily.factoryapi.util.ModInfo;
-import wily.legacy.Legacy4JClient;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.PackAlbum;
 import wily.legacy.client.controller.ControllerBinding;
+//? if forge {
+/*import net.minecraftforge.fml.ModList;
+import net.minecraftforge.client.ConfigScreenHandler;
+*///?} else if neoforge {
+/*import net.neoforged.fml.ModList;
+//? if <1.20.5 {
+/^import net.neoforged.neoforge.client.ConfigScreenHandler;
+ ^///?} else {
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+//?}
+*///?} else if fabric {
+import wily.legacy.client.screen.compat.ModMenuCompat;
+//?}
+import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
@@ -33,6 +54,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 public class ModsScreen extends PanelVListScreen {
     protected final Map<ModInfo, SizedLocation> modLogosCache = new ConcurrentHashMap<>();
@@ -45,7 +67,21 @@ public class ModsScreen extends PanelVListScreen {
     }
     protected final Panel tooltipBox = Panel.tooltipBoxOf(panel,192);
     protected final Stocker.Sizeable sorting = new Stocker.Sizeable(0,1);
-    public static final Component ALPHABETICAL = Component.translatable("legacy.menu.sorting.alphabetical");
+
+    public static final ListMap<String, Function<Screen,Screen>> configScreensMap = ListMap.<String, Function<Screen, Screen>>builder().put(Legacy4J.MOD_ID, Legacy4JSettingsScreen::new).put("minecraft", s-> new OptionsScreen(s, Minecraft.getInstance().options)).build();
+
+
+    public static Screen getConfigScreen(ModInfo mod, Screen screen) {
+        if (configScreensMap.containsKey(mod.getId())) return configScreensMap.get(mod.getId()).apply(screen);
+        //? if fabric {
+        return FactoryAPI.isModLoaded("modmenu") ? ModMenuCompat.getConfigScreen(mod.getId(),screen) : null;
+        //?} else if forge || neoforge && <1.20.5 {
+        /*return ModList.get().getModContainerById(mod.getId()).flatMap(m-> m.getCustomExtension(ConfigScreenHandler.ConfigScreenFactory.class)).map(s -> s.screenFunction().apply(Minecraft.getInstance(), screen)).orElse(null);
+         *///?} else if neoforge {
+        /*return ModList.get().getModContainerById(mod.getId()).flatMap(m-> IConfigScreenFactory.getForMod(m.getModInfo()).map(s -> s.createScreen(m, screen))).orElse(null);
+         *///?} else
+        /*throw new AssertionError();*/
+    }
 
     protected ModInfo focusedMod;
     protected final LoadingCache<ModInfo, List<FormattedCharSequence>> modLabelsCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
@@ -84,7 +120,7 @@ public class ModsScreen extends PanelVListScreen {
                 @Override
                 public void onPress() {
                     if (isFocused()){
-                        net.minecraft.client.gui.screens.Screen config = Legacy4JClient.getConfigScreen(mod,ModsScreen.this);
+                        Screen config = getConfigScreen(mod,ModsScreen.this);
                         if (config != null) minecraft.setScreen(config);
                     }
                 }
@@ -104,8 +140,8 @@ public class ModsScreen extends PanelVListScreen {
                                 if (location != null) return new SizedLocation(location,image.getWidth(),image.getHeight());
                             } catch (IOException e) {
                             }
-                        ResourceLocation defaultLogo = Assort.Selector.DEFAULT_ICON;
-                        if (mod.getId().equals("minecraft")) defaultLogo = Assort.Selector.getPackIcon(minecraft.getResourcePackRepository().getPack("vanilla"));
+                        ResourceLocation defaultLogo = PackAlbum.Selector.DEFAULT_ICON;
+                        if (mod.getId().equals("minecraft")) defaultLogo = PackAlbum.Selector.getPackIcon(minecraft.getResourcePackRepository().getPack("vanilla"));
                         return new SizedLocation(defaultLogo,1,1);
                     });
                     if (logo != null) FactoryGuiGraphics.of(guiGraphics).blit(logo.location,getX() + 5, getY() + 5, 0,0, logo.getScaledWidth(20),20,logo.getScaledWidth(20),20);
@@ -173,6 +209,6 @@ public class ModsScreen extends PanelVListScreen {
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.add(()->ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), ()-> Component.translatable("legacy.menu.sorting", this.sorting.get() == 0 ? LegacyKeyBindsScreen.NONE : ALPHABETICAL));
+        renderer.add(()->ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), ()-> Component.translatable("legacy.menu.sorting", this.sorting.get() == 0 ? LegacyComponents.NONE : LegacyComponents.ALPHABETICAL));
     }
 }

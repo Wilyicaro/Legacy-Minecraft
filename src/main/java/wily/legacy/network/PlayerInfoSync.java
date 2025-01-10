@@ -97,7 +97,7 @@ public record PlayerInfoSync(int sync, UUID player) implements CommonNetwork.Pay
         @Override
         public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> p) {
             executor.executeWhen(()->{
-                if (p.get().level().isClientSide && FactoryAPIClient.hasModOnServer){
+                if (p.get() != null && p.get().level().isClientSide && FactoryAPIClient.hasModOnServer){
                     Legacy4JClient.defaultServerGameType = defaultGameType;
                     Legacy4JClient.updateLegacyPlayerInfos(players);
                     return true;

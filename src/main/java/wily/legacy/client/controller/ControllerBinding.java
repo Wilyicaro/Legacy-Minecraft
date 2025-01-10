@@ -1,11 +1,13 @@
 package wily.legacy.client.controller;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.serialization.Codec;
 import net.minecraft.util.StringRepresentable;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static wily.legacy.client.controller.ControllerManager.DEFAULT_CONTROLLER_BUTTONS_BY_KEY;
@@ -19,14 +21,14 @@ public enum ControllerBinding implements StringRepresentable {
     BACK(InputConstants.KEY_H),
     GUIDE,
     START(InputConstants.KEY_ESCAPE),
-    LEFT_STICK(c-> BindingState.Axis.createStick(c,()->LegacyOption.leftStickDeadZone.get().floatValue(),(a, s)->{}),false),
-    RIGHT_STICK(c-> BindingState.Axis.createStick(c,()->LegacyOption.rightStickDeadZone.get().floatValue(), ControllerManager::updatePlayerCamera),false),
+    LEFT_STICK(c-> BindingState.Axis.createStick(c,()->LegacyOptions.leftStickDeadZone.get().floatValue(),(a, s)->{}),false),
+    RIGHT_STICK(c-> BindingState.Axis.createStick(c,()->LegacyOptions.rightStickDeadZone.get().floatValue(), ControllerManager::updatePlayerCamera),false),
     LEFT_STICK_BUTTON(InputConstants.KEY_F5),
     RIGHT_STICK_BUTTON(InputConstants.KEY_LSHIFT),
     LEFT_BUMPER(InputConstants.KEY_PAGEDOWN),
     RIGHT_BUMPER(InputConstants.KEY_PAGEUP),
-    LEFT_TRIGGER(c-> BindingState.Axis.createTrigger(c,()-> LegacyOption.leftTriggerDeadZone.get().floatValue()), InputConstants.MOUSE_BUTTON_RIGHT),
-    RIGHT_TRIGGER(c-> BindingState.Axis.createTrigger(c,()->LegacyOption.rightTriggerDeadZone.get().floatValue()), InputConstants.MOUSE_BUTTON_LEFT),
+    LEFT_TRIGGER(c-> BindingState.Axis.createTrigger(c,()-> LegacyOptions.leftTriggerDeadZone.get().floatValue()), InputConstants.MOUSE_BUTTON_RIGHT),
+    RIGHT_TRIGGER(c-> BindingState.Axis.createTrigger(c,()->LegacyOptions.rightTriggerDeadZone.get().floatValue()), InputConstants.MOUSE_BUTTON_LEFT),
     DPAD_UP(InputConstants.KEY_UP),
     DPAD_DOWN(InputConstants.KEY_DOWN),
     DPAD_LEFT(InputConstants.KEY_LEFT),
@@ -40,6 +42,7 @@ public enum ControllerBinding implements StringRepresentable {
     RIGHT_STICK_RIGHT(c-> BindingState.create(c, h-> RIGHT_STICK.bindingState instanceof BindingState.Axis a && a.x >= a.getDeadZone())),
     RIGHT_STICK_LEFT(c-> BindingState.create(c, h-> RIGHT_STICK.bindingState instanceof BindingState.Axis a && a.x <= -a.getDeadZone()));
     public static final EnumCodec<ControllerBinding> CODEC = StringRepresentable.fromEnum(ControllerBinding::values);
+    public static final Codec<Optional<ControllerBinding>> OPTIONAL_CODEC = Codec.STRING.xmap(s->s.equals("none") ? Optional.empty() : Optional.ofNullable(CODEC.byName(s)), b-> b.map(ControllerBinding::getSerializedName).orElse("none"));
 
     public final BindingState bindingState;
     public final boolean isBindable;
@@ -64,7 +67,7 @@ public enum ControllerBinding implements StringRepresentable {
         return getMappedBinding(this);
     }
     public static ControllerBinding getMappedBinding(ControllerBinding component){
-        boolean invert = LegacyOption.invertControllerButtons.get();
+        boolean invert = LegacyOptions.invertControllerButtons.get();
         return switch (component){
             case DOWN_BUTTON -> invert ? RIGHT_BUTTON : component;
             case RIGHT_BUTTON -> invert ? DOWN_BUTTON : component;

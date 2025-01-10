@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 
 @Mixin(Particle.class)
 public class ParticleMixin {
@@ -15,6 +15,6 @@ public class ParticleMixin {
 
     @Inject(method = "<init>(Lnet/minecraft/client/multiplayer/ClientLevel;DDD)V", at = @At("RETURN"))
     private void init(ClientLevel clientLevel, double d, double e, double f, CallbackInfo ci){
-        if (!LegacyOption.defaultParticlePhysics.get()) hasPhysics = false;
+        if (!LegacyOptions.defaultParticlePhysics.get()) hasPhysics = false;
     }
 }

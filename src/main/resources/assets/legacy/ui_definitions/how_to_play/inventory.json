@@ -1,0 +1,128 @@
+{
+  "elements": {
+    "panel": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/panel",
+      "width":215,
+      "height":217,
+      "x":"${width}/2",
+      "y":"(${height}-${panel.height})/2+30"
+    },
+    "scrollable_renderer": {
+      "type": "put_scrollable_renderer",
+      "x": "${width}/2-228",
+      "y": "${panel.y}+1",
+      "width": 200,
+      "height": 222,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.inventory_message", "allowVariables": true, "args": ["controlIcon.legacy.key.inventory","controlIcon.pointer_movement","controlIcon.menu_main_action","controlIcon.menu_off_action"]},
+          "width": 176
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.inventory_message_1", "allowVariables": true, "args": ["controlIcon.menu_main_action","controlIcon.menu_main_action","controlIcon.menu_off_action","controlIcon.menu_quick_action","controlIcon.menu_off_action"]},
+          "width": 176
+        }
+      }
+    },
+    "player_slot": {
+      "type":"blit_sprite",
+      "sprite": "legacy:tiles/entity_panel",
+      "x":"${panel.x}+90",
+      "y":"${panel.y}+13",
+      "width": 63,
+      "height": 84
+    },
+    "player": {
+      "type":"blit_sprite",
+      "sprite": "legacy:container/htp_inventory_player",
+      "x":"${panel.x}+92",
+      "y":"${panel.y}+15",
+      "width": 59,
+      "height": 80
+    },
+    "pointer": {
+      "type":"blit_sprite",
+      "sprite": "legacy:container/pointer",
+      "x":"${panel.x}+162",
+      "y":"${panel.y}+25",
+      "width": 16,
+      "height": 16,
+      "apply_condition": "${window_height}>720"
+    },
+    "small_pointer": {
+      "type":"blit_sprite",
+      "sprite": "legacy:container/pointer",
+      "x":"${panel.x}+162",
+      "y":"${panel.y}+25",
+      "width": 16,
+      "height": 16,
+      "apply_condition": "${window_height}<=720"
+    },
+    "inventory_label": {
+      "type":"draw_string",
+      "component": {"translate": "container.inventory"},
+      "color": "${commonColor.inventory_gray_text}",
+      "shadow": false,
+      "x":"${panel.x}+14",
+      "y":"${panel.y}+103"
+    },
+    "helmet": {
+      "type":"put_legacy_slot",
+      "isFake":true,
+      "fakeItem": "iron_helmet",
+      "x":"${panel.x}+64",
+      "y":"${panel.y}+14"
+    },
+    "chest": {
+      "type":"put_legacy_slot",
+      "isFake":true,
+      "fakeItem": "leather_chestplate",
+      "x":"${panel.x}+64",
+      "y":"${panel.y}+35"
+    },
+    "legs": {
+      "type":"put_legacy_slot",
+      "isFake":true,
+      "iconSprite": "legacy:container/legs_slot",
+      "x":"${panel.x}+64",
+      "y":"${panel.y}+56"
+    },
+    "feet": {
+      "type":"put_legacy_slot",
+      "isFake":true,
+      "iconSprite": "legacy:container/feet_slot",
+      "x":"${panel.x}+64",
+      "y":"${panel.y}+77"
+    },
+    "shield": {
+      "type":"put_legacy_slot",
+      "isFake":true,
+      "iconSprite": "legacy:container/shield_slot",
+      "x":"${panel.x}+161",
+      "y":"${panel.y}+77"
+    },
+    "inventory": {
+      "type":"put_legacy_slot",
+      "range":"[0,26]",
+      "isFake":true,
+      "fakeContainer": [
+        {"item": "stone", "count": 32},{"item": "oak_planks", "count": 17},"air","air","oak_fence_gate","air","air",{"item": "arrow", "count": 64},{"item": "stick", "count": 10},
+        {"item": "bookshelf", "count": 3},"air","dark_oak_door","air","emerald","air",{"item": "cobblestone_wall", "count": 7},"oak_sign","air",
+        {"item": "stone_brick_stairs", "count": 24},{"item": "cobblestone_stairs", "count": 16},"air","oak_log",{"item": "acacia_stairs", "count": 15},"air","diamond_pickaxe",{"item": "paper", "count": 21},{"item": "gunpowder", "count": 15}
+      ],
+      "x":"${panel.x}+14+(${inventory.index}%9)*21",
+      "y":"${panel.y}+116+(${inventory.index}/9)*21"
+    },
+    "quick_select": {
+      "type":"put_legacy_slot",
+      "range":"[0,8]",
+      "isFake":true,
+      "fakeContainer": ["iron_sword","bow",{"item": "arrow", "count": 64},{"item": "flint_and_steel", "components": {"damage": 28}, "nbt": {"Damage": 28}},"clock","shears",{"item": "iron_axe", "components": {"damage": 65}, "nbt": {"Damage": 65}},"fishing_rod","compass"],
+      "x":"${panel.x}+14+(${quick_select.index}%9)*21",
+      "y":"${panel.y}+186"
+    }
+  }
+}

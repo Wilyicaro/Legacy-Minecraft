@@ -40,16 +40,20 @@ public class LegacyTipManager extends SimplePreparableReloadListener<List<Suppli
     public static LegacyTip getActualTip() {
         return actualTip;
     }
+
     public static LegacyTip getLastTip() {
         return lastTip;
     }
+
     public static float getTipXDiff(){
-        return LegacyOption.hints.get() && Minecraft.getInstance().screen instanceof LegacyMenuAccess<?> a && a.getTipXDiff() != 0 ? Math.min(0,Math.max(a.getTipXDiff(),50 - a.getMenuRectangle().left()) * Math.max(0,Math.min(tipDiffPercentage,1))) : 0;
+        return LegacyOptions.hints.get() && Minecraft.getInstance().screen instanceof LegacyMenuAccess<?> a && a.getTipXDiff() != 0 ? Math.min(0,Math.max(a.getTipXDiff(),50 - a.getMenuRectangle().left()) * Math.max(0,Math.min(tipDiffPercentage,1))) : 0;
     }
+
     public static void setActualTip(LegacyTip tip) {
         lastTip = actualTip;
         actualTip = tip;
     }
+
     public static LegacyTip getUpdateTip() {
         if (tips.isEmpty()) setActualTip(null);
         else {
@@ -58,6 +62,7 @@ public class LegacyTipManager extends SimplePreparableReloadListener<List<Suppli
         }
         return actualTip;
     }
+
     public static boolean setTip(Supplier<LegacyTip> tipSupplier){
         if (tipSupplier != null) {
             setActualTip(tipSupplier.get());
@@ -65,6 +70,7 @@ public class LegacyTipManager extends SimplePreparableReloadListener<List<Suppli
         }
         return false;
     }
+
     public static void addTip(Supplier<LegacyTip> tipSupplier){
         if (tipSupplier != null) tips.add(tipSupplier);
     }

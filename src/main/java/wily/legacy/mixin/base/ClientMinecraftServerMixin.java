@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.ScreenUtil;
 
@@ -42,17 +42,17 @@ public abstract class ClientMinecraftServerMixin {
     @Shadow private int ticksUntilAutosave;
     @Inject(method = "computeNextAutosaveInterval", at = @At("RETURN"), cancellable = true)
     private void tickServer(CallbackInfoReturnable<Integer> cir){
-        cir.setReturnValue(LegacyOption.autoSaveInterval.get() > 0 ? LegacyOption.autoSaveInterval.get() * cir.getReturnValue() : 1);
+        cir.setReturnValue(LegacyOptions.autoSaveInterval.get() > 0 ? LegacyOptions.autoSaveInterval.get() * cir.getReturnValue() : 1);
     }
     @Inject(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;ticksUntilAutosave:I", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER))
     private void tickServer(BooleanSupplier booleanSupplier, CallbackInfo ci){
-        if (LegacyOption.autoSaveInterval.get() > 0 && ticksUntilAutosave >= 0 && ticksUntilAutosave <= 100) {
+        if (LegacyOptions.autoSaveCountdown.get() && LegacyOptions.autoSaveInterval.get() > 0 && ticksUntilAutosave >= 0 && ticksUntilAutosave <= 100) {
             if (ticksUntilAutosave % 20 == 0) TopMessage.medium = new TopMessage(Component.translatable("legacy.menu.autoSave_countdown", ticksUntilAutosave / 20),CommonColor.INVENTORY_GRAY_TEXT.get());
         }else TopMessage.medium = null;
     }
     @Redirect(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;ticksUntilAutosave:I", opcode = Opcodes.GETFIELD, ordinal = 1))
     private int tickServer(MinecraftServer instance){
-        return LegacyOption.autoSaveInterval.get() > 0 && !Minecraft.getInstance().isDemo() ? ticksUntilAutosave : 1;
+        return LegacyOptions.autoSaveInterval.get() > 0 && !Minecraft.getInstance().isDemo() ? ticksUntilAutosave : 1;
     }
     //?} else {
     /*@Shadow private int tickCount;
@@ -70,16 +70,16 @@ public abstract class ClientMinecraftServerMixin {
     }
     @Unique
     private int autoSaveInterval(){
-        return 6000 * LegacyOption.autoSaveInterval.get();
+        return 6000 * LegacyOptions.autoSaveInterval.get();
     }
     @Inject(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;tickCount:I", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER))
     private void tickServer(BooleanSupplier booleanSupplier, CallbackInfo ci){
-        int t = LegacyOption.autoSaveInterval.get() == 0 ? 0 : autoSaveInterval() - (tickCount % autoSaveInterval());
+        int t = LegacyOptions.autoSaveInterval.get() == 0 ? 0 : autoSaveInterval() - (tickCount % autoSaveInterval());
         t = t == autoSaveInterval() ? 0 : t;
-        if (LegacyOption.autoSaveInterval.get() > 0 && t >= 0 && t <= 100) {
+        if (LegacyOptions.autoSaveCountdown.get() && LegacyOptions.autoSaveInterval.get() > 0 && t >= 0 && t <= 100) {
             if (t % 20 == 0) TopMessage.medium = new TopMessage(Component.translatable("legacy.menu.autoSave_countdown", t / 20),CommonColor.INVENTORY_GRAY_TEXT.get());
         }else TopMessage.medium = null;
-        if (LegacyOption.autoSaveInterval.get() == 0 || Minecraft.getInstance().isDemo()) return;
+        if (LegacyOptions.autoSaveInterval.get() == 0 || Minecraft.getInstance().isDemo()) return;
         if (this.tickCount % autoSaveInterval() == 0) {
             LOGGER.debug("Autosave started");
             this.profiler.push("save");
@@ -98,6 +98,7 @@ public abstract class ClientMinecraftServerMixin {
     }
     @Inject(method = "saveEverything", at = @At("RETURN"))
     public void saveEverything(boolean bl, boolean bl2, boolean bl3, CallbackInfoReturnable<Boolean> cir) {
+        if (!Legacy4JClient.isCurrentWorldSource(storageSource)) return;
         CompletableFuture.runAsync(()->{
             isSaving = true;
             Iterable<ServerLevel> levels = getAllLevels();

@@ -20,6 +20,7 @@ import net.minecraft.client.multiplayer.ServerStatusPinger;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.screen.JoinGameScreen;
@@ -34,13 +35,14 @@ public class FriendsServerRenderableList extends ServerRenderableList {
     boolean ping = false;
     protected final FriendsListUpdate friendsListUpdate = friends -> updateServers();
 
-    public FriendsServerRenderableList(UIDefinition.Accessor accessor) {
+    public FriendsServerRenderableList(UIAccessor accessor) {
         super(accessor);
     }
 
     public void added() {
         WorldHost.ONLINE_FRIEND_UPDATES.add(friendsListUpdate);
     }
+
     @Override
     public void removed() {
         super.removed();
@@ -50,13 +52,14 @@ public class FriendsServerRenderableList extends ServerRenderableList {
     public boolean hasOnlineFriends(){
         return !WorldHost.ONLINE_FRIENDS.isEmpty();
     }
+
     @Override
-    public void updateServers() {
+    public void updateLANServers() {
         if (!ping) {
             WorldHost.pingFriends();
             ping = true;
         }
-        super.updateServers();
+        super.updateLANServers();
         Util.backgroundExecutor().execute(()-> {
             WorldHost.ONLINE_FRIENDS.forEach(((uuid, id) -> {
                 AbstractButton onlineButton;

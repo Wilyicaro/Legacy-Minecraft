@@ -45,6 +45,7 @@ import org.joml.Vector3f;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
@@ -70,12 +71,17 @@ public class ScreenUtil {
     public static final ResourceLocation MENU_BACKGROUND = Legacy4J.createModLocation( "textures/gui/menu_background.png");
 
     public static void renderPointerPanel(GuiGraphics graphics, int x, int y, int width, int height){
+        blitTranslucentOverlaySprite(graphics, LegacySprites.POINTER_PANEL, x, y, width, height);
+    }
+
+    public static void blitTranslucentOverlaySprite(GuiGraphics graphics, ResourceLocation sprite, int x, int y, int width, int height){
         RenderSystem.enableBlend();
         FactoryGuiGraphics.of(graphics).disableDepthTest();
-        FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.POINTER_PANEL,x,y,width,height);
+        FactoryGuiGraphics.of(graphics).blitSprite(sprite,x,y,width,height);
         FactoryGuiGraphics.of(graphics).enableDepthTest();
         RenderSystem.disableBlend();
     }
+
     public static void renderPanelTranslucentRecess(GuiGraphics graphics, int x, int y, int width, int height){
         RenderSystem.enableBlend();
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.PANEL_TRANSLUCENT_RECESS,x,y,width,height);
@@ -104,16 +110,16 @@ public class ScreenUtil {
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SAVE_ARROW,0,0,13,16);
         graphics.pose().popPose();
     }
-    public static void renderDefaultBackground(UIDefinition.Accessor accessor, GuiGraphics guiGraphics){
+    public static void renderDefaultBackground(UIAccessor accessor, GuiGraphics guiGraphics){
         renderDefaultBackground(accessor, guiGraphics, true);
     }
-    public static void renderDefaultBackground(UIDefinition.Accessor accessor, GuiGraphics guiGraphics, boolean title){
+    public static void renderDefaultBackground(UIAccessor accessor, GuiGraphics guiGraphics, boolean title){
         renderDefaultBackground(accessor, guiGraphics, false, title, true);
     }
     public static boolean getActualLevelNight(){
         return (mc.getSingleplayerServer() != null&& mc.getSingleplayerServer().overworld() != null && mc.getSingleplayerServer().overworld().isNight()) || (mc.level!= null && mc.level.isNight());
     }
-    public static void renderDefaultBackground(UIDefinition.Accessor accessor, GuiGraphics guiGraphics, boolean forcePanorama, boolean title, boolean username){
+    public static void renderDefaultBackground(UIAccessor accessor, GuiGraphics guiGraphics, boolean forcePanorama, boolean title, boolean username){
         if (mc.level == null || accessor.getBoolean("forcePanorama",forcePanorama))
             renderPanoramaBackground(guiGraphics, forcePanorama && getActualLevelNight());
         else /*? if <=1.20.1 {*//*renderTransparentBackground(guiGraphics)*//*?} else {*/accessor.getScreen().renderTransparentBackground(guiGraphics)/*?}*/;
@@ -183,46 +189,38 @@ public class ScreenUtil {
     public static void prepareHUDRender(GuiGraphics graphics){
         graphics.pose().pushPose();
         FactoryGuiGraphics.of(graphics).setColor(1.0f,1.0f,1.0f,getHUDOpacity());
-        //? if >=1.21.2 {
-        /*graphics.flush();
-        RenderSystem.setShaderColor(1.0f,1.0f,1.0f,getHUDOpacity());
-        *///?}
         graphics.pose().translate(0,getHUDDistance(),0);
         RenderSystem.enableBlend();
     }
     public static void finalizeHUDRender(GuiGraphics graphics){
         graphics.pose().popPose();
         FactoryGuiGraphics.of(graphics).setColor(1.0f,1.0f,1.0f,1.0f);
-        //? if >=1.21.2 {
-        /*graphics.flush();
-        RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
-        *///?}
         RenderSystem.disableBlend();
     }
     public static boolean hasClassicCrafting(){
-        return !FactoryAPIClient.hasModOnServer || LegacyOption.classicCrafting.get();
+        return !FactoryAPIClient.hasModOnServer || LegacyOptions.classicCrafting.get();
     }
     public static float getHUDScale(){
-        return Math.max(1.5f,4 - LegacyOption.hudScale.get());
+        return Math.max(1.5f,4 - LegacyOptions.hudScale.get());
     }
     public static float getHUDSize(){
         return 6 + 3f / ScreenUtil.getHUDScale() * (35 + (mc.gameMode.canHurtPlayer() ?  Math.max(2,Mth.ceil((Math.max(mc.player.getAttributeValue(Attributes.MAX_HEALTH), Math.max(mc.gui.displayHealth, mc.player.getHealth())) + mc.player.getAbsorptionAmount()) / 20f) + (mc.player.getArmorValue() > 0 ? 1 : 0))* 10 : 0));
     }
     public static double getHUDDistance(){
-        return -LegacyOption.hudDistance.get()*(22.5D + (LegacyOption.inGameTooltips.get() ? 17.5D : 0));
+        return -LegacyOptions.hudDistance.get()*(22.5D + (LegacyOptions.inGameTooltips.get() ? 17.5D : 0));
     }
     public static float getHUDOpacity(){
         float f = (Util.getMillis() - lastHotbarSelectionChange)/ 1200f;
         return getInterfaceOpacity() <= 0.8f ?Math.min(0.8f,getInterfaceOpacity() + (1 -getInterfaceOpacity()) * (f >= 3f ? Math.max(4 - f,0) : 1)) : getInterfaceOpacity();
     }
     public static boolean hasTooltipBoxes(){
-        return LegacyOption.tooltipBoxes.get();
+        return LegacyOptions.tooltipBoxes.get();
     }
-    public static boolean hasTooltipBoxes(UIDefinition.Accessor accessor){
+    public static boolean hasTooltipBoxes(UIAccessor accessor){
         return hasTooltipBoxes() && accessor.getBoolean("hasTooltipBox",true);
     }
     public static float getInterfaceOpacity(){
-        return LegacyOption.hudOpacity.get().floatValue();
+        return LegacyOptions.hudOpacity.get().floatValue();
     }
     public static int getDefaultTextColor(boolean forceWhite){
         return !forceWhite ? CommonColor.HIGHLIGHTED_WIDGET_TEXT.get() : CommonColor.WIDGET_TEXT.get();
@@ -371,11 +369,11 @@ public class ScreenUtil {
     }
 
     public static float getTextScale(){
-        return LegacyOption.legacyItemTooltipScaling.get() ? Math.max(2/3f,Math.min(720f/getStandardHeight(),4/3f)) : 1.0f;
+        return LegacyOptions.legacyItemTooltipScaling.get() ? Math.max(2/3f,Math.min(720f/getStandardHeight(),4/3f)) : 1.0f;
     }
 
     public static float getChatSafeZone(){
-        return 29 * LegacyOption.hudDistance.get().floatValue();
+        return 29 * LegacyOptions.hudDistance.get().floatValue();
     }
 
     public static Component getDimensionName(ResourceKey<Level> dimension){
@@ -384,13 +382,13 @@ public class ScreenUtil {
     }
 
     public static int getSelectedItemTooltipLines(){
-        return LegacyOption.selectedItemTooltipLines.get() == 0 ? 0 : LegacyOption.selectedItemTooltipLines.get() + (LegacyOption.itemTooltipEllipsis.get() ? 1 : 0);
+        return LegacyOptions.selectedItemTooltipLines.get() == 0 ? 0 : LegacyOptions.selectedItemTooltipLines.get() + (LegacyOptions.itemTooltipEllipsis.get() ? 1 : 0);
     }
 
     public static void renderAnimatedCharacter(GuiGraphics guiGraphics){
         if (mc.getCameraEntity() instanceof LivingEntity character) {
             boolean hasRemainingTime = character.isSprinting() || character.isCrouching() || character.isFallFlying() || character.isVisuallySwimming() || !(character instanceof Player);
-            if (LegacyOption.animatedCharacter.get() && (hasRemainingTime || character instanceof Player p && p.getAbilities().flying) && !character.isSleeping()) {
+            if (LegacyOptions.animatedCharacter.get() && (hasRemainingTime || character instanceof Player p && p.getAbilities().flying) && !character.isSleeping()) {
                 ScreenUtil.animatedCharacterTime = Util.getMillis();
                 ScreenUtil.remainingAnimatedCharacterTime = hasRemainingTime ? 450 : 0;
             }
@@ -401,17 +399,13 @@ public class ScreenUtil {
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(32f, character.isFallFlying() ? 44 : 18,0);
                 ScreenUtil.applyHUDScale(guiGraphics);
-                float f = LegacyOption.smoothAnimatedCharacter.get() ? FactoryAPIClient.getPartialTick() : 0;
+                float f = LegacyOptions.smoothAnimatedCharacter.get() ? FactoryAPIClient.getPartialTick() : 0;
                 ScreenUtil.renderEntity(guiGraphics, 10f, (character.isFallFlying() ? -character.getViewXRot(f) / 180 * 40 : 36), 12, f,new Vector3f(), new Quaternionf().rotationXYZ(-5* Mth.PI/180f, (165 -Mth.lerp(f, character.yBodyRotO, character.yBodyRot)) * Mth.PI/180f, Mth.PI), null, character);
                 guiGraphics.pose().popPose();
                 character.setXRot(xRot);
                 character.xRotO = xRotO;
             }
         }
-    }
-
-    public static int colorFromFloat(float r, float g, float b, float a) {
-        return (int)(a * 255f) << 24 | (int)(r * 255f) << 16 | (int)(g * 255f) << 8 | (int)(b * 255f);
     }
 
     public static void renderContainerEffects(GuiGraphics guiGraphics, int leftPos, int topPos, int imageWidth, int imageHeight, int mouseX, int mouseY){
@@ -472,6 +466,6 @@ public class ScreenUtil {
     }
 
     public static List<Component> getTooltip(ItemStack stack){
-        return stack.getTooltipLines(/*? if >1.20.5 {*/Item.TooltipContext.of(mc.level),/*?}*/ mc.player, LegacyOption.advancedHeldItemTooltip.get() ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL);
+        return stack.getTooltipLines(/*? if >1.20.5 {*/Item.TooltipContext.of(mc.level),/*?}*/ mc.player, LegacyOptions.advancedHeldItemTooltip.get() ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL);
     }
 }

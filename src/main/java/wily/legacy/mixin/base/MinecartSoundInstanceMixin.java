@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 
 @Mixin(value = {MinecartSoundInstance.class, RidingMinecartSoundInstance.class})
 public abstract class MinecartSoundInstanceMixin extends AbstractTickableSoundInstance {
@@ -20,7 +20,7 @@ public abstract class MinecartSoundInstanceMixin extends AbstractTickableSoundIn
 
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     public void tick(CallbackInfo ci) {
-        if (!LegacyOption.minecartSounds.get()) {
+        if (!LegacyOptions.minecartSounds.get()) {
             volume = 0;
             ci.cancel();
         }

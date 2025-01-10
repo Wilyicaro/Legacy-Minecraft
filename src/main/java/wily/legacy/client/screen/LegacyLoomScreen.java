@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.StackIngredient;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.util.PagedList;
@@ -64,7 +65,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
     protected ItemStack resultStack = ItemStack.EMPTY;
     protected ItemStack selectedStack = ItemStack.EMPTY;
     protected ItemStack previewStack = ItemStack.EMPTY;
-    protected final UIDefinition.Accessor accessor = UIDefinition.Accessor.of(this);
+    protected final UIAccessor accessor = UIAccessor.of(this);
     protected final ScrollableRenderer scrollableRenderer = new ScrollableRenderer();
     protected final List<LoomTabListing> loomTabListings = List.copyOf(LoomTabListing.map.values());
     protected final List<RecipeIconHolder<BannerRecipe>> craftingButtons = new ArrayList<>();

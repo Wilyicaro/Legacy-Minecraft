@@ -14,9 +14,9 @@ import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.client.screen.LegacyIconHolder;
-import wily.legacy.client.screen.SimpleLayoutRenderable;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.function.Supplier;

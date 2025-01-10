@@ -1,0 +1,14 @@
+[
+  {
+    "title": {"translate": "legacy.menu.how_to_play.basics"},
+    "ui_definition": "legacy:how_to_play/basics"
+  },
+  {
+    "title": {"translate": "legacy.menu.how_to_play.hud"},
+    "ui_definition": "legacy:how_to_play/hud"
+  },
+  {
+    "title": {"translate": "container.inventory"},
+    "ui_definition": "legacy:how_to_play/inventory"
+  }
+]

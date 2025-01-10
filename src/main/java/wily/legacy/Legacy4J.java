@@ -62,6 +62,7 @@ import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
+import wily.legacy.config.LegacyConfig;
 import wily.legacy.init.*;
 import wily.legacy.network.*;
 import wily.legacy.entity.LegacyPlayerInfo;
@@ -117,20 +118,21 @@ public class Legacy4J {
         LegacyRegistries.register();
         LegacyGameRules.init();
         FactoryEvent.registerPayload(r->{
-            r.register(false,ClientAdvancementsPayload.ID);
-            r.register(false,ClientAnimalInLoveSyncPayload.ID);
-            r.register(false,ClientEffectActivationPayload.ID);
-            r.register(true,ClientMerchantTradingPayload.ID_C2S);
-            r.register(false,ClientMerchantTradingPayload.ID_S2C);
-            r.register(true,PlayerInfoSync.ID);
-            r.register(true,PlayerInfoSync.All.ID_C2S);
-            r.register(false,PlayerInfoSync.All.ID_S2C);
-            r.register(true,ServerMenuCraftPayload.ID);
-            r.register(true,ServerOpenClientMenuPayload.ID);
+            r.register(false, ClientAdvancementsPayload.ID);
+            r.register(false, ClientAnimalInLoveSyncPayload.ID);
+            r.register(false, ClientEffectActivationPayload.ID);
+            r.register(true, ClientMerchantTradingPayload.ID_C2S);
+            r.register(false, ClientMerchantTradingPayload.ID_S2C);
+            r.register(true, PlayerInfoSync.ID);
+            r.register(true, PlayerInfoSync.All.ID_C2S);
+            r.register(false, PlayerInfoSync.All.ID_S2C);
+            r.register(true, ServerMenuCraftPayload.ID);
+            r.register(true, ServerOpenClientMenuPayload.ID);
             r.register(true, ServerPlayerMissHitPayload.ID);
-            r.register(false,TipCommand.Payload.ID);
-            r.register(false,TipCommand.EntityPayload.ID);
-            r.register(false,TopMessage.Payload.ID);
+            r.register(false, TipCommand.Payload.ID);
+            r.register(false, TipCommand.EntityPayload.ID);
+            r.register(false, TopMessage.Payload.ID);
+            r.register(false, CommonConfigSyncPayload.ID);
             //? if >=1.21.2 {
             /*r.register(false, CommonRecipeManager.ClientPayload.ID);
             *///?}
@@ -142,7 +144,10 @@ public class Legacy4J {
         /*ItemAccessor.of(Items.CAKE).setMaxStackSize(64);
         ItemAccessor.of(Items.MUSIC_DISC_CAT).setRecordLengthInTicks(330);
         *///?}
-        FactoryEvent.registerCommands(TipCommand::register);
+        FactoryEvent.registerCommands((dispatcher,context,selection)->{
+            TipCommand.register(dispatcher,context,selection);
+            Legacy4JCommand.register(dispatcher,context);
+        });
         FactoryEvent.setup(Legacy4J::setup);
         FactoryEvent.tagsLoaded(Legacy4J::tagsLoaded);
         FactoryEvent.serverStarted(Legacy4J::onServerStart);
@@ -153,19 +158,6 @@ public class Legacy4J {
         return FactoryAPI.createLocation(MOD_ID,path);
     }
 
-    public static <T> Map<String, Field> getAccessibleFieldsMap(Class<T> fieldsClass, String... fields){
-        Map<String,Field> map = new HashMap<>();
-        for (String s : fields) {
-            try {
-                Field field = fieldsClass.getDeclaredField(s);
-                field.setAccessible(true);
-                map.put(s, field);
-            } catch (NoSuchFieldException var1) {
-                throw new IllegalStateException("Couldn't get field %s for %s".formatted(s, fieldsClass), var1);
-            }
-        }
-        return map;
-    }
 
     public static /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult *//*?} else {*/ItemInteractionResult/*?}*/ defaultPassInteraction() {
         return /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult.PASS*//*?} else {*/ ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION/*?}*/;
@@ -179,6 +171,8 @@ public class Legacy4J {
     }
 
     public static void setup(){
+        //LegacyConfig.commonLoadAll();
+        if (!LegacyConfig.legacyCauldrons.get()) return;
         Map<Item, CauldronInteraction> emptyCauldron = CauldronInteraction.EMPTY/*? if >1.20.1 {*/.map()/*?}*/;
         Map<Item, CauldronInteraction> waterCauldron = CauldronInteraction.WATER/*? if >1.20.1 {*/.map()/*?}*/;
         CauldronInteraction emptyCauldronPotion = (blockState, level, blockPos, player, interactionHand, itemStack) ->{
@@ -356,14 +350,30 @@ public class Legacy4J {
         return /*? if <1.20.5 {*//*FactoryScreenUtil.colorFromFloat(dyeColor.getTextureDiffuseColors())*//*?} else {*/dyeColor.getTextureDiffuseColor()/*?}*/;
     }
 
+    public static float getItemDamageModifier(ItemStack stack){
+        if (LegacyConfig.legacyCombat.get()){
+            if (stack.getItem() instanceof SwordItem) return 1;
+            else if (stack.getItem() instanceof ShovelItem) return -0.5f;
+            else if (stack.getItem() instanceof PickaxeItem) return 1;
+            else if (stack.getItem() instanceof AxeItem) {
+                if (stack.is(Items.STONE_AXE)) return -4;
+                else if (stack.is(Items.DIAMOND_AXE)) return - 2;
+                else return -3;
+            }
+        }
+        return 0;
+    }
+
     public static void tagsLoaded(){
         //? if >=1.20.5 {
         registerDyedWaterCauldronInteraction(CauldronInteraction.WATER.map());
         //?}
     }
+
     public static void registerDyedWaterCauldronInteraction(Map<Item, CauldronInteraction> waterCauldron){
+        if (!LegacyConfig.legacyCauldrons.get()) return;
         BuiltInRegistries.ITEM.asHolderIdMap().forEach(i-> {
-            if (!/*? if <1.20.5 {*//*(i.value() instanceof DyeableLeatherItem)*//*?} else {*/i.is(ItemTags.DYEABLE)/*?}*/) return;
+            if (!isDyeableItem(i)) return;
             waterCauldron.put(i.value(),(blockState, level, blockPos, player, interactionHand, itemStack) -> {
                 Optional<WaterCauldronBlockEntity> opt = level.getBlockEntity(blockPos,LegacyRegistries.WATER_CAULDRON_BLOCK_ENTITY.get());
                 if ((opt.isPresent() && !opt.get().hasWater()) || (/*? if <1.20.5 {*//*((DyeableLeatherItem)itemStack.getItem()).hasCustomColor(itemStack) *//*?} else {*/itemStack.get(DataComponents.DYED_COLOR) == null/*?}*/ && (opt.isEmpty() || opt.get().waterColor == null))) {
@@ -408,6 +418,10 @@ public class Legacy4J {
         return repairItem.is(ingredient.getItem()) && repairItem.getCount() == 1 && ingredient.getCount() == 1 && /*? if <1.20.5 {*//*repairItem.getItem().canBeDepleted()*//*?} else {*/repairItem.getItem().components().has(DataComponents.DAMAGE) && !repairItem.isEnchanted()/*?}*/ && !ingredient.isEnchanted();
     }
 
+    public static boolean isDyeableItem(Holder<Item> item){
+        return /*? if <1.20.5 {*//*(item.value() instanceof DyeableLeatherItem)*//*?} else {*/item.is(ItemTags.DYEABLE)/*?}*/;
+    }
+
     public static ItemStack dyeItem(ItemStack itemStack, int color) {
         List<Integer> colors = new ArrayList<>();
         //? if <1.20.5 {
@@ -428,6 +442,7 @@ public class Legacy4J {
         //?}
         return itemStack;
     }
+
     public static int mixColors(Iterator<Integer> colors){
         int n;
         float h;
@@ -488,6 +503,7 @@ public class Legacy4J {
         ((LegacyPlayerInfo)p).setIdentifierIndex(pos);
         CommonNetwork.forceEnabledPlayer(p, ()-> {
             CommonNetwork.sendToPlayer(p, new PlayerInfoSync.All(Map.of(p.getUUID(),(LegacyPlayerInfo)p), Collections.emptyMap(),p.server.getDefaultGameType(),PlayerInfoSync.All.ID_S2C));
+            CommonNetwork.sendToPlayer(p, CommonConfigSyncPayload.of(LegacyConfig.COMMON_STORAGE));
             playerInitialPayloads.forEach(payload->CommonNetwork.sendToPlayer(p, payload));
         });
         if (!p.server.isDedicatedServer()) Legacy4JClient.serverPlayerJoin(p);

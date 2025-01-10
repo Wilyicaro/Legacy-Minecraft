@@ -27,6 +27,7 @@ import org.joml.Vector3f;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.inventory.LegacySlotDisplay;
@@ -56,23 +57,29 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     private boolean focused = false;
 
     public LegacyIconHolder(){}
+
     public LegacyIconHolder(Slot slot){
-        slotBounds(slot);
+        slotBoundsWithItem(0, 0, slot);
     }
+
     public LegacyIconHolder(int leftPos, int topPos, Slot slot){
         slotBounds(leftPos, topPos, slot);
     }
+
     public LegacyIconHolder(int x, int y, int width, int height){
         this(width,height);
         setPos(x,y);
     }
+
     public LegacyIconHolder(int width, int height){
         setBounds(width,height);
     }
+
     public void setBounds(int width, int height){
         this.width = width;
         this.height = height;
     }
+
     public void setPos(int x, int y){
         setX(x);
         setY(y);
@@ -83,21 +90,33 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         return isHovered;
     }
 
+    public LegacyIconHolder slotBoundsWithItem(int leftPos, int topPos, Slot slot){
+        return slotBounds(leftPos, topPos, slot, slot.getItem());
+    }
+
     public LegacyIconHolder slotBounds(Slot slot){
         return slotBounds(0,0,slot);
     }
+
     public LegacyIconHolder slotBounds(int leftPos, int topPos, Slot slot){
-        return itemHolder(leftPos + slot.x,topPos + slot.y,LegacySlotDisplay.of(slot).getWidth(),LegacySlotDisplay.of(slot).getHeight(),ItemStack.EMPTY,false,LegacySlotDisplay.of(slot).getIconSprite(),LegacySlotDisplay.of(slot).getOffset(),LegacySlotDisplay.of(slot).getIconHolderOverride());
+        return slotBounds(leftPos, topPos, slot, ItemStack.EMPTY);
     }
+    public LegacyIconHolder slotBounds(int leftPos, int topPos, Slot slot, ItemStack stack){
+        return itemHolder(leftPos + slot.x,topPos + slot.y,LegacySlotDisplay.of(slot).getWidth(),LegacySlotDisplay.of(slot).getHeight(), stack,false,LegacySlotDisplay.of(slot).getIconSprite(),LegacySlotDisplay.of(slot).getOffset(),LegacySlotDisplay.of(slot).getIconHolderOverride());
+    }
+
     public LegacyIconHolder itemHolder(ItemStack itemIcon, boolean isWarning){
         return itemHolder(itemIcon,isWarning,Vec3.ZERO);
     }
+
     public LegacyIconHolder itemHolder(ItemStack itemIcon, boolean isWarning, Vec3 offset){
         return itemHolder(0,0,21,21,itemIcon,isWarning,offset);
     }
+
     public LegacyIconHolder itemHolder(int x, int y, int width, int height, ItemStack itemIcon, boolean isWarning, Vec3 offset){
         return itemHolder(x,y,width,height,itemIcon,isWarning,null,offset,null);
     }
+
     public LegacyIconHolder itemHolder(int x, int y, int width, int height, ItemStack itemIcon, boolean isWarning, ResourceLocation iconSprite, Vec3 offset, ArbitrarySupplier<ResourceLocation> override){
         setPos(x,y);
         setBounds(width,height);

@@ -13,11 +13,12 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
 import wily.factoryapi.FactoryAPIPlatform;
+import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.client.controller.ControllerBinding;
@@ -28,8 +29,8 @@ import wily.legacy.util.ScreenUtil;
 import java.util.Arrays;
 import java.util.Objects;
 
-import static wily.legacy.client.screen.LegacyKeyBindsScreen.NONE;
-import static wily.legacy.client.screen.LegacyKeyBindsScreen.SELECTION;
+import static wily.legacy.util.LegacyComponents.NONE;
+import static wily.legacy.util.LegacyComponents.SELECTION;
 
 public class ControllerMappingScreen extends PanelVListScreen implements Controller.Event {
     protected LegacyKeyMapping selectedKey = null;
@@ -42,16 +43,16 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.reset_defaults"),button -> minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.reset_controls"),Component.translatable("legacy.menu.reset_controls_message"), b-> {
             for (KeyMapping keyMapping : keyMappings)
                 LegacyKeyMapping.of(keyMapping).setBinding(LegacyKeyMapping.of(keyMapping).getDefaultBinding());
-            options.save();
+            LegacyOptions.CLIENT_STORAGE.save();
             minecraft.setScreen(this);
         }))).size(240,20).build());
-        renderableVList.addOptions(LegacyOption.controllerToggleCrouch,LegacyOption.controllerToggleSprint,LegacyOption.selectedController,LegacyOption.selectedControllerHandler,LegacyOption.invertControllerButtons,LegacyOption.controllerSensitivity,LegacyOption.leftStickDeadZone,LegacyOption.rightStickDeadZone,LegacyOption.leftTriggerDeadZone,LegacyOption.rightTriggerDeadZone);
+        renderableVList.addOptions(LegacyOptions.controllerToggleCrouch,LegacyOptions.controllerToggleSprint,LegacyOptions.selectedController,LegacyOptions.selectedControllerHandler,LegacyOptions.invertControllerButtons,LegacyOptions.controllerSensitivity,LegacyOptions.leftStickDeadZone,LegacyOptions.rightStickDeadZone,LegacyOptions.leftTriggerDeadZone,LegacyOptions.rightTriggerDeadZone);
         for (KeyMapping keyMapping : keyMappings) {
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category)) {
                 renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> {}))), SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> graphics.drawString(font, Component.translatable(category), l.x + 1, l.y + 4, CommonColor.INVENTORY_GRAY_TEXT.get(), false)))));
                 if (category.equals("key.categories.movement"))
-                    renderableVList.addOptions(LegacyOption.invertYController,LegacyOption.smoothMovement,LegacyOption.linearCameraMovement);
+                    renderableVList.addOptions(LegacyOptions.invertYController,LegacyOptions.smoothMovement,LegacyOptions.linearCameraMovement);
             }
             lastCategory = keyMapping.getCategory();
             LegacyKeyMapping mapping = (LegacyKeyMapping) keyMapping;
@@ -60,12 +61,12 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
                 protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                     if (!isFocused() && isPressed()) selectedKey = null;
                     super.renderWidget(guiGraphics, i, j, f);
-                    Component c = isPressed() ? SELECTION : ((LegacyKeyMapping) keyMapping).getBinding() == null ? NONE : null;
+                    Component c = isPressed() ? SELECTION : LegacyKeyMapping.of(keyMapping).getBinding() == null ? NONE : null;
                     if (c != null){
                         guiGraphics.drawString(font,c, getX() + width - 20 - font.width(c) / 2, getY() + (height -  font.lineHeight) / 2 + 1,0xFFFFFF);
                         return;
                     }
-                    ControlTooltip.Icon icon = ((LegacyKeyMapping) keyMapping).getBinding().bindingState.getIcon();
+                    ControlTooltip.Icon icon = LegacyKeyMapping.of(keyMapping).getBinding().bindingState.getIcon();
                     RenderSystem.enableBlend();
                     icon.render(guiGraphics, getX() + width - 20 - icon.render(guiGraphics,0,0,false,true) / 2, getY() + (height -  font.lineHeight) / 2 + 1,false,false);
                     RenderSystem.disableBlend();
@@ -78,7 +79,7 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
                     ControllerBinding.DOWN_BUTTON.bindingState.block();
                     if (net.minecraft.client.gui.screens.Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed){
                         mapping.setBinding(mapping.getDefaultBinding());
-                        options.save();
+                        LegacyOptions.CLIENT_STORAGE.save();
                     } else if (!ControlType.getActiveType().isKbm()) selectedKey = mapping;
                 }
                 @Override
@@ -102,7 +103,7 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
     public boolean keyPressed(int i, int j, int k) {
         if (i == InputConstants.KEY_ESCAPE && selectedKey != null) {
             selectedKey.setBinding(null);
-            minecraft.options.save();
+            LegacyOptions.CLIENT_STORAGE.save();
             selectedKey = null;
             return true;
         }
@@ -126,7 +127,7 @@ public class ControllerMappingScreen extends PanelVListScreen implements Control
         if (selectedKey != null) {
             if (!state.canClick() || !state.binding.isBindable) return;
             selectedKey.setBinding(!state.is(ControllerBinding.BACK) || selectedKey.self() == Legacy4JClient.keyHostOptions ? state.binding : null);
-            minecraft.options.save();
+            LegacyOptions.CLIENT_STORAGE.save();
             selectedKey = null;
             state.block();
         }

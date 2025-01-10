@@ -4,6 +4,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.SimpleLayoutRenderable;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
@@ -13,14 +15,14 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Panel extends SimpleLayoutRenderable {
-    protected final UIDefinition.Accessor accessor;
+    protected final UIAccessor accessor;
     public ResourceLocation panelSprite = LegacySprites.SMALL_PANEL;
-    String name;
+    public String name;
 
     public Panel(Screen screen){
-        this(UIDefinition.Accessor.of(screen));
+        this(UIAccessor.of(screen));
     }
-    public Panel(UIDefinition.Accessor accessor){
+    public Panel(UIAccessor accessor){
         this.accessor = accessor;
     }
     public static Panel createPanel(Screen screen, Function<Panel,Integer> leftPosGetter, Function<Panel,Integer> topPosGetter, int width, int height){
@@ -33,7 +35,7 @@ public class Panel extends SimpleLayoutRenderable {
         return createPanel(screen, initAppearance, p->p.centered(screen));
     }
     public static Panel createPanel(Screen screen, Consumer<Panel> initAppearance, Consumer<Panel> initPos){
-        return new Panel(UIDefinition.Accessor.of(screen)){
+        return new Panel(UIAccessor.of(screen)){
             @Override
             public void init(String name) {
                 super.init(name);

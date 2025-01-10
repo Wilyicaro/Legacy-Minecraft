@@ -44,10 +44,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.client.MinecraftAccessor;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.AdvancementToastAccessor;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.*;
 import wily.legacy.network.ServerPlayerMissHitPayload;
@@ -157,7 +158,7 @@ public abstract class MinecraftMixin {
     }
     @Redirect(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
     private InteractionResult startUseItemReturn(MultiPlayerGameMode instance, LocalPlayer localPlayer, InteractionHand arg, BlockHitResult arg2){
-        if (LegacyOption.legacyCreativeBlockPlacing.get() && rightClickDelay == 4 && player.getAbilities().instabuild && ControlTooltip.canPlace(self(),arg)) {
+        if (LegacyOptions.legacyCreativeBlockPlacing.get() && rightClickDelay == 4 && player.getAbilities().instabuild && ControlTooltip.canPlace(self(),arg)) {
             if (lastPlayerBlockUsePos == null) lastPlayerBlockUsePos = player.position();
             rightClickDelay = 0;
         }
@@ -244,23 +245,27 @@ public abstract class MinecraftMixin {
     }
 
     private boolean isOtherDimension(Level level){
-        return level != null && level.dimension() !=Level.OVERWORLD;
+        return level != null && level.dimension() != Level.OVERWORLD;
     }
+
     @ModifyArg(method = "resizeDisplay",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/Window;setGuiScale(D)V"))
     public double resizeDisplay(double d) {
-        int h = (LegacyOption.autoResolution.get() ? ScreenUtil.getStandardHeight() : getWindow().getHeight());
-        return h / 360d * getTweakedHeightScale(h);
+        UIAccessor accessor = screen == null ? UIAccessor.of(gui) : UIAccessor.of(screen);
+        int h = (LegacyOptions.autoResolution.get() ? ScreenUtil.getStandardHeight() : getWindow().getHeight());
+        return h / 360d * getTweakedHeightScale(h) * accessor.getDouble("scaleMultiplier",1);
     }
+
     @Unique
     public double getTweakedHeightScale(int height) {
-        if (LegacyOption.autoResolution.get()){
+        if (LegacyOptions.autoResolution.get()){
             if (height == 1080) return 0.999623452;
             else if (height % 720 != 0) return 1.001d;
 
             return 1d;
         }
-        return (1.125 - LegacyOption.interfaceResolution.get() / 4);
+        return (1.125 - LegacyOptions.interfaceResolution.get() / 4);
     }
+
     //? if >1.20.1 {
     @Inject(method = "addInitialScreens", at = @At("HEAD"))
     private void addInitialScreens(List<Function<Runnable, Screen>> list, CallbackInfo ci) {

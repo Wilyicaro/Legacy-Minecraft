@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.FactoryAPI;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyClientWorldSettings;
 
 import java.net.Proxy;
@@ -57,7 +57,7 @@ public abstract class IntegratedServerMixin extends MinecraftServer {
 
     @Redirect(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/client/server/IntegratedServer;paused:Z", opcode = Opcodes.GETFIELD, ordinal = 1))
     public boolean tickServer(IntegratedServer instance) {
-        return paused && LegacyOption.autoSaveWhenPaused.get() && LegacyOption.autoSaveInterval.get() > 0 && !minecraft.isDemo();
+        return paused && LegacyOptions.autoSaveWhenPaused.get() && (LegacyOptions.autoSaveInterval.get() > 0 || !Legacy4JClient.isCurrentWorldSource(storageSource)) && !minecraft.isDemo();
     }
 
     @Override

@@ -10,7 +10,7 @@ import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 import wily.legacy.client.LegacyBiomeOverride;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 
 @Mixin(FogRenderer.class)
 public abstract class FogRendererMixin {
@@ -23,10 +23,10 @@ public abstract class FogRendererMixin {
     }
     @Redirect(method = "setupFog",at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/FogRenderer$FogData;start:F", opcode = Opcodes.PUTFIELD, ordinal = 8))
     private static void setupFog(FogRenderer.FogData instance, float value) {
-        instance.start = LegacyOption.overrideTerrainFogStart.get() ? LegacyOption.terrainFogStart.get() * 16 : value;
+        instance.start = LegacyOptions.overrideTerrainFogStart.get() ? LegacyOptions.terrainFogStart.get() * 16 : value;
     }
     @Redirect(method = "setupFog",at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/FogRenderer$FogData;end:F", opcode = Opcodes.PUTFIELD, ordinal = 11))
     private static void setupFogEnd(FogRenderer.FogData instance, float value, Camera camera, FogRenderer.FogMode fogMode,/*? if >=1.21.2 {*/ /*Vector4f vector4f,*//*?}*/ float f) {
-        instance.end = f * LegacyOption.terrainFogEnd.get().floatValue() * 2;
+        instance.end = f * LegacyOptions.terrainFogEnd.get().floatValue() * 2;
     }
 }

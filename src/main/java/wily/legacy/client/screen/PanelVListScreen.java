@@ -33,7 +33,7 @@ public class PanelVListScreen extends PanelBackgroundScreen implements Renderabl
         if (!getRenderableVLists().isEmpty()) renderableVListInit();
     }
     public void renderableVListInit(){
-        getRenderableVList().init("renderableVList",panel.x + 10,panel.y + 10,panel.width - 20,panel.height-20);
+        getRenderableVList().init(panel.x + 10,panel.y + 10,panel.width - 20,panel.height-20);
     }
     @Override
     public void onClose() {

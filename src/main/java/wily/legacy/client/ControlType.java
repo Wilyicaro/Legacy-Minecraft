@@ -3,7 +3,6 @@ package wily.legacy.client;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
-import wily.factoryapi.FactoryAPI;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.screen.ControlTooltip;
@@ -37,10 +36,10 @@ public interface ControlType  {
     static ControlType create(ResourceLocation id, Component displayName, boolean isKbm){
         return create(id,new HashMap<>(),displayName == null ? Component.translatable("legacy.options.controlType." + id.getPath()) : displayName,Style.EMPTY.withFont(id),isKbm);
     }
-    static ControlType create(ResourceLocation id, Map<String, ControlTooltip.ComponentIcon> map, Component displayName, Style style, boolean isKbm){
+    static ControlType create(ResourceLocation id, Map<String, ControlTooltip.LegacyIcon> map, Component displayName, Style style, boolean isKbm){
         return new ControlType() {
             @Override
-            public Map<String, ControlTooltip.ComponentIcon> getIcons() {
+            public Map<String, ControlTooltip.LegacyIcon> getIcons() {
                 return map;
             }
 
@@ -65,29 +64,29 @@ public interface ControlType  {
         };
     }
     static ControlType getActiveControllerType(){
-        if (LegacyOption.selectedControlType.get().equals("auto")) {
+        if (LegacyOptions.selectedControlType.get().equals("auto")) {
             if (Legacy4JClient.controllerManager.connectedController != null){
                 return Legacy4JClient.controllerManager.connectedController.getType();
             } else return x360;
         } else {
-            ControlType type = typesMap.getOrDefault(LegacyOption.selectedControlType.get(), x360);
+            ControlType type = typesMap.getOrDefault(LegacyOptions.selectedControlType.get(), x360);
             return type.isKbm() ? x360 : type;
         }
     }
 
     static ControlType getActiveType(){
-        return !LegacyOption.lockControlTypeChange.get() && Legacy4JClient.controllerManager.isControllerTheLastInput || LegacyOption.lockControlTypeChange.get() && (Legacy4JClient.controllerManager.connectedController != null && LegacyOption.selectedControlType.get().equals("auto") || !typesMap.getOrDefault(LegacyOption.selectedControlType.get(), KBM).isKbm()) ? getActiveControllerType() : getKbmActiveType();
+        return !LegacyOptions.lockControlTypeChange.get() && Legacy4JClient.controllerManager.isControllerTheLastInput || LegacyOptions.lockControlTypeChange.get() && (Legacy4JClient.controllerManager.connectedController != null && LegacyOptions.selectedControlType.get().equals("auto") || !typesMap.getOrDefault(LegacyOptions.selectedControlType.get(), KBM).isKbm()) ? getActiveControllerType() : getKbmActiveType();
     }
 
     static ControlType getKbmActiveType(){
-        if (LegacyOption.selectedControlType.get().equals("auto")) return KBM;
+        if (LegacyOptions.selectedControlType.get().equals("auto")) return KBM;
         else {
-            ControlType type = typesMap.getOrDefault(LegacyOption.selectedControlType.get(), KBM);
+            ControlType type = typesMap.getOrDefault(LegacyOptions.selectedControlType.get(), KBM);
             return !type.isKbm() ? KBM : type;
         }
     }
     ResourceLocation getId();
-    Map<String, ControlTooltip.ComponentIcon> getIcons();
+    Map<String, ControlTooltip.LegacyIcon> getIcons();
     boolean isKbm();
     Component getDisplayName();
     Style getStyle();

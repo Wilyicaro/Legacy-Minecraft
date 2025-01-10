@@ -1,7 +1,5 @@
 package wily.legacy.client;
 
-import wily.legacy.client.screen.Assort;
-
 public interface LegacyClientWorldSettings {
     long getDisplaySeed();
     void setDisplaySeed(long s);
@@ -10,8 +8,8 @@ public interface LegacyClientWorldSettings {
     boolean isDifficultyLocked();
     void setDifficultyLocked(boolean locked);
     void setAllowCommands(boolean allow);
-    void setSelectedResourceAssort(Assort assort);
-    Assort getSelectedResourceAssort();
+    void setSelectedResourceAlbum(PackAlbum album);
+    PackAlbum getSelectedResourceAlbum();
 
     static LegacyClientWorldSettings of(Object object){
         return (LegacyClientWorldSettings) object;

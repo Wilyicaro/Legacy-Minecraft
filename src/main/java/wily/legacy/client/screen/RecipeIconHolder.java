@@ -18,7 +18,7 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.client.RecipeInfo;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.init.LegacyRegistries;
@@ -216,7 +216,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
                 craft();
                 updateRecipeDisplay(getFocusedRecipe());
             }else {
-                if (minecraft.player.containerMenu instanceof LegacyCraftingMenu m && !m.showedNotEnoughIngredientsHint && LegacyOption.hints.get()){
+                if (minecraft.player.containerMenu instanceof LegacyCraftingMenu m && !m.showedNotEnoughIngredientsHint && LegacyOptions.hints.get()){
                     m.showedNotEnoughIngredientsHint = true;
                     LegacyTipManager.setActualTip(new LegacyTip(CommonComponents.EMPTY,NOT_ENOUGH_INGREDIENTS));
                 }

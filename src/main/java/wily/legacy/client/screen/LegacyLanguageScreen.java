@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.LanguageManager;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacySprites;
 
 import java.util.Locale;
@@ -73,6 +74,6 @@ public class LegacyLanguageScreen extends PanelVListScreen {
         addRenderableOnly(panel);
         addRenderableOnly(((guiGraphics, i, j, f) -> FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 6, panel.y + 24, panel.width - 12, panel.height - 34)));
         getRenderableVList().init(panel.x + 10,panel.y + 30,panel.width - 20,panel.height - 46);
-        addRenderableWidget(minecraft.options.forceUnicodeFont().createButton(minecraft.options,panel.x + 10, panel.y + 10, panel.width - 20));
+        addRenderableWidget(LegacyConfigWidget.createWidget(LegacyOptions.of(minecraft.options.forceUnicodeFont()),panel.x + 10, panel.y + 10, panel.width - 20, v->{}));
     }
 }

@@ -16,7 +16,7 @@ import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.entity.LegacyPlayerInfo;
@@ -46,18 +46,18 @@ public  class ControllerManager {
     }
 
     public static Controller.Handler getHandler() {
-        return LegacyOption.selectedControllerHandler.get();
+        return LegacyOptions.selectedControllerHandler.get();
     }
 
     public static void updatePlayerCamera(BindingState.Axis stick, Controller handler){
         Minecraft minecraft = Minecraft.getInstance();
         if (!minecraft.mouseHandler.isMouseGrabbed() || !minecraft.isWindowActive() || !stick.pressed || minecraft.player == null) return;
-        double f = Math.pow(LegacyOption.controllerSensitivity.get() * (double)0.6f + (double)0.2f,3) * 7.5f * (minecraft.player.isScoping() ? 0.125: 1.0);
-        minecraft.player.turn(getCameraCurve(stick.getSmoothX()) * f, getCameraCurve(stick.getSmoothY()) * f * (LegacyOption.invertYController.get() ? -1 : 1));
+        double f = Math.pow(LegacyOptions.controllerSensitivity.get() * (double)0.6f + (double)0.2f,3) * 7.5f * (minecraft.player.isScoping() ? 0.125: 1.0);
+        minecraft.player.turn(getCameraCurve(stick.getSmoothX()) * f, getCameraCurve(stick.getSmoothY()) * f * (LegacyOptions.invertYController.get() ? -1 : 1));
     }
 
     public static float getCameraCurve(float f){
-        if (LegacyOption.linearCameraMovement.get()) return f;
+        if (LegacyOptions.linearCameraMovement.get()) return f;
         return f * f * Math.signum(f);
     }
 
@@ -70,11 +70,11 @@ public  class ControllerManager {
                 minecraft.execute(getHandler()::init);
                 if (minecraft.isRunning() && getHandler().update()) {
                     Setup.EVENT.invoker.accept(ControllerManager.this);
-                    if (!getHandler().isValidController(LegacyOption.selectedController.get())) {
+                    if (!getHandler().isValidController(LegacyOptions.selectedController.get())) {
                         if (connectedController != null) connectedController.disconnect(ControllerManager.this);
                         return;
                     }
-                    if (connectedController == null && (connectedController = getHandler().getController(LegacyOption.selectedController.get())) != null) connectedController.connect(ControllerManager.this);
+                    if (connectedController == null && (connectedController = getHandler().getController(LegacyOptions.selectedController.get())) != null) connectedController.connect(ControllerManager.this);
                     minecraft.execute(() -> {
                         if (connectedController != null) getHandler().setup(ControllerManager.this);
                     });
@@ -132,7 +132,7 @@ public  class ControllerManager {
                 }
                 Controller.Event.of(minecraft.screen).bindingStateTick(state);
                 if (minecraft.screen == null) break s;
-                ControllerBinding cursorBinding = ((LegacyKeyMapping) Legacy4JClient.keyToggleCursor).getBinding();
+                ControllerBinding cursorBinding = LegacyKeyMapping.of(Legacy4JClient.keyToggleCursor).getBinding();
                 if (cursorBinding != null && state.is(cursorBinding) && state.canClick()) toggleCursor();
                 if (isCursorDisabled) simulateKeyAction(s-> state.is(ControllerBinding.DOWN_BUTTON) && (minecraft.screen instanceof Controller.Event e && !e.onceClickBindings() || state.onceClick(true)),InputConstants.KEY_RETURN, state);
                 simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_BUTTON) && state.onceClick(true),InputConstants.KEY_ESCAPE, state);
@@ -160,7 +160,7 @@ public  class ControllerManager {
 
             if (minecraft.screen != null && !isCursorDisabled) {
                 if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && state.pressed)
-                    setPointerPos(minecraft.mouseHandler.xpos() + stick.x * ((double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth())  * LegacyOption.interfaceSensitivity.get() / 2,minecraft.mouseHandler.ypos() + stick.y * ((double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()) * LegacyOption.interfaceSensitivity.get() / 2);
+                    setPointerPos(minecraft.mouseHandler.xpos() + stick.x * ((double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth())  * LegacyOptions.interfaceSensitivity.get() / 2,minecraft.mouseHandler.ypos() + stick.y * ((double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()) * LegacyOptions.interfaceSensitivity.get() / 2);
 
                 if (state.is(ControllerBinding.LEFT_TRIGGER) && minecraft.screen instanceof LegacyMenuAccess<?> m && m.getMenu().getCarried().getCount() > 1){
                     if (state.justPressed) minecraft.screen.mouseClicked(getPointerX(), getPointerY(), 0);
@@ -200,7 +200,7 @@ public  class ControllerManager {
                         else if (state.canReleaseKeyMapping(value)) value.setDown(false);
                         if (state.pressed) {
                             if (value == minecraft.options.keyTogglePerspective || value == minecraft.options.keyUse) state.block();
-                            else if (value == minecraft.options.keyAttack) state.onceClick(-state.getDefaultDelay() * (minecraft.player.getAbilities().invulnerable ? 3 : 4));
+                            else if (value == minecraft.options.keyAttack) state.onceClick(-state.getDefaultDelay() * (minecraft.player.getAbilities().invulnerable ? 3 : 5));
                         }
                     }
                 }
@@ -228,11 +228,13 @@ public  class ControllerManager {
     public BindingState getButtonState(ControllerBinding button){
         return button.bindingState;
     }
+
     public void disableCursor(){
         if (getCursorMode() == 1 || minecraft.screen == null || minecraft.screen instanceof Controller.Event e && !e.disableCursorOnInit()) return;
         GLFW.glfwSetInputMode(minecraft.getWindow().getWindow(),GLFW.GLFW_CURSOR,GLFW.GLFW_CURSOR_HIDDEN);
         isCursorDisabled = true;
     }
+
     public void resetCursor(){
         if (!resetCursor || isCursorDisabled) return;
         if (minecraft.screen instanceof LegacyMenuAccess<?> a) {
@@ -245,13 +247,16 @@ public  class ControllerManager {
         }
         resetCursor = false;
     }
+
     public void enableAndResetCursor(){
         enableCursor();
         resetCursor = true;
     }
+
     public void enableCursor(){
         isCursorDisabled = false;
     }
+
     public void toggleCursor(){
         if (getCursorMode() < 2) setCursorMode(getCursorMode() + 1);
         else setCursorMode(0);
@@ -264,13 +269,14 @@ public  class ControllerManager {
     }
 
     public int getCursorMode() {
-        return LegacyOption.cursorMode.get();
+        return LegacyOptions.cursorMode.get();
     }
 
     public void setCursorMode(int cursorMode) {
-        LegacyOption.cursorMode.set(cursorMode);
-        minecraft.options.save();
+        LegacyOptions.cursorMode.set(cursorMode);
+        LegacyOptions.cursorMode.save();
     }
+
     interface Setup extends Consumer<ControllerManager> {
         FactoryEvent<Setup> EVENT = new FactoryEvent<>(e-> m-> e.invokeAll(l->l.accept(m)));
     }

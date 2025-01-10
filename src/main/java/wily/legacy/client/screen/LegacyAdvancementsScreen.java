@@ -22,7 +22,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.PagedList;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.*;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.ControllerBinding;
@@ -213,14 +213,14 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
     @Override
     public void added() {
         super.added();
-        oldLegacyTooltipsValue = LegacyOption.legacyItemTooltips.get();
-        LegacyOption.legacyItemTooltipScaling.set(false);
+        oldLegacyTooltipsValue = LegacyOptions.legacyItemTooltips.get();
+        LegacyOptions.legacyItemTooltipScaling.set(false);
     }
 
     @Override
     public void removed() {
         super.removed();
-        LegacyOption.legacyItemTooltipScaling.set(oldLegacyTooltipsValue);
+        LegacyOptions.legacyItemTooltipScaling.set(oldLegacyTooltipsValue);
     }
     @Override
     public void setTooltipForNextRenderPass(List<FormattedCharSequence> list, ClientTooltipPositioner clientTooltipPositioner, boolean bl) {

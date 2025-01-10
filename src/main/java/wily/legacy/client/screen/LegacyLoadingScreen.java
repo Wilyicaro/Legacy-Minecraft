@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
@@ -31,7 +32,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
     private Component loadingHeader;
     private Component loadingStage;
     private boolean genericLoading;
-    private UIDefinition.Accessor accessor = UIDefinition.Accessor.of(this);
+    private UIAccessor accessor = UIAccessor.of(this);
 
     protected RandomSource random = RandomSource.create();
 
@@ -47,7 +48,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
     public void prepareRender(Minecraft minecraft,int width, int height,Component loadingHeader, Component loadingStage, int progress, boolean genericLoading){
         resize(minecraft,width,height);
         this.minecraft = minecraft;
-        this.accessor = UIDefinition.Accessor.of(minecraft.screen);
+        this.accessor = UIAccessor.of(minecraft.screen);
         this.setLoadingHeader(accessor.getElementValue("loadingHeader.component",loadingHeader,Component.class));
         this.setLoadingStage(accessor.getElementValue("loadingStage.component",loadingStage,Component.class));
         this.setProgress(accessor.getInteger("progress",progress));

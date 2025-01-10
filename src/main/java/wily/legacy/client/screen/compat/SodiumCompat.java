@@ -6,59 +6,53 @@ import net.caffeinemc.mods.sodium.client.SodiumClientMod;
 import net.caffeinemc.mods.sodium.client.gui.SodiumGameOptionPages;
 import net.caffeinemc.mods.sodium.client.gui.SodiumGameOptions;
 import net.caffeinemc.mods.sodium.client.gui.options.Option;
+import net.caffeinemc.mods.sodium.client.gui.options.OptionPage;
 import net.caffeinemc.mods.sodium.client.gui.options.control.ControlValueFormatter;
 import net.caffeinemc.mods.sodium.client.gui.options.control.CyclingControl;
 import net.caffeinemc.mods.sodium.client.gui.options.control.SliderControl;
 import net.caffeinemc.mods.sodium.client.gui.options.control.TickBoxControl;
+import net.caffeinemc.mods.sodium.client.gui.options.storage.MinecraftOptionsStorage;
 import net.caffeinemc.mods.sodium.client.gui.options.storage.SodiumOptionsStorage;
 //?} else {
 /*import me.jellysquid.mods.sodium.client.SodiumClientMod;
 import me.jellysquid.mods.sodium.client.gui.SodiumGameOptionPages;
 import me.jellysquid.mods.sodium.client.gui.SodiumGameOptions;
 import me.jellysquid.mods.sodium.client.gui.options.Option;
+import me.jellysquid.mods.sodium.client.gui.options.OptionPage;
 import me.jellysquid.mods.sodium.client.gui.options.control.ControlValueFormatter;
 import me.jellysquid.mods.sodium.client.gui.options.control.CyclingControl;
 import me.jellysquid.mods.sodium.client.gui.options.control.SliderControl;
 import me.jellysquid.mods.sodium.client.gui.options.control.TickBoxControl;
+import me.jellysquid.mods.sodium.client.gui.options.storage.MinecraftOptionsStorage;
 import me.jellysquid.mods.sodium.client.gui.options.storage.SodiumOptionsStorage;
 *///?}
-import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.apache.logging.log4j.core.util.ReflectionUtil;
+import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIPlatform;
+import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.Legacy4JPlatform;
+import wily.legacy.client.CommonColor;
 import wily.legacy.client.screen.*;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.function.Function;
 
 public class SodiumCompat {
 
-    public static final List<Function<Screen, AbstractButton>> OPTIONS_BUTTONS = new ArrayList<>();
-    public static OptionsScreen.Section add(OptionsScreen.Section section){
-        OPTIONS_BUTTONS.add(s->RenderableVListScreen.openScreenButton(section.title(),()->section.build(s)).build());
-        return section;
-    }
+    public static final OptionsScreen.Section SODIUM = OptionsScreen.Section.add(new OptionsScreen.Section(Component.literal(FactoryAPIPlatform.getModInfo("sodium").getName()), s-> Panel.centered(s, 250,200,0,18), new ArrayList<>(List.of(o-> addSodiumOptionsFromPage(o, SodiumGameOptionPages.general(), SodiumGameOptionPages.quality(), SodiumGameOptionPages.performance(), SodiumGameOptionPages.advanced())))));
 
-    public static final OptionsScreen.Section GENERAL = add(new OptionsScreen.Section(SodiumGameOptionPages.general().getName(), s-> Panel.centered(s, 250,200,0,18), new ArrayList<>(List.of(o->SodiumGameOptionPages.general().getOptions().forEach(opt->addSodiumOptionWidgetIfPossible(o,opt))))));
-    public static final OptionsScreen.Section QUALITY = add(new OptionsScreen.Section(SodiumGameOptionPages.quality().getName(), s-> Panel.centered(s, 250,200,0,18), new ArrayList<>(List.of(o->SodiumGameOptionPages.quality().getOptions().forEach(opt->addSodiumOptionWidgetIfPossible(o,opt))))));
-    public static final OptionsScreen.Section PERFORMANCE = add(new OptionsScreen.Section(SodiumGameOptionPages.performance().getName(), s-> Panel.centered(s, 250,142), new ArrayList<>(List.of(o->SodiumGameOptionPages.performance().getOptions().forEach(opt->addSodiumOptionWidgetIfPossible(o,opt))))));
-    public static final OptionsScreen.Section ADVANCED = add(new OptionsScreen.Section(SodiumGameOptionPages.advanced().getName(), s-> Panel.centered(s, 250,52), new ArrayList<>(List.of(o->SodiumGameOptionPages.advanced().getOptions().forEach(opt->addSodiumOptionWidgetIfPossible(o,opt))))));
-
-    public static final OptionsScreen.Section SODIUM = OptionsScreen.Section.add(new OptionsScreen.Section(Component.literal(FactoryAPIPlatform.getModInfo("sodium").getName()), s-> Panel.centered(s, 220, OPTIONS_BUTTONS.size()*24+16), new ArrayList<>(List.of(o-> OPTIONS_BUTTONS.forEach(s-> o.getRenderableVList().addRenderable(s.apply(o)))))));
-
-    public static final Map<String,Field> SODIUM_SLIDER_CONTROL_FIELDS = Legacy4J.getAccessibleFieldsMap(SliderControl.class,"min","max","mode");
-    public static final Map<String,Field> SODIUM_CYCLING_CONTROL_FIELDS = Legacy4J.getAccessibleFieldsMap(CyclingControl.class,"allowedValues","names");
-    public static final Map<String,Field> SODIUM_GAME_OPTIONS_PAGE_FIELDS = Legacy4J.getAccessibleFieldsMap(SodiumGameOptionPages.class,"sodiumOpts");
-    public static final Map<String,Field> SODIUM_OPTIONS_STORAGE_FIELDS = Legacy4J.getAccessibleFieldsMap(SodiumOptionsStorage.class,"options");
+    public static final Map<String,Field> SODIUM_SLIDER_CONTROL_FIELDS = FactoryAPI.getAccessibleFieldsMap(SliderControl.class,"min","max","mode");
+    public static final Map<String,Field> SODIUM_CYCLING_CONTROL_FIELDS = FactoryAPI.getAccessibleFieldsMap(CyclingControl.class,"allowedValues","names");
+    public static final Map<String,Field> SODIUM_GAME_OPTIONS_PAGE_FIELDS = FactoryAPI.getAccessibleFieldsMap(SodiumGameOptionPages.class,"sodiumOpts");
+    public static final Map<String,Field> SODIUM_OPTIONS_STORAGE_FIELDS = FactoryAPI.getAccessibleFieldsMap(SodiumOptionsStorage.class,"options");
 
     public static AbstractWidget getSodiumOptionWidget(Option<?> option){
+        if (option.getStorage() instanceof MinecraftOptionsStorage) return null;
+
         Tooltip tooltip = option.getTooltip() == null ? null : Tooltip.create(option.getTooltip());
 
         if (option.getControl() instanceof TickBoxControl c) {
@@ -92,9 +86,14 @@ public class SodiumCompat {
         return null;
     }
 
-    public static void addSodiumOptionWidgetIfPossible(OptionsScreen screen, Option<?> option){
-        AbstractWidget widget = getSodiumOptionWidget(option);
-        if (widget != null) screen.getRenderableVList().addRenderable(widget);
+    public static void addSodiumOptionsFromPage(OptionsScreen screen, OptionPage... pages){
+        for (OptionPage page : pages) {
+            List<AbstractWidget> widgets = page.getOptions().stream().map(SodiumCompat::getSodiumOptionWidget).filter(Objects::nonNull).toList();
+            if (!widgets.isEmpty()){
+                screen.getRenderableVList().addRenderable(SimpleLayoutRenderable.createDrawString(page.getName(),0,1,200,9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+                screen.getRenderableVList().renderables.addAll(widgets);
+            }
+        }
     }
 
     public static void init(){

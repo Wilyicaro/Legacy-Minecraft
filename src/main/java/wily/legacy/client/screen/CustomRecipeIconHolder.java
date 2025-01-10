@@ -16,6 +16,7 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.FactoryIngredient;
+import wily.factoryapi.base.StackIngredient;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.util.FactoryItemUtil;
@@ -85,7 +86,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
             if (index >= addedIngredientsItems.size()) break;
             Optional<Ingredient> ing = getIngredientsGrid().get(i1);
             if (ing.isPresent()) continue;
-            getIngredientsGrid().set(i1, Optional.of(FactoryIngredient.of(addedIngredientsItems.get(index)).toIngredient()));
+            getIngredientsGrid().set(i1, Optional.of(StackIngredient.of(false, addedIngredientsItems.get(index))));
             index++;
         }
     }

@@ -1,9 +1,6 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.OptionInstance;
-import net.minecraft.client.Options;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
@@ -13,8 +10,9 @@ import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import wily.factoryapi.base.Stocker;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
-import wily.legacy.Legacy4J;
+import wily.legacy.config.LegacyConfig;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.ArrayList;
@@ -34,17 +32,17 @@ public class RenderableVList {
     protected int listWidth;
     protected int listHeight;
     public final List<Renderable> renderables = new ArrayList<>();
-    public final UIDefinition.Accessor accessor;
+    public final UIAccessor accessor;
     protected int renderablesCount;
     protected LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     public boolean cyclic = true;
     protected Function<LayoutElement,Integer> layoutSeparation = w-> 3;
 
-    public RenderableVList(UIDefinition.Accessor accessor){
+    public RenderableVList(UIAccessor accessor){
         this.accessor = accessor;
     }
     public RenderableVList(Screen screen){
-        this(UIDefinition.Accessor.of(screen));
+        this(UIAccessor.of(screen));
     }
 
     public RenderableVList addRenderables(Renderable... renderables){
@@ -68,25 +66,24 @@ public class RenderableVList {
         return screenClass.cast(accessor.getScreen());
     }
 
-    public <T> RenderableVList addLinkedOptions(int indexOffset, OptionInstance<T> dependency, Predicate<OptionInstance<T>> activeDependent, OptionInstance<?> dependent){
-        Options options = Minecraft.getInstance().options;
-        AbstractWidget dependentWidget = dependent.createButton(options,0,0,0);
+    public <T> RenderableVList addLinkedOptions(int indexOffset, LegacyConfig<T> dependency, Predicate<LegacyConfig<T>> activeDependent, LegacyConfig<?> dependent){
+        AbstractWidget dependentWidget = LegacyConfigWidget.createWidget(dependent);
         dependentWidget.active = activeDependent.test(dependency);
-        AbstractWidget dependencyWidget = dependency.createButton(options,0,0,0,b-> dependentWidget.active = activeDependent.test(dependency));
+        AbstractWidget dependencyWidget = LegacyConfigWidget.createWidget(dependency,0,0,0, b-> dependentWidget.active = activeDependent.test(dependency));
         addRenderables(indexOffset,dependentWidget,dependencyWidget);
         return this;
     }
 
-    public RenderableVList addOptions(OptionInstance<?>... optionInstances){
+    public RenderableVList addOptions(LegacyConfig<?>... optionInstances){
         return addOptions(-1,optionInstances);
     }
 
-    public RenderableVList addOptions(int indexOffset, OptionInstance<?>... optionInstances){
+    public RenderableVList addOptions(int indexOffset, LegacyConfig<?>... optionInstances){
         return addOptions(indexOffset,Arrays.stream(optionInstances));
     }
 
-    public RenderableVList addOptions(int indexOffset, Stream<OptionInstance<?>> optionInstances){
-        return addRenderables(indexOffset,optionInstances.map(i-> i.createButton(Minecraft.getInstance().options, 0,0,0)).toList().toArray(AbstractWidget[]::new));
+    public RenderableVList addOptions(int indexOffset, Stream<LegacyConfig<?>> optionInstances){
+        return addRenderables(indexOffset,optionInstances.map(LegacyConfigWidget::createWidget).toList().toArray(AbstractWidget[]::new));
     }
 
     public RenderableVList layoutSpacing(Function<LayoutElement,Integer> layoutSeparation){
@@ -127,21 +124,22 @@ public class RenderableVList {
         }
     }
 
-    public void init(String name, int leftPos, int topPos, int listWidth, int listHeight) {
-        init(accessor.getInteger(name+".x",leftPos),accessor.getInteger(name+".y",topPos),accessor.getInteger(name+".width",listWidth),accessor.getInteger(name+".height",listHeight));
-    }
 
     public void init(int leftPos, int topPos, int listWidth, int listHeight) {
-        this.leftPos = leftPos;
-        this.topPos = topPos;
-        this.listWidth = listWidth;
-        this.listHeight = listHeight;
-        boolean allowScroll = listHeight > 0;
+        init("renderableVList", leftPos, topPos, listWidth, listHeight);
+    }
+
+    public void init(String name, int leftPos, int topPos, int listWidth, int listHeight) {
+        this.leftPos = accessor.getInteger(name+".x",leftPos);
+        this.topPos = accessor.getInteger(name+".y",topPos);
+        this.listWidth = accessor.getInteger(name+".width",listWidth);
+        this.listHeight = accessor.getInteger(name+".height",listHeight);
+        boolean allowScroll = this.listHeight > 0;
         if (allowScroll) accessor.getRenderables().add(((guiGraphics, i, j, f) -> {
             if (scrolledList.get() > 0)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, leftPos + listWidth - 29, topPos + listHeight - 8);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, this.leftPos + this.listWidth - 29, this.topPos + this.listHeight - 8);
             if (canScrollDown)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN,leftPos+ listWidth - 13, topPos + listHeight - 8);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN,this.leftPos + this.listWidth - 13, this.topPos + this.listHeight - 8);
         }));
         canScrollDown = false;
         int yDiff = 0;
@@ -149,11 +147,11 @@ public class RenderableVList {
         renderablesCount = 0;
         for (int i = scrolledList.get(); i < renderables.size(); i++) {
             Renderable r = renderables.get(i);
-            if (!allowScroll || !(r instanceof LayoutElement l) || yDiff + l.getHeight() + (i == renderables.size() - 1 && scrolledList.get() == 0 ? 0 : 12) <= listHeight) {
+            if (!allowScroll || !(r instanceof LayoutElement l) || yDiff + l.getHeight() + (i == renderables.size() - 1 && scrolledList.get() == 0 ? 0 : 12) <= this.listHeight) {
                 if (r instanceof LayoutElement l) {
-                    boolean changeRow = forceWidth || xDiff + l.getWidth() > listWidth;
-                    l.setX(leftPos + xDiff);
-                    l.setY(topPos + yDiff);
+                    boolean changeRow = forceWidth || xDiff + l.getWidth() > this.listWidth;
+                    l.setX(this.leftPos + xDiff);
+                    l.setY(this.topPos + yDiff);
                     xDiff = changeRow ? 0 : xDiff + l.getWidth() + layoutSeparation.apply(l);
                     yDiff += changeRow ? l.getHeight() + layoutSeparation.apply(l) : 0;
                     if (changeRow && !forceWidth) {
@@ -163,7 +161,7 @@ public class RenderableVList {
                 }
                 renderablesCount++;
                 if (r instanceof AbstractWidget w && forceWidth)
-                    w.setWidth(listWidth);
+                    w.setWidth(this.listWidth);
                 if (r instanceof GuiEventListener l) {
                     accessor.addChild(accessor.getChildren().size(),l,false,true);
                 }

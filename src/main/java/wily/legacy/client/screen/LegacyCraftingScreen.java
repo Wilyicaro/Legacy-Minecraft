@@ -36,6 +36,7 @@ import wily.factoryapi.base.FactoryIngredient;
 import wily.factoryapi.base.StackIngredient;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.util.PagedList;
@@ -76,7 +77,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     protected final List<Optional<Ingredient>> ingredientsGrid;
     protected final CraftingContainer container;
     protected ItemStack resultStack = ItemStack.EMPTY;
-    protected final UIDefinition.Accessor accessor = UIDefinition.Accessor.of(this);
+    protected final UIAccessor accessor = UIAccessor.of(this);
     protected final List<RecipeIconHolder<CraftingRecipe>> craftingButtons = new PagedList<>(new Stocker.Sizeable(0,0),()->accessor.getInteger("maxCraftingButtonsCount",12));
     protected final List<CustomRecipeIconHolder> dyeItemButtons = new ArrayList<>();
     protected final List<CustomRecipeIconHolder> dyeArmorButtons = new ArrayList<>();
@@ -149,7 +150,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             craftingTabList.addTabButton(43,0,listing.icon(),listing.name(), t->resetElements());
 
         }
-        if (LegacyOption.vanillaTabs.get()) allRecipes.stream().collect(Collectors.groupingBy(h->h.get().category(),()->new TreeMap<>(Comparator.comparingInt(Enum::ordinal)),Collectors.groupingBy(h->h.get()./*? <1.21.2 {*/getGroup/*?} else {*//*group*//*?}*/().isEmpty() ? h.getId().toString() : h.get()./*? <1.21.2 {*/getGroup/*?} else {*//*group*//*?}*/()))).forEach((category, m)->{
+        if (LegacyOptions.vanillaTabs.get()) allRecipes.stream().collect(Collectors.groupingBy(h->h.get().category(),()->new TreeMap<>(Comparator.comparingInt(Enum::ordinal)),Collectors.groupingBy(h->h.get()./*? <1.21.2 {*/getGroup/*?} else {*//*group*//*?}*/().isEmpty() ? h.getId().toString() : h.get()./*? <1.21.2 {*/getGroup/*?} else {*//*group*//*?}*/()))).forEach((category, m)->{
             if (m.isEmpty()) return;
             List<List<RecipeInfo<CraftingRecipe>>> groups = new ArrayList<>();
             m.values().forEach(l->{

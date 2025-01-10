@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
@@ -279,7 +280,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     public void render(GuiGraphics guiGraphics, int i, int j, float f/*? if <=1.20.1 {*//*, CallbackInfo ci*//*?}*/) {
         //? if <=1.20.1
         /*ci.cancel();*/
-        ScreenUtil.renderDefaultBackground(UIDefinition.Accessor.of(this), guiGraphics, false);
+        ScreenUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
         panel.render(guiGraphics, i, j, f);
         RenderSystem.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,0.6f);

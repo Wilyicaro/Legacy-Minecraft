@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 
 import java.util.Optional;
 
@@ -17,6 +17,6 @@ public class BiomeAmbientSoundsHandlerMixin {
 
     @Redirect(method = "tick",at = @At(value = "FIELD", target = "Lnet/minecraft/client/resources/sounds/BiomeAmbientSoundsHandler;moodSettings:Ljava/util/Optional;", opcode = Opcodes.GETFIELD))
     public Optional<AmbientMoodSettings> tick(BiomeAmbientSoundsHandler instance) {
-        return LegacyOption.caveSounds.get() ? moodSettings : Optional.empty();
+        return LegacyOptions.caveSounds.get() ? moodSettings : Optional.empty();
     }
 }

@@ -156,9 +156,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
         super.render(guiGraphics, i, j, f);
         setHoveredSlot(null);
         menu.slots.forEach(s -> {
-            LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(panel.x, panel.y, s);
-            if (!s.getItem().isEmpty())
-                holder.itemIcon = s.getItem();
+            LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBoundsWithItem(panel.x, panel.y, s);
             holder.render(guiGraphics, i, j, f);
             if (holder.isHovered) {
                 if (s.isHighlightable()) holder.renderHighlight(guiGraphics);

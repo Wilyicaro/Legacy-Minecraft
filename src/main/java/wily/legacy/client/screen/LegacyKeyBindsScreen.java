@@ -14,10 +14,13 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
 import wily.factoryapi.FactoryAPIPlatform;
+import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
+import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
@@ -26,8 +29,7 @@ import java.util.Objects;
 
 public class LegacyKeyBindsScreen extends PanelVListScreen{
     protected KeyMapping selectedKey = null;
-    public static final Component SELECTION = Component.literal("...");
-    public static final Component NONE = Component.translatable("legacy.options.none");
+
     public LegacyKeyBindsScreen(Screen parent, Options options) {
         super(parent, s-> Panel.centered(s, LegacySprites.PANEL,255, 293), Component.translatable("controls.keybinds.title"));
         renderableVList.layoutSpacing(l->1);
@@ -41,7 +43,7 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
             options.save();
             minecraft.setScreen(this);
         }))).size(240,20).build());
-        renderableVList.addOptions(Minecraft.getInstance().options.toggleCrouch(),Minecraft.getInstance().options.toggleSprint());
+        renderableVList.addOptions(LegacyOptions.of(Minecraft.getInstance().options.toggleCrouch()),LegacyOptions.of(Minecraft.getInstance().options.toggleSprint()));
         for (KeyMapping keyMapping : keyMappings) {
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category))
@@ -53,9 +55,9 @@ public class LegacyKeyBindsScreen extends PanelVListScreen{
                     if (!isFocused() && isPressed()) selectedKey = null;
                     super.renderWidget(guiGraphics, i, j, f);
                     ControlTooltip.Icon icon = ControlTooltip.getKeyIcon(((LegacyKeyMapping) keyMapping).getKey().getValue());
-                    Component c = isPressed() ? SELECTION : icon == null ? NONE : null;
+                    Component c = isPressed() ? LegacyComponents.SELECTION : icon == null ? LegacyComponents.NONE : null;
                     if (c != null){
-                        guiGraphics.drawString(font,NONE, getX() + width - 20 - font.width(NONE) / 2, getY() + (height -  font.lineHeight) / 2 + 1,0xFFFFFF);
+                        guiGraphics.drawString(font, LegacyComponents.NONE, getX() + width - 20 - font.width(LegacyComponents.NONE) / 2, getY() + (height -  font.lineHeight) / 2 + 1,0xFFFFFF);
                         return;
                     }
                     RenderSystem.enableBlend();

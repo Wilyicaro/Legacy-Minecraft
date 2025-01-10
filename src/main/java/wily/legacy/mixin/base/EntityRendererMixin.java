@@ -24,8 +24,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.ScreenUtil;
 
@@ -37,21 +38,21 @@ public abstract class EntityRendererMixin {
     protected void renderNameTag(/*? if <1.21.2 {*/ Entity/*?} else {*/ /*EntityRenderState*//*?}*/ entity, Component component, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, /*? if >=1.20.5 && <1.21.2 {*/float f, /*?}*/CallbackInfo ci) {
         Minecraft minecraft = Minecraft.getInstance();
         float thickness = Math.max(0.1f,/*? if <1.21.2 {*/ minecraft.player.distanceTo(entity)/*?} else {*/ /*(float) Math.sqrt(entity.distanceToCameraSq)*//*?}*/ / 16f);
-        if (!component.equals(entity./*? if <1.21.2 {*/ getDisplayName()/*?} else {*/ /*nameTag*//*?}*/) || !LegacyOption.displayNameTagBorder.get() || thickness >=1) return;
+        if (!component.equals(entity./*? if <1.21.2 {*/ getDisplayName()/*?} else {*/ /*nameTag*//*?}*/) || !LegacyOptions.displayNameTagBorder.get() || thickness >=1) return;
         String name = component.getString();
         int j = "deadmau5".equals(name) ? -10 : 0;
         int h = (int) (-font.width(component) / 2f);
         float[] color = !(entity instanceof /*? if <1.21.2 {*/ AbstractClientPlayer/*?} else {*/ /*PlayerRenderState*//*?}*/ p)  || minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(p./*? if <1.21.2 {*/ getUUID()/*?} else {*/ /*name*//*?}*/) instanceof LegacyPlayerInfo info) || info.getIdentifierIndex() == 0 ?  new float[]{0,0,0} : Legacy4JClient.getVisualPlayerColor(info);
         renderOutline(multiBufferSource.getBuffer(entity./*? if <1.21.2 {*/ isShiftKeyDown()/*?} else {*/ /*isDiscrete*//*?}*/ ?  RenderType.textBackground() : RenderType.textBackgroundSeeThrough()), poseStack, h - 1.1f, j - 1.1f, font.width(component) + 2.1f,10.1f, thickness, color[0],color[1],color[2],1.0f);
     }
+
     @Redirect(method = "renderNameTag", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;drawInBatch(Lnet/minecraft/network/chat/Component;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/gui/Font$DisplayMode;II)I", ordinal = 0))
     protected int renderNameTag(Font instance, Component arg, float f, float g, int i, boolean bl, Matrix4f matrix4f, MultiBufferSource arg2, Font.DisplayMode arg3, int j, int k, /*? if <1.21.2 {*/ Entity/*?} else {*/ /*EntityRenderState*//*?}*/ entity) {
         Minecraft minecraft = Minecraft.getInstance();
         float thickness = Math.max(0.1f,/*? if <1.21.2 {*/ minecraft.player.distanceTo(entity)/*?} else {*/ /*(float) Math.sqrt(entity.distanceToCameraSq)*//*?}*/ / 16f);
-        float[] color = thickness < 1 || !LegacyOption.displayNameTagBorder.get() ? null : !(entity instanceof /*? if <1.21.2 {*/ AbstractClientPlayer/*?} else {*/ /*PlayerRenderState*//*?}*/ p)  || minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(p./*? if <1.21.2 {*/ getUUID()/*?} else {*/ /*name*//*?}*/) instanceof LegacyPlayerInfo info) || info.getIdentifierIndex() == 0 ?  new float[]{0,0,0} : Legacy4JClient.getVisualPlayerColor(info);
-        return instance.drawInBatch(arg,f,g,i,bl,matrix4f,arg2,arg3,color == null ? j : ScreenUtil.colorFromFloat(color[0],color[1],color[2],1.0f),k);
+        float[] color = thickness < 1 || !LegacyOptions.displayNameTagBorder.get() ? null : !(entity instanceof /*? if <1.21.2 {*/ AbstractClientPlayer/*?} else {*/ /*PlayerRenderState*//*?}*/ p)  || minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(p./*? if <1.21.2 {*/ getUUID()/*?} else {*/ /*name*//*?}*/) instanceof LegacyPlayerInfo info) || info.getIdentifierIndex() == 0 ?  new float[]{0,0,0} : Legacy4JClient.getVisualPlayerColor(info);
+        return instance.drawInBatch(arg,f,g,i,bl,matrix4f,arg2,arg3,color == null ? j : FactoryScreenUtil.colorFromFloat(color[0],color[1],color[2],1.0f),k);
     }
-
 
     public void renderOutline(VertexConsumer consumer, PoseStack poseStack, float x, float y, float width, float height,float thickness, float r, float g, float b , float a) {
         this.fill(consumer,poseStack,x, y, x + width, y + thickness, r,g,b,a);
@@ -59,6 +60,7 @@ public abstract class EntityRendererMixin {
         this.fill(consumer,poseStack,x, y + thickness, x + thickness, y + height - thickness, r,g,b,a);
         this.fill(consumer,poseStack,x + width - thickness, y + thickness, x + width, y + height - thickness, r,g,b,a);
     }
+
     public void fill(VertexConsumer vertexConsumer, PoseStack poseStack, float i, float j, float k, float l, float r, float g, float b , float a) {
         float o;
         Matrix4f matrix4f = poseStack.last().pose();

@@ -19,7 +19,7 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.ControlType;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.LegacyLoadingScreen;
 import wily.legacy.client.screen.OverlayPanelScreen;
@@ -59,16 +59,16 @@ public class SDLControllerHandler implements Controller.Handler{
             if (!nativesFile.exists()){
                 if (!(minecraft.screen instanceof OverlayPanelScreen) && MinecraftAccessor.getInstance().hasGameLoaded()) {
                     Screen s = minecraft.screen;
-                    LegacyOption.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
-                    LegacyOption.saveAll();
+                    LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
+                    LegacyOptions.selectedControllerHandler.save();
                     minecraft.setScreen(new ConfirmationScreen(s, Component.translatable("legacy.menu.download_natives",getName()), Controller.Handler.DOWNLOAD_MESSAGE, b -> {
                         Stocker<Long> fileSize = new Stocker<>(1L);
                         LegacyLoadingScreen screen = new LegacyLoadingScreen(Controller.Handler.DOWNLOADING_NATIVES, CommonComponents.EMPTY){
                             @Override
                             public void tick() {
                                 if (getProgress() == 100) {
-                                    LegacyOption.selectedControllerHandler.set(getInstance());
-                                    LegacyOption.saveAll();
+                                    LegacyOptions.selectedControllerHandler.set(getInstance());
+                                    LegacyOptions.CLIENT_STORAGE.save();
                                     minecraft.setScreen(s);
                                     return;
                                 }

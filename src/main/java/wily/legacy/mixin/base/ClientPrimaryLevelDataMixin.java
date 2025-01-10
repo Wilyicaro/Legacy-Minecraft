@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyClientWorldSettings;
-import wily.legacy.client.screen.Assort;
+import wily.legacy.client.PackAlbum;
 
 @Mixin(PrimaryLevelData.class)
 public abstract class ClientPrimaryLevelDataMixin implements LegacyClientWorldSettings {
@@ -46,7 +46,7 @@ public abstract class ClientPrimaryLevelDataMixin implements LegacyClientWorldSe
     @Inject(method = "setTagData",at = @At("TAIL"))
     private void setTagData(RegistryAccess registryAccess, CompoundTag compoundTag, CompoundTag compoundTag2, CallbackInfo ci) {
         compoundTag.putBoolean("TrustPlayers",trustPlayers());
-        compoundTag.putString("SelectedResourceAssort",getSelectedResourceAssort().id());
+        compoundTag.putString("SelectedResourceAssort", getSelectedResourceAlbum().id());
     }
     public long getDisplaySeed() {
         return LegacyClientWorldSettings.of(settings).getDisplaySeed();
@@ -58,12 +58,12 @@ public abstract class ClientPrimaryLevelDataMixin implements LegacyClientWorldSe
     }
 
     @Override
-    public Assort getSelectedResourceAssort() {
-        return LegacyClientWorldSettings.of(settings).getSelectedResourceAssort();
+    public PackAlbum getSelectedResourceAlbum() {
+        return LegacyClientWorldSettings.of(settings).getSelectedResourceAlbum();
     }
 
     @Override
-    public void setSelectedResourceAssort(Assort assort) {
-        LegacyClientWorldSettings.of(settings).setSelectedResourceAssort(assort);
+    public void setSelectedResourceAlbum(PackAlbum album) {
+        LegacyClientWorldSettings.of(settings).setSelectedResourceAlbum(album);
     }
 }

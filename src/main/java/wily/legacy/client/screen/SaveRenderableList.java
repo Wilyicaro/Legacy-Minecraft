@@ -34,10 +34,11 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.ScreenUtil;
 
@@ -127,7 +128,7 @@ public class SaveRenderableList extends RenderableVList {
         }
     });
 
-    public SaveRenderableList(UIDefinition.Accessor accessor) {
+    public SaveRenderableList(UIAccessor accessor) {
         super(accessor);
         layoutSpacing(l->0);
         this.minecraft = Minecraft.getInstance();
@@ -204,12 +205,12 @@ public class SaveRenderableList extends RenderableVList {
     }
 
     @Override
-    public void init(int leftPos, int topPos, int listWidth, int listHeight) {
+    public void init(String name, int leftPos, int topPos, int listWidth, int listHeight) {
         if (firstLoad){
             addCreationButtons();
             firstLoad = false;
         }
-        super.init(leftPos, topPos, listWidth, listHeight);
+        super.init(name, leftPos, topPos, listWidth, listHeight);
     }
 
     public class SaveButton extends AbstractButton implements ControlTooltip.ActionHolder {
@@ -404,13 +405,13 @@ public class SaveRenderableList extends RenderableVList {
 
     public void loadWorld(LevelSummary summary){
         SaveRenderableList.this.reloadSaveList();
-        if (LegacyOption.directSaveLoad.get()){
-            Legacy4JClient.copySaveBtwSources(LoadSaveScreen.getSummaryAccess(Minecraft.getInstance().getLevelSource(),summary),Legacy4JClient.currentWorldSource);
-            LoadSaveScreen.loadWorld(getScreen(),minecraft,Legacy4JClient.currentWorldSource,summary);
-        }else minecraft.setScreen(new LoadSaveScreen(getScreen(), summary, Legacy4JClient.currentWorldSource){
+        if (LegacyOptions.directSaveLoad.get()){
+            Legacy4JClient.copySaveBtwSources(LoadSaveScreen.getSummaryAccess(Minecraft.getInstance().getLevelSource(),summary),Legacy4JClient.getLevelStorageSource());
+            LoadSaveScreen.loadWorld(getScreen(),minecraft,Legacy4JClient.getLevelStorageSource(),summary);
+        }else minecraft.setScreen(new LoadSaveScreen(getScreen(), summary, Legacy4JClient.getLevelStorageSource()){
             @Override
             public void onLoad() throws IOException {
-                Legacy4JClient.copySaveBtwSources(LoadSaveScreen.getSummaryAccess(Minecraft.getInstance().getLevelSource(),summary),Legacy4JClient.currentWorldSource);
+                if (LegacyOptions.hasSaveCache.get()) Legacy4JClient.copySaveBtwSources(LoadSaveScreen.getSummaryAccess(Minecraft.getInstance().getLevelSource(),summary),Legacy4JClient.currentWorldSource);
                 super.onLoad();
             }
         });

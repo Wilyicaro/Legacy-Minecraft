@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIClient;import wily.factoryapi.util.FactoryScreenUtil;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEntity/*? if >=1.21.2 {*//*, LivingEntityRenderState*//*?}*/> {
@@ -54,7 +54,7 @@ public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEnt
 
     @Inject(method = /*? if <1.21.2 {*/"render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"/*?} else {*//*"render(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"*//*?}*/, at = @At("HEAD"))
     public void render(/*? if <1.21.2 {*/LivingEntity livingEntity, float f, float g/*?} else {*//*LivingEntityRenderState livingEntityRenderState*//*?}*/, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, CallbackInfo ci) {
-        if (/*? if <1.21.2 {*/livingEntity instanceof Merchant m && m.getTradingPlayer() != null/*?} else {*//*FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyVillagerRenderState.class) != null && FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyVillagerRenderState.class).isTrading*//*?}*/ && LegacyOption.merchantTradingIndicator.get()) {
+        if (/*? if <1.21.2 {*/livingEntity instanceof Merchant m && m.getTradingPlayer() != null/*?} else {*//*FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyVillagerRenderState.class) != null && FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyVillagerRenderState.class).isTrading*//*?}*/ && LegacyOptions.merchantTradingIndicator.get()) {
             poseStack.pushPose();
             poseStack.translate(0,/*? if <1.21.2 {*/livingEntity.getBbHeight()/*?} else {*//*livingEntityRenderState.boundingBoxHeight*//*?}*/ + 0.5f,0);
             poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
@@ -66,19 +66,19 @@ public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEnt
     //? if <=1.20.6 {
     /*@Redirect(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/EntityModel;renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;IIFFFF)V"))
     public void renderToBufferFireColor(EntityModel instance, PoseStack poseStack, VertexConsumer consumer, int light, int overlay, float r, float g, float b, float a, LivingEntity livingEntity, float f, float partialTick){
-        boolean fireTint = LegacyOption.legacyEntityFireTint.get() && livingEntity.isOnFire() && livingEntity.displayFireAnimation();
+        boolean fireTint = LegacyOptions.legacyEntityFireTint.get() && livingEntity.isOnFire() && livingEntity.displayFireAnimation();
         instance.renderToBuffer(poseStack,consumer,light, overlay, r, fireTint ? g * getGreenFireOverlayDiff(livingEntity.tickCount +partialTick) : g, fireTint ? b/6 : b, a);
     }
     *///?} else {
     @Redirect(method = /*? if <1.21.2 {*/"render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"/*?} else {*//*"render(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/EntityModel;renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V"))
     public void renderToBufferFireColor(EntityModel instance, PoseStack poseStack, VertexConsumer consumer, int light, int overlay, /*? if <=1.20.6 {*//*float r, float g, float b, float a*//*?} else {*/ int color/*?}*/, /*? if <1.21.2 {*/LivingEntity livingEntity, float f, float g/*?} else {*//*LivingEntityRenderState livingEntityRenderState*//*?}*/){
-        instance.renderToBuffer(poseStack,consumer,light, overlay, LegacyOption.legacyEntityFireTint.get() && /*? if <1.21.2 {*/livingEntity.isOnFire() && livingEntity.displayFireAnimation() && !livingEntity.fireImmune()/*?} else {*//*livingEntityRenderState.displayFireAnimation && !FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyLivingEntityRenderState.class).fireImmune*//*?}*/ ? FactoryScreenUtil.colorFromFloat(FactoryScreenUtil.getRed(color),FactoryScreenUtil.getGreen(color) * getGreenFireOverlayDiff(/*? if <1.21.2 {*/livingEntity.tickCount + g/*?} else {*//*livingEntityRenderState.ageInTicks*//*?}*/),FactoryScreenUtil.getBlue(color)/6,FactoryScreenUtil.getAlpha(color)) : color);
+        instance.renderToBuffer(poseStack,consumer,light, overlay, LegacyOptions.legacyEntityFireTint.get() && /*? if <1.21.2 {*/livingEntity.isOnFire() && livingEntity.displayFireAnimation() && !livingEntity.fireImmune()/*?} else {*//*livingEntityRenderState.displayFireAnimation && !FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyLivingEntityRenderState.class).fireImmune*//*?}*/ ? FactoryScreenUtil.colorFromFloat(FactoryScreenUtil.getRed(color),FactoryScreenUtil.getGreen(color) * getGreenFireOverlayDiff(/*? if <1.21.2 {*/livingEntity.tickCount + g/*?} else {*//*livingEntityRenderState.ageInTicks*//*?}*/),FactoryScreenUtil.getBlue(color)/6,FactoryScreenUtil.getAlpha(color)) : color);
     }
     //?}
 
     @Inject(method = "getOverlayCoords", at = @At("HEAD"), cancellable = true)
     private static void getOverlayCoords(/*? if <1.21.2 {*/LivingEntity livingEntity/*?} else {*//*LivingEntityRenderState livingEntityRenderState*//*?}*/, float f, CallbackInfoReturnable<Integer> cir) {
-        if (LegacyOption.legacyEntityFireTint.get() && /*? if <1.21.2 {*/livingEntity.isOnFire() && livingEntity.displayFireAnimation() && !livingEntity.fireImmune()/*?} else {*//*livingEntityRenderState.displayFireAnimation && !FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyLivingEntityRenderState.class).fireImmune*//*?}*/) cir.setReturnValue(OverlayTexture.pack(0, OverlayTexture.v(true)));
+        if (LegacyOptions.legacyEntityFireTint.get() && /*? if <1.21.2 {*/livingEntity.isOnFire() && livingEntity.displayFireAnimation() && !livingEntity.fireImmune()/*?} else {*//*livingEntityRenderState.displayFireAnimation && !FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyLivingEntityRenderState.class).fireImmune*//*?}*/) cir.setReturnValue(OverlayTexture.pack(0, OverlayTexture.v(true)));
     }
 
     @Unique

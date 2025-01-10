@@ -36,7 +36,7 @@ import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.entity.PlayerYBobbing;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.LegacyTip;
@@ -77,7 +77,7 @@ public abstract class GameRendererMixin {
             tip.render(graphics,0,0,FactoryAPIClient.getPartialTick());
             if (tip.visibility == Toast.Visibility.HIDE) LegacyTipManager.getUpdateTip();
         }
-        if (minecraft.options.showAutosaveIndicator().get().booleanValue() && (minecraft.gui.autosaveIndicatorValue > 0 || minecraft.gui.lastAutosaveIndicatorValue > 0) && Mth.clamp(Mth.lerp(FactoryAPIClient.getPartialTick(), minecraft.gui.lastAutosaveIndicatorValue, minecraft.gui.autosaveIndicatorValue), 0.0f, 1.0f) > 0.02) {
+        if (minecraft.options.showAutosaveIndicator().get() && (minecraft.gui.autosaveIndicatorValue > 0 || minecraft.gui.lastAutosaveIndicatorValue > 0) && Mth.clamp(Mth.lerp(FactoryAPIClient.getPartialTick(), minecraft.gui.lastAutosaveIndicatorValue, minecraft.gui.autosaveIndicatorValue), 0.0f, 1.0f) > 0.02) {
             RenderSystem.disableDepthTest();
             ScreenUtil.drawAutoSavingIcon(graphics, graphics.guiWidth() - 66, 44);
             RenderSystem.enableDepthTest();
@@ -93,8 +93,8 @@ public abstract class GameRendererMixin {
             RenderSystem.enableDepthTest();
         }
         PostChain gammaEffect = Legacy4JClient.getGammaEffect();
-        if (gammaEffect != null && LegacyOption.displayLegacyGamma.get()) {
-            float gamma = LegacyOption.legacyGamma.get().floatValue();
+        if (gammaEffect != null && LegacyOptions.displayLegacyGamma.get()) {
+            float gamma = LegacyOptions.legacyGamma.get().floatValue();
             graphics.flush();
             RenderSystem.enableBlend();
             RenderSystem.disableDepthTest();
@@ -139,11 +139,11 @@ public abstract class GameRendererMixin {
     }
     @Inject(method = "shouldRenderBlockOutline", at = @At("HEAD"), cancellable = true)
     private void renderLevel(CallbackInfoReturnable<Boolean> cir){
-        if (!LegacyOption.displayHUD.get()) cir.setReturnValue(false);
+        if (!LegacyOptions.displayHUD.get()) cir.setReturnValue(false);
     }
     @Redirect(method = "renderLevel", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/GameRenderer;renderHand:Z"))
     private boolean renderLevel(GameRenderer instance){
-        return renderHand && LegacyOption.displayHand.get();
+        return renderHand && LegacyOptions.displayHand.get();
     }
     //? if >=1.20.5 {
     @ModifyVariable(method = "renderLevel", at = @At(value = "STORE", remap = false),ordinal = /*? if <1.21.2 {*/1/*?} else {*//*2*//*?}*/)
@@ -165,7 +165,7 @@ public abstract class GameRendererMixin {
     *///?}
     @Unique
     private float getFlyingViewRollingRotation(){
-        if (LegacyOption.flyingViewRolling.get() && minecraft.player != null && minecraft.player.isFallFlying()){
+        if (LegacyOptions.flyingViewRolling.get() && minecraft.player != null && minecraft.player.isFallFlying()){
             float f = FactoryAPIClient.getGamePartialTick(false);
             Vec3 vec3 =  minecraft.player.getViewVector(f);
             Vec3 vec32 =  minecraft.player.getDeltaMovementLerped(f);

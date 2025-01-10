@@ -1,5 +1,6 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
@@ -31,9 +32,22 @@ public class ScrollableRenderer {
             if (scrolled.get() > 0) scrollRenderer.renderScroll(graphics, ScreenDirection.UP, x + width - 29, y + 3 + height);
         }
     }
+
     public boolean mouseScrolled(double g){
         if (scrolled.max > 0){
             int i = scrolled.add((int)-Math.signum(g));
+            if (i != 0) {
+                scrollRenderer.updateScroll(i > 0 ? ScreenDirection.DOWN : ScreenDirection.UP);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean keyPressed(int key){
+        boolean up;
+        if (((up = key == InputConstants.KEY_UP) || key == InputConstants.KEY_DOWN) && scrolled.max > 0){
+            int i = scrolled.add(up ? -1 : 1);
             if (i != 0) {
                 scrollRenderer.updateScroll(i > 0 ? ScreenDirection.DOWN : ScreenDirection.UP);
                 return true;

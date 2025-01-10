@@ -9,15 +9,15 @@
 # 📜 About
 **Legacy4J** is a mod about nostalgia of old 4J Studios Minecraft Legacy Edition. The main objective of this mod is remake every aspect of [Legacy Console Edition](https://minecraft.wiki/w/Legacy_Console_Edition) in 1:1 for Java Edition versions, adding its exclusive features, and bringing it to modern versions.
 
-This includes the crafting menu, creative flight, the gamma system, the hud, and more!
+This includes an accurate controller support, the control tooltips, the crafting menu, the creative flight, the gamma shader, the scaling, the HUD, and more!
+
 
 ![4d16d058705efd1447a848f3715b36b407841422](https://github.com/omo50/Legacy-Minecraft/assets/144749186/5deb83e5-24ee-4006-9eb5-544e2517ad2d)
 
-<h1>👋You should also check out the official modpacks!</h1>
+<h1>👋You should also check out the recommended modpacks!</h1>
 
+- [Project4J](https://modrinth.com/modpack/project-4j) | Experience a timeline where Legacy Console Edition had mods!
 - [Re-Console](https://modrinth.com/modpack/legacy-minecraft) | Better performance, all tutorial worlds, and more!
-- [Legacy Remade](https://modrinth.com/modpack/legacy-remade) | The Legacy Console Editions preserved into the future!
-- [Legacy Reborn](https://modrinth.com/modpack/legacy-reborn) | The Old Legacy Console Versions Remade in Java!
 
 ![892ef1c08dae6aee23c78dd0154bd801094a6d5e](https://github.com/omo50/Legacy-Minecraft/assets/144749186/ff8b464b-e0e7-4951-a33f-242df53c5b8c)
 
@@ -29,17 +29,23 @@ This includes the crafting menu, creative flight, the gamma system, the hud, and
 
 
 # 📝 Planned and Implemented Features
-| Feature                                                             | Implemented | Planned |
-|:--------------------------------------------------------------------|:-----------:|:-------:|
-| All Interfaces                                                      | ✅           | ✅       |
-| Animated Character                                                  | ✅           | ✅       |
-| Auto-Save Icon                                                      | ✅           | ✅       |
-| Backports to earlier versions (Currently 1.20.1)                                      | ✅           | ✅       |
-| Create the world with open LAN (Equivalent to "Online Game" in LCE) | ✅           | ✅       |
-| HUD distance from the bottom (Configurable)                         | ✅           | ✅       |
-| HUD opacity setting                                                 | ✅           | ✅       |
-| LCE-style tooltips                                                  | ✅           | ✅       |
-| LCE GUI blocks Lighting                                             | ✅           | ✅       |
-| LCE Creative Flight                                                 | ✅           | ✅       |
-| Superflat in-GUI customizer                                         | ✅           | ✅       |
-| Tutorial World                                                      | ✅           | ✅       |
+| Feature                                                                    | Implemented | Planned |
+|:---------------------------------------------------------------------------|:-----------:|:-------:|
+| All Interfaces                                                             |      ✅      | ✅       |
+| Animated Character (Paper doll in Bedrock Edition)                         |      ✅      | ✅       |
+| Auto-Save Icon                                                             |      ✅      | ✅       |
+| Backports to earlier versions (Currently 1.20.1)                           |      ✅      | ✅       |
+| Create or load the world with open LAN (Online Game if using World Host)   |      ✅      | ✅       |
+| Integration with [World Host](https://github.com/Gaming32/world-host)      |      ✅      | ✅       |
+| HUD distance from the bottom (Configurable)                                |      ✅      | ✅       |
+| HUD opacity setting                                                        |      ✅      | ✅       |
+| LE-style tooltips                                                          |      ✅      | ✅       |
+| LE GUI blocks Lighting                                                     |      ✅      | ✅       |
+| LE Creative Flight                                                         |      ✅      | ✅       |
+| Superflat in-GUI customizer                                                |      ✅      | ✅       |
+| Tutorial World                                                             |      ✅      | ✅       |
+| Patch/Update Notes Interface                                               |      ❌      | ✅       |
+| Advanced Hints/Tutorial                                                    |      ❌      | ✅       |
+| Improved Change Skin Interface                                             |      ❌      | ✅       |
+| [Legacy Edition Minigames](https://www.legacyminigames.net/) Compatibility |      ❌      | ✅       |
+| Backports that would need a full remake (<=1.16.5)                         |      ❌      | ❌       |

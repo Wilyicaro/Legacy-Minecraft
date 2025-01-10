@@ -77,10 +77,10 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
         },false);
     }
     public void init(BiConsumer<LegacyTabButton, Integer> buttonManager, boolean vertical) {
-        int x = 0;
+        int position = 0;
         for (LegacyTabButton b : tabButtons) {
-            buttonManager.accept(b,x);
-            x+=vertical ? b.getHeight() : b.getWidth();
+            buttonManager.accept(b,position);
+            position+=vertical ? b.getHeight() : b.getWidth();
         }
     }
     @Override

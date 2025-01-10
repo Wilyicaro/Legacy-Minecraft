@@ -1,11 +1,10 @@
 package wily.legacy.util;
 
 import net.minecraft.network.chat.Component;
-import wily.legacy.client.screen.ControlTooltip;
 
 public class LegacyComponents {
-    public static final Component RESOURCE_ASSORTS = Component.translatable("legacy.menu.assorts.resources");
-    public static final Component ASSORT_OPTIONS = Component.translatable("legacy.menu.assort_options");
+    public static final Component RESOURCE_ALBUMS = Component.translatable("legacy.menu.albums.resource");
+    public static final Component ALBUM_OPTIONS = Component.translatable("legacy.menu.album_options");
     public static final Component SELECT = Component.translatable("mco.template.button.select");
     public static final Component USE = Component.translatable("key.use");
     public static final Component ACTION = Component.translatable("key.attack");
@@ -33,6 +32,7 @@ public class LegacyComponents {
     public static final Component DROP = Component.translatable("legacy.action.drop");
     public static final Component DROP_ALL = Component.translatable("legacy.action.drop_all");
     public static final Component DROP_ONE = Component.translatable("legacy.action.drop_one");
+    public static final Component DYE = Component.translatable("legacy.action.dye");
     public static final Component EAT = Component.translatable("legacy.action.eat");
     public static final Component EJECT = Component.translatable("legacy.action.eject");
     public static final Component EMPTY = Component.translatable("legacy.action.empty");
@@ -146,4 +146,9 @@ public class LegacyComponents {
     public static final Component RESET_KNOWN_ENTITIES_MESSAGE = Component.translatable("legacy.menu.reset_known_entities_message");
     public static final Component RESET_KNOWN_BLOCKS_TITLE = Component.translatable("legacy.menu.reset_known_blocks");
     public static final Component RESET_KNOWN_BLOCKS_MESSAGE = Component.translatable("legacy.menu.reset_known_blocks_message");
+    public static final Component SELECTION = Component.literal("...");
+    public static final Component NONE = Component.translatable("legacy.options.none");
+    public static final Component NEEDS_RESTART = Component.translatable("legacy.options.needs_restart");
+    public static final Component ALPHABETICAL = Component.translatable("legacy.menu.sorting.alphabetical");
+    public static final Component ALL = Component.translatable("legacy.menu.settings.all");
 }

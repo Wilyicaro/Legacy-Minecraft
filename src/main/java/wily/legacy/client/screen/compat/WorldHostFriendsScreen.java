@@ -80,6 +80,7 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+        if (minecraft.level == null) ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
     }
 
     protected void addFriendButtons(Runnable afterButtonsAdd){

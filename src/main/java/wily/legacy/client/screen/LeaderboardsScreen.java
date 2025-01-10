@@ -19,6 +19,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ServerboundClientCommandPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.StatType;
@@ -33,6 +34,7 @@ import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
@@ -158,7 +160,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
                     for (int index = page; index < statsBoards.get(selectedStatBoard).statsList.size(); index++) {
                         if (added >= statsInScreen)break;
                         Stat<?> stat = statsBoards.get(selectedStatBoard).statsList.get(index);
-                        Component value = ControlTooltip.CONTROL_ICON_FUNCTION.apply(stat.format((FactoryAPIClient.hasModOnServer ? info.getStatsMap() : minecraft.player.getStats().stats).getInt(stat)), Style.EMPTY);
+                        Component value = ControlTooltip.CONTROL_ICON_FUNCTION.apply(stat.format((FactoryAPIClient.hasModOnServer ? info.getStatsMap() : minecraft.player.getStats().stats).getInt(stat)), Style.EMPTY).getComponent();
                         SimpleLayoutRenderable renderable = statsBoards.get(selectedStatBoard).renderables.get(index);
                         int w = font.width(value);
                         ScreenUtil.renderScrollingString(guiGraphics,font, value,renderable.getX() + Math.max(0,renderable.getWidth() - w) / 2, getY(),renderable.getX() + Math.min(renderable.getWidth(),(renderable.getWidth() - w)/ 2 + getWidth()), getY() + getHeight(), ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()),true);
@@ -338,30 +340,24 @@ public class LeaderboardsScreen extends PanelVListScreen {
         }
 
     }
-    public static class Manager extends SimplePreparableReloadListener<List<StatsBoard>> {
+    public static class Manager implements ResourceManagerReloadListener {
         public static final String LEADERBOARD_LISTING = "leaderboard_listing.json";
 
         @Override
-        protected List<StatsBoard> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
-            List<StatsBoard> statsBoards = new ArrayList<>();
-            ResourceManager manager = Minecraft.getInstance().getResourceManager();
+        public void onResourceManagerReload(ResourceManager resourceManager) {
 
-            JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(FactoryAPI.createLocation(name, LEADERBOARD_LISTING)).ifPresent(((r) -> {
-                try {
-                    BufferedReader bufferedReader = r.openAsReader();
+            JsonUtil.getOrderedNamespaces(resourceManager).forEach(name->resourceManager.getResource(FactoryAPI.createLocation(name, LEADERBOARD_LISTING)).ifPresent(((r) -> {
+                try (BufferedReader bufferedReader = r.openAsReader()) {
                     JsonObject obj = GsonHelper.parse(bufferedReader);
                     JsonElement ioElement = obj.get("listing");
                     if (ioElement instanceof JsonArray array)
                         array.forEach(e-> {
                             if (e instanceof JsonObject o) statsBoards.add(statsBoardFromJson(o));
                         });
-                    else if (ioElement instanceof JsonObject o) statsBoards.add(statsBoardFromJson(o));
-                    bufferedReader.close();
                 } catch (IOException exception) {
                     Legacy4J.LOGGER.warn(exception.getMessage());
                 }
             })));
-            return statsBoards;
         }
         protected StatsBoard statsBoardFromJson(JsonObject o){
             StatType<?> statType = FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(o,"type")),BuiltInRegistries.STAT_TYPE);
@@ -397,11 +393,6 @@ public class LeaderboardsScreen extends PanelVListScreen {
             });
 
             return statsBoard;
-        }
-        @Override
-        protected void apply(List<StatsBoard> list, ResourceManager resourceManager, ProfilerFiller profilerFiller) {
-            statsBoards.clear();
-            statsBoards.addAll(list);
         }
         @Override
         public String getName() {

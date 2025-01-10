@@ -18,7 +18,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
+import wily.legacy.config.LegacyConfig;
 
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin {
@@ -49,7 +50,7 @@ public abstract class ItemInHandRendererMixin {
 
     @Redirect(method = "renderHandsWithItems", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;renderArmWithItem(Lnet/minecraft/client/player/AbstractClientPlayer;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"))
     public void renderItemLight(ItemInHandRenderer instance, AbstractClientPlayer f3, float f4, float f9, InteractionHand f13, float f, ItemStack f1, float f2, PoseStack flag1, MultiBufferSource flag2, int i) {
-        int light = LegacyOption.itemLightingInHand.get() ? getLight(f3.getMainHandItem(),f3.getOffhandItem()) : 0;
+        int light = LegacyOptions.itemLightingInHand.get() ? getLight(f3.getMainHandItem(),f3.getOffhandItem()) : 0;
         renderArmWithItem(f3,f4,f9,f13,f,f1,f2,flag1,flag2,light > 0 ? LightTexture.pack(light,LightTexture.sky(i)) : i);
     }
     @Unique
@@ -117,5 +118,19 @@ public abstract class ItemInHandRendererMixin {
         poseStack.translate((float)k * lx, mx, n);
         this.applyItemArmTransform(poseStack, humanoidArm, i);
         this.applyItemArmAttackTransform(poseStack, humanoidArm, h);
+    }
+
+    @Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;applyItemArmTransform(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/entity/HumanoidArm;F)V", shift = At.Shift.AFTER, ordinal = 4))
+    private void renderArmWithItemBlockAnim(AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, MultiBufferSource multiBufferSource, int j, CallbackInfo ci) {
+        if (LegacyConfig.legacySwordBlocking.get()) {
+            boolean bl = interactionHand == InteractionHand.MAIN_HAND;
+            HumanoidArm humanoidArm = bl ? abstractClientPlayer.getMainArm() : abstractClientPlayer.getMainArm().getOpposite();
+            this.applyItemArmAttackTransform(poseStack, humanoidArm, h);
+            poseStack.translate(-0.14142136F, 0.08F, 0.14142136F);
+            poseStack.mulPose(Axis.XP.rotationDegrees(-102.25F));
+            poseStack.mulPose(Axis.YP.rotationDegrees(13.365F));
+            poseStack.mulPose(Axis.ZP.rotationDegrees(78.05F));
+
+        }
     }
 }

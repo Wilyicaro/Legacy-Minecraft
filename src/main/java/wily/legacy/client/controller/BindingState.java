@@ -38,7 +38,7 @@ public abstract class BindingState {
     }
 
 
-    public ControlTooltip.ComponentIcon getIcon(){
+    public ControlTooltip.LegacyIcon getIcon(){
         return ControlType.getActiveControllerType().getIcons().get(binding.getMapped().getSerializedName());
     }
     public boolean canClick(){

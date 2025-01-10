@@ -23,6 +23,7 @@ import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.RegisterListing;
 import wily.legacy.Legacy4J;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
+import wily.legacy.config.LegacyConfig;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.LegacyMerchantMenu;
 
@@ -67,7 +68,7 @@ public class LegacyRegistries {
     }
     public static void register(){
         BLOCK_REGISTER.register();
-        BLOCK_ENTITIES_REGISTER.register();
+        if (LegacyConfig.legacyCauldrons.get()) BLOCK_ENTITIES_REGISTER.register();
         BLOCK_ITEMS_REGISTER.register();
         BLOCK_ITEMS_REGISTER.forEach(b-> ITEM_REGISTER.add(b.getId().getPath(),()-> new BlockItem(b.get(), new Item.Properties()/*? if >=1.21.2 {*//*.setId(ResourceKey.create(Registries.ITEM,b.getId())).useBlockDescriptionPrefix()*//*?}*/)));
         ITEM_REGISTER.register();

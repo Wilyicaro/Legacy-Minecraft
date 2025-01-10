@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 
 import static wily.legacy.Legacy4JClient.keyFlyLeft;
 import static wily.legacy.Legacy4JClient.keyFlyRight;
@@ -60,7 +60,7 @@ public abstract class ClientEntityMixin {
         //? if >=1.21.2 {
         /*if (getVehicle() instanceof AbstractMinecart && AbstractMinecart.useExperimentalMovement(level())) return;
         *///?}
-        if (getVehicle() == null || getVehicle().getControllingPassenger() == (Object) this || LegacyOption.vehicleCameraRotation.get() == LegacyOption.VehicleCameraRotation.NONE || !(getVehicle() instanceof LivingEntity && LegacyOption.vehicleCameraRotation.get().isForLivingEntities() || !(getVehicle() instanceof LivingEntity) && LegacyOption.vehicleCameraRotation.get().isForNonLivingEntities())) return;
+        if (getVehicle() == null || getVehicle().getControllingPassenger() == (Object) this || LegacyOptions.vehicleCameraRotation.get() == LegacyOptions.VehicleCameraRotation.NONE || !(getVehicle() instanceof LivingEntity && LegacyOptions.vehicleCameraRotation.get().isForLivingEntities() || !(getVehicle() instanceof LivingEntity) && LegacyOptions.vehicleCameraRotation.get().isForNonLivingEntities())) return;
 
         this.ridingEntityYRotDelta = this.ridingEntityYRotDelta + (this.getVehicle().getYRot() - this.getVehicle().yRotO);
 

@@ -65,14 +65,16 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
+import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.FactoryEvent;
+import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryItemUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
@@ -91,9 +93,21 @@ import static net.minecraft.world.level.block.JukeboxBlock.HAS_RECORD;
 public interface ControlTooltip {
     String CONTROL_TOOLTIPS = "control_tooltips";
 
-    BiFunction<String,Style,Component> CONTROL_ICON_FUNCTION = Util.memoize((s,style)-> Component.literal(s).withStyle(style));
+    BiFunction<String,Style,ComponentIcon> CONTROL_ICON_FUNCTION = Util.memoize((s,style)-> ComponentIcon.of(Component.literal(s).withStyle(style)));
     Function<Icon[], Icon> COMPOUND_ICON_FUNCTION = Util.memoize(Icon::createCompound);
-    static Component getControlIcon(String s, ControlType type){
+    Function<ComponentIcon[], ComponentIcon> COMPOUND_COMPONENT_ICON_FUNCTION = Util.memoize(ComponentIcon::createCompound);
+
+    String MOUSE_BASE_CHAR = "\uC002";
+    String MOUSE_BASE_FOCUSED_CHAR = "\uC003";
+    String KEY_CHAR = "\uC000";
+    String KEY_PRESSED_CHAR = "\uC001";
+    Component MORE = Component.literal("...").withStyle(ChatFormatting.GRAY);
+    Component SPACE = Component.literal("  ");
+    Component PLUS = Component.literal("+");
+    ComponentIcon SPACE_ICON = ComponentIcon.of(SPACE);
+    ComponentIcon PLUS_ICON = ComponentIcon.of(PLUS);
+
+    static ComponentIcon getControlIcon(String s, ControlType type){
         return CONTROL_ICON_FUNCTION.apply(s,type.getStyle());
     }
 
@@ -111,11 +125,22 @@ public interface ControlTooltip {
     Icon getIcon();
     @Nullable
     Component getAction();
-    Component MORE = Component.literal("...").withStyle(ChatFormatting.GRAY);
-    Component SPACE = Component.literal("  ");
-    Component PLUS = Component.literal("+");
-    Icon SPACE_ICON = Icon.of(SPACE);
-    Icon PLUS_ICON = Icon.of(PLUS);
+
+
+    Map<String,ArbitrarySupplier<ComponentIcon>> commonIcons = new HashMap<>();
+
+    static ArbitrarySupplier<ComponentIcon> registerCommonComponentIcon(String key, ArbitrarySupplier<ComponentIcon> supplier){
+        commonIcons.put(key, supplier);
+        return supplier;
+    }
+
+    ArbitrarySupplier<ComponentIcon> PLAYER_MOVEMENT = registerCommonComponentIcon("player_movement", ()-> ControlType.getActiveType().isKbm() ? COMPOUND_COMPONENT_ICON_FUNCTION.apply(new ComponentIcon[]{getKeyIcon(InputConstants.KEY_W), getKeyIcon(InputConstants.KEY_A), getKeyIcon(InputConstants.KEY_S), getKeyIcon(InputConstants.KEY_D)}) : ControllerBinding.LEFT_STICK.bindingState.getIcon());
+    ArbitrarySupplier<ComponentIcon> POINTER_MOVEMENT = registerCommonComponentIcon("pointer_movement", ()-> ControlType.getActiveType().isKbm() ? getKbmIcon(MOUSE_BASE_CHAR) : ControllerBinding.LEFT_STICK.bindingState.getIcon());
+    ArbitrarySupplier<ComponentIcon> CAMERA_MOVEMENT = registerCommonComponentIcon("camera_movement", ()-> ControlType.getActiveType().isKbm() ? getKbmIcon(MOUSE_BASE_CHAR) : ControllerBinding.LEFT_STICK.bindingState.getIcon());
+    ArbitrarySupplier<ComponentIcon> MENU_MAIN_ACTION = registerCommonComponentIcon("menu_main_action", ()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon());
+    ArbitrarySupplier<ComponentIcon> MENU_OFF_ACTION = registerCommonComponentIcon("menu_off_action", ()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.MOUSE_BUTTON_RIGHT) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon());
+    ArbitrarySupplier<ComponentIcon> MENU_QUICK_ACTION = registerCommonComponentIcon("menu_quick_action", ()-> ControlType.getActiveType().isKbm() ? COMPOUND_COMPONENT_ICON_FUNCTION.apply(new ComponentIcon[]{getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT), PLUS_ICON,getKeyIcon(InputConstants.KEY_LSHIFT)}) : ControllerBinding.UP_BUTTON.bindingState.getIcon());
+
 
     static Component getKeyMessage(int key, Screen screen){
         for (GuiEventListener child : screen.children()) {
@@ -135,22 +160,32 @@ public interface ControlTooltip {
     }
     static ControlTooltip.Renderer setupDefaultContainerScreen(Renderer renderer, LegacyMenuAccess<?> a){
         return renderer.
-                add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(),()->a.isOutsideClick(0) && !a.getMenu().getCarried().isEmpty() ? a.getMenu().getCarried().getCount() > 1 ? LegacyComponents.DROP_ALL : LegacyComponents.DROP : a.getHoveredSlot() != null && (a.getHoveredSlot().hasItem() || !a.getMenu().getCarried().isEmpty()) ? a.getHoveredSlot().hasItem() && !FactoryItemUtil.equalItems(a.getHoveredSlot().getItem(),a.getMenu().getCarried()) && !isBundleAndAcceptItem(a.getHoveredSlot().getItem(),a.getMenu().getCarried())  ? a.getMenu().getCarried().isEmpty() ? LegacyComponents.TAKE : isBundleAndAcceptItem(a.getMenu().getCarried(),a.getHoveredSlot().getItem()) ? LegacyComponents.PICK_UP : LegacyComponents.SWAP : LegacyComponents.PLACE : null).
+                add(MENU_MAIN_ACTION::get,()->a.isOutsideClick(0) && !a.getMenu().getCarried().isEmpty() ? a.getMenu().getCarried().getCount() > 1 ? LegacyComponents.DROP_ALL : LegacyComponents.DROP : a.getHoveredSlot() != null && (a.getHoveredSlot().hasItem() || !a.getMenu().getCarried().isEmpty()) ? a.getHoveredSlot().hasItem() && !FactoryItemUtil.equalItems(a.getHoveredSlot().getItem(),a.getMenu().getCarried()) && !isBundleAndAcceptItem(a.getHoveredSlot().getItem(),a.getMenu().getCarried())  ? a.getMenu().getCarried().isEmpty() ? LegacyComponents.TAKE : isBundleAndAcceptItem(a.getMenu().getCarried(),a.getHoveredSlot().getItem()) ? LegacyComponents.PICK_UP : LegacyComponents.SWAP : LegacyComponents.PLACE : null).
                 add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.bindingState.getIcon(),()-> LegacyComponents.EXIT).
-                add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.MOUSE_BUTTON_RIGHT) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(),()->getMouseRightAction(a)).
-                add(()-> ControlType.getActiveType().isKbm() ? COMPOUND_ICON_FUNCTION.apply(new Icon[]{getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT), PLUS_ICON,getKeyIcon(InputConstants.KEY_LSHIFT)}) : ControllerBinding.UP_BUTTON.bindingState.getIcon(),()-> a.getHoveredSlot() != null && a.getHoveredSlot().hasItem() ? LegacyComponents.QUICK_MOVE : null).
+                add(MENU_OFF_ACTION::get,()-> getMenuOffAction(a)).
+                add(MENU_QUICK_ACTION::get,()-> a.getHoveredSlot() != null && a.getHoveredSlot().hasItem() ? LegacyComponents.QUICK_MOVE : null).
                 add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_W) : ControllerBinding.RIGHT_TRIGGER.bindingState.getIcon(),()->a.getHoveredSlot() != null && a.getHoveredSlot().hasItem() && LegacyTipManager.hasTip(a.getHoveredSlot().getItem()) ? LegacyComponents.WHATS_THIS : null).
                 add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT) : ControllerBinding.LEFT_TRIGGER.bindingState.getIcon(),()-> a.getMenu().getCarried().getCount() > 1 ? LegacyComponents.DISTRIBUTE : null);
     }
 
-    static Component getMouseRightAction(LegacyMenuAccess<?> a){
+    static Component getIconComponentFromKeyMapping(LegacyKeyMapping mapping){
+        LegacyIcon icon = getIconFromKeyMapping(mapping);
+        return icon == null ? CommonComponents.EMPTY : icon.getComponent();
+    }
+
+    static LegacyIcon getIconFromKeyMapping(LegacyKeyMapping mapping){
+        return ControlType.getActiveType().isKbm() ? getKeyIcon(mapping.getKey().getValue()) : mapping.getBinding() == null ? null : mapping.getBinding().bindingState.getIcon();
+    }
+
+    static Component getMenuOffAction(LegacyMenuAccess<?> a){
         if (a.isOutsideClick(1) && !a.getMenu().getCarried().isEmpty()) return a.getMenu().getCarried().getCount() > 1 ? LegacyComponents.DROP_ONE : LegacyComponents.DROP;
         if (a.getHoveredSlot() != null){
             if (a.getMenu().getCarried().isEmpty()) {
                 if (isBundle(a.getHoveredSlot().getItem()) && BundleItem.getFullnessDisplay(a.getHoveredSlot().getItem()) > 0) return LegacyComponents.PICK_UP;
                 else if (a.getHoveredSlot().getItem().getCount() > 1) return LegacyComponents.TAKE_HALF;
             } else {
-                if (a.getHoveredSlot().hasItem() && Legacy4J.canRepair(a.getHoveredSlot().getItem(),a.getMenu().getCarried())) return LegacyComponents.REPAIR;
+                if (a.getHoveredSlot().hasItem() && FactoryAPIClient.hasModOnServer && Legacy4J.canRepair(a.getHoveredSlot().getItem(),a.getMenu().getCarried())) return LegacyComponents.REPAIR;
+                if (a.getHoveredSlot().hasItem() && FactoryAPIClient.hasModOnServer && Legacy4J.isDyeableItem(a.getHoveredSlot().getItem().getItemHolder()) && a.getMenu().getCarried().getItem() instanceof DyeItem) return LegacyComponents.DYE;
                 else if (isBundle(a.getMenu().getCarried()) && BundleItem.getFullnessDisplay(a.getMenu().getCarried()) > 0 && !a.getHoveredSlot().hasItem()) return LegacyComponents.RELEASE;
                 else if (a.getHoveredSlot().hasItem() && !a.getMenu().getCarried().isEmpty() && !FactoryItemUtil.equalItems(a.getMenu().getCarried(),a.getHoveredSlot().getItem())) return LegacyComponents.SWAP;
                 else if (!a.getHoveredSlot().hasItem()) return a.getMenu().getCarried().getCount() > 1 ? LegacyComponents.PLACE_ONE : LegacyComponents.PLACE;
@@ -176,21 +211,13 @@ public interface ControlTooltip {
             }
         };
     }
+
     static ControlTooltip create(LegacyKeyMapping mapping,Supplier<Component> action){
-        return create(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(mapping.getKey().getValue()) : mapping.getBinding() == null ? null : mapping.getBinding().bindingState.getIcon(),action);
+        return create(()-> getIconFromKeyMapping(mapping),action);
     }
 
     interface Icon {
         int render(GuiGraphics graphics, int x, int y, boolean allowPressed, boolean simulate);
-
-        static Icon of(Component component){
-            return (graphics, x, y, allowPressed, simulate) -> {
-                Font font = Minecraft.getInstance().font;
-                if (!simulate) graphics.drawString(font,component,x,y,0xFFFFFF,false);
-                return font.width(component);
-            };
-        }
-
         static Icon createCompound(Icon[] icons){
             return (graphics, x, y, allowPressed, simulate) -> {
                 int totalWidth = 0;
@@ -200,7 +227,43 @@ public interface ControlTooltip {
         }
     }
 
-    abstract class ComponentIcon implements Icon {
+    interface ComponentIcon extends Icon {
+        Component getComponent();
+
+        static ComponentIcon of(Component component){
+            return new ComponentIcon() {
+                @Override
+                public Component getComponent() {
+                    return component;
+                }
+
+                @Override
+                public int render(GuiGraphics graphics, int x, int y, boolean allowPressed, boolean simulate)  {
+                    Font font = Minecraft.getInstance().font;
+                    if (!simulate) graphics.drawString(font,getComponent(),x,y,0xFFFFFF,false);
+                    return font.width(getComponent());
+                };
+            };
+        }
+
+        static ComponentIcon createCompound(ComponentIcon[] componentIcons){
+            MutableComponent allIcons = Component.empty();
+            for (ComponentIcon componentIcon : componentIcons) {
+                allIcons.append(componentIcon.getComponent());
+            }
+            return of(allIcons);
+        }
+
+        static ComponentIcon createCompound(Component[] components){
+            MutableComponent allIcons = Component.empty();
+            for (Component component : components) {
+                allIcons.append(component);
+            }
+            return of(allIcons);
+        }
+    }
+
+    abstract class LegacyIcon implements ComponentIcon {
         public abstract Component getComponent(boolean allowPressed);
         public abstract Component getOverlayComponent(boolean allowPressed);
         public Component getComponent(){
@@ -215,7 +278,7 @@ public interface ControlTooltip {
             return (Util.getMillis() - startPressTime) / 280f;
         }
         public Component getActualIcon(char[] chars, boolean allowPressed, ControlType type){
-            return chars == null ? null : ControlTooltip.getControlIcon(String.valueOf(chars[chars.length > 1 && allowPressed && startPressTime != 0 && (canLoop() || getPressInterval() <= 1) ? 1 + Math.round(((getPressInterval() / 2) <= 1.4f ? (getPressInterval() / 2f) % 1f : 0.4f) * (chars.length - 2)) : 0]),type);
+            return chars == null ? null : ControlTooltip.getControlIcon(String.valueOf(chars[chars.length > 1 && allowPressed && startPressTime != 0 && (canLoop() || getPressInterval() <= 1) ? 1 + Math.round(((getPressInterval() / 2) <= 1.4f ? (getPressInterval() / 2f) % 1f : 0.4f) * (chars.length - 2)) : 0]),type).getComponent();
         }
 
         @Override
@@ -247,11 +310,11 @@ public interface ControlTooltip {
             }
             return Math.max(cw,cow);
         }
-        public static ComponentIcon create(InputConstants.Key key, char[] iconChars, char[] iconOverlayChars, Character tipIcon){
+        public static LegacyIcon create(InputConstants.Key key, char[] iconChars, char[] iconOverlayChars, Character tipIcon){
             return create(key, (k,b)-> create(b,iconChars,iconOverlayChars,tipIcon,()-> k.getType() != InputConstants.Type.MOUSE, ControlType::getKbmActiveType));
         }
-        public static ComponentIcon create(BooleanSupplier pressed, char[] iconChars, char[] iconOverlayChars, Character tipIcon, BooleanSupplier loop, Supplier<ControlType> type){
-            return new ControlTooltip.ComponentIcon() {
+        public static LegacyIcon create(BooleanSupplier pressed, char[] iconChars, char[] iconOverlayChars, Character tipIcon, BooleanSupplier loop, Supplier<ControlType> type){
+            return new LegacyIcon() {
 
                 @Override
                 public Component getComponent(boolean allowPressed) {
@@ -265,7 +328,7 @@ public interface ControlTooltip {
 
                 @Override
                 public Component getComponent() {
-                    return tipIcon == null ? super.getComponent() == null ? getOverlayComponent(false) : super.getComponent() : getControlIcon(String.valueOf(tipIcon), ControlType.getActiveControllerType());
+                    return tipIcon == null ? super.getComponent() == null ? getOverlayComponent(false) : super.getComponent() : getControlIcon(String.valueOf(tipIcon), ControlType.getActiveControllerType()).getComponent();
                 }
 
                 @Override
@@ -280,14 +343,14 @@ public interface ControlTooltip {
             };
         }
 
-        public static ComponentIcon create(InputConstants.Key key, BiFunction<InputConstants.Key,BooleanSupplier,ComponentIcon> iconGetter){
+        public static LegacyIcon create(InputConstants.Key key, BiFunction<InputConstants.Key,BooleanSupplier, LegacyIcon> iconGetter){
             long window = Minecraft.getInstance().getWindow().getWindow();
             return iconGetter.apply(key,()->(key.getType() == InputConstants.Type.KEYSYM ? InputConstants.isKeyDown(window, key.getValue()) : GLFW.glfwGetMouseButton(window, key.getValue()) == 1));
         }
     }
 
 
-    class Renderer implements Renderable{
+    class Renderer implements Renderable {
         public static final FactoryEvent<BiConsumer<Screen,ControlTooltip.Renderer>> SCREEN_EVENT = new FactoryEvent<>(e-> (screen, event)-> e.invokeAll(c->c.accept(screen,event)));
         public static final FactoryEvent<BiConsumer<Gui,ControlTooltip.Renderer>> GUI_EVENT = new FactoryEvent<>(e-> (screen, event)-> e.invokeAll(c->c.accept(screen,event)));
 
@@ -345,19 +408,19 @@ public interface ControlTooltip {
         }
         @Override
         public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-            if (!LegacyOption.inGameTooltips.get() && minecraft.screen == null) return;
+            if (!LegacyOptions.inGameTooltips.get() && minecraft.screen == null || !LegacyOptions.displayControlTooltips.get()) return;
             renderTooltips.clear();
             for (ControlTooltip tooltip : tooltips) {
                 Component action;
                 Icon icon;
                 if ((action = tooltip.getAction()) == null || (icon = tooltip.getIcon()) == null) continue;
-                renderTooltips.compute(action, (k, existingIcon) -> existingIcon == null ? icon : existingIcon.equals(icon) || !LegacyOption.displayMultipleControlsFromAction.get() ? existingIcon : COMPOUND_ICON_FUNCTION.apply(new Icon[]{existingIcon,SPACE_ICON, icon}));
+                renderTooltips.compute(action, (k, existingIcon) -> existingIcon == null ? icon : existingIcon.equals(icon) || !LegacyOptions.displayMultipleControlsFromAction.get() ? existingIcon : COMPOUND_ICON_FUNCTION.apply(new Icon[]{existingIcon,SPACE_ICON, icon}));
             }
             RenderSystem.disableDepthTest();
             RenderSystem.enableBlend();
             RenderSystem.setShaderColor(1.0f,1.0f,1.0f,Math.max(minecraft.screen == null ? 0.0f : 0.2f,  ScreenUtil.getHUDOpacity()));
             guiGraphics.pose().pushPose();
-            double hudDiff = (1 - LegacyOption.hudDistance.get()) * 60D;
+            double hudDiff = (1 - LegacyOptions.hudDistance.get()) * 60D;
             guiGraphics.pose().translate(-Math.min(hudDiff,30), Math.min(hudDiff,16),0);
             int baseHeight = guiGraphics.guiHeight() - 29;
 
@@ -375,20 +438,19 @@ public interface ControlTooltip {
             RenderSystem.enableDepthTest();
         }
     }
-    String MOUSE_BASE_CHAR = "\uC002";
-    String MOUSE_BASE_FOCUSED_CHAR = "\uC003";
-    String KEY_CHAR = "\uC000";
-    String KEY_PRESSED_CHAR = "\uC001";
 
+    static ComponentIcon getKbmIcon(String key){
+        return getControlIcon(key, ControlType.getKbmActiveType());
+    }
 
-    static ComponentIcon getKeyIcon(int i){
+    static LegacyIcon getKeyIcon(int i){
         InputConstants.Type type = i >= 0 ? i <= 9 ? InputConstants.Type.MOUSE : InputConstants.Type.KEYSYM : null;
         if (type == null) return null;
         InputConstants.Key key = type.getOrCreate(i);
-        return ControlType.getKbmActiveType().getIcons().computeIfAbsent(key.getName(), i2-> ComponentIcon.create(key,(k, b)->new ComponentIcon() {
+        return ControlType.getKbmActiveType().getIcons().computeIfAbsent(key.getName(), i2-> LegacyIcon.create(key,(k, b)->new LegacyIcon() {
             @Override
             public Component getComponent(boolean allowPressed) {
-                return getControlIcon(k.getType() == InputConstants.Type.MOUSE ? b.getAsBoolean() && allowPressed ? MOUSE_BASE_FOCUSED_CHAR : MOUSE_BASE_CHAR : b.getAsBoolean() && allowPressed ? KEY_PRESSED_CHAR : KEY_CHAR,ControlType.getKbmActiveType());
+                return getControlIcon(k.getType() == InputConstants.Type.MOUSE ? b.getAsBoolean() && allowPressed ? MOUSE_BASE_FOCUSED_CHAR : MOUSE_BASE_CHAR : b.getAsBoolean() && allowPressed ? KEY_PRESSED_CHAR : KEY_CHAR,ControlType.getKbmActiveType()).getComponent();
             }
 
             @Override
@@ -511,7 +573,8 @@ public interface ControlTooltip {
             }
             if (minecraft.hitResult instanceof BlockHitResult r && !actualItem.isEmpty() && minecraft.level.getBlockEntity(r.getBlockPos()) instanceof CampfireBlockEntity e && /*? if <1.21.2 {*/e.getCookableRecipe(actualItem).isPresent()/*?} else {*//*minecraft.level.recipeAccess().propertySet(RecipePropertySet.FURNACE_INPUT).test(actualItem)*//*?}*/) return LegacyComponents.COOK;
             if (actualItem.getItem() instanceof BrushItem && minecraft.hitResult instanceof BlockHitResult r && r.getType() != HitResult.Type.MISS && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof BrushableBlock) return LegacyComponents.BRUSH;
-            if (/*? if <1.21.2 {*/actualItem.getItem() instanceof Equipable e/*?} else {*//*actualItem.has(DataComponents.EQUIPPABLE)*//*?}*/ && (/*? if <1.20.5 {*//*actualItem.getItem() instanceof HorseArmorItem*//*?} else if <1.21.2 {*/!e.getEquipmentSlot().equals(EquipmentSlot.BODY)/*?} else {*//*!actualItem.get(DataComponents.EQUIPPABLE).slot().equals(EquipmentSlot.BODY) *//*?}*/ || minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Mob m && /*? if <1.20.5 {*//*m instanceof AbstractHorse h && h.isArmor(actualItem)*//*?} else if <1.21.2 {*/m.isBodyArmorItem(actualItem)/*?} else {*/ /*m.isEquippableInSlot(actualItem,EquipmentSlot.BODY)*//*?}*/)) return actualItem.getItem() instanceof ShieldItem ? LegacyComponents.BLOCK : LegacyComponents.EQUIP;
+            if (actualItem.getUseAnimation().equals(/*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/.BLOCK)) return LegacyComponents.BLOCK;
+            if (/*? if <1.21.2 {*/actualItem.getItem() instanceof Equipable e/*?} else {*//*actualItem.has(DataComponents.EQUIPPABLE)*//*?}*/ && (!/*? if <1.20.5 {*//*(actualItem.getItem() instanceof HorseArmorItem)*//*?} else if <1.21.2 {*/e.getEquipmentSlot().equals(EquipmentSlot.BODY)/*?} else {*//*actualItem.get(DataComponents.EQUIPPABLE).slot().equals(EquipmentSlot.BODY) *//*?}*/ || minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Mob m && /*? if <1.20.5 {*//*m instanceof AbstractHorse h && h.isArmor(actualItem)*//*?} else if <1.21.2 {*/m.isBodyArmorItem(actualItem)/*?} else {*/ /*m.isEquippableInSlot(actualItem,EquipmentSlot.BODY)*//*?}*/)) return LegacyComponents.EQUIP;
             if (actualItem.getItem() instanceof EmptyMapItem || actualItem.getItem() instanceof FishingRodItem) return LegacyComponents.USE;
             if (actualItem.getItem() instanceof FireworkRocketItem && (minecraft.player.isFallFlying() || minecraft.hitResult instanceof BlockHitResult && minecraft.hitResult.getType() != HitResult.Type.MISS)) return LegacyComponents.LAUNCH;
             if (actualItem.getItem() instanceof ShearsItem ){

@@ -39,6 +39,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.SimpleLayoutRenderable;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4J;
 import wily.legacy.util.LegacyComponents;
@@ -87,7 +89,7 @@ public class ServerRenderableList extends RenderableVList {
     public final LanServerDetection.LanServerList lanServerList;
     public List<LanServer> lanServers;
 
-    public ServerRenderableList(UIDefinition.Accessor accessor) {
+    public ServerRenderableList(UIAccessor accessor) {
         super(accessor);
         layoutSpacing(l->0);
         minecraft = Minecraft.getInstance();
@@ -97,14 +99,14 @@ public class ServerRenderableList extends RenderableVList {
         updateServers();
     }
     @Override
-    public void init(int leftPos, int topPos, int listWidth, int listHeight) {
+    public void init(String name, int leftPos, int topPos, int listWidth, int listHeight) {
         try {
             this.lanServerDetector = new LanServerDetection.LanServerDetector(this.lanServerList);
             this.lanServerDetector.start();
         } catch (Exception exception) {
             Legacy4J.LOGGER.warn("Unable to start LAN server detection: {}", exception.getMessage());
         }
-        super.init(leftPos, topPos, listWidth, listHeight);
+        super.init(name, leftPos, topPos, listWidth, listHeight);
     }
     public boolean hasOnlineFriends(){
         return false;
@@ -112,12 +114,14 @@ public class ServerRenderableList extends RenderableVList {
 
     public void added(){
     }
+
     public void removed(){
         if (lanServerDetector != null) {
             lanServerDetector.interrupt();
             lanServerDetector = null;
         }
     }
+
     private Component getMultiplayerDisabledReason() {
         if (this.minecraft.allowsMultiplayer()) {
             return null;
@@ -147,6 +151,10 @@ public class ServerRenderableList extends RenderableVList {
         for (int i = 0; i < servers.size(); i++) {
             addRenderable(new ServerButton(0,0,0,30,i));
         }
+        updateLANServers();
+    }
+
+    public void updateLANServers(){
         if (lanServers != null){
             for (LanServer lanServer : lanServers) {
                 AbstractButton lanButton;

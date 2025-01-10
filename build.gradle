@@ -26,12 +26,8 @@ repositories {
         url "https://www.cursemaven.com"
     }
     maven {
-        name = 'GitHubPackages'
-        url uri("$mod_mvngit_source")
-        credentials{
-            username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-            password = project.findProperty("gpr.token") ?: System.getenv("TOKEN")
-        }
+        name = 'Kyubion Mod Resources'
+        url "https://raw.githubusercontent.com/Kyubion-Studios/Mod-Resources/main/maven/"
     }
 
     exclusiveContent {
@@ -277,12 +273,10 @@ publishing {
     }
     repositories {
         maven {
-            name = 'GitHubPackages'
-            url uri("$mod_mvngit_source")
-            credentials{
-                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
-                password = project.findProperty("gpr.token") ?: System.getenv("TOKEN")
-            }
+            name = 'ModResources'
+            def modResourcesURL = project.findProperty("MOD_RESOURCES") ?: System.getenv("MOD_RESOURCES")
+            if (modResourcesURL != null)
+                url uri(modResourcesURL)
         }
     }
 }
@@ -312,7 +306,7 @@ publishMods {
 
     modrinth {
         minecraftVersions.addAll versions
-        accessToken = project.findProperty("gpr.token") ?: System.getenv("MODRINTH_TOKEN")
+        accessToken = project.findProperty("MODRINTH_TOKEN") ?: System.getenv("MODRINTH_TOKEN")
         projectId = modrinth_id
         publishMods.version = "$project.version+$loader"
         requires("factory-api")

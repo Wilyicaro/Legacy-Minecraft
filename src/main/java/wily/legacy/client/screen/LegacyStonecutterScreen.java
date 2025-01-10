@@ -17,6 +17,7 @@ import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Unique;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
@@ -50,7 +51,7 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
     private boolean onlyCraftableRecipes;
     protected final List<ItemStack> compactInventoryList = new ArrayList<>();
     private final ContainerListener listener;
-    protected final UIDefinition.Accessor accessor = UIDefinition.Accessor.of(this);
+    protected final UIAccessor accessor = UIAccessor.of(this);
 
     public LegacyStonecutterScreen(LegacyCraftingMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);

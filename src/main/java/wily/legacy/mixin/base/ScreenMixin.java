@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyTipManager;
@@ -71,14 +72,16 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     //?}
     @Inject(method = "renderBackground",at = @At("HEAD"), cancellable = true)
     public void renderBackground(GuiGraphics guiGraphics, /*? if >1.20.1 {*/int i, int j, float f,/*?}*/ CallbackInfo ci) {
-        ScreenUtil.renderDefaultBackground(UIDefinition.Accessor.of(self()), guiGraphics, false);
-        ci.cancel();
+        if (UIAccessor.of(self()).getBoolean("hasBackground", true)) {
+            ScreenUtil.renderDefaultBackground(UIAccessor.of(self()), guiGraphics, false);
+            ci.cancel();
+        }
     }
     //? if >=1.20.5 {
     @Inject(method = "renderPanorama",at = @At("HEAD"), cancellable = true)
     public void renderPanorama(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderDefaultBackground(UIDefinition.Accessor.of(self()), guiGraphics, true, false, true);
+        ScreenUtil.renderDefaultBackground(UIAccessor.of(self()), guiGraphics, true, false, true);
     }
     //?}
     @Inject(method = "hasShiftDown",at = @At("HEAD"), cancellable = true)

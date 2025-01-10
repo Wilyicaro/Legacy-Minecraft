@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 
 @Mixin(DrownedModel.class)
 public class DrownedModelMixin extends ZombieModel {
@@ -23,7 +23,7 @@ public class DrownedModelMixin extends ZombieModel {
 
     @Inject(method = /*? if <1.21.2 {*/"setupAnim(Lnet/minecraft/world/entity/monster/Zombie;FFFFF)V"/*?} else {*//*"setupAnim(Lnet/minecraft/client/renderer/entity/state/ZombieRenderState;)V"*//*?}*/, at = @At(value = "FIELD", target = /*? if <1.21.2 {*/"Lnet/minecraft/client/model/DrownedModel;swimAmount:F"/*?} else {*//*"Lnet/minecraft/client/renderer/entity/state/ZombieRenderState;swimAmount:F"*//*?}*/, ordinal = 0), cancellable = true)
     public void setupAnim(/*? if >=1.21.2 {*//*ZombieRenderState renderState*//*?} else {*/Zombie zombie, float f, float g, float h, float i, float j/*?}*/, CallbackInfo ci) {
-        if (LegacyOption.legacyDrownedAnimation.get()) {
+        if (LegacyOptions.legacyDrownedAnimation.get()) {
             ci.cancel();
             if (/*? if >=1.21.2 {*//*renderState.*//*?}*/ swimAmount <= 0) return;
             //? if >=1.21.2 {

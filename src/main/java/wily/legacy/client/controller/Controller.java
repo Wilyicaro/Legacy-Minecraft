@@ -1,6 +1,5 @@
 package wily.legacy.client.controller;
 
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.FactoryAPIClient;
@@ -85,14 +84,21 @@ public interface Controller {
         Component getName();
 
         void init();
+
         boolean update();
+
         default void setup(ControllerManager manager) {
             manager.connectedController.manageBindings(manager::updateBindings);
         }
+
         Controller getController(int jid);
+
         boolean isValidController(int jid);
+
         int getBindingIndex(ControllerBinding component);
+
         void applyGamePadMappingsFromBuffer(BufferedReader reader) throws IOException;
+
         default void tryDownloadAndApplyNewMappings(){
             try {
                 applyGamePadMappingsFromBuffer(new BufferedReader(new InputStreamReader(URI.create("https://raw.githubusercontent.com/mdqinc/SDL_GameControllerDB/master/gamecontrollerdb.txt").toURL().openStream())));

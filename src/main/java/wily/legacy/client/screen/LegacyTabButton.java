@@ -27,6 +27,7 @@ import wily.factoryapi.util.DynamicUtil;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
+import wily.legacy.util.ScreenUtil;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -60,24 +61,35 @@ public class LegacyTabButton extends AbstractButton {
         selected = !selected;
         onPress.accept(this);
     }
+
     public static Function<LegacyTabButton,Renderable> iconOf(Item item){
         return t-> (guiGraphics, i, j, f) -> t.renderItemIcon(item.getDefaultInstance(),guiGraphics);
     }
+
     public static Function<LegacyTabButton,Renderable> iconOf(ItemStack stack){
         return t-> (guiGraphics, i, j, f) -> t.renderItemIcon(stack,guiGraphics);
     }
+
     public static Function<LegacyTabButton,Renderable> iconOf(Supplier<ItemStack> stack){
         return t-> (guiGraphics, i, j, f) -> t.renderItemIcon(stack.get(),guiGraphics);
     }
+
     public static Function<LegacyTabButton,Renderable> iconOf(ResourceLocation sprite){
         return t-> (guiGraphics, i, j, f) -> t.renderIconSprite(sprite,guiGraphics);
     }
-    public  void renderString(GuiGraphics guiGraphics, Font font, int i, boolean shadow){
-        guiGraphics.drawString(font,getMessage(),getX() + (width - font.width(getMessage())) / 2,getY() + (height - 7) / 2,i,shadow);
+
+    public void renderString(GuiGraphics guiGraphics, Font font, int i, boolean shadow){
+        renderString(guiGraphics,font,getX(),getY(),i,shadow);
     }
+
+    public void renderString(GuiGraphics guiGraphics, Font font, int x, int y, int i, boolean shadow){
+        ScreenUtil.renderScrollingString(guiGraphics,font,getMessage(),x + Math.max(6, (getWidth() - font.width(getMessage())) / 2), y, x + getWidth() - 6, y + getHeight(), i,shadow);
+    }
+
     public  void renderIconSprite(ResourceLocation icon, GuiGraphics guiGraphics){
         FactoryGuiGraphics.of(guiGraphics).blitSprite(icon, getX() + width / 2 - 12, getY() + height / 2 - 12, 24, 24);
     }
+
     public  void renderItemIcon(ItemStack itemIcon, GuiGraphics guiGraphics){
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(getX() + width / 2f - 12, getY() + height / 2f - 12, 0);

@@ -3,6 +3,7 @@ package wily.legacy.client.screen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.init.LegacyRegistries;
@@ -10,7 +11,7 @@ import wily.legacy.util.ScreenUtil;
 
 public class LegacyScreen extends Screen implements Controller.Event, ControlTooltip.Event {
     public Screen parent;
-    protected final UIDefinition.Accessor accessor = UIDefinition.Accessor.of(this);
+    protected final UIAccessor accessor = UIAccessor.of(this);
 
     protected LegacyScreen(Component component) {
         super(component);

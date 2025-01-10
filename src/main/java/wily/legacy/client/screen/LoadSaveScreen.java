@@ -20,11 +20,12 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
-import wily.factoryapi.base.client.UIDefinition;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyClientWorldSettings;
+import wily.legacy.client.PackAlbum;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
@@ -51,13 +52,13 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     public final List<ResourceKey<Level>> dimensionsToReset = new ArrayList<>();
     public Difficulty difficulty;
     public final LevelSummary summary;
-    protected final Assort.Selector resourceAssortSelector;
+    protected final PackAlbum.Selector resourceAssortSelector;
     protected final TickBox onlineTickBox;
     protected final PublishScreen publishScreen;
     public static final List<GameType> GAME_TYPES = Arrays.stream(GameType.values()).toList();
 
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean isLocked) {
-        super(s-> Panel.createPanel(s, p-> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes(UIDefinition.Accessor.of(s)) ? 160 : 0))) / 2, p-> (s.height - p.height) / 2 + 24, 245, 233), Component.translatable("legacy.menu.load_save.load"));
+        super(s-> Panel.createPanel(s, p-> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes(UIAccessor.of(s)) ? 160 : 0))) / 2, p-> (s.height - p.height) / 2 + 24, 245, 233), Component.translatable("legacy.menu.load_save.load"));
         this.isLocked = isLocked;
         this.parent = screen;
         this.summary = summary;
@@ -72,7 +73,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         });
         allowCommands = hasCommands(summary);
         trustPlayers = LegacyClientWorldSettings.of(summary.getSettings()).trustPlayers();
-        (resourceAssortSelector = Assort.Selector.resources(panel.x + 13, panel.y + 112, 220,45, !ScreenUtil.hasTooltipBoxes(accessor),LegacyClientWorldSettings.of(summary.getSettings()).getSelectedResourceAssort())).active = !this.isLocked;
+        (resourceAssortSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 112, 220,45, !ScreenUtil.hasTooltipBoxes(accessor),LegacyClientWorldSettings.of(summary.getSettings()).getSelectedResourceAlbum())).active = !this.isLocked;
     }
 
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource source) {
@@ -132,8 +133,8 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         completeLoad();
     }
     private void completeLoad(){
-        LegacyClientWorldSettings.of(summary.getSettings()).setSelectedResourceAssort(resourceAssortSelector.getSelectedAssort());
-        loadWorld(this,minecraft,Legacy4JClient.currentWorldSource,summary);
+        LegacyClientWorldSettings.of(summary.getSettings()).setSelectedResourceAlbum(resourceAssortSelector.getSelectedAlbum());
+        loadWorld(this,minecraft, Legacy4JClient.getLevelStorageSource(),summary);
         Legacy4JClient.serverPlayerJoinConsumer = s-> {
             if (dimensionsToReset.contains(Level.END)) s.server.getLevel(Level.END).setDragonFight(new EndDragonFight(minecraft.getSingleplayerServer().getLevel(Level.END),minecraft.getSingleplayerServer().getWorldData().worldGenOptions().seed(), EndDragonFight.Data.DEFAULT));
             s.server.setDefaultGameType(gameTypeSlider.getObjectValue());
@@ -142,7 +143,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
             publishScreen.publish((IntegratedServer) s.server);
             LegacyClientWorldSettings.of(s.server.getWorldData()).setAllowCommands(allowCommands);
             s.server.getPlayerList().sendPlayerPermissionLevel(s);
-            LegacyClientWorldSettings.of(s.server.getWorldData()).setSelectedResourceAssort(resourceAssortSelector.getSelectedAssort());
+            LegacyClientWorldSettings.of(s.server.getWorldData()).setSelectedResourceAlbum(resourceAssortSelector.getSelectedAlbum());
             if (s.gameMode.getGameModeForPlayer() != gameTypeSlider.getObjectValue()) s.setGameMode(gameTypeSlider.getObjectValue());
         };
     }
@@ -226,6 +227,6 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
 
     public static void loadWorld(Screen screen, Minecraft minecraft, LevelStorageSource source, LevelSummary summary) {
         SaveRenderableList.resetIconCache();
-        Assort.Selector.applyResourceChanges(minecraft,Assort.getSelectedIds(minecraft.getResourcePackRepository()),LegacyClientWorldSettings.of(summary.getSettings()).getSelectedResourceAssort().packs(),()->new WorldOpenFlows(minecraft,source)./*? if <1.20.3 {*//*loadLevel*//*?} else if <1.20.5 {*//*checkForBackupAndLoad*//*?} else {*/openWorld/*?}*/(/*? if <1.20.3 {*//*screen, *//*?}*/summary.getLevelId()/*? if >1.20.2 {*/, ()-> minecraft.setScreen(screen)/*?}*/));
+        PackAlbum.Selector.applyResourceChanges(minecraft, PackAlbum.getSelectedIds(minecraft.getResourcePackRepository()),LegacyClientWorldSettings.of(summary.getSettings()).getSelectedResourceAlbum().packs(),()->new WorldOpenFlows(minecraft,source)./*? if <1.20.3 {*//*loadLevel*//*?} else if <1.20.5 {*//*checkForBackupAndLoad*//*?} else {*/openWorld/*?}*/(/*? if <1.20.3 {*//*screen, *//*?}*/summary.getLevelId()/*? if >1.20.2 {*/, ()-> minecraft.setScreen(screen)/*?}*/));
     }
 }

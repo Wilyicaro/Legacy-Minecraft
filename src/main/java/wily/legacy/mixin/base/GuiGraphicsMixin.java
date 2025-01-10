@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.LegacyOption;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.util.ScreenUtil;
 
@@ -70,7 +70,7 @@ public abstract class GuiGraphicsMixin {
     }
     @Inject(method = "renderTooltipInternal", at = @At("HEAD"), cancellable = true)
     private void renderTooltipInternal(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner,/*? if >=1.21.2 {*/ /*ResourceLocation location,*//*?}*/ CallbackInfo ci){
-        if (!LegacyOption.legacyItemTooltips.get()) return;
+        if (!LegacyOptions.legacyItemTooltips.get()) return;
         ci.cancel();
         if (list.isEmpty()) return;
         int k = 0;
@@ -129,6 +129,6 @@ public abstract class GuiGraphicsMixin {
 
     @Redirect(method = /*? if <1.21.2 {*/"renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V"/*?} else {*//*"renderItemCount"*//*?}*/, at = @At(value = "INVOKE", target = "Ljava/lang/String;valueOf(I)Ljava/lang/String;"))
     private String renderItemDecorationsTail(int i, Font font, ItemStack itemStack){
-        return i > itemStack.getMaxStackSize() && LegacyOption.legacyOverstackedItems.get() ? I18n.get("legacy.container.overstack",itemStack.getMaxStackSize()) : String.valueOf(i);
+        return i > itemStack.getMaxStackSize() && LegacyOptions.legacyOverstackedItems.get() ? I18n.get("legacy.container.overstack",itemStack.getMaxStackSize()) : String.valueOf(i);
     }
 }
