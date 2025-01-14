@@ -1,5 +1,5 @@
 //? if <1.20.5 && (forge || neoforge) {
-/*package wily.legacy.mixin.base;
+/*package wily.legacy.mixin.base.client.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;

@@ -351,12 +351,15 @@ public record PackAlbum(String id, int version, Component displayName, Component
                                     repeat++;
                                 String id = TEMPLATE_ALBUM +(repeat > 0 ? "_" + repeat : "");
                                 setSelectedIndex(albums.size());
-                                EditBox nameBox = new EditBox(minecraft.font, width / 2 - 100,0,200, 20, Component.translatable("legacy.menu.album_name"));
+                                EditBox nameBox = new EditBox(minecraft.font, width / 2 - 100,0,200, 20, Component.translatable("legacy.menu.album_info"));
+                                Component description = Component.translatable("legacy.menu.albums.resource.template.description");
+                                MultiLineEditBox descriptionBox = new MultiLineEditBox(minecraft.font, width / 2 - 100,0,200, 60, description, nameBox.getMessage());
+
                                 Component name = Component.translatable("legacy.menu.albums.resource.template",repeat);
                                 nameBox.setHint(name);
-                                minecraft.setScreen(new ConfirmationScreen(parent, 230, 120, ADD_ALBUM, Component.translatable("legacy.menu.album_name"), p -> {
+                                minecraft.setScreen(new ConfirmationScreen(parent, 230, 184, ADD_ALBUM, nameBox.getMessage(), p -> {
                                     minecraft.setScreen(new PackSelectionScreen(packRepository, r -> {
-                                        PackAlbum.resourceAlbums.put(id,new PackAlbum(id, 0,nameBox.getValue().isBlank() ? name : Component.literal(nameBox.getValue()),Component.translatable("legacy.menu.albums.resource.template.description"),Optional.empty(),Optional.empty(), getSelectableIds(packRepository), Optional.empty()));
+                                        PackAlbum.resourceAlbums.put(id,new PackAlbum(id, 0,nameBox.getValue().isBlank() ? name : Component.literal(nameBox.getValue()), descriptionBox.getValue().isBlank() ? description : Component.literal(descriptionBox.getValue()),Optional.empty(),Optional.empty(), getSelectableIds(packRepository), Optional.empty()));
                                         save();
                                         updateSavedAlbum();
                                         minecraft.setScreen(screen);
@@ -368,11 +371,13 @@ public record PackAlbum(String id, int version, Component displayName, Component
                                         super.init();
                                         nameBox.setPosition(panel.x + 15, panel.y + 45);
                                         addRenderableWidget(nameBox);
+                                        descriptionBox.setPosition(panel.x + 15, panel.y + 69);
+                                        addRenderableWidget(descriptionBox);
                                     }
                                 });
                             }).build());
                             AbstractButton removeButton;
-                            renderableVList.addRenderable(removeButton= Button.builder(REMOVE_ALBUM, b-> {
+                            renderableVList.addRenderable(removeButton = Button.builder(REMOVE_ALBUM, b-> {
                                 albums.remove(getSelectedAlbum().id());
                                 save();
                                 updateSavedAlbum();

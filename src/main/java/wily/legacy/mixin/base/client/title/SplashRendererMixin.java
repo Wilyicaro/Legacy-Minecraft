@@ -1,4 +1,4 @@
-package wily.legacy.mixin.base;
+package wily.legacy.mixin.base.client.title;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;

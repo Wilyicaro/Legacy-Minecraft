@@ -245,6 +245,7 @@ public class Legacy4JClient {
     }, Optional.of(WorldPresets.SINGLE_BIOME_SURFACE), (createWorldScreen, settings) -> new LegacyBuffetWorldScreen(createWorldScreen, settings.worldgenLoadContext().lookupOrThrow(Registries.BIOME), holder -> createWorldScreen.getUiState().updateDimensions(PresetEditor.fixedBiomeConfigurator(holder)))));
 
     public static Screen getReplacementScreen(Screen screen){
+        if (!LegacyMixinOptions.legacyTitleScreen.get()) return screen;
         if (screen instanceof JoinMultiplayerScreen)
             return new PlayGameScreen(new TitleScreen(),2);
         else if (screen instanceof DisconnectedScreen s)
@@ -320,6 +321,9 @@ public class Legacy4JClient {
         }
         while (keyHostOptions.consumeClick()) {
             minecraft.setScreen(new HostOptionsScreen());
+        }
+        while (keyLegacy4JSettings.consumeClick()) {
+            minecraft.setScreen(new Legacy4JSettingsScreen(Minecraft.getInstance().screen));
         }
         boolean left;
         while ((left=keyCycleHeldLeft.consumeClick()) || keyCycleHeldRight.consumeClick()){
@@ -531,10 +535,12 @@ public class Legacy4JClient {
     public static final KeyMapping keyCycleHeldRight = new KeyMapping("legacy.key.cycleHeldRight", InputConstants.KEY_PAGEUP, "key.categories.inventory");
     public static final KeyMapping keyToggleCursor = new KeyMapping("legacy.key.toggleCursor", -1, "key.categories.misc");
     public static KeyMapping keyHostOptions = new KeyMapping( MOD_ID +".key.host_options", InputConstants.KEY_H, "key.categories.misc");
+    public static KeyMapping keyLegacy4JSettings = new KeyMapping( MOD_ID +".key.legacy4JSettings", InputConstants.KEY_Y, "key.categories.misc");
     public static KeyMapping keyFlyUp = new KeyMapping( MOD_ID +".key.flyUp", InputConstants.KEY_UP, "key.categories.movement");
     public static KeyMapping keyFlyDown = new KeyMapping( MOD_ID +".key.flyDown", InputConstants.KEY_DOWN, "key.categories.movement");
     public static KeyMapping keyFlyLeft = new KeyMapping( MOD_ID +".key.flyLeft", InputConstants.KEY_LEFT, "key.categories.movement");
     public static KeyMapping keyFlyRight = new KeyMapping( MOD_ID +".key.flyRight", InputConstants.KEY_RIGHT, "key.categories.movement");
+
 
     public static void resetOptions(Minecraft minecraft){
         whenResetOptions.forEach(Runnable::run);

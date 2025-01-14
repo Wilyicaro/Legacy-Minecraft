@@ -207,7 +207,7 @@ public class LegacyOptions {
     public static final LegacyConfig<Integer> hudScale = CLIENT_STORAGE.register(createInteger("hudScale", Options::genericValueLabel, 1, ()->3, 2));
     public static final LegacyConfig<Double> hudOpacity = CLIENT_STORAGE.register(createDouble("hudOpacity", LegacyOptions::percentValueLabel, 0.8));
     public static final LegacyConfig<Double> hudDistance = CLIENT_STORAGE.register(createDouble("hudDistance", LegacyOptions::percentValueLabel, 1.0));
-    public static final LegacyConfig<Double> interfaceResolution = CLIENT_STORAGE.register(createDouble("interfaceResolution", (c, d)-> percentValueLabel(c, 0.25 + d * 1.5), 0.5, d -> Minecraft.getInstance().resizeDisplay()));
+    public static final LegacyConfig<Double> interfaceResolution = CLIENT_STORAGE.register(createDouble("interfaceResolution", (c, d)-> percentValueLabel(c, 0.25 + d * 1.5), 0.5, d -> Minecraft.getInstance().execute(Minecraft.getInstance()::resizeDisplay)));
     public static final LegacyConfig<Double> interfaceSensitivity = CLIENT_STORAGE.register(createDouble("interfaceSensitivity", (c, d)-> percentValueLabel(c, d*2), 0.5, d -> {}));
     public static final LegacyConfig<Double> controllerSensitivity = CLIENT_STORAGE.register(LegacyConfig.createDouble("controllerSensitivity", ArbitrarySupplier.of(new LegacyConfigDisplay<>(Component.translatable("options.sensitivity"))), (c, d)-> percentValueLabel(c, d*2), 0.5, d -> {}, CLIENT_STORAGE));
     public static final LegacyConfig<Boolean> overrideTerrainFogStart = CLIENT_STORAGE.register(createBoolean("overrideTerrainFogStart", true));

@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -23,6 +24,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.KeyboardScreen;
+import wily.legacy.client.screen.Legacy4JSettingsScreen;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.ScreenUtil;
 
@@ -91,6 +93,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     @Inject(method = "keyPressed",at = @At("HEAD"))
     private void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir){
         if (Legacy4JClient.keyToggleCursor.matches(i,j)) Legacy4JClient.controllerManager.toggleCursor();
+        else if (Legacy4JClient.keyLegacy4JSettings.matches(i,j) && (self().shouldCloseOnEsc() || self() instanceof TitleScreen)) minecraft.setScreen(new Legacy4JSettingsScreen(self()));
     }
     @Redirect(method = "rebuildWidgets",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;clearFocus()V"))
     public void rebuildWidgets(Screen instance) {

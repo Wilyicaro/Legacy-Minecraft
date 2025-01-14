@@ -1,4 +1,4 @@
-package wily.legacy.mixin.base;
+package wily.legacy.mixin.base.client.title;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
@@ -15,17 +15,13 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.controller.ControllerManager;
 import wily.legacy.client.screen.*;
 import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
-import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;

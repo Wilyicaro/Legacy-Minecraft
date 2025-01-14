@@ -8,6 +8,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraft.client.model.BookModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
@@ -148,7 +149,8 @@ public class LegacyUIElementTypes {
             a.getElement(elementName + ".component", Component.class).ifPresent((c) -> ScreenUtil.drawOutlinedString(guiGraphics ,Minecraft.getInstance().font, c, a.getInteger(elementName + ".x", 0), a.getInteger(elementName + ".y", 0), a.getInteger(elementName + ".color", 16777215), a.getInteger(elementName + ".outlineColor", 0), a.getFloat(elementName + ".outline", 0.5f)));
         }))));
     }));
-    public static final UIDefinitionManager.ElementType RENDER_ENCHANTMENT_BOOK = UIDefinitionManager.ElementType.registerConditional("render_enchanted_book", UIDefinitionManager.ElementType.createIndexable(slots->(uiDefinition, accessorFunction, elementName, element) -> {
+
+    public static final UIDefinitionManager.ElementType RENDER_ENCHANTED_BOOK = UIDefinitionManager.ElementType.registerConditional("render_enchanted_book", UIDefinitionManager.ElementType.createIndexable(slots->(uiDefinition, accessorFunction, elementName, element) -> {
         Bearer<BookModel> bookModel = Bearer.of(null);
         Bearer<Float> flip = Bearer.of(0f);
         Bearer<Float> oFlip = Bearer.of(0f);
@@ -177,14 +179,15 @@ public class LegacyUIElementTypes {
                     flipT.set(flipT.get() + (float)(random.nextInt(4) - random.nextInt(4)));
                 } while(flip.get() <= flipT.get() + 1.0F && flip.get() >= flipT.get() - 1.0F);
             }
+
             oFlip.set(flip.get());
             oOpen.set(open.get());
-            open.set(open.get() - 0.2F);
+            open.set(open.get() + 0.2F);
 
             open.set(Mth.clamp(open.get(), 0.0F, 1.0F));
             float f1 = (flipT.get() - flip.get()) * 0.4F;
             f1 = Mth.clamp(f1, -0.2F, 0.2F);
-            flipA.set(flipA.get()+ (f1 - flipA.get()) * 0.9F);
+            flipA.set(flipA.get() + (f1 - flipA.get()) * 0.9F);
             flip.set(flip.get() + flipA.get());
         }));
         UIDefinitionManager.ElementType.parseTranslationElements(uiDefinition, elementName, element);
