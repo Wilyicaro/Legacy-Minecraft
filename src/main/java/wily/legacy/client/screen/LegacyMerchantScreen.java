@@ -144,7 +144,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
                 for (int index = 0; index < 3; index++) {
                     MerchantOffer offer = getSelectedMerchantOffer();
                     if (index == 1 && (offer == null || offer.getCostB().isEmpty())) continue;
-                    LegacyIconHolder iconHolder = ScreenUtil.iconHolderRenderer.itemHolder(leftPos + (index == 2 ? 86 : 17), topPos +  (index == 0 ? 114 + (offer == null || offer.getCostB().isEmpty() ? 16 : 0) : index == 1 ? 144 : 130), 27,27,offer == null || index == 0 ? ItemStack.EMPTY : index == 1 ? offer.getCostB() : offer.getResult(),offer != null && displaySlotsWarning[index], Vec3.ZERO.ZERO);
+                    LegacyIconHolder iconHolder = ScreenUtil.iconHolderRenderer.itemHolder(leftPos + (index == 2 ? 86 : 17), topPos +  (index == 0 ? 114 + (offer == null || offer.getCostB().isEmpty() ? 16 : 0) : index == 1 ? 144 : 130), 27,27,offer == null || index == 0 ? ItemStack.EMPTY : index == 1 ? offer.getCostB() : offer.getResult(),offer != null && displaySlotsWarning[index], Vec3.ZERO);
                     iconHolder.render(graphics, i, j, f);
                     if (offer == null || index != 0) continue;
                     iconHolder.renderItem(graphics,()->{
@@ -294,8 +294,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
         return false;
     }
 
-
-    private void renderProgressBar(GuiGraphics guiGraphics) {
+    protected void renderProgressBar(GuiGraphics guiGraphics) {
         int k = this.menu.merchantLevel;
         int l = this.menu.merchant.getVillagerXp();
         if (k >= 5) {
@@ -307,6 +306,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.EXPERIENCE_BAR_BACKGROUND, 0, 0, 0, 161, 4);
         int m = VillagerData.getMinXpPerLevel(k);
         if (l < m || !VillagerData.canLevelUp(k)) {
+            guiGraphics.pose().popPose();
             return;
         }
         float f = 161.0f / (float)(VillagerData.getMaxXpPerLevel(k) - m);
@@ -321,7 +321,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
     }
 
     public static MutableComponent getMerchantTile(Component title, int i){
-        return /*? if >1.20.1 {*/Component.translatable("merchant.title", title, Component.translatable("merchant.level." + i))/*?} else {*//*title.copy().append(" - ").append(Component.translatable("merchant.level." + i))*//*?}*/;
+        return Component.translatable("merchant.title", title, Component.translatable("merchant.level." + i));
     }
 
     @Override
@@ -357,7 +357,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
         guiGraphics.pose().popPose();
         if (getSelectedMerchantOffer() instanceof LegacyMerchantOffer o && o.getRequiredLevel() > menu.merchantLevel)
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PADLOCK, leftPos + 56,  topPos + 134, 16, 16);
-        if (menu.showProgressBar)
+        if (UIAccessor.of(this).getBoolean("showProgressBar", menu.showProgressBar))
             renderProgressBar(guiGraphics);
 
         if (tradingButtonsOffset.get() > 0)

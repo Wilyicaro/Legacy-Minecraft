@@ -1,0 +1,136 @@
+{
+  "elements": {
+    "scrollable_renderer": {
+      "type": "put_scrollable_renderer",
+      "x": "${width}/2-228",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+      "width": 200,
+      "height": 222,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.furnace_message", "allowVariables": true, "args": ["controlIcon.key.use"]},
+          "width": 176
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.furnace_message_1", "allowVariables": true, "args": ["controlIcon.menu_quick_action"]},
+          "width": 176
+        }
+      }
+    },
+    "panel": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/small_panel",
+      "width":215,
+      "height":217,
+      "x":"${scrollable_renderer.x}+${scrollable_renderer.width}+28",
+      "y":"${scrollable_renderer.y}+4"
+    },
+    "furnace_label": {
+      "type":"draw_string",
+      "component": {"translate": "container.furnace"},
+      "color": "${commonColor.inventory_gray_text}",
+      "shadow": false,
+      "x":"${panel.x}+14",
+      "y":"${panel.y}+10"
+    },
+    "input": {
+      "type":"put_legacy_slot",
+      "range":"[0,26]",
+      "isFake":true,
+      "fakeItem": {"item": "raw_iron", "count": 61},
+      "x":"${panel.x}+14+3*21",
+      "y":"${panel.y}+25"
+    },
+    "input_label": {
+      "type":"draw_string",
+      "component": {"translate": "legacy.container.ingredient"},
+      "color": "${commonColor.inventory_gray_text}",
+      "shadow": false,
+      "x":"(${panel.x}+14+3*21-3)-${input_label.component.width}",
+      "y":"${panel.y}+25+6"
+    },
+    "fuel": {
+      "type":"put_legacy_slot",
+      "range":"[0,26]",
+      "isFake":true,
+      "fakeItem": {"item": "coal", "count": 63},
+      "x":"${panel.x}+14+3*21",
+      "y":"${panel.y}+72"
+    },
+    "fuel_label": {
+      "type":"draw_string",
+      "component": {"translate": "legacy.container.fuel"},
+      "color": "${commonColor.inventory_gray_text}",
+      "shadow": false,
+      "x":"(${panel.x}+14+3*21-3)-${fuel_label.component.width}",
+      "y":"${panel.y}+72+6"
+    },
+    "lit": {
+      "type":"blit_sprite",
+      "sprite": "legacy:container/lit",
+      "x": "${panel.x}+14+3*21",
+      "y": "${panel.y}+23+25",
+      "width": 19,
+      "height": 19
+    },
+    "lit_progress": {
+      "type":"blit",
+      "texture": "legacy:textures/gui/sprites/container/lit_progress.png",
+      "x": "${panel.x}+14+3*21",
+      "y": "${panel.y}+23+25+9",
+      "width": 19,
+      "height": 10,
+      "imageWidth": 19,
+      "imageHeight": 19,
+      "uvY": 9
+    },
+    "arrow": {
+      "type":"blit_sprite",
+      "sprite": "legacy:container/arrow",
+      "x": "${panel.x}+14+3*21+37",
+      "y": "${panel.y}+23+25",
+      "width": 33,
+      "height": 22
+    },
+    "output": {
+      "type":"put_legacy_slot",
+      "range":"[0,26]",
+      "isFake":true,
+      "fakeItem": {"item": "iron_ingot", "count": 3},
+      "width": 32,
+      "height": 32,
+      "x":"${panel.x}+${panel.width}-11-21-21-6",
+      "y":"${panel.y}+44"
+    },
+    "inventory_label": {
+      "type":"draw_string",
+      "component": {"translate": "container.inventory"},
+      "color": "${commonColor.inventory_gray_text}",
+      "shadow": false,
+      "x":"${panel.x}+14",
+      "y":"${panel.y}+106"
+    },
+    "inventory": {
+      "type":"put_legacy_slot",
+      "range":"[0,26]",
+      "isFake":true,
+      "fakeContainer": [
+        {"item": "stone", "count": 32},{"item": "oak_planks", "count": 17},"air","air","oak_fence_gate","air","air",{"item": "arrow", "count": 64},{"item": "stick", "count": 10},
+        {"item": "bookshelf", "count": 3},"air","dark_oak_door","air","emerald","air",{"item": "cobblestone_wall", "count": 7},"oak_sign","air",
+        {"item": "stone_brick_stairs", "count": 24},{"item": "cobblestone_stairs", "count": 16},"air",{"item": "oak_log", "count":  7},{"item": "acacia_stairs", "count": 15},"air","diamond_pickaxe",{"item": "paper", "count": 21},{"item": "gunpowder", "count": 15}
+      ],
+      "x":"${panel.x}+14+(${inventory.index}%9)*21",
+      "y":"${panel.y}+116+(${inventory.index}/9)*21"
+    },
+    "quick_select": {
+      "type":"put_legacy_slot",
+      "range":"[0,8]",
+      "isFake":true,
+      "fakeContainer": ["iron_sword","bow",{"item": "arrow", "count": 64},{"item": "flint_and_steel", "components": {"damage": 28}, "nbt": {"Damage": 28}},"clock","shears",{"item": "iron_axe", "components": {"damage": 65}, "nbt": {"Damage": 65}},"fishing_rod","compass"],
+      "x":"${panel.x}+14+(${quick_select.index}%9)*21",
+      "y":"${panel.y}+186"
+    }
+  }
+}

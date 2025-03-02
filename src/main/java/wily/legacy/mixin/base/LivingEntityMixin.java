@@ -18,7 +18,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIClient;
-import wily.legacy.config.LegacyConfig;
+import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.config.LegacyCommonOptions;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
@@ -56,11 +57,11 @@ public abstract class LivingEntityMixin extends Entity {
     //? if <1.21.2 {
     @Inject(method = "isBlocking", at = @At("HEAD"), cancellable = true)
     public void isBlocking(CallbackInfoReturnable<Boolean> cir) {
-        if (LegacyConfig.legacySwordBlocking.get() && useItem.getItem() instanceof SwordItem) cir.setReturnValue(false);
+        if (LegacyCommonOptions.legacySwordBlocking.get() && useItem.getItem() instanceof SwordItem) cir.setReturnValue(false);
     }
     //?}
     @Inject(method = "getDamageAfterArmorAbsorb", at = @At("RETURN"), cancellable = true)
     protected void getDamageAfterArmorAbsorb(DamageSource damageSource, float f, CallbackInfoReturnable<Float> cir) {
-        if (!damageSource.is(DamageTypeTags.BYPASSES_ARMOR) && LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacySwordBlocking) && useItem.getItem() instanceof SwordItem) cir.setReturnValue(cir.getReturnValue()/2);
+        if (!damageSource.is(DamageTypeTags.BYPASSES_ARMOR) && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking) && useItem.getItem() instanceof SwordItem) cir.setReturnValue(cir.getReturnValue()/2);
     }
 }

@@ -1,5 +1,6 @@
 package wily.legacy.util;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import wily.factoryapi.FactoryAPI;
 import wily.legacy.Legacy4J;
@@ -99,6 +100,11 @@ public class LegacySprites {
     public static final ResourceLocation[] ENABLED_LEVEL_SPRITES = new ResourceLocation[]{FactoryAPI.createVanillaLocation("container/enchanting_table/level_1"), FactoryAPI.createVanillaLocation("container/enchanting_table/level_2"), FactoryAPI.createVanillaLocation("container/enchanting_table/level_3")};
     public static final ResourceLocation[] DISABLED_LEVEL_SPRITES = new ResourceLocation[]{FactoryAPI.createVanillaLocation("container/enchanting_table/level_1_disabled"), FactoryAPI.createVanillaLocation("container/enchanting_table/level_2_disabled"), FactoryAPI.createVanillaLocation("container/enchanting_table/level_3_disabled")};
     public static final ResourceLocation DRAFT_REPORT = FactoryAPI.createVanillaLocation("icon/draft_report");
+    public static final ResourceLocation STRUCTURES = Legacy4J.createModLocation("icon/structures");
+    public static final ResourceLocation MECHANISMS = Legacy4J.createModLocation("icon/mechanisms");
+    public static final ResourceLocation TOOLS = Legacy4J.createModLocation("icon/tools");
+    public static final ResourceLocation MISC = Legacy4J.createModLocation("icon/misc");
+    public static final ResourceLocation SEARCH = Legacy4J.createModLocation("icon/search");
 
     public static final ResourceLocation SAVE_CHEST = Legacy4J.createModLocation("hud/save_chest");
     public static final ResourceLocation SAVE_ARROW = Legacy4J.createModLocation("hud/save_arrow");

@@ -1,6 +1,6 @@
 {
   "overrides": {
     "item": "#axes",
-    "tip": "item.minecraft.axe.tip"
+    "tip": {"translate": "item.minecraft.axe.tip"}
   }
 }

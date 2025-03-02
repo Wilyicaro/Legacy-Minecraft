@@ -5,11 +5,13 @@ import net.minecraft.client.gui.components.CommandSuggestions;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.PageButton;
 import net.minecraft.network.chat.Component;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
@@ -44,17 +46,23 @@ public abstract class ChatScreenMixin extends Screen implements Controller.Event
         ControlTooltip.Renderer.of(this).replace(1,i-> i,c-> ControlType.getActiveType().isKbm() ? input.getValue().isBlank() ? null : input.getValue().startsWith("/") ? LegacyComponents.SEND_COMMAND : LegacyComponents.SEND_MESSAGE : c).add(()-> !ControlType.getActiveType().isKbm() ? ControllerBinding.START.bindingState.getIcon() : null,()-> /*? if >1.20.1 {*/commandSuggestions.isVisible()/*?} else {*//*commandSuggestions.suggestions != null*//*?}*/ ? LegacyComponents.USE_SUGGESTION : input.getValue().isBlank() ? null : input.getValue().startsWith("/") ? LegacyComponents.SEND_COMMAND : LegacyComponents.SEND_MESSAGE);
     }
 
-    @Redirect(method = "init",at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/ChatScreen;input:Lnet/minecraft/client/gui/components/EditBox;", opcode = Opcodes.PUTFIELD))
-    private void init(ChatScreen instance, EditBox value){
+    @Inject(method = "init",at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/ChatScreen;input:Lnet/minecraft/client/gui/components/EditBox;", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
+    private void init(CallbackInfo ci){
         //? if >1.20.1 {
-        this.input = value;
-        value.setHeight(20);
-        value.setPosition(4 + Math.round(ScreenUtil.getChatSafeZone()),height - value.getHeight() + (int)(ScreenUtil.getHUDDistance() - 56));
-        value.setWidth(width - (8 + Math.round(ScreenUtil.getChatSafeZone()) * 2));
+        this.input.setHeight(20);
+        this.input.setPosition(4 + Math.round(ScreenUtil.getChatSafeZone()),height - input.getHeight() + (int)(ScreenUtil.getHUDDistance() - 56));
+        this.input.setWidth(width - (8 + Math.round(ScreenUtil.getChatSafeZone()) * 2));
         //?} else {
-        /*this.input = new EditBox(minecraft.font, 4 + Math.round(ScreenUtil.getChatSafeZone()),height - value.getHeight() + (int)(ScreenUtil.getHUDDistance() - 56), width - (8 + Math.round(ScreenUtil.getChatSafeZone()) * 2), 20,value.getMessage());
+        /*this.input = new EditBox(minecraft.font, 4 + Math.round(ScreenUtil.getChatSafeZone()),height - input.getHeight() + (int)(ScreenUtil.getHUDDistance() - 56), width - (8 + Math.round(ScreenUtil.getChatSafeZone()) * 2), 20, input.getMessage());
         *///?}
     }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (getFocused() != input) setFocused(input);
+    }
+
     @Redirect(method = "init",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;setBordered(Z)V"))
     private void setBordered(EditBox instance, boolean bl){
     }

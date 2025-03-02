@@ -53,14 +53,12 @@ public abstract class BitmapProviderMixin {
 
                 int n = 0;
                 int[] var13 = this.codepointGrid[m];
-                int var14 = var13.length;
 
-                for(int var15 = 0; var15 < var14; ++var15) {
-                    int o = var13[var15];
+                for (int o : var13) {
                     int p = n++;
                     if (o != 0) {
                         int q = this.getActualGlyphWidth(nativeImage, k, l, p, m);
-                        BitmapProvider.Glyph glyph = codepointMap.put(o, new BitmapProvider.Glyph(f, nativeImage, p * k, m * l, k, l, (int)(0.5 + (double)((float)q * f)) + 1, this.ascent){
+                        BitmapProvider.Glyph glyph = codepointMap.put(o, new BitmapProvider.Glyph(f, nativeImage, p * k, m * l, k, l, (int) (0.5 + (double) ((float) q * f)) + 1, this.ascent) {
                             @Override
                             public float getAdvance() {
                                 return (q + 1) * f;
@@ -75,20 +73,16 @@ public abstract class BitmapProviderMixin {
                 ++m;
             }
         } catch (Throwable var21) {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (Throwable var20) {
-                    var21.addSuppressed(var20);
-                }
+            try {
+                inputStream.close();
+            } catch (Throwable var20) {
+                var21.addSuppressed(var20);
             }
             cir.setReturnValue(null);
             throw var21;
         }
 
-        if (inputStream != null) {
-            inputStream.close();
-        }
+        inputStream.close();
 
         cir.setReturnValue(var22);
     }

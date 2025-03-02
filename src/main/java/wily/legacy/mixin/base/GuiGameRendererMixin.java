@@ -5,6 +5,7 @@ import net.minecraft.client.DeltaTracker;
 //?}
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
@@ -28,8 +29,8 @@ public class GuiGameRendererMixin {
 
     @Shadow @Nullable private ItemStack itemActivationItem;
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;render(Lnet/minecraft/client/gui/GuiGraphics;F)V"))
-    private void render(Gui instance, GuiGraphics guiGraphics, float f){
+    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;render(Lnet/minecraft/client/gui/GuiGraphics;F)V"))
+    private boolean render(Gui instance, GuiGraphics guiGraphics, float f){
         if (this.itemActivationItem != null && this.itemActivationTicks > 0 && Legacy4JClient.itemActivationRenderReplacement != null) {
             float g = ((float)40 - this.itemActivationTicks + f) / 40.0F;
             float h = g * g;
@@ -50,12 +51,12 @@ public class GuiGameRendererMixin {
             Legacy4JClient.itemActivationRenderReplacement.render(guiGraphics,0,0,f);
             guiGraphics.pose().popPose();
         }
-        if (LegacyOptions.displayHUD.get()) instance.render(guiGraphics,f);
+        return LegacyOptions.displayHUD.get();
     }
     *///?} else {
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"))
-    private void render(Gui instance, GuiGraphics guiGraphics, DeltaTracker deltaTracker){
-        if (LegacyOptions.displayHUD.get()) instance.render(guiGraphics,deltaTracker);
+    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"))
+    private boolean render(Gui instance, GuiGraphics guiGraphics, DeltaTracker deltaTracker){
+        return LegacyOptions.displayHUD.get();
     }
     //?}
 }

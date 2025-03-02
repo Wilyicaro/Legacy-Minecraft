@@ -24,6 +24,29 @@
     //? if >1.20.2 {
     "client.crafter.CrafterScreenMixin",
     //?}
+    //? if >=1.21 && (fabric || neoforge) {
+    "compat.sodium.FluidRendererFactoryMixin",
+    "compat.sodium.BlockRendererMixin",
+    //?}
+    //? (fabric || >=1.21 && neoforge) {
+    "compat.sodium.OcclusionCullerMixin",
+    //?}
+    //? (fabric && <1.21) {
+    /*"compat.sodium.BlockRenderContextMixin",
+    *///?}
+    //? (>=1.21 && (fabric || neoforge)) || (1.20.1 && (forge || fabric)) {
+    "compat.nostalgic.HudHelperMixin",
+    //?}
+    //? if <=1.21.1 {
+    "compat.jei.VanillaPluginMixin",
+    "compat.jei.RecipesGuiMixin",
+    //?}
+    //? if fabric {
+    "TerrainRenderContextMixin",
+    //?}
+    //? if >=1.20.2 {
+    "SectionOcclusionGraphMixin",
+    //?}
     "client.inventory.EffectRenderingInventoryScreenMixin",
     "AbstractButtonMixin",
     "AbstractContainerScreenMixin",
@@ -53,13 +76,13 @@
     "ClientPrimaryLevelDataMixin",
     "ClientTextTooltipMixin",
     "ContainerEventHandlerMixin",
-    "ContainerScreenMixin",
+    "client.container.ContainerScreenMixin",
     "client.crafting.CraftingScreenMixin",
     "client.create_world.CreateWorldScreenMixin",
     "CyclingSlotBackgroundMixin",
     "DeathScreenMixin",
-    "DrownedModelMixin",
-    "DrownedRendererMixin",
+    "client.drowned.DrownedModelMixin",
+    "client.drowned.DrownedRendererMixin",
     "EditBoxMixin",
     "client.enchantment.EnchantmentScreenMixin",
     "EndCrystalRendererMixin",
@@ -89,7 +112,7 @@
     "KeyMappingMixin",
     "LegacyLoadingMessageScreenMixin",
     "LegacyLoadingScreenMixin",
-    "LevelRendererMixin",
+    "SkyLevelRendererMixin",
     "LiquidBlockRendererMixin",
     "LivingEntityRendererMixin",
     "LoadingOverlayMixin",
@@ -133,9 +156,17 @@
     "PaintingRendererMixin",
     "piston.PistonHeadRendererMixin",
     "WinScreenMixin",
-    "PlayerTabOverlayMixin",
+    "client.gui.PlayerTabOverlayMixin",
     "AbstractScrollWidgetMixin",
-    "MultilineEditBoxMixin"
+    "MultilineEditBoxMixin",
+    "EvokerFangsRendererMixin",
+    "WindowMixin",
+    "MenuScreensMixin",
+    "MultiplayerGameModeMixin",
+    "CameraMixin",
+    "BlockRenderDispatcherMixin",
+    "MouseHandlerAccessor",
+    "LevelRendererMixin"
   ],
   "mixins": [
     //? if <1.20.5 {
@@ -146,6 +177,15 @@
     //? if <1.21.2 {
     "RecipeManagerAccessor",
     //?}
+    //? if >1.20.1 {
+    "ChunkTrackingViewMixin",
+    //?} else {
+    /*"ChunkMapMixin",
+    *///?}
+    //? if >=1.20.5 && neoforge {
+    /*"AttributeUtilMixin",
+    "IAttributeExtensionMixin",
+    *///?}
     "AbstractContainerMenuMixin",
     "AbstractMinecartMixin",
     "AbstractVillagerMixin",
@@ -180,7 +220,6 @@
     "ServerPlayerGameModeMixin",
     "ServerPlayerMixin",
     "SnowLayerBlockMixin",
-    "SpawnEggItemMixin",
     "SquidMixin",
     "StonecutterBlockMixin",
     "StyleMixin",
@@ -193,7 +232,13 @@
     "FireworkStarRecipeAccessor",
     "FireworkRocketRecipeAccessor",
     "ThrownTridentMixin",
-    "SwordItemMixin"
+    "SwordItemMixin",
+    "client.chat.ChatFormattingMixin",
+    "ChangeDimensionTriggerMixin",
+    "EnchantmentMixin",
+    "EntityMixin",
+    "WitherSkullBlockMixin",
+    "SdlGamepadMixin"
   ],
   "injectors": {
     "defaultRequire": 1

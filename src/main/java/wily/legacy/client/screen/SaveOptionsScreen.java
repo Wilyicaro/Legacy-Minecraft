@@ -31,9 +31,9 @@ public class SaveOptionsScreen extends ConfirmationScreen{
     @Override
     protected void addButtons() {
         renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b-> minecraft.setScreen(parent)).bounds(panel.x + 15, panel.y + panel.height - 96,200,20).build());
-        EditBox renameBox = new EditBox(font, width / 2 - 100,0,200, 20, Component.translatable("selectWorld.enterName"));
+        EditBox renameBox = new EditBox(font, width / 2 - 100, 0, 200, 20, Component.translatable("selectWorld.enterName"));
         renameBox.setValue(summary.getLevelName());
-        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.rename_save"),b-> minecraft.setScreen(new ConfirmationScreen(parent,Component.translatable("legacy.menu.rename_save_title"),Component.translatable("legacy.menu.rename_save_message"), p->{
+        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.rename_save"),b-> minecraft.setScreen(new ConfirmationScreen(parent, 230, 121,Component.translatable("legacy.menu.rename_save_title"), Component.translatable("legacy.menu.rename_save_message"), p->{
             String id = summary.getLevelId();
             try {
                 LevelStorageSource.LevelStorageAccess levelStorageAccess = minecraft.getLevelSource().validateAndCreateAccess(id);

@@ -411,7 +411,7 @@ public class SaveRenderableList extends RenderableVList {
         }else minecraft.setScreen(new LoadSaveScreen(getScreen(), summary, Legacy4JClient.getLevelStorageSource()){
             @Override
             public void onLoad() throws IOException {
-                if (LegacyOptions.hasSaveCache.get()) Legacy4JClient.copySaveBtwSources(LoadSaveScreen.getSummaryAccess(Minecraft.getInstance().getLevelSource(),summary),Legacy4JClient.currentWorldSource);
+                if (LegacyOptions.saveCache.get()) Legacy4JClient.copySaveBtwSources(LoadSaveScreen.getSummaryAccess(Minecraft.getInstance().getLevelSource(),summary),Legacy4JClient.currentWorldSource);
                 super.onLoad();
             }
         });

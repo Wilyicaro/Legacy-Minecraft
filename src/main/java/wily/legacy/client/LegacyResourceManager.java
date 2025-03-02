@@ -2,6 +2,7 @@ package wily.legacy.client;
 
 import com.google.gson.*;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.PostChain;
@@ -80,7 +81,6 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
             }
         });
 
-        ControlType.typesMap.clear();
         ControlType.types.clear();
         CommonValue.COMMON_VALUES.forEach((s,c)->c.reset());
         CommonColor.COMMON_COLORS.forEach((s,c)->c.reset());
@@ -93,11 +93,10 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
                         ControlType type;
                         if (e instanceof JsonPrimitive p) {
                             id = FactoryAPI.createLocation(p.getAsString());
-                            if (ControlType.typesMap.containsKey(id.toString()) && ControlType.defaultTypes.contains(ControlType.typesMap.get(id.toString()))) return;
+                            if (ControlType.types.containsKey(id.toString()) && ControlType.defaultTypes.contains(ControlType.types.get(id.toString()))) return;
                             for (ControlType defaultType : ControlType.defaultTypes) {
                                 if (defaultType.getId().equals(id)){
-                                    ControlType.types.add(defaultType);
-                                    ControlType.typesMap.put(id.toString(), defaultType);
+                                    ControlType.types.put(id.toString(), defaultType);
                                     return;
                                 }
                             }
@@ -107,8 +106,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
                             id = FactoryAPI.createLocation(GsonHelper.getAsString(o,"id"));
                             type = ControlType.create(id,JsonUtil.getJsonStringOrNull(o,"displayName", Component::translatable),GsonHelper.getAsBoolean(o,"isKbm",false));
                         }
-                        ControlType.types.add(type);
-                        ControlType.typesMap.put(id.toString(), type);
+                        ControlType.types.put(id.toString(), type);
                     });
                 } catch (IOException e) {
                     Legacy4J.LOGGER.warn(e.getMessage());
@@ -119,7 +117,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
                     JsonObject obj = GsonHelper.parse(r.openAsReader());
                     obj.asMap().forEach((s,e)-> {
                         ResourceLocation id = FactoryAPI.createLocation(s);
-                        if (CommonColor.COMMON_COLORS.containsKey(id)) CommonColor.INT_COLOR_CODEC.parse(JsonOps.INSTANCE,e).result().ifPresent(CommonColor.COMMON_COLORS.get(id)::set);
+                        if (CommonColor.COMMON_COLORS.containsKey(id)) CommonColor.COMMON_COLORS.get(id).parse(new Dynamic<>(JsonOps.INSTANCE,e));
                     });
                 } catch (IOException e) {
                     Legacy4J.LOGGER.warn(e.getMessage());
@@ -130,24 +128,19 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
                     JsonObject obj = GsonHelper.parse(r.openAsReader());
                     obj.asMap().forEach((s,e)-> {
                         ResourceLocation id = FactoryAPI.createLocation(s);
-                        if (CommonColor.COMMON_VALUES.containsKey(id)) {
-                            if (e instanceof JsonPrimitive p){
-                                if (p.isBoolean()) CommonColor.COMMON_VALUES.get(id).secureCast(Boolean.class).set(p.getAsBoolean());
-                                else if (p.isNumber()) CommonColor.COMMON_VALUES.get(id).secureCast(Number.class).set(p.getAsNumber());
-                            }
-                        }
+                        if (CommonColor.COMMON_VALUES.containsKey(id)) CommonColor.COMMON_VALUES.get(id).parse(new Dynamic<>(JsonOps.INSTANCE,e));
                     });
                 } catch (IOException e) {
                     Legacy4J.LOGGER.warn(e.getMessage());
                 }
             });
             addKbmIcons(resourceManager, FactoryAPI.createLocation(name,DEFAULT_KBM_ICONS),(s,b)->{
-                for (ControlType value : ControlType.types) if (value.isKbm()) value.getIcons().put(s, b);
+                for (ControlType value : ControlType.types.values()) if (value.isKbm()) value.getIcons().put(s, b);
             });
             addControllerIcons(resourceManager, FactoryAPI.createLocation(name, DEFAULT_CONTROLLER_ICONS),(s, b)->{
-                for (ControlType value : ControlType.types) if (!value.isKbm()) value.getIcons().put(s, b);
+                for (ControlType value : ControlType.types.values()) if (!value.isKbm()) value.getIcons().put(s, b);
             });
-            for (ControlType value : ControlType.types) {
+            for (ControlType value : ControlType.types.values()) {
                 ResourceLocation location = FactoryAPI.createLocation(value.getId().getNamespace(),"control_tooltips/icons/%s.json".formatted(value.getId().getPath()));
                 if (value.isKbm()) addKbmIcons(resourceManager,location,value.getIcons()::put);
                 else addControllerIcons(resourceManager, location, value.getIcons()::put);

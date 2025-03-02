@@ -21,7 +21,7 @@ public interface MerchantMixin {
     @Overwrite
     default void openTradingScreen(Player player2, Component component, int i2) {
         MerchantOffers merchantOffers;
-        OptionalInt optionalInt = player2.openMenu(new SimpleMenuProvider((i, inventory, player) -> player2 instanceof LegacyPlayer p && !p.hasClassicCrafting() ? new LegacyMerchantMenu(i,inventory,(Merchant) this) : new MerchantMenu(i, inventory, (Merchant) this), component));
+        OptionalInt optionalInt = player2.openMenu(new SimpleMenuProvider((i, inventory, player) -> player2 instanceof LegacyPlayer p && !p.hasClassicTrading() ? new LegacyMerchantMenu(i,inventory,(Merchant) this) : new MerchantMenu(i, inventory, (Merchant) this), component));
         if (optionalInt.isPresent() && !(merchantOffers = ((Merchant) this).getOffers()).isEmpty())
             player2.sendMerchantOffers(optionalInt.getAsInt(), merchantOffers, i2, ((Merchant) this).getVillagerXp(), ((Merchant) this).showProgressBar(), ((Merchant) this).canRestock());
 

@@ -1,0 +1,23 @@
+- Added the Tricky Trials! Venture into the hazardous Trial Chambers alone or with friends!
+- Added Trial Chambers, a new underground structure featuring procedurally generated layouts with traps, combat challenges, and valuable loot.
+- Added Breeze, a new hostile mob found in Trial Chambers that attacks with wind energy projectiles.
+- Added Bogged, a new variant of the Skeleton that shoots poisonous arrows, spawning naturally in Swamps and Mangrove Swamps.
+- Added Maces, a heavy weapon crafted using a Breeze Rod and a Heavy Core, featuring unique smash attacks, and their unique enchantments; Density, Breach and Wind Burst.
+- Added Crafter Block, a block that enables automatic crafting with item input and output capabilities.
+- Added new spawners found in the Trial Chambers: Trial Spawner, Ominous Trial Spawner.
+- Added new loot blocks found in the Trials Chambers: Vault and Ominous Vault.
+- Added new decorative blocks and building materials in the Copper and Tuff families.
+- Added Wind Charge, a projectile used by the Breeze mob.
+- Added Heavy Core and Breeze Rod, used in the Mace crafting.
+- Added new Pottery Sherds: Flow, Guster, and Scrape.
+- Added new Banner Patterns: Flow and Guster.
+- Added new Armor Trims: Bolt and Flow.
+- Added new Potions and Tipped Arrows: Infestation, Oozing, Weaving, and Wind Charging.
+- Added new music discs by Aaron Cherof and Lena Raine: Precipice, Creator and Creator (musicbox).
+- Added 20 new paintings by artists Sarah Boeving and Kristoffer Zetterstrand.
+- Added new Status Effects: Infested, Oozing, Weaving, Wind Charged, Raid Omen, and Trial Omen.
+- Added 9 new music tracks by Aaron Cherof, Kumi Tanioka, and Lena Raine.
+- Added 8 new Advancements.
+- Added 4 new cave ambient sounds.
+- Redesigned Bad Omen Effect to give access to Ominous Events.
+- Boats are now Leashable.

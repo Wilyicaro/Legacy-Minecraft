@@ -1,6 +1,6 @@
 {
   "overrides": {
     "item": "#planks",
-    "tip": "block.minecraft.planks.tip"
+    "tip": {"translate": "block.minecraft.planks.tip"}
   }
 }

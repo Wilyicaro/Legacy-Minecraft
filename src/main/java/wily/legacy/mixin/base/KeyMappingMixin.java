@@ -2,6 +2,8 @@ package wily.legacy.mixin.base;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -9,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
+import wily.legacy.client.screen.ControlTooltip;
 
 @Mixin(KeyMapping.class)
 public abstract class KeyMappingMixin implements LegacyKeyMapping {
@@ -46,5 +49,11 @@ public abstract class KeyMappingMixin implements LegacyKeyMapping {
     @Override
     public InputConstants.Key getKey() {
         return key;
+    }
+
+
+
+    public Component getDisplayName() {
+        return LegacyKeyMapping.getDefaultDisplayName(self());
     }
 }

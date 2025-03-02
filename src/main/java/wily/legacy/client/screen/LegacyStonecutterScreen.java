@@ -1,6 +1,5 @@
 package wily.legacy.client.screen;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
@@ -18,15 +17,12 @@ import org.spongepowered.asm.mixin.Unique;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.base.client.UIDefinition;
+import wily.factoryapi.base.network.CommonRecipeManager;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.ControlType;
 import wily.legacy.client.RecipeInfo;
 import wily.legacy.client.StoneCuttingGroupManager;
 import wily.legacy.client.controller.Controller;
-import wily.legacy.network.CommonRecipeManager;
 import wily.legacy.util.*;
-import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.RecipeMenu;
 
@@ -83,7 +79,7 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
     public void addControlTooltips(Renderer renderer) {
         ControlTooltip.setupDefaultButtons(renderer,this);
         Event.super.addControlTooltips(renderer);
-        renderer.add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), ()-> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES);
+        renderer.add(OPTION::get, ()-> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES);
     }
 
     @Override

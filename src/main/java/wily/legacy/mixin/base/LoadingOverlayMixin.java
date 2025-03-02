@@ -63,9 +63,6 @@ public abstract class LoadingOverlayMixin extends Overlay {
         if (!finishedIntro) {
             if ((InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_RETURN) || GLFW.glfwGetMouseButton(minecraft.getWindow().getWindow(),GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS || ControllerBinding.DOWN_BUTTON.bindingState.pressed) && reload.isDone()) finishedIntro = true;
             if (timer % INTROS.size() >= INTROS.size() - 0.01f) finishedIntro = true;
-
-            guiGraphics.fill(RenderType.guiOverlay(), 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFFFFFFFF);
-
             FactoryGuiGraphics.of(guiGraphics).blit(BACKGROUND, 0, 0,0,0, guiGraphics.guiWidth(), guiGraphics.guiHeight(),guiGraphics.guiWidth(), guiGraphics.guiHeight());
 
             RenderSystem.enableBlend();
@@ -86,9 +83,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
             h = this.fadeInStart > -1L ? (float)(m - this.fadeInStart) / 500.0f : -1.0f;
             if ((MinecraftAccessor.getInstance().hasGameLoaded() && reload.isDone()) && minecraft.screen != null) this.minecraft.screen.renderWithTooltip(guiGraphics, 0, 0, f);
             else {
-                GlStateManager._clearColor(0, 0, 0, 1.0f);
-                GlStateManager._clear(16384/*? if <1.21.2 {*/, Minecraft.ON_OSX/*?}*/);
-                guiGraphics.fill(RenderType.guiOverlay(),0,0,guiGraphics.guiWidth(),guiGraphics.guiHeight(),0);
+                FactoryGuiGraphics.of(guiGraphics).blit(ScreenUtil.LOADING_BACKGROUND, 0, 0,0,0, guiGraphics.guiWidth(), guiGraphics.guiHeight(),guiGraphics.guiWidth(), guiGraphics.guiHeight());
             }
             if (g < 1.0f && !reload.isDone() && MinecraftAccessor.getInstance().hasGameLoaded())
                 ScreenUtil.drawGenericLoading(guiGraphics, (guiGraphics.guiWidth() - 75) / 2, (guiGraphics.guiHeight() - 75) / 2);

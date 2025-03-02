@@ -7,6 +7,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.RecipeToast;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.world.item.crafting.Recipe;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? if <1.21.2 {
 import net.minecraft.client.gui.components.toasts.ToastComponent;
@@ -54,8 +55,14 @@ public abstract class RecipeToastMixin implements Toast {
 
     @Override
     public int width() {
-        return Toast.super.width() + 80;
+        return 70 + 3 * Minecraft.getInstance().font.width(TITLE_TEXT) / 2;
     }
+
+    @Override
+    public int height() {
+        return 40;
+    }
+
     @Inject(method = "addOrUpdate", at = @At("HEAD"), cancellable = true)
     private static void addOrUpdate(CallbackInfo ci) {
         if (!ScreenUtil.hasClassicCrafting()) ci.cancel();
@@ -78,11 +85,11 @@ public abstract class RecipeToastMixin implements Toast {
 
         ScreenUtil.renderPointerPanel(guiGraphics,0,0,width(),height());
         guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate((width() - 1.5 * Minecraft.getInstance().font.width(TITLE_TEXT)) / 2, 5,0);
+        guiGraphics.pose().translate((width() - 1.5f * Minecraft.getInstance().font.width(TITLE_TEXT)) / 2, 10,0);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
         guiGraphics.drawString(Minecraft.getInstance().font, TITLE_TEXT, 0,0, 0xFFFFFF);
         guiGraphics.pose().popPose();
-        guiGraphics.drawString(Minecraft.getInstance().font, DESCRIPTION_TEXT, (width() - Minecraft.getInstance().font.width(DESCRIPTION_TEXT)) / 2 , 18, 0xFFFFFF);
+        guiGraphics.drawString(Minecraft.getInstance().font, DESCRIPTION_TEXT, (width() - Minecraft.getInstance().font.width(DESCRIPTION_TEXT)) / 2 , 27, 0xFFFFFF);
         ItemStack toastSymbol = /*? if <1.21.2 {*/recipeHolder/*? if >1.20.1 {*/.value()/*?}*/.getToastSymbol()/*?} else {*/ /*displayItems.get(displayedRecipeIndex).key()*//*?}*/;
         ItemStack resultItem = /*? if <1.21.2 {*/recipeHolder/*? if >1.20.1 {*/.value()/*?}*/.getResultItem(Minecraft.getInstance().level.registryAccess())/*?} else {*/ /*displayItems.get(displayedRecipeIndex).value()*//*?}*/;
 

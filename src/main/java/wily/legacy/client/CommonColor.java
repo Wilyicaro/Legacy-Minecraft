@@ -39,18 +39,35 @@ public class CommonColor extends CommonValue<Integer> {
     public static final CommonColor SELECTED_STORAGE_SAVE = registerCommonColor("selected_storage_save",0xFFFFFF00);
     public static final CommonColor STORAGE_SAVE = registerCommonColor("storage_save",0xFF8C9DE2);
     public static final CommonColor EXPERIENCE_TEXT = registerCommonColor("experience_text", 0x80FF20);
-    public static final CommonColor INSUFFICIENT_EXPERIENCE_TEXT = registerCommonColor("insufficient_experience_text", 0x407F10);
+    public static final CommonColor INSUFFICIENT_EXPERIENCE_TEXT = registerCommonColor("insufficient_experience_text", 0xCF1F1D);
     public static final CommonColor ANVIL_ERROR_TEXT = registerCommonColor("anvil_error_text", 0xFF6060);
     public static final CommonColor ENCHANTMENT_TEXT = registerCommonColor("enchantment_text",0x685E4A);
     public static final CommonColor HIGHLIGHTED_ENCHANTMENT_TEXT = registerCommonColor("highlighted_enchantment_text",0xFFFF80);
+    public static final CommonColor BLACK = registerCommonColor("black", 0x000000);
+    public static final CommonColor DARK_BLUE = registerCommonColor("dark_blue", 0x0000AA);
+    public static final CommonColor DARK_GREEN = registerCommonColor("dark_green", 0x00AA00);
+    public static final CommonColor DARK_AQUA = registerCommonColor("dark_aqua", 0x00AAAA);
+    public static final CommonColor DARK_RED = registerCommonColor("dark_red", 0xAA0000);
+    public static final CommonColor DARK_PURPLE = registerCommonColor("dark_purple", 0xAA00AA);
+    public static final CommonColor GOLD = registerCommonColor("gold", 0xFFAA00);
+    public static final CommonColor GRAY = registerCommonColor("gray", 0xAAAAAA);
+    public static final CommonColor DARK_GRAY = registerCommonColor("dark_gray", 0x555555);
+    public static final CommonColor BLUE = registerCommonColor("blue", 0x7878ff);
+    public static final CommonColor GREEN = registerCommonColor("green", 0x55FF55);
+    public static final CommonColor AQUA = registerCommonColor("aqua", 0x55FFFF);
+    public static final CommonColor RED = registerCommonColor("red", 0xFF5555);
+    public static final CommonColor LIGHT_PURPLE = registerCommonColor("light_purple", 0xFF55FF);
+    public static final CommonColor YELLOW = registerCommonColor("yellow", 0xFFFF55);
+    public static final CommonColor WHITE = registerCommonColor("white", 0xFFFFFF);
 
     public CommonColor(Integer obj) {
-        super(obj);
+        super(obj, INT_COLOR_CODEC);
     }
 
     public static CommonColor registerCommonColor(String path, int defaultValue) {
         return registerCommonColor(FactoryAPI.createVanillaLocation(path),defaultValue);
     }
+
     public static CommonColor registerCommonColor(ResourceLocation id, int defaultValue) {
         CommonColor color = new CommonColor(defaultValue);
         COMMON_COLORS.put(id, color);

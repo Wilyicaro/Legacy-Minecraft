@@ -21,11 +21,15 @@ public interface LegacyKeyMapping {
     default KeyMapping self(){
         return (KeyMapping) this;
     }
+
     ControllerBinding getDefaultBinding();
+
     ControllerBinding getBinding();
 
-    default Component getDisplayName() {
-        String name = self().getName();
+    Component getDisplayName();
+
+    static Component getDefaultDisplayName(KeyMapping keyMapping) {
+        String name = keyMapping.getName();
         Minecraft minecraft = Minecraft.getInstance();
         boolean hasPlayer = minecraft.player != null && minecraft.gameMode != null;
         switch (name){
@@ -34,8 +38,10 @@ public interface LegacyKeyMapping {
         }
         return ControlTooltip.getAction(name);
     }
+
     InputConstants.Key getKey();
 
     void setBinding(ControllerBinding binding);
+
     void setDefaultBinding(ControllerBinding binding);
 }

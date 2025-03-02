@@ -1,17 +1,9 @@
 {
   "elements": {
-    "panel": {
-      "type":"blit_sprite",
-      "sprite":"legacy:tiles/panel",
-      "width":215,
-      "height":217,
-      "x":"${width}/2",
-      "y":"(${height}-${panel.height})/2+30"
-    },
     "scrollable_renderer": {
       "type": "put_scrollable_renderer",
       "x": "${width}/2-228",
-      "y": "${panel.y}+1",
+      "y": "(${height}-${scrollable_renderer.height})/2+31",
       "width": 200,
       "height": 222,
       "elements": {
@@ -27,6 +19,14 @@
         }
       }
     },
+    "panel": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/small_panel",
+      "width":215,
+      "height":217,
+      "x":"${width}/2",
+      "y":"${scrollable_renderer.y}-2"
+    },
     "player_slot": {
       "type":"blit_sprite",
       "sprite": "legacy:tiles/entity_panel",
@@ -37,7 +37,7 @@
     },
     "player": {
       "type":"blit_sprite",
-      "sprite": "legacy:container/htp_inventory_player",
+      "sprite": "legacy:container/how_to_play/inventory_player",
       "x":"${panel.x}+92",
       "y":"${panel.y}+15",
       "width": 59,
@@ -111,7 +111,7 @@
       "fakeContainer": [
         {"item": "stone", "count": 32},{"item": "oak_planks", "count": 17},"air","air","oak_fence_gate","air","air",{"item": "arrow", "count": 64},{"item": "stick", "count": 10},
         {"item": "bookshelf", "count": 3},"air","dark_oak_door","air","emerald","air",{"item": "cobblestone_wall", "count": 7},"oak_sign","air",
-        {"item": "stone_brick_stairs", "count": 24},{"item": "cobblestone_stairs", "count": 16},"air","oak_log",{"item": "acacia_stairs", "count": 15},"air","diamond_pickaxe",{"item": "paper", "count": 21},{"item": "gunpowder", "count": 15}
+        {"item": "stone_brick_stairs", "count": 24},{"item": "cobblestone_stairs", "count": 16},"air",{"item": "oak_log", "count":  7},{"item": "acacia_stairs", "count": 15},"air","diamond_pickaxe",{"item": "paper", "count": 21},{"item": "gunpowder", "count": 15}
       ],
       "x":"${panel.x}+14+(${inventory.index}%9)*21",
       "y":"${panel.y}+116+(${inventory.index}/9)*21"

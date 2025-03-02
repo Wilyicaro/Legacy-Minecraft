@@ -1,0 +1,88 @@
+{
+  "elements": {
+    "scrollable_renderer": {
+      "type": "put_scrollable_renderer",
+      "x": "${width}/2-228",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+      "width": 200,
+      "height": 222,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.large-chest_message"},
+          "width": 176
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.large-chest_message_1"},
+          "width": 176
+        }
+      }
+    },
+    "panel": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/small_panel",
+      "width":167,
+      "height":214,
+      "x":"${width}/2",
+      "y":"${scrollable_renderer.y}-2"
+    },
+    "chest_label": {
+      "type":"draw_string",
+      "component": {"translate": "container.chestDouble"},
+      "color": "${commonColor.inventory_gray_text}",
+      "shadow": false,
+      "x":"${panel.x}+8",
+      "y":"${panel.y}+7"
+    },
+    "chest_inventory": {
+      "type":"put_legacy_slot",
+      "range":"[0,53]",
+      "isFake":true,
+      "fakeContainer": [
+        {"item": "glass_pane", "count": 12},"iron_door",{"item": "pumpkin_seeds", "count": 3},"air","air","air","air","air","air",
+        "air","air",{"item": "glass", "count": 2},"air","air","air","air","air","air",
+        {"item": "stone_axe", "components": {"damage": 150}, "nbt": {"Damage": 150}},"air","air","air",{"item": "cobblestone", "count": 54},"air","air",{"item": "bone", "count": 2},"air",
+        "air","air","iron_helmet","air","air","air","air",{"item": "string", "count": 3},"air",
+        "air","air","air","air","air","air","air","air",{"item": "wooden_shovel", "components": {"damage": 50}, "nbt": {"Damage": 50}},
+        "air",{"item": "dirt", "count": 6},"air","air",{"item": "leather", "count": 2},"air","air",{"item": "birch_door", "count": 6},"air"
+      ],
+      "x":"${panel.x}+8+(${chest_inventory.index}%9)*17",
+      "y":"${panel.y}+18+(${chest_inventory.index}/9)*17",
+      "width":17,
+      "height":17
+    },
+    "inventory_label": {
+      "type":"draw_string",
+      "component": {"translate": "container.inventory"},
+      "color": "${commonColor.inventory_gray_text}",
+      "shadow": false,
+      "x":"${panel.x}+8",
+      "y":"${panel.y}+95+27"
+    },
+    "inventory": {
+      "type":"put_legacy_slot",
+      "range":"[0,26]",
+      "isFake":true,
+      "fakeContainer": [
+        {"item": "stone", "count": 32},{"item": "oak_planks", "count": 17},"air","air","oak_fence_gate","air","air",{"item": "arrow", "count": 64},{"item": "stick", "count": 10},
+        {"item": "bookshelf", "count": 3},"air","dark_oak_door","air","emerald","air",{"item": "cobblestone_wall", "count": 7},"oak_sign","air",
+        {"item": "stone_brick_stairs", "count": 24},{"item": "cobblestone_stairs", "count": 16},"air",{"item": "oak_log", "count":  7},{"item": "acacia_stairs", "count": 15},"air","diamond_pickaxe",{"item": "paper", "count": 21},{"item": "gunpowder", "count": 15}
+      ],
+      "x":"${panel.x}+8+(${inventory.index}%9)*17",
+      "y":"${panel.y}+108+(${inventory.index}/9)*17+25",
+      "width":17,
+      "height":17
+    },
+    "quick_select": {
+      "type":"put_legacy_slot",
+      "range":"[0,8]",
+      "isFake":true,
+      "fakeContainer": ["iron_sword","bow",{"item": "arrow", "count": 64},{"item": "flint_and_steel", "components": {"damage": 28}, "nbt": {"Damage": 28}},"clock","shears",{"item": "iron_axe", "components": {"damage": 65}, "nbt": {"Damage": 65}},"fishing_rod","compass"],
+      "x":"${panel.x}+8+(${quick_select.index}%9)*17",
+      "y":"${panel.y}+167+17+6",
+      "width":17,
+      "height":17
+    }
+  }
+}

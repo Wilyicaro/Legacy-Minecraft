@@ -1,27 +1,29 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.Util;
 import net.minecraft.client.GameNarrator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
+import net.minecraft.client.gui.screens.ReceivingLevelScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
+import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.ScreenUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 import static wily.legacy.util.LegacySprites.LOADING_BACKGROUND;
 import static wily.legacy.util.LegacySprites.LOADING_BAR;
@@ -93,7 +95,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
         if (!isGenericLoading()) {
             if (getProgress() != -1) {
                 if (getLoadingStage() != null)
-                    Legacy4JClient.applyFontOverrideIf(fontOverride != null,fontOverride,b-> guiGraphics.drawString(minecraft.font, getLoadingStage(), accessor.getInteger("loadingStage.x",x), accessor.getInteger("loadingStage.y",height / 2 + 4), CommonColor.STAGE_TEXT.get()));
+                    Legacy4JClient.applyFontOverrideIf(fontOverride != null,fontOverride,b-> guiGraphics.drawString(minecraft.font, getLoadingStage(), accessor.getInteger("loadingStage.x",x + 1), accessor.getInteger("loadingStage.y",height / 2 + 5), CommonColor.STAGE_TEXT.get()));
                 try (SpriteContents contents = FactoryGuiGraphics.getSprites().getSprite(LOADING_BACKGROUND).contents()){
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BACKGROUND, x, y, 320, 320 * contents.height() / contents.width());
                 }
@@ -114,13 +116,42 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
             Legacy4JClient.applyFontOverrideIf(fontOverride != null, fontOverride, b -> {
                 guiGraphics.pose().pushPose();
                 float scaleX = accessor.getFloat("loadingHeader.scaleX", 2.0f);
-                guiGraphics.pose().translate(accessor.getFloat("loadingHeader.x", (width - minecraft.font.width(getLoadingHeader()) * scaleX) / 2), accessor.getFloat("loadingHeader.y", height / 2 - 26), 0);
+                guiGraphics.pose().translate(accessor.getFloat("loadingHeader.x", (width - minecraft.font.width(getLoadingHeader()) * scaleX) / 2), accessor.getFloat("loadingHeader.y", height / 2 - 23), 0);
                 guiGraphics.pose().scale(scaleX, accessor.getFloat("loadingHeader.scaleY", 2.0f), 1.0f);
                 ScreenUtil.drawOutlinedString(guiGraphics, minecraft.font, getLoadingHeader(), 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), accessor.getFloat("loadingHeader.outline", 0.5f));
                 guiGraphics.pose().popPose();
             });
         }
         RenderSystem.enableDepthTest();
+    }
+
+    public static LegacyLoadingScreen getDimensionChangeScreen(ClientLevel lastLevel, ClientLevel newLevel){
+        boolean lastOd = isOtherDimension(lastLevel);
+        boolean od = isOtherDimension(newLevel);
+        LegacyLoadingScreen screen = new LegacyLoadingScreen(od || lastOd ? Component.translatable("legacy.menu." + (lastOd ? "leaving" : "entering"), LegacyComponents.getDimensionName((lastOd ? lastLevel : newLevel).dimension())) : Component.empty(), Component.empty());
+        if (od || lastOd) screen.setGenericLoading(true);
+        return screen;
+    }
+
+    public static boolean isOtherDimension(Level level){
+        return level != null && level.dimension() != Level.OVERWORLD;
+    }
+
+    public static LegacyLoadingScreen getRespawningScreen(BooleanSupplier levelReady){
+        long createdTime = Util.getMillis();
+        LegacyLoadingScreen screen = new LegacyLoadingScreen(LegacyComponents.RESPAWNING, Component.empty()){
+            @Override
+            public void tick() {
+                if (levelReady.getAsBoolean() || Util.getMillis() - createdTime >= 30000) minecraft.setScreen(null);
+            }
+
+            @Override
+            public boolean isPauseScreen() {
+                return false;
+            }
+        };
+        screen.setGenericLoading(true);
+        return screen;
     }
 
     public int getProgress() {

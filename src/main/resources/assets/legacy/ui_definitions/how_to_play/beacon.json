@@ -1,0 +1,256 @@
+{
+  "elements": {
+    "scrollable_renderer": {
+      "type": "put_scrollable_renderer",
+      "x": "${width}/2-228",
+      "y": "(${height}-${scrollable_renderer.height})/2+31",
+      "width": 200,
+      "height": 222,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.beacon_message"},
+          "width": 176
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.beacon_message_1"},
+          "width": 176
+        }
+      }
+    },
+    "panel": {
+      "type": "blit_sprite",
+      "sprite": "legacy:tiles/small_panel",
+      "width":226,
+      "height":222,
+      "x": "${width}/2",
+      "y":"${scrollable_renderer.y}"
+    },
+    "left_square_panel": {
+      "type": "blit_sprite",
+      "sprite": "legacy:tiles/square_recessed_panel",
+      "width":104,
+      "height":100,
+      "x": "${panel.x}+10",
+      "y": "${panel.y}+8"
+    },
+    "right_square_panel": {
+      "type": "blit_sprite",
+      "sprite": "legacy:tiles/square_recessed_panel",
+      "width":104,
+      "height":100,
+      "x": "${panel.x}+114",
+      "y": "${panel.y}+8"
+    },
+    "beacon_first": {
+      "type": "blit_sprite",
+      "sprite": "legacy:container/beacon_1",
+      "width":16,
+      "height":17,
+      "x": "${panel.x}+30",
+      "y": "${panel.y}+34"
+    },
+    "beacon_second": {
+      "type": "blit_sprite",
+      "sprite": "legacy:container/beacon_2",
+      "width":16,
+      "height":17,
+      "x": "${beacon_first.x}",
+      "y": "${beacon_first.y}+26"
+    },
+    "beacon_third": {
+      "type": "blit_sprite",
+      "sprite": "legacy:container/beacon_3",
+      "width":16,
+      "height":17,
+      "x": "${beacon_first.x}",
+      "y": "${beacon_second.y}+26"
+    },
+    "beacon_fourth": {
+      "type": "blit_sprite",
+      "sprite": "legacy:container/beacon_4",
+      "width":16,
+      "height":17,
+      "x": "${panel.x}+158",
+      "y": "${panel.y}+40"
+    },
+    "first_beacon_buttons_row": {
+      "type": "blit_sprite",
+      "sprite": "container/beacon/button",
+      "width":18,
+      "height":18,
+      "amount":2,
+      "x": "${panel.x}+51+23*${first_beacon_buttons_row.index}",
+      "y": "${panel.y}+33"
+    },
+    "third_button": {
+      "type": "blit_sprite",
+      "sprite": "container/beacon/button",
+      "width":18,
+      "height":18,
+      "x": "${panel.x}+51",
+      "y": "${first_beacon_buttons_row.y}+26"
+    },
+    "fourth_button": {
+      "type": "blit_sprite",
+      "sprite": "container/beacon/button_selected",
+      "width":18,
+      "height":18,
+      "x": "${third_button.x}+23",
+      "y": "${third_button.y}"
+    },
+    "fifth_button": {
+      "type": "blit_sprite",
+      "sprite": "container/beacon/button_disabled",
+      "width":18,
+      "height": 18,
+      "x": "${third_button.x}+12",
+      "y": "${third_button.y}+26"
+    },
+    "extra_buttons": {
+      "type": "blit_sprite",
+      "sprite": "container/beacon/button_disabled",
+      "width": 18,
+      "height": 18,
+      "amount": 2,
+      "x": "${panel.x}+145+${extra_buttons.index}*23",
+      "y": "${third_button.y}"
+    },
+    "confirm_button": {
+      "type": "blit_sprite",
+      "sprite": "container/beacon/button",
+      "width":18,
+      "height":18,
+      "x": "${panel.x}+178",
+      "y": "${panel.y}+111"
+    },
+    "speed": {
+      "type": "blit",
+      "texture": "textures/mob_effect/speed.png",
+      "width": 14,
+      "height": 14,
+      "imageWidth": 14,
+      "imageHeight": 14,
+      "x": "${first_beacon_buttons_row.x}+2-23",
+      "y": "${first_beacon_buttons_row.y}+2"
+    },
+    "haste": {
+      "type": "blit",
+      "texture": "textures/mob_effect/haste.png",
+      "width": 14,
+      "height": 14,
+      "imageWidth": 14,
+      "imageHeight": 14,
+      "x": "${first_beacon_buttons_row.x}+2",
+      "y": "${first_beacon_buttons_row.y}+2"
+    },
+    "resistance": {
+      "type": "blit",
+      "texture": "textures/mob_effect/resistance.png",
+      "width": 14,
+      "height": 14,
+      "imageWidth": 14,
+      "imageHeight": 14,
+      "amount": 2,
+      "x": "${third_button.x}+2+94*${resistance.index}",
+      "y": "${third_button.y}+2"
+    },
+    "jump_boost": {
+      "type": "blit",
+      "texture": "textures/mob_effect/jump_boost.png",
+      "width": 14,
+      "height": 14,
+      "imageWidth": 14,
+      "imageHeight": 14,
+      "x": "${fourth_button.x}+2",
+      "y": "${fourth_button.y}+2"
+    },
+    "strength": {
+      "type": "blit",
+      "texture": "textures/mob_effect/strength.png",
+      "width": 14,
+      "height": 14,
+      "imageWidth": 14,
+      "imageHeight": 14,
+      "x": "${fifth_button.x}+2",
+      "y": "${fifth_button.y}+2"
+    },
+    "regeneration": {
+      "type": "blit",
+      "texture": "textures/mob_effect/regeneration.png",
+      "width": 14,
+      "height": 14,
+      "imageWidth": 14,
+      "imageHeight": 14,
+      "x": "${extra_buttons.x}+2",
+      "y": "${extra_buttons.y}+2"
+    },
+    "confirm": {
+      "type": "blit_sprite",
+      "sprite": "legacy:container/beacon_check",
+      "width": 14,
+      "height": 14,
+      "imageWidth": 14,
+      "imageHeight": 14,
+      "x": "${confirm_button.x}+2",
+      "y": "${confirm_button.y}+2"
+    },
+    "primary_power_label": {
+      "type": "draw_string",
+      "component": {"translate": "block.minecraft.beacon.primary", "font": "legacy:default_11"},
+      "color": "${commonColor.inventory_gray_text}",
+      "shadow": false,
+      "x": "${left_square_panel.x}+(${left_square_panel.width}-${primary_power_label.component.width})/2",
+      "y": "${left_square_panel.y}+3"
+    },
+    "secondary_power_label": {
+      "type": "draw_string",
+      "component": {"translate": "block.minecraft.beacon.secondary", "font": "legacy:default_11"},
+      "color": "${commonColor.inventory_gray_text}",
+      "shadow": false,
+      "x": "${right_square_panel.x}+(${right_square_panel.width}-${secondary_power_label.component.width})/2",
+      "y": "${right_square_panel.y}+3"
+    },
+    "beacon_slot": {
+      "type": "put_legacy_slot",
+      "isFake": true,
+      "fakeItem": "iron_ingot",
+      "x": "${panel.x}+122",
+      "y": "${panel.y}+112",
+      "width": 18
+    },
+    "beacon_items": {
+      "type": "render_items",
+      "isFake":true,
+      "items": ["netherite_ingot","emerald","diamond","gold_ingot","iron_ingot"],
+      "scaleX": 1.125,
+      "scaleY": 1.125,
+      "translateX": "${panel.x}+15",
+      "translateY": "${panel.y}+112",
+      "x": "${beacon_items.index}*16"
+    },
+    "inventory": {
+      "type": "put_legacy_slot",
+      "range": "[0,26]",
+      "isFake":true,
+      "fakeContainer": [
+        {"item": "stone", "count": 32},{"item": "oak_planks", "count": 17},"air","air","oak_fence_gate","air","air",{"item": "arrow", "count": 64},{"item": "stick", "count": 10},
+        {"item": "bookshelf", "count": 3},"air","dark_oak_door","air","emerald","air",{"item": "cobblestone_wall", "count": 7},"oak_sign","air",
+        {"item": "stone_brick_stairs", "count": 24},{"item": "cobblestone_stairs", "count": 16},"air",{"item": "oak_log", "count":  7},{"item": "acacia_stairs", "count": 15},"air","diamond_pickaxe",{"item": "paper", "count": 21},{"item": "gunpowder", "count": 15}
+      ],
+      "x": "${panel.x}+31+(${inventory.index}%9)*18",
+      "y": "${panel.y}+135+(${inventory.index}/9)*18",
+      "width": 18
+    },
+    "quick_select": {
+      "type": "put_legacy_slot",
+      "range": "[0,8]",
+      "isFake":true,
+      "fakeContainer": ["iron_sword","bow",{"item": "arrow", "count": 64},{"item": "flint_and_steel", "components": {"damage": 28}, "nbt": {"Damage": 28}},"clock","shears",{"item": "iron_axe", "components": {"damage": 65}, "nbt": {"Damage": 65}},"fishing_rod","compass"],
+      "x": "${panel.x}+31+(${quick_select.index}%9)*18",
+      "y": "${panel.y}+194",
+      "width": 18
+    }
+  }
+}

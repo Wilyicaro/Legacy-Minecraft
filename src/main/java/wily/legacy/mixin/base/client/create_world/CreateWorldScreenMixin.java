@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base.client.create_world;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -23,6 +24,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.base.ArbitrarySupplier;
+import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
@@ -49,7 +52,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
     @Shadow protected abstract void onCreate();
 
-    protected boolean trustPlayers = true;
+    protected Bearer<Boolean> trustPlayers = Bearer.of(true);
     protected Panel panel;
     protected PublishScreen publishScreen;
     protected PackAlbum.Selector resourceAssortSelector;
@@ -72,7 +75,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     @Override
     public void added() {
         super.added();
-        resourceAssortSelector.addControlTooltips(this,ControlTooltip.Renderer.of(this));
+        OptionsScreen.setupSelectorControlTooltips(ControlTooltip.Renderer.of(this), this);
     }
 
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
@@ -94,7 +97,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
             difficultyButton.active = !uiState.isHardcore();
         });
 
-        addRenderableWidget(Button.builder(Component.translatable( "createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), b-> trustPlayers = b))).bounds(panel.x + 13, panel.y + 172,220,20).build());
+        addRenderableWidget(Button.builder(Component.translatable( "createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(self(), trustPlayers))).bounds(panel.x + 13, panel.y + 172,220,20).build());
         addRenderableWidget(Button.builder(Component.translatable("selectWorld.create"), button -> this.onCreate()).bounds(panel.x + 13, panel.y + 197,220,20).build());
         addRenderableWidget(new TickBox(panel.x+ 14, panel.y+155,220,publishScreen.publish, b-> PublishScreen.PUBLISH, b->null, button -> {
             if (button.selected) minecraft.setScreen(publishScreen);
@@ -106,30 +109,33 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         this.uiState.onChanged();
     }
 
-    @Override
-    public void repositionElements() {
+    @Inject(method = "repositionElements", at = @At("HEAD"), cancellable = true)
+    public void repositionElements(CallbackInfo ci) {
         rebuildWidgets();
+        ci.cancel();
     }
 
     @Inject(method = /*? if >=1.21.2 {*/ /*"createWorldAndCleanup"*//*?} else {*/"createNewWorld"/*?}*/,at = @At("RETURN"))
     private void onCreate(CallbackInfo ci) {
+        resourceAssortSelector.applyChanges(true);
         Legacy4JClient.serverPlayerJoinConsumer = s->{
-            LegacyClientWorldSettings.of(s.server.getWorldData()).setTrustPlayers(trustPlayers);
+            LegacyClientWorldSettings.of(s.server.getWorldData()).setTrustPlayers(trustPlayers.get());
             s.server.getPlayerList().sendPlayerPermissionLevel(s);
             publishScreen.publish((IntegratedServer) s.server);
             LegacyClientWorldSettings.of(minecraft.getSingleplayerServer().getWorldData()).setSelectedResourceAlbum(resourceAssortSelector.getSelectedAlbum());
         };
     }
 
-    @Redirect(method = "createNewWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;createWorldOpenFlows()Lnet/minecraft/client/gui/screens/worldselection/WorldOpenFlows;"))
-    private WorldOpenFlows createNewWorld(Minecraft instance) {
-        return new WorldOpenFlows(minecraft,Legacy4JClient.getLevelStorageSource());
+    @ModifyExpressionValue(method = "createNewWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;createWorldOpenFlows()Lnet/minecraft/client/gui/screens/worldselection/WorldOpenFlows;"))
+    private WorldOpenFlows createNewWorld(WorldOpenFlows original) {
+        return LegacyOptions.saveCache.get() ? new WorldOpenFlows(minecraft,Legacy4JClient.currentWorldSource) : original;
     }
 
     @Inject(method = "createNewWorldDirectory", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelStorageSource;createAccess(Ljava/lang/String;)Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;"))
     private /*? >=1.21.2 {*//*static*//*?}*/ void createNewWorldDirectory(/*? >=1.21.2 {*//*Minecraft minecraft, String string, @Nullable Path path, *//*?}*/CallbackInfoReturnable<Optional<LevelStorageSource.LevelStorageAccess>> cir) {
+        if (!LegacyOptions.saveCache.get()) return;
         try {
-            LevelStorageSource.LevelStorageAccess access = Legacy4JClient.getLevelStorageSource().createAccess(/*? <1.21.2 {*/uiState.getTargetFolder()/*?} else {*//*string*//*?}*/);
+            LevelStorageSource.LevelStorageAccess access = Legacy4JClient.currentWorldSource.createAccess(/*? <1.21.2 {*/uiState.getTargetFolder()/*?} else {*//*string*//*?}*/);
             access.close();
             if (Files.exists(access.getDimensionPath(Level.OVERWORLD))) FileUtils.deleteDirectory(access.getDimensionPath(Level.OVERWORLD).toFile());
         } catch (IOException e) {
@@ -137,9 +143,9 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         }
     }
 
-    @Redirect(method = "createNewWorldDirectory", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getLevelSource()Lnet/minecraft/world/level/storage/LevelStorageSource;"))
-    private /*? if >=1.21.2 {*//*static*//*?}*/ LevelStorageSource createNewWorldDirectory(Minecraft instance) {
-        return Legacy4JClient.currentWorldSource;
+    @ModifyExpressionValue(method = "createNewWorldDirectory", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getLevelSource()Lnet/minecraft/world/level/storage/LevelStorageSource;"))
+    private /*? if >=1.21.2 {*//*static*//*?}*/ LevelStorageSource createNewWorldDirectory(LevelStorageSource original) {
+        return LegacyOptions.saveCache.get() ? Legacy4JClient.currentWorldSource : original;
     }
 
     //? if >1.20.1 {

@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.realmsclient.client.RealmsClient;
 import net.minecraft.client.KeyMapping;
@@ -7,8 +8,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.toasts.AdvancementToast;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.screens.*;
@@ -18,7 +17,6 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
 import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.sounds.SoundEvents;
@@ -38,13 +36,11 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.client.MinecraftAccessor;
-import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.AdvancementToastAccessor;
@@ -52,7 +48,6 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.*;
 import wily.legacy.network.ServerPlayerMissHitPayload;
-import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
@@ -108,11 +103,6 @@ public abstract class MinecraftMixin {
     private Supplier<Overlay> init(Supplier<Minecraft> mc, Supplier<ReloadInstance> ri, Consumer<Optional<Throwable>> ex, boolean fade){
         return ()-> new LoadingOverlay(mc.get(),ri.get(),ex,fade);
     }
-    *///?}
-
-    //? if <1.20.5 {
-    /*@Accessor
-    public abstract float getPausePartialTick();
     *///?}
 
     //? if <1.21.4 {
@@ -235,35 +225,10 @@ public abstract class MinecraftMixin {
     public void pauseGame(SoundManager instance) {
 
     }
-    @Redirect(method = "setLevel",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/Minecraft;updateScreenAndTick(Lnet/minecraft/client/gui/screens/Screen;)V"))
-    public void setLevelLoadingScreen(Minecraft instance, Screen screen, ClientLevel level) {
-        boolean lastOd = isOtherDimension(this.level);
-        boolean od = isOtherDimension(level);
-        LegacyLoadingScreen s = new LegacyLoadingScreen(od || lastOd ? Component.translatable("legacy.menu." + (lastOd ? "leaving" : "entering"), ScreenUtil.getDimensionName((lastOd ? this.level : level).dimension())) : Component.empty(), Component.empty());
-        if (od || lastOd) s.setGenericLoading(true);
-        updateScreenAndTick(s);
-    }
 
-    private boolean isOtherDimension(Level level){
-        return level != null && level.dimension() != Level.OVERWORLD;
-    }
-
-    @ModifyArg(method = "resizeDisplay",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/Window;setGuiScale(D)V"))
-    public double resizeDisplay(double d) {
-        UIAccessor accessor = screen == null ? UIAccessor.of(gui) : UIAccessor.of(screen);
-        int h = (LegacyOptions.autoResolution.get() ? ScreenUtil.getStandardHeight() : getWindow().getHeight());
-        return h / 360d * getTweakedHeightScale(h) * accessor.getDouble("scaleMultiplier",1);
-    }
-
-    @Unique
-    public double getTweakedHeightScale(int height) {
-        if (LegacyOptions.autoResolution.get()){
-            if (height == 1080) return 0.999623452;
-            else if (height % 720 != 0) return 1.001d;
-
-            return 1d;
-        }
-        return (1.125 - LegacyOptions.interfaceResolution.get() / 4);
+    @ModifyArg(method = "setLevel",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/Minecraft;updateScreenAndTick(Lnet/minecraft/client/gui/screens/Screen;)V"))
+    public Screen setLevelLoadingScreen(Screen arg, @Local(argsOnly = true) ClientLevel newLevel) {
+        return LegacyLoadingScreen.getDimensionChangeScreen(level, newLevel);
     }
 
     //? if >1.20.1 {

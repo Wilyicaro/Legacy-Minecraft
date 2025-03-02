@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.FactoryAPI;
+import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyClientWorldSettings;
@@ -48,10 +49,10 @@ public abstract class IntegratedServerMixin extends MinecraftServer {
     public void tickServer(BooleanSupplier booleanSupplier, CallbackInfo ci) {
         if (Legacy4JClient.manualSave){
             Legacy4JClient.manualSave = false;
-            FactoryAPI.getProfiler().push("manualSave");
+            FactoryAPIClient.getProfiler().push("manualSave");
             LOGGER.info("Saving manually...");
             this.saveEverything(false, true, true);
-            FactoryAPI.getProfiler().pop();
+            FactoryAPIClient.getProfiler().pop();
         }
     }
 

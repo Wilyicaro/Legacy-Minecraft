@@ -142,6 +142,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         }
         guiGraphics.pose().popPose();
     }
+
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();

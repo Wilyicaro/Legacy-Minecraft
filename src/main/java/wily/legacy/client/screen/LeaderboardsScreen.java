@@ -180,7 +180,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
 
     @Override
     protected void init() {
-        if (FactoryAPIClient.hasModOnServer) CommonNetwork.sendToServer(new PlayerInfoSync(0,minecraft.player));
+        if (FactoryAPIClient.hasModOnServer) CommonNetwork.sendToServer(PlayerInfoSync.askAll(minecraft.player));
         else minecraft.getConnection().send(new ServerboundClientCommandPacket(ServerboundClientCommandPacket.Action.REQUEST_STATS));
         super.init();
     }
@@ -194,7 +194,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
             ScreenUtil.renderPointerPanel(guiGraphics,panel.x +  panel.width - 174 ,panel.y - 18,166,18);
             if (!statsBoards.isEmpty() && selectedStatBoard < statsBoards.size()){
                 StatsBoard board = statsBoards.get(selectedStatBoard);
-                Legacy4JClient.applyFontOverrideIf(minecraft.getWindow().getHeight() <= 720, LegacyIconHolder.MOJANGLES_11_FONT, b-> {
+                Legacy4JClient.applyFontOverrideIf(ScreenUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b-> {
                     guiGraphics.pose().pushPose();
                     Component filter = Component.translatable("legacy.menu.leaderboard.filter", this.filter.get() == 0 ? OVERALL :  MY_SCORE);
                     guiGraphics.pose().translate(panel.x + 91 - font.width(filter) / 3f, panel.y - 12, 0);
@@ -235,9 +235,9 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(panel.x + (panel.width - 211) / 2f, panel.y - 12,0);
                 guiGraphics.pose().scale(0.5f,0.5f,0.5f);
-                (ControlType.getActiveType().isKbm() ? ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.LEFT_STICK.bindingState.getIcon()).render(guiGraphics,4,0,false, false);
+                (ControlType.getActiveType().isKbm() ? ControlTooltip.ComponentIcon.compoundOf(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.bindingState.getIcon()).render(guiGraphics,4,0,false, false);
                 if (statsInScreen < statsBoards.get(selectedStatBoard).renderables.size()) {
-                    ControlTooltip.Icon pageControl = ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon()});
+                    ControlTooltip.Icon pageControl = ControlTooltip.ComponentIcon.compoundOf(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon());
                     pageControl.render(guiGraphics,422 - pageControl.render(guiGraphics,0,0,false,true) - 8, 0,false,false);
                 }
                 guiGraphics.pose().popPose();
@@ -301,7 +301,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
             }
             Component name = Component.translatable("stat." + stat.getValue().toString().replace(':', '.'));
             return SimpleLayoutRenderable.create(Minecraft.getInstance().font.width(name) * 2/3 + 8,7, (l)->((guiGraphics, i, j, f) ->
-                Legacy4JClient.applyFontOverrideIf(Minecraft.getInstance().getWindow().getHeight() <= 720, LegacyIconHolder.MOJANGLES_11_FONT, b-> {
+                Legacy4JClient.applyFontOverrideIf(ScreenUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b-> {
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(l.getX() + 4, l.getY(),0);
                 if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);

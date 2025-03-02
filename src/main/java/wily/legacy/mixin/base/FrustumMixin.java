@@ -1,25 +1,21 @@
 package wily.legacy.mixin.base;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.renderer.culling.Frustum;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
  * Thanks for ABU008, from Legacy4J Group, for suggesting and creating the original code in this mixin
  */
 @Mixin(Frustum.class)
 public class FrustumMixin {
+    @Shadow @Final private Matrix4f matrix;
 
-    @Final
-    @Shadow
-    private Matrix4f matrix;
-
-    @Inject(method = "calculateFrustum",at = @At("HEAD"))
-    private void calculateFrustum(Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci) {
-        adjustProjectionFOV(matrix4f2).mul(matrix4f, this.matrix);
+    @ModifyExpressionValue(method = "calculateFrustum",at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4f;mul(Lorg/joml/Matrix4fc;Lorg/joml/Matrix4f;)Lorg/joml/Matrix4f;", remap = false))
+    private Matrix4f calculateFrustum(Matrix4f original, Matrix4f right, Matrix4f matrix4f2) {
+        return adjustProjectionFOV(matrix4f2).mul(right, matrix);
     }
 
     @Unique

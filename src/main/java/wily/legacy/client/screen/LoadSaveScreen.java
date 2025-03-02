@@ -19,6 +19,7 @@ import net.minecraft.world.level.dimension.end.EndDragonFight;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
 import org.jetbrains.annotations.Nullable;
+import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
@@ -58,7 +59,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     public static final List<GameType> GAME_TYPES = Arrays.stream(GameType.values()).toList();
 
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean isLocked) {
-        super(s-> Panel.createPanel(s, p-> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes(UIAccessor.of(s)) ? 160 : 0))) / 2, p-> (s.height - p.height) / 2 + 24, 245, 233), Component.translatable("legacy.menu.load_save.load"));
+        super(s-> Panel.createPanel(s, p-> (s.width - (p.width + (ScreenUtil.hasTooltipBoxes(UIAccessor.of(s)) ? 160 : 0))) / 2, p-> (s.height - p.height) / 2 + 21, 245, 233), Component.translatable("legacy.menu.load_save.load"));
         this.isLocked = isLocked;
         this.parent = screen;
         this.summary = summary;
@@ -83,7 +84,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     @Override
     public void addControlTooltips(Renderer renderer) {
         super.addControlTooltips(renderer);
-        resourceAssortSelector.addControlTooltips(this,renderer);
+        OptionsScreen.setupSelectorControlTooltips(renderer,this);
     }
 
     public static boolean hasCommands(LevelSummary levelSummary){

@@ -140,7 +140,7 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_4,leftPos + 180, topPos + 42, 20, 19);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 15, topPos + 129, 100.0F);
-        guiGraphics.pose().scale(7/6f, 7/6f,7/6f);
+        guiGraphics.pose().scale(1.125f, 1.125f,1.125f);
         for (Item displayItem : DISPLAY_ITEMS) {
             guiGraphics.renderItem(new ItemStack(displayItem), 0, 0);
             guiGraphics.pose().translate(18,0,0);

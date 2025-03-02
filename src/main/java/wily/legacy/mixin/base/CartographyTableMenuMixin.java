@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.util.FactoryItemUtil;
 import wily.legacy.inventory.RenameItemMenu;
 
 @Mixin(CartographyTableMenu.class)
@@ -59,17 +60,17 @@ public abstract class CartographyTableMenuMixin extends AbstractContainerMenu im
             ItemStack result = resultContainer.getItem(0);
             if (resultContainer.getItem(0).isEmpty() && itemStack.is(Items.FILLED_MAP) && itemStack2.isEmpty()) {
                 result = itemStack.copyWithCount(1);
-                if (RenameItemMenu.validateName(itemName) != null) RenameItemMenu.setCustomName(result,Component.literal(itemName));
+                if (RenameItemMenu.validateName(itemName) != null) FactoryItemUtil.setCustomName(result,Component.literal(itemName));
                 resultContainer.setItem(0, result);
                 return;
             }
             if (RenameItemMenu.validateName(itemName) != null) {
                 if (!itemStack3.getHoverName().getString().equals(itemName)) {
-                    RenameItemMenu.setCustomName(result,Component.literal(itemName));
+                    FactoryItemUtil.setCustomName(result,Component.literal(itemName));
                     broadcastChanges();
                 }
-            } else if (RenameItemMenu.hasCustomName(result)){
-                RenameItemMenu.setCustomName(result,null);
+            } else if (FactoryItemUtil.hasCustomName(result)){
+                FactoryItemUtil.setCustomName(result,null);
                 broadcastChanges();
             }
         }));

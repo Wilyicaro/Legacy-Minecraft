@@ -20,17 +20,4 @@ public interface RenameItemMenu {
         }
         return null;
     }
-
-    static boolean hasCustomName(ItemStack stack){
-        return /*? if <1.20.5 {*//*stack.hasCustomHoverName()*//*?} else {*/stack.has(DataComponents.CUSTOM_NAME)/*?}*/;
-    }
-
-    static void setCustomName(ItemStack stack, Component name){
-        //? if <1.20.5 {
-        /*if (name == null) stack.resetHoverName();
-        else stack.setHoverName(name);
-        *///?} else {
-        stack.set(DataComponents.CUSTOM_NAME,name);
-        //?}
-    }
 }

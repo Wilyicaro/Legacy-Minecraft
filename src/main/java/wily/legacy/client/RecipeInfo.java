@@ -164,7 +164,7 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
             List<Component> description = new ArrayList<>();
             recipeAdder.accept(RecipeInfo.create(TIPPED_ARROW, null, ings, result, ()-> {
                 description.clear();
-                Legacy4J.addPotionTooltip(p, description, 1.0F/*? if >=1.20.3 {*/, Minecraft.getInstance().level.tickRateManager().tickrate()/*?}*/);
+                Legacy4J.addPotionTooltip(p, description, 0.125F/*? if >=1.20.3 {*/, Minecraft.getInstance().level.tickRateManager().tickrate()/*?}*/);
                 return description.get(0);
             }));
         })/*? if <1.21.2 {*/,SUSPICIOUS_STEW,(validRecipes, recipeAdder)-> BuiltInRegistries.ITEM.getTag(ItemTags.SMALL_FLOWERS).ifPresent(s->s.forEach(h->{
@@ -202,12 +202,6 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
             return new Id(FactoryAPI.createLocation(s));
         }
 
-        @Deprecated
-        static Filter create(String s){
-            if (s.startsWith("#blocks/")) return new BlockTag(TagKey.create(Registries.BLOCK, FactoryAPI.createLocation(s.replaceFirst("#blocks/", ""))));
-            return parse(s);
-        }
-
         interface IdOverride<T> {
             void addRecipes(Iterable<RecipeInfo<T>> validRecipes, Consumer<RecipeInfo<T>> recipeAdder);
         }
@@ -225,7 +219,7 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
             }
             @Override
             public String toString() {
-                return "#block_tag"+tag.location();
+                return "#block_tag/"+tag.location();
             }
         }
         record ItemTag(TagKey<Item> tag) implements Filter {

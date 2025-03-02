@@ -1,0 +1,48 @@
+{
+  "elements": {
+    "scrollable_renderer": {
+      "type": "put_scrollable_renderer",
+      "x": "(${width}-${scrollable_renderer.width})/2",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+      "width": 456,
+      "height": 222,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.ocean-mobs_message"},
+          "width": 433
+        },
+        "fish": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.ocean-mobs_fish"},
+          "width": 433
+        },
+        "squid": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.ocean-mobs_squid"},
+          "width": 433
+        },
+        "dolphins": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.ocean-mobs_dolphins"},
+          "width": 433
+        },
+        "sea-turtles": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.ocean-mobs_sea-turtles"},
+          "width": 433
+        },
+        "drowned": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.ocean-mobs_drowned"},
+          "width": 433
+        },
+        "guardians": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.ocean-mobs_guardians"},
+          "width": 433
+        }
+      }
+    }
+  }
+}

@@ -74,6 +74,6 @@ public class LegacyLanguageScreen extends PanelVListScreen {
         addRenderableOnly(panel);
         addRenderableOnly(((guiGraphics, i, j, f) -> FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 6, panel.y + 24, panel.width - 12, panel.height - 34)));
         getRenderableVList().init(panel.x + 10,panel.y + 30,panel.width - 20,panel.height - 46);
-        addRenderableWidget(LegacyConfigWidget.createWidget(LegacyOptions.of(minecraft.options.forceUnicodeFont()),panel.x + 10, panel.y + 10, panel.width - 20, v->{}));
+        addRenderableWidget(LegacyConfigWidgets.createWidget(LegacyOptions.of(minecraft.options.forceUnicodeFont()),panel.x + 10, panel.y + 10, panel.width - 20, v->{}));
     }
 }

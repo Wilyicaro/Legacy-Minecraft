@@ -41,6 +41,9 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
 
     int position = -1;
     boolean classicCrafting = true;
+    boolean classicTrading = true;
+    boolean classicStonecutting = true;
+    boolean classicLoom = true;
     boolean disableExhaustion = false;
     boolean mayFlySurvival = false;
 
@@ -76,17 +79,48 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     }
 
     @Override
+    public boolean hasClassicTrading() {
+        return classicTrading;
+    }
+
+    @Override
+    public void setTrading(boolean classic) {
+        classicTrading = classic;
+    }
+
+    @Override
+    public boolean hasClassicStonecutting() {
+        return classicStonecutting;
+    }
+
+    @Override
+    public void setStonecutting(boolean classic) {
+        classicStonecutting = classic;
+    }
+
+    @Override
+    public boolean hasClassicLoom() {
+        return classicLoom;
+    }
+
+    @Override
+    public void setLoom(boolean classic) {
+        classicLoom = classic;
+    }
+
+    @Override
     public boolean isExhaustionDisabled() {
         return disableExhaustion;
     }
 
     @Override
     public void setDisableExhaustion(boolean exhaustion) {
-        this.disableExhaustion = exhaustion;
+        if (hasPermissions(2)) this.disableExhaustion = exhaustion;
     }
 
     @Override
     public void setMayFlySurvival(boolean mayFlySurvival) {
+        if (!hasPermissions(2)) return;
         this.mayFlySurvival = mayFlySurvival;
         if (getAbilities().mayfly != mayFlySurvival && gameMode.isSurvival()){
             getAbilities().mayfly = mayFlySurvival;

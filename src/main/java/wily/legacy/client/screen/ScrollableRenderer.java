@@ -4,12 +4,18 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
+import net.minecraft.util.Mth;
 import org.joml.Math;
+import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.Stocker;
 
 public class ScrollableRenderer {
     public Stocker.Sizeable scrolled = new Stocker.Sizeable(0);
-    public float visualLabelY = 0;
+    public float lineHeight = 12f;
+    public final LegacyScrollRenderer scrollRenderer;
+    protected float oldSmoothScrolled;
+    protected float smoothScrolled;
+
     public ScrollableRenderer(){
         this(new LegacyScrollRenderer());
     }
@@ -17,13 +23,13 @@ public class ScrollableRenderer {
     public ScrollableRenderer(LegacyScrollRenderer renderer){
         scrollRenderer = renderer;
     }
-    public final LegacyScrollRenderer scrollRenderer;
+
     public void render(GuiGraphics graphics, int x, int y, int width, int height, Runnable scrollable){
         graphics.enableScissor(x,y, x + width, y + height);
+        oldSmoothScrolled = smoothScrolled;
+        smoothScrolled = Mth.lerp(FactoryAPIClient.getPartialTick() * 0.5f, oldSmoothScrolled, scrolled.get());
         graphics.pose().pushPose();
-        float s = Math.min(1.0f,(Util.getMillis() - scrollRenderer.lastScroll) / 480f);
-        visualLabelY += (scrolled.get() - visualLabelY) * s;
-        graphics.pose().translate(0, -visualLabelY * 12,0);
+        graphics.pose().translate(0, -getYOffset(),0);
         scrollable.run();
         graphics.pose().popPose();
         graphics.disableScissor();
@@ -31,6 +37,10 @@ public class ScrollableRenderer {
             if (scrolled.get() < scrolled.max) scrollRenderer.renderScroll(graphics, ScreenDirection.DOWN,x + width - 13, y + 3 + height);
             if (scrolled.get() > 0) scrollRenderer.renderScroll(graphics, ScreenDirection.UP, x + width - 29, y + 3 + height);
         }
+    }
+
+    public float getYOffset(){
+        return smoothScrolled * lineHeight;
     }
 
     public boolean mouseScrolled(double g){

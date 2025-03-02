@@ -1,0 +1,203 @@
+{
+  "elements": {
+    "scrollable_renderer": {
+      "type": "put_scrollable_renderer",
+      "x": "${width}/2-228",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+      "width": 200,
+      "height": 222,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.enchantment_message", "allowVariables": true, "args": ["controlIcon.key.use"]},
+          "width": 176
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.enchantment_message_1"},
+          "width": 176
+        }
+      }
+    },
+    "panel": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/small_panel",
+      "width":215,
+      "height":217,
+      "x":"${width}/2",
+      "y":"${scrollable_renderer.y}+4"
+    },
+    "enchantment_label": {
+      "type":"draw_string",
+      "component": {"translate": "container.enchant"},
+      "color": "${commonColor.inventory_gray_text}",
+      "shadow": false,
+      "x":"${panel.x}+14",
+      "y":"${panel.y}+10"
+    },
+    "enchantment_inventory": {
+      "type": "children",
+      "elements": {
+        "equipment_slot": {
+          "type":"put_legacy_slot",
+          "isFake":true,
+          "fakeItem": "bow",
+          "x":"${panel.x}+19",
+          "y":"${panel.y}+66"
+        },
+        "lapis_slot": {
+          "type":"put_legacy_slot",
+          "isFake":true,
+          "fakeItem": {"item": "lapis_lazuli", "count": 7},
+          "x":"${panel.x}+50",
+          "y":"${panel.y}+66"
+        },
+        "book": {
+          "type": "render_enchanted_book",
+          "translateX": "${panel.x}-15",
+          "translateY": "${panel.y}-13",
+          "scaleX": 1.75,
+          "scaleY": 1.75,
+          "scaleZ": 1.75
+        },
+        "buttons": {
+          "type":"children",
+          "elements": {
+            "panel": {
+              "type":"blit_sprite",
+              "sprite": "legacy:tiles/square_recessed_panel",
+              "x":"${panel.x}+79",
+              "y":"${panel.y}+22",
+              "width": 123,
+              "height": 66
+            },
+            "active_button": {
+              "type":"blit_sprite",
+              "sprite": "legacy:container/enchantment_button_active",
+              "translateX":"${panel.x}+80.5",
+              "translateY":"${panel.y}+23.5",
+              "width": 120,
+              "height": 21
+            },
+            "active_button_text": {
+              "type":"draw_string",
+              "component": {"text": "THE ELDER SCROLLS","font":"minecraft:alt"},
+              "color": "${commonColor.enchantment_text}",
+              "shadow": false,
+              "translateX":"${panel.x}+104.5",
+              "translateY":"${panel.y}+26.5"
+            },
+            "active_button_cost": {
+              "type":"draw_string",
+              "component": "3",
+              "color": "${commonColor.experience_text}",
+              "shadow": true,
+              "translateX":"${panel.x}+200.5-${enchantment_inventory.buttons.active_button_cost.component.width}",
+              "translateY":"${panel.y}+35.5"
+            },
+            "active_button_icon": {
+              "type":"blit_sprite",
+              "sprite": "minecraft:container/enchanting_table/level_1",
+              "translateX":"${panel.x}+79.5",
+              "translateY":"${panel.y}+22.5",
+              "width": 24,
+              "height": 24
+            },
+            "selected_button": {
+              "type":"blit_sprite",
+              "sprite": "legacy:container/enchantment_button_selected",
+              "translateX":"${panel.x}+80.5",
+              "translateY":"${panel.y}+23.5+21",
+              "width": 120,
+              "height": 21
+            },
+            "selected_button_text": {
+              "type":"draw_string",
+              "component": {"text": "KLAATU BERATA","font":"minecraft:alt"},
+              "color": "${commonColor.highlighted_enchantment_text}",
+              "shadow": false,
+              "translateX":"${panel.x}+104.5",
+              "translateY":"${panel.y}+26.5+21"
+            },
+            "selected_button_cost": {
+              "type":"draw_string",
+              "component": "2",
+              "color": "${commonColor.experience_text}",
+              "shadow": true,
+              "translateX":"${panel.x}+200.5-${enchantment_inventory.buttons.selected_button_cost.component.width}",
+              "translateY":"${panel.y}+35.5+21"
+            },
+            "selected_button_icon": {
+              "type":"blit_sprite",
+              "sprite": "minecraft:container/enchanting_table/level_2",
+              "translateX":"${panel.x}+79.5",
+              "translateY":"${panel.y}+22.5+21",
+              "width": 24,
+              "height": 24
+            },
+            "empty_button": {
+              "type":"blit_sprite",
+              "sprite": "legacy:container/enchantment_button_empty",
+              "translateX":"${panel.x}+80.5",
+              "translateY":"${panel.y}+23.5+21*2",
+              "width": 120,
+              "height": 21
+            },
+            "empty_button_text": {
+              "type":"draw_string",
+              "component": {"text": "ELEMENTAL SPIRIT","font":"minecraft:alt"},
+              "color": "(${commonColor.enchantment_text}&#FEFEFE) >> 1",
+              "shadow": false,
+              "translateX":"${panel.x}+104.5",
+              "translateY":"${panel.y}+26.5+21*2"
+            },
+            "empty_button_cost": {
+              "type":"draw_string",
+              "component": "8",
+              "color": "${commonColor.insufficient_experience_text}",
+              "shadow": true,
+              "translateX":"${panel.x}+200.5-${enchantment_inventory.buttons.empty_button_cost.component.width}",
+              "translateY":"${panel.y}+35.5+21*2"
+            },
+            "empty_button_icon": {
+              "type":"blit_sprite",
+              "sprite": "minecraft:container/enchanting_table/level_3_disabled",
+              "translateX":"${panel.x}+79.5",
+              "translateY":"${panel.y}+22.5+21*2",
+              "width": 24,
+              "height": 24
+            }
+          }
+        }
+      }
+    },
+    "inventory_label": {
+      "type":"draw_string",
+      "component": {"translate": "container.inventory"},
+      "color": "${commonColor.inventory_gray_text}",
+      "shadow": false,
+      "x":"${panel.x}+14",
+      "y":"${panel.y}+104"
+    },
+    "inventory": {
+      "type":"put_legacy_slot",
+      "range":"[0,26]",
+      "isFake":true,
+      "fakeContainer": [
+        {"item": "stone", "count": 32},{"item": "oak_planks", "count": 17},"air","air","oak_fence_gate","air","air",{"item": "arrow", "count": 64},{"item": "stick", "count": 10},
+        {"item": "bookshelf", "count": 3},"air","dark_oak_door","air","emerald","air",{"item": "cobblestone_wall", "count": 7},"oak_sign","air",
+        {"item": "stone_brick_stairs", "count": 24},{"item": "cobblestone_stairs", "count": 16},"air",{"item": "oak_log", "count":  7},{"item": "acacia_stairs", "count": 15},"air","diamond_pickaxe",{"item": "paper", "count": 21},{"item": "gunpowder", "count": 15}
+      ],
+      "x":"${panel.x}+14+(${inventory.index}%9)*21",
+      "y":"${panel.y}+115+(${inventory.index}/9)*21"
+    },
+    "quick_select": {
+      "type":"put_legacy_slot",
+      "range":"[0,8]",
+      "isFake":true,
+      "fakeContainer": ["iron_sword","bow",{"item": "arrow", "count": 64},{"item": "flint_and_steel", "components": {"damage": 28}, "nbt": {"Damage": 28}},"clock","shears",{"item": "iron_axe", "components": {"damage": 65}, "nbt": {"Damage": 65}},"fishing_rod","compass"],
+      "x":"${panel.x}+14+(${quick_select.index}%9)*21",
+      "y":"${panel.y}+185"
+    }
+  }
+}

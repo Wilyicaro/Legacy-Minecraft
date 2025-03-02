@@ -70,25 +70,7 @@ public class LegacyCraftingTabListing implements LegacyTabInfo {
             JsonUtil.getOrderedNamespaces(manager).forEach(name->manager.getResource(FactoryAPI.createLocation(name, CRAFTING_TAB_LISTING)).ifPresent(r->{
                 try (BufferedReader bufferedReader = r.openAsReader()) {
                     JsonElement element = JsonParser.parseReader(bufferedReader);
-                    if (element instanceof JsonObject obj) {
-                        Legacy4J.LOGGER.warn("The Crafting Tab Listing {} is using a deprecated syntax, please contact this resource creator or try updating it.", name+":"+CRAFTING_TAB_LISTING);
-                        obj.asMap().forEach((c, ce) -> {
-                            ResourceLocation id = FactoryAPI.createLocation(c);
-                            if (ce instanceof JsonObject go) {
-                                JsonElement listingElement = go.get("listing");
-                                if (map.containsKey(id)) {
-                                    LegacyCraftingTabListing l = map.get(id);
-                                    ifJsonStringNotNull(go, "displayName", Component::translatable, n -> l.name = n);
-                                    LegacyTabButton.DEPRECATED_ICON_HOLDER_CODEC.parse(JsonOps.INSTANCE, go).result().ifPresent(icon -> l.iconHolder = icon);
-                                    JsonUtil.addGroupedRecipeValuesFromJson(l.craftings, listingElement);
-                                } else  {
-                                    LegacyCraftingTabListing listing = new LegacyCraftingTabListing(id, getJsonStringOrNull(go, "displayName", Component::translatable), LegacyTabButton.DEPRECATED_ICON_HOLDER_CODEC.parse(JsonOps.INSTANCE, go).result().orElse(null));
-                                    JsonUtil.addGroupedRecipeValuesFromJson(listing.craftings, listingElement);
-                                    map.put(listing.id(),listing);
-                                }
-                            }
-                        });
-                    } else if (element instanceof JsonArray a) a.forEach(e-> CODEC.parse(JsonOps.INSTANCE,e).result().ifPresent(listing->{
+                    if (element instanceof JsonArray a) a.forEach(e-> CODEC.parse(JsonOps.INSTANCE,e).result().ifPresent(listing->{
                         if (map.containsKey(listing.id)){
                             LegacyCraftingTabListing l = map.get(listing.id);
                             if (listing.name != null) l.name = listing.name;

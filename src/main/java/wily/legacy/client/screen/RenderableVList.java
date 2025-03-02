@@ -1,5 +1,6 @@
 package wily.legacy.client.screen;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -11,16 +12,14 @@ import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.base.client.UIDefinition;
-import wily.legacy.config.LegacyConfig;
+import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.util.ScreenUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class RenderableVList {
@@ -46,11 +45,11 @@ public class RenderableVList {
     }
 
     public RenderableVList addRenderables(Renderable... renderables){
-        return addRenderables(-1,renderables);
+        return addRenderables(this.renderables.size(), renderables);
     }
 
     public RenderableVList addRenderables(int indexOffset, Renderable... renderables){
-        for (Renderable renderable : renderables) this.renderables.add(indexOffset < 0 ? this.renderables.size() : indexOffset, renderable);
+        this.renderables.addAll(indexOffset, List.of(renderables));
         return this;
     }
 
@@ -62,28 +61,55 @@ public class RenderableVList {
     public Screen getScreen(){
         return accessor.getScreen();
     }
+
     public <S> S getScreen(Class<S> screenClass){
         return screenClass.cast(accessor.getScreen());
     }
 
-    public <T> RenderableVList addLinkedOptions(int indexOffset, LegacyConfig<T> dependency, Predicate<LegacyConfig<T>> activeDependent, LegacyConfig<?> dependent){
-        AbstractWidget dependentWidget = LegacyConfigWidget.createWidget(dependent);
-        dependentWidget.active = activeDependent.test(dependency);
-        AbstractWidget dependencyWidget = LegacyConfigWidget.createWidget(dependency,0,0,0, b-> dependentWidget.active = activeDependent.test(dependency));
-        addRenderables(indexOffset,dependentWidget,dependencyWidget);
+    public <T> RenderableVList addLinkedOptions(int index, FactoryConfig<T> dependency, Predicate<FactoryConfig<T>> activeDependent, FactoryConfig<?>... dependents){
+        List<AbstractWidget> dependentWidgets = new ArrayList<>();
+        for (FactoryConfig<?> dependent : dependents) {
+            AbstractWidget dependentWidget = LegacyConfigWidgets.createWidget(dependent);
+            dependentWidget.active = activeDependent.test(dependency);
+            dependentWidgets.add(dependentWidget);
+        }
+        renderables.addAll(index, ImmutableList.<AbstractWidget>builder().addAll(dependentWidgets).add(LegacyConfigWidgets.createWidget(dependency,0,0,0, b-> dependentWidgets.forEach(dependentWidget-> dependentWidget.active = activeDependent.test(dependency)))).build());
         return this;
     }
 
-    public RenderableVList addOptions(LegacyConfig<?>... optionInstances){
-        return addOptions(-1,optionInstances);
+    public <T> RenderableVList addLinkedOptions(FactoryConfig<T> dependency, Predicate<FactoryConfig<T>> activeDependent, FactoryConfig<?>... dependents) {
+        return addLinkedOptions(renderables.size(), dependency, activeDependent, dependents);
     }
 
-    public RenderableVList addOptions(int indexOffset, LegacyConfig<?>... optionInstances){
+    public RenderableVList addDependentOptions(int index, boolean enabled, FactoryConfig<?>... dependents){
+        if (enabled) addOptions(index, dependents);
+        else renderables.addAll(index, Arrays.stream(dependents).map(option-> {
+            AbstractWidget widget = LegacyConfigWidgets.createWidget(option);
+            widget.active = false;
+            return widget;
+        }).toList());
+        return this;
+    }
+
+    public RenderableVList addDependentOptions(boolean enabled, FactoryConfig<?>... dependents){
+        return addDependentOptions(this.renderables.size(), enabled, dependents);
+    }
+
+    public RenderableVList addOptions(FactoryConfig<?>... optionInstances){
+        return addOptions(this.renderables.size(), optionInstances);
+    }
+
+    public RenderableVList addOptions(int indexOffset, FactoryConfig<?>... optionInstances){
         return addOptions(indexOffset,Arrays.stream(optionInstances));
     }
 
-    public RenderableVList addOptions(int indexOffset, Stream<LegacyConfig<?>> optionInstances){
-        return addRenderables(indexOffset,optionInstances.map(LegacyConfigWidget::createWidget).toList().toArray(AbstractWidget[]::new));
+    public RenderableVList addOptions(Stream<FactoryConfig<?>> optionInstances) {
+        return addOptions(this.renderables.size(), optionInstances);
+    }
+
+    public RenderableVList addOptions(int indexOffset, Stream<FactoryConfig<?>> optionInstances){
+        renderables.addAll(indexOffset,optionInstances.map(LegacyConfigWidgets::createWidget).toList());
+        return this;
     }
 
     public RenderableVList layoutSpacing(Function<LayoutElement,Integer> layoutSeparation){
@@ -103,7 +129,15 @@ public class RenderableVList {
 
     public void focusRenderable(Renderable renderable){
         if (renderables.isEmpty()) return;
-        if (getScreen().getFocused() == null && renderables.get(0) instanceof GuiEventListener l) getScreen().setFocused(l);
+        if (renderable instanceof GuiEventListener l && getScreen().children().contains(l)){
+            getScreen().setFocused(l);
+            return;
+        }
+        if (scrolledList.get() > 0) {
+            scrolledList.set(0);
+            accessor.reloadUI();
+        }
+        if (renderables.get(0) instanceof GuiEventListener l && getScreen().getFocused() != l) getScreen().setFocused(l);
         while (getScreen().getFocused() != renderable){
             if (forceWidth){
                 ComponentPath path = getDirectionalNextFocusPath(ScreenDirection.DOWN);
@@ -240,13 +274,13 @@ public class RenderableVList {
                 if (isInvalidFocus(path,true)) {
                     if (canScrollDown) {
                         while (canScrollDown && isDirectionFocused(ScreenDirection.DOWN,true)) mouseScrolled(true);
-                    } else if (cyclic && path == null) {
-                        if (scrolledList.get() > 0) {
+                    } else if (cyclic) {
+                        if (path == null && scrolledList.get() > 0) {
                             scrolledList.set(0);
                             accessor.reloadUI();
                             setLastFocusInDirection(ScreenDirection.DOWN);
                         }
-                    }
+                    } else if (path == null) return true;
                 }
             }
             if (i == InputConstants.KEY_UP) {
@@ -254,10 +288,12 @@ public class RenderableVList {
                 if (isInvalidFocus(path,true)) {
                     if (scrolledList.get() > 0) {
                         while (scrolledList.get() > 0 && isDirectionFocused(ScreenDirection.UP,true)) mouseScrolled(false);
-                    } else if (cyclic && path == null){
-                        while (canScrollDown)
-                            mouseScrolled(true);
-                    }
+                    } else if (cyclic){
+                        if (path == null) {
+                            while (canScrollDown)
+                                mouseScrolled(true);
+                        }
+                    } else if (path == null) return true;
                 }
             }
             if (listHeight > 0) {

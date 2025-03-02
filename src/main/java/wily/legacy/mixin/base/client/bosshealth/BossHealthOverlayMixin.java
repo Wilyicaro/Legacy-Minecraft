@@ -32,7 +32,7 @@ public abstract class BossHealthOverlayMixin {
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)I"))
     public int drawString(GuiGraphics graphics, Font font, Component component, int i, int j, int k) {
-        Legacy4JClient.applyFontOverrideIf(minecraft.getWindow().getHeight() <= 720, LegacyIconHolder.MOJANGLES_11_FONT, b->{
+        Legacy4JClient.applyFontOverrideIf(ScreenUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b->{
             Legacy4JClient.forceVanillaFontShadowColor = true;
             graphics.pose().pushPose();
             graphics.pose().translate(graphics.guiWidth() / 2f,j,0);
@@ -47,22 +47,6 @@ public abstract class BossHealthOverlayMixin {
     //? if >1.20.1 {
     @Shadow protected abstract void drawBar(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, int k, ResourceLocation[] resourceLocations, ResourceLocation[] resourceLocations2);
     //?}
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, CallbackInfo ci) {
-        if (minecraft.screen != null) {
-            ci.cancel();
-            return;
-        }
-        RenderSystem.enableBlend();
-        RenderSystem.setShaderColor(1.0f,1.0f,1.0f, ScreenUtil.getInterfaceOpacity());
-
-    }
-    @Inject(method = "render", at = @At("RETURN"))
-    public void renderReturn(GuiGraphics guiGraphics, CallbackInfo ci) {
-        if (minecraft.screen != null) return;
-        RenderSystem.setShaderColor(1.0f,1.0f,1.0f, 1.0f);
-        RenderSystem.disableBlend();
-    }
     @ModifyVariable(method = "render", at = @At(value = "STORE", ordinal = 0), ordinal = 1)
     public int render(int i) {
         return (int) (12 + 16 * LegacyOptions.hudDistance.get());

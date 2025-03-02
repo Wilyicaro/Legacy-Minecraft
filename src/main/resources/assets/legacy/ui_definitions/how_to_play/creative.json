@@ -1,0 +1,181 @@
+{
+  "elements": {
+    "scrollable_renderer": {
+      "type": "put_scrollable_renderer",
+      "x": "${width}/2-228",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+      "width": 200,
+      "height": 222,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.creative_message"},
+          "width": 176
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.creative_message_1", "allowVariables": true, "args": ["controlIcon.key.jump","controlIcon.player_movement","controlIcon.key.jump","controlIcon.key.jump","controlIcon.key.sneak","controlIcon.legacy.key.flyUp","controlIcon.legacy.key.flyDown","controlIcon.legacy.key.flyLeft","controlIcon.legacy.key.flyRight"]},
+          "width": 176
+        }
+      }
+    },
+    "low_tabs": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/low_tab",
+      "width":33,
+      "height":32,
+      "x":"${panel.x}+32+32*${low_tabs.index}",
+      "y":"${panel.y}-26",
+      "amount": 7,
+      "translateY": 1.5
+    },
+    "panel": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/creative_panel",
+      "width":257,
+      "height":170,
+      "x":"${width}/2",
+      "y":"${scrollable_renderer.y}+40"
+    },
+    "high_tab": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/high_tab_left",
+      "width":33,
+      "height":32,
+      "x":"${panel.x}",
+      "y":"${panel.y}-26"
+    },
+    "tab_icons": {
+      "type": "children",
+      "applyPrefix": false,
+      "elements": {
+        "structures": {
+          "type":"blit_sprite",
+          "sprite":"legacy:icon/structures_small",
+          "width":16,
+          "height":16,
+          "translateX": 0.5,
+          "x":"${high_tab.x}+8",
+          "y":"${high_tab.y}+7"
+        },
+        "decorations": {
+          "type":"blit_sprite",
+          "sprite":"legacy:icon/decoration_small",
+          "width":16,
+          "height":16,
+          "translateX": 0.5,
+          "x":"${structures.x}+32",
+          "y":"${structures.y}+1"
+        },
+        "redstone_and_transport": {
+          "type":"blit_sprite",
+          "sprite":"legacy:icon/redstone_and_transport_small",
+          "width":16,
+          "height":16,
+          "translateX": 0.5,
+          "x":"${decorations.x}+32",
+          "y":"${decorations.y}"
+        },
+        "materials": {
+          "type":"blit_sprite",
+          "sprite":"legacy:icon/materials_small",
+          "width":16,
+          "height":16,
+          "translateX": 0.5,
+          "x":"${redstone_and_transport.x}+32",
+          "y":"${decorations.y}"
+        },
+        "food": {
+          "type":"blit_sprite",
+          "sprite":"legacy:icon/food_small",
+          "width":16,
+          "height":16,
+          "translateX": 0.5,
+          "x":"${materials.x}+32",
+          "y":"${decorations.y}"
+        },
+        "tools": {
+          "type":"blit_sprite",
+          "sprite":"legacy:icon/tools_small",
+          "width":16,
+          "height":16,
+          "translateX": 0.5,
+          "x":"${food.x}+32",
+          "y":"${decorations.y}"
+        },
+        "brewing": {
+          "type":"blit_sprite",
+          "sprite":"legacy:icon/brewing_small",
+          "width":16,
+          "height":16,
+          "translateX": 0.5,
+          "x":"${tools.x}+32",
+          "y":"${decorations.y}"
+        },
+        "misc": {
+          "type":"blit_sprite",
+          "sprite":"legacy:icon/misc_small",
+          "width":16,
+          "height":16,
+          "translateX": 0.5,
+          "x":"${brewing.x}+32",
+          "y":"${decorations.y}"
+        }
+      }
+    },
+    "scroll_space": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/square_recessed_panel",
+      "width":9,
+      "height":105,
+      "x":"${panel.x}+${panel.width}-22",
+      "y":"${panel.y}+22"
+    },
+    "scroller": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/panel",
+      "width":13,
+      "height":13,
+      "x":"${scroll_space.x}-2",
+      "y":"${scroll_space.y}-1"
+    },
+    "scroll_down": {
+      "type":"blit_sprite",
+      "sprite":"legacy:widget/scroll_down",
+      "width":11,
+      "height":6,
+      "x":"${scroll_space.x}-1",
+      "y":"${scroll_space.y}+${scroll_space.height}+2"
+    },
+    "tab_label": {
+      "type":"draw_string",
+      "component": {"translate": "legacy.container.tab.building_blocks"},
+      "color": "${commonColor.inventory_gray_text}",
+      "shadow": false,
+      "x":"${panel.x}+(${panel.width}-${tab_label.component.width})/2",
+      "y":"${panel.y}+9"
+    },
+    "creative_menu": {
+      "type":"put_legacy_slot",
+      "range":"[0,49]",
+      "isFake":true,
+      "fakeContainer": [
+        "stone","grass_block","dirt_path","dirt","cobblestone","sand","sandstone","smooth_sandstone","chiseled_sandstone","red_sand",
+        "red_sandstone","smooth_red_sandstone","chiseled_red_sandstone","granite","polished_granite","andesite","polished_andesite","diorite","polished_diorite","coal_block",
+        "gold_block","iron_block","lapis_block","diamond_block","emerald_block","quartz_block","coal_ore","lapis_ore","diamond_ore","redstone_ore",
+        "iron_ore","gold_ore","emerald_ore","nether_quartz_ore","nether_wart_block","bedrock","oak_planks","spruce_planks","birch_planks","jungle_planks",
+        "acacia_planks","dark_oak_planks","oak_log","spruce_log","birch_log","jungle_log","acacia_log","dark_oak_log","gravel","bricks"
+      ],
+      "x":"${panel.x}+17+(${creative_menu.index}%10)*21",
+      "y":"${panel.y}+23+(${creative_menu.index}/10)*21"
+    },
+    "quick_select": {
+      "type":"put_legacy_slot",
+      "range":"[0,8]",
+      "isFake":true,
+      "fakeContainer": ["iron_sword","bow",{"item": "arrow", "count": 64},{"item": "flint_and_steel", "components": {"damage": 28}, "nbt": {"Damage": 28}},"clock","shears",{"item": "iron_axe", "components": {"damage": 65}, "nbt": {"Damage": 65}},"fishing_rod","compass"],
+      "x":"${panel.x}+27+(${quick_select.index}%9)*21",
+      "y":"${panel.y}+139"
+    }
+  }
+}

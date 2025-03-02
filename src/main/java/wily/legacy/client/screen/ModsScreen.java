@@ -12,20 +12,18 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
-//? <1.20.5 {
-/*import net.minecraft.client.gui.screens.OptionsScreen;
-*///?} else {
-import net.minecraft.client.gui.screens.options.OptionsScreen;
-//?}
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 import wily.factoryapi.FactoryAPI;
+import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.Stocker;
+import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.ListMap;
 import wily.factoryapi.util.ModInfo;
@@ -33,19 +31,6 @@ import wily.legacy.Legacy4J;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.PackAlbum;
 import wily.legacy.client.controller.ControllerBinding;
-//? if forge {
-/*import net.minecraftforge.fml.ModList;
-import net.minecraftforge.client.ConfigScreenHandler;
-*///?} else if neoforge {
-/*import net.neoforged.fml.ModList;
-//? if <1.20.5 {
-/^import net.neoforged.neoforge.client.ConfigScreenHandler;
- ^///?} else {
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
-//?}
-*///?} else if fabric {
-import wily.legacy.client.screen.compat.ModMenuCompat;
-//?}
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
@@ -66,27 +51,13 @@ public class ModsScreen extends PanelVListScreen {
         }
     }
     protected final Panel tooltipBox = Panel.tooltipBoxOf(panel,192);
-    protected final Stocker.Sizeable sorting = new Stocker.Sizeable(0,1);
+    protected final Stocker.Sizeable sorting = new Stocker.Sizeable(1,1);
 
-    public static final ListMap<String, Function<Screen,Screen>> configScreensMap = ListMap.<String, Function<Screen, Screen>>builder().put(Legacy4J.MOD_ID, Legacy4JSettingsScreen::new).put("minecraft", s-> new OptionsScreen(s, Minecraft.getInstance().options)).build();
-
-
-    public static Screen getConfigScreen(ModInfo mod, Screen screen) {
-        if (configScreensMap.containsKey(mod.getId())) return configScreensMap.get(mod.getId()).apply(screen);
-        //? if fabric {
-        return FactoryAPI.isModLoaded("modmenu") ? ModMenuCompat.getConfigScreen(mod.getId(),screen) : null;
-        //?} else if forge || neoforge && <1.20.5 {
-        /*return ModList.get().getModContainerById(mod.getId()).flatMap(m-> m.getCustomExtension(ConfigScreenHandler.ConfigScreenFactory.class)).map(s -> s.screenFunction().apply(Minecraft.getInstance(), screen)).orElse(null);
-         *///?} else if neoforge {
-        /*return ModList.get().getModContainerById(mod.getId()).flatMap(m-> IConfigScreenFactory.getForMod(m.getModInfo()).map(s -> s.createScreen(m, screen))).orElse(null);
-         *///?} else
-        /*throw new AssertionError();*/
-    }
 
     protected ModInfo focusedMod;
-    protected final LoadingCache<ModInfo, List<FormattedCharSequence>> modLabelsCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
+    protected final LoadingCache<ModInfo, AdvancedTextWidget> modLabelsCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
         @Override
-        public List<FormattedCharSequence> load(ModInfo key) {
+        public AdvancedTextWidget load(ModInfo key) {
             List<Component> components = new ArrayList<>();
             SizedLocation logo = modLogosCache.get(key);
             if (logo != null && logo.getScaledWidth(28) >= 120){
@@ -103,14 +74,16 @@ public class ModsScreen extends PanelVListScreen {
             if (key.getLicense() != null && !key.getLicense().isEmpty()) components.add(Component.translatable("legacy.menu.mods.license", String.join(", ", key.getLicense())));
             components.add(Component.literal(key.getDescription()));
             MultilineTooltip tooltip = new MultilineTooltip(components,tooltipBox.getWidth() - 16);
-            return tooltip.toCharSequence(minecraft);
+            return new AdvancedTextWidget(accessor).withWidth(tooltipBox.getWidth() - 16).withLines(tooltip.toCharSequence(minecraft));
         }
     });
+
     public ModsScreen(Screen parent) {
         super(parent,282,243, Component.empty());
         renderableVList.layoutSpacing(l->0);
         fillMods();
     }
+
     public void fillMods(){
         Collection<ModInfo> mods = FactoryAPIPlatform.getMods();
         if (sorting.get() != 0) mods = mods.stream().sorted(Comparator.comparing(ModInfo::getName)).toList();
@@ -120,7 +93,7 @@ public class ModsScreen extends PanelVListScreen {
                 @Override
                 public void onPress() {
                     if (isFocused()){
-                        Screen config = getConfigScreen(mod,ModsScreen.this);
+                        Screen config = FactoryAPIClient.getConfigScreen(mod,ModsScreen.this);
                         if (config != null) minecraft.setScreen(config);
                     }
                 }
@@ -164,22 +137,29 @@ public class ModsScreen extends PanelVListScreen {
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
-        if (ScreenUtil.hasTooltipBoxes(accessor)) {
-            tooltipBox.render(guiGraphics,i,j,f);
-            if (focusedMod != null) {
-                List<FormattedCharSequence> label = modLabelsCache.getUnchecked(focusedMod);
-                scrollableRenderer.scrolled.max = Math.max(0,label.size() - (tooltipBox.getHeight() - 50) / 12);
-                SizedLocation logo = modLogosCache.get(focusedMod);
-                int x = panel.x + panel.width + (logo == null ? 5 : logo.getScaledWidth(28) + 10);
-                if (logo != null)
-                    FactoryGuiGraphics.of(guiGraphics).blit(logo.location, panel.x + panel.width + 5, panel.y + 10, 0.0f, 0.0f, logo.getScaledWidth(28), 28, logo.getScaledWidth(28), 28);
-                if (logo == null || logo.getScaledWidth(28) < 120) {
-                    ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.id", focusedMod.getId()), x, panel.y + 12, panel.x + panel.width + 185, panel.y + 24, 0xFFFFFF, true);
-                    ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.version",focusedMod.getVersion()), x, panel.y + 24, panel.x + panel.width + 185, panel.y + 36, 0xFFFFFF, true);
-                }
-                scrollableRenderer.render(guiGraphics, panel.x + panel.width + 5, panel.y + 38, tooltipBox.getWidth() - 16, tooltipBox.getHeight() - 50, () -> label.forEach(c->guiGraphics.drawString(font, c,panel.x + panel.width + 5, panel.y + 41 + label.indexOf(c) * 12, 0xFFFFFF)));
+        tooltipBox.render(guiGraphics,i,j,f);
+        if (focusedMod != null) {
+            AdvancedTextWidget label = modLabelsCache.getUnchecked(focusedMod).withPos(panel.x + panel.width + 5, panel.y + 41);
+            scrollableRenderer.scrolled.max = Math.max(0, Mth.ceil((label.getHeight() - (tooltipBox.getHeight() - 50)) / 12f));
+            SizedLocation logo = modLogosCache.get(focusedMod);
+            int x = panel.x + panel.width + (logo == null ? 5 : logo.getScaledWidth(28) + 10);
+            if (logo != null)
+                FactoryGuiGraphics.of(guiGraphics).blit(logo.location, panel.x + panel.width + 5, panel.y + 10, 0.0f, 0.0f, logo.getScaledWidth(28), 28, logo.getScaledWidth(28), 28);
+            if (logo == null || logo.getScaledWidth(28) < 120) {
+                ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.id", focusedMod.getId()), x, panel.y + 12, panel.x + panel.width + 185, panel.y + 24, 0xFFFFFF, true);
+                ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.version",focusedMod.getVersion()), x, panel.y + 24, panel.x + panel.width + 185, panel.y + 36, 0xFFFFFF, true);
             }
+            scrollableRenderer.render(guiGraphics, panel.x + panel.width + 5, panel.y + 38, tooltipBox.getWidth() - 16, tooltipBox.getHeight() - 50, () -> label.render(guiGraphics, i, j + Math.round(scrollableRenderer.getYOffset()), f));
         }
+    }
+
+    @Override
+    public boolean mouseClicked(double d, double e, int i) {
+        if (focusedMod != null && ScreenUtil.isMouseOver(d, e, panel.x + panel.width + 5, panel.y + 38, tooltipBox.getWidth() - 16, tooltipBox.getHeight() - 50)) {
+            AdvancedTextWidget label = modLabelsCache.getUnchecked(focusedMod);
+            if (label.mouseClicked(d, e + scrollableRenderer.getYOffset(), i)) return true;
+        }
+        return super.mouseClicked(d, e, i);
     }
 
     @Override

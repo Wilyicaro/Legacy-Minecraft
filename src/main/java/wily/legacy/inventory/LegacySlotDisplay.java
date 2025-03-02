@@ -42,6 +42,10 @@ public interface LegacySlotDisplay {
         return null;
     }
 
+    default boolean isWarning(){
+        return false;
+    }
+
     static LegacySlotDisplay of(Slot slot){
         return slot instanceof LegacySlotDisplay d ? d : DEFAULT;
     }

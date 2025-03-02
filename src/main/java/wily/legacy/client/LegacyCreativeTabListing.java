@@ -88,17 +88,7 @@ public class LegacyCreativeTabListing implements LegacyTabInfo {
             JsonUtil.getOrderedNamespaces(resourceManager).forEach(name-> resourceManager.getResource(FactoryAPI.createLocation(name,LISTING)).ifPresent(r->{
                 try (BufferedReader bufferedReader = r.openAsReader()) {
                     JsonElement json = JsonParser.parseReader(bufferedReader);
-                    if (json instanceof JsonObject obj) {
-                        Legacy4J.LOGGER.warn("The Creative Tab Listing {} is using a deprecated syntax, please contact this resource creator or try updating it.", name+":"+LISTING);
-                        obj.asMap().forEach((s, element) -> {
-                            if (element instanceof JsonObject tabObj) {
-                                LegacyCreativeTabListing l = new LegacyCreativeTabListing(FactoryAPI.createLocation(s.toLowerCase(Locale.ENGLISH)),Component.translatable(s), LegacyTabButton.DEPRECATED_ICON_HOLDER_CODEC.parse(JsonOps.INSTANCE, tabObj).result().orElse(null), new ArrayList<>());
-                                if (tabObj.get("listing") instanceof JsonArray a)
-                                    a.forEach(e -> l.displayItems.add(JsonUtil.getItemFromJson(e, true)));
-                                map.put(l.id(), l);
-                            }
-                        });
-                    } else if (json instanceof JsonArray a) a.forEach(e->CODEC.parse(JsonOps.INSTANCE,e).result().ifPresent(listing->{
+                    if (json instanceof JsonArray a) a.forEach(e->CODEC.parse(JsonOps.INSTANCE,e).result().ifPresent(listing->{
                         if (map.containsKey(listing.id)){
                             LegacyCreativeTabListing l = map.get(listing.id);
                             if (listing.name != null) l.name = listing.name;

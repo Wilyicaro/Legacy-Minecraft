@@ -1,0 +1,11 @@
+- Adicionado o Farejador, vencedor da votação de mobs de 2022.
+- Adicionado o Camelo, um novo mob montável.
+- Introduzida a Arqueologia com Pincéis, Areia Suspeita e Vasos Decorados.
+- Adicionado o bioma Bosque de Cerejeiras com Árvores de Cerejeira e um conjunto de madeira de Cerejeira.
+- Adicionado o conjunto de Madeira de Bambu, incluindo Jangadas de Bambu.
+- Introduzida a Estante Cinzelada para armazenar livros.
+- Adicionados Placas Suspensas para cada tipo de madeira.
+- Adicionados Enfeites de Armadura e Moldes de Ferraria para personalização de armaduras.
+- Adicionados novos discos de música e sons ambientes.
+- Adicionados novos avanços e melhorias no inventário criativo.
+- Adicionado o Sensor de Sculk Calibrado, um bloco usado para filtrar vibrações, criado com um sensor de sculk e três fragmentos de ametista.

@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.client.screen.LeaderboardsScreen;
 import wily.legacy.client.screen.LegacyLoadingScreen;
@@ -32,14 +33,20 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
     //? if <=1.20.2 {
     /*@Shadow @Final
     private Minecraft minecraft;
-    @Inject(method = "handleRespawn", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;cameraEntity:Lnet/minecraft/world/entity/Entity;", shift = At.Shift.AFTER))
+    @Inject(method = "handleRespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", shift = At.Shift.AFTER))
     public void handleRespawn(ClientboundRespawnPacket clientboundRespawnPacket, CallbackInfo ci) {
         if (clientboundRespawnPacket.shouldKeep(ClientboundRespawnPacket.KEEP_ALL_DATA)) return;
+        LegacyLoadingScreen respawningScreen = LegacyLoadingScreen.getRespawningScreen(()-> false);
         minecraft.setScreen(new ReceivingLevelScreen(){
             @Override
+            protected void init() {
+                super.init();
+                respawningScreen.init(minecraft, width, height);
+            }
+
+            @Override
             public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-                Legacy4JClient.legacyLoadingScreen.prepareRender(minecraft,guiGraphics.guiWidth(),guiGraphics.guiHeight(),LegacyComponents.RESPAWNING,null,0,true);
-                Legacy4JClient.legacyLoadingScreen.render(guiGraphics, i, j, f);
+                respawningScreen.render(guiGraphics, i, j, f);
             }
         });
     }
@@ -52,20 +59,7 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
     @Inject(method = "handleRespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;setId(I)V"))
     public void handleRespawn(ClientboundRespawnPacket clientboundRespawnPacket, CallbackInfo ci) {
         if (!clientboundRespawnPacket.shouldKeep(ClientboundRespawnPacket.KEEP_ALL_DATA)){
-            long createdTime = Util.getMillis();
-            LegacyLoadingScreen respawningScreen = new LegacyLoadingScreen(LegacyComponents.RESPAWNING,Component.empty()){
-                @Override
-                public void tick() {
-                    if (levelLoadStatusManager.levelReady() || Util.getMillis() - createdTime >= 30000) minecraft.setScreen(null);
-                }
-
-                @Override
-                public boolean isPauseScreen() {
-                    return false;
-                }
-            };
-            respawningScreen.setGenericLoading(true);
-            minecraft.setScreen(respawningScreen);
+            minecraft.setScreen(LegacyLoadingScreen.getRespawningScreen(levelLoadStatusManager::levelReady));
         }
     }
     //?}
@@ -92,19 +86,22 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
         instance.setCarried(itemStack);
     }
 
-
-    @Inject(method = "handleContainerSetSlot", at = @At("RETURN"))
+    //? if >=1.21.2 {
+    /*@Inject(method = "handleContainerSetSlot", at = @At("RETURN"))
     public void handleContainerSetSlot(ClientboundContainerSetSlotPacket clientboundContainerSetSlotPacket, CallbackInfo ci) {
         if (this.minecraft.screen instanceof CreativeModeScreen) {
             minecraft.player.inventoryMenu.setRemoteSlot(clientboundContainerSetSlotPacket.getSlot(), clientboundContainerSetSlotPacket.getItem());
             minecraft.player.inventoryMenu.broadcastChanges();
         }
     }
+    *///?}
+
     @Redirect(method = "handleContainerSetSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/AbstractContainerMenu;setItem(IILnet/minecraft/world/item/ItemStack;)V", ordinal = 0))
     public void handleContainerSetSlot(AbstractContainerMenu instance, int i, int j, ItemStack itemStack) {
         if (minecraft.screen instanceof CreativeModeScreen) return;
         instance.setItem(i,j,itemStack);
     }
+
     @Redirect(method = "handleSetEntityPassengersPacket", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;setOverlayMessage(Lnet/minecraft/network/chat/Component;Z)V"))
     public void handleSetEntityPassengersPacket(Gui instance, Component component, boolean bl) {
 
@@ -121,5 +118,13 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
     @Inject(method = "handleAwardStats", at = @At("RETURN"))
     public void handleAwardStats(ClientboundAwardStatsPacket clientboundAwardStatsPacket, CallbackInfo ci) {
         if (minecraft.screen instanceof LeaderboardsScreen s) s.onStatsUpdated();
+    }
+
+    @Inject(method = "handleSystemChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/util/thread/BlockableEventLoop;)V", shift = At.Shift.AFTER), cancellable = true)
+    public void handleSystemChat(ClientboundSystemChatPacket clientboundSystemChatPacket, CallbackInfo ci) {
+        if (!LegacyOptions.systemMessagesAsOverlay.get()) {
+            minecraft.getChatListener().handleSystemMessage(clientboundSystemChatPacket.content(), false);
+            ci.cancel();
+        }
     }
 }

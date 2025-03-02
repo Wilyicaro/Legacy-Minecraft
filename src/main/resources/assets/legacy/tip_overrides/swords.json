@@ -1,6 +1,6 @@
 {
   "overrides": {
     "item": "#swords",
-    "tip": "item.minecraft.sword.tip"
+    "tip": {"translate": "item.minecraft.sword.tip"}
   }
 }

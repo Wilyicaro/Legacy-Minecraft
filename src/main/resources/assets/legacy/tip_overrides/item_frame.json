@@ -1,0 +1,8 @@
+{
+  "overrides": [
+    {
+      "entity_type": "item_frame",
+      "tip": {"itemIcon": {"item": "item_frame"}}
+    }
+  ]
+}

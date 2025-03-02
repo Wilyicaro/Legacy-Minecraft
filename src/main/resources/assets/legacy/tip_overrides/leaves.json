@@ -1,6 +1,6 @@
 {
   "overrides": {
     "block": "#leaves",
-    "tip": "block.minecraft.leaves.tip"
+    "tip": {"translate": "block.minecraft.leaves.tip"}
   }
 }

@@ -1,0 +1,11 @@
+- Added the Sniffer, winner of the 2022 Mob Vote.
+- Added the Camel, a new rideable mob.
+- Introduced Archaeology with Brushes, Suspicious Sand, and Decorated Pots.
+- Added Cherry Grove biome with Cherry Trees and Cherry Woodset.
+- Added Bamboo Woodset, including Bamboo Rafts.
+- Introduced the Chiseled Bookshelf to store books.
+- Added Hanging Signs for every type of wood.
+- Added Armor Trims and Smithing Templates for armor customization.
+- Added new music discs and ambient sounds.
+- Added new advancements and creative inventory improvements.
+- Added Calibrated Sculk Sensor, a block used to filter vibrations crafted using a sculk sensor and three amethyst shards.

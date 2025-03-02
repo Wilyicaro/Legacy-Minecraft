@@ -35,7 +35,7 @@ public interface LegacyPlayerInfo {
             boolean exhaustion = buf.readBoolean();
             boolean mayFly = buf.readBoolean();
 
-            Object2IntMap<Stat<?>> statsMap = buf.readMap(Object2IntOpenHashMap::new,b->decodeStatCap(b,BuiltInRegistries.STAT_TYPE.asHolderIdMap().byId(b.readVarInt()).value()),FriendlyByteBuf::readVarInt);
+            Object2IntMap<Stat<?>> statsMap = buf.readMap(Object2IntOpenHashMap::new,b->decodeStatCap(b,BuiltInRegistries.STAT_TYPE.byId(b.readVarInt())),FriendlyByteBuf::readVarInt);
             public int getIdentifierIndex() {
                 return index;
             }

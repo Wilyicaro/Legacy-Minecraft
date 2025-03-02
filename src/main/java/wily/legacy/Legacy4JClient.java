@@ -1,10 +1,12 @@
 package wily.legacy;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Axis;
+import net.minecraft.SharedConstants;
 import net.minecraft.Util;
+import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
@@ -18,22 +20,23 @@ import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.*;
-import net.minecraft.core.Holder;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.*;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.monster.Ghast;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.*;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 //? if >=1.21.2 {
 /*import net.minecraft.client.renderer.entity.state.*;
 import wily.factoryapi.base.Stocker;
-import wily.factoryapi.base.client.FactoryRenderStateExtension;
+import wily.factoryapi.base.client.*;
 *///?}
 import net.minecraft.client.renderer.entity.layers.EyesLayer;
 import net.minecraft.client.renderer.entity.DrownedRenderer;
 import net.minecraft.client.renderer.entity.GhastRenderer;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.CommonComponents;
@@ -51,17 +54,14 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 //? if >=1.20.5 {
 import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.client.gui.screens.options.OptionsScreen;
 //?} else {
 /*import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.client.gui.screens.OptionsScreen;
 *///?}
-import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.GrassColor;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.base.config.FactoryConfig;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.CraftingTableBlock;
-import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
@@ -74,6 +74,7 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import wily.factoryapi.util.ColorUtil;
 //? if fabric {
 import wily.legacy.client.screen.compat.ModMenuCompat;
 //?} else if forge {
@@ -83,14 +84,17 @@ import net.minecraftforge.client.event.RegisterPresetEditorsEvent;
 /*import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.client.event.RegisterPresetEditorsEvent;
 *///?}
+import wily.factoryapi.base.Stocker;
+import wily.factoryapi.base.client.*;
 import org.apache.commons.io.FileUtils;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.FactoryEvent;
-import wily.factoryapi.base.client.FactoryGuiGraphics;
-import wily.factoryapi.base.client.UIDefinition;
+import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.network.CommonNetwork;
+import wily.factoryapi.util.FactoryGuiElement;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.client.*;
 import wily.legacy.client.controller.Controller;
@@ -101,13 +105,14 @@ import wily.legacy.client.screen.*;
 import wily.legacy.client.screen.compat.IrisCompat;
 import wily.legacy.client.screen.compat.SodiumCompat;
 //?}
-import wily.legacy.config.LegacyConfig;
+import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.init.LegacyUIElementTypes;
 import wily.legacy.inventory.LegacyPistonMovingBlockEntity;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.network.ServerOpenClientMenuPayload;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.network.TopMessage;
 import wily.legacy.util.MCAccount;
 import wily.legacy.util.ScreenUtil;
 
@@ -126,11 +131,14 @@ import static wily.legacy.init.LegacyRegistries.SHRUB;
 
 public class Legacy4JClient {
 
+    public static boolean isNewerVersion = false;
+    public static boolean isNewerMinecraftVersion = false;
     public static final List<Runnable> whenResetOptions = new ArrayList<>();
     public static LevelStorageSource currentWorldSource;
     public static boolean legacyFont = true;
     public static boolean forceVanillaFontShadowColor = false;
     public static ResourceLocation defaultFontOverride = null;
+    public static ControlType lastControlType;
     public static boolean manualSave = false;
     public static boolean saveExit = false;
     public static boolean retakeWorldIcon = false;
@@ -150,12 +158,14 @@ public class Legacy4JClient {
     public static final HowToPlayScreen.Manager howToPlaySectionManager = new HowToPlayScreen.Manager();
 
     public static final ControllerManager controllerManager = new ControllerManager(Minecraft.getInstance());
+    public static final Map<Block, ModelResourceLocation> fastLeavesModels = new HashMap<>();
     public static KnownListing<Block> knownBlocks;
     public static KnownListing<EntityType<?>> knownEntities;
     public static GameType defaultServerGameType;
     public static GameRules gameRules;
     public static Consumer<ServerPlayer> serverPlayerJoinConsumer;
     private static final List<ItemStack> lastArmorSlots = new ArrayList<>();
+    public static final FactoryConfig.StorageHandler MIXIN_CONFIGS_STORAGE = FactoryConfig.StorageHandler.fromMixin(LegacyMixinOptions.CLIENT_MIXIN_STORAGE, false);
     //? if <1.21.2 {
     public static PostChain gammaEffect;
     //?}
@@ -191,12 +201,19 @@ public class Legacy4JClient {
         });
         LeaderboardsScreen.refreshStatsBoards(minecraft);
         if (minecraft.screen instanceof LeaderboardsScreen s && LeaderboardsScreen.statsBoards.get(s.selectedStatBoard).statsList.isEmpty()) minecraft.executeIfPossible(()-> s.changeStatBoard(false));
-        if (minecraft.player != null) CommonNetwork.sendToServer(new PlayerInfoSync(ScreenUtil.hasClassicCrafting() ? 1 : 2,minecraft.player));
+        if (minecraft.player != null) {
+            LegacyOptions.classicCrafting.set(LegacyOptions.classicCrafting.get());
+            LegacyOptions.classicTrading.set(LegacyOptions.classicTrading.get());
+            LegacyOptions.classicStonecutting.set(LegacyOptions.classicStonecutting.get());
+            LegacyOptions.classicLoom.set(LegacyOptions.classicLoom.get());
+        }
     }
+
     public static void displayActivationAnimation(Renderable renderable){
         itemActivationRenderReplacement = renderable;
         Minecraft.getInstance().gameRenderer.displayItemActivation(ItemStack.EMPTY);
     }
+
     public static void applyFontOverrideIf(boolean b, ResourceLocation override, Consumer<Boolean> fontRender){
         if (b) defaultFontOverride = override;
         fontRender.accept(b);
@@ -204,7 +221,7 @@ public class Legacy4JClient {
     }
 
     public static LevelStorageSource getLevelStorageSource(){
-        return LegacyOptions.hasSaveCache.get() ? currentWorldSource : Minecraft.getInstance().getLevelSource();
+        return LegacyOptions.saveCache.get() ? currentWorldSource : Minecraft.getInstance().getLevelSource();
     }
 
     public static boolean hasSaveSystem(Minecraft minecraft){
@@ -218,7 +235,6 @@ public class Legacy4JClient {
     public static void saveLevel(LevelStorageSource.LevelStorageAccess storageSource){
         if (isCurrentWorldSource(storageSource)) Legacy4JClient.copySaveBtwSources(storageSource,Minecraft.getInstance().getLevelSource());
     }
-
 
     public static void displayEffectActivationAnimation(/*? if <1.20.5 {*//*MobEffect*//*?} else {*/Holder<MobEffect>/*?}*/ effect){
         displayActivationAnimation(((guiGraphics, i, j, f) -> {
@@ -279,24 +295,13 @@ public class Legacy4JClient {
         return screen;
     }
 
-    public static void postTick(Minecraft minecraft){
-        if (minecraft.level != null && minecraft.screen == null && LegacyOptions.hints.get() && LegacyTipManager.getActualTip() == null) {
-            HitResult hit = minecraft.hitResult;
-            if (hit instanceof BlockHitResult blockHitResult) {
-                BlockState state = minecraft.level.getBlockState(blockHitResult.getBlockPos());
-                if (!state.isAir() && !(state.getBlock() instanceof LiquidBlock) && state.getBlock().asItem() instanceof BlockItem) {
-                    if (!knownBlocks.contains(state.getBlock()) && LegacyTipManager.setTip(LegacyTipManager.getTip(state.getBlock().asItem().getDefaultInstance()))) knownBlocks.add(state.getBlock());
-                }
-            } else if (hit instanceof EntityHitResult r){
-                Entity e = r.getEntity();
-                if (!knownEntities.contains(e.getType()) && LegacyTipManager.setTip(LegacyTipManager.getTip(e))) knownEntities.add(e.getType());
-            }
-        }
-    }
-
     public static void preTick(Minecraft minecraft){
+        ControlType activeControlType = ControlType.getActiveType();
+        if (lastControlType != activeControlType){
+            if (lastControlType != null) ControlType.UpdateEvent.EVENT.invoker.change(lastControlType, activeControlType);
+            lastControlType = activeControlType;
+        }
         if (minecraft.screen instanceof ReplaceableScreen r && r.canReplace()) minecraft.setScreen(r.getReplacement());
-
         if (minecraft.player != null){
             if (!lastArmorSlots.equals(minecraft.player.getInventory().armor)){
                 if (!lastArmorSlots.isEmpty()){
@@ -317,7 +322,13 @@ public class Legacy4JClient {
             if (ScreenUtil.hasClassicCrafting()) {
                 minecraft.getTutorial().onOpenInventory();
                 minecraft.setScreen(new InventoryScreen(minecraft.player));
-            }else CommonNetwork.sendToServer(minecraft.hitResult != null && minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof CraftingTableBlock ? new ServerOpenClientMenuPayload(r.getBlockPos(),0) : new ServerOpenClientMenuPayload(1));
+            }else {
+                if (minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof CraftingTableBlock){
+                    minecraft.gameMode.useItemOn(minecraft.player, InteractionHand.MAIN_HAND, r);
+                } else if (ScreenUtil.hasMixedCrafting()) {
+                    minecraft.setScreen(MixedCraftingScreen.playerCraftingScreen(minecraft.player));
+                } else CommonNetwork.sendToServer(ServerOpenClientMenuPayload.playerCrafting());
+            }
         }
         while (keyHostOptions.consumeClick()) {
             minecraft.setScreen(new HostOptionsScreen());
@@ -331,6 +342,25 @@ public class Legacy4JClient {
                 if (minecraft.player.isSpectator()) {
                     if (minecraft.gui.getSpectatorGui().isMenuActive()) minecraft.gui.getSpectatorGui().onMouseScrolled(left ? -1 : 1);
                 } else /*? if <1.21.2 {*/minecraft.player.getInventory().swapPaint(left ? 1 : -1)/*?} else {*/ /*minecraft.player.getInventory().setSelectedHotbarSlot(Stocker.cyclic(0, minecraft.player.getInventory().selected + (left ? -1 : 1),9))*//*?}*/;
+            }
+        }
+
+        if (!Minecraft.getInstance().isPaused()) {
+            TopMessage.tick();
+        }
+    }
+
+    public static void postTick(Minecraft minecraft){
+        if (minecraft.level != null && minecraft.screen == null && LegacyOptions.hints.get() && LegacyTipManager.getActualTip() == null) {
+            HitResult hit = minecraft.hitResult;
+            if (hit instanceof BlockHitResult blockHitResult) {
+                BlockState state = minecraft.level.getBlockState(blockHitResult.getBlockPos());
+                if (!state.isAir() && !(state.getBlock() instanceof LiquidBlock) && state.getBlock().asItem() instanceof BlockItem) {
+                    if (!knownBlocks.contains(state.getBlock()) && LegacyTipManager.setTip(LegacyTipManager.getTip(state.getBlock().asItem().getDefaultInstance()))) knownBlocks.add(state.getBlock());
+                }
+            } else if (hit instanceof EntityHitResult r){
+                Entity e = r.getEntity();
+                if (!knownEntities.contains(e.getType()) && LegacyTipManager.setTip(LegacyTipManager.getTip(e))) knownEntities.add(r.getEntity().getType());
             }
         }
     }
@@ -378,9 +408,17 @@ public class Legacy4JClient {
         knownEntities = new KnownListing<>(BuiltInRegistries.ENTITY_TYPE,Minecraft.getInstance().gameDirectory.toPath());
         currentWorldSource = LevelStorageSource.createDefault(Minecraft.getInstance().gameDirectory.toPath().resolve("current-world"));
         MCAccount.loadAll();
+        FactoryOptions.NEAREST_MIPMAP_SCALING.set(true);
+        FactoryOptions.RANDOM_BLOCK_ROTATIONS.set(false);
+        ControlType.UpdateEvent.EVENT.register((last, actual)->{
+            UIAccessor uiAccessor = Minecraft.getInstance().screen == null ? FactoryScreenUtil.getGuiAccessor() : FactoryScreenUtil.getScreenAccessor();
+            uiAccessor.reloadUI();
+            LegacyTipManager.rebuildActual();
+        });
         FactoryAPIClient.registerKeyMapping(registry->{
             registry.accept(keyCrafting);
             registry.accept(keyHostOptions);
+            registry.accept(keyLegacy4JSettings);
             registry.accept(keyCycleHeldLeft);
             registry.accept(keyCycleHeldRight);
             registry.accept(keyToggleCursor);
@@ -412,7 +450,70 @@ public class Legacy4JClient {
             if (FactoryAPI.isModLoaded("sodium")) SodiumCompat.init();
             if (FactoryAPI.isModLoaded("iris")) IrisCompat.init();
             //?}
+
+            String[] nonScaledElements = new String[]{FactoryGuiElement.SELECTED_ITEM_NAME.name(), FactoryGuiElement.OVERLAY_MESSAGE.name(), FactoryGuiElement.SPECTATOR_TOOLTIP.name()};
+            ArbitrarySupplier<Float> hudScale = ()-> 3 / ScreenUtil.getHUDScale();
+            ArbitrarySupplier<Float> crosshairScale = ()-> ScreenUtil.getStandardHeight() >= 1080 ? switch (LegacyOptions.hudScale.get()){
+                case 1,2 -> 0.9f;
+                default -> 1f;
+            } : 1f;
+            UIAccessor accessor = FactoryScreenUtil.getGuiAccessor();
+            FactoryGuiElement.HOTBAR.pre().register(guiGraphics -> {
+                ScreenUtil.renderAnimatedCharacter(guiGraphics);
+                int newSelection = Minecraft.getInstance().player != null ? Minecraft.getInstance().player.getInventory().selected : -1;
+                if (ScreenUtil.lastHotbarSelection >= 0 && ScreenUtil.lastHotbarSelection != newSelection) ScreenUtil.lastHotbarSelectionChange = Util.getMillis();
+                ScreenUtil.lastHotbarSelection = newSelection;
+                if (ColorUtil.getAlpha(FactoryGuiElement.HOTBAR.getColor(accessor)) < 1.0)
+                    FactoryGuiGraphics.of(guiGraphics).pushBufferSource(BufferSourceWrapper.translucent(FactoryGuiGraphics.of(guiGraphics).getBufferSource()));
+            });
+            FactoryGuiElement.HOTBAR.post().register(guiGraphics -> {
+                if (ColorUtil.getAlpha(FactoryGuiElement.HOTBAR.getColor(accessor)) < 1.0)
+                    FactoryGuiGraphics.of(guiGraphics).popBufferSource();
+                if (Minecraft.getInstance().player != null) ControlTooltip.Renderer.of(Minecraft.getInstance().gui).render(guiGraphics, 0,0, FactoryAPIClient.getPartialTick());
+                ScreenUtil.renderTopText(guiGraphics, TopMessage.small,21,1.0f, TopMessage.smallTicks);
+                ScreenUtil.renderTopText(guiGraphics, TopMessage.medium,37,1.5f, TopMessage.mediumTicks);
+            });
+            FactoryGuiElement.SPECTATOR_HOTBAR.pre().register(guiGraphics -> {
+                Legacy4JClient.legacyFont = false;
+                ScreenUtil.renderAnimatedCharacter(guiGraphics);
+            });
+            FactoryGuiElement.SPECTATOR_HOTBAR.post().register(guiGraphics -> Legacy4JClient.legacyFont = true);
+            accessor.getStaticDefinitions().add(UIDefinition.createBeforeInit(a->{
+                if (!LegacyMixinOptions.legacyGui.get()) return;
+                a.getElements().put(FactoryGuiElement.VIGNETTE.name()+".isVisible", ()-> false);
+                a.getElements().put("isGuiVisible", ()-> Minecraft.getInstance().screen == null);
+                a.getElements().put("hud.scaleX", hudScale);
+                a.getElements().put("hud.scaleY", hudScale);
+                a.getElements().put("hud.scaleZ", hudScale);
+                a.getElements().put("hud.translateX", ()-> Minecraft.getInstance().getWindow().getGuiScaledWidth() / 2);
+                a.getElements().put("hud.scaledTranslateX", ()-> -Minecraft.getInstance().getWindow().getGuiScaledWidth() / 2);
+                a.getElements().put("hud.translateY", ()-> Minecraft.getInstance().getWindow().getGuiScaledHeight() + ScreenUtil.getHUDDistance());
+                a.getElements().put("hud.scaledTranslateY", ()-> -Minecraft.getInstance().getWindow().getGuiScaledHeight());
+                a.getElements().put("hud.renderColor", ()-> ColorUtil.colorFromFloat(1.0f,1.0f,1.0f, ScreenUtil.getHUDOpacity()));
+                a.getElements().put(FactoryGuiElement.BOSSHEALTH.name()+".renderColor", ()-> ColorUtil.colorFromFloat(1.0f,1.0f,1.0f, ScreenUtil.getInterfaceOpacity()));
+
+                a.getElements().put(FactoryGuiElement.CROSSHAIR.name()+".scaleX", crosshairScale);
+                a.getElements().put(FactoryGuiElement.CROSSHAIR.name()+".scaleY", crosshairScale);
+                a.getElements().put(FactoryGuiElement.CROSSHAIR.name()+".scaleZ", crosshairScale);
+                a.putStaticElement(FactoryGuiElement.CROSSHAIR.name()+".hud.translateY", false);
+                a.putStaticElement(FactoryGuiElement.CROSSHAIR.name()+".hud.scaledTranslateY", false);
+                a.getElements().put(FactoryGuiElement.SPECTATOR_HOTBAR.name()+".translateY", ()-> (22-ScreenUtil.getHUDDistance()) * (1- SpectatorGuiAccessor.getInstance().getVisibility()));
+                a.getElements().put(FactoryGuiElement.SPECTATOR_TOOLTIP.name()+".translateY", ()-> (22-ScreenUtil.getHUDDistance()) * (1- SpectatorGuiAccessor.getInstance().getVisibility()) + 35 - ScreenUtil.getHUDSize() + ScreenUtil.getHUDDistance());
+
+                for (String element : nonScaledElements) {
+                    a.putStaticElement(element+".hud.translateX", false);
+                    a.putStaticElement(element+".hud.translateY", false);
+                    a.putStaticElement(element+".hud.scaledTranslateX", false);
+                    a.putStaticElement(element+".hud.scaledTranslateY", false);
+                    a.putStaticElement(element+".hud.scale", false);
+                }
+                a.getElements().put(FactoryGuiElement.OVERLAY_MESSAGE.name()+".translateY", ()-> ScreenUtil.getHUDDistance() + 72 - LegacyOptions.selectedItemTooltipSpacing.get() - ScreenUtil.getHUDSize() - (GuiAccessor.getInstance().getLastToolHighlight().isEmpty() || GuiAccessor.getInstance().getToolHighlightTimer() <= 0 || ScreenUtil.getSelectedItemTooltipLines() == 0 ? 0 : (Math.min(ScreenUtil.getSelectedItemTooltipLines() + 1, ScreenUtil.getTooltip(GuiAccessor.getInstance().getLastToolHighlight()).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum()) - 1) * LegacyOptions.selectedItemTooltipSpacing.get()));
+
+                a.getElements().put(FactoryGuiElement.CROSSHAIR.name()+".translateY", ()-> Minecraft.getInstance().getWindow().getGuiScaledHeight() / 2);
+                a.getElements().put(FactoryGuiElement.CROSSHAIR.name()+".scaledTranslateY", ()-> -Minecraft.getInstance().getWindow().getGuiScaledHeight() / 2);
+            }));
         });
+
         FactoryAPIClient.registerBlockColor(registry->{
             registry.accept((blockState, blockAndTintGetter, blockPos, i) -> blockAndTintGetter == null || blockPos == null ? GrassColor.getDefaultColor() : BiomeColors.getAverageGrassColor(blockAndTintGetter, blockPos), SHRUB.get());
 
@@ -431,6 +532,22 @@ public class Legacy4JClient {
                 return -1;
             }, Blocks.WATER_CAULDRON);
         });
+        fastLeavesModels.put(Blocks.OAK_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_oak_leaves")));
+        fastLeavesModels.put(Blocks.SPRUCE_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_spruce_leaves")));
+        fastLeavesModels.put(Blocks.BIRCH_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_birch_leaves")));
+        fastLeavesModels.put(Blocks.JUNGLE_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_jungle_leaves")));
+        fastLeavesModels.put(Blocks.ACACIA_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_acacia_leaves")));
+        fastLeavesModels.put(Blocks.CHERRY_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_cherry_leaves")));
+        fastLeavesModels.put(Blocks.DARK_OAK_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_dark_oak_leaves")));
+        fastLeavesModels.put(Blocks.MANGROVE_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_mangrove_leaves")));
+        //? if >=1.21.2 {
+        /*fastLeavesModels.put(Blocks.PALE_OAK_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_pale_oak_leaves")));
+        *///?}
+        fastLeavesModels.put(Blocks.AZALEA_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_azalea_leaves")));
+        fastLeavesModels.put(Blocks.FLOWERING_AZALEA_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_flowering_azalea_leaves")));
+
+        FactoryAPIClient.registerExtraModels(register-> fastLeavesModels.values().forEach(register));
+
         //? if <1.21.4 {
         FactoryAPIClient.registerItemColor(registry->{
             registry.accept((item,i) ->0xFF3153AF, LegacyRegistries.WATER.get());
@@ -452,7 +569,8 @@ public class Legacy4JClient {
             knownEntities.save();
             PackAlbum.applyDefaultResourceAlbum();
             LegacyOptions.lastLoadedVersion.set(Legacy4J.VERSION.get());
-            LegacyOptions.lastLoadedVersion.save();
+            LegacyOptions.lastLoadedMinecraftVersion.set(SharedConstants.getCurrentVersion().getName());
+            LegacyOptions.CLIENT_STORAGE.save();
         });
         FactoryEvent.ServerSave.EVENT.register((server, log, flush, force) -> {
             Legacy4JClient.retakeWorldIcon = true;
@@ -476,6 +594,10 @@ public class Legacy4JClient {
             for (KeyMapping keyMapping : Minecraft.getInstance().options.keyMappings) {
                 a.getElements().put("controlIcon."+keyMapping.getName(), ()-> ControlTooltip.getIconComponentFromKeyMapping(LegacyKeyMapping.of(keyMapping)));
             }
+            a.getElements().put("interfaceResolution", ScreenUtil::getInterfaceResolution);
+            ControlType.types.forEach((s,c)->{
+                a.getElements().put("activeControlType."+s, ()-> ControlType.getActiveType().equals(c));
+            });
  
         }));
         LegacyUIElementTypes.init();
@@ -512,7 +634,57 @@ public class Legacy4JClient {
         //? if forge || neoforge {
         /*FactoryAPIPlatform.getModEventBus().addListener(EventPriority.NORMAL,false, RegisterPresetEditorsEvent.class, e->Legacy4JClient.VANILLA_PRESET_EDITORS.forEach(((o, presetEditor) -> o.ifPresent(worldPresetResourceKey -> e.register(worldPresetResourceKey, presetEditor)))));
         *///?}
-        FactoryAPIClient.PlayerEvent.DISCONNECTED_EVENT.register(p->lastArmorSlots.clear());
+        FactoryAPIClient.PlayerEvent.DISCONNECTED_EVENT.register(p->{
+            lastArmorSlots.clear();
+            PackAlbum.applyDefaultResourceAlbum();
+        });
+        FactoryAPIClient.registerConfigScreen(FactoryAPIPlatform.getModInfo(MOD_ID),Legacy4JSettingsScreen::new);
+        FactoryAPIClient.registerDefaultConfigScreen("minecraft", s-> new OptionsScreen(s, Minecraft.getInstance().options));
+    }
+
+    public static void updateChunks(){
+        FactoryAPIClient.SECURE_EXECUTOR.execute(()->Minecraft.getInstance().levelRenderer.allChanged());
+    }
+
+    public static void updateSkyShape(){
+        FactoryAPIClient.SECURE_EXECUTOR.execute(()->((LevelRendererAccessor)Minecraft.getInstance().levelRenderer).updateSkyBuffers());
+    }
+
+    public static void buildLegacySkyDisc(VertexConsumer consumer, float f) {
+        for(int k = -384; k <= 384; k += 64) {
+            for(int l = -384; l <= 384; l += 64) {
+                float g = (float)k;
+                float f1 = (float)(k + 64);
+                //? if <1.20.5 {
+                /*consumer.vertex(g, f, l).endVertex();
+                consumer.vertex(f1, f, l).endVertex();
+                consumer.vertex(f1, f, l + 64).endVertex();
+                consumer.vertex(g, f, l + 64).endVertex();
+                *///?} else {
+                consumer.addVertex(g, f, l);
+                consumer.addVertex(f1, f, l);
+                consumer.addVertex(f1, f, l + 64);
+                consumer.addVertex(g, f, l + 64);
+                //?}
+            }
+        }
+    }
+
+    public static BakedModel getFastLeavesModelReplacement(BlockGetter blockGetter, BlockPos pos, BlockState blockState, BakedModel model){
+        boolean fastGraphics = Minecraft.getInstance().options.graphicsMode().get() == GraphicsStatus.FAST;
+        if (LegacyOptions.fastLeavesCustomModels.get() && blockState.getBlock() instanceof LeavesBlock && fastLeavesModels.containsKey(blockState.getBlock()) && (fastGraphics || LegacyOptions.fastLeavesWhenBlocked.get())){
+            if (!fastGraphics) {
+                for (Direction value : Direction.values()) {
+                    BlockPos relative = pos.relative(value);
+                    BlockState relativeBlockState = blockGetter.getBlockState(relative);
+                    if (!(relativeBlockState.getBlock() instanceof LeavesBlock) && !relativeBlockState.isSolidRender(/*? if <1.21.2 {*/blockGetter, relative/*?}*/)) {
+                        return model;
+                    }
+                }
+            }
+            return FactoryAPIClient.getModel(fastLeavesModels.get(blockState.getBlock()));
+        }
+        return model;
     }
 
     public static int getEffectiveRenderDistance(){
@@ -522,7 +694,7 @@ public class Legacy4JClient {
     public static void onClientPlayerInfoChange(){
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level != null && minecraft.player != null)
-            CommonNetwork.sendToServer(new PlayerInfoSync(0, minecraft.player));
+            CommonNetwork.sendToServer(PlayerInfoSync.askAll(minecraft.player));
         if (minecraft.screen instanceof HostOptionsScreen s) s.reloadPlayerButtons();
         else if (minecraft.screen instanceof LeaderboardsScreen s){
             s.rebuildRenderableVList(minecraft);
@@ -550,7 +722,7 @@ public class Legacy4JClient {
             KeyMapping.resetMapping();
         }
         LegacyOptions.CLIENT_STORAGE.save();
-        LegacyConfig.COMMON_STORAGE.save();
+        LegacyCommonOptions.COMMON_STORAGE.save();
         minecraft.options.save();
     }
 

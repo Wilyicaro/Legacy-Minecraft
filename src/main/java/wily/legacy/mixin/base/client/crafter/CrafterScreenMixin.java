@@ -1,4 +1,4 @@
-//? if >=1.20.2 {
+//? if >1.20.2 {
 package wily.legacy.mixin.base.client.crafter;
 
 import net.minecraft.client.gui.GuiGraphics;

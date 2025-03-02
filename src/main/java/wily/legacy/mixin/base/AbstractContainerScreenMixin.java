@@ -82,9 +82,8 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
             this.onClose();
             cir.setReturnValue(true);
         }
-        if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && LegacyTipManager.hasTip(hoveredSlot.getItem())) {
+        if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy()))) {
             ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
-            LegacyTipManager.setActualTip(new LegacyTip(hoveredSlot.getItem().copy()));
         }
     }
 
@@ -160,7 +159,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
                 this.recalculateQuickCraftRemaining();
             }
         }
-        graphics.pose().pushPose();
+
         graphics.pose().translate(0.0f, 0.0f, 100.0f);
         //? if <1.21.4 {
         Pair<ResourceLocation, ResourceLocation> pair;
@@ -183,7 +182,8 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
             graphics.renderItemDecorations(minecraft.font, itemStack, 0, 0, string);
         }
         graphics.pose().popPose();
-        graphics.pose().popPose();
+
+        if (holder.isWarning()) holder.renderWarning(graphics, 600);
     }
     @Inject(method = "renderTooltip", at = @At("HEAD"), cancellable = true)
     protected void renderTooltip(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {

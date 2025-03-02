@@ -66,8 +66,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     protected final List<List<ItemStack>> displayListing = new ArrayList<>();
     protected final Stocker.Sizeable arrangement = new Stocker.Sizeable(0,2);
-    protected final EditBox searchBox = new EditBox(Minecraft.getInstance().font, 0, 0, 200,20, Component.translatable("itemGroup.search"));
-    public static final ResourceLocation SEARCH_SPRITE = Legacy4J.createModLocation("icon/search");
+    protected final EditBox searchBox = new EditBox(Minecraft.getInstance().font, 0, 0, 200,20, LegacyComponents.SEARCH_ITEMS);
     boolean canRemoveSearch = false;
 
     public CreativeModeScreen(Player player) {
@@ -117,7 +116,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         });
         if (LegacyOptions.searchCreativeTab.get()) {
             displayListing.add(List.copyOf(CreativeModeTabs.searchTab().getDisplayItems()));
-            tabList.addTabButton(39, 0, LegacyTabButton.iconOf(SEARCH_SPRITE), searchBox.getMessage(), b -> {
+            tabList.addTabButton(39, 0, LegacyTabButton.iconOf(LegacySprites.SEARCH), LegacyComponents.SEARCH_ITEMS, b -> {
                 canRemoveSearch = arrangement.get() != 2 && !canRemoveSearch;
                 arrangement.set(2);
                 repositionElements();
@@ -127,6 +126,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         panel = Panel.createPanel(this, p-> p.appearance(LegacySprites.CREATIVE_PANEL, 321, 212), p-> p.pos(p.centeredLeftPos(this), Math.max(33,(height - 179)/ 2)));
         displayListing.forEach(t-> tabsScrolledList.add(new Stocker.Sizeable(0)));
     }
+
     public void pressCommonTab(){
         if (canRemoveSearch) {
             canRemoveSearch = false;
@@ -141,7 +141,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         renderer.
                 replace(2,i-> ControlType.getActiveType().isKbm() && canClearQuickSelect() ? getKeyIcon(InputConstants.KEY_X) : i,a-> canClearQuickSelect() ? LegacyComponents.CLEAR_QUICK_SELECT : a).
                 replace(3,i-> i, a-> hoveredSlot != null && hoveredSlot.hasItem() && hoveredSlot.container != creativeModeGrid ? LegacyComponents.CLEAR : a).
-                add(()-> page.max > 0 ? ControlType.getActiveType().isKbm() ? COMPOUND_ICON_FUNCTION.apply(new Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.RIGHT_STICK.bindingState.getIcon() : null,()-> LegacyComponents.PAGE);
+                add(()-> page.max > 0 ? ControlType.getActiveType().isKbm() ? ControlTooltip.ComponentIcon.compoundOf(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.RIGHT_STICK.bindingState.getIcon() : null,()-> LegacyComponents.PAGE);
     }
 
 
@@ -195,6 +195,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         });
         fillCreativeGrid();
     }
+
     public void fillCreativeGrid(){
         if (displayListing.isEmpty()) return;
         List<ItemStack> list = displayListing.get(page.get() * 8 + tabList.selectedTab);
@@ -205,6 +206,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         }
         tabsScrolledList.get(page.get() * 8 + tabList.selectedTab).max = Math.max(0, (list.size() - 1) / creativeModeGrid.getContainerSize());
     }
+
     public static List<ItemStack> getItemsSearchResult(Minecraft minecraft, String value){
         return (value.startsWith("#") ? /*? if <1.20.5 {*//*minecraft.getSearchTree(SearchRegistry.CREATIVE_TAGS)*//*?} else {*/minecraft.getConnection().searchTrees().creativeTagSearch()/*?}*/.search(value.substring(1).toLowerCase(Locale.ROOT)) : /*? if <1.20.5 {*//*minecraft.getSearchTree(SearchRegistry.CREATIVE_NAMES)*//*?} else {*/minecraft.getConnection().searchTrees().creativeNameSearch()/*?}*/.search(value.toLowerCase(Locale.ROOT)));
     }
@@ -304,9 +306,9 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
+        if (tabList.controlTab(i)) return true;
         if (i != InputConstants.KEY_ESCAPE && searchBox.isFocused()) return searchBox.keyPressed(i,j,k);
 
-        tabList.controlTab(i);
         if (hasShiftDown() && tabList.controlPage(page,i == 263 , i == 262)) repositionElements();
         if (i == InputConstants.KEY_X && canClearQuickSelect()) {
             for (int n = 36; n < 45; ++n) {
@@ -318,6 +320,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         }
         return super.keyPressed(i, j, k);
     }
+
     protected void slotClicked(@Nullable Slot slot, int i, int j, ClickType clickType) {
         boolean bl = clickType == ClickType.QUICK_MOVE;
         clickType = i == -999 && clickType == ClickType.PICKUP ? ClickType.THROW : clickType;
@@ -343,7 +346,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
                     return;
                 }
                 if (clickType == ClickType.THROW) {
-                    if (!itemStack2.isEmpty()) {
+                    if (!itemStack2.isEmpty()/*? if >=1.21.2 {*/ /*&& minecraft.player.canDropItems()*//*?}*/) {
                         ItemStack itemStack3 = itemStack2.copyWithCount(j == 0 ? 1 : itemStack2.getMaxStackSize());
                         this.minecraft.player.drop(itemStack3, true);
                         this.minecraft.gameMode.handleCreativeModeItemDrop(itemStack3);
@@ -388,15 +391,23 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
                     int l = 50 + j;
                     if (clickType == ClickType.SWAP) {
                         this.minecraft.gameMode.handleCreativeModeItemAdd(itemStack, l - menu.slots.size() + 9 + 36);
-                    } else if (clickType == ClickType.THROW && !itemStack.isEmpty()) {
+                    }
+                    //? if <1.21.2 {
+                    else if (clickType == ClickType.THROW && !itemStack.isEmpty()) {
                         ItemStack itemStack4 = itemStack.copyWithCount(j == 0 ? 1 : itemStack.getMaxStackSize());
                         this.minecraft.player.drop(itemStack4, true);
                         this.minecraft.gameMode.handleCreativeModeItemDrop(itemStack4);
                     }
+                    //?}
                     this.minecraft.player.inventoryMenu.broadcastChanges();
                 }
             }
         } else if (!menu.getCarried().isEmpty() && this.hasClickedOutside) {
+            //? if >=1.21.2 {
+            /*if (!this.minecraft.player.canDropItems()) {
+                return;
+            }
+            *///?}
             if (j == 0) {
                 this.minecraft.player.drop(menu.getCarried(), true);
                 this.minecraft.gameMode.handleCreativeModeItemDrop(menu.getCarried());
@@ -409,10 +420,9 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
             }
         }
     }
+
     protected boolean hasClickedOutside(double d, double e, int i, int j, int k) {
-        boolean bl = d < (double)i || e < (double)j || d >= (double)(i + this.imageWidth) || e >= (double)(j + this.imageHeight);
-        this.hasClickedOutside = bl && !tabList.isMouseOver(d,e);
-        return this.hasClickedOutside;
+        return this.hasClickedOutside = super.hasClickedOutside(d, e, i, j, k) && !tabList.isMouseOver(d,e);
     }
 
     @Override

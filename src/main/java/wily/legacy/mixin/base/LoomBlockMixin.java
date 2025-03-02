@@ -16,7 +16,7 @@ import wily.legacy.entity.LegacyPlayer;
 public class LoomBlockMixin {
     @Redirect(method = /*? if <1.20.5 {*//*"use"*//*?} else {*/"useWithoutItem"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getMenuProvider(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/MenuProvider;"))
     public MenuProvider use(BlockState instance, Level level, BlockPos blockPos, BlockState blockState, Level level1, BlockPos blockPos1, Player player) {
-        if (player instanceof LegacyPlayer p && !p.hasClassicCrafting()) return LegacyCraftingMenu.getLoomMenuProvider(blockPos);
+        if (player instanceof LegacyPlayer p && !p.hasClassicLoom()) return LegacyCraftingMenu.getLoomMenuProvider(blockPos);
         return instance.getMenuProvider(level,blockPos);
     }
 }

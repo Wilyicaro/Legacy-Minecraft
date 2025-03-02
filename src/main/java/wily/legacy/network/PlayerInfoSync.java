@@ -18,22 +18,56 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public record PlayerInfoSync(int sync, UUID player) implements CommonNetwork.Payload {
+public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Payload {
+    public enum Sync {
+        ASK_ALL,CLASSIC_CRAFTING,LEGACY_CRAFTING,DISABLE_EXHAUSTION,ENABLE_EXHAUSTION,ENABLE_MAY_FLY_SURVIVAL,DISABLE_MAY_FLY_SURVIVAL,CLASSIC_TRADING,LEGACY_TRADING,CLASSIC_STONECUTTING,LEGACY_STONECUTTING,CLASSIC_LOOM,LEGACY_LOOM;
+    }
+
     public static final CommonNetwork.Identifier<PlayerInfoSync> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("player_info_sync_c2s"),PlayerInfoSync::new);
 
     public PlayerInfoSync(CommonNetwork.PlayBuf buf){
-        this(buf.get().readVarInt(),buf.get().readUUID());
+        this(buf.get().readEnum(Sync.class),buf.get().readUUID());
     }
-    public PlayerInfoSync(int type, Player player){
-        this(type,player.getUUID());
+
+    public static PlayerInfoSync askAll(Player player){
+        return new PlayerInfoSync(Sync.ASK_ALL, player);
     }
-    public PlayerInfoSync(int type, GameProfile profile){
-        this(type,profile.getId());
+
+    public static PlayerInfoSync classicCrafting(boolean classic, Player player){
+        return new PlayerInfoSync(classic ? Sync.CLASSIC_CRAFTING : Sync.LEGACY_CRAFTING, player);
+    }
+
+    public static PlayerInfoSync classicTrading(boolean classic, Player player){
+        return new PlayerInfoSync(classic ? Sync.CLASSIC_TRADING : Sync.LEGACY_TRADING, player);
+    }
+
+    public static PlayerInfoSync classicStonecutting(boolean classic, Player player){
+        return new PlayerInfoSync(classic ? Sync.CLASSIC_STONECUTTING : Sync.LEGACY_STONECUTTING, player);
+    }
+
+    public static PlayerInfoSync classicLoom(boolean classic, Player player){
+        return new PlayerInfoSync(classic ? Sync.CLASSIC_LOOM : Sync.LEGACY_LOOM, player);
+    }
+
+    public static PlayerInfoSync disableExhaustion(boolean disableExhaustion, GameProfile profile){
+        return new PlayerInfoSync(disableExhaustion ? Sync.DISABLE_EXHAUSTION : Sync.ENABLE_EXHAUSTION, profile);
+    }
+
+    public static PlayerInfoSync mayFlySurvival(boolean mayFlySurvival, GameProfile profile){
+        return new PlayerInfoSync(mayFlySurvival ? Sync.ENABLE_MAY_FLY_SURVIVAL : Sync.DISABLE_MAY_FLY_SURVIVAL, profile);
+    }
+
+    public PlayerInfoSync(Sync sync, Player player){
+        this(sync,player.getUUID());
+    }
+
+    public PlayerInfoSync(Sync sync, GameProfile profile){
+        this(sync,profile.getId());
     }
 
     @Override
     public void encode(CommonNetwork.PlayBuf buf) {
-        buf.get().writeVarInt(sync);
+        buf.get().writeEnum(sync);
         buf.get().writeUUID(player);
     }
 
@@ -55,10 +89,13 @@ public record PlayerInfoSync(int sync, UUID player) implements CommonNetwork.Pay
             sp = sp.server.getPlayerList().getPlayer(player);
             if (sp == null) return;
             switch (sync){
-                case 0 -> CommonNetwork.sendToPlayer(sp, new All(sp.server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().getId(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(sp.server.getGameRules()),sp.server.getDefaultGameType(), All.ID_S2C));
-                case 1,2 -> ((LegacyPlayer) sp).setCrafting(sync == 1);
-                case 3,4 -> ((LegacyPlayerInfo)sp).setDisableExhaustion(sync == 3);
-                case 5,6 -> ((LegacyPlayerInfo)sp).setMayFlySurvival(sync == 5);
+                case ASK_ALL -> CommonNetwork.sendToPlayer(sp, new All(sp.server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().getId(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(sp.server.getGameRules()),sp.server.getDefaultGameType(), All.ID_S2C));
+                case CLASSIC_CRAFTING,LEGACY_CRAFTING -> ((LegacyPlayer) sp).setCrafting(sync == Sync.CLASSIC_CRAFTING);
+                case CLASSIC_TRADING,LEGACY_TRADING -> ((LegacyPlayer) sp).setTrading(sync == Sync.CLASSIC_TRADING);
+                case CLASSIC_STONECUTTING,LEGACY_STONECUTTING -> ((LegacyPlayer) sp).setStonecutting(sync == Sync.CLASSIC_STONECUTTING);
+                case CLASSIC_LOOM,LEGACY_LOOM -> ((LegacyPlayer) sp).setLoom(sync == Sync.CLASSIC_LOOM);
+                case DISABLE_EXHAUSTION,ENABLE_EXHAUSTION -> ((LegacyPlayerInfo)sp).setDisableExhaustion(sync == Sync.DISABLE_EXHAUSTION);
+                case ENABLE_MAY_FLY_SURVIVAL,DISABLE_MAY_FLY_SURVIVAL -> ((LegacyPlayerInfo)sp).setMayFlySurvival(sync == Sync.ENABLE_MAY_FLY_SURVIVAL);
             }
         }
     }

@@ -145,3 +145,4 @@ accessible method net/minecraft/world/level/block/entity/BlockEntityType <init> 
 extendable class net/minecraft/world/item/crafting/Ingredient
 accessible method net/minecraft/world/item/crafting/Ingredient <init> (Lnet/minecraft/core/HolderSet;)V
 accessible method net/minecraft/client/gui/screens/Screen changeFocus (Lnet/minecraft/client/gui/ComponentPath;)V
+accessible field net/minecraft/client/renderer/GameRenderer resourcePool Lcom/mojang/blaze3d/resource/CrossFrameResourcePool;

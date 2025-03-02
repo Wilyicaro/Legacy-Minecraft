@@ -50,7 +50,7 @@ public class CreationList extends RenderableVList{
                 } else minecraft.setScreen(new LoadSaveScreen(getScreen(),summary,access,t.isLocked()) {
                     @Override
                     public void onClose() {
-                        if (!LegacyOptions.hasSaveCache.get()) FileUtils.deleteQuietly(access.getDimensionPath(Level.OVERWORLD).toFile());
+                        if (!LegacyOptions.saveCache.get()) FileUtils.deleteQuietly(access.getDimensionPath(Level.OVERWORLD).toFile());
                         super.onClose();
                     }
                 });

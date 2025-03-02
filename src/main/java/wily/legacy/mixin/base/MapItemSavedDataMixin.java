@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.FactoryAPI;
 import wily.legacy.Legacy4J;
 import wily.legacy.init.LegacyGameRules;
 
@@ -77,13 +78,13 @@ public abstract class MapItemSavedDataMixin {
     }
     @Inject(method = "createFresh", at = @At("HEAD"), cancellable = true)
     private static void createFresh(double d, double e, byte b, boolean bl, boolean bl2, ResourceKey<Level> resourceKey, CallbackInfoReturnable<MapItemSavedData> cir) {
-        if (Legacy4J.currentServer != null && !Legacy4J.currentServer.getGameRules().getBoolean(LegacyGameRules.LEGACY_MAP_GRID)) return;
+        if (FactoryAPI.currentServer != null && !FactoryAPI.currentServer.getGameRules().getBoolean(LegacyGameRules.LEGACY_MAP_GRID)) return;
         int i = 128 * (1 << b);
         cir.setReturnValue(new MapItemSavedData((((int)d + (i / 2) * Mth.sign(d)) / i) * i, (((int)e + (i / 2) * Mth.sign(e)) / i) * i, b, bl, bl2, false, resourceKey));
     }
     @Inject(method = "scaled", at = @At("HEAD"), cancellable = true)
     public void scaled(CallbackInfoReturnable<MapItemSavedData> cir) {
-        if (Legacy4J.currentServer != null && !Legacy4J.currentServer.getGameRules().getBoolean(LegacyGameRules.LEGACY_MAP_GRID)) return;
+        if (FactoryAPI.currentServer != null && !FactoryAPI.currentServer.getGameRules().getBoolean(LegacyGameRules.LEGACY_MAP_GRID)) return;
         int i = 128 * (1 << (scale));
         cir.setReturnValue(MapItemSavedData.createFresh(this.centerX - (i / 2) * Mth.sign(this.centerX), this.centerZ - (i / 2) * Mth.sign(this.centerZ), (byte)Mth.clamp(this.scale + 1, 0, 4), this.trackingPosition, this.unlimitedTracking, this.dimension));
     }

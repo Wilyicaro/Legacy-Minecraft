@@ -1,0 +1,203 @@
+{
+  "elements": {
+    "scrollable_renderer": {
+      "type": "put_scrollable_renderer",
+      "x": "(${width}-${scrollable_renderer.width})/2",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+      "width": 456,
+      "height": 222,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_message"},
+          "width": 433
+        },
+        "game-options": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_game-options"},
+          "width": 433
+        },
+        "player-vs-player": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_player-vs-player"},
+          "width": 433
+        },
+        "trust-players": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_trust-players"},
+          "width": 433
+        },
+        "fire-spreads": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_fire-spreads"},
+          "width": 433
+        },
+        "tnt-explodes": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_tnt-explodes"},
+          "width": 433
+        },
+        "host-privileges": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_host-privileges"},
+          "width": 433
+        },
+        "daylight-cycle": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_daylight-cycle"},
+          "width": 433
+        },
+        "weather-cycle": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_weather-cycle"},
+          "width": 433
+        },
+        "keep-inventory": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_keep-inventory"},
+          "width": 433
+        },
+        "mob-spawning": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_mob-spawning"},
+          "width": 433
+        },
+        "mob-griefing": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_mob-griefing"},
+          "width": 433
+        },
+        "mob-loot": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_mob-loot"},
+          "width": 433
+        },
+        "tile-drops": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_tile-drops"},
+          "width": 433
+        },
+        "natural-regeneration": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_natural-regeneration"},
+          "width": 433
+        },
+        "world-generation-options": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_world-generation-options"},
+          "width": 433
+        },
+        "generate-structures": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_generate-structures"},
+          "width": 433
+        },
+        "superflat-world": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_superflat-world"},
+          "width": 433
+        },
+        "bonus-chest": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_bonus-chest"},
+          "width": 433
+        },
+        "reset-nether": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_reset-nether"},
+          "width": 433
+        },
+        "reset-end": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_reset-end"},
+          "width": 433
+        },
+        "ingame-options": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_ingame-options", "allowVariables": true, "args": ["controlIcon.legacy.key.host_options"]},
+          "width": 433
+        },
+        "host-options": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_host-options"},
+          "width": 433
+        },
+        "player-options": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_player-options", "allowVariables": true, "args": ["controlIcon.press"]},
+          "width": 433
+        },
+        "can-build-and-mine": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_can-build-and-mine"},
+          "width": 433
+        },
+        "can-use-doors-and-switches": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_can-use-doors-and-switches"},
+          "width": 433
+        },
+        "can-open-containers": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_can-open-containers"},
+          "width": 433
+        },
+        "can-attack-players": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_can-attack-players"},
+          "width": 433
+        },
+        "can-attack-animals": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_can-attack-animals"},
+          "width": 433
+        },
+        "moderator": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_moderator"},
+          "width": 433
+        },
+        "can-teleport": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_can-teleport"},
+          "width": 433
+        },
+        "game-mode": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_game-mode"},
+          "width": 433
+        },
+        "set-player-spawn-point": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_set-player-spawn-point"},
+          "width": 433
+        },
+        "kick-player": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_kick-player"},
+          "width": 433
+        },
+        "host-player-options": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_host-player-options", "allowVariables": true, "args": ["controlIcon.press"]},
+          "width": 433
+        },
+        "can-fly": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_can-fly"},
+          "width": 433
+        },
+        "disable-exhaustion": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_disable-exhaustion"},
+          "width": 433
+        },
+        "invisible": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.host-and-player-options_invisible"},
+          "width": 433
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "elements": {
+    "scrollable_renderer": {
+      "type": "put_scrollable_renderer",
+      "x": "(${width}-${scrollable_renderer.width})/2",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+      "width": 456,
+      "height": 222,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.crafting_message", "allowVariables": true, "args": ["controlIcon.legacy.key.crafting"]},
+          "width": 433
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.crafting_message_1", "allowVariables": true, "args": ["controlIcon.left_tab","controlIcon.right_tab","controlIcon.horizontal_navigation","controlIcon.press"]},
+          "width": 433
+        },
+        "text2": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.crafting_message_2", "allowVariables": true, "args": ["controlIcon.left_crafting_type","controlIcon.right_crafting_type"]},
+          "width": 433
+        }
+      }
+    }
+  }
+}

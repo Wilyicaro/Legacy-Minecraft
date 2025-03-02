@@ -7,10 +7,10 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.chat.Component;
+import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PackAlbum;
-import wily.legacy.config.LegacyConfig;
 
 public class ExitConfirmationScreen extends ConfirmationScreen {
     public ExitConfirmationScreen(Screen parent) {
@@ -32,7 +32,6 @@ public class ExitConfirmationScreen extends ConfirmationScreen {
             return;
         }
 
-        if (!minecraft.hasSingleplayerServer()) LegacyConfig.COMMON_STORAGE.load();
         if (save) Legacy4JClient.saveExit = Legacy4JClient.retakeWorldIcon = true;
         //? if <=1.20.2
         /*boolean wasInRealms = minecraft.isConnectedToRealms();*/
@@ -42,7 +41,6 @@ public class ExitConfirmationScreen extends ConfirmationScreen {
         minecraft.getSoundManager().stop();
 
         minecraft./*? if >1.20.2 {*/disconnect/*?} else {*//*clearLevel*//*?}*/(new LegacyLoadingScreen(Component.translatable(save ? "menu.savingLevel": "disconnect.quitting"),Component.empty()));
-        PackAlbum.applyDefaultResourceAlbum();
         ServerData serverData = minecraft.getCurrentServer();
         TitleScreen mainMenuScreen = new TitleScreen();
         if (serverData != null && /*? if >1.20.2 {*/serverData.isRealm()/*?} else {*//*wasInRealms*//*?}*/) {

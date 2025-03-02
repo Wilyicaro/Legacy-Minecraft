@@ -24,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.ColorUtil;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
@@ -51,7 +52,7 @@ public abstract class EntityRendererMixin {
         Minecraft minecraft = Minecraft.getInstance();
         float thickness = Math.max(0.1f,/*? if <1.21.2 {*/ minecraft.player.distanceTo(entity)/*?} else {*/ /*(float) Math.sqrt(entity.distanceToCameraSq)*//*?}*/ / 16f);
         float[] color = thickness < 1 || !LegacyOptions.displayNameTagBorder.get() ? null : !(entity instanceof /*? if <1.21.2 {*/ AbstractClientPlayer/*?} else {*/ /*PlayerRenderState*//*?}*/ p)  || minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(p./*? if <1.21.2 {*/ getUUID()/*?} else {*/ /*name*//*?}*/) instanceof LegacyPlayerInfo info) || info.getIdentifierIndex() == 0 ?  new float[]{0,0,0} : Legacy4JClient.getVisualPlayerColor(info);
-        return instance.drawInBatch(arg,f,g,i,bl,matrix4f,arg2,arg3,color == null ? j : FactoryScreenUtil.colorFromFloat(color[0],color[1],color[2],1.0f),k);
+        return instance.drawInBatch(arg,f,g,i,bl,matrix4f,arg2,arg3,color == null ? j : ColorUtil.colorFromFloat(color[0],color[1],color[2],1.0f),k);
     }
 
     public void renderOutline(VertexConsumer consumer, PoseStack poseStack, float x, float y, float width, float height,float thickness, float r, float g, float b , float a) {

@@ -14,6 +14,7 @@ group = rootProject.maven_group
 def loader = property("loom.platform")
 
 repositories {
+    mavenCentral()
     maven { url "https://maven.neoforged.net/releases/" }
 
     maven {
@@ -49,6 +50,19 @@ repositories {
     }
 
     maven{url = "https://maven.su5ed.dev/releases"}
+
+
+    maven {
+        // location of the maven that hosts JEI files since January 2023
+        name = "Jared's maven"
+        url = "https://maven.blamejared.com/"
+    }
+
+    maven {
+        // location of a maven mirror for JEI files, as a fallback
+        name = "ModMaven"
+        url = "https://modmaven.dev"
+    }
 }
 configurations.configureEach {
     resolutionStrategy {
@@ -62,19 +76,32 @@ dependencies {
     modApi "wily.factory_api:factory_api-${loader}:${stonecutter.current.version}-${factory_api_version}"
     modCompileOnly("maven.modrinth:world-host:${world_host_version}")
     modCompileOnly("maven.modrinth:vivecraft:${vivecraft_version}")
+    if (stonecutter.eval(stonecutter.current.version, "<=1.21.1")) {
+        modCompileOnlyApi("mezz.jei:jei-${stonecutter.current.version}-${loader}-api:${jei_version}")
+        modCompileOnly("mezz.jei:jei-${stonecutter.current.version}-${loader}:${jei_version}")
+    }
 
     if (loader == "fabric" || stonecutter.eval(stonecutter.current.version, ">=1.21") && loader == "neoforge"){
-        modCompileOnly("maven.modrinth:sodium:${sodium_version}")
+        modImplementation("maven.modrinth:sodium:${sodium_version}")
         modCompileOnly("maven.modrinth:iris:${iris_version}")
     }
 
     if (loader == "fabric") {
         modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
         modApi "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
-        modCompileOnly("com.terraformersmc:modmenu:${modmenu_version}")
+        modImplementation("com.terraformersmc:modmenu:${modmenu_version}")
+        if (stonecutter.eval(stonecutter.current.version, ">=1.21") || stonecutter.eval(stonecutter.current.version, "1.20.1")) {
+            modCompileOnly("maven.modrinth:nostalgic-tweaks:${nt_version}")
+            modCompileOnly("dev.architectury:architectury-fabric:${architectury_version}")
+        }
 
     } else if (loader == "forge") {
         forge "net.minecraftforge:forge:${stonecutter.current.version}-${forge_version}"
+        if (stonecutter.eval(stonecutter.current.version, "1.20.1")){
+            modCompileOnly("maven.modrinth:nostalgic-tweaks:${nt_version}")
+            modCompileOnly("dev.architectury:architectury-forge:${architectury_version}")
+        }
+        compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:${mixin_extras_version}"))
     } else if (loader == "neoforge") {
         neoForge "net.neoforged:neoforge:${neoforge_version}"
     }
@@ -82,11 +109,14 @@ dependencies {
     if (loader == "neoforge" && stonecutter.eval(stonecutter.current.version, ">=1.21")) {
         modCompileOnly("org.sinytra.forgified-fabric-api:fabric-rendering-data-attachment-v1:0.3.48+73761d2e19")
         modCompileOnly("org.sinytra.forgified-fabric-api:fabric-block-view-api-v2:1.0.10+9afaaf8c19")
+        modCompileOnly("maven.modrinth:nostalgic-tweaks:${nt_version}")
+        modCompileOnly("dev.architectury:architectury-neoforge:${architectury_version}")
     }
 
     if (loader == "forge" || loader == "neoforge") {
         forgeRuntimeLibrary sdl_dependency
     }
+
 
 }
 
@@ -148,13 +178,8 @@ ext {
         def changes = new StringBuilder()
         changes << "## " + stage.capitalize() + " $version  \nUpdated at **$time**.  \n**Changelog**  "
         def proc = "git log --max-count=4 --pretty=format:%s".execute()
-        proc.in.eachLine { line ->
-                def processedLine = line.toString()
-                def lines = processedLine.split(" -")
-                changes << "\n**${lines[0]}**  "
-                lines.each {s-> if (s != lines[0]) changes << "\n- " + s + "  "}
-        }
-        changes << "\n[Click here for complete changelog]($mod_source/commits/$branch)"
+        getRootProject().file("src/main/resources/assets/legacy/changelog/en_us.txt").readLines().forEach {s-> changes << "\n" + s}
+        changes << "\n\n[Click here for complete changelog]($mod_source/commits/$branch)"
         proc.waitFor()
         return changes.toString()
     }
@@ -180,6 +205,7 @@ processResources {
             "mod_issues" : mod_issues,
             "neoforge_version" : neoforge_version,
             "forge_version" : forge_version,
+            "fabric_api_version" : fabric_api_version,
             "mc_version_range" : version_range,
             "mc_version" : stonecutter.current.version,
             "aw": aw,
@@ -189,11 +215,10 @@ processResources {
         if (loader != "fabric") {
             exclude "fabric.mod.json"
             exclude "${mod_id}-fabric.mixins.json"
-        } else exclude "${mod_id}-forge_like.mixins.json"
+        }
         if (loader != "forge") exclude "META-INF/mods.toml"
         if (loader != "neoforge") {
             exclude "META-INF/neoforge.mods.toml"
-            exclude "${mod_id}-neoforge.mixins.json"
         }
         filesMatching(loader == "fabric" ? "fabric.mod.json" : loader == "forge" ? "META-INF/mods.toml" : "META-INF/neoforge.mods.toml") {
             expand properties

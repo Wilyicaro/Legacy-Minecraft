@@ -1,0 +1,77 @@
+- Added Legacy4J Settings Screen, a way to search all the settings, accessible via Mods screen.
+- Added World Host Friends screen to Main menu.
+- Added `Advanced Options Mode` slider to Legacy4J Settings screen Advanced User Interface section.
+- Added `Save Cache` option to Game Options section.
+- Added `Inverted Front Camera Pitch` option to Game Options section.
+- Added `Auto Save Countdown` option to User Interface section.
+- Added `Head Follows the Camera` option to Graphics section.
+- Added `Fast Leaves When Blocked` option to Graphics section.
+- Added `Fast Leaves Custom Models` option to Graphics section.
+- Added `Override Terrain Fog End` option to `Graphics` section.
+- Added `Legacy Sky Shape` option to `Graphics` section.
+- Added back `Virtual Cursor` option to Controller section.
+- Added Legacy Common Config (`.minecraft/config/legacy/common.json`).
+- Added Legacy Common Mixin Config (`.minecraft/config/legacy/common_mixin.json`).
+- Added Legacy Mixin Options (`.minecraft/config/legacy/client_mixin.json`).
+- Added Legacy4J Settings key mapping, with `Y` as default key.
+- Added `Display System Messages as Overlay` option in Advanced User Interface section.
+- Added `Global Resource Packs` to Graphics section.
+- Added `Classic Trading`, `Classic Stonecutting`, `Classic Loom` and `Mixed Crafting` options to User Interface section.
+- Added missing `Force Smooth Movement` Portuguese translations.
+- Added `put_scrollable_renderer`, `put_renderable_vertical_list`, `modify_renderable_vertical_list`, `draw_outlined_string` and `render_enchanted_book` UI Definition Element Types.
+- Added `Random Block Rotations` and `Nearest Mipmap Scaling` Factory API options to Graphics section.
+- Added manual mipmaps for water.
+- Added a Patch Notes screen, which appears when the game/Legacy4J is updated or launched for the first time.
+- Added common options to Game Options section (or Host Options when playing in a world): Legacy Combat`, `Legacy Sword Blocking` and `Squared View Distance`.
+- Added client mixin options to Graphics section:
+ - Screens: `Legacy Inventory Screen`, `Legacy Classic Crafting Screen`,  `Legacy Classic Stonecutter Screen`, `Legacy Classic Loom Screen`, `Legacy Classic Merchant Screen`, `Legacy Container Screen`, `Legacy Crafter Screen` (in versions >=1.20.4), `Legacy Furnace Screen`, `Legacy Anvil Screen`, `Legacy Smithing Screen`, `Legacy Gridstone Screen`, `Legacy Cartography Screen`, `Legacy Enchantment Screen`, `Legacy Beacon Screen`, `Legacy Brewing Stand Screen`, `Legacy Book Screen`, `Legacy Create World Screen` and `Legacy Title Screen`.
+ - Miscellaneous: `Legacy Gui`, `Legacy Chat`, `Legacy Bosshealth`, `Legacy Witches` and `Legacy Drowned`.
+- Now, the leaves when using Fast graphics will use an alternative model instead of removing the cutout effect, similar to LE.
+- Now, Legacy Waters has a new logo.
+- Now, the Mixed Crafting Interface will be used when Legacy4J isn't present on server side.
+- Now, the Alphabetical sorting will be used in the Mods screen by default.
+- Now, the Graphics section will show the resource selectors tooltip box.
+- Now, the `Interface Resolution` slider will be nominally 50 to 150%, equivalent to the real value used.
+- Now, the enchantment tooltips will be similar to LE.
+- Now, the options are completely unlinked from vanilla, having a new directory `.minecraft/config/legacy/client_options.json`.
+- Now, the How To Play will be similar to LE (thanks to Moustard for providing the text) and almost completely data-driven with UI Definitions.
+- Now, it'll be possible to access the vanilla Options screen via Mods screen.
+- Now, the sugar cane won't have tint when using Programmer Art or Console Aspects, being similar to LE.
+- Now, multiline edit boxes will have a LE-style and allow using the keyboard.
+- Now, the Add Album screen will allow description changes.
+- Now, any resolution next to 720p will use the mojangles 11 font.
+- Now, the Brewing Stand Interface panel will be positioned similar to LE.
+- Now, the Controller Mapping and Keybinds screens are more similar to LE, having tooltips for cancel and conflicts.
+- Now, the Loading and Load Save screen are more similar to LE.
+- Now, the text in tabs is positioned more similarly to LE.
+- Now, there will be a message when trying to spawn the wither in peaceful mode, like in LE.
+- Now, the loading background is a texture `legacy:textures/gui/loading_background.png`.
+- Now, hints and autosave icon will no longer appear when the gui is hidden (with F1)
+- Now, the `Terrain Fog End` option will be in chunks, being more similar to LE.
+- Improved JEI controller compatibility.
+- Renamed the Resource Assorts to Resource Albums (thanks to cloud54 for suggesting this).
+- Removed blockstate definitions that disabled the random block rotations.
+- Removed all the deprecated listing syntax.
+- Fixed incompatibility with Hold My Items mod.
+- Fixed Controller Manager stopping working when using more than one controller on Linux and macOS.
+- Fixed a lot of confirmation screens having incorrect background panel height.
+- Fixed Player Tab List with wrong background height.
+- Fixed Programmer Art and Console Aspects not having item definitions in 1.21.2+, resulting in broken models.
+- Fixed Interface Opacity being different in versions 1.21.2+.
+- Fixed crash when loading a World Template with a non-game path.
+- Fixed Loading Overlay screen not rendering correctly in versions +1.21.2.
+- Fixed Firework with incorrect texture format in versions +1.21.2.
+- Fixed mixin crash in versions forge/neoforge <=1.20.4.
+- Fixed items with custom names based on the item stack not having a default tip based on their name, such as potions.
+- Fixed `put_legacy_slot` UI Element Type missing the warning icon when it's a real slot, and not updating its display when it's a fake slot.
+- Fixed Merchant Interface with weird scale when the villager can't level up.
+- Fixed scroll out of the panel in the Host Options Interface.
+- Fixed chat line spacing not being at max by default in versions >=1.21.2.
+- Fixed Creative Mode screen not allowing to drop items in versions >=1.21.2.
+- Fixed JEI having wrong positions for recipe viewers.
+- Fixed loading background not being black in versions >=1.21.4.
+- Fixed incompatibility with Iris shaders caused by `Flying View Rolling`.
+- Fixed a lot of mixin incompatibilities by using mixin extras.
+- Fixed items and blocks being invisible in the hotbar when using Fabulous graphics in 1.21.1.
+- Updated Mod Credits.
+- MIT License is being used again.

@@ -46,6 +46,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(LegacyTipManager.getTipXDiff(),0,0);
     }
+
     @Inject(method = "renderWithTooltip",at = @At("RETURN"))
     private void renderWithTooltipReturn(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci){
         guiGraphics.pose().translate(-LegacyTipManager.getTipXDiff(),0,0);
@@ -53,7 +54,6 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
         ControlTooltip.Renderer.of(this).render(guiGraphics,i,j,f);
         guiGraphics.pose().popPose();
     }
-
 
     @Inject(method = "changeFocus",at = @At("HEAD"))
     private void changeFocus(ComponentPath componentPath, CallbackInfo ci){
@@ -93,7 +93,6 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     @Inject(method = "keyPressed",at = @At("HEAD"))
     private void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir){
         if (Legacy4JClient.keyToggleCursor.matches(i,j)) Legacy4JClient.controllerManager.toggleCursor();
-        else if (Legacy4JClient.keyLegacy4JSettings.matches(i,j) && (self().shouldCloseOnEsc() || self() instanceof TitleScreen)) minecraft.setScreen(new Legacy4JSettingsScreen(self()));
     }
     @Redirect(method = "rebuildWidgets",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;clearFocus()V"))
     public void rebuildWidgets(Screen instance) {

@@ -11,7 +11,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
-import wily.legacy.config.LegacyConfig;
+import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.config.LegacyCommonOptions;
 
 @Mixin(SwordItem.class)
 public class SwordItemMixin extends Item {
@@ -23,13 +24,13 @@ public class SwordItemMixin extends Item {
 
     @Override
     public int getUseDuration(ItemStack itemStack/*? if >=1.20.5 {*/, LivingEntity livingEntity/*?}*/) {
-        if (LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacySwordBlocking)) return 7200;
+        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking)) return 7200;
         return super.getUseDuration(itemStack/*? if >=1.20.5 {*/, livingEntity/*?}*/);
     }
 
     //? <=1.21.1 {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
-        if (LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacySwordBlocking)) {
+        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking)) {
             player.startUsingItem(interactionHand);
             return InteractionResultHolder.consume( player.getItemInHand(interactionHand));
         }
@@ -37,7 +38,7 @@ public class SwordItemMixin extends Item {
     }
     //?} else {
     /*public InteractionResult use(Level level, Player player, InteractionHand interactionHand) {
-        if (LegacyConfig.legacySwordBlocking.get()) {
+        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking)) {
             player.startUsingItem(interactionHand);
             return InteractionResult.CONSUME;
         }
@@ -47,7 +48,7 @@ public class SwordItemMixin extends Item {
 
     @Override
     public /*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/ getUseAnimation(ItemStack itemStack) {
-        if (LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacySwordBlocking)) return /*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/.BLOCK;
+        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking)) return /*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/.BLOCK;
         return super.getUseAnimation(itemStack);
     }
 }

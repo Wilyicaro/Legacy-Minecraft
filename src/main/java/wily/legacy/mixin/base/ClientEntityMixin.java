@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -17,19 +18,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.ClientEntityAccessor;
 import wily.legacy.client.LegacyOptions;
 
 import static wily.legacy.Legacy4JClient.keyFlyLeft;
 import static wily.legacy.Legacy4JClient.keyFlyRight;
 
 @Mixin(Entity.class)
-public abstract class ClientEntityMixin {
+public abstract class ClientEntityMixin implements ClientEntityAccessor {
     @Unique
     private float ridingEntityYRotDelta;
 
     @Unique
     private float ridingEntityXRotDelta;
 
+    @Unique
+    private boolean allowDisplayFireAnimation = true;
 
     @Shadow
     public abstract Entity getVehicle();
@@ -89,6 +93,16 @@ public abstract class ClientEntityMixin {
         this.ridingEntityXRotDelta -= ridingEntityXRotDeltaSmooth;
         this.setYRot(this.getYRot() + ridingEntityYRotDeltaSmooth);
         this.setXRot(this.getXRot() + ridingEntityXRotDeltaSmooth);
+    }
+
+    @ModifyReturnValue(method = "displayFireAnimation", at = @At("RETURN"))
+    private boolean displayFireAnimation(boolean original){
+        return original && allowDisplayFireAnimation;
+    }
+
+    @Override
+    public void setAllowDisplayFireAnimation(boolean displayFireAnimation) {
+        this.allowDisplayFireAnimation = displayFireAnimation;
     }
 
     @Redirect(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;"))

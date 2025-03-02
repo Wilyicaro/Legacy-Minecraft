@@ -4,8 +4,10 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import wily.factoryapi.FactoryAPI;
+import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.client.LegacyMixinOptions;
-import wily.legacy.config.LegacyConfig;
+import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.config.LegacyMixinToggles;
 
 import java.util.List;
 import java.util.Set;
@@ -13,7 +15,7 @@ import java.util.Set;
 public class LegacyMixinPlugin implements IMixinConfigPlugin {
     @Override
     public void onLoad(String mixinPackage) {
-        LegacyConfig.COMMON_STORAGE.load();
+        LegacyMixinToggles.COMMON_STORAGE.load();
         if (FactoryAPI.isClient()) LegacyMixinOptions.CLIENT_MIXIN_STORAGE.load();
     }
 
@@ -24,21 +26,19 @@ public class LegacyMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        LegacyConfig<?> config;
-        if ((config = LegacyConfig.COMMON_STORAGE.configMap.get(formatToOption(mixinClassName))) != null && config.secureCast(Boolean.class).get() == Boolean.FALSE)
-            return false;
-        if (FactoryAPI.isClient() && (config = LegacyMixinOptions.CLIENT_MIXIN_STORAGE.configMap.get(formatToOption(mixinClassName))) != null && config.secureCast(Boolean.class).get() == Boolean.FALSE)
-            return false;
-        if (FactoryAPI.isLoadingMod("nostalgic_tweaks") && mixinClassName.endsWith("ItemInHandRendererSwayMixin")) return false;
+        if (!LegacyMixinToggles.COMMON_STORAGE.getFormatted("wily.", mixinClassName)) return false;
+        if (FactoryAPI.isClient() && !LegacyMixinOptions.CLIENT_MIXIN_STORAGE.getFormatted("wily.", mixinClassName)) return false;
+        if (FactoryAPI.isLoadingMod("nostalgic_tweaks")) {
+            if (mixinClassName.endsWith("ItemInHandRendererSwayMixin")) return false;
+        } else if (mixinClassName.contains("compat.nostalgic.")) return false;
+        if (!FactoryAPI.isLoadingMod("sodium") && mixinClassName.contains("compat.sodium.")) return false;
+        if (!FactoryAPI.isLoadingMod("jei") && mixinClassName.contains("compat.jei.")) return false;
+
         boolean hasVivecraft = FactoryAPI.isLoadingMod("vivecraft");
         if (hasVivecraft && mixinClassName.endsWith("GuiGameRendererMixin")) return false;
         return true;
     }
 
-    public String formatToOption(String mixinClass){
-        mixinClass = mixinClass.replace("wily.","");
-        return mixinClass.substring(0, mixinClass.lastIndexOf("."));
-    }
 
     @Override
     public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {

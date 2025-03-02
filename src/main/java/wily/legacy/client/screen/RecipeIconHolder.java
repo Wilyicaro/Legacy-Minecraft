@@ -218,7 +218,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
             }else {
                 if (minecraft.player.containerMenu instanceof LegacyCraftingMenu m && !m.showedNotEnoughIngredientsHint && LegacyOptions.hints.get()){
                     m.showedNotEnoughIngredientsHint = true;
-                    LegacyTipManager.setActualTip(new LegacyTip(CommonComponents.EMPTY,NOT_ENOUGH_INGREDIENTS));
+                    LegacyTipManager.setActualTip(new LegacyTip(null,NOT_ENOUGH_INGREDIENTS));
                 }
                 ScreenUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(), 1.0f);
             }

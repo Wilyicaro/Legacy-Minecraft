@@ -106,7 +106,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
             } else if (i < menu.slots.size() - 1) {
                 LegacySlotDisplay.override(s, 14 + s.getContainerSlot() * 21,186);
             } else {
-                LegacySlotDisplay.override(s,111, 77,new LegacySlotDisplay(){
+                LegacySlotDisplay.override(s,111, 77, new LegacySlotDisplay(){
                     public Vec3 getOffset() {
                         return ScreenUtil.hasClassicCrafting() ? Vec3.ZERO : EQUIP_SLOT_OFFSET;
                     }

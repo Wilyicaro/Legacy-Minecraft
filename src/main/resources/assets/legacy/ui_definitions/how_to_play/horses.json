@@ -1,0 +1,47 @@
+{
+  "elements": {
+    "scrollable_renderer": {
+      "type": "put_scrollable_renderer",
+      "x": "${width}/2-228",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+      "width": 200,
+      "height": 222,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.horses_message"},
+          "width": 176
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.horses_message_1", "allowVariables": true, "args": ["controlIcon.key.sneak"]},
+          "width": 176
+        }
+      }
+    },
+    "panel": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/small_panel",
+      "width":262,
+      "height":140,
+      "x":"${width}/2-15",
+      "y":"${scrollable_renderer.y}+25"
+    },
+    "frame": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/square_recessed_panel",
+      "width":"${panel.width}-14",
+      "height":"${panel.height}-14",
+      "x":"${panel.x}+7",
+      "y":"${panel.y}+7"
+    },
+    "portal": {
+      "type":"blit_sprite",
+      "sprite": "legacy:container/how_to_play/horses",
+      "x":"${panel.x}+8",
+      "y":"${panel.y}+8",
+      "width":"${panel.width}-16",
+      "height":"${panel.height}-16"
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "elements": {
+    "scrollable_renderer": {
+      "type": "put_scrollable_renderer",
+      "x": "${width}/2-228",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+      "width": 200,
+      "height": 222,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.the-end_message"},
+          "width": 176
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.the-end_message_1"},
+          "width": 176
+        }
+      }
+    },
+    "panel": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/small_panel",
+      "width":260,
+      "height":160,
+      "x":"${width}/2-15",
+      "y":"(${height}-${panel.height})/2+20"
+    },
+    "frame1": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/square_recessed_panel",
+      "width":"${panel.width}/2-7",
+      "height":"${panel.height}-14",
+      "x":"${panel.x}+7",
+      "y":"${panel.y}+7"
+    },
+    "frame2": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/square_recessed_panel",
+      "width":"${panel.width}/2-7",
+      "height":"${panel.height}-14",
+      "x":"${panel.x}+${panel.width}/2",
+      "y":"${panel.y}+7"
+    },
+    "portal": {
+      "type":"blit_sprite",
+      "sprite": "legacy:container/how_to_play/the-end-1",
+      "x":"${panel.x}+8",
+      "y":"${panel.y}+8",
+      "width":"${panel.width}/2-9",
+      "height":"${panel.height}-16"
+    },
+    "dragon": {
+      "type":"blit_sprite",
+      "sprite": "legacy:container/how_to_play/the-end-2",
+      "x":"${panel.x}+${panel.width}/2+1",
+      "y":"${panel.y}+8",
+      "width":"${panel.width}/2-9",
+      "height":"${panel.height}-16"
+    }
+  }
+}

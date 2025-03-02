@@ -1,0 +1,23 @@
+{
+  "elements": {
+    "scrollable_renderer": {
+      "type": "put_scrollable_renderer",
+      "x": "(${width}-${scrollable_renderer.width})/2",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+      "width": 456,
+      "height": 222,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.conduit_message", "allowVariables": true, "args": ["controlIcon.legacy.key.crafting"]},
+          "width": 433
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.conduit_message_1", "allowVariables": true, "args": ["controlIcon.legacy.key.crafting"]},
+          "width": 433
+        }
+      }
+    }
+  }
+}

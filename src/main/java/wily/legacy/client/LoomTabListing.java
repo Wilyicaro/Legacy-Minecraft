@@ -77,6 +77,11 @@ public class LoomTabListing implements LegacyTabInfo {
     public static class Manager implements ResourceManagerReloadListener {
 
         @Override
+        public String getName() {
+            return "legacy:loom_tab_listing";
+        }
+
+        @Override
         public void onResourceManagerReload(ResourceManager resourceManager) {
             map.clear();
             ResourceManager manager = Minecraft.getInstance().getResourceManager();

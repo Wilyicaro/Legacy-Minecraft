@@ -58,9 +58,16 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
 
     public LegacyIconHolder(){}
 
-    public LegacyIconHolder(Slot slot){
-        slotBoundsWithItem(0, 0, slot);
+    public static LegacyIconHolder fromSlot(Slot slot){
+        return new LegacyIconHolder(){
+            @Override
+            public void render(GuiGraphics graphics, int i, int j, float f) {
+                slotBoundsWithItem(0, 0, slot);
+                super.render(graphics, i, j, f);
+            }
+        };
     }
+
 
     public LegacyIconHolder(int leftPos, int topPos, Slot slot){
         slotBounds(leftPos, topPos, slot);
@@ -102,7 +109,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         return slotBounds(leftPos, topPos, slot, ItemStack.EMPTY);
     }
     public LegacyIconHolder slotBounds(int leftPos, int topPos, Slot slot, ItemStack stack){
-        return itemHolder(leftPos + slot.x,topPos + slot.y,LegacySlotDisplay.of(slot).getWidth(),LegacySlotDisplay.of(slot).getHeight(), stack,false,LegacySlotDisplay.of(slot).getIconSprite(),LegacySlotDisplay.of(slot).getOffset(),LegacySlotDisplay.of(slot).getIconHolderOverride());
+        return itemHolder(leftPos + slot.x,topPos + slot.y,LegacySlotDisplay.of(slot).getWidth(),LegacySlotDisplay.of(slot).getHeight(), stack, LegacySlotDisplay.of(slot).isWarning(), LegacySlotDisplay.of(slot).getIconSprite(), LegacySlotDisplay.of(slot).getOffset(), LegacySlotDisplay.of(slot).getIconHolderOverride());
     }
 
     public LegacyIconHolder itemHolder(ItemStack itemIcon, boolean isWarning){
@@ -159,7 +166,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         return getHeight() - 2 * (isSizeable() ?  1 : getHeight() / 20f);
     }
     public boolean isSizeable(){
-        return Math.min(getWidth(),getHeight()) < 18 && Minecraft.getInstance().getWindow().getHeight() <= 720;
+        return Math.min(getWidth(),getHeight()) < 18 && ScreenUtil.is720p();
     }
     public boolean canSizeIcon(){
         return Math.min(getWidth(),getHeight()) > 21;
@@ -211,15 +218,22 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
     public void renderItem(GuiGraphics graphics, Runnable itemRender, int x, int y, boolean isWarning){
         renderScaled(graphics,x,y,itemRender);
-        if (isWarning) {
-            renderChild(graphics,x,y,()->{
-                RenderSystem.disableDepthTest();
-                graphics.pose().translate(0,0,332);
-                FactoryGuiGraphics.of(graphics).blitSprite(WARNING_ICON,0,0,8,8);
-                RenderSystem.enableDepthTest();
-            });
-        }
+        if (isWarning) renderWarning(graphics);
     }
+
+    public void renderWarning(GuiGraphics graphics, float z){
+        renderChild(graphics,x,y,()->{
+            FactoryGuiGraphics.of(graphics).disableDepthTest();
+            graphics.pose().translate(0,0,z);
+            FactoryGuiGraphics.of(graphics).blitSprite(WARNING_ICON,0,0,8,8);
+            FactoryGuiGraphics.of(graphics).enableDepthTest();
+        });
+    }
+
+    public void renderWarning(GuiGraphics graphics){
+        renderWarning(graphics, 332);
+    }
+
     public void renderEntity(GuiGraphics graphics, Entity entity, int i, int j, float f){
         entity.setYRot(180);
         entity.yRotO = entity.getYRot();
@@ -265,7 +279,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         if (isHovered || (allowFocusedItemTooltip && isFocused())) renderTooltip(minecraft,graphics,itemIcon, !isHovered ? (int) getMiddleX() : i,!isHovered ? (int) getMiddleY() : j);
     }
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics,ItemStack stack, int i, int j){
-        if (!stack.isEmpty()) Legacy4JClient.applyFontOverrideIf(minecraft.getWindow().getHeight() <= 720,MOJANGLES_11_FONT,b->graphics.renderTooltip(minecraft.font, stack, i, j));
+        if (!stack.isEmpty()) Legacy4JClient.applyFontOverrideIf(ScreenUtil.is720p(),MOJANGLES_11_FONT,b->graphics.renderTooltip(minecraft.font, stack, i, j));
     }
     public boolean isHoveredOrFocused(){
         return isHovered || isFocused();

@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.util.ColorUtil;
 import wily.factoryapi.util.FactoryScreenUtil;
 
 import java.util.List;
@@ -42,7 +43,7 @@ public abstract class ScreenEffectRendererMixin {
             BakedQuad quad = quads.get(0);
             f = quad.getSprite();
             int color = minecraft.getBlockColors().getColor(state, minecraft.level, minecraft.player.blockPosition(), quad.getTintIndex());
-            RenderSystem.setShaderColor(FactoryScreenUtil.getRed(color), FactoryScreenUtil.getGreen(color), FactoryScreenUtil.getBlue(color), 1.0f);
+            RenderSystem.setShaderColor(ColorUtil.getRed(color), ColorUtil.getGreen(color), ColorUtil.getBlue(color), 1.0f);
         }
         renderTex(f,f1/*? if >=1.21.4 {*//*, multiBufferSource*//*?}*/);
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f, 1.0f);

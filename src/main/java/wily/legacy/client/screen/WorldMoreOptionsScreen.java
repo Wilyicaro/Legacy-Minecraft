@@ -19,6 +19,8 @@ import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.WorldDataConfiguration;
+import wily.factoryapi.base.Bearer;
+import wily.factoryapi.base.client.DatapackRepositoryAccessor;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
@@ -32,7 +34,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlTooltip.Event{
+public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlTooltip.Event, DatapackRepositoryAccessor {
     protected List<FormattedCharSequence> tooltipBoxLabel;
     protected ScrollableRenderer scrollableRenderer =  new ScrollableRenderer(new LegacyScrollRenderer());
 
@@ -52,7 +54,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         renderer.addCompound(()-> new ControlTooltip.Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(),ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon()},()->tabList.selectedTab == 0 ? LegacyComponents.GAME_OPTIONS : LegacyComponents.WORLD_OPTIONS);
     }
 
-    public WorldMoreOptionsScreen(CreateWorldScreen parent, Consumer<Boolean> setTrustPlayers) {
+    public WorldMoreOptionsScreen(CreateWorldScreen parent, Bearer<Boolean> trustPlayers) {
         super(parent,244, 199, Component.translatable("createWorld.tab.more.title"));
         renderableVLists.add(gameRenderables);
         renderableVList.addRenderable(SimpleLayoutRenderable.createDrawString(ENTER_SEED,0,1,2,9, CommonColor.INVENTORY_GRAY_TEXT.get(),false));
@@ -99,7 +101,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             };
         }
         renderableVList.addRenderable(Button.builder(Component.translatable("selectWorld.dataPacks"), button -> openDataPackSelectionScreen(parent, parent.getUiState().getSettings().dataConfiguration())).build());
-        renderableVList.addRenderable(new TickBox(0,0,parent.getUiState()./*? if <1.20.5 {*//*isAllowCheats*//*?} else {*/isAllowCommands/*?}*/(), b-> Component.translatable("legacy.menu.selectWorld.trust_players"),b-> null,t-> setTrustPlayers.accept(t.selected)));
+        renderableVList.addRenderable(new TickBox(0,0, trustPlayers.get(), b-> Component.translatable("legacy.menu.selectWorld.trust_players"),b-> null,t-> trustPlayers.set(t.selected)));
         addGameRulesOptions(renderableVList,gameRules, k-> k.getCategory() == GameRules.Category.UPDATES);
         gameRenderables.addRenderable(hostPrivileges);
         for (GameRules.Category value : GameRules.Category.values()) {
@@ -170,7 +172,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         renderableVLists.add(gameRenderables);
         tabList.selectedTab = 1;
         GameRules gameRules = parent.summary.getSettings().gameRules();
-        LoadSaveScreen.RESETTABLE_DIMENSIONS.forEach(d-> renderableVList.addRenderable(new TickBox(0,0,false, b-> Component.translatable("legacy.menu.load_save.reset",ScreenUtil.getDimensionName(d)), b-> null, t-> {
+        LoadSaveScreen.RESETTABLE_DIMENSIONS.forEach(d-> renderableVList.addRenderable(new TickBox(0,0,false, b-> Component.translatable("legacy.menu.load_save.reset", LegacyComponents.getDimensionName(d)), b-> null, t-> {
             if (t.selected) parent.dimensionsToReset.add(d);
             else parent.dimensionsToReset.remove(d);
         })));
@@ -225,10 +227,22 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         super.renderableVListInit();
     }
 
-    void openDataPackSelectionScreen(CreateWorldScreen screen, WorldDataConfiguration worldDataConfiguration) {
+    protected void openDataPackSelectionScreen(CreateWorldScreen screen, WorldDataConfiguration worldDataConfiguration) {
         Pair<Path, PackRepository> pair = screen.getDataPackSelectionSettings(worldDataConfiguration);
         if (pair != null) {
             this.minecraft.setScreen(new PackSelectionScreen(pair.getSecond(), packRepository -> screen.tryApplyNewDataPacks(packRepository, true, d-> openDataPackSelectionScreen(screen,d)), pair.getFirst(), Component.translatable("dataPack.title")));
+        }
+    }
+
+    @Override
+    public PackRepository getDatapackRepository() {
+        return parent instanceof CreateWorldScreen screen ? screen.getDataPackSelectionSettings(screen.getUiState().getSettings().dataConfiguration()).getSecond() : null;
+    }
+
+    @Override
+    public void tryApplyNewDataPacks(PackRepository packRepository) {
+        if (parent instanceof CreateWorldScreen screen) {
+            screen.tryApplyNewDataPacks(packRepository, false, w-> minecraft.setScreen(this));
         }
     }
 }

@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.legacy.Legacy4J;
+import wily.factoryapi.util.DynamicUtil;import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
@@ -44,7 +44,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            }else minecraft.setScreen(new PlayGameScreen(this));
+            }else minecraft.setScreen(PlayGameScreen.createAndCheckNewerVersions(this));
         }).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("options.language"), b -> minecraft.setScreen(new LegacyLanguageScreen(this, this.minecraft.getLanguageManager()))).build());
@@ -97,6 +97,10 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         }
         if (i == InputConstants.KEY_O && PublishScreen.hasWorldHost()) {
             minecraft.setScreen(new WorldHostFriendsScreen(this));
+            return true;
+        }
+        if (Legacy4JClient.keyLegacy4JSettings.matches(i,j)) {
+            minecraft.setScreen(new Legacy4JSettingsScreen(this));
             return true;
         }
         return super.keyPressed(i, j, k);

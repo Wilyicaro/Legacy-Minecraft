@@ -1,9 +1,13 @@
 package wily.legacy.mixin.base;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -18,8 +22,9 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.config.LegacyConfig;
+import wily.legacy.config.LegacyCommonOptions;
 
 @Mixin(ItemInHandRenderer.class)
 public abstract class ItemInHandRendererMixin {
@@ -35,9 +40,6 @@ public abstract class ItemInHandRendererMixin {
     @Shadow protected abstract void applyItemArmAttackTransform(PoseStack arg, HumanoidArm arg2, float g);
 
     @Shadow public abstract void renderItem(LivingEntity arg, ItemStack arg2, ItemDisplayContext arg3, boolean bl, PoseStack arg4, MultiBufferSource arg5, int i);
-
-    @Shadow protected abstract void renderArmWithItem(AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, MultiBufferSource multiBufferSource, int j);
-
     @Inject(method = "renderPlayerArm", at = @At(value = "HEAD"), cancellable = true)
     private void renderPlayerArm(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, float f, float g, HumanoidArm humanoidArm, CallbackInfo ci) {
         if (minecraft.player == null || minecraft.player.isRemoved()) ci.cancel();
@@ -48,15 +50,17 @@ public abstract class ItemInHandRendererMixin {
         if (minecraft.player == null || minecraft.player.isRemoved()) ci.cancel();
     }
 
-    @Redirect(method = "renderHandsWithItems", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;renderArmWithItem(Lnet/minecraft/client/player/AbstractClientPlayer;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V"))
-    public void renderItemLight(ItemInHandRenderer instance, AbstractClientPlayer f3, float f4, float f9, InteractionHand f13, float f, ItemStack f1, float f2, PoseStack flag1, MultiBufferSource flag2, int i) {
-        int light = LegacyOptions.itemLightingInHand.get() ? getLight(f3.getMainHandItem(),f3.getOffhandItem()) : 0;
-        renderArmWithItem(f3,f4,f9,f13,f,f1,f2,flag1,flag2,light > 0 ? LightTexture.pack(light,LightTexture.sky(i)) : i);
+    @Inject(method = "renderHandsWithItems", at = @At("HEAD"))
+    public void renderItemLight(float f, PoseStack poseStack, MultiBufferSource.BufferSource bufferSource, LocalPlayer localPlayer, int i, CallbackInfo ci, @Local(ordinal = 0, argsOnly = true) LocalIntRef original) {
+        int light =getLight(localPlayer.getMainHandItem(), localPlayer.getOffhandItem());
+        if (LegacyOptions.itemLightingInHand.get() && light > 0) original.set(LightTexture.pack(light,LightTexture.sky(i)));
     }
+
     @Unique
     private int getLight(ItemStack mainHand, ItemStack offHand){
         return Math.max(mainHand.getItem() instanceof BlockItem item ? item.getBlock().defaultBlockState().getLightEmission() : 0, offHand.getItem() instanceof BlockItem item ? item.getBlock().defaultBlockState().getLightEmission() : 0);
     }
+
     @Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", shift = At.Shift.AFTER))
     private void renderItemInHand(AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, MultiBufferSource multiBufferSource, int j, CallbackInfo ci) {
         int screenWidth = minecraft.getWindow().getScreenWidth();
@@ -111,6 +115,8 @@ public abstract class ItemInHandRendererMixin {
         poseStack.popPose();
 
     }
+
+    @Unique
     private void applyItemTransforms(PoseStack poseStack, float h, HumanoidArm humanoidArm, float i, int k){
         float lx = -0.4F * Mth.sin(Mth.sqrt(h) * (float) Math.PI);
         float mx = 0.2F * Mth.sin(Mth.sqrt(h) * (float) (Math.PI * 2));
@@ -123,7 +129,7 @@ public abstract class ItemInHandRendererMixin {
     //? if <1.21.4 {
     @Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;applyItemArmTransform(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/entity/HumanoidArm;F)V", shift = At.Shift.AFTER, ordinal = 4))
     private void renderArmWithItemBlockAnim(AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, MultiBufferSource multiBufferSource, int j, CallbackInfo ci) {
-        if (LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacySwordBlocking) && !(itemStack.getItem() instanceof ShieldItem)) {
+        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking) && !(itemStack.getItem() instanceof ShieldItem)) {
             boolean bl = interactionHand == InteractionHand.MAIN_HAND;
             HumanoidArm humanoidArm = bl ? abstractClientPlayer.getMainArm() : abstractClientPlayer.getMainArm().getOpposite();
             int q = humanoidArm == HumanoidArm.RIGHT ? 1 : -1;

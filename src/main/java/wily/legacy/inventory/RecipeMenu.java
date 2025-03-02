@@ -24,7 +24,13 @@ public interface RecipeMenu {
     }
 
     static void handleCompactItemStackListAdd(Collection<ItemStack> compactList, ItemStack item){
-        compactList.stream().filter(i -> FactoryItemUtil.equalItems(i, item)).findFirst().ifPresentOrElse(i -> i.grow(item.getCount()), () -> compactList.add(item.copy()));
+        for (ItemStack itemStack : compactList) {
+            if (FactoryItemUtil.equalItems(itemStack, item)) {
+                itemStack.grow(item.getCount());
+                return;
+            }
+        }
+        compactList.add(item.copy());
     }
 
     static boolean canCraft(List<Optional<Ingredient>> ingredients, Inventory inventory, ItemStack carriedItem){
@@ -33,12 +39,15 @@ public interface RecipeMenu {
         handleCompactInventoryList(compactList,inventory,carriedItem);
         main: for (Optional<Ingredient> ing : ingredients) {
             if (ing.isEmpty()) continue;
-            for (int i = 0; i < FactoryIngredient.of(ing.get()).getCount(); i++) {
-                Optional<ItemStack> match = compactList.stream().filter(item -> !item.isEmpty() && ing.get().test(item.copyWithCount(1))).findFirst();
-                if (match.isEmpty()) {
-                    canCraft = false;
-                    break main;
-                } else match.get().shrink(1);
+            ingLoop : for (int i = 0; i < FactoryIngredient.of(ing.get()).getCount(); i++) {
+                for (ItemStack itemStack : compactList) {
+                    if (!itemStack.isEmpty() && ing.get().test(itemStack.copyWithCount(1))){
+                        itemStack.shrink(1);
+                        continue ingLoop;
+                    }
+                }
+                canCraft = false;
+                break main;
             }
         }
         return canCraft;

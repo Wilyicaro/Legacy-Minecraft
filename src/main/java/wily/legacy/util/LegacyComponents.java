@@ -1,10 +1,15 @@
 package wily.legacy.util;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import wily.factoryapi.FactoryAPI;
+import wily.legacy.client.LegacyTipManager;
 
 public class LegacyComponents {
     public static final Component RESOURCE_ALBUMS = Component.translatable("legacy.menu.albums.resource");
     public static final Component ALBUM_OPTIONS = Component.translatable("legacy.menu.album_options");
+    public static final Component GLOBAL_RESOURCE_PACKS = Component.translatable("legacy.menu.global_packs.resource");
     public static final Component SELECT = Component.translatable("mco.template.button.select");
     public static final Component USE = Component.translatable("key.use");
     public static final Component ACTION = Component.translatable("key.attack");
@@ -15,6 +20,7 @@ public class LegacyComponents {
     public static final Component BLOCK = Component.translatable("legacy.action.block");
     public static final Component BOOST = Component.translatable("legacy.action.boost");
     public static final Component BRUSH = Component.translatable("legacy.action.brush");
+    public static final Component CANCEL = Component.translatable("legacy.action.cancel");
     public static final Component CARVE = Component.translatable("legacy.action.carve");
     public static final Component CHANGE_FILTER = Component.translatable("legacy.action.change_filter");
     public static final Component CHANGE_PITCH = Component.translatable("legacy.action.change_pitch");
@@ -38,6 +44,7 @@ public class LegacyComponents {
     public static final Component EMPTY = Component.translatable("legacy.action.empty");
     public static final Component EQUIP = Component.translatable("legacy.action.equip");
     public static final Component EXIT = Component.translatable("legacy.action.exit");
+    public static final Component EXIT_SEARCH_MODE = Component.translatable("legacy.action.exit_search_mode");
     public static final Component FEED = Component.translatable("legacy.action.feed");
     public static final Component FILL = Component.translatable("legacy.action.fill");
     public static final Component FOLLOW_ME = Component.translatable("legacy.action.follow_me");
@@ -81,6 +88,7 @@ public class LegacyComponents {
     public static final Component RIDE = Component.translatable("legacy.action.ride");
     public static final Component SADDLE = Component.translatable("legacy.action.saddle");
     public static final Component SAIL = Component.translatable("legacy.action.sail");
+    public static final Component SEARCH_MODE = Component.translatable("legacy.action.search_mode");
     public static final Component SELECT_TAB = Component.translatable("legacy.action.select_tab");
     public static final Component SHEAR = Component.translatable("legacy.action.shear");
     public static final Component SEND_COMMAND = Component.translatable("legacy.action.send_command");
@@ -107,6 +115,7 @@ public class LegacyComponents {
     public static final Component USE_SUGGESTION = Component.translatable("legacy.action.use_suggestion");
     public static final Component WAKE_UP = Component.translatable("legacy.action.wake_up");
     public static final Component WHATS_THIS = Component.translatable("legacy.action.whats_this");
+    public static final Component ZOOM = Component.translatable("legacy.action.zoom");
     public static final Component LAYER_OPTIONS = Component.translatable("legacy.menu.create_flat_world.layer_options");
     public static final Component LAYER_MESSAGE = Component.translatable("legacy.menu.create_flat_world.layer_message");
     public static final Component AUTOSAVE_MESSAGE = Component.translatable("legacy.menu.autoSave_message");
@@ -149,6 +158,33 @@ public class LegacyComponents {
     public static final Component SELECTION = Component.literal("...");
     public static final Component NONE = Component.translatable("legacy.options.none");
     public static final Component NEEDS_RESTART = Component.translatable("legacy.options.needs_restart");
+    public static final Component MAY_BE_A_CHEAT = Component.translatable("legacy.options.may_be_a_cheat");
     public static final Component ALPHABETICAL = Component.translatable("legacy.menu.sorting.alphabetical");
     public static final Component ALL = Component.translatable("legacy.menu.settings.all");
+    public static final Component ACCEPT = Component.translatable("legacy.menu.accept");
+    public static final Component STRUCTURES = Component.translatable("legacy.container.tab.structures");
+    public static final Component MECHANISMS = Component.translatable("legacy.container.tab.mechanisms");
+    public static final Component TOOLS_AND_ARMOUR = Component.translatable("legacy.container.tab.tools_and_armour");
+    public static final Component MISC = Component.translatable("legacy.container.tab.misc");
+    public static final Component SEARCH_ITEMS = Component.translatable("itemGroup.search");
+    public static final Component CONFLICTING_BUTTONS = Component.translatable("legacy.options.controllerMappingConflicting");
+    public static final Component CONFLICTING_KEYS = Component.translatable("legacy.options.keyMappingConflicting");
+    public static final Component PEACEFUL_SPAWN_TIP = Component.translatable("item.minecraft.spawn_egg.peaceful.tip");
+
+    public static Component optionName(String key){
+        return Component.translatable("legacy.options."+key);
+    }
+
+    public static Component getDimensionName(ResourceKey<Level> dimension){
+        String s = dimension.location().toLanguageKey("dimension");
+        return Component.translatable(!FactoryAPI.isClient() || LegacyTipManager.hasTip(s) ? s : "dimension.minecraft");
+    }
+
+    public static Component getEnteredDimensionMessage(Component name, ResourceKey<Level> dimension){
+        return Component.translatable("legacy.chat.entered_dimension", name, getDimensionName(dimension));
+    }
+
+    public static Component getLeftDimensionMessage(Component name, ResourceKey<Level> dimension){
+        return Component.translatable("legacy.chat.left_dimension", name, getDimensionName(dimension));
+    }
 }

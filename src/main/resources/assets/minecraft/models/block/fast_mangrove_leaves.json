@@ -1,0 +1,6 @@
+{
+    "parent": "minecraft:block/leaves",
+    "textures": {
+      "all": "minecraft:block/fast_mangrove_leaves"
+    }
+  }

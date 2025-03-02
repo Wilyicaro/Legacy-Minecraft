@@ -1,0 +1,143 @@
+{
+  "elements": {
+    "scrollable_renderer": {
+      "type": "put_scrollable_renderer",
+      "x": "${width}/2-228",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+      "width": 200,
+      "height": 222,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.anvil_message", "allowVariables": true, "args": ["controlIcon.key.use"]},
+          "width": 176
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.anvil_message_1", "allowVariables": true, "args": ["controlIcon.menu_quick_action"]},
+          "width": 176
+        }
+      }
+    },
+    "panel": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/small_panel",
+      "width":207,
+      "height":215,
+      "x":"${width}/2",
+      "y":"${scrollable_renderer.y}-1"
+    },
+    "anvil_label": {
+      "type":"draw_string",
+      "component": {"translate": "container.repair"},
+      "color": "${commonColor.inventory_gray_text}",
+      "shadow": false,
+      "x":"${panel.x}+${panel.width}/2-${anvil_label.component.width}/2",
+      "y":"${panel.y}+10"
+    },
+    "input_1": {
+      "type":"put_legacy_slot",
+      "isFake":true,
+      "fakeItem": {"item": "iron_sword", "components": {"damage": 160}, "nbt": {"Damage": 160}},
+      "width": 30,
+      "height": 30,
+      "x":"${panel.x}+15",
+      "y":"${panel.y}+56"
+    },
+    "combine": {
+      "type":"blit_sprite",
+      "sprite": "legacy:container/combiner_plus",
+      "translateX": "${panel.x}+53",
+      "translateY": "${panel.y}+60",
+      "width": 13,
+      "height": 13,
+      "scaleX": 1.5,
+      "scaleY": 1.5
+    },
+    "input_2": {
+      "type":"put_legacy_slot",
+      "isFake":true,
+      "fakeItem": "iron_sword",
+      "width": 30,
+      "height": 30,
+      "x":"${panel.x}+84",
+      "y":"${panel.y}+56"
+    },
+    "arrow": {
+      "type":"blit_sprite",
+      "sprite": "legacy:container/arrow",
+      "x": "${panel.x}+122",
+      "y": "${panel.y}+59",
+      "width": 33,
+      "height": 22
+    },
+    "output": {
+      "type":"put_legacy_slot",
+      "isFake":true,
+      "fakeItem": "iron_sword",
+      "width": 30,
+      "height": 30,
+      "x":"${panel.x}+167",
+      "y":"${panel.y}+56"
+    },
+    "hammer": {
+      "type":"blit_sprite",
+      "sprite": "legacy:container/anvil_hammer",
+      "translateX": "${panel.x}+13.5",
+      "translateY": "${panel.y}+9.5",
+      "width": 15,
+      "height": 15,
+      "scaleX": 2.5,
+      "scaleY": 2.5
+    },
+    "text_box": {
+      "type":"blit_sprite",
+      "sprite": "minecraft:widget/text_field",
+      "x": "${panel.x}+72",
+      "y": "${panel.y}+26",
+      "width": 120,
+      "height": 20
+    },
+    "sword_name": {
+      "type":"draw_string",
+      "component": {"translate": "legacy.menu.how_to_play.anvil_sword_name"},
+      "x":"${text_box.x}+4",
+      "y":"${text_box.y}+(${text_box.height}-8)/2}"
+    },
+    "enchant_cost": {
+      "type":"draw_string",
+      "component": {"translate": "container.repair.cost", "with":["8"]},
+      "color": "${commonColor.experience_text}",
+      "x":"${panel.x}+${panel.width}-${enchant_cost.component.width}-10",
+      "y":"${panel.y}+90"
+    },
+    "inventory_label": {
+      "type":"draw_string",
+      "component": {"translate": "container.inventory"},
+      "color": "${commonColor.inventory_gray_text}",
+      "shadow": false,
+      "x":"${panel.x}+10",
+      "y":"${panel.y}+105"
+    },
+    "inventory": {
+      "type":"put_legacy_slot",
+      "range":"[0,26]",
+      "isFake":true,
+      "fakeContainer": [
+        {"item": "stone", "count": 32},{"item": "oak_planks", "count": 17},"air","air","oak_fence_gate","air","air",{"item": "arrow", "count": 64},{"item": "stick", "count": 10},
+        {"item": "bookshelf", "count": 3},"air","dark_oak_door","air","emerald","air",{"item": "cobblestone_wall", "count": 7},"oak_sign","air",
+        {"item": "stone_brick_stairs", "count": 24},{"item": "cobblestone_stairs", "count": 16},"air",{"item": "oak_log", "count":  7},{"item": "acacia_stairs", "count": 15},"air","diamond_pickaxe",{"item": "paper", "count": 21},{"item": "gunpowder", "count": 15}
+      ],
+      "x":"${panel.x}+10+(${inventory.index}%9)*21",
+      "y":"${panel.y}+116+(${inventory.index}/9)*21"
+    },
+    "quick_select": {
+      "type":"put_legacy_slot",
+      "range":"[0,8]",
+      "isFake":true,
+      "fakeContainer": ["iron_sword","bow",{"item": "arrow", "count": 64},{"item": "flint_and_steel", "components": {"damage": 28}, "nbt": {"Damage": 28}},"clock","shears",{"item": "iron_axe", "components": {"damage": 65}, "nbt": {"Damage": 65}},"fishing_rod","compass"],
+      "x":"${panel.x}+10+(${quick_select.index}%9)*21",
+      "y":"${panel.y}+185"
+    }
+  }
+}

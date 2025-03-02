@@ -54,6 +54,7 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
     public BrewingStandScreenMixin(BrewingStandMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
+
     @Inject(method = "init",at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
@@ -64,6 +65,7 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
         this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2;
         titleLabelY = 11;
         super.init();
+        topPos-=20;
         for (int i = 0; i < menu.slots.size(); i++) {
             Slot s = menu.slots.get(i);
             if (i == 0){

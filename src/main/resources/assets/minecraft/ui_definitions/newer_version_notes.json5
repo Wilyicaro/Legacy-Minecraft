@@ -1,0 +1,36 @@
+{
+  "elements": {
+    "changelogBackground": {
+      "type": "blit_sprite",
+      "sprite": "legacy:tiles/square_recessed_panel",
+      "x": "${panel.x}+7",
+      "y": "${panel.y}+10",
+      "width": 353,
+      "height": 190
+    },
+    "scrollable_renderer": {
+      "type": "put_scrollable_renderer",
+      "x": "${panel.x}-2",
+      "y": "${panel.y}",
+      "width": 370,
+      "height": 200,
+      "hasBackground": false,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.newerMinecraftVersion"},
+          "shadow": false,
+          "color": "${commonColor.inventory_gray_text}",
+          "width": 348
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+          "component": {"baseDir": /*? if >=1.21 {*/"minecraft:changelog"/*?} else {*//*"minecraft:changelog_120"*//*?}*/},
+          "shadow": false,
+          "color": "${commonColor.inventory_gray_text}",
+          "width": 348
+        }
+      }
+    }
+  }
+}

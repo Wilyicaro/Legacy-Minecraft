@@ -20,6 +20,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.mixin.base.MouseHandlerAccessor;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -37,6 +38,7 @@ public  class ControllerManager {
     public static final ListMap<String,Controller.Handler> handlers = ListMap.<String,Controller.Handler>builder().put("none",Controller.Handler.EMPTY).put("glfw", GLFWControllerHandler.getInstance()).put("sdl3", SDLControllerHandler.getInstance()).build();
 
     public boolean isControllerTheLastInput = false;
+    public boolean isControllerSimulatingInput = false;
 
     public static final Component CONTROLLER_DETECTED = Component.translatable("legacy.controller.detected");
     public static final Component CONTROLLER_DISCONNECTED = Component.translatable("legacy.controller.disconnected");
@@ -85,15 +87,18 @@ public  class ControllerManager {
             return null;
         });
     }
+
     public void setPointerPos(double x, double y){
-        setPointerPos(x,y,isControllerTheLastInput);
+        setPointerPos(x, y, isControllerTheLastInput && LegacyOptions.controllerVirtualCursor.get());
     }
+
     public void setPointerPos(double x, double y, boolean onlyVirtual){
         Window window = minecraft.getWindow();
         minecraft.mouseHandler.xpos = Math.max(0,Math.min(x,window.getScreenWidth()));
         minecraft.mouseHandler.ypos = Math.max(0,Math.min(y,window.getScreenHeight()));
         if (!onlyVirtual) GLFW.glfwSetCursorPos(Minecraft.getInstance().getWindow().getWindow(), minecraft.mouseHandler.xpos,minecraft.mouseHandler.ypos);
     }
+
     public synchronized void updateBindings() {
         updateBindings(minecraft.isWindowActive() ? connectedController : Controller.EMPTY);
     }
@@ -168,10 +173,12 @@ public  class ControllerManager {
                     if (state.pressed) minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
                 }
                 if (state.is(ControllerBinding.DOWN_BUTTON) || state.is(ControllerBinding.UP_BUTTON) || state.is(ControllerBinding.LEFT_BUTTON)) {
+                    isControllerSimulatingInput = true;
                     if (state.pressed && state.onceClick(true))
-                        minecraft.screen.mouseClicked(getPointerX(), getPointerY(), state.is(ControllerBinding.LEFT_BUTTON) ? 1 : 0);
+                        ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), state.is(ControllerBinding.LEFT_BUTTON) ? 1 : 0, 1, 0);
                     else if (state.released)
-                        minecraft.screen.mouseReleased(getPointerX(), getPointerY(), state.is(ControllerBinding.LEFT_BUTTON) ? 1 : 0);
+                        ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), state.is(ControllerBinding.LEFT_BUTTON) ? 1 : 0, 0, 0);
+                    isControllerSimulatingInput = false;
                 }
             }
 
@@ -187,40 +194,52 @@ public  class ControllerManager {
                         a.movePointerToSlotIn(ScreenDirection.LEFT);
                 }else if (state.is(ControllerBinding.LEFT_STICK) && state.released) a.movePointerToSlot(a.findSlotAt(getPointerX(),getPointerY()));
             }
-
-            KeyMapping.ALL.forEach((key, value) -> {
-                if (!state.matches(value)) return;
+            for (KeyMapping keyMapping : minecraft.options.keyMappings) {
+                if (!state.matches(keyMapping)) continue;
                 Screen screen;
                 if (this.minecraft.screen == null || (screen = this.minecraft.screen) instanceof PauseScreen/*? if >1.20.1 {*/ && !((PauseScreen) screen).showsPauseMenu()/*?}*/) {
                     if (state.is(ControllerBinding.START) && state.pressed) {
-                        value.setDown(false);
+                        keyMapping.setDown(false);
                     } else {
-                        if (state.canClick()) value.clickCount++;
-                        if (state.pressed && state.canDownKeyMapping(value)) value.setDown(true);
-                        else if (state.canReleaseKeyMapping(value)) value.setDown(false);
+                        if (state.canClick()) keyMapping.clickCount++;
+                        if (state.pressed && state.canDownKeyMapping(keyMapping)) keyMapping.setDown(true);
+                        else if (state.canReleaseKeyMapping(keyMapping)) keyMapping.setDown(false);
                         if (state.pressed) {
-                            if (value == minecraft.options.keyTogglePerspective || value == minecraft.options.keyUse) state.block();
-                            else if (value == minecraft.options.keyAttack) state.onceClick(-state.getDefaultDelay() * (minecraft.player.getAbilities().invulnerable ? 3 : 5));
+                            if (keyMapping == minecraft.options.keyTogglePerspective || keyMapping == minecraft.options.keyUse) state.block();
+                            else if (keyMapping == minecraft.options.keyAttack) state.onceClick(-state.getDefaultDelay() * (minecraft.player.getAbilities().invulnerable ? 3 : 5));
                         }
                     }
                 }
-            });
+            }
         }
     }
-    public void simulateKeyAction(int key, BindingState state){
-        if (state.pressed && state.canClick()) minecraft.screen.keyPressed(key, 0, 0);
-        else if (state.released) minecraft.screen.keyReleased(key, 0, 0);
-    }
+
     public void simulateKeyAction(Predicate<BindingState> canSimulate, int key, BindingState state){
         boolean clicked = state.pressed && state.canClick();
         if (canSimulate.test(state)){
-            if (clicked) minecraft.screen.keyPressed(key, 0, 0);
-            else if (state.released) minecraft.screen.keyReleased(key, 0, 0);
+            simulateKeyAction(key, state, clicked);
         }
     }
+
+    public void simulateKeyAction(int key, BindingState state){
+        simulateKeyAction(key, state, state.pressed && state.canClick());
+    }
+
+    public void simulateKeyAction(int key, BindingState state, boolean canPress){
+        if (canPress) simulateKeyAction(key,true);
+        else if (state.released) simulateKeyAction(key,false);
+    }
+
+    public void simulateKeyAction(int key, boolean press){
+        isControllerSimulatingInput = true;
+        minecraft.keyboardHandler.keyPress(minecraft.getWindow().getWindow(), key, 0, press ? 1 : 0, 0);
+        isControllerSimulatingInput = false;
+    }
+
     public double getPointerX(){
         return minecraft.mouseHandler.xpos() * (double)this.minecraft.getWindow().getGuiScaledWidth() / (double)this.minecraft.getWindow().getScreenWidth();
     }
+
     public double getPointerY(){
         return minecraft.mouseHandler.ypos() * (double)this.minecraft.getWindow().getGuiScaledHeight() / (double)this.minecraft.getWindow().getScreenHeight();
     }

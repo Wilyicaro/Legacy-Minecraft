@@ -22,21 +22,21 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.InteractionResult;
 //? if >=1.20.5 && <1.21.2 {
 import net.minecraft.world.ItemInteractionResult;
 //?}
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.alchemy.Potion;
 //? if >=1.20.5 {
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
-import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.component.DyedItemColor;
 //?} else {
 /*import net.minecraft.world.item.alchemy.PotionUtils;
+import wily.factoryapi.util.ColorUtil;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.util.ItemAccessor;
 *///?}
@@ -60,9 +60,12 @@ import org.apache.logging.log4j.Logger;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.FactoryEvent;
+import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
-import wily.legacy.config.LegacyConfig;
+import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.config.LegacyMixinToggles;
+import wily.legacy.config.LegacyWorldOptions;
 import wily.legacy.init.*;
 import wily.legacy.network.*;
 import wily.legacy.entity.LegacyPlayerInfo;
@@ -83,7 +86,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.List;
 import java.util.function.Function;
@@ -100,10 +102,8 @@ public class Legacy4J {
 
     public static final String MOD_ID = "legacy";
     public static final Supplier<String> VERSION = ()-> FactoryAPIPlatform.getModInfo(MOD_ID).getVersion();
-
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
-
-    public static MinecraftServer currentServer;
+    public static final FactoryConfig.StorageHandler MIXIN_CONFIGS_STORAGE = FactoryConfig.StorageHandler.fromMixin(LegacyMixinToggles.COMMON_STORAGE, true);
 
     private static Collection<CommonNetwork.Payload> playerInitialPayloads = Collections.emptySet();
 
@@ -114,7 +114,39 @@ public class Legacy4J {
             Legacy4JClient.init();
         *///?}
     }
+
+    public static List<Integer> getParsedVersion(String version){
+        List<Integer> parsedVersion = new ArrayList<>();
+        String[] versions = version.split("\\.");
+        for (String s : versions) {
+            int value;
+            try {
+                value = Integer.parseInt(s);
+            } catch (NumberFormatException e) {
+                value = 0;
+            }
+            parsedVersion.add(value);
+        }
+        return parsedVersion;
+    }
+
+    public static boolean isNewerVersion(String actualVersion, String previous){
+        return isNewerVersion(actualVersion, previous, 2);
+    }
+
+    public static boolean isNewerVersion(String actualVersion, String previous, int limitCount){
+        List<Integer> v = getParsedVersion(actualVersion);
+        List<Integer> v1 = getParsedVersion(previous);
+        int size = limitCount <= 0 ? v.size() : Math.min(limitCount, v.size());
+        for (int i = 0; i < size; i++) {
+            if (v.get(i) > (v1.size() <= i ? 0 : v1.get(i))) return true;
+        }
+        return false;
+    }
+
     public static void init(){
+        FactoryConfig.registerCommonStorage(createModLocation("common"), LegacyCommonOptions.COMMON_STORAGE);
+        FactoryConfig.registerCommonStorage(createModLocation("mixin_common"), MIXIN_CONFIGS_STORAGE);
         LegacyRegistries.register();
         LegacyGameRules.init();
         FactoryEvent.registerPayload(r->{
@@ -132,10 +164,6 @@ public class Legacy4J {
             r.register(false, TipCommand.Payload.ID);
             r.register(false, TipCommand.EntityPayload.ID);
             r.register(false, TopMessage.Payload.ID);
-            r.register(false, CommonConfigSyncPayload.ID);
-            //? if >=1.21.2 {
-            /*r.register(false, CommonRecipeManager.ClientPayload.ID);
-            *///?}
         });
         ArmorStandPose.init();
         //? if >=1.20.5 {
@@ -146,7 +174,6 @@ public class Legacy4J {
         *///?}
         FactoryEvent.registerCommands((dispatcher,context,selection)->{
             TipCommand.register(dispatcher,context,selection);
-            Legacy4JCommand.register(dispatcher,context);
         });
         FactoryEvent.setup(Legacy4J::setup);
         FactoryEvent.tagsLoaded(Legacy4J::tagsLoaded);
@@ -171,8 +198,8 @@ public class Legacy4J {
     }
 
     public static void setup(){
-        //LegacyConfig.commonLoadAll();
-        if (!LegacyConfig.legacyCauldrons.get()) return;
+        LegacyCommonOptions.COMMON_STORAGE.load();
+        if (!LegacyMixinToggles.legacyCauldrons.get()) return;
         Map<Item, CauldronInteraction> emptyCauldron = CauldronInteraction.EMPTY/*? if >1.20.1 {*/.map()/*?}*/;
         Map<Item, CauldronInteraction> waterCauldron = CauldronInteraction.WATER/*? if >1.20.1 {*/.map()/*?}*/;
         CauldronInteraction emptyCauldronPotion = (blockState, level, blockPos, player, interactionHand, itemStack) ->{
@@ -329,9 +356,17 @@ public class Legacy4J {
         *///?}
     }
 
+    public static boolean isChunkPosVisibleInSquare(int centerX, int centerZ, int viewDistance, int x, int z, boolean offset){
+        int n = Math.max(0, Math.abs(x - centerX) - 1);
+        int o = Math.max(0, Math.abs(z - centerZ) - 1);
+        long p = Math.max(0, Math.max(n, o) - (offset ? 1 : 0));
+        long q = Math.min(n, o);
+        return Math.max(p, q) < viewDistance;
+    }
+
     public static ItemStack setItemStackPotion(ItemStack stack, Holder<Potion> potion){
         //? if <1.20.5 {
-        /*return PotionUtils.setPotion(stack,potion.value());
+        /*return PotionUtils.setPotion(stack, potion.value());
         *///?} else {
         stack.set(DataComponents.POTION_CONTENTS, new PotionContents(potion));
         return stack;
@@ -347,17 +382,17 @@ public class Legacy4J {
     }
 
     public static int getDyeColor(DyeColor dyeColor){
-        return /*? if <1.20.5 {*//*FactoryScreenUtil.colorFromFloat(dyeColor.getTextureDiffuseColors())*//*?} else {*/dyeColor.getTextureDiffuseColor()/*?}*/;
+        return /*? if <1.20.5 {*//*ColorUtil.colorFromFloat(dyeColor.getTextureDiffuseColors())*//*?} else {*/dyeColor.getTextureDiffuseColor()/*?}*/;
     }
 
     public static float getItemDamageModifier(ItemStack stack){
-        if (LegacyConfig.hasCommonConfigEnabled(LegacyConfig.legacyCombat)){
+        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat)){
             if (stack.getItem() instanceof SwordItem) return 1;
             else if (stack.getItem() instanceof ShovelItem) return -0.5f;
             else if (stack.getItem() instanceof PickaxeItem) return 1;
             else if (stack.getItem() instanceof AxeItem) {
                 if (stack.is(Items.STONE_AXE)) return -4;
-                else if (stack.is(Items.DIAMOND_AXE)) return - 2;
+                else if (stack.is(Items.DIAMOND_AXE) || stack.is(Items.NETHERITE_AXE)) return -2;
                 else return -3;
             }
         }
@@ -371,7 +406,7 @@ public class Legacy4J {
     }
 
     public static void registerDyedWaterCauldronInteraction(Map<Item, CauldronInteraction> waterCauldron){
-        if (!LegacyConfig.legacyCauldrons.get()) return;
+        if (!LegacyMixinToggles.legacyCauldrons.get()) return;
         BuiltInRegistries.ITEM.asHolderIdMap().forEach(i-> {
             if (!isDyeableItem(i)) return;
             waterCauldron.put(i.value(),(blockState, level, blockPos, player, interactionHand, itemStack) -> {
@@ -503,30 +538,24 @@ public class Legacy4J {
         ((LegacyPlayerInfo)p).setIdentifierIndex(pos);
         CommonNetwork.forceEnabledPlayer(p, ()-> {
             CommonNetwork.sendToPlayer(p, new PlayerInfoSync.All(Map.of(p.getUUID(),(LegacyPlayerInfo)p), Collections.emptyMap(),p.server.getDefaultGameType(),PlayerInfoSync.All.ID_S2C));
-            CommonNetwork.sendToPlayer(p, CommonConfigSyncPayload.of(LegacyConfig.COMMON_STORAGE));
             playerInitialPayloads.forEach(payload->CommonNetwork.sendToPlayer(p, payload));
         });
         if (!p.server.isDedicatedServer()) Legacy4JClient.serverPlayerJoin(p);
     }
 
     public static void onServerStart(MinecraftServer server){
-        //? if >=1.21.2 {
-        /*CommonRecipeManager.recipesByType = server.getRecipeManager().getRecipes().stream().collect(Collectors.groupingBy(h->h.value().getType(),Collectors.toMap(h->h.id().location(), Function.identity())));
-        *///?}
         playerInitialPayloads = createPlayerInitialPayloads(server);
+        LegacyWorldOptions.WORLD_STORAGE.withServerFile(server, "legacy_data.json").load();
     }
 
     public static void onResourcesReload(PlayerList playerList){
         onServerStart(playerList.getServer());
-        playerList.getPlayers().forEach(sp-> playerInitialPayloads.forEach(payload->CommonNetwork.sendToPlayer(sp, payload)));
+        playerInitialPayloads.forEach(payload->CommonNetwork.sendToPlayers(playerList.getPlayers(), payload));
     }
 
     public static Collection<CommonNetwork.Payload> createPlayerInitialPayloads(MinecraftServer server){
         HashSet<CommonNetwork.Payload> payloads = new HashSet<>();
         payloads.add(new ClientAdvancementsPayload(/*? if >1.20.1 {*/List.copyOf(server.getAdvancements().getAllAdvancements())/*?} else {*//*server.getAdvancements().getAllAdvancements().stream().collect(Collectors.toMap(Advancement::getId, Advancement::deconstruct))*//*?}*/));
-        //? if >=1.21.2 {
-        /*payloads.add(new CommonRecipeManager.ClientPayload(CommonRecipeManager.recipesByType));
-        *///?}
         return payloads;
     }
 

@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4J;
+import wily.legacy.config.LegacyWorldOptions;
 import wily.legacy.entity.LegacyPlayer;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.init.LegacyGameRules;
@@ -37,10 +38,7 @@ public abstract class PlayerListMixin {
     public /*? if <1.20.5 {*//*CompoundTag*//*?} else {*/Optional<CompoundTag>/*?}*/ placeNewPlayer(PlayerList list, ServerPlayer arg2) {
         var playerTag = list.load(arg2);
         if (/*? if <1.20.5 {*//*playerTag == null*//*?} else {*/playerTag.isEmpty()/*?}*/){
-            List<ItemStack> itemsToAdd = new ArrayList<>();
-            if (arg2.getServer().getGameRules().getBoolean(LegacyGameRules.PLAYER_STARTING_MAP)) itemsToAdd.add(Items.MAP.getDefaultInstance());
-            if (arg2.getServer().getGameRules().getBoolean(LegacyGameRules.PLAYER_STARTING_BUNDLE) && Items.BUNDLE.isEnabled(arg2.level().enabledFeatures())) itemsToAdd.add(Items.BUNDLE.getDefaultInstance());
-
+            List<ItemStack> itemsToAdd = new ArrayList<>(LegacyWorldOptions.initialItems.get().stream().filter(i-> i.isEnabled(arg2.getServer())).map(LegacyWorldOptions.InitialItem::item).toList());
 
             for (int j = 0; j < 27; j++) {
                 if (itemsToAdd.isEmpty()) break;

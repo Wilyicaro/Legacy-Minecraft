@@ -1,32 +1,40 @@
 package wily.legacy.client;
 
-import wily.legacy.config.LegacyConfig;
-import wily.legacy.config.LegacyConfigDisplay;
-import wily.legacy.util.LegacyComponents;
+import wily.factoryapi.base.config.FactoryMixinToggle;
+import wily.legacy.config.LegacyMixinToggles;
 
 public class LegacyMixinOptions {
-    public static final LegacyConfig.StorageHandler CLIENT_MIXIN_STORAGE = new LegacyConfig.StorageHandler("legacy/client_mixin.json");
+    public static final FactoryMixinToggle.Storage CLIENT_MIXIN_STORAGE = new FactoryMixinToggle.Storage("legacy/client_mixin.json");
 
-    public static final LegacyConfig<Boolean> legacyInventoryScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.inventory", ()-> new LegacyConfigDisplay<>("legacyInventoryScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyClassicCraftingScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.crafting", ()-> new LegacyConfigDisplay<>("legacyClassicCraftingScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyClassicStonecutterScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.stonecutter", ()-> new LegacyConfigDisplay<>("legacyClassicStonecutterScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyClassicLoomScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.loom", ()-> new LegacyConfigDisplay<>("legacyClassicLoomScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyClassicMerchantScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.merchant", ()-> new LegacyConfigDisplay<>("legacyClassicMerchantScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyCrafterScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.crafter", ()-> new LegacyConfigDisplay<>("legacyCrafterScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyFurnaceScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.furnace", ()-> new LegacyConfigDisplay<>("legacyFurnaceScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyAnvilScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.anvil", ()-> new LegacyConfigDisplay<>("legacyAnvilScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacySmithingScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.smithing", ()-> new LegacyConfigDisplay<>("legacySmithingScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyGrindstoneScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.grindstone", ()-> new LegacyConfigDisplay<>("legacyGrindstoneScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyCartographyScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.cartography", ()-> new LegacyConfigDisplay<>("legacyCartographyScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyEnchantmentScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.enchantment", ()-> new LegacyConfigDisplay<>("legacyEnchantmentScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyBeaconScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.beacon", ()-> new LegacyConfigDisplay<>("legacyBeaconScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyBrewingStandScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.brewing", ()-> new LegacyConfigDisplay<>("legacyBrewingStandScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyBookScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.book", ()-> new LegacyConfigDisplay<>("legacyBookScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyCreateWorldScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.create_world", ()-> new LegacyConfigDisplay<>("legacyCreateWorldScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyTitleScreen = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.title", ()-> new LegacyConfigDisplay<>("legacyTitleScreen", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyGui = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.gui", ()-> new LegacyConfigDisplay<>("legacyGui", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyChat = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.chat", ()-> new LegacyConfigDisplay<>("legacyChat", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyBossHealth = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.bosshealth", ()-> new LegacyConfigDisplay<>("legacyBossHealth", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
-    public static final LegacyConfig<Boolean> legacyWitches = CLIENT_MIXIN_STORAGE.register(LegacyConfig.createBoolean("legacy.mixin.base.client.witch", ()-> new LegacyConfigDisplay<>("legacyWitches", b-> LegacyComponents.NEEDS_RESTART), true, b->{}, CLIENT_MIXIN_STORAGE));
+    public static final FactoryMixinToggle legacyInventoryScreen = createAndRegisterMixin("legacy.mixin.base.client.inventory", "legacyInventoryScreen");
+    public static final FactoryMixinToggle legacyClassicCraftingScreen = createAndRegisterMixin("legacy.mixin.base.client.crafting", "legacyClassicCraftingScreen");
+    public static final FactoryMixinToggle legacyClassicStonecutterScreen = createAndRegisterMixin("legacy.mixin.base.client.stonecutter", "legacyClassicStonecutterScreen");
+    public static final FactoryMixinToggle legacyClassicLoomScreen = createAndRegisterMixin("legacy.mixin.base.client.loom", "legacyClassicLoomScreen");
+    public static final FactoryMixinToggle legacyClassicMerchantScreen = createAndRegisterMixin("legacy.mixin.base.client.merchant", "legacyClassicMerchantScreen");
+    public static final FactoryMixinToggle legacyContainerLikeScreen = createAndRegisterMixin("legacy.mixin.base.client.container", "legacyContainerLikeScreen");
+    //? if >=1.20.2 {
+    public static final FactoryMixinToggle legacyCrafterScreen = createAndRegisterMixin("legacy.mixin.base.client.crafter", "legacyCrafterScreen");
+    //?}
+    public static final FactoryMixinToggle legacyFurnaceScreen = createAndRegisterMixin("legacy.mixin.base.client.furnace", "legacyFurnaceScreen");
+    public static final FactoryMixinToggle legacyAnvilScreen = createAndRegisterMixin("legacy.mixin.base.client.anvil", "legacyAnvilScreen");
+    public static final FactoryMixinToggle legacySmithingScreen = createAndRegisterMixin("legacy.mixin.base.client.smithing", "legacySmithingScreen");
+    public static final FactoryMixinToggle legacyGrindstoneScreen = createAndRegisterMixin("legacy.mixin.base.client.grindstone", "legacyGrindstoneScreen");
+    public static final FactoryMixinToggle legacyCartographyScreen = createAndRegisterMixin("legacy.mixin.base.client.cartography", "legacyCartographyScreen");
+    public static final FactoryMixinToggle legacyEnchantmentScreen = createAndRegisterMixin("legacy.mixin.base.client.enchantment", "legacyEnchantmentScreen");
+    public static final FactoryMixinToggle legacyBeaconScreen = createAndRegisterMixin("legacy.mixin.base.client.beacon", "legacyBeaconScreen");
+    public static final FactoryMixinToggle legacyBrewingStandScreen = createAndRegisterMixin("legacy.mixin.base.client.brewing", "legacyBrewingStandScreen");
+    public static final FactoryMixinToggle legacyBookScreen = createAndRegisterMixin("legacy.mixin.base.client.book", "legacyBookScreen");
+    public static final FactoryMixinToggle legacyCreateWorldScreen = createAndRegisterMixin("legacy.mixin.base.client.create_world", "legacyCreateWorldScreen");
+    public static final FactoryMixinToggle legacyTitleScreen = createAndRegisterMixin("legacy.mixin.base.client.title", "legacyTitleScreen");
+    public static final FactoryMixinToggle legacyGui = createAndRegisterMixin("legacy.mixin.base.client.gui", "legacyGui");
+    public static final FactoryMixinToggle legacyChat = createAndRegisterMixin("legacy.mixin.base.client.chat", "legacyChat");
+    public static final FactoryMixinToggle legacyBossHealth = createAndRegisterMixin("legacy.mixin.base.client.bosshealth", "legacyBossHealth");
+    public static final FactoryMixinToggle legacyWitches = createAndRegisterMixin("legacy.mixin.base.client.witch", "legacyWitches");
+    public static final FactoryMixinToggle legacyDrowned = createAndRegisterMixin("legacy.mixin.base.client.drowned", "legacyDrowned");
 
+
+
+    public static FactoryMixinToggle createAndRegisterMixin(String key, String translationKey){
+        return CLIENT_MIXIN_STORAGE.register(LegacyMixinToggles.createMixinOption(key, translationKey, true));
+    }
 }

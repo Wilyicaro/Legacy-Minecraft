@@ -20,7 +20,6 @@ import net.minecraft.world.level.storage.LevelSummary;
 import org.apache.commons.compress.utils.FileNameUtils;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
@@ -84,6 +83,19 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     public PlayGameScreen(Screen parent) {
         this(parent,0);
+    }
+
+    public static Screen createAndCheckNewerVersions(Screen parent){
+        PlayGameScreen screen = new PlayGameScreen(parent);
+        if (Legacy4JClient.isNewerVersion) {
+            Legacy4JClient.isNewerVersion = false;
+            return PatchNotesScreen.createNewerVersion(createAndCheckNewerVersions(parent));
+        }
+        else if (Legacy4JClient.isNewerMinecraftVersion) {
+            Legacy4JClient.isNewerMinecraftVersion = false;
+            return PatchNotesScreen.createNewerMinecraftVersion(createAndCheckNewerVersions(parent));
+        }
+        return screen;
     }
 
     protected boolean canNotifyOnlineFriends(){

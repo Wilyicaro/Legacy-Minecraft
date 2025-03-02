@@ -31,7 +31,7 @@ public class MouseHandlerMixin {
     @Unique
     private void onChange(long window, CallbackInfo ci){
         if (window == Minecraft.getInstance().getWindow().getWindow()) {
-            Legacy4JClient.controllerManager.isControllerTheLastInput = false;
+            if (!Legacy4JClient.controllerManager.isControllerSimulatingInput) Legacy4JClient.controllerManager.isControllerTheLastInput = false;
             if (Legacy4JClient.controllerManager.isCursorDisabled) {
                 if (Legacy4JClient.controllerManager.getCursorMode() != 2)
                     Legacy4JClient.controllerManager.enableCursor();

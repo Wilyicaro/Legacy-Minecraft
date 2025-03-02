@@ -97,4 +97,9 @@ public abstract class SlotMixin implements LegacySlotDisplay, LegacySlot {
     public boolean isVisible(){
         return getDisplay() == null || getDisplay().isVisible();
     }
+
+    @Override
+    public boolean isWarning() {
+        return getDisplay() != null && getDisplay().isWarning();
+    }
 }

@@ -35,6 +35,7 @@ import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.LegacyMenuAccess;
+import wily.legacy.client.screen.RenderableVList;
 import wily.legacy.client.screen.ScrollableRenderer;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
@@ -49,11 +50,11 @@ public class LegacyUIElementTypes {
 
     public static final UIDefinitionManager.ElementType PUT_LEGACY_SLOT = UIDefinitionManager.ElementType.registerConditional("put_legacy_slot", UIDefinitionManager.ElementType.createIndexable(slots->(uiDefinition, accessorFunction, elementName, element) -> {
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeContainer", (s, d)->d.asListOpt(d1->DynamicUtil.getItemFromDynamic(d1, true)).result().map(l-> UIDefinition.createBeforeInit(elementName, (a)-> a.putStaticElement(s,new SimpleContainer(l.stream().map(ArbitrarySupplier::get).toArray(ItemStack[]::new))))).orElse(null));
-        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeItem", UIDefinitionManager.ElementType::parseItemStackElement);
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeItem", (s, d)-> UIDefinitionManager.ElementType.parseItemStackElement(elementName, s, d));
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "spriteOverride", ResourceLocation.CODEC);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "iconSprite", ResourceLocation.CODEC);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "offset", DynamicUtil.VEC3_OBJECT_CODEC);
-        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseBooleanElement(elementName, s, d),"iconCondition", "iconHolderCondition", "isVisible", "isFake");
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseBooleanElement(elementName, s, d),"iconCondition", "iconHolderCondition", "isVisible", "isFake", "isWarning");
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "x", "y", "width", "height");
         uiDefinition.getDefinitions().add(UIDefinition.createAfterInit(elementName,a->{
             Bearer<Integer> index = Bearer.of(0);
@@ -102,42 +103,83 @@ public class LegacyUIElementTypes {
                     public ArbitrarySupplier<ResourceLocation> getIconHolderOverride() {
                         return a.getBoolean(elementName+".iconHolderCondition",true) ? a.getElement(elementName+".spriteOverride",ResourceLocation.class).or(LegacySlotDisplay.super.getIconHolderOverride()) : ArbitrarySupplier.empty();
                     }
+
+                    @Override
+                    public boolean isWarning() {
+                        return a.getBoolean(elementName+".isWarning", LegacySlotDisplay.super.isWarning());
+                    }
                 });
                 if (isFake)
-                    a.addRenderable(new LegacyIconHolder(s));
+                    a.addRenderable(LegacyIconHolder.fromSlot(s));
                 index.set(index.get() + 1);
             });
         }));
     }));
 
     public static final UIDefinitionManager.ElementType PUT_SCROLLABLE_RENDERER = UIDefinitionManager.ElementType.registerConditional("put_scrollable_renderer", UIDefinitionManager.ElementType.createIndexable(slots->(uiDefinition, accessorFunction, elementName, element) -> {
-        List<Renderable> renderables = new ArrayList<>();
         uiDefinition.getDefinitions().add(UIDefinition.createBeforeInit(a-> {
-            renderables.clear();
-            a.putStaticElement(elementName+".renderables",renderables);
-            a.putStaticElement("scrollable_renderer", new ScrollableRenderer());
+            a.putStaticElement(elementName+".renderables", UIAccessor.createRenderablesWrapper(a, new ArrayList<>()));
+            a.putStaticElement(elementName, new ScrollableRenderer());
         }));
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "backgroundSprite", ResourceLocation.CODEC);
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "hasBackground", (s, d) -> UIDefinitionManager.ElementType.parseBooleanElement(elementName, s, d));
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "x", "y", "width", "height");
-        UIDefinitionManager.parseAllElements(uiDefinition, a-> UIAccessor.createRenderablesWrapper(a, renderables), element, s-> s);
-        uiDefinition.getDefinitions().add(UIDefinition.createAfterInit(a-> a.addRenderable(elementName, ((guiGraphics, i, j, f) -> {
+        UIDefinitionManager.parseAllElements(uiDefinition, a-> a.getElementValue(elementName+".renderables", a, UIAccessor.class), element, s-> s);
+        uiDefinition.getDefinitions().add(UIDefinition.createAfterInit(elementName, a-> a.addRenderable(elementName, ((guiGraphics, i, j, f) -> {
             int x = a.getInteger(elementName + ".x", 0);
             int y = a.getInteger(elementName + ".y", 0);
             int width = a.getInteger(elementName + ".width", 0);
             int height = a.getInteger(elementName + ".height", 0);
-            ScreenUtil.blitTranslucentOverlaySprite(guiGraphics, a.getResourceLocation(elementName+".backgroundSprite", LegacySprites.POINTER_PANEL), x, y, width, height );
-            a.getElement("scrollable_renderer", ScrollableRenderer.class).ifPresent(s-> s.render(guiGraphics, x + 11, y + 13, width - 22, height - 28, ()-> {
+            if (a.getBoolean(elementName+".hasBackground", true)) ScreenUtil.blitTranslucentOverlaySprite(guiGraphics, a.getResourceLocation(elementName+".backgroundSprite", LegacySprites.POINTER_PANEL), x, y, width, height );
+            a.getElement(elementName, ScrollableRenderer.class).ifPresent(s-> s.render(guiGraphics, x + 11, y + 11, width - 22, height - 28, ()-> {
                 int yOffset = 0;
-                for (Renderable r : renderables) {
+                for (Renderable r : a.getElementValue(elementName+".renderables", a, UIAccessor.class).getRenderables()) {
                     if (r instanceof LayoutElement e) {
-                        e.setPosition(x + 11, y + 13 + yOffset);
-                        r.render(guiGraphics, i, j, f);
+                        e.setPosition(x + 11, y + 15 + yOffset);
+                        r.render(guiGraphics, i, j + Math.round(s.getYOffset()), f);
                         yOffset += e.getHeight();
                     }
                 }
-                s.scrolled.max = Math.max(0, Math.round((yOffset - (height - 28)) / 12f));
+                s.scrolled.max = Math.max(0, Mth.ceil((yOffset - (height - 28)) / 12f));
             }));
         }))));
+    }));
+
+    public static final UIDefinitionManager.ElementType PUT_RENDERABLE_VLIST = UIDefinitionManager.ElementType.registerConditional("put_renderable_vertical_list", UIDefinitionManager.ElementType.createIndexable(slots->(uiDefinition, accessorFunction, elementName, element) -> {
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseBooleanElement(elementName, s, d), "forceWidth", "cyclic");
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "x", "y", "width", "height", "layoutSpacing");
+        uiDefinition.getDefinitions().add(UIDefinition.createBeforeInit(a-> {
+            RenderableVList renderableVList = new RenderableVList(a).layoutSpacing(l-> a.getInteger(elementName+".layoutSpacing", 5)).cyclic(a.getBoolean(elementName+".forceWidth", true)).cyclic(a.getBoolean(elementName+".cyclic", true));
+            a.putStaticElement(elementName, renderableVList);
+            a.putStaticElement(elementName+".renderables", UIAccessor.createRenderablesWrapper(a, renderableVList.renderables));
+        })); UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "x", "y", "width", "height");
+        UIDefinitionManager.parseAllElements(uiDefinition, a-> a.getElementValue(elementName+".renderables", a, UIAccessor.class), element, s-> s);
+        uiDefinition.getDefinitions().add(UIDefinition.createAfterInit(elementName, a-> a.getElementValue(elementName, null, RenderableVList.class).init(elementName, 0, 0, 225, 0)));
+    }));
+
+    public static final UIDefinitionManager.ElementType MODIFY_RENDERABLE_VLIST = UIDefinitionManager.ElementType.registerConditional("modify_renderable_vertical_list", UIDefinitionManager.ElementType.createIndexable(slots->(uiDefinition, accessorFunction, elementName, element) -> {
+        UIDefinition renderableVListUIDefinition = new UIDefinition() {
+            private final List<UIDefinition> definitions = new ArrayList<>();
+            @Override
+            public List<UIDefinition> getDefinitions() {
+                return definitions;
+            }
+
+            @Override
+            public void beforeInit(UIAccessor accessor) {
+                if (!accessor.initialized() && accessor.getScreen() instanceof RenderableVList.Access access){
+                    accessor.putStaticElement(elementName+".renderables", UIAccessor.createRenderablesWrapper(accessor, access.getRenderableVList().renderables));
+                    UIDefinition.super.beforeInit(accessor);
+                    UIDefinition.super.afterInit(accessor);
+                }
+            }
+
+            @Override
+            public void afterInit(UIAccessor accessor) {
+            }
+        };
+        UIDefinitionManager.parseAllElements(renderableVListUIDefinition, a-> a.getElementValue(elementName+".renderables", a, UIAccessor.class), element, s-> s);
+        uiDefinition.getDefinitions().add(renderableVListUIDefinition);
     }));
 
     public static final UIDefinitionManager.ElementType DRAW_OUTLINED_STRING = UIDefinitionManager.ElementType.registerConditional("draw_outlined_string", UIDefinitionManager.ElementType.createIndexable(slots->(uiDefinition, accessorFunction, elementName, element) -> {
@@ -190,6 +232,7 @@ public class LegacyUIElementTypes {
             flipA.set(flipA.get() + (f1 - flipA.get()) * 0.9F);
             flip.set(flip.get() + flipA.get());
         }));
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "x", "y");
         UIDefinitionManager.ElementType.parseTranslationElements(uiDefinition, elementName, element);
         uiDefinition.getDefinitions().add(UIDefinition.createAfterInit(elementName, (a) -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (guiGraphics, i, j, f) -> {
             float g = Mth.lerp(f, oOpen.get(), open.get());
@@ -197,7 +240,7 @@ public class LegacyUIElementTypes {
             guiGraphics.flush();
             Lighting.setupForEntityInInventory();
             guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate(33.0F, 31.0F, 100.0F);
+            guiGraphics.pose().translate( a.getInteger(elementName+".x", 0) + 33.0F, a.getInteger(elementName+".y", 0) + 31.0F, 100.0F);
             guiGraphics.pose().scale(-40.0F, 40.0F, 40.0F);
             guiGraphics.pose().mulPose(Axis.XP.rotationDegrees(25.0F));
             guiGraphics.pose().translate((1.0F - g) * 0.2F, (1.0F - g) * 0.1F, (1.0F - g) * 0.25F);

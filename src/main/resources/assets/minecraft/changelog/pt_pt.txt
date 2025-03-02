@@ -1,0 +1,23 @@
+- Adicionado a Tricky Trials! Explore as perigosas Câmaras do Desafio sozinho ou com amigos!
+- Adicionado Câmaras do Desafio, uma nova estrutura subterrânea com trilhas geradas proceduralmente, desafios de combate, e tesouros valiosos.
+- Adicionado Vórtice, um novo monstro encontrado nas Cãmaras do Desafio que ataca com projéteis energéticos de vento.
+- Adicionado Esqueleto-pantanoso, uma nova variante do Esqueleto que atira flechas venenosas, nascendo naturalmente em Pântanos e Manguezais.
+- Adicionado Clavas, uma arma pesada com ataques esmagadores únicos, e seus encantamentos únicos; Densidade, Ruptura e Rajada de Vento.
+- Adicionado Bancada Automática, um bloco que permite fabricação automática com capacidade de entrar e sair itens.
+- Adicionado novos geradores encontrados nas Câmaras do Desafio: Gerador do desafio, Gerador sombrio do desafio.
+- Adicionado novos blocos de tesouro encontrados nas Câmaras do Desafio: Cofre e Cofre sombrio.
+- Adicionado novos blocos decorativos e materiais para construção nas famílias do Cobre e do Tufo
+- Adicionado Projétil de vento, um projétil usado pelo Vórtice.
+- Adicionado Núcleo Pesado e Vara de Vórtice, itens usados na fabricação da Clava.
+- Adicionado novos Óstracos: Fluxo, Vórtice e Machado.
+- Adicionado novos desenhos para estandarte: Espiral e Vórtice
+- Adicionado novos enfeites: Parafuso e Fluxo.
+- Adicionado novas Poções e flechas com efeito: Infestação, Pegajoso, Tecitura, e Ventania.
+- Adicionado novos discos de música por Aaron Cherof e Lena Raine: Precipice, Creator e Creator (caixa musical).
+- Adicionado 20 novas pinturas pelos artistas Sarah Boeving e Kristoffer Zetterstrand.
+- Adicionado novos efeitos: Infestação, Pegajoso, Tecitura, Ventania, Presságio de Invasão, e Presságio de Desafio.
+- Adicionado 9 novas trilhas músicais por Aaron Cherof, Kumi Tanioka, e Lena Raine.
+- Adicionado 8 novos Progressos.
+- Adicionado 4 novos sons de ambiente de caverna.
+- Redesenhado Efeito de Mau Presságio para dar acesso à Eventos Sombrios.
+- Botes são laçáveis agora.

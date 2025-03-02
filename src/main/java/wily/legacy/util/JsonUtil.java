@@ -72,24 +72,6 @@ public class JsonUtil {
         return DynamicUtil.getItemFromDynamic(new Dynamic<>(JsonOps.INSTANCE,element),allowData);
     }
 
-    public static void addGroupedRecipeValuesFromJson(Map<String,List<RecipeInfo.Filter>> groups, JsonElement element){
-        if (element instanceof JsonArray a) a.forEach(e->{
-            if (e instanceof JsonPrimitive p && p.isString()) addRecipeValue(groups,p.getAsString(),p.getAsString());
-            else if(e instanceof JsonObject obj && obj.get("recipes") instanceof JsonArray rcps) rcps.forEach(r-> {
-                if (r instanceof JsonPrimitive p && p.isString()) addRecipeValue(groups, GsonHelper.getAsString(obj,"group",p.getAsString()), p.getAsString());
-            });
-        });
-        else if (element instanceof JsonObject obj) obj.asMap().forEach((g,ge)->{
-            if (ge instanceof JsonArray a) a.forEach(e-> {
-                if (e instanceof JsonPrimitive p && p.isString())  addRecipeValue(groups,g, p.getAsString());
-            });
-        });
-    }
-
-    public static <T> void addRecipeValue(Map<String,List<RecipeInfo.Filter>> map, String key, String recipeString){
-        addMapListEntry(map,key.isEmpty() ? recipeString : key, RecipeInfo.Filter.create(recipeString));
-    }
-
     public static <K,V> void addMapListEntry(Map<K,List<V>> map, K key, V entry){
         map.computeIfAbsent(key,k-> new ArrayList<>()).add(entry);
     }
@@ -103,6 +85,7 @@ public class JsonUtil {
         T obj = getJsonStringOrNull(object,element,constructor);
         if  (obj != null) consumer.accept(obj);
     }
+
     public static Stream<String> getOrderedNamespaces(ResourceManager manager){
         return manager.getNamespaces().stream().sorted(Comparator.comparingInt(s-> s.equals("legacy") ? 0 : 1));
     }

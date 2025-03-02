@@ -1,0 +1,49 @@
+{
+  "elements": {
+    "scrollable_renderer": {
+      "type": "put_scrollable_renderer",
+      "x": "${width}/2-228",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+      "width": 200,
+      "height": 222,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.breeding-animals_message"},
+          "width": 176
+        },
+        "text1": {
+          "type": "draw_multiline_string",
+          "component": {"translate": "legacy.menu.how_to_play.breeding-animals_message_1"},
+          "width": 176
+        }
+      }
+    },
+    "panel": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/small_panel",
+      "width":200,
+      "height":213,
+      "x":"${width}/2",
+      "y":"${scrollable_renderer.y}+4"
+    },
+    "frame": {
+      "type":"blit_sprite",
+      "sprite":"legacy:tiles/square_recessed_panel",
+      "width":"${panel.width}-20",
+      "height":"${panel.height}-20",
+      "x":"${panel.x}+10",
+      "y":"${panel.y}+10"
+    },
+    "breeding_animals": {
+      "type":"blit_sprite",
+      "sprite": "legacy:container/how_to_play/breeding-animals",
+      "x":"${frame.x}",
+      "y":"${frame.y}",
+      "translateX":1.5,
+      "translateY":1.5,
+      "width":"${frame.width}-3",
+      "height":"${frame.height}-3"
+    }
+  }
+}

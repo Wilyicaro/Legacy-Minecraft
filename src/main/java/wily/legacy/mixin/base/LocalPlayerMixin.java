@@ -1,5 +1,7 @@
 package wily.legacy.mixin.base;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -25,8 +27,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIClient;
-import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOptions;
 
 import static wily.legacy.Legacy4JClient.*;
 
@@ -53,12 +56,12 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
         super(clientLevel, gameProfile);
     }
 
-    @Redirect(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;onGround()Z", ordinal = /*? if <1.20.5 {*//*2*//*?} else {*/3/*?}*/))
-    public boolean onGroundFlying(LocalPlayer instance) {
+    @ModifyExpressionValue(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;onGround()Z", ordinal = /*? if <1.20.5 {*//*2*//*?} else {*/3/*?}*/))
+    public boolean onGroundFlying(boolean original) {
         return false;
     }
-    @Redirect(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;onGround()Z", ordinal = 0))
-    public boolean onGroundCanSprint(LocalPlayer instance) {
+    @ModifyExpressionValue(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;onGround()Z", ordinal = 0))
+    public boolean onGroundCanSprint(boolean original) {
         return true;
     }
     @Redirect(method = "aiStep", at = @At(value = "FIELD",target = "Lnet/minecraft/client/player/LocalPlayer;crouching:Z", opcode = Opcodes.PUTFIELD, ordinal = 0))
@@ -69,8 +72,8 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
     public void aiStepStopCrouching(CallbackInfo ci) {
         minecraft.options.keyShift.setDown(false);
     }
-    @Redirect(method = "aiStep", at = @At(value = "FIELD",target = "Lnet/minecraft/client/player/LocalPlayer;horizontalCollision:Z"))
-    public boolean aiStepSprinting(LocalPlayer instance) {
+    @ModifyExpressionValue(method = "aiStep", at = @At(value = "FIELD",target = "Lnet/minecraft/client/player/LocalPlayer;horizontalCollision:Z"))
+    public boolean aiStepSprinting(boolean original) {
         return false;
     }
     @Redirect(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;setSprinting(Z)V", ordinal = /*? if <1.21.4 {*/3/*?} else {*//*4*//*?}*/))
@@ -82,17 +85,18 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
         if (FactoryAPIClient.hasModOnServer) move(MoverType.SELF,vec3.with(Direction.Axis.Y,(vec3.y - getDeltaMovement().y) * (input./*? if >=1.21.2 {*//*keyPresses.jump()*//*?} else {*/jumping/*?}*/ ? (/*? if <1.20.5 {*//*0.42f*//*?} else {*/this.getAttributeValue(Attributes.JUMP_STRENGTH)/*?}*/ + getJumpBoostPower()) * 6 : 3)));
         else setDeltaMovement(vec3);
     }
-    @Redirect(method = "aiStep", at = @At(/*? if <1.21.2 {*/value = "FIELD",target = "Lnet/minecraft/client/player/Input;shiftKeyDown:Z"/*?} else {*//*value = "INVOKE",target = "Lnet/minecraft/world/entity/player/Input;shift()Z"*//*?}*/, ordinal = 3))
-    public boolean aiStepShift(Input instance) {
+    @ModifyExpressionValue(method = "aiStep", at = @At(/*? if <1.21.2 {*/value = "FIELD",target = "Lnet/minecraft/client/player/Input;shiftKeyDown:Z"/*?} else {*//*value = "INVOKE",target = "Lnet/minecraft/world/entity/player/Input;shift()Z"*//*?}*/, ordinal = 3))
+    public boolean aiStepShift(boolean original) {
         if (!lastOnGround && !isSpectator()){
             checkSupportingBlock(true,null);
             lastOnGround = mainSupportingBlockPos.isPresent();
         }
-        return instance./*? if >=1.21.2 {*//*shift()*//*?} else {*/shiftKeyDown/*?}*/ && (!FactoryAPIClient.hasModOnServer || (!instance./*? if >=1.21.2 {*//*jump()*//*?} else {*/jumping/*?}*/ && !lastOnGround));
+        return original && (!FactoryAPIClient.hasModOnServer || (!input./*? if >=1.21.2 {*//*keyPresses.jump()*//*?} else {*/jumping/*?}*/ && !lastOnGround));
     }
-    @Redirect(method = "aiStep", at = @At(/*? if <1.21.2 {*/value = "FIELD",target = "Lnet/minecraft/client/player/Input;jumping:Z"/*?} else {*//*value = "INVOKE",target = "Lnet/minecraft/world/entity/player/Input;jump()Z"*//*?}*/, ordinal = 4))
-    public boolean aiStepJump(Input instance) {
-        return instance./*? if >=1.21.2 {*//*jump()*//*?} else {*/jumping/*?}*/ && (!FactoryAPIClient.hasModOnServer || !isSprinting() || getXRot() <= 0 || !lastOnGround);
+
+    @ModifyExpressionValue(method = "aiStep", at = @At(/*? if <1.21.2 {*/value = "FIELD",target = "Lnet/minecraft/client/player/Input;jumping:Z"/*?} else {*//*value = "INVOKE",target = "Lnet/minecraft/world/entity/player/Input;jump()Z"*//*?}*/, ordinal = 4))
+    public boolean aiStepJump(boolean original) {
+        return original && (!FactoryAPIClient.hasModOnServer || !isSprinting() || getXRot() <= 0 || !lastOnGround);
     }
 
     @Override
@@ -117,10 +121,12 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
             if (getXRot() != 0 && (!lastOnGround || getXRot() < 0) && input.hasForwardImpulse() && isSprinting()) move(MoverType.SELF,new Vec3(0,-(getXRot() / 90) * input.forwardImpulse * getFlyingSpeed() * 2, 0));
         }
     }
-    @Redirect(method = /*? if <1.20.5 {*//*"handleNetherPortalClient"*//*?} else {*/"handleConfusionTransitionEffect"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;isPauseScreen()Z"))
-    public boolean handleConfusionTransitionEffect(Screen instance) {
-        return instance.isPauseScreen() || FactoryAPIClient.hasModOnServer;
+
+    @ModifyExpressionValue(method = /*? if <1.20.5 {*//*"handleNetherPortalClient"*//*?} else {*/"handleConfusionTransitionEffect"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;isPauseScreen()Z"))
+    public boolean handleConfusionTransitionEffect(boolean original) {
+        return original || FactoryAPIClient.hasModOnServer;
     }
+
     @Inject(method = "serverAiStep", at = @At("RETURN"))
     public void serverAiStep(CallbackInfo ci) {
         if (!FactoryAPIClient.hasModOnServer) return;
@@ -129,6 +135,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
             if (getXRot() != 0 && input.hasForwardImpulse() && isSprinting()) zza*=Math.max(0.1f,1 - Math.abs(getXRot() / 90));
         }
     }
+
     @Inject(method = "rideTick", at = @At("HEAD"))
     public void rideTick(CallbackInfo ci) {
         if (!FactoryAPIClient.hasModOnServer) return;

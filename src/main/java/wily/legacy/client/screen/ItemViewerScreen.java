@@ -130,9 +130,8 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && LegacyTipManager.hasTip(hoveredSlot.getItem())) {
+        if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy()))) {
             ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
-            LegacyTipManager.setActualTip(new LegacyTip(hoveredSlot.getItem().copy()));
             return true;
         }
         return super.keyPressed(i, j, k);

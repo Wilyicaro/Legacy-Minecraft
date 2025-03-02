@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -49,9 +50,11 @@ public class LegacyBiomeOverride {
     public ItemStack icon() {
         return icon;
     }
+
     public float waterTransparency() {
         return waterTransparency == null ? DEFAULT.waterTransparency() : waterTransparency;
     }
+
     public Integer waterColor() {
         return waterColor == null ? DEFAULT.waterColor : waterColor;
     }
@@ -59,6 +62,7 @@ public class LegacyBiomeOverride {
     public int getWaterARGBOrDefault(int defaultColor){
         return (int) (waterTransparency()*255) << 24 | (waterColor() == null ? defaultColor : waterColor()) & 16777215;
     }
+
     public Integer waterFogColor() {
         return waterFogColor == null ? DEFAULT.waterFogColor : waterFogColor;
     }

@@ -2,39 +2,39 @@
   "overrides": [
     {
       "items": ["#minecraft:terracotta","!minecraft:terracotta"],
-      "tip": "block.minecraft.colored_terracotta.tip"
+      "tip": {"translate": "block.minecraft.colored_terracotta.tip"}
     },
     {
       "block": "#minecraft:shulker_boxes",
-      "tip": "block.minecraft.shulker_box.tip"
+      "tip": {"translate": "block.minecraft.shulker_box.tip"}
     },
     {
       "item": "#minecraft:beds",
-      "tip": "block.minecraft.bed.tip"
+      "tip": {"translate": "block.minecraft.bed.tip"}
     },
     {
       "item": "#minecraft:wool",
-      "tip": "block.minecraft.wool.tip"
+      "tip": {"translate": "block.minecraft.wool.tip"}
     },
     {
       "item": "#minecraft:wool_carpets",
-      "tip": "block.minecraft.carpet.tip"
+      "tip": {"translate": "block.minecraft.carpet.tip"}
     },
     {
       "item": "#minecraft:banners",
-      "tip": "block.minecraft.banner.tip"
+      "tip": {"translate": "block.minecraft.banner.tip"}
     },
     {
       "block": "#minecraft:concrete_powder",
-      "tip": "block.minecraft.concrete_powder.tip"
+      "tip": {"translate": "block.minecraft.concrete_powder.tip"}
     },
     {
       "item": "#minecraft:concrete",
-      "tip": "block.minecraft.concrete.tip"
+      "tip": {"translate": "block.minecraft.concrete.tip"}
     },
     {
       "items": ["#minecraft:candles", "!minecraft:candle"],
-      "tip": "block.minecraft.colored_candle.tip"
+      "tip": {"translate": "block.minecraft.colored_candle.tip"}
     }
   ]
 }

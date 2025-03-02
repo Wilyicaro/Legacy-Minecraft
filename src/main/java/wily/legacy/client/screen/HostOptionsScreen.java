@@ -15,13 +15,16 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
+import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.base.network.CommonNetwork;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
@@ -30,7 +33,7 @@ import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
 import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.config.LegacyConfig;
+import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.network.PlayerInfoSync;
@@ -48,6 +51,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     public static final Component HOST_OPTIONS = Component.translatable("legacy.menu.host_options");
     public static final Component PLAYERS_INVITE = Component.translatable("legacy.menu.players_invite");
     protected final Component title;
+    protected float oldAlpha = getDefaultOpacity();
     protected float alpha = getDefaultOpacity();
     protected boolean shouldFade = false;
 
@@ -124,6 +128,30 @@ public class HostOptionsScreen extends PanelVListScreen {
         return super.keyPressed(i, j, k);
     }
 
+    protected abstract class PlayerButton extends AbstractButton {
+        public final GameProfile profile;
+
+        public PlayerButton(int x, int y, int width, int height, GameProfile profile) {
+            super(x, y, width, height, Component.literal(profile.getName()));
+            this.profile = profile;
+        }
+
+        @Override
+        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+            if (isHoveredOrFocused()) shouldFade = true;
+            super.renderWidget(guiGraphics, i, j, f);
+            drawPlayerIcon(profile, guiGraphics,getX() + 6, getY() + 5);
+        }
+        @Override
+        protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+            ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 68, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j,true);
+        }
+        @Override
+        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+            defaultButtonNarrationText(narrationElementOutput);
+        }
+    }
+
     public static void drawPlayerIcon(GameProfile profile, GuiGraphics guiGraphics, int x, int y){
         LegacyPlayerInfo info = (LegacyPlayerInfo)Minecraft.getInstance().getConnection().getPlayerInfo(profile.getId());
         float[] color = Legacy4JClient.getVisualPlayerColor(info);
@@ -133,6 +161,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         RenderSystem.disableBlend();
         FactoryGuiGraphics.of(guiGraphics).clearColor();
     }
+
     protected void addPlayerButtons(){
         addPlayerButtons(true,(profile, b)->{
             if (!minecraft.player.hasPermissions(2)) return;
@@ -141,9 +170,13 @@ public class HostOptionsScreen extends PanelVListScreen {
             boolean initialVisibility = !((LegacyPlayerInfo)playerInfo).isVisible();
             PanelVListScreen screen = new PanelVListScreen(this, s-> Panel.centered(s, LegacySprites.PANEL,280, playerInfo.getGameMode().isSurvival() ? 120 : 88), HOST_OPTIONS){
                 @Override
-                protected void init() {
+                public void renderableVListInit() {
+                    getRenderableVList().init(panel.x + 8, panel.y + 27, panel.width - 16, panel.height - 16);
+                }
+
+                @Override
+                protected void panelInit() {
                     panel.init();
-                    renderableVList.init(panel.x + 8,panel.y + 27,panel.width - 16,panel.height - 16);
                 }
 
                 @Override
@@ -177,38 +210,26 @@ public class HostOptionsScreen extends PanelVListScreen {
                 }
             }));
             if (playerInfo.getGameMode().isSurvival()){
-                screen.renderableVList.addRenderable(new TickBox(0,0,((LegacyPlayerInfo) playerInfo).mayFlySurvival(),b1-> Component.translatable("legacy.menu.host_options.player.mayFly"),b1-> null, b1-> CommonNetwork.sendToServer(new PlayerInfoSync(b1.selected ? 5 : 6, profile))));
-                screen.renderableVList.addRenderable(new TickBox(0,0,((LegacyPlayerInfo) playerInfo).isExhaustionDisabled(),b1-> Component.translatable("legacy.menu.host_options.player.disableExhaustion"),b1-> null, b1-> CommonNetwork.sendToServer(new PlayerInfoSync(b1.selected ? 3 : 4, profile))));
+                screen.renderableVList.addRenderable(new TickBox(0,0,((LegacyPlayerInfo) playerInfo).mayFlySurvival(),b1-> Component.translatable("legacy.menu.host_options.player.mayFly"),b1-> null, b1-> CommonNetwork.sendToServer(PlayerInfoSync.mayFlySurvival(b1.selected, profile))));
+                screen.renderableVList.addRenderable(new TickBox(0,0,((LegacyPlayerInfo) playerInfo).isExhaustionDisabled(),b1-> Component.translatable("legacy.menu.host_options.player.disableExhaustion"),b1-> null, b1-> CommonNetwork.sendToServer(PlayerInfoSync.disableExhaustion(b1.selected, profile))));
             }
             screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230,16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL,b1.getObjectValue().getLongDisplayName()),(b1)->Tooltip.create(Component.translatable("selectWorld.gameMode."+playerInfo.getGameMode().getName()+ ".info")),playerInfo.getGameMode(),()->gameTypes, b1->COMMAND_MAP.put(b1,()-> minecraft.getConnection().sendCommand("gamemode %s %s".formatted(b1.getObjectValue().getName(),profile.getName())))));
             screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_player_spawn"),b1-> COMMAND_MAP.put(b1,()-> minecraft.player.connection.sendCommand("spawnpoint %s ~ ~ ~".formatted(profile.getName())))).bounds(0,0,215,20).build());minecraft.setScreen(screen);
         });
     }
+
     protected void addPlayerButtons(boolean includeClient, BiConsumer<GameProfile, AbstractButton> onPress){
         for (GameProfile profile : getActualGameProfiles()) {
             if (!includeClient && Objects.equals(profile.getName(), Minecraft.getInstance().player.getGameProfile().getName())) continue;
-            renderableVList.addRenderable(new AbstractButton(0,0, 230, 30,Component.literal(profile.getName())) {
-                @Override
-                protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                    if (isHoveredOrFocused()) shouldFade = true;
-                    super.renderWidget(guiGraphics, i, j, f);
-                    drawPlayerIcon(profile, guiGraphics,getX() + 6, getY() + 5);
-                }
-                @Override
-                protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                    ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 68, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j,true);
-                }
+            renderableVList.addRenderable(new PlayerButton(0,0, 230, 30, profile) {
                 @Override
                 public void onPress() {
                     onPress.accept(profile,this);
                 }
-                @Override
-                protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-                    defaultButtonNarrationText(narrationElementOutput);
-                }
             });
         }
     }
+
     public static List<GameProfile> getActualGameProfiles(){
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.hasSingleplayerServer()) return minecraft.getSingleplayerServer().getPlayerList().getPlayers().stream().map(Player::getGameProfile).toList();
@@ -219,11 +240,21 @@ public class HostOptionsScreen extends PanelVListScreen {
 
     @Override
     protected void init() {
-        CommonNetwork.sendToServer(new PlayerInfoSync(0,minecraft.player));
-        panel.init();
+        CommonNetwork.sendToServer(PlayerInfoSync.askAll(minecraft.player));
+        super.init();
         addHostOptionsButton();
-        renderableVList.init(panel.x + 10,panel.y + 22,panel.width - 20,panel.height - 20);
     }
+
+    @Override
+    protected void panelInit() {
+        panel.init();
+    }
+
+    @Override
+    public void renderableVListInit() {
+        getRenderableVList().init(panel.x + 10, panel.y + 22, panel.width - 20, panel.height - 26);
+    }
+
     protected void addHostOptionsButton(){
         if (!minecraft.player.hasPermissions(2) && !minecraft.hasSingleplayerServer()) return;
         addRenderableWidget(Button.builder(HOST_OPTIONS,this::pressHostOptionsButton).bounds(panel.x, panel.y - 36,250,20).build());
@@ -234,10 +265,15 @@ public class HostOptionsScreen extends PanelVListScreen {
 
         PanelVListScreen screen = new PanelVListScreen(this,s-> Panel.centered(s, LegacySprites.PANEL, 265,minecraft.player.hasPermissions(2) ? 200 : 130), HOST_OPTIONS){
             @Override
-            protected void init() {
-                panel.init();
-                renderableVList.init(panel.x + 8,panel.y + 8,panel.width - 16,panel.height - 16);
+            public void renderableVListInit() {
+                getRenderableVList().init(panel.x + 8, panel.y + 8, panel.width - 16, panel.height - 16);
             }
+
+            @Override
+            protected void panelInit() {
+                panel.init();
+            }
+
             public void onClose() {
                 super.onClose();
                 COMMAND_MAP.values().forEach(Runnable::run);
@@ -255,7 +291,8 @@ public class HostOptionsScreen extends PanelVListScreen {
         if (!minecraft.player.hasPermissions(2)){
             for (GameRules.Key<GameRules.BooleanValue> key : PlayerInfoSync.All.NON_OP_GAMERULES)
                 screen.renderableVList.addRenderable(new TickBox(0,0,Legacy4JClient.gameRules.getRule(key).get(),b1-> Component.translatable(key.getDescriptionId()),b1-> null, b1-> nonOpGamerules.put(key.getId(),b1.selected)));
-            LegacyConfig.COMMON_STORAGE.configMap.values().forEach(c-> screen.getRenderableVList().addRenderable(LegacyConfigWidget.createWidget(c, 0, 0, 0, b1-> LegacyConfig.sync(c))));
+            LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c-> screen.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1-> c.sync())));
+            Legacy4J.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c-> screen.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1-> c.sync())));
             minecraft.setScreen(screen);
             return;
         }
@@ -278,7 +315,8 @@ public class HostOptionsScreen extends PanelVListScreen {
         }));
         for (GameRules.Key<GameRules.BooleanValue> key : OTHER_RULES)
             screen.renderableVList.addRenderable(new TickBox(0,0,Legacy4JClient.gameRules.getRule(key).get(),b1-> Component.translatable(key.getDescriptionId()),b1-> null, b1->COMMAND_MAP.put(b1,()->minecraft.player.connection.sendCommand("gamerule %s %s".formatted(key.getId(), b1.selected)))));
-        LegacyConfig.COMMON_STORAGE.configMap.values().forEach(c-> screen.getRenderableVList().addRenderable(LegacyConfigWidget.createWidget(c, 0, 0, 0, b1-> LegacyConfig.sync(c))));
+        LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c-> screen.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1-> c.sync())));
+        Legacy4J.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c-> screen.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1-> c.sync())));
         minecraft.setScreen(screen);
         if (minecraft.hasSingleplayerServer() && !minecraft.getSingleplayerServer().isPublished()) return;
         BiFunction<Boolean,Component,AbstractButton> teleportButton = (bol,title)-> Button.builder(title, b1-> minecraft.setScreen(new HostOptionsScreen(title) {
@@ -305,20 +343,13 @@ public class HostOptionsScreen extends PanelVListScreen {
         return false;
     }
 
-    @Override
-    public void tick() {
-        super.tick();
-        if (shouldFade) {
-            alpha = Math.min(1.0f, alpha * 1.04f);
-            shouldFade = false;
-        }else {
-            if (alpha > getDefaultOpacity())  alpha = Math.max(getDefaultOpacity(), alpha / 1.04f);
-        }
-    }
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f, Math.max(getDefaultOpacity(), Math.min(alpha * (shouldFade ? 1 + f * 0.04f : 1 / (1 + f * 0.04f)),1.0f)));
+        oldAlpha = alpha;
+        alpha = Mth.lerp(f * 0.1f, oldAlpha, shouldFade ? 1.0f : getDefaultOpacity());
+        shouldFade = false;
+        FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f, alpha);
         RenderSystem.enableBlend();
         panel.render(guiGraphics,i,j,f);
         RenderSystem.disableBlend();

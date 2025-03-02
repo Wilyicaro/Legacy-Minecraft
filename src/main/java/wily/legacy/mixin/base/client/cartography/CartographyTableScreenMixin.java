@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
+import wily.factoryapi.util.FactoryItemUtil;
 import wily.legacy.client.CommonColor;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
@@ -104,7 +105,7 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
             if (!slot.hasItem())
                 return;
 
-            if (!RenameItemMenu.hasCustomName(slot.getItem()) && s.equals(slot.getItem().getHoverName().getString())) {
+            if (!FactoryItemUtil.hasCustomName(slot.getItem()) && s.equals(slot.getItem().getHoverName().getString())) {
                 s = "";
             }
             ((RenameItemMenu)menu).setResultItemName(s);
