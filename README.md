@@ -1,31 +1,46 @@
-![A title using Minecraft's logo style saying "Legacy Edition 4JAVA" in a red pixelated background](https://cdn.modrinth.com/data/cached_images/67141437c0984015f45bb785154c81e3481fd5b6.png)
+<img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/banners/modpage_banner.png?raw=true" alt="Legacy4J Themed Banner" width="600" >
+<p></p>
 
-[<img alt="curseforge" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/curseforge_vector.svg">](https://www.curseforge.com/minecraft/mc-mods/legacy-minecraft) <!-- SVG version -->
-[<img alt="modrinth" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/available/modrinth_vector.svg">](https://modrinth.com/mod/legacy4j) <!-- SVG version -->
-[<img alt="fabric" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/fabric_vector.svg">](https://fabricmc.net/) <!-- SVG version -->
-[<img alt="forge" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/forge_vector.svg">](https://files.minecraftforge.net) <!-- SVG version -->
-[<img alt="quilt" height="56" src="https://cdn.jsdelivr.net/npm/@intergrav/devins-badges@3/assets/cozy/supported/quilt_vector.svg">](https://quiltmc.org/)
+[<img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/curseforge_button.png?raw=true" alt="curseforge" width="100">](https://www.curseforge.com/minecraft/mc-mods/legacy-minecraft)
+[<img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/modrinth_button.png?raw=true" alt="modrinth" width="100">](https://modrinth.com/mod/legacy4j)
+[<img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/forge_button.png?raw=true" alt="forge" width="100">](https://files.minecraftforge.net/)
+[<img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/fabric_button.png?raw=true" alt="fabric" width="100">](https://fabricmc.net/)
+[<img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/neoforge_button.png?raw=true" alt="neoforge" width="100">](https://neoforged.net/)
+[<img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/quilt_button.png?raw=true" alt="quilt" width="100">](https://quiltmc.org/)
 
-# 📜 About
+<img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/modpage_about.png?raw=true" width="600" >
+
 **Legacy4J** is a mod about nostalgia of old 4J Studios Minecraft Legacy Edition. The main objective of this mod is remake every aspect of [Legacy Console Edition](https://minecraft.wiki/w/Legacy_Console_Edition) in 1:1 for Java Edition versions, adding its exclusive features, and bringing it to modern versions.
 
 This includes an accurate controller support, the control tooltips, the crafting menu, the creative flight, the gamma shader, the scaling, the HUD, and more!
 
+<img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/modpage_comparison.png?raw=true" width="600" >
 
-![4d16d058705efd1447a848f3715b36b407841422](https://github.com/omo50/Legacy-Minecraft/assets/144749186/5deb83e5-24ee-4006-9eb5-544e2517ad2d)
+Not only that, but several QOL features have been added in addition to those already present in the Legacy Edition, such as Resource Albums, Global Packs, World Templates, an integrated Mods screen, options related to terrain fog and more.
+You can see more about this on the [project wiki](https://github.com/Wilyicaro/Legacy-Minecraft/wiki)!
 
-<h1>👋You should also check out the recommended modpacks!</h1>
+## 🚫 **LEGACY4J** CAN BE CONSIDERED A HACK IN SERVERS EQUIPPED WITH ANTI-CHEATS
+WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
 
+*Feel free to [report issues](https://github.com/Wilyicaro/Legacy-Minecraft/issues) or contribute [here](https://github.com/Wilyicaro/Legacy-Minecraft)!*  
+*You can also join our [Discord](https://discord.com/invite/CVas58uPyb) to talk to the developers, other members and suggest features for the mod!*  
+*Also, you can follow the mod's development in detail and see how it's progressing on the [Kyubion Studios server](https://discord.gg/cdZg5aYfMM).*
+
+
+<img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/modpage_special_thanks.png?raw=true" width="600" >
+
+- AgentMindStorm for providing the built-in resource packs: Console Aspects & Programmer Console Aspects (NeoForge and Forge)
+- Moustard for providing the How To Play text from TU69
+- RedRain0o0 for doing almost the How To Play UI Definitions
+- cloud54 for providing Steam Control Icons and sounds for the keyboard screen
+- Permdog99 and ItzJustAPlayer for helping with the PlayStation® 5 Control Icons
+- NicSonic-_- for providing the Stadia Control Icons
+
+<img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/modpage_related_projects.png?raw=true" width="600" >
+
+- [VDX: Legacy Console UI](https://www.curseforge.com/minecraft-bedrock/texture-packs/vdx-legacy-console-ui) | An experimental resource pack by CrisXolt that converts Legacy Edition UI designs to Bedrock Edition with high accuracy
 - [Project4J](https://modrinth.com/modpack/project-4j) | Experience a timeline where Legacy Console Edition had mods!
 - [Re-Console](https://modrinth.com/modpack/legacy-minecraft) | Better performance, all tutorial worlds, and more!
-
-![892ef1c08dae6aee23c78dd0154bd801094a6d5e](https://github.com/omo50/Legacy-Minecraft/assets/144749186/ff8b464b-e0e7-4951-a33f-242df53c5b8c)
-
-> ### 🚫 THIS MOD CAN BE CONSIDERED A HACK IN SERVERS
-> WE ARE NOT RESPONSIBLE FOR SERVER PUNISHMENTS 
-
-*Feel free to [report issues](https://github.com/Wilyicaro/Legacy-Minecraft/issues) or contribute [here](https://github.com/Wilyicaro/Legacy-Minecraft)!*
-*You can also join our [Discord](https://discord.com/invite/CVas58uPyb) to talk to the developers, other members and suggest features for the mod!*
 
 
 # 📝 Planned and Implemented Features
@@ -44,7 +59,8 @@ This includes an accurate controller support, the control tooltips, the crafting
 | LE Creative Flight                                                         |      ✅      | ✅       |
 | Superflat in-GUI customizer                                                |      ✅      | ✅       |
 | Tutorial World                                                             |      ✅      | ✅       |
-| Patch/Update Notes Interface                                               |      ❌      | ✅       |
+| How To Play Interface                                               |      ✅      | ✅       |
+| Patch/Update Notes Interface                                               |      ✅      | ✅       |
 | Advanced Hints/Tutorial                                                    |      ❌      | ✅       |
 | Improved Change Skin Interface                                             |      ❌      | ✅       |
 | [Legacy Edition Minigames](https://www.legacyminigames.net/) Compatibility |      ❌      | ✅       |
