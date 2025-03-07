@@ -233,6 +233,7 @@ public class SDLControllerHandler implements Controller.Handler{
             case DPAD_DOWN -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_DPAD_DOWN;
             case DPAD_LEFT -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_DPAD_LEFT;
             case DPAD_RIGHT -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_DPAD_RIGHT;
+            case TOUCHPAD -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_TOUCHPAD;
             default -> -1;
         };
     }

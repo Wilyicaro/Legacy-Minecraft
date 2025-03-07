@@ -21,6 +21,7 @@ public enum ControllerBinding implements StringRepresentable {
     BACK(InputConstants.KEY_H),
     GUIDE,
     START(InputConstants.KEY_ESCAPE),
+    TOUCHPAD(InputConstants.KEY_T),
     LEFT_STICK(c-> BindingState.Axis.createStick(c,()->LegacyOptions.leftStickDeadZone.get().floatValue(),(a, s)->{}),false),
     RIGHT_STICK(c-> BindingState.Axis.createStick(c,()->LegacyOptions.rightStickDeadZone.get().floatValue(), ControllerManager::updatePlayerCamera),false),
     LEFT_STICK_BUTTON(InputConstants.KEY_F5),

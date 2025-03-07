@@ -6,6 +6,7 @@
     "back":{"icon": "\uE73E\uE005"},
     "guide":{"icon": "\uE745"},
     "start":{"icon": "\uE73D\uE006"},
+    "touchpad":{"icon": "\uE750\uE751"},
     "left_stick":{"icon": "\uE746\uE748\uE747"},
     "right_stick":{"icon": "\uE749\uE74F\uE74E"},
     "left_stick_button":{"icon": "\uE743\uE00F"},
