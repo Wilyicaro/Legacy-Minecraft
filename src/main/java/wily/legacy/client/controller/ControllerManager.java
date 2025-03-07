@@ -143,6 +143,7 @@ public  class ControllerManager {
                 simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_BUTTON) && state.onceClick(true),InputConstants.KEY_ESCAPE, state);
                 simulateKeyAction(s-> s.is(ControllerBinding.LEFT_BUTTON),InputConstants.KEY_X, state);
                 simulateKeyAction(s->s.is(ControllerBinding.UP_BUTTON),InputConstants.KEY_O, state);
+                simulateKeyAction(s->s.is(ControllerBinding.TOUCHPAD),InputConstants.KEY_T, state);
                 simulateKeyAction(s->s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_W, state);
                 simulateKeyAction(s->s.is(ControllerBinding.LEFT_TRIGGER),InputConstants.KEY_PAGEUP, state);
                 simulateKeyAction(s->s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_PAGEDOWN, state);

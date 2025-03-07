@@ -272,6 +272,20 @@
             "ascent": 11,
             "height": 15,
             "chars": ["\uE00F"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/ps4/touchpad.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE750"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/ps4/touchpad_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE751"]
         }
-    ]    
+    ]
 }
