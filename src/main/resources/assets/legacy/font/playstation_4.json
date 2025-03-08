@@ -286,6 +286,48 @@
             "ascent": 11,
             "height": 15,
             "chars": ["\uE751"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/ps4/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE752"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/ps4/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE753"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/ps4/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE754"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/ps4/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE755"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/ps4/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE756"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/ps4/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE757"]
         }
     ]
 }
