@@ -116,7 +116,7 @@ public  class ControllerManager {
             if (state.pressed) {
                 isControllerTheLastInput = true;
                 //? if >=1.21.2
-                /*minecraft.getFramerateLimitTracker().onInputReceived();*/
+                //minecraft.getFramerateLimitTracker().onInputReceived();
             }
 
             if (getCursorMode() == 0 && state.pressed && !isCursorDisabled) disableCursor();
@@ -143,12 +143,13 @@ public  class ControllerManager {
                 simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_BUTTON) && state.onceClick(true),InputConstants.KEY_ESCAPE, state);
                 simulateKeyAction(s-> s.is(ControllerBinding.LEFT_BUTTON),InputConstants.KEY_X, state);
                 simulateKeyAction(s->s.is(ControllerBinding.UP_BUTTON),InputConstants.KEY_O, state);
-                simulateKeyAction(s->s.is(ControllerBinding.TOUCHPAD),InputConstants.KEY_T, state);
                 simulateKeyAction(s->s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_W, state);
                 simulateKeyAction(s->s.is(ControllerBinding.LEFT_TRIGGER),InputConstants.KEY_PAGEUP, state);
                 simulateKeyAction(s->s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_PAGEDOWN, state);
                 simulateKeyAction(s->s.is(ControllerBinding.RIGHT_BUMPER),InputConstants.KEY_RBRACKET, state);
                 simulateKeyAction(s->s.is(ControllerBinding.LEFT_BUMPER),InputConstants.KEY_LBRACKET, state);
+                simulateKeyAction(s->s.is(ControllerBinding.TOUCHPAD),InputConstants.KEY_T, state);
+                simulateKeyAction(s->s.is(ControllerBinding.CAPTURE),InputConstants.KEY_F2, state);
                 if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis stick && Math.abs(stick.y) > Math.abs(stick.x) && state.pressed && state.canClick())
                     minecraft.screen.mouseScrolled(getPointerX(), getPointerY()/*? if >1.20.1 {*/, 0/*?}*/, Math.signum(-stick.y));
                 Predicate<Predicate<BindingState.Axis>> isStickAnd = s -> state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && s.test(stick);

@@ -6,7 +6,6 @@
     "back":{"icon": "\uE73E\uE005"},
     "guide":{"icon": "\uE745"},
     "start":{"icon": "\uE73D\uE006"},
-    "touchpad":{"icon": "\uE750\uE751"},
     "left_stick":{"icon": "\uE746\uE748\uE747"},
     "right_stick":{"icon": "\uE749\uE74F\uE74E"},
     "left_stick_button":{"icon": "\uE743\uE00F"},
@@ -26,5 +25,11 @@
     "right_stick_up":{"icon": "\uE749"},
     "right_stick_down":{"icon": "\uE749"},
     "right_stick_right":{"icon": "\uE74F"},
-    "right_stick_left":{"icon": "\uE74E"}
+    "right_stick_left":{"icon": "\uE74E"},
+    "touchpad":{"icon": "\uE750\uE751"},
+    "capture": {"icon": "\uE752\uE753"},
+    "lsl_button": {"icon": "\uE754\uE755"},
+    "lsr_button": {"icon": "\uE756\uE757"},
+    "rsl_button": {"icon": "\uE754\uE755"},
+    "rsr_button": {"icon": "\uE756\uE757"}
 }
