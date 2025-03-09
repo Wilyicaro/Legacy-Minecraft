@@ -272,6 +272,55 @@
             "ascent": 11,
             "height": 15,
             "chars": ["\uE00F"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/xone/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE750"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/xone/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE752"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/xone/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE753"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/xone/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE754"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/xone/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE755"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/xone/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE756"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/xone/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE757"]
         }
     ]    
 }
