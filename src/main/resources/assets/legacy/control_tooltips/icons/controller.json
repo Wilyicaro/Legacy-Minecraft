@@ -25,5 +25,11 @@
     "right_stick_up":{"icon": "\uE749"},
     "right_stick_down":{"icon": "\uE749"},
     "right_stick_right":{"icon": "\uE74F"},
-    "right_stick_left":{"icon": "\uE74E"}
+    "right_stick_left":{"icon": "\uE74E"},
+    "touchpad":{"icon": "\uE750\uE751"},
+    "capture": {"icon": "\uE752\uE753"},
+    "lsl_button": {"icon": "\uE754\uE755"},
+    "lsr_button": {"icon": "\uE756\uE757"},
+    "rsl_button": {"icon": "\uE758\uE759"},
+    "rsr_button": {"icon": "\uE75A\uE75B"}
 }
