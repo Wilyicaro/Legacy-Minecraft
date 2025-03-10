@@ -91,7 +91,7 @@ dependencies {
     }
 
     if (loader == "fabric" || stonecutter.eval(stonecutter.current.version, ">=1.21") && loader == "neoforge"){
-        modImplementation("maven.modrinth:sodium:${sodium_version}")
+        modCompileOnly("maven.modrinth:sodium:${sodium_version}")
         modCompileOnly("maven.modrinth:iris:${iris_version}")
     }
 

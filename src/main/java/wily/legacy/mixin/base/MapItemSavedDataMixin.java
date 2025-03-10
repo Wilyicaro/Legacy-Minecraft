@@ -93,7 +93,7 @@ public abstract class MapItemSavedDataMixin {
         boolean modified = false;
         while (iterator.hasNext()){
             var next = iterator.next();
-            if (next.isValid(player.getServer())){
+            if (next.isValid(player.getServer()) && dimension == Level.OVERWORLD){
                 addDecoration(/*? if <1.20.5 {*//*MapDecoration.Type*//*?} else {*/MapDecorationTypes/*?}*/.TARGET_X, player.level(), next.identifier(), next.pos().getX(), next.pos().getZ(), 0, null);
             } else {
                 removeDecoration(next.identifier());

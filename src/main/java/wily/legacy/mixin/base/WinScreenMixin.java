@@ -124,7 +124,8 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
             guiGraphics.pose().popPose();
             Legacy4JClient.defaultFontOverride = null;
         } else {
-            FactoryGuiGraphics.of(guiGraphics).blit(CREDITS_BACKGROUND,0,0,0,0, guiGraphics.guiWidth(), guiGraphics.guiHeight(),guiGraphics.guiWidth(), guiGraphics.guiHeight());
+            int fixedHeight = guiGraphics.guiWidth() * 9 / 16;
+            FactoryGuiGraphics.of(guiGraphics).blit(CREDITS_BACKGROUND,0,0,0,(fixedHeight - guiGraphics.guiHeight()) / 2f, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), fixedHeight);
 
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(0.0F, g, 0.0F);
@@ -154,7 +155,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
             guiGraphics.pose().popPose();
             RenderSystem.enableBlend();
             FactoryGuiGraphics.of(guiGraphics).disableDepthTest();
-            FactoryGuiGraphics.of(guiGraphics).blit(CREDITS_BACKGROUND_FADE,0,0,0,0, guiGraphics.guiWidth(), guiGraphics.guiHeight(),guiGraphics.guiWidth(), guiGraphics.guiHeight());
+            FactoryGuiGraphics.of(guiGraphics).blit(CREDITS_BACKGROUND_FADE,0,0,0,(fixedHeight - guiGraphics.guiHeight()) / 2f, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), fixedHeight);
             guiGraphics.flush();
             FactoryGuiGraphics.of(guiGraphics).enableDepthTest();
             RenderSystem.disableBlend();
