@@ -78,8 +78,12 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         setFocused(panel);
         this.updateButtonVisibility();
     }
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+
+    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
+    public void renderBackground(CallbackInfo ci) {
+        ci.cancel();
     }
+
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();

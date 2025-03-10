@@ -64,7 +64,7 @@ public abstract class ArmorStandMixin extends LivingEntity {
     *///?} else {
     @Redirect(method = "defineSynchedData", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/syncher/SynchedEntityData$Builder;define(Lnet/minecraft/network/syncher/EntityDataAccessor;Ljava/lang/Object;)Lnet/minecraft/network/syncher/SynchedEntityData$Builder;", ordinal = 0))
     public SynchedEntityData.Builder defineSynchedData(SynchedEntityData.Builder instance, EntityDataAccessor<Object> i, Object arg) {
-        return instance.define(i,this.setBit((byte)arg, 4, !(level() instanceof ServerLevel l) || l.getGameRules().getBoolean(LegacyGameRules.DEFAULT_SHOW_ARMOR_STANDS_ARMS)));
+        return instance.define(i, level() instanceof ServerLevel l ? this.setBit((byte)arg, 4, l.getGameRules().getBoolean(LegacyGameRules.DEFAULT_SHOW_ARMOR_STANDS_ARMS)) : arg);
     }
     //?}
 }

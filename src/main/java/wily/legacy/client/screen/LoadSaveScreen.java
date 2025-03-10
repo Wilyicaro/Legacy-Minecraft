@@ -27,6 +27,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyClientWorldSettings;
 import wily.legacy.client.PackAlbum;
+import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
@@ -105,13 +106,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         gameTypeSlider.setPosition(panel.x + 13, panel.y + 65);
         addRenderableWidget(new LegacySliderButton<>(panel.x + 13, panel.y + 90, 220,16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"),b.getObjectValue().getDisplayName()),b->Tooltip.create(difficulty.getInfo()), difficulty,()-> Arrays.asList(Difficulty.values()), b-> difficulty = b.getObjectValue())).active = !LegacyClientWorldSettings.of(summary.getSettings()).isDifficultyLocked() && !summary.isHardcore();
         addRenderableWidget(Button.builder(Component.translatable( "createWorld.tab.more.title"), button -> minecraft.setScreen(new WorldMoreOptionsScreen(this))).bounds(panel.x + 13, panel.y + 178,220,20).build());
-        Button loadButton = addRenderableWidget(Button.builder(Component.translatable("legacy.menu.load_save.load"), button -> {
-            try {
-                this.onLoad();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).bounds(panel.x + 13, panel.y + 203,220,20).build());
+        Button loadButton = addRenderableWidget(Button.builder(Component.translatable("legacy.menu.load_save.load"), button -> onLoad()).bounds(panel.x + 13, panel.y + 203,220,20).build());
         addRenderableWidget(gameTypeSlider);
         onlineTickBox.selected = publishScreen.publish;
         onlineTickBox.setPosition(panel.x+ 14, panel.y+161);
@@ -122,7 +117,38 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         addRenderableWidget(resourceAssortSelector);
     }
 
-    public void onLoad() throws IOException {
+    public void onLoad() {
+        if (dimensionsToReset.isEmpty()){
+            completeLoad();
+        } else {
+            confirmDimensionToReset(0);
+        }
+    }
+
+    public void confirmDimensionToReset(int index){
+        ResourceKey<Level> level = dimensionsToReset.get(index);
+
+        Component dimensionName = LegacyComponents.getDimensionName(level);
+        minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.load_save.reset", dimensionName), Component.translatable("legacy.menu.load_save.reset_message", dimensionName, dimensionName), b->{
+            if (index == dimensionsToReset.size() - 1){
+                completeLoad();
+            } else confirmDimensionToReset(index + 1);
+        }){
+            @Override
+            protected void addButtons(){
+                renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.load_save.reset_cancel", dimensionName), b-> {
+                    dimensionsToReset.remove(index);
+                    if (dimensionsToReset.isEmpty()){
+                        completeLoad();
+                    } else confirmDimensionToReset(index);
+                }).build());
+                renderableVList.addRenderable(okButton = Button.builder(getTitle(),b-> okAction.accept(this)).build());
+            }
+        });
+
+    }
+
+    public void completeLoad(){
         dimensionsToReset.forEach(l-> {
             if (l == Level.OVERWORLD) return;
             try {
@@ -131,9 +157,6 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
                 throw new RuntimeException(e);
             }
         });
-        completeLoad();
-    }
-    private void completeLoad(){
         LegacyClientWorldSettings.of(summary.getSettings()).setSelectedResourceAlbum(resourceAssortSelector.getSelectedAlbum());
         loadWorld(this,minecraft, Legacy4JClient.getLevelStorageSource(),summary);
         Legacy4JClient.serverPlayerJoinConsumer = s-> {

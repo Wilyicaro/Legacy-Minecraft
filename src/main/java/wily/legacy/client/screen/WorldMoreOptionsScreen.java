@@ -172,7 +172,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         renderableVLists.add(gameRenderables);
         tabList.selectedTab = 1;
         GameRules gameRules = parent.summary.getSettings().gameRules();
-        LoadSaveScreen.RESETTABLE_DIMENSIONS.forEach(d-> renderableVList.addRenderable(new TickBox(0,0,false, b-> Component.translatable("legacy.menu.load_save.reset", LegacyComponents.getDimensionName(d)), b-> null, t-> {
+        LoadSaveScreen.RESETTABLE_DIMENSIONS.forEach(d-> renderableVList.addRenderable(new TickBox(0,0, parent.dimensionsToReset.contains(d), b-> Component.translatable("legacy.menu.load_save.reset", LegacyComponents.getDimensionName(d)), b-> null, t-> {
             if (t.selected) parent.dimensionsToReset.add(d);
             else parent.dimensionsToReset.remove(d);
         })));

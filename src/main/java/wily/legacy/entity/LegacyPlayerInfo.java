@@ -6,7 +6,8 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.stats.Stat;
-import net.minecraft.stats.StatType;
+import wily.factoryapi.base.network.CommonNetwork;
+import wily.legacy.mixin.base.ClientBoundAwardStatsPacketAccessor;
 
 public interface LegacyPlayerInfo {
     static LegacyPlayerInfo of(Object obj) {
@@ -28,14 +29,14 @@ public interface LegacyPlayerInfo {
     Object2IntMap<Stat<?>> getStatsMap();
     void setStatsMap(Object2IntMap<Stat<?>> statsMap);
 
-    static LegacyPlayerInfo decode(FriendlyByteBuf buf){
+    static LegacyPlayerInfo decode(CommonNetwork.PlayBuf buf){
         return new LegacyPlayerInfo() {
-            int index = buf.readVarInt();
-            boolean invisible = buf.readBoolean();
-            boolean exhaustion = buf.readBoolean();
-            boolean mayFly = buf.readBoolean();
+            int index = buf.get().readVarInt();
+            boolean invisible = buf.get().readBoolean();
+            boolean exhaustion = buf.get().readBoolean();
+            boolean mayFly = buf.get().readBoolean();
 
-            Object2IntMap<Stat<?>> statsMap = buf.readMap(Object2IntOpenHashMap::new,b->decodeStatCap(b,BuiltInRegistries.STAT_TYPE.byId(b.readVarInt())),FriendlyByteBuf::readVarInt);
+            Object2IntMap<Stat<?>> statsMap = /*? if <1.20.5 {*//*buf.get().readMap(Object2IntOpenHashMap::new, b->ClientBoundAwardStatsPacketAccessor.decodeStatCap(b,BuiltInRegistries.STAT_TYPE.byId(b.readVarInt())),FriendlyByteBuf::readVarInt)*//*?} else {*/ClientBoundAwardStatsPacketAccessor.getStatsValueCodec().decode(buf.get())/*?}*/;
             public int getIdentifierIndex() {
                 return index;
             }
@@ -71,22 +72,18 @@ public interface LegacyPlayerInfo {
         };
     }
 
-    static void encode(FriendlyByteBuf buf, LegacyPlayerInfo info){
-        buf.writeVarInt(info.getIdentifierIndex());
-        buf.writeBoolean(info.isVisible());
-        buf.writeBoolean(info.isExhaustionDisabled());
-        buf.writeBoolean(info.mayFlySurvival());
-        buf.writeMap(info.getStatsMap(), LegacyPlayerInfo::encodeStat, FriendlyByteBuf::writeVarInt);
+    static void encode(CommonNetwork.PlayBuf buf, LegacyPlayerInfo info){
+        buf.get().writeVarInt(info.getIdentifierIndex());
+        buf.get().writeBoolean(info.isVisible());
+        buf.get().writeBoolean(info.isExhaustionDisabled());
+        buf.get().writeBoolean(info.mayFlySurvival());
+        //? if <1.20.5 {
+        /*buf.get().writeMap(info.getStatsMap(), ClientBoundAwardStatsPacketAccessor::encodeStatCap, FriendlyByteBuf::writeVarInt);
+        *///?} else {
+        ClientBoundAwardStatsPacketAccessor.getStatsValueCodec().encode(buf.get(), info.getStatsMap());
+        //?}
     }
 
-    static <T> void encodeStat(FriendlyByteBuf b, Stat<T> s){
-        b.writeVarInt(BuiltInRegistries.STAT_TYPE.getId(s.getType()));
-        b.writeVarInt(s.getType().getRegistry().getId(s.getValue()));
-    }
-
-    static <T> Stat<T> decodeStatCap(FriendlyByteBuf b, StatType<T> statType) {
-        return statType.get(statType.getRegistry().asHolderIdMap().byId(b.readVarInt()).value());
-    }
     default void copyFrom(LegacyPlayerInfo info){
         this.setIdentifierIndex(info.getIdentifierIndex());
         this.setVisibility(info.isVisible());

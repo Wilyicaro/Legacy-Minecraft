@@ -30,11 +30,12 @@ WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
 <img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/modpage_special_thanks.png?raw=true" width="600" >
 
 - AgentMindStorm for providing the built-in resource packs: Console Aspects & Programmer Console Aspects (NeoForge and Forge)
-- Moustard for providing the How To Play text from TU69
-- RedRain0o0 for doing almost the How To Play UI Definitions
+- Moutardx for providing the How To Play text from TU69
+- RedRain0o0 for doing almost all the How To Play UI Definitions
 - cloud54 for providing Steam Control Icons and sounds for the keyboard screen
 - Permdog99 and ItzJustAPlayer for helping with the PlayStation® 5 Control Icons
 - NicSonic-_- for providing the Stadia Control Icons
+- Cjnator38 for providing the LE default font converted to JE, and the 1.21.x credits background
 
 <img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/modpage_related_projects.png?raw=true" width="600" >
 

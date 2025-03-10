@@ -232,15 +232,22 @@ public abstract class MinecraftMixin {
     }
 
     //? if >1.20.1 {
+    @Unique GameConfig gameConfig;
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void init(GameConfig gameConfig, CallbackInfo ci){
+        this.gameConfig = gameConfig;
+    }
+
     @Inject(method = "addInitialScreens", at = @At("HEAD"))
     private void addInitialScreens(List<Function<Runnable, Screen>> list, CallbackInfo ci) {
-        list.add(r-> ConfirmationScreen.createSaveInfoScreen(new TitleScreen()));
+        if (gameConfig.quickPlay.isEnabled()) return;
+        list.add(r-> ScreenUtil.getInitialScreen());
     }
     //?} else {
     /*@Inject(method = "setInitialScreen", at = @At("HEAD"), cancellable = true)
     private void addInitialScreens(RealmsClient realmsClient, ReloadInstance reloadInstance, GameConfig.QuickPlayData quickPlayData, CallbackInfo ci) {
         ci.cancel();
-        FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(() -> setScreen(ConfirmationScreen.createSaveInfoScreen(new TitleScreen())), MinecraftAccessor.getInstance()::hasGameLoaded);
+        FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(() -> setScreen(ScreenUtil.getInitialScreen()), MinecraftAccessor.getInstance()::hasGameLoaded);
     }
     *///?}
 }

@@ -13,6 +13,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.toasts.Toast;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -70,6 +72,7 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.network.TopMessage;
@@ -705,5 +708,12 @@ public class ScreenUtil {
             RenderSystem.enableDepthTest();
             RenderSystem.disableBlend();
         }
+    }
+
+    public static Screen getInitialScreen(){
+        TitleScreen titleScreen = new TitleScreen(LegacyOptions.titleScreenFade.get());
+        if (LegacyOptions.skipInitialSaveWarning.get()){
+            return titleScreen;
+        } else return ConfirmationScreen.createSaveInfoScreen(titleScreen);
     }
 }
