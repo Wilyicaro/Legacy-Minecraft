@@ -321,6 +321,34 @@
             "ascent": 11,
             "height": 15,
             "chars": ["\uE757"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/xone/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE758"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/xone/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE759"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/xone/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE75A"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/xone/unknown.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE75B"]
         }
     ]    
 }

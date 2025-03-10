@@ -296,31 +296,59 @@
         },
         {
             "type": "bitmap",
-            "file": "legacy:component/switch/sl_button.png",
+            "file": "legacy:component/switch/left_sl_button.png",
             "ascent": 11,
             "height": 15,
             "chars": ["\uE754"]
         },
         {
             "type": "bitmap",
-            "file": "legacy:component/switch/sl_button_pressed.png",
+            "file": "legacy:component/switch/left_sl_button_pressed.png",
             "ascent": 11,
             "height": 15,
             "chars": ["\uE755"]
         },
         {
             "type": "bitmap",
-            "file": "legacy:component/switch/sr_button.png",
+            "file": "legacy:component/switch/left_sr_button.png",
             "ascent": 11,
             "height": 15,
             "chars": ["\uE756"]
         },
         {
             "type": "bitmap",
-            "file": "legacy:component/switch/sr_button_pressed.png",
+            "file": "legacy:component/switch/left_sr_button_pressed.png",
             "ascent": 11,
             "height": 15,
             "chars": ["\uE757"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/switch/right_sl_button.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE758"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/switch/right_sl_button_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE759"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/switch/right_sr_button.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE75A"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/switch/right_sr_button_pressed.png",
+            "ascent": 11,
+            "height": 15,
+            "chars": ["\uE75B"]
         }
     ]    
 }

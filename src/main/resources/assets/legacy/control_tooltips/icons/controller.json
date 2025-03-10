@@ -30,6 +30,6 @@
     "capture": {"icon": "\uE752\uE753"},
     "lsl_button": {"icon": "\uE754\uE755"},
     "lsr_button": {"icon": "\uE756\uE757"},
-    "rsl_button": {"icon": "\uE754\uE755"},
-    "rsr_button": {"icon": "\uE756\uE757"}
+    "rsl_button": {"icon": "\uE758\uE759"},
+    "rsr_button": {"icon": "\uE75A\uE75B"}
 }
