@@ -51,7 +51,7 @@
     "AbstractButtonMixin",
     "AbstractContainerScreenMixin",
     "client.furnace.AbstractFurnaceScreenMixin",
-    "AbstractSignEditScreenMixin",
+    "client.sign.AbstractSignEditScreenMixin",
     "AbstractSliderButtonMixin",
     "AbstractWidgetMixin",
     "AdvancementToastMixin",
@@ -98,7 +98,7 @@
     "GuiGameRendererMixin",
     "GuiGraphicsMixin",
     "client.gui.GuiMixin",
-    "HangingSignEditScreenMixin",
+    "client.sign.HangingSignEditScreenMixin",
     "client.inventory.HorseInventoryScreenMixin",
     "HugeExplosionParticleMixin",
     "HumanoidModelMixin",
@@ -129,7 +129,7 @@
     "PackSelectionScreenMixin",
     "ParticleEngineMixin",
     "ParticleMixin",
-    "PauseScreenMixin",
+    "client.pause.PauseScreenMixin",
     "PlayerInfoMixin",
     "PlayerRendererMixin",
     "PresetEditorMixin",
@@ -138,7 +138,7 @@
     "RenderTypeMixin",
     "ScreenEffectRendererMixin",
     "ScreenMixin",
-    "SignEditScreenMixin",
+    "client.sign.SignEditScreenMixin",
     "SimpleSoundInstanceMixin",
     "SlotMixin",
     "client.smithing.SmithingScreenMixin",
@@ -238,7 +238,10 @@
     "EnchantmentMixin",
     "EntityMixin",
     "WitherSkullBlockMixin",
-    "SdlGamepadMixin"
+    "SdlGamepadMixin",
+    "ClientBoundAwardStatsPacketAccessor",
+    "EntityAccessor",
+    "EndPortalBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1

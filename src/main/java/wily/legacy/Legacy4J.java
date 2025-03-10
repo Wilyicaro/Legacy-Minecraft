@@ -117,7 +117,7 @@ public class Legacy4J {
 
     public static List<Integer> getParsedVersion(String version){
         List<Integer> parsedVersion = new ArrayList<>();
-        String[] versions = version.split("\\.");
+        String[] versions = version.split("[.\\-]");
         for (String s : versions) {
             int value;
             try {
@@ -178,6 +178,7 @@ public class Legacy4J {
         FactoryEvent.setup(Legacy4J::setup);
         FactoryEvent.tagsLoaded(Legacy4J::tagsLoaded);
         FactoryEvent.serverStarted(Legacy4J::onServerStart);
+        FactoryEvent.PlayerEvent.JOIN_EVENT.register(Legacy4J::onServerPlayerJoin);
         FactoryEvent.PlayerEvent.RELOAD_RESOURCES_EVENT.register(Legacy4J::onResourcesReload);
     }
 
@@ -536,8 +537,9 @@ public class Legacy4J {
                 }
         }
         ((LegacyPlayerInfo)p).setIdentifierIndex(pos);
+        CommonNetwork.sendToPlayers(p.getServer().getPlayerList().getPlayers().stream().filter(sp-> sp != p).collect(Collectors.toSet()), new PlayerInfoSync.All(Map.of(p.getUUID(),(LegacyPlayerInfo)p), Collections.emptyMap(), p.server.getDefaultGameType(),PlayerInfoSync.All.ID_S2C));
         CommonNetwork.forceEnabledPlayer(p, ()-> {
-            CommonNetwork.sendToPlayer(p, new PlayerInfoSync.All(Map.of(p.getUUID(),(LegacyPlayerInfo)p), Collections.emptyMap(),p.server.getDefaultGameType(),PlayerInfoSync.All.ID_S2C));
+            CommonNetwork.sendToPlayer(p, PlayerInfoSync.All.fromPlayerList(p.getServer()));
             playerInitialPayloads.forEach(payload->CommonNetwork.sendToPlayer(p, payload));
         });
         if (!p.server.isDedicatedServer()) Legacy4JClient.serverPlayerJoin(p);

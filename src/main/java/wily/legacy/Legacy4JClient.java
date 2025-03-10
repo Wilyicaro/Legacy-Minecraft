@@ -29,6 +29,7 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import org.lwjgl.glfw.GLFW;
 //? if >=1.21.2 {
 /*import net.minecraft.client.renderer.entity.state.*;
 import wily.factoryapi.base.Stocker;
@@ -75,6 +76,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import wily.factoryapi.util.ColorUtil;
+import wily.legacy.client.controller.ControllerBinding;
 //? if fabric {
 import wily.legacy.client.screen.compat.ModMenuCompat;
 //?} else if forge {
@@ -126,6 +128,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static wily.legacy.Legacy4J.MOD_ID;
+import static wily.legacy.client.LegacyResourceManager.INTROS;
 import static wily.legacy.init.LegacyRegistries.SHRUB;
 
 
@@ -397,12 +400,6 @@ public class Legacy4JClient {
         }
     }
 
-    //? if <1.21.2 {
-    public static RecipeManager getRecipeManager(){
-        return Minecraft.getInstance().level.getRecipeManager();
-    }
-    //?}
-
     public static void init() {
         knownBlocks = new KnownListing<>(BuiltInRegistries.BLOCK,Minecraft.getInstance().gameDirectory.toPath());
         knownEntities = new KnownListing<>(BuiltInRegistries.ENTITY_TYPE,Minecraft.getInstance().gameDirectory.toPath());
@@ -673,7 +670,7 @@ public class Legacy4JClient {
     public static BakedModel getFastLeavesModelReplacement(BlockGetter blockGetter, BlockPos pos, BlockState blockState, BakedModel model){
         boolean fastGraphics = Minecraft.getInstance().options.graphicsMode().get() == GraphicsStatus.FAST;
         if (LegacyOptions.fastLeavesCustomModels.get() && blockState.getBlock() instanceof LeavesBlock && fastLeavesModels.containsKey(blockState.getBlock()) && (fastGraphics || LegacyOptions.fastLeavesWhenBlocked.get())){
-            if (!fastGraphics) {
+            if (!fastGraphics && blockGetter != null) {
                 for (Direction value : Direction.values()) {
                     BlockPos relative = pos.relative(value);
                     BlockState relativeBlockState = blockGetter.getBlockState(relative);
@@ -693,13 +690,15 @@ public class Legacy4JClient {
 
     public static void onClientPlayerInfoChange(){
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.level != null && minecraft.player != null)
-            CommonNetwork.sendToServer(PlayerInfoSync.askAll(minecraft.player));
         if (minecraft.screen instanceof HostOptionsScreen s) s.reloadPlayerButtons();
         else if (minecraft.screen instanceof LeaderboardsScreen s){
             s.rebuildRenderableVList(minecraft);
             s.repositionElements();
         }
+    }
+
+    public static boolean canSkipIntro(float timer){
+        return timer % INTROS.size() >= INTROS.size() - 0.01f || LegacyOptions.skipIntro.get() || InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), InputConstants.KEY_RETURN) || GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(),GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS || ControllerBinding.DOWN_BUTTON.bindingState.pressed;
     }
 
     public static final KeyMapping keyCrafting = new KeyMapping("legacy.key.crafting", InputConstants.KEY_E, "key.categories.inventory");

@@ -44,9 +44,9 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
     @Unique
     ResourceLocation POEM_BACKGROUND = Legacy4J.createModLocation("textures/gui/end_poem_background.png");
     @Unique
-    ResourceLocation CREDITS_BACKGROUND = Legacy4J.createModLocation("textures/gui/credits_background.png");
+    ResourceLocation CREDITS_BACKGROUND = Legacy4J.createModLocation(/*? if <1.21 {*//*"textures/gui/credits_background_120.png"*//*?} else {*/"textures/gui/credits_background.png"/*?}*/);
     @Unique
-    ResourceLocation CREDITS_BACKGROUND_FADE = Legacy4J.createModLocation("textures/gui/credits_background_fade.png");
+    ResourceLocation CREDITS_BACKGROUND_FADE = Legacy4J.createModLocation(/*? if <1.21 {*//*"textures/gui/credits_background_fade_120.png"*//*?} else {*/"textures/gui/credits_background_fade.png"/*?}*/);
     @Shadow @Final private boolean poem;
     @Unique
     private IntSet titleLines;
@@ -124,7 +124,8 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
             guiGraphics.pose().popPose();
             Legacy4JClient.defaultFontOverride = null;
         } else {
-            FactoryGuiGraphics.of(guiGraphics).blit(CREDITS_BACKGROUND,0,0,0,0, guiGraphics.guiWidth(), guiGraphics.guiHeight(),guiGraphics.guiWidth(), guiGraphics.guiHeight());
+            int fixedHeight = guiGraphics.guiWidth() * 9 / 16;
+            FactoryGuiGraphics.of(guiGraphics).blit(CREDITS_BACKGROUND,0,0,0,(fixedHeight - guiGraphics.guiHeight()) / 2f, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), fixedHeight);
 
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(0.0F, g, 0.0F);
@@ -154,7 +155,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
             guiGraphics.pose().popPose();
             RenderSystem.enableBlend();
             FactoryGuiGraphics.of(guiGraphics).disableDepthTest();
-            FactoryGuiGraphics.of(guiGraphics).blit(CREDITS_BACKGROUND_FADE,0,0,0,0, guiGraphics.guiWidth(), guiGraphics.guiHeight(),guiGraphics.guiWidth(), guiGraphics.guiHeight());
+            FactoryGuiGraphics.of(guiGraphics).blit(CREDITS_BACKGROUND_FADE,0,0,0,(fixedHeight - guiGraphics.guiHeight()) / 2f, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), fixedHeight);
             guiGraphics.flush();
             FactoryGuiGraphics.of(guiGraphics).enableDepthTest();
             RenderSystem.disableBlend();

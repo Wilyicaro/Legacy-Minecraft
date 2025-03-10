@@ -24,8 +24,10 @@ public class LegacyMixinOptions {
     public static final FactoryMixinToggle legacyBeaconScreen = createAndRegisterMixin("legacy.mixin.base.client.beacon", "legacyBeaconScreen");
     public static final FactoryMixinToggle legacyBrewingStandScreen = createAndRegisterMixin("legacy.mixin.base.client.brewing", "legacyBrewingStandScreen");
     public static final FactoryMixinToggle legacyBookScreen = createAndRegisterMixin("legacy.mixin.base.client.book", "legacyBookScreen");
+    public static final FactoryMixinToggle legacySignScreen = createAndRegisterMixin("legacy.mixin.base.client.sign", "legacySignScreen");
     public static final FactoryMixinToggle legacyCreateWorldScreen = createAndRegisterMixin("legacy.mixin.base.client.create_world", "legacyCreateWorldScreen");
     public static final FactoryMixinToggle legacyTitleScreen = createAndRegisterMixin("legacy.mixin.base.client.title", "legacyTitleScreen");
+    public static final FactoryMixinToggle legacyPauseScreen = createAndRegisterMixin("legacy.mixin.base.client.pause", "legacyPauseScreen");
     public static final FactoryMixinToggle legacyGui = createAndRegisterMixin("legacy.mixin.base.client.gui", "legacyGui");
     public static final FactoryMixinToggle legacyChat = createAndRegisterMixin("legacy.mixin.base.client.chat", "legacyChat");
     public static final FactoryMixinToggle legacyBossHealth = createAndRegisterMixin("legacy.mixin.base.client.bosshealth", "legacyBossHealth");

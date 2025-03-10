@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base;
 
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,10 +31,6 @@ import java.util.Optional;
 public abstract class PlayerListMixin {
 
 
-    @Inject(method = "placeNewPlayer", at = @At("RETURN"))
-    public void placeNewPlayer(Connection connection, ServerPlayer serverPlayer, /*? if >1.20.2 {*/CommonListenerCookie commonListenerCookie, /*?}*/CallbackInfo ci) {
-        Legacy4J.onServerPlayerJoin(serverPlayer);
-    }
     @Redirect(method = "placeNewPlayer", at = @At(value = "INVOKE", target = /*? if <1.20.5 {*//*"Lnet/minecraft/server/players/PlayerList;load(Lnet/minecraft/server/level/ServerPlayer;)Lnet/minecraft/nbt/CompoundTag;"*//*?} else {*/"Lnet/minecraft/server/players/PlayerList;load(Lnet/minecraft/server/level/ServerPlayer;)Ljava/util/Optional;"/*?}*/))
     public /*? if <1.20.5 {*//*CompoundTag*//*?} else {*/Optional<CompoundTag>/*?}*/ placeNewPlayer(PlayerList list, ServerPlayer arg2) {
         var playerTag = list.load(arg2);
@@ -52,9 +49,11 @@ public abstract class PlayerListMixin {
         }
         return playerTag;
     }
+
     @Inject(method = "respawn", at = @At("RETURN"))
     public void respawn(ServerPlayer serverPlayer, boolean bl, /*? if >=1.20.5 {*/Entity.RemovalReason removalReason,/*?}*/ CallbackInfoReturnable<ServerPlayer> cir) {
         ((LegacyPlayerInfo)cir.getReturnValue()).copyFrom(((LegacyPlayerInfo)serverPlayer));
         ((LegacyPlayer)cir.getReturnValue()).copyFrom(((LegacyPlayer)serverPlayer));
+        CriteriaTriggers.CHANGED_DIMENSION.trigger(cir.getReturnValue(), serverPlayer.level().dimension(), cir.getReturnValue().serverLevel().dimension());
     }
 }

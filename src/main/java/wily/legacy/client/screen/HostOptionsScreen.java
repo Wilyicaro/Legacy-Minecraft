@@ -218,9 +218,9 @@ public class HostOptionsScreen extends PanelVListScreen {
         });
     }
 
-    protected void addPlayerButtons(boolean includeClient, BiConsumer<GameProfile, AbstractButton> onPress){
+    protected void addPlayerButtons(boolean includeLocal, BiConsumer<GameProfile, AbstractButton> onPress){
         for (GameProfile profile : getActualGameProfiles()) {
-            if (!includeClient && Objects.equals(profile.getName(), Minecraft.getInstance().player.getGameProfile().getName())) continue;
+            if (!includeLocal && Objects.equals(profile.getName(), Minecraft.getInstance().player.getGameProfile().getName())) continue;
             renderableVList.addRenderable(new PlayerButton(0,0, 230, 30, profile) {
                 @Override
                 public void onPress() {
@@ -234,7 +234,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.hasSingleplayerServer()) return minecraft.getSingleplayerServer().getPlayerList().getPlayers().stream().map(Player::getGameProfile).toList();
         if (minecraft.player != null && !minecraft.player.connection.getOnlinePlayers().isEmpty())
-            return minecraft.player.connection.getOnlinePlayers().stream().sorted(Comparator.comparingInt((p -> /*? if >1.20.1 {*/minecraft.isLocalPlayer/*?} else {*//*minecraft.player.getUUID().equals*//*?}*/(p.getProfile().getId()) ? 0 : ((LegacyPlayerInfo)p).getIdentifierIndex()))).map(PlayerInfo::getProfile).toList();
+            return minecraft.player.connection.getOnlinePlayers().stream().sorted(Comparator.comparingInt((p -> minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer().isSingleplayerOwner(p.getProfile()) ? 0 : ((LegacyPlayerInfo)p).getIdentifierIndex()))).map(PlayerInfo::getProfile).toList();
         return Collections.emptyList();
     }
 

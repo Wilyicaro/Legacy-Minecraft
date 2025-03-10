@@ -111,7 +111,6 @@ accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$Displ
 accessible class net/minecraft/client/gui/Font$StringRenderOutput
 accessible field net/minecraft/client/resources/TextureAtlasHolder textureAtlas Lnet/minecraft/client/renderer/texture/TextureAtlas;
 accessible field net/minecraft/client/multiplayer/ClientAdvancements progress Ljava/util/Map;
-accessible field net/minecraft/network/protocol/game/ClientboundAwardStatsPacket STAT_VALUES_STREAM_CODEC Lnet/minecraft/network/codec/StreamCodec;
 accessible field net/minecraft/stats/StatsCounter stats Lit/unimi/dsi/fastutil/objects/Object2IntMap;
 accessible field net/minecraft/client/KeyMapping clickCount I
 accessible method net/minecraft/world/item/trading/MerchantOffer <init> (Lnet/minecraft/world/item/trading/ItemCost;Ljava/util/Optional;Lnet/minecraft/world/item/ItemStack;IIZIIFI)V

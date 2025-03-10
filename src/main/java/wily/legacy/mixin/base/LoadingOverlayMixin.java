@@ -23,6 +23,8 @@ import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyResourceManager;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.ScreenUtil;
@@ -50,6 +52,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
     @Unique
     private long initTime;
     private static ResourceLocation BACKGROUND = Legacy4J.createModLocation("textures/gui/intro/background.png");
+
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
@@ -59,10 +62,8 @@ public abstract class LoadingOverlayMixin extends Overlay {
             LegacyResourceManager.registerIntroLocations(minecraft.getResourceManager());
         }
         float timer = (Util.getMillis() - initTime) / 3200f;
-        if (!finishedIntro && timer % INTROS.size() >= INTROS.size() - 0.01f && reload.isDone()) finishedIntro = true;
+        if (!finishedIntro && Legacy4JClient.canSkipIntro(timer) && reload.isDone()) finishedIntro = true;
         if (!finishedIntro) {
-            if ((InputConstants.isKeyDown(minecraft.getWindow().getWindow(), InputConstants.KEY_RETURN) || GLFW.glfwGetMouseButton(minecraft.getWindow().getWindow(),GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS || ControllerBinding.DOWN_BUTTON.bindingState.pressed) && reload.isDone()) finishedIntro = true;
-            if (timer % INTROS.size() >= INTROS.size() - 0.01f) finishedIntro = true;
             FactoryGuiGraphics.of(guiGraphics).blit(BACKGROUND, 0, 0,0,0, guiGraphics.guiWidth(), guiGraphics.guiHeight(),guiGraphics.guiWidth(), guiGraphics.guiHeight());
 
             RenderSystem.enableBlend();

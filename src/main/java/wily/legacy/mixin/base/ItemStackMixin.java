@@ -52,7 +52,7 @@ import java.util.function.Consumer;
 public abstract class ItemStackMixin {
 
     //? if <1.21.2 {
-    @ModifyArg(method = "getTooltipLines",at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = /*? if neoforge {*/ /*0*//*?} else {*/ 1/*?}*/))
+    @ModifyArg(method = "getTooltipLines",at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = /*? if neoforge || (forge && <1.20.5) {*/ /*0*//*?} else {*/ 1/*?}*/))
     public ChatFormatting getTooltipLines(ChatFormatting arg) {
         return ChatFormatting.GOLD;
     }

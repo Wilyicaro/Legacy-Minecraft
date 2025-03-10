@@ -2,6 +2,7 @@ package wily.legacy.network;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
@@ -89,7 +90,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
             sp = sp.server.getPlayerList().getPlayer(player);
             if (sp == null) return;
             switch (sync){
-                case ASK_ALL -> CommonNetwork.sendToPlayer(sp, new All(sp.server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().getId(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(sp.server.getGameRules()),sp.server.getDefaultGameType(), All.ID_S2C));
+                case ASK_ALL -> CommonNetwork.sendToPlayer(sp, All.fromPlayerList(sp.server));
                 case CLASSIC_CRAFTING,LEGACY_CRAFTING -> ((LegacyPlayer) sp).setCrafting(sync == Sync.CLASSIC_CRAFTING);
                 case CLASSIC_TRADING,LEGACY_TRADING -> ((LegacyPlayer) sp).setTrading(sync == Sync.CLASSIC_TRADING);
                 case CLASSIC_STONECUTTING,LEGACY_STONECUTTING -> ((LegacyPlayer) sp).setStonecutting(sync == Sync.CLASSIC_STONECUTTING);
@@ -112,17 +113,24 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
         public All(Map<String,Object> gameRules,CommonNetwork.Identifier<All> identifier){
             this(Collections.emptyMap(),gameRules,GameType.SURVIVAL,identifier);
         }
+
         public static final List<GameRules.Key<GameRules.BooleanValue>> NON_OP_GAMERULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK, LegacyGameRules.TNT_EXPLODES,GameRules.RULE_DOMOBLOOT,GameRules.RULE_DOBLOCKDROPS,GameRules.RULE_NATURAL_REGENERATION,LegacyGameRules.GLOBAL_MAP_PLAYER_ICON,GameRules.RULE_DO_IMMEDIATE_RESPAWN));
+
         public All(CommonNetwork.PlayBuf buf, CommonNetwork.Identifier<All> identifier){
-            this(buf.get().readMap(HashMap::new, b-> b.readUUID(), LegacyPlayerInfo::decode), buf.get().readMap(HashMap::new, FriendlyByteBuf::readUtf, b->{
+            this(buf.get().readMap(HashMap::new, b-> b.readUUID(), b-> LegacyPlayerInfo.decode(buf)), buf.get().readMap(HashMap::new, FriendlyByteBuf::readUtf, b->{
                 int type = b.readVarInt();
                 if (type == 0) return b.readBoolean();
                 else return b.readVarInt();
             }),buf.get().readEnum(GameType.class),identifier);
         }
+
+        public static All fromPlayerList(MinecraftServer server){
+            return new All(server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().getId(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(server.getGameRules()), server.getDefaultGameType(), All.ID_S2C);
+        }
+
         @Override
         public void encode(CommonNetwork.PlayBuf buf) {
-            buf.get().writeMap(players, (b,u)-> b.writeUUID(u), LegacyPlayerInfo::encode);
+            buf.get().writeMap(players, (b,u)-> b.writeUUID(u), (b,info)-> LegacyPlayerInfo.encode(buf, info));
             buf.get().writeMap(gameRules,FriendlyByteBuf::writeUtf,(b,obj)-> {
                 b.writeVarInt(obj instanceof Boolean ? 0 : 1);
                 if (obj instanceof Boolean bol)  b.writeBoolean(bol);

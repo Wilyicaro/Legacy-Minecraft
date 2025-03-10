@@ -28,9 +28,9 @@ public class SwordItemMixin extends Item {
         return super.getUseDuration(itemStack/*? if >=1.20.5 {*/, livingEntity/*?}*/);
     }
 
-    //? <=1.21.1 {
+    //? <1.21.2 {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
-        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking)) {
+        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking) && (interactionHand == InteractionHand.OFF_HAND || !player.getOffhandItem().getUseAnimation().equals(UseAnim.BLOCK))) {
             player.startUsingItem(interactionHand);
             return InteractionResultHolder.consume( player.getItemInHand(interactionHand));
         }
@@ -38,7 +38,7 @@ public class SwordItemMixin extends Item {
     }
     //?} else {
     /*public InteractionResult use(Level level, Player player, InteractionHand interactionHand) {
-        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking)) {
+        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking) && (interactionHand == InteractionHand.OFF_HAND || !player.getOffhandItem().getUseAnimation().equals(ItemUseAnimation.BLOCK))) {
             player.startUsingItem(interactionHand);
             return InteractionResult.CONSUME;
         }

@@ -57,6 +57,12 @@ public class HowToPlayScreen extends LegacyScreen {
         renderer.replace(1, i->i, a-> hasNextPage() ? LegacyComponents.NEXT_PAGE : null).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), ()-> hasPreviousPage() ? LegacyComponents.PREVIOUS_PAGE : null );
     }
 
+    @Override
+    protected void init() {
+        super.init();
+        accessor.putStaticElement("scrollable_renderer", scrollableRenderer);
+    }
+
     protected boolean hasNextPage(){
         return sectionIndex < Section.list.size() - 1;
     }

@@ -63,6 +63,15 @@ repositories {
         name = "ModMaven"
         url = "https://modmaven.dev"
     }
+
+    maven {
+        url = "https://maven.pkg.github.com/ims212/ForgifiedFabricAPI"
+        credentials {
+            username = "IMS212"
+            // Read only token
+            password = "ghp_" + "DEuGv0Z56vnSOYKLCXdsS9svK4nb9K39C1Hn"
+        }
+    }
 }
 configurations.configureEach {
     resolutionStrategy {
@@ -82,7 +91,7 @@ dependencies {
     }
 
     if (loader == "fabric" || stonecutter.eval(stonecutter.current.version, ">=1.21") && loader == "neoforge"){
-        modImplementation("maven.modrinth:sodium:${sodium_version}")
+        modCompileOnly("maven.modrinth:sodium:${sodium_version}")
         modCompileOnly("maven.modrinth:iris:${iris_version}")
     }
 
@@ -107,6 +116,8 @@ dependencies {
     }
 
     if (loader == "neoforge" && stonecutter.eval(stonecutter.current.version, ">=1.21")) {
+        modCompileOnly("org.sinytra.forgified-fabric-api:fabric-api-base:0.4.42+d1308ded19")
+        modCompileOnly("org.sinytra.forgified-fabric-api:fabric-renderer-api-v1:5.0.0+babc52e504")
         modCompileOnly("org.sinytra.forgified-fabric-api:fabric-rendering-data-attachment-v1:0.3.48+73761d2e19")
         modCompileOnly("org.sinytra.forgified-fabric-api:fabric-block-view-api-v2:1.0.10+9afaaf8c19")
         modCompileOnly("maven.modrinth:nostalgic-tweaks:${nt_version}")
@@ -178,8 +189,13 @@ ext {
         def changes = new StringBuilder()
         changes << "## " + stage.capitalize() + " $version  \nUpdated at **$time**.  \n**Changelog**  "
         def proc = "git log --max-count=4 --pretty=format:%s".execute()
-        getRootProject().file("src/main/resources/assets/legacy/changelog/en_us.txt").readLines().forEach {s-> changes << "\n" + s}
-        changes << "\n\n[Click here for complete changelog]($mod_source/commits/$branch)"
+        proc.in.eachLine { line ->
+            def processedLine = line.toString()
+            def lines = processedLine.split(" -")
+            changes << "\n**${lines[0]}**  "
+            lines.each {s-> if (s != lines[0]) changes << "\n- " + s + "  "}
+        }
+        changes << "\n[Click here for complete changelog]($mod_source/commits/$branch)"
         proc.waitFor()
         return changes.toString()
     }
@@ -321,10 +337,11 @@ publishMods {
 
     def isFabric = loader == "fabric"
     displayName = "$mod_name [$modPlatformName] $project.version"
-    type = STABLE
+    type = BETA
     changelog = releaseChangelog()
     modLoaders.add(loader)
     if (isFabric) modLoaders.add "quilt"
+    else if (loader == "forge" && stonecutter.eval(stonecutter.current.version, "<=1.20.1")) modLoaders.add "neoforge"
     file = renameJarForPublication.archiveFile
     def versions = mc_version_range.split(",")
 
