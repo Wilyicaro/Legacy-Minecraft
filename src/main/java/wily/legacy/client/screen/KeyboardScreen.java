@@ -61,15 +61,19 @@ public class KeyboardScreen extends OverlayPanelScreen {
     protected int lastY = 0;
     protected int xDiff = 0;
     protected int yDiff = 0;
+
     public KeyboardScreen(Supplier<GuiEventListener> listener, Screen parent){
         this(60, listener,parent);
     }
+
     public KeyboardScreen(int yOffset, Supplier<GuiEventListener> listener, Screen parent){
         this((s,p)->p.centeredLeftPos(s),(s,p)-> Math.min(p.centeredTopPos(s) + yOffset,s.height-p.height), listener,parent);
     }
+
     public KeyboardScreen(BiFunction<Screen,Panel,Integer> leftPosGetter, BiFunction<Screen,Panel,Integer> topPosGetter, Supplier<GuiEventListener> listener, Screen parent){
         this(s-> Panel.createPanel(s, p->p.appearance(LegacySprites.PANEL, 385, 154), p-> p.pos(leftPosGetter.apply(s,p), topPosGetter.apply(s,p))), listener,parent);
     }
+
     public KeyboardScreen(Function<Screen,Panel> panelConstructor, Supplier<GuiEventListener> listener, Screen parent) {
         super(parent, panelConstructor, CommonComponents.EMPTY);
         this.listenerSupplier = listener;
@@ -128,7 +132,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.add(()-> ControlType.getActiveType().isKbm() ? null : ControllerBinding.RIGHT_STICK.bindingState.getIcon(), ()-> LegacyComponents.MOVE_KEYBOARD);
+        renderer.add(()-> ControlType.getActiveType().isKbm() ? null : ControllerBinding.RIGHT_STICK.getIcon(), ()-> LegacyComponents.MOVE_KEYBOARD);
     }
 
     public static boolean isOpenKey(int i){
@@ -201,24 +205,24 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
     public record CharButtonBuilder(int width, String chars, String shiftChars, ControllerBinding binding, ResourceLocation iconSprite, SoundEvent downSound){
         public CharButton build(KeyboardScreen screen){
-            return screen.new CharButton(width,screen.listenerSupplier,chars,shiftChars, binding, iconSprite, downSound);
+            return screen.new CharButton(width, chars, shiftChars, binding, iconSprite, downSound);
         }
     }
+
     public class CharButton extends ActionButton {
-        private final Supplier<GuiEventListener> charListener;
         private final String chars;
         private final String shiftChars;
         private final SoundEvent downSound;
         private int selectedChar = 0;
 
 
-        public CharButton(int width, Supplier<GuiEventListener> charListener,String chars, String shiftChars, ControllerBinding binding, ResourceLocation iconSprite, SoundEvent downSound) {
+        public CharButton(int width,String chars, String shiftChars, ControllerBinding binding, ResourceLocation iconSprite, SoundEvent downSound) {
             super(width,20, CommonComponents.EMPTY, binding, iconSprite);
-            this.charListener = charListener;
             this.chars = chars;
             this.shiftChars = shiftChars;
             this.downSound = downSound;
         }
+
         public boolean matches(char c){
             return chars.contains(String.valueOf(c)) || (shiftChars != null && shiftChars.contains(String.valueOf(c)));
         }
@@ -265,7 +269,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
         @Override
         public void onRelease() {
-            GuiEventListener l = charListener.get();
+            GuiEventListener l = listenerSupplier.get();
             if (l != null) {
                 parent.setFocused(l);
                 l.charTyped(getSelectedChar(), 0);
@@ -288,6 +292,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
             return Component.literal(String.valueOf(getSelectedChar()));
         }
     }
+
     public static class KeyButton extends ActionButton {
 
         public final int key;
@@ -381,7 +386,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
             int bindingOffset = 0;
 
-            if (binding != null && Legacy4JClient.controllerManager.connectedController != null) bindingOffset = binding.bindingState.getIcon().render(guiGraphics,getX() + i, getY() + (getHeight() - 9) / 2 + 1,true,false);
+            if (binding != null && Legacy4JClient.controllerManager.connectedController != null) bindingOffset = binding.getIcon().render(guiGraphics,getX() + i, getY() + (getHeight() - 9) / 2 + 1,true,false);
 
             if (iconSprite == null) renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + i + bindingOffset, this.getY(), this.getX() + this.getWidth() - i, this.getY() + this.getHeight(), j);
             else {
@@ -403,7 +408,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
     @Override
     public void bindingStateTick(BindingState state) {
         children().forEach(r->  {
-            if (r instanceof ActionButton a && a.binding == state.binding){
+            if (r instanceof ActionButton a && state.is(a.binding)){
                 if (state.canClick()) {
                     a.playDownSound(minecraft.getSoundManager());
                     a.onPress();

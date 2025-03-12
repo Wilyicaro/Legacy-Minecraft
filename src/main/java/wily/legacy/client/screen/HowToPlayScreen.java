@@ -54,7 +54,7 @@ public class HowToPlayScreen extends LegacyScreen {
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.replace(1, i->i, a-> hasNextPage() ? LegacyComponents.NEXT_PAGE : null).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), ()-> hasPreviousPage() ? LegacyComponents.PREVIOUS_PAGE : null );
+        renderer.replace(1, i->i, a-> hasNextPage() ? LegacyComponents.NEXT_PAGE : null).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), ()-> hasPreviousPage() ? LegacyComponents.PREVIOUS_PAGE : null );
     }
 
     @Override

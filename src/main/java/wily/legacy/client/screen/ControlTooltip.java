@@ -134,24 +134,24 @@ public interface ControlTooltip {
         return supplier;
     }
 
-    ArbitrarySupplier<ComponentIcon> PRESS = registerCommonComponentIcon("press", ()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon());
-    ArbitrarySupplier<ComponentIcon> OPTION = registerCommonComponentIcon("option", ()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon());
-    ArbitrarySupplier<ComponentIcon> EXTRA = registerCommonComponentIcon("extra", ()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon());
-    ArbitrarySupplier<ComponentIcon> PLAYER_MOVEMENT = registerCommonComponentIcon("player_movement", ()-> ControlType.getActiveType().isKbm() ? COMPOUND_COMPONENT_ICON_FUNCTION.apply(new ComponentIcon[]{getKeyIcon(InputConstants.KEY_W), getKeyIcon(InputConstants.KEY_A), getKeyIcon(InputConstants.KEY_S), getKeyIcon(InputConstants.KEY_D)}) : ControllerBinding.LEFT_STICK.bindingState.getIcon());
-    ArbitrarySupplier<ComponentIcon> POINTER_MOVEMENT = registerCommonComponentIcon("pointer_movement", ()-> ControlType.getActiveType().isKbm() ? getKbmIcon(MOUSE_BASE_CHAR) : ControllerBinding.LEFT_STICK.bindingState.getIcon());
-    ArbitrarySupplier<ComponentIcon> CAMERA_MOVEMENT = registerCommonComponentIcon("camera_movement", ()-> ControlType.getActiveType().isKbm() ? getKbmIcon(MOUSE_BASE_CHAR) : ControllerBinding.LEFT_STICK.bindingState.getIcon());
-    ArbitrarySupplier<ComponentIcon> MENU_MAIN_ACTION = registerCommonComponentIcon("menu_main_action", ()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon());
-    ArbitrarySupplier<ComponentIcon> MENU_OFF_ACTION = registerCommonComponentIcon("menu_off_action", ()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.MOUSE_BUTTON_RIGHT) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon());
-    ArbitrarySupplier<ComponentIcon> MENU_QUICK_ACTION = registerCommonComponentIcon("menu_quick_action", ()-> ControlType.getActiveType().isKbm() ? COMPOUND_COMPONENT_ICON_FUNCTION.apply(new ComponentIcon[]{getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT), PLUS_ICON,getKeyIcon(InputConstants.KEY_LSHIFT)}) : ControllerBinding.UP_BUTTON.bindingState.getIcon());
-    ArbitrarySupplier<ComponentIcon> NAVIGATION = registerCommonComponentIcon("navigation", ()-> ControlType.getActiveType().isKbm() ? COMPOUND_COMPONENT_ICON_FUNCTION.apply(new ComponentIcon[]{getKeyIcon(InputConstants.KEY_UP), getKeyIcon(InputConstants.KEY_LEFT), getKeyIcon(InputConstants.KEY_DOWN), getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.LEFT_STICK.bindingState.getIcon());
-    ArbitrarySupplier<ComponentIcon> HORIZONTAL_NAVIGATION = registerCommonComponentIcon("horizontal_navigation", ()-> ControlType.getActiveType().isKbm() ? COMPOUND_COMPONENT_ICON_FUNCTION.apply(new ComponentIcon[]{getKeyIcon(InputConstants.KEY_LEFT), getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.LEFT_STICK.bindingState.getIcon());
-    ArbitrarySupplier<ComponentIcon> VERTICAL_NAVIGATION = registerCommonComponentIcon("vertical_navigation", ()-> ControlType.getActiveType().isKbm() ? COMPOUND_COMPONENT_ICON_FUNCTION.apply(new ComponentIcon[]{getKeyIcon(InputConstants.KEY_UP), getKeyIcon(InputConstants.KEY_DOWN)}) : ControllerBinding.LEFT_STICK.bindingState.getIcon());
-    ArbitrarySupplier<ComponentIcon> LEFT_TAB = registerCommonComponentIcon("left_tab", ()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon());
-    ArbitrarySupplier<ComponentIcon> RIGHT_TAB = registerCommonComponentIcon("right_tab", ()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon());
-    ArbitrarySupplier<ComponentIcon> LEFT_CRAFTING_TYPE = registerCommonComponentIcon("left_crafting_type",  ()-> ControlType.getActiveType().isKbm() ? COMPOUND_COMPONENT_ICON_FUNCTION.apply(new ComponentIcon[]{getKeyIcon(InputConstants.KEY_LSHIFT), PLUS_ICON, getKeyIcon(InputConstants.KEY_LBRACKET)}) : ControllerBinding.LEFT_TRIGGER.bindingState.getIcon());
-    ArbitrarySupplier<ComponentIcon> RIGHT_CRAFTING_TYPE = registerCommonComponentIcon("right_crafting_type", ()-> ControlType.getActiveType().isKbm() ? COMPOUND_COMPONENT_ICON_FUNCTION.apply(new ComponentIcon[]{getKeyIcon(InputConstants.KEY_LSHIFT), PLUS_ICON, getKeyIcon(InputConstants.KEY_RBRACKET)}) : ControllerBinding.RIGHT_TRIGGER.bindingState.getIcon());
-    ArbitrarySupplier<ComponentIcon> CANCEL_BINDING = registerCommonComponentIcon("cancel_binding", ()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.BACK.bindingState.getIcon());
+    ArbitrarySupplier<ComponentIcon> PRESS = registerCommonComponentIcon("press", ()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.getIcon());
+    ArbitrarySupplier<ComponentIcon> OPTION = registerCommonComponentIcon("option", ()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon());
+    ArbitrarySupplier<ComponentIcon> EXTRA = registerCommonComponentIcon("extra", ()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon());
+    ArbitrarySupplier<ComponentIcon> PLAYER_MOVEMENT = registerCommonComponentIcon("player_movement", ()-> ControlType.getActiveType().isKbm() ? COMPOUND_COMPONENT_ICON_FUNCTION.apply(new ComponentIcon[]{getKeyIcon(InputConstants.KEY_W), getKeyIcon(InputConstants.KEY_A), getKeyIcon(InputConstants.KEY_S), getKeyIcon(InputConstants.KEY_D)}) : ControllerBinding.LEFT_STICK.getIcon());
+    ArbitrarySupplier<ComponentIcon> POINTER_MOVEMENT = registerCommonComponentIcon("pointer_movement", ()-> ControlType.getActiveType().isKbm() ? getKbmIcon(MOUSE_BASE_CHAR) : ControllerBinding.LEFT_STICK.getIcon());
+    ArbitrarySupplier<ComponentIcon> CAMERA_MOVEMENT = registerCommonComponentIcon("camera_movement", ()-> ControlType.getActiveType().isKbm() ? getKbmIcon(MOUSE_BASE_CHAR) : ControllerBinding.LEFT_STICK.getIcon());
+    ArbitrarySupplier<ComponentIcon> MENU_MAIN_ACTION = registerCommonComponentIcon("menu_main_action", ()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT) : ControllerBinding.DOWN_BUTTON.getIcon());
+    ArbitrarySupplier<ComponentIcon> MENU_OFF_ACTION = registerCommonComponentIcon("menu_off_action", ()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.MOUSE_BUTTON_RIGHT) : ControllerBinding.LEFT_BUTTON.getIcon());
+    ArbitrarySupplier<ComponentIcon> MENU_QUICK_ACTION = registerCommonComponentIcon("menu_quick_action", ()-> ControlType.getActiveType().isKbm() ? COMPOUND_COMPONENT_ICON_FUNCTION.apply(new ComponentIcon[]{getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT), PLUS_ICON,getKeyIcon(InputConstants.KEY_LSHIFT)}) : ControllerBinding.UP_BUTTON.getIcon());
+    ArbitrarySupplier<ComponentIcon> NAVIGATION = registerCommonComponentIcon("navigation", ()-> ControlType.getActiveType().isKbm() ? COMPOUND_COMPONENT_ICON_FUNCTION.apply(new ComponentIcon[]{getKeyIcon(InputConstants.KEY_UP), getKeyIcon(InputConstants.KEY_LEFT), getKeyIcon(InputConstants.KEY_DOWN), getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.LEFT_STICK.getIcon());
+    ArbitrarySupplier<ComponentIcon> HORIZONTAL_NAVIGATION = registerCommonComponentIcon("horizontal_navigation", ()-> ControlType.getActiveType().isKbm() ? COMPOUND_COMPONENT_ICON_FUNCTION.apply(new ComponentIcon[]{getKeyIcon(InputConstants.KEY_LEFT), getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.LEFT_STICK.getIcon());
+    ArbitrarySupplier<ComponentIcon> VERTICAL_NAVIGATION = registerCommonComponentIcon("vertical_navigation", ()-> ControlType.getActiveType().isKbm() ? COMPOUND_COMPONENT_ICON_FUNCTION.apply(new ComponentIcon[]{getKeyIcon(InputConstants.KEY_UP), getKeyIcon(InputConstants.KEY_DOWN)}) : ControllerBinding.LEFT_STICK.getIcon());
+    ArbitrarySupplier<ComponentIcon> LEFT_TAB = registerCommonComponentIcon("left_tab", ()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon());
+    ArbitrarySupplier<ComponentIcon> RIGHT_TAB = registerCommonComponentIcon("right_tab", ()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
 
+    ArbitrarySupplier<ComponentIcon> LEFT_CRAFTING_TYPE = registerCommonComponentIcon("left_crafting_type",  ()-> ControlType.getActiveType().isKbm() ? COMPOUND_COMPONENT_ICON_FUNCTION.apply(new ComponentIcon[]{getKeyIcon(InputConstants.KEY_LSHIFT), PLUS_ICON, getKeyIcon(InputConstants.KEY_LBRACKET)}) : ControllerBinding.LEFT_TRIGGER.getIcon());
+    ArbitrarySupplier<ComponentIcon> RIGHT_CRAFTING_TYPE = registerCommonComponentIcon("right_crafting_type", ()-> ControlType.getActiveType().isKbm() ? COMPOUND_COMPONENT_ICON_FUNCTION.apply(new ComponentIcon[]{getKeyIcon(InputConstants.KEY_LSHIFT), PLUS_ICON, getKeyIcon(InputConstants.KEY_RBRACKET)}) : ControllerBinding.RIGHT_TRIGGER.getIcon());
+    ArbitrarySupplier<ComponentIcon> CANCEL_BINDING = registerCommonComponentIcon("cancel_binding", ()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.BACK.getIcon());
 
     static Component getKeyMessage(int key, Screen screen){
         for (GuiEventListener child : screen.children()) {
@@ -164,19 +164,19 @@ public interface ControlTooltip {
         return keyContext.key == InputConstants.KEY_NUMPADENTER && ControlType.getActiveType().isKbm() || keyContext.key == InputConstants.KEY_RETURN  && !ControlType.getActiveType().isKbm() ? LegacyComponents.SHOW_KEYBOARD : null;
     }
     static ControlTooltip.Renderer setupDefaultButtons(Renderer renderer, Screen screen){
-        return renderer.add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_NUMPADENTER) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(), ()-> getKeyMessage(InputConstants.KEY_NUMPADENTER, screen)).add(PRESS::get,()-> getKeyMessage(InputConstants.KEY_RETURN,screen));
+        return renderer.add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_NUMPADENTER) : ControllerBinding.DOWN_BUTTON.getIcon(), ()-> getKeyMessage(InputConstants.KEY_NUMPADENTER, screen)).add(PRESS::get,()-> getKeyMessage(InputConstants.KEY_RETURN,screen));
     }
     static ControlTooltip.Renderer setupDefaultScreen(Renderer renderer, Screen screen){
-        return setupDefaultButtons(renderer,screen).add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.bindingState.getIcon(),()-> getKeyMessage(InputConstants.KEY_RETURN,screen)).add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.bindingState.getIcon(),()->screen.shouldCloseOnEsc() ? CommonComponents.GUI_BACK : null);
+        return setupDefaultButtons(renderer,screen).add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_RETURN) : ControllerBinding.DOWN_BUTTON.getIcon(),()-> getKeyMessage(InputConstants.KEY_RETURN,screen)).add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.getIcon(),()->screen.shouldCloseOnEsc() ? CommonComponents.GUI_BACK : null);
     }
     static ControlTooltip.Renderer setupDefaultContainerScreen(Renderer renderer, LegacyMenuAccess<?> a){
         return renderer.
                 add(MENU_MAIN_ACTION::get,()->a.isOutsideClick(0) && !a.getMenu().getCarried().isEmpty() ? a.getMenu().getCarried().getCount() > 1 ? LegacyComponents.DROP_ALL : LegacyComponents.DROP : a.getHoveredSlot() != null && (a.getHoveredSlot().hasItem() || !a.getMenu().getCarried().isEmpty()) ? a.getHoveredSlot().hasItem() && !FactoryItemUtil.equalItems(a.getHoveredSlot().getItem(),a.getMenu().getCarried()) && !isBundleAndAcceptItem(a.getHoveredSlot().getItem(),a.getMenu().getCarried())  ? a.getMenu().getCarried().isEmpty() ? LegacyComponents.TAKE : isBundleAndAcceptItem(a.getMenu().getCarried(),a.getHoveredSlot().getItem()) ? LegacyComponents.PICK_UP : LegacyComponents.SWAP : LegacyComponents.PLACE : null).
-                add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.bindingState.getIcon(),()-> LegacyComponents.EXIT).
+                add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.getIcon(),()-> LegacyComponents.EXIT).
                 add(MENU_OFF_ACTION::get,()-> getMenuOffAction(a)).
                 add(MENU_QUICK_ACTION::get,()-> a.getHoveredSlot() != null && a.getHoveredSlot().hasItem() ? LegacyComponents.QUICK_MOVE : null).
-                add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_W) : ControllerBinding.RIGHT_TRIGGER.bindingState.getIcon(),()->a.getHoveredSlot() != null && a.getHoveredSlot().hasItem() && LegacyTipManager.hasTip(a.getHoveredSlot().getItem()) ? LegacyComponents.WHATS_THIS : null).
-                add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT) : ControllerBinding.LEFT_TRIGGER.bindingState.getIcon(),()-> a.getMenu().getCarried().getCount() > 1 ? LegacyComponents.DISTRIBUTE : null);
+                add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_W) : ControllerBinding.RIGHT_TRIGGER.getIcon(),()->a.getHoveredSlot() != null && a.getHoveredSlot().hasItem() && LegacyTipManager.hasTip(a.getHoveredSlot().getItem()) ? LegacyComponents.WHATS_THIS : null).
+                add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT) : ControllerBinding.LEFT_TRIGGER.getIcon(),()-> a.getMenu().getCarried().getCount() > 1 ? LegacyComponents.DISTRIBUTE : null);
     }
 
     static Component getIconComponentFromKeyMapping(LegacyKeyMapping mapping){
@@ -185,7 +185,7 @@ public interface ControlTooltip {
     }
 
     static LegacyIcon getIconFromKeyMapping(LegacyKeyMapping mapping){
-        return ControlType.getActiveType().isKbm() ? getKeyIcon(mapping.getKey().getValue()) : mapping.getBinding() == null ? null : mapping.getBinding().bindingState.getIcon();
+        return ControlType.getActiveType().isKbm() ? getKeyIcon(mapping.getKey().getValue()) : mapping.getBinding() == null ? null : mapping.getBinding().getIcon();
     }
 
     static Component getMenuOffAction(LegacyMenuAccess<?> a){

@@ -217,7 +217,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
                 if (isValidIndex() && isFocused()) {
                     MerchantOffer offer = menu.merchant.getOffers().get(getIndex());
                     if (((LegacyMerchantOffer)offer).getRequiredLevel() <= menu.merchantLevel && !offer.isOutOfStock() && !displaySlotsWarning[2]) {
-                        CommonNetwork.sendToServer(new ServerMenuCraftPayload(Collections.emptyList(),getIndex(),hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
+                        CommonNetwork.sendToServer(new ServerMenuCraftPayload(Collections.emptyList(),getIndex(),hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed));
                     }else ScreenUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
                 }
             }

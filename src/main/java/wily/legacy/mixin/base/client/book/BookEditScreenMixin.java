@@ -143,8 +143,8 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
     public void added() {
         super.added();
         ControlTooltip.Renderer.of(this)
-                .add(()-> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT)}) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(), ()-> currentPage != 0 ? LegacyComponents.PREVIOUS_PAGE : null)
-                .add(()-> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon(), ()-> this.currentPage < this.getNumPages() - 1 ? LegacyComponents.NEXT_PAGE : LegacyComponents.ADD_PAGE);
+                .add(()-> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT)}) : ControllerBinding.LEFT_BUMPER.getIcon(), ()-> currentPage != 0 ? LegacyComponents.PREVIOUS_PAGE : null)
+                .add(()-> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.RIGHT_BUMPER.getIcon(), ()-> this.currentPage < this.getNumPages() - 1 ? LegacyComponents.NEXT_PAGE : LegacyComponents.ADD_PAGE);
     }
 
     protected BookEditScreenMixin(Component component) {

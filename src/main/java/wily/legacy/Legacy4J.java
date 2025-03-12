@@ -1,6 +1,7 @@
 package wily.legacy;
 
 import net.minecraft.advancements.Advancement;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.cauldron.CauldronInteraction;
@@ -318,7 +319,8 @@ public class Legacy4J {
             protected ItemStack execute(BlockSource blockSource, ItemStack itemStack) {
                 setSuccess(blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/().getGameRules().getBoolean(LegacyGameRules.TNT_EXPLODES));
                 if (isSuccess()){
-                    TntBlock.explode(blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/(),blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/());
+                    BlockPos blockPos = blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/().relative(blockSource./*? if >1.20.1 {*/state/*?} else {*//*getBlockState*//*?}*/().getValue(DispenserBlock.FACING));
+                    TntBlock.explode(blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/(), blockPos);
                     blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/().gameEvent(null, GameEvent.ENTITY_PLACE, blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/());
                     itemStack.shrink(1);
                 }

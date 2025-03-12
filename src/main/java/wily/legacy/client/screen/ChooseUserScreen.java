@@ -56,8 +56,8 @@ public class ChooseUserScreen extends PanelVListScreen {
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.add(()->getFocused() == null || renderableVList.renderables.indexOf(getFocused()) <= 0 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), ()-> ACCOUNT_OPTIONS);
-        renderer.add(()->ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), ()-> DIRECT_LOGIN);
+        renderer.add(()->getFocused() == null || renderableVList.renderables.indexOf(getFocused()) <= 0 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), ()-> ACCOUNT_OPTIONS);
+        renderer.add(()->ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), ()-> DIRECT_LOGIN);
     }
 
     @Override

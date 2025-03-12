@@ -75,7 +75,21 @@ public class GLFWControllerHandler implements Controller.Handler{
 
             @Override
             public float axisValue(int i) {
-                return gamepadState == null ? 0 : gamepadState.axes(i);
+                float value = gamepadState == null ? 0 : gamepadState.axes(i);
+                return switch (i){
+                    case GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER,GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER -> (value + 1) / 2;
+                    default -> value;
+                };
+            }
+
+            @Override
+            public boolean hasButton(ControllerBinding.Button button) {
+                return getButtonIndex(button) != -1;
+            }
+
+            @Override
+            public boolean hasAxis(ControllerBinding.Axis axis) {
+                return getAxisIndex(axis) != -1;
             }
 
             @Override
@@ -94,23 +108,17 @@ public class GLFWControllerHandler implements Controller.Handler{
     }
 
     @Override
-    public int getBindingIndex(ControllerBinding component) {
-        return switch (component){
-            case DOWN_BUTTON -> GLFW.GLFW_GAMEPAD_BUTTON_A;
-            case RIGHT_BUTTON -> GLFW.GLFW_GAMEPAD_BUTTON_B;
-            case LEFT_BUTTON -> GLFW.GLFW_GAMEPAD_BUTTON_X;
-            case UP_BUTTON -> GLFW.GLFW_GAMEPAD_BUTTON_Y;
+    public int getButtonIndex(ControllerBinding.Button button) {
+        return switch (button){
+            case DOWN -> GLFW.GLFW_GAMEPAD_BUTTON_A;
+            case RIGHT -> GLFW.GLFW_GAMEPAD_BUTTON_B;
+            case LEFT -> GLFW.GLFW_GAMEPAD_BUTTON_X;
+            case UP -> GLFW.GLFW_GAMEPAD_BUTTON_Y;
             case BACK -> GLFW.GLFW_GAMEPAD_BUTTON_BACK;
             case GUIDE -> GLFW.GLFW_GAMEPAD_BUTTON_GUIDE;
             case START -> GLFW.GLFW_GAMEPAD_BUTTON_START;
-            case LEFT_STICK_BUTTON -> GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB;
-            case RIGHT_STICK_BUTTON -> GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB;
-            case LEFT_STICK_RIGHT,LEFT_STICK_LEFT -> GLFW.GLFW_GAMEPAD_AXIS_LEFT_X;
-            case RIGHT_STICK_RIGHT,RIGHT_STICK_LEFT -> GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X;
-            case LEFT_STICK_UP,LEFT_STICK_DOWN -> GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
-            case RIGHT_STICK_UP,RIGHT_STICK_DOWN -> GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y;
-            case LEFT_TRIGGER -> GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER;
-            case RIGHT_TRIGGER -> GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER;
+            case LEFT_STICK -> GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB;
+            case RIGHT_STICK -> GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB;
             case LEFT_BUMPER ->  GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER;
             case RIGHT_BUMPER -> GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER;
             case DPAD_UP -> GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP;
@@ -118,6 +126,18 @@ public class GLFWControllerHandler implements Controller.Handler{
             case DPAD_LEFT -> GLFW.GLFW_GAMEPAD_BUTTON_DPAD_LEFT;
             case DPAD_RIGHT -> GLFW.GLFW_GAMEPAD_BUTTON_DPAD_RIGHT;
             default -> -1;
+        };
+    }
+
+    @Override
+    public int getAxisIndex(ControllerBinding.Axis axis) {
+        return switch (axis){
+            case LEFT_STICK_X -> GLFW.GLFW_GAMEPAD_AXIS_LEFT_X;
+            case LEFT_STICK_Y -> GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
+            case RIGHT_STICK_X -> GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X;
+            case RIGHT_STICK_Y -> GLFW.GLFW_GAMEPAD_AXIS_RIGHT_Y;
+            case LEFT_TRIGGER -> GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER;
+            case RIGHT_TRIGGER -> GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER;
         };
     }
 

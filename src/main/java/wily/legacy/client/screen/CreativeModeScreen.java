@@ -141,7 +141,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         renderer.
                 replace(2,i-> ControlType.getActiveType().isKbm() && canClearQuickSelect() ? getKeyIcon(InputConstants.KEY_X) : i,a-> canClearQuickSelect() ? LegacyComponents.CLEAR_QUICK_SELECT : a).
                 replace(3,i-> i, a-> hoveredSlot != null && hoveredSlot.hasItem() && hoveredSlot.container != creativeModeGrid ? LegacyComponents.CLEAR : a).
-                add(()-> page.max > 0 ? ControlType.getActiveType().isKbm() ? ControlTooltip.ComponentIcon.compoundOf(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.RIGHT_STICK.bindingState.getIcon() : null,()-> LegacyComponents.PAGE);
+                add(()-> page.max > 0 ? ControlType.getActiveType().isKbm() ? ControlTooltip.ComponentIcon.compoundOf(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.RIGHT_STICK.getIcon() : null,()-> LegacyComponents.PAGE);
     }
 
 

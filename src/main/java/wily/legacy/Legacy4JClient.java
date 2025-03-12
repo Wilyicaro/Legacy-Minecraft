@@ -440,6 +440,7 @@ public class Legacy4JClient {
             LegacyOptions.CLIENT_STORAGE.load();
             FactoryAPIClient.registerRenderType(RenderType.cutoutMipped(), SHRUB.get());
             FactoryAPIClient.registerRenderType(RenderType.translucent(), Blocks.WATER);
+            ControllerBinding.setupDefaultBindings(m);
             controllerManager.setup();
             //? if fabric
             if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
@@ -698,7 +699,7 @@ public class Legacy4JClient {
     }
 
     public static boolean canSkipIntro(float timer){
-        return timer % INTROS.size() >= INTROS.size() - 0.01f || LegacyOptions.skipIntro.get() || InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), InputConstants.KEY_RETURN) || GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(),GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS || ControllerBinding.DOWN_BUTTON.bindingState.pressed;
+        return timer % INTROS.size() >= INTROS.size() - 0.01f || LegacyOptions.skipIntro.get() || InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), InputConstants.KEY_RETURN) || GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(),GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS || ControllerBinding.DOWN_BUTTON.state().pressed;
     }
 
     public static final KeyMapping keyCrafting = new KeyMapping("legacy.key.crafting", InputConstants.KEY_E, "key.categories.inventory");

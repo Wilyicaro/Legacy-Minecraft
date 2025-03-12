@@ -76,7 +76,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(),()-> LegacyComponents.CHANGE_FILTER);
+        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()-> LegacyComponents.CHANGE_FILTER);
     }
 
     public static void refreshStatsBoards(Minecraft minecraft){
@@ -235,9 +235,9 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(panel.x + (panel.width - 211) / 2f, panel.y - 12,0);
                 guiGraphics.pose().scale(0.5f,0.5f,0.5f);
-                (ControlType.getActiveType().isKbm() ? ControlTooltip.ComponentIcon.compoundOf(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.bindingState.getIcon()).render(guiGraphics,4,0,false, false);
+                (ControlType.getActiveType().isKbm() ? ControlTooltip.ComponentIcon.compoundOf(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(guiGraphics,4,0,false, false);
                 if (statsInScreen < statsBoards.get(selectedStatBoard).renderables.size()) {
-                    ControlTooltip.Icon pageControl = ControlTooltip.ComponentIcon.compoundOf(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon());
+                    ControlTooltip.Icon pageControl = ControlTooltip.ComponentIcon.compoundOf(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
                     pageControl.render(guiGraphics,422 - pageControl.render(guiGraphics,0,0,false,true) - 8, 0,false,false);
                 }
                 guiGraphics.pose().popPose();

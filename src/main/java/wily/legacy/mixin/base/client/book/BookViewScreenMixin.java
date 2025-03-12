@@ -59,8 +59,8 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
     public void added() {
         super.added();
         ControlTooltip.Renderer.of(this)
-                .add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(), ()-> currentPage != 0 ? LegacyComponents.PREVIOUS_PAGE : null)
-                .add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon(), ()-> this.currentPage < this.getNumPages() - 1 ? LegacyComponents.NEXT_PAGE : null);
+                .add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT) : ControllerBinding.LEFT_BUMPER.getIcon(), ()-> currentPage != 0 ? LegacyComponents.PREVIOUS_PAGE : null)
+                .add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT) : ControllerBinding.RIGHT_BUMPER.getIcon(), ()-> this.currentPage < this.getNumPages() - 1 ? LegacyComponents.NEXT_PAGE : null);
     }
 
 

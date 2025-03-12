@@ -58,7 +58,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
     @Override
     public void added() {
         super.added();
-        ControlTooltip.Renderer.of(this).clear().add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.bindingState.getIcon(), ()-> poem ? CommonComponents.GUI_CONTINUE : CommonComponents.GUI_BACK);
+        ControlTooltip.Renderer.of(this).clear().add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.getIcon(), ()-> poem ? CommonComponents.GUI_CONTINUE : CommonComponents.GUI_BACK);
     }
     //? if >=1.20.5 {
     @Shadow protected abstract void renderVignette(GuiGraphics arg);
@@ -124,8 +124,11 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
             guiGraphics.pose().popPose();
             Legacy4JClient.defaultFontOverride = null;
         } else {
-            int fixedHeight = guiGraphics.guiWidth() * 9 / 16;
-            FactoryGuiGraphics.of(guiGraphics).blit(CREDITS_BACKGROUND,0,0,0,(fixedHeight - guiGraphics.guiHeight()) / 2f, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), fixedHeight);
+            int fixedWidth = Math.max(guiGraphics.guiHeight() * 16 / 9, guiGraphics.guiWidth());
+            int fixedHeight = Math.max(guiGraphics.guiWidth() * 9 / 16, guiGraphics.guiHeight());
+            float x = (fixedWidth - guiGraphics.guiWidth()) / 2f;
+            float y = (fixedHeight - guiGraphics.guiHeight()) / 2f;
+            FactoryGuiGraphics.of(guiGraphics).blit(CREDITS_BACKGROUND,0,0, x,y, guiGraphics.guiWidth(), guiGraphics.guiHeight(), fixedWidth, fixedHeight);
 
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(0.0F, g, 0.0F);
@@ -155,7 +158,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
             guiGraphics.pose().popPose();
             RenderSystem.enableBlend();
             FactoryGuiGraphics.of(guiGraphics).disableDepthTest();
-            FactoryGuiGraphics.of(guiGraphics).blit(CREDITS_BACKGROUND_FADE,0,0,0,(fixedHeight - guiGraphics.guiHeight()) / 2f, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), fixedHeight);
+            FactoryGuiGraphics.of(guiGraphics).blit(CREDITS_BACKGROUND_FADE,0,0, x, y, guiGraphics.guiWidth(), guiGraphics.guiHeight(), fixedWidth, fixedHeight);
             guiGraphics.flush();
             FactoryGuiGraphics.of(guiGraphics).enableDepthTest();
             RenderSystem.disableBlend();

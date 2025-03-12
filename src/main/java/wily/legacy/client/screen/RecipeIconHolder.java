@@ -206,7 +206,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
 
 
     public void craft() {
-        CommonNetwork.sendToServer(new ServerMenuCraftPayload(getFocusedRecipe(), Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
+        CommonNetwork.sendToServer(new ServerMenuCraftPayload(getFocusedRecipe(), Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed));
     }
 
     @Override

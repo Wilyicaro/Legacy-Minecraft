@@ -89,7 +89,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     @Override
     public void added() {
         super.added();
-        ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), ()-> LegacyComponents.OPEN_DIRECTORY);
+        ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), ()-> LegacyComponents.OPEN_DIRECTORY);
     }
 
     //? if >1.20.1 {
@@ -210,7 +210,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                     }));
                 }
                 public boolean keyPressed(int i, int j, int k) {
-                    if (Screen.hasShiftDown() || ControllerBinding.LEFT_BUTTON.bindingState.pressed) {
+                    if (Screen.hasShiftDown() || ControllerBinding.LEFT_BUTTON.state().pressed) {
                         switch (i) {
                             case 265 -> {
                                 int oldFocused = getFocused() == null ? -1 : children().indexOf(getFocused());

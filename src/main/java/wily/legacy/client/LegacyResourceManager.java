@@ -44,7 +44,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
     public static final List<ResourceLocation> INTROS = new ArrayList<>();
 
     public static final List<KeyboardScreen.CharButtonBuilder> keyboardButtonBuilders = new ArrayList<>();
-    public static ControllerBinding shiftBinding;
+    public static ControllerBinding<?> shiftBinding;
     @Override
     public void onResourceManagerReload(ResourceManager resourceManager) {
         Minecraft minecraft = Minecraft.getInstance();
@@ -153,10 +153,10 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
         try {
             JsonObject obj = GsonHelper.parse(resource.openAsReader());
             keyboardButtonBuilders.clear();
-            shiftBinding = obj.has("shiftBinding") ? ControllerBinding.CODEC.byName(obj.get("shiftBinding").getAsString()) : ControllerBinding.LEFT_STICK_BUTTON;
+            shiftBinding = obj.has("shiftBinding") ? ControllerBinding.map.get(obj.get("shiftBinding").getAsString()) : ControllerBinding.LEFT_STICK_BUTTON;
             obj.getAsJsonArray("layout").forEach(e->{
                 if (e instanceof JsonObject o){
-                    keyboardButtonBuilders.add(new KeyboardScreen.CharButtonBuilder(GsonHelper.getAsInt(o,"width",25),GsonHelper.getAsString(o,"chars"),GsonHelper.getAsString(o,"shiftChars",null),JsonUtil.getJsonStringOrNull(o,"binding",ControllerBinding.CODEC::byName),JsonUtil.getJsonStringOrNull(o,"icon",FactoryAPI::createLocation),JsonUtil.getJsonStringOrNull(o,"soundEvent",s-> FactoryAPIPlatform.getRegistryValue(FactoryAPI.createLocation(s),BuiltInRegistries.SOUND_EVENT))));
+                    keyboardButtonBuilders.add(new KeyboardScreen.CharButtonBuilder(GsonHelper.getAsInt(o,"width",25),GsonHelper.getAsString(o,"chars"),GsonHelper.getAsString(o,"shiftChars",null),JsonUtil.getJsonStringOrNull(o,"binding", ControllerBinding.map::get),JsonUtil.getJsonStringOrNull(o,"icon",FactoryAPI::createLocation),JsonUtil.getJsonStringOrNull(o,"soundEvent",s-> FactoryAPIPlatform.getRegistryValue(FactoryAPI.createLocation(s),BuiltInRegistries.SOUND_EVENT))));
                 }else if (e instanceof JsonPrimitive p) keyboardButtonBuilders.add(new KeyboardScreen.CharButtonBuilder(25,p.getAsString(),null,null,null,null));
             });
         } catch (IOException e) {
@@ -174,10 +174,11 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
     }
     public static void addControllerIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon){
         addIcons(resourceManager,location,(s,o)->{
-            ControllerBinding binding = ControllerBinding.CODEC.byName(s);
-            addIcon.accept(s, ControlTooltip.LegacyIcon.create(()->binding.getMapped().bindingState.pressed, JsonUtil.getJsonStringOrNull(o,"icon",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"iconOverlay",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"tipIcon", v-> v.charAt(0)),()-> !binding.getMapped().bindingState.isBlocked(), ControlType::getActiveControllerType));
+            ControllerBinding<?> binding = ControllerBinding.map.get(s);
+            if (binding != null) addIcon.accept(s, ControlTooltip.LegacyIcon.create(()->binding.getMapped().state().pressed, JsonUtil.getJsonStringOrNull(o,"icon",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"iconOverlay",String::toCharArray),JsonUtil.getJsonStringOrNull(o,"tipIcon", v-> v.charAt(0)),()-> !binding.getMapped().state().isBlocked(), ControlType::getActiveControllerType));
         });
     }
+
     public static void addKbmIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon){
         addIcons(resourceManager,location,(s,o)->{
             InputConstants.Key key = InputConstants.getKey(s);
@@ -185,6 +186,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
             addIcon.accept(key.getName(), icon);
         });
     }
+
     public static void registerIntroLocations(ResourceManager resourceManager){
         try {
             INTROS.clear();

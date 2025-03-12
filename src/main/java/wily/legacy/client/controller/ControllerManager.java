@@ -29,7 +29,6 @@ import java.util.function.Predicate;
 
 
 public  class ControllerManager {
-    public static final Map<Integer, ControllerBinding> DEFAULT_CONTROLLER_BUTTONS_BY_KEY = new HashMap<>();
     public Controller connectedController = null;
     public boolean isCursorDisabled = false;
     public boolean resetCursor = false;
@@ -107,9 +106,9 @@ public  class ControllerManager {
         if (minecraft.screen != null) Controller.Event.of(minecraft.screen).controllerTick(controller);
         if (LegacyTipManager.getActualTip() != null) LegacyTipManager.getActualTip().controllerTick(controller);
 
-        for (ControllerBinding binding : ControllerBinding.values()) {
+        for (ControllerBinding<?> binding : ControllerBinding.map.values()) {
             if (controller == null) break;
-            BindingState state = binding.bindingState;
+            BindingState state = binding.state();
             state.update(controller);
             if (LegacyTipManager.getActualTip() != null) LegacyTipManager.getActualTip().bindingStateTick(state);
 
@@ -137,19 +136,19 @@ public  class ControllerManager {
                 }
                 Controller.Event.of(minecraft.screen).bindingStateTick(state);
                 if (minecraft.screen == null) break s;
-                ControllerBinding cursorBinding = LegacyKeyMapping.of(Legacy4JClient.keyToggleCursor).getBinding();
+                ControllerBinding<?> cursorBinding = LegacyKeyMapping.of(Legacy4JClient.keyToggleCursor).getBinding();
                 if (cursorBinding != null && state.is(cursorBinding) && state.canClick()) toggleCursor();
                 if (isCursorDisabled) simulateKeyAction(s-> state.is(ControllerBinding.DOWN_BUTTON) && (minecraft.screen instanceof Controller.Event e && !e.onceClickBindings() || state.onceClick(true)),InputConstants.KEY_RETURN, state);
                 simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_BUTTON) && state.onceClick(true),InputConstants.KEY_ESCAPE, state);
                 simulateKeyAction(s-> s.is(ControllerBinding.LEFT_BUTTON),InputConstants.KEY_X, state);
-                simulateKeyAction(s->s.is(ControllerBinding.UP_BUTTON),InputConstants.KEY_O, state);
-                simulateKeyAction(s->s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_W, state);
-                simulateKeyAction(s->s.is(ControllerBinding.LEFT_TRIGGER),InputConstants.KEY_PAGEUP, state);
-                simulateKeyAction(s->s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_PAGEDOWN, state);
-                simulateKeyAction(s->s.is(ControllerBinding.RIGHT_BUMPER),InputConstants.KEY_RBRACKET, state);
-                simulateKeyAction(s->s.is(ControllerBinding.LEFT_BUMPER),InputConstants.KEY_LBRACKET, state);
-                simulateKeyAction(s->s.is(ControllerBinding.TOUCHPAD),InputConstants.KEY_T, state);
-                simulateKeyAction(s->s.is(ControllerBinding.CAPTURE),InputConstants.KEY_F2, state);
+                simulateKeyAction(s-> s.is(ControllerBinding.UP_BUTTON),InputConstants.KEY_O, state);
+                simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_W, state);
+                simulateKeyAction(s-> s.is(ControllerBinding.LEFT_TRIGGER),InputConstants.KEY_PAGEUP, state);
+                simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_PAGEDOWN, state);
+                simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_BUMPER),InputConstants.KEY_RBRACKET, state);
+                simulateKeyAction(s-> s.is(ControllerBinding.LEFT_BUMPER),InputConstants.KEY_LBRACKET, state);
+                simulateKeyAction(s-> s.is(ControllerBinding.TOUCHPAD_BUTTON),InputConstants.KEY_T, state);
+                simulateKeyAction(s-> s.is(ControllerBinding.CAPTURE),InputConstants.KEY_F2, state);
                 if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis stick && Math.abs(stick.y) > Math.abs(stick.x) && state.pressed && state.canClick())
                     minecraft.screen.mouseScrolled(getPointerX(), getPointerY()/*? if >1.20.1 {*/, 0/*?}*/, Math.signum(-stick.y));
                 Predicate<Predicate<BindingState.Axis>> isStickAnd = s -> state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && s.test(stick);
@@ -247,7 +246,7 @@ public  class ControllerManager {
     }
 
     public BindingState getButtonState(ControllerBinding button){
-        return button.bindingState;
+        return button.state();
     }
 
     public void disableCursor(){

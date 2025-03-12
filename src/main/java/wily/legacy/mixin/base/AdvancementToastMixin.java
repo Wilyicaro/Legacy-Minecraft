@@ -45,7 +45,7 @@ public abstract class AdvancementToastMixin implements Toast, AdvancementToastAc
         //?} else {
         /*ci.cancel();
         *///?}
-        Component holdToView = Component.translatable("legacy.menu.advancements.toast",(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_I) : ControllerBinding.UP_BUTTON.bindingState.getIcon()).getComponent());
+        Component holdToView = Component.translatable("legacy.menu.advancements.toast",(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_I) : ControllerBinding.UP_BUTTON.getIcon()).getComponent());
         DisplayInfo displayInfo = this.advancement./*? if >1.20.1 {*/value().display().orElse(null)/*?} else {*//*getDisplay()*//*?}*/;
         width = 82 + (displayInfo == null ? 0 : Math.max(font.width(holdToView), Math.max(font.width(displayInfo.getTitle()) * 3/2,font.width(displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName()))));
         ScreenUtil.renderPointerPanel(guiGraphics,0,0,width(),height());

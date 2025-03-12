@@ -64,8 +64,8 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(),()->ControlTooltip.getKeyMessage(InputConstants.KEY_O,this));
-        renderer.add(()-> tabList.selectedTab != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(),()->DIRECT_CONNECTION);
+        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(),()->ControlTooltip.getKeyMessage(InputConstants.KEY_O,this));
+        renderer.add(()-> tabList.selectedTab != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()->DIRECT_CONNECTION);
     }
     public PlayGameScreen(Screen parent, int initialTab) {
         super(s-> Panel.centered(s,300,256,()-> 0, ()-> UIAccessor.of(s).getBoolean("hasTabList",true) ? 12 : 0),Component.translatable("legacy.menu.play_game"));

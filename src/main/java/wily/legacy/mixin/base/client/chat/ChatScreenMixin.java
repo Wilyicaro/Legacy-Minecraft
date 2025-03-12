@@ -43,7 +43,7 @@ public abstract class ChatScreenMixin extends Screen implements Controller.Event
     @Override
     public void added() {
         super.added();
-        ControlTooltip.Renderer.of(this).replace(1,i-> i,c-> ControlType.getActiveType().isKbm() ? input.getValue().isBlank() ? null : input.getValue().startsWith("/") ? LegacyComponents.SEND_COMMAND : LegacyComponents.SEND_MESSAGE : c).add(()-> !ControlType.getActiveType().isKbm() ? ControllerBinding.START.bindingState.getIcon() : null,()-> /*? if >1.20.1 {*/commandSuggestions.isVisible()/*?} else {*//*commandSuggestions.suggestions != null*//*?}*/ ? LegacyComponents.USE_SUGGESTION : input.getValue().isBlank() ? null : input.getValue().startsWith("/") ? LegacyComponents.SEND_COMMAND : LegacyComponents.SEND_MESSAGE);
+        ControlTooltip.Renderer.of(this).replace(1,i-> i,c-> ControlType.getActiveType().isKbm() ? input.getValue().isBlank() ? null : input.getValue().startsWith("/") ? LegacyComponents.SEND_COMMAND : LegacyComponents.SEND_MESSAGE : c).add(()-> !ControlType.getActiveType().isKbm() ? ControllerBinding.START.getIcon() : null,()-> /*? if >1.20.1 {*/commandSuggestions.isVisible()/*?} else {*//*commandSuggestions.suggestions != null*//*?}*/ ? LegacyComponents.USE_SUGGESTION : input.getValue().isBlank() ? null : input.getValue().startsWith("/") ? LegacyComponents.SEND_COMMAND : LegacyComponents.SEND_MESSAGE);
     }
 
     @Inject(method = "init",at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/ChatScreen;input:Lnet/minecraft/client/gui/components/EditBox;", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))

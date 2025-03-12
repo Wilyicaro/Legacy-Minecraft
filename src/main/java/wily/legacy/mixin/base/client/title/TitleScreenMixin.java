@@ -73,8 +73,8 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
 
     @Inject(method = "added", at = @At("RETURN"))
     public void added(CallbackInfo ci) {
-        ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(),()-> ChooseUserScreen.CHOOSE_USER);
-        if (PublishScreen.hasWorldHost()) ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), ()-> WorldHostFriendsScreen.FRIENDS);
+        ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()-> ChooseUserScreen.CHOOSE_USER);
+        if (PublishScreen.hasWorldHost()) ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), ()-> WorldHostFriendsScreen.FRIENDS);
         if (splash == null) this.splash = Minecraft.getInstance().getSplashManager().getSplash();
     }
     @Inject(method = "removed", at = @At("RETURN"))

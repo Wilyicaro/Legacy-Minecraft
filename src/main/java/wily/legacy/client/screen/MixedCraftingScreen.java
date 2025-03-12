@@ -128,8 +128,8 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
         renderer.
                 add(EXTRA::get, () -> LegacyComponents.INFO).
                 add(OPTION::get, () -> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES).
-                add(()-> searchMode ? VERTICAL_NAVIGATION.get() : ControlTooltip.ComponentIcon.compoundOf(ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LSHIFT) : ControllerBinding.LEFT_STICK_BUTTON.bindingState.getIcon(),PLUS_ICON,OPTION.get()), () -> searchMode ? LegacyComponents.EXIT_SEARCH_MODE : LegacyComponents.SEARCH_MODE).
-                addCompound(() -> new Icon[]{ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(), SPACE_ICON, ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon()}, () -> LegacyComponents.GROUP);
+                add(()-> searchMode ? VERTICAL_NAVIGATION.get() : ControlTooltip.ComponentIcon.compoundOf(ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LSHIFT) : ControllerBinding.LEFT_STICK_BUTTON.getIcon(),PLUS_ICON,OPTION.get()), () -> searchMode ? LegacyComponents.EXIT_SEARCH_MODE : LegacyComponents.SEARCH_MODE).
+                addCompound(() -> new Icon[]{ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), SPACE_ICON, ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon()}, () -> LegacyComponents.GROUP);
     }
 
     public void resetElements() {
@@ -530,7 +530,7 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
 
                 @Override
                 protected void toggleCraftableRecipes() {
-                    if (hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed) return;
+                    if (hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed) return;
                     onlyCraftableRecipes = !onlyCraftableRecipes;
                     updateStackedContents();
                 }
@@ -644,7 +644,7 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
 
     @Override
     public boolean keyReleased(int i, int j, int k) {
-        if (!searchBox.isFocused() && !searchMode && i == InputConstants.KEY_O && (hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed)){
+        if (!searchBox.isFocused() && !searchMode && i == InputConstants.KEY_O && (hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed)){
             enableSearchMode(false);
             return true;
         }

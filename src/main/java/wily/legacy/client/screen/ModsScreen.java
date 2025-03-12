@@ -189,6 +189,6 @@ public class ModsScreen extends PanelVListScreen {
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.add(()->ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), ()-> Component.translatable("legacy.menu.sorting", this.sorting.get() == 0 ? LegacyComponents.NONE : LegacyComponents.ALPHABETICAL));
+        renderer.add(()->ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), ()-> Component.translatable("legacy.menu.sorting", this.sorting.get() == 0 ? LegacyComponents.NONE : LegacyComponents.ALPHABETICAL));
     }
 }

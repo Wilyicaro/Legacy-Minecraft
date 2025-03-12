@@ -23,11 +23,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.Difficulty;
 import wily.factoryapi.FactoryAPI;
-import wily.factoryapi.FactoryAPIClient;
-import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.Bearer;
-import wily.factoryapi.base.Stocker;
-import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.base.config.FactoryConfigControl;
 import wily.factoryapi.base.config.FactoryConfigDisplay;
@@ -35,7 +31,6 @@ import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.controller.*;
-import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.util.LegacyComponents;
 
@@ -70,20 +65,7 @@ public class LegacyOptions {
             Legacy4JClient.isNewerMinecraftVersion = Legacy4J.isNewerVersion(SharedConstants.getCurrentVersion().getName(), lastLoadedMinecraftVersion.get());
         }
     }.withFile("legacy/client_options.json");
-    public static final FactoryConfig.StorageAccess CLIENT_PARSE_WHEN_LOADED_STORAGE_ACCESS = new FactoryConfig.StorageAccess(){
-        @Override
-        public <T> void whenParsed(FactoryConfig<T> config, T newValue) {
-            FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(()-> {
-                FactoryConfig.StorageAccess.super.whenParsed(config, newValue);
-            }, MinecraftAccessor.getInstance()::hasGameLoaded);
-        }
 
-        @Override
-        public void save() {
-            CLIENT_STORAGE.save();
-        }
-    };
-    
     public static final FactoryConfig.StorageAccess VANILLA_STORAGE_ACCESS = ()-> Minecraft.getInstance().options.save();
 
 
@@ -204,10 +186,10 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> legacyItemTooltips = CLIENT_STORAGE.register(createBoolean("legacyItemTooltips", true));
     public static final FactoryConfig<Boolean> legacyItemTooltipScaling = CLIENT_STORAGE.register(createBoolean("legacyItemTooltipsScaling", true));
     public static final FactoryConfig<Boolean> invertYController = CLIENT_STORAGE.register(createBoolean("invertYController", false));
-    public static final FactoryConfig<Boolean> invertControllerButtons = CLIENT_STORAGE.register(createBoolean("invertControllerButtons", false, (b)-> ControllerBinding.RIGHT_BUTTON.bindingState.block(2)));
+    public static final FactoryConfig<Boolean> invertControllerButtons = CLIENT_STORAGE.register(createBoolean("invertControllerButtons", false, (b)-> ControllerBinding.RIGHT_BUTTON.state().block(2)));
     public static final FactoryConfig<Integer> selectedController = CLIENT_STORAGE.register(createInteger("selectedController", (c, i)-> Component.translatable("options.generic_value",c,Component.literal(i+1 + (Legacy4JClient.controllerManager.connectedController == null ? "" : " (%s)".formatted(Legacy4JClient.controllerManager.connectedController.getName())))),  0, ()->15, 0, d -> { if (Legacy4JClient.controllerManager.connectedController!= null) Legacy4JClient.controllerManager.connectedController.disconnect(Legacy4JClient.controllerManager);}));
     public static final FactoryConfig<Controller.Handler> selectedControllerHandler = CLIENT_STORAGE.register(create("selectedControllerHandler", (c, h)-> Component.translatable("options.generic_value",c,h.getName()), ()->((List<Controller.Handler>)ControllerManager.handlers.values()), SDLControllerHandler.getInstance(), d-> {
-        ControllerBinding.LEFT_STICK.bindingState.block(2);
+        ControllerBinding.LEFT_STICK.state().block(2);
         if (Legacy4JClient.controllerManager.connectedController != null) Legacy4JClient.controllerManager.connectedController.disconnect(Legacy4JClient.controllerManager);
     }));
     public static final FactoryConfig<Boolean> controllerVirtualCursor = CLIENT_STORAGE.register(createBoolean("controllerVirtualCursor", true, b-> {}));
@@ -279,6 +261,11 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> skipInitialSaveWarning = CLIENT_STORAGE.register(createBoolean("skipInitialSaveWarning", false));
     public static final FactoryConfig<Boolean> titleScreenFade = CLIENT_STORAGE.register(createBoolean("titleScreenFade", false));
     public static final FactoryConfig<Boolean> legacyEvokerFangs = CLIENT_STORAGE.register(createBoolean("legacyEvokerFangs", true));
+    public static final FactoryConfig<Boolean> vanillaTutorial = CLIENT_STORAGE.register(createBoolean("vanillaTutorial", false, o->{
+        if (Minecraft.getInstance().level != null && !o) {
+            Minecraft.getInstance().getTutorial().stop();
+        }
+    }));
 
     public static int getTerrainFogStart(){
         return Math.min(terrainFogStart.get(), Minecraft.getInstance().options.renderDistance().get());

@@ -86,7 +86,7 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
 
                 @Override
                 public void onPress() {
-                    if (Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed) {
+                    if (Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed) {
                         setAndUpdateKey(keyMapping, keyMapping.getDefaultKey());
                         setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
                     } else {

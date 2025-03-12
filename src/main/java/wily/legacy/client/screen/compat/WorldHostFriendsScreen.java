@@ -55,7 +55,7 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), ()-> ControlTooltip.getKeyMessage(InputConstants.KEY_X,this));
+        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), ()-> ControlTooltip.getKeyMessage(InputConstants.KEY_X,this));
     }
 
     public void reloadFriendButtons(){

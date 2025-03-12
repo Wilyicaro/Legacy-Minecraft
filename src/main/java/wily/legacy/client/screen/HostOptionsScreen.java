@@ -68,8 +68,8 @@ public class HostOptionsScreen extends PanelVListScreen {
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), ()-> minecraft.hasSingleplayerServer() ? !minecraft.getSingleplayerServer().isPublished() ? PublishScreen.PUBLISH : PublishScreen.hasWorldHost() ? WorldHostFriendsScreen.FRIENDS : null : null);
-        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(),()-> minecraft.getChatStatus().isChatAllowed(minecraft.isLocalServer()) ? LegacyKeyMapping.of(Minecraft.getInstance().options.keyChat).getDisplayName() : null);
+        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), ()-> minecraft.hasSingleplayerServer() ? !minecraft.getSingleplayerServer().isPublished() ? PublishScreen.PUBLISH : PublishScreen.hasWorldHost() ? WorldHostFriendsScreen.FRIENDS : null : null);
+        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(),()-> minecraft.getChatStatus().isChatAllowed(minecraft.isLocalServer()) ? LegacyKeyMapping.of(Minecraft.getInstance().options.keyChat).getDisplayName() : null);
     }
 
     public HostOptionsScreen() {

@@ -49,7 +49,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
             renderableVList.addRenderable(new MappingButton(0,0,240,20, LegacyKeyMapping.of(keyMapping)) {
                 @Override
                 public ControlTooltip.ComponentIcon getIcon() {
-                    return mapping.getBinding().bindingState.getIcon();
+                    return mapping.getBinding().getIcon();
                 }
 
                 @Override
@@ -59,8 +59,8 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
 
                 @Override
                 public void onPress() {
-                    ControllerBinding.DOWN_BUTTON.bindingState.block();
-                    if (Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed){
+                    ControllerBinding.DOWN_BUTTON.state().block();
+                    if (Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed){
                         mapping.setBinding(mapping.getDefaultBinding());
                         LegacyOptions.CLIENT_STORAGE.save();
                         setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
@@ -109,16 +109,25 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
         return LegacyComponents.CONFLICTING_BUTTONS;
     }
 
+    public void applyBinding(ControllerBinding<?> binding) {
+        selectedMapping.setBinding(binding);
+        LegacyOptions.CLIENT_STORAGE.save();
+        setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
+        resolveConflictingMappings();
+        setSelectedMapping(null);
+    }
+
     @Override
     public void bindingStateTick(BindingState state) {
         if (selectedMapping != null) {
-            if (!state.canClick() || !state.binding.isBindable) return;
-            selectedMapping.setBinding(!state.is(ControllerBinding.BACK) || selectedMapping.self() == Legacy4JClient.keyHostOptions ? state.binding : null);
-            LegacyOptions.CLIENT_STORAGE.save();
-            setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
-            resolveConflictingMappings();
-            setSelectedMapping(null);
-            state.block();
+            if (state.is(ControllerBinding.BACK)){
+                if (state.canClick() && state.timePressed >= state.getDefaultDelay())
+                    applyBinding(ControllerBinding.BACK);
+                else if (state.released) applyBinding(null);
+            } else if (state.canClick() && state.binding.isBindable) {
+                applyBinding(state.binding);
+                state.block();
+            }
         }
     }
 }

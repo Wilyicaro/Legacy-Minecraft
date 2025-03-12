@@ -19,13 +19,19 @@ import static wily.legacy.client.controller.ControllerManager.CONTROLLER_DISCONN
 public interface Controller {
 
     String getName();
+
     ControlType getType();
+
     boolean buttonPressed(int i);
+
     float axisValue(int i);
+
     default boolean hasLED(){
         return false;
     }
+
     default void setLED(byte r, byte g, byte b){}
+
     default void connect(ControllerManager manager){
         manager.isControllerTheLastInput = true;
         if (!manager.isCursorDisabled && manager.minecraft.screen != null) manager.minecraft.execute(()-> manager.minecraft.screen.repositionElements());
@@ -47,6 +53,10 @@ public interface Controller {
     default boolean hasFingerInTouchpad(int touchpad, int finger, Byte state, Float x, Float y, Float pressure){
         return false;
     }
+
+    boolean hasButton(ControllerBinding.Button button);
+
+    boolean hasAxis(ControllerBinding.Axis axis);
 
     default void disconnect(ControllerManager manager){
         manager.isControllerTheLastInput = false;
@@ -72,10 +82,22 @@ public interface Controller {
         public float axisValue(int i) {
             return 0;
         }
+
+        @Override
+        public boolean hasButton(ControllerBinding.Button button) {
+            return false;
+        }
+
+        @Override
+        public boolean hasAxis(ControllerBinding.Axis axis) {
+            return false;
+        }
+
         @Override
         public void manageBindings(Runnable run) {
         }
     };
+
     interface Handler {
         Component DOWNLOAD_MESSAGE = Component.translatable("legacy.menu.download_natives_message");
         Component DOWNLOADING_NATIVES = Component.translatable("legacy.menu.downloading_natives");
@@ -95,7 +117,9 @@ public interface Controller {
 
         boolean isValidController(int jid);
 
-        int getBindingIndex(ControllerBinding component);
+        int getButtonIndex(ControllerBinding.Button button);
+
+        int getAxisIndex(ControllerBinding.Axis axis);
 
         void applyGamePadMappingsFromBuffer(BufferedReader reader) throws IOException;
 
@@ -106,6 +130,7 @@ public interface Controller {
                 Legacy4J.LOGGER.warn(e.getMessage());
             }
         }
+
         Handler EMPTY = new Handler() {
             @Override
             public Component getName() {
@@ -115,25 +140,36 @@ public interface Controller {
             @Override
             public void init() {
             }
+
             @Override
             public boolean update() {
                 return false;
             }
+
             @Override
             public void setup(ControllerManager manager) {
             }
+
             @Override
             public Controller getController(int jid) {
                 return null;
             }
+
             @Override
             public boolean isValidController(int jid) {
                 return false;
             }
+
             @Override
-            public int getBindingIndex(ControllerBinding component) {
-                return 0;
+            public int getButtonIndex(ControllerBinding.Button button) {
+                return -1;
             }
+
+            @Override
+            public int getAxisIndex(ControllerBinding.Axis axis) {
+                return -1;
+            }
+
             @Override
             public void applyGamePadMappingsFromBuffer(BufferedReader reader) {
             }

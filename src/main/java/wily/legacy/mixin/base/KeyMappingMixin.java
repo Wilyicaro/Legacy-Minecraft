@@ -2,48 +2,41 @@ package wily.legacy.mixin.base;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.Unique;
+import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
-import wily.legacy.client.screen.ControlTooltip;
 
 @Mixin(KeyMapping.class)
 public abstract class KeyMappingMixin implements LegacyKeyMapping {
 
     @Shadow private InputConstants.Key key;
-    private ControllerBinding defaultButton;
-    private ControllerBinding button;
-    @Inject(method = "<init>(Ljava/lang/String;Lcom/mojang/blaze3d/platform/InputConstants$Type;ILjava/lang/String;)V",at = @At("RETURN"))
-    private void init(String string, InputConstants.Type type, int i, String string2, CallbackInfo ci){
-        ControllerBinding b = ControllerBinding.getDefaultKeyMappingBinding(i);
-        setDefaultBinding(b);
-        setBinding(b);
+    @Unique
+    private ControllerBinding<?> defaultBinding;
+    @Unique
+    private ControllerBinding<?> binding;
+
+    @Override
+    public ControllerBinding<?> getDefaultBinding() {
+        return defaultBinding;
     }
 
     @Override
-    public ControllerBinding getDefaultBinding() {
-        return defaultButton;
+    public ControllerBinding<?> getBinding() {
+        return binding;
     }
 
     @Override
-    public ControllerBinding getBinding() {
-        return button;
+    public <T extends BindingState> void setBinding(ControllerBinding<T> binding) {
+        this.binding = binding;
     }
 
     @Override
-    public void setBinding(ControllerBinding binding) {
-        this.button = binding;
-    }
-
-    @Override
-    public void setDefaultBinding(ControllerBinding binding) {
-        this.defaultButton = binding;
+    public <T extends BindingState> void setDefaultBinding(ControllerBinding<T> binding) {
+        this.defaultBinding = binding;
     }
 
     @Override

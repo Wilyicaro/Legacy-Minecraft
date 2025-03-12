@@ -78,7 +78,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
 
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
-        ControlTooltip.setupDefaultScreen(renderer, this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_W) : ControllerBinding.RIGHT_TRIGGER.bindingState.getIcon(),()->getHoveredSlot() != null && getHoveredSlot().hasItem() && LegacyTipManager.hasTip(getHoveredSlot().getItem()) ? LegacyComponents.WHATS_THIS : null);
+        ControlTooltip.setupDefaultScreen(renderer, this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_W) : ControllerBinding.RIGHT_TRIGGER.getIcon(),()->getHoveredSlot() != null && getHoveredSlot().hasItem() && LegacyTipManager.hasTip(getHoveredSlot().getItem()) ? LegacyComponents.WHATS_THIS : null);
     }
 
     public void updateScroll(double d, double e, int i) {

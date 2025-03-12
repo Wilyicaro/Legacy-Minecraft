@@ -17,9 +17,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.LegacyBiomeOverride;
 
-@Mixin(/*? if fabric {*/FluidRendererImpl.FabricFactory /*?} else {*/ /*FluidRendererImpl.ForgeFactory*//*?}*/.class)
+@Mixin(value = /*? if fabric {*/FluidRendererImpl.FabricFactory /*?} else {*/ /*FluidRendererImpl.ForgeFactory*//*?}*/.class, remap = false)
 public class FluidRendererFactoryMixin {
-    @Inject(method = "getWaterColorProvider", at = @At("HEAD"), cancellable = true, remap = false)
+    @Inject(method = "getWaterColorProvider", at = @At("HEAD"), cancellable = true)
     public void getWaterColorProvider(CallbackInfoReturnable<BlendedColorProvider<FluidState>> cir) {
         cir.setReturnValue(new BlendedColorProvider<>() {
             @Override
@@ -28,7 +28,7 @@ public class FluidRendererFactoryMixin {
             }
         });
     }
-    @Inject(method = "getWaterBlockColorProvider", at = @At("HEAD"), cancellable = true, remap = false)
+    @Inject(method = "getWaterBlockColorProvider", at = @At("HEAD"), cancellable = true)
     public void getWaterBlockColorProvider(CallbackInfoReturnable<BlendedColorProvider<FluidState>> cir) {
         cir.setReturnValue(new BlendedColorProvider<>() {
             @Override

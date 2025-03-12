@@ -284,9 +284,9 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         renderer.
                 add(EXTRA::get, ()-> typeTabList.selectedTab == 0 ? LegacyComponents.INFO : getFocused() instanceof CustomCraftingIconHolder h && h.addedIngredientsItems != null && !h.addedIngredientsItems.isEmpty() ? LegacyComponents.REMOVE : null).
                 add(OPTION::get, ()-> typeTabList.selectedTab == 0 ? onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES : ControlTooltip.getKeyMessage(InputConstants.KEY_O,this)).
-                add(()-> ControlType.getActiveType().isKbm() ? COMPOUND_ICON_FUNCTION.apply(new Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET)}) : COMPOUND_ICON_FUNCTION.apply(new Icon[]{ControllerBinding.LEFT_TRIGGER.bindingState.getIcon(),ControlTooltip.SPACE_ICON, ControllerBinding.RIGHT_TRIGGER.bindingState.getIcon()}),()->hasTypeTabList() ? LegacyComponents.TYPE : null).
-                addCompound(()-> new Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.bindingState.getIcon(),ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.bindingState.getIcon()},()->LegacyComponents.GROUP).
-                add(()-> page.max > 0 && typeTabList.selectedTab == 0 ? ControlType.getActiveType().isKbm() ? COMPOUND_ICON_FUNCTION.apply(new Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.RIGHT_STICK.bindingState.getIcon() : null,()->LegacyComponents.PAGE);
+                add(()-> ControlType.getActiveType().isKbm() ? COMPOUND_ICON_FUNCTION.apply(new Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET)}) : COMPOUND_ICON_FUNCTION.apply(new Icon[]{ControllerBinding.LEFT_TRIGGER.getIcon(),ControlTooltip.SPACE_ICON, ControllerBinding.RIGHT_TRIGGER.getIcon()}),()->hasTypeTabList() ? LegacyComponents.TYPE : null).
+                addCompound(()-> new Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(),ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon()},()->LegacyComponents.GROUP).
+                add(()-> page.max > 0 && typeTabList.selectedTab == 0 ? ControlType.getActiveType().isKbm() ? COMPOUND_ICON_FUNCTION.apply(new Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.RIGHT_STICK.getIcon() : null,()->LegacyComponents.PAGE);
     }
 
     public void resetElements(){
@@ -332,7 +332,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             @Override
             public void craft() {
                 ScreenUtil.playSimpleUISound(SoundEvents.ITEM_PICKUP,1.0f);
-                CommonNetwork.sendToServer(new ServerMenuCraftPayload(recipes.get(results.indexOf(itemIcon)), Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
+                CommonNetwork.sendToServer(new ServerMenuCraftPayload(recipes.get(results.indexOf(itemIcon)), Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed));
             }
         };
     }

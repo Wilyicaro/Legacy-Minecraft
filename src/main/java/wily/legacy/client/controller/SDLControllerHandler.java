@@ -196,6 +196,18 @@ public class SDLControllerHandler implements Controller.Handler{
             }
 
             @Override
+            public boolean hasButton(ControllerBinding.Button button) {
+                int index = getButtonIndex(button);
+                return index != -1 && SdlGamepad.SDL_GamepadHasButton(controller, index);
+            }
+
+            @Override
+            public boolean hasAxis(ControllerBinding.Axis axis) {
+                int index = getAxisIndex(axis);
+                return index != -1 && SdlGamepad.SDL_GamepadHasAxis(controller, index);
+            }
+
+            @Override
             public void disconnect(ControllerManager manager) {
                 Controller.super.disconnect(manager);
                 SdlGamepad.SDL_CloseGamepad(controller);
@@ -210,23 +222,17 @@ public class SDLControllerHandler implements Controller.Handler{
     }
 
     @Override
-    public int getBindingIndex(ControllerBinding component) {
-        return switch (component){
-            case DOWN_BUTTON -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_SOUTH;
-            case RIGHT_BUTTON -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_EAST;
-            case LEFT_BUTTON -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_WEST;
-            case UP_BUTTON -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_NORTH;
+    public int getButtonIndex(ControllerBinding.Button button) {
+        return switch (button){
+            case DOWN-> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_SOUTH;
+            case RIGHT -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_EAST;
+            case LEFT-> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_WEST;
+            case UP -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_NORTH;
             case BACK -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_BACK;
             case GUIDE -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_GUIDE;
             case START -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_START;
-            case LEFT_STICK_BUTTON -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_LEFT_STICK;
-            case RIGHT_STICK_BUTTON -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_RIGHT_STICK;
-            case LEFT_STICK_RIGHT,LEFT_STICK_LEFT -> SDL_GamepadAxis.SDL_GAMEPAD_AXIS_LEFTX;
-            case RIGHT_STICK_RIGHT,RIGHT_STICK_LEFT -> SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHTX;
-            case LEFT_STICK_UP,LEFT_STICK_DOWN -> SDL_GamepadAxis.SDL_GAMEPAD_AXIS_LEFTY;
-            case RIGHT_STICK_UP,RIGHT_STICK_DOWN -> SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHTY;
-            case LEFT_TRIGGER -> SDL_GamepadAxis.SDL_GAMEPAD_AXIS_LEFT_TRIGGER;
-            case RIGHT_TRIGGER -> SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHT_TRIGGER;
+            case LEFT_STICK-> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_LEFT_STICK;
+            case RIGHT_STICK -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_RIGHT_STICK;
             case LEFT_BUMPER -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_LEFT_SHOULDER;
             case RIGHT_BUMPER -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER;
             case DPAD_UP -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_DPAD_UP;
@@ -235,11 +241,22 @@ public class SDLControllerHandler implements Controller.Handler{
             case DPAD_RIGHT -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_DPAD_RIGHT;
             case TOUCHPAD -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_TOUCHPAD;
             case CAPTURE -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_MISC1;
-            case LSL_BUTTON -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_LEFT_PADDLE1;
-            case LSR_BUTTON -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_LEFT_PADDLE2;
-            case RSL_BUTTON -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_RIGHT_PADDLE2;
-            case RSR_BUTTON -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1;
-            default -> -1;
+            case LSL -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_LEFT_PADDLE1;
+            case LSR -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_LEFT_PADDLE2;
+            case RSL -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_RIGHT_PADDLE2;
+            case RSR -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_RIGHT_PADDLE1;
+        };
+    }
+
+    @Override
+    public int getAxisIndex(ControllerBinding.Axis axis) {
+        return switch (axis){
+            case LEFT_STICK_X -> SDL_GamepadAxis.SDL_GAMEPAD_AXIS_LEFTX;
+            case LEFT_STICK_Y -> SDL_GamepadAxis.SDL_GAMEPAD_AXIS_LEFTY;
+            case RIGHT_STICK_X -> SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHTX;
+            case RIGHT_STICK_Y -> SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHTY;
+            case LEFT_TRIGGER -> SDL_GamepadAxis.SDL_GAMEPAD_AXIS_LEFT_TRIGGER;
+            case RIGHT_TRIGGER -> SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHT_TRIGGER;
         };
     }
 
@@ -247,8 +264,7 @@ public class SDLControllerHandler implements Controller.Handler{
     public void applyGamePadMappingsFromBuffer(BufferedReader reader) {
         String s = reader.lines().collect(Collectors.joining());
         int i = SdlGamepad.SDL_AddGamepadMapping(s);
-        Legacy4J.LOGGER.warn("Added SDL Controller Mappings: " + i + " Code");
-        //      Legacy4J.LOGGER.warn("Mapping: " + s);
+        Legacy4J.LOGGER.warn("Added SDL Controller Mappings: {} Code", i);
     }
 
 }

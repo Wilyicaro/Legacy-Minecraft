@@ -166,7 +166,8 @@
     "CameraMixin",
     "BlockRenderDispatcherMixin",
     "MouseHandlerAccessor",
-    "LevelRendererMixin"
+    "LevelRendererMixin",
+    "TutorialMixin"
   ],
   "mixins": [
     //? if <1.20.5 {

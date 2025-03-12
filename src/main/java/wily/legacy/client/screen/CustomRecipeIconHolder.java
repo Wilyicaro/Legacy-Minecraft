@@ -129,7 +129,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
     }
 
     public void craft(){
-        CommonNetwork.sendToServer(new ServerMenuCraftPayload(getRecipeId(),List.copyOf(getIngredientsGrid()),-1,Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.bindingState.pressed));
+        CommonNetwork.sendToServer(new ServerMenuCraftPayload(getRecipeId(),List.copyOf(getIngredientsGrid()),-1,Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed));
     }
 
     public Optional<ResourceLocation> getRecipeId(){
