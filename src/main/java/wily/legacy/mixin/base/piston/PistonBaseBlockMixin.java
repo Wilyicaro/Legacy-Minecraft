@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base.piston;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Clearable;
@@ -17,9 +18,9 @@ import wily.legacy.util.LegacyTags;
 
 @Mixin(PistonBaseBlock.class)
 public class PistonBaseBlockMixin {
-    @Redirect(method = "isPushable", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;hasBlockEntity()Z"))
-    private static boolean isPushable(BlockState instance) {
-        return instance.hasBlockEntity() && !instance.is(LegacyTags.PUSHABLE_BLOCK);
+    @ModifyExpressionValue(method = "isPushable", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;hasBlockEntity()Z"))
+    private static boolean isPushable(boolean original, BlockState blockState) {
+        return original && !blockState.is(LegacyTags.PUSHABLE_BLOCK);
     }
     @Redirect(method = "moveBlocks", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/piston/MovingPistonBlock;newMovingBlockEntity(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/Direction;ZZ)Lnet/minecraft/world/level/block/entity/BlockEntity;", ordinal = 0))
     private BlockEntity moveBlocksPistonHead(BlockPos arg, BlockState arg2, BlockState arg3, Direction arg4, boolean bl, boolean bl2, Level level) {

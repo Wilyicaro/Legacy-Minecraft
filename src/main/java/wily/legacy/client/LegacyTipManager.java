@@ -56,7 +56,7 @@ public class LegacyTipManager implements ResourceManagerReloadListener {
         actualTipSupplier = null;
     }
 
-    public static LegacyTip getUpdateTip() {
+    public static LegacyTip updateTip() {
         if (tips.isEmpty()) setActualTip(null);
         else {
             setActualTip(tips.get(0).get());

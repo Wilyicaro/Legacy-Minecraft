@@ -184,7 +184,7 @@ public class ScreenUtil {
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate((guiGraphics.guiWidth() - 285.5f) / 2, 30,0);
         guiGraphics.pose().scale(0.5f,0.5f,0.5f);
-        FactoryGuiGraphics.of(guiGraphics).blit(mc.getResourceManager().getResource(MINECRAFT).isPresent() ? MINECRAFT : LegacyOptions.selectedControlType.get().get().getMinecraftLogo(),0, 0,0,0, 571,138,571,138);
+        FactoryGuiGraphics.of(guiGraphics).blit(mc.getResourceManager().getResource(MINECRAFT).isPresent() ? MINECRAFT : ControlType.getActiveType().getMinecraftLogo(),0,0,0,0,571,138,571,138);
         guiGraphics.pose().popPose();
         RenderSystem.disableBlend();
     }
@@ -493,7 +493,6 @@ public class ScreenUtil {
         return 29 * LegacyOptions.hudDistance.get().floatValue();
     }
 
-
     public static int getSelectedItemTooltipLines(){
         return LegacyOptions.selectedItemTooltipLines.get() == 0 ? 0 : LegacyOptions.selectedItemTooltipLines.get() + (LegacyOptions.itemTooltipEllipsis.get() ? 1 : 0);
     }
@@ -510,7 +509,7 @@ public class ScreenUtil {
                 float xRotO = character.xRotO;
                 if (!character.isFallFlying()) character.setXRot(character.xRotO = -2.5f);
                 guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(32f, character.isFallFlying() ? 44 : 18,0);
+                guiGraphics.pose().translate(32f, character.isFallFlying() ? 44 : 18,-200);
                 ScreenUtil.applyHUDScale(guiGraphics);
                 float f = LegacyOptions.smoothAnimatedCharacter.get() ? FactoryAPIClient.getPartialTick() : 0;
                 ClientEntityAccessor.of(character).setAllowDisplayFireAnimation(false);
@@ -697,10 +696,10 @@ public class ScreenUtil {
         boolean canRenderElement = (mc.screen != null || !mc.options.hideGui);
         LegacyTip tip = LegacyTipManager.getActualTip();
         if ((!LegacyTipManager.tips.isEmpty() || tip != null) && canRenderElement) {
-            if (tip == null) tip = LegacyTipManager.getUpdateTip();
+            if (tip == null) tip = LegacyTipManager.updateTip();
             tip.setX(graphics.guiWidth() - tip.getWidth() - 30);
             tip.render(graphics, 0, 0, partialTick);
-            if (tip.visibility == Toast.Visibility.HIDE) LegacyTipManager.getUpdateTip();
+            if (tip.visibility == Toast.Visibility.HIDE) LegacyTipManager.updateTip();
         }
 
         if (mc.options.showAutosaveIndicator().get() && canRenderElement && (mc.gui.autosaveIndicatorValue > 0 || mc.gui.lastAutosaveIndicatorValue > 0) && Mth.clamp(Mth.lerp(FactoryAPIClient.getPartialTick(), mc.gui.lastAutosaveIndicatorValue, mc.gui.autosaveIndicatorValue), 0.0f, 1.0f) > 0.02) {
