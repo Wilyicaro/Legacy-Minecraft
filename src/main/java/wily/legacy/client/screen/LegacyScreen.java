@@ -2,6 +2,7 @@ package wily.legacy.client.screen;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
@@ -12,6 +13,9 @@ import wily.legacy.util.ScreenUtil;
 public class LegacyScreen extends Screen implements Controller.Event, ControlTooltip.Event {
     public Screen parent;
     protected final UIAccessor accessor = UIAccessor.of(this);
+    //? if >=1.20.5 {
+    public static final PanoramaRenderer PANORAMA_RENDERER = PANORAMA;
+    //?}
 
     protected LegacyScreen(Component component) {
         super(component);

@@ -13,8 +13,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.toasts.Toast;
+import net.minecraft.client.gui.screens.AccessibilityOnboardingScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.renderer.CubeMap;
+import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -75,6 +78,7 @@ import wily.legacy.client.*;
 import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.LegacyIconHolder;
+import wily.legacy.client.screen.LegacyScreen;
 import wily.legacy.network.TopMessage;
 
 import java.util.Collection;
@@ -94,8 +98,9 @@ public class ScreenUtil {
     public static long animatedCharacterTime;
     public static long remainingAnimatedCharacterTime;
     public static int lastHotbarSelection = -1;
-    protected static LogoRenderer logoRenderer = new LogoRenderer(false);
-    public static LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
+    protected static final LogoRenderer logoRenderer = new LogoRenderer(false);
+    public static final PanoramaRenderer panoramaRenderer = /*? if <1.20.5 {*//*new PanoramaRenderer(TitleScreen.CUBE_MAP)*//*?} else {*/LegacyScreen.PANORAMA_RENDERER/*?}*/;
+    public static final LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
     public static final ResourceLocation MINECRAFT = Legacy4J.createModLocation( "textures/gui/title/minecraft.png");
     public static final ResourceLocation PANORAMA_DAY = Legacy4J.createModLocation( "textures/gui/title/panorama_day.png");
     public static final ResourceLocation PANORAMA_NIGHT = Legacy4J.createModLocation( "textures/gui/title/panorama_night.png");
@@ -149,35 +154,39 @@ public class ScreenUtil {
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SAVE_ARROW,0,0,13,16);
         graphics.pose().popPose();
     }
+
     public static void renderDefaultBackground(UIAccessor accessor, GuiGraphics guiGraphics){
         renderDefaultBackground(accessor, guiGraphics, true);
     }
+
     public static void renderDefaultBackground(UIAccessor accessor, GuiGraphics guiGraphics, boolean title){
         renderDefaultBackground(accessor, guiGraphics, false, title, true);
     }
-    public static boolean getActualLevelNight(){
-        return (mc.getSingleplayerServer() != null&& mc.getSingleplayerServer().overworld() != null && mc.getSingleplayerServer().overworld().isNight()) || (mc.level!= null && mc.level.isNight());
+
+    public static boolean isVisualNight(){
+        return mc.level != null && mc.level.isNight();
     }
+
     public static void renderDefaultBackground(UIAccessor accessor, GuiGraphics guiGraphics, boolean forcePanorama, boolean title, boolean username){
-        if (mc.level == null || accessor.getBoolean("forcePanorama",forcePanorama))
-            renderPanoramaBackground(guiGraphics, forcePanorama && getActualLevelNight());
-        else /*? if <=1.20.1 {*//*renderTransparentBackground(guiGraphics)*//*?} else {*/accessor.getScreen().renderTransparentBackground(guiGraphics)/*?}*/;
+        if (mc.level == null || accessor.getBoolean("forcePanorama", forcePanorama)) {
+           renderPanorama(guiGraphics, 1.0f, FactoryAPIClient.getPartialTick());
+        }else /*? if <=1.20.1 {*//*renderTransparentBackground(guiGraphics)*//*?} else {*/accessor.getScreen().renderTransparentBackground(guiGraphics)/*?}*/;
         if (accessor.getBoolean("hasTitle", title)) renderLogo(guiGraphics);
         if (accessor.getBoolean("hasUsername", username)) renderUsername(guiGraphics);
     }
 
     public static void renderLogo(GuiGraphics guiGraphics){
-        if (Minecraft.getInstance().getResourceManager().getResource(MINECRAFT).isEmpty())
-            logoRenderer.renderLogo(guiGraphics, guiGraphics.guiWidth(), 1.0F);
-        else {
-            RenderSystem.enableBlend();
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().translate((guiGraphics.guiWidth() - 285.5f) / 2, 30,0);
-            guiGraphics.pose().scale(0.5f,0.5f,0.5f);
-            FactoryGuiGraphics.of(guiGraphics).blit(MINECRAFT,0, 0,0,0, 571,138,571,138);
-            guiGraphics.pose().popPose();
-            RenderSystem.disableBlend();
-        }
+        logoRenderer.renderLogo(guiGraphics, guiGraphics.guiWidth(), 1.0F);
+    }
+
+    public static void renderLegacyLogo(GuiGraphics guiGraphics){
+        RenderSystem.enableBlend();
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate((guiGraphics.guiWidth() - 285.5f) / 2, 30,0);
+        guiGraphics.pose().scale(0.5f,0.5f,0.5f);
+        FactoryGuiGraphics.of(guiGraphics).blit(mc.getResourceManager().getResource(MINECRAFT).isPresent() ? MINECRAFT : LegacyOptions.selectedControlType.get().get().getMinecraftLogo(),0, 0,0,0, 571,138,571,138);
+        guiGraphics.pose().popPose();
+        RenderSystem.disableBlend();
     }
 
     public static void renderTransparentBackground(GuiGraphics graphics){
@@ -192,7 +201,21 @@ public class ScreenUtil {
         graphics.drawString(mc.font, username, graphics.guiWidth() - 33 - mc.font.width(username), graphics.guiHeight() - 27, 0xFFFFFF);
     }
 
-    public static void renderPanoramaBackground(GuiGraphics guiGraphics, boolean isNight){
+    public static void renderPanorama(GuiGraphics guiGraphics, float speed, float partialTick){
+        //? if <1.20.5 {
+        /*if (LegacyOptions.legacyPanorama.get()){
+            renderLegacyPanorama(guiGraphics);
+        } else panoramaRenderer.render(partialTick, speed);
+        *///?} else {
+        panoramaRenderer.render(guiGraphics, guiGraphics.guiWidth(), guiGraphics.guiHeight(), speed, partialTick);
+         //?}
+    }
+
+    public static void renderLegacyPanorama(GuiGraphics guiGraphics){
+        renderLegacyPanorama(guiGraphics, isVisualNight());
+    }
+
+    public static void renderLegacyPanorama(GuiGraphics guiGraphics, boolean isNight){
         RenderSystem.depthMask(false);
         guiGraphics.blit(/*? if >=1.21.2 {*//*RenderType::guiTexturedOverlay,*//*?}*/ isNight ? PANORAMA_NIGHT : PANORAMA_DAY, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() * guiGraphics.guiHeight() / 360 / 66.32f, 1, guiGraphics.guiWidth(), guiGraphics.guiHeight() + 2, guiGraphics.guiHeight() * 820/144, guiGraphics.guiHeight() + 2);
         RenderSystem.depthMask(true);

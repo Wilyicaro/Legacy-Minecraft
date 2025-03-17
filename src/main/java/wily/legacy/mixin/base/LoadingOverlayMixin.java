@@ -64,14 +64,13 @@ public abstract class LoadingOverlayMixin extends Overlay {
         float timer = (Util.getMillis() - initTime) / 3200f;
         if (!finishedIntro && Legacy4JClient.canSkipIntro(timer) && reload.isDone()) finishedIntro = true;
         if (!finishedIntro) {
+            guiGraphics.fill(RenderType.guiOverlay(), 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFFFFFFFF);
             FactoryGuiGraphics.of(guiGraphics).blit(BACKGROUND, 0, 0,0,0, guiGraphics.guiWidth(), guiGraphics.guiHeight(),guiGraphics.guiWidth(), guiGraphics.guiHeight());
 
-            RenderSystem.enableBlend();
             float last = (float) Math.ceil(timer) - timer;
-            FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, last <= 0.4f ? last * 2.5f : last > 0.6f ? (1 - last) * 2.5f : 1.0f);
+            FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, last <= 0.4f ? last * 2.5f : last > 0.6f ? (1 - last) * 2.5f : 1.0f, true);
             FactoryGuiGraphics.of(guiGraphics).blit(INTROS.get((int) (timer % INTROS.size())), (guiGraphics.guiWidth() - guiGraphics.guiHeight() * 320 / 180) / 2, 0, 0, 0, guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight(), guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight());
-            FactoryGuiGraphics.of(guiGraphics).clearColor();
-            RenderSystem.disableBlend();
+            FactoryGuiGraphics.of(guiGraphics).clearColor(true);
         }
 
         if (finishedIntro) {

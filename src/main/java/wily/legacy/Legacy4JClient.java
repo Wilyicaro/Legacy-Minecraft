@@ -721,8 +721,10 @@ public class Legacy4JClient {
             LegacyKeyMapping.of(keyMapping).setBinding(LegacyKeyMapping.of(keyMapping).getDefaultBinding());
             KeyMapping.resetMapping();
         }
+        LegacyOptions.CLIENT_STORAGE.configMap.values().forEach(FactoryConfig::reset);
         LegacyOptions.CLIENT_STORAGE.save();
         LegacyCommonOptions.COMMON_STORAGE.save();
+        LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(FactoryConfig::reset);
         minecraft.options.save();
     }
 

@@ -39,9 +39,9 @@ public interface ControlType  {
         return type;
     }
     static ControlType create(ResourceLocation id, Component displayName, boolean isKbm){
-        return create(id,new HashMap<>(),displayName == null ? Component.translatable("legacy.options.controlType." + id.getPath()) : displayName,Style.EMPTY.withFont(id),isKbm);
+        return create(id, new HashMap<>(), displayName == null ? Component.translatable("legacy.options.controlType." + id.getPath()) : displayName,Style.EMPTY.withFont(id), isKbm, id.withPath("textures/gui/title/minecraft/%s.png".formatted(id.getPath())));
     }
-    static ControlType create(ResourceLocation id, Map<String, ControlTooltip.LegacyIcon> map, Component displayName, Style style, boolean isKbm){
+    static ControlType create(ResourceLocation id, Map<String, ControlTooltip.LegacyIcon> map, Component displayName, Style style, boolean isKbm, ResourceLocation minecraftLogoLocation){
         return new ControlType() {
             @Override
             public Map<String, ControlTooltip.LegacyIcon> getIcons() {
@@ -65,6 +65,11 @@ public interface ControlType  {
             @Override
             public Style getStyle() {
                 return style;
+            }
+
+            @Override
+            public ResourceLocation getMinecraftLogo() {
+                return minecraftLogoLocation;
             }
         };
     }
@@ -101,6 +106,8 @@ public interface ControlType  {
     Component getDisplayName();
 
     Style getStyle();
+
+    ResourceLocation getMinecraftLogo();
 
     class Holder implements RegisterListing.Holder<ControlType> {
         public static final Holder AUTO = new Holder(null){

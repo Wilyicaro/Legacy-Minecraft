@@ -74,4 +74,8 @@ public class LegacyWorldOptions {
             return serverPlayer != null && serverPlayer.level().dimension() == Level.END;
         }
     }
+
+    public record NamedArea(BlockPos firstPos, BlockPos secondPos, boolean checkHeight, boolean isBarrier, List<UUID> players){
+
+    }
 }

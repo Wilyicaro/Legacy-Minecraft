@@ -21,6 +21,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.KeyboardScreen;
@@ -67,14 +68,14 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     @Inject(method = "renderTransparentBackground",at = @At("HEAD"), cancellable = true)
     public void renderTransparentBackground(GuiGraphics graphics, CallbackInfo ci) {
         ci.cancel();
-        if (self() instanceof AbstractContainerScreen<?>) return;
+        if (self() instanceof AbstractContainerScreen<?> && !LegacyOptions.menusWithBackground.get()) return;
         ScreenUtil.renderTransparentBackground(graphics);
     }
     //?} else {
     //?}
     @Inject(method = "renderBackground",at = @At("HEAD"), cancellable = true)
     public void renderBackground(GuiGraphics guiGraphics, /*? if >1.20.1 {*/int i, int j, float f,/*?}*/ CallbackInfo ci) {
-        if (UIAccessor.of(self()).getBoolean("hasBackground", true)) {
+        if (UIAccessor.of(self()).getBoolean("hasBackground", true) && (!(self() instanceof AbstractContainerScreen<?>) || LegacyOptions.menusWithBackground.get())) {
             ScreenUtil.renderDefaultBackground(UIAccessor.of(self()), guiGraphics, false);
             ci.cancel();
         }

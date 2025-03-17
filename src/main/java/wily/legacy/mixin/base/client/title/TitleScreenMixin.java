@@ -1,13 +1,17 @@
 package wily.legacy.mixin.base.client.title;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.SplashRenderer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,10 +19,10 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.util.DynamicUtil;import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
 import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
@@ -77,16 +81,11 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         if (PublishScreen.hasWorldHost()) ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), ()-> WorldHostFriendsScreen.FRIENDS);
         if (splash == null) this.splash = Minecraft.getInstance().getSplashManager().getSplash();
     }
+
     @Inject(method = "removed", at = @At("RETURN"))
     public void removed(CallbackInfo ci) {
         splash = null;
     }
-    //? if >1.20.1 {
-    @Override
-    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, true, true, false);
-    }
-    //?}
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
@@ -106,14 +105,21 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         return super.keyPressed(i, j, k);
     }
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
-        ci.cancel();
-        //? if <=1.20.1
-        /*ScreenUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, true, true, false);*/
-        super.render(guiGraphics, i, j, f);
-        if (this.splash != null) this.splash.render(guiGraphics, this.width, this.font, 255 << 24);
+    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;III)I"))
+    public boolean render(GuiGraphics instance, Font font, String string, int i, int j, int k) {
+        return LegacyOptions.titleScreenVersionText.get();
     }
 
+    @ModifyReturnValue(method = "realmsNotificationsEnabled", at = @At("RETURN"))
+    public boolean realmsNotificationsEnabled(boolean original) {
+        return false;
+    }
 
+    //? if <1.20.5 {
+    /*@WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/PanoramaRenderer;render(FF)V"))
+    public boolean render(PanoramaRenderer instance, float partialTick, float speed, GuiGraphics guiGraphics) {
+        ScreenUtil.renderPanorama(guiGraphics, speed, partialTick);
+        return false;
+    }
+    *///?}
 }

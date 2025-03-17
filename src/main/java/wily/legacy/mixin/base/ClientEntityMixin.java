@@ -1,6 +1,9 @@
 package wily.legacy.mixin.base;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -46,19 +49,18 @@ public abstract class ClientEntityMixin implements ClientEntityAccessor {
 
     @Shadow public abstract float getYRot();
 
-    @Shadow public abstract boolean isUnderWater();
-
     @Shadow private boolean onGround;
 
-    @Shadow protected abstract Vec3 collide(Vec3 arg);
-
     @Shadow public abstract Level level();
+
+    @Shadow public abstract boolean isInWater();
 
     @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", at = @At("HEAD"))
     private void startRiding(Entity entity, boolean force, CallbackInfoReturnable<Boolean> cir) {
         this.ridingEntityXRotDelta = 0.0F;
         this.ridingEntityYRotDelta = 0.0F;
     }
+
     @Inject(method = "rideTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;positionRider(Lnet/minecraft/world/entity/Entity;)V", shift = At.Shift.AFTER))
     private void modifyYawAndPitch(CallbackInfo ci) {
         //? if >=1.21.2 {
@@ -105,17 +107,18 @@ public abstract class ClientEntityMixin implements ClientEntityAccessor {
         this.allowDisplayFireAnimation = displayFireAnimation;
     }
 
-    @Redirect(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;"))
-    protected Vec3 move(Entity instance, Vec3 vec31) {
+    @WrapOperation(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;"))
+    protected Vec3 move(Entity instance, Vec3 vec3, Operation<Vec3> original) {
         boolean lastOnGround = onGround;
         onGround = onGround || instance instanceof Player p && p.getAbilities().flying;
-        Vec3 collision = collide(vec31);
+        Vec3 collision = original.call(instance, vec3);
         onGround = lastOnGround;
         return collision;
     }
-    @Redirect(method = "updateSwimming", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isUnderWater()Z"))
-    protected boolean updateSwimming(Entity instance) {
-        return (!instance.level().isClientSide || FactoryAPIClient.hasModOnServer || isUnderWater()) && instance.isInWater();
+
+    @ModifyExpressionValue(method = "updateSwimming", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isUnderWater()Z"))
+    protected boolean updateSwimming(boolean original) {
+        return ((!level().isClientSide || FactoryAPIClient.hasModOnServer) && isInWater() || original);
     }
 
     @Inject(method = "moveRelative", at = @At("HEAD"), cancellable = true)

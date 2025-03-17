@@ -27,6 +27,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PlayerIdentifier;
 import wily.legacy.entity.LegacyPlayerInfo;
 
@@ -69,7 +70,7 @@ public abstract class MapRendererMixin {
     void draw(/*? if >=1.21.2 {*//*MapRenderState mapRenderState, *//*?}*/PoseStack poseStack, MultiBufferSource multiBufferSource, boolean bl, int i, CallbackInfo ci) {
         Minecraft minecraft = Minecraft.getInstance();
         Font font = minecraft.font;
-        if (!bl) {
+        if (!bl && LegacyOptions.mapsWithCoords.get()) {
             poseStack.pushPose();
             poseStack.translate(-0.2f,0.4f,-0.1f);
             poseStack.scale(1f, 0.95f, 1);

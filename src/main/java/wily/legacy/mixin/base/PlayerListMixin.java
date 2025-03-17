@@ -40,7 +40,7 @@ public abstract class PlayerListMixin {
             for (int j = 0; j < 27; j++) {
                 if (itemsToAdd.isEmpty()) break;
                 for (int i = 0; i < itemsToAdd.size(); i++) {
-                    if (arg2.getInventory().add(9 + j, itemsToAdd.get(i))) {
+                    if (arg2.getInventory().add(9 + j, itemsToAdd.get(i).copy())) {
                         itemsToAdd.remove(i);
                         break;
                     }

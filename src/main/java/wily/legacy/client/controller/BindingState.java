@@ -74,6 +74,10 @@ public abstract class BindingState {
         return binding == b;
     }
 
+    public <T extends BindingState> boolean isAnd(ControllerBinding<T> binding, Predicate<T> predicate){
+        return is(binding) && predicate.test((T) this);
+    }
+
     public void block(){
         block(1);
     }

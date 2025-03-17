@@ -115,18 +115,12 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
 
     @Override
     public void setDisableExhaustion(boolean exhaustion) {
-        if (hasPermissions(2)) this.disableExhaustion = exhaustion;
+        this.disableExhaustion = exhaustion;
     }
 
     @Override
     public void setMayFlySurvival(boolean mayFlySurvival) {
-        if (!hasPermissions(2)) return;
         this.mayFlySurvival = mayFlySurvival;
-        if (getAbilities().mayfly != mayFlySurvival && gameMode.isSurvival()){
-            getAbilities().mayfly = mayFlySurvival;
-            if (!getAbilities().mayfly && getAbilities().flying) getAbilities().flying = false;
-            onUpdateAbilities();
-        }
     }
 
     @Override

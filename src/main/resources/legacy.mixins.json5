@@ -7,6 +7,7 @@
   "client": [
     //? if >=1.20.5 {
     "GustParticleMixin",
+    "PanoramaRendererMixin",
     //?}
     //? if <1.21.2 {
     "AbstractFurnaceRecipeBookComponentMixin",
@@ -167,7 +168,8 @@
     "BlockRenderDispatcherMixin",
     "MouseHandlerAccessor",
     "LevelRendererMixin",
-    "TutorialMixin"
+    "TutorialMixin",
+    "LogoRendererMixin"
   ],
   "mixins": [
     //? if <1.20.5 {

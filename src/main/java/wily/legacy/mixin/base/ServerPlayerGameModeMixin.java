@@ -15,11 +15,8 @@ import wily.legacy.entity.LegacyPlayerInfo;
 public class ServerPlayerGameModeMixin {
     @Shadow @Final protected ServerPlayer player;
 
-    @Inject(method = "setGameModeForPlayer", at = @At(value = "RETURN"))
+    @Inject(method = "setGameModeForPlayer", at = @At("RETURN"))
     protected void setGameModeForPlayer(GameType gameType, GameType gameType2, CallbackInfo ci) {
-        if (player.getAbilities().mayfly != LegacyPlayerInfo.of(player).mayFlySurvival() && gameType.isSurvival()){
-            player.getAbilities().mayfly = LegacyPlayerInfo.of(player).mayFlySurvival();
-            if (!player.getAbilities().mayfly && player.getAbilities().flying) player.getAbilities().flying = false;
-        }
+        LegacyPlayerInfo.updateMayFlySurvival(player, LegacyPlayerInfo.of(player).mayFlySurvival(), false);
     }
 }

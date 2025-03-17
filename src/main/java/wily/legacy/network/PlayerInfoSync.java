@@ -95,8 +95,12 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
                 case CLASSIC_TRADING,LEGACY_TRADING -> ((LegacyPlayer) sp).setTrading(sync == Sync.CLASSIC_TRADING);
                 case CLASSIC_STONECUTTING,LEGACY_STONECUTTING -> ((LegacyPlayer) sp).setStonecutting(sync == Sync.CLASSIC_STONECUTTING);
                 case CLASSIC_LOOM,LEGACY_LOOM -> ((LegacyPlayer) sp).setLoom(sync == Sync.CLASSIC_LOOM);
-                case DISABLE_EXHAUSTION,ENABLE_EXHAUSTION -> ((LegacyPlayerInfo)sp).setDisableExhaustion(sync == Sync.DISABLE_EXHAUSTION);
-                case ENABLE_MAY_FLY_SURVIVAL,DISABLE_MAY_FLY_SURVIVAL -> ((LegacyPlayerInfo)sp).setMayFlySurvival(sync == Sync.ENABLE_MAY_FLY_SURVIVAL);
+            }
+            if (sp.hasPermissions(2)){
+                switch (sync){
+                    case DISABLE_EXHAUSTION,ENABLE_EXHAUSTION -> ((LegacyPlayerInfo)sp).setDisableExhaustion(sync == Sync.DISABLE_EXHAUSTION);
+                    case ENABLE_MAY_FLY_SURVIVAL,DISABLE_MAY_FLY_SURVIVAL -> LegacyPlayerInfo.updateMayFlySurvival(sp,sync == Sync.ENABLE_MAY_FLY_SURVIVAL, true);
+                }
             }
         }
     }

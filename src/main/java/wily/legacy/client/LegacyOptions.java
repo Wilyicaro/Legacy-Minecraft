@@ -260,12 +260,16 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> skipIntro = CLIENT_STORAGE.register(createBoolean("skipIntro", false));
     public static final FactoryConfig<Boolean> skipInitialSaveWarning = CLIENT_STORAGE.register(createBoolean("skipInitialSaveWarning", false));
     public static final FactoryConfig<Boolean> titleScreenFade = CLIENT_STORAGE.register(createBoolean("titleScreenFade", false));
+    public static final FactoryConfig<Boolean> titleScreenVersionText = CLIENT_STORAGE.register(createBoolean("titleScreenVersionText", false));
     public static final FactoryConfig<Boolean> legacyEvokerFangs = CLIENT_STORAGE.register(createBoolean("legacyEvokerFangs", true));
     public static final FactoryConfig<Boolean> vanillaTutorial = CLIENT_STORAGE.register(createBoolean("vanillaTutorial", false, o->{
         if (Minecraft.getInstance().level != null && !o) {
             Minecraft.getInstance().getTutorial().stop();
         }
     }));
+    public static final FactoryConfig<Boolean> mapsWithCoords = CLIENT_STORAGE.register(createBoolean("mapsWithCoords", true));
+    public static final FactoryConfig<Boolean> menusWithBackground = CLIENT_STORAGE.register(createBoolean("menusWithBackground", false));
+    public static final FactoryConfig<Boolean> legacyPanorama = CLIENT_STORAGE.register(createBoolean("legacyPanorama", true));
 
     public static int getTerrainFogStart(){
         return Math.min(terrainFogStart.get(), Minecraft.getInstance().options.renderDistance().get());

@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stat;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.mixin.base.ClientBoundAwardStatsPacketAccessor;
@@ -17,59 +18,38 @@ public interface LegacyPlayerInfo {
     default GameProfile legacyMinecraft$getProfile(){
         return null;
     }
+
     int getIdentifierIndex();
+
     void setIdentifierIndex(int i);
+
     boolean isVisible();
+
     void setVisibility(boolean visible);
+
     boolean isExhaustionDisabled();
+
     void setDisableExhaustion(boolean exhaustion);
+
     boolean mayFlySurvival();
+
     void setMayFlySurvival(boolean mayFly);
 
+    static void updateMayFlySurvival(ServerPlayer player, boolean mayFlySurvival, boolean updateAbilities){
+        LegacyPlayerInfo.of(player).setMayFlySurvival(mayFlySurvival);
+        if (player.getAbilities().mayfly != mayFlySurvival && player.gameMode.isSurvival()){
+            player.getAbilities().mayfly = mayFlySurvival;
+            if (!player.getAbilities().mayfly && player.getAbilities().flying) player.getAbilities().flying = false;
+            if (updateAbilities) player.onUpdateAbilities();
+        }
+    }
+
     Object2IntMap<Stat<?>> getStatsMap();
+
     void setStatsMap(Object2IntMap<Stat<?>> statsMap);
 
     static LegacyPlayerInfo decode(CommonNetwork.PlayBuf buf){
-        return new LegacyPlayerInfo() {
-            int index = buf.get().readVarInt();
-            boolean invisible = buf.get().readBoolean();
-            boolean exhaustion = buf.get().readBoolean();
-            boolean mayFly = buf.get().readBoolean();
-
-            Object2IntMap<Stat<?>> statsMap = /*? if <1.20.5 {*//*buf.get().readMap(Object2IntOpenHashMap::new, b->ClientBoundAwardStatsPacketAccessor.decodeStatCap(b,BuiltInRegistries.STAT_TYPE.byId(b.readVarInt())),FriendlyByteBuf::readVarInt)*//*?} else {*/ClientBoundAwardStatsPacketAccessor.getStatsValueCodec().decode(buf.get())/*?}*/;
-            public int getIdentifierIndex() {
-                return index;
-            }
-            public void setIdentifierIndex(int i) {
-                index = i;
-            }
-            public boolean isVisible() {
-                return invisible;
-            }
-            public void setVisibility(boolean visible) {
-                this.invisible = visible;
-            }
-            public boolean isExhaustionDisabled() {
-                return exhaustion;
-            }
-            public void setDisableExhaustion(boolean exhaustion) {
-                this.exhaustion = exhaustion;
-            }
-            public boolean mayFlySurvival() {
-                return mayFly;
-            }
-            public void setMayFlySurvival(boolean mayFly) {
-                this.mayFly = mayFly;
-            }
-            @Override
-            public Object2IntMap<Stat<?>> getStatsMap() {
-                return statsMap;
-            }
-            @Override
-            public void setStatsMap(Object2IntMap<Stat<?>> statsMap) {
-                this.statsMap = statsMap;
-            }
-        };
+        return new Instance(buf.get().readVarInt(), buf.get().readBoolean(), buf.get().readBoolean(), buf.get().readBoolean(),/*? if <1.20.5 {*//*buf.get().readMap(Object2IntOpenHashMap::new, b->ClientBoundAwardStatsPacketAccessor.decodeStatCap(b,BuiltInRegistries.STAT_TYPE.byId(b.readVarInt())),FriendlyByteBuf::readVarInt)*//*?} else {*/ClientBoundAwardStatsPacketAccessor.getStatsValueCodec().decode(buf.get())/*?}*/);
     }
 
     static void encode(CommonNetwork.PlayBuf buf, LegacyPlayerInfo info){
@@ -90,5 +70,71 @@ public interface LegacyPlayerInfo {
         this.setDisableExhaustion(info.isExhaustionDisabled());
         this.setMayFlySurvival(info.mayFlySurvival());
         this.setStatsMap(info.getStatsMap());
+    }
+
+    class Instance implements LegacyPlayerInfo {
+        int index = -1;
+        boolean visibility = true;
+        boolean disableExhaustion;
+        boolean mayFlySurvival = false;
+        Object2IntMap<Stat<?>> statsMap;
+
+        public Instance(int index, boolean invisible, boolean disableExhaustion, boolean mayFlySurvival, Object2IntMap<Stat<?>> object2IntMap){
+            setIdentifierIndex(index);
+            setVisibility(invisible);
+            setDisableExhaustion(disableExhaustion);
+            setMayFlySurvival(mayFlySurvival);
+            setStatsMap(object2IntMap);
+        }
+
+        @Override
+        public int getIdentifierIndex() {
+            return index;
+        }
+
+        @Override
+        public void setIdentifierIndex(int i) {
+            index = i;
+        }
+
+        @Override
+        public boolean isVisible() {
+            return visibility;
+        }
+
+        @Override
+        public void setVisibility(boolean visible) {
+            this.visibility = visible;
+        }
+
+        @Override
+        public boolean isExhaustionDisabled() {
+            return disableExhaustion;
+        }
+
+        @Override
+        public void setDisableExhaustion(boolean exhaustion) {
+            this.disableExhaustion = exhaustion;
+        }
+
+        @Override
+        public boolean mayFlySurvival() {
+            return mayFlySurvival;
+        }
+
+        @Override
+        public void setMayFlySurvival(boolean mayFly) {
+            this.mayFlySurvival = mayFly;
+        }
+
+        @Override
+        public Object2IntMap<Stat<?>> getStatsMap() {
+            return statsMap;
+        }
+
+        @Override
+        public void setStatsMap(Object2IntMap<Stat<?>> statsMap) {
+            this.statsMap = statsMap;
+        }
     }
 }
