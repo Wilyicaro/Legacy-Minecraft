@@ -437,10 +437,10 @@ public class Legacy4JClient {
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES,leaderBoardListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES,howToPlaySectionManager);
         FactoryAPIClient.setup(m->{
+            ControllerBinding.setupDefaultBindings(m);
             LegacyOptions.CLIENT_STORAGE.load();
             FactoryAPIClient.registerRenderType(RenderType.cutoutMipped(), SHRUB.get());
             FactoryAPIClient.registerRenderType(RenderType.translucent(), Blocks.WATER);
-            ControllerBinding.setupDefaultBindings(m);
             controllerManager.setup();
             //? if fabric
             if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
