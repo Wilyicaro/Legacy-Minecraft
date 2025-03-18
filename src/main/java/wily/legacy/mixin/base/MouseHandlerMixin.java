@@ -32,7 +32,7 @@ public class MouseHandlerMixin {
         onChange(l,ci);
     }
 
-    @Inject(method = "releaseMouse", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;grabOrReleaseMouse(JIDD)V", shift = At.Shift.AFTER, remap = false))
+    @Inject(method = "releaseMouse", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;grabOrReleaseMouse(JIDD)V", shift = At.Shift.AFTER))
     private void releaseMouse(CallbackInfo ci){
         Legacy4JClient.controllerManager.enableCursorAndScheduleReset();
         Legacy4JClient.controllerManager.updateCursorInputMode();
