@@ -12,6 +12,6 @@ import wily.legacy.Legacy4JClient;
 public class KeyboardHandlerMixin {
     @Inject(method = "keyPress", at = @At("HEAD"))
     public void keyPress(long l, int i, int j, int k, int m, CallbackInfo ci) {
-        if (l == Minecraft.getInstance().getWindow().getWindow() && !Legacy4JClient.controllerManager.isControllerSimulatingInput) Legacy4JClient.controllerManager.isControllerTheLastInput = false;
+        if (l == Minecraft.getInstance().getWindow().getWindow() && !Legacy4JClient.controllerManager.isControllerSimulatingInput) Legacy4JClient.controllerManager.setControllerTheLastInput(false);
     }
 }

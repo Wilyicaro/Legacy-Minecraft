@@ -136,7 +136,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     public static boolean isOpenKey(int i){
-        return i == InputConstants.KEY_NUMPADENTER && !Legacy4JClient.controllerManager.isControllerTheLastInput || i == InputConstants.KEY_RETURN && Legacy4JClient.controllerManager.isControllerTheLastInput;
+        return i == InputConstants.KEY_NUMPADENTER && !Legacy4JClient.controllerManager.isControllerTheLastInput() || i == InputConstants.KEY_RETURN && Legacy4JClient.controllerManager.isControllerTheLastInput();
     }
 
     public static KeyboardScreen fromStaticListener(GuiEventListener listener, Screen parent){

@@ -13,6 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.Slot;
 import org.lwjgl.glfw.GLFW;
 import wily.factoryapi.FactoryEvent;
+import wily.factoryapi.base.Stocker;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
@@ -28,7 +29,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 
-public  class ControllerManager {
+public class ControllerManager {
     public Controller connectedController = null;
     public boolean isCursorDisabled = false;
     public boolean resetCursor = false;
@@ -36,7 +37,7 @@ public  class ControllerManager {
     final Minecraft minecraft;
     public static final ListMap<String,Controller.Handler> handlers = ListMap.<String,Controller.Handler>builder().put("none",Controller.Handler.EMPTY).put("glfw", GLFWControllerHandler.getInstance()).put("sdl3", SDLControllerHandler.getInstance()).build();
 
-    public boolean isControllerTheLastInput = false;
+    protected boolean isControllerTheLastInput = false;
     public boolean isControllerSimulatingInput = false;
 
     public static final Component CONTROLLER_DETECTED = Component.translatable("legacy.controller.detected");
@@ -63,7 +64,7 @@ public  class ControllerManager {
     }
 
     public void setup(){
-        GLFW.glfwSetInputMode(minecraft.getWindow().getWindow(),GLFW.GLFW_CURSOR,GLFW.GLFW_CURSOR_HIDDEN);
+        updateCursorInputMode();
 
         CompletableFuture.runAsync(()-> new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -88,7 +89,7 @@ public  class ControllerManager {
     }
 
     public void setPointerPos(double x, double y){
-        setPointerPos(x, y, isControllerTheLastInput && LegacyOptions.controllerVirtualCursor.get());
+        setPointerPos(x, y, isControllerTheLastInput() && LegacyOptions.controllerVirtualCursor.get());
     }
 
     public void setPointerPos(double x, double y, boolean onlyVirtual){
@@ -113,12 +114,12 @@ public  class ControllerManager {
             if (LegacyTipManager.getActualTip() != null) LegacyTipManager.getActualTip().bindingStateTick(state);
 
             if (state.pressed) {
-                isControllerTheLastInput = true;
+                setControllerTheLastInput(true);
                 //? if >=1.21.2
                 /*minecraft.getFramerateLimitTracker().onInputReceived();*/
             }
 
-            if (getCursorMode() == 0 && state.pressed && !isCursorDisabled) disableCursor();
+            if (getCursorMode().isAuto() && state.pressed && !isCursorDisabled) disableCursor();
 
             if (minecraft.player != null && minecraft.getConnection() != null && controller.hasLED() && minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID()) instanceof LegacyPlayerInfo i){
                 float[] color = Legacy4JClient.getVisualPlayerColor(i);
@@ -245,19 +246,23 @@ public  class ControllerManager {
         return minecraft.mouseHandler.ypos() * (double)this.minecraft.getWindow().getGuiScaledHeight() / (double)this.minecraft.getWindow().getScreenHeight();
     }
 
-    public BindingState getButtonState(ControllerBinding button){
+    public <T extends BindingState> T getButtonState(ControllerBinding<T> button){
         return button.state();
     }
 
+    public boolean allowCursorAtFirstInventorySlot(){
+        return (isControllerTheLastInput() && LegacyOptions.controllerCursorAtFirstInventorySlot.get()) || (!isControllerTheLastInput() && LegacyOptions.cursorAtFirstInventorySlot.get());
+    }
+
     public void disableCursor(){
-        if (getCursorMode() == 1 || minecraft.screen == null || minecraft.screen instanceof Controller.Event e && !e.disableCursorOnInit()) return;
-        GLFW.glfwSetInputMode(minecraft.getWindow().getWindow(),GLFW.GLFW_CURSOR,GLFW.GLFW_CURSOR_HIDDEN);
+        if (getCursorMode().isAlways() || minecraft.screen == null || minecraft.screen instanceof Controller.Event e && !e.disableCursorOnInit()) return;
+        setCursorInputMode(true);
         isCursorDisabled = true;
     }
 
     public void resetCursor(){
         if (!resetCursor || isCursorDisabled) return;
-        if (minecraft.screen instanceof LegacyMenuAccess<?> a) {
+        if (allowCursorAtFirstInventorySlot() && minecraft.screen instanceof LegacyMenuAccess<?> a) {
             for (Slot slot : a.getMenu().slots) {
                 if (slot.getContainerSlot() == 0 && (minecraft.player == null || slot.container == minecraft.player.getInventory())){
                     a.movePointerToSlot(slot);
@@ -268,33 +273,57 @@ public  class ControllerManager {
         resetCursor = false;
     }
 
-    public void enableAndResetCursor(){
+    public void enableCursorAndScheduleReset(){
         enableCursor();
         resetCursor = true;
     }
 
     public void enableCursor(){
         isCursorDisabled = false;
+        updateCursorInputMode();
     }
 
     public void toggleCursor(){
-        if (getCursorMode() < 2) setCursorMode(getCursorMode() + 1);
-        else setCursorMode(0);
-        if (getCursorMode() == 1) {
-            enableCursor();
-        }else if (getCursorMode() == 2){
-            disableCursor();
-            if (minecraft.screen != null) minecraft.screen.repositionElements();
+        setCursorMode(LegacyOptions.CursorMode.values()[Stocker.cyclic(0, getCursorMode().ordinal() + 1, LegacyOptions.CursorMode.values().length)]);
+        updateCursorMode();
+    }
+
+    public void updateCursorMode(){
+        switch (getCursorMode()){
+            case ALWAYS -> enableCursor();
+            case NEVER -> {
+                disableCursor();
+                if (minecraft.screen != null) minecraft.screen.repositionElements();
+            }
         }
     }
 
-    public int getCursorMode() {
+    public LegacyOptions.CursorMode getCursorMode() {
         return LegacyOptions.cursorMode.get();
     }
 
-    public void setCursorMode(int cursorMode) {
+    public void setCursorMode(LegacyOptions.CursorMode cursorMode) {
         LegacyOptions.cursorMode.set(cursorMode);
         LegacyOptions.cursorMode.save();
+    }
+
+    public boolean isControllerTheLastInput() {
+        return isControllerTheLastInput;
+    }
+
+    public void setCursorInputMode(boolean hidden){
+        GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().getWindow(),GLFW.GLFW_CURSOR, hidden ? GLFW.GLFW_CURSOR_HIDDEN : GLFW.GLFW_CURSOR_NORMAL);
+    }
+
+    public void updateCursorInputMode(){
+        if (!minecraft.mouseHandler.isMouseGrabbed()) setCursorInputMode(!LegacyOptions.hasSystemCursor());
+    }
+
+    public void setControllerTheLastInput(boolean controllerTheLastInput) {
+        if (isControllerTheLastInput != controllerTheLastInput){
+            isControllerTheLastInput = controllerTheLastInput;
+            updateCursorInputMode();
+        }
     }
 
     interface Setup extends Consumer<ControllerManager> {

@@ -33,7 +33,7 @@ public interface Controller {
     default void setLED(byte r, byte g, byte b){}
 
     default void connect(ControllerManager manager){
-        manager.isControllerTheLastInput = true;
+        manager.setControllerTheLastInput(true);
         if (!manager.isCursorDisabled && manager.minecraft.screen != null) manager.minecraft.execute(()-> manager.minecraft.screen.repositionElements());
         FactoryAPIClient.getToasts().addToast(new LegacyTip(CONTROLLER_DETECTED, Component.literal(getName())).disappearTime(4500));
     }
@@ -59,8 +59,8 @@ public interface Controller {
     boolean hasAxis(ControllerBinding.Axis axis);
 
     default void disconnect(ControllerManager manager){
-        manager.isControllerTheLastInput = false;
-        if (manager.isCursorDisabled && manager.getCursorMode() != 2) manager.enableCursor();
+        manager.setControllerTheLastInput(false);
+        if (manager.isCursorDisabled && !manager.getCursorMode().isNever()) manager.enableCursor();
         manager.updateBindings(Controller.EMPTY);
         manager.connectedController = null;
         FactoryAPIClient.getToasts().addToast(new LegacyTip(CONTROLLER_DISCONNECTED, Component.literal(getName())).disappearTime(4500));

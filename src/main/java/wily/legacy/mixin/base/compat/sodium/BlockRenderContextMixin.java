@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 
-@Mixin(BlockRenderContext.class)
+@Mixin(value = BlockRenderContext.class, remap = false)
 public class BlockRenderContextMixin {
 
     @Shadow @Final private WorldSlice world;

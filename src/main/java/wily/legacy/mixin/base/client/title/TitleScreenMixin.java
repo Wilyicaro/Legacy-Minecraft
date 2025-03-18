@@ -16,6 +16,7 @@ import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -29,10 +30,12 @@ import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
+import java.util.function.BiConsumer;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen implements ControlTooltip.Event,RenderableVList.Access{
     @Shadow @Nullable private SplashRenderer splash;
+    @Unique
     private RenderableVList renderableVList = new RenderableVList(this).layoutSpacing(l->5);
 
     protected TitleScreenMixin(Component component) {
@@ -74,7 +77,6 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         getRenderableVList().init(width / 2 - 112,this.height / 3 + 10,225,0);
     }
 
-
     @Inject(method = "added", at = @At("RETURN"))
     public void added(CallbackInfo ci) {
         ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()-> ChooseUserScreen.CHOOSE_USER);
@@ -105,10 +107,21 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         return super.keyPressed(i, j, k);
     }
 
-    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;III)I"))
-    public boolean render(GuiGraphics instance, Font font, String string, int i, int j, int k) {
+    //? if forge || neoforge {
+    /*@WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = /^? if neoforge {^//^"Lnet/neoforged/neoforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"^//^?} else {^/"Lnet/minecraftforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"/^?}^/, remap = false))
+    public boolean wrapVersionText(boolean includeMC, boolean reverse, BiConsumer<Integer, String> lineConsumer) {
         return LegacyOptions.titleScreenVersionText.get();
     }
+    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = /^? if neoforge {^//^"Lnet/neoforged/neoforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"^//^?} else {^/"Lnet/minecraftforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"/^?}^/, remap = false))
+    public boolean wrapBrandingOverCopyright(boolean includeMC, boolean reverse, BiConsumer<Integer, String> lineConsumer) {
+        return LegacyOptions.titleScreenVersionText.get();
+    }
+    *///?} else {
+    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;III)I"))
+    public boolean wrapVersionText(GuiGraphics instance, Font font, String string, int i, int j, int k) {
+        return LegacyOptions.titleScreenVersionText.get();
+    }
+    //?}
 
     @ModifyReturnValue(method = "realmsNotificationsEnabled", at = @At("RETURN"))
     public boolean realmsNotificationsEnabled(boolean original) {

@@ -376,10 +376,10 @@ public class Legacy4JClient {
             /*screen.setFocused(null);
             *///?}
         }
-        if ((Minecraft.getInstance().getLastInputType().isKeyboard() || controllerManager.connectedController != null || controllerManager.getCursorMode() == 2) && controllerManager.getCursorMode() != 1) {
+        if ((Minecraft.getInstance().getLastInputType().isKeyboard() || controllerManager.connectedController != null || controllerManager.getCursorMode().isNever()) && !controllerManager.getCursorMode().isAlways()) {
             Controller.Event e = Controller.Event.of(screen);
-            if (e.disableCursorOnInit() && controllerManager.getCursorMode() != 1) controllerManager.disableCursor();
-            if (controllerManager.isCursorDisabled && (!e.disableCursorOnInit() || controllerManager.getCursorMode() == 1)) controllerManager.enableAndResetCursor();
+            if (e.disableCursorOnInit() && !controllerManager.getCursorMode().isAlways()) controllerManager.disableCursor();
+            if (controllerManager.isCursorDisabled && (!e.disableCursorOnInit() || controllerManager.getCursorMode().isAlways())) controllerManager.enableCursorAndScheduleReset();
             if (screen.getFocused() == null || !screen.getFocused().isFocused()) {
                 ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(ScreenDirection.DOWN));
                 if (path != null) path.applyFocus(true);
@@ -437,10 +437,10 @@ public class Legacy4JClient {
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES,leaderBoardListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES,howToPlaySectionManager);
         FactoryAPIClient.setup(m->{
+            ControllerBinding.setupDefaultBindings(m);
             LegacyOptions.CLIENT_STORAGE.load();
             FactoryAPIClient.registerRenderType(RenderType.cutoutMipped(), SHRUB.get());
             FactoryAPIClient.registerRenderType(RenderType.translucent(), Blocks.WATER);
-            ControllerBinding.setupDefaultBindings(m);
             controllerManager.setup();
             //? if fabric
             if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();

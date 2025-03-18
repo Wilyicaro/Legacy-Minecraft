@@ -38,12 +38,12 @@ public abstract class OptionsMixin {
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ToggleKeyMapping;<init>(Ljava/lang/String;ILjava/lang/String;Ljava/util/function/BooleanSupplier;)V", ordinal = 0),index = 3)
     protected BooleanSupplier initKeyShift(BooleanSupplier booleanSupplier) {
-        return ()-> (minecraft == null || minecraft.player == null || (!minecraft.player.getAbilities().flying && minecraft.player.getVehicle() == null && (!minecraft.player.isInWater() || minecraft.player.onGround()))) && (booleanSupplier.getAsBoolean() && !Legacy4JClient.controllerManager.isControllerTheLastInput || LegacyOptions.controllerToggleCrouch.get() && Legacy4JClient.controllerManager.isControllerTheLastInput);
+        return ()-> (minecraft == null || minecraft.player == null || (!minecraft.player.getAbilities().flying && minecraft.player.getVehicle() == null && (!minecraft.player.isInWater() || minecraft.player.onGround()))) && (booleanSupplier.getAsBoolean() && !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.controllerToggleCrouch.get() && Legacy4JClient.controllerManager.isControllerTheLastInput());
     }
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ToggleKeyMapping;<init>(Ljava/lang/String;ILjava/lang/String;Ljava/util/function/BooleanSupplier;)V", ordinal = 1),index = 3)
     protected BooleanSupplier initKeySprint(BooleanSupplier booleanSupplier) {
-        return ()-> booleanSupplier.getAsBoolean() && !Legacy4JClient.controllerManager.isControllerTheLastInput || LegacyOptions.controllerToggleSprint.get() && Legacy4JClient.controllerManager.isControllerTheLastInput;
+        return ()-> booleanSupplier.getAsBoolean() && !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.controllerToggleSprint.get() && Legacy4JClient.controllerManager.isControllerTheLastInput();
     }
 
     @Inject(method = "loadSelectedResourcePacks",at = @At("HEAD"), cancellable = true)

@@ -61,7 +61,7 @@ public abstract class EditBoxMixin extends AbstractWidget implements ControlTool
     @Inject(method = "onClick", at = @At("HEAD"), cancellable = true)
     private void onClick(double d, double e, CallbackInfo ci){
         Screen screen = Minecraft.getInstance().screen;
-        if (Screen.hasShiftDown() || Legacy4JClient.controllerManager.isControllerTheLastInput) {
+        if (Screen.hasShiftDown() || Legacy4JClient.controllerManager.isControllerTheLastInput()) {
             Minecraft.getInstance().setScreen(KeyboardScreen.fromStaticListener(this, screen));
             ci.cancel();
         }

@@ -86,7 +86,7 @@ public interface ControlType  {
     }
 
     static ControlType getActiveType(){
-        return !LegacyOptions.lockControlTypeChange.get() && Legacy4JClient.controllerManager.isControllerTheLastInput || LegacyOptions.lockControlTypeChange.get() && (Legacy4JClient.controllerManager.connectedController != null && LegacyOptions.selectedControlType.get().isAuto() || !LegacyOptions.selectedControlType.get().orElse(KBM).isKbm()) ? getActiveControllerType() : getKbmActiveType();
+        return !LegacyOptions.lockControlTypeChange.get() && Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.lockControlTypeChange.get() && (Legacy4JClient.controllerManager.connectedController != null && LegacyOptions.selectedControlType.get().isAuto() || !LegacyOptions.selectedControlType.get().orElse(KBM).isKbm()) ? getActiveControllerType() : getKbmActiveType();
     }
 
     static ControlType getKbmActiveType(){

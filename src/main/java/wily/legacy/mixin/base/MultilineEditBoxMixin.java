@@ -45,7 +45,7 @@ public abstract class MultilineEditBoxMixin extends AbstractWidget implements Co
     @Override
     public void onClick(double d, double e){
         Screen screen = Minecraft.getInstance().screen;
-        if (Screen.hasShiftDown() || Legacy4JClient.controllerManager.isControllerTheLastInput) {
+        if (Screen.hasShiftDown() || Legacy4JClient.controllerManager.isControllerTheLastInput()) {
             Minecraft.getInstance().setScreen(KeyboardScreen.fromStaticListener(this, screen));
         }
     }
@@ -53,7 +53,7 @@ public abstract class MultilineEditBoxMixin extends AbstractWidget implements Co
     /*@Inject(method = "onClick", at = @At("HEAD"), cancellable = true)
     private void onClick(double d, double e, CallbackInfo ci){
         Screen screen = Minecraft.getInstance().screen;
-        if (Screen.hasShiftDown() || Legacy4JClient.controllerManager.isControllerTheLastInput) {
+        if (Screen.hasShiftDown() || Legacy4JClient.controllerManager.isControllerTheLastInput()) {
             Minecraft.getInstance().setScreen(KeyboardScreen.fromStaticListener(this, screen));
             ci.cancel();
         }

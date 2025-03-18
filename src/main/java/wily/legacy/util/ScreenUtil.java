@@ -708,7 +708,7 @@ public class ScreenUtil {
             RenderSystem.enableDepthTest();
         }
 
-        if (GLFW.glfwGetInputMode(mc.getWindow().getWindow(),GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerManager.isCursorDisabled) {
+        if (GLFW.glfwGetInputMode(mc.getWindow().getWindow(),GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerManager.isCursorDisabled && !LegacyOptions.hasSystemCursor()) {
             RenderSystem.disableDepthTest();
             RenderSystem.enableBlend();
             graphics.pose().pushPose();

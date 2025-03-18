@@ -193,7 +193,7 @@ public class LegacyOptions {
         if (Legacy4JClient.controllerManager.connectedController != null) Legacy4JClient.controllerManager.connectedController.disconnect(Legacy4JClient.controllerManager);
     }));
     public static final FactoryConfig<Boolean> controllerVirtualCursor = CLIENT_STORAGE.register(createBoolean("controllerVirtualCursor", true, b-> {}));
-    public static final FactoryConfig<Integer> cursorMode = CLIENT_STORAGE.register(createInteger("cursorMode", (c, i)-> Component.translatable("options.generic_value",c,Component.translatable(i == 0 ? "options.guiScale.auto" : i == 1 ? "team.visibility.always" : "team.visibility.never")), 0, ()->2, 0));
+    public static final FactoryConfig<CursorMode> cursorMode = CLIENT_STORAGE.register(create("cursorMode", (c, d) -> CommonComponents.optionNameValue(c, d.displayName), i-> CursorMode.values()[i], CursorMode::ordinal, ()->CursorMode.values().length, CursorMode.AUTO, d -> Legacy4JClient.controllerManager.updateCursorMode(), CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> unfocusedInputs = CLIENT_STORAGE.register(createBoolean("unfocusedInputs", false));
     public static final FactoryConfig<Double> leftStickDeadZone = CLIENT_STORAGE.register(createDouble("leftStickDeadZone", LegacyOptions::percentValueLabel, 0.25));
     public static final FactoryConfig<Double> rightStickDeadZone = CLIENT_STORAGE.register(createDouble("rightStickDeadZone", LegacyOptions::percentValueLabel, 0.34));
@@ -270,9 +270,16 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> mapsWithCoords = CLIENT_STORAGE.register(createBoolean("mapsWithCoords", true));
     public static final FactoryConfig<Boolean> menusWithBackground = CLIENT_STORAGE.register(createBoolean("menusWithBackground", false));
     public static final FactoryConfig<Boolean> legacyPanorama = CLIENT_STORAGE.register(createBoolean("legacyPanorama", true));
+    public static final FactoryConfig<Boolean> cursorAtFirstInventorySlot = CLIENT_STORAGE.register(createBoolean("cursorAtFirstInventorySlot", false));
+    public static final FactoryConfig<Boolean> controllerCursorAtFirstInventorySlot = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerCursorAtFirstInventorySlot", new FactoryConfigDisplay.Instance<>(Component.translatable("legacy.options.cursorAtFirstInventorySlot")),true, b->{}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> systemCursor = CLIENT_STORAGE.register(createBoolean("systemCursor", false, b-> Legacy4JClient.controllerManager.updateCursorInputMode()));
 
     public static int getTerrainFogStart(){
         return Math.min(terrainFogStart.get(), Minecraft.getInstance().options.renderDistance().get());
+    }
+
+    public static boolean hasSystemCursor(){
+        return systemCursor.get() && !Legacy4JClient.controllerManager.isControllerTheLastInput();
     }
 
     public enum VehicleCameraRotation implements StringRepresentable {
@@ -312,6 +319,38 @@ public class LegacyOptions {
         }
         AdvancedOptionsMode(String name) {
             this(name, Component.translatable("legacy.options.advancedOptionsMode." + name));
+        }
+        @Override
+        public String getSerializedName() {
+            return name;
+        }
+    }
+
+    public enum CursorMode implements StringRepresentable {
+        AUTO("auto"),ALWAYS("always"),NEVER("never");
+        public static final EnumCodec<CursorMode> CODEC = StringRepresentable.fromEnum(CursorMode::values);
+        private final String name;
+        public final Component displayName;
+
+        CursorMode(String name, Component displayName){
+            this.name = name;
+            this.displayName = displayName;
+        }
+
+        CursorMode(String name){
+            this(name, Component.translatable("legacy.options.cursorMode."+name));
+        }
+
+        public boolean isAuto(){
+            return this == AUTO;
+        }
+
+        public boolean isAlways(){
+            return this == ALWAYS;
+        }
+
+        public boolean isNever(){
+            return this == NEVER;
         }
         @Override
         public String getSerializedName() {

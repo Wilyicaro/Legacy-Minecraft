@@ -103,7 +103,6 @@
     "client.inventory.HorseInventoryScreenMixin",
     "HugeExplosionParticleMixin",
     "HumanoidModelMixin",
-    "InputConstantsMixin",
     "IntegratedServerMixin",
     "client.inventory.InventoryScreenMixin",
     "ItemInHandRendererMixin",

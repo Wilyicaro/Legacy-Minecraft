@@ -56,6 +56,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
         this.setProgress(accessor.getInteger("progress",progress));
         this.setGenericLoading(accessor.getBoolean("genericLoading",genericLoading));
     }
+
     public LegacyTip getLoadingTip(){
         if (usingLoadingTips.isEmpty()){
             if (LegacyTipManager.loadingTips.isEmpty()) return null;
