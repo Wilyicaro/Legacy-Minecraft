@@ -28,22 +28,26 @@ public class LegacyBiomeOverride {
     public static final Map<ResourceLocation,LegacyBiomeOverride> map = new HashMap<>();
     private static final String BIOME_OVERRIDES = "biome_overrides.json";
     public static final ResourceLocation DEFAULT_LOCATION = FactoryAPI.createVanillaLocation("default");
-    public static final LegacyBiomeOverride DEFAULT = new LegacyBiomeOverride(){
-        public float waterTransparency() {
-            return this.waterTransparency == null ? 1.0f : waterTransparency;
-        }
-    };
     private ItemStack icon = ItemStack.EMPTY;
     Integer waterColor;
     Integer waterFogColor;
+    Integer fogColor;
+    Integer skyColor;
     Float waterTransparency;
+    Float waterFogDistance;
+
+    public static LegacyBiomeOverride getDefault(){
+        return map.get(DEFAULT_LOCATION);
+    }
 
     public static LegacyBiomeOverride getOrDefault(Optional<ResourceKey<Biome>> optionalKey){
-        return optionalKey.isEmpty() ? DEFAULT : getOrDefault(optionalKey.get().location());
+        return optionalKey.isEmpty() ? getDefault() : getOrDefault(optionalKey.get().location());
     }
+
     public static LegacyBiomeOverride getOrDefault(ResourceLocation location){
-        return map.getOrDefault(location, DEFAULT);
+        return map.getOrDefault(location, getDefault());
     }
+
     public LegacyBiomeOverride(){
     }
 
@@ -52,11 +56,11 @@ public class LegacyBiomeOverride {
     }
 
     public float waterTransparency() {
-        return waterTransparency == null ? DEFAULT.waterTransparency() : waterTransparency;
+        return waterTransparency == null ? getDefault().waterTransparency() : waterTransparency;
     }
 
     public Integer waterColor() {
-        return waterColor == null ? DEFAULT.waterColor : waterColor;
+        return waterColor == null ? getDefault().waterColor : waterColor;
     }
 
     public int getWaterARGBOrDefault(int defaultColor){
@@ -64,14 +68,30 @@ public class LegacyBiomeOverride {
     }
 
     public Integer waterFogColor() {
-        return waterFogColor == null ? DEFAULT.waterFogColor : waterFogColor;
+        return waterFogColor == null ? getDefault().waterFogColor : waterFogColor;
+    }
+
+    public Integer fogColor() {
+        return fogColor == null ? getDefault().fogColor : fogColor;
+    }
+
+    public Integer skyColor() {
+        return skyColor == null ? getDefault().skyColor : skyColor;
+    }
+
+    public Float waterFogDistance() {
+        return waterFogDistance == null ? getDefault().waterFogDistance : waterFogDistance;
     }
 
     public static class Manager implements ResourceManagerReloadListener {
         @Override
         public void onResourceManagerReload(ResourceManager resourceManager) {
             map.clear();
-            map.put(DEFAULT_LOCATION,DEFAULT);
+            map.put(DEFAULT_LOCATION, new LegacyBiomeOverride(){
+                public float waterTransparency() {
+                    return this.waterTransparency == null ? 1.0f : waterTransparency;
+                }
+            });
             JsonUtil.getOrderedNamespaces(resourceManager).forEach(name->resourceManager.getResource(FactoryAPI.createLocation(name,BIOME_OVERRIDES)).ifPresent(r->{
                 try {
                     BufferedReader bufferedReader = r.openAsReader();
@@ -85,6 +105,9 @@ public class LegacyBiomeOverride {
                                 Integer i;
                                 if ((i = JsonUtil.optionalJsonColor(o, "water_color", null)) != null) override.waterColor = i;
                                 if ((i = JsonUtil.optionalJsonColor(o, "water_fog_color", null)) != null) override.waterFogColor = i;
+                                if ((i = JsonUtil.optionalJsonColor(o, "fog_color", null)) != null) override.fogColor = i;
+                                if ((i = JsonUtil.optionalJsonColor(o, "sky_color", null)) != null) override.skyColor = i;
+                                if (o.get("water_fog_distance") instanceof JsonPrimitive p && p.isNumber()) override.waterFogDistance = p.getAsFloat();
                                 if (o.get("water_transparency") instanceof JsonPrimitive p && p.isNumber()) override.waterTransparency = p.getAsFloat();
                             }
                             });

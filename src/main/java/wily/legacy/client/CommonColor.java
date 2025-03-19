@@ -59,6 +59,7 @@ public class CommonColor extends CommonValue<Integer> {
     public static final CommonColor LIGHT_PURPLE = registerCommonColor("light_purple", 0xFF55FF);
     public static final CommonColor YELLOW = registerCommonColor("yellow", 0xFFFF55);
     public static final CommonColor WHITE = registerCommonColor("white", 0xFFFFFF);
+    public static final CommonColor BLOCK_LIGHT = registerCommonColor("block_light", 0xFFFFFF);
 
     public CommonColor(Integer obj) {
         super(obj, INT_COLOR_CODEC);
