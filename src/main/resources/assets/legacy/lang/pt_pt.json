@@ -541,6 +541,8 @@
   "gamerule.globalMapPlayerIcon.description": "Permite ícones de jogadores aparecerem em todos os mapas criados.",
   "gamerule.legacyMapGrid": "Grade de Mapa Legacy",
   "gamerule.legacyMapGrid.description": "Quando habilitado, os mapas criados vão ser centralizado em X:0 e Y:0.",
+  "gamerule.legacySwimming": "Nado Legacy",
+  "gamerule.legacySwimming.description": "Quando habilitado, jogadores vão poder nadar a qualquer toque na água.",
   "gamerule.playerStartingBundle": "Trouxa Inicial",
   "gamerule.playerStartingBundle.description": "Quando habilitado, os jogadores vão iniciar com uma trouxa vazia.",
   "gamerule.playerStartingMap": "Mapa Inicial",

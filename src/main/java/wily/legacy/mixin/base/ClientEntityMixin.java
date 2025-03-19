@@ -116,11 +116,6 @@ public abstract class ClientEntityMixin implements ClientEntityAccessor {
         return collision;
     }
 
-    @ModifyExpressionValue(method = "updateSwimming", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isUnderWater()Z"))
-    protected boolean updateSwimming(boolean original) {
-        return ((!level().isClientSide || FactoryAPIClient.hasModOnServer) && isInWater() || original);
-    }
-
     @Inject(method = "moveRelative", at = @At("HEAD"), cancellable = true)
     public void moveRelative(float f, Vec3 vec3, CallbackInfo ci) {
         if (((Object)this) instanceof LocalPlayer p && FactoryAPIClient.hasModOnServer && p.getAbilities().flying && p.isCreative() && !p.isSprinting()){

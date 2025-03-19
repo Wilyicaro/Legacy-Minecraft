@@ -600,6 +600,8 @@
   "gamerule.lavaSourceConversion.description": "When enabled, two lava sources that flow into the same block will create a new lava source.",
   "gamerule.legacyMapGrid": "Legacy Map Grid",
   "gamerule.legacyMapGrid.description": "When enabled, the maps will be centered on X:0 and Y:0.",
+  "gamerule.legacySwimming": "Legacy Swimming",
+  "gamerule.legacySwimming.description": "When enabled, players will be able to swim at any time they are in the water.",
   "gamerule.logAdminCommands": "Log Admin Commands",
   "gamerule.logAdminCommands.description": "When enabled, admin commands will be saved to the server log.",
   "gamerule.maxCommandChainLength": "Command Chain Limit",

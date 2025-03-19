@@ -13,6 +13,11 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.network.chat.Component;
+//? if forge {
+/*import net.minecraftforge.client.gui.TitleScreenModUpdateIndicator;
+*///?} else if neoforge && <=1.20.4 {
+/*import net.neoforged.neoforge.client.gui.TitleScreenModUpdateIndicator;
+*///?}
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -31,10 +36,14 @@ import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
 import java.util.function.BiConsumer;
+import java.util.function.ObjIntConsumer;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen implements ControlTooltip.Event,RenderableVList.Access{
     @Shadow @Nullable private SplashRenderer splash;
+    //? if forge || neoforge && <=1.20.4 {
+    /*@Shadow private TitleScreenModUpdateIndicator modUpdateNotification;
+    *///?}
     @Unique
     private RenderableVList renderableVList = new RenderableVList(this).layoutSpacing(l->5);
 
@@ -53,10 +62,14 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
                 }
             }else minecraft.setScreen(PlayGameScreen.createAndCheckNewerVersions(this));
         }).build());
-        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build());
+        Button modButton;
+        renderableVList.addRenderable(modButton = Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("options.language"), b -> minecraft.setScreen(new LegacyLanguageScreen(this, this.minecraft.getLanguageManager()))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.options"), b -> minecraft.setScreen(new HelpAndOptionsScreen(this))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
+        //? if forge || neoforge && <=1.20.4 {
+        /*this.modUpdateNotification = TitleScreenModUpdateIndicator.init((TitleScreen) (Object) this, modButton);
+        *///?}
     }
 
 
@@ -108,12 +121,12 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     }
 
     //? if forge || neoforge {
-    /*@WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = /^? if neoforge {^//^"Lnet/neoforged/neoforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"^//^?} else {^/"Lnet/minecraftforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"/^?}^/, remap = false))
-    public boolean wrapVersionText(boolean includeMC, boolean reverse, BiConsumer<Integer, String> lineConsumer) {
+    /*@WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = /^? if neoforge {^//^"Lnet/neoforged/neoforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"^//^?} else if <1.20.5 {^//^"Lnet/minecraftforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"^//^?} else {^/"Lnet/minecraftforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/ObjIntConsumer;)V"/^?}^/, remap = false))
+    public boolean wrapVersionText(boolean includeMC, boolean reverse, /^? if forge && >=1.20.5 {^//^ObjIntConsumer<String>^//^?} else {^/BiConsumer<Integer, String>/^?}^/ lineConsumerr) {
         return LegacyOptions.titleScreenVersionText.get();
     }
-    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = /^? if neoforge {^//^"Lnet/neoforged/neoforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"^//^?} else {^/"Lnet/minecraftforge/internal/BrandingControl;forEachLine(ZZLjava/util/function/BiConsumer;)V"/^?}^/, remap = false))
-    public boolean wrapBrandingOverCopyright(boolean includeMC, boolean reverse, BiConsumer<Integer, String> lineConsumer) {
+    @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = /^? if neoforge {^//^"Lnet/neoforged/neoforge/internal/BrandingControl;forEachAboveCopyrightLine(Ljava/util/function/BiConsumer;)V"^//^?} else if <1.20.5 {^//^"Lnet/minecraftforge/internal/BrandingControl;forEachAboveCopyrightLine(Ljava/util/function/BiConsumer;)V"^//^?} else {^/"Lnet/minecraftforge/internal/BrandingControl;forEachAboveCopyrightLine(Ljava/util/function/ObjIntConsumer;)V"/^?}^/, remap = false))
+    public boolean wrapBrandingOverCopyright(/^? if forge && >=1.20.5 {^//^ObjIntConsumer<String>^//^?} else {^/BiConsumer<Integer, String>/^?}^/ lineConsumer) {
         return LegacyOptions.titleScreenVersionText.get();
     }
     *///?} else {

@@ -55,7 +55,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     protected float alpha = getDefaultOpacity();
     protected boolean shouldFade = false;
 
-    public static final List<GameRules.Key<GameRules.BooleanValue>> WORLD_RULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK,LegacyGameRules.TNT_EXPLODES,GameRules.RULE_DAYLIGHT,GameRules.RULE_KEEPINVENTORY,GameRules.RULE_DOMOBSPAWNING,GameRules.RULE_MOBGRIEFING, LegacyGameRules.GLOBAL_MAP_PLAYER_ICON));
+    public static final List<GameRules.Key<GameRules.BooleanValue>> WORLD_RULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK,LegacyGameRules.TNT_EXPLODES,GameRules.RULE_DAYLIGHT,GameRules.RULE_KEEPINVENTORY,GameRules.RULE_DOMOBSPAWNING,GameRules.RULE_MOBGRIEFING,LegacyGameRules.GLOBAL_MAP_PLAYER_ICON,LegacyGameRules.LEGACY_SWIMMING));
     public static final List<GameRules.Key<GameRules.BooleanValue>> OTHER_RULES = new ArrayList<>(List.of(GameRules.RULE_WEATHER_CYCLE,GameRules.RULE_DOMOBLOOT,GameRules.RULE_DOBLOCKDROPS,GameRules.RULE_NATURAL_REGENERATION,GameRules.RULE_DO_IMMEDIATE_RESPAWN));
 
     public HostOptionsScreen(Component title) {

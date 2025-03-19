@@ -57,7 +57,7 @@ public abstract class ItemStackMixin {
         return ChatFormatting.GOLD;
     }
     //?} else {
-    /*@ModifyArg(method = "getStyledHoverName",at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = /^? if neoforge {^/ /^0^//^?} else {^/1/^?}^/))
+    /*@ModifyArg(method = "getStyledHoverName",at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = /^? if neoforge {^/ 0/^?} else {^//^1^//^?}^/))
     public ChatFormatting getStyledHoverName(ChatFormatting arg) {
         return ChatFormatting.GOLD;
     }
