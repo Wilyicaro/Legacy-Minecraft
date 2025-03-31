@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.screen.ControlTooltip;
 
 import java.util.function.Function;
@@ -28,7 +29,7 @@ public interface LegacyKeyMapping {
         Minecraft minecraft = Minecraft.getInstance();
         boolean hasPlayer = minecraft.player != null && minecraft.gameMode != null;
         switch (name){
-            case "legacy.key.crafting" -> name = hasPlayer && minecraft.gameMode.hasInfiniteItems() ? "selectWorld.gameMode.creative" : name;
+            case "legacy.key.crafting" -> name = hasPlayer && Legacy4JClient.playerHasInfiniteMaterials() ? "selectWorld.gameMode.creative" : name;
             case "legacy.key.inventory" -> name = "key.inventory";
         }
         return ControlTooltip.getAction(name);

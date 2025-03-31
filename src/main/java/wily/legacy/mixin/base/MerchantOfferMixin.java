@@ -20,8 +20,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.util.CompoundTagUtil;
 import wily.legacy.inventory.LegacyMerchantOffer;
 
+import java.util.Optional;
 import java.util.function.Function;
 
 @Mixin(MerchantOffer.class)
@@ -59,8 +61,9 @@ public abstract class MerchantOfferMixin implements LegacyMerchantOffer {
         CustomData data = offer.getResult().get(DataComponents.CUSTOM_DATA);
         if (data != null) {
             CompoundTag copy = data.copyTag();
-            if (copy.contains("requiredLevel")) {
-                level = copy.getInt("requiredLevel");
+            Optional<Integer> requiredLevel = CompoundTagUtil.getInt(copy, "requiredLevel");
+            if (requiredLevel.isPresent()) {
+                level = requiredLevel.get();
                 copy.remove("requiredLevel");
                 if (copy.isEmpty()) offer.getResult().set(DataComponents.CUSTOM_DATA,null);
             }

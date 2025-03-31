@@ -145,7 +145,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
                 if (value.isKbm()) addKbmIcons(resourceManager,location,value.getIcons()::put);
                 else addControllerIcons(resourceManager, location, value.getIcons()::put);
             }
-            resourceManager.getResource(FactoryAPI.createLocation(name,"keyboard_layout/" + minecraft.getLanguageManager().getSelected()+ ".json")).ifPresent(LegacyResourceManager::setKeyboardLayout);
+            resourceManager.getResource(FactoryAPI.createLocation(name,"keyboard_layout/" + minecraft.getLanguageManager().getSelected() + ".json")).ifPresent(LegacyResourceManager::setKeyboardLayout);
         });
     }
 

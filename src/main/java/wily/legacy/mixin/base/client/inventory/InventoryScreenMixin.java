@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base.client.inventory;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.navigation.ScreenPosition;
@@ -24,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.CreativeModeScreen;
@@ -53,11 +55,17 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
     public InventoryScreenMixin(InventoryMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
-    @Redirect(method = "containerTick",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;hasInfiniteItems()Z"))
-    public boolean containerTick(MultiPlayerGameMode instance) {
+    //? if <1.21.5 {
+    @ModifyExpressionValue(method = "containerTick",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;hasInfiniteItems()Z"))
+    public boolean containerTick(boolean original) {
         return false;
     }
-
+    //?} else {
+    /*@ModifyExpressionValue(method = "containerTick",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;hasInfiniteMaterials()Z"))
+    public boolean containerTick(boolean original) {
+        return false;
+    }
+    *///?}
     //? if >1.20.1 {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
@@ -162,7 +170,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
     }
 
     public boolean canReplace() {
-        return this.minecraft.gameMode.hasInfiniteItems() && canReplace;
+        return Legacy4JClient.playerHasInfiniteMaterials() && canReplace;
     }
 
     public void setCanReplace(boolean canReplace) {

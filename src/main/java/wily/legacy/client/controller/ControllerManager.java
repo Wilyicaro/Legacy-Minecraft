@@ -34,7 +34,7 @@ public class ControllerManager {
     public boolean isCursorDisabled = false;
     public boolean resetCursor = false;
     public boolean canChangeSlidersValue = true;
-    final Minecraft minecraft;
+    protected Minecraft minecraft;
     public static final ListMap<String,Controller.Handler> handlers = ListMap.<String,Controller.Handler>builder().put("none",Controller.Handler.EMPTY).put("glfw", GLFWControllerHandler.getInstance()).put("sdl3", SDLControllerHandler.getInstance()).build();
 
     protected boolean isControllerTheLastInput = false;
@@ -43,15 +43,12 @@ public class ControllerManager {
     public static final Component CONTROLLER_DETECTED = Component.translatable("legacy.controller.detected");
     public static final Component CONTROLLER_DISCONNECTED = Component.translatable("legacy.controller.disconnected");
 
-    public ControllerManager(Minecraft minecraft){
-        this.minecraft = minecraft;
-    }
 
     public static Controller.Handler getHandler() {
         return LegacyOptions.selectedControllerHandler.get();
     }
 
-    public static void updatePlayerCamera(BindingState.Axis stick, Controller handler){
+    public static void updatePlayerCamera(BindingState.Axis stick, Controller controller){
         Minecraft minecraft = Minecraft.getInstance();
         if (!minecraft.mouseHandler.isMouseGrabbed() || !minecraft.isWindowActive() || !stick.pressed || minecraft.player == null) return;
         double f = Math.pow(LegacyOptions.controllerSensitivity.get() * (double)0.6f + (double)0.2f,3) * 7.5f * (minecraft.player.isScoping() ? 0.125: 1.0);
@@ -63,7 +60,8 @@ public class ControllerManager {
         return f * f * Math.signum(f);
     }
 
-    public void setup(){
+    public void setup(Minecraft minecraft){
+        this.minecraft = minecraft;
         updateCursorInputMode();
 
         CompletableFuture.runAsync(()-> new Timer().scheduleAtFixedRate(new TimerTask() {

@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyBiomeOverride;
 import wily.legacy.client.LegacyTipManager;
@@ -120,10 +121,10 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
                     guiGraphics.renderItem(s,0, 0);
                     guiGraphics.pose().popPose();
                 }
-                RenderSystem.enableBlend();
+                FactoryScreenUtil.enableBlend();
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(TickBox.SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);
                 if (generator.biome == biome) FactoryGuiGraphics.of(guiGraphics).blitSprite(TickBox.TICK, this.getX() + 6, this.getY()  + (height - 12) / 2, 14, 12);
-                RenderSystem.disableBlend();
+                FactoryScreenUtil.disableBlend();
             }
             @Override
             protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {

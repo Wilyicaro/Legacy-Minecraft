@@ -14,6 +14,7 @@ public class CameraMixin {
     protected float setRotation(float f) {
         return ScreenUtil.getFlyingViewRollingRotation(f);
     }
+
     @ModifyExpressionValue(method = "setup", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Camera;xRot:F"))
     protected float setup(float f) {
         return LegacyOptions.invertedFrontCameraPitch.get() ? f : -f;

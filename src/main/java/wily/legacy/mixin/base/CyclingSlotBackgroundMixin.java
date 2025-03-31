@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.ScreenUtil;
@@ -25,7 +26,7 @@ public class CyclingSlotBackgroundMixin {
         else return;
         LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(slot);
         holder.renderScaled(guiGraphics, i + slot.x,j + slot.y, ()->{
-            RenderSystem.enableBlend();
+            FactoryScreenUtil.enableBlend();
             FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,f);
             //? if <1.21.4 {
             TextureAtlasSprite textureAtlasSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(resourceLocation);
@@ -34,7 +35,7 @@ public class CyclingSlotBackgroundMixin {
             /*FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation, 0, 0, 16, 16);
             *///?}
             FactoryGuiGraphics.of(guiGraphics).clearColor();
-            RenderSystem.disableBlend();
+            FactoryScreenUtil.disableBlend();
         });
     }
 }

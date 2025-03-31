@@ -26,6 +26,7 @@ import net.minecraft.sounds.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
@@ -184,7 +185,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         super.renderDefaultBackground(guiGraphics, i, j, f);
-        RenderSystem.enableBlend();
+        FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).setColor(1f,1f,1f,0.8f);
         panel.render(guiGraphics,i,j,f);
         guiGraphics.pose().pushPose();
@@ -194,7 +195,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
         guiGraphics.pose().translate(-4.5f,0,0);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,(panel.getWidth() - 267) / 2,-1,267, 125);
         guiGraphics.pose().popPose();
-        RenderSystem.disableBlend();
+        FactoryScreenUtil.disableBlend();
         FactoryGuiGraphics.of(guiGraphics).clearColor();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(panel.getX() + (panel.getWidth() - font.width(KEYBOARD) * 1.5f) / 2,panel.getY() + 8,0);
@@ -314,9 +315,9 @@ public class KeyboardScreen extends OverlayPanelScreen {
         @Override
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(),getX(),getY(),getWidth(),getHeight());
-            RenderSystem.enableBlend();
+            FactoryScreenUtil.enableBlend();
             renderString(guiGraphics,Minecraft.getInstance().font, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
-            RenderSystem.disableBlend();
+            FactoryScreenUtil.disableBlend();
         }
         public ResourceLocation getSprite(){
             return isHoveredOrFocused() ? LegacySprites.BUTTON_SLOT_HIGHLIGHTED : LegacySprites.BUTTON_SLOT;
@@ -393,9 +394,9 @@ public class KeyboardScreen extends OverlayPanelScreen {
                 TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().textureAtlas.texturesByName.getOrDefault(iconSprite,null);
                 if (sprite == null) return;
                 try (SpriteContents contents = sprite.contents()){
-                    RenderSystem.enableBlend();
+                    FactoryScreenUtil.enableBlend();
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + (getWidth() - contents.width()) / 2 + Math.max(0,i + bindingOffset -  (getWidth() - contents.width()) / 2), getY() + (getHeight() - contents.height()) / 2,contents.width(),contents.height());
-                    RenderSystem.disableBlend();
+                    FactoryScreenUtil.disableBlend();
                 }
             }
         }

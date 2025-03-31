@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(FlowerBlock.class)
-public abstract class FlowerBlockMixin extends BushBlock implements BonemealableBlock {
+public abstract class FlowerBlockMixin extends /*? if <1.21.5 {*/BushBlock/*?} else {*//*VegetationBlock*//*?}*/ implements BonemealableBlock {
 
     protected FlowerBlockMixin(Properties properties) {
         super(properties);

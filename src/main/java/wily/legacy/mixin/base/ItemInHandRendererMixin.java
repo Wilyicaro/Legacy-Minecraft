@@ -39,7 +39,7 @@ public abstract class ItemInHandRendererMixin {
 
     @Shadow protected abstract void applyItemArmAttackTransform(PoseStack arg, HumanoidArm arg2, float g);
 
-    @Shadow public abstract void renderItem(LivingEntity arg, ItemStack arg2, ItemDisplayContext arg3, boolean bl, PoseStack arg4, MultiBufferSource arg5, int i);
+    @Shadow public abstract void renderItem(LivingEntity arg, ItemStack arg2, ItemDisplayContext arg3/*? if <1.21.5 {*/, boolean bl/*?}*/, PoseStack arg4, MultiBufferSource arg5, int i);
     @Inject(method = "renderPlayerArm", at = @At(value = "HEAD"), cancellable = true)
     private void renderPlayerArm(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, float f, float g, HumanoidArm humanoidArm, CallbackInfo ci) {
         if (minecraft.player == null || minecraft.player.isRemoved()) ci.cancel();
@@ -110,7 +110,8 @@ public abstract class ItemInHandRendererMixin {
                 poseStack.mulPose(Axis.YP.rotationDegrees((float) k * 10.0F));
             }
         }
-        this.renderItem(abstractClientPlayer, itemStack, humanoidArm == HumanoidArm.RIGHT ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, humanoidArm == HumanoidArm.LEFT, poseStack, multiBufferSource, j);
+
+        this.renderItem(abstractClientPlayer, itemStack, humanoidArm == HumanoidArm.RIGHT ? ItemDisplayContext.FIRST_PERSON_RIGHT_HAND : ItemDisplayContext.FIRST_PERSON_LEFT_HAND, /*? if <1.21.5 {*/ humanoidArm == HumanoidArm.LEFT,/*?}*/ poseStack, multiBufferSource, j);
         ci.cancel();
         poseStack.popPose();
 

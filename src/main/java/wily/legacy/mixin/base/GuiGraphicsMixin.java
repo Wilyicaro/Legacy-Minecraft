@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.FactoryAPIClient;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyMenuAccess;
@@ -88,7 +89,7 @@ public abstract class GuiGraphicsMixin {
         if (p == (int)Legacy4JClient.controllerManager.getPointerX() && q == (int)Legacy4JClient.controllerManager.getPointerY()) this.pose.translate(Legacy4JClient.controllerManager.getPointerX() - i, Legacy4JClient.controllerManager.getPointerY() - j,0.0f);
         ScreenUtil.renderPointerPanel(self(),p - Math.round(5 * ScreenUtil.getTextScale()),q - Math.round(9 * ScreenUtil.getTextScale()),Math.round((k + 11) *  ScreenUtil.getTextScale()),Math.round((l + 13) * ScreenUtil.getTextScale()));
         this.pose.translate(p, q, 800.0F);
-        RenderSystem.disableDepthTest();
+        FactoryScreenUtil.disableDepthTest();
         this.pose.scale(ScreenUtil.getTextScale(), ScreenUtil.getTextScale(),1.0f);
         int s = 0;
 
@@ -107,7 +108,7 @@ public abstract class GuiGraphicsMixin {
             tooltipComponent.renderImage(font, 0, s,/*? if >=1.21.2 {*//*k, l,*//*?}*/ self());
             s += tooltipComponent.getHeight(/*? if >=1.21.2 {*//*font*//*?}*/);
         }
-        RenderSystem.enableDepthTest();
+        FactoryScreenUtil.enableDepthTest();
         this.pose.popPose();
     }
 
@@ -119,7 +120,7 @@ public abstract class GuiGraphicsMixin {
             pose().translate((float)(i + 8), (float)(j + 12), 0.0F);
             pose().scale(1.0F / h, (h + 1.0F) / 2.0F, 1.0F);
             pose().translate((float)(-(i + 8)), (float)(-(j + 12)), 0.0F);
-            if (minecraft.player != null  && !minecraft.player.getInventory().items.contains(itemStack)) itemStack.setPopTime(itemStack.getPopTime() - 1);
+            if (minecraft.player != null  && !minecraft.player.getInventory()./*? if <1.21.5 {*/items/*?} else {*//*getNonEquipmentItems()*//*?}*/.contains(itemStack)) itemStack.setPopTime(itemStack.getPopTime() - 1);
         }
     }
     @ModifyArg(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V", ordinal = 0), index = 2)

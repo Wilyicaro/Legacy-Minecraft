@@ -25,6 +25,7 @@ import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.ListMap;
 import wily.factoryapi.util.ModInfo;
 import wily.legacy.Legacy4J;
@@ -36,6 +37,7 @@ import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,15 +70,19 @@ public class ModsScreen extends PanelVListScreen {
                 components.add(Component.translatable("legacy.menu.mods.authors", String.join(", ", key.getAuthors())));
             if (!key.getCredits().isEmpty())
                 components.add(Component.translatable("legacy.menu.mods.credits", String.join(", ", key.getCredits())));
-            key.getHomepage().ifPresent(s-> components.add(Component.translatable("legacy.menu.mods.homepage",s).withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, s)))));
-            key.getIssues().ifPresent(s-> components.add(Component.translatable("legacy.menu.mods.issues",s).withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, s)))));
-            key.getSources().ifPresent(s-> components.add(Component.translatable("legacy.menu.mods.sources",s).withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, s)))));
+            key.getHomepage().ifPresent(s-> components.add(Component.translatable("legacy.menu.mods.homepage",s).withStyle(Style.EMPTY.withClickEvent(urlClickEvent(s)))));
+            key.getIssues().ifPresent(s-> components.add(Component.translatable("legacy.menu.mods.issues",s).withStyle(Style.EMPTY.withClickEvent(urlClickEvent(s)))));
+            key.getSources().ifPresent(s-> components.add(Component.translatable("legacy.menu.mods.sources",s).withStyle(Style.EMPTY.withClickEvent(urlClickEvent(s)))));
             if (key.getLicense() != null && !key.getLicense().isEmpty()) components.add(Component.translatable("legacy.menu.mods.license", String.join(", ", key.getLicense())));
             components.add(Component.literal(key.getDescription()));
             MultilineTooltip tooltip = new MultilineTooltip(components,tooltipBox.getWidth() - 16);
             return new AdvancedTextWidget(accessor).withWidth(tooltipBox.getWidth() - 16).withLines(tooltip.toCharSequence(minecraft));
         }
     });
+
+    public static ClickEvent urlClickEvent(String url){
+        return /*? if <1.21.5 {*/new ClickEvent(ClickEvent.Action.OPEN_URL, url)/*?} else {*//*new ClickEvent.OpenUrl(URI.create(url))*//*?}*/;
+    }
 
     public ModsScreen(Screen parent) {
         super(parent,282,243, Component.empty());
@@ -102,14 +108,14 @@ public class ModsScreen extends PanelVListScreen {
                 protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                     super.renderWidget(guiGraphics, i, j, f);
                     if (isFocused()) focusedMod = mod;
-                    RenderSystem.enableBlend();
+                    FactoryScreenUtil.enableBlend();
                     SizedLocation logo = modLogosCache.computeIfAbsent(mod, m-> {
                         Optional<String> opt = m.getLogoFile(100);
                         if (opt.isPresent() && mod.findResource(opt.get()).isPresent())
                             try {
                                 NativeImage image = NativeImage.read(Files.newInputStream(mod.findResource(opt.get()).get()));
                                 ResourceLocation location = FactoryAPI.createLocation(mod.getId(),opt.get().toLowerCase(Locale.ENGLISH));
-                                minecraft.getTextureManager().register(location, new DynamicTexture(image));
+                                minecraft.getTextureManager().register(location, new DynamicTexture(/*? if >=1.21.5 {*//*location::toString, *//*?}*/image));
                                 if (location != null) return new SizedLocation(location,image.getWidth(),image.getHeight());
                             } catch (IOException e) {
                             }
@@ -119,7 +125,7 @@ public class ModsScreen extends PanelVListScreen {
                     });
                     if (logo != null) FactoryGuiGraphics.of(guiGraphics).blit(logo.location,getX() + 5, getY() + 5, 0,0, logo.getScaledWidth(20),20,logo.getScaledWidth(20),20);
                     
-                    RenderSystem.disableBlend();
+                    FactoryScreenUtil.disableBlend();
                 }
                 @Override
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {

@@ -44,17 +44,19 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
     List<ItemStack> addedIngredientsItems = null;
     Predicate<CustomRecipeIconHolder> canAddIngredient = h->true;
     public ItemStack nextItem(Inventory inventory, Predicate<ItemStack> isValid) {
-        for (int i = Math.max(0,inventory.items.indexOf(itemIcon)); i < inventory.items.size(); i++)
-            if (itemIcon != inventory.items.get(i) && isValid.test(inventory.items.get(i))) return inventory.items.get(i);
-        for (int i = 0; i < Math.max(0,inventory.items.indexOf(itemIcon)); i++)
-            if (itemIcon != inventory.items.get(i) && isValid.test(inventory.items.get(i))) return inventory.items.get(i);
+        List<ItemStack> items = inventory./*? if <1.21.5 {*/items/*?} else {*//*getNonEquipmentItems()*//*?}*/;
+        for (int i = Math.max(0,items.indexOf(itemIcon)); i < items.size(); i++)
+            if (itemIcon != items.get(i) && isValid.test(items.get(i))) return items.get(i);
+        for (int i = 0; i < Math.max(0,items.indexOf(itemIcon)); i++)
+            if (itemIcon != items.get(i) && isValid.test(items.get(i))) return items.get(i);
         return ItemStack.EMPTY;
     }
     public ItemStack previousItem(Inventory inventory, Predicate<ItemStack> isValid) {
-        for (int i = Math.max(0,inventory.items.indexOf(itemIcon)); i >= 0; i--)
-            if (itemIcon != inventory.items.get(i) && isValid.test(inventory.items.get(i))) return inventory.items.get(i);
-        for (int i = inventory.items.size() - 1; i >= Math.max(0,inventory.items.indexOf(itemIcon)); i--)
-            if (itemIcon != inventory.items.get(i) && isValid.test(inventory.items.get(i))) return inventory.items.get(i);
+        List<ItemStack> items = inventory./*? if <1.21.5 {*/items/*?} else {*//*getNonEquipmentItems()*//*?}*/;
+        for (int i = Math.max(0,items.indexOf(itemIcon)); i >= 0; i--)
+            if (itemIcon != items.get(i) && isValid.test(items.get(i))) return items.get(i);
+        for (int i = items.size() - 1; i >= Math.max(0,items.indexOf(itemIcon)); i--)
+            if (itemIcon != items.get(i) && isValid.test(items.get(i))) return items.get(i);
         return ItemStack.EMPTY;
     }
     public ItemStack nextItem(List<ItemStack> itemStacks) {
@@ -163,7 +165,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
         return hasItem(itemIcon);
     }
     protected boolean hasItem(ItemStack stack) {
-        return !stack.isEmpty() && minecraft.player.getInventory().items.stream().filter(s-> FactoryItemUtil.equalItems(s,stack)).mapToInt(ItemStack::getCount).sum() >= stack.getCount();
+        return !stack.isEmpty() && minecraft.player.getInventory()./*? if <1.21.5 {*/items/*?} else {*//*getNonEquipmentItems()*//*?}*/.stream().filter(s-> FactoryItemUtil.equalItems(s,stack)).mapToInt(ItemStack::getCount).sum() >= stack.getCount();
     }
     @Override
     public void renderItem(GuiGraphics graphics, int i, int j, float f) {

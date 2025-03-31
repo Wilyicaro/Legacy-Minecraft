@@ -38,8 +38,10 @@ import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryItemUtil;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.PagedList;
 import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyCreativeTabListing;
@@ -165,7 +167,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
     @Override
     protected void init() {
         super.init();
-        if (!this.minecraft.gameMode.hasInfiniteItems()) {
+        if (!Legacy4JClient.playerHasInfiniteMaterials()) {
             minecraft.setScreen(new InventoryScreen(minecraft.player));
             return;
         }
@@ -234,12 +236,12 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
             if (scroll.get() > 0)
                 scrollRenderer.renderScroll(guiGraphics,ScreenDirection.UP, 0, -11);
         }else FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,0.5f);
-        RenderSystem.enableBlend();
+        FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0,13,135);
         guiGraphics.pose().translate(-2f, -1f + (scroll.max > 0 ? scroll.get() * 121.5f / scroll.max : 0), 0f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
         FactoryGuiGraphics.of(guiGraphics).clearColor();
-        RenderSystem.disableBlend();
+        FactoryScreenUtil.disableBlend();
         guiGraphics.pose().popPose();
         this.renderTooltip(guiGraphics, i, j);
         //? if >=1.21.2 {

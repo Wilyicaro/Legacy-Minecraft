@@ -37,7 +37,7 @@ void main() {
     );
 
     if (floor(texCoord.x * 16) < 15) {
-        color *= BlockLightColor;
+        color = color * BlockLightColor;
     }
 
     if (UseBrightLightmap != 0) {

@@ -1,5 +1,6 @@
 package wily.legacy;
 
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.datafixers.util.Pair;
@@ -20,8 +21,11 @@ import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.*;
+//? if <1.21.5 {
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+//?} else {
+/*import net.minecraft.client.renderer.block.model.BlockStateModel;
+*///?}
 import net.minecraft.core.*;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.monster.Ghast;
@@ -160,14 +164,13 @@ public class Legacy4JClient {
     public static final LeaderboardsScreen.Manager leaderBoardListingManager = new LeaderboardsScreen.Manager();
     public static final HowToPlayScreen.Manager howToPlaySectionManager = new HowToPlayScreen.Manager();
 
-    public static final ControllerManager controllerManager = new ControllerManager(Minecraft.getInstance());
-    public static final Map<Block, ModelResourceLocation> fastLeavesModels = new HashMap<>();
+    public static ControllerManager controllerManager = new ControllerManager();
+    public static final Map<Block, ResourceLocation> fastLeavesModels = new HashMap<>();
     public static KnownListing<Block> knownBlocks;
     public static KnownListing<EntityType<?>> knownEntities;
     public static GameType defaultServerGameType;
     public static GameRules gameRules;
     public static Consumer<ServerPlayer> serverPlayerJoinConsumer;
-    private static final List<ItemStack> lastArmorSlots = new ArrayList<>();
     public static final FactoryConfig.StorageHandler MIXIN_CONFIGS_STORAGE = FactoryConfig.StorageHandler.fromMixin(LegacyMixinOptions.CLIENT_MIXIN_STORAGE, false);
     //? if <1.21.2 {
     public static PostChain gammaEffect;
@@ -196,6 +199,7 @@ public class Legacy4JClient {
         float b = ((playerIdentifier.color() & 255) * (0.8f + (i%17) /34f)) / 255f;
         return new float[]{r,g,b};
     }
+
     public static void updateLegacyPlayerInfos(Map<UUID, LegacyPlayerInfo> map){
         Minecraft minecraft = Minecraft.getInstance();
         map.forEach((s,i)->{
@@ -233,6 +237,10 @@ public class Legacy4JClient {
 
     public static boolean isCurrentWorldSource(LevelStorageSource.LevelStorageAccess storageSource){
         return storageSource.getDimensionPath(Level.OVERWORLD).getParent().equals(Legacy4JClient.currentWorldSource.getBaseDir());
+    }
+
+    public static boolean playerHasInfiniteMaterials(){
+        return /*? if <1.21.5 {*/Minecraft.getInstance().gameMode.hasInfiniteItems()/*?} else {*//*Minecraft.getInstance().player.hasInfiniteMaterials()*//*?}*/;
     }
 
     public static void saveLevel(LevelStorageSource.LevelStorageAccess storageSource){
@@ -305,16 +313,7 @@ public class Legacy4JClient {
             lastControlType = activeControlType;
         }
         if (minecraft.screen instanceof ReplaceableScreen r && r.canReplace()) minecraft.setScreen(r.getReplacement());
-        if (minecraft.player != null){
-            if (!lastArmorSlots.equals(minecraft.player.getInventory().armor)){
-                if (!lastArmorSlots.isEmpty()){
-                    ScreenUtil.animatedCharacterTime = Util.getMillis();
-                    ScreenUtil.remainingAnimatedCharacterTime = 1500;
-                }
-                lastArmorSlots.clear();
-                lastArmorSlots.addAll(minecraft.player.getInventory().armor);
-            }
-        }
+
         if (LegacyOptions.unfocusedInputs.get()) minecraft.setWindowActive(true);
         while (keyCrafting.consumeClick()){
             if (minecraft.player != null && (minecraft.player.isCreative() || minecraft.player.isSpectator())) {
@@ -343,8 +342,17 @@ public class Legacy4JClient {
         while ((left=keyCycleHeldLeft.consumeClick()) || keyCycleHeldRight.consumeClick()){
             if (minecraft.player != null) {
                 if (minecraft.player.isSpectator()) {
-                    if (minecraft.gui.getSpectatorGui().isMenuActive()) minecraft.gui.getSpectatorGui().onMouseScrolled(left ? -1 : 1);
-                } else /*? if <1.21.2 {*/minecraft.player.getInventory().swapPaint(left ? 1 : -1)/*?} else {*/ /*minecraft.player.getInventory().setSelectedHotbarSlot(Stocker.cyclic(0, minecraft.player.getInventory().selected + (left ? -1 : 1),9))*//*?}*/;
+                    if (minecraft.gui.getSpectatorGui().isMenuActive())
+                        minecraft.gui.getSpectatorGui().onMouseScrolled(left ? -1 : 1);
+                } else {
+                    //? if <1.21.2 {
+                    minecraft.player.getInventory().swapPaint(left ? 1 : -1);
+                    //?} else if <1.21.5 {
+                    /*minecraft.player.getInventory().setSelectedHotbarSlot(Stocker.cyclic(0, minecraft.player.getInventory().selected + (left ? -1 : 1), 9));
+                    *///?} else {
+                    /*minecraft.player.getInventory().setSelectedSlot(Stocker.cyclic(0, minecraft.player.getInventory().getSelectedSlot() + (left ? -1 : 1), 9));
+                    *///?}
+                }
             }
         }
 
@@ -401,12 +409,6 @@ public class Legacy4JClient {
     }
 
     public static void init() {
-        knownBlocks = new KnownListing<>(BuiltInRegistries.BLOCK,Minecraft.getInstance().gameDirectory.toPath());
-        knownEntities = new KnownListing<>(BuiltInRegistries.ENTITY_TYPE,Minecraft.getInstance().gameDirectory.toPath());
-        currentWorldSource = LevelStorageSource.createDefault(Minecraft.getInstance().gameDirectory.toPath().resolve("current-world"));
-        MCAccount.loadAll();
-        FactoryOptions.NEAREST_MIPMAP_SCALING.set(true);
-        FactoryOptions.RANDOM_BLOCK_ROTATIONS.set(false);
         ControlType.UpdateEvent.EVENT.register((last, actual)->{
             UIAccessor uiAccessor = Minecraft.getInstance().screen == null ? FactoryScreenUtil.getGuiAccessor() : FactoryScreenUtil.getScreenAccessor();
             uiAccessor.reloadUI();
@@ -437,11 +439,17 @@ public class Legacy4JClient {
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES,leaderBoardListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES,howToPlaySectionManager);
         FactoryAPIClient.setup(m->{
+            MCAccount.loadAll();
+            controllerManager.setup(m);
+            FactoryOptions.NEAREST_MIPMAP_SCALING.set(true);
+            FactoryOptions.RANDOM_BLOCK_ROTATIONS.set(false);
+            knownBlocks = new KnownListing<>(BuiltInRegistries.BLOCK,m.gameDirectory.toPath());
+            knownEntities = new KnownListing<>(BuiltInRegistries.ENTITY_TYPE,m.gameDirectory.toPath());
+            currentWorldSource = LevelStorageSource.createDefault(m.gameDirectory.toPath().resolve("current-world"));
             ControllerBinding.setupDefaultBindings(m);
             LegacyOptions.CLIENT_STORAGE.load();
             FactoryAPIClient.registerRenderType(RenderType.cutoutMipped(), SHRUB.get());
             FactoryAPIClient.registerRenderType(RenderType.translucent(), Blocks.WATER);
-            controllerManager.setup();
             //? if fabric
             if (FactoryAPI.isModLoaded("modmenu")) ModMenuCompat.init();
             //? if fabric || >=1.21 && neoforge {
@@ -458,7 +466,7 @@ public class Legacy4JClient {
             UIAccessor accessor = FactoryScreenUtil.getGuiAccessor();
             FactoryGuiElement.HOTBAR.pre().register(guiGraphics -> {
                 ScreenUtil.renderAnimatedCharacter(guiGraphics);
-                int newSelection = Minecraft.getInstance().player != null ? Minecraft.getInstance().player.getInventory().selected : -1;
+                int newSelection = Minecraft.getInstance().player != null ? Minecraft.getInstance().player.getInventory()./*? if <1.21.5 {*/selected/*?} else {*//*getSelectedSlot()*//*?}*/ : -1;
                 if (ScreenUtil.lastHotbarSelection >= 0 && ScreenUtil.lastHotbarSelection != newSelection) ScreenUtil.lastHotbarSelectionChange = Util.getMillis();
                 ScreenUtil.lastHotbarSelection = newSelection;
                 if (ColorUtil.getAlpha(FactoryGuiElement.HOTBAR.getColor(accessor)) < 1.0)
@@ -530,19 +538,19 @@ public class Legacy4JClient {
                 return -1;
             }, Blocks.WATER_CAULDRON);
         });
-        fastLeavesModels.put(Blocks.OAK_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_oak_leaves")));
-        fastLeavesModels.put(Blocks.SPRUCE_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_spruce_leaves")));
-        fastLeavesModels.put(Blocks.BIRCH_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_birch_leaves")));
-        fastLeavesModels.put(Blocks.JUNGLE_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_jungle_leaves")));
-        fastLeavesModels.put(Blocks.ACACIA_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_acacia_leaves")));
-        fastLeavesModels.put(Blocks.CHERRY_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_cherry_leaves")));
-        fastLeavesModels.put(Blocks.DARK_OAK_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_dark_oak_leaves")));
-        fastLeavesModels.put(Blocks.MANGROVE_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_mangrove_leaves")));
+        fastLeavesModels.put(Blocks.OAK_LEAVES, FactoryAPI.createVanillaLocation("fast_oak_leaves"));
+        fastLeavesModels.put(Blocks.SPRUCE_LEAVES, FactoryAPI.createVanillaLocation("fast_spruce_leaves"));
+        fastLeavesModels.put(Blocks.BIRCH_LEAVES, FactoryAPI.createVanillaLocation("fast_birch_leaves"));
+        fastLeavesModels.put(Blocks.JUNGLE_LEAVES, FactoryAPI.createVanillaLocation("fast_jungle_leaves"));
+        fastLeavesModels.put(Blocks.ACACIA_LEAVES, FactoryAPI.createVanillaLocation("fast_acacia_leaves"));
+        fastLeavesModels.put(Blocks.CHERRY_LEAVES, FactoryAPI.createVanillaLocation("fast_cherry_leaves"));
+        fastLeavesModels.put(Blocks.DARK_OAK_LEAVES, FactoryAPI.createVanillaLocation("fast_dark_oak_leaves"));
+        fastLeavesModels.put(Blocks.MANGROVE_LEAVES, FactoryAPI.createVanillaLocation("fast_mangrove_leaves"));
         //? if >=1.21.2 {
-        /*fastLeavesModels.put(Blocks.PALE_OAK_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_pale_oak_leaves")));
+        /*fastLeavesModels.put(Blocks.PALE_OAK_LEAVES, FactoryAPI.createVanillaLocation("fast_pale_oak_leaves"));
         *///?}
-        fastLeavesModels.put(Blocks.AZALEA_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_azalea_leaves")));
-        fastLeavesModels.put(Blocks.FLOWERING_AZALEA_LEAVES, FactoryAPIClient.createModelLocation(FactoryAPI.createVanillaLocation("fast_flowering_azalea_leaves")));
+        fastLeavesModels.put(Blocks.AZALEA_LEAVES, FactoryAPI.createVanillaLocation("fast_azalea_leaves"));
+        fastLeavesModels.put(Blocks.FLOWERING_AZALEA_LEAVES, FactoryAPI.createVanillaLocation("fast_flowering_azalea_leaves"));
 
         FactoryAPIClient.registerExtraModels(register-> fastLeavesModels.values().forEach(register));
 
@@ -632,10 +640,7 @@ public class Legacy4JClient {
         //? if forge || neoforge {
         /*FactoryAPIPlatform.getModEventBus().addListener(EventPriority.NORMAL,false, RegisterPresetEditorsEvent.class, e->Legacy4JClient.VANILLA_PRESET_EDITORS.forEach(((o, presetEditor) -> o.ifPresent(worldPresetResourceKey -> e.register(worldPresetResourceKey, presetEditor)))));
         *///?}
-        FactoryAPIClient.PlayerEvent.DISCONNECTED_EVENT.register(p->{
-            lastArmorSlots.clear();
-            PackAlbum.applyDefaultResourceAlbum();
-        });
+        FactoryAPIClient.PlayerEvent.DISCONNECTED_EVENT.register(p-> PackAlbum.applyDefaultResourceAlbum());
         FactoryAPIClient.registerConfigScreen(FactoryAPIPlatform.getModInfo(MOD_ID),Legacy4JSettingsScreen::new);
         FactoryAPIClient.registerDefaultConfigScreen("minecraft", s-> new OptionsScreen(s, Minecraft.getInstance().options));
     }
@@ -650,7 +655,7 @@ public class Legacy4JClient {
 
     public static void buildLegacySkyDisc(VertexConsumer consumer, float f) {
         for(int k = -384; k <= 384; k += 64) {
-            for(int l = -384; l <= 384; l += 64) {
+            for(int l = -256; l <= 384; l += 64) {
                 float g = (float)k;
                 float f1 = (float)(k + 64);
                 //? if <1.20.5 {
@@ -668,7 +673,7 @@ public class Legacy4JClient {
         }
     }
 
-    public static BakedModel getFastLeavesModelReplacement(BlockGetter blockGetter, BlockPos pos, BlockState blockState, BakedModel model){
+    public static /*? if <1.21.5 {*/BakedModel/*?} else {*//*BlockStateModel*//*?}*/ getFastLeavesModelReplacement(BlockGetter blockGetter, BlockPos pos, BlockState blockState, /*? if <1.21.5 {*/BakedModel/*?} else {*//*BlockStateModel*//*?}*/ model){
         boolean fastGraphics = Minecraft.getInstance().options.graphicsMode().get() == GraphicsStatus.FAST;
         if (LegacyOptions.fastLeavesCustomModels.get() && blockState.getBlock() instanceof LeavesBlock && fastLeavesModels.containsKey(blockState.getBlock()) && (fastGraphics || LegacyOptions.fastLeavesWhenBlocked.get())){
             if (!fastGraphics && blockGetter != null) {
@@ -680,7 +685,7 @@ public class Legacy4JClient {
                     }
                 }
             }
-            return FactoryAPIClient.getModel(fastLeavesModels.get(blockState.getBlock()));
+            return FactoryAPIClient.getExtraModel(fastLeavesModels.get(blockState.getBlock()));
         }
         return model;
     }

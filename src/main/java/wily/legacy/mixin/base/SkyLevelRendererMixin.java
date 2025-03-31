@@ -1,7 +1,17 @@
 package wily.legacy.mixin.base;
 
 //? if >=1.21.2 {
-/*import com.mojang.blaze3d.vertex.*;
+/*import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
+//? if >=1.21.5 {
+/^import com.mojang.blaze3d.pipeline.RenderPipeline;
+import wily.legacy.client.LegacyRenderPipelines;
+import com.mojang.blaze3d.buffers.GpuBuffer;
+import com.mojang.blaze3d.systems.RenderPass;
+^///?}
 import net.minecraft.client.renderer.SkyRenderer;
 *///?} else {
 import net.minecraft.client.renderer.LevelRenderer;
@@ -23,15 +33,37 @@ public class SkyLevelRendererMixin {
         return original - 0.05f;
     }
     //? if >=1.21.4 {
-    /*@ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/VertexBuffer;uploadStatic(Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;Lcom/mojang/blaze3d/vertex/VertexFormat;Ljava/util/function/Consumer;)Lcom/mojang/blaze3d/vertex/VertexBuffer;", ordinal = 1))
+    /*//? if <1.21.5 {
+    @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/VertexBuffer;uploadStatic(Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;Lcom/mojang/blaze3d/vertex/VertexFormat;Ljava/util/function/Consumer;)Lcom/mojang/blaze3d/vertex/VertexBuffer;", ordinal = 1))
     private VertexFormat.Mode changeLightSkyMode(VertexFormat.Mode par1){
         return LegacyOptions.legacySkyShape.get() ? VertexFormat.Mode.QUADS : par1;
     }
-
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/VertexBuffer;uploadStatic(Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;Lcom/mojang/blaze3d/vertex/VertexFormat;Ljava/util/function/Consumer;)Lcom/mojang/blaze3d/vertex/VertexBuffer;", ordinal = 2))
     private VertexFormat.Mode changeDarkSkyMode(VertexFormat.Mode par1){
         return LegacyOptions.legacySkyShape.get() ? VertexFormat.Mode.QUADS : par1;
     }
+    //?} else {
+
+    /^@ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/ByteBufferBuilder;<init>(I)V"))
+    private int changeSkyBufferVertexCount(int vertices){
+        return LegacyOptions.legacySkyShape.get() ? 576 * DefaultVertexFormat.POSITION.getVertexSize() : vertices;
+    }
+
+    @WrapOperation(method = {"renderDarkDisc", "renderSkyDisc"}, at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;draw(II)V", remap = false))
+    private void changeSkyRenderVertexCount(RenderPass instance, int i, int size, Operation<Void> original, @Local RenderPass renderPass){
+        if (LegacyOptions.legacySkyShape.get()){
+            RenderSystem.AutoStorageIndexBuffer autoStorageIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
+            GpuBuffer gpuBuffer = autoStorageIndexBuffer.getBuffer(864);
+            instance.setIndexBuffer(gpuBuffer, autoStorageIndexBuffer.type());
+            instance.drawIndexed(0, 864);
+        }else original.call(instance, i, size);
+    }
+
+    @ModifyArg(method = {"renderDarkDisc", "renderSkyDisc"}, at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setPipeline(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)V", remap = false))
+    private RenderPipeline changeSkyRenderPipeline(RenderPipeline renderPipeline){
+        return LegacyOptions.legacySkyShape.get() ? LegacyRenderPipelines.LEGACY_SKY : renderPipeline;
+    }
+    ^///?}
 
     @Inject(method = "buildSkyDisc", at = @At("HEAD"), cancellable = true)
     private void buildSkyDisc(VertexConsumer vertexConsumer, float f, CallbackInfo ci) {

@@ -34,7 +34,7 @@ public class PistonBaseBlockMixin {
             }
             if (!level.isClientSide()) {
                 if (be instanceof RandomizableContainerBlockEntity r) r.unpackLootTable(null);
-                Clearable.tryClear(be);
+                if (be instanceof Clearable clearable) clearable.clearContent();
             }
         }
         return movingBe;

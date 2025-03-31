@@ -35,7 +35,9 @@ import wily.legacy.util.ScreenUtil;
 public abstract class AdvancementToastMixin implements Toast, AdvancementToastAccessor {
     @Unique
     int width = 82;
+    //? if <1.21.5 {
     @Shadow private boolean playedSound;
+    //?}
 
     @Shadow @Final private /*? if >1.20.1 {*/AdvancementHolder/*?} else {*//*Advancement*//*?}*/ advancement;
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
@@ -59,13 +61,14 @@ public abstract class AdvancementToastMixin implements Toast, AdvancementToastAc
             guiGraphics.pose().scale(1.5f,1.5f,1.5f);
             guiGraphics.drawString(font, displayInfo.getTitle(), 0, 0, -1);
             guiGraphics.pose().popPose();
-
+            //? if <1.21.5 {
             if (!this.playedSound && l > 0L) {
                 this.playedSound = true;
                 if (displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/() == /*? if >1.20.1 {*/AdvancementType/*?} else {*//*FrameType*//*?}*/.CHALLENGE) {
                     Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, 1.0f, 1.0f));
                 }
             }
+            //?}
             ScreenUtil.renderLocalPlayerHead(guiGraphics,7, (height() - 32) / 2, 32);
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,width() - 38,(height() - 28) / 2,28,28);
             guiGraphics.renderItem(displayInfo.getIcon(), width() - 32, (height() - 16) / 2);

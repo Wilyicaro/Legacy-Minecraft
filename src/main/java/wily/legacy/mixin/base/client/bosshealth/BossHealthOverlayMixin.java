@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyIconHolder;
@@ -54,13 +55,13 @@ public abstract class BossHealthOverlayMixin {
     @Inject(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At("HEAD"))
     private void drawBar(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, CallbackInfo ci) {
         guiGraphics.pose().pushPose();
-        RenderSystem.enableBlend();
+        FactoryScreenUtil.enableBlend();
         guiGraphics.pose().translate((guiGraphics.guiWidth() - 203) / 2f,j,0);
         guiGraphics.pose().scale(0.5f,0.5f,0.5f);
     }
     @Inject(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At("RETURN"))
     private void drawBarReturn(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, CallbackInfo ci) {
-        RenderSystem.disableBlend();
+        FactoryScreenUtil.disableBlend();
         guiGraphics.pose().popPose();
     }
     //? if >1.20.1 {
@@ -99,9 +100,9 @@ public abstract class BossHealthOverlayMixin {
     private void drawBar(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, int k, ResourceLocation[] resourceLocations, ResourceLocation[] resourceLocations2) {
         FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocations[bossEvent.getColor().ordinal()], k <= 400 ? 400 : 406, 15, 0, 0, i, j, k, 15);
         if (bossEvent.getOverlay() != BossEvent.BossBarOverlay.PROGRESS) {
-            RenderSystem.enableBlend();
+            FactoryScreenUtil.enableBlend();
             FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocations2[bossEvent.getOverlay().ordinal() - 1], k <= 400 ? 400 : 406, 15, 0, 0, i, j, k, 15);
-            RenderSystem.disableBlend();
+            FactoryScreenUtil.disableBlend();
         }
 
     }

@@ -19,6 +19,7 @@ import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
@@ -120,9 +121,9 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
                 return;
             }
             ControlTooltip.Icon icon = getIcon();
-            RenderSystem.enableBlend();
+            FactoryScreenUtil.enableBlend();
             icon.render(guiGraphics, getX() + width - 20 - icon.render(guiGraphics,0,0,false,true) / 2, getY() + (height -  font.lineHeight) / 2 + 1,false,false);
-            RenderSystem.disableBlend();
+            FactoryScreenUtil.disableBlend();
         }
 
         private boolean isPressed(){

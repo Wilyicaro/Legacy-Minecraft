@@ -93,7 +93,11 @@
     "FontMixin",
     "FrustumMixin",
     "GameRendererMixin",
+    //? if <1.21.5 {
     "GLStateManagerMixin",
+    //?} else {
+    /*"SectionCompilerMixin",
+    *///?}
     "GlyphInfoMixin",
     "client.grindstone.GrindstoneScreenMixin",
     "GuiGameRendererMixin",
@@ -164,17 +168,21 @@
     "MenuScreensMixin",
     "MultiplayerGameModeMixin",
     "CameraMixin",
+    //? if <1.21.5 {
     "BlockRenderDispatcherMixin",
+    //?}
     "MouseHandlerAccessor",
     "LevelRendererMixin",
     "TutorialMixin",
     "LogoRendererMixin",
-    "LightTextureMixin"
+    "LightTextureMixin",
+    "RenderSystemMixin",
+    "CompositeRenderTypeAccessor",
+    "ClientInventoryMixin"
   ],
   "mixins": [
     //? if <1.20.5 {
     /*"MerchantOffersMixin",
-    "ItemMixin",
     "RecordItemMixin",
     *///?}
     //? if <1.21.2 {
@@ -189,6 +197,7 @@
     /*"AttributeUtilMixin",
     "IAttributeExtensionMixin",
     *///?}
+    "ItemMixin",
     "AbstractContainerMenuMixin",
     "AbstractMinecartMixin",
     "AbstractVillagerMixin",
@@ -235,7 +244,6 @@
     "FireworkStarRecipeAccessor",
     "FireworkRocketRecipeAccessor",
     "ThrownTridentMixin",
-    "SwordItemMixin",
     "client.chat.ChatFormattingMixin",
     "ChangeDimensionTriggerMixin",
     "EnchantmentMixin",

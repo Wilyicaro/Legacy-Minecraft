@@ -1,3 +1,4 @@
+//? if <1.21.5 {
 package wily.legacy.mixin.base;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -30,3 +31,4 @@ public class BlockRenderDispatcherMixin {
     //?}
 
 }
+//?}

@@ -37,6 +37,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.network.CommonNetwork;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
@@ -60,6 +61,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
     protected int statsInScreen = 0;
     protected int lastStatsInScreen = 0;
     protected int page = 0;
+    protected int updateTimer = 0;
     public static final Component RANK = Component.translatable("legacy.menu.leaderboard.rank");
     public static final Component USERNAME = Component.translatable("legacy.menu.leaderboard.username");
     public static final Component OVERALL = Component.translatable("legacy.menu.leaderboard.filter.overall");
@@ -95,9 +97,11 @@ public class LeaderboardsScreen extends PanelVListScreen {
             });
         }
     }
+
     public int changedPage(int count){
         return Math.max(0,(page + count) >= statsBoards.get(selectedStatBoard).renderables.size() ? page : page + count);
     }
+
     public void changeStatBoard(boolean left){
         int initialSelectedStatBoard = selectedStatBoard;
         while (selectedStatBoard != (selectedStatBoard = Stocker.cyclic(0,selectedStatBoard + (left ? -1 : 1), statsBoards.size())) && selectedStatBoard != initialSelectedStatBoard){
@@ -109,6 +113,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
             }
         }
     }
+
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (i == InputConstants.KEY_X){
@@ -178,11 +183,15 @@ public class LeaderboardsScreen extends PanelVListScreen {
         }
     }
 
+
     @Override
-    protected void init() {
-        if (FactoryAPIClient.hasModOnServer) CommonNetwork.sendToServer(PlayerInfoSync.askAll(minecraft.player));
-        else minecraft.getConnection().send(new ServerboundClientCommandPacket(ServerboundClientCommandPacket.Action.REQUEST_STATS));
-        super.init();
+    public void tick() {
+        super.tick();
+        if (updateTimer <= 0){
+            updateTimer = 20;
+            if (FactoryAPIClient.hasModOnServer) CommonNetwork.sendToServer(PlayerInfoSync.askAll(minecraft.player));
+            else minecraft.getConnection().send(new ServerboundClientCommandPacket(ServerboundClientCommandPacket.Action.REQUEST_STATS));
+        } else updateTimer--;
     }
 
     @Override
@@ -231,7 +240,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
                     statsInScreen++;
                     totalWidth = newWidth;
                 }
-                RenderSystem.enableBlend();
+                FactoryScreenUtil.enableBlend();
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(panel.x + (panel.width - 211) / 2f, panel.y - 12,0);
                 guiGraphics.pose().scale(0.5f,0.5f,0.5f);
@@ -241,7 +250,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
                     pageControl.render(guiGraphics,422 - pageControl.render(guiGraphics,0,0,false,true) - 8, 0,false,false);
                 }
                 guiGraphics.pose().popPose();
-                RenderSystem.disableBlend();
+                FactoryScreenUtil.disableBlend();
                 if (statsInScreen == 0) return;
                 int x = (351 - totalWidth) / (statsInScreen + 1);
                 Integer hovered = null;

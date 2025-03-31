@@ -16,6 +16,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyTip;
@@ -86,7 +87,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
     //?}
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        RenderSystem.disableDepthTest();
+        FactoryScreenUtil.disableDepthTest();
         //? if <=1.20.1
         /*ScreenUtil.renderDefaultBackground(accessor, guiGraphics, true, true, false);*/
         super.render(guiGraphics, i, j, f);
@@ -123,7 +124,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
                 guiGraphics.pose().popPose();
             });
         }
-        RenderSystem.enableDepthTest();
+        FactoryScreenUtil.enableDepthTest();
     }
 
     public static LegacyLoadingScreen getDimensionChangeScreen(ClientLevel lastLevel, ClientLevel newLevel){

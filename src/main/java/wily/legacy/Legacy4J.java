@@ -28,9 +28,12 @@ import net.minecraft.world.ItemInteractionResult;
 //?}
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.alchemy.Potion;
 //? if >=1.20.5 {
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -90,6 +93,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
@@ -313,7 +317,7 @@ public class Legacy4J {
                 return level.isClientSide ? successInteraction() : consumeInteraction();
             });
         }
-
+        //? if <1.21.5 {
         DispenserBlock.registerBehavior(Blocks.TNT, new OptionalDispenseItemBehavior() {
             @Override
             protected ItemStack execute(BlockSource blockSource, ItemStack itemStack) {
@@ -332,6 +336,7 @@ public class Legacy4J {
                 if (isSuccess()) super.playAnimation(blockSource, direction);
             }
         });
+        //?}
         DefaultDispenseItemBehavior defaultDispenseItemBehavior = new DefaultDispenseItemBehavior() {
             public ItemStack execute(BlockSource blockSource, ItemStack itemStack) {
                 Direction direction = blockSource./*? if >1.20.1 {*/state/*?} else {*//*getBlockState*//*?}*/().getValue(DispenserBlock.FACING);
@@ -390,9 +395,9 @@ public class Legacy4J {
 
     public static float getItemDamageModifier(ItemStack stack){
         if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat)){
-            if (stack.getItem() instanceof SwordItem) return 1;
+            if (stack.is(ItemTags.SWORDS)) return 1;
             else if (stack.getItem() instanceof ShovelItem) return -0.5f;
-            else if (stack.getItem() instanceof PickaxeItem) return 1;
+            else if (stack.is(ItemTags.PICKAXES)) return 1;
             else if (stack.getItem() instanceof AxeItem) {
                 if (stack.is(Items.STONE_AXE)) return -4;
                 else if (stack.is(Items.DIAMOND_AXE) || stack.is(Items.NETHERITE_AXE)) return -2;
@@ -473,10 +478,10 @@ public class Legacy4J {
         if (dyeableLeatherItem != null) dyeableLeatherItem.setColor(itemStack, mixColors(colors.iterator()));
         *///?} else {
         DyedItemColor dyedItemColor = itemStack.get(DataComponents.DYED_COLOR);
-        boolean bl = dyedItemColor == null || dyedItemColor.showInTooltip();
+        /*? if <1.21.5 {*/boolean bl = dyedItemColor == null || dyedItemColor.showInTooltip();/*?}*/
         if (dyedItemColor != null) colors.add(color);
         colors.add(color);
-        itemStack.set(DataComponents.DYED_COLOR, new DyedItemColor(mixColors(colors.iterator()), bl));
+        itemStack.set(DataComponents.DYED_COLOR, new DyedItemColor(mixColors(colors.iterator())/*? if <1.21.5 {*/, bl/*?}*/));
         //?}
         return itemStack;
     }
@@ -523,6 +528,14 @@ public class Legacy4J {
         return beTag == null ? 0 : beTag.contains("Patterns") ? beTag.getList("Patterns",10).size() : -1;
         *///?} else
         return stack.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY).layers().size();
+    }
+
+    public static boolean anyArmorSlotMatch(Inventory inventory, Predicate<ItemStack> predicate){
+        //? if <1.21.5 {
+        return inventory.armor.stream().anyMatch(predicate);
+        //?} else {
+        /*return Inventory.EQUIPMENT_SLOT_MAPPING.int2ObjectEntrySet().stream().anyMatch(e-> e.getValue() != EquipmentSlot.OFFHAND && predicate.test(inventory.getItem(e.getIntKey())));
+        *///?}
     }
 
     public static void onServerPlayerJoin(ServerPlayer p){

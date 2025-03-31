@@ -18,6 +18,7 @@ import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
@@ -70,9 +71,9 @@ public class CreationList extends RenderableVList{
             protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                 super.renderWidget(guiGraphics, i, j, f);
                 if (!list.accessor.getBoolean("allowButtonsWithIcons",true)) return;
-                RenderSystem.enableBlend();
+                FactoryScreenUtil.enableBlend();
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + 5, getY() + 5, 20, 20);
-                RenderSystem.disableBlend();
+                FactoryScreenUtil.disableBlend();
                 if (Minecraft.getInstance().options.touchscreen().get().booleanValue() || isHovered) {
                     guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
                 }

@@ -13,7 +13,7 @@ import java.util.*;
 
 public interface RecipeMenu {
     static void handleCompactInventoryList(Collection<ItemStack> compactList, Inventory inventory, ItemStack carriedItem){
-        handleCompactItemStackList(compactList,inventory.items);
+        handleCompactItemStackList(compactList,inventory./*? if <1.21.5 {*/items/*?} else {*//*getNonEquipmentItems()*//*?}*/);
         if (!carriedItem.isEmpty()) handleCompactItemStackListAdd(compactList,carriedItem);
     }
     static void handleCompactItemStackList(Collection<ItemStack> compactList, Iterable<ItemStack> items){

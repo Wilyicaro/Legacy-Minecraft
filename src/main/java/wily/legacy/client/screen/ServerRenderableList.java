@@ -42,6 +42,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
@@ -138,9 +139,9 @@ public class ServerRenderableList extends RenderableVList {
         }
     }
     public static void drawIcon(GuiGraphics guiGraphics, int i, int j, ResourceLocation resourceLocation) {
-        RenderSystem.enableBlend();
+        FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).blit(resourceLocation, i + 5, j + 5, 0.0f, 0.0f, 20, 20, 20, 20);
-        RenderSystem.disableBlend();
+        FactoryScreenUtil.disableBlend();
     }
     public void updateServers(){
         renderables.clear();

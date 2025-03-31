@@ -24,6 +24,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.base.network.CommonNetwork;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
@@ -55,7 +56,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     protected float alpha = getDefaultOpacity();
     protected boolean shouldFade = false;
 
-    public static final List<GameRules.Key<GameRules.BooleanValue>> WORLD_RULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK,LegacyGameRules.TNT_EXPLODES,GameRules.RULE_DAYLIGHT,GameRules.RULE_KEEPINVENTORY,GameRules.RULE_DOMOBSPAWNING,GameRules.RULE_MOBGRIEFING,LegacyGameRules.GLOBAL_MAP_PLAYER_ICON,LegacyGameRules.LEGACY_SWIMMING));
+    public static final List<GameRules.Key<GameRules.BooleanValue>> WORLD_RULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK,LegacyGameRules.getTntExplodes(),GameRules.RULE_DAYLIGHT,GameRules.RULE_KEEPINVENTORY,GameRules.RULE_DOMOBSPAWNING,GameRules.RULE_MOBGRIEFING,LegacyGameRules.GLOBAL_MAP_PLAYER_ICON,LegacyGameRules.LEGACY_SWIMMING));
     public static final List<GameRules.Key<GameRules.BooleanValue>> OTHER_RULES = new ArrayList<>(List.of(GameRules.RULE_WEATHER_CYCLE,GameRules.RULE_DOMOBLOOT,GameRules.RULE_DOBLOCKDROPS,GameRules.RULE_NATURAL_REGENERATION,GameRules.RULE_DO_IMMEDIATE_RESPAWN));
 
     public HostOptionsScreen(Component title) {
@@ -156,9 +157,9 @@ public class HostOptionsScreen extends PanelVListScreen {
         LegacyPlayerInfo info = (LegacyPlayerInfo)Minecraft.getInstance().getConnection().getPlayerInfo(profile.getId());
         float[] color = Legacy4JClient.getVisualPlayerColor(info);
         FactoryGuiGraphics.of(guiGraphics).setColor(color[0],color[1],color[2],1.0f);
-        RenderSystem.enableBlend();
+        FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(PlayerIdentifier.of(info.getIdentifierIndex()).optionsMapSprite(),x,y, 20,20);
-        RenderSystem.disableBlend();
+        FactoryScreenUtil.disableBlend();
         FactoryGuiGraphics.of(guiGraphics).clearColor();
     }
 
@@ -350,9 +351,9 @@ public class HostOptionsScreen extends PanelVListScreen {
         alpha = Mth.lerp(f * 0.1f, oldAlpha, shouldFade ? 1.0f : getDefaultOpacity());
         shouldFade = false;
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f, alpha);
-        RenderSystem.enableBlend();
+        FactoryScreenUtil.enableBlend();
         panel.render(guiGraphics,i,j,f);
-        RenderSystem.disableBlend();
+        FactoryScreenUtil.disableBlend();
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,1.0f);
         guiGraphics.drawString(font,title,panel.x + 11, panel.y + 8, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }

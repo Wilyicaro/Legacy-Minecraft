@@ -19,6 +19,7 @@ import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.PagedList;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
@@ -123,14 +124,14 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_HIGHLIGHT, getX(), getY(), 41, 41);
                 guiGraphics.pose().popPose();
             }
-            RenderSystem.enableBlend();
+            FactoryScreenUtil.enableBlend();
             if (!isUnlocked()) FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 0.5f);
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL, getX(), getY(), getWidth(), getHeight());
-            RenderSystem.disableDepthTest();
+            FactoryScreenUtil.disableDepthTest();
             if (!isUnlocked())
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PADLOCK, getX() + (getWidth() - 32) / 2, getY() + (getHeight() - 32) / 2, 32, 32);
-            RenderSystem.enableDepthTest();
-            RenderSystem.disableBlend();
+            FactoryScreenUtil.enableDepthTest();
+            FactoryScreenUtil.disableBlend();
             FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 1.0f);
             if (!isUnlocked()) return;
             guiGraphics.pose().pushPose();
@@ -161,12 +162,12 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         addRenderableOnly(((guiGraphics, i, j, f) ->{
             guiGraphics.drawString(font,showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle(),panel.x + (panel.width - font.width(showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle()))/ 2,panel.y + 10, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
             if (!displayInfos.isEmpty()) {
-                ResourceLocation background = displayInfos.get(tabList.selectedTab).getBackground()/*? if >1.20.1 {*/.orElse(null)/*?}*/;
+                ResourceLocation background = displayInfos.get(tabList.selectedTab).getBackground()/*? if >1.20.1 {*/.orElse(null)/*?}*//*? if >=1.21.5 {*//*.id()*//*?}*/;
                 if (background != null) FactoryGuiGraphics.of(guiGraphics).blit(background,panel.x + 14, panel.y + 24,0,0,422,23,16,16);
             }
             ScreenUtil.renderPanelTranslucentRecess(guiGraphics,panel.x + 12, panel.y + 22, 426, 27);
             if (getFocused() instanceof AdvancementButton a) guiGraphics.drawString(font,a.info.getTitle(),panel.x + (panel.width - font.width(a.info.getTitle()))/ 2,panel.y + 32,0xFFFFFF);
-            RenderSystem.disableBlend();
+            FactoryScreenUtil.disableBlend();
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 12, panel.y + 50, 426, 186);
         }));
         tabList.init(panel.x,panel.y - 37,panel.width,(b,i)->{

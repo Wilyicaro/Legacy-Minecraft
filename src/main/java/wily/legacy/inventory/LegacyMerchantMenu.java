@@ -47,12 +47,12 @@ public class LegacyMerchantMenu extends LegacyCraftingMenu {
     public void onCraft(Player player, ServerMenuCraftPayload packet, ItemStack result) {
         super.onCraft(player, packet, result);
         MerchantOffer offer = merchant.getOffers().get(packet.button());
-        offer.getResult().onCraftedBy(player.level(),player,offer.getResult().getCount());
+        offer.getResult().onCraftedBy(/*? if <1.21.5 {*/player.level(),/*?}*/player,offer.getResult().getCount());
         if (merchant instanceof LivingEntity e) e.playSound(merchant.getNotifyTradeSound(), 1.0f, e.getVoicePitch());
         merchant.notifyTrade(offer);
         player.awardStat(Stats.TRADED_WITH_VILLAGER);
         merchant.overrideXp(merchant.getVillagerXp() + offer.getXp());
-        player.sendMerchantOffers(containerId, merchant.getOffers(), merchant instanceof Villager v ? v.getVillagerData().getLevel() : 0, merchant.getVillagerXp(), merchant.showProgressBar(), merchant.canRestock());
+        player.sendMerchantOffers(containerId, merchant.getOffers(), merchant instanceof Villager v ? v.getVillagerData()./*? if <1.21.5 {*/getLevel/*?} else {*//*level*//*?}*/() : 0, merchant.getVillagerXp(), merchant.showProgressBar(), merchant.canRestock());
     }
 
     @Override

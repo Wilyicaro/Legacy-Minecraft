@@ -133,7 +133,7 @@ public class LegacyUIElementTypes {
             if (a.getBoolean(elementName+".hasBackground", true)) ScreenUtil.blitTranslucentOverlaySprite(guiGraphics, a.getResourceLocation(elementName+".backgroundSprite", LegacySprites.POINTER_PANEL), x, y, width, height );
             a.getElement(elementName, ScrollableRenderer.class).ifPresent(s-> s.render(guiGraphics, x + 11, y + 11, width - 22, height - 28, ()-> {
                 int yOffset = 0;
-                for (Renderable r : a.getElementValue(elementName+".renderables", a, UIAccessor.class).getRenderables()) {
+                for (Renderable r : a.getElementValue(elementName+".renderables", a, UIAccessor.class).getChildrenRenderables()) {
                     if (r instanceof LayoutElement e) {
                         e.setPosition(x + 11, y + 15 + yOffset);
                         r.render(guiGraphics, i, j + Math.round(s.getYOffset()), f);

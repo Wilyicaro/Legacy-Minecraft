@@ -1,7 +1,6 @@
 package wily.legacy.util;
 
 import com.google.common.collect.Ordering;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
@@ -13,13 +12,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.toasts.Toast;
-import net.minecraft.client.gui.screens.AccessibilityOnboardingScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.client.renderer.CubeMap;
 import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.client.renderer.PostChain;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.MobEffectTextureManager;
@@ -110,6 +106,11 @@ public class ScreenUtil {
     public static final Bearer<Integer> actualPlayerTabWidth = Bearer.of(0);
     public static final Bearer<Integer> actualPlayerTabHeight = Bearer.of(0);
 
+    public static void updateAnimatedCharacterTime(long remainingTime){
+        animatedCharacterTime = Util.getMillis();
+        remainingAnimatedCharacterTime = remainingTime;
+    }
+
     public static void renderPointerPanel(GuiGraphics graphics, int x, int y, int width, int height){
         blitTranslucentOverlaySprite(graphics, LegacySprites.POINTER_PANEL, x, y, width, height);
     }
@@ -121,26 +122,13 @@ public class ScreenUtil {
     }
 
     public static void blitTranslucentSprite(GuiGraphics graphics, ResourceLocation sprite, int x, int y, int width, int height){
-        RenderSystem.enableBlend();
+        FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(graphics).blitSprite(sprite, x, y, width,height);
-        RenderSystem.disableBlend();
+        FactoryScreenUtil.disableBlend();
     }
 
     public static void renderPanelTranslucentRecess(GuiGraphics graphics, int x, int y, int width, int height){
         blitTranslucentSprite(graphics, LegacySprites.PANEL_TRANSLUCENT_RECESS, x, y, width, height);
-    }
-
-    public static void renderTiles(ResourceLocation location,GuiGraphics graphics, int x, int y, int width, int height, float dp){
-        mc.getTextureManager().getTexture(GUI_ATLAS).bind();
-        GlStateManager._texParameter(3553, 10241, 9729);
-        //GlStateManager._texParameter(3553, 10240, 9729);
-        graphics.pose().pushPose();
-        graphics.pose().translate(x,y,0);
-        if (dp != 1.0)
-            graphics.pose().scale(1/dp,1/dp,1/dp);
-        FactoryGuiGraphics.of(graphics).blitSprite(location,0,0, (int) (width * dp), (int) (height * dp));
-        graphics.pose().popPose();
-        GlStateManager._texParameter(3553, 10241, 9728);
     }
 
     public static void drawAutoSavingIcon(GuiGraphics graphics,int x, int y) {
@@ -164,7 +152,7 @@ public class ScreenUtil {
     }
 
     public static boolean isVisualNight(){
-        return mc.level != null && mc.level.isNight();
+        return mc.level != null && mc.level./*? if <1.21.5 {*/isNight/*?} else {*//*isDarkOutside*//*?}*/();
     }
 
     public static void renderDefaultBackground(UIAccessor accessor, GuiGraphics guiGraphics, boolean forcePanorama, boolean title, boolean username){
@@ -180,19 +168,19 @@ public class ScreenUtil {
     }
 
     public static void renderLegacyLogo(GuiGraphics guiGraphics){
-        RenderSystem.enableBlend();
+        FactoryScreenUtil.enableBlend();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate((guiGraphics.guiWidth() - 285.5f) / 2, 30,0);
         guiGraphics.pose().scale(0.5f,0.5f,0.5f);
         FactoryGuiGraphics.of(guiGraphics).blit(mc.getResourceManager().getResource(MINECRAFT).isPresent() ? MINECRAFT : ControlType.getActiveType().getMinecraftLogo(),0,0,0,0,571,138,571,138);
         guiGraphics.pose().popPose();
-        RenderSystem.disableBlend();
+        FactoryScreenUtil.disableBlend();
     }
 
     public static void renderTransparentBackground(GuiGraphics graphics){
-        RenderSystem.enableBlend();
+        FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(graphics).blit(ScreenUtil.MENU_BACKGROUND,0,0,0,0,graphics.guiWidth(),graphics.guiHeight(),graphics.guiWidth(),graphics.guiHeight());
-        RenderSystem.disableBlend();
+        FactoryScreenUtil.disableBlend();
     }
 
     public static void renderUsername(GuiGraphics graphics){
@@ -216,9 +204,9 @@ public class ScreenUtil {
     }
 
     public static void renderLegacyPanorama(GuiGraphics guiGraphics, boolean isNight){
-        RenderSystem.depthMask(false);
-        guiGraphics.blit(/*? if >=1.21.2 {*//*RenderType::guiTexturedOverlay,*//*?}*/ isNight ? PANORAMA_NIGHT : PANORAMA_DAY, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() * guiGraphics.guiHeight() / 360 / 66.32f, 1, guiGraphics.guiWidth(), guiGraphics.guiHeight() + 2, guiGraphics.guiHeight() * 820/144, guiGraphics.guiHeight() + 2);
-        RenderSystem.depthMask(true);
+        FactoryGuiGraphics.of(guiGraphics).disableDepthTest();
+        FactoryGuiGraphics.of(guiGraphics).blit(isNight ? PANORAMA_NIGHT : PANORAMA_DAY, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() * guiGraphics.guiHeight() / 360 / 66.32f, 1, guiGraphics.guiWidth(), guiGraphics.guiHeight() + 2, guiGraphics.guiHeight() * 820/144, guiGraphics.guiHeight() + 2);
+        FactoryGuiGraphics.of(guiGraphics).enableDepthTest();
     }
 
     public static void drawOutlinedString(GuiGraphics graphics, Font font, Component component, int x, int y, int color, int outlineColor, float outline) {
@@ -256,13 +244,13 @@ public class ScreenUtil {
         graphics.pose().pushPose();
         FactoryGuiGraphics.of(graphics).setColor(1.0f,1.0f,1.0f, getHUDOpacity());
         graphics.pose().translate(0,getHUDDistance(),0);
-        RenderSystem.enableBlend();
+        FactoryScreenUtil.enableBlend();
     }
 
     public static void finalizeHUDRender(GuiGraphics graphics){
         graphics.pose().popPose();
         FactoryGuiGraphics.of(graphics).setColor(1.0f,1.0f,1.0f,1.0f);
-        RenderSystem.disableBlend();
+        FactoryScreenUtil.disableBlend();
     }
 
     public static boolean hasClassicCrafting(){
@@ -332,7 +320,7 @@ public class ScreenUtil {
     }
 
     public static void drawGenericLoading(GuiGraphics graphics,int x, int y) {
-        RenderSystem.enableBlend();
+        FactoryScreenUtil.enableBlend();
         for (int i = 0; i < 8; i++) {
             int v = (i + 1) * 100;
             int n = (i + 3) * 100;
@@ -343,7 +331,7 @@ public class ScreenUtil {
                 FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.LOADING_BLOCK, x+ (i <= 2 ? i : i >= 4 ? i == 7 ? 0 : 6 - i : 2) * 27, y + (i <= 2 ? 0 : i == 3 || i == 7 ? 1 : 2)* 27, 21, 21);
             }
         }
-        RenderSystem.disableBlend();
+        FactoryScreenUtil.disableBlend();
         FactoryGuiGraphics.of(graphics).clearColor();
     }
 
@@ -381,9 +369,9 @@ public class ScreenUtil {
         FactoryGuiGraphics.of(graphics).pushBufferSource(BufferSourceWrapper.translucent(FactoryGuiGraphics.of(graphics).getBufferSource()));
         graphics.flush();
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,alpha);
-        RenderSystem.enableBlend();
+        FactoryScreenUtil.enableBlend();
         render.accept(true);
-        RenderSystem.disableBlend();
+        FactoryScreenUtil.disableBlend();
         graphics.flush();
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
         FactoryGuiGraphics.of(graphics).popBufferSource();
@@ -501,8 +489,7 @@ public class ScreenUtil {
         if (mc.getCameraEntity() instanceof LivingEntity character) {
             boolean hasRemainingTime = character.isSprinting() || character.isCrouching() || character.isFallFlying() || character.isVisuallySwimming() || !(character instanceof Player);
             if (LegacyOptions.animatedCharacter.get() && (hasRemainingTime || character instanceof Player p && p.getAbilities().flying) && !character.isSleeping()) {
-                ScreenUtil.animatedCharacterTime = Util.getMillis();
-                ScreenUtil.remainingAnimatedCharacterTime = hasRemainingTime ? 450 : 0;
+                ScreenUtil.updateAnimatedCharacterTime(450);
             }
             if (Util.getMillis() - ScreenUtil.animatedCharacterTime <= ScreenUtil.remainingAnimatedCharacterTime) {
                 float xRot = character.getXRot();
@@ -645,18 +632,18 @@ public class ScreenUtil {
                 int m = mobEffectInstance.getDuration();
                 f = Mth.clamp((float)m / 10.0f / 5.0f * 0.5f, 0.0f, 0.5f) + Mth.cos((float)m * (float)Math.PI / 5.0f) * Mth.clamp((10 - m / 20) / 10.0f * 0.25f, 0.0f, 0.25f);
             }
-            RenderSystem.enableBlend();
+            FactoryScreenUtil.enableBlend();
             TextureAtlasSprite textureAtlasSprite = mobEffectTextureManager.get(mobEffect/*? if <1.20.5 {*//*.value()*//*?}*/);
             FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, f * backAlpha);
             FactoryGuiGraphics.of(guiGraphics).blit(k + 3, l + 3, 0, 18, 18, textureAtlasSprite);
-            RenderSystem.disableBlend();
+            FactoryScreenUtil.disableBlend();
         }
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
     public static void renderTopText(GuiGraphics guiGraphics, TopMessage topMessage, int y, float scale, int ticks) {
         if (topMessage != null && ticks < topMessage.ticksOnScreen()) {
-            RenderSystem.disableDepthTest();
+            FactoryScreenUtil.disableDepthTest();
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(guiGraphics.guiWidth() / 2f, y,0);
             guiGraphics.pose().scale(scale, scale, scale);
@@ -670,7 +657,7 @@ public class ScreenUtil {
             float fade = topMessage.fade() ? Math.min(1, (topMessage.ticksOnScreen() - (ticks + FactoryAPIClient.getPartialTick())) / maxFade) : 1;
             guiGraphics.drawString(mc.font, topMessage.message(),0,0, fade < 1 ? ColorUtil.withAlpha(topMessage.baseColor(), fade) : topMessage.baseColor(), topMessage.shadow());
             guiGraphics.pose().popPose();
-            RenderSystem.enableDepthTest();
+            FactoryScreenUtil.enableDepthTest();
         }
     }
 
@@ -703,32 +690,35 @@ public class ScreenUtil {
         }
 
         if (mc.options.showAutosaveIndicator().get() && canRenderElement && (mc.gui.autosaveIndicatorValue > 0 || mc.gui.lastAutosaveIndicatorValue > 0) && Mth.clamp(Mth.lerp(FactoryAPIClient.getPartialTick(), mc.gui.lastAutosaveIndicatorValue, mc.gui.autosaveIndicatorValue), 0.0f, 1.0f) > 0.02) {
-            RenderSystem.disableDepthTest();
+            FactoryScreenUtil.disableDepthTest();
             ScreenUtil.drawAutoSavingIcon(graphics, graphics.guiWidth() - 66, 44);
-            RenderSystem.enableDepthTest();
+            FactoryScreenUtil.enableDepthTest();
         }
 
         if (GLFW.glfwGetInputMode(mc.getWindow().getWindow(),GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerManager.isCursorDisabled && !LegacyOptions.hasSystemCursor()) {
-            RenderSystem.disableDepthTest();
-            RenderSystem.enableBlend();
+            FactoryScreenUtil.disableDepthTest();
+            FactoryScreenUtil.enableBlend();
             graphics.pose().pushPose();
             graphics.pose().translate(Legacy4JClient.controllerManager.getPointerX() + LegacyTipManager.getTipXDiff(), Legacy4JClient.controllerManager.getPointerY(), 4000);
             FactoryGuiGraphics.of(graphics).blitSprite(mc.getWindow().getScreenWidth() >= 1920 ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
             graphics.pose().popPose();
-            RenderSystem.disableBlend();
-            RenderSystem.enableDepthTest();
+            FactoryScreenUtil.disableBlend();
+            FactoryScreenUtil.enableDepthTest();
         }
 
         PostChain gammaEffect = Legacy4JClient.getGammaEffect();
         if (gammaEffect != null && LegacyOptions.displayLegacyGamma.get()) {
             float gamma = LegacyOptions.legacyGamma.get().floatValue();
             graphics.flush();
-            RenderSystem.enableBlend();
-            RenderSystem.disableDepthTest();
-            gammaEffect.passes.forEach(p-> p./*? if <1.21.2 {*/getEffect/*?} else {*//*getShader*//*?}*/().safeGetUniform("gamma").set(gamma >= 0.5f ? (gamma - 0.5f) * 1.12f + 1.08f : gamma * 0.96f + 0.6f));
-            gammaEffect.process(/*? if <1.21.2 {*/partialTick/*?} else {*//*mc.getMainRenderTarget(), mc.gameRenderer.resourcePool*//*?}*/);
-            RenderSystem.enableDepthTest();
-            RenderSystem.disableBlend();
+            FactoryScreenUtil.enableBlend();
+            FactoryScreenUtil.disableDepthTest();
+            float tweakedGamma = gamma >= 0.5f ? (gamma - 0.5f) * 1.12f + 1.08f : gamma * 0.96f + 0.6f;
+            //? if <1.21.5 {
+            gammaEffect.passes.forEach(p-> p./*? if <1.21.2 {*/getEffect/*?} else {*//*getShader*//*?}*/().safeGetUniform("gamma").set(tweakedGamma));
+            //?}
+            gammaEffect.process(/*? if <1.21.2 {*/partialTick/*?} else {*//*mc.getMainRenderTarget(), mc.gameRenderer.resourcePool*//*?}*//*? if >1.21.4 {*//*, pass-> pass.setUniform("gamma", tweakedGamma)*//*?}*/);
+            FactoryScreenUtil.enableDepthTest();
+            FactoryScreenUtil.disableBlend();
         }
     }
 

@@ -7,6 +7,7 @@ import net.minecraft.client.gui.navigation.ScreenAxis;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.resources.ResourceLocation;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.util.LegacySprites;
 
@@ -22,7 +23,7 @@ public class LegacyScrollRenderer {
     }
     public void renderScroll(GuiGraphics graphics, ScreenDirection direction, int x, int y){
         boolean h = direction.getAxis() == ScreenAxis.HORIZONTAL;
-        RenderSystem.enableBlend();
+        FactoryScreenUtil.enableBlend();
         long l = lastScrolled[direction.ordinal()];
         if (l > 0) {
             float f = (Util.getMillis() - l) / 320f;
@@ -32,7 +33,7 @@ public class LegacyScrollRenderer {
         FactoryGuiGraphics.of(graphics).blitSprite(SCROLLS[direction.ordinal()],x,y, h ? 6 : 13, h ? 11 : 7);
         if (l > 0)
             FactoryGuiGraphics.of(graphics).clearColor();
-        RenderSystem.disableBlend();
+        FactoryScreenUtil.disableBlend();
     }
 
 }

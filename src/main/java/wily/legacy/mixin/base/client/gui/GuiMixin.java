@@ -1,6 +1,5 @@
 package wily.legacy.mixin.base.client.gui;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.AttackIndicatorStatus;
@@ -22,6 +21,9 @@ import net.minecraft.world.scores.PlayerScoreEntry;
 //?} else {
 /*import net.minecraft.world.scores.Score;
 *///?}
+//? if <1.21.5 {
+import com.mojang.blaze3d.platform.GlStateManager;
+//?}
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.scores.Objective;
@@ -83,7 +85,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
 
     //? if <1.21.2 {
     @Redirect(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;blendFuncSeparate(Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;Lcom/mojang/blaze3d/platform/GlStateManager$SourceFactor;Lcom/mojang/blaze3d/platform/GlStateManager$DestFactor;)V"/*? if forge || neoforge {*//*, remap = false*//*?}*/))
-    public void renderCrosshairBlendFunc(GlStateManager.SourceFactor sourceFactor, GlStateManager.DestFactor destFactor, GlStateManager.SourceFactor sourceFactor2, GlStateManager.DestFactor destFactor2, GuiGraphics guiGraphics) {
+    public void renderCrosshairBlendFunc(GlStateManager.SourceFactor sourceFactor, GlStateManager.DestFactor destFactor, GlStateManager.SourceFactor sourceFactor2, GlStateManager.DestFactor destFactor2) {
         if (LegacyOptions.invertedCrosshair.get()) RenderSystem.blendFuncSeparate(sourceFactor,destFactor,sourceFactor2,destFactor2);
     }
     //?} else {
@@ -105,7 +107,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
     //? if >1.20.1 {
     @Inject(method = /*? if >=1.20.5 {*/"renderItemHotbar"/*?} else {*//*"renderHotbar"*//*?}*/, at = @At(value = "INVOKE", target = /*? if <1.21.2 {*/"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V"/*?} else {*//*"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIII)V"*//*?}*/, ordinal = 1))
     private void renderHotbarSelection(/*? if <1.20.5 {*//*float f, *//*?}*/GuiGraphics guiGraphics/*? if >=1.20.5 {*/, DeltaTracker deltaTracker/*?}*/, CallbackInfo ci) {
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HOTBAR_SELECTION,24,24,0,23,guiGraphics.guiWidth() / 2 - 91 - 1 + minecraft.player.getInventory().selected * 20, guiGraphics.guiHeight(), 0,24, 1);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HOTBAR_SELECTION,24,24,0,23,guiGraphics.guiWidth() / 2 - 91 - 1 + minecraft.player.getInventory()./*? if <1.21.5 {*/selected/*?} else {*//*getSelectedSlot()*//*?}*/ * 20, guiGraphics.guiHeight(), 0,24, 1);
     }
     //?} else {
     /*@Redirect(method = "renderHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lnet/minecraft/resources/ResourceLocation;IIIIII)V", ordinal = 1))
@@ -197,12 +199,12 @@ public abstract class GuiMixin implements ControlTooltip.Event {
 
     @Redirect(method = "tick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z"))
     private boolean tick(ItemStack instance) {
-        return !ScreenUtil.getTooltip(instance).equals(ScreenUtil.getTooltip(minecraft.player.getInventory().getSelected()));
+        return !ScreenUtil.getTooltip(instance).equals(ScreenUtil.getTooltip(minecraft.player.getInventory()./*? if <1.21.5 {*/getSelected()/*?} else {*//*getSelectedItem()*//*?}*/));
     }
 
     @Redirect(method = "tick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/OptionInstance;get()Ljava/lang/Object;"))
     private Object tick(OptionInstance<Double> instance) {
-        return Math.min(ScreenUtil.getSelectedItemTooltipLines(),ScreenUtil.getTooltip(minecraft.player.getInventory().getSelected()).size()) * instance.get();
+        return Math.min(ScreenUtil.getSelectedItemTooltipLines(),ScreenUtil.getTooltip(minecraft.player.getInventory()./*? if <1.21.5 {*/getSelected()/*?} else {*//*getSelectedItem()*//*?}*/).size()) * instance.get();
     }
 
     @Inject(method = /*? if forge || neoforge {*/ /*"renderSelectedItemName(Lnet/minecraft/client/gui/GuiGraphics;I)V" *//*?} else {*/"renderSelectedItemName"/*?}*/, at = @At("HEAD"), cancellable = true/*? if forge || neoforge {*//*, remap = false*//*?}*/)

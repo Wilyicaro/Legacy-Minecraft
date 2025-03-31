@@ -24,6 +24,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
@@ -105,10 +106,10 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
                     @Override
                     protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                         super.renderWidget(guiGraphics, i, j, f);
-                        RenderSystem.enableBlend();
+                        FactoryScreenUtil.enableBlend();
                         FactoryGuiGraphics.of(guiGraphics).blitSprite(TickBox.SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX() + 30, this.getY() + (height - 12) / 2, 12, 12);
                         if (friendsToAdd.contains(friend)) FactoryGuiGraphics.of(guiGraphics).blitSprite(TickBox.TICK, this.getX() + 30, this.getY()  + (height - 12) / 2, 14, 12);
-                        RenderSystem.disableBlend();
+                        FactoryScreenUtil.disableBlend();
                     }
                     @Override
                     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {

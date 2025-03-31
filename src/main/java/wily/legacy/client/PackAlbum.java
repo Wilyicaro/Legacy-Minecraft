@@ -42,6 +42,7 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.DynamicUtil;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.controller.ControllerBinding;
@@ -543,7 +544,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
             Font font = minecraft.font;
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,getX() -1,getY()+ font.lineHeight -1 , width + 2,height + 2 - minecraft.font.lineHeight);
             int visibleCount = 0;
-            RenderSystem.enableBlend();
+            FactoryScreenUtil.enableBlend();
             for (int index = 0; index < albums.size(); index++) {
                 if (visibleCount>=getMaxPacks()) break;
                 PackAlbum album = albums.getByIndex(Math.min(albums.size() - 1, scrolledList.get() + index));
@@ -553,7 +554,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(PACK_HIGHLIGHTED, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
                 visibleCount++;
             }
-            RenderSystem.disableBlend();
+            FactoryScreenUtil.disableBlend();
             guiGraphics.pose().pushPose();
             if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.5f,0.5f,0f);
             guiGraphics.drawString(font,getMessage(),getX() + 2,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused());
@@ -576,7 +577,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
                     InputStream inputStream = ioSupplier.get();
                     try {
                         NativeImage nativeImage = NativeImage.read(inputStream);
-                        textureManager.register(resourceLocation3, new DynamicTexture(nativeImage));
+                        textureManager.register(resourceLocation3, new DynamicTexture(/*? if >1.21.4 {*//*resourceLocation3::toString, *//*?}*/nativeImage));
                         resourceLocation = resourceLocation3;
                     } catch (Throwable throwable) {
                         try {

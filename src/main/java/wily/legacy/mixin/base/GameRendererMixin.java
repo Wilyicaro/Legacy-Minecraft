@@ -3,41 +3,24 @@ package wily.legacy.mixin.base;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.PostChain;
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4f;
-import org.lwjgl.glfw.GLFW;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.factoryapi.FactoryAPIClient;
-import wily.factoryapi.base.client.FactoryGuiGraphics;
-import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.entity.PlayerYBobbing;
-import wily.legacy.util.LegacySprites;
-import wily.legacy.client.LegacyTip;
-import wily.legacy.client.LegacyTipManager;
 import wily.legacy.util.ScreenUtil;
 
 import java.nio.file.Files;
@@ -86,6 +69,14 @@ public abstract class GameRendererMixin {
     /*@WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemActivationAnimation(IIF)V"))
     private boolean renderItemActivationAnimation(GameRenderer instance, int i, int j, float f){
         return Legacy4JClient.itemActivationRenderReplacement == null;
+    }
+
+    @Inject(method = "renderLevel", at = @At("HEAD"))
+    private void applyFlyingViewRolling(float f, long l, PoseStack poseStack, CallbackInfo ci){
+        float z = ScreenUtil.getFlyingViewRollingRotation(0);
+        if (z != 0){
+            poseStack.mulPose(Axis.ZN.rotation(z));
+        }
     }
     *///?}
     @Inject(method = "bobView", at = @At("RETURN"))

@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIPlatform;
+import wily.factoryapi.util.CompoundTagUtil;
 import wily.legacy.inventory.LegacyPistonMovingBlockEntity;
 
 @Mixin(PistonMovingBlockEntity.class)
@@ -50,9 +51,8 @@ public class PistonMovingBlockEntityMixin extends BlockEntity implements LegacyP
     }
     @Inject(method = /*? if <1.20.5 {*//*"load"*//*?} else {*/"loadAdditional"/*?}*/, at = @At("RETURN"))
     protected void load(CompoundTag compoundTag/*? if >=1.20.5 {*/, HolderLookup.Provider provider/*?}*/, CallbackInfo ci) {
-        CompoundTag newMovedBeTag = compoundTag.getCompound("movedBlockEntityTag");
-        ResourceLocation beTypeId = compoundTag.contains("movedBlockEntityType") ? FactoryAPI.createLocation(compoundTag.getString("movedBlockEntityType")) : null;
-        if (beTypeId != null) movingBlockEntityType = FactoryAPIPlatform.getRegistryValue(beTypeId,BuiltInRegistries.BLOCK_ENTITY_TYPE);
+        CompoundTag newMovedBeTag = CompoundTagUtil.getCompoundTagOrEmpty(compoundTag, "movedBlockEntityTag");
+        CompoundTagUtil.getString(compoundTag, "movedBlockEntityType").map(FactoryAPI::createLocation).ifPresent(beTypeId -> movingBlockEntityType = FactoryAPIPlatform.getRegistryValue(beTypeId, BuiltInRegistries.BLOCK_ENTITY_TYPE));
         if (!newMovedBeTag.isEmpty()) {
             movedBeTag = newMovedBeTag;
             if (hasLevel() && getLevel().isClientSide() && movingBlockEntityType != null) createRenderingBlockEntity(getLevel());

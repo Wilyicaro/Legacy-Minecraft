@@ -16,6 +16,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 
@@ -39,7 +40,7 @@ public class GuiGameRendererMixin {
             float n = m * 3.1415927F;
             float o = this.itemActivationOffX * (float)(guiGraphics.guiWidth() / 4);
             float p = this.itemActivationOffX * (float)(guiGraphics.guiHeight() / 4);
-            RenderSystem.enableDepthTest();
+            FactoryScreenUtil.enableDepthTest();
             RenderSystem.disableCull();
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate((float)(guiGraphics.guiWidth() / 2) + o * Mth.abs(Mth.sin(n * 2.0F)), (float)(guiGraphics.guiHeight() / 2) + p * Mth.abs(Mth.sin(n * 2.0F)), -50.0F);

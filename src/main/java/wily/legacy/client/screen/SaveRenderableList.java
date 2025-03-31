@@ -36,6 +36,7 @@ import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
@@ -257,9 +258,9 @@ public class SaveRenderableList extends RenderableVList {
         @Override
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             super.renderWidget(guiGraphics, i, j, f);
-            RenderSystem.enableBlend();
+            FactoryScreenUtil.enableBlend();
             FactoryGuiGraphics.of(guiGraphics).blit(iconCache.getUnchecked(summary).textureLocation(), getX() + 5, getY() + 5, 0, 0, 20, 20, 20, 20);
-            RenderSystem.disableBlend();
+            FactoryScreenUtil.disableBlend();
             if (minecraft.options.touchscreen().get().booleanValue() || isHovered) {
                 guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
 

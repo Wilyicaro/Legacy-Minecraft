@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.CommonColor;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
@@ -71,9 +72,9 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
         BeaconScreen.BeaconConfirmButton confirmButton = self().new BeaconConfirmButton(this.leftPos + 202, this.topPos + 127){
             @Override
             protected void renderIcon(GuiGraphics guiGraphics) {
-                RenderSystem.enableBlend();
+                FactoryScreenUtil.enableBlend();
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_CONFIRM,this.getX() + 4, this.getY() + 4, 14, 14);
-                RenderSystem.disableBlend();
+                FactoryScreenUtil.disableBlend();
             }
         };
         addRenderableWidget(confirmButton);

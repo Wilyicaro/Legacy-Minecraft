@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyTip;
@@ -204,9 +205,8 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     @Inject(method = "onClose",at = @At("RETURN"))
     public void removed(CallbackInfo ci) {
-        if (minecraft.player.getInventory().armor.stream().anyMatch(i-> !i.isEmpty())) {
-            ScreenUtil.animatedCharacterTime = Util.getMillis();
-            ScreenUtil.remainingAnimatedCharacterTime = 1500;
+        if (Legacy4J.anyArmorSlotMatch(minecraft.player.getInventory(), i-> !i.isEmpty())) {
+            ScreenUtil.updateAnimatedCharacterTime(1500);
         }
     }
 

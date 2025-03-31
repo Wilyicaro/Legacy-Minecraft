@@ -24,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.init.LegacyRegistries;
@@ -127,9 +128,9 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                 @Override
                 protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
                     super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
-                    RenderSystem.enableBlend();
+                    FactoryScreenUtil.enableBlend();
                     FactoryGuiGraphics.of(guiGraphics).blit(e.getIconTexture(), getX() + 5, getY() + 5, 0.0f, 0.0f, 20, 20, 20, 20);
-                    RenderSystem.disableBlend();
+                    FactoryScreenUtil.disableBlend();
                     if ((minecraft.options.touchscreen().get().booleanValue() || isHovered) && showHoverOverlay()) {
                         guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
                         int p = mouseX - getX();
@@ -282,11 +283,11 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
         /*ci.cancel();*/
         ScreenUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
         panel.render(guiGraphics, i, j, f);
-        RenderSystem.enableBlend();
+        FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,0.6f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 10, panel.y + 10, 190, 220);
         FactoryGuiGraphics.of(guiGraphics).clearColor();
-        RenderSystem.disableBlend();
+        FactoryScreenUtil.disableBlend();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 210, panel.y + 10, 190, 220);
         guiGraphics.drawString(this.font, SELECTED_PACK, panel.x + 10 + (190 - font.width(SELECTED_PACK)) / 2, panel.y + 18, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
         guiGraphics.drawString(this.font, AVAILABLE_PACK, panel.x + 210 + (190 - font.width(AVAILABLE_PACK)) / 2, panel.y + 18, CommonColor.INVENTORY_GRAY_TEXT.get(), false);

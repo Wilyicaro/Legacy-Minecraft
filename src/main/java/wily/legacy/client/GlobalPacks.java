@@ -28,6 +28,7 @@ import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.config.FactoryConfig;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.client.screen.Panel;
@@ -265,7 +266,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,getX() -1,getY()+ font.lineHeight -1 , width + 2,height + 2 - minecraft.font.lineHeight);
             List<Pack> displayPacks = getDisplayPacks();
             int visibleCount = 0;
-            RenderSystem.enableBlend();
+            FactoryScreenUtil.enableBlend();
             for (int index = 0; index < displayPacks.size(); index++) {
                 if (visibleCount>=getMaxPacks()) break;
                 FactoryGuiGraphics.of(guiGraphics).blit(PackAlbum.Selector.getPackIcon(displayPacks.get(scrolledList.get() + index)), getX() + 21 + 30 * index,getY() + font.lineHeight + 4,0.0f, 0.0f, 28, 28, 28, 28);
@@ -274,7 +275,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PACK_HIGHLIGHTED, getX() + 20 + 30 * index,getY() +font.lineHeight + 3,30,30);
                 visibleCount++;
             }
-            RenderSystem.disableBlend();
+            FactoryScreenUtil.disableBlend();
             guiGraphics.drawString(font,getMessage(),getX() + 1,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused());
             if (scrolledList.max > 0){
                 if (scrolledList.get() < scrolledList.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);

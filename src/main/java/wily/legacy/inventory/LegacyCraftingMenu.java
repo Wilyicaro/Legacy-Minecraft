@@ -219,7 +219,7 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
         return LOOM_PATTERN_EXTRA_INGREDIENT_CACHE.computeIfAbsent(pattern,key->{
             Holder<BannerPattern> holder = registryAccess.lookupOrThrow(Registries.BANNER_PATTERN).getOrThrow(pattern);
             for (Item item : BuiltInRegistries.ITEM) {
-                if (item instanceof BannerPatternItem p && holder.is(p.getBannerPattern())) return Optional.of(Ingredient.of(p));
+                if (/*? if <1.21.5 {*/item instanceof BannerPatternItem p && holder.is(p.getBannerPattern())/*?} else {*//*item.components().has(DataComponents.PROVIDES_BANNER_PATTERNS) && holder.is(item.components().get(DataComponents.PROVIDES_BANNER_PATTERNS))*//*?}*/) return Optional.of(Ingredient.of(item));
             }
             return Optional.empty();
         });
@@ -311,7 +311,7 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
         return getMenuProvider((i,inv,p)-> stoneCutterMenu(i,inv,pos), STONECUTTER_TITLE);
     }
     public void onCraft(Player player, ServerMenuCraftPayload packet, ItemStack result) {
-        result.onCraftedBy(player.level(),player,result.getCount());
+        result.onCraftedBy(/*? if <1.21.5 {*/player.level(),/*?}*/player,result.getCount());
 
     }
 }

@@ -1,3 +1,4 @@
+//? if <1.21.5 {
 package wily.legacy.mixin.base;
 
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -23,3 +24,4 @@ public class GLStateManagerMixin {
         ci.cancel();
     }
 }
+//?}

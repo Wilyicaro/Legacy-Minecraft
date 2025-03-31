@@ -2,6 +2,7 @@ package wily.legacy.mixin.base;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -11,7 +12,6 @@ import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.SnowGolem;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -57,11 +57,11 @@ public abstract class LivingEntityMixin extends Entity {
     //? if <1.21.2 {
     @Inject(method = "isBlocking", at = @At("HEAD"), cancellable = true)
     public void isBlocking(CallbackInfoReturnable<Boolean> cir) {
-        if (LegacyCommonOptions.legacySwordBlocking.get() && useItem.getItem() instanceof SwordItem) cir.setReturnValue(false);
+        if (LegacyCommonOptions.legacySwordBlocking.get() && useItem.is(ItemTags.SWORDS)) cir.setReturnValue(false);
     }
     //?}
     @Inject(method = "getDamageAfterArmorAbsorb", at = @At("RETURN"), cancellable = true)
     protected void getDamageAfterArmorAbsorb(DamageSource damageSource, float f, CallbackInfoReturnable<Float> cir) {
-        if (!damageSource.is(DamageTypeTags.BYPASSES_ARMOR) && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking) && useItem.getItem() instanceof SwordItem) cir.setReturnValue(cir.getReturnValue()/2);
+        if (!damageSource.is(DamageTypeTags.BYPASSES_ARMOR) && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking) && useItem.is(ItemTags.SWORDS)) cir.setReturnValue(cir.getReturnValue()/2);
     }
 }

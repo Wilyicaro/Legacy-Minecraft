@@ -27,6 +27,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+//? if >=1.21.5 {
+/*import net.minecraft.world.item.component.TooltipDisplay;
+*///?}
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -57,7 +60,7 @@ public abstract class ItemStackMixin {
         return ChatFormatting.GOLD;
     }
     //?} else {
-    /*@ModifyArg(method = "getStyledHoverName",at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = /^? if neoforge {^/ 0/^?} else {^//^1^//^?}^/))
+    /*@ModifyArg(method = "getStyledHoverName",at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = /^? if neoforge {^/ /^0^//^?} else {^/1/^?}^/))
     public ChatFormatting getStyledHoverName(ChatFormatting arg) {
         return ChatFormatting.GOLD;
     }
@@ -102,7 +105,7 @@ public abstract class ItemStackMixin {
     }
 
     @Redirect(method = "addAttributeTooltips", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;forEachModifier(Lnet/minecraft/world/entity/EquipmentSlotGroup;Ljava/util/function/BiConsumer;)V"))
-    private void addAttributeTooltips(ItemStack instance, EquipmentSlotGroup equipmentSlotGroup, BiConsumer<Holder<Attribute>, AttributeModifier> biConsumer, Consumer<Component> consumer, @Nullable Player player) {
+    private void addAttributeTooltips(ItemStack instance, EquipmentSlotGroup equipmentSlotGroup, BiConsumer<Holder<Attribute>, AttributeModifier> biConsumer, Consumer<Component> consumer/*? if >=1.21.5 {*//*, TooltipDisplay tooltipDisplay*//*?}*/, @Nullable Player player) {
         Bearer<Boolean> noSpace = Bearer.of(true);
         forEachModifier(equipmentSlotGroup, (holder, attributeModifier)->{
             if (noSpace.get()){

@@ -118,7 +118,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
             this(Collections.emptyMap(),gameRules,GameType.SURVIVAL,identifier);
         }
 
-        public static final List<GameRules.Key<GameRules.BooleanValue>> NON_OP_GAMERULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK,LegacyGameRules.TNT_EXPLODES,GameRules.RULE_DOMOBLOOT,GameRules.RULE_DOBLOCKDROPS,GameRules.RULE_NATURAL_REGENERATION,LegacyGameRules.GLOBAL_MAP_PLAYER_ICON,LegacyGameRules.LEGACY_SWIMMING,GameRules.RULE_DO_IMMEDIATE_RESPAWN));
+        public static final List<GameRules.Key<GameRules.BooleanValue>> NON_OP_GAMERULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK,LegacyGameRules.getTntExplodes(),GameRules.RULE_DOMOBLOOT,GameRules.RULE_DOBLOCKDROPS,GameRules.RULE_NATURAL_REGENERATION,LegacyGameRules.GLOBAL_MAP_PLAYER_ICON,LegacyGameRules.LEGACY_SWIMMING,GameRules.RULE_DO_IMMEDIATE_RESPAWN));
 
         public All(CommonNetwork.PlayBuf buf, CommonNetwork.Identifier<All> identifier){
             this(buf.get().readMap(HashMap::new, b-> b.readUUID(), b-> LegacyPlayerInfo.decode(buf)), buf.get().readMap(HashMap::new, FriendlyByteBuf::readUtf, b->{

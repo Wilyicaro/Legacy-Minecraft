@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import wily.legacy.mixin.base.BufferSourceAccessor;
+import wily.legacy.mixin.base.CompositeRenderTypeAccessor;
 
 public class BufferSourceWrapper extends MultiBufferSource.BufferSource {
     public final MultiBufferSource.BufferSource source;
@@ -24,7 +25,7 @@ public class BufferSourceWrapper extends MultiBufferSource.BufferSource {
                 //? if >=1.21.2 {
                 /*else if (renderType == Sheets.cutoutBlockSheet()) return super.getBuffer(Sheets.translucentItemSheet());
                 *///?}
-                else if (renderType.format() == DefaultVertexFormat.NEW_ENTITY && renderType instanceof RenderType.CompositeRenderType r && r.state().textureState instanceof RenderStateShard.TextureStateShard s && s.texture.isPresent()) return super.getBuffer(RenderType./*? if <1.21.2 {*/entityTranslucentCull/*?} else {*//*itemEntityTranslucentCull*//*?}*/(s.texture.get()));
+                else if (renderType.format() == DefaultVertexFormat.NEW_ENTITY && renderType instanceof RenderType.CompositeRenderType r && ((CompositeRenderTypeAccessor)(Object)r).getState().textureState instanceof RenderStateShard.TextureStateShard s && s.texture.isPresent()) return super.getBuffer(RenderType./*? if <1.21.2 {*/entityTranslucentCull/*?} else {*//*itemEntityTranslucentCull*//*?}*/(s.texture.get()));
                 return super.getBuffer(renderType);
             }
         };

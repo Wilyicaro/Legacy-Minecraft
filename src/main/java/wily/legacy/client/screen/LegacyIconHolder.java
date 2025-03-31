@@ -28,6 +28,7 @@ import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.inventory.LegacySlotDisplay;
@@ -270,9 +271,9 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
     public void renderHighlight(GuiGraphics graphics){
         renderScaled(graphics,getX(),getY(),()-> {
-            RenderSystem.enableBlend();
+            FactoryScreenUtil.enableBlend();
             FactoryGuiGraphics.of(graphics).blitSprite(SLOT_HIGHLIGHT, 0, 0, 16, 16);
-            RenderSystem.disableBlend();
+            FactoryScreenUtil.disableBlend();
         });
     }
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics,int i, int j){

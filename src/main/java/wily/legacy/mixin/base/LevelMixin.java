@@ -36,7 +36,7 @@ public abstract class LevelMixin {
     //?} else {
     /*@Inject(method = "explode", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerExplosion;explode()V"), cancellable = true)
     public void explode(Entity entity, DamageSource damageSource, ExplosionDamageCalculator explosionDamageCalculator, double d, double e, double f, float g, boolean bl, Level.ExplosionInteraction explosionInteraction, ParticleOptions particleOptions, ParticleOptions particleOptions2, Holder<SoundEvent> holder, CallbackInfo ci) {
-        if (explosionInteraction != Level.ExplosionInteraction.MOB && !getGameRules().getBoolean(LegacyGameRules.TNT_EXPLODES)) ci.cancel();
+        if (explosionInteraction != Level.ExplosionInteraction.MOB && !getGameRules().getBoolean(LegacyGameRules.getTntExplodes())) ci.cancel();
     }
     *///?}
 }

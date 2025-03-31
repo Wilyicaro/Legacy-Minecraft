@@ -1,6 +1,8 @@
 package wily.legacy.mixin.base;
 
+//? if <1.21.5 {
 import com.mojang.blaze3d.platform.GlStateManager;
+//?}
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -27,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ControlType;
@@ -87,10 +90,10 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
             //? if >=1.20.5 {
             renderVignette(guiGraphics);
             //?} else {
-            /*RenderSystem.enableBlend();
+            /*FactoryScreenUtil.enableBlend();
             RenderSystem.blendFunc(GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.ONE_MINUS_SRC_COLOR);
             guiGraphics.blit(VIGNETTE_LOCATION, 0, 0, 0, 0.0F, 0.0F, this.width, this.height, this.width, this.height);
-            RenderSystem.disableBlend();
+            FactoryScreenUtil.disableBlend();
             RenderSystem.defaultBlendFunc();
             *///?}
             guiGraphics.pose().pushPose();
@@ -156,12 +159,12 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
                 m += 18;
             }
             guiGraphics.pose().popPose();
-            RenderSystem.enableBlend();
+            FactoryScreenUtil.enableBlend();
             FactoryGuiGraphics.of(guiGraphics).disableDepthTest();
             FactoryGuiGraphics.of(guiGraphics).blit(CREDITS_BACKGROUND_FADE,0,0, x, y, guiGraphics.guiWidth(), guiGraphics.guiHeight(), fixedWidth, fixedHeight);
             guiGraphics.flush();
             FactoryGuiGraphics.of(guiGraphics).enableDepthTest();
-            RenderSystem.disableBlend();
+            FactoryScreenUtil.disableBlend();
             guiGraphics.pose().pushPose();
             guiGraphics.pose().translate(0,0,200);
             ScreenUtil.renderLogo(guiGraphics);

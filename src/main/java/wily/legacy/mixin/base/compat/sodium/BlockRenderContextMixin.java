@@ -24,7 +24,7 @@ public class BlockRenderContextMixin {
 
     @Inject(method = "update", at = @At("HEAD"))
     public void update(BlockPos pos, BlockPos origin, BlockState state, BakedModel model, long seed, CallbackInfo ci, @Local(argsOnly = true) LocalRef<BakedModel> bakedModelLocalRef) {
-        bakedModelLocalRef.set(Legacy4JClient.getFastLeavesModelReplacement(this.world, pos, state, model));
+        bakedModelLocalRef.set(Legacy4JClient.getFastLeavesModelReplacement(world, pos, state, model));
     }
 }
 *///?}

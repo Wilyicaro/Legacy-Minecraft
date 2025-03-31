@@ -18,6 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyCreativeTabListing;
 import wily.legacy.client.LegacyTip;
@@ -182,12 +183,12 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
             if (scrolledList.get() > 0)
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, 0, -11);
         } else FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 0.5f);
-        RenderSystem.enableBlend();
+        FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0, 13, 135);
         guiGraphics.pose().translate(-2f, -1f + (scrolledList.max > 0 ? scrolledList.get() * 121.5f / scrolledList.max : 0), 0f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL, 0, 0, 16, 16);
         FactoryGuiGraphics.of(guiGraphics).clearColor();
-        RenderSystem.disableBlend();
+        FactoryScreenUtil.disableBlend();
         guiGraphics.pose().popPose();
     }
 

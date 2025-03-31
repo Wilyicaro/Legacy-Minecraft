@@ -28,6 +28,7 @@ import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.base.config.FactoryConfigControl;
 import wily.factoryapi.base.config.FactoryConfigDisplay;
 import wily.factoryapi.base.network.CommonNetwork;
+import wily.factoryapi.util.CompoundTagUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.controller.*;
@@ -393,12 +394,7 @@ public class LegacyOptions {
                 throw var6;
             }
             bufferedReader.close();
-            CLIENT_STORAGE.configMap.forEach((s,o)->{
-                String value = compoundTag.contains(s) ? compoundTag.getString(s) : null;
-                if (value != null) {
-                    parseDeprecatedOptionFromString(value.isEmpty() ? "\"\"" : value,o);
-                }
-            });
+            CLIENT_STORAGE.configMap.forEach((s,o)-> CompoundTagUtil.getString(compoundTag, s).ifPresent(value -> parseDeprecatedOptionFromString(value.isEmpty() ? "\"\"" : value,o)));
         } catch (IOException e) {
             Legacy4J.LOGGER.error("Failed to load options", e);
         }

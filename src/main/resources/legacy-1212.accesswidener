@@ -66,7 +66,6 @@ accessible field net/minecraft/client/renderer/chunk/RenderChunkRegion level Lne
 accessible field net/minecraft/client/gui/screens/ConnectScreen status Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/client/gui/components/Tooltip message Lnet/minecraft/network/chat/Component;
 accessible method net/minecraft/client/gui/components/Tooltip <init> (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/Component;)V
-accessible method net/minecraft/client/renderer/RenderType$CompositeRenderType state ()Lnet/minecraft/client/renderer/RenderType$CompositeState;
 accessible field net/minecraft/client/renderer/RenderStateShard$TextureStateShard texture Ljava/util/Optional;
 accessible field net/minecraft/client/renderer/RenderType$CompositeState textureState Lnet/minecraft/client/renderer/RenderStateShard$EmptyTextureStateShard;
 accessible field net/minecraft/client/KeyMapping ALL Ljava/util/Map;
@@ -134,7 +133,7 @@ accessible method net/minecraft/world/level/GameRules$IntegerValue create (I)Lne
 accessible class net/minecraft/client/gui/font/providers/BitmapProvider$Glyph
 extendable class net/minecraft/client/gui/font/providers/BitmapProvider$Glyph
 accessible method net/minecraft/client/gui/font/providers/BitmapProvider$Glyph <init> (FLcom/mojang/blaze3d/platform/NativeImage;IIIIII)V
-accessible method net/minecraft/world/level/GameRules$Type <init> (Ljava/util/function/Supplier;Ljava/util/function/Function;Ljava/util/function/BiConsumer;Lnet/minecraft/world/level/GameRules$VisitorCaller;Lnet/minecraft/world/flag/FeatureFlagSet;)V
+accessible method net/minecraft/world/level/GameRules$IntegerValue create (IIILnet/minecraft/world/flag/FeatureFlagSet;Ljava/util/function/BiConsumer;)Lnet/minecraft/world/level/GameRules$Type;
 accessible class net/minecraft/world/level/GameRules$VisitorCaller
 accessible method net/minecraft/world/inventory/AbstractFurnaceMenu canSmelt (Lnet/minecraft/world/item/ItemStack;)Z
 accessible method net/minecraft/world/entity/Mob shouldDespawnInPeaceful ()Z

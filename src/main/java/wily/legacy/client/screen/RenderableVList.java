@@ -169,7 +169,7 @@ public class RenderableVList {
         this.listWidth = accessor.getInteger(name+".width",listWidth);
         this.listHeight = accessor.getInteger(name+".height",listHeight);
         boolean allowScroll = this.listHeight > 0;
-        if (allowScroll) accessor.getRenderables().add(((guiGraphics, i, j, f) -> {
+        if (allowScroll) accessor.getChildrenRenderables().add(((guiGraphics, i, j, f) -> {
             if (scrolledList.get() > 0)
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, this.leftPos + this.listWidth - 29, this.topPos + this.listHeight - 8);
             if (canScrollDown)
@@ -199,7 +199,7 @@ public class RenderableVList {
                 if (r instanceof GuiEventListener l) {
                     accessor.addChild(accessor.getChildren().size(),l,false,true);
                 }
-                accessor.addRenderable(accessor.getRenderables().size(),r);
+                accessor.addRenderable(accessor.getChildrenRenderables().size(),r);
             } else {
                 canScrollDown = true;
                 break;
