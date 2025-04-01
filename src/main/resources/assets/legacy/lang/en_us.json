@@ -1683,6 +1683,7 @@
   "legacy.options.selectedItemTooltipSpacing": "Selected Item Tooltip Spacing",
   "legacy.options.showVanillaRecipeBook": "Display Vanilla Recipe Book",
   "legacy.options.skipIntro": "Skip Intro",
+  "legacy.options.legacyIntroAndLoading": "Legacy Intro and Loading",
   "legacy.options.skipInitialSaveWarning": "Skip Initial Save Warning",
   "legacy.options.smoothAnimatedCharacter": "Smooth Animated Character",
   "legacy.options.smoothMovement": "Smooth Movement",

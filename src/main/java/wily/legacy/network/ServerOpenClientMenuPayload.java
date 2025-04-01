@@ -39,8 +39,8 @@ public record ServerOpenClientMenuPayload(ClientMenu menu) implements CommonNetw
     }
 
     @Override
-    public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> p) {
-        if (p.get() instanceof ServerPlayer sp) {
+    public void apply(Context context) {
+        if (context.player() instanceof ServerPlayer sp) {
             sp.openMenu(menu.menuProviderSupplier.get());
         }
     }

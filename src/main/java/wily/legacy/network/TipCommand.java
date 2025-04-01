@@ -110,8 +110,8 @@ public class TipCommand {
         }
 
         @Override
-        public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> player) {
-            if (player.get().level().isClientSide) {
+        public void apply(Context context) {
+            if (context.player().level().isClientSide) {
                 if (force) LegacyTipManager.setTip(LegacyTipManager.getTip(builder.getItem(), builder));
                 else LegacyTipManager.addTip(LegacyTipManager.getTip(builder.getItem(), builder));
             }
@@ -134,8 +134,8 @@ public class TipCommand {
             buf.get().writeBoolean(force);
         }
         @Override
-        public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> player) {
-            if (player.get().level().isClientSide) {
+        public void apply(Context context) {
+            if (context.player().level().isClientSide) {
                 if (force) LegacyTipManager.setTip(LegacyTipManager.getTip(entityType));
                 else LegacyTipManager.addTip(entityType);
             }

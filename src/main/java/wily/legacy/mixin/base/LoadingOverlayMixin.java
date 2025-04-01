@@ -19,6 +19,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyResourceManager;
 import wily.legacy.util.ScreenUtil;
 
@@ -49,52 +50,55 @@ public abstract class LoadingOverlayMixin extends Overlay {
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
-        ci.cancel();
-        if (!loadIntroLocation){
-            initTime = Util.getMillis();
-            loadIntroLocation = true;
-            LegacyResourceManager.registerIntroLocations(minecraft.getResourceManager());
-        }
-        float timer = (Util.getMillis() - initTime) / 3200f;
-        if (!finishedIntro && Legacy4JClient.canSkipIntro(timer) && reload.isDone()) finishedIntro = true;
-        if (!finishedIntro) {
-            guiGraphics.fill(RenderType.guiOverlay(), 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFFFFFFFF);
-            FactoryGuiGraphics.of(guiGraphics).blit(BACKGROUND, 0, 0,0,0, guiGraphics.guiWidth(), guiGraphics.guiHeight(),guiGraphics.guiWidth(), guiGraphics.guiHeight());
-
-            float last = (float) Math.ceil(timer) - timer;
-            FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, last <= 0.4f ? last * 2.5f : last > 0.6f ? (1 - last) * 2.5f : 1.0f, true);
-            FactoryGuiGraphics.of(guiGraphics).blit(INTROS.get((int) (timer % INTROS.size())), (guiGraphics.guiWidth() - guiGraphics.guiHeight() * 320 / 180) / 2, 0, 0, 0, guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight(), guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight());
-            FactoryGuiGraphics.of(guiGraphics).clearColor(true);
-        }
-
-        if (finishedIntro) {
-            float h;
-            long m = Util.getMillis();
-            if (this.fadeIn && this.fadeInStart == -1L) {
-                this.fadeInStart = m;
+        if (LegacyOptions.legacyIntroAndLoading.get()) {
+            ci.cancel();
+            if (!loadIntroLocation) {
+                initTime = Util.getMillis();
+                loadIntroLocation = true;
+                LegacyResourceManager.registerIntroLocations(minecraft.getResourceManager());
             }
-            float g = this.fadeOutStart > -1L ? (float)(m - this.fadeOutStart) / 1000.0f : -1.0f;
-            h = this.fadeInStart > -1L ? (float)(m - this.fadeInStart) / 500.0f : -1.0f;
-            if ((MinecraftAccessor.getInstance().hasGameLoaded() && reload.isDone()) && minecraft.screen != null) this.minecraft.screen.renderWithTooltip(guiGraphics, 0, 0, f);
-            else {
-                FactoryGuiGraphics.of(guiGraphics).blit(ScreenUtil.LOADING_BACKGROUND, 0, 0,0,0, guiGraphics.guiWidth(), guiGraphics.guiHeight(),guiGraphics.guiWidth(), guiGraphics.guiHeight());
+            float timer = (Util.getMillis() - initTime) / 3200f;
+            if (!finishedIntro && Legacy4JClient.canSkipIntro(timer) && reload.isDone()) finishedIntro = true;
+            if (!finishedIntro) {
+                guiGraphics.fill(RenderType.guiOverlay(), 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFFFFFFFF);
+                FactoryGuiGraphics.of(guiGraphics).blit(BACKGROUND, 0, 0, 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight());
+
+                float last = (float) Math.ceil(timer) - timer;
+                FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, last <= 0.4f ? last * 2.5f : last > 0.6f ? (1 - last) * 2.5f : 1.0f, true);
+                FactoryGuiGraphics.of(guiGraphics).blit(INTROS.get((int) (timer % INTROS.size())), (guiGraphics.guiWidth() - guiGraphics.guiHeight() * 320 / 180) / 2, 0, 0, 0, guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight(), guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight());
+                FactoryGuiGraphics.of(guiGraphics).clearColor(true);
             }
-            if (g < 1.0f && !reload.isDone() && MinecraftAccessor.getInstance().hasGameLoaded())
-                ScreenUtil.drawGenericLoading(guiGraphics, (guiGraphics.guiWidth() - 75) / 2, (guiGraphics.guiHeight() - 75) / 2);
 
-            if (g >= 2.0f)
-                this.minecraft.setOverlay(null);
-
-            if (this.fadeOutStart == -1L && this.reload.isDone() && (!this.fadeIn || h >= 2.0f)) {
-                try {
-                    this.reload.checkExceptions();
-                    this.onFinish.accept(Optional.empty());
-                } catch (Throwable throwable) {
-                    this.onFinish.accept(Optional.of(throwable));
+            if (finishedIntro) {
+                float h;
+                long m = Util.getMillis();
+                if (this.fadeIn && this.fadeInStart == -1L) {
+                    this.fadeInStart = m;
                 }
-                this.fadeOutStart = Util.getMillis();
-                if (this.minecraft.screen != null) {
-                    this.minecraft.screen.init(this.minecraft, guiGraphics.guiWidth(), guiGraphics.guiHeight());
+                float g = this.fadeOutStart > -1L ? (float) (m - this.fadeOutStart) / 1000.0f : -1.0f;
+                h = this.fadeInStart > -1L ? (float) (m - this.fadeInStart) / 500.0f : -1.0f;
+                if ((MinecraftAccessor.getInstance().hasGameLoaded() && reload.isDone()) && minecraft.screen != null)
+                    this.minecraft.screen.renderWithTooltip(guiGraphics, 0, 0, f);
+                else {
+                    FactoryGuiGraphics.of(guiGraphics).blit(ScreenUtil.LOADING_BACKGROUND, 0, 0, 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight());
+                }
+                if (g < 1.0f && !reload.isDone() && MinecraftAccessor.getInstance().hasGameLoaded())
+                    ScreenUtil.drawGenericLoading(guiGraphics, (guiGraphics.guiWidth() - 75) / 2, (guiGraphics.guiHeight() - 75) / 2);
+
+                if (g >= 2.0f)
+                    this.minecraft.setOverlay(null);
+
+                if (this.fadeOutStart == -1L && this.reload.isDone() && (!this.fadeIn || h >= 2.0f)) {
+                    try {
+                        this.reload.checkExceptions();
+                        this.onFinish.accept(Optional.empty());
+                    } catch (Throwable throwable) {
+                        this.onFinish.accept(Optional.of(throwable));
+                    }
+                    this.fadeOutStart = Util.getMillis();
+                    if (this.minecraft.screen != null) {
+                        this.minecraft.screen.init(this.minecraft, guiGraphics.guiWidth(), guiGraphics.guiHeight());
+                    }
                 }
             }
         }

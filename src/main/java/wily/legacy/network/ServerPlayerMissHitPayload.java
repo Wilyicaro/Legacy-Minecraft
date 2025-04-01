@@ -17,7 +17,7 @@ public class ServerPlayerMissHitPayload extends CommonNetwork.EmptyPayload {
     }
 
     @Override
-    public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> player) {
-        if (!player.get().isSpectator()) player.get().level().playSound(null,player.get(),SoundEvents.PLAYER_ATTACK_WEAK, SoundSource.PLAYERS,1.0f,1.0f);
+    public void apply(Context context) {
+        if (!context.player().isSpectator()) context.player().level().playSound(null,context.player(),SoundEvents.PLAYER_ATTACK_WEAK, SoundSource.PLAYERS,1.0f,1.0f);
     }
 }

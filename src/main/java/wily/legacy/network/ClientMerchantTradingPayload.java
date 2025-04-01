@@ -37,9 +37,9 @@ public record ClientMerchantTradingPayload(int entityID, Optional<UUID> player, 
     }
 
     @Override
-    public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> p) {
-        if (!(p.get().level().getEntity(entityID) instanceof AbstractVillager v)) return;
-        if (p.get().level().isClientSide()) v.setTradingPlayer(player.map(u-> v.level().getPlayerByUUID(u)).orElse(null));
+    public void apply(Context context) {
+        if (!(context.player().level().getEntity(entityID) instanceof AbstractVillager v)) return;
+        if (context.player().level().isClientSide()) v.setTradingPlayer(player.map(u-> v.level().getPlayerByUUID(u)).orElse(null));
         else sync(v);
     }
 }

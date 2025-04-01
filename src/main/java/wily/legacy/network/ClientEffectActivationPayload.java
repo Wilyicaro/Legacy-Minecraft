@@ -27,7 +27,7 @@ public record ClientEffectActivationPayload(/*? if <1.20.5 {*//*MobEffect*//*?} 
     }
 
     @Override
-    public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> player) {
+    public void apply(Context context) {
         if (FactoryAPIPlatform.isClient()) Legacy4JClient.displayEffectActivationAnimation(effect);
     }
 

@@ -35,8 +35,8 @@ public record ClientAnimalInLoveSyncPayload(int entityID, int inLove, int age) i
     }
 
     @Override
-    public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> p) {
-        if (p.get().level().getEntity(entityID) instanceof Animal e) {
+    public void apply(Context context) {
+        if (context.player().level().getEntity(entityID) instanceof Animal e) {
             e.setInLoveTime(inLove);
             e.setAge(age);
         }

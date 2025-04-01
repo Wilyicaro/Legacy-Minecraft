@@ -42,8 +42,8 @@ public record ServerMenuCraftPayload(Optional<ResourceLocation> craftId, List<Op
     }
 
     @Override
-    public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> p) {
-        if (p.get() instanceof ServerPlayer sp && sp.containerMenu instanceof RecipeMenu m) executor.execute(()-> m.tryCraft(sp,this));
+    public void apply(Context context) {
+        if (context.player() instanceof ServerPlayer sp && sp.containerMenu instanceof RecipeMenu m) context.executor().execute(()-> m.tryCraft(sp,this));
     }
 
     @Override

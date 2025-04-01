@@ -44,7 +44,7 @@ public record ClientAdvancementsPayload(/*? if >1.20.1 {*/List<AdvancementHolder
     }
 
     @Override
-    public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> p) {
+    public void apply(Context context) {
         advancements.clear();
         //? if >1.20.1 {
         advancements.addAll(collection);

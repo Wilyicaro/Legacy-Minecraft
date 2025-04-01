@@ -90,7 +90,7 @@ public record TopMessage(Component message, int baseColor, int ticksOnScreen, bo
         }
 
         @Override
-        public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> player) {
+        public void apply(Context context) {
             if (sendType().isSmall()) setSmall(topMessage);
             if (sendType().isMedium()) setMedium(topMessage);
         }

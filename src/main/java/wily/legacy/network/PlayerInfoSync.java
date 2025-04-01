@@ -85,8 +85,8 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
         return rules;
     }
     @Override
-    public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> p) {
-        if (p.get() instanceof ServerPlayer sp) {
+    public void apply(Context context) {
+        if (context.player() instanceof ServerPlayer sp) {
             sp = sp.server.getPlayerList().getPlayer(player);
             if (sp == null) return;
             switch (sync){
@@ -144,21 +144,21 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
         }
 
         @Override
-        public void apply(CommonNetwork.SecureExecutor executor, Supplier<Player> p) {
-            executor.executeWhen(()->{
-                if (p.get() != null && p.get().level().isClientSide && FactoryAPIClient.hasModOnServer){
+        public void apply(Context context) {
+            context.executor().executeWhen(()->{
+                if (context.isClient() && FactoryAPIClient.hasModOnServer){
                     Legacy4JClient.defaultServerGameType = defaultGameType;
                     Legacy4JClient.updateLegacyPlayerInfos(players);
                     return true;
                 }
                 return false;
             });
-            executor.execute(()-> {
-                GameRules displayRules = p.get() instanceof ServerPlayer sp ? sp.getServer().getGameRules() : Legacy4JClient.gameRules;
+            context.executor().execute(()-> {
+                GameRules displayRules = context.player() instanceof ServerPlayer sp ? sp.getServer().getGameRules() : Legacy4JClient.gameRules;
                 displayRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
                     @Override
                     public <T extends GameRules.Value<T>> void visit(GameRules.Key<T> key, GameRules.Type<T> type) {
-                        if (gameRules.containsKey(key.getId()) && (p.get().level().isClientSide || NON_OP_GAMERULES.contains(key) || p.get().hasPermissions(2))) {
+                        if (gameRules.containsKey(key.getId()) && (context.player().level().isClientSide || NON_OP_GAMERULES.contains(key) || context.player().hasPermissions(2))) {
                             if (gameRules.get(key.getId()) instanceof Boolean b && displayRules.getRule(key) instanceof GameRules.BooleanValue v)
                                 v.set(b, null);
                             if (gameRules.get(key.getId()) instanceof Integer i && displayRules.getRule(key) instanceof GameRules.IntegerValue v)

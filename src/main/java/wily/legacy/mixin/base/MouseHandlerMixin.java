@@ -49,4 +49,16 @@ public class MouseHandlerMixin {
             }
         }
     }
+
+    //? if >=1.21.5 {
+    /*@Inject(method = "getScaledXPos(Lcom/mojang/blaze3d/platform/Window;)D", at = @At("HEAD"), cancellable = true)
+    private void getScaledXPos(CallbackInfoReturnable<Double> cir) {
+        if (Legacy4JClient.controllerManager.isCursorDisabled) cir.setReturnValue(-1d);
+    }
+
+    @Inject(method = "getScaledYPos(Lcom/mojang/blaze3d/platform/Window;)D", at = @At("HEAD"), cancellable = true)
+    private void getScaledYPos(CallbackInfoReturnable<Double> cir) {
+        if (Legacy4JClient.controllerManager.isCursorDisabled) cir.setReturnValue(-1d);
+    }
+    *///?}
 }

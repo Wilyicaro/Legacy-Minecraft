@@ -162,7 +162,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         addRenderableOnly(((guiGraphics, i, j, f) ->{
             guiGraphics.drawString(font,showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle(),panel.x + (panel.width - font.width(showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle()))/ 2,panel.y + 10, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
             if (!displayInfos.isEmpty()) {
-                ResourceLocation background = displayInfos.get(tabList.selectedTab).getBackground()/*? if >1.20.1 {*/.orElse(null)/*?}*//*? if >=1.21.5 {*//*.id()*//*?}*/;
+                ResourceLocation background = displayInfos.get(tabList.selectedTab).getBackground()/*? if >1.20.1 {*/.orElse(null)/*?}*//*? if >=1.21.5 {*//*.texturePath()*//*?}*/;
                 if (background != null) FactoryGuiGraphics.of(guiGraphics).blit(background,panel.x + 14, panel.y + 24,0,0,422,23,16,16);
             }
             ScreenUtil.renderPanelTranslucentRecess(guiGraphics,panel.x + 12, panel.y + 22, 426, 27);

@@ -4,9 +4,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import wily.factoryapi.FactoryAPI;
-import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.client.LegacyMixinOptions;
-import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.config.LegacyMixinToggles;
 
 import java.util.List;
