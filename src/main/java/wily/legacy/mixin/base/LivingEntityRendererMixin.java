@@ -34,7 +34,7 @@ import wily.factoryapi.util.ColorUtil;
 import wily.legacy.client.LegacyOptions;
 
 @Mixin(LivingEntityRenderer.class)
-public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEntity/*? if >=1.21.2 {*//*, LivingEntityRenderState*//*?}*/> {
+public abstract class LivingEntityRendererMixin extends /*? if >=1.21.2 {*//*EntityRenderer<LivingEntity, LivingEntityRenderState>*//*?} else {*/EntityRenderer<LivingEntity>/*?}*/ {
     @Shadow public abstract EntityModel</*? if <1.21.2 {*/LivingEntity/*?} else {*//*LivingEntityRenderState*//*?}*/> getModel();
 
 

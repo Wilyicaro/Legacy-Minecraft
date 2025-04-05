@@ -31,7 +31,7 @@ import wily.factoryapi.FactoryAPI;
 import wily.legacy.Legacy4J;
 
 @Mixin(FireworkEntityRenderer.class)
-public abstract class FireworkEntityRendererMixin extends EntityRenderer<FireworkRocketEntity/*? if >=1.21.2 {*//*, FireworkRocketRenderState*//*?}*/> {
+public abstract class FireworkEntityRendererMixin extends /*? if >=1.21.2 {*//*EntityRenderer<FireworkRocketEntity, FireworkRocketRenderState>*//*?} else {*/EntityRenderer<FireworkRocketEntity>/*?}*/ {
     private static final ResourceLocation FIREWORK_LOCATION = Legacy4J.createModLocation( "textures/entity/projectiles/firework.png");
     protected FireworkEntityRendererMixin(EntityRendererProvider.Context context) {
         super(context);

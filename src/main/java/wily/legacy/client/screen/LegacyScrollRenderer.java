@@ -1,6 +1,5 @@
 package wily.legacy.client.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenAxis;
@@ -8,7 +7,6 @@ import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.resources.ResourceLocation;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
-import wily.legacy.Legacy4J;
 import wily.legacy.util.LegacySprites;
 
 public class LegacyScrollRenderer {

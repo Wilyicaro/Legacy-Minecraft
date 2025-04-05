@@ -1,0 +1,11 @@
+{
+  "targetUI": "wily.legacy.client.screen.OptionsScreen",
+  "targetType": "class",
+  "applyCondition": "${windowHeight}>=1080",
+  "elements": {
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    }
+  }
+}

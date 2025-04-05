@@ -7,6 +7,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -84,9 +85,9 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
         return (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat) || FactoryItemUtil.getEnchantmentLevel(getMainHandItem(), Enchantments.SWEEPING_EDGE, level().registryAccess()) > 0) && original;
     }
 
-    @ModifyExpressionValue(method = "getDestroySpeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;onGround()Z"))
+    @ModifyExpressionValue(method = /*? if (forge || neoforge) && >=1.21 {*//*"getDestroySpeed(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)F"*//*?} else if forge || neoforge {*//*"getDigSpeed"*//*?} else {*/"getDestroySpeed"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;onGround()Z"))
     protected boolean getDestroySpeed(boolean original) {
-        return true;
+        return FactoryAPIClient.hasModOnServer || original;
     }
 
 }

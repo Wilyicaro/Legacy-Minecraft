@@ -16,6 +16,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec3;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
@@ -40,7 +41,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
 
     protected final AbstractContainerMenu menu;
     protected Slot hoveredSlot = null;
-    protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
+    protected final LegacyScroller scroller = LegacyScroller.create(135, ()->scrolledList);
 
     public ItemViewerScreen(Screen parent, Function<Screen, Panel> panelConstructor, Component component) {
         super(parent, panelConstructor, component);
@@ -82,22 +83,12 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
         ControlTooltip.setupDefaultScreen(renderer, this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_W) : ControllerBinding.RIGHT_TRIGGER.getIcon(),()->getHoveredSlot() != null && getHoveredSlot().hasItem() && LegacyTipManager.hasTip(getHoveredSlot().getItem()) ? LegacyComponents.WHATS_THIS : null);
     }
 
-    public void updateScroll(double d, double e, int i) {
-        float x = panel.x + 299.5f;
-        float y = panel.y + 23.5f;
-        if (i == 0 && d >= x && d < x + 11 && e >= y && e < y + 133) {
-            int lastScroll = scrolledList.get();
-            scrolledList.set((int) Math.round(scrolledList.max * (e - y) / 133));
-            if (lastScroll != scrolledList.get()) {
-                scrollRenderer.updateScroll(scrolledList.get() - lastScroll > 0 ? ScreenDirection.DOWN : ScreenDirection.UP);
-                fillLayerGrid();
-            }
-        }
-    }
 
     @Override
     protected void init() {
         panel.init();
+        scroller.setPosition(panel.x + 299, panel.y + 23);
+        scroller.offset(new Vec3(0.5f, 0, 0));
         fillLayerGrid();
     }
 
@@ -110,23 +101,21 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
 
     @Override
     public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
-        int scroll = (int) -Math.signum(g);
-        if (scrolledList.max > 0) {
-            int lastScrolled = scrolledList.get();
-            scrolledList.set(Math.max(0, Math.min(scrolledList.get() + scroll, scrolledList.max)));
-            if (lastScrolled != scrolledList.get()) {
-                scrollRenderer.updateScroll(scroll > 0 ? ScreenDirection.DOWN : ScreenDirection.UP);
-                fillLayerGrid();
-            }
-        }
+        if (scroller.mouseScrolled(g)) fillLayerGrid();
         return super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g);
     }
 
     @Override
     public boolean mouseClicked(double d, double e, int i) {
-        updateScroll(d, e, i);
+        if (scroller.mouseClicked(d, e, i)) fillLayerGrid();;
         if (hoveredSlot != null) slotClicked(hoveredSlot);
         return super.mouseClicked(d, e, i);
+    }
+
+    @Override
+    public boolean mouseReleased(double d, double e, int i) {
+        scroller.mouseReleased(d, e, i);
+        return super.mouseReleased(d, e, i);
     }
 
     @Override
@@ -143,7 +132,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
 
     @Override
     public boolean mouseDragged(double d, double e, int i, double f, double g) {
-        updateScroll(d, e, i);
+        if (scroller.mouseDragged(e)) fillLayerGrid();;
         return super.mouseDragged(d, e, i, f, g);
     }
 
@@ -175,21 +164,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     }
 
     protected void renderScroll(GuiGraphics guiGraphics, int i, int j, float f) {
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(panel.x + 299.5, panel.y + 23, 0f);
-        if (scrolledList.max > 0) {
-            if (scrolledList.get() != scrolledList.max)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, 0, 139);
-            if (scrolledList.get() > 0)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, 0, -11);
-        } else FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 0.5f);
-        FactoryScreenUtil.enableBlend();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0, 13, 135);
-        guiGraphics.pose().translate(-2f, -1f + (scrolledList.max > 0 ? scrolledList.get() * 121.5f / scrolledList.max : 0), 0f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL, 0, 0, 16, 16);
-        FactoryGuiGraphics.of(guiGraphics).clearColor();
-        FactoryScreenUtil.disableBlend();
-        guiGraphics.pose().popPose();
+        scroller.render(guiGraphics, i, j, f);
     }
 
     @Override

@@ -22,7 +22,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LoyaltyLinesRenderState;
 
 @Mixin(ThrownTridentRenderer.class)
-public abstract class ThrownTridentRendererMixin extends EntityRenderer<ThrownTrident/*? if >=1.21.2 {*//*, ThrownTridentRenderState*//*?}*/> {
+public abstract class ThrownTridentRendererMixin extends /*? if >=1.21.2 {*//*EntityRenderer<ThrownTrident, ThrownTridentRenderState>*//*?} else {*/EntityRenderer<ThrownTrident>/*?}*/ {
     protected ThrownTridentRendererMixin(EntityRendererProvider.Context context) {
         super(context);
     }

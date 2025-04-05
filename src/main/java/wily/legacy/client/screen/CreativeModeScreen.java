@@ -65,7 +65,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
     private CreativeInventoryListener listener;
     protected boolean hasClickedOutside;
     public final List<Stocker.Sizeable> tabsScrolledList = new ArrayList<>();
-    protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
+    protected final LegacyScroller scroller = LegacyScroller.create(135, ()-> tabsScrolledList.get(page.get() * 8 + tabList.selectedTab));
     protected final List<List<ItemStack>> displayListing = new ArrayList<>();
     protected final Stocker.Sizeable arrangement = new Stocker.Sizeable(0,2);
     protected final EditBox searchBox = new EditBox(Minecraft.getInstance().font, 0, 0, 200,20, LegacyComponents.SEARCH_ITEMS);
@@ -178,6 +178,9 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         imageHeight = panel.height;
         leftPos = panel.x;
         topPos = panel.y;
+        addRenderableOnly(scroller);
+        scroller.setPosition(panel.x + 296, panel.y + 27);
+        scroller.offset(new Vec3(0.5f, 0.5f, 0));
         if (arrangement.get() == 2){
             searchBox.setPosition(panel.getX() + (panel.getWidth() - searchBox.getWidth()) / 2 - 6, panel.getY() + 7);
             addRenderableWidget(searchBox);
@@ -227,22 +230,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(leftPos + 296.5f, topPos + 27.5f, 0f);
-        Stocker.Sizeable scroll = tabsScrolledList.get(page.get() * 8 + tabList.selectedTab);
-        if (scroll.max > 0) {
-            if (scroll.get() != scroll.max)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN,0, 139);
-            if (scroll.get() > 0)
-                scrollRenderer.renderScroll(guiGraphics,ScreenDirection.UP, 0, -11);
-        }else FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,0.5f);
-        FactoryScreenUtil.enableBlend();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0,13,135);
-        guiGraphics.pose().translate(-2f, -1f + (scroll.max > 0 ? scroll.get() * 121.5f / scroll.max : 0), 0f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
-        FactoryGuiGraphics.of(guiGraphics).clearColor();
-        FactoryScreenUtil.disableBlend();
-        guiGraphics.pose().popPose();
+
         this.renderTooltip(guiGraphics, i, j);
         //? if >=1.21.2 {
         /*ScreenUtil.renderContainerEffects(guiGraphics,leftPos,topPos,imageWidth,imageHeight,i,j);
@@ -262,18 +250,17 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
     }
 
     @Override
+    public boolean mouseReleased(double d, double e, int i) {
+        scroller.mouseReleased(d, e, i);
+        return super.mouseReleased(d, e, i);
+    }
+
+    @Override
     public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
         if (super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g)) return true;
-        int i = (int) -Math.signum(g);
-        Stocker.Sizeable scroll = tabsScrolledList.get(page.get() * 8 + tabList.selectedTab);
-        if (scroll.max > 0 || scroll.get() > 0){
-            int lastScrolled = scroll.get();
-            scroll.set(Math.max(0,Math.min(scroll.get() + i,scroll.max)));
-            if (lastScrolled != scroll.get()) {
-                scrollRenderer.updateScroll(i > 0 ? ScreenDirection.DOWN : ScreenDirection.UP);
-                fillCreativeGrid();
-                return true;
-            }
+        else if (scroller.mouseScrolled(g)){
+            fillCreativeGrid();
+            return true;
         }
         return false;
     }
@@ -282,28 +269,14 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
     public boolean mouseClicked(double d, double e, int i) {
         if (searchBox.isFocused() && !searchBox.isMouseOver(d,e)) setFocused(null);
         if (canClearQuickSelect() && i == 1) return false;
-        updateCreativeGridScroll(d,e,i);
+        if (scroller.mouseClicked(d, e, i)) fillCreativeGrid();
         return super.mouseClicked(d, e, i);
     }
 
     @Override
     public boolean mouseDragged(double d, double e, int i, double f, double g) {
-        updateCreativeGridScroll(d,e,i);
+        if (scroller.mouseDragged(e)) fillCreativeGrid();
         return super.mouseDragged(d, e, i, f, g);
-    }
-
-    public void updateCreativeGridScroll(double d, double e, int i){
-        float x = leftPos + 297.5f;
-        float y = topPos + 28.5f;
-        if (i == 0 && d >= x && d < x + 11 && e >= y && e < y + 133){
-            Stocker.Sizeable scrolledList = tabsScrolledList.get(page.get() * 8 + tabList.selectedTab);
-            int lastScroll = scrolledList.get();
-            scrolledList.set((int) Math.round(scrolledList.max * (e - y) / 133));
-            if (lastScroll != scrolledList.get()) {
-                scrollRenderer.updateScroll(scrolledList.get() - lastScroll > 0 ? ScreenDirection.DOWN : ScreenDirection.UP);
-                fillCreativeGrid();
-            }
-        }
     }
 
     @Override
