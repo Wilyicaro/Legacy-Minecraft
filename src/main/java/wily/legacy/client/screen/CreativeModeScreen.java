@@ -448,11 +448,8 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
                             return super.mayPickup(player) && !getItem().isEmpty() ? getItem().isItemEnabled(player.level().enabledFeatures()) && /*? if <1.20.5 {*//*getItem().getTagElement("CustomCreativeLock") == null*//*?} else {*/!getItem().has(DataComponents.CREATIVE_SLOT_LOCK)/*?}*/ : getItem().isEmpty();
                         }
                     }, new LegacySlotDisplay(){
-                        public int getWidth() {
-                            return 27;
-                        }
                         @Override
-                        public int getHeight() {
+                        public int getWidth() {
                             return 27;
                         }
                     }));
@@ -461,10 +458,6 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
             for (int x = 0; x < 9; x++) {
                 addSlot(LegacySlotDisplay.override(new Slot(player.getInventory(), x,35 + x * 27,176), new LegacySlotDisplay(){
                     public int getWidth() {
-                        return 27;
-                    }
-                    @Override
-                    public int getHeight() {
                         return 27;
                     }
                 }));

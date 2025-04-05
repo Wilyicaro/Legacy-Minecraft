@@ -49,7 +49,7 @@ public class ItemMixin /*? if <1.20.5 {*//*implements ItemAccessor*//*?}*/ {
     }
 
     //? <1.21.2 {
-    @Inject(method = "use", at = @At("HEAD"))
+    @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     public void use(Level level, Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir) {
         if (isSword() && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking) && (interactionHand == InteractionHand.OFF_HAND || !player.getOffhandItem().getUseAnimation().equals(UseAnim.BLOCK))) {
             player.startUsingItem(interactionHand);

@@ -28,10 +28,10 @@ public class LegacyGameRules {
 
     public static GameRules.Type<GameRules.IntegerValue> createInteger(int defaultValue, int min, int max, BiConsumer<MinecraftServer, GameRules.IntegerValue> biConsumer){
         //? if <1.21.2 {
-        return new GameRules.Type<>(()-> IntegerArgumentType.integer(0,4), t-> new GameRules.IntegerValue(t,3),(s, t)->{}, GameRules.GameRuleTypeVisitor::visitInteger);
+        return new GameRules.Type<>(()-> IntegerArgumentType.integer(min,max), t-> new GameRules.IntegerValue(t,defaultValue), biConsumer, GameRules.GameRuleTypeVisitor::visitInteger);
         //?} else {
         /*return GameRules.IntegerValue.create(defaultValue, min, max, FeatureFlagSet.of(), biConsumer);
-        *///?}
+         *///?}
     }
 
     public static void init(){

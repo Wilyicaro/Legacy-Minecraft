@@ -10,6 +10,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.controller.Controller;
+import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Comparator;
@@ -55,7 +56,7 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
         return movePointerToSlot(s,true);
     }
     default boolean movePointerToSlot(Slot s, boolean allowHovered){
-        if (s == null || (!allowHovered && s == findHoveredSlot()) || !s.isActive()) return false;
+        if (s == null || (!allowHovered && s == findHoveredSlot()) || !LegacySlotDisplay.isVisibleAndActive(s)) return false;
         Minecraft minecraft = Minecraft.getInstance();
         LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(getMenuRectangle().left(), getMenuRectangle().top(), s);
         Legacy4JClient.controllerManager.setPointerPos(holder.getMiddleX() * ((double)minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth()), holder.getMiddleY() * ((double)minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()));

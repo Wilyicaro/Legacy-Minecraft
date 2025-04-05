@@ -297,12 +297,12 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
                 *///?}
 
                 if (allowRecipeDisplay) {
+                    compactItemStackList.clear();
+                    RecipeMenu.handleCompactInventoryList(compactItemStackList, inventory, ItemStack.EMPTY);
                     //? if <1.21.2 {
                     LegacyCraftingScreen.canCraft(compactItemStackList, ings, warningSlots);
                     //?} else {
-                    /*compactItemStackList.clear();
-                    RecipeMenu.handleCompactInventoryList(compactItemStackList, inventory, ItemStack.EMPTY);
-                    main : for (int i = 0; i < displays.size(); i++) {
+                    /*main : for (int i = 0; i < displays.size(); i++) {
                         List<ItemStack> stacks = displays.get(i);
                         if (stacks.isEmpty() || stacks.get(0).isEmpty()) {
                             warningSlots[i] = false;

@@ -1,17 +1,11 @@
 package wily.legacy.mixin.base;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import org.objectweb.asm.Opcodes;
@@ -87,7 +81,12 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
 
     @ModifyVariable(method = "attack", at = @At(value = "STORE"), ordinal = 3)
     protected boolean modifyAttackDamage(boolean original) {
-        return (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat) || FactoryItemUtil.getEnchantmentLevel(getMainHandItem(), Enchantments.SWEEPING_EDGE) > 0) && original;
+        return (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat) || FactoryItemUtil.getEnchantmentLevel(getMainHandItem(), Enchantments.SWEEPING_EDGE, level().registryAccess()) > 0) && original;
+    }
+
+    @ModifyExpressionValue(method = "getDestroySpeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;onGround()Z"))
+    protected boolean getDestroySpeed(boolean original) {
+        return true;
     }
 
 }

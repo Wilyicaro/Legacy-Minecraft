@@ -1,5 +1,7 @@
 package wily.legacy.mixin.base;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
@@ -32,6 +34,7 @@ import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.LegacyMenuAccess;
+import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Set;
@@ -65,8 +68,6 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Shadow protected int imageWidth;
 
     @Shadow protected Slot hoveredSlot;
-
-    @Shadow protected abstract void init();
 
     @Shadow protected int imageHeight;
 
@@ -107,10 +108,13 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         cir.setReturnValue(ScreenUtil.isHovering(slot,leftPos,topPos,d,e));
     }
     //? if <1.21.2 {
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isActive()Z", ordinal = 1))
-    private boolean render(Slot instance) {
-        if (instance.isActive()) hoveredSlot = instance;
+    @ModifyExpressionValue(method = /*? if neoforge {*//*"renderSlotHighlight(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/inventory/Slot;IIF)V"*//*?} else {*/"render"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z"))
+    private boolean renderSlotHighlight(boolean original) {
         return false;
+    }
+    @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isActive()Z"))
+    private boolean renderSlots(boolean original, @Local Slot slot) {
+        return original && LegacySlotDisplay.of(slot).isVisible();
     }
     //?} else {
     /*@Inject(method = "renderSlotHighlightFront", at = @At("HEAD"), cancellable = true)
@@ -121,13 +125,18 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     private void renderSlotHighlightBack(GuiGraphics guiGraphics, CallbackInfo ci) {
         ci.cancel();
     }
+
+    @ModifyExpressionValue(method = "renderSlots", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isActive()Z"))
+    private boolean renderSlots(boolean original, @Local Slot slot) {
+        return original && LegacySlotDisplay.of(slot).isVisible();
+    }
     *///?}
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
     private void renderSlot(GuiGraphics graphics, Slot slot, CallbackInfo ci) {
         ci.cancel();
         LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(slot);
         holder.render(graphics, 0, 0, 0);
-        if (ScreenUtil.isHovering(slot,leftPos,topPos,Legacy4JClient.controllerManager.getPointerX(), Legacy4JClient.controllerManager.getPointerY()) && slot.isActive()) holder.renderHighlight(graphics);
+        if (ScreenUtil.isHovering(slot,leftPos,topPos,Legacy4JClient.controllerManager.getPointerX(),Legacy4JClient.controllerManager.getPointerY())) holder.renderHighlight(graphics);
         graphics.pose().pushPose();
         holder.applyOffset(graphics);
         graphics.pose().translate(slot.x,slot.y,0);
@@ -188,7 +197,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     }
     @Inject(method = "renderTooltip", at = @At("HEAD"), cancellable = true)
     protected void renderTooltip(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
-        if (hoveredSlot == null || !hoveredSlot.isActive()) ci.cancel();
+        if (hoveredSlot == null || !LegacySlotDisplay.isVisibleAndActive(hoveredSlot)) ci.cancel();
     }
     @Redirect(method = "mouseClicked",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;isKeyDown(JI)Z"))
     public boolean mouseClicked(long l, int i) {
@@ -204,10 +213,11 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     }
 
     @Inject(method = "onClose",at = @At("RETURN"))
-    public void removed(CallbackInfo ci) {
+    public void onClose(CallbackInfo ci) {
         if (Legacy4J.anyArmorSlotMatch(minecraft.player.getInventory(), i-> !i.isEmpty())) {
             ScreenUtil.updateAnimatedCharacterTime(1500);
         }
+        menu.slots.forEach(s-> LegacySlotDisplay.override(s, LegacySlotDisplay.VANILLA));
     }
 
     @Override

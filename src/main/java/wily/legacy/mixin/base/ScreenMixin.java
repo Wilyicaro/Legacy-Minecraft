@@ -71,13 +71,12 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
         if (self() instanceof AbstractContainerScreen<?> && !LegacyOptions.menusWithBackground.get()) return;
         ScreenUtil.renderTransparentBackground(graphics);
     }
-    //?} else {
     //?}
     @Inject(method = "renderBackground",at = @At("HEAD"), cancellable = true)
     public void renderBackground(GuiGraphics guiGraphics, /*? if >1.20.1 {*/int i, int j, float f,/*?}*/ CallbackInfo ci) {
+        ci.cancel();
         if (UIAccessor.of(self()).getBoolean("hasBackground", true) && (!(self() instanceof AbstractContainerScreen<?>) || LegacyOptions.menusWithBackground.get())) {
             ScreenUtil.renderDefaultBackground(UIAccessor.of(self()), guiGraphics, false);
-            ci.cancel();
         }
     }
     //? if >=1.20.5 {

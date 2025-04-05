@@ -110,7 +110,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         return slotBounds(leftPos, topPos, slot, ItemStack.EMPTY);
     }
     public LegacyIconHolder slotBounds(int leftPos, int topPos, Slot slot, ItemStack stack){
-        return itemHolder(leftPos + slot.x,topPos + slot.y,LegacySlotDisplay.of(slot).getWidth(),LegacySlotDisplay.of(slot).getHeight(), stack, LegacySlotDisplay.of(slot).isWarning(), LegacySlotDisplay.of(slot).getIconSprite(), LegacySlotDisplay.of(slot).getOffset(), LegacySlotDisplay.of(slot).getIconHolderOverride());
+        return itemHolder(leftPos + slot.x,topPos + slot.y, LegacySlotDisplay.of(slot).getWidth(),LegacySlotDisplay.of(slot).getHeight(), stack, LegacySlotDisplay.of(slot).isWarning(), LegacySlotDisplay.of(slot).getIconSprite(), LegacySlotDisplay.of(slot).getOffset(), LegacySlotDisplay.of(slot).getIconHolderOverride());
     }
 
     public LegacyIconHolder itemHolder(ItemStack itemIcon, boolean isWarning){

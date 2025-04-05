@@ -11,6 +11,17 @@ import java.util.function.Function;
 
 public interface LegacySlotDisplay {
     LegacySlotDisplay DEFAULT = new LegacySlotDisplay(){};
+    LegacySlotDisplay VANILLA = new LegacySlotDisplay(){
+        @Override
+        public int getWidth() {
+            return 18;
+        }
+
+        @Override
+        public ArbitrarySupplier<ResourceLocation> getIconHolderOverride() {
+            return EMPTY_OVERRIDE;
+        }
+    };
 
     ArbitrarySupplier<ResourceLocation> EMPTY_OVERRIDE = ArbitrarySupplier.empty();
 
@@ -47,19 +58,26 @@ public interface LegacySlotDisplay {
     }
 
     static LegacySlotDisplay of(Slot slot){
-        return slot instanceof LegacySlotDisplay d ? d : DEFAULT;
+        return slot instanceof LegacySlot legacySlot ? legacySlot.getDisplay() : VANILLA;
+    }
+
+    static boolean isVisibleAndActive(Slot slot){
+        return slot.isActive() && LegacySlotDisplay.of(slot).isVisible();
     }
 
     static Slot override(Slot slot){
         return override(slot,DEFAULT);
     }
 
-    static Slot override(Slot slot,int x, int y){
+    static Slot override(Slot slot, int x, int y){
         return override(slot,x,y,DEFAULT);
     }
 
     static Slot override(Slot slot, LegacySlotDisplay legacySlot){
-        return override(slot,slot.x,slot.y,legacySlot);
+        if (slot instanceof LegacySlot c){
+            c.setDisplay(legacySlot);
+        }
+        return slot;
     }
 
     static Slot override(Slot slot, int x, int y, LegacySlotDisplay legacySlot){
