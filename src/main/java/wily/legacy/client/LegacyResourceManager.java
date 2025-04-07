@@ -41,7 +41,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
     public static final String DEFAULT_KBM_ICONS = "control_tooltips/icons/kbm.json";
     public static final String DEFAULT_CONTROLLER_ICONS = "control_tooltips/icons/controller.json";
 
-    public static final List<ResourceLocation> INTROS = new ArrayList<>();
+    public static LegacyIntro intro = LegacyIntro.EMPTY;
 
     public static final List<KeyboardScreen.CharButtonBuilder> keyboardButtonBuilders = new ArrayList<>();
     public static ControllerBinding<?> shiftBinding;
@@ -70,7 +70,6 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
             Legacy4J.LOGGER.warn("Failed to parse shader: {}", GAMMA_LOCATION, jsonSyntaxException);
         }
         //?}
-        registerIntroLocations(resourceManager);
 
         PlayerIdentifier.list.clear();
         resourceManager.getResourceStack(PLAYER_IDENTIFIERS_LOCATION).forEach(r->{
@@ -163,6 +162,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
             Legacy4J.LOGGER.warn(e.getMessage());
         }
     }
+
     public static void addIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String,JsonObject> addIcon){
         resourceManager.getResource(location).ifPresent(r->{
             try {
@@ -172,6 +172,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
             }
         });
     }
+
     public static void addControllerIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon){
         addIcons(resourceManager,location,(s,o)->{
             ControllerBinding<?> binding = ControllerBinding.map.get(s);
@@ -187,15 +188,14 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
         });
     }
 
-    public static void registerIntroLocations(ResourceManager resourceManager){
+    public static void loadIntroLocations(ResourceManager resourceManager){
         try {
-            INTROS.clear();
-            JsonArray array = GsonHelper.parseArray(resourceManager.getResourceOrThrow(INTRO_LOCATION).openAsReader());
-            array.forEach(e-> INTROS.add(FactoryAPI.createLocation(e.getAsString())));
+            LegacyIntro.CODEC.parse(JsonOps.INSTANCE,JsonParser.parseReader(resourceManager.openAsReader(INTRO_LOCATION))).result().ifPresent(i-> intro = i);
         } catch (IOException e) {
             Legacy4J.LOGGER.error(e.getMessage());
         }
     }
+
     @Override
     public String getName() {
         return "legacy:resource_manager";

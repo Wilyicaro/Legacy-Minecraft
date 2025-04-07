@@ -1,14 +1,14 @@
 package wily.legacy.mixin.base;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,6 +22,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.PlayerYBobbing;
+import wily.legacy.init.LegacyGameRules;
 
 @Mixin(Player.class)
 public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing {
@@ -90,4 +91,21 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
         return FactoryAPIClient.hasModOnServer || original;
     }
 
+    @ModifyExpressionValue(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/material/FluidState;isEmpty()Z"))
+    protected boolean travel(boolean original) {
+        if (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SWIMMING)) {
+            if (original) {
+                double diff = getY() - getBlockY();
+                setDeltaMovement(getDeltaMovement().multiply(1, 0, 1));
+                return diff > 0.8;
+            }
+        } else return original;
+        return false;
+    }
+
+
+    @ModifyArg(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/BlockPos;containing(DDD)Lnet/minecraft/core/BlockPos;"), index = 1)
+    protected double travel(double original) {
+        return LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SWIMMING) ? original + 0.1f : original;
+    }
 }

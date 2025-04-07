@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -14,7 +15,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.objectweb.asm.Opcodes;
 import org.slf4j.Logger;
@@ -25,10 +25,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIClient;
-import wily.legacy.Legacy4J;
-import wily.legacy.Legacy4JClient;
+import wily.legacy.init.LegacyGameRules;
 
 import static wily.legacy.Legacy4JClient.*;
 
@@ -82,14 +80,14 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
         return false;
     }
     //? if <1.21.5 {
-    @Redirect(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;setSprinting(Z)V", ordinal = /*? if <1.21.4 {*/3/*?} else {*//*4*//*?}*/))
-    public void aiStepSprintingWater(LocalPlayer instance, boolean b) {
-        if (!FactoryAPIClient.hasModOnServer || !this.input.hasForwardImpulse() || !this.hasEnoughFoodToStartSprinting()) instance.setSprinting(b);
+    @WrapWithCondition(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;setSprinting(Z)V", ordinal = /*? if <1.21.4 {*/3/*?} else {*//*4*//*?}*/))
+    public boolean aiStepSprintingWater(LocalPlayer instance, boolean b) {
+        return !FactoryAPIClient.hasModOnServer || !gameRules.getRule(LegacyGameRules.LEGACY_SWIMMING).get() || !this.input.hasForwardImpulse() || !this.hasEnoughFoodToStartSprinting();
     }
     //?} else {
-    /*@ModifyExpressionValue(method = "shouldStopRunSprinting", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isInWater()Z"))
+    /*@ModifyExpressionValue(method = {"shouldStopRunSprinting", "canStartSprinting"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUnderWater()Z"))
     public boolean shouldStopRunSprinting(boolean original) {
-        return !FactoryAPIClient.hasModOnServer && original;
+        return (FactoryAPIClient.hasModOnServer && gameRules.getRule(LegacyGameRules.LEGACY_SWIMMING).get() && isInWater()) || original;
     }
     *///?}
 

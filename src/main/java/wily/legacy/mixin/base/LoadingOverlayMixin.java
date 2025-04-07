@@ -19,14 +19,13 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyIntro;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyResourceManager;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.Optional;
 import java.util.function.Consumer;
-
-import static wily.legacy.client.LegacyResourceManager.INTROS;
 
 @Mixin(LoadingOverlay.class)
 public abstract class LoadingOverlayMixin extends Overlay {
@@ -45,8 +44,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
     @Shadow private long fadeInStart;
     @Unique
     private long initTime;
-    @Unique
-    private static ResourceLocation BACKGROUND = Legacy4J.createModLocation("textures/gui/intro/background.png");
+
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
@@ -55,18 +53,12 @@ public abstract class LoadingOverlayMixin extends Overlay {
             if (!loadIntroLocation) {
                 initTime = Util.getMillis();
                 loadIntroLocation = true;
-                LegacyResourceManager.registerIntroLocations(minecraft.getResourceManager());
+                LegacyResourceManager.loadIntroLocations(minecraft.getResourceManager());
             }
-            float timer = (Util.getMillis() - initTime) / 3200f;
-            if (!finishedIntro && Legacy4JClient.canSkipIntro(timer) && reload.isDone()) finishedIntro = true;
+            float timer = LegacyIntro.getTimer(initTime, LegacyResourceManager.intro);
+            if (!finishedIntro && LegacyIntro.canSkip(timer, LegacyResourceManager.intro) && reload.isDone()) finishedIntro = true;
             if (!finishedIntro) {
-                guiGraphics.fill(RenderType.guiOverlay(), 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFFFFFFFF);
-                FactoryGuiGraphics.of(guiGraphics).blit(BACKGROUND, 0, 0, 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight());
-
-                float last = (float) Math.ceil(timer) - timer;
-                FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, last <= 0.4f ? last * 2.5f : last > 0.6f ? (1 - last) * 2.5f : 1.0f, true);
-                FactoryGuiGraphics.of(guiGraphics).blit(INTROS.get((int) (timer % INTROS.size())), (guiGraphics.guiWidth() - guiGraphics.guiHeight() * 320 / 180) / 2, 0, 0, 0, guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight(), guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight());
-                FactoryGuiGraphics.of(guiGraphics).clearColor(true);
+                LegacyIntro.render(guiGraphics, LegacyResourceManager.intro, timer);
             }
 
             if (finishedIntro) {

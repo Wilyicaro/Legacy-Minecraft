@@ -120,6 +120,14 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
 
         public static final List<GameRules.Key<GameRules.BooleanValue>> NON_OP_GAMERULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK,LegacyGameRules.getTntExplodes(),GameRules.RULE_DOMOBLOOT,GameRules.RULE_DOBLOCKDROPS,GameRules.RULE_NATURAL_REGENERATION,LegacyGameRules.GLOBAL_MAP_PLAYER_ICON,LegacyGameRules.LEGACY_SWIMMING,GameRules.RULE_DO_IMMEDIATE_RESPAWN));
 
+        public static <T extends GameRules.Value<T>> void syncGamerule(GameRules.Key<T> key, T value, MinecraftServer server){
+            Object objectValue = value instanceof GameRules.IntegerValue integer ? integer.get() : value instanceof GameRules.BooleanValue bool ? bool.get() : null;
+            if (server != null && objectValue != null) {
+                All payload = new All(Collections.emptyMap(), Map.of(key.getId(), objectValue), server.getDefaultGameType(), All.ID_S2C);
+                server.getPlayerList().getPlayers().forEach(sp -> CommonNetwork.sendToPlayer(sp, payload));
+            }
+        }
+
         public All(CommonNetwork.PlayBuf buf, CommonNetwork.Identifier<All> identifier){
             this(buf.get().readMap(HashMap::new, b-> b.readUUID(), b-> LegacyPlayerInfo.decode(buf)), buf.get().readMap(HashMap::new, FriendlyByteBuf::readUtf, b->{
                 int type = b.readVarInt();
@@ -138,7 +146,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
             buf.get().writeMap(gameRules,FriendlyByteBuf::writeUtf,(b,obj)-> {
                 b.writeVarInt(obj instanceof Boolean ? 0 : 1);
                 if (obj instanceof Boolean bol)  b.writeBoolean(bol);
-                else if (obj instanceof  Integer i) b.writeVarInt(i);
+                else if (obj instanceof Integer i) b.writeVarInt(i);
             });
             buf.get().writeEnum(defaultGameType);
         }

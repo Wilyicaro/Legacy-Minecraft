@@ -140,3 +140,4 @@ accessible class net/minecraft/world/level/GameRules$VisitorCaller
 accessible method net/minecraft/world/entity/Mob shouldDespawnInPeaceful ()Z
 accessible method net/minecraft/client/gui/screens/Screen changeFocus (Lnet/minecraft/client/gui/ComponentPath;)V
 accessible field net/minecraft/client/renderer/PostChain passes Ljava/util/List;
+accessible method net/minecraft/world/level/GameRules$BooleanValue create (ZLjava/util/function/BiConsumer;)Lnet/minecraft/world/level/GameRules$Type;

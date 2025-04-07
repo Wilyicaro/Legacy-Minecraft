@@ -2,8 +2,12 @@ package wily.legacy.init;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.GameRules;
+import wily.factoryapi.FactoryAPIClient;
+import wily.legacy.Legacy4JClient;
+import wily.legacy.network.PlayerInfoSync;
 
 import java.util.function.BiConsumer;
 
@@ -20,10 +24,15 @@ public class LegacyGameRules {
     public static final GameRules.Key<GameRules.IntegerValue> DEFAULT_MAP_SIZE = GameRules.register("defaultMapSize", GameRules.Category.MISC, createInteger(3, 0, 4, ((server, integerValue) -> {})));
     public static final GameRules.Key<GameRules.BooleanValue> PLAYER_STARTING_BUNDLE = GameRules.register("playerStartingBundle", GameRules.Category.PLAYER, GameRules.BooleanValue.create(false));
     public static final GameRules.Key<GameRules.BooleanValue> LEGACY_MAP_GRID = GameRules.register("legacyMapGrid", GameRules.Category.PLAYER, GameRules.BooleanValue.create(true));
-    public static final GameRules.Key<GameRules.BooleanValue> LEGACY_SWIMMING = GameRules.register("legacySwimming", GameRules.Category.PLAYER, GameRules.BooleanValue.create(true));
+    public static final GameRules.Key<GameRules.BooleanValue> LEGACY_SWIMMING = GameRules.register("legacySwimming", GameRules.Category.PLAYER, GameRules.BooleanValue.create(true, (server, booleanValue) -> PlayerInfoSync.All.syncGamerule(LegacyGameRules.LEGACY_SWIMMING, booleanValue, server)));
 
     public static GameRules.Key<GameRules.BooleanValue> getTntExplodes(){
         return /*? if <1.21.5 {*/TNT_EXPLODES/*?} else {*//*GameRules.RULE_TNT_EXPLODES*//*?}*/;
+    }
+
+
+    public static boolean getSidedBooleanGamerule(Entity entity, GameRules.Key<GameRules.BooleanValue> key){
+        return entity.level().isClientSide && FactoryAPIClient.hasModOnServer && Legacy4JClient.gameRules.getBoolean(key) || !entity.level().isClientSide && entity.getServer().getGameRules().getBoolean(key);
     }
 
     public static GameRules.Type<GameRules.IntegerValue> createInteger(int defaultValue, int min, int max, BiConsumer<MinecraftServer, GameRules.IntegerValue> biConsumer){

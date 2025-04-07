@@ -132,7 +132,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static wily.legacy.Legacy4J.MOD_ID;
-import static wily.legacy.client.LegacyResourceManager.INTROS;
 import static wily.legacy.init.LegacyRegistries.SHRUB;
 
 
@@ -701,10 +700,6 @@ public class Legacy4JClient {
             s.rebuildRenderableVList(minecraft);
             s.repositionElements();
         }
-    }
-
-    public static boolean canSkipIntro(float timer){
-        return timer % INTROS.size() >= INTROS.size() - 0.01f || LegacyOptions.skipIntro.get() || InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), InputConstants.KEY_RETURN) || GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(),GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS || ControllerBinding.DOWN_BUTTON.state().pressed;
     }
 
     public static final KeyMapping keyCrafting = new KeyMapping("legacy.key.crafting", InputConstants.KEY_E, "key.categories.inventory");
