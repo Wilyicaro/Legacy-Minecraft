@@ -22,7 +22,7 @@ You can see more about this on the [project wiki](https://github.com/Wilyicaro/L
 ## 🚫 **LEGACY4J** CAN BE CONSIDERED A HACK IN SERVERS EQUIPPED WITH ANTI-CHEATS
 WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
 
-*Feel free to [report issues](https://github.com/Wilyicaro/Legacy-Minecraft/issues) or contribute [here](https://github.com/Wilyicaro/Legacy-Minecraft)!*  
+*Feel free to [report issues](https://github.com/Wilyicaro/Legacy-Minecraft/issues) or contribute [here](https://github.com/Wilyicaro/Legacy-Minecraft), and to use this mod in modpacks!*  
 *You can also join our [Discord](https://discord.com/invite/CVas58uPyb) to talk to the developers, other members and suggest features for the mod!*  
 *Also, you can follow the mod's development in detail and see how it's progressing on the [Kyubion Studios server](https://discord.gg/cdZg5aYfMM).*
 

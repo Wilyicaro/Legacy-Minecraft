@@ -158,6 +158,7 @@ public class LegacyUIElementTypes {
     }));
 
     public static final UIDefinitionManager.ElementType MODIFY_RENDERABLE_VLIST = UIDefinitionManager.ElementType.registerConditional("modify_renderable_vertical_list", UIDefinitionManager.ElementType.createIndexable(slots->(uiDefinition, accessorFunction, elementName, element) -> {
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "index");
         UIDefinition renderableVListUIDefinition = new UIDefinition() {
             private final List<UIDefinition> definitions = new ArrayList<>();
             @Override
@@ -168,7 +169,7 @@ public class LegacyUIElementTypes {
             @Override
             public void beforeInit(UIAccessor accessor) {
                 if (!accessor.initialized() && accessor.getScreen() instanceof RenderableVList.Access access){
-                    accessor.putStaticElement(elementName+".renderables", UIAccessor.createRenderablesWrapper(accessor, access.getRenderableVList().renderables));
+                    accessor.putStaticElement(elementName+".renderables", UIAccessor.createRenderablesWrapper(accessor, access.getRenderableVLists().get(accessor.getInteger(elementName + ".index", 0)).renderables));
                     UIDefinition.super.beforeInit(accessor);
                     UIDefinition.super.afterInit(accessor);
                 }
