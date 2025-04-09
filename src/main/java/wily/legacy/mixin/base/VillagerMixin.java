@@ -61,7 +61,8 @@ public abstract class VillagerMixin extends AbstractVillager {
     protected void updateTrades(int level){
         Int2ObjectMap<VillagerTrades.ItemListing[]> int2ObjectMap;
         VillagerData villagerData = this.getVillagerData();
-        Int2ObjectMap<VillagerTrades.ItemListing[]> int2ObjectMap2 = /*? if >=1.20.2 {*/this.level().enabledFeatures().contains(FeatureFlags.TRADE_REBALANCE) ? ((int2ObjectMap = VillagerTrades.EXPERIMENTAL_TRADES.get(villagerData./*? if <1.21.5 {*/getProfession/*?} else {*//*profession*//*?}*/())) != null ? int2ObjectMap : VillagerTrades.TRADES.get(villagerData./*? if <1.21.5 {*/getProfession/*?} else {*//*profession*//*?}*/())) : /*?}*/ VillagerTrades.TRADES.get(villagerData./*? if <1.21.5 {*/getProfession/*?} else {*//*profession*//*?}*/());
+        var profession = villagerData./*? if <1.21.5 {*/getProfession()/*?} else {*//*profession().unwrapKey().orElse(null)*//*?}*/;
+        Int2ObjectMap<VillagerTrades.ItemListing[]> int2ObjectMap2 = /*? if >=1.20.2 {*/this.level().enabledFeatures().contains(FeatureFlags.TRADE_REBALANCE) ? ((int2ObjectMap = VillagerTrades.EXPERIMENTAL_TRADES.get(profession))) : /*?}*/ VillagerTrades.TRADES.get(profession);
         VillagerTrades.ItemListing[] itemListings;
         if (int2ObjectMap2 == null || int2ObjectMap2.isEmpty() || (itemListings = int2ObjectMap2.get(level)) == null) return;
 

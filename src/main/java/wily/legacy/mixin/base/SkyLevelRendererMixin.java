@@ -4,6 +4,8 @@ package wily.legacy.mixin.base;
 /*import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 //? if >=1.21.5 {
@@ -16,6 +18,7 @@ import net.minecraft.client.renderer.SkyRenderer;
 *///?} else {
 import net.minecraft.client.renderer.LevelRenderer;
 //?}
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -33,7 +36,9 @@ public class SkyLevelRendererMixin {
         return original - 0.05f;
     }
     //? if >=1.21.4 {
-    /*//? if <1.21.5 {
+    /*@Unique
+    private boolean legacySkyShape = LegacyOptions.legacySkyShape.get();
+    //? if <1.21.5 {
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/VertexBuffer;uploadStatic(Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;Lcom/mojang/blaze3d/vertex/VertexFormat;Ljava/util/function/Consumer;)Lcom/mojang/blaze3d/vertex/VertexBuffer;", ordinal = 1))
     private VertexFormat.Mode changeLightSkyMode(VertexFormat.Mode par1){
         return LegacyOptions.legacySkyShape.get() ? VertexFormat.Mode.QUADS : par1;
@@ -43,31 +48,36 @@ public class SkyLevelRendererMixin {
         return LegacyOptions.legacySkyShape.get() ? VertexFormat.Mode.QUADS : par1;
     }
     //?} else {
-
     /^@ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/ByteBufferBuilder;<init>(I)V"))
     private int changeSkyBufferVertexCount(int vertices){
-        return LegacyOptions.legacySkyShape.get() ? 576 * DefaultVertexFormat.POSITION.getVertexSize() : vertices;
+        return legacySkyShape ? 576 * DefaultVertexFormat.POSITION.getVertexSize() : vertices;
+    }
+
+    @Inject(method = {"renderDarkDisc", "renderSkyDisc"}, at = @At("HEAD"))
+    private void addShareParams(CallbackInfo ci, @Share("autoStorageIndexBuffer") LocalRef<RenderSystem.AutoStorageIndexBuffer> autoStorageIndexBuffer, @Share("gpuBuffer") LocalRef<GpuBuffer> gpuBuffer){
+        if (legacySkyShape){
+            autoStorageIndexBuffer.set(RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS));
+            gpuBuffer.set(autoStorageIndexBuffer.get().getBuffer(864));
+        }
     }
 
     @WrapOperation(method = {"renderDarkDisc", "renderSkyDisc"}, at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;draw(II)V", remap = false))
-    private void changeSkyRenderVertexCount(RenderPass instance, int i, int size, Operation<Void> original, @Local RenderPass renderPass){
-        if (LegacyOptions.legacySkyShape.get()){
-            RenderSystem.AutoStorageIndexBuffer autoStorageIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
-            GpuBuffer gpuBuffer = autoStorageIndexBuffer.getBuffer(864);
-            instance.setIndexBuffer(gpuBuffer, autoStorageIndexBuffer.type());
+    private void changeSkyRenderVertexCount(RenderPass instance, int i, int size, Operation<Void> original, @Local RenderPass renderPass, @Share("autoStorageIndexBuffer") LocalRef<RenderSystem.AutoStorageIndexBuffer> autoStorageIndexBuffer, @Share("gpuBuffer") LocalRef<GpuBuffer> gpuBuffer){
+        if (legacySkyShape){
+            instance.setIndexBuffer(gpuBuffer.get(), autoStorageIndexBuffer.get().type());
             instance.drawIndexed(0, 864);
         }else original.call(instance, i, size);
     }
 
     @ModifyArg(method = {"renderDarkDisc", "renderSkyDisc"}, at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setPipeline(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)V", remap = false))
     private RenderPipeline changeSkyRenderPipeline(RenderPipeline renderPipeline){
-        return LegacyOptions.legacySkyShape.get() ? LegacyRenderPipelines.LEGACY_SKY : renderPipeline;
+        return legacySkyShape ? LegacyRenderPipelines.LEGACY_SKY : renderPipeline;
     }
     ^///?}
 
     @Inject(method = "buildSkyDisc", at = @At("HEAD"), cancellable = true)
     private void buildSkyDisc(VertexConsumer vertexConsumer, float f, CallbackInfo ci) {
-        if (LegacyOptions.legacySkyShape.get()) {
+        if (legacySkyShape) {
             Legacy4JClient.buildLegacySkyDisc(vertexConsumer, f);
             ci.cancel();
         }
