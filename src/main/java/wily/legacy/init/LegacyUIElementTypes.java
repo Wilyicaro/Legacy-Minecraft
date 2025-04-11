@@ -33,16 +33,14 @@ import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.client.UIDefinitionManager;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.screen.LegacyIconHolder;
-import wily.legacy.client.screen.LegacyMenuAccess;
-import wily.legacy.client.screen.RenderableVList;
-import wily.legacy.client.screen.ScrollableRenderer;
+import wily.legacy.client.screen.*;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 
 public class LegacyUIElementTypes {
     private static final Container emptyFakeContainer = new SimpleContainer();
@@ -258,6 +256,10 @@ public class LegacyUIElementTypes {
             guiGraphics.pose().popPose();
             Lighting.setupFor3DItems();
         }))));
+    }));
+
+    public static final UIDefinitionManager.ElementType PUT_TOGGLEABLE_TAB_SPRITES = UIDefinitionManager.ElementType.registerConditional("put_toggleable_tab_sprites", UIDefinitionManager.ElementType.createIndexable(slots->(uiDefinition, accessorFunction, elementName, element) -> {
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "value", (s, d) -> LegacyTabButton.ToggleableTabSprites.CODEC.parse(d).result().map((c) -> UIDefinition.createBeforeInit(elementName, (a) -> a.putStaticElement(elementName, c))).orElse(null));
     }));
 
     public static void init(){

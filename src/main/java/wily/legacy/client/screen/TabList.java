@@ -11,6 +11,7 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.Stocker;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.ScreenUtil;
 
@@ -23,21 +24,26 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class TabList implements Renderable,GuiEventListener, NarratableEntry {
-
+    protected final UIAccessor accessor;
     public final List<LegacyTabButton> tabButtons;
     public int selectedTab = 0;
     boolean focused = false;
-    public TabList(){
-        this(new ArrayList<>());
+
+    public TabList(UIAccessor uiAccessor){
+        this(uiAccessor, new ArrayList<>());
     }
-    public TabList(List<LegacyTabButton> list){
+
+    public TabList(UIAccessor accessor, List<LegacyTabButton> list){
+        this.accessor = accessor;
         this.tabButtons = list;
     }
+
     public LegacyTabButton addTabButton(LegacyTabButton button){
         tabButtons.add(button);
         return button;
     }
-    public LegacyTabButton addTabButton(int x, int y, int width, int height, int type, Function<LegacyTabButton,Renderable> icon, Component message, Tooltip tooltip, Consumer<LegacyTabButton> onPress){
+
+    public LegacyTabButton addTabButton(int x, int y, int width, int height, LegacyTabButton.Type type, LegacyTabButton.Render icon, Component message, Tooltip tooltip, Consumer<LegacyTabButton> onPress){
         return this.addTabButton(new LegacyTabButton(x,y,width,height,type,icon,message,tooltip, t-> {
             int index = tabButtons.indexOf(t);
             if (selectedTab != index) {
@@ -46,36 +52,50 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
             }
         }));
     }
-    public LegacyTabButton addTabButton(int height, int type, Function<LegacyTabButton,Renderable> icon, Component component, Consumer<LegacyTabButton> onPress) {
+
+    public LegacyTabButton addTabButton(int height, LegacyTabButton.Type type, LegacyTabButton.Render icon, Component component, Consumer<LegacyTabButton> onPress) {
         return addTabButton(0,0,0,height,type,icon,component, null,onPress);
     }
-    public TabList add(int x, int y, int width, int height, int type, Function<LegacyTabButton,Renderable> icon, Component message, Tooltip tooltip, Consumer<LegacyTabButton> onPress){
+
+    public TabList add(int x, int y, int width, int height, LegacyTabButton.Type type, LegacyTabButton.Render icon, Component message, Tooltip tooltip, Consumer<LegacyTabButton> onPress){
         this.addTabButton(x,y,width,height,type,icon,message,tooltip,onPress);
         return this;
     }
-    public TabList add(int height, int type, Function<LegacyTabButton,Renderable> icon, Component component, Consumer<LegacyTabButton> onPress) {
+
+    public TabList add(int height, LegacyTabButton.Type type, LegacyTabButton.Render icon, Component component, Consumer<LegacyTabButton> onPress) {
         return add(0,0,0,height,type,icon,component, null,onPress);
     }
-    public TabList add(int x, int y, int width, int height, int type, Component message, Consumer<LegacyTabButton> onPress){
+
+    public TabList add(int x, int y, int width, int height, LegacyTabButton.Type type, Component message, Consumer<LegacyTabButton> onPress){
         return add(x,y,width,height,type,null,message,null,onPress);
     }
-    public TabList add(int x, int y, int height, int type, Component message, Consumer<LegacyTabButton> onPress){
+
+    public TabList add(int x, int y, int height, LegacyTabButton.Type type, Component message, Consumer<LegacyTabButton> onPress){
         return add(x,y,0,height,type,null,message,null,onPress);
     }
-    public TabList add(int height, int type, Component message, Consumer<LegacyTabButton> onPress){
+
+    public TabList add(int height, LegacyTabButton.Type type, Component message, Consumer<LegacyTabButton> onPress){
         return add(0,0,0,height,type,null,message,null,onPress);
     }
+
     public void init(int leftPos, int topPos, int width){
         init(leftPos,topPos,width,(t,i)->{});
     }
-    public void init(int leftPos, int topPos, int width,BiConsumer<LegacyTabButton, Integer> buttonManager){
+
+    public void init(int leftPos, int topPos, int width, BiConsumer<LegacyTabButton, Integer> buttonManager){
+        init("tabList", leftPos, topPos, width, buttonManager);
+    }
+
+    public void init(String name, int leftPos, int topPos, int width, BiConsumer<LegacyTabButton, Integer> buttonManager){
         init((b,i)->{
             b.setWidth(width / tabButtons.size());
-            b.setX(leftPos + i);
-            b.setY(topPos);
+            b.setX(accessor.getInteger(name+".leftPos", leftPos) + i);
+            b.setY(accessor.getInteger(name+".topPos", topPos));
+            b.spriteRender = accessor.getElementValue(name+".sprites", LegacyTabButton.ToggleableTabSprites.DEFAULT, LegacyTabButton.Render.class);
             buttonManager.accept(b,i);
         },false);
     }
+
     public void init(BiConsumer<LegacyTabButton, Integer> buttonManager, boolean vertical) {
         int position = 0;
         for (LegacyTabButton b : tabButtons) {
@@ -83,6 +103,7 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
             position+=vertical ? b.getHeight() : b.getWidth();
         }
     }
+
     @Override
     public void render(GuiGraphics graphics, int i, int j, float f) {
         for (int index = 0; index < tabButtons.size(); index++) {
@@ -91,6 +112,7 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
             tabButton.render(graphics,i, j, f);
         }
     }
+
     public void resetSelectedTab(){
         if (!tabButtons.isEmpty()){
             selectedTab = -1;
@@ -112,9 +134,11 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
     public boolean keyPressed(int i, int j, int k) {
         return tabButtons.stream().anyMatch(t -> t.isHoveredOrFocused() && t.keyPressed(i, j, k));
     }
+
     public boolean controlTab(int i){
         return controlTab(i,InputConstants.KEY_LBRACKET,InputConstants.KEY_RBRACKET);
     }
+
     public boolean directionalControlTab(int i){
         return controlTab(i,InputConstants.KEY_LEFT,InputConstants.KEY_RIGHT);
     }
@@ -122,6 +146,7 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
     public boolean controlTab(int i, int leftButton, int rightButton){
         return controlTab(i == leftButton, i == rightButton);
     }
+
     public boolean controlTab(boolean left, boolean right){
         if (!left && !right || tabButtons.isEmpty()) return false;
         Optional<LegacyTabButton> opt = tabButtons.stream().filter(LegacyTabButton::isActive).min(Comparator.comparingInt(t -> {
@@ -137,6 +162,7 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
         }
         return false;
     }
+
     protected boolean controlPage(Stocker.Sizeable page, boolean left, boolean right){
         if ((left|| right) && page.max > 0){
             int lastPage = page.get();
@@ -147,16 +173,19 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
             }
         }return false;
     }
+
     public void numberControlTab(int i){
         if (i <= 57 && i > 48 && i - 49 < tabButtons.size()) {
             tabButtons.get(i - 49).onPress();
             ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
         }
     }
+
     @Override
     public boolean mouseClicked(double d, double e, int i) {
         return !tabButtons.stream().filter(t-> t.mouseClicked(d,e,i)).toList().isEmpty();
     }
+
     public boolean isMouseOver(double d, double e) {
         return !tabButtons.stream().filter(t-> t.isMouseOver(d,e)).toList().isEmpty();
     }

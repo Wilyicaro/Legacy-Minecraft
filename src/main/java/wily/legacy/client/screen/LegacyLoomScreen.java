@@ -141,7 +141,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
     protected List<List<RecipeInfo<BannerRecipe>>> recipesByGroup = new ArrayList<>();
     protected final Stocker.Sizeable page =  new Stocker.Sizeable(0);
     protected final Stocker.Sizeable craftingButtonsOffset =  new Stocker.Sizeable(0);
-    protected final TabList craftingTabList = new TabList(new PagedList<>(page,7));
+    protected final TabList craftingTabList = new TabList(accessor, new PagedList<>(page,7));
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     private final boolean[] warningSlots = new boolean[9];
     protected final ContainerListener listener = new ContainerListener() {
@@ -222,9 +222,9 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
     public LegacyLoomScreen(LegacyCraftingMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
         this.inventory = inventory;
-        craftingTabList.addTabButton(43,0,LegacyTabButton.iconOf(Items.WHITE_BANNER),Component.empty(),t-> resetElements());
+        craftingTabList.addTabButton(43, LegacyTabButton.Type.LEFT,LegacyTabButton.iconOf(Items.WHITE_BANNER),Component.empty(), t-> resetElements());
         for (LoomTabListing listing : loomTabListings) {
-            craftingTabList.addTabButton(43,0, listing.icon(),listing.name(), t->resetElements());
+            craftingTabList.addTabButton(43, LegacyTabButton.Type.LEFT, listing.icon(),listing.name(), t->resetElements());
         }
         craftingTabList.resetSelectedTab();
         inited = true;
@@ -315,7 +315,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         craftingTabList.init(leftPos, topPos - 37, imageWidth, (t, i) -> {
             int index = craftingTabList.tabButtons.indexOf(t);
             t.active = index == 0 && selectedStack.isEmpty() || index != 0 && !selectedStack.isEmpty();
-            t.type = index == 0 ? 0 : index >= 6 ? 2 : 1;
+            t.type = LegacyTabButton.Type.bySize(index, 6);
             t.setWidth(51);
             t.offset = (t1) -> new Vec3(-1.5 * craftingTabList.tabButtons.indexOf(t), t1.active ? t1.selected ? 0 : 4.5: 26.5, 0);
         });

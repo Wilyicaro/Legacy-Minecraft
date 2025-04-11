@@ -517,6 +517,22 @@ public class Legacy4JClient {
                 a.getElements().put(FactoryGuiElement.CROSSHAIR.name()+".translateY", ()-> Minecraft.getInstance().getWindow().getGuiScaledHeight() / 2);
                 a.getElements().put(FactoryGuiElement.CROSSHAIR.name()+".scaledTranslateY", ()-> -Minecraft.getInstance().getWindow().getGuiScaledHeight() / 2);
             }));
+
+            FactoryAPIClient.uiDefinitionManager.staticList.add(UIDefinition.createBeforeInit(a-> {
+                CommonValue.COMMON_VALUES.forEach((s,c)-> a.getElements().put("commonValue."+(s.getNamespace().equals("minecraft") ? "" : s.getNamespace() + ".")+s.getPath(),c));
+                CommonColor.COMMON_COLORS.forEach((s,c)-> a.getElements().put("commonColor."+(s.getNamespace().equals("minecraft") ? "" : s.getNamespace() + ".")+s.getPath(),c));
+                ControlTooltip.commonIcons.forEach((s,i)-> {
+                    a.getElements().put("controlIcon."+s, i.map(ControlTooltip.ComponentIcon::getComponent));
+                });
+                for (KeyMapping keyMapping : Minecraft.getInstance().options.keyMappings) {
+                    a.getElements().put("controlIcon."+keyMapping.getName(), ()-> ControlTooltip.getIconComponentFromKeyMapping(LegacyKeyMapping.of(keyMapping)));
+                }
+                a.getElements().put("interfaceResolution", ScreenUtil::getInterfaceResolution);
+                ControlType.types.forEach((s,c)->{
+                    a.getElements().put("activeControlType."+s, ()-> ControlType.getActiveType().equals(c));
+                });
+
+            }));
         });
 
         FactoryAPIClient.registerBlockColor(registry->{
@@ -590,21 +606,6 @@ public class Legacy4JClient {
                 registry.register("high_contrast", FactoryAPI.createLocation(MOD_ID,"high_contrast"), Component.translatable("legacy.builtin.high_contrast"), Pack.Position.TOP, false);
             }
         });
-        FactoryAPIClient.uiDefinitionManager.staticList.add(UIDefinition.createBeforeInit(a-> {
-            CommonValue.COMMON_VALUES.forEach((s,c)-> a.getElements().put("commonValue."+(s.getNamespace().equals("minecraft") ? "" : s.getNamespace() + ".")+s.getPath(),c));
-            CommonColor.COMMON_COLORS.forEach((s,c)-> a.getElements().put("commonColor."+(s.getNamespace().equals("minecraft") ? "" : s.getNamespace() + ".")+s.getPath(),c));
-            ControlTooltip.commonIcons.forEach((s,i)-> {
-                a.getElements().put("controlIcon."+s, i.map(ControlTooltip.ComponentIcon::getComponent));
-            });
-            for (KeyMapping keyMapping : Minecraft.getInstance().options.keyMappings) {
-                a.getElements().put("controlIcon."+keyMapping.getName(), ()-> ControlTooltip.getIconComponentFromKeyMapping(LegacyKeyMapping.of(keyMapping)));
-            }
-            a.getElements().put("interfaceResolution", ScreenUtil::getInterfaceResolution);
-            ControlType.types.forEach((s,c)->{
-                a.getElements().put("activeControlType."+s, ()-> ControlType.getActiveType().equals(c));
-            });
- 
-        }));
         LegacyUIElementTypes.init();
         //? if >=1.21.2 {
         /*FactoryRenderStateExtension.types.add(new FactoryRenderStateExtension.Type<>(ThrownTridentRenderState.class,LoyaltyLinesRenderState::new));
@@ -687,6 +688,10 @@ public class Legacy4JClient {
             return FactoryAPIClient.getExtraModel(fastLeavesModels.get(blockState.getBlock()));
         }
         return model;
+    }
+
+    public static boolean hasModOnServer(){
+        return FactoryAPIClient.hasModOnServer(MOD_ID);
     }
 
     public static int getEffectiveRenderDistance(){

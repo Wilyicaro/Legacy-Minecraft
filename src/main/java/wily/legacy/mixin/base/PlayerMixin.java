@@ -57,7 +57,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
 
     @Inject(method = "getFlyingSpeed", at = @At(value = "RETURN"), cancellable = true)
     protected void getFlyingSpeed(CallbackInfoReturnable<Float> cir) {
-        if (level().isClientSide && !FactoryAPIClient.hasModOnServer) return;
+        if (level().isClientSide && !Legacy4JClient.hasModOnServer()) return;
         cir.setReturnValue(cir.getReturnValueF() * ( getAbilities().flying ? (isSprinting() ? level().isClientSide ? Math.max(10,Math.min(Legacy4JClient.getEffectiveRenderDistance(),14)) * 0.6f : 6 : 2) : 1));
     }
 
@@ -88,7 +88,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
 
     @ModifyExpressionValue(method = /*? if (forge || neoforge) && >=1.21 {*//*"getDestroySpeed(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)F"*//*?} else if forge || neoforge {*//*"getDigSpeed"*//*?} else {*/"getDestroySpeed"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;onGround()Z"))
     protected boolean getDestroySpeed(boolean original) {
-        return FactoryAPIClient.hasModOnServer || original;
+        return Legacy4JClient.hasModOnServer() || original;
     }
 
     @ModifyExpressionValue(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/material/FluidState;isEmpty()Z"))

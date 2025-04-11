@@ -37,6 +37,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryItemUtil;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.PagedList;
@@ -59,7 +60,7 @@ import static wily.legacy.client.screen.ControlTooltip.*;
 
 public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInventoryScreen/*?} else {*//*AbstractContainerScreen*//*?}*/<CreativeModeScreen.CreativeModeMenu> implements Controller.Event,ControlTooltip.Event{
     protected Stocker.Sizeable page = new Stocker.Sizeable(0);
-    protected final TabList tabList = new TabList(new PagedList<>(page,8));
+    protected final TabList tabList = new TabList(UIAccessor.of(this), new PagedList<>(page,8));
     protected final Panel panel;
     public static final Container creativeModeGrid = new SimpleContainer(50);
     private CreativeInventoryListener listener;
@@ -81,7 +82,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         LegacyCreativeTabListing.rebuildVanillaCreativeTabsItems(Minecraft.getInstance());
         for (LegacyCreativeTabListing tab : LegacyCreativeTabListing.map.values()) {
             displayListing.add(tab.displayItems().stream().map(Supplier::get).filter(i-> !i.isEmpty() && i.isItemEnabled(Minecraft.getInstance().getConnection().enabledFeatures())).toList());
-            tabList.addTabButton(39, 0, tab.icon(), tab.name(), b -> pressCommonTab());
+            tabList.addTabButton(39, LegacyTabButton.Type.LEFT, tab.icon(), tab.name(), b -> pressCommonTab());
         }
         BuiltInRegistries.CREATIVE_MODE_TAB.stream().filter(CreativeModeScreen::canDisplayVanillaCreativeTab).forEach(c-> {
             List<ItemStack> displayItems;
@@ -114,11 +115,11 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
                 }
             }else displayItems = List.copyOf(c.getDisplayItems());
             displayListing.add(displayItems);
-            tabList.addTabButton(39, 0,LegacyTabButton.iconOf(c.getIconItem()), c.getDisplayName(), b -> pressCommonTab());
+            tabList.addTabButton(39, LegacyTabButton.Type.LEFT,LegacyTabButton.iconOf(c.getIconItem()), c.getDisplayName(), b -> pressCommonTab());
         });
         if (LegacyOptions.searchCreativeTab.get()) {
             displayListing.add(List.copyOf(CreativeModeTabs.searchTab().getDisplayItems()));
-            tabList.addTabButton(39, 0, LegacyTabButton.iconOf(LegacySprites.SEARCH), LegacyComponents.SEARCH_ITEMS, b -> {
+            tabList.addTabButton(39, LegacyTabButton.Type.LEFT, LegacyTabButton.iconOf(LegacySprites.SEARCH), LegacyComponents.SEARCH_ITEMS, b -> {
                 canRemoveSearch = arrangement.get() != 2 && !canRemoveSearch;
                 arrangement.set(2);
                 repositionElements();
@@ -190,7 +191,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         this.minecraft.player.inventoryMenu.addSlotListener(this.listener);
         tabList.init(panel.x,panel.y - 33, panel.width,(t,i)->{
             int index = tabList.tabButtons.indexOf(t);
-            t.type = index == 0 ? 0 : index >= 7 ? 2 : 1;
+            t.type = LegacyTabButton.Type.bySize(index, 7);
             t.offset = (b)-> {
                 if (!t.selected) return new Vec3(0,1.5,0);
                 return Vec3.ZERO;

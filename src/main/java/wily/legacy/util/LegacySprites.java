@@ -118,4 +118,12 @@ public class LegacySprites {
     public static final ResourceLocation ENTITY_PANEL = Legacy4J.createModLocation("tiles/entity_panel");
     public static final ResourceLocation SQUARE_RECESSED_PANEL = Legacy4J.createModLocation("tiles/square_recessed_panel");
     public static final ResourceLocation SQUARE_ENTITY_PANEL = Legacy4J.createModLocation("tiles/square_entity_panel");
+    public static final ResourceLocation HIGH_TAB_LEFT = Legacy4J.createModLocation("tiles/high_tab_left");
+    public static final ResourceLocation HIGH_TAB_MIDDLE = Legacy4J.createModLocation("tiles/high_tab_middle");
+    public static final ResourceLocation HIGH_TAB_RIGHT = Legacy4J.createModLocation("tiles/high_tab_right");
+    public static final ResourceLocation LOW_TAB = Legacy4J.createModLocation("tiles/low_tab");
+    public static final ResourceLocation HIGH_VERT_TAB_DOWN = Legacy4J.createModLocation("tiles/high_vert_tab_down");
+    public static final ResourceLocation HIGH_VERT_TAB_MIDDLE = Legacy4J.createModLocation("tiles/high_vert_tab_middle");
+    public static final ResourceLocation HIGH_VERT_TAB_UP = Legacy4J.createModLocation("tiles/high_vert_tab_up");
+    public static final ResourceLocation LOW_VERT_TAB = Legacy4J.createModLocation("tiles/low_vert_tab");
 }

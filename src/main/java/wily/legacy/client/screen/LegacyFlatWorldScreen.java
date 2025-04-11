@@ -48,7 +48,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
     private final Consumer<FlatLevelGeneratorSettings> applySettings;
     protected final WorldCreationUiState uiState;
     FlatLevelGeneratorSettings generator;
-    protected final TabList tabList = new TabList().add(30,0,Component.translatable("legacy.menu.create_flat_world.layers"), b-> rebuildWidgets()).add(30,1,Component.translatable("legacy.menu.create_flat_world.biomes"), b-> rebuildWidgets()).add(30,2,Component.translatable("legacy.menu.create_flat_world.properties"), b-> rebuildWidgets());
+    protected final TabList tabList = new TabList(accessor).add(30, LegacyTabButton.Type.LEFT,Component.translatable("legacy.menu.create_flat_world.layers"), b-> rebuildWidgets()).add(30, LegacyTabButton.Type.MIDDLE,Component.translatable("legacy.menu.create_flat_world.biomes"), b-> rebuildWidgets()).add(30, LegacyTabButton.Type.RIGHT,Component.translatable("legacy.menu.create_flat_world.properties"), b-> rebuildWidgets());
 
     protected final RenderableVList displayLayers = new RenderableVList(accessor).layoutSpacing(l->0);
     protected final RenderableVList displayBiomes = new RenderableVList(accessor).layoutSpacing(l->0);

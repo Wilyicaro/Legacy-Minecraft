@@ -50,7 +50,7 @@ public class LegacyRegistries {
 
     public static final RegisterListing.Holder<Block> SHRUB = BLOCK_ITEMS_REGISTER.add("shrub",()-> new TallGrassBlock(BlockBehaviour.Properties.of()./*? if >=1.21.2 {*//*setId(ResourceKey.create(Registries.BLOCK,LegacyRegistries.SHRUB.getId())).*//*?}*/mapColor(MapColor.PLANT).replaceable().noCollission().instabreak().sound(SoundType.GRASS).offsetType(BlockBehaviour.OffsetType.XYZ).ignitedByLava().pushReaction(PushReaction.DESTROY)));
 
-    public static final RegisterListing.Holder<BlockEntityType<WaterCauldronBlockEntity>> WATER_CAULDRON_BLOCK_ENTITY = BLOCK_ENTITIES_REGISTER.add("water_cauldron",()-> /*? if <1.21.2 {*/BlockEntityType.Builder.of/*?} else {*//*new BlockEntityType*//*?}*/(WaterCauldronBlockEntity::new, /*? if >=1.21.2 {*//*Set.of(Blocks.WATER_CAULDRON))*//*?} else {*/Blocks.WATER_CAULDRON).build(null)/*?}*/);
+    public static final RegisterListing.Holder<BlockEntityType<WaterCauldronBlockEntity>> WATER_CAULDRON_BLOCK_ENTITY = BLOCK_ENTITIES_REGISTER.add("water_cauldron",()-> FactoryAPIPlatform.createBlockEntityType(WaterCauldronBlockEntity::new, Blocks.WATER_CAULDRON));
 
     public static final RegisterListing.Holder<SoundEvent> SCROLL = SOUND_EVENT_REGISTER.add("random.scroll",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.scroll")));
     public static final RegisterListing.Holder<SoundEvent> CRAFT_FAIL = SOUND_EVENT_REGISTER.add("random.craft_fail",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.craft_fail")));

@@ -92,11 +92,11 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     protected List<List<RecipeInfo<CraftingRecipe>>> filteredRecipesByGroup = Collections.emptyList();
     protected final Stocker.Sizeable page =  new Stocker.Sizeable(0);
     protected final Stocker.Sizeable craftingButtonsOffset =  new Stocker.Sizeable(0);
-    protected final TabList craftingTabList = new TabList(new PagedList<>(page, this::getMaxTabCount));
-    protected final TabList bannerTabList = new TabList();
-    protected final TabList fireworkTabList = new TabList();
-    protected final TabList dyeTabList = new TabList();
-    protected final TabList typeTabList = new TabList().add(0,0,42, 42, 4,LegacyTabButton.iconOf(Items.CRAFTING_TABLE), CommonComponents.EMPTY,null, b->resetElements()).add(0,0,42, 42, 4,LegacyTabButton.iconOf(Items.WHITE_BANNER), CommonComponents.EMPTY,null, b->resetElements()).add(0,0,42, 42, 4, LegacyTabButton.iconOf(Items.FIREWORK_ROCKET), CommonComponents.EMPTY,null, b->resetElements()).add(0,0,42, 42, 4, LegacyTabButton.iconOf(Items.CYAN_DYE), CommonComponents.EMPTY,null, b->resetElements());
+    protected final TabList craftingTabList = new TabList(accessor, new PagedList<>(page, this::getMaxTabCount));
+    protected final TabList bannerTabList = new TabList(accessor);
+    protected final TabList fireworkTabList = new TabList(accessor);
+    protected final TabList dyeTabList = new TabList(accessor);
+    protected final TabList typeTabList = new TabList(accessor).add(0,0,42, 42, LegacyTabButton.Type.MIDDLE,LegacyTabButton.iconOf(Items.CRAFTING_TABLE), CommonComponents.EMPTY,null, b->resetElements()).add(0,0,42, 42, LegacyTabButton.Type.MIDDLE,LegacyTabButton.iconOf(Items.WHITE_BANNER), CommonComponents.EMPTY,null, b->resetElements()).add(0,0,42, 42, LegacyTabButton.Type.MIDDLE, LegacyTabButton.iconOf(Items.FIREWORK_ROCKET), CommonComponents.EMPTY,null, b->resetElements()).add(0,0,42, 42, LegacyTabButton.Type.MIDDLE, LegacyTabButton.iconOf(Items.CYAN_DYE), CommonComponents.EMPTY,null, b->resetElements());
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     protected final ScrollableRenderer scrollableRenderer = new ScrollableRenderer();
     private final boolean[] warningSlots;
@@ -147,7 +147,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
 
             recipesByTab.add(groups);
 
-            craftingTabList.addTabButton(43,0,listing.icon(),listing.name(), t->resetElements());
+            craftingTabList.addTabButton(43,LegacyTabButton.Type.MIDDLE,listing.icon(),listing.name(), t->resetElements());
 
         }
         if (LegacyOptions.vanillaTabs.get()) allRecipes.stream().collect(Collectors.groupingBy(h->h.get().category(),()->new TreeMap<>(Comparator.comparingInt(Enum::ordinal)),Collectors.groupingBy(h->h.get()./*? <1.21.2 {*/getGroup/*?} else {*//*group*//*?}*/().isEmpty() ? h.getId().toString() : h.get()./*? <1.21.2 {*/getGroup/*?} else {*//*group*//*?}*/()))).forEach((category, m)->{
@@ -159,7 +159,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             });
             if (groups.isEmpty()) return;
             recipesByTab.add(groups);
-            craftingTabList.addTabButton(43,0,LegacyTabButton.iconOf(VANILLA_CATEGORY_ICONS[category.ordinal()]), getTitle(), t->resetElements());
+            craftingTabList.addTabButton(43, LegacyTabButton.Type.MIDDLE,LegacyTabButton.iconOf(VANILLA_CATEGORY_ICONS[category.ordinal()]), getTitle(), t->resetElements());
         });
         resetElements(false);
         addCraftingButtons();
@@ -173,14 +173,14 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         *///?} else
         redStar.set(DataComponents.FIREWORK_EXPLOSION,new FireworkExplosion(FireworkExplosion.Shape.SMALL_BALL, IntList.of(DyeColor.RED.getFireworkColor()),IntList.of(),false,false));
 
-        bannerTabList.add(0,0,0,43,0,LegacyTabButton.iconOf(Items.WHITE_BANNER), CommonComponents.EMPTY,null, b-> resetElements());
-        bannerTabList.add(0,0,0,43,0,LegacyTabButton.iconOf(Items.SHIELD), CommonComponents.EMPTY,null, b-> resetElements());
-        fireworkTabList.add(0,0,0,43,0,LegacyTabButton.iconOf(Items.FIREWORK_STAR), CommonComponents.EMPTY,null, b-> resetElements());
-        fireworkTabList.add(0,0,0,43,0,LegacyTabButton.iconOf(redStar), CommonComponents.EMPTY,null, b-> resetElements());
-        fireworkTabList.add(0,0,0,43,0,LegacyTabButton.iconOf(Items.FIREWORK_ROCKET), CommonComponents.EMPTY,null, b-> resetElements());
-        dyeTabList.add(0,0,0,43,0,LegacyTabButton.iconOf(Legacy4J.dyeItem(Items.LEATHER_CHESTPLATE.getDefaultInstance(),Legacy4J.getDyeColor(DyeColor.GREEN))), CommonComponents.EMPTY,null, b-> resetElements());
-        dyeTabList.add(0,0,0,43,0, typeTabList.tabButtons.get(3).icon, CommonComponents.EMPTY,null, b-> resetElements());
-        if (!is2x2) dyeTabList.add(0,0,0,43,0,LegacyTabButton.iconOf(Items.DECORATED_POT), CommonComponents.EMPTY,null, b-> resetElements());
+        bannerTabList.add(0,0,0,43, LegacyTabButton.Type.MIDDLE,LegacyTabButton.iconOf(Items.WHITE_BANNER), CommonComponents.EMPTY,null, b-> resetElements());
+        bannerTabList.add(0,0,0,43, LegacyTabButton.Type.MIDDLE,LegacyTabButton.iconOf(Items.SHIELD), CommonComponents.EMPTY,null, b-> resetElements());
+        fireworkTabList.add(0,0,0,43, LegacyTabButton.Type.MIDDLE,LegacyTabButton.iconOf(Items.FIREWORK_STAR), CommonComponents.EMPTY,null, b-> resetElements());
+        fireworkTabList.add(0,0,0,43, LegacyTabButton.Type.MIDDLE,LegacyTabButton.iconOf(redStar), CommonComponents.EMPTY,null, b-> resetElements());
+        fireworkTabList.add(0,0,0,43, LegacyTabButton.Type.MIDDLE,LegacyTabButton.iconOf(Items.FIREWORK_ROCKET), CommonComponents.EMPTY,null, b-> resetElements());
+        dyeTabList.add(0,0,0,43, LegacyTabButton.Type.MIDDLE,LegacyTabButton.iconOf(Legacy4J.dyeItem(Items.LEATHER_CHESTPLATE.getDefaultInstance(),Legacy4J.getDyeColor(DyeColor.GREEN))), CommonComponents.EMPTY,null, b-> resetElements());
+        dyeTabList.add(0,0,0,43, LegacyTabButton.Type.MIDDLE, typeTabList.tabButtons.get(3).icon, CommonComponents.EMPTY,null, b-> resetElements());
+        if (!is2x2) dyeTabList.add(0,0,0,43, LegacyTabButton.Type.MIDDLE,LegacyTabButton.iconOf(Items.DECORATED_POT), CommonComponents.EMPTY,null, b-> resetElements());
 
         Consumer<CustomCraftingIconHolder> fireworkStarUpdateRecipe = h->{
             clearIngredients(ingredientsGrid);
@@ -481,11 +481,12 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         addWidget(getTabList());
         getTabList().init(leftPos, topPos - 37, imageWidth, (t, i) -> {
             int index = getTabList().tabButtons.indexOf(t);
-            t.type = index == 0 ? 0 : index >= (getMaxTabCount() - 1) ? 2 : 1;
+            t.type = LegacyTabButton.Type.bySize(index, getMaxTabCount() - 1);
             t.setWidth(51);
             t.offset = (t1) -> new Vec3(accessor.getDouble("tabListXOffset",-1.5) * getTabList().tabButtons.indexOf(t), t1.selected ? 0 : accessor.getDouble("tabListSelectedYOffset",4.5), 0);
         });
         if (hasTypeTabList()) typeTabList.init((b, i)->{
+            b.spriteRender = LegacyTabButton.ToggleableTabSprites.VERTICAL;
             b.setX(leftPos - b.getWidth() + 6);
             b.setY(topPos + i + 4);
             b.offset = (t1) -> new Vec3(t1.selected ? 0 : 3.5, 0.5, 0);

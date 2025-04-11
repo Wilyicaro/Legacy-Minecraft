@@ -33,7 +33,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.alchemy.Potion;
 //? if >=1.20.5 {
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.item.crafting.RecipeType;import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -66,6 +66,7 @@ import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.base.network.CommonNetwork;
+import wily.factoryapi.base.network.CommonRecipeManager;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.config.LegacyMixinToggles;
@@ -205,6 +206,10 @@ public class Legacy4J {
 
     public static void setup(){
         LegacyCommonOptions.COMMON_STORAGE.load();
+        //? if >=1.21.2 {
+        /*CommonRecipeManager.addRecipeTypeToSync(RecipeType.CRAFTING);
+        CommonRecipeManager.addRecipeTypeToSync(RecipeType.STONECUTTING);
+        *///?}
         if (!LegacyMixinToggles.legacyCauldrons.get()) return;
         Map<Item, CauldronInteraction> emptyCauldron = CauldronInteraction.EMPTY/*? if >1.20.1 {*/.map()/*?}*/;
         Map<Item, CauldronInteraction> waterCauldron = CauldronInteraction.WATER/*? if >1.20.1 {*/.map()/*?}*/;
@@ -553,10 +558,10 @@ public class Legacy4J {
         }
         ((LegacyPlayerInfo)p).setIdentifierIndex(pos);
         CommonNetwork.sendToPlayers(p.getServer().getPlayerList().getPlayers().stream().filter(sp-> sp != p).collect(Collectors.toSet()), new PlayerInfoSync.All(Map.of(p.getUUID(),(LegacyPlayerInfo)p), Collections.emptyMap(), p.server.getDefaultGameType(),PlayerInfoSync.All.ID_S2C));
-        CommonNetwork.forceEnabledPlayer(p, ()-> {
-            CommonNetwork.sendToPlayer(p, PlayerInfoSync.All.fromPlayerList(p.getServer()));
-            playerInitialPayloads.forEach(payload->CommonNetwork.sendToPlayer(p, payload));
-        });
+
+        CommonNetwork.sendToPlayer(p, PlayerInfoSync.All.fromPlayerList(p.getServer()), true);
+        playerInitialPayloads.forEach(payload->CommonNetwork.sendToPlayer(p, payload, true));
+
         if (!p.server.isDedicatedServer()) Legacy4JClient.serverPlayerJoin(p);
     }
 

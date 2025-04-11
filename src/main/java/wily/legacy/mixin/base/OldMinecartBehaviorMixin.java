@@ -31,7 +31,7 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior {
 
     @Inject(method = "tick", at = @At("RETURN"))
     public void tick(CallbackInfo ci){
-        if (doubleTick){
+        if (doubleTick && !level().isClientSide){
             doubleTick = false;
             tick();
             doubleTick = true;

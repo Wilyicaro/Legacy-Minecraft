@@ -154,7 +154,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
         @Override
         public void apply(Context context) {
             context.executor().executeWhen(()->{
-                if (context.isClient() && FactoryAPIClient.hasModOnServer){
+                if (context.isClient() && Legacy4JClient.hasModOnServer()){
                     Legacy4JClient.defaultServerGameType = defaultGameType;
                     Legacy4JClient.updateLegacyPlayerInfos(players);
                     return true;

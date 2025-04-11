@@ -84,7 +84,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
     public static void refreshStatsBoards(Minecraft minecraft){
         if (minecraft.getConnection() == null) return;
         statsBoards.forEach(StatsBoard::clear);
-        if (FactoryAPIClient.hasModOnServer) {
+        if (Legacy4JClient.hasModOnServer()) {
             minecraft.getConnection().getOnlinePlayers().stream().map(p -> ((LegacyPlayerInfo) p).getStatsMap()).forEach(o -> o.forEach((s, i) -> {
                 if (i <= 0) return;
                 for (StatsBoard statsBoard : statsBoards) if (statsBoard.add(s)) break;
@@ -148,7 +148,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
     public void rebuildRenderableVList(Minecraft minecraft){
         renderableVList.renderables.clear();
         if (minecraft.getConnection() == null ||  statsBoards.get(selectedStatBoard).statsList.isEmpty()) return;
-        actualRankBoard = FactoryAPIClient.hasModOnServer && filter.get() != 1 ? minecraft.getConnection().getOnlinePlayers().stream().map(p-> ((LegacyPlayerInfo)p)).filter(info-> info.getStatsMap().object2IntEntrySet().stream().filter(s-> statsBoards.get(selectedStatBoard).statsList.contains(s.getKey())).mapToInt(Object2IntMap.Entry::getIntValue).sum() > 0).sorted(filter.get() == 0 ? Comparator.comparingInt(info-> ((LegacyPlayerInfo)info).getStatsMap().object2IntEntrySet().stream().filter(s-> statsBoards.get(selectedStatBoard).statsList.contains(s.getKey())).mapToInt(Object2IntMap.Entry::getIntValue).sum()).reversed() : Comparator.comparing((LegacyPlayerInfo l) -> l.legacyMinecraft$getProfile().getName())).toList() : List.of((LegacyPlayerInfo) minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID()));
+        actualRankBoard = Legacy4JClient.hasModOnServer() && filter.get() != 1 ? minecraft.getConnection().getOnlinePlayers().stream().map(p-> ((LegacyPlayerInfo)p)).filter(info-> info.getStatsMap().object2IntEntrySet().stream().filter(s-> statsBoards.get(selectedStatBoard).statsList.contains(s.getKey())).mapToInt(Object2IntMap.Entry::getIntValue).sum() > 0).sorted(filter.get() == 0 ? Comparator.comparingInt(info-> ((LegacyPlayerInfo)info).getStatsMap().object2IntEntrySet().stream().filter(s-> statsBoards.get(selectedStatBoard).statsList.contains(s.getKey())).mapToInt(Object2IntMap.Entry::getIntValue).sum()).reversed() : Comparator.comparing((LegacyPlayerInfo l) -> l.legacyMinecraft$getProfile().getName())).toList() : List.of((LegacyPlayerInfo) minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID()));
         for (int i = 0; i < actualRankBoard.size(); i++) {
             LegacyPlayerInfo info = actualRankBoard.get(i);
             String rank = i + 1 + "";
@@ -165,7 +165,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
                     for (int index = page; index < statsBoards.get(selectedStatBoard).statsList.size(); index++) {
                         if (added >= statsInScreen)break;
                         Stat<?> stat = statsBoards.get(selectedStatBoard).statsList.get(index);
-                        Component value = ControlTooltip.CONTROL_ICON_FUNCTION.apply(stat.format((FactoryAPIClient.hasModOnServer ? info.getStatsMap() : minecraft.player.getStats().stats).getInt(stat)), Style.EMPTY).getComponent();
+                        Component value = ControlTooltip.CONTROL_ICON_FUNCTION.apply(stat.format((Legacy4JClient.hasModOnServer() ? info.getStatsMap() : minecraft.player.getStats().stats).getInt(stat)), Style.EMPTY).getComponent();
                         SimpleLayoutRenderable renderable = statsBoards.get(selectedStatBoard).renderables.get(index);
                         int w = font.width(value);
                         ScreenUtil.renderScrollingString(guiGraphics,font, value,renderable.getX() + Math.max(0,renderable.getWidth() - w) / 2, getY(),renderable.getX() + Math.min(renderable.getWidth(),(renderable.getWidth() - w)/ 2 + getWidth()), getY() + getHeight(), ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()),true);
@@ -189,7 +189,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
         super.tick();
         if (updateTimer <= 0){
             updateTimer = 20;
-            if (FactoryAPIClient.hasModOnServer) CommonNetwork.sendToServer(PlayerInfoSync.askAll(minecraft.player));
+            if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(PlayerInfoSync.askAll(minecraft.player));
             else minecraft.getConnection().send(new ServerboundClientCommandPacket(ServerboundClientCommandPacket.Action.REQUEST_STATS));
         } else updateTimer--;
     }
@@ -277,7 +277,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
     }
 
     public void onStatsUpdated() {
-        if (!FactoryAPIClient.hasModOnServer){
+        if (!Legacy4JClient.hasModOnServer()){
             refreshStatsBoards(minecraft);
             if (LeaderboardsScreen.statsBoards.get(selectedStatBoard).statsList.isEmpty()) minecraft.executeIfPossible(()-> changeStatBoard(false));
         }

@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.init.LegacyGameRules;
 
@@ -40,7 +41,7 @@ public abstract class LivingEntityMixin extends Entity {
     }
 
     private boolean isLegacyFlying(){
-        return ((LivingEntity)(Object)this instanceof Player p && p.getAbilities().flying && (!level().isClientSide || FactoryAPIClient.hasModOnServer));
+        return ((LivingEntity)(Object)this instanceof Player p && p.getAbilities().flying && (!level().isClientSide || Legacy4JClient.hasModOnServer()));
     }
     @Redirect(method = /*? if <1.21.2 {*/"travel"/*?} else {*//*"travelInAir"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setDeltaMovement(DDD)V", ordinal = /*? if <1.21.2 {*/3/*?} else {*//*1*//*?}*/))
     public void travelFlight(LivingEntity instance, double x, double y, double z) {

@@ -21,6 +21,7 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.PagedList;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
@@ -37,7 +38,7 @@ import static wily.legacy.client.screen.ControlTooltip.*;
 public class LegacyAdvancementsScreen extends PanelVListScreen implements TabList.Access {
     public static final Component TITLE = Component.translatable("gui.advancements");
     protected final Stocker.Sizeable page = new Stocker.Sizeable(0);
-    protected final TabList tabList = new TabList(new PagedList<>(page,10));
+    protected final TabList tabList = new TabList(accessor, new PagedList<>(page,10));
     protected final List<DisplayInfo> displayInfos = new ArrayList<>();
     protected boolean showDescription = false;
     protected boolean oldLegacyTooltipsValue;
@@ -50,7 +51,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             DisplayInfo displayInfo = a./*? if >1.20.1 {*/advancement().display().orElse(null)/*?} else {*//*getDisplay()*//*?}*/;
             if (displayInfo == null) return;
 
-            tabList.addTabButton(43, 0, LegacyTabButton.iconOf(displayInfo.getIcon()), displayInfo.getTitle(), b -> repositionElements());
+            tabList.addTabButton(43, LegacyTabButton.Type.MIDDLE, LegacyTabButton.iconOf(displayInfo.getIcon()), displayInfo.getTitle(), b -> repositionElements());
             RenderableVList renderableVList = new RenderableVList(this).layoutSpacing(l -> 4).forceWidth(false).cyclic(false);
             renderableVLists.add(renderableVList);
             displayInfos.add(displayInfo);
@@ -172,7 +173,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         }));
         tabList.init(panel.x,panel.y - 37,panel.width,(b,i)->{
             int index = tabList.tabButtons.indexOf(b);
-            b.type = index == 0 ? 0 : index >= 9 ? 2 : 1;
+            b.type = LegacyTabButton.Type.bySize(index, 9);
             b.setWidth(45);
             b.offset = (t1) -> new Vec3(0, t1.selected ? 0 : 4.5, 0);
         });
@@ -235,7 +236,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
     }
 
     public static /*? if >1.20.1 {*/AdvancementTree/*?} else {*//*AdvancementList*//*?}*/ getActualAdvancements(){
-        return FactoryAPIClient.hasModOnServer ? ClientAdvancementsPayload.advancements : getAdvancements(). /*? if >1.20.1 {*/getTree/*?} else {*//*getAdvancements*//*?}*/();
+        return Legacy4JClient.hasModOnServer() ? ClientAdvancementsPayload.advancements : getAdvancements(). /*? if >1.20.1 {*/getTree/*?} else {*//*getAdvancements*//*?}*/();
     }
     public static ClientAdvancements getAdvancements(){
         return Minecraft.getInstance().getConnection().getAdvancements();

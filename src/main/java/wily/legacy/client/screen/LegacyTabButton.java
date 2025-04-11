@@ -1,12 +1,12 @@
 package wily.legacy.client.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -28,6 +28,7 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.function.Consumer;
@@ -35,21 +36,21 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class LegacyTabButton extends AbstractButton {
-    public static final ResourceLocation[][] SPRITES = new ResourceLocation[][]{new ResourceLocation[]{Legacy4J.createModLocation( "tiles/high_tab_left"),Legacy4J.createModLocation( "tiles/low_tab_left")}, new ResourceLocation[]{Legacy4J.createModLocation( "tiles/high_tab_middle"),Legacy4J.createModLocation( "tiles/low_tab_middle")}, new ResourceLocation[]{Legacy4J.createModLocation( "tiles/high_tab_right"),Legacy4J.createModLocation( "tiles/low_tab_right")},
-            new ResourceLocation[]{Legacy4J.createModLocation( "tiles/high_vert_tab_up"),Legacy4J.createModLocation( "tiles/low_vert_tab_up")}, new ResourceLocation[]{Legacy4J.createModLocation( "tiles/high_vert_tab_middle"),Legacy4J.createModLocation( "tiles/low_vert_tab_middle")}, new ResourceLocation[]{Legacy4J.createModLocation( "tiles/high_vert_tab_down"),Legacy4J.createModLocation( "tiles/low_vert_tab_down")}};
     public static final Vec3 DEFAULT_DESACTIVE_OFFSET = new Vec3(0,22,0);
     public static final Vec3 DEFAULT_UNSELECTED_OFFSET = new Vec3(0,4,0);
-    public final Function<LegacyTabButton,Renderable> icon;
+    public final Render icon;
+    public Render spriteRender = ToggleableTabSprites.DEFAULT;
     private final Consumer<LegacyTabButton> onPress;
     public boolean selected;
-    protected int type;
+    public Type type;
+
     public Function<LegacyTabButton, Vec3> offset = (t)-> {
         if (!isActive()) return DEFAULT_DESACTIVE_OFFSET;
         if (!t.selected) return DEFAULT_UNSELECTED_OFFSET;
         return Vec3.ZERO;
     };
 
-    public LegacyTabButton(int i, int j, int width, int height, int type, Function<LegacyTabButton,Renderable> icon, Component text, Tooltip tooltip, Consumer<LegacyTabButton> onPress) {
+    public LegacyTabButton(int i, int j, int width, int height, Type type, Render icon, Component text, Tooltip tooltip, Consumer<LegacyTabButton> onPress) {
         super(i, j, width, height, text);
         setTooltip(tooltip);
         this.onPress = onPress;
@@ -63,20 +64,20 @@ public class LegacyTabButton extends AbstractButton {
         onPress.accept(this);
     }
 
-    public static Function<LegacyTabButton,Renderable> iconOf(Item item){
-        return t-> (guiGraphics, i, j, f) -> t.renderItemIcon(item.getDefaultInstance(),guiGraphics);
+    public static Render iconOf(Item item){
+        return (t, guiGraphics, i, j, f) -> t.renderItemIcon(item.getDefaultInstance(),guiGraphics);
     }
 
-    public static Function<LegacyTabButton,Renderable> iconOf(ItemStack stack){
-        return t-> (guiGraphics, i, j, f) -> t.renderItemIcon(stack,guiGraphics);
+    public static Render iconOf(ItemStack stack){
+        return (t, guiGraphics, i, j, f) -> t.renderItemIcon(stack,guiGraphics);
     }
 
-    public static Function<LegacyTabButton,Renderable> iconOf(Supplier<ItemStack> stack){
-        return t-> (guiGraphics, i, j, f) -> t.renderItemIcon(stack.get(),guiGraphics);
+    public static Render iconOf(Supplier<ItemStack> stack){
+        return (t, guiGraphics, i, j, f) -> t.renderItemIcon(stack.get(), guiGraphics);
     }
 
-    public static Function<LegacyTabButton,Renderable> iconOf(ResourceLocation sprite){
-        return t-> (guiGraphics, i, j, f) -> t.renderIconSprite(sprite,guiGraphics);
+    public static Render iconOf(ResourceLocation sprite){
+        return (t, guiGraphics, i, j, f) -> t.renderIconSprite(sprite,guiGraphics);
     }
 
     public void renderString(GuiGraphics guiGraphics, Font font, int i, boolean shadow){
@@ -112,37 +113,98 @@ public class LegacyTabButton extends AbstractButton {
             isHovered = isMouseOver(i,j);
         }
         if (selected) guiGraphics.pose().translate(0F,0f,1F);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(SPRITES[type][selected ? 0 : 1], getX(), getY(), getWidth(), this.getHeight());
+        spriteRender.render(this, guiGraphics, i, j, f);
         if (!selected) guiGraphics.pose().translate(0,-1,0);
         if (active) {
             if (icon == null) this.renderString(guiGraphics, minecraft.font, CommonColor.INVENTORY_GRAY_TEXT.get() | Mth.ceil(this.alpha * 255.0f) << 24);
-            else icon.apply(this).render(guiGraphics,i,j,f);
+            else icon.render(this, guiGraphics,i,j,f);
         }
         guiGraphics.pose().popPose();
     }
 
     public boolean isMouseOver(double d, double e) {
         Vec3 translate = offset.apply(this);
-        double x =  getX() + (translate.equals(Vec3.ZERO) ? 0 : translate.x());
-        double y =  getY() + (translate.equals(Vec3.ZERO) ? 0 : translate.y());
+        double x = getX() + (translate.equals(Vec3.ZERO) ? 0 : translate.x());
+        double y = getY() + (translate.equals(Vec3.ZERO) ? 0 : translate.y());
         return this.active && this.visible && d >= x && e >= y && d < (x + this.width) && e < (y + this.height);
     }
+
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
         narrationElementOutput.add(NarratedElementType.TITLE, Component.translatable("gui.narrate.tab", this.getMessage().getString()));
     }
+
     //? if <1.21.4 {
     @Override
     protected boolean clicked(double d, double e) {
         return isMouseOver(d,e);
     }
     //?}
+
     @Override
     public void renderString(GuiGraphics guiGraphics, Font font, int i) {
         renderString(guiGraphics,font,i,false);
     }
 
-    public record IconType<T>(Codec<T> contentCodec, Function<T,Function<LegacyTabButton,Renderable>> createIcon){
+
+    public interface Render {
+        void render(LegacyTabButton button, GuiGraphics guiGraphics, int i, int j, float f);
+    }
+
+    public interface SpriteRender extends Render {
+        ResourceLocation getSprite(LegacyTabButton button);
+        @Override
+        default void render(LegacyTabButton button, GuiGraphics guiGraphics, int i, int j, float f) {
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(button), button.getX(), button.getY(), button.getWidth(), button.getHeight());
+        }
+    }
+
+    public record TabSprite(ResourceLocation sprite) implements SpriteRender {
+        public static final Codec<TabSprite> CODEC = ResourceLocation.CODEC.xmap(TabSprite::new, TabSprite::sprite);
+
+        @Override
+        public ResourceLocation getSprite(LegacyTabButton button) {
+            return sprite();
+        }
+    }
+
+    public enum Type {
+        LEFT,MIDDLE,RIGHT;
+
+        public static Type bySize(int actual, int size){
+            return actual == 0 ? LEFT : actual >= size ? RIGHT : MIDDLE;
+        }
+    }
+
+    public record ToggleableTabSprites(TabSprites high, TabSprite down) implements SpriteRender {
+        public static final ToggleableTabSprites DEFAULT = new ToggleableTabSprites(new TabSprites(LegacySprites.HIGH_TAB_LEFT, LegacySprites.HIGH_TAB_MIDDLE, LegacySprites.HIGH_TAB_RIGHT), new TabSprite(LegacySprites.LOW_TAB));
+        public static final ToggleableTabSprites VERTICAL = new ToggleableTabSprites(new TabSprites(LegacySprites.HIGH_VERT_TAB_DOWN, LegacySprites.HIGH_VERT_TAB_MIDDLE, LegacySprites.HIGH_VERT_TAB_UP), new TabSprite(LegacySprites.LOW_VERT_TAB));
+        public static final Codec<ToggleableTabSprites> CODEC = RecordCodecBuilder.create(i-> i.group(TabSprites.CODEC.fieldOf("high").forGetter(ToggleableTabSprites::high),TabSprite.CODEC.fieldOf("down").forGetter(ToggleableTabSprites::down)).apply(i, ToggleableTabSprites::new));
+
+        @Override
+        public ResourceLocation getSprite(LegacyTabButton button) {
+            return button.selected ? high.getSprite(button) : down.getSprite(button);
+        }
+    }
+
+    public record TabSprites(ResourceLocation left, ResourceLocation middle, ResourceLocation right) implements SpriteRender {
+        public static final Codec<TabSprites> CODEC = RecordCodecBuilder.create(i-> i.group(ResourceLocation.CODEC.fieldOf("left").forGetter(TabSprites::left),ResourceLocation.CODEC.fieldOf("middle").forGetter(TabSprites::middle),ResourceLocation.CODEC.fieldOf("right").forGetter(TabSprites::right)).apply(i, TabSprites::new));
+
+        public ResourceLocation byType(Type type){
+            return switch (type){
+                case LEFT -> left;
+                case MIDDLE -> middle;
+                case RIGHT -> right;
+            };
+        }
+
+        @Override
+        public ResourceLocation getSprite(LegacyTabButton button) {
+            return byType(button.type);
+        }
+    }
+
+    public record IconType<T>(Codec<T> contentCodec, Function<T,Render> createIcon){
         public DataResult<IconHolder<T>> parse(ResourceLocation typeId, Dynamic<?> dynamic){
             return contentCodec.parse(dynamic).map(c-> new IconHolder<>(typeId,this,c));
         }
@@ -150,7 +212,6 @@ public class LegacyTabButton extends AbstractButton {
     public static final ResourceLocation DEFAULT_ICON_TYPE_ID = FactoryAPI.createVanillaLocation("sprite");
     public static final IconType<ResourceLocation> DEFAULT_ICON_TYPE = new IconType<>(ResourceLocation.CODEC,LegacyTabButton::iconOf);
     public static final ListMap<ResourceLocation, IconType<?>> ICON_TYPES = new ListMap.Builder<ResourceLocation, IconType<?>>().put(DEFAULT_ICON_TYPE_ID, DEFAULT_ICON_TYPE).put(FactoryAPI.createVanillaLocation("item"), new IconType<>(DynamicUtil.ITEM_SUPPLIER_CODEC, LegacyTabButton::iconOf)).build();
-    public static final Codec<IconHolder<?>> DEPRECATED_ICON_HOLDER_CODEC = createIconHolderCodec("iconType","icon");
     public static final Codec<IconHolder<?>> ICON_HOLDER_CODEC = Codec.either(ResourceLocation.CODEC.xmap(r->new IconHolder<>(DEFAULT_ICON_TYPE_ID, DEFAULT_ICON_TYPE,r), h-> h.content), createIconHolderCodec("type","value")).xmap(c-> c.right().orElseGet(c.left()::get), Either::right);
 
     public static Codec<IconHolder<?>> createIconHolderCodec(String typeField, String valueField){
@@ -173,7 +234,7 @@ public class LegacyTabButton extends AbstractButton {
         };
     }
 
-    public record IconHolder<T>(ResourceLocation typeId, IconType<T> type, T content, Function<LegacyTabButton,Renderable> icon){
+    public record IconHolder<T>(ResourceLocation typeId, IconType<T> type, T content, Render icon){
         public IconHolder(ResourceLocation typeId, IconType<T> type, T content){
             this(typeId,type,content,type.createIcon.apply(content));
         }

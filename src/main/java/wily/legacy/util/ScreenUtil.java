@@ -258,7 +258,7 @@ public class ScreenUtil {
     }
 
     public static boolean hasMixedCrafting(){
-        return (LegacyOptions.forceMixedCrafting.get() || !FactoryAPIClient.hasModOnServer) && !LegacyOptions.classicCrafting.get();
+        return (LegacyOptions.forceMixedCrafting.get() || !Legacy4JClient.hasModOnServer()) && !LegacyOptions.classicCrafting.get();
     }
 
     public static float getHUDScale(){

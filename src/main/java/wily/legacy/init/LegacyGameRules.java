@@ -32,7 +32,7 @@ public class LegacyGameRules {
 
 
     public static boolean getSidedBooleanGamerule(Entity entity, GameRules.Key<GameRules.BooleanValue> key){
-        return entity.level().isClientSide && FactoryAPIClient.hasModOnServer && Legacy4JClient.gameRules.getBoolean(key) || !entity.level().isClientSide && entity.getServer().getGameRules().getBoolean(key);
+        return entity.level().isClientSide && Legacy4JClient.hasModOnServer() && Legacy4JClient.gameRules.getBoolean(key) || !entity.level().isClientSide && entity.getServer().getGameRules().getBoolean(key);
     }
 
     public static GameRules.Type<GameRules.IntegerValue> createInteger(int defaultValue, int min, int max, BiConsumer<MinecraftServer, GameRules.IntegerValue> biConsumer){

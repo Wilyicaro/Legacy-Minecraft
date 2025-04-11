@@ -80,7 +80,7 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
     protected final List<RecipeIconHolder<VanillaCrafting>> craftingButtons = new PagedList<>(new Stocker.Sizeable(0, 0), () -> accessor.getInteger("maxCraftingButtonsCount", 12));
     protected List<List<RecipeInfo<VanillaCrafting>>> recipesByGroup = new ArrayList<>();
     protected final Stocker.Sizeable craftingButtonsOffset = new Stocker.Sizeable(0);
-    protected final TabList craftingTabList = new TabList().add(43, 0, LegacyTabButton.iconOf(LegacySprites.STRUCTURES), LegacyComponents.STRUCTURES, t -> resetElements()).add(43, 0, LegacyTabButton.iconOf(LegacySprites.MECHANISMS), LegacyComponents.MECHANISMS, t -> resetElements()).add(43, 0, LegacyTabButton.iconOf(LegacySprites.TOOLS), LegacyComponents.TOOLS_AND_ARMOUR, t -> resetElements()).add(43, 0, LegacyTabButton.iconOf(LegacySprites.MISC), LegacyComponents.MISC, t -> resetElements()).add(43, 0, LegacyTabButton.iconOf(LegacySprites.SEARCH), LegacyComponents.SEARCH_ITEMS, t -> enableSearchMode(true));
+    protected final TabList craftingTabList = new TabList(accessor).add(43, LegacyTabButton.Type.LEFT, LegacyTabButton.iconOf(LegacySprites.STRUCTURES), LegacyComponents.STRUCTURES, t -> resetElements()).add(43, LegacyTabButton.Type.MIDDLE, LegacyTabButton.iconOf(LegacySprites.MECHANISMS), LegacyComponents.MECHANISMS, t -> resetElements()).add(43, LegacyTabButton.Type.MIDDLE, LegacyTabButton.iconOf(LegacySprites.TOOLS), LegacyComponents.TOOLS_AND_ARMOUR, t -> resetElements()).add(43, LegacyTabButton.Type.MIDDLE, LegacyTabButton.iconOf(LegacySprites.MISC), LegacyComponents.MISC, t -> resetElements()).add(43, LegacyTabButton.Type.RIGHT, LegacyTabButton.iconOf(LegacySprites.SEARCH), LegacyComponents.SEARCH_ITEMS, t -> enableSearchMode(true));
     protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
     protected final ScrollableRenderer scrollableRenderer = new ScrollableRenderer();
     protected boolean allowRecipeDisplay = false;
@@ -494,7 +494,7 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
         addWidget(getTabList());
         getTabList().init(leftPos, topPos - 37, imageWidth, (t, i) -> {
             int index = getTabList().tabButtons.indexOf(t);
-            t.type = index == 0 ? 0 : index >= getMaxTabCount() ? 2 : 1;
+            t.type = LegacyTabButton.Type.bySize(getMaxTabCount(), index);
             t.setWidth(accessor.getInteger("tabListButtonWidth", 71));
             t.offset = (t1) -> new Vec3(accessor.getDouble("tabListXOffset", -1.5) * getTabList().tabButtons.indexOf(t), t1.selected ? 0 : accessor.getDouble("tabListSelectedYOffset", 4.5), 0);
         });

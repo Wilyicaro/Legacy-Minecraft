@@ -20,21 +20,21 @@ import java.util.List;
 import java.util.Locale;
 
 public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Access {
-    protected final TabList tabList = new TabList();
+    protected final TabList tabList = new TabList(accessor);
     protected final List<List<Renderable>> renderablesByTab = new ArrayList<>();
     protected final EditBox editBox = new EditBox(Minecraft.getInstance().font, 0, 0, 200, 20, Component.translatable("legacy.menu.filter.search"));
 
 
     public Legacy4JSettingsScreen(Screen screen) {
         super(screen,s-> Panel.centered(s,250,250, 50, 0), CommonComponents.EMPTY);
-        tabList.add(0,0,100, 25, 4, null, LegacyComponents.ALL,null, b->resetElements());
+        tabList.add(0,0,100, 25, LegacyTabButton.Type.MIDDLE, null, LegacyComponents.ALL,null, b->resetElements());
         renderablesByTab.add(new ArrayList<>());
         OptionsScreen.Section.list.forEach(this::addOptionSection);
         addActualRenderables();
     }
 
     protected void addOptionSection(OptionsScreen.Section section){
-        tabList.add(0,0,100, 25, 4, null, section.title(),null, b->resetElements());
+        tabList.add(0,0,100, 25, LegacyTabButton.Type.MIDDLE, null, section.title(),null, b->resetElements());
         section.elements().forEach(c->c.accept(this));
         section.advancedSection().ifPresent(s1-> {
             getRenderableVList().addRenderable(SimpleLayoutRenderable.createDrawString(s1.title(),0,1,200,9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
@@ -80,6 +80,7 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
         editBox.setPosition(panel.getX() + (panel.width - editBox.getWidth()) / 2, panel.getY() + 10);
         editBox.setResponder(s->resetElements());
         tabList.init((b, i)->{
+            b.spriteRender = LegacyTabButton.ToggleableTabSprites.VERTICAL;
             b.setX(panel.x - b.getWidth() + 6);
             b.setY(panel.y + i + 4);
             b.offset = (t1) -> new Vec3(t1.selected ? 0 : 3.5, 0.5, 0);
