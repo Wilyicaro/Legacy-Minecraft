@@ -38,9 +38,10 @@ public class SDLControllerHandler implements Controller.Handler{
     private boolean init = false;
 
     private static final SDLControllerHandler INSTANCE = new SDLControllerHandler();
-    public static String SDL_VERSION = SdlVersionConst.SDL_MAJOR_VERSION + "." + SdlVersionConst.SDL_COMMIT;
+    public static final String SDL_VERSION = SdlVersionConst.SDL_MAJOR_VERSION + "." + SdlVersionConst.SDL_MINOR_VERSION+ "." + SdlVersionConst.SDL_MICRO_VERSION + "." + SdlVersionConst.SDL_COMMIT;
 
-    public static File nativesFile;
+    public static final String nativesMainURLFormat = "https://maven.isxander.dev/releases/dev/isxander/libsdl4j-natives/%s/%s";
+    public File nativesFile;
 
     public static final Component TITLE = Component.literal("SDL3 (isXander's libsdl4j)");
     @Override
@@ -104,8 +105,7 @@ public class SDLControllerHandler implements Controller.Handler{
         }
     }
     public static URI getNativesURI() throws URISyntaxException {
-        String nativesPath = "https://maven.isxander.dev/releases/dev/isxander/libsdl4j-natives/" + SDL_VERSION + "/";
-        return new URI(nativesPath + getNativesFile());
+        return new URI(nativesMainURLFormat.formatted(SDL_VERSION, getNativesFile()));
     }
     public static String getNativesFile(){
         String arch = System.getProperty("os.arch");

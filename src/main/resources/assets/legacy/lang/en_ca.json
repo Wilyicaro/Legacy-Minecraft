@@ -120,6 +120,6 @@
   "options.key.toggleSprint": "Toggle Sprint",
   "options.language": "Languages",
   "options.resourcepack": "Resource Packs",
-  "selectWorld.allowCommands": "Host Privileges",
-  "selectWorld.allowCommands.info": "When enabled, the host can execute commands."
+  "legacy.menu.hostPrivileges": "Host Privileges",
+  "legacy.menu.hostPrivileges.info": "When enabled, the host can execute commands."
 }

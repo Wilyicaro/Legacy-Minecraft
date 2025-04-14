@@ -12,6 +12,7 @@ import net.minecraft.world.phys.Vec3;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -26,7 +27,9 @@ import wily.legacy.init.LegacyGameRules;
 
 @Mixin(Player.class)
 public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing {
+    @Unique
     float oYBob;
+    @Unique
     float yBob;
 
     @Shadow public abstract Abilities getAbilities();
@@ -86,7 +89,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
         return (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat) || FactoryItemUtil.getEnchantmentLevel(getMainHandItem(), Enchantments.SWEEPING_EDGE, level().registryAccess()) > 0) && original;
     }
 
-    @ModifyExpressionValue(method = /*? if (forge || neoforge) && >=1.21 {*//*"getDestroySpeed(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)F"*//*?} else if forge || neoforge {*//*"getDigSpeed"*//*?} else {*/"getDestroySpeed"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;onGround()Z"))
+    @ModifyExpressionValue(method = /*? if (forge && >=1.21) || (neoforge && >=1.21.2) {*//*"getDestroySpeed(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)F"*//*?} else if forge || neoforge {*//*"getDigSpeed"*//*?} else {*/"getDestroySpeed"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;onGround()Z"))
     protected boolean getDestroySpeed(boolean original) {
         return Legacy4JClient.hasModOnServer() || original;
     }

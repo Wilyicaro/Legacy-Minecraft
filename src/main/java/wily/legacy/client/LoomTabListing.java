@@ -64,7 +64,11 @@ public class LoomTabListing implements LegacyTabInfo {
         return patterns;
     }
 
-
+    public void addFrom(LoomTabListing otherListing){
+        if (otherListing.name != null) name = otherListing.name;
+        if (otherListing.iconHolder != null) iconHolder = otherListing.iconHolder;
+        patterns.addAll(otherListing.patterns);
+    }
 
     public static class Manager implements ResourceManagerReloadListener {
 
@@ -82,10 +86,7 @@ public class LoomTabListing implements LegacyTabInfo {
                     JsonElement element = JsonParser.parseReader(bufferedReader);
                     if (element instanceof JsonArray a) a.forEach(e-> CODEC.parse(JsonOps.INSTANCE,e).result().ifPresent(listing->{
                         if (map.containsKey(listing.id)){
-                            LoomTabListing l = map.get(listing.id);
-                            if (listing.name != null) l.name = listing.name;
-                            if (listing.iconHolder != null) l.iconHolder = listing.iconHolder;
-                            l.patterns.addAll(listing.patterns);
+                            map.get(listing.id).addFrom(listing);
                         } else if (listing.isValid()) map.put(listing.id,listing);
                     }));
                 } catch (IOException exception) {

@@ -170,6 +170,8 @@ public class LegacyComponents {
     public static final Component CONFLICTING_BUTTONS = Component.translatable("legacy.options.controllerMappingConflicting");
     public static final Component CONFLICTING_KEYS = Component.translatable("legacy.options.keyMappingConflicting");
     public static final Component PEACEFUL_SPAWN_TIP = Component.translatable("item.minecraft.spawn_egg.peaceful.tip");
+    public static final Component HOST_PRIVILEGES = Component.translatable("legacy.menu.hostPrivileges");
+    public static final Component HOST_PRIVILEGES_INFO = Component.translatable("legacy.menu.hostPrivileges.info");
 
     public static Component optionName(String key){
         return Component.translatable("legacy.options."+key);

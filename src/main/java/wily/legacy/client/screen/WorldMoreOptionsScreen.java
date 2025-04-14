@@ -31,7 +31,6 @@ import wily.legacy.util.ScreenUtil;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlTooltip.Event, DatapackRepositoryAccessor {
@@ -78,7 +77,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         parent.getUiState().addListener( s->customizeButton.active = !s.isDebug() && s.getPresetEditor() != null);
         renderableVList.addRenderable(customizeButton);
         renderableVList.addRenderable(SimpleLayoutRenderable.create(0,9,r-> ((guiGraphics, i, j, f) -> {})));
-        TickBox hostPrivileges = new TickBox(0,0,parent.getUiState()./*? if <1.20.5 {*//*isAllowCheats*//*?} else {*/isAllowCommands/*?}*/(),b->Component.translatable("selectWorld.allowCommands"),b->Tooltip.create(Component.translatable("selectWorld.allowCommands.info")),b->parent.getUiState()./*? if <1.20.5 {*//*setAllowCheats*//*?} else {*/setAllowCommands/*?}*/(b.selected));
+        TickBox hostPrivileges = new TickBox(0,0,parent.getUiState()./*? if <1.20.5 {*//*isAllowCheats*//*?} else {*/isAllowCommands/*?}*/(),b->LegacyComponents.HOST_PRIVILEGES,b->Tooltip.create(LegacyComponents.HOST_PRIVILEGES_INFO),b->parent.getUiState()./*? if <1.20.5 {*//*setAllowCheats*//*?} else {*/setAllowCommands/*?}*/(b.selected));
         parent.getUiState().addListener(s-> hostPrivileges.active = !s.isDebug() && !s.isHardcore());
         GameRules gameRules = parent.getUiState().getGameRules();
         Pair<Path,PackRepository> pair = parent.getDataPackSelectionSettings(parent.getUiState().getSettings().dataConfiguration());
@@ -178,7 +177,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         })));
         renderableVList.addRenderable(new TickBox(0,0,parent.trustPlayers, b-> Component.translatable("legacy.menu.selectWorld.trust_players"),b-> null,t-> parent.trustPlayers = t.selected));
         addGameRulesOptions(renderableVList,gameRules, k-> k.getCategory() == GameRules.Category.UPDATES);
-        gameRenderables.addRenderable(new TickBox(0,0,parent.allowCommands, b->Component.translatable("selectWorld.allowCommands"), b->Tooltip.create(Component.translatable("selectWorld.allowCommands.info")), b-> parent.allowCommands = b.selected));
+        gameRenderables.addRenderable(new TickBox(0,0,parent.hostPrivileges, b->LegacyComponents.HOST_PRIVILEGES, b->Tooltip.create(LegacyComponents.HOST_PRIVILEGES_INFO), b-> parent.hostPrivileges = b.selected));
         for (GameRules.Category value : GameRules.Category.values()) {
             if (value == GameRules.Category.UPDATES) continue;
             addGameRulesOptions(gameRenderables,gameRules, k-> k.getCategory() == value);

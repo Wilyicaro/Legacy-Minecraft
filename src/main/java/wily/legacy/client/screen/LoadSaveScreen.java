@@ -19,7 +19,6 @@ import net.minecraft.world.level.dimension.end.EndDragonFight;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
 import org.jetbrains.annotations.Nullable;
-import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
@@ -49,7 +48,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     protected final LevelStorageSource.LevelStorageAccess access;
     protected final LegacySliderButton<GameType> gameTypeSlider;
     public boolean trustPlayers;
-    public boolean allowCommands;
+    public boolean hostPrivileges;
     public static final List<ResourceKey<Level>> RESETTABLE_DIMENSIONS = new ArrayList<>(List.of(Level.NETHER,Level.END));
     public final List<ResourceKey<Level>> dimensionsToReset = new ArrayList<>();
     public Difficulty difficulty;
@@ -73,7 +72,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
             if (button.selected) minecraft.setScreen(publishScreen);
             button.selected = publishScreen.publish = false;
         });
-        allowCommands = hasCommands(summary);
+        hostPrivileges = hasCommands(summary);
         trustPlayers = LegacyClientWorldSettings.of(summary.getSettings()).trustPlayers();
         (resourceAssortSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 112, 220,45, !ScreenUtil.hasTooltipBoxes(accessor),LegacyClientWorldSettings.of(summary.getSettings()).getSelectedResourceAlbum())).active = !this.isLocked;
     }
@@ -165,7 +164,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
             s.server.setDifficulty(difficulty, false);
             applyGameRules.accept(s.server.getGameRules(), minecraft.getSingleplayerServer());
             publishScreen.publish((IntegratedServer) s.server);
-            LegacyClientWorldSettings.of(s.server.getWorldData()).setAllowCommands(allowCommands);
+            LegacyClientWorldSettings.of(s.server.getWorldData()).setAllowCommands(hostPrivileges);
             s.server.getPlayerList().sendPlayerPermissionLevel(s);
             LegacyClientWorldSettings.of(s.server.getWorldData()).setSelectedResourceAlbum(resourceAssortSelector.getSelectedAlbum());
             if (s.gameMode.getGameModeForPlayer() != gameTypeSlider.getObjectValue()) s.setGameMode(gameTypeSlider.getObjectValue());

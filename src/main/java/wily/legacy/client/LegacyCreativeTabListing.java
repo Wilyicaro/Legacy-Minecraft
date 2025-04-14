@@ -74,6 +74,12 @@ public class LegacyCreativeTabListing implements LegacyTabInfo {
         return displayItems;
     }
 
+    public void addFrom(LegacyCreativeTabListing otherListing){
+        if (otherListing.name != null) name = otherListing.name;
+        if (otherListing.iconHolder != null) iconHolder = otherListing.iconHolder;
+        displayItems.addAll(otherListing.displayItems);
+    }
+
     public static class Manager implements ResourceManagerReloadListener {
 
         public Manager(){
@@ -90,10 +96,7 @@ public class LegacyCreativeTabListing implements LegacyTabInfo {
                     JsonElement json = JsonParser.parseReader(bufferedReader);
                     if (json instanceof JsonArray a) a.forEach(e->CODEC.parse(JsonOps.INSTANCE,e).result().ifPresent(listing->{
                         if (map.containsKey(listing.id)){
-                            LegacyCreativeTabListing l = map.get(listing.id);
-                            if (listing.name != null) l.name = listing.name;
-                            if (listing.iconHolder != null) l.iconHolder = listing.iconHolder;
-                            l.displayItems.addAll(listing.displayItems);
+                            map.get(listing.id).addFrom(listing);
                         } else if (listing.isValid()) map.put(listing.id,listing);
                     }));
                 } catch (IOException var8) {

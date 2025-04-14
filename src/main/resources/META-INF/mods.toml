@@ -11,6 +11,7 @@ displayURL="${mod_source}"
 logoFile="logo.png"
 authors="${mod_authors}"
 description="${mod_description}"
+credits="${mod_credits}"
 
 [[dependencies.${mod_id}]]
 modId = "minecraft"

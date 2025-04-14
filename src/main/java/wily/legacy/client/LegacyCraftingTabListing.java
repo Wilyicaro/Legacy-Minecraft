@@ -63,6 +63,15 @@ public class LegacyCraftingTabListing implements LegacyTabInfo {
         return craftings;
     }
 
+    public void addFrom(LegacyCraftingTabListing otherListing){
+        if (otherListing.name != null) name = otherListing.name;
+        if (otherListing.iconHolder != null) iconHolder = otherListing.iconHolder;
+        otherListing.craftings.forEach((s,f)->{
+            if (craftings.containsKey(s)) craftings.get(s).addAll(f);
+            else craftings.put(s,f);
+        });
+    }
+
     public static class Manager implements ResourceManagerReloadListener {
         @Override
         public void onResourceManagerReload(ResourceManager manager) {
@@ -72,13 +81,7 @@ public class LegacyCraftingTabListing implements LegacyTabInfo {
                     JsonElement element = JsonParser.parseReader(bufferedReader);
                     if (element instanceof JsonArray a) a.forEach(e-> CODEC.parse(JsonOps.INSTANCE,e).result().ifPresent(listing->{
                         if (map.containsKey(listing.id)){
-                            LegacyCraftingTabListing l = map.get(listing.id);
-                            if (listing.name != null) l.name = listing.name;
-                            if (listing.iconHolder != null) l.iconHolder = listing.iconHolder;
-                            listing.craftings.forEach((s,f)->{
-                                if (l.craftings.containsKey(s)) l.craftings.get(s).addAll(f);
-                                else l.craftings.put(s,f);
-                            });
+                            map.get(listing.id).addFrom(listing);
                         } else if (listing.isValid()) map.put(listing.id,listing);
                     }));
                 } catch (IOException exception) {
