@@ -93,6 +93,11 @@ public class GLFWControllerHandler implements Controller.Handler{
             }
 
             @Override
+            public Handler getHandler() {
+                return GLFWControllerHandler.this;
+            }
+
+            @Override
             public void manageBindings(Runnable run) {
                 gamepadState = GLFWGamepadState.calloc();
                 if (GLFW.glfwGetGamepadState(jid, gamepadState))

@@ -143,7 +143,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(getX(),getY(),800);
         ScreenUtil.renderPointerPanel(guiGraphics,0,0,getWidth(),getHeight());
-        if (title != null) guiGraphics.drawString(minecraft.font,title,13,13,CommonColor.TIP_TITLE_TEXT.get());
+        if (title != null) guiGraphics.drawString(minecraft.font,title, (centered ? (width() - minecraft.font.width(title)) / 2 : 13),13, CommonColor.TIP_TITLE_TEXT.get());
         tipLabel.centered(centered).withShadow(centered).withPos(13, title == null ? 13 : 25).render(guiGraphics, i, j, f);
         if (holder != null) holder.render(guiGraphics,i,j,f);
         guiGraphics.pose().popPose();

@@ -113,7 +113,7 @@ public abstract class BindingState {
 
         @Override
         public void update(Controller controller) {
-            update(controller.hasButton(button.get()) && controller.buttonPressed(ControllerManager.getHandler().getButtonIndex(button.get())));
+            update(controller.hasButton(button.get()) && controller.buttonPressed(controller.getHandler().getButtonIndex(button.get())));
         }
     }
 
@@ -155,8 +155,8 @@ public abstract class BindingState {
 
         @Override
         public void update(Controller controller) {
-            xAxis.ifPresent(axis-> x = controller.hasAxis(axis) ? controller.axisValue(ControllerManager.getHandler().getAxisIndex(axis)) : 0);
-            yAxis.ifPresent(axis-> y = controller.hasAxis(axis) ? controller.axisValue(ControllerManager.getHandler().getAxisIndex(axis)) : 0);
+            xAxis.ifPresent(axis-> x = controller.hasAxis(axis) ? controller.axisValue(controller.getHandler().getAxisIndex(axis)) : 0);
+            yAxis.ifPresent(axis-> y = controller.hasAxis(axis) ? controller.axisValue(controller.getHandler().getAxisIndex(axis)) : 0);
             update(getMagnitude() >= getDeadZone());
         }
 

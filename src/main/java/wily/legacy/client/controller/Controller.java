@@ -1,5 +1,6 @@
 package wily.legacy.client.controller;
 
+import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.FactoryAPIClient;
@@ -35,7 +36,7 @@ public interface Controller {
     default void connect(ControllerManager manager){
         manager.setControllerTheLastInput(true);
         if (!manager.isCursorDisabled && manager.minecraft.screen != null) manager.minecraft.execute(()-> manager.minecraft.screen.repositionElements());
-        FactoryAPIClient.getToasts().addToast(new LegacyTip(CONTROLLER_DETECTED, Component.literal(getName())).disappearTime(4500));
+        addOrSetControllerToast(CONTROLLER_DETECTED);
     }
 
     default void rumble(char low_frequency_rumble, char high_frequency_rumble, int duration_ms){}
@@ -63,8 +64,20 @@ public interface Controller {
         if (manager.isCursorDisabled && !manager.getCursorMode().isNever()) manager.enableCursor();
         manager.updateBindings(Controller.EMPTY);
         manager.connectedController = null;
-        FactoryAPIClient.getToasts().addToast(new LegacyTip(CONTROLLER_DISCONNECTED, Component.literal(getName())).disappearTime(4500));
+        addOrSetControllerToast(CONTROLLER_DISCONNECTED);
     }
+
+    default void addOrSetControllerToast(Component component){
+        LegacyTip oldToast = FactoryAPIClient.getToasts().getToast(LegacyTip.class, Toast.NO_TOKEN);
+        Component tip = Component.literal(getName());
+        if (oldToast == null || (oldToast.title != CONTROLLER_DETECTED && oldToast.title != CONTROLLER_DISCONNECTED) || oldToast.visibility == Toast.Visibility.HIDE) {
+            FactoryAPIClient.getToasts().addToast(new LegacyTip(component, tip).centered().disappearTime(4500));
+        } else {
+            oldToast.tip(tip).title(component).disappearTime(4500);
+        }
+    }
+
+    Handler getHandler();
 
     Controller EMPTY = new Controller() {
         public String getName() {
@@ -91,6 +104,11 @@ public interface Controller {
         @Override
         public boolean hasAxis(ControllerBinding.Axis axis) {
             return false;
+        }
+
+        @Override
+        public Handler getHandler() {
+            return Handler.EMPTY;
         }
 
         @Override

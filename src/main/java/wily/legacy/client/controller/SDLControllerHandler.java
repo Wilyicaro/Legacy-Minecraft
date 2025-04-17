@@ -15,6 +15,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.io.FileUtils;
+import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.legacy.Legacy4J;
@@ -30,11 +31,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 
 public class SDLControllerHandler implements Controller.Handler{
-    private SDL_JoystickID[] actualIds = new SDL_JoystickID[]{};
+    private SDL_JoystickID[] actualIds = new SDL_JoystickID[0];
     private boolean init = false;
 
     private static final SDLControllerHandler INSTANCE = new SDLControllerHandler();
@@ -56,45 +59,32 @@ public class SDLControllerHandler implements Controller.Handler{
     public void init() {
         if (!init) {
             Minecraft minecraft = Minecraft.getInstance();
-            if (nativesFile == null) nativesFile = new File(minecraft.gameDirectory,"natives/" + getNativesFile());
-            if (!nativesFile.exists()){
-                if (!(minecraft.screen instanceof OverlayPanelScreen) && MinecraftAccessor.getInstance().hasGameLoaded()) {
-                    Screen s = minecraft.screen;
+            if (nativesFile == null) {
+                String fileName = getNativesFileName();
+                if (fileName == null) {
+                    Legacy4J.LOGGER.warn("{} isn't supported in this system. GLFW will be used instead.", getName());
                     LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
                     LegacyOptions.selectedControllerHandler.save();
-                    minecraft.setScreen(new ConfirmationScreen(s, Component.translatable("legacy.menu.download_natives",getName()), Controller.Handler.DOWNLOAD_MESSAGE, b -> {
-                        Stocker<Long> fileSize = new Stocker<>(1L);
-                        LegacyLoadingScreen screen = new LegacyLoadingScreen(Controller.Handler.DOWNLOADING_NATIVES, CommonComponents.EMPTY){
-                            @Override
-                            public void tick() {
-                                if (getProgress() == 100) {
-                                    LegacyOptions.selectedControllerHandler.set(getInstance());
-                                    LegacyOptions.CLIENT_STORAGE.save();
-                                    minecraft.setScreen(s);
-                                    return;
-                                }
-                                setProgress(nativesFile.exists() ? Math.round(Math.min(1,FileUtils.sizeOf(nativesFile) / (float) fileSize.get()) * 80) : 0);
-                                super.tick();
-                            }
-                        };
-                        minecraft.setScreen(screen);
-                        CompletableFuture.runAsync(()->{
-                            try {
-                                fileSize.set(getNativesURI().toURL().openConnection().getContentLengthLong());
-                                FileUtils.copyURLToFile(getNativesURI().toURL(), nativesFile);
-                                screen.setLoadingHeader(Controller.Handler.LOADING_NATIVES);
-                                minecraft.execute(()->{
-                                    init();
-                                    screen.setProgress(100);
-                                });
-                            } catch (IOException | URISyntaxException e) {
-                                throw new RuntimeException(e);
-                            }
-                        });
-                    }));
+                    init = true;
+                    return;
+                } else {
+                    nativesFile = new File(minecraft.gameDirectory, "natives/" + fileName);
                 }
+            }
+
+            if (!nativesFile.exists()){
+                LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
+                LegacyOptions.selectedControllerHandler.save();
+                FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(()-> openNativesScreen(minecraft), ()-> !(minecraft.screen instanceof OverlayPanelScreen) && MinecraftAccessor.getInstance().hasGameLoaded());
+                init = true;
                 return;
-            }else SdlNativeLibraryLoader.loadLibSDL3FromFilePathNow(nativesFile.getPath());
+            } else try {
+                SdlNativeLibraryLoader.loadLibSDL3FromFilePathNow(nativesFile.getPath());
+            } catch (Exception e) {
+                Legacy4J.LOGGER.warn("Failed to load {} natives: {}", getName(), e.getMessage());
+                init = true;
+                return;
+            }
 
             if (!SdlInit.SDL_Init(SdlSubSystemConst.SDL_INIT_JOYSTICK | SdlSubSystemConst.SDL_INIT_GAMEPAD)) {
                 Legacy4J.LOGGER.warn("SDL Game Controller failed to start!");
@@ -104,16 +94,80 @@ public class SDLControllerHandler implements Controller.Handler{
             init = true;
         }
     }
-    public static URI getNativesURI() throws URISyntaxException {
-        return new URI(nativesMainURLFormat.formatted(SDL_VERSION, getNativesFile()));
+
+    public void openNativesScreen(Minecraft minecraft){
+        Screen s = minecraft.screen;
+        minecraft.setScreen(new ConfirmationScreen(s, Component.translatable("legacy.menu.download_natives",getName()), Controller.Handler.DOWNLOAD_MESSAGE, b -> {
+            Stocker<Long> fileSize = new Stocker<>(1L);
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            LegacyLoadingScreen screen = new LegacyLoadingScreen(Controller.Handler.DOWNLOADING_NATIVES, CommonComponents.EMPTY){
+                @Override
+                public void tick() {
+                    if (getProgress() == 100) {
+                        LegacyOptions.selectedControllerHandler.set(getInstance());
+                        LegacyOptions.CLIENT_STORAGE.save();
+                        onClose();
+                        return;
+                    }
+                    setProgress(nativesFile.exists() ? Math.round(Math.min(1,FileUtils.sizeOf(nativesFile) / (float) fileSize.get()) * 80) : 0);
+                    super.tick();
+                }
+
+                @Override
+                public void onClose() {
+                    minecraft.setScreen(s);
+                    LegacyLoadingScreen.closeExecutor(executor);
+                }
+
+                @Override
+                public boolean shouldCloseOnEsc() {
+                    return true;
+                }
+            };
+            minecraft.setScreen(screen);
+            CompletableFuture.runAsync(()->{
+                try {
+                    fileSize.set(getNativesURI().toURL().openConnection().getContentLengthLong());
+                    FileUtils.copyURLToFile(getNativesURI().toURL(), nativesFile);
+                    screen.setLoadingHeader(Controller.Handler.LOADING_NATIVES);
+                    screen.setProgress(100);
+                    init = false;
+                } catch (IOException | URISyntaxException e) {
+                    throw new RuntimeException(e);
+                }
+            }, executor);
+        }){
+            @Override
+            public void onClose() {
+                super.onClose();
+                init = false;
+            }
+        });
     }
-    public static String getNativesFile(){
+
+    public static URI getNativesURI() throws URISyntaxException {
+        return new URI(nativesMainURLFormat.formatted(SDL_VERSION, getNativesFileName()));
+    }
+
+    public static String getNativesFileName(){
+        if (System.getenv("POJAV_NATIVEDIR") != null){
+            Legacy4J.LOGGER.warn("PojavLauncher Detected.");
+            return null;
+        }
+        try {
+            Class.forName("com.sun.jna.Native");
+        } catch (ClassNotFoundException e) {
+            Legacy4J.LOGGER.warn("JNA wasn't found.");
+            return null;
+        }
         String arch = System.getProperty("os.arch");
-        return (switch (Util.getPlatform()){
+        String base = switch (Util.getPlatform()){
             case WINDOWS -> arch.contains("64") ? "libsdl4j-natives-%s-windows-x86_64.dll" : "libsdl4j-natives-%s-windows-x86.dll";
             case OSX -> "libsdl4j-natives-%s-macos-universal.dylib";
-            default -> arch.contains("aarch") || arch.contains("arm") ? "libsdl4j-natives-%s-linux-aarch64.so" : "libsdl4j-natives-%s-linux-x86_64.so";
-        }).formatted(SDL_VERSION);
+            case LINUX -> arch.contains("aarch") || arch.contains("arm") ? "libsdl4j-natives-%s-linux-aarch64.so" : "libsdl4j-natives-%s-linux-x86_64.so";
+            default -> null;
+        };
+        return base != null ? base.formatted(SDL_VERSION) : null;
     }
 
     @Override
@@ -211,6 +265,11 @@ public class SDLControllerHandler implements Controller.Handler{
             public void disconnect(ControllerManager manager) {
                 Controller.super.disconnect(manager);
                 SdlGamepad.SDL_CloseGamepad(controller);
+            }
+
+            @Override
+            public Handler getHandler() {
+                return SDLControllerHandler.this;
             }
         };
     }

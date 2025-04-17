@@ -158,8 +158,8 @@ def buildJar = tasks.create("buildJar", Copy.class) {
 }
 
 afterEvaluate {
-    buildJar.dependsOn(remapJar)
-    buildJar.from(remapJar.archiveFile)
+    buildJar.dependsOn(renameJarForPublication)
+    buildJar.from(renameJarForPublication.archiveFile)
     build.finalizedBy(buildJar)
 }
 

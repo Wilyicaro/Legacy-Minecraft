@@ -252,7 +252,8 @@
     "SdlGamepadMixin",
     "ClientBoundAwardStatsPacketAccessor",
     "EntityAccessor",
-    "EndPortalBlockMixin"
+    "EndPortalBlockMixin",
+    "ScaffoldingBlockItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

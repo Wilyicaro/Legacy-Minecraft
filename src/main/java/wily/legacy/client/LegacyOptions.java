@@ -22,6 +22,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.entity.HumanoidArm;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.config.FactoryConfig;
@@ -275,6 +276,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> cursorAtFirstInventorySlot = CLIENT_STORAGE.register(createBoolean("cursorAtFirstInventorySlot", false));
     public static final FactoryConfig<Boolean> controllerCursorAtFirstInventorySlot = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerCursorAtFirstInventorySlot", new FactoryConfigDisplay.Instance<>(Component.translatable("legacy.options.cursorAtFirstInventorySlot")),true, b->{}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> systemCursor = CLIENT_STORAGE.register(createBoolean("systemCursor", false, b-> Legacy4JClient.controllerManager.updateCursorInputMode()));
+    public static final FactoryConfig<ControlTooltipDisplay> controlTooltipDisplay = CLIENT_STORAGE.register(create("controlTooltipDisplay", (c, d) -> CommonComponents.optionNameValue(c, d.displayName), i-> ControlTooltipDisplay.values()[i], ControlTooltipDisplay::ordinal, ()->ControlTooltipDisplay.values().length, ControlTooltipDisplay.AUTO, d -> {}, CLIENT_STORAGE));
 
     public static int getTerrainFogStart(){
         return Math.min(terrainFogStart.get(), Minecraft.getInstance().options.renderDistance().get());
@@ -354,6 +356,35 @@ public class LegacyOptions {
         public boolean isNever(){
             return this == NEVER;
         }
+        @Override
+        public String getSerializedName() {
+            return name;
+        }
+    }
+
+    public enum ControlTooltipDisplay implements StringRepresentable {
+        AUTO("auto"),LEFT("left", HumanoidArm.LEFT.getCaption()),RIGHT("right", HumanoidArm.RIGHT.getCaption());
+        public static final EnumCodec<ControlTooltipDisplay> CODEC = StringRepresentable.fromEnum(ControlTooltipDisplay::values);
+        private final String name;
+        public final Component displayName;
+
+        ControlTooltipDisplay(String name, Component displayName){
+            this.name = name;
+            this.displayName = displayName;
+        }
+
+        ControlTooltipDisplay(String name){
+            this(name, Component.translatable("legacy.options.controlTooltipDisplay."+name));
+        }
+
+        public boolean isRight(){
+            return this == RIGHT || this == AUTO && Minecraft.getInstance().options.mainHand().get() == HumanoidArm.LEFT;
+        }
+
+        public boolean isLeft(){
+            return this == LEFT || this == AUTO && Minecraft.getInstance().options.mainHand().get() == HumanoidArm.RIGHT;
+        }
+
         @Override
         public String getSerializedName() {
             return name;

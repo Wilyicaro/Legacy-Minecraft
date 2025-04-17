@@ -116,6 +116,7 @@ public class LegacyComponents {
     public static final Component WAKE_UP = Component.translatable("legacy.action.wake_up");
     public static final Component WHATS_THIS = Component.translatable("legacy.action.whats_this");
     public static final Component ZOOM = Component.translatable("legacy.action.zoom");
+    public static final Component HOLD_TO_DESCEND = Component.translatable("legacy.action.hold_to_descend");
     public static final Component LAYER_OPTIONS = Component.translatable("legacy.menu.create_flat_world.layer_options");
     public static final Component LAYER_MESSAGE = Component.translatable("legacy.menu.create_flat_world.layer_message");
     public static final Component AUTOSAVE_MESSAGE = Component.translatable("legacy.menu.autoSave_message");

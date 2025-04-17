@@ -1,14 +1,12 @@
 package wily.legacy.mixin.base;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.minecraft.core.Direction;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,7 +14,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.factoryapi.FactoryAPIClient;
+import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.FactoryItemUtil;
 import wily.legacy.Legacy4J;
@@ -91,7 +89,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
 
     @ModifyExpressionValue(method = /*? if (forge && >=1.21) || (neoforge && >=1.21.2) {*//*"getDestroySpeed(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)F"*//*?} else if forge || neoforge {*//*"getDigSpeed"*//*?} else {*/"getDestroySpeed"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;onGround()Z"))
     protected boolean getDestroySpeed(boolean original) {
-        return Legacy4JClient.hasModOnServer() || original;
+        return !FactoryAPI.isClient() || original || Legacy4JClient.hasModOnServer();
     }
 
     @ModifyExpressionValue(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/material/FluidState;isEmpty()Z"))

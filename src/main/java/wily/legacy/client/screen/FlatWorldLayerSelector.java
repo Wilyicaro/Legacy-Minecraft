@@ -21,7 +21,6 @@ import java.util.function.Consumer;
 
 public class FlatWorldLayerSelector extends ItemViewerScreen {
     private final Consumer<FlatWorldLayerSelector> applyLayer;
-    protected final int maxLayerHeight;
     protected Block selectedLayer = Blocks.AIR;
     protected final LegacySliderButton<Integer> layerSlider;
 
@@ -30,7 +29,6 @@ public class FlatWorldLayerSelector extends ItemViewerScreen {
     public FlatWorldLayerSelector(Screen parent, Consumer<FlatWorldLayerSelector> applyLayer, int maxLayerHeight, Component component) {
         super(parent,s-> Panel.centered(s,325,245), component);
         this.applyLayer = applyLayer;
-        this.maxLayerHeight = maxLayerHeight;
         layerSlider = LegacySliderButton.createFromIntRange(panel.x + 21, panel.y + 167, 271, 16, (b)-> Component.translatable("legacy.menu.create_flat_world.layer_height"),(b)-> null, 1, 1, maxLayerHeight, b-> {});
     }
 

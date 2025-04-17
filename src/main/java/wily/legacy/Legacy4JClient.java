@@ -163,7 +163,7 @@ public class Legacy4JClient {
     public static final LeaderboardsScreen.Manager leaderBoardListingManager = new LeaderboardsScreen.Manager();
     public static final HowToPlayScreen.Manager howToPlaySectionManager = new HowToPlayScreen.Manager();
 
-    public static ControllerManager controllerManager = new ControllerManager();
+    public static final ControllerManager controllerManager = new ControllerManager();
     public static final Map<Block, ResourceLocation> fastLeavesModels = new HashMap<>();
     public static KnownListing<Block> knownBlocks;
     public static KnownListing<EntityType<?>> knownEntities;

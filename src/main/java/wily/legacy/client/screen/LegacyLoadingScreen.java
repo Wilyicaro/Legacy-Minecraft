@@ -24,6 +24,8 @@ import wily.legacy.client.LegacyTipManager;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.ScreenUtil;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
 
 import static wily.legacy.util.LegacySprites.LOADING_BACKGROUND;
@@ -154,6 +156,35 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
         };
         screen.setGenericLoading(true);
         return screen;
+    }
+
+    public static LegacyLoadingScreen createWithExecutor(Component header, Runnable onClose, ExecutorService executor){
+        return new LegacyLoadingScreen(header,Component.empty()){
+            @Override
+            public void onClose() {
+                onClose.run();
+                closeExecutor(executor);
+            }
+
+            @Override
+            public boolean shouldCloseOnEsc() {
+                return true;
+            }
+        };
+    }
+
+    public static void closeExecutor(ExecutorService executor){
+        executor.shutdown();
+        boolean bl;
+        try {
+            bl = executor.awaitTermination(3L, TimeUnit.SECONDS);
+        } catch (InterruptedException var3) {
+            bl = false;
+        }
+
+        if (!bl) {
+            executor.shutdownNow();
+        }
     }
 
     public int getProgress() {

@@ -87,19 +87,22 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
     @Override
     public void apply(Context context) {
         if (context.player() instanceof ServerPlayer sp) {
-            sp = sp.server.getPlayerList().getPlayer(player);
-            if (sp == null) return;
-            switch (sync){
-                case ASK_ALL -> CommonNetwork.sendToPlayer(sp, All.fromPlayerList(sp.server));
-                case CLASSIC_CRAFTING,LEGACY_CRAFTING -> ((LegacyPlayer) sp).setCrafting(sync == Sync.CLASSIC_CRAFTING);
-                case CLASSIC_TRADING,LEGACY_TRADING -> ((LegacyPlayer) sp).setTrading(sync == Sync.CLASSIC_TRADING);
-                case CLASSIC_STONECUTTING,LEGACY_STONECUTTING -> ((LegacyPlayer) sp).setStonecutting(sync == Sync.CLASSIC_STONECUTTING);
-                case CLASSIC_LOOM,LEGACY_LOOM -> ((LegacyPlayer) sp).setLoom(sync == Sync.CLASSIC_LOOM);
-            }
+            ServerPlayer affectPlayer;
+            if (sp.getUUID().equals(player)) {
+                switch (sync) {
+                    case ASK_ALL -> CommonNetwork.sendToPlayer(sp, All.fromPlayerList(sp.server));
+                    case CLASSIC_CRAFTING, LEGACY_CRAFTING -> ((LegacyPlayer) sp).setCrafting(sync == Sync.CLASSIC_CRAFTING);
+                    case CLASSIC_TRADING, LEGACY_TRADING -> ((LegacyPlayer) sp).setTrading(sync == Sync.CLASSIC_TRADING);
+                    case CLASSIC_STONECUTTING, LEGACY_STONECUTTING -> ((LegacyPlayer) sp).setStonecutting(sync == Sync.CLASSIC_STONECUTTING);
+                    case CLASSIC_LOOM, LEGACY_LOOM -> ((LegacyPlayer) sp).setLoom(sync == Sync.CLASSIC_LOOM);
+                }
+                affectPlayer = sp;
+            } else affectPlayer = sp.server.getPlayerList().getPlayer(player);
+            if (affectPlayer == null) return;
             if (sp.hasPermissions(2)){
                 switch (sync){
-                    case DISABLE_EXHAUSTION,ENABLE_EXHAUSTION -> ((LegacyPlayerInfo)sp).setDisableExhaustion(sync == Sync.DISABLE_EXHAUSTION);
-                    case ENABLE_MAY_FLY_SURVIVAL,DISABLE_MAY_FLY_SURVIVAL -> LegacyPlayerInfo.updateMayFlySurvival(sp,sync == Sync.ENABLE_MAY_FLY_SURVIVAL, true);
+                    case DISABLE_EXHAUSTION,ENABLE_EXHAUSTION -> ((LegacyPlayerInfo)affectPlayer).setDisableExhaustion(sync == Sync.DISABLE_EXHAUSTION);
+                    case ENABLE_MAY_FLY_SURVIVAL,DISABLE_MAY_FLY_SURVIVAL -> LegacyPlayerInfo.updateMayFlySurvival(affectPlayer,sync == Sync.ENABLE_MAY_FLY_SURVIVAL, true);
                 }
             }
         }

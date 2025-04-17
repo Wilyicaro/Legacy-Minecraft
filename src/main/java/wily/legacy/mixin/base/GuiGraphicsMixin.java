@@ -86,9 +86,10 @@ public abstract class GuiGraphicsMixin {
         int p = vector2ic.x();
         int q = vector2ic.y();
         this.pose.pushPose();
+        this.pose.translate(0, 0, 800.0F);
         if (p == (int)Legacy4JClient.controllerManager.getPointerX() && q == (int)Legacy4JClient.controllerManager.getPointerY()) this.pose.translate(Legacy4JClient.controllerManager.getPointerX() - i, Legacy4JClient.controllerManager.getPointerY() - j,0.0f);
         ScreenUtil.renderPointerPanel(self(),p - Math.round(5 * ScreenUtil.getTextScale()),q - Math.round(9 * ScreenUtil.getTextScale()),Math.round((k + 11) *  ScreenUtil.getTextScale()),Math.round((l + 13) * ScreenUtil.getTextScale()));
-        this.pose.translate(p, q, 800.0F);
+        this.pose.translate(p, q, 0.0F);
         FactoryScreenUtil.disableDepthTest();
         this.pose.scale(ScreenUtil.getTextScale(), ScreenUtil.getTextScale(),1.0f);
         int s = 0;

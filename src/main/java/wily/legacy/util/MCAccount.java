@@ -717,29 +717,9 @@ public interface MCAccount {
     }
 
     static LegacyLoadingScreen prepareLoginInScreen(Runnable onClose, ExecutorService executor){
-        return new LegacyLoadingScreen(LOGIN_IN,Component.empty()){
-            @Override
-            public void onClose() {
-                onClose.run();
-                executor.shutdown();
-                boolean bl;
-                try {
-                    bl = executor.awaitTermination(3L, TimeUnit.SECONDS);
-                } catch (InterruptedException var3) {
-                    bl = false;
-                }
-
-                if (!bl) {
-                    executor.shutdownNow();
-                }
-            }
-
-            @Override
-            public boolean shouldCloseOnEsc() {
-                return true;
-            }
-        };
+        return LegacyLoadingScreen.createWithExecutor(LOGIN_IN, onClose, executor);
     }
+
     static CompletableFuture<User> login(LegacyLoadingScreen screen, String code, String password, Stocker<String> refresh, Executor executor){
         CompletableFuture<User> login = updateStage(MCAccount.acquireMSAccessToken(code,refresh.get() != null,executor), screen,ACQUIRING_MSACCESS_TOKEN,20).
                 thenComposeAsync(s-> {

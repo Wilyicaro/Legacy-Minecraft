@@ -451,25 +451,36 @@ public interface ControlTooltip {
                 if ((action = tooltip.getAction()) == null || (icon = tooltip.getIcon()) == null) continue;
                 renderTooltips.compute(action, (k, existingIcon) -> existingIcon == null ? icon : existingIcon.equals(icon) || !LegacyOptions.displayMultipleControlsFromAction.get() ? existingIcon : COMPOUND_ICON_FUNCTION.apply(new Icon[]{existingIcon,SPACE_ICON, icon}));
             }
-            FactoryScreenUtil.disableDepthTest();
             RenderSystem.setShaderColor(1.0f,1.0f,1.0f, Math.max(minecraft.screen == null ? 0.0f : 0.2f,  ScreenUtil.getHUDOpacity()));
             guiGraphics.pose().pushPose();
+            boolean left = LegacyOptions.controlTooltipDisplay.get().isLeft();
             double hudDiff = (1 - LegacyOptions.hudDistance.get()) * 60D;
-            guiGraphics.pose().translate(-Math.min(hudDiff,30), Math.min(hudDiff,16),0);
+            double xDiff = -Math.min(hudDiff,30);
+            guiGraphics.pose().translate(left ? xDiff : guiGraphics.guiWidth() - xDiff, Math.min(hudDiff,16),1000);
             int baseHeight = guiGraphics.guiHeight() - 29;
 
             renderTooltips.forEach((action,icon)->{
-                int controlWidth = icon.render(guiGraphics, 32, baseHeight, allowPressed(), false);
-                if (controlWidth > 0) {
-                    guiGraphics.drawString(minecraft.font, action, 34 + controlWidth, baseHeight, CommonColor.ACTION_TEXT.get());
-                    guiGraphics.pose().translate(controlWidth + minecraft.font.width(action) + 12, 0, 0);
-                    guiGraphics.flush();
+                if (left) {
+                    int controlWidth = icon.render(guiGraphics, 32, baseHeight, allowPressed(), false);
+                    if (controlWidth > 0) {
+                        guiGraphics.drawString(minecraft.font, action, 34 + controlWidth, baseHeight, CommonColor.ACTION_TEXT.get());
+                        guiGraphics.pose().translate(controlWidth + minecraft.font.width(action) + 12, 0, 0);
+                        guiGraphics.flush();
+                    }
+                } else {
+                    int controlWidth = icon.render(guiGraphics, -32, baseHeight, allowPressed(), true);
+                    if (controlWidth > 0) {
+                        guiGraphics.pose().translate(-controlWidth - minecraft.font.width(action), 0, 0);
+                        icon.render(guiGraphics, -32, baseHeight, allowPressed(), false);
+                        guiGraphics.drawString(minecraft.font, action, -30 + controlWidth, baseHeight, CommonColor.ACTION_TEXT.get());
+                        guiGraphics.pose().translate(-12, 0, 0);
+                        guiGraphics.flush();
+                    }
                 }
             });
             guiGraphics.pose().popPose();
             RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
             FactoryScreenUtil.disableBlend();
-            FactoryScreenUtil.enableDepthTest();
         }
     }
 
@@ -532,7 +543,7 @@ public interface ControlTooltip {
         public static void applyGUIControlTooltips(Renderer renderer, Minecraft minecraft){
             renderer.add(minecraft.options.keyJump,()-> minecraft.player.isUnderWater() ? LegacyComponents.SWIM_UP : null).add(Minecraft.getInstance().options.keyInventory).add(Legacy4JClient.keyCrafting).add(Minecraft.getInstance().options.keyUse,()-> getActualUse(minecraft)).add(Minecraft.getInstance().options.keyAttack,()->getMainAction(minecraft));
             renderer.tooltips.addAll(controlTooltips);
-            renderer.add(minecraft.options.keyShift,()-> minecraft.player.isPassenger() ? minecraft.player.getVehicle() instanceof LivingEntity ? LegacyComponents.DISMOUNT : LegacyComponents.EXIT : null).add(minecraft.options.keyPickItem,()-> getPickAction(minecraft));
+            renderer.add(minecraft.options.keyShift,()-> minecraft.player.isPassenger() ? minecraft.player.getVehicle() instanceof LivingEntity ? LegacyComponents.DISMOUNT : LegacyComponents.EXIT : minecraft.player./*? if >=1.21 {*/getInBlockState/*?} else {*//*getFeetBlockState*//*?}*/().is(Blocks.SCAFFOLDING) ? LegacyComponents.HOLD_TO_DESCEND : null).add(minecraft.options.keyPickItem,()-> getPickAction(minecraft));
         }
         protected ControlTooltip guiControlTooltipFromJson(JsonObject o){
             LegacyKeyMapping mapping = LegacyKeyMapping.of(KeyMapping.ALL.get(GsonHelper.getAsString(o, "keyMapping")));

@@ -2,6 +2,12 @@
   "music.creative": {
     "replace": true,
     "sounds": [
+      //? if <1.20.2 {
+      /*{
+        "name": "music.game",
+        "type": "event"
+      }
+      *///?} else {
       {
         "name": "music/game/creative/biome_fest",
         "stream": true
@@ -26,15 +32,23 @@
         "name": "music/game/creative/taswell",
         "stream": true
       }
+      //?}
     ]
   },
   "music.credits": {
     "replace": true,
     "sounds": [
+      //? if <1.20.2 {
+      /*{
+        "name": "music/game/end/credits",
+        "stream": true
+      }
+      *///?} else {
       {
         "name": "music/game/end/alpha",
         "stream": true
       }
+      //?}
     ]
   },
   "music.dragon": {
@@ -49,10 +63,17 @@
   "music.end": {
     "replace": true,
     "sounds": [
+      //? if <1.20.2 {
+      /*{
+        "name": "music/game/end/end",
+        "stream": true
+      },
+      *///?} else {
       {
         "name": "music/game/end/the_end",
         "stream": true
       },
+      //?}
       {
         "name": "music/game/end/boss",
         "stream": true
@@ -62,6 +83,56 @@
   "music.game": {
     "replace": true,
     "sounds": [
+      //? if <1.20.2 {
+      /*{
+        "name": "music/game/calm1",
+        "stream": true
+      },
+      {
+        "name": "music/game/calm2",
+        "stream": true
+      },
+      {
+        "name": "music/game/calm3",
+        "stream": true
+      },
+      {
+        "name": "music/game/hal1",
+        "stream": true
+      },
+      {
+        "name": "music/game/hal2",
+        "stream": true
+      },
+      {
+        "name": "music/game/hal3",
+        "stream": true
+      },
+      {
+        "name": "music/game/hal4",
+        "stream": true
+      },
+      {
+        "name": "music/game/nuance1",
+        "stream": true
+      },
+      {
+        "name": "music/game/nuance2",
+        "stream": true
+      },
+      {
+        "name": "music/game/piano1",
+        "stream": true
+      },
+      {
+        "name": "music/game/piano2",
+        "stream": true
+      },
+      {
+        "name": "music/game/piano3",
+        "stream": true
+      }
+      *///?} else {
       {
         "name": "music/game/minecraft",
         "stream": true
@@ -110,11 +181,30 @@
         "name": "music/game/mice_on_venus",
         "stream": true
       }
+      //?}
     ]
   },
   "music.menu": {
     "replace": true,
     "sounds": [
+      //? if <1.20.2 {
+      /*{
+        "name": "music/menu/menu1",
+        "stream": true
+      },
+      {
+        "name": "music/menu/menu2",
+        "stream": true
+      },
+      {
+        "name": "music/menu/menu3",
+        "stream": true
+      },
+      {
+        "name": "music/menu/menu4",
+        "stream": true
+      }
+      *///?} else {
       {
         "name": "music/menu/mutation",
         "stream": true
@@ -131,11 +221,30 @@
         "name": "music/menu/floating_trees",
         "stream": true
       }
+      //?}
     ]
   },
   "music.nether.nether_wastes": {
     "replace": true,
     "sounds": [
+      //? if <1.20.2 {
+      /*{
+        "name": "music/game/nether/nether1",
+        "stream": true
+      },
+      {
+        "name": "music/game/nether/nether2",
+        "stream": true
+      },
+      {
+        "name": "music/game/nether/nether3",
+        "stream": true
+      },
+      {
+        "name": "music/game/nether/nether4",
+        "stream": true
+      }
+      *///?} else {
       {
         "name": "music/game/nether/concrete_halls",
         "stream": true
@@ -152,11 +261,30 @@
         "name": "music/game/nether/ballad_of_the_cats",
         "stream": true
       }
+      //?}
     ]
   },
   "music.nether.warped_forest": {
     "replace": true,
     "sounds": [
+      //? if <1.20.2 {
+      /*{
+        "name": "music/game/nether/nether1",
+        "stream": true
+      },
+      {
+        "name": "music/game/nether/nether2",
+        "stream": true
+      },
+      {
+        "name": "music/game/nether/nether3",
+        "stream": true
+      },
+      {
+        "name": "music/game/nether/nether4",
+        "stream": true
+      },
+      *///?} else {
       {
         "name": "music/game/nether/concrete_halls",
         "stream": true
@@ -173,6 +301,7 @@
         "name": "music/game/nether/ballad_of_the_cats",
         "stream": true
       },
+      //?}
       {
         "name": "music/game/nether/nether_wastes/rubedo",
         "stream": true,

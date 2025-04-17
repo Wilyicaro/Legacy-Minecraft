@@ -3,6 +3,7 @@ package wily.legacy.mixin.base;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.server.packs.repository.PackRepository;
+import net.minecraft.world.level.block.Blocks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,7 +39,7 @@ public abstract class OptionsMixin {
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ToggleKeyMapping;<init>(Ljava/lang/String;ILjava/lang/String;Ljava/util/function/BooleanSupplier;)V", ordinal = 0),index = 3)
     protected BooleanSupplier initKeyShift(BooleanSupplier booleanSupplier) {
-        return ()-> (minecraft == null || minecraft.player == null || (!minecraft.player.getAbilities().flying && minecraft.player.getVehicle() == null && (!minecraft.player.isInWater() || minecraft.player.onGround()))) && (booleanSupplier.getAsBoolean() && !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.controllerToggleCrouch.get() && Legacy4JClient.controllerManager.isControllerTheLastInput());
+        return ()-> (minecraft == null || minecraft.player == null || (!minecraft.player.getAbilities().flying && minecraft.player.getVehicle() == null && (!minecraft.player.isInWater() || minecraft.player.onGround()) && !minecraft.player./*? if >=1.21 {*/getInBlockState/*?} else {*//*getFeetBlockState*//*?}*/().is(Blocks.SCAFFOLDING))) && (booleanSupplier.getAsBoolean() && !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.controllerToggleCrouch.get() && Legacy4JClient.controllerManager.isControllerTheLastInput());
     }
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ToggleKeyMapping;<init>(Ljava/lang/String;ILjava/lang/String;Ljava/util/function/BooleanSupplier;)V", ordinal = 1),index = 3)

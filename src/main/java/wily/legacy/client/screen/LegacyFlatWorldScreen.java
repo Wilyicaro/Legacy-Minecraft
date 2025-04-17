@@ -29,6 +29,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.util.FactoryScreenUtil;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyBiomeOverride;
 import wily.legacy.client.LegacyTipManager;
@@ -205,6 +206,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
                 return;
             }
             int allHeight = getAllLayersHeight();
+            Legacy4J.LOGGER.warn(allHeight);
             int layerIndex = displayLayers.renderables.indexOf(this);
             minecraft.setScreen(new ConfirmationScreen(LegacyFlatWorldScreen.this,230,120,LegacyComponents.LAYER_OPTIONS, LegacyComponents.LAYER_MESSAGE,b->{}){
                 @Override
@@ -215,10 +217,9 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
                             addLayer(f.getFlatLayerInfo(),layerIndex);
                         }, maxOverworldHeight - allHeight + flatLayerInfo.getHeight(),Component.translatable("legacy.menu.create_flat_world.edit_layer")));
                     }).bounds(panel.x + 15, panel.y + panel.height - 74,200,20).build());
-                    renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.create_flat_world.add_layer"), b-> {
-                        if (allHeight < maxOverworldHeight) this.minecraft.setScreen(new FlatWorldLayerSelector(LegacyFlatWorldScreen.this, f-> addLayer(f.getFlatLayerInfo(),layerIndex), maxOverworldHeight - allHeight,Component.translatable("legacy.menu.create_flat_world.add_layer")));
-                        else this.onClose();
-                    }).bounds(panel.x + 15, panel.y + panel.height - 52,200,20).build());
+                    Button addButton = Button.builder(Component.translatable("legacy.menu.create_flat_world.add_layer"), b-> this.minecraft.setScreen(new FlatWorldLayerSelector(LegacyFlatWorldScreen.this, f-> addLayer(f.getFlatLayerInfo(),layerIndex), maxOverworldHeight - allHeight,Component.translatable("legacy.menu.create_flat_world.add_layer")))).bounds(panel.x + 15, panel.y + panel.height - 52,200,20).build();
+                    if (allHeight >= maxOverworldHeight) addButton.active = false;
+                    renderableVList.addRenderable(addButton);
                     renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.create_flat_world.delete_layer"),b-> {
                         removeLayer(layerIndex);
                         this.onClose();
@@ -239,8 +240,8 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
 
     public int getAllLayersHeight(){
         int height = 0;
-        for (FlatLayerInfo flatLayerInfo : generator.getLayersInfo()) {
-            height += flatLayerInfo.getHeight();
+        for (Renderable renderable : displayLayers.renderables) {
+            if (renderable instanceof LayerButton layerButton) height += layerButton.flatLayerInfo.getHeight();
         }
         return height;
     }
