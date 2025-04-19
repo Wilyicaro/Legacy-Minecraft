@@ -1,3 +1,5 @@
 files:
   - source: /src/main/resources/assets/legacy/lang/en_us.json
     translation: /src/main/resources/assets/legacy/lang/%locale_with_underscore%.json
+bundles:
+  - 2
