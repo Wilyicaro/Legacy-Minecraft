@@ -67,3 +67,15 @@ WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
 | Improved Change Skin Interface                                             |      ❌      | ✅       |
 | [Legacy Edition Minigames](https://www.legacyminigames.net/) Compatibility |      ❌      | ✅       |
 | Backports that would need a full remake (<=1.16.5)                         |      ❌      | ❌       |
+
+
+# Build Instructions
+## Linux & MacOS
+```
+sudo chmod +x gradlew
+./gradlew chiseledBuild
+```
+## Windows
+```
+.\gradlew.bat chiseledBuild
+```
