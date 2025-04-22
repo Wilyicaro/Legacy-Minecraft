@@ -64,6 +64,7 @@ public class CreationList extends RenderableVList{
     public static void addIconButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress){
         addIconButton(list,iconSprite,message,onPress,null);
     }
+
     public static void addIconButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress, Tooltip tooltip){
         AbstractButton button;
         list.addRenderable(button = new AbstractButton(0,0,270,30,message) {
@@ -78,12 +79,12 @@ public class CreationList extends RenderableVList{
                     guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
                 }
             }
+
             @Override
             protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                int k = this.getX() + 35;
-                int l = this.getX() + this.getWidth();
-                ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j, true);
+                ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
             }
+
             @Override
             public void onPress() {
                 onPress.accept(this);

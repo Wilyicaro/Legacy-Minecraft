@@ -130,18 +130,18 @@ public class HostOptionsScreen extends PanelVListScreen {
     }
 
     protected abstract class PlayerButton extends AbstractButton {
-        public final GameProfile profile;
+        public final PlayerInfo playerInfo;
 
-        public PlayerButton(int x, int y, int width, int height, GameProfile profile) {
-            super(x, y, width, height, Component.literal(profile.getName()));
-            this.profile = profile;
+        public PlayerButton(int x, int y, int width, int height, PlayerInfo playerInfo) {
+            super(x, y, width, height, Component.literal(playerInfo.getProfile().getName()));
+            this.playerInfo = playerInfo;
         }
 
         @Override
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             if (isHoveredOrFocused()) shouldFade = true;
             super.renderWidget(guiGraphics, i, j, f);
-            drawPlayerIcon(profile, guiGraphics,getX() + 6, getY() + 5);
+            drawPlayerIcon((LegacyPlayerInfo) playerInfo, guiGraphics,getX() + 6, getY() + 5);
         }
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
@@ -153,8 +153,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         }
     }
 
-    public static void drawPlayerIcon(GameProfile profile, GuiGraphics guiGraphics, int x, int y){
-        LegacyPlayerInfo info = (LegacyPlayerInfo)Minecraft.getInstance().getConnection().getPlayerInfo(profile.getId());
+    public static void drawPlayerIcon(LegacyPlayerInfo info, GuiGraphics guiGraphics, int x, int y){
         float[] color = Legacy4JClient.getVisualPlayerColor(info);
         FactoryGuiGraphics.of(guiGraphics).setColor(color[0],color[1],color[2],1.0f);
         FactoryScreenUtil.enableBlend();
@@ -164,9 +163,8 @@ public class HostOptionsScreen extends PanelVListScreen {
     }
 
     protected void addPlayerButtons(){
-        addPlayerButtons(true,(profile, b)->{
+        addPlayerButtons(true,(playerInfo, b)->{
             if (!minecraft.player.hasPermissions(2)) return;
-            PlayerInfo playerInfo = minecraft.getConnection().getPlayerInfo(profile.getId());
             Map<AbstractWidget,Runnable> COMMAND_MAP = new HashMap<>();
             boolean initialVisibility = !((LegacyPlayerInfo)playerInfo).isVisible();
             PanelVListScreen screen = new PanelVListScreen(this, s-> Panel.centered(s, LegacySprites.PANEL,280, playerInfo.getGameMode().isSurvival() ? 120 : 88), HOST_OPTIONS){
@@ -193,8 +191,8 @@ public class HostOptionsScreen extends PanelVListScreen {
                 @Override
                 public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
                     panel.render(guiGraphics,i,j,f);
-                    drawPlayerIcon(profile,guiGraphics, panel.x + 7,panel.y + 5);
-                    guiGraphics.drawString(font,profile.getName(),panel.x + 31, panel.y + 12, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+                    drawPlayerIcon((LegacyPlayerInfo) playerInfo, guiGraphics, panel.x + 7,panel.y + 5);
+                    guiGraphics.drawString(font, playerInfo.getProfile().getName(),panel.x + 31, panel.y + 12, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
                 }
             };
             List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
@@ -202,40 +200,39 @@ public class HostOptionsScreen extends PanelVListScreen {
                 if (initialVisibility != b1.selected){
                     COMMAND_MAP.put(b1,()->{
                     if (b1.selected) {
-                        minecraft.player.connection.sendCommand("effect give %s minecraft:invisibility infinite 255 true".formatted(profile.getName()));
-                        minecraft.player.connection.sendCommand("effect give %s minecraft:resistance infinite 255 true".formatted(profile.getName()));
+                        minecraft.player.connection.sendCommand("effect give %s minecraft:invisibility infinite 255 true".formatted(playerInfo.getProfile().getName()));
+                        minecraft.player.connection.sendCommand("effect give %s minecraft:resistance infinite 255 true".formatted(playerInfo.getProfile().getName()));
                     }else {
-                        minecraft.player.connection.sendCommand("effect clear %s minecraft:invisibility".formatted(profile.getName()));
-                        minecraft.player.connection.sendCommand("effect clear %s minecraft:resistance".formatted(profile.getName()));
+                        minecraft.player.connection.sendCommand("effect clear %s minecraft:invisibility".formatted(playerInfo.getProfile().getName()));
+                        minecraft.player.connection.sendCommand("effect clear %s minecraft:resistance".formatted(playerInfo.getProfile().getName()));
                     }});
                 }
             }));
             if (playerInfo.getGameMode().isSurvival()){
-                screen.renderableVList.addRenderable(new TickBox(0,0,((LegacyPlayerInfo) playerInfo).mayFlySurvival(),b1-> Component.translatable("legacy.menu.host_options.player.mayFly"),b1-> null, b1-> CommonNetwork.sendToServer(PlayerInfoSync.mayFlySurvival(b1.selected, profile))));
-                screen.renderableVList.addRenderable(new TickBox(0,0,((LegacyPlayerInfo) playerInfo).isExhaustionDisabled(),b1-> Component.translatable("legacy.menu.host_options.player.disableExhaustion"),b1-> null, b1-> CommonNetwork.sendToServer(PlayerInfoSync.disableExhaustion(b1.selected, profile))));
+                screen.renderableVList.addRenderable(new TickBox(0,0,((LegacyPlayerInfo) playerInfo).mayFlySurvival(),b1-> Component.translatable("legacy.menu.host_options.player.mayFly"),b1-> null, b1-> CommonNetwork.sendToServer(PlayerInfoSync.mayFlySurvival(b1.selected, playerInfo.getProfile()))));
+                screen.renderableVList.addRenderable(new TickBox(0,0,((LegacyPlayerInfo) playerInfo).isExhaustionDisabled(),b1-> Component.translatable("legacy.menu.host_options.player.disableExhaustion"),b1-> null, b1-> CommonNetwork.sendToServer(PlayerInfoSync.disableExhaustion(b1.selected, playerInfo.getProfile()))));
             }
-            screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230,16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL,b1.getObjectValue().getLongDisplayName()),(b1)->Tooltip.create(Component.translatable("selectWorld.gameMode."+playerInfo.getGameMode().getName()+ ".info")),playerInfo.getGameMode(),()->gameTypes, b1->COMMAND_MAP.put(b1,()-> minecraft.getConnection().sendCommand("gamemode %s %s".formatted(b1.getObjectValue().getName(),profile.getName())))));
-            screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_player_spawn"),b1-> COMMAND_MAP.put(b1,()-> minecraft.player.connection.sendCommand("spawnpoint %s ~ ~ ~".formatted(profile.getName())))).bounds(0,0,215,20).build());minecraft.setScreen(screen);
+            screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230,16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL,b1.getObjectValue().getLongDisplayName()),(b1)->Tooltip.create(Component.translatable("selectWorld.gameMode."+playerInfo.getGameMode().getName()+ ".info")),playerInfo.getGameMode(),()->gameTypes, b1->COMMAND_MAP.put(b1,()-> minecraft.getConnection().sendCommand("gamemode %s %s".formatted(b1.getObjectValue().getName(),playerInfo.getProfile().getName())))));
+            screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_player_spawn"),b1-> COMMAND_MAP.put(b1,()-> minecraft.player.connection.sendCommand("spawnpoint %s ~ ~ ~".formatted(playerInfo.getProfile().getName())))).bounds(0,0,215,20).build());minecraft.setScreen(screen);
         });
     }
 
-    protected void addPlayerButtons(boolean includeLocal, BiConsumer<GameProfile, AbstractButton> onPress){
-        for (GameProfile profile : getActualGameProfiles()) {
-            if (!includeLocal && Objects.equals(profile.getName(), Minecraft.getInstance().player.getGameProfile().getName())) continue;
-            renderableVList.addRenderable(new PlayerButton(0,0, 230, 30, profile) {
+    protected void addPlayerButtons(boolean includeLocal, BiConsumer<PlayerInfo, AbstractButton> onPress){
+        for (PlayerInfo playerInfo : getActualPlayerInfos()) {
+            if (!includeLocal && Objects.equals(playerInfo.getProfile().getName(), Minecraft.getInstance().player.getGameProfile().getName())) continue;
+            renderableVList.addRenderable(new PlayerButton(0,0, 230, 30, playerInfo) {
                 @Override
                 public void onPress() {
-                    onPress.accept(profile,this);
+                    onPress.accept(playerInfo,this);
                 }
             });
         }
     }
 
-    public static List<GameProfile> getActualGameProfiles(){
+    public static List<PlayerInfo> getActualPlayerInfos(){
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.hasSingleplayerServer()) return minecraft.getSingleplayerServer().getPlayerList().getPlayers().stream().map(Player::getGameProfile).toList();
         if (minecraft.player != null && !minecraft.player.connection.getOnlinePlayers().isEmpty())
-            return minecraft.player.connection.getOnlinePlayers().stream().sorted(Comparator.comparingInt((p -> minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer().isSingleplayerOwner(p.getProfile()) ? 0 : ((LegacyPlayerInfo)p).getIdentifierIndex()))).map(PlayerInfo::getProfile).toList();
+            return minecraft.player.connection.getOnlinePlayers().stream().sorted(Comparator.comparingInt((p -> minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer().isSingleplayerOwner(p.getProfile()) ? 0 : ((LegacyPlayerInfo)p).getIdentifierIndex()))).toList();
         return Collections.emptyList();
     }
 
@@ -328,8 +325,8 @@ public class HostOptionsScreen extends PanelVListScreen {
             @Override
             protected void addPlayerButtons() {
                 addPlayerButtons(false,(profile,b1)->{
-                    if (bol) minecraft.player.connection.sendCommand("tp %s".formatted(profile.getName()));
-                    else minecraft.player.connection.sendCommand("tp %s ~ ~ ~".formatted(profile.getName()));
+                    if (bol) minecraft.player.connection.sendCommand("tp %s".formatted(profile.getProfile().getName()));
+                    else minecraft.player.connection.sendCommand("tp %s ~ ~ ~".formatted(profile.getProfile().getName()));
                 });
             }
 

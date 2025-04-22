@@ -52,9 +52,10 @@ public class LegacyLanguageScreen extends PanelVListScreen {
             }
         })));
     }
+
     public static String getSystemLanguageCode(){
         String auto = Locale.getDefault().toString().toLowerCase(Locale.ENGLISH);
-        return Minecraft.getInstance().getLanguageManager().getLanguages().containsKey(auto) ? auto : "en_us";
+        return Minecraft.getInstance().getLanguageManager().getLanguage(auto) != null ? auto : "en_us";
     }
 
     @Override

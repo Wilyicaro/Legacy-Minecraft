@@ -5,9 +5,11 @@ import net.minecraft.client.gui.screens.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyLoading;
 
 import static wily.legacy.Legacy4JClient.legacyLoadingScreen;
@@ -18,7 +20,8 @@ public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
         super(component);
     }
 
-    Screen self(){
+    @Unique
+    private Screen self(){
         return this;
     }
 
@@ -30,29 +33,31 @@ public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
 
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
-        ci.cancel();
-        Component lastLoadingHeader = null;
-        Component lastLoadingStage = null;
-        boolean genericLoading = false;
-        int progress = 0;
-        if (self() instanceof ReceivingLevelScreen) progress = -1;
-        if (self() instanceof LevelLoadingScreen loading) {
-            lastLoadingHeader = Component.translatable("legacy.connect.initializing");
-            lastLoadingStage = Component.translatable("legacy.loading_spawn_area");
-            progress = loading.progressListener.getProgress();
-        }
-        if (self() instanceof ProgressScreen p) {
-            lastLoadingHeader = p.header;
-            lastLoadingStage = p.stage;
-            if (minecraft.level != null && minecraft.level.dimension() != Level.OVERWORLD){
-                genericLoading = true;
+        if (LegacyOptions.legacyLoadingAndConnecting.get()) {
+            ci.cancel();
+            Component lastLoadingHeader = null;
+            Component lastLoadingStage = null;
+            boolean genericLoading = false;
+            int progress = 0;
+            if (self() instanceof ReceivingLevelScreen) progress = -1;
+            if (self() instanceof LevelLoadingScreen loading) {
+                lastLoadingHeader = Component.translatable("legacy.connect.initializing");
+                lastLoadingStage = Component.translatable("legacy.loading_spawn_area");
+                progress = loading.progressListener.getProgress();
             }
+            if (self() instanceof ProgressScreen p) {
+                lastLoadingHeader = p.header;
+                lastLoadingStage = p.stage;
+                if (minecraft.level != null && minecraft.level.dimension() != Level.OVERWORLD) {
+                    genericLoading = true;
+                }
+            }
+            if (self() instanceof ConnectScreen p) {
+                lastLoadingHeader = p.status;
+            }
+            legacyLoadingScreen.prepareRender(minecraft, width, height, lastLoadingHeader, lastLoadingStage, progress, genericLoading);
+            legacyLoadingScreen.render(guiGraphics, i, j, f);
         }
-        if (self() instanceof ConnectScreen p) {
-            lastLoadingHeader = p.status;
-        }
-        legacyLoadingScreen.prepareRender(minecraft,width, height,lastLoadingHeader,lastLoadingStage,progress,genericLoading);
-        legacyLoadingScreen.render(guiGraphics,i,j,f);
     }
 
     @Override

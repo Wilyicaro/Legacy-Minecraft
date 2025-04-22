@@ -1,7 +1,10 @@
 package wily.legacy.mixin.base;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.Window;
+import net.minecraft.Util;
 import com.mojang.realmsclient.client.RealmsClient;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -27,6 +30,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BedBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -147,23 +151,26 @@ public abstract class MinecraftMixin {
             else ci.cancel();
         }
     }
+
     @Inject(method = "startUseItem", at = @At("RETURN"))
     private void startUseItemReturn(CallbackInfo ci){
         if (player.getAbilities().flying && player.isSprinting()) rightClickDelay = -1;
     }
-    @Redirect(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
-    private InteractionResult startUseItemReturn(MultiPlayerGameMode instance, LocalPlayer localPlayer, InteractionHand arg, BlockHitResult arg2){
-        if (LegacyOptions.legacyCreativeBlockPlacing.get() && rightClickDelay == 4 && player.getAbilities().instabuild && ControlTooltip.canPlace(self(),arg)) {
+
+    @Inject(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;useItemOn(Lnet/minecraft/client/player/LocalPlayer;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"))
+    private void startUseItemCreativeBlockPlacing(CallbackInfo ci, @Local InteractionHand hand, @Local BlockHitResult hit){
+        if (LegacyOptions.legacyCreativeBlockPlacing.get() && rightClickDelay == 4 && player.getAbilities().instabuild && ControlTooltip.canPlace(self(), hand)) {
             if (lastPlayerBlockUsePos == null) lastPlayerBlockUsePos = player.position();
             rightClickDelay = 0;
         }
-        if (level.getBlockState(arg2.getBlockPos()).getBlock() instanceof BedBlock || player.getAbilities().flying && player.isSprinting()) rightClickDelay = -1;
-        return instance.useItemOn(localPlayer,arg,arg2);
+        if (level.getBlockState(hit.getBlockPos()).getBlock() instanceof BedBlock || player.getAbilities().flying && player.isSprinting()) rightClickDelay = -1;
     }
-    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isSleeping()Z"))
-    private boolean tick(LocalPlayer instance){
+
+    @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isSleeping()Z"))
+    private boolean tick(boolean original){
         return false;
     }
+
     @Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z", ordinal = 4))
     private boolean handleKeybindsInventoryKey(KeyMapping instance){
         if (!instance.consumeClick()) {
@@ -182,31 +189,37 @@ public abstract class MinecraftMixin {
         return false;
     }
 
-    @Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", ordinal = 1))
-    private void handleKeybinds(Minecraft instance, Screen screen){
+    @WrapWithCondition(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", ordinal = 1))
+    private boolean handleKeybinds(Minecraft instance, Screen screen){
         if (screen instanceof ReplaceableScreen s) s.setCanReplace(false);
-        setScreen(screen);
+        return true;
     }
     @ModifyArg(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", ordinal = 2))
     private Screen handleKeybinds(Screen arg){
         return new LegacyAdvancementsScreen(null);
     }
-    @Redirect(method = "setScreen",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;removed()V"))
-    private void removedScreen(Screen instance, Screen newScreen){
-        if (newScreen instanceof OverlayPanelScreen s && s.parent == instance) return;
-        instance.removed();
+
+    @WrapWithCondition(method = "setScreen",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;removed()V"))
+    private boolean removedScreen(Screen instance, Screen newScreen){
+        return !(newScreen instanceof OverlayPanelScreen s) || s.parent != instance;
     }
+
     @Inject(method = "setScreen",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;added()V"))
     private void addedScreen(Screen screen, CallbackInfo ci){
         ControlTooltip.Event.of(screen).setupControlTooltips();
         ControlTooltip.Renderer.SCREEN_EVENT.invoker.accept(screen,ControlTooltip.Event.of(screen).getControlTooltips());
         LegacyTipManager.tipDiffPercentage = 0;
     }
-    @Redirect(method = "setScreen",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;init(Lnet/minecraft/client/Minecraft;II)V"))
-    private void initScreen(Screen instance, Minecraft minecraft, int i, int j){
-        if (oldScreen instanceof OverlayPanelScreen s && s.parent == instance) instance.resize(minecraft,i,j);
-        else instance.init(minecraft,i,j);
+
+    @WrapWithCondition(method = "setScreen",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;init(Lnet/minecraft/client/Minecraft;II)V"))
+    private boolean initScreen(Screen instance, Minecraft minecraft, int i, int j){
+        if (oldScreen instanceof OverlayPanelScreen s && s.parent == instance) {
+            instance.resize(minecraft, i, j);
+            return false;
+        }
+        return true;
     }
+
     @Inject(method = "setScreen",at = @At("HEAD"), cancellable = true)
     public void setScreen(Screen screen, CallbackInfo ci) {
         oldScreen = this.screen;
@@ -218,22 +231,25 @@ public abstract class MinecraftMixin {
         }
         if (Minecraft.getInstance().screen == null && Minecraft.getInstance().level != null && screen != null && (screen instanceof PauseScreen || !screen.isPauseScreen())) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
         if (screen == null && level != null) {
+            ScreenUtil.lastGui = Util.getMillis();
             ControlTooltip.Event.of(gui).setupControlTooltips();
             ControlTooltip.Renderer.GUI_EVENT.invoker.accept(gui,ControlTooltip.Event.of(gui).getControlTooltips());
         }
     }
-    @Redirect(method = "updateScreenAndTick",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/sounds/SoundManager;stop()V"))
-    public void updateScreenAndTick(SoundManager instance) {
+
+    @WrapWithCondition(method = "updateScreenAndTick",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/sounds/SoundManager;stop()V"))
+    public boolean updateScreenAndTick(SoundManager instance) {
+        return false;
     }
 
-    @Redirect(method = "pauseGame",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/sounds/SoundManager;pause()V"))
-    public void pauseGame(SoundManager instance) {
-
+    @WrapWithCondition(method = "pauseGame",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/sounds/SoundManager;pause()V"))
+    public boolean pauseGame(SoundManager instance) {
+        return false;
     }
 
     @ModifyArg(method = "setLevel",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/Minecraft;updateScreenAndTick(Lnet/minecraft/client/gui/screens/Screen;)V"))
     public Screen setLevelLoadingScreen(Screen arg, @Local(argsOnly = true) ClientLevel newLevel) {
-        return LegacyLoadingScreen.getDimensionChangeScreen(level, newLevel);
+        return LegacyOptions.legacyLoadingAndConnecting.get() ? LegacyLoadingScreen.getDimensionChangeScreen(level, newLevel) : arg;
     }
 
     //? if >1.20.1 {

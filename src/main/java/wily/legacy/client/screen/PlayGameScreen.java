@@ -156,8 +156,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             ScreenUtil.renderPanelTranslucentRecess(guiGraphics, panel.x + 9, panel.y + panel.height - 25, panel.width - 18 , 16);
         }
         if (isLoading)
-            ScreenUtil.drawGenericLoading(guiGraphics, panel.x + 112 ,
-                    panel.y + 66);
+            ScreenUtil.drawGenericLoading(guiGraphics, panel.x + 112, panel.y + 66);
     }
 
     @Override
@@ -193,12 +192,9 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         this.pinger.tick();
     }
 
-
-
-
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (hasTabList() && (tabList.controlTab(i) || tabList.directionalControlTab(i)))  return true;
+        if (hasTabList() && (tabList.controlTab(i) || tabList.directionalControlTab(i))) return true;
         if (super.keyPressed(i, j, k)) {
             return true;
         }
