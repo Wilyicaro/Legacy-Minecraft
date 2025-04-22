@@ -1677,6 +1677,7 @@
   "legacy.options.merchantTradingIndicator": "Display Trading Icon",
   "legacy.options.minecartSounds": "Sonidos de Carro Minero",
   "legacy.options.mins_value": "%s: %s Minutos",
+  "legacy.options.modCraftingTabs": "Mod Crafting Tabs",
   "legacy.options.needs_restart": "This option will require a §4restart§r to be applied correctly.",
   "legacy.options.none": "NINGUNO",
   "legacy.options.overrideTerrainFogEnd": "Override Terrain Fog End",
