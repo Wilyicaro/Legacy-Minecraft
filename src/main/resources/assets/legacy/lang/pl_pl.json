@@ -1677,6 +1677,7 @@
   "legacy.options.merchantTradingIndicator": "Display Trading Icon",
   "legacy.options.minecartSounds": "Dźwięki wagonów",
   "legacy.options.mins_value": "%s: %s Mins",
+  "legacy.options.modCraftingTabs": "Mod Crafting Tabs",
   "legacy.options.needs_restart": "This option will require a §4restart§r to be applied correctly.",
   "legacy.options.none": "Brak",
   "legacy.options.overrideTerrainFogEnd": "Override Terrain Fog End",
