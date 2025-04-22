@@ -1657,7 +1657,7 @@
   "legacy.options.legacyInventoryScreen": "Tela de Inventário Legacy",
   "legacy.options.legacyItemTooltips": "Dicas de Itens Legacy",
   "legacy.options.legacyItemTooltipsScaling": "Escalonamento de Dicas de Itens Legacy",
-  "legacy.options.legacyLoadingScreen": "Tela de Carregamento Legacy",
+  "legacy.options.legacyLoadingAndConnecting": "Legacy Loading & Connecting",
   "legacy.options.legacyOverstackedItems": "Items Sobrecarregados Legacy",
   "legacy.options.legacyPanorama": "Panorama Legacy",
   "legacy.options.legacyPauseScreen": "Tela de Pausamento Legacy",
