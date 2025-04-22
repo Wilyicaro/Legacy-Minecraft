@@ -1677,6 +1677,7 @@
   "legacy.options.merchantTradingIndicator": "显示交易图标",
   "legacy.options.minecartSounds": "矿车声音",
   "legacy.options.mins_value": "%s: %s 分钟",
+  "legacy.options.modCraftingTabs": "Mod Crafting Tabs",
   "legacy.options.needs_restart": "此选项需要§4重启§r才能正确应用。",
   "legacy.options.none": "无",
   "legacy.options.overrideTerrainFogEnd": "覆盖地形雾结束",
