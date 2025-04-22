@@ -491,7 +491,7 @@ public class ScreenUtil {
 
     public static boolean canDisplayHUD(){
         int hudDelay = LegacyOptions.hudDelay.get();
-        return LegacyOptions.displayHUD.get() && (hudDelay == 0 || Util.getMillis() - lastGui > hudDelay);
+        return mc.screen == null && (hudDelay == 0 || Util.getMillis() - lastGui > hudDelay);
     }
 
     public static void renderAnimatedCharacter(GuiGraphics guiGraphics){

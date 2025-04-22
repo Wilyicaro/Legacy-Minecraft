@@ -19,7 +19,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.util.ScreenUtil;
 
 @Mixin(GameRenderer.class)
 public class GuiGameRendererMixin {
@@ -53,12 +52,12 @@ public class GuiGameRendererMixin {
             Legacy4JClient.itemActivationRenderReplacement.render(guiGraphics,0,0,f);
             guiGraphics.pose().popPose();
         }
-        return ScreenUtil.canDisplayHUD();
+        return LegacyOptions.displayHUD.get();
     }
     *///?} else {
     @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"))
     private boolean render(Gui instance, GuiGraphics guiGraphics, DeltaTracker deltaTracker){
-        return ScreenUtil.canDisplayHUD();
+        return LegacyOptions.displayHUD.get();
     }
     //?}
 }

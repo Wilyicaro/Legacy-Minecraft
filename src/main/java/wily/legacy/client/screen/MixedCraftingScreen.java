@@ -494,7 +494,7 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
         addWidget(getTabList());
         getTabList().init(leftPos, topPos - 37, imageWidth, (t, i) -> {
             int index = getTabList().tabButtons.indexOf(t);
-            t.type = LegacyTabButton.Type.bySize(getMaxTabCount(), index);
+            t.type = LegacyTabButton.Type.bySize(index, getMaxTabCount());
             t.setWidth(accessor.getInteger("tabListButtonWidth", 71));
             t.offset = (t1) -> new Vec3(accessor.getDouble("tabListXOffset", -1.5) * getTabList().tabButtons.indexOf(t), t1.selected ? 0 : accessor.getDouble("tabListSelectedYOffset", 4.5), 0);
         });

@@ -486,7 +486,7 @@ public class Legacy4JClient {
             accessor.getStaticDefinitions().add(UIDefinition.createBeforeInit(a->{
                 if (!LegacyMixinOptions.legacyGui.get()) return;
                 a.getElements().put(FactoryGuiElement.VIGNETTE.name()+".isVisible", ()-> false);
-                a.getElements().put("isGuiVisible", ()-> Minecraft.getInstance().screen == null);
+                a.getElements().put("isGuiVisible", ScreenUtil::canDisplayHUD);
                 a.getElements().put("hud.scaleX", hudScale);
                 a.getElements().put("hud.scaleY", hudScale);
                 a.getElements().put("hud.scaleZ", hudScale);
