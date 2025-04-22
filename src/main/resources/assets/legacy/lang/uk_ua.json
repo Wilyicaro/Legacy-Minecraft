@@ -1652,7 +1652,7 @@
   "legacy.options.legacyFurnaceScreen": "Legacy Furnace Screen",
   "legacy.options.legacyGrindstoneScreen": "Legacy Grindstone Screen",
   "legacy.options.legacyGui": "Legacy Gui",
-  "legacy.options.legacyIntroAndLoading": "Legacy Intro and Loading",
+  "legacy.options.legacyIntroAndReloading": "Legacy Intro and Loading",
   "legacy.options.legacyInventoryScreen": "Legacy Inventory Screen",
   "legacy.options.legacyItemTooltips": "Legacy Item Tooltips",
   "legacy.options.legacyItemTooltipsScaling": "Класичне масштабування підказок предметів",

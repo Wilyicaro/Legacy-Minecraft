@@ -44,6 +44,7 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.CommonColor;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
@@ -185,12 +186,29 @@ public class ServerRenderableList extends RenderableVList {
                     this.minecraft.getNarrator().say(Component.translatable("multiplayer.lan.server_found", Component.empty().append(LAN_SERVER_HEADER).append(CommonComponents.SPACE).append(lanServer.getMotd())));
             }
         }else {
-            addRenderable(SimpleLayoutRenderable.create(0,30,(r)-> ((guiGraphics, i, j, f) -> {
-                int p = r.y + (r.height - minecraft.font.lineHeight) / 2;
-                guiGraphics.drawString(this.minecraft.font, SCANNING_LABEL, r.x + (listWidth - this.minecraft.font.width(SCANNING_LABEL)) / 2, p, 0xFFFFFF, false);
-                String string = LoadingDotsText.get(Util.getMillis());
-                guiGraphics.drawString(this.minecraft.font, string, r.x + (listWidth - this.minecraft.font.width(string)) / 2, p + this.minecraft.font.lineHeight, -8355712, false);
-            })));
+            AbstractButton scanningButton;
+            addRenderable(scanningButton = new AbstractButton(0,0,0,30, SCANNING_LABEL) {
+                @Override
+                protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+                    super.renderWidget(guiGraphics, i, j, f);
+                    ScreenUtil.drawGenericLoading(guiGraphics, getX() + 5, getY() + 5, 6, 1);
+                }
+
+                @Override
+                protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+                    ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
+                }
+
+                @Override
+                public void onPress() {
+                }
+
+                @Override
+                protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+                    defaultButtonNarrationText(narrationElementOutput);
+                }
+            });
+            scanningButton.active = false;
         }
     }
 
@@ -534,11 +552,11 @@ public class ServerRenderableList extends RenderableVList {
                 joinLanServer(lanServers.get(i - servers.size()));
         }
     }
+
     private void joinLanServer(LanServer lanServer) {
         join(new ServerData(lanServer.getMotd(),lanServer.getAddress(),/*? if >1.20.1 {*/ServerData.Type.LAN/*?} else {*//*true*//*?}*/));
     }
     private void join(ServerData serverData) {
         ConnectScreen.startConnecting(getScreen(), this.minecraft, ServerAddress.parseString(serverData.ip), serverData, false/*? if >=1.20.5 {*/,null/*?}*/);
     }
-
 }

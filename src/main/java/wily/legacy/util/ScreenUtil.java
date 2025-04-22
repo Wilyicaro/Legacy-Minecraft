@@ -94,6 +94,7 @@ public class ScreenUtil {
     public static long animatedCharacterTime;
     public static long remainingAnimatedCharacterTime;
     public static int lastHotbarSelection = -1;
+    public static long lastGui = -1;
     protected static final LogoRenderer logoRenderer = new LogoRenderer(false);
     public static final PanoramaRenderer panoramaRenderer = /*? if <1.20.5 {*//*new PanoramaRenderer(TitleScreen.CUBE_MAP)*//*?} else {*/LegacyScreen.PANORAMA_RENDERER/*?}*/;
     public static final LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
@@ -319,19 +320,22 @@ public class ScreenUtil {
         playSimpleUISound(sound,1.0f,randomPitch);
     }
 
-    public static void drawGenericLoading(GuiGraphics graphics,int x, int y) {
-        FactoryScreenUtil.enableBlend();
+    public static void drawGenericLoading(GuiGraphics graphics, int x, int y) {
+        drawGenericLoading(graphics, x, y, 21, 6);
+    }
+
+    public static void drawGenericLoading(GuiGraphics graphics, int x, int y, int blockSize, int blockDistance) {
+        int blockD = (blockSize + blockDistance);
         for (int i = 0; i < 8; i++) {
             int v = (i + 1) * 100;
             int n = (i + 3) * 100;
             float l = (Util.getMillis() / 4f) % 1000;
             float alpha = l >= v - 100  ? (l <= v ? l / v: (n - l) / 200f) : 0;
             if (alpha > 0) {
-                FactoryGuiGraphics.of(graphics).setColor(1.0f, 1.0f, 1.0f, alpha);
-                FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.LOADING_BLOCK, x+ (i <= 2 ? i : i >= 4 ? i == 7 ? 0 : 6 - i : 2) * 27, y + (i <= 2 ? 0 : i == 3 || i == 7 ? 1 : 2)* 27, 21, 21);
+                FactoryGuiGraphics.of(graphics).setColor(1.0f, 1.0f, 1.0f, alpha, true);
+                FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.LOADING_BLOCK, x + (i <= 2 ? i : i >= 4 ? i == 7 ? 0 : 6 - i : 2) * blockD, y + (i <= 2 ? 0 : i == 3 || i == 7 ? 1 : 2) * blockD, blockSize, blockSize);
             }
         }
-        FactoryScreenUtil.disableBlend();
         FactoryGuiGraphics.of(graphics).clearColor();
     }
 
@@ -483,6 +487,11 @@ public class ScreenUtil {
 
     public static int getSelectedItemTooltipLines(){
         return LegacyOptions.selectedItemTooltipLines.get() == 0 ? 0 : LegacyOptions.selectedItemTooltipLines.get() + (LegacyOptions.itemTooltipEllipsis.get() ? 1 : 0);
+    }
+
+    public static boolean canDisplayHUD(){
+        int hudDelay = LegacyOptions.hudDelay.get();
+        return LegacyOptions.displayHUD.get() && (hudDelay == 0 || Util.getMillis() - lastGui > hudDelay);
     }
 
     public static void renderAnimatedCharacter(GuiGraphics guiGraphics){

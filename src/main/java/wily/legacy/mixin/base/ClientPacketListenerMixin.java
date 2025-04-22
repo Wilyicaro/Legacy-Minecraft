@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base;
 
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -79,11 +80,9 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
         Legacy4JClient.onClientPlayerInfoChange();
     }
 
-
-    @Redirect(method = /*? if <1.21.2 {*/"handleContainerSetSlot"/*?} else {*//*"handleSetCursorItem"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/AbstractContainerMenu;setCarried(Lnet/minecraft/world/item/ItemStack;)V"))
-    public void handleContainerSetSlot(AbstractContainerMenu instance, ItemStack itemStack) {
-        if (minecraft.screen instanceof CreativeModeScreen) return;
-        instance.setCarried(itemStack);
+    @WrapWithCondition(method = /*? if <1.21.2 {*/"handleContainerSetSlot"/*?} else {*//*"handleSetCursorItem"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/AbstractContainerMenu;setCarried(Lnet/minecraft/world/item/ItemStack;)V"))
+    public boolean handleContainerSetSlot(AbstractContainerMenu instance, ItemStack itemStack) {
+        return !(minecraft.screen instanceof CreativeModeScreen);
     }
 
     //? if >=1.21.2 {
@@ -96,10 +95,9 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
     }
     *///?}
 
-    @Redirect(method = "handleContainerSetSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/AbstractContainerMenu;setItem(IILnet/minecraft/world/item/ItemStack;)V", ordinal = 0))
-    public void handleContainerSetSlot(AbstractContainerMenu instance, int i, int j, ItemStack itemStack) {
-        if (minecraft.screen instanceof CreativeModeScreen) return;
-        instance.setItem(i,j,itemStack);
+    @WrapWithCondition(method = "handleContainerSetSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/AbstractContainerMenu;setItem(IILnet/minecraft/world/item/ItemStack;)V", ordinal = 0))
+    public boolean handleContainerSetSlot(AbstractContainerMenu instance, int i, int j, ItemStack itemStack) {
+        return !(minecraft.screen instanceof CreativeModeScreen);
     }
 
     @Redirect(method = "handleSetEntityPassengersPacket", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;setOverlayMessage(Lnet/minecraft/network/chat/Component;Z)V"))

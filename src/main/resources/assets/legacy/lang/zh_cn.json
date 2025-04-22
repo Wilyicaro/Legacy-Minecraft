@@ -1652,7 +1652,7 @@
   "legacy.options.legacyFurnaceScreen": "旧版熔炉界面",
   "legacy.options.legacyGrindstoneScreen": "旧版磨石界面",
   "legacy.options.legacyGui": "旧版GUI",
-  "legacy.options.legacyIntroAndLoading": "Legacy Intro and Loading",
+  "legacy.options.legacyIntroAndReloading": "Legacy Intro and Loading",
   "legacy.options.legacyInventoryScreen": "旧版物品栏界面",
   "legacy.options.legacyItemTooltips": "旧版物品提示",
   "legacy.options.legacyItemTooltipsScaling": "旧版物品提示缩放",

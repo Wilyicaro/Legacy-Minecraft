@@ -68,7 +68,7 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
             Minecraft.getInstance().options.save();
             minecraft.setScreen(this);
         }))).size(240,20).build());
-        renderableVList.addOptions(LegacyOptions.of(Minecraft.getInstance().options.toggleCrouch()),LegacyOptions.of(Minecraft.getInstance().options.toggleSprint()));
+        renderableVList.addOptions(LegacyOptions.unbindConflictingKeys,LegacyOptions.of(Minecraft.getInstance().options.toggleCrouch()),LegacyOptions.of(Minecraft.getInstance().options.toggleSprint()));
         for (KeyMapping keyMapping : keyMappings) {
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category))
@@ -201,6 +201,10 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
         return keyMapping.getKey() == comparison.getKey();
     }
 
+    public boolean unbindConflictingBindings(){
+        return LegacyOptions.unbindConflictingKeys.get();
+    }
+
     protected void setNone(LegacyKeyMapping keyMapping){
         setAndUpdateKey(keyMapping.self(), InputConstants.UNKNOWN);
     }
@@ -209,7 +213,7 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
         for (Renderable renderable : getRenderableVList().renderables) {
             if (renderable instanceof MappingButton b && selectedMapping != b.mapping && !b.isNone() && areConflicting(selectedMapping, b.mapping)){
                 getRenderableVList().focusRenderable(b);
-                setNone(b.mapping);
+                if (unbindConflictingBindings()) setNone(b.mapping);
                 setAndUpdateMappingTooltip(this::getConflictingTooltip);
                 break;
             }

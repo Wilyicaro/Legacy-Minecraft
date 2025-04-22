@@ -48,7 +48,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
-        if (LegacyOptions.legacyIntroAndLoading.get()) {
+        if (LegacyOptions.legacyIntroAndReloading.get()) {
             ci.cancel();
             if (!loadIntroLocation) {
                 initTime = Util.getMillis();
