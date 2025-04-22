@@ -156,17 +156,14 @@ public class LegacyOptions {
         return Component.translatable("options.percent_value", component, (int)(d * 100.0));
     }
 
-    public static <T> Function<T,Component> staticComponent(Component component){
-        return v->component;
-    }
-
     public static final FactoryConfig<String> lastLoadedVersion = CLIENT_STORAGE.register(FactoryConfig.create("lastLoadedVersion", null,()-> Codec.STRING,"", v-> {}, CLIENT_STORAGE));
     public static final FactoryConfig<String> lastLoadedMinecraftVersion = CLIENT_STORAGE.register(FactoryConfig.create("lastLoadedMinecraftVersion", null, ()-> Codec.STRING, "", v-> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> animatedCharacter = CLIENT_STORAGE.register(createBoolean("animatedCharacter",true));
     public static final FactoryConfig<Boolean> classicCrafting = CLIENT_STORAGE.register(createBoolean("classicCrafting",false, b-> {
         if (Minecraft.getInstance().player != null) CommonNetwork.sendToServer(PlayerInfoSync.classicCrafting(b  || LegacyOptions.forceMixedCrafting.get(), Minecraft.getInstance().player));
     }));
-    public static final FactoryConfig<Boolean> vanillaTabs = CLIENT_STORAGE.register(createBoolean("vanillaTabs",staticComponent(Component.translatable("legacy.options.vanillaTabs.description")),false));
+    public static final FactoryConfig<Boolean> vanillaTabs = CLIENT_STORAGE.register(createBoolean("vanillaTabs",false));
+    public static final FactoryConfig<Boolean> modCraftingTabs = CLIENT_STORAGE.register(createBoolean("modCraftingTabs",false));
     public static final FactoryConfig<Boolean> displayLegacyGamma = CLIENT_STORAGE.register(createBoolean("displayGamma", true));
     public static final FactoryConfig<Double> legacyGamma = CLIENT_STORAGE.register(createDouble("gamma", LegacyOptions::percentValueLabel, 0.5));
     public static final FactoryConfig<Boolean> displayHUD = CLIENT_STORAGE.register(createBoolean("displayHUD",true));

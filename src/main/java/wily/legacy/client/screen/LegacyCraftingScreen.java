@@ -33,6 +33,7 @@ import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.FactoryIngredient;
 import wily.factoryapi.base.StackIngredient;
 import wily.factoryapi.base.Stocker;
@@ -41,6 +42,7 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.base.network.CommonRecipeManager;
+import wily.factoryapi.util.ModInfo;
 import wily.factoryapi.util.PagedList;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
@@ -150,17 +152,37 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             craftingTabList.addTabButton(43,LegacyTabButton.Type.MIDDLE,listing.icon(),listing.name(), t->resetElements());
 
         }
-        if (LegacyOptions.vanillaTabs.get()) allRecipes.stream().collect(Collectors.groupingBy(h->h.get().category(),()->new TreeMap<>(Comparator.comparingInt(Enum::ordinal)),Collectors.groupingBy(h->h.get()./*? <1.21.2 {*/getGroup/*?} else {*//*group*//*?}*/().isEmpty() ? h.getId().toString() : h.get()./*? <1.21.2 {*/getGroup/*?} else {*//*group*//*?}*/()))).forEach((category, m)->{
-            if (m.isEmpty()) return;
-            List<List<RecipeInfo<CraftingRecipe>>> groups = new ArrayList<>();
-            m.values().forEach(l->{
-                l.removeIf(i->i.isInvalid() || i.getOptionalIngredients().size() > ingredientsGrid.size());
-                if (!l.isEmpty()) groups.add(l);
+
+        var recipesByGroupsCollector = Collectors.<RecipeInfo<CraftingRecipe>, String>groupingBy(h -> h.get()./*? <1.21.2 {*/getGroup/*?} else {*//*group*//*?}*/().isEmpty() ? h.getId().toString() : h.get()./*? <1.21.2 {*/getGroup/*?} else {*//*group*//*?}*/());
+
+
+        if (LegacyOptions.vanillaTabs.get()) {
+            allRecipes.stream().collect(Collectors.groupingBy(h -> h.get().category(), () -> new TreeMap<>(Comparator.comparingInt(Enum::ordinal)), recipesByGroupsCollector)).forEach((category, m) -> {
+                if (m.isEmpty()) return;
+                List<List<RecipeInfo<CraftingRecipe>>> groups = new ArrayList<>();
+                m.values().forEach(l -> {
+                    l.removeIf(i -> i.isInvalid() || i.getOptionalIngredients().size() > ingredientsGrid.size());
+                    if (!l.isEmpty()) groups.add(l);
+                });
+                if (groups.isEmpty()) return;
+                recipesByTab.add(groups);
+                craftingTabList.addTabButton(43, LegacyTabButton.Type.MIDDLE, LegacyTabButton.iconOf(VANILLA_CATEGORY_ICONS[category.ordinal()]), getTitle(), t -> resetElements());
             });
-            if (groups.isEmpty()) return;
-            recipesByTab.add(groups);
-            craftingTabList.addTabButton(43, LegacyTabButton.Type.MIDDLE,LegacyTabButton.iconOf(VANILLA_CATEGORY_ICONS[category.ordinal()]), getTitle(), t->resetElements());
-        });
+        }
+        if (LegacyOptions.modCraftingTabs.get()){
+            allRecipes.stream().collect(Collectors.groupingBy(h -> h.getId().getNamespace(), () -> new TreeMap<>(Comparator.<String>naturalOrder()), recipesByGroupsCollector)).forEach((namespace, m) -> {
+                ModInfo modInfo = FactoryAPIPlatform.getModInfo(namespace);
+                if (modInfo == null || namespace.equals("minecraft") || namespace.equals(Legacy4J.MOD_ID) || m.isEmpty()) return;
+                List<List<RecipeInfo<CraftingRecipe>>> groups = new ArrayList<>();
+                m.values().forEach(l -> {
+                    l.removeIf(i -> i.isInvalid() || i.getOptionalIngredients().size() > ingredientsGrid.size());
+                    if (!l.isEmpty()) groups.add(l);
+                });
+                if (groups.isEmpty()) return;
+                recipesByTab.add(groups);
+                craftingTabList.addTabButton(43, LegacyTabButton.Type.MIDDLE,  LegacyTabButton.iconOf(ModsScreen.modLogosCache.apply(modInfo)), Component.literal(modInfo.getName()), t -> resetElements());
+            });
+        }
         resetElements(false);
         addCraftingButtons();
         accessor.getStaticDefinitions().add(UIDefinition.createBeforeInit(a->accessor.putStaticElement("is2x2",is2x2)));

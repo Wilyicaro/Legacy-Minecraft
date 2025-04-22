@@ -80,6 +80,10 @@ public class LegacyTabButton extends AbstractButton {
         return (t, guiGraphics, i, j, f) -> t.renderIconSprite(sprite,guiGraphics);
     }
 
+    public static Render iconOf(ModsScreen.SizedLocation sized){
+        return (t, guiGraphics, i, j, f) -> FactoryGuiGraphics.of(guiGraphics).blit(sized.location(), t.getX() + t.getWidth() / 2 - 12, t.getY() + t.getHeight() / 2 - 12, 0, 0, 24, sized.getScaledHeight(24), 24, sized.getScaledHeight(24));
+    }
+
     public void renderString(GuiGraphics guiGraphics, Font font, int i, boolean shadow){
         renderString(guiGraphics,font,getX(),getY(),i,shadow);
     }
