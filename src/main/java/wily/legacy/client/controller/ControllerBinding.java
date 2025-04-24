@@ -1,6 +1,8 @@
 package wily.legacy.client.controller;
 
 import com.mojang.serialization.Codec;
+import it.unimi.dsi.fastutil.objects.Object2ObjectAVLTreeMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -11,17 +13,14 @@ import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.ControlTooltip;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 
 public class ControllerBinding<T extends BindingState> {
-    public static final Map<String,ControllerBinding<?>> map = new ListMap<>();
-    public static final Codec<ControllerBinding<?>> CODEC = Codec.STRING.xmap(map::get, ControllerBinding::getKey);
-    public static final Codec<Optional<ControllerBinding<?>>> OPTIONAL_CODEC = Codec.STRING.xmap(s->s.equals("none") ? Optional.empty() : Optional.ofNullable(map.get(s)), b-> b.map(ControllerBinding::getKey).orElse("none"));
+    public static final Map<String,ControllerBinding<?>> map = new Object2ObjectLinkedOpenHashMap<>();
+    public static final Codec<ControllerBinding<?>> CODEC = Codec.STRING.xmap(ControllerBinding::getOrCreate, ControllerBinding::getKey);
+    public static final Codec<Optional<ControllerBinding<?>>> OPTIONAL_CODEC = Codec.STRING.xmap(s->s.equals("none") ? Optional.empty() : Optional.ofNullable(getOrCreate(s)), b-> b.map(ControllerBinding::getKey).orElse("none"));
     private static final Map<ControllerBinding<?>, Function<Options, List<KeyMapping>>> defaultKeyMappingByBinding = new HashMap<>();
     public final Function<ControllerBinding<T>, T> stateConstructor;
     public final T bindingState;
@@ -51,8 +50,12 @@ public class ControllerBinding<T extends BindingState> {
         return this;
     }
 
-    public ControlTooltip.LegacyIcon getIcon(){
+    public ControlTooltip.ComponentIcon getIcon(){
         return ControlType.getActiveControllerType().getIcons().get(getMapped().getKey());
+    }
+
+    public boolean isSpecial(){
+        return false;
     }
 
     public static ControllerBinding<BindingState.Button> createButton(String key, ArbitrarySupplier<Button> button){
@@ -80,6 +83,11 @@ public class ControllerBinding<T extends BindingState> {
     private static <B extends ControllerBinding<?>> B registerWithDefaults(B binding, Function<Options, List<KeyMapping>> defaultKeyMappings){
         defaultKeyMappingByBinding.put(binding, defaultKeyMappings);
         return register(binding);
+    }
+
+    public static ControllerBinding<?> getOrCreate(String key){
+        String[] keys = key.split(",");
+        return keys.length == 1 ? map.get(key) : register(CompoundControllerBinding.getOrCreate(Arrays.stream(keys).map(map::get).toArray(ControllerBinding[]::new)));
     }
 
     public static final ControllerBinding<BindingState.Button> DOWN_BUTTON = registerWithDefaults(createButton("down_button", () -> LegacyOptions.invertControllerButtons.get() ? Button.RIGHT : Button.DOWN), o -> List.of(o.keyJump));

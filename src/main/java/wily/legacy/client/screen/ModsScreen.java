@@ -6,6 +6,7 @@ import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -44,12 +45,29 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 public class ModsScreen extends PanelVListScreen {
-    protected final Map<ModInfo, SizedLocation> modLogosCache = new ConcurrentHashMap<>();
+    public static final Function<ModInfo, SizedLocation> modLogosCache = Util.memoize(mod->{
+        Optional<String> opt = mod.getLogoFile(100);
+        if (opt.isPresent() && mod.findResource(opt.get()).isPresent())
+            try {
+                NativeImage image = NativeImage.read(Files.newInputStream(mod.findResource(opt.get()).get()));
+                ResourceLocation location = FactoryAPI.createLocation(mod.getId(),opt.get().toLowerCase(Locale.ENGLISH));
+                Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(/*? if >=1.21.5 {*//*location::toString, *//*?}*/image));
+                if (location != null) return new SizedLocation(location,image.getWidth(),image.getHeight());
+            } catch (IOException e) {
+            }
+        ResourceLocation defaultLogo = PackAlbum.Selector.DEFAULT_ICON;
+        if (mod.getId().equals("minecraft")) defaultLogo = PackAlbum.Selector.getPackIcon(Minecraft.getInstance().getResourcePackRepository().getPack("vanilla"));
+        return new SizedLocation(defaultLogo,1,1);
+    });
     protected ScrollableRenderer scrollableRenderer =  new ScrollableRenderer(new LegacyScrollRenderer());
 
     public record SizedLocation(ResourceLocation location, int width, int height){
         public int getScaledWidth(int height){
-            return (int) (height * ((float) width / height()));
+            return (int) (height * ((float) width() / height()));
+        }
+
+        public int getScaledHeight(int width){
+            return (int) (width * ((float) height() / width()));
         }
     }
     protected final Panel tooltipBox = Panel.tooltipBoxOf(panel,192);
@@ -61,7 +79,7 @@ public class ModsScreen extends PanelVListScreen {
         @Override
         public AdvancedTextWidget load(ModInfo key) {
             List<Component> components = new ArrayList<>();
-            SizedLocation logo = modLogosCache.get(key);
+            SizedLocation logo = modLogosCache.apply(key);
             if (logo != null && logo.getScaledWidth(28) >= 120){
                 components.add(Component.literal(focusedMod.getName()));
                 components.add(Component.translatable("legacy.menu.mods.id", focusedMod.getId()));
@@ -109,27 +127,14 @@ public class ModsScreen extends PanelVListScreen {
                     super.renderWidget(guiGraphics, i, j, f);
                     if (isFocused()) focusedMod = mod;
                     FactoryScreenUtil.enableBlend();
-                    SizedLocation logo = modLogosCache.computeIfAbsent(mod, m-> {
-                        Optional<String> opt = m.getLogoFile(100);
-                        if (opt.isPresent() && mod.findResource(opt.get()).isPresent())
-                            try {
-                                NativeImage image = NativeImage.read(Files.newInputStream(mod.findResource(opt.get()).get()));
-                                ResourceLocation location = FactoryAPI.createLocation(mod.getId(),opt.get().toLowerCase(Locale.ENGLISH));
-                                minecraft.getTextureManager().register(location, new DynamicTexture(/*? if >=1.21.5 {*//*location::toString, *//*?}*/image));
-                                if (location != null) return new SizedLocation(location,image.getWidth(),image.getHeight());
-                            } catch (IOException e) {
-                            }
-                        ResourceLocation defaultLogo = PackAlbum.Selector.DEFAULT_ICON;
-                        if (mod.getId().equals("minecraft")) defaultLogo = PackAlbum.Selector.getPackIcon(minecraft.getResourcePackRepository().getPack("vanilla"));
-                        return new SizedLocation(defaultLogo,1,1);
-                    });
+                    SizedLocation logo = modLogosCache.apply(mod);
                     if (logo != null) FactoryGuiGraphics.of(guiGraphics).blit(logo.location,getX() + 5, getY() + 5, 0,0, logo.getScaledWidth(20),20,logo.getScaledWidth(20),20);
                     
                     FactoryScreenUtil.disableBlend();
                 }
                 @Override
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                    SizedLocation logo = modLogosCache.get(mod);
+                    SizedLocation logo = modLogosCache.apply(mod);
                     ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(),this.getX() + 10 + (logo == null ? 20 : logo.getScaledWidth(20)), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j,true);
                 }
                 @Override
@@ -147,7 +152,7 @@ public class ModsScreen extends PanelVListScreen {
         if (focusedMod != null) {
             AdvancedTextWidget label = modLabelsCache.getUnchecked(focusedMod).withPos(panel.x + panel.width + 5, panel.y + 41);
             scrollableRenderer.scrolled.max = Math.max(0, Mth.ceil((label.getHeight() - (tooltipBox.getHeight() - 50)) / 12f));
-            SizedLocation logo = modLogosCache.get(focusedMod);
+            SizedLocation logo = modLogosCache.apply(focusedMod);
             int x = panel.x + panel.width + (logo == null ? 5 : logo.getScaledWidth(28) + 10);
             if (logo != null)
                 FactoryGuiGraphics.of(guiGraphics).blit(logo.location, panel.x + panel.width + 5, panel.y + 10, 0.0f, 0.0f, logo.getScaledWidth(28), 28, logo.getScaledWidth(28), 28);

@@ -1,6 +1,7 @@
 package wily.legacy.client.controller;
 
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.ToggleKeyMapping;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.legacy.Legacy4J;
@@ -40,7 +41,7 @@ public abstract class BindingState {
         if (justPressed) blockAmount--;
     }
 
-    public ControlTooltip.LegacyIcon getIcon(){
+    public ControlTooltip.ComponentIcon getIcon(){
         return binding.getIcon();
     }
 
@@ -83,7 +84,7 @@ public abstract class BindingState {
     }
 
     public void block(int blockAmount){
-        this.blockAmount= blockAmount;
+        this.blockAmount = blockAmount;
     }
 
     public boolean isBlocked() {
@@ -100,6 +101,10 @@ public abstract class BindingState {
 
     public boolean matches(KeyMapping mapping){
         return ((LegacyKeyMapping)mapping).getBinding() == binding;
+    }
+
+    public boolean canBlock(KeyMapping keyMapping) {
+        return keyMapping == Minecraft.getInstance().options.keyTogglePerspective || keyMapping == Minecraft.getInstance().options.keyUse || keyMapping instanceof ToggleKeyMapping || binding.isSpecial();
     }
 
     public static class Button extends BindingState {

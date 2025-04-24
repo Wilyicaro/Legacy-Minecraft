@@ -186,11 +186,11 @@ public interface ControlTooltip {
     }
 
     static Component getIconComponentFromKeyMapping(LegacyKeyMapping mapping){
-        LegacyIcon icon = getIconFromKeyMapping(mapping);
+        ComponentIcon icon = getIconFromKeyMapping(mapping);
         return icon == null ? LegacyComponents.NONE : icon.getComponent();
     }
 
-    static LegacyIcon getIconFromKeyMapping(LegacyKeyMapping mapping){
+    static ComponentIcon getIconFromKeyMapping(LegacyKeyMapping mapping){
         return ControlType.getActiveType().isKbm() ? getKeyIcon(mapping.getKey().getValue()) : mapping.getBinding() == null ? null : mapping.getBinding().getIcon();
     }
 
