@@ -4,6 +4,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.*;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyLoading;
 
 import static wily.legacy.Legacy4JClient.legacyLoadingScreen;
@@ -14,10 +18,23 @@ public class LegacyLoadingMessageScreenMixin extends Screen implements LegacyLoa
         super(component);
     }
 
-    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        legacyLoadingScreen.prepareRender(minecraft,width, height,getTitle(), null,0,false);
-        legacyLoadingScreen.render(guiGraphics,i,j,f);
+    @Inject(method = /*? if <1.20.5 {*//*"render"*//*?} else {*/"renderBackground"/*?}*/, at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        if (LegacyOptions.legacyLoadingAndConnecting.get()) {
+            ci.cancel();
+            legacyLoadingScreen.prepareRender(minecraft, width, height, getTitle(), null, 0, false);
+            legacyLoadingScreen.render(guiGraphics, i, j, f);
+        }
     }
+
+    //? if >=1.20.5 {
+    @Inject(method = "init", at = @At("HEAD"), cancellable = true)
+    public void init(CallbackInfo ci) {
+        if (LegacyOptions.legacyLoadingAndConnecting.get()) {
+            ci.cancel();
+        }
+    }
+    //?}
 
     @Override
     public int getProgress() {

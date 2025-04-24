@@ -213,7 +213,7 @@ public interface Controller {
 
         }
 
-        default boolean onceClickBindings(){
+        default boolean onceClickBindings(BindingState state){
             return true;
         }
 

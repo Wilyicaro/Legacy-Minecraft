@@ -21,7 +21,9 @@ import wily.factoryapi.base.network.CommonRecipeManager;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.RecipeInfo;
 import wily.legacy.client.StoneCuttingGroupManager;
+import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
+import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.*;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.RecipeMenu;
@@ -88,8 +90,8 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
     }
 
     @Override
-    public boolean onceClickBindings() {
-        return false;
+    public boolean onceClickBindings(BindingState state) {
+        return !state.is(ControllerBinding.DOWN_BUTTON);
     }
 
     @Override

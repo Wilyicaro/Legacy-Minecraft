@@ -50,6 +50,7 @@ import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.util.PagedList;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.init.LegacyRegistries;
@@ -627,8 +628,8 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
     }
 
     @Override
-    public boolean onceClickBindings() {
-        return false;
+    public boolean onceClickBindings(BindingState state) {
+        return state.is(ControllerBinding.DOWN_BUTTON);
     }
 
     @Override

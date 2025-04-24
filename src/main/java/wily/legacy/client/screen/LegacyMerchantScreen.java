@@ -25,6 +25,7 @@ import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.init.LegacyRegistries;
@@ -83,8 +84,8 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
     }
 
     @Override
-    public boolean onceClickBindings() {
-        return false;
+    public boolean onceClickBindings(BindingState state) {
+        return !state.is(ControllerBinding.DOWN_BUTTON);
     }
 
     private void updateSlotsDisplay(){

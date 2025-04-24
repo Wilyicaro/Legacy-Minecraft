@@ -708,8 +708,8 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     }
 
     @Override
-    public boolean onceClickBindings() {
-        return false;
+    public boolean onceClickBindings(BindingState state) {
+        return !state.is(ControllerBinding.DOWN_BUTTON);
     }
 
     @Override

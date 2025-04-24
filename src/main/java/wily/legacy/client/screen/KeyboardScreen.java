@@ -424,7 +424,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
         }
     }
     @Override
-    public boolean onceClickBindings() {
+    public boolean onceClickBindings(BindingState b) {
         return false;
     }
 }

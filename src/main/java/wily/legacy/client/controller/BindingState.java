@@ -104,7 +104,7 @@ public abstract class BindingState {
     }
 
     public boolean canBlock(KeyMapping keyMapping) {
-        return keyMapping == Minecraft.getInstance().options.keyTogglePerspective || keyMapping == Minecraft.getInstance().options.keyUse || keyMapping instanceof ToggleKeyMapping || binding.isSpecial();
+        return keyMapping == Minecraft.getInstance().options.keyTogglePerspective || keyMapping == Minecraft.getInstance().options.keyUse || binding.isSpecial();
     }
 
     public static class Button extends BindingState {

@@ -26,6 +26,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.FactoryAPIClient;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.init.LegacyGameRules;
 
@@ -66,7 +67,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
         return true;
     }
 
-    @Redirect(method = "aiStep", at = @At(value = "FIELD",target = "Lnet/minecraft/client/player/LocalPlayer;crouching:Z", opcode = Opcodes.PUTFIELD, ordinal = 0))
+    @Redirect(method = "aiStep", at = @At(value = "FIELD", target = "Lnet/minecraft/client/player/LocalPlayer;crouching:Z", opcode = Opcodes.PUTFIELD, ordinal = 0))
     public void aiStepCrouching(LocalPlayer instance, boolean value) {
         crouching = value && (onGround() || !isInWater()) && !getAbilities().flying && !isFallFlying();
     }
@@ -147,11 +148,8 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
             if (keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown()) xxa+= (keyFlyLeft.isDown() ? 12 : -12) * this.getAbilities().getFlyingSpeed();
             if (getXRot() != 0 && input.hasForwardImpulse() && isSprinting()) zza*=Math.max(0.1f,1 - Math.abs(getXRot() / 90));
         }
-    }
-
-    @Inject(method = "rideTick", at = @At("HEAD"))
-    public void rideTick(CallbackInfo ci) {
-        if (!Legacy4JClient.hasModOnServer()) return;
-        if (wantsToStopRiding() && this.isPassenger()) minecraft.options.keyShift.setDown(false);
+        if (wantsToStopRiding() && this.isPassenger()) {
+            minecraft.options.keyShift.setDown(false);
+        }
     }
 }

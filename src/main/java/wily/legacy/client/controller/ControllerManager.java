@@ -135,10 +135,30 @@ public class ControllerManager {
                 }
                 Controller.Event.of(minecraft.screen).bindingStateTick(state);
                 if (minecraft.screen == null) break s;
+
+                if (!isCursorDisabled) {
+                    if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && state.pressed)
+                        setPointerPos(minecraft.mouseHandler.xpos() + stick.x * ((double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth())  * LegacyOptions.interfaceSensitivity.get() / 2,minecraft.mouseHandler.ypos() + stick.y * ((double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()) * LegacyOptions.interfaceSensitivity.get() / 2);
+
+                    if (state.is(ControllerBinding.LEFT_TRIGGER) && minecraft.screen instanceof LegacyMenuAccess<?> m && m.getMenu().getCarried().getCount() > 1){
+                        if (state.justPressed) minecraft.screen.mouseClicked(getPointerX(), getPointerY(), 0);
+                        else if (state.released) minecraft.screen.mouseReleased(getPointerX(), getPointerY(),0);
+                        if (state.pressed) minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
+                    }
+                    if (state.is(ControllerBinding.DOWN_BUTTON) || state.is(ControllerBinding.UP_BUTTON) || state.is(ControllerBinding.LEFT_BUTTON)) {
+                        isControllerSimulatingInput = true;
+                        if (state.pressed && state.onceClick(true))
+                            ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), state.is(ControllerBinding.LEFT_BUTTON) ? 1 : 0, 1, 0);
+                        else if (state.released)
+                            ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), state.is(ControllerBinding.LEFT_BUTTON) ? 1 : 0, 0, 0);
+                        isControllerSimulatingInput = false;
+                    }
+                }
+
                 ControllerBinding<?> cursorBinding = LegacyKeyMapping.of(Legacy4JClient.keyToggleCursor).getBinding();
                 if (cursorBinding != null && state.is(cursorBinding) && state.canClick()) toggleCursor();
-                if (isCursorDisabled) simulateKeyAction(s-> state.is(ControllerBinding.DOWN_BUTTON) && (minecraft.screen instanceof Controller.Event e && !e.onceClickBindings() || state.onceClick(true)),InputConstants.KEY_RETURN, state);
-                simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_BUTTON) && (minecraft.screen instanceof Controller.Event e && !e.onceClickBindings() || state.onceClick(true)),InputConstants.KEY_ESCAPE, state, true);
+                if (isCursorDisabled) simulateKeyAction(s-> state.is(ControllerBinding.DOWN_BUTTON),InputConstants.KEY_RETURN, state);
+                simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_BUTTON),InputConstants.KEY_ESCAPE, state, true);
                 simulateKeyAction(s-> s.is(ControllerBinding.LEFT_BUTTON),InputConstants.KEY_X, state);
                 simulateKeyAction(s-> s.is(ControllerBinding.UP_BUTTON),InputConstants.KEY_O, state);
                 simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_W, state);
@@ -163,24 +183,6 @@ public class ControllerManager {
                 }
             }
 
-            if (minecraft.screen != null && !isCursorDisabled) {
-                if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && state.pressed)
-                    setPointerPos(minecraft.mouseHandler.xpos() + stick.x * ((double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth())  * LegacyOptions.interfaceSensitivity.get() / 2,minecraft.mouseHandler.ypos() + stick.y * ((double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()) * LegacyOptions.interfaceSensitivity.get() / 2);
-
-                if (state.is(ControllerBinding.LEFT_TRIGGER) && minecraft.screen instanceof LegacyMenuAccess<?> m && m.getMenu().getCarried().getCount() > 1){
-                    if (state.justPressed) minecraft.screen.mouseClicked(getPointerX(), getPointerY(), 0);
-                    else if (state.released) minecraft.screen.mouseReleased(getPointerX(), getPointerY(),0);
-                    if (state.pressed) minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
-                }
-                if (state.is(ControllerBinding.DOWN_BUTTON) || state.is(ControllerBinding.UP_BUTTON) || state.is(ControllerBinding.LEFT_BUTTON)) {
-                    isControllerSimulatingInput = true;
-                    if (state.pressed && state.onceClick(true))
-                        ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), state.is(ControllerBinding.LEFT_BUTTON) ? 1 : 0, 1, 0);
-                    else if (state.released)
-                        ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), state.is(ControllerBinding.LEFT_BUTTON) ? 1 : 0, 0, 0);
-                    isControllerSimulatingInput = false;
-                }
-            }
 
             if (minecraft.screen instanceof LegacyMenuAccess<?> a && !isCursorDisabled) {
                 if (state.pressed && state.canClick()) {
@@ -230,7 +232,7 @@ public class ControllerManager {
 
     public void simulateKeyAction(Predicate<BindingState> canSimulate, int key, BindingState state, boolean onlyScreen){
         boolean clicked = state.pressed && state.canClick();
-        if (canSimulate.test(state)){
+        if (canSimulate.test(state) && (minecraft.screen instanceof Controller.Event e && !e.onceClickBindings(state) || state.onceClick(true))){
             simulateKeyAction(key, state, clicked, onlyScreen);
         }
     }

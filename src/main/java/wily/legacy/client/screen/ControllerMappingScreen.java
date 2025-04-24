@@ -124,7 +124,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
     }
 
     @Override
-    public boolean onceClickBindings() {
+    public boolean onceClickBindings(BindingState state) {
         return selectedMapping == null;
     }
 
