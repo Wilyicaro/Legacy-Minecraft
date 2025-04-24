@@ -192,7 +192,6 @@ public class Legacy4J {
         return FactoryAPI.createLocation(MOD_ID,path);
     }
 
-
     public static /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult *//*?} else {*/ItemInteractionResult/*?}*/ defaultPassInteraction() {
         return /*? if <1.20.5 || >=1.21.2 {*/ /*InteractionResult.PASS*//*?} else {*/ ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION/*?}*/;
     }

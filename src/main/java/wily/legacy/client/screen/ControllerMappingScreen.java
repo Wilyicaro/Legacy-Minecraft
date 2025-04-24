@@ -1,6 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -9,19 +10,21 @@ import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.controller.BindingState;
-import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.controller.LegacyKeyMapping;
+import wily.legacy.client.controller.*;
 import wily.legacy.util.LegacyComponents;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Set;
 
 public class ControllerMappingScreen extends LegacyKeyMappingScreen {
+    private Set<ControllerBinding<?>> recordedBindings = new ObjectOpenHashSet<>();
+
     public ControllerMappingScreen(Screen parent) {
         super(parent, Component.translatable("legacy.options.selectedController"));
     }
@@ -59,7 +62,6 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
 
                 @Override
                 public void onPress() {
-                    ControllerBinding.DOWN_BUTTON.state().block();
                     if (Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed){
                         mapping.setBinding(mapping.getDefaultBinding());
                         LegacyOptions.CLIENT_STORAGE.save();
@@ -89,7 +91,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (i == InputConstants.KEY_ESCAPE && selectedMapping != null) {
+        if (i == InputConstants.KEY_ESCAPE && selectedMapping != null && !Legacy4JClient.controllerManager.isControllerSimulatingInput) {
             setSelectedMapping(null);
             setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
             return true;
@@ -122,14 +124,32 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
     }
 
     @Override
+    public boolean onceClickBindings() {
+        return selectedMapping == null;
+    }
+
+    @Override
     public void bindingStateTick(BindingState state) {
         if (selectedMapping != null) {
-            if (state.is(ControllerBinding.BACK)){
+            if (state.is(ControllerBinding.BACK)) {
                 if (state.canClick() && state.timePressed >= state.getDefaultDelay())
                     applyBinding(ControllerBinding.BACK);
                 else if (state.released) applyBinding(null);
-            } else if (state.canClick() && state.binding.isBindable) {
+            }
+        }
+    }
+
+    @Override
+    public void controllerTick(Controller controller) {
+        if (selectedMapping != null) {
+            for (ControllerBinding<?> binding : ControllerBinding.map.values()) {
+                if (binding.state().justPressed && binding.isBindable && !binding.state().isBlocked() && !binding.equals(ControllerBinding.BACK) && !binding.isSpecial()) recordedBindings.add(binding);
+            }
+
+            if (!recordedBindings.isEmpty() && recordedBindings.stream().noneMatch(binding-> binding.state().pressed)) {
+                BindingState state = CompoundControllerBinding.getOrCreateAndUpdate(controller, recordedBindings.toArray(ControllerBinding[]::new)).state();
                 applyBinding(state.binding);
+                recordedBindings.clear();
                 state.block();
             }
         }

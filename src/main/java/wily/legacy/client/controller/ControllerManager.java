@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.InputType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.Screenshot;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -43,6 +44,7 @@ public class ControllerManager {
     public static final Component CONTROLLER_DETECTED = Component.translatable("legacy.controller.detected");
     public static final Component CONTROLLER_DISCONNECTED = Component.translatable("legacy.controller.disconnected");
 
+    private KeyMapping[] orderedKeyMappings;
 
     public static Controller.Handler getHandler() {
         return LegacyOptions.selectedControllerHandler.get();
@@ -62,6 +64,7 @@ public class ControllerManager {
 
     public void setup(Minecraft minecraft){
         this.minecraft = minecraft;
+        this.orderedKeyMappings = minecraft.options.keyMappings.clone();
         updateCursorInputMode();
 
         CompletableFuture.runAsync(()-> new Timer().scheduleAtFixedRate(new TimerTask() {
@@ -102,11 +105,8 @@ public class ControllerManager {
     }
 
     public synchronized void updateBindings(Controller controller) {
-        if (minecraft.screen != null) Controller.Event.of(minecraft.screen).controllerTick(controller);
-        if (LegacyTipManager.getActualTip() != null) LegacyTipManager.getActualTip().controllerTick(controller);
-
+        Arrays.sort(orderedKeyMappings, Comparator.comparingInt(mapping -> LegacyKeyMapping.of(mapping).getBinding() == null ? 2 : LegacyKeyMapping.of(mapping).getBinding().isSpecial() ? 0 : 1));
         for (ControllerBinding<?> binding : ControllerBinding.map.values()) {
-            if (controller == null) break;
             BindingState state = binding.state();
             state.update(controller);
             if (LegacyTipManager.getActualTip() != null) LegacyTipManager.getActualTip().bindingStateTick(state);
@@ -138,7 +138,7 @@ public class ControllerManager {
                 ControllerBinding<?> cursorBinding = LegacyKeyMapping.of(Legacy4JClient.keyToggleCursor).getBinding();
                 if (cursorBinding != null && state.is(cursorBinding) && state.canClick()) toggleCursor();
                 if (isCursorDisabled) simulateKeyAction(s-> state.is(ControllerBinding.DOWN_BUTTON) && (minecraft.screen instanceof Controller.Event e && !e.onceClickBindings() || state.onceClick(true)),InputConstants.KEY_RETURN, state);
-                simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_BUTTON) && state.onceClick(true),InputConstants.KEY_ESCAPE, state);
+                simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_BUTTON) && (minecraft.screen instanceof Controller.Event e && !e.onceClickBindings() || state.onceClick(true)),InputConstants.KEY_ESCAPE, state, true);
                 simulateKeyAction(s-> s.is(ControllerBinding.LEFT_BUTTON),InputConstants.KEY_X, state);
                 simulateKeyAction(s-> s.is(ControllerBinding.UP_BUTTON),InputConstants.KEY_O, state);
                 simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_W, state);
@@ -194,46 +194,70 @@ public class ControllerManager {
                         a.movePointerToSlotIn(ScreenDirection.LEFT);
                 }else if (state.is(ControllerBinding.LEFT_STICK) && state.released) a.movePointerToSlot(a.findSlotAt(getPointerX(),getPointerY()));
             }
-            for (KeyMapping keyMapping : minecraft.options.keyMappings) {
-                if (!state.matches(keyMapping)) continue;
-                Screen screen;
-                if (this.minecraft.screen == null || (screen = this.minecraft.screen) instanceof PauseScreen/*? if >1.20.1 {*/ && !((PauseScreen) screen).showsPauseMenu()/*?}*/) {
-                    if (state.is(ControllerBinding.START) && state.pressed) {
-                        keyMapping.setDown(false);
-                    } else {
-                        if (state.canClick()) keyMapping.clickCount++;
-                        if (state.pressed && state.canDownKeyMapping(keyMapping)) keyMapping.setDown(true);
-                        else if (state.canReleaseKeyMapping(keyMapping)) keyMapping.setDown(false);
-                        if (state.pressed) {
-                            if (keyMapping == minecraft.options.keyTogglePerspective || keyMapping == minecraft.options.keyUse) state.block();
-                            else if (keyMapping == minecraft.options.keyAttack) state.onceClick(-state.getDefaultDelay() * (minecraft.player.getAbilities().invulnerable ? 3 : 5));
-                        }
+        }
+
+        for (KeyMapping keyMapping : orderedKeyMappings) {
+            if (LegacyKeyMapping.of(keyMapping).getBinding() == null) break;
+            BindingState state = LegacyKeyMapping.of(keyMapping).getBinding().state();
+            Screen screen;
+            if (this.minecraft.screen == null || (screen = this.minecraft.screen) instanceof PauseScreen/*? if >1.20.1 {*/ && !((PauseScreen) screen).showsPauseMenu()/*?}*/) {
+                if (state.is(ControllerBinding.START) && state.pressed) {
+                    keyMapping.setDown(false);
+                } else {
+                    if (state.canClick()) keyMapping.clickCount++;
+                    if (state.pressed && state.canDownKeyMapping(keyMapping)) keyMapping.setDown(true);
+                    else if (state.canReleaseKeyMapping(keyMapping)) keyMapping.setDown(false);
+                    if (state.pressed) {
+                        if (state.canBlock(keyMapping)) state.block();
+                        else if (keyMapping == minecraft.options.keyAttack) state.onceClick(-state.getDefaultDelay() * (minecraft.player.getAbilities().invulnerable ? 3 : 5));
                     }
                 }
             }
         }
+
+        ControllerBinding<?> binding = LegacyKeyMapping.of(minecraft.options.keyScreenshot).getBinding();
+        if (binding != null && binding.state().justPressed){
+            Screenshot.grab(this.minecraft.gameDirectory, this.minecraft.getMainRenderTarget(), component -> this.minecraft.execute(() -> this.minecraft.gui.getChat().addMessage(component)));
+        }
+
+        if (minecraft.screen != null) Controller.Event.of(minecraft.screen).controllerTick(controller);
+        if (LegacyTipManager.getActualTip() != null) LegacyTipManager.getActualTip().controllerTick(controller);
     }
 
     public void simulateKeyAction(Predicate<BindingState> canSimulate, int key, BindingState state){
+        simulateKeyAction(canSimulate, key, state, false);
+    }
+
+    public void simulateKeyAction(Predicate<BindingState> canSimulate, int key, BindingState state, boolean onlyScreen){
         boolean clicked = state.pressed && state.canClick();
         if (canSimulate.test(state)){
-            simulateKeyAction(key, state, clicked);
+            simulateKeyAction(key, state, clicked, onlyScreen);
         }
     }
 
     public void simulateKeyAction(int key, BindingState state){
-        simulateKeyAction(key, state, state.pressed && state.canClick());
+        simulateKeyAction(key, state, false);
     }
 
-    public void simulateKeyAction(int key, BindingState state, boolean canPress){
-        if (canPress) simulateKeyAction(key,true);
-        else if (state.released) simulateKeyAction(key,false);
+    public void simulateKeyAction(int key, BindingState state, boolean onlyScreen){
+        simulateKeyAction(key, state, state.pressed && state.canClick(), onlyScreen);
     }
 
-    public void simulateKeyAction(int key, boolean press){
+    public void simulateKeyAction(int key, BindingState state, boolean canPress, boolean onlyScreen){
+        if (canPress) simulateKeyAction(key,true, onlyScreen);
+        else if (state.released) simulateKeyAction(key,false, onlyScreen);
+    }
+
+    public void simulateKeyAction(int key, boolean press, boolean onlyScreen){
         isControllerSimulatingInput = true;
-        minecraft.keyboardHandler.keyPress(minecraft.getWindow().getWindow(), key, 0, press ? 1 : 0, 0);
+        if (onlyScreen) simulateScreenKeyAction(key, press);
+        else minecraft.keyboardHandler.keyPress(minecraft.getWindow().getWindow(), key, 0, press ? 1 : 0, 0);
         isControllerSimulatingInput = false;
+    }
+
+    public void simulateScreenKeyAction(int key, boolean press){
+        if (press) minecraft.screen.keyPressed(key, 0, 0);
+        else minecraft.screen.keyReleased(key, 0, 0);
     }
 
     public double getPointerX(){

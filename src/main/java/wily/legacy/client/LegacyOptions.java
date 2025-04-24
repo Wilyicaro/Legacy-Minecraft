@@ -59,7 +59,7 @@ public class LegacyOptions {
         public void load() {
             for (KeyMapping keyMapping : Minecraft.getInstance().options.keyMappings) {
                 LegacyKeyMapping mapping = LegacyKeyMapping.of(keyMapping);
-                register(FactoryConfig.create("component_" + keyMapping.getName(), null, Optional.ofNullable(((LegacyKeyMapping) keyMapping).getDefaultBinding()), Bearer.of(()->Optional.ofNullable(mapping.getBinding()),o->mapping.setBinding(o.map(b-> !b.isBindable ? null : b).orElse(mapping.getDefaultBinding()))), ()->ControllerBinding.OPTIONAL_CODEC, m->{}, this));
+                register(FactoryConfig.create("component_" + keyMapping.getName(), null, Optional.ofNullable(((LegacyKeyMapping) keyMapping).getDefaultBinding()), Bearer.of(()->Optional.ofNullable(mapping.getBinding()),o->mapping.setBinding(o.filter(b -> b.isBindable).orElse(null))), ()->ControllerBinding.OPTIONAL_CODEC, m->{}, this));
             }
             loadDeprecated();
             super.load();

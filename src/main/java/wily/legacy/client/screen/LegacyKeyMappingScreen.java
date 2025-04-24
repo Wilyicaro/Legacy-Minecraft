@@ -117,7 +117,7 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
             super.renderWidget(guiGraphics, i, j, f);
             Component c = isPressed() ? SELECTION : isNone() ? NONE : null;
             if (c != null){
-                guiGraphics.drawString(font, c, getX() + width - 20 - Minecraft.getInstance().font.width(c) / 2, getY() + (height -  font.lineHeight) / 2 + 1,0xFFFFFF);
+                guiGraphics.drawString(font, c, getX() + width - 20 - Minecraft.getInstance().font.width(c) / 2, getY() + (height -  font.lineHeight) / 2 + 1, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
                 return;
             }
             ControlTooltip.Icon icon = getIcon();
