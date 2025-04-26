@@ -599,6 +599,7 @@ public class Legacy4JClient {
             knownEntities.save();
         });
         FactoryEvent.registerBuiltInPacks(registry->{
+            registry.registerResourcePack(FactoryAPI.createLocation(MOD_ID,"legacy_resources"),true);
             registry.registerResourcePack(FactoryAPI.createLocation(MOD_ID,"legacy_waters"),true);
             registry.registerResourcePack(FactoryAPI.createLocation(MOD_ID,"console_aspects"),false);
             if (FactoryAPI.getLoader().isForgeLike()) {

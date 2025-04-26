@@ -178,7 +178,8 @@
     "LightTextureMixin",
     "RenderSystemMixin",
     "CompositeRenderTypeAccessor",
-    "ClientInventoryMixin"
+    "ClientInventoryMixin",
+    "VillagerModelMixin"
   ],
   "mixins": [
     //? if <1.20.5 {

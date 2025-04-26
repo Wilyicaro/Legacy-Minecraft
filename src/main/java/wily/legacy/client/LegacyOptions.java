@@ -70,7 +70,6 @@ public class LegacyOptions {
 
     public static final FactoryConfig.StorageAccess VANILLA_STORAGE_ACCESS = ()-> Minecraft.getInstance().options.save();
 
-
     public static <T> FactoryConfig<T> of(OptionInstance<T> optionInstance) {
         return (FactoryConfig<T>) LEGACY_OPTION_OPTION_INSTANCE_CACHE.apply(optionInstance);
     }
@@ -102,9 +101,11 @@ public class LegacyOptions {
     public static FactoryConfig<Boolean> createBoolean(String key, boolean defaultValue, Consumer<Boolean> consumer) {
         return createBoolean(key, b->null, defaultValue, consumer);
     }
+
     public static FactoryConfig<Boolean> createBoolean(String key, Function<Boolean,Component> tooltipFunction, boolean defaultValue) {
         return createBoolean(key, tooltipFunction, defaultValue, b->{});
     }
+
     public static FactoryConfig<Boolean> createBoolean(String key, Function<Boolean,Component> tooltipFunction, boolean defaultValue, Consumer<Boolean> consumer) {
         return FactoryConfig.createBoolean(key, new FactoryConfigDisplay.Instance<>(optionName(key), tooltipFunction, (c, v) -> c), defaultValue, consumer, CLIENT_STORAGE);
     }
@@ -137,13 +138,14 @@ public class LegacyOptions {
         return FactoryConfig.create(key, new FactoryConfigDisplay.Instance<>(optionName(key), tooltipFunction, captionFunction), new FactoryConfigControl.FromInt<>(i->listSupplier.get().get(i), v-> listSupplier.get().indexOf(v), ()-> listSupplier.get().size()), defaultValue, consumer, CLIENT_STORAGE);
     }
 
-
     public static FactoryConfig<Double> createDouble(String key, BiFunction<Component,Double,Component> captionFunction, double defaultValue) {
         return createDouble(key, captionFunction, defaultValue, b->{});
     }
+
     public static FactoryConfig<Double> createDouble(String key, BiFunction<Component,Double,Component> captionFunction, double defaultValue, Consumer<Double> consumer) {
         return createDouble(key, v-> null, captionFunction, defaultValue, consumer);
     }
+
     public static FactoryConfig<Double> createDouble(String key, Function<Double,Component> tooltipFunction, BiFunction<Component,Double,Component> captionFunction, double defaultValue) {
         return createDouble(key, tooltipFunction, captionFunction, defaultValue, b->{});
     }
@@ -278,6 +280,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> unbindConflictingKeys = CLIENT_STORAGE.register(createBoolean("unbindConflictingKeys", true));
     public static final FactoryConfig<Boolean> unbindConflictingButtons = CLIENT_STORAGE.register(createBoolean("unbindConflictingButtons", true));
     public static final FactoryConfig<Integer> hudDelay = CLIENT_STORAGE.register(createInteger("hudDelay", (c, i)-> i == 0 ? Options.genericValueLabel(c,Component.translatable("options.off")) : percentValueLabel(c, i / 100d), 0, ()-> 200, 100));
+    public static final FactoryConfig<Boolean> legacyBabyVillagerHead = CLIENT_STORAGE.register(createBoolean("legacyBabyVillagerHead", true));
 
 
     public static int getTerrainFogStart(){

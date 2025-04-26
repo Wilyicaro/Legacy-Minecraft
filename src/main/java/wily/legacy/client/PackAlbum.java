@@ -81,7 +81,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
     public static final Gson GSON = new GsonBuilder().create();
 
     public static List<String> getMinecraftResourcePacks(){
-        return new ArrayList<>(List.of("vanilla", FactoryAPI.getLoader().isForgeLike() ? "mod_resources" : "fabric","legacy:legacy_waters"));
+        return new ArrayList<>(List.of("vanilla", /*? if forge || neoforge {*/ /*"mod_resources"*//*?} else {*/"fabric"/*?}*/, "legacy:legacy_waters"));
     }
 
     public static List<String> getMinecraftClassicResourcePacks(){

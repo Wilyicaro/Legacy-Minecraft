@@ -67,7 +67,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
 
     public static final Codec<GlobalPacks> CODEC = RecordCodecBuilder.create(i-> i.group(Codec.STRING.listOf().fieldOf("packs").forGetter(GlobalPacks::list), Codec.BOOL.fieldOf("applyOnTop").forGetter(GlobalPacks::applyOnTop)).apply(i, GlobalPacks::new));
     public static final FactoryConfig.StorageHandler STORAGE = new FactoryConfig.StorageHandler().withFile("legacy/global_packs.json");
-    public static final FactoryConfig<GlobalPacks> globalResources = STORAGE.register(FactoryConfig.create("globalResources", null, ()-> CODEC, EMPTY, v-> {}, STORAGE));
+    public static final FactoryConfig<GlobalPacks> globalResources = STORAGE.register(FactoryConfig.create("globalResources", null, ()-> CODEC, EMPTY.withPacks(List.of("legacy:legacy_resources")), v-> {}, STORAGE));
 
 
     public static class Selector extends AbstractWidget implements ControlTooltip.ActionHolder {

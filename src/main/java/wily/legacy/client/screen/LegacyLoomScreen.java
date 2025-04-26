@@ -282,7 +282,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
 
     @Override
     public boolean onceClickBindings(BindingState state) {
-        return !state.is(ControllerBinding.DOWN_BUTTON);
+        return !state.is(ControllerBinding.DOWN_BUTTON) && Controller.Event.super.onceClickBindings(state);
     }
 
     @Override

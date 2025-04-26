@@ -214,7 +214,7 @@ public interface Controller {
         }
 
         default boolean onceClickBindings(BindingState state){
-            return true;
+            return !(state.is(ControllerBinding.RIGHT_BUMPER) || state.is(ControllerBinding.LEFT_BUMPER) || state.is(ControllerBinding.LEFT_TRIGGER) || state.is(ControllerBinding.RIGHT_TRIGGER));
         }
 
         default boolean disableCursorOnInit(){

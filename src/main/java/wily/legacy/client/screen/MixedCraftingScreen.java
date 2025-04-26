@@ -629,7 +629,7 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
 
     @Override
     public boolean onceClickBindings(BindingState state) {
-        return state.is(ControllerBinding.DOWN_BUTTON);
+        return state.is(ControllerBinding.DOWN_BUTTON) && Controller.Event.super.onceClickBindings(state);
     }
 
     @Override

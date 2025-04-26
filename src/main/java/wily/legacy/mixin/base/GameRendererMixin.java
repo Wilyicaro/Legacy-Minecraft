@@ -81,7 +81,8 @@ public abstract class GameRendererMixin {
     *///?}
     @Inject(method = "bobView", at = @At("RETURN"))
     private void bobView(PoseStack poseStack, float f, CallbackInfo ci){
-        if (this.minecraft.getCameraEntity() instanceof PlayerYBobbing p && !minecraft.player.getAbilities().flying) poseStack.mulPose(Axis.XP.rotationDegrees(p.getAngle(f)));
+        float xAngle = PlayerYBobbing.getAngle(minecraft, f);
+        if (xAngle != 0) poseStack.mulPose(Axis.XP.rotationDegrees(xAngle));
     }
 
     @Inject(method = "shouldRenderBlockOutline", at = @At("HEAD"), cancellable = true)

@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base;
 
+import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.server.packs.repository.PackRepository;
@@ -10,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.GlobalPacks;
 import wily.legacy.client.LegacyOptions;
@@ -51,6 +53,8 @@ public abstract class OptionsMixin {
     private void loadSelectedResourcePacks(PackRepository packRepository, CallbackInfo ci){
         PackAlbum.init();
         GlobalPacks.STORAGE.load();
+        if (Legacy4J.isNewerVersion("1.8.0.2518.5", LegacyOptions.lastLoadedVersion.get()) && !LegacyOptions.lastLoadedVersion.isEmpty() && !GlobalPacks.globalResources.get().list().contains("legacy:legacy_resources"))
+            GlobalPacks.globalResources.set(GlobalPacks.globalResources.get().withPacks(ImmutableList.<String>builder().addAll(GlobalPacks.globalResources.get().list()).add("legacy:legacy_resources").build()));
         GlobalPacks.globalResources.get().applyPacks(packRepository, PackAlbum.getDefaultResourceAlbum().packs());
         PackAlbum.updateSavedResourcePacks();
         ci.cancel();
