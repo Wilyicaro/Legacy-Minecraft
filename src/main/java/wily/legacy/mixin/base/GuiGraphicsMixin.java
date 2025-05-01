@@ -15,9 +15,14 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.joml.Matrix4f;
+//? forge {
+/*import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.event.RenderTooltipEvent;
+*///?} else if neoforge {
+/*import net.neoforged.neoforge.client.ClientHooks;
+import net.neoforged.neoforge.client.event.RenderTooltipEvent;
+*///?}
 import org.joml.Vector2ic;
-import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -46,21 +51,15 @@ public abstract class GuiGraphicsMixin {
     @Shadow @Final private MultiBufferSource.BufferSource bufferSource;
 
     @Shadow public abstract int guiHeight();
+    //? if forge || neoforge {
+    /*@Shadow(remap = false) private ItemStack tooltipStack;
+    *///?}
 
     @Unique
     GuiGraphics self(){
         return (GuiGraphics) (Object) this;
     }
 
-    //? if <1.21.4 {
-    @Redirect(method = "enableScissor", at = @At(value = "NEW", target = "(IIII)Lnet/minecraft/client/gui/navigation/ScreenRectangle;"))
-    private ScreenRectangle enableScissor(int i, int j, int k, int l, int x, int y, int xd, int yd){
-        Matrix4f matrix4f = this.pose.last().pose();
-        Vector3f vector3f = matrix4f.transformPosition(x, y, 0.0F, new Vector3f());
-        Vector3f vector3f2 = matrix4f.transformPosition(xd, yd, 0.0F, new Vector3f());
-        return new ScreenRectangle(Mth.floor(vector3f.x), Mth.floor(vector3f.y), Mth.floor(vector3f2.x - vector3f.x), Mth.floor(vector3f2.y - vector3f.y));
-    }
-    //?}
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("HEAD"))
     private void renderItemDecorationsHead(Font font, ItemStack itemStack, int i, int j, String string, CallbackInfo ci){
         Legacy4JClient.legacyFont = false;
@@ -74,6 +73,19 @@ public abstract class GuiGraphicsMixin {
         if (!LegacyOptions.legacyItemTooltips.get()) return;
         ci.cancel();
         if (list.isEmpty()) return;
+        //? if forge {
+        /*RenderTooltipEvent.Pre preEvent = ForgeHooksClient.onRenderTooltipPre(this.tooltipStack, self(), i, j, this.guiWidth(), this.guiHeight(), list, font, clientTooltipPositioner);
+         *///?} else if neoforge {
+        /*RenderTooltipEvent.Pre preEvent = ClientHooks.onRenderTooltipPre(this.tooltipStack, self(), i, j, this.guiWidth(), this.guiHeight(), list, font, clientTooltipPositioner);
+         *///?}
+        //? if neoforge || forge {
+        /*if (preEvent.isCanceled()) {
+            return;
+        }
+        font = preEvent.getFont();
+        i = preEvent.getX();
+        j = preEvent.getY();
+        *///?}
         int k = 0;
         int l = 0;
 

@@ -244,7 +244,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             e.yHeadRot = 180;
             e.yHeadRotO = e.yHeadRot;
         }
-        graphics.enableScissor(getX(),getY(),getX() + Math.round(getSelectableWidth()),getY() + Math.round(getSelectableHeight()));
+        FactoryGuiGraphics.of(graphics).enableScissor(getX(),getY(),getX() + Math.round(getSelectableWidth()),getY() + Math.round(getSelectableHeight()));
         ScreenUtil.renderEntity(graphics,getX() + getWidth() / 2f,getYCorner() + Math.min(getSelectableWidth(),getSelectableHeight()),(int)Math.min(getSelectableWidth(),getSelectableHeight()),f, new Vector3f(),new Quaternionf().rotationXYZ(0.0f, (float) Math.PI/ 4, (float) Math.PI), null, entity,true);
         graphics.disableScissor();
     }

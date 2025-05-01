@@ -23,6 +23,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.vehicle./*? if <1.21.2 {*/Boat/*?} else {*//*AbstractBoat*//*?}*/;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.config.FactoryConfig;
@@ -181,6 +182,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> directSaveLoad = CLIENT_STORAGE.register(createBoolean("directSaveLoad", false));
     public static final FactoryConfig<Boolean> vignette = CLIENT_STORAGE.register(createBoolean("vignette", false));
     public static final FactoryConfig<Boolean> minecartSounds = CLIENT_STORAGE.register(createBoolean("minecartSounds", true));
+    public static final FactoryConfig<Boolean> backSound = CLIENT_STORAGE.register(createBoolean("backSound", true));
     public static final FactoryConfig<Boolean> caveSounds = CLIENT_STORAGE.register(createBoolean("caveSounds", true));
     public static final FactoryConfig<Boolean> showVanillaRecipeBook = CLIENT_STORAGE.register(createBoolean("showVanillaRecipeBook", false));
     public static final FactoryConfig<Boolean> displayNameTagBorder = CLIENT_STORAGE.register(createBoolean("displayNameTagBorder", true));
@@ -289,6 +291,11 @@ public class LegacyOptions {
 
     public static boolean hasSystemCursor(){
         return systemCursor.get() && !Legacy4JClient.controllerManager.isControllerTheLastInput();
+    }
+
+    public static float getLeftStickDeadZone(){
+        Minecraft minecraft = Minecraft.getInstance();
+        return minecraft.player != null && minecraft.player.getControlledVehicle() instanceof /*? if <1.21.2 {*/Boat/*?} else {*//*AbstractBoat*//*?}*/ ? 0.5f + leftStickDeadZone.get().floatValue() / 2 : leftStickDeadZone.get().floatValue();
     }
 
     public enum VehicleCameraRotation implements StringRepresentable {

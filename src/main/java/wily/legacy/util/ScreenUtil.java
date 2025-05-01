@@ -75,6 +75,7 @@ import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.LegacyScreen;
+import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.TopMessage;
 
 import java.util.Collection;
@@ -320,6 +321,10 @@ public class ScreenUtil {
         playSimpleUISound(sound,1.0f,randomPitch);
     }
 
+    public static void playBackSound(){
+        if (LegacyOptions.backSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.BACK.get(),1.0f);
+    }
+
     public static void drawGenericLoading(GuiGraphics graphics, int x, int y) {
         drawGenericLoading(graphics, x, y, 21, 6);
     }
@@ -356,7 +361,7 @@ public class ScreenUtil {
             double e = Math.max((double)r * 0.5, 3.0);
             double f = Math.sin(1.5707963267948966 * Math.cos(Math.PI * 2 * d / e)) / 2.0 + 0.5;
             double g = Mth.lerp(f, 0.0, r);
-            guiGraphics.enableScissor(j, k, l, m);
+            FactoryGuiGraphics.of(guiGraphics).enableScissor(j, k, l, m);
             guiGraphics.drawString(font, charSequence, j - (int)g, p, n,shadow && CommonValue.WIDGET_TEXT_SHADOW.get());
             guiGraphics.disableScissor();
         } else {
@@ -419,7 +424,7 @@ public class ScreenUtil {
     public static void renderEntityInInventoryFollowsMouse(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, float f, float g, float h, LivingEntity livingEntity) {
         float n = (float)(i + k) / 2.0f;
         float o = (float)(j + l) / 2.0f;
-        guiGraphics.enableScissor(i, j, k, l);
+        FactoryGuiGraphics.of(guiGraphics).enableScissor(i, j, k, l);
         float p = (float)Math.atan((n - g) / 40.0f);
         float q = (float)Math.atan((o - h) / 40.0f);
         Quaternionf quaternionf = new Quaternionf().rotateZ((float)Math.PI);

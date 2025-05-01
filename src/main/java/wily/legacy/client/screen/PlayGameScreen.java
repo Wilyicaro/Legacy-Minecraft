@@ -139,7 +139,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
                 guiGraphics.pose().pushPose();
                 guiGraphics.pose().translate(panel.x + 11.25f, panel.y + panel.height - 22.75, 0);
                 long storage = new File("/").getTotalSpace();
-                guiGraphics.enableScissor(0, 0, panel.width - 24, panel.height - 10);
+                FactoryGuiGraphics.of(guiGraphics).enableScissor(0, 0, panel.width - 24, panel.height - 10);
                 for (LevelSummary level : saveRenderableList.currentlyDisplayedLevels) {
                     Long size;
                     if ((size = SaveRenderableList.sizeCache.getIfPresent(level)) == null) continue;

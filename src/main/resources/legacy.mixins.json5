@@ -178,7 +178,7 @@
     "LightTextureMixin",
     "RenderSystemMixin",
     "CompositeRenderTypeAccessor",
-    "ClientInventoryMixin",
+    "ClientLivingEntityMixin",
     "VillagerModelMixin"
   ],
   "mixins": [

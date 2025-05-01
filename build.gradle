@@ -337,7 +337,7 @@ publishMods {
 
     def isFabric = loader == "fabric"
     displayName = "$mod_name [$modPlatformName] $project.version"
-    type = BETA
+    type = STABLE
     changelog = releaseChangelog()
     modLoaders.add(loader)
     if (isFabric) modLoaders.add "quilt"

@@ -42,7 +42,7 @@ import java.util.function.ObjIntConsumer;
 public abstract class TitleScreenMixin extends Screen implements ControlTooltip.Event,RenderableVList.Access{
     @Shadow @Nullable private SplashRenderer splash;
     //? if forge || neoforge && <=1.20.4 {
-    /*@Shadow private TitleScreenModUpdateIndicator modUpdateNotification;
+    /*@Shadow(remap = false) private TitleScreenModUpdateIndicator modUpdateNotification;
     *///?}
     @Unique
     private RenderableVList renderableVList = new RenderableVList(this).layoutSpacing(l->5);

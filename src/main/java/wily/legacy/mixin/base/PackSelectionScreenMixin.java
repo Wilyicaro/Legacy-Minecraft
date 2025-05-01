@@ -113,7 +113,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     }
     @Inject(method = "onClose", at = @At("RETURN"))
     public void onClose(CallbackInfo info){
-        ScreenUtil.playSimpleUISound(LegacyRegistries.BACK.get(),1.0f);
+        ScreenUtil.playBackSound();
     }
     private void addPacks(RenderableVList list,Stream<PackSelectionModel.Entry> stream){
         list.renderables.clear();

@@ -47,7 +47,7 @@ public class LegacyScreen extends Screen implements Controller.Event, ControlToo
 
     @Override
     public void onClose() {
-        ScreenUtil.playSimpleUISound(LegacyRegistries.BACK.get(),1.0f);
+        ScreenUtil.playBackSound();
         this.minecraft.setScreen(parent);
     }
 }

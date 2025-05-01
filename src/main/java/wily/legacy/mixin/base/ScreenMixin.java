@@ -62,7 +62,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     }
     @Inject(method = "onClose",at = @At("HEAD"))
     private void onClose(CallbackInfo ci){
-        ScreenUtil.playSimpleUISound(LegacyRegistries.BACK.get(),1.0f);
+        ScreenUtil.playBackSound();
     }
     //? if >1.20.1 {
     @Inject(method = "renderTransparentBackground",at = @At("HEAD"), cancellable = true)

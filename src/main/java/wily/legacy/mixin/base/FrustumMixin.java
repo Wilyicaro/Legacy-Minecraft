@@ -26,7 +26,7 @@ public class FrustumMixin {
 
     @Unique
     private Matrix4f adjustProjectionFOV(Matrix4f projectionMatrix, float yBobAngle) {
-        float mul = 1 - yBobAngle / 45;
+        float mul = Math.max(0.65f, 1 - yBobAngle / 45);
         Matrix4f adjustedMatrix = new Matrix4f(projectionMatrix);
         adjustedMatrix.m00(adjustedMatrix.m00() * mul);
         adjustedMatrix.m11(adjustedMatrix.m11() * mul);

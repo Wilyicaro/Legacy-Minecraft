@@ -363,7 +363,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 boolean p = getSelectedAlbum().isValidPackDisplay(packRepository);
                 if (getSelectedAlbum().iconSprite().isPresent()) FactoryGuiGraphics.of(graphics).blitSprite(getSelectedAlbum().iconSprite().get(),x + 7,y + 5,32,32);
                 else FactoryGuiGraphics.of(graphics).blit(p ? getPackIcon(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : DEFAULT_ICON, x + 7,y + 5,0.0f, 0.0f, 32, 32, 32, 32);
-                graphics.enableScissor(x + 40, y + 4,x + 148, y + 44);
+                FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4,x + 148, y + 44);
                 labelsCache.apply(getSelectedAlbum().displayName(),108).renderLeftAligned(graphics,x + 43, y + 8,12,0xFFFFFF);
                 graphics.disableScissor();
                 ResourceLocation background = getSelectedAlbum().backgroundSprite.orElse(p ? getPackBackground(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : null);

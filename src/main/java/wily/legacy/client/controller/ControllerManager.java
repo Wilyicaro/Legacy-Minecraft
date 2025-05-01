@@ -161,8 +161,8 @@ public class ControllerManager {
                 simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_BUTTON),InputConstants.KEY_ESCAPE, state, true);
                 simulateKeyAction(s-> s.is(ControllerBinding.LEFT_BUTTON),InputConstants.KEY_X, state);
                 simulateKeyAction(s-> s.is(ControllerBinding.UP_BUTTON),InputConstants.KEY_O, state);
-                simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_W, state);
-                simulateKeyAction(s-> s.is(ControllerBinding.LEFT_TRIGGER),InputConstants.KEY_PAGEUP, state);
+                if (isCursorDisabled) simulateKeyAction(s-> s.is(ControllerBinding.LEFT_TRIGGER),InputConstants.KEY_PAGEUP, state);
+                else simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_W, state);
                 simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_PAGEDOWN, state);
                 simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_BUMPER),InputConstants.KEY_RBRACKET, state);
                 simulateKeyAction(s-> s.is(ControllerBinding.LEFT_BUMPER),InputConstants.KEY_LBRACKET, state);
@@ -232,7 +232,7 @@ public class ControllerManager {
 
     public void simulateKeyAction(Predicate<BindingState> canSimulate, int key, BindingState state, boolean onlyScreen){
         boolean clicked = state.pressed && state.canClick();
-        if (canSimulate.test(state) && (minecraft.screen instanceof Controller.Event e && !e.onceClickBindings(state) || state.onceClick(true))){
+        if (canSimulate.test(state) && (!Controller.Event.of(minecraft.screen).onceClickBindings(state) || state.onceClick(true))){
             simulateKeyAction(key, state, clicked, onlyScreen);
         }
     }

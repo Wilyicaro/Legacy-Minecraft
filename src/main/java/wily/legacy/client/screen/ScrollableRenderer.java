@@ -8,6 +8,7 @@ import net.minecraft.util.Mth;
 import org.joml.Math;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.Stocker;
+import wily.factoryapi.base.client.FactoryGuiGraphics;
 
 public class ScrollableRenderer {
     public Stocker.Sizeable scrolled = new Stocker.Sizeable(0);
@@ -25,7 +26,7 @@ public class ScrollableRenderer {
     }
 
     public void render(GuiGraphics graphics, int x, int y, int width, int height, Runnable scrollable){
-        graphics.enableScissor(x,y, x + width, y + height);
+        FactoryGuiGraphics.of(graphics).enableScissor(x,y, x + width, y + height);
         oldSmoothScrolled = smoothScrolled;
         smoothScrolled = Mth.lerp(FactoryAPIClient.getPartialTick() * 0.5f, oldSmoothScrolled, scrolled.get());
         graphics.pose().pushPose();

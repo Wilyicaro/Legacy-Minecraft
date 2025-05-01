@@ -97,7 +97,7 @@ public class ControllerBinding<T extends BindingState> {
     public static final ControllerBinding<BindingState.Button> BACK = registerWithDefaults(createButton("back", Button.BACK), o -> List.of(Legacy4JClient.keyHostOptions));
     public static final ControllerBinding<BindingState.Button> GUIDE = register(createButton("guide", Button.GUIDE));
     public static final ControllerBinding<BindingState.Button> START = register(createButton("start", Button.START));
-    public static final ControllerBinding<BindingState.Axis> LEFT_STICK = register(new ControllerBinding<>("left_stick", c-> BindingState.Axis.createStick(c, ()->LegacyOptions.leftStickDeadZone.get().floatValue(), (a, s)->{}, true), false));
+    public static final ControllerBinding<BindingState.Axis> LEFT_STICK = register(new ControllerBinding<>("left_stick", c-> BindingState.Axis.createStick(c, LegacyOptions::getLeftStickDeadZone, (a, s)->{}, true), false));
     public static final ControllerBinding<BindingState.Axis> RIGHT_STICK = register(new ControllerBinding<>("right_stick", c-> BindingState.Axis.createStick(c, ()->LegacyOptions.rightStickDeadZone.get().floatValue(), ControllerManager::updatePlayerCamera, false), false));
     public static final ControllerBinding<BindingState.Button> LEFT_STICK_BUTTON = registerWithDefaults(createButton("left_stick_button", Button.LEFT_STICK), o -> List.of(o.keyTogglePerspective));
     public static final ControllerBinding<BindingState.Button> RIGHT_STICK_BUTTON = registerWithDefaults(createButton("right_stick_button", Button.RIGHT_STICK), o -> List.of(o.keyShift));

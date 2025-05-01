@@ -176,7 +176,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
     @Override
     public void onClose() {
-        ScreenUtil.playSimpleUISound(LegacyRegistries.BACK.get(),1.0f);
+        ScreenUtil.playBackSound();
         popScreen();
     }
 }
