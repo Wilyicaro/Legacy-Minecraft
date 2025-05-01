@@ -1464,6 +1464,7 @@
   "legacy.options.autoSaveInterval": "Сохранять каждые",
   "legacy.options.autoSaveWhenPaused": "Autosave When Paused",
   "legacy.options.auto_value": "Автоматический (%s)",
+  "legacy.options.backSound": "Back Sound",
   "legacy.options.caveSounds": "Звуки пещер",
   "legacy.options.classicCrafting": "Классическое создание предметов",
   "legacy.options.classicLoom": "Classic Loom",
