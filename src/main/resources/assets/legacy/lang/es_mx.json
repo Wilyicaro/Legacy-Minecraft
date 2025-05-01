@@ -1464,6 +1464,7 @@
   "legacy.options.autoSaveInterval": "Intervalo de guardado automatico",
   "legacy.options.autoSaveWhenPaused": "Autoguardar al Pausar",
   "legacy.options.auto_value": "Automático (%s)",
+  "legacy.options.backSound": "Back Sound",
   "legacy.options.caveSounds": "Sonidos de Cueva",
   "legacy.options.classicCrafting": "Creación Clásica",
   "legacy.options.classicLoom": "Classic Loom",
