@@ -1464,6 +1464,7 @@
   "legacy.options.autoSaveInterval": "自动保存间隔",
   "legacy.options.autoSaveWhenPaused": "暂停时自动保存",
   "legacy.options.auto_value": "自动 (%s)",
+  "legacy.options.backSound": "Back Sound",
   "legacy.options.caveSounds": "洞穴音效",
   "legacy.options.classicCrafting": "经典合成",
   "legacy.options.classicLoom": "经典织布机",

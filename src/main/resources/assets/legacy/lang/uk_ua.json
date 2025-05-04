@@ -1464,6 +1464,7 @@
   "legacy.options.autoSaveInterval": "Інтервал автозбереження",
   "legacy.options.autoSaveWhenPaused": "Autosave When Paused",
   "legacy.options.auto_value": "Авто (%s)",
+  "legacy.options.backSound": "Back Sound",
   "legacy.options.caveSounds": "Звуки печер",
   "legacy.options.classicCrafting": "Класичне майстрування",
   "legacy.options.classicLoom": "Classic Loom",

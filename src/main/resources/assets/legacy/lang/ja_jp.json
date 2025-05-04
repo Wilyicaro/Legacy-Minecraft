@@ -1464,6 +1464,7 @@
   "legacy.options.autoSaveInterval": "オートセーブの間隔",
   "legacy.options.autoSaveWhenPaused": "Autosave When Pausing",
   "legacy.options.auto_value": "自動 (%s)",
+  "legacy.options.backSound": "Back Sound",
   "legacy.options.caveSounds": "洞窟の音",
   "legacy.options.classicCrafting": "クラシッククラフト",
   "legacy.options.classicLoom": "Classic Loom",
