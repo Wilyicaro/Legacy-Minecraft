@@ -320,8 +320,11 @@ public class Legacy4JClient {
                 else minecraft.setScreen(CreativeModeScreen.getActualCreativeScreenInstance(minecraft));
                 continue;
             }
-            if (minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof CraftingTableBlock){
+            if (minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof CraftingTableBlock && !activeControlType.isKbm()){
                 minecraft.gameMode.useItemOn(minecraft.player, InteractionHand.MAIN_HAND, r);
+            } else if (ScreenUtil.hasClassicCrafting()) {
+                minecraft.getTutorial().onOpenInventory();
+                minecraft.setScreen(new InventoryScreen(minecraft.player));
             } else if (ScreenUtil.hasMixedCrafting()) {
                 minecraft.setScreen(MixedCraftingScreen.playerCraftingScreen(minecraft.player));
             } else CommonNetwork.sendToServer(ServerOpenClientMenuPayload.playerCrafting());
