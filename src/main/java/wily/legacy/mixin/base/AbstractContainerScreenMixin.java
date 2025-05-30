@@ -6,7 +6,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
@@ -75,8 +74,6 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Shadow protected abstract boolean hasClickedOutside(double d, double e, int i, int j, int k);
 
     @Shadow private boolean skipNextRelease;
-
-    @Shadow public abstract void clearDraggingState();
 
     @ModifyArg(method = "renderLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)I"), index = 4)
     private int renderLabels(int i){
