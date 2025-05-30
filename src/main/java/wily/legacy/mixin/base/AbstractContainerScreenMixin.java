@@ -95,8 +95,10 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     private void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
         if (getChildAt(d,e).isEmpty()) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
         if (!skipNextRelease) {
-            if (Legacy4JClient.controllerManager.getButtonState(ControllerBinding.DOWN_BUTTON).justPressed)
+            if (Legacy4JClient.controllerManager.getButtonState(ControllerBinding.DOWN_BUTTON).justPressed) {
                 minecraft.screen.mouseReleased(Legacy4JClient.controllerManager.getPointerX(), Legacy4JClient.controllerManager.getPointerY(), 0);
+                skipNextRelease = true;
+            }
             else if (Legacy4JClient.controllerManager.getButtonState(ControllerBinding.LEFT_BUTTON).justPressed) {
                 minecraft.screen.mouseReleased(Legacy4JClient.controllerManager.getPointerX(), Legacy4JClient.controllerManager.getPointerY(), 1);
                 skipNextRelease = true;
