@@ -80,7 +80,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import wily.factoryapi.util.ColorUtil;
-import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.client.controller.*;
 //? if fabric {
 import wily.legacy.client.screen.compat.ModMenuCompat;
 //?} else if forge {
@@ -103,9 +103,6 @@ import wily.factoryapi.util.FactoryGuiElement;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.client.*;
-import wily.legacy.client.controller.Controller;
-import wily.legacy.client.controller.ControllerManager;
-import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.client.screen.*;
 //? if fabric || >=1.21 && neoforge {
 import wily.legacy.client.screen.compat.IrisCompat;
@@ -353,6 +350,10 @@ public class Legacy4JClient {
                     *///?}
                 }
             }
+        }
+        if (minecraft.player != null) {
+            if (minecraft.player.isSprinting() && controllerManager.getButtonState(ControllerBinding.LEFT_STICK).getSmoothY() > -0.6 && controllerManager.isControllerTheLastInput())
+                minecraft.player.setSprinting(false);
         }
 
         if (!Minecraft.getInstance().isPaused()) {
