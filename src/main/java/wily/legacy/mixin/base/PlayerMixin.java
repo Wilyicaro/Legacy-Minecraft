@@ -59,7 +59,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
     @Inject(method = "getFlyingSpeed", at = @At(value = "RETURN"), cancellable = true)
     protected void getFlyingSpeed(CallbackInfoReturnable<Float> cir) {
         if (level().isClientSide && !Legacy4JClient.hasModOnServer()) return;
-        cir.setReturnValue(cir.getReturnValueF() * ( getAbilities().flying ? (isSprinting() ? level().isClientSide ? Math.max(10,Math.min(Legacy4JClient.getEffectiveRenderDistance(),14)) * 0.6f : 6 : 2) : 1));
+        cir.setReturnValue(cir.getReturnValueF() * (getAbilities().flying ? (isSprinting() ? 6 : 2) : 1));
     }
 
     @Inject(method = "aiStep", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/player/Player;bob:F", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))

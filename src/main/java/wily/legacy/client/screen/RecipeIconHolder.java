@@ -143,9 +143,11 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
     }
 
     protected abstract void updateRecipeDisplay(RecipeInfo<R> rcp);
+
     public static ItemStack getActualItem(Optional<Ingredient> ingredient){
         return ingredient.isEmpty() || FactoryIngredient.of(ingredient.get()).getStacks().length == 0 ? ItemStack.EMPTY : FactoryIngredient.of(ingredient.get()).getStacks()[(int) ((Util.getMillis() / 800) % FactoryIngredient.of(ingredient.get()).getStacks().length)];
     }
+
     @Override
     public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
         if (isValidIndex()) {

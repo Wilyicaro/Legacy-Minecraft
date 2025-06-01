@@ -10,6 +10,7 @@ import net.minecraft.Util;
 import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
@@ -240,7 +241,7 @@ public class Legacy4JClient {
     }
 
     public static void saveLevel(LevelStorageSource.LevelStorageAccess storageSource){
-        if (isCurrentWorldSource(storageSource)) Legacy4JClient.copySaveBtwSources(storageSource,Minecraft.getInstance().getLevelSource());
+        if (isCurrentWorldSource(storageSource)) Legacy4JClient.copySaveBtwSources(storageSource,Minecraft.getInstance().getLevelSource(), false);
     }
 
     public static void displayEffectActivationAnimation(/*? if <1.20.5 {*//*MobEffect*//*?} else {*/Holder<MobEffect>/*?}*/ effect){
@@ -536,8 +537,7 @@ public class Legacy4JClient {
 
         FactoryAPIClient.registerBlockColor(registry->{
             registry.accept((blockState, blockAndTintGetter, blockPos, i) -> blockAndTintGetter == null || blockPos == null ? GrassColor.getDefaultColor() : BiomeColors.getAverageGrassColor(blockAndTintGetter, blockPos), SHRUB.get());
-
-            registry.accept((blockState, blockAndTintGetter, blockPos, i) -> {
+            BlockColor blockColor = (blockState, blockAndTintGetter, blockPos, i) -> {
                 if (blockAndTintGetter != null && blockPos != null){
                     BlockEntity blockEntity = blockAndTintGetter.getBlockEntity(blockPos);
                     if (blockEntity instanceof LegacyPistonMovingBlockEntity e && e.getRenderingBlockEntity() != null && LegacyOptions.enhancedPistonMovingRenderer.get()) {
@@ -550,7 +550,9 @@ public class Legacy4JClient {
                     return BiomeColors.getAverageWaterColor(blockAndTintGetter, blockPos);
                 }
                 return -1;
-            }, Blocks.WATER_CAULDRON);
+            };
+            registry.accept(blockColor, Blocks.WATER_CAULDRON);
+            registry.accept(blockColor, LegacyRegistries.COLORED_WATER_CAULDRON.get());
         });
         fastLeavesModels.put(Blocks.OAK_LEAVES, FactoryAPI.createVanillaLocation("fast_oak_leaves"));
         fastLeavesModels.put(Blocks.SPRUCE_LEAVES, FactoryAPI.createVanillaLocation("fast_spruce_leaves"));
@@ -767,11 +769,20 @@ public class Legacy4JClient {
         },source::levelExists,source,saveDirName);
     }
 
-    public static void copySaveBtwSources(LevelStorageSource.LevelStorageAccess sendSource, LevelStorageSource destSource){
+    public static void copySaveBtwSources(LevelStorageSource.LevelStorageAccess sendSource, LevelStorageSource destSource) {
+        copySaveBtwSources(sendSource, destSource, true);
+    }
+
+    public static void copySaveBtwSources(LevelStorageSource.LevelStorageAccess sendSource, LevelStorageSource destSource, boolean deleteOldDest){
         try {
             File destLevelDirectory = destSource.getBaseDir().resolve(sendSource.getLevelId()).toFile();
-            if (destLevelDirectory.exists()) FileUtils.deleteQuietly(destLevelDirectory);
-            FileUtils.copyDirectory(sendSource.getDimensionPath(Level.OVERWORLD).toFile(), destLevelDirectory, p -> !p.getName().equals("session.lock"));
+            if (deleteOldDest && destLevelDirectory.exists()) FileUtils.deleteQuietly(destLevelDirectory);
+            FileUtils.copyDirectory(sendSource.getDimensionPath(Level.OVERWORLD).toFile(), destLevelDirectory, p -> {
+                if (p.getName().equals("session.lock")) return false;
+                if (deleteOldDest) return true;
+                File destFile = p.toPath().relativize(destLevelDirectory.toPath()).toFile();
+                return !destFile.exists() || FileUtils.isFileNewer(p, destFile);
+            });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

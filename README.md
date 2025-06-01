@@ -37,6 +37,7 @@ WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
 - NicSonic-_- for providing the Stadia Control Icons
 - Cjnator38 for providing the LE default font converted to JE, and the 1.21.x credits background
 - Androser for contributing to the controller bindings
+- pizzart for contributing with some QOL and accuracy changes
 
 <img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/modpage_related_projects.png?raw=true" width="600" >
 

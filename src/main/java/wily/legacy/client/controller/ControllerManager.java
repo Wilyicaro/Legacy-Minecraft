@@ -145,29 +145,20 @@ public class ControllerManager {
                         else if (state.released) minecraft.screen.mouseReleased(getPointerX(), getPointerY(),0);
                         if (state.pressed) minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
                     }
-                    if (state.is(ControllerBinding.DOWN_BUTTON) || state.is(ControllerBinding.UP_BUTTON) || state.is(ControllerBinding.LEFT_BUTTON)) {
+                    int mouseClick = Controller.Event.of(minecraft.screen).getBindingMouseClick(state);
+                    if (mouseClick != -1) {
                         isControllerSimulatingInput = true;
                         if (state.pressed && state.onceClick(true))
-                            ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), state.is(ControllerBinding.LEFT_BUTTON) ? 1 : 0, 1, 0);
+                            ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), mouseClick, 1, 0);
                         else if (state.released)
-                            ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), state.is(ControllerBinding.LEFT_BUTTON) ? 1 : 0, 0, 0);
+                            ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), mouseClick, 0, 0);
                         isControllerSimulatingInput = false;
                     }
                 }
 
                 ControllerBinding<?> cursorBinding = LegacyKeyMapping.of(Legacy4JClient.keyToggleCursor).getBinding();
                 if (cursorBinding != null && state.is(cursorBinding) && state.canClick()) toggleCursor();
-                if (isCursorDisabled) simulateKeyAction(s-> state.is(ControllerBinding.DOWN_BUTTON),InputConstants.KEY_RETURN, state);
-                simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_BUTTON),InputConstants.KEY_ESCAPE, state, true);
-                simulateKeyAction(s-> s.is(ControllerBinding.LEFT_BUTTON),InputConstants.KEY_X, state);
-                simulateKeyAction(s-> s.is(ControllerBinding.UP_BUTTON),InputConstants.KEY_O, state);
-                if (isCursorDisabled) simulateKeyAction(s-> s.is(ControllerBinding.LEFT_TRIGGER),InputConstants.KEY_PAGEUP, state);
-                else simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_W, state);
-                simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_PAGEDOWN, state);
-                simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_BUMPER),InputConstants.KEY_RBRACKET, state);
-                simulateKeyAction(s-> s.is(ControllerBinding.LEFT_BUMPER),InputConstants.KEY_LBRACKET, state);
-                simulateKeyAction(s-> s.is(ControllerBinding.TOUCHPAD_BUTTON),InputConstants.KEY_T, state);
-                simulateKeyAction(s-> s.is(ControllerBinding.CAPTURE),InputConstants.KEY_F2, state);
+                Controller.Event.of(minecraft.screen).simulateKeyAction(this, state);
                 if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis stick && Math.abs(stick.y) > Math.abs(stick.x) && state.pressed && state.canClick())
                     minecraft.screen.mouseScrolled(getPointerX(), getPointerY()/*? if >1.20.1 {*/, 0/*?}*/, Math.signum(-stick.y));
                 Predicate<Predicate<BindingState.Axis>> isStickAnd = s -> state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && s.test(stick);

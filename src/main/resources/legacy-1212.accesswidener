@@ -145,3 +145,5 @@ accessible method net/minecraft/world/item/crafting/Ingredient <init> (Lnet/mine
 accessible method net/minecraft/client/gui/screens/Screen changeFocus (Lnet/minecraft/client/gui/ComponentPath;)V
 accessible field net/minecraft/client/renderer/GameRenderer resourcePool Lcom/mojang/blaze3d/resource/CrossFrameResourcePool;
 accessible method net/minecraft/world/level/GameRules$BooleanValue create (ZLjava/util/function/BiConsumer;)Lnet/minecraft/world/level/GameRules$Type;
+accessible class net/minecraft/client/gui/components/SubtitleOverlay$Subtitle
+accessible class net/minecraft/client/gui/components/SubtitleOverlay$SoundPlayedAt

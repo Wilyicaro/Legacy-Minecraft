@@ -500,9 +500,10 @@ public class ScreenUtil {
     }
 
     public static void renderAnimatedCharacter(GuiGraphics guiGraphics){
+        if (!LegacyOptions.animatedCharacter.get()) return;
         if (mc.getCameraEntity() instanceof LivingEntity character) {
             boolean hasRemainingTime = character.isSprinting() || character.isCrouching() || character.isFallFlying() || character.isVisuallySwimming() || !(character instanceof Player);
-            if (LegacyOptions.animatedCharacter.get() && (hasRemainingTime || character instanceof Player p && p.getAbilities().flying) && !character.isSleeping()) {
+            if ((hasRemainingTime || character instanceof Player p && p.getAbilities().flying) && !character.isSleeping()) {
                 ScreenUtil.updateAnimatedCharacterTime(450);
             }
             if (Util.getMillis() - ScreenUtil.animatedCharacterTime <= ScreenUtil.remainingAnimatedCharacterTime) {

@@ -142,14 +142,15 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
     public void addControlTooltips(Renderer renderer) {
         Event.super.addControlTooltips(renderer);
         renderer.
-                replace(2,i-> ControlType.getActiveType().isKbm() && canClearQuickSelect() ? getKeyIcon(InputConstants.KEY_X) : i,a-> canClearQuickSelect() ? LegacyComponents.CLEAR_QUICK_SELECT : a).
+                replace(2,i-> i,a-> canClearQuickSelect() && !ControlType.getActiveType().isKbm() ? LegacyComponents.CLEAR_QUICK_SELECT : a).
                 replace(3,i-> i, a-> hoveredSlot != null && hoveredSlot.hasItem() && hoveredSlot.container != creativeModeGrid ? LegacyComponents.CLEAR : a).
-                add(()-> page.max > 0 ? ControlType.getActiveType().isKbm() ? ControlTooltip.ComponentIcon.compoundOf(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.RIGHT_STICK.getIcon() : null,()-> LegacyComponents.PAGE);
+                add(()-> page.max > 0 ? ControlType.getActiveType().isKbm() ? ControlTooltip.ComponentIcon.compoundOf(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.RIGHT_STICK.getIcon() : null,()-> LegacyComponents.PAGE).
+                add(()-> canClearQuickSelect() && ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_X) : null, ()-> LegacyComponents.CLEAR_QUICK_SELECT);
     }
 
 
     public boolean canClearQuickSelect(){
-        return hoveredSlot == null || hoveredSlot.container == minecraft.player.getInventory() && !hoveredSlot.hasItem();
+        return ControlType.getActiveType().isKbm() || hoveredSlot == null || hoveredSlot.container == minecraft.player.getInventory() && hoveredSlot.getItem().getCount() <= 1;
     }
     public static AbstractContainerScreen<?> getActualCreativeScreenInstance(Minecraft minecraft){
         return LegacyOptions.legacyCreativeTab.get() ? new CreativeModeScreen(minecraft.player) : new CreativeModeInventoryScreen(minecraft.player, minecraft.player.connection.enabledFeatures(), minecraft.options.operatorItemsTab().get());
@@ -269,7 +270,6 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
     @Override
     public boolean mouseClicked(double d, double e, int i) {
         if (searchBox.isFocused() && !searchBox.isMouseOver(d,e)) setFocused(null);
-        if (canClearQuickSelect() && i == 1) return false;
         if (scroller.mouseClicked(d, e, i)) fillCreativeGrid();
         return super.mouseClicked(d, e, i);
     }
@@ -278,6 +278,11 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
     public boolean mouseDragged(double d, double e, int i, double f, double g) {
         if (scroller.mouseDragged(e)) fillCreativeGrid();
         return super.mouseDragged(d, e, i, f, g);
+    }
+
+    @Override
+    public int getBindingMouseClick(BindingState state) {
+        return state.is(ControllerBinding.LEFT_BUTTON) && canClearQuickSelect() ? -1 : Controller.Event.super.getBindingMouseClick(state);
     }
 
     @Override

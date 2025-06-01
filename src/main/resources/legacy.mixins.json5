@@ -179,7 +179,10 @@
     "RenderSystemMixin",
     "CompositeRenderTypeAccessor",
     "ClientLivingEntityMixin",
-    "VillagerModelMixin"
+    "VillagerModelMixin",
+    "BubbleParticleMixin",
+    "client.gui.SubtitleOverlayMixin",
+    "ItemPickupParticleMixin"
   ],
   "mixins": [
     //? if <1.20.5 {
@@ -254,7 +257,9 @@
     "ClientBoundAwardStatsPacketAccessor",
     "EntityAccessor",
     "EndPortalBlockMixin",
-    "ScaffoldingBlockItemMixin"
+    "ScaffoldingBlockItemMixin",
+    "FlowerPotBlockAccessor",
+    "HangingEntityItemAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -15,23 +15,43 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.CommonValue;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.init.LegacyRegistries;
+import wily.legacy.util.ScreenUtil;
 
 @Mixin(AbstractWidget.class)
 public abstract class AbstractWidgetMixin implements ControlTooltip.ActionHolder {
     @Shadow public abstract boolean isFocused();
 
+    @Shadow protected boolean isHovered;
+
+
     @Unique
-    long lastTimePressed;
+    private long lastHovered = -1;
+
+    @Unique
+    private boolean playedFocusSound = false;
+
+    @Inject(method = "render",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractWidget;renderWidget(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"))
+    private void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci){
+        if (isHovered) {
+            if (lastHovered == -1){
+                lastHovered = Util.getMillis();
+            }
+            if (!playedFocusSound && Util.getMillis() - lastHovered >= 10 && LegacyOptions.hoverFocusSound.get()) {
+                ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+                playedFocusSound = true;
+            }
+        } else {
+            lastHovered = -1;
+            playedFocusSound = false;
+        }
+    }
 
     @Redirect(method = "nextFocusPath", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/components/AbstractWidget;active:Z"))
     public boolean nextFocusPath(AbstractWidget instance) {
         return true;
-    }
-
-    @Inject(method = "setFocused", at = @At("HEAD"))
-    private void setFocused(boolean bl, CallbackInfo ci){
-        if (bl) lastTimePressed = Util.getMillis();
     }
 
     @Override

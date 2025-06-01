@@ -533,6 +533,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         RecipeMenu.handleCompactInventoryList(compactItemStackList,inventory,menu.getCarried());
         return canCraft(compactItemStackList, isFocused ? ingredientsGrid : ingredients, isFocused ? warningSlots : null);
     }
+
     public static boolean canCraft(List<ItemStack> compactItemStackList, List<Optional<Ingredient>> ings, boolean[] warningSlots) {
         boolean canCraft = true;
         boolean isAllEmpty = true;
