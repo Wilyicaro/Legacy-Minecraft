@@ -28,7 +28,11 @@ public abstract class ItemPickupParticleMixin extends Particle {
         if (LegacyOptions.legacyItemPickup.get()) lifetime += level.random.nextInt(8);
     }
 
+    //? if <1.21.4 {
     @ModifyVariable(method = "render", at = @At("STORE"), index = 4)
+    //?} else {
+    /*@ModifyVariable(method = "renderCustom", at = @At("STORE"), index = 5)
+    *///?}
     public float render(float original, @Local(ordinal = 0, argsOnly = true) float partialTick) {
         return LegacyOptions.legacyItemPickup.get() ? ((float) this.life + partialTick) / lifetime : original;
     }
