@@ -1464,6 +1464,7 @@
   "legacy.options.autoSaveInterval": "Odstęp czasowy automatycznego zapisul",
   "legacy.options.autoSaveWhenPaused": "Autozapis podczas pauzy",
   "legacy.options.auto_value": "Auto (%s)",
+  "legacy.options.backSound": "Back Sound",
   "legacy.options.caveSounds": "Odgłosy jaskini",
   "legacy.options.classicCrafting": "Klasyczne tworzenie",
   "legacy.options.classicLoom": "Classic Loom",
