@@ -317,16 +317,14 @@ public class Legacy4JClient {
                 else minecraft.setScreen(CreativeModeScreen.getActualCreativeScreenInstance(minecraft));
                 continue;
             }
-            if (ScreenUtil.hasClassicCrafting()) {
+            if (minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof CraftingTableBlock && controllerManager.isControllerTheLastInput()){
+                minecraft.gameMode.useItemOn(minecraft.player, InteractionHand.MAIN_HAND, r);
+            } else if (ScreenUtil.hasClassicCrafting()) {
                 minecraft.getTutorial().onOpenInventory();
                 minecraft.setScreen(new InventoryScreen(minecraft.player));
-            }else {
-                if (minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof CraftingTableBlock){
-                    minecraft.gameMode.useItemOn(minecraft.player, InteractionHand.MAIN_HAND, r);
-                } else if (ScreenUtil.hasMixedCrafting()) {
-                    minecraft.setScreen(MixedCraftingScreen.playerCraftingScreen(minecraft.player));
-                } else CommonNetwork.sendToServer(ServerOpenClientMenuPayload.playerCrafting());
-            }
+            } else if (ScreenUtil.hasMixedCrafting()) {
+                minecraft.setScreen(MixedCraftingScreen.playerCraftingScreen(minecraft.player));
+            } else CommonNetwork.sendToServer(ServerOpenClientMenuPayload.playerCrafting());
         }
         while (keyHostOptions.consumeClick()) {
             minecraft.setScreen(new HostOptionsScreen());
