@@ -73,6 +73,8 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     @Shadow protected abstract boolean hasClickedOutside(double d, double e, int i, int j, int k);
 
+    @Shadow private boolean skipNextRelease;
+
     @ModifyArg(method = "renderLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)I"), index = 4)
     private int renderLabels(int i){
         return CommonColor.INVENTORY_GRAY_TEXT.get();
@@ -92,6 +94,16 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Inject(method = "mouseClicked", at = @At("RETURN"))
     private void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
         if (getChildAt(d,e).isEmpty()) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+        if (!skipNextRelease) {
+            if (Legacy4JClient.controllerManager.getButtonState(ControllerBinding.DOWN_BUTTON).justPressed) {
+                minecraft.screen.mouseReleased(Legacy4JClient.controllerManager.getPointerX(), Legacy4JClient.controllerManager.getPointerY(), 0);
+                skipNextRelease = true;
+            }
+            else if (Legacy4JClient.controllerManager.getButtonState(ControllerBinding.LEFT_BUTTON).justPressed) {
+                minecraft.screen.mouseReleased(Legacy4JClient.controllerManager.getPointerX(), Legacy4JClient.controllerManager.getPointerY(), 1);
+                skipNextRelease = true;
+            }
+        }
     }
     @Inject(method = "renderFloatingItem", at = @At(value = "HEAD"), cancellable = true)
     private void renderFloatingItem(GuiGraphics guiGraphics, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
