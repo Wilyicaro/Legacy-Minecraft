@@ -114,11 +114,11 @@ public class ControllerManager {
             int top = rect.top() - (minecraft.screen instanceof CreativeModeScreen || minecraft.screen instanceof LegacyCraftingScreen ? 35 : 0);
             int paddingH = 20;
             int paddingV = 10;
-            minecraft.mouseHandler.xpos = Math.clamp(x, (left - paddingH) * scale, (rect.right() + paddingH) * scale);
-            minecraft.mouseHandler.ypos = Math.clamp(y, (top - paddingV) * scale, (rect.bottom() + paddingV) * scale);
+            minecraft.mouseHandler.xpos = Math.max((left - paddingH) * scale, Math.min(x, (rect.right() + paddingH) * scale));
+            minecraft.mouseHandler.ypos = Math.max((top - paddingV) * scale, Math.min(y, (rect.bottom() + paddingV) * scale));
         } else {
-            minecraft.mouseHandler.xpos = Math.clamp(x, 0, window.getScreenWidth());
-            minecraft.mouseHandler.ypos = Math.clamp(y, 0, window.getScreenHeight());
+            minecraft.mouseHandler.xpos = Math.max(0, Math.min(x, window.getScreenWidth()));
+            minecraft.mouseHandler.ypos = Math.max(0, Math.min(y, window.getScreenHeight()));
         }
         if (!onlyVirtual) GLFW.glfwSetCursorPos(Minecraft.getInstance().getWindow().getWindow(), minecraft.mouseHandler.xpos,minecraft.mouseHandler.ypos);
     }
