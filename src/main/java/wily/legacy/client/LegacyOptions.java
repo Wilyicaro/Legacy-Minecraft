@@ -286,6 +286,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> legacyBabyVillagerHead = CLIENT_STORAGE.register(createBoolean("legacyBabyVillagerHead", true));
     public static final FactoryConfig<Boolean> bubblesOutsideWater = CLIENT_STORAGE.register(createBoolean("bubblesOutsideWater", true));
     public static final FactoryConfig<Boolean> legacyItemPickup = CLIENT_STORAGE.register(createBoolean("legacyItemPickup", true));
+    public static final FactoryConfig<Boolean> legacyCursor = CLIENT_STORAGE.register(createBoolean("legacyCursor", true));
 
     public static int getTerrainFogStart(){
         return Math.min(terrainFogStart.get(), Minecraft.getInstance().options.renderDistance().get());

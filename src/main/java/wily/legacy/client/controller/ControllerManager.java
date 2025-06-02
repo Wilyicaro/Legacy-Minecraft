@@ -11,7 +11,10 @@ import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.Slot;
+import org.joml.Vector2d;
+import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.base.Stocker;
@@ -31,6 +34,12 @@ import java.util.function.Predicate;
 
 
 public class ControllerManager {
+    private static final float FAST_MOVE_SPEED = 0.18F;
+    private static final float VERTICAL_SPEED = 0.8F;
+    private static final float DIAGONAL_SPEED = 0.6F;
+    private static final float ANGLE_SLOW = 45F * Mth.DEG_TO_RAD;
+    private static final float ANGLE_FAST = 30F * Mth.DEG_TO_RAD;
+
     public Controller connectedController = null;
     public boolean isCursorDisabled = false;
     public boolean resetCursor = false;
@@ -95,8 +104,8 @@ public class ControllerManager {
 
     public void setPointerPos(double x, double y, boolean onlyVirtual){
         Window window = minecraft.getWindow();
-        minecraft.mouseHandler.xpos = Math.max(0,Math.min(x,window.getScreenWidth()));
-        minecraft.mouseHandler.ypos = Math.max(0,Math.min(y,window.getScreenHeight()));
+        minecraft.mouseHandler.xpos = Math.clamp(x, 0, window.getScreenWidth());
+        minecraft.mouseHandler.ypos = Math.clamp(y, 0, window.getScreenHeight());
         if (!onlyVirtual) GLFW.glfwSetCursorPos(Minecraft.getInstance().getWindow().getWindow(), minecraft.mouseHandler.xpos,minecraft.mouseHandler.ypos);
     }
 
@@ -137,9 +146,28 @@ public class ControllerManager {
                 if (minecraft.screen == null) break s;
 
                 if (!isCursorDisabled) {
-                    if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && state.pressed)
-                        setPointerPos(minecraft.mouseHandler.xpos() + stick.x * ((double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth())  * LegacyOptions.interfaceSensitivity.get() / 2,minecraft.mouseHandler.ypos() + stick.y * ((double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()) * LegacyOptions.interfaceSensitivity.get() / 2);
-
+                    if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && state.pressed) {
+                        double moveX;
+                        double moveY;
+                        double deltaX = stick.x * LegacyOptions.interfaceSensitivity.get() / 2;
+                        double deltaY = stick.y * LegacyOptions.interfaceSensitivity.get() / 2;
+                        if (LegacyOptions.legacyCursor.get()) {
+                            double deltaLength = Vector2d.length(deltaX, deltaY);
+                            double angle = Math.atan2(stick.y, stick.x);
+                            float snappedSlow = Math.round(angle / ANGLE_SLOW) * ANGLE_SLOW;
+                            float snappedFast = Math.round(angle / ANGLE_FAST) * ANGLE_FAST;
+                            float finalAngle = deltaLength > FAST_MOVE_SPEED ? snappedFast : snappedSlow;
+                            float speed = Math.round(snappedFast * Mth.RAD_TO_DEG) % 90 == 0 ? 1 : DIAGONAL_SPEED;
+                            float length = Vector2f.length(stick.x, stick.y);
+                            moveX = Math.cos(finalAngle) * speed * length;
+                            moveY = Math.sin(finalAngle) * speed * length * VERTICAL_SPEED;
+                        } else {
+                            moveX = stick.x;
+                            moveY = stick.y;
+                        }
+                        setPointerPos(minecraft.mouseHandler.xpos() + moveX * ((double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth()) * LegacyOptions.interfaceSensitivity.get() / 2,
+                                minecraft.mouseHandler.ypos() + moveY * ((double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()) * LegacyOptions.interfaceSensitivity.get() / 2);
+                    }
                     if (state.is(ControllerBinding.LEFT_TRIGGER) && minecraft.screen instanceof LegacyMenuAccess<?> m && m.getMenu().getCarried().getCount() > 1){
                         if (state.justPressed) minecraft.screen.mouseClicked(getPointerX(), getPointerY(), 0);
                         else if (state.released) minecraft.screen.mouseReleased(getPointerX(), getPointerY(),0);

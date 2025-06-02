@@ -1551,6 +1551,7 @@
   "legacy.options.legacyCrafterScreen": "Legacy Crafter Screen",
   "legacy.options.legacyCreateWorldScreen": "Legacy Create World Screen",
   "legacy.options.legacyCreativeBlockPlacing": "Legacy Creative Block Placing",
+  "legacy.options.legacyCursor": "Legacy Cursor",
   "legacy.options.legacyDrowned": "Legacy Drowned",
   "legacy.options.legacyDrownedAnimation": "Legacy Drowned Animation",
   "legacy.options.legacyEnchantmentScreen": "Legacy Enchanting Screen",
