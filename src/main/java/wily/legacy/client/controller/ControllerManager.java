@@ -190,12 +190,14 @@ public class ControllerManager {
                     }
                     int mouseClick = Controller.Event.of(minecraft.screen).getBindingMouseClick(state);
                     if (mouseClick != -1) {
-                        isControllerSimulatingInput = true;
-                        if (state.pressed && state.onceClick(true))
-                            ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), mouseClick, 1, 0);
-                        else if (state.released)
-                            ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), mouseClick, 0, 0);
-                        isControllerSimulatingInput = false;
+                        if (minecraft.screen instanceof LegacyMenuAccess<?> || state.is(ControllerBinding.DOWN_BUTTON)) {
+                            isControllerSimulatingInput = true;
+                            if (state.pressed && state.onceClick(true))
+                                ((MouseHandlerAccessor) minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), mouseClick, 1, 0);
+                            else if (state.released)
+                                ((MouseHandlerAccessor) minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), mouseClick, 0, 0);
+                            isControllerSimulatingInput = false;
+                        }
                     }
                 }
 
