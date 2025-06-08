@@ -12,6 +12,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.toasts.Toast;
+import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.renderer.PanoramaRenderer;
@@ -742,5 +743,19 @@ public class ScreenUtil {
         if (LegacyOptions.skipInitialSaveWarning.get()){
             return titleScreen;
         } else return ConfirmationScreen.createSaveInfoScreen(titleScreen);
+    }
+
+    public static ScreenDirection getScreenDirection(double x, double y) {
+        if (Math.abs(x) > Math.abs(y)) {
+            if (x > 0)
+                return ScreenDirection.RIGHT;
+            else if (x < 0)
+                return ScreenDirection.LEFT;
+        }
+        if (y > 0)
+            return ScreenDirection.DOWN;
+        else if (y < 0)
+            return ScreenDirection.UP;
+        return null;
     }
 }
