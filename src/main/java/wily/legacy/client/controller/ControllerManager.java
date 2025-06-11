@@ -112,7 +112,7 @@ public class ControllerManager {
         Window window = minecraft.getWindow();
         if (minecraft.screen instanceof LegacyMenuAccess<?> && LegacyOptions.limitCursor.get()) {
             ScreenRectangle rect = ((LegacyMenuAccess<?>) minecraft.screen).getMenuRectangle();
-            double scale = window.getGuiScale();
+            double scale = ScreenUtil.getGuiScale();
             int left = rect.left() - (minecraft.screen instanceof LegacyCraftingScreen ? 35 : 0);
             int top = rect.top() - (minecraft.screen instanceof CreativeModeScreen || minecraft.screen instanceof LegacyCraftingScreen ? 35 : 0);
             int paddingH = 20;
@@ -169,7 +169,7 @@ public class ControllerManager {
                     if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && state.pressed) {
                         double moveX;
                         double moveY;
-                        double scale = minecraft.getWindow().getGuiScale();
+                        double scale = ScreenUtil.getGuiScale();
                         double moveSensitivity = LegacyOptions.interfaceSensitivity.get() * 0.5;
                         double deadzone = stick.getDeadZone();
                         double deadzoneY = Math.max(deadzone, Mth.lerp(affectY, 1, 0.35));
