@@ -1491,6 +1491,7 @@
   "legacy.options.controlType.xbox_one": "Xbox One Edition",
   "legacy.options.controllerMappingConflicting": "Button Conflict Detected. Please assign a button to this action.",
   "legacy.options.controllerMappingTooltip": "Press any button or press %s to cancel.",
+  "legacy.options.controllerToasts": "Display Connection Toasts",
   "legacy.options.controllerVirtualCursor": "Virtual Cursor",
   "legacy.options.creativeTab": "Legacy Creative Interface",
   "legacy.options.cursorAtFirstInventorySlot": "Cursor At First Inventory Slot",

@@ -40,7 +40,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
             LegacyOptions.CLIENT_STORAGE.save();
             minecraft.setScreen(this);
         }))).size(240,20).build());
-        renderableVList.addOptions(LegacyOptions.unbindConflictingButtons,LegacyOptions.controllerToggleCrouch,LegacyOptions.controllerToggleSprint,LegacyOptions.controllerCursorAtFirstInventorySlot,LegacyOptions.selectedController,LegacyOptions.selectedControllerHandler,LegacyOptions.invertControllerButtons,LegacyOptions.controllerSensitivity,LegacyOptions.leftStickDeadZone,LegacyOptions.rightStickDeadZone,LegacyOptions.leftTriggerDeadZone,LegacyOptions.rightTriggerDeadZone);
+        renderableVList.addOptions(LegacyOptions.unbindConflictingButtons,LegacyOptions.controllerToggleCrouch,LegacyOptions.controllerToggleSprint,LegacyOptions.controllerCursorAtFirstInventorySlot,LegacyOptions.selectedController,LegacyOptions.selectedControllerHandler,LegacyOptions.controllerToasts,LegacyOptions.invertControllerButtons,LegacyOptions.controllerSensitivity,LegacyOptions.leftStickDeadZone,LegacyOptions.rightStickDeadZone,LegacyOptions.leftTriggerDeadZone,LegacyOptions.rightTriggerDeadZone);
         for (KeyMapping keyMapping : keyMappings) {
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category)) {
