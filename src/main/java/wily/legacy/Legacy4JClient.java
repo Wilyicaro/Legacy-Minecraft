@@ -358,19 +358,16 @@ public class Legacy4JClient {
             BindingState.Axis stick = controllerManager.getButtonState(ControllerBinding.LEFT_STICK);
             float y = Math.abs(stick.y) > stick.getDeadZone() ? stick.y : 0;
             if (!minecraft.player.isSprinting()) {
-                if (y > 0.4) {
-                    canSprint = false;
-                    sprintTicksLeft = -1;
+                if (minecraft.player./*? if <1.21.5 {*/hasEnoughFoodToStartSprinting()/*?} else {*//*hasEnoughFoodToSprint()*//*?}*/) {
+                    if (y < -0.85) {
+                        if (!canSprint && sprintTicksLeft == -1) sprintTicksLeft = 9;
+                        else if (canSprint && sprintTicksLeft > 0) minecraft.player.setSprinting(true);
+                        else canSprint = false;
+                    } else if (y > -0.85 && sprintTicksLeft == 0) {
+                        canSprint = false;
+                        sprintTicksLeft = -1;
+                    } else if (y > -0.5 && !canSprint && sprintTicksLeft > 0) canSprint = true;
                 }
-                if (y < -0.85) {
-                    if (!canSprint && sprintTicksLeft == -1) sprintTicksLeft = 9;
-                    else if (canSprint && sprintTicksLeft > 0) minecraft.player.setSprinting(true);
-                    else canSprint = false;
-                } else if (y > -0.85 && sprintTicksLeft == 0) {
-                    canSprint = false;
-                    sprintTicksLeft = -1;
-                }
-                else if (y > -0.5 && !canSprint && sprintTicksLeft > 0) canSprint = true;
             } else {
                 if (y > -0.85) minecraft.player.setSprinting(false);
                 canSprint = false;
