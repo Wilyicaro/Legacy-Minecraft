@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base.client.gui;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.AttackIndicatorStatus;
@@ -50,7 +51,9 @@ import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 
 @Mixin(Gui.class)
@@ -65,8 +68,8 @@ public abstract class GuiMixin implements ControlTooltip.Event {
 
     @Shadow public abstract Font getFont();
 
-
     @Shadow private long healthBlinkTime;
+
 
     @Redirect(method = "renderSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getPopTime()I"))
     public int renderSlot(ItemStack instance) {
@@ -214,10 +217,18 @@ public abstract class GuiMixin implements ControlTooltip.Event {
     }
 
     //? if >=1.20.5 || fabric {
-    @Redirect(method=/*? if neoforge {*//*"renderHealthLevel"*//*?} else {*/"renderPlayerHealth"/*?}*/, at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD, ordinal = 1))
+    @Redirect(method=/*? if neoforge {*//*"renderHealthLevel"*//*?} else {*/"renderPlayerHealth"/*?}*/, at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD))
     private void renderPlayerHealth(Gui instance, long value) {
         healthBlinkTime = value - 6;
     }
     //?}
+
+    @Redirect(method = "renderHearts", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderHeart(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Gui$HeartType;IIZZZ)V", ordinal = 2))
+    private void noFlashingHeart(Gui instance, GuiGraphics arg, Gui.HeartType arg2, int i, int j, boolean bl, boolean bl2, boolean bl3) { }
+
+    @ModifyArg(method = "renderHearts", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderHeart(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Gui$HeartType;IIZZZ)V", ordinal = 3), index = 5)
+    private boolean renderRemainingAsFlashing(boolean bl, @Local(ordinal = 0, argsOnly = true) boolean flash) {
+        return flash;
+    }
 
 }
