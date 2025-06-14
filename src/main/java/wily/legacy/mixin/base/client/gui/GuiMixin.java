@@ -1,8 +1,8 @@
 package wily.legacy.mixin.base.client.gui;
 
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.AttackIndicatorStatus;
 //? if >=1.21 {
 import net.minecraft.client.DeltaTracker;
@@ -12,8 +12,6 @@ import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 //? if >1.20.2 {
 import net.minecraft.network.chat.numbers.NumberFormat;
@@ -25,7 +23,6 @@ import net.minecraft.world.scores.PlayerScoreEntry;
 //? if <1.21.5 {
 import com.mojang.blaze3d.platform.GlStateManager;
 //?}
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.PlayerTeam;
@@ -51,9 +48,6 @@ import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 
 @Mixin(Gui.class)
@@ -219,16 +213,18 @@ public abstract class GuiMixin implements ControlTooltip.Event {
     //? if >=1.20.5 || fabric {
     @Redirect(method=/*? if neoforge {*//*"renderHealthLevel"*//*?} else {*/"renderPlayerHealth"/*?}*/, at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD))
     private void renderPlayerHealth(Gui instance, long value) {
-        healthBlinkTime = value - 6;
+        if (LegacyOptions.legacyHearts.get()) healthBlinkTime = value - 6;
     }
     //?}
 
-    @Redirect(method = "renderHearts", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderHeart(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Gui$HeartType;IIZZZ)V", ordinal = 2))
-    private void noFlashingHeart(Gui instance, GuiGraphics arg, Gui.HeartType arg2, int i, int j, boolean bl, boolean bl2, boolean bl3) { }
+    @WrapWithCondition(method = "renderHearts", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderHeart(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Gui$HeartType;IIZZZ)V", ordinal = 2))
+    private boolean noFlashingHeart(Gui instance, GuiGraphics arg, Gui.HeartType arg2, int i, int j, boolean bl, boolean bl2, boolean bl3) {
+        return !LegacyOptions.legacyHearts.get();
+    }
 
     @ModifyArg(method = "renderHearts", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderHeart(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Gui$HeartType;IIZZZ)V", ordinal = 3), index = 5)
-    private boolean renderRemainingAsFlashing(boolean bl, @Local(ordinal = 0, argsOnly = true) boolean flash) {
-        return flash;
+    private boolean renderRemainingAsFlashing(boolean original, @Local(ordinal = 0, argsOnly = true) boolean flash) {
+        return LegacyOptions.legacyHearts.get() ? flash : original;
     }
 
 }
