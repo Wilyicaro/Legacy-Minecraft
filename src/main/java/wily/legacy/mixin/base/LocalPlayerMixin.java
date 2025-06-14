@@ -81,6 +81,10 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
     public boolean aiStepSprinting(boolean original) {
         return false;
     }
+    @WrapWithCondition(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;setSprinting(Z)V", ordinal = 0))
+    public boolean aiStepSprintController(LocalPlayer instance, boolean b) {
+        return !controllerManager.isControllerTheLastInput();
+    }
     //? if <1.21.5 {
     @WrapWithCondition(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;setSprinting(Z)V", ordinal = /*? if <1.21.4 {*/3/*?} else {*//*4*//*?}*/))
     public boolean aiStepSprintingWater(LocalPlayer instance, boolean b) {
