@@ -21,6 +21,7 @@ import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -28,6 +29,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.ControlTooltip;
@@ -75,6 +77,10 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     @Shadow private boolean skipNextRelease;
 
+    @Shadow private boolean doubleclick;
+
+    @Unique private long lastUpPressedTime;
+
     @ModifyArg(method = "renderLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)I"), index = 4)
     private int renderLabels(int i){
         return CommonColor.INVENTORY_GRAY_TEXT.get();
@@ -94,17 +100,25 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Inject(method = "mouseClicked", at = @At("RETURN"))
     private void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
         if (getChildAt(d,e).isEmpty()) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
-        if (!skipNextRelease) {
-            if (Legacy4JClient.controllerManager.getButtonState(ControllerBinding.DOWN_BUTTON).justPressed) {
-                minecraft.screen.mouseReleased(Legacy4JClient.controllerManager.getPointerX(), Legacy4JClient.controllerManager.getPointerY(), 0);
-                skipNextRelease = true;
-            }
-            else if (Legacy4JClient.controllerManager.getButtonState(ControllerBinding.LEFT_BUTTON).justPressed) {
-                minecraft.screen.mouseReleased(Legacy4JClient.controllerManager.getPointerX(), Legacy4JClient.controllerManager.getPointerY(), 1);
-                skipNextRelease = true;
+
+        boolean downPressed = Legacy4JClient.controllerManager.getButtonState(ControllerBinding.DOWN_BUTTON).justPressed;
+        boolean upPressed = Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).justPressed;
+        if (Util.getMillis() - lastUpPressedTime < 250L && downPressed) this.doubleclick = false;
+        if (upPressed) lastUpPressedTime = Util.getMillis();
+        if (!this.skipNextRelease) {
+            boolean leftPressed = Legacy4JClient.controllerManager.getButtonState(ControllerBinding.LEFT_BUTTON).justPressed;
+            if (downPressed || upPressed || leftPressed) {
+                this.mouseReleased(Legacy4JClient.controllerManager.getPointerX(), Legacy4JClient.controllerManager.getPointerY(), leftPressed ? 1 : 0);
+                this.skipNextRelease = true;
             }
         }
     }
+    @Inject(method = "mouseReleased", at = @At("HEAD"))
+    public void mouseReleasedNoDoubleClick(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
+        if (Legacy4JClient.controllerManager.isControllerTheLastInput() && !LegacyOptions.controllerDoubleClick.get())
+            this.doubleclick = false;
+    }
+
     @Inject(method = "renderFloatingItem", at = @At(value = "HEAD"), cancellable = true)
     private void renderFloatingItem(GuiGraphics guiGraphics, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
         guiGraphics.pose().pushPose();
@@ -212,16 +226,16 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         if (hoveredSlot == null || !LegacySlotDisplay.isVisibleAndActive(hoveredSlot)) ci.cancel();
     }
     @Redirect(method = "mouseClicked",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;isKeyDown(JI)Z"))
-    public boolean mouseClicked(long l, int i) {
+    public boolean mouseClickedShift(long l, int i) {
         return InputConstants.isKeyDown(l,i) || Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).pressed;
     }
     @Redirect(method = "mouseReleased",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;hasShiftDown()Z"))
-    public boolean mouseReleased(double d, double e, int i) {
-        return hasShiftDown() || Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).released;
+    public boolean mouseReleasedShift0(double d, double e, int i) {
+        return hasShiftDown() || Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).released || Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).justPressed;
     }
     @Redirect(method = "mouseReleased",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;isKeyDown(JI)Z"))
-    public boolean mouseReleased(long l, int i) {
-        return InputConstants.isKeyDown(l,i) || Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).released;
+    public boolean mouseReleasedShift1(long l, int i) {
+        return InputConstants.isKeyDown(l,i) || Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).released || Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).justPressed;
     }
 
     @Inject(method = "onClose",at = @At("RETURN"))
