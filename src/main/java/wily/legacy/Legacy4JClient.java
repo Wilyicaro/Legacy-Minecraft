@@ -110,6 +110,7 @@ import wily.legacy.client.screen.compat.IrisCompat;
 import wily.legacy.client.screen.compat.SodiumCompat;
 //?}
 import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.entity.LegacyLocalPlayer;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.init.LegacyUIElementTypes;
 import wily.legacy.inventory.LegacyPistonMovingBlockEntity;
@@ -357,17 +358,15 @@ public class Legacy4JClient {
         if (minecraft.player != null && controllerManager.isControllerTheLastInput()) {
             BindingState.Axis stick = controllerManager.getButtonState(ControllerBinding.LEFT_STICK);
             float y = Math.abs(stick.y) > stick.getDeadZone() ? stick.y : 0;
-            if (!minecraft.player.isSprinting()) {
-                if (minecraft.player./*? if <1.21.5 {*/hasEnoughFoodToStartSprinting()/*?} else {*//*hasEnoughFoodToSprint()*//*?}*/) {
-                    if (y < -0.85) {
-                        if (!canSprint && sprintTicksLeft == -1) sprintTicksLeft = 9;
-                        else if (canSprint && sprintTicksLeft > 0) minecraft.player.setSprinting(true);
-                        else canSprint = false;
-                    } else if (y > -0.85 && sprintTicksLeft == 0) {
-                        canSprint = false;
-                        sprintTicksLeft = -1;
-                    } else if (y > -0.5 && !canSprint && sprintTicksLeft > 0) canSprint = true;
-                }
+            if (((LegacyLocalPlayer)minecraft.player).canSprintController()) {
+                if (y < -0.85) {
+                    if (!canSprint && sprintTicksLeft == -1) sprintTicksLeft = 9;
+                    else if (canSprint && sprintTicksLeft > 0) minecraft.player.setSprinting(true);
+                    else canSprint = false;
+                } else if (y > -0.85 && sprintTicksLeft == 0) {
+                    canSprint = false;
+                    sprintTicksLeft = -1;
+                } else if (y > -0.5 && !canSprint && sprintTicksLeft > 0) canSprint = true;
             } else {
                 if (y > -0.85) minecraft.player.setSprinting(false);
                 canSprint = false;

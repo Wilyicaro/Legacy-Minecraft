@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -28,12 +29,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.entity.LegacyLocalPlayer;
 import wily.legacy.init.LegacyGameRules;
 
 import static wily.legacy.Legacy4JClient.*;
 
 @Mixin(LocalPlayer.class)
-public abstract class LocalPlayerMixin extends AbstractClientPlayer {
+public abstract class LocalPlayerMixin extends AbstractClientPlayer implements LegacyLocalPlayer {
 
     @Shadow private boolean crouching;
 
@@ -49,12 +51,20 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
 
     //? if <1.21.5 {
     @Shadow protected abstract boolean hasEnoughFoodToStartSprinting();
-    //?}
+    //?} else {
+    /*@Shadow protected abstract boolean hasEnoughFoodToSprint();
+    *///?}
 
     @Shadow public abstract void move(MoverType arg, Vec3 arg2);
 
+    @Shadow public abstract boolean isMovingSlowly();
+
     public LocalPlayerMixin(ClientLevel clientLevel, GameProfile gameProfile) {
         super(clientLevel, gameProfile);
+    }
+
+    public boolean canSprintController() {
+        return !this.isSprinting() && /*? if <1.21.5 {*/this.hasEnoughFoodToStartSprinting()/*?} else {*//*this.hasEnoughFoodToSprint()*//*?}*/ && !this.isUsingItem() && !this.isMovingSlowly() && this.minecraft.screen == null;
     }
 
     @ModifyExpressionValue(method = "aiStep", at = @At(value = "INVOKE",target = "Lnet/minecraft/client/player/LocalPlayer;onGround()Z", ordinal = /*? if <1.20.5 {*//*2*//*?} else if <1.21.5 {*/3/*?} else {*//*1*//*?}*/))
