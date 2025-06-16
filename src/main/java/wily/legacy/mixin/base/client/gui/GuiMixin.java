@@ -12,10 +12,13 @@ import net.minecraft.client.OptionInstance;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 //? if >1.20.2 {
 import net.minecraft.network.chat.numbers.NumberFormat;
 import net.minecraft.network.chat.numbers.StyledFormat;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.scores.PlayerScoreEntry;
 //?} else {
 /*import net.minecraft.world.scores.Score;
@@ -48,6 +51,7 @@ import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.*;
+import java.util.function.Function;
 
 
 @Mixin(Gui.class)
