@@ -3,6 +3,7 @@ package wily.legacy.mixin.base.client.gui;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.AttackIndicatorStatus;
 //? if >=1.21 {
 import net.minecraft.client.DeltaTracker;
