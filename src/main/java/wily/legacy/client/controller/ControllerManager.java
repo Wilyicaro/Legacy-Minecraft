@@ -24,6 +24,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.init.LegacyRegistries;
 import wily.legacy.mixin.base.MouseHandlerAccessor;
 import wily.legacy.util.ScreenUtil;
 
@@ -193,14 +194,19 @@ public class ControllerManager {
 
             if (minecraft.screen instanceof LegacyMenuAccess<?> a && !isCursorDisabled) {
                 if (state.pressed && state.canClick()) {
-                    if (state.is(ControllerBinding.DPAD_UP))
+                    if (state.is(ControllerBinding.DPAD_UP)) {
                         a.movePointerToSlotIn(ScreenDirection.UP);
-                    else if (state.is(ControllerBinding.DPAD_DOWN))
+                        if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+                    } else if (state.is(ControllerBinding.DPAD_DOWN)) {
                         a.movePointerToSlotIn(ScreenDirection.DOWN);
-                    else if (state.is(ControllerBinding.DPAD_RIGHT))
+                        if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+                    } else if (state.is(ControllerBinding.DPAD_RIGHT)) {
                         a.movePointerToSlotIn(ScreenDirection.RIGHT);
-                    else if (state.is(ControllerBinding.DPAD_LEFT))
+                        if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+                    } else if (state.is(ControllerBinding.DPAD_LEFT)) {
                         a.movePointerToSlotIn(ScreenDirection.LEFT);
+                        if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+                    }
                 }else if (state.is(ControllerBinding.LEFT_STICK) && state.released) a.movePointerToSlot(a.findSlotAt(getPointerX(),getPointerY()));
             }
         }
