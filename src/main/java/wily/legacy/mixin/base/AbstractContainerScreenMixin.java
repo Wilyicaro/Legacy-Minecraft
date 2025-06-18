@@ -92,7 +92,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
             this.onClose();
             cir.setReturnValue(true);
         }
-        if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy()))) {
+        if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && !this.minecraft.screen.isDragging() && LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy()))) {
             ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
         }
     }
@@ -125,7 +125,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         guiGraphics.pose().translate(Legacy4JClient.controllerManager.getPointerX() - leftPos - 10, Legacy4JClient.controllerManager.getPointerY() - topPos - 10, 432.0f);
         guiGraphics.pose().scale(27/18f, 27/18f, 27/18f);
         guiGraphics.renderItem(itemStack, 0, 0);
-        guiGraphics.renderItemDecorations(Minecraft.getInstance().font, itemStack, 0, (this.draggingItem.isEmpty() ? 0 : -8), string);
+        guiGraphics.renderItemDecorations(Minecraft.getInstance().font, itemStack, 0, (this.draggingItem.isEmpty() ? 0 : -8), string == null && this.isQuickCrafting && this.quickCraftSlots.size() > 1 && itemStack.getCount() == 1 ? String.valueOf(itemStack.getCount()) : string);
         guiGraphics.pose().popPose();
         ci.cancel();
     }
@@ -249,6 +249,11 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Override
     public boolean isOutsideClick(int i) {
         return hasClickedOutside(Legacy4JClient.controllerManager.getPointerX(),Legacy4JClient.controllerManager.getPointerY(),leftPos,topPos,i);
+    }
+
+    @Override
+    public boolean isMouseDragging() {
+        return this.isDragging();
     }
 
     @Override

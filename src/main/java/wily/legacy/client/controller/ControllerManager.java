@@ -11,6 +11,8 @@ import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import org.lwjgl.glfw.GLFW;
 import wily.factoryapi.FactoryEvent;
@@ -23,6 +25,7 @@ import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.mixin.base.MouseHandlerAccessor;
+import wily.legacy.util.ScreenUtil;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -137,16 +140,29 @@ public class ControllerManager {
                 if (minecraft.screen == null) break s;
 
                 if (!isCursorDisabled) {
-                    if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && state.pressed)
-                        setPointerPos(minecraft.mouseHandler.xpos() + stick.x * ((double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth())  * LegacyOptions.interfaceSensitivity.get() / 2,minecraft.mouseHandler.ypos() + stick.y * ((double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()) * LegacyOptions.interfaceSensitivity.get() / 2);
-
-                    if (state.is(ControllerBinding.LEFT_TRIGGER) && minecraft.screen instanceof LegacyMenuAccess<?> m && m.getMenu().getCarried().getCount() > 1){
-                        if (state.justPressed) minecraft.screen.mouseClicked(getPointerX(), getPointerY(), 0);
-                        else if (state.released) minecraft.screen.mouseReleased(getPointerX(), getPointerY(),0);
-                        if (state.pressed) minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
+                    if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && state.pressed) {
+                        setPointerPos(minecraft.mouseHandler.xpos() + stick.x * ((double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth()) * LegacyOptions.interfaceSensitivity.get() / 2, minecraft.mouseHandler.ypos() + stick.y * ((double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()) * LegacyOptions.interfaceSensitivity.get() / 2);
                     }
+                    if (state.is(ControllerBinding.LEFT_TRIGGER) && state.justPressed && minecraft.screen instanceof LegacyMenuAccess<?> m && m.getMenu().getCarried().getCount() > 1){
+                        if (minecraft.screen.isDragging()) {
+                            minecraft.screen.mouseReleased(getPointerX(), getPointerY(), 0);
+                            minecraft.screen.setDragging(false);
+                        } else {
+                            minecraft.screen.mouseClicked(getPointerX(), getPointerY(), 0);
+                            minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
+                            minecraft.screen.setDragging(true);
+                        }
+                    }
+                    if (minecraft.screen.isDragging() && (state.is(ControllerBinding.LEFT_STICK) || state.is(ControllerBinding.DPAD_DOWN) || state.is(ControllerBinding.DPAD_LEFT) || state.is(ControllerBinding.DPAD_RIGHT) || state.is(ControllerBinding.DPAD_UP)) && state.pressed)
+                        minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
+
                     int mouseClick = Controller.Event.of(minecraft.screen).getBindingMouseClick(state);
-                    if (mouseClick != -1) {
+                    if (state.is(ControllerBinding.UP_BUTTON) && state.justPressed && minecraft.screen instanceof LegacyMenuAccess<?> a && a.isMouseDragging()) {
+                        minecraft.gameMode.handleInventoryMouseClick(a.getMenu().containerId, a.getHoveredSlot().index, 0, ClickType.QUICK_MOVE, minecraft.player);
+                        minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
+                        ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
+                    }
+                    if (mouseClick != -1 && (!minecraft.screen.isDragging() || (minecraft.screen instanceof LegacyMenuAccess<?> a && a.isOutsideClick(mouseClick)))) {
                         isControllerSimulatingInput = true;
                         if (state.pressed && state.onceClick(true))
                             ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), mouseClick, 1, 0);
