@@ -1046,7 +1046,7 @@
   "legacy.controller.disconnected": "Controller Disconnected",
   "legacy.createWorld.customize.superFlat.decorations": "Decorations",
   "legacy.createWorld.customize.superFlat.lavaLakes": "Lava Lakes",
-  "legacy.finding_seed": "Finding seed for the world generator",
+  "legacy.finding_seed": "Finding Seed for the World Generator",
   "legacy.hint.not_enough_ingredients": "You do not have all the required ingredients to make this item. The box on the bottom left shows the ingredients required to craft this.",
   "legacy.key.categories.standard": "Standard",
   "legacy.key.crafting": "Crafting",
