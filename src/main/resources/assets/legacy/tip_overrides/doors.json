@@ -1,0 +1,12 @@
+{
+  "overrides": [
+    {
+    "block": "#wooden_doors",
+    "tip": {"translate": "block.minecraft.door.tip"}
+  },
+  {
+    "blocks": ["copper_door","exposed_copper_door","weathered_copper_door","oxidized_copper_door","waxed_copper_door","waxed_xposed_copper_door","waxed_weathered_copper_door","waxed_oxidized_copper_door"],
+    "tip": {"translate": "block.minecraft.copper_door.tip"}
+  }
+]
+}

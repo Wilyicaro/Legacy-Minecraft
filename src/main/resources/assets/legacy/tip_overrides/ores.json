@@ -1,0 +1,36 @@
+{
+  "overrides": [
+    {
+      "block": "#coal_ores",
+      "tip": {"translate": "block.minecraft.coal_ore.tip"}
+    },
+    {
+      "block": "#copper_ores",
+      "tip": {"translate": "block.minecraft.copper_ore.tip"}
+    },
+    {
+      "block": "#lapis_ores",
+      "tip": {"translate": "block.minecraft.lapis_ore.tip"}
+    },
+    {
+      "block": "#diamond_ores",
+      "tip": {"translate": "block.minecraft.diamond_ore.tip"}
+    },
+    {
+      "block": "#redstone_ores",
+      "tip": {"translate": "block.minecraft.redstone_ore.tip"}
+    },
+    {
+      "block": "#iron_ores",
+      "tip": {"translate": "block.minecraft.iron_ore.tip"}
+    },
+    {
+      "block": "#gold_ores",
+      "tip": {"translate": "block.minecraft.gold_ore.tip"}
+    },
+    {
+      "block": "#emerald_ores",
+      "tip": {"translate": "block.minecraft.emerald_ore.tip"}
+    }
+  ]
+}
