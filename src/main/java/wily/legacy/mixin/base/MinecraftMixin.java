@@ -90,6 +90,11 @@ public abstract class MinecraftMixin {
 
     @Shadow @Final public Gui gui;
 
+    @Shadow @Final private SoundManager soundManager;
+
+    @Shadow public abstract boolean isPaused();
+
+    @Shadow @Nullable private Overlay overlay;
     @Unique
     Screen oldScreen;
 
@@ -170,6 +175,14 @@ public abstract class MinecraftMixin {
     private boolean tick(boolean original){
         return false;
     }
+
+    @Inject(method = "runTick", at = @At("TAIL"))
+    public void runSoundTick(boolean bl, CallbackInfo ci) {
+        soundManager.tick(isPaused() && overlay != null && overlay.isPauseScreen());
+    }
+
+    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;tick(Z)V"))
+    private void noSoundTick(SoundManager instance, boolean bl) {}
 
     @Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z", ordinal = 4))
     private boolean handleKeybindsInventoryKey(KeyMapping instance){

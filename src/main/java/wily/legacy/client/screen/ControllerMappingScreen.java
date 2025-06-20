@@ -39,13 +39,33 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
             LegacyOptions.CLIENT_STORAGE.save();
             minecraft.setScreen(this);
         }))).size(240,20).build());
-        renderableVList.addOptions(LegacyOptions.unbindConflictingButtons,LegacyOptions.controllerToggleCrouch,LegacyOptions.controllerToggleSprint,LegacyOptions.controllerCursorAtFirstInventorySlot,LegacyOptions.legacyCursor,LegacyOptions.selectedController,LegacyOptions.selectedControllerHandler,LegacyOptions.invertControllerButtons,LegacyOptions.controllerSensitivity,LegacyOptions.leftStickDeadZone,LegacyOptions.rightStickDeadZone,LegacyOptions.leftTriggerDeadZone,LegacyOptions.rightTriggerDeadZone);
+        renderableVList.addOptions(
+                LegacyOptions.unbindConflictingButtons,
+                LegacyOptions.controllerToggleCrouch,
+                LegacyOptions.controllerToggleSprint,
+                LegacyOptions.invertControllerButtons,
+                LegacyOptions.controllerCursorAtFirstInventorySlot,
+                LegacyOptions.controllerDoubleClick,
+                LegacyOptions.controllerToasts,
+                LegacyOptions.selectedController,
+                LegacyOptions.selectedControllerHandler,
+                LegacyOptions.controllerSensitivity,
+                LegacyOptions.leftStickDeadZone,
+                LegacyOptions.rightStickDeadZone,
+                LegacyOptions.leftTriggerDeadZone,
+                LegacyOptions.rightTriggerDeadZone);
+
         for (KeyMapping keyMapping : keyMappings) {
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category)) {
-                renderableVList.addRenderables(SimpleLayoutRenderable.createDrawString(Component.translatable(category), 1, 4, 240, 13, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+                renderableVList.addCategory(Component.translatable(category));
                 if (category.equals("key.categories.movement"))
-                    renderableVList.addOptions(LegacyOptions.invertYController,LegacyOptions.smoothMovement,LegacyOptions.forceSmoothMovement,LegacyOptions.linearCameraMovement,LegacyOptions.controllerVirtualCursor);
+                    renderableVList.addOptions(
+                            LegacyOptions.invertYController,
+                            LegacyOptions.smoothMovement,
+                            LegacyOptions.forceSmoothMovement,
+                            LegacyOptions.linearCameraMovement,
+                            LegacyOptions.controllerVirtualCursor);
             }
             lastCategory = keyMapping.getCategory();
             renderableVList.addRenderable(new MappingButton(0,0,240,20, LegacyKeyMapping.of(keyMapping)) {

@@ -10,9 +10,12 @@ import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.Stocker;
+import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.client.CommonColor;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.*;
@@ -73,7 +76,7 @@ public class RenderableVList {
             dependentWidget.active = activeDependent.test(dependency);
             dependentWidgets.add(dependentWidget);
         }
-        renderables.addAll(index, ImmutableList.<AbstractWidget>builder().addAll(dependentWidgets).add(LegacyConfigWidgets.createWidget(dependency,0,0,0, b-> dependentWidgets.forEach(dependentWidget-> dependentWidget.active = activeDependent.test(dependency)))).build());
+        renderables.addAll(index, ImmutableList.<AbstractWidget>builder().add(LegacyConfigWidgets.createWidget(dependency,0,0,0, b-> dependentWidgets.forEach(dependentWidget-> dependentWidget.active = activeDependent.test(dependency)))).addAll(dependentWidgets).build());
         return this;
     }
 
@@ -109,6 +112,16 @@ public class RenderableVList {
 
     public RenderableVList addOptions(int indexOffset, Stream<FactoryConfig<?>> optionInstances){
         renderables.addAll(indexOffset,optionInstances.map(LegacyConfigWidgets::createWidget).toList());
+        return this;
+    }
+
+    public RenderableVList addOptionsCategory(Component title, FactoryConfig<?>... optionInstances) {
+        addCategory(title);
+        return addOptions(optionInstances);
+    }
+
+    public RenderableVList addCategory(Component title) {
+        renderables.add(SimpleLayoutRenderable.createDrawString(title, 1, 4, listWidth, 13, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
         return this;
     }
 
