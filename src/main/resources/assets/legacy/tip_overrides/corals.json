@@ -22,7 +22,7 @@
     },
     {
       "block": "#dead_coral_blocks",
-      "tip": {"translate": "block.wminecraft.dead_coral_block.tip"}
+      "tip": {"translate": "block.minecraft.dead_coral_block.tip"}
     }
   ]
 }
