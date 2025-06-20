@@ -1,28 +1,28 @@
 {
   "overrides": [
     {
-      "block": "#minecraft:corals",
+      "block": "#corals",
       "tip": {"translate": "block.minecraft.coral.tip"}
     },
     {
-      "block": "#minecraft:coral_plants",
+      "block": "#coral_plants",
       "tip": {"translate": "block.minecraft.coral_fan.tip"}
     },
     {
-      "block": "#minecraft:coral_blocks",
+      "block": "#coral_blocks",
       "tip": {"translate": "block.minecraft.coral_block.tip"}
     },
     {
-      "item": "#minecraft:dead_corals",
+      "block": "#dead_corals",
       "tip": {"translate": "block.minecraft.dead_coral.tip"}
     },
     {
-      "item": "#minecraft:dead_coral_plants",
+      "block": "#dead_coral_plants",
       "tip": {"translate": "block.minecraft.dead_coral_fan.tip"}
     },
     {
-      "item": "#minecraft:dead_coral_blocks",
-      "tip": {"translate": "block.minecraft.dead_coral_block.tip"}
+      "block": "#dead_coral_blocks",
+      "tip": {"translate": "block.wminecraft.dead_coral_block.tip"}
     }
   ]
 }

@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "blocks": ["crimson_nylium","warped_nylium"],
+    "tip": {"translate": "block.minecraft.nylium.tip"}
+  }
+}

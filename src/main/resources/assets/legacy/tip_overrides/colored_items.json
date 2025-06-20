@@ -1,40 +1,48 @@
 {
   "overrides": [
     {
-      "items": ["#minecraft:terracotta","!minecraft:terracotta"],
+      "blocks": ["#terracotta","!terracotta"],
       "tip": {"translate": "block.minecraft.colored_terracotta.tip"}
     },
     {
-      "block": "#minecraft:shulker_boxes",
+      "block": "#shulker_boxes",
       "tip": {"translate": "block.minecraft.shulker_box.tip"}
     },
     {
-      "item": "#minecraft:beds",
+      "block": "#beds",
       "tip": {"translate": "block.minecraft.bed.tip"}
     },
     {
-      "item": "#minecraft:wool",
+      "block": "#wool",
       "tip": {"translate": "block.minecraft.wool.tip"}
     },
     {
-      "item": "#minecraft:wool_carpets",
+      "block": "#wool_carpets",
       "tip": {"translate": "block.minecraft.carpet.tip"}
     },
     {
-      "item": "#minecraft:banners",
+      "block": "#banners",
       "tip": {"translate": "block.minecraft.banner.tip"}
     },
     {
-      "block": "#minecraft:concrete_powder",
+      "block": "#concrete_powder",
       "tip": {"translate": "block.minecraft.concrete_powder.tip"}
     },
     {
-      "item": "#minecraft:concrete",
+      "block": "#concrete",
       "tip": {"translate": "block.minecraft.concrete.tip"}
     },
     {
-      "items": ["#minecraft:candles", "!minecraft:candle"],
+      "blocks": ["#candles", "!candle"],
       "tip": {"translate": "block.minecraft.colored_candle.tip"}
+    },
+    {
+      "blocks": ["black_stained_glass","blue_stained_glass","light_blue_stained_glass","cyan_stained_glass","green_stained_glass","lime_stained_glass","pink_stained_glass","magenta_stained_glass","purple_stained_glass","red_stained_glass","brown_stained_glass","orange_stained_glass","yellow_stained_glass","white_stained_glass","light_gray_stained_glass","gray_stained_glass"],
+      "tip": {"translate":"block.minecraft.stained_glass.tip"}
+    },
+    {
+      "blocks": ["black_stained_glass_pane","blue_stained_glass_pane","light_blue_stained_glass_pane","cyan_stained_glass_pane","green_stained_glass_pane","lime_stained_glass_pane","pink_stained_glass_pane","magenta_stained_glass_pane","purple_stained_glass_pane","red_stained_glass_pane","brown_stained_glass_pane","orange_stained_glass_pane","yellow_stained_glass_pane","white_stained_glass_pane","light_gray_stained_glass_pane","gray_stained_glass_paneww"],
+      "tip": {"translate":"block.minecraft.stained_glass_pane.tip"}
     }
   ]
 }
