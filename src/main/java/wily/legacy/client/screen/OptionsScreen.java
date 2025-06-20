@@ -247,6 +247,7 @@ public class OptionsScreen extends PanelVListScreen {
                             }
                         }
 
+
                         @Override
                         public void tick() {
                             if (((getFocused() == selector || getFocused() == globalPackSelector) || selectorTooltipVisibility > 0) && selectorTooltipVisibility < 10){
@@ -395,6 +396,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.of(mc.options.autoSuggestions()),
                                 LegacyOptions.of(mc.options.hideMatchedNames()),
                                 LegacyOptions.of(mc.options.onlyShowSecureChat())))));
+
 
         public static Section add(Section section){
             list.add(section);

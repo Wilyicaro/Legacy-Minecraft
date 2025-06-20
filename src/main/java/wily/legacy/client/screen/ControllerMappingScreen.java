@@ -10,7 +10,6 @@ import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
-import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
@@ -55,6 +54,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
                 LegacyOptions.rightStickDeadZone,
                 LegacyOptions.leftTriggerDeadZone,
                 LegacyOptions.rightTriggerDeadZone);
+
         for (KeyMapping keyMapping : keyMappings) {
             String category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category)) {
