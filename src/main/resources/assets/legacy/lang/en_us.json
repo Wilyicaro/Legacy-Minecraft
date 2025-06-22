@@ -99,7 +99,7 @@
   "block.biomesoplenty.stripped_umbran_log.tip": "An Umbran log that has had the bark removed with an axe.",
   "block.biomesoplenty.stripped_umbran_wood.tip": "Umbran wood that has had the bark removed with an axe.",
   "block.biomesoplenty.stripped_willow_log.tip": "A Willow log that has had the bark removed with an axe.",
-  "block.biomesoplenty.stripped_willow_wood": "Willow wood that has had the bark removed with an axe.",
+  "block.biomesoplenty.stripped_willow_wood.tip": "Willow wood that has had the bark removed with an axe.",
   "block.biomesoplenty.umbran_pressure_plate.tip": "A sensitive Umbran pressure plate that can be activated by applying almost any amount of pressure.",
   "block.biomesoplenty.willow_pressure_plate.tip": "A sensitive Willow pressure plate that can be activated by applying almost any amount of pressure.",
   "block.legacy.shrub": "Shrub",
