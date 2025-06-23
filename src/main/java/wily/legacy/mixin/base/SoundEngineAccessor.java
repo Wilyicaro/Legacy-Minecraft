@@ -16,8 +16,8 @@ public interface SoundEngineAccessor {
     Map<SoundInstance, ChannelAccess.ChannelHandle> getInstanceToChannel();
     @Invoker("calculateVolume")
     float invokeCalculateVolume(SoundInstance soundInstance);
-    //? } else {
-    /* @Invoker("setVolume")
+    //?} else {
+     /*@Invoker("setVolume")
     void invokeSetVolume(SoundInstance soundInstance, float f);
-    *///? }
+    *///?}
 }

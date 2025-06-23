@@ -48,6 +48,9 @@
     //? if >=1.20.2 {
     "SectionOcclusionGraphMixin",
     //?}
+    //? if >=1.21.4 {
+    /*"LevelEventHandlerMixin",
+    *///?}
     "client.inventory.EffectRenderingInventoryScreenMixin",
     "AbstractButtonMixin",
     "AbstractContainerScreenMixin",

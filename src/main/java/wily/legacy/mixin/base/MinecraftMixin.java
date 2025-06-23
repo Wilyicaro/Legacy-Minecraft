@@ -49,6 +49,7 @@ import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.AdvancementToastAccessor;
+import wily.legacy.util.LegacyMusicFader;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.*;
@@ -95,7 +96,11 @@ public abstract class MinecraftMixin {
 
     @Shadow public abstract boolean isPaused();
 
+    //? if <1.21.4 {
     @Shadow public abstract DeltaTracker getTimer();
+    //?} else {
+    /*@Shadow public abstract DeltaTracker getDeltaTracker();
+    *///?}
 
     @Unique
     Screen oldScreen;
@@ -184,13 +189,15 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;updateSource(Lnet/minecraft/client/Camera;)V"))
     public void runSoundTick(boolean bl, CallbackInfo ci) {
-        realtimeDeltaTickResidual += this.getTimer().getRealtimeDeltaTicks();
+        float deltaTicks = /*? if <1.21.4 {*/getTimer()/*?} else {*//*getDeltaTracker()*//*?}*/.getRealtimeDeltaTicks();
+        realtimeDeltaTickResidual += deltaTicks;
         int i = (int) realtimeDeltaTickResidual;
         realtimeDeltaTickResidual -= i;
         if (Util.getMillis() - lastMillis > 50 || i > 0) lastMillis = Util.getMillis();
-        if (Util.getMillis() - lastMillis > 60 && i == 0) soundManager.tick(this.isPaused());
+        if (Util.getMillis() - lastMillis > 60 && i == 0) i = 1;
         for (int j = 0; j < Math.min(10, i); ++j) {
             soundManager.tick(this.isPaused());
+            LegacyMusicFader.tick();
         }
     }
 
