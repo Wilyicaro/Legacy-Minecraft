@@ -23,6 +23,7 @@ import net.minecraft.client.resources.MobEffectTextureManager;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.ChannelAccess;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
@@ -77,6 +78,8 @@ import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.LegacyScreen;
 import wily.legacy.init.LegacyRegistries;
+import wily.legacy.mixin.base.SoundEngineAccessor;
+import wily.legacy.mixin.base.SoundManagerAccessor;
 import wily.legacy.network.TopMessage;
 
 import java.util.Collection;
@@ -757,5 +760,15 @@ public class ScreenUtil {
         else if (y < 0)
             return ScreenDirection.UP;
         return null;
+    }
+
+    public static void setSoundInstanceVolume(SoundInstance soundInstance, float volume) {
+        SoundEngineAccessor soundEngineAccessor = (SoundEngineAccessor)((SoundManagerAccessor) mc.getSoundManager()).getSoundEngine();
+        //? if <1.21.4 {
+        ChannelAccess.ChannelHandle channelHandle = soundEngineAccessor.getInstanceToChannel().get(soundInstance);
+        if (channelHandle != null) channelHandle.execute((channel) -> channel.setVolume(volume * soundEngineAccessor.invokeCalculateVolume(soundInstance)));
+        //?} else {
+        /*soundEngineAccessor.invokeSetVolume(soundInstance, volume);
+        *///?}
     }
 }
