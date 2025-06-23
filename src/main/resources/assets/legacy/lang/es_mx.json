@@ -1532,6 +1532,7 @@
   "legacy.options.hudScale": "Tamaño del HUD",
   "legacy.options.interfaceResolution": "Resolución de la Interfaz",
   "legacy.options.interfaceSensitivity": "Sensibilidad de la Interfaz",
+  "legacy.options.inventoryHoverFocusSound": "Inventory Hover Focus Sound",
   "legacy.options.invertControllerButtons": "Invertir Diseño de Botones",
   "legacy.options.invertYController": "Invertir Vista",
   "legacy.options.invertedCrosshair": "Display Inverted Crosshair",
