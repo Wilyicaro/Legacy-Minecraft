@@ -13,6 +13,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import org.joml.Vector2d;
 import org.lwjgl.glfw.GLFW;
@@ -27,6 +29,7 @@ import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.client.screen.LegacyCraftingScreen;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.entity.LegacyPlayerInfo;
+import wily.legacy.init.LegacyRegistries;
 import wily.legacy.mixin.base.MouseHandlerAccessor;
 import wily.legacy.util.ScreenUtil;
 
@@ -264,23 +267,33 @@ public class ControllerManager {
                                 lastCursorDirection = new Vector2d();
                             }
                         }
-
-                        if (state.is(ControllerBinding.LEFT_TRIGGER) && screen.getMenu().getCarried().getCount() > 1) {
-                            if (state.justPressed) minecraft.screen.mouseClicked(getPointerX(), getPointerY(), 0);
-                            else if (state.released) minecraft.screen.mouseReleased(getPointerX(), getPointerY(),0);
-                            if (state.pressed) minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
+                    }
+                    if (state.is(ControllerBinding.LEFT_TRIGGER) && state.justPressed && minecraft.screen instanceof LegacyMenuAccess<?> m && m.getMenu().getCarried().getCount() > 1){
+                        if (minecraft.screen.isDragging()) {
+                            minecraft.screen.mouseReleased(getPointerX(), getPointerY(), 0);
+                            minecraft.screen.setDragging(false);
+                        } else {
+                            minecraft.screen.mouseClicked(getPointerX(), getPointerY(), 0);
+                            minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
+                            minecraft.screen.setDragging(true);
                         }
                     }
+                    if (minecraft.screen.isDragging() && (state.is(ControllerBinding.LEFT_STICK) || state.is(ControllerBinding.DPAD_DOWN) || state.is(ControllerBinding.DPAD_LEFT) || state.is(ControllerBinding.DPAD_RIGHT) || state.is(ControllerBinding.DPAD_UP)) && state.pressed)
+                        minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
+
+                    if (state.is(ControllerBinding.UP_BUTTON) && state.justPressed && minecraft.screen instanceof LegacyMenuAccess<?> a && a.isMouseDragging()) {
+                        minecraft.gameMode.handleInventoryMouseClick(a.getMenu().containerId, a.getHoveredSlot().index, 0, ClickType.QUICK_MOVE, minecraft.player);
+                        minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
+                        ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
+                    }
                     int mouseClick = Controller.Event.of(minecraft.screen).getBindingMouseClick(state);
-                    if (mouseClick != -1) {
-                        if (minecraft.screen instanceof LegacyMenuAccess<?> || state.is(ControllerBinding.DOWN_BUTTON)) {
-                            isControllerSimulatingInput = true;
-                            if (state.pressed && state.onceClick(true))
-                                ((MouseHandlerAccessor) minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), mouseClick, 1, 0);
-                            else if (state.released)
-                                ((MouseHandlerAccessor) minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), mouseClick, 0, 0);
-                            isControllerSimulatingInput = false;
-                        }
+                    if (mouseClick != -1 && (!minecraft.screen.isDragging() || (minecraft.screen instanceof LegacyMenuAccess<?> a && a.isOutsideClick(mouseClick)))) {
+                        isControllerSimulatingInput = true;
+                        if (state.pressed && state.onceClick(true))
+                            ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), mouseClick, 1, 0);
+                        else if (state.released)
+                            ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), mouseClick, 0, 0);
+                        isControllerSimulatingInput = false;
                     }
                 }
 
@@ -300,6 +313,25 @@ public class ControllerManager {
                     if (isStickAnd.test(s -> s.x < 0 && -s.x > Math.abs(s.y)) || state.is(ControllerBinding.DPAD_LEFT))
                         simulateKeyAction(InputConstants.KEY_LEFT, state);
                 }
+            }
+
+
+            if (minecraft.screen instanceof LegacyMenuAccess<?> a && !isCursorDisabled) {
+                if (state.pressed && state.canClick()) {
+                    if (state.is(ControllerBinding.DPAD_UP)) {
+                        a.movePointerToSlotIn(ScreenDirection.UP);
+                        if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+                    } else if (state.is(ControllerBinding.DPAD_DOWN)) {
+                        a.movePointerToSlotIn(ScreenDirection.DOWN);
+                        if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+                    } else if (state.is(ControllerBinding.DPAD_RIGHT)) {
+                        a.movePointerToSlotIn(ScreenDirection.RIGHT);
+                        if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+                    } else if (state.is(ControllerBinding.DPAD_LEFT)) {
+                        a.movePointerToSlotIn(ScreenDirection.LEFT);
+                        if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+                    }
+                }else if (state.is(ControllerBinding.LEFT_STICK) && state.released) a.movePointerToSlot(a.findSlotAt(getPointerX(),getPointerY()));
             }
         }
 

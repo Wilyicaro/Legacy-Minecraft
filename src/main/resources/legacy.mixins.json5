@@ -48,6 +48,9 @@
     //? if >=1.20.2 {
     "SectionOcclusionGraphMixin",
     //?}
+    //? if >=1.21.3 {
+    /*"LevelEventHandlerMixin",
+    *///?}
     "client.inventory.EffectRenderingInventoryScreenMixin",
     "AbstractButtonMixin",
     "AbstractContainerScreenMixin",
@@ -127,6 +130,7 @@
     "MinecartSoundInstanceMixin",
     "MinecraftMixin",
     "MouseHandlerMixin",
+    "MusicManagerAccessor",
     "MusicsMixin",
     "OptionInstanceMixin",
     "OptionsMixin",
@@ -146,6 +150,8 @@
     "SimpleSoundInstanceMixin",
     "SlotMixin",
     "client.smithing.SmithingScreenMixin",
+    "SoundEngineAccessor",
+    "SoundManagerAccessor",
     "client.gui.SpectatorGuiMixin",
     "client.title.SplashRendererMixin",
     "client.stonecutter.StonecutterScreenMixin",
@@ -182,7 +188,8 @@
     "VillagerModelMixin",
     "BubbleParticleMixin",
     "client.gui.SubtitleOverlayMixin",
-    "ItemPickupParticleMixin"
+    "ItemPickupParticleMixin",
+    "SoundEngineMixin"
   ],
   "mixins": [
     //? if <1.20.5 {

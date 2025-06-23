@@ -91,4 +91,7 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
     default boolean allowItemPopping(){
         return false;
     }
+    default boolean isMouseDragging() {
+        return false;
+    }
 }

@@ -199,7 +199,8 @@ public class OptionsScreen extends PanelVListScreen {
                         o-> o.renderableVList.addOptions(
                                 LegacyOptions.of(mc.options.soundDevice()),
                                 LegacyOptions.backSound,
-                                LegacyOptions.hoverFocusSound),
+                                LegacyOptions.hoverFocusSound,
+                                LegacyOptions.inventoryHoverFocusSound),
                         o->o.renderableVList.addOptions(Arrays.stream(SoundSource.values()).filter(ss->ss.ordinal() > 1).map(mc.options::getSoundSourceOptionInstance).map(LegacyOptions::of)))));
         public static final Section GRAPHICS = add(new Section(
                 Component.translatable("legacy.menu.graphics"),

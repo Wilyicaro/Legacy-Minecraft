@@ -41,12 +41,15 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
         }))).size(240,20).build());
         renderableVList.addOptions(
                 LegacyOptions.unbindConflictingButtons,
+                LegacyOptions.controllerToasts,
                 LegacyOptions.controllerToggleCrouch,
                 LegacyOptions.controllerToggleSprint,
                 LegacyOptions.invertControllerButtons,
-                LegacyOptions.controllerCursorAtFirstInventorySlot,
+                LegacyOptions.controllerVirtualCursor,
+                LegacyOptions.legacyCursor,
+                LegacyOptions.limitCursor,
                 LegacyOptions.controllerDoubleClick,
-                LegacyOptions.controllerToasts,
+                LegacyOptions.controllerCursorAtFirstInventorySlot,
                 LegacyOptions.selectedController,
                 LegacyOptions.selectedControllerHandler,
                 LegacyOptions.controllerSensitivity,
@@ -64,8 +67,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
                             LegacyOptions.invertYController,
                             LegacyOptions.smoothMovement,
                             LegacyOptions.forceSmoothMovement,
-                            LegacyOptions.linearCameraMovement,
-                            LegacyOptions.controllerVirtualCursor);
+                            LegacyOptions.linearCameraMovement);
             }
             lastCategory = keyMapping.getCategory();
             renderableVList.addRenderable(new MappingButton(0,0,240,20, LegacyKeyMapping.of(keyMapping)) {
