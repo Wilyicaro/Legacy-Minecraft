@@ -157,12 +157,12 @@ public class ControllerManager {
                     if (minecraft.screen.isDragging() && (state.is(ControllerBinding.LEFT_STICK) || state.is(ControllerBinding.DPAD_DOWN) || state.is(ControllerBinding.DPAD_LEFT) || state.is(ControllerBinding.DPAD_RIGHT) || state.is(ControllerBinding.DPAD_UP)) && state.pressed)
                         minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
 
-                    int mouseClick = Controller.Event.of(minecraft.screen).getBindingMouseClick(state);
                     if (state.is(ControllerBinding.UP_BUTTON) && state.justPressed && minecraft.screen instanceof LegacyMenuAccess<?> a && a.isMouseDragging()) {
                         minecraft.gameMode.handleInventoryMouseClick(a.getMenu().containerId, a.getHoveredSlot().index, 0, ClickType.QUICK_MOVE, minecraft.player);
                         minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
                         ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
                     }
+                    int mouseClick = Controller.Event.of(minecraft.screen).getBindingMouseClick(state);
                     if (mouseClick != -1 && (!minecraft.screen.isDragging() || (minecraft.screen instanceof LegacyMenuAccess<?> a && a.isOutsideClick(mouseClick)))) {
                         isControllerSimulatingInput = true;
                         if (state.pressed && state.onceClick(true))

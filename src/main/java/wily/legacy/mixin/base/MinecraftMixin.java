@@ -6,6 +6,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.Util;
 import com.mojang.realmsclient.client.RealmsClient;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -94,9 +95,14 @@ public abstract class MinecraftMixin {
 
     @Shadow public abstract boolean isPaused();
 
-    @Shadow @Nullable private Overlay overlay;
+    @Shadow public abstract DeltaTracker getTimer();
+
     @Unique
     Screen oldScreen;
+
+    @Unique public float realtimeDeltaTickResidual;
+
+    @Unique public long lastMillis;
 
     private Minecraft self(){
         return (Minecraft)(Object)this;
@@ -176,9 +182,16 @@ public abstract class MinecraftMixin {
         return false;
     }
 
-    @Inject(method = "runTick", at = @At("TAIL"))
+    @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;updateSource(Lnet/minecraft/client/Camera;)V"))
     public void runSoundTick(boolean bl, CallbackInfo ci) {
-        soundManager.tick(isPaused() && overlay != null && overlay.isPauseScreen());
+        realtimeDeltaTickResidual += this.getTimer().getRealtimeDeltaTicks();
+        int i = (int) realtimeDeltaTickResidual;
+        realtimeDeltaTickResidual -= i;
+        if (Util.getMillis() - lastMillis > 50 || i > 0) lastMillis = Util.getMillis();
+        if (Util.getMillis() - lastMillis > 60 && i == 0) soundManager.tick(this.isPaused());
+        for (int j = 0; j < Math.min(10, i); ++j) {
+            soundManager.tick(this.isPaused());
+        }
     }
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;tick(Z)V"))
@@ -191,7 +204,7 @@ public abstract class MinecraftMixin {
         }
         AdvancementToast toast = FactoryAPIClient.getToasts().getToast(AdvancementToast.class, Toast.NO_TOKEN);
         if (toast == null) return true;
-        inventoryKeyHold++;;
+        inventoryKeyHold++;
         if (!(inventoryKeyLastPressed = inventoryKeyHold < 10)){
             FactoryAPIClient.getToasts().clear();
             inventoryKeyHold = 0;
