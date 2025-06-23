@@ -1532,6 +1532,7 @@
   "legacy.options.hudScale": "画面表示サイズ",
   "legacy.options.interfaceResolution": "ユーザー インターフェースの解像度",
   "legacy.options.interfaceSensitivity": "メニューでの感度",
+  "legacy.options.inventoryHoverFocusSound": "Inventory Hover Focus Sound",
   "legacy.options.invertControllerButtons": "ボタン レイアウトを反転",
   "legacy.options.invertYController": "上下反転",
   "legacy.options.invertedCrosshair": "Display Inverted Crosshair",
