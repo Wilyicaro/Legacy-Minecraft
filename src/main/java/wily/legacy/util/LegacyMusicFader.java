@@ -5,50 +5,50 @@ import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import wily.legacy.mixin.base.MusicManagerAccessor;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 public class LegacyMusicFader {
-    public static final int FADE_TICKS = 70;
-    public static int musicStartTick = -1;
-    public static int musicStopTick = -1;
-    public static SoundInstance fadingMusic;
-    public static int ticks = 0;
+    private static final long FADE_TICKS = 70;
+    private static long ticks = 0;
     private static final Minecraft mc = Minecraft.getInstance();
     private static final SoundManager soundManager = mc.getSoundManager();
+    private static final MusicManagerAccessor musicManagerAccessor = (MusicManagerAccessor) mc.getMusicManager();
+
+    public static SoundInstance queuedSong = null;
+    public static Map<SoundInstance, Long> fadingSongs = new HashMap<>();
 
     public static void fadeInMusic(SoundInstance newSong) {
-        if (fadingMusic != null || ((MusicManagerAccessor) mc.getMusicManager()).getCurrentMusic() != null) {
-            musicStartTick = fadingMusic != null ? musicStopTick : ticks + FADE_TICKS;
-            soundManager.playDelayed(newSong, fadingMusic != null ? musicStopTick - ticks : FADE_TICKS);
-        } else {
-            soundManager.play(newSong);
-        }
+        SoundInstance music;
+        if ((music = musicManagerAccessor.getCurrentMusic()) != null) fadingSongs.putIfAbsent(music, ticks + FADE_TICKS);
+        if (fadingSongs.isEmpty()) soundManager.play(newSong);
+        else queuedSong = newSong;
     }
 
     public static void fadeOutMusic(SoundInstance fadeMusic, boolean delayMusicManager) {
-        musicStopTick = ticks + FADE_TICKS;
-        if (fadingMusic != null) soundManager.stop(fadingMusic);
-        fadingMusic = fadeMusic;
-        if (delayMusicManager) ((MusicManagerAccessor) mc.getMusicManager()).setNextSongDelay(1200);
+        if (queuedSong == fadeMusic) queuedSong = null;
+        else fadingSongs.putIfAbsent(fadeMusic, ticks + FADE_TICKS);
+        if (delayMusicManager) musicManagerAccessor.setNextSongDelay(1200);
     }
 
     public static void tick() {
         ++ticks;
 
-        SoundInstance music;
-        if (ticks <= musicStartTick && (music = ((MusicManagerAccessor) mc.getMusicManager()).getCurrentMusic()) != null) {
-            ScreenUtil.setSoundInstanceVolume(music, (musicStartTick - ticks) / (float) FADE_TICKS);
-            if (ticks == musicStartTick) {
-                mc.getMusicManager().stopPlaying();
-                musicStartTick = -1;
+        for (Iterator<Map.Entry<SoundInstance, Long>> it = fadingSongs.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<SoundInstance, Long> entry = it.next();
+            SoundInstance song = entry.getKey();
+            long songTick = entry.getValue();
+            if (ticks >= songTick) {
+                soundManager.stop(song);
+                it.remove();
+            } else {
+                ScreenUtil.setSoundInstanceVolume(song, (songTick - ticks) / (float) FADE_TICKS);
             }
         }
-
-        if (ticks <= musicStopTick && fadingMusic != null) {
-            ScreenUtil.setSoundInstanceVolume(fadingMusic, (musicStopTick - ticks) / (float) FADE_TICKS);
-            if (ticks == musicStopTick) {
-                soundManager.stop(fadingMusic);
-                musicStopTick = -1;
-                fadingMusic = null;
-            }
+        if (fadingSongs.isEmpty() && queuedSong != null) {
+            soundManager.play(queuedSong);
+            queuedSong = null;
         }
     }
 }
