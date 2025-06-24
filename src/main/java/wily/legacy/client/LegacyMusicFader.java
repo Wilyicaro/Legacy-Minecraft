@@ -1,9 +1,10 @@
-package wily.legacy.util;
+package wily.legacy.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import wily.legacy.mixin.base.MusicManagerAccessor;
+import wily.legacy.util.ScreenUtil;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,17 +19,20 @@ public class LegacyMusicFader {
 
     public static SoundInstance queuedSong = null;
     public static Map<SoundInstance, Long> fadingSongs = new HashMap<>();
+    public static boolean musicManagerShouldTick = true;
 
-    public static void fadeInMusic(SoundInstance newSong) {
+    public static void fadeInMusic(SoundInstance newSong, boolean stopMusicManager) {
         SoundInstance music;
         if ((music = musicManagerAccessor.getCurrentMusic()) != null) fadingSongs.putIfAbsent(music, ticks + FADE_TICKS);
         if (fadingSongs.isEmpty()) soundManager.play(newSong);
         else queuedSong = newSong;
+        if (stopMusicManager) musicManagerShouldTick = false;
     }
 
-    public static void fadeOutMusic(SoundInstance fadeMusic, boolean delayMusicManager) {
+    public static void fadeOutMusic(SoundInstance fadeMusic, boolean startMusicManager, boolean delayMusicManager) {
         if (queuedSong == fadeMusic) queuedSong = null;
         else fadingSongs.putIfAbsent(fadeMusic, ticks + FADE_TICKS);
+        if (startMusicManager) musicManagerShouldTick = true;
         if (delayMusicManager) musicManagerAccessor.setNextSongDelay(1200);
     }
 

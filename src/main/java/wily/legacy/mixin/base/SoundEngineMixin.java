@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base;
 
 import com.google.common.collect.Multimap;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.audio.Channel;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.resources.sounds.TickableSoundInstance;
@@ -12,15 +13,18 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.util.LegacyMusicFader;
+import wily.legacy.client.LegacyMusicFader;
+import wily.legacy.client.SoundEngineAccessor;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 @Mixin(SoundEngine.class)
-public class SoundEngineMixin {
+public abstract class SoundEngineMixin implements SoundEngineAccessor {
     @Shadow private boolean loaded;
 
     @Shadow @Final private Map<SoundInstance, ChannelAccess.ChannelHandle> instanceToChannel;
@@ -35,6 +39,8 @@ public class SoundEngineMixin {
 
     @Shadow @Final private List<TickableSoundInstance> queuedTickableSounds;
 
+    @Shadow protected abstract float calculateVolume(SoundInstance arg);
+
     @Inject(method = "stopAll", at = @At("HEAD"), cancellable = true)
     public void stopAll(CallbackInfo ci) {
         if (this.loaded) {
@@ -48,8 +54,29 @@ public class SoundEngineMixin {
             this.queuedSounds.clear();
             this.tickingSounds.clear();
             this.queuedTickableSounds.clear();
-            this.instanceToChannel.keySet().forEach(soundInstance -> LegacyMusicFader.fadeOutMusic(soundInstance, true));
             ci.cancel();
         }
+    }
+
+    @Redirect(method = "method_19754", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/ChannelAccess$ChannelHandle;execute(Ljava/util/function/Consumer;)V"))
+    private void noStopMusic(ChannelAccess.ChannelHandle instance, Consumer<Channel> consumer, @Local(argsOnly = true) SoundInstance soundInstance, @Local float volume) {
+        instance.execute((channel) -> {
+            if (volume <= 0 && soundInstance.getSource() != SoundSource.MUSIC && soundInstance.getSource() != SoundSource.RECORDS) channel.stop();
+            else channel.setVolume(volume);
+        });
+    }
+
+    @Override
+    public void setVolume(SoundInstance soundInstance, float volume) {
+        ChannelAccess.ChannelHandle channelHandle = this.instanceToChannel.get(soundInstance);
+        if (channelHandle != null) channelHandle.execute((channel) -> channel.setVolume(volume * this.calculateVolume(soundInstance)));
+    }
+
+    @Override
+    public void fadeAllMusic() {
+        this.instanceToChannel.keySet().forEach(soundInstance -> {
+            if (soundInstance.getSource() == SoundSource.MUSIC || soundInstance.getSource() == SoundSource.RECORDS)
+                LegacyMusicFader.fadeOutMusic(soundInstance, true, true);
+        });
     }
 }

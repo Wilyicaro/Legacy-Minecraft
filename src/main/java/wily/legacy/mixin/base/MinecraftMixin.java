@@ -5,7 +5,6 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.Util;
-import com.mojang.realmsclient.client.RealmsClient;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -20,18 +19,15 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.sounds.MusicManager;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
-import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BedBlock;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -45,22 +41,15 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPIClient;
-import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.AdvancementToastAccessor;
-import wily.legacy.util.LegacyMusicFader;
-import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.LegacyTipManager;
+import wily.legacy.client.*;
 import wily.legacy.client.screen.*;
 import wily.legacy.network.ServerPlayerMissHitPayload;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
@@ -101,6 +90,8 @@ public abstract class MinecraftMixin {
     //?} else {
     /*@Shadow public abstract DeltaTracker getDeltaTracker();
     *///?}
+
+    @Shadow public abstract SoundManager getSoundManager();
 
     @Unique
     Screen oldScreen;
@@ -203,6 +194,17 @@ public abstract class MinecraftMixin {
 
     @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;tick(Z)V"))
     private void noSoundTick(SoundManager instance, boolean bl) {}
+
+    @WrapWithCondition(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/MusicManager;tick()V"))
+    private boolean tickMusicManager(MusicManager instance) {
+        return LegacyMusicFader.musicManagerShouldTick;
+    }
+
+    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At("TAIL"))
+    private void disconnectFadeMusic(Screen screen, boolean bl, CallbackInfo ci) {
+        SoundEngineAccessor soundEngineAccessor = SoundEngineAccessor.of(((SoundManagerAccessor) this.getSoundManager()).getSoundEngine());
+        soundEngineAccessor.fadeAllMusic();
+    }
 
     @Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z", ordinal = 4))
     private boolean handleKeybindsInventoryKey(KeyMapping instance){

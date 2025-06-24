@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LevelRendererAccessor;
-import wily.legacy.util.LegacyMusicFader;
+import wily.legacy.client.LegacyMusicFader;
 
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererMixin implements LevelRendererAccessor {
@@ -68,12 +68,12 @@ public abstract class LevelRendererMixin implements LevelRendererAccessor {
     //? if <1.21.3 {
     @Redirect(method = "playJukeboxSong", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;play(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
     public void waitToPlaySong(SoundManager instance, SoundInstance soundInstance) {
-        LegacyMusicFader.fadeInMusic(soundInstance);
+        LegacyMusicFader.fadeInMusic(soundInstance, true);
     }
 
     @Redirect(method = "stopJukeboxSong", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;stop(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
     public void fadeJukeboxSong(SoundManager instance, SoundInstance soundInstance) {
-        LegacyMusicFader.fadeOutMusic(soundInstance, true);
+        LegacyMusicFader.fadeOutMusic(soundInstance, true, true);
     }
     //?}
 }

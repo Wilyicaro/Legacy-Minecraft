@@ -1,6 +1,5 @@
 package wily.legacy;
 
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.datafixers.util.Pair;
@@ -65,7 +64,6 @@ import net.minecraft.client.gui.screens.options.OptionsScreen;
 /*import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.client.gui.screens.OptionsScreen;
 *///?}
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.config.FactoryConfig;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
