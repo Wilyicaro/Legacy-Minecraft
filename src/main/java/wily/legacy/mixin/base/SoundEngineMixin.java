@@ -68,11 +68,8 @@ public abstract class SoundEngineMixin implements SoundEngineAccessor {
 
     @WrapOperation(method = "tickNonPaused", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Options;getSoundSourceVolume(Lnet/minecraft/sounds/SoundSource;)F"))
     private float getSoundSourceVolumeNotMusic(Options instance, SoundSource soundSource, Operation<Float> original) {
-        if (soundSource == SoundSource.MUSIC || soundSource == SoundSource.RECORDS) {
-            return 1;
-        } else {
-            return original.call(instance, soundSource);
-        }
+        if (soundSource == SoundSource.MUSIC || soundSource == SoundSource.RECORDS) return 1;
+        else return original.call(instance, soundSource);
     }
 
     @Override

@@ -36,6 +36,11 @@ public class LegacyMusicFader {
         if (delayMusicManager) musicManagerAccessor.setNextSongDelay(1200);
     }
 
+    public static void fadeOutBgMusic(boolean startMusicManager) {
+        SoundInstance music = ((MusicManagerAccessor) mc.getMusicManager()).getCurrentMusic();
+        if (music != null) fadeOutMusic(music, startMusicManager, false);
+    }
+
     public static void tick() {
         ++ticks;
 

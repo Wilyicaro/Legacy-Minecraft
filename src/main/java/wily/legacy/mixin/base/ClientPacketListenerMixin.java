@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyMusicFader;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.client.screen.LeaderboardsScreen;
@@ -53,6 +55,8 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
     }
     *///?} else {
     @Shadow private LevelLoadStatusManager levelLoadStatusManager;
+    @Shadow private ClientLevel level;
+
     protected ClientPacketListenerMixin(Minecraft minecraft, Connection connection, CommonListenerCookie commonListenerCookie) {
         super(minecraft, connection, commonListenerCookie);
     }
@@ -66,8 +70,13 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
     //?}
 
     @Redirect(method = "handleRespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/MusicManager;stopPlaying()V"))
-    public void handleRespawn(MusicManager instance) {
-        minecraft.getSoundManager().stop();
+    public void handleRespawnMusic(MusicManager instance) {
+        LegacyMusicFader.fadeOutBgMusic(true);
+    }
+
+    @Inject(method = "handleLogin", at = @At("TAIL"))
+    public void handleLoginMusic(ClientboundLoginPacket clientboundLoginPacket, CallbackInfo ci) {
+        if (this.level.dimension() != Level.OVERWORLD) LegacyMusicFader.fadeOutBgMusic(true);
     }
 
     @Inject(method = "handlePlayerInfoUpdate", at = @At("RETURN"))
