@@ -151,7 +151,7 @@
     "SlotMixin",
     "client.smithing.SmithingScreenMixin",
     "SoundEngineMixin",
-    "SoundManagerAccessor",
+    "SoundManagerMixin",
     "client.gui.SpectatorGuiMixin",
     "client.title.SplashRendererMixin",
     "client.stonecutter.StonecutterScreenMixin",
@@ -188,8 +188,7 @@
     "VillagerModelMixin",
     "BubbleParticleMixin",
     "client.gui.SubtitleOverlayMixin",
-    "ItemPickupParticleMixin",
-    "SoundEngineMixin"
+    "ItemPickupParticleMixin"
   ],
   "mixins": [
     //? if <1.20.5 {

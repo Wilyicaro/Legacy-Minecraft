@@ -76,7 +76,6 @@ import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.LegacyScreen;
 import wily.legacy.init.LegacyRegistries;
-import wily.legacy.mixin.base.SoundManagerAccessor;
 import wily.legacy.network.TopMessage;
 
 import java.util.Collection;
@@ -759,7 +758,6 @@ public class ScreenUtil {
     }
 
     public static void setSoundInstanceVolume(SoundInstance soundInstance, float volume) {
-        SoundEngineAccessor soundEngineAccessor = SoundEngineAccessor.of(((SoundManagerAccessor) mc.getSoundManager()).getSoundEngine());
-        soundEngineAccessor.setVolume(soundInstance, volume);
+        SoundManagerAccessor.of(mc.getSoundManager()).setVolume(soundInstance, volume);
     }
 }

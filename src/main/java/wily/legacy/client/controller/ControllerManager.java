@@ -208,19 +208,19 @@ public class ControllerManager {
                         if (state.pressed && state.canClick()) {
                             if (state.is(ControllerBinding.DPAD_UP)) {
                                 screen.movePointerToSlotIn(ScreenDirection.UP);
-                                if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+                                if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
                             }
                             else if (state.is(ControllerBinding.DPAD_DOWN)) {
                                 screen.movePointerToSlotIn(ScreenDirection.DOWN);
-                                if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+                                if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
                             }
                             else if (state.is(ControllerBinding.DPAD_RIGHT)) {
                                 screen.movePointerToSlotIn(ScreenDirection.RIGHT);
-                                if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+                                if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
                             }
                             else if (state.is(ControllerBinding.DPAD_LEFT)) {
                                 screen.movePointerToSlotIn(ScreenDirection.LEFT);
-                                if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), 1.0f);
+                                if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
                             }
                         } else if (state.is(ControllerBinding.LEFT_STICK) && state.released && !LegacyOptions.legacyCursor.get())
                             screen.movePointerToSlot(screen.findSlotAt(getPointerX(), getPointerY()));

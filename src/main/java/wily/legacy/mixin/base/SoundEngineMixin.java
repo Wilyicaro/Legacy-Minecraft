@@ -1,8 +1,11 @@
 package wily.legacy.mixin.base;
 
 import com.google.common.collect.Multimap;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.audio.Channel;
+import net.minecraft.client.Options;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.client.sounds.ChannelAccess;
@@ -12,9 +15,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyMusicFader;
 import wily.legacy.client.SoundEngineAccessor;
 
@@ -41,8 +42,8 @@ public abstract class SoundEngineMixin implements SoundEngineAccessor {
 
     @Shadow protected abstract float calculateVolume(SoundInstance arg);
 
-    @Inject(method = "stopAll", at = @At("HEAD"), cancellable = true)
-    public void stopAll(CallbackInfo ci) {
+    @Override
+    public void stopAllSound() {
         if (this.loaded) {
             Predicate<SoundInstance> isNotMusic = (soundInstance) -> soundInstance.getSource() != SoundSource.MUSIC && soundInstance.getSource() != SoundSource.RECORDS;
             this.instanceToChannel.forEach((soundInstance, channelHandle) -> {
@@ -54,7 +55,6 @@ public abstract class SoundEngineMixin implements SoundEngineAccessor {
             this.queuedSounds.clear();
             this.tickingSounds.clear();
             this.queuedTickableSounds.clear();
-            ci.cancel();
         }
     }
 
@@ -64,6 +64,15 @@ public abstract class SoundEngineMixin implements SoundEngineAccessor {
             if (volume <= 0 && soundInstance.getSource() != SoundSource.MUSIC && soundInstance.getSource() != SoundSource.RECORDS) channel.stop();
             else channel.setVolume(volume);
         });
+    }
+
+    @WrapOperation(method = "tickNonPaused", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Options;getSoundSourceVolume(Lnet/minecraft/sounds/SoundSource;)F"))
+    private float getSoundSourceVolumeNotMusic(Options instance, SoundSource soundSource, Operation<Float> original) {
+        if (soundSource == SoundSource.MUSIC || soundSource == SoundSource.RECORDS) {
+            return 1;
+        } else {
+            return original.call(instance, soundSource);
+        }
     }
 
     @Override

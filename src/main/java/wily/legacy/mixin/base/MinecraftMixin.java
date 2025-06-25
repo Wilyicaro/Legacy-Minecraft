@@ -44,6 +44,7 @@ import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
+import wily.legacy.client.SoundManagerAccessor;
 import wily.legacy.client.screen.*;
 import wily.legacy.network.ServerPlayerMissHitPayload;
 import wily.legacy.util.ScreenUtil;
@@ -90,8 +91,6 @@ public abstract class MinecraftMixin {
     //?} else {
     /*@Shadow public abstract DeltaTracker getDeltaTracker();
     *///?}
-
-    @Shadow public abstract SoundManager getSoundManager();
 
     @Unique
     Screen oldScreen;
@@ -200,10 +199,9 @@ public abstract class MinecraftMixin {
         return LegacyMusicFader.musicManagerShouldTick;
     }
 
-    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At("TAIL"))
+    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;onDisconnected()V"))
     private void disconnectFadeMusic(Screen screen, boolean bl, CallbackInfo ci) {
-        SoundEngineAccessor soundEngineAccessor = SoundEngineAccessor.of(((SoundManagerAccessor) this.getSoundManager()).getSoundEngine());
-        soundEngineAccessor.fadeAllMusic();
+        SoundManagerAccessor.of(this.soundManager).fadeAllMusic();
     }
 
     @Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z", ordinal = 4))
