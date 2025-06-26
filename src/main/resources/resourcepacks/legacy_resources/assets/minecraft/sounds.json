@@ -8,55 +8,5 @@
       "mob/horse/idle4"
     ],
     "subtitle": "subtitles.entity.horse.ambient"
-  },
-  "block.wooden_door.close": {
-    "sounds": [
-      {
-        "name": "block/wooden_door/close1",
-        "volume": 0.9
-      },
-      {
-        "name": "block/wooden_door/close2",
-        "volume": 0.9
-      },
-      {
-        "name": "block/wooden_door/close3",
-        "volume": 0.9
-      },
-	  {
-        "name": "block/wooden_door/close4",
-        "volume": 0.9
-      },
-	  {
-        "name": "block/wooden_door/close5",
-        "volume": 0.9
-      },
-	  {
-        "name": "block/wooden_door/close6",
-        "volume": 0.9
-      }
-    ],
-    "subtitle": "subtitles.block.door.toggle"
-  },
-  "block.wooden_door.open": {
-    "sounds": [
-      {
-        "name": "block/wooden_door/open1",
-        "volume": 0.9
-      },
-      {
-        "name": "block/wooden_door/open2",
-        "volume": 0.9
-      },
-	  {
-        "name": "block/wooden_door/open3",
-        "volume": 0.9
-      },
-	  {
-        "name": "block/wooden_door/open4",
-        "volume": 0.9
-      }
-    ],
-    "subtitle": "subtitles.block.door.toggle"
-  }  
+  }
 }
