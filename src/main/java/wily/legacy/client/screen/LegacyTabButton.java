@@ -89,7 +89,7 @@ public class LegacyTabButton extends AbstractButton {
     }
 
     public void renderString(GuiGraphics guiGraphics, Font font, int x, int y, int i, boolean shadow){
-        ScreenUtil.renderScrollingString(guiGraphics,font,getMessage(),x + Math.max(6, (getWidth() - font.width(getMessage())) / 2), y - 1, x + getWidth() - 6, y + getHeight() - 1, i,shadow);
+        ScreenUtil.renderScrollingString(guiGraphics,font,getMessage(),x + Math.max(6, (getWidth() - font.width(getMessage())) / 2), y - 2, x + getWidth() - 6, y + getHeight() - 1, i,shadow);
     }
 
     public  void renderIconSprite(ResourceLocation icon, GuiGraphics guiGraphics){
