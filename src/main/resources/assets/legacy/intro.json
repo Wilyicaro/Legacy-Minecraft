@@ -1,1 +1,16 @@
-["legacy:textures/gui/intro/mojang.png","legacy:textures/gui/intro/kyubion.png","legacy:textures/gui/intro/4j.png"]
+{
+   "brands": [
+	"legacy:textures/gui/intro/background.png",
+	"legacy:textures/gui/intro/background.png",
+	"legacy:textures/gui/intro/background.png",
+	"legacy:textures/gui/intro/background.png",
+	"legacy:textures/gui/intro/mojang.png",
+	"legacy:textures/gui/intro/kyubion.png",
+	"legacy:textures/gui/intro/4j.png"
+    ],
+    "background": "legacy:textures/gui/intro/background.png",
+    "brandDuration": 2600,
+    "fadeIn": 0.09,
+    "fadeOut": 0.09,
+    "crossFade": false
+}
