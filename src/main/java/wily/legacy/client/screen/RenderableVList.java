@@ -12,10 +12,12 @@ import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.Stocker;
+import wily.factoryapi.base.client.FactoryConfigWidgets;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.*;
@@ -115,13 +117,17 @@ public class RenderableVList {
         return this;
     }
 
+    public RenderableVList addMultSliderOption(FactoryConfig<?> optionInstance, double rangeMultiplier) {
+        return addRenderable(LegacyConfigWidgets.createSliderWidget(optionInstance, rangeMultiplier));
+    }
+
     public RenderableVList addOptionsCategory(Component title, FactoryConfig<?>... optionInstances) {
         addCategory(title);
         return addOptions(optionInstances);
     }
 
     public RenderableVList addCategory(Component title) {
-        renderables.add(SimpleLayoutRenderable.createDrawString(title, 1, 4, listWidth, 13, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        addRenderable(SimpleLayoutRenderable.createDrawString(title, 1, 4, listWidth, 13, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
         return this;
     }
 

@@ -9,7 +9,10 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
 import wily.factoryapi.base.ArbitrarySupplier;
+import wily.factoryapi.base.client.FactoryConfigWidgets;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
+import wily.factoryapi.base.config.FactoryConfig;
+import wily.factoryapi.base.config.FactoryConfigControl;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
@@ -51,8 +54,9 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
                 LegacyOptions.controllerDoubleClick,
                 LegacyOptions.controllerCursorAtFirstInventorySlot,
                 LegacyOptions.selectedController,
-                LegacyOptions.selectedControllerHandler,
-                LegacyOptions.controllerSensitivity,
+                LegacyOptions.selectedControllerHandler);
+        renderableVList.addMultSliderOption(LegacyOptions.controllerSensitivity, 2);
+        renderableVList.addOptions(
                 LegacyOptions.leftStickDeadZone,
                 LegacyOptions.rightStickDeadZone,
                 LegacyOptions.leftTriggerDeadZone,

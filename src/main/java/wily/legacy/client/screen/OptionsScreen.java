@@ -328,8 +328,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.of(mc.options.attackIndicator()),
                                 LegacyOptions.hudScale,
                                 LegacyOptions.hudOpacity,
-                                LegacyOptions.hudDistance,
-                                LegacyOptions.interfaceSensitivity),
+                                LegacyOptions.hudDistance),
+                        o -> o.renderableVList.addMultSliderOption(LegacyOptions.interfaceSensitivity, 2),
                         o-> o.renderableVList.addLinkedOptions(
                                 LegacyOptions.autoResolution, b-> !b.get(),
                                 LegacyOptions.interfaceResolution),
@@ -361,8 +361,9 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.invertedCrosshair,
                                 LegacyOptions.legacyCreativeTab,
                                 LegacyOptions.legacyOverstackedItems,
-                                LegacyOptions.legacyHearts,
-                                LegacyOptions.hudDelay,
+                                LegacyOptions.legacyHearts),
+                        o-> o.renderableVList.addMultSliderOption(LegacyOptions.hudDelay, 2),
+                        o-> o.renderableVList.addOptions(
                                 LegacyOptions.systemMessagesAsOverlay,
                                 LegacyOptions.autoSaveCountdown,
                                 LegacyOptions.advancedHeldItemTooltip,

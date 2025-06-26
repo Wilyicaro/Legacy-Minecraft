@@ -218,7 +218,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
     //? if >=1.20.5 || fabric {
     @Redirect(method=/*? if neoforge {*//*"renderHealthLevel"*//*?} else {*/"renderPlayerHealth"/*?}*/, at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD))
     private void renderPlayerHealth(Gui instance, long value) {
-        if (LegacyOptions.legacyHearts.get()) healthBlinkTime = value - 6;
+        healthBlinkTime = value - (LegacyOptions.legacyHearts.get() ? 6 : 0);
     }
     //?}
 
