@@ -1,8 +1,7 @@
 {
   "block.minecraft.bed.no_sleep": "You can only sleep at night and during thunderstorms",
   "block.minecraft.bed.not_safe": "You may not rest now, there are monsters nearby",
-  "block.minecraft.bed.obstructed": "Bed is obstructed",
-  "block.minecraft.bed.too_far_away": "Bed is too far away",
+  "block.minecraft.bed.too_far_away": "You may not rest now, the bed is too far away",
   "connect.connecting": "Connecting",
   "createWorld.tab.more.title": "More Options",
   "createWorld.tab.world.title": "World Options",
