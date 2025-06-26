@@ -22,6 +22,8 @@
   "gamerule.commandModificationBlockLimit.description": "The command modification block limit decides how many blocks can be changed at once by one command, such as fill or clone.",
   "gamerule.disableElytraMovementCheck": "Disable Elytra Movement Check",
   "gamerule.disableElytraMovementCheck.description": "When enabled, the speed limit for elytra flight will be removed.",
+  "gamerule.disablePlayerMovementCheck": "Disable Player Movement Check",
+  "gamerule.disablePlayerMovementCheck.description": "When enabled, the speed limit for player movement will be removed.",
   "gamerule.disableRaids": "Disable Raids",
   "gamerule.disableRaids.description": "When enabled, village raids will not occur.",
   "gamerule.doDaylightCycle": "Daylight Cycle",
