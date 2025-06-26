@@ -76,7 +76,7 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
 
     @Inject(method = "handleLogin", at = @At("TAIL"))
     public void handleLoginMusic(ClientboundLoginPacket clientboundLoginPacket, CallbackInfo ci) {
-        if (this.level.dimension() != Level.OVERWORLD) LegacyMusicFader.fadeOutBgMusic(true);
+        if (minecraft.level.dimension() != Level.OVERWORLD) LegacyMusicFader.fadeOutBgMusic(true);
     }
 
     @Inject(method = "handlePlayerInfoUpdate", at = @At("RETURN"))

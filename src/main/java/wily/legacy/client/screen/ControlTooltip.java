@@ -739,7 +739,7 @@ public interface ControlTooltip {
                 BlockState state = minecraft.level.getBlockState(bucketHitResult.getBlockPos());
                 if (ItemContainerPlatform.getBucketFluid(i) != Fluids.EMPTY) {
                     BlockState resultState = state.getBlock() instanceof LiquidBlockContainer && ItemContainerPlatform.getBucketFluid(i) == Fluids.WATER ? state : minecraft.level.getBlockState(bucketHitResult.getBlockPos().relative(bucketHitResult.getDirection()));
-                    if (resultState.canBeReplaced(ItemContainerPlatform.getBucketFluid(i)) || resultState.isAir() || resultState.getBlock() instanceof LiquidBlockContainer container && container.canPlaceLiquid(/*? if >=1.20.2 {*/minecraft.player, /*?}*/minecraft.level, bucketHitResult.getBlockPos(), state, ItemContainerPlatform.getBucketFluid(i))) return LegacyComponents.EMPTY;
+                    if (resultState.canBeReplaced(ItemContainerPlatform.getBucketFluid(i)) || resultState.isAir() || resultState.getBlock() instanceof LiquidBlockContainer container && container.canPlaceLiquid(/*? if >=1.20.2 {*/minecraft.player, /*?}*/minecraft.level, bucketHitResult.getBlockPos(), resultState, ItemContainerPlatform.getBucketFluid(i))) return LegacyComponents.EMPTY;
                 } else if (state.getBlock() instanceof BucketPickup) return LegacyComponents.COLLECT;
             }
             if (/*? if <1.21.5 {*/actualItem.getItem() instanceof SaddleItem && /*?}*/minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof /*? if <1.21.5 {*/Saddleable/*?} else {*//*Mob*//*?}*/ s &&/*? if <1.21.5 {*/s.isSaddleable()/*?} else {*//*s.isEquippableInSlot(actualItem, EquipmentSlot.SADDLE)*//*?}*/ && !s.isSaddled()) return LegacyComponents.SADDLE;

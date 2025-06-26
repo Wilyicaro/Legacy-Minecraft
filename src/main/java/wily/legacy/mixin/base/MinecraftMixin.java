@@ -4,8 +4,8 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.Window;
+import com.mojang.realmsclient.client.RealmsClient;
 import net.minecraft.Util;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -22,6 +22,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.sounds.MusicManager;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
+import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -40,7 +41,9 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIClient;
+import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
@@ -86,11 +89,7 @@ public abstract class MinecraftMixin {
 
     @Shadow public abstract boolean isPaused();
 
-    //? if <1.21.3 {
-    @Shadow public abstract DeltaTracker getTimer();
-    //?} else {
-    /*@Shadow public abstract DeltaTracker getDeltaTracker();
-    *///?}
+
 
     @Unique
     Screen oldScreen;
@@ -179,7 +178,7 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;updateSource(Lnet/minecraft/client/Camera;)V"))
     public void runSoundTick(boolean bl, CallbackInfo ci) {
-        float deltaTicks = /*? if <1.21.3 {*/getTimer()/*?} else {*//*getDeltaTracker()*//*?}*/.getRealtimeDeltaTicks();
+        float deltaTicks = FactoryAPIClient.getPartialTick();
         realtimeDeltaTickResidual += deltaTicks;
         int i = (int) realtimeDeltaTickResidual;
         realtimeDeltaTickResidual -= i;
@@ -199,8 +198,8 @@ public abstract class MinecraftMixin {
         return LegacyMusicFader.musicManagerShouldTick;
     }
 
-    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;onDisconnected()V"))
-    private void disconnectFadeMusic(Screen screen, boolean bl, CallbackInfo ci) {
+    @Inject(method = /*? if <1.20.3 {*//*"clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V"*//*?} else if <1.21 {*//*"clearClientLevel"*//*?} else {*/"disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;onDisconnected()V"))
+    private void disconnectFadeMusic(CallbackInfo ci) {
         SoundManagerAccessor.of(this.soundManager).fadeAllMusic();
     }
 

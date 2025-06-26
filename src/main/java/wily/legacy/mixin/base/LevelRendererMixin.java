@@ -65,7 +65,17 @@ public abstract class LevelRendererMixin implements LevelRendererAccessor {
     }
     *///?}
 
-    //? if <1.21.3 {
+    //? if <1.20.5 {
+    /*@Redirect(method = "playStreamingMusic", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;play(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
+    public void waitToPlaySong(SoundManager instance, SoundInstance soundInstance) {
+        LegacyMusicFader.fadeInMusic(soundInstance, true);
+    }
+
+    @Redirect(method = "playStreamingMusic", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;stop(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
+    public void fadeJukeboxSong(SoundManager instance, SoundInstance soundInstance) {
+        LegacyMusicFader.fadeOutMusic(soundInstance, true, true);
+    }
+    *///?} else if <1.21.3 {
     @Redirect(method = "playJukeboxSong", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;play(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
     public void waitToPlaySong(SoundManager instance, SoundInstance soundInstance) {
         LegacyMusicFader.fadeInMusic(soundInstance, true);
