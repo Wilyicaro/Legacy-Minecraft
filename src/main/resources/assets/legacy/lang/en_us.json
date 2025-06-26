@@ -1400,7 +1400,7 @@
   "legacy.menu.leaving": "Leaving %s",
   "legacy.menu.legacy_settings": "Legacy Settings",
   "legacy.menu.load": "Load",
-  "legacy.menu.load_save.created_in": "Created in %s",
+  "legacy.menu.load_save.created_in": "Created in %s Mode",
   "legacy.menu.load_save.load": "Load",
   "legacy.menu.load_save.reset": "Reset %s",
   "legacy.menu.load_save.reset_cancel": "Don't Reset %s",
