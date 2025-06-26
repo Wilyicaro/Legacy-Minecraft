@@ -1,4 +1,5 @@
 {
+  "block.minecraft.bed.no_sleep": "You can only sleep at night and during thunderstorms",
   "connect.connecting": "Connecting",
   "createWorld.tab.more.title": "More Options",
   "createWorld.tab.world.title": "World Options",
