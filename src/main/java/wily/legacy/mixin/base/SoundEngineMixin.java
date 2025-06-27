@@ -15,13 +15,13 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import wily.legacy.client.LegacyMusicFader;
 import wily.legacy.client.SoundEngineAccessor;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 @Mixin(SoundEngine.class)
@@ -58,12 +58,15 @@ public abstract class SoundEngineMixin implements SoundEngineAccessor {
         }
     }
 
-    @Redirect(method = "method_19754", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/ChannelAccess$ChannelHandle;execute(Ljava/util/function/Consumer;)V"))
-    private void noStopMusic(ChannelAccess.ChannelHandle instance, Consumer<Channel> consumer, @Local(argsOnly = true) SoundInstance soundInstance, @Local float volume) {
-        instance.execute((channel) -> {
-            if (volume <= 0 && soundInstance.getSource() != SoundSource.MUSIC && soundInstance.getSource() != SoundSource.RECORDS) channel.stop();
-            else channel.setVolume(volume);
-        });
+    @ModifyArg(method = "updateCategoryVolume", at = @At(value = "INVOKE", target = "Ljava/util/Map;forEach(Ljava/util/function/BiConsumer;)V"))
+    private BiConsumer<SoundInstance, ChannelAccess.ChannelHandle> noStopMusic(BiConsumer<SoundInstance, ChannelAccess.ChannelHandle> action) {
+        return (instance, handle) -> {
+            float f = this.calculateVolume(instance);
+            handle.execute((channel) -> {
+                if (f <= 0 && instance.getSource() != SoundSource.MUSIC && instance.getSource() != SoundSource.RECORDS) channel.stop();
+                else channel.setVolume(f);
+            });
+        };
     }
 
     @WrapOperation(method = "tickNonPaused", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Options;getSoundSourceVolume(Lnet/minecraft/sounds/SoundSource;)F"))
