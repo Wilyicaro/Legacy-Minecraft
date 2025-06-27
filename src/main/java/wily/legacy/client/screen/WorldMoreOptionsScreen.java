@@ -37,7 +37,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     protected List<FormattedCharSequence> tooltipBoxLabel;
     protected ScrollableRenderer scrollableRenderer =  new ScrollableRenderer(new LegacyScrollRenderer());
 
-    protected final TabList tabList = new TabList(accessor).add(29, LegacyTabButton.Type.LEFT,Component.translatable("createWorld.tab.world.title"), t-> rebuildWidgets()).add(29, LegacyTabButton.Type.RIGHT,Component.translatable("legacy.menu.game_options"), t-> rebuildWidgets());
+    protected final TabList tabList = new TabList(accessor).add(30, LegacyTabButton.Type.LEFT,Component.translatable("createWorld.tab.world.title"), t-> rebuildWidgets()).add(30, LegacyTabButton.Type.RIGHT,Component.translatable("legacy.menu.game_options"), t-> rebuildWidgets());
 
     protected final RenderableVList gameRenderables = new RenderableVList(accessor);
 
@@ -217,7 +217,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     protected void init() {
         addRenderableWidget(tabList);
         super.init();
-        tabList.init(panel.x,panel.y - 23,panel.width);
+        tabList.init(panel.x,panel.y - 24,panel.width);
     }
 
     @Override
