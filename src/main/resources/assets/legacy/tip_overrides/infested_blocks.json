@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "blocks": ["infested_stone","infested_cobblestone","infested_stone_bricks","infested_mossy_stone_bricks","infested_cracked_stone_bricks","infested_chiseled_stone_bricks","infested_deepslate"],
+    "tip": {"translate": "block.minecraft.infested_stone.tip"}
+  }
+}

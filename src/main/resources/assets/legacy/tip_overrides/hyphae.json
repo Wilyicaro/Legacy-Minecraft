@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "blocks": ["crimson_hyphae","warped_hyphae"],
+    "tip": {"translate": "block.minecraft.hyphae.tip"}
+  }
+}

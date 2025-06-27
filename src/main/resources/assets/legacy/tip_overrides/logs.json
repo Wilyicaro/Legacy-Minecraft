@@ -1,6 +1,6 @@
 {
   "overrides": {
-    "items": ["dark_oak_log","oak_log","acacia_log","birch_log","jungle_log","spruce_log","mangrove_log","cherry_log"],
+    "blocks": ["dark_oak_log","oak_log","acacia_log","birch_log","jungle_log","spruce_log","mangrove_log","cherry_log","pale_oak_log","crimson_stem","warped_stem"],
     "tip": {"translate": "block.minecraft.log.tip"}
   }
 }

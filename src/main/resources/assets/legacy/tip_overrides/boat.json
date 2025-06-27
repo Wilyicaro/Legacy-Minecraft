@@ -1,11 +1,11 @@
 {
   "overrides": [
     {
-      "item": "#minecraft:boats",
+      "item": "#boats",
       "tip": {"translate": "item.minecraft.boat.tip"}
     },
     {
-      "item": "#minecraft:chest_boats",
+      "item": "#chest_boats",
       "tip": {"translate": "item.minecraft.chest_boat.tip"}
     }
   ]

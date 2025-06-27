@@ -1,6 +1,6 @@
 {
   "overrides": {
-    "item": "#minecraft:slabs",
+    "block": "#slabs",
     "tip": {"translate": "block.minecraft.slab.tip"}
   }
 }
