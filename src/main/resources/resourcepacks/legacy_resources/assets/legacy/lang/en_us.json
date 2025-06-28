@@ -127,6 +127,8 @@
   "options.key.toggleSneak": "Toggle Sneak",
   "options.key.toggleSprint": "Toggle Sprint",
   "options.language": "Languages",
+  "selectServer.delete": "Delete Server",
+  "selectWorld.delete": "Delete Save",
   "selectWorld.mapFeatures.info": "When enabled, structures such as Villages and Strongholds will generate in the world.",
   "soundCategory.master": "Sound"
 }
