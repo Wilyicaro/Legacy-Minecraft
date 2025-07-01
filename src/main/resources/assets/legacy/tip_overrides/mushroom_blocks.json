@@ -1,6 +1,6 @@
 {
   "overrides": {
-    "items": ["red_mushroom_block","brown_mushroom_block","mushroom_stem"],
+    "blocks": ["red_mushroom_block","brown_mushroom_block","mushroom_stem"],
     "tip": {"translate": "block.minecraft.mushroom_block.tip"}
   }
 }

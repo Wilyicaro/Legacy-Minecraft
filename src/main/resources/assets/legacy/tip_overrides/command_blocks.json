@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "blocks": ["command_block","chain_command_block","repeating_command_block"],
+    "tip": {"translate": "block.minecraft.command_block.tip"}
+  }
+}

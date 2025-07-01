@@ -1,0 +1,6 @@
+{
+  "overrides": {
+    "blocks": ["red_mushroom","brown_mushroom"],
+    "tip": {"translate": "block.minecraft.mushroom.tip"}
+  }
+}

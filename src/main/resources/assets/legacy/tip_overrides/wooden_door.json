@@ -1,6 +1,0 @@
-{
-  "overrides": {
-    "block": "#minecraft:wooden_doors",
-    "tip": {"translate": "block.minecraft.door.tip"}
-  }
-}
