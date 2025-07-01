@@ -101,11 +101,11 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
                 if (getLoadingStage() != null)
                     Legacy4JClient.applyFontOverrideIf(fontOverride != null,fontOverride,b-> guiGraphics.drawString(minecraft.font, getLoadingStage(), accessor.getInteger("loadingStage.x",x + 1), accessor.getInteger("loadingStage.y",height / 2 + 5), CommonColor.STAGE_TEXT.get()));
                 try (SpriteContents contents = FactoryGuiGraphics.getSprites().getSprite(LOADING_BACKGROUND).contents()){
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BACKGROUND, x, y, 320, 320 * contents.height() / contents.width());
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BACKGROUND, x, y - 1, 320, 320 * contents.height() / contents.width());
                 }
                 if (getProgress() >= 0) {
                     try (SpriteContents contents = FactoryGuiGraphics.getSprites().getSprite(LOADING_BAR).contents()) {
-                        FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BAR, 318, 318 * contents.height() / contents.width(), 0, 0, x + 1, y + 1,0, (int) (318 * Math.max(0, Math.min(getProgress() / 100F, 1))), 318 * contents.height() / contents.width());
+                        FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BAR, 318, 318 * contents.height() / contents.width(), 0, 0, x + 1, y,0, (int) (318 * Math.max(0, Math.min(getProgress() / 100F, 1))), 318 * contents.height() / contents.width());
                     }
                 }
                 LegacyTip tip = getLoadingTip();
