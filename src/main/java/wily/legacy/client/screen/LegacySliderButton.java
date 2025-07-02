@@ -73,14 +73,9 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
     }
 
     @Override
-    protected void updateMessage() {
+    public void updateMessage() {
         setTooltip(tooltipSupplier.apply(this));
-    }
-
-    @Override
-    public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
         setMessage(messageGetter.apply(this));
-        super.renderWidget(guiGraphics, i, j, f);
     }
 
     public void setFocused(boolean bl) {

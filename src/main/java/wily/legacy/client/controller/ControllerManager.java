@@ -297,7 +297,7 @@ public class ControllerManager {
                         ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
                     }
                     int mouseClick = Controller.Event.of(minecraft.screen).getBindingMouseClick(state);
-                    if (mouseClick != -1 && (!minecraft.screen.isDragging() || (minecraft.screen instanceof LegacyMenuAccess<?> a && a.isOutsideClick(mouseClick)))) {
+                    if (mouseClick != -1 && (!state.is(ControllerBinding.LEFT_TRIGGER) || (minecraft.screen instanceof LegacyMenuAccess<?> a && a.isOutsideClick(mouseClick)))) {
                         isControllerSimulatingInput = true;
                         if (state.pressed && state.onceClick(true))
                             ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), mouseClick, 1, 0);

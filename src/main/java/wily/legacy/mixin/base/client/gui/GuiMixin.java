@@ -222,10 +222,18 @@ public abstract class GuiMixin implements ControlTooltip.Event {
     }
     //?}
 
-    // For some reason the Gui::renderHeart isn't being a valid target on <1.20.5, certainly a bug
-    //? if <1.20.5 {
+    //
+    //? if <=1.20.2 {
+    /*@WrapWithCondition(method = "renderHearts", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderHeart(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Gui$HeartType;IIIZZ)V", ordinal = 2))
+    private boolean noFlashingHeart(Gui instance, GuiGraphics arg, Gui.HeartType arg2, int i, int j, int k, boolean bl2, boolean bl3) {
+        return !LegacyOptions.legacyHearts.get();
+    }
 
-    //?} else {
+    @ModifyArg(method = "renderHearts", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderHeart(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Gui$HeartType;IIIZZ)V", ordinal = 3), index = 5)
+    private boolean renderRemainingAsFlashing(boolean original, @Local(ordinal = 0, argsOnly = true) boolean flash) {
+        return LegacyOptions.legacyHearts.get() ? flash : original;
+    }
+    *///?} else {
     @WrapWithCondition(method = "renderHearts", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderHeart(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Gui$HeartType;IIZZZ)V", ordinal = 2))
     private boolean noFlashingHeart(Gui instance, GuiGraphics arg, Gui.HeartType arg2, int i, int j, boolean bl, boolean bl2, boolean bl3) {
         return !LegacyOptions.legacyHearts.get();
