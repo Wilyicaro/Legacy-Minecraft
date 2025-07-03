@@ -51,9 +51,11 @@ public abstract class HumanoidModelMixin {
         if(/*? if <1.21.2 {*/livingEntity.getUseItemRemainingTicks() > 0/*?} else {*//*humanoidRenderState.isUsingItem*//*?}*/ &&  (useAnim == /*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/.EAT || useAnim == /*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/.DRINK)){
             boolean isRightHand = useArm == HumanoidArm.RIGHT;
             ModelPart armModel = isRightHand ? rightArm : leftArm;
-            float r = Math.min((/*? if <1.21.2 {*/livingEntity.getTicksUsingItem()/*?} else {*//*humanoidRenderState.ticksUsingItem*//*?}*/ + FactoryAPIClient.getGamePartialTick(/*? if <=1.20.2 {*//*false*//*?} else if <1.21.2 {*/Minecraft.getInstance().level.tickRateManager().isEntityFrozen(livingEntity)/*?} else {*/ /*humanoidRenderState.isFullyFrozen*//*?}*/)) / /*? if <1.21.2 {*/useItem.getUseDuration(/*? if >=1.20.5 {*/livingEntity/*?}*/)/*?} else {*//*FactoryRenderStateExtension.Accessor.of(humanoidRenderState).getExtension(LegacyLivingEntityRenderState.class).itemUseDuration*//*?}*/ * 6,1);
-            armModel.xRot =  r * -1.4f + (r > 0.8f ? (Mth.cos(ageInTicks * 1.7f) * 0.08f) : 0);
-            armModel.yRot = (isRightHand ? -0.45f : 0.45f) * r;
+            float time = (/*? if <1.21.2 {*/livingEntity.getTicksUsingItem()/*?} else {*//*humanoidRenderState.ticksUsingItem*//*?}*/ + FactoryAPIClient.getGamePartialTick(/*? if <=1.20.2 {*//*false*//*?} else if <1.21.2 {*/Minecraft.getInstance().level.tickRateManager().isEntityFrozen(livingEntity)/*?} else {*/ /*humanoidRenderState.isFullyFrozen*//*?}*/)) / /*? if <1.21.2 {*/useItem.getUseDuration(/*? if >=1.20.5 {*/livingEntity/*?}*/)/*?} else {*//*FactoryRenderStateExtension.Accessor.of(humanoidRenderState).getExtension(LegacyLivingEntityRenderState.class).itemUseDuration*//*?}*/ * 6;
+            float prog = Math.min(time, 1.1f) / 1.1f;
+            float eased = (1 - (float) Math.pow(1 - prog, 3));
+            armModel.xRot = eased * -1.3f + (time > 1.2f ? (1 - Math.abs(Mth.sin(ageInTicks * 0.8f) * 2)) * 0.09f : 0);
+            armModel.yRot = (isRightHand ? -0.45f : 0.45f) * eased;
         }
     }
     @Redirect(method = /*? if <1.21.2 {*/"setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V"/*?} else {*//*"setupAnim(Lnet/minecraft/client/renderer/entity/state/HumanoidRenderState;)V"*//*?}*/, at = @At(value = "FIELD", target = "Lnet/minecraft/client/model/geom/ModelPart;xRot:F", opcode = Opcodes.PUTFIELD, ordinal = /*? if <1.21.2 {*/0/*?} else {*//*1*//*?}*/))

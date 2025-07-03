@@ -202,8 +202,8 @@ public interface ControlTooltip {
                 add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_ESCAPE) : ControllerBinding.RIGHT_BUTTON.getIcon(),()-> LegacyComponents.EXIT).
                 add(MENU_OFF_ACTION::get,()-> getMenuOffAction(a)).
                 add(MENU_QUICK_ACTION::get,()-> getMenuQuickAction(a)).
-                add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_W) : ControllerBinding.RIGHT_TRIGGER.getIcon(),()->a.getHoveredSlot() != null && a.getHoveredSlot().hasItem() && LegacyTipManager.hasTip(a.getHoveredSlot().getItem()) ? LegacyComponents.WHATS_THIS : null).
-                add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT) : ControllerBinding.LEFT_TRIGGER.getIcon(),()-> a.getMenu().getCarried().getCount() > 1 ? LegacyComponents.DISTRIBUTE : null);
+                add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_W) : ControllerBinding.RIGHT_TRIGGER.getIcon(),()->a.getHoveredSlot() != null && a.getHoveredSlot().hasItem() && !a.isMouseDragging() && LegacyTipManager.hasTip(a.getHoveredSlot().getItem()) ? LegacyComponents.WHATS_THIS : null).
+                add(()-> ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT) : ControllerBinding.LEFT_TRIGGER.getIcon(),()-> a.getMenu().getCarried().getCount() > 1 && !a.isOutsideClick(0) ? LegacyComponents.DISTRIBUTE : null);
     }
 
     static Component getIconComponentFromKeyMapping(LegacyKeyMapping mapping){
@@ -217,7 +217,7 @@ public interface ControlTooltip {
 
     static Component getMenuMainAction(LegacyMenuAccess<?> a){
         if (a.isOutsideClick(0) && !a.getMenu().getCarried().isEmpty()) return a.getMenu().getCarried().getCount() > 1 ? LegacyComponents.DROP_ALL : LegacyComponents.DROP;
-        if (a.getHoveredSlot() != null && (a.getHoveredSlot().hasItem() || !a.getMenu().getCarried().isEmpty())){
+        if (a.getHoveredSlot() != null && !a.isMouseDragging() && (a.getHoveredSlot().hasItem() || !a.getMenu().getCarried().isEmpty())){
             if (a.getHoveredSlot().hasItem() && !FactoryItemUtil.equalItems(a.getHoveredSlot().getItem(),a.getMenu().getCarried()) && !isBundleAndAcceptItem(a.getHoveredSlot().getItem(),a.getMenu().getCarried())){
                 return a.getMenu().getCarried().isEmpty() ? LegacyComponents.TAKE : isBundleAndAcceptItem(a.getMenu().getCarried(),a.getHoveredSlot().getItem()) ? LegacyComponents.PICK_UP : LegacyComponents.SWAP;
             } else if (!a.getMenu().getCarried().isEmpty() && a.getHoveredSlot().mayPlace(a.getMenu().getCarried())) return a.getHoveredSlot().getMaxStackSize() == 1 ? LegacyComponents.PLACE_ONE : a.getMenu().getCarried().getCount() > 1 ? LegacyComponents.PLACE_ALL : LegacyComponents.PLACE;
@@ -226,8 +226,8 @@ public interface ControlTooltip {
     }
 
     static Component getMenuOffAction(LegacyMenuAccess<?> a){
-        if (a.isOutsideClick(1) && !a.getMenu().getCarried().isEmpty()) return a.getMenu().getCarried().getCount() > 1 ? LegacyComponents.DROP_ONE : LegacyComponents.DROP;
-        if (a.getHoveredSlot() != null){
+        if (a.isOutsideClick(1) && !a.getMenu().getCarried().isEmpty() && !a.isMouseDragging()) return a.getMenu().getCarried().getCount() > 1 ? LegacyComponents.DROP_ONE : LegacyComponents.DROP;
+        if (a.getHoveredSlot() != null && !a.isMouseDragging()){
             if (a.getMenu().getCarried().isEmpty()) {
                 if (isBundle(a.getHoveredSlot().getItem()) && BundleItem.getFullnessDisplay(a.getHoveredSlot().getItem()) > 0) return LegacyComponents.PICK_UP;
                 else if (a.getHoveredSlot().getItem().getCount() > 1) return LegacyComponents.TAKE_HALF;
@@ -739,7 +739,7 @@ public interface ControlTooltip {
                 BlockState state = minecraft.level.getBlockState(bucketHitResult.getBlockPos());
                 if (ItemContainerPlatform.getBucketFluid(i) != Fluids.EMPTY) {
                     BlockState resultState = state.getBlock() instanceof LiquidBlockContainer && ItemContainerPlatform.getBucketFluid(i) == Fluids.WATER ? state : minecraft.level.getBlockState(bucketHitResult.getBlockPos().relative(bucketHitResult.getDirection()));
-                    if (resultState.canBeReplaced(ItemContainerPlatform.getBucketFluid(i)) || resultState.isAir() || resultState.getBlock() instanceof LiquidBlockContainer container && container.canPlaceLiquid(/*? if >=1.20.2 {*/minecraft.player, /*?}*/minecraft.level, bucketHitResult.getBlockPos(), state, ItemContainerPlatform.getBucketFluid(i))) return LegacyComponents.EMPTY;
+                    if (resultState.canBeReplaced(ItemContainerPlatform.getBucketFluid(i)) || resultState.isAir() || resultState.getBlock() instanceof LiquidBlockContainer container && container.canPlaceLiquid(/*? if >=1.20.2 {*/minecraft.player, /*?}*/minecraft.level, bucketHitResult.getBlockPos(), resultState, ItemContainerPlatform.getBucketFluid(i))) return LegacyComponents.EMPTY;
                 } else if (state.getBlock() instanceof BucketPickup) return LegacyComponents.COLLECT;
             }
             if (/*? if <1.21.5 {*/actualItem.getItem() instanceof SaddleItem && /*?}*/minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof /*? if <1.21.5 {*/Saddleable/*?} else {*//*Mob*//*?}*/ s &&/*? if <1.21.5 {*/s.isSaddleable()/*?} else {*//*s.isEquippableInSlot(actualItem, EquipmentSlot.SADDLE)*//*?}*/ && !s.isSaddled()) return LegacyComponents.SADDLE;

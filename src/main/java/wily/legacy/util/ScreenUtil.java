@@ -12,6 +12,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.toasts.Toast;
+import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.renderer.PanoramaRenderer;
@@ -22,6 +23,7 @@ import net.minecraft.client.resources.MobEffectTextureManager;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.ChannelAccess;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
@@ -72,7 +74,6 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.ConfirmationScreen;
-import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.LegacyScreen;
 import wily.legacy.init.LegacyRegistries;
@@ -742,5 +743,23 @@ public class ScreenUtil {
         if (LegacyOptions.skipInitialSaveWarning.get()){
             return titleScreen;
         } else return ConfirmationScreen.createSaveInfoScreen(titleScreen);
+    }
+
+    public static ScreenDirection getScreenDirection(double x, double y) {
+        if (Math.abs(x) > Math.abs(y)) {
+            if (x > 0)
+                return ScreenDirection.RIGHT;
+            else if (x < 0)
+                return ScreenDirection.LEFT;
+        }
+        if (y > 0)
+            return ScreenDirection.DOWN;
+        else if (y < 0)
+            return ScreenDirection.UP;
+        return null;
+    }
+
+    public static void setSoundInstanceVolume(SoundInstance soundInstance, float volume) {
+        SoundManagerAccessor.of(mc.getSoundManager()).setVolume(soundInstance, volume);
     }
 }

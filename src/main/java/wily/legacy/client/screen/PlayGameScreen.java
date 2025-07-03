@@ -42,7 +42,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     private static final Component SAFETY_CHECK = Component.translatable("multiplayerWarning.check");
     public static final Component DIRECT_CONNECTION = Component.translatable("selectServer.direct");
     public boolean isLoading = false;
-    protected final TabList tabList = new TabList(accessor).add(30, LegacyTabButton.Type.LEFT,Component.translatable("legacy.menu.load"), b-> repositionElements()).add(30, LegacyTabButton.Type.MIDDLE,Component.translatable("legacy.menu.create"), b-> repositionElements()).add(30, LegacyTabButton.Type.RIGHT, (t, guiGraphics, i, j, f) -> t.renderString(guiGraphics,font,canNotifyOnlineFriends() ? 0xFFFFFF : CommonColor.INVENTORY_GRAY_TEXT.get(),canNotifyOnlineFriends()),Component.translatable("legacy.menu.join"), b-> {
+    protected final TabList tabList = new TabList(accessor).add(31, LegacyTabButton.Type.LEFT,Component.translatable("legacy.menu.load"), b-> repositionElements()).add(31, LegacyTabButton.Type.MIDDLE,Component.translatable("legacy.menu.create"), b-> repositionElements()).add(31, LegacyTabButton.Type.RIGHT, (t, guiGraphics, i, j, f) -> t.renderString(guiGraphics,font,canNotifyOnlineFriends() ? 0xFFFFFF : CommonColor.INVENTORY_GRAY_TEXT.get(),canNotifyOnlineFriends()),Component.translatable("legacy.menu.join"), b-> {
         if (this.minecraft.options.skipMultiplayerWarning)
             repositionElements();
         else minecraft.setScreen(new ConfirmationScreen(this,SAFETY_TITLE,Component.translatable("legacy.menu.multiplayer_warning").append("\n").append(SAFETY_CONTENT)){
@@ -119,7 +119,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         if (hasTabList()) addWidget(tabList);
         panel.init();
         renderableVListInit();
-        if (hasTabList()) tabList.init(panel.x,panel.y - 24,panel.width);
+        if (hasTabList()) tabList.init(panel.x,panel.y - 25,panel.width);
     }
 
     @Override

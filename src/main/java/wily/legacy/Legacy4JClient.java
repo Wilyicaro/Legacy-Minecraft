@@ -1,6 +1,5 @@
 package wily.legacy;
 
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.datafixers.util.Pair;
@@ -65,7 +64,6 @@ import net.minecraft.client.gui.screens.options.OptionsScreen;
 /*import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.client.gui.screens.OptionsScreen;
 *///?}
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.config.FactoryConfig;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
@@ -110,6 +108,7 @@ import wily.legacy.client.screen.compat.IrisCompat;
 import wily.legacy.client.screen.compat.SodiumCompat;
 //?}
 import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.entity.LegacyLocalPlayer;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.init.LegacyUIElementTypes;
 import wily.legacy.inventory.LegacyPistonMovingBlockEntity;
@@ -146,6 +145,8 @@ public class Legacy4JClient {
     public static boolean manualSave = false;
     public static boolean saveExit = false;
     public static boolean retakeWorldIcon = false;
+    public static boolean canSprint = false;
+    public static int sprintTicksLeft = -1;
     public static LegacyLoadingScreen legacyLoadingScreen = new LegacyLoadingScreen();
     public static Renderable itemActivationRenderReplacement = null;
     public static final LegacyTipManager legacyTipManager = new LegacyTipManager();
@@ -350,9 +351,25 @@ public class Legacy4JClient {
                 }
             }
         }
-        if (minecraft.player != null) {
-            if (minecraft.player.isSprinting() && controllerManager.getButtonState(ControllerBinding.LEFT_STICK).getSmoothY() > -0.6 && controllerManager.isControllerTheLastInput())
-                minecraft.player.setSprinting(false);
+
+        if (sprintTicksLeft > 0) --sprintTicksLeft;
+        if (minecraft.player != null && controllerManager.isControllerTheLastInput()) {
+            BindingState.Axis stick = controllerManager.getButtonState(ControllerBinding.LEFT_STICK);
+            float y = Math.abs(stick.y) > stick.getDeadZone() ? stick.y : 0;
+            if (((LegacyLocalPlayer)minecraft.player).canSprintController()) {
+                if (y < -0.85) {
+                    if (!canSprint && sprintTicksLeft == -1) sprintTicksLeft = 9;
+                    else if (canSprint && sprintTicksLeft > 0) minecraft.player.setSprinting(true);
+                    else canSprint = false;
+                } else if (y > -0.85 && sprintTicksLeft == 0) {
+                    canSprint = false;
+                    sprintTicksLeft = -1;
+                } else if (y > -0.5 && !canSprint && sprintTicksLeft > 0) canSprint = true;
+            } else {
+                if (y > -0.85) minecraft.player.setSprinting(false);
+                canSprint = false;
+                sprintTicksLeft = -1;
+            }
         }
 
         if (!Minecraft.getInstance().isPaused()) {

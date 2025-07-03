@@ -2,26 +2,22 @@ package wily.legacy.mixin.base;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.RenderBuffers;
 //? if >=1.21.2 {
 /*import net.minecraft.client.renderer.SkyRenderer;
 *///?}
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.Shadow;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.SoundManager;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LevelRendererAccessor;
+import wily.legacy.client.LegacyMusicFader;
 
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererMixin implements LevelRendererAccessor {
@@ -68,4 +64,26 @@ public abstract class LevelRendererMixin implements LevelRendererAccessor {
         this.skyRenderer = new SkyRenderer();
     }
     *///?}
+
+    //? if <1.20.5 {
+    /*@Redirect(method = "playStreamingMusic", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;play(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
+    public void waitToPlaySong(SoundManager instance, SoundInstance soundInstance) {
+        LegacyMusicFader.fadeInMusic(soundInstance, true);
+    }
+
+    @Redirect(method = "playStreamingMusic", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;stop(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
+    public void fadeJukeboxSong(SoundManager instance, SoundInstance soundInstance) {
+        LegacyMusicFader.fadeOutMusic(soundInstance, true, true);
+    }
+    *///?} else if <1.21.3 {
+    @Redirect(method = "playJukeboxSong", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;play(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
+    public void waitToPlaySong(SoundManager instance, SoundInstance soundInstance) {
+        LegacyMusicFader.fadeInMusic(soundInstance, true);
+    }
+
+    @Redirect(method = "stopJukeboxSong", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;stop(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
+    public void fadeJukeboxSong(SoundManager instance, SoundInstance soundInstance) {
+        LegacyMusicFader.fadeOutMusic(soundInstance, true, true);
+    }
+    //?}
 }

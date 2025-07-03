@@ -4,8 +4,8 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.Window;
-import net.minecraft.Util;
 import com.mojang.realmsclient.client.RealmsClient;
+import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -19,18 +19,16 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.sounds.MusicManager;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
 import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BedBlock;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -43,13 +41,13 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.AdvancementToastAccessor;
-import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.LegacyTipManager;
+import wily.legacy.client.*;
+import wily.legacy.client.SoundManagerAccessor;
 import wily.legacy.client.screen.*;
 import wily.legacy.network.ServerPlayerMissHitPayload;
 import wily.legacy.util.ScreenUtil;
@@ -90,8 +88,18 @@ public abstract class MinecraftMixin {
 
     @Shadow @Final public Gui gui;
 
+    @Shadow @Final private SoundManager soundManager;
+
+    @Shadow public abstract boolean isPaused();
+
+
+
     @Unique
     Screen oldScreen;
+
+    @Unique public float realtimeDeltaTickResidual;
+
+    @Unique public long lastMillis;
 
     private Minecraft self(){
         return (Minecraft)(Object)this;
@@ -171,6 +179,33 @@ public abstract class MinecraftMixin {
         return false;
     }
 
+    @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;updateSource(Lnet/minecraft/client/Camera;)V"))
+    public void runSoundTick(boolean bl, CallbackInfo ci) {
+        float deltaTicks = FactoryAPIClient.getPartialTick();
+        realtimeDeltaTickResidual += deltaTicks;
+        int i = (int) realtimeDeltaTickResidual;
+        realtimeDeltaTickResidual -= i;
+        if (Util.getMillis() - lastMillis > 50 || i > 0) lastMillis = Util.getMillis();
+        if (Util.getMillis() - lastMillis > 60 && i == 0) i = 1;
+        for (int j = 0; j < Math.min(10, i); ++j) {
+            soundManager.tick(this.isPaused());
+            LegacyMusicFader.tick();
+        }
+    }
+
+    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;tick(Z)V"))
+    private void noSoundTick(SoundManager instance, boolean bl) {}
+
+    @WrapWithCondition(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/MusicManager;tick()V"))
+    private boolean tickMusicManager(MusicManager instance) {
+        return LegacyMusicFader.musicManagerShouldTick;
+    }
+
+    @Inject(method = /*? if <1.20.3 {*//*"clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V"*//*?} else if <1.21 {*//*"clearClientLevel"*//*?} else {*/"disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;onDisconnected()V"))
+    private void disconnectFadeMusic(CallbackInfo ci) {
+        SoundManagerAccessor.of(this.soundManager).fadeAllMusic();
+    }
+
     @Redirect(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z", ordinal = 4))
     private boolean handleKeybindsInventoryKey(KeyMapping instance){
         if (!instance.consumeClick()) {
@@ -178,7 +213,7 @@ public abstract class MinecraftMixin {
         }
         AdvancementToast toast = FactoryAPIClient.getToasts().getToast(AdvancementToast.class, Toast.NO_TOKEN);
         if (toast == null) return true;
-        inventoryKeyHold++;;
+        inventoryKeyHold++;
         if (!(inventoryKeyLastPressed = inventoryKeyHold < 10)){
             FactoryAPIClient.getToasts().clear();
             inventoryKeyHold = 0;
