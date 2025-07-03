@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
@@ -15,11 +16,11 @@ import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.MobEffectTextureManager;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -133,12 +134,12 @@ public class LegacyRenderUtil {
 
     public static void drawAutoSavingIcon(GuiGraphics graphics,int x, int y) {
         graphics.pose().pushMatrix();
-        graphics.pose().scale(0.5F,0.5F,1);
+        graphics.pose().scale(0.5F,0.5F);
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SAVE_CHEST,x * 2,y * 2,48,48);
         graphics.pose().popMatrix();
         graphics.pose().pushMatrix();
-        double heightAnim = (Util.getMillis() / 50D) % 11;
-        graphics.pose().translate(x + 5.5,y - 8 - (heightAnim > 5 ? 10 - heightAnim : heightAnim),0);
+        float heightAnim = (Util.getMillis() / 50f) % 11;
+        graphics.pose().translate(x + 5.5f, y - 8 - (heightAnim > 5 ? 10 - heightAnim : heightAnim));
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SAVE_ARROW,0,0,13,16);
         graphics.pose().popMatrix();
     }
@@ -157,7 +158,7 @@ public class LegacyRenderUtil {
 
     public static void renderDefaultBackground(UIAccessor accessor, GuiGraphics guiGraphics, boolean forcePanorama, boolean title, boolean username){
         if (mc.level == null || accessor.getBoolean("forcePanorama", forcePanorama)) {
-           renderPanorama(guiGraphics, 1.0f, FactoryAPIClient.getPartialTick());
+           renderPanorama(guiGraphics);
         }else /*? if <=1.20.1 {*//*renderTransparentBackground(guiGraphics)*//*?} else {*/accessor.getScreen().renderTransparentBackground(guiGraphics)/*?}*/;
         if (accessor.getBoolean("hasTitle", title)) renderLogo(guiGraphics);
         if (accessor.getBoolean("hasUsername", username)) renderUsername(guiGraphics);
@@ -170,8 +171,8 @@ public class LegacyRenderUtil {
     public static void renderLegacyLogo(GuiGraphics guiGraphics){
         FactoryScreenUtil.enableBlend();
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate((guiGraphics.guiWidth() - 285.5f) / 2, 30,0);
-        guiGraphics.pose().scale(0.5f,0.5f,0.5f);
+        guiGraphics.pose().translate((guiGraphics.guiWidth() - 285.5f) / 2, 30);
+        guiGraphics.pose().scale(0.5f,0.5f);
         FactoryGuiGraphics.of(guiGraphics).blit(mc.getResourceManager().getResource(MINECRAFT).isPresent() ? MINECRAFT : ControlType.getActiveType().getMinecraftLogo(),0,0,0,0,571,138,571,138);
         guiGraphics.pose().popMatrix();
         FactoryScreenUtil.disableBlend();
@@ -189,14 +190,8 @@ public class LegacyRenderUtil {
         graphics.drawString(mc.font, username, graphics.guiWidth() - 33 - mc.font.width(username), graphics.guiHeight() - 27, 0xFFFFFF);
     }
 
-    public static void renderPanorama(GuiGraphics guiGraphics, float speed, float partialTick){
-        //? if <1.20.5 {
-        /*if (LegacyOptions.legacyPanorama.get()){
-            renderLegacyPanorama(guiGraphics);
-        } else panoramaRenderer.render(partialTick, speed);
-        *///?} else {
-        panoramaRenderer.render(guiGraphics, guiGraphics.guiWidth(), guiGraphics.guiHeight(), speed, partialTick);
-         //?}
+    public static void renderPanorama(GuiGraphics guiGraphics){
+        panoramaRenderer.render(guiGraphics, guiGraphics.guiWidth(), guiGraphics.guiHeight(), true);
     }
 
     public static void renderLegacyPanorama(GuiGraphics guiGraphics){
@@ -224,7 +219,7 @@ public class LegacyRenderUtil {
             for (float t1 : translations) {
                 if (t != 0 || t1 != 0) {
                     graphics.pose().pushMatrix();
-                    graphics.pose().translate(t,t1,0F);
+                    graphics.pose().translate(t,t1);
                     graphics.drawString(font, formattedCharSequence, x, y, outlineColor, false);
                     graphics.pose().popMatrix();
                 }
@@ -237,13 +232,13 @@ public class LegacyRenderUtil {
     }
 
     public static void applyHUDScale(GuiGraphics graphics){
-        graphics.pose().scale(3f / getHUDScale(), 3f / getHUDScale() ,3f / getHUDScale());
+        graphics.pose().scale(3f / getHUDScale(), 3f / getHUDScale());
     }
 
     public static void prepareHUDRender(GuiGraphics graphics){
         graphics.pose().pushMatrix();
         FactoryGuiGraphics.of(graphics).setColor(1.0f,1.0f,1.0f, getHUDOpacity());
-        graphics.pose().translate(0,getHUDDistance(),0);
+        graphics.pose().translate(0, getHUDDistance());
         FactoryScreenUtil.enableBlend();
     }
 
@@ -269,8 +264,8 @@ public class LegacyRenderUtil {
         return 6 + 3f / LegacyRenderUtil.getHUDScale() * (35 + (mc.gameMode.canHurtPlayer() ?  Math.max(2,Mth.ceil((Math.max(mc.player.getAttributeValue(Attributes.MAX_HEALTH), Math.max(mc.gui.displayHealth, mc.player.getHealth())) + mc.player.getAbsorptionAmount()) / 20f) + (mc.player.getArmorValue() > 0 ? 1 : 0))* 10 : 0));
     }
 
-    public static double getHUDDistance(){
-        return -LegacyOptions.hudDistance.get()*(22.5D + (LegacyOptions.inGameTooltips.get() ? 17.5D : 0));
+    public static float getHUDDistance(){
+        return -LegacyOptions.hudDistance.get().floatValue() * (22.5f + (LegacyOptions.inGameTooltips.get() ? 17.5f : 0));
     }
 
     public static float getHUDOpacity(){
@@ -373,18 +368,16 @@ public class LegacyRenderUtil {
             return;
         }
 
-        FactoryGuiGraphics.of(graphics).pushBufferSource(BufferSourceWrapper.translucent(FactoryGuiGraphics.of(graphics).getBufferSource()));
-        graphics.flush();
+        //FactoryGuiGraphics.of(graphics).pushBufferSource(BufferSourceWrapper.translucent(FactoryGuiGraphics.of(graphics).getBufferSource()));
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,alpha);
         FactoryScreenUtil.enableBlend();
         render.accept(true);
         FactoryScreenUtil.disableBlend();
-        graphics.flush();
         RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
-        FactoryGuiGraphics.of(graphics).popBufferSource();
+        //FactoryGuiGraphics.of(graphics).popBufferSource();
     }
 
-    public static boolean isHovering(Slot slot,int leftPos, int topPos,  double d, double e) {
+    public static boolean isHovering(Slot slot, int leftPos, int topPos,  double d, double e) {
         LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(slot);
         int width = holder.getWidth();
         int height = holder.getHeight();
@@ -397,7 +390,9 @@ public class LegacyRenderUtil {
         renderEntity(guiGraphics,x,y,size,partialTicks,vector3f,quaternionf,quaternionf2,entity,false);
     }
 
-    public static void renderEntity(GuiGraphics guiGraphics, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity, boolean forceSize) {
+    public static void renderEntity(GuiGraphics guiGraphics, int x, int y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity, boolean forceSize) {
+        InventoryScreen.renderEntityInInventory(guiGraphics, x, y, size, partialTicks, vector3f, quaternionf, quaternionf2, entity, forceSize);
+
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(x, y, 50.0);
         float h = forceSize ? Math.max(1f,Math.max(entity.getBbWidth(), entity.getBbHeight())) : 1;
@@ -509,7 +504,7 @@ public class LegacyRenderUtil {
                 float xRotO = character.xRotO;
                 if (!character.isFallFlying()) character.setXRot(character.xRotO = -2.5f);
                 guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(32f, character.isFallFlying() ? 44 : 18,-200);
+                guiGraphics.pose().translate(32f, character.isFallFlying() ? 44 : 18);
                 LegacyRenderUtil.applyHUDScale(guiGraphics);
                 float f = LegacyOptions.smoothAnimatedCharacter.get() ? FactoryAPIClient.getPartialTick() : 0;
                 ClientEntityAccessor.of(character).setAllowDisplayFireAnimation(false);
@@ -540,17 +535,17 @@ public class LegacyRenderUtil {
             LegacyRenderUtil.renderPointerPanel(guiGraphics,x,y,bl ? 129 : 28, 28);
             if (bl) {
                 guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(x + 25, y + 7,0);
+                guiGraphics.pose().translate(x + 25, y + 7);
                 Legacy4JClient.applyFontOverrideIf(is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b->{
                     Component effect = getEffectName(mobEffectInstance);
-                    if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
+                    if (!b) guiGraphics.pose().scale(2/3f,2/3f);
                     guiGraphics.drawString(mc.font, effect, 0, 0, 0xFFFFFF);
-                    guiGraphics.pose().translate(0, 10 * (b ? 1 : 1.5f),0);
+                    guiGraphics.pose().translate(0, 10 * (b ? 1 : 1.5f));
                     guiGraphics.drawString(mc.font, MobEffectUtil.formatDuration(mobEffectInstance, 1.0f/*? if >1.20.2 {*/, mc.level.tickRateManager().tickrate()/*?}*/), 0,0, 0x7F7F7F);
                 });
                 guiGraphics.pose().popMatrix();
             }
-            FactoryGuiGraphics.of(guiGraphics).blit(x + (bl ? 3 : 5), y + 5, 0, 18, 18, mc.getMobEffectTextures().get(mobEffectInstance.getEffect()));
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(Gui.getMobEffectSprite(mobEffectInstance.getEffect()), x + (bl ? 3 : 5), y + 5,  18, 18);
             y -= m;
         }
         if (!bl && mouseX >= x && mouseX <= x + 28) {
@@ -564,7 +559,7 @@ public class LegacyRenderUtil {
             }
             if (mobEffectInstance != null) {
                 List<Component> list = List.of(getEffectName(mobEffectInstance), MobEffectUtil.formatDuration(mobEffectInstance, 1.0f/*? if >1.20.2 {*/, mc.level.tickRateManager().tickrate()/*?}*/));
-                guiGraphics.renderTooltip(mc.font, list, Optional.empty(), mouseX, mouseY);
+                guiGraphics.setTooltipForNextFrame(mc.font, list, Optional.empty(), mouseX, mouseY);
             }
         }
     }
@@ -586,7 +581,7 @@ public class LegacyRenderUtil {
     public static void renderHUDTooltip(GuiGraphics guiGraphics, int shift){
         if (!FactoryGuiElement.SELECTED_ITEM_NAME.isVisible(FactoryScreenUtil.getGuiAccessor()) || LegacyRenderUtil.getSelectedItemTooltipLines() == 0) return;
         LegacyRenderUtil.prepareHUDRender(guiGraphics);
-        guiGraphics.pose().translate(0, guiGraphics.guiHeight() - Math.max(shift, LegacyRenderUtil.getHUDSize()),0);
+        guiGraphics.pose().translate(0, guiGraphics.guiHeight() - Math.max(shift, LegacyRenderUtil.getHUDSize()));
         FactoryAPIClient.getProfiler().push("selectedItemName");
         if (GuiAccessor.getInstance().getToolHighlightTimer() > 0 && !GuiAccessor.getInstance().getLastToolHighlight().isEmpty()) {
             Font font = /*? if forge || neoforge {*//*Objects.requireNonNullElse(IClientItemExtensions.of(GuiAccessor.getInstance().getLastToolHighlight()).getFont(GuiAccessor.getInstance().getLastToolHighlight(), IClientItemExtensions.FontContext.SELECTED_ITEM_NAME), mc.font)*//*?} else {*/  mc.font/*?}*/;
@@ -596,7 +591,7 @@ public class LegacyRenderUtil {
             int l = Math.min((int)((float)GuiAccessor.getInstance().getToolHighlightTimer() * 256.0f / 10.0f),255);
             if (l > 0) {
                 int height = LegacyOptions.selectedItemTooltipSpacing.get() * (tooltipLines.size() -1);
-                guiGraphics.pose().translate(0, -height, 0);
+                guiGraphics.pose().translate(0, -height);
                 if (!mc.options.backgroundForChatOnly().get()) {
                     int backgroundWidth = tooltipLines.values().intStream().max().orElse(0) + 4;
                     int backgroundX = (guiGraphics.guiWidth() - backgroundWidth) / 2;
@@ -607,7 +602,7 @@ public class LegacyRenderUtil {
                 tooltipLines.forEach((mutableComponent, width) -> {
                     int x = (guiGraphics.guiWidth() - width) / 2;
                     guiGraphics.drawString(font, mutableComponent, x, 0, 0xFFFFFF + (l << 24));
-                    guiGraphics.pose().translate(0, LegacyOptions.selectedItemTooltipSpacing.get(), 0);
+                    guiGraphics.pose().translate(0, LegacyOptions.selectedItemTooltipSpacing.get());
                 });
             }
         }
@@ -623,7 +618,7 @@ public class LegacyRenderUtil {
         int i = 0;
         int j = 0;
         float backAlpha = LegacyRenderUtil.getHUDOpacity();
-        MobEffectTextureManager mobEffectTextureManager = mc.getMobEffectTextures();
+
         for (MobEffectInstance mobEffectInstance : Ordering.natural().reverse().sortedCopy(collection)) {
             Holder<MobEffect> mobEffect = /*? if <1.20.5 {*//*BuiltInRegistries.MOB_EFFECT.wrapAsHolder(mobEffectInstance.getEffect())*//*?} else {*/mobEffectInstance.getEffect()/*?}*/;
             if (!mobEffectInstance.showIcon()) continue;
@@ -646,9 +641,9 @@ public class LegacyRenderUtil {
                 f = Mth.clamp((float)m / 10.0f / 5.0f * 0.5f, 0.0f, 0.5f) + Mth.cos((float)m * (float)Math.PI / 5.0f) * Mth.clamp((10 - m / 20) / 10.0f * 0.25f, 0.0f, 0.25f);
             }
             FactoryScreenUtil.enableBlend();
-            TextureAtlasSprite textureAtlasSprite = mobEffectTextureManager.get(mobEffect/*? if <1.20.5 {*//*.value()*//*?}*/);
+
             FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, f * backAlpha);
-            FactoryGuiGraphics.of(guiGraphics).blit(k + 3, l + 3, 0, 18, 18, textureAtlasSprite);
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(Gui.getMobEffectSprite(mobEffect), k + 3, l + 3, 18, 18);
             FactoryScreenUtil.disableBlend();
         }
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -658,14 +653,14 @@ public class LegacyRenderUtil {
         if (topMessage != null && ticks < topMessage.ticksOnScreen()) {
             FactoryScreenUtil.disableDepthTest();
             guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(guiGraphics.guiWidth() / 2f, y,0);
-            guiGraphics.pose().scale(scale, scale, scale);
+            guiGraphics.pose().translate(guiGraphics.guiWidth() / 2f, y);
+            guiGraphics.pose().scale(scale, scale);
             if (topMessage.pulse()) {
                 float pulse = Util.getMillis() / 400f % 1;
                 pulse = 1 + (pulse > 0.5f ? 1 - pulse : pulse) / 10;
-                guiGraphics.pose().scale(pulse, pulse, pulse);
+                guiGraphics.pose().scale(pulse, pulse);
             }
-            guiGraphics.pose().translate(-mc.font.width(topMessage.message()) / 2f,0,0);
+            guiGraphics.pose().translate(-mc.font.width(topMessage.message()) / 2f,0);
             float maxFade = Math.min(topMessage.ticksOnScreen(), 20);
             float fade = topMessage.fade() ? Math.min(1, (topMessage.ticksOnScreen() - (ticks + FactoryAPIClient.getPartialTick())) / maxFade) : 1;
             guiGraphics.drawString(mc.font, topMessage.message(),0,0, fade < 1 ? ColorUtil.withAlpha(topMessage.baseColor(), fade) : topMessage.baseColor(), topMessage.shadow());
@@ -712,7 +707,7 @@ public class LegacyRenderUtil {
             FactoryScreenUtil.disableDepthTest();
             FactoryScreenUtil.enableBlend();
             graphics.pose().pushMatrix();
-            graphics.pose().translate(Legacy4JClient.controllerManager.getPointerX() + LegacyTipManager.getTipXDiff(), Legacy4JClient.controllerManager.getPointerY(), 4000);
+            graphics.pose().translate((float) (Legacy4JClient.controllerManager.getPointerX() + LegacyTipManager.getTipXDiff()), (float) Legacy4JClient.controllerManager.getPointerY());
             FactoryGuiGraphics.of(graphics).blitSprite(mc.getWindow().getScreenWidth() >= 1920 ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
             graphics.pose().popMatrix();
             FactoryScreenUtil.disableBlend();
@@ -722,14 +717,13 @@ public class LegacyRenderUtil {
         PostChain gammaEffect = Legacy4JClient.getGammaEffect();
         if (gammaEffect != null && LegacyOptions.displayLegacyGamma.get()) {
             float gamma = LegacyOptions.legacyGamma.get().floatValue();
-            graphics.flush();
             FactoryScreenUtil.enableBlend();
             FactoryScreenUtil.disableDepthTest();
             float tweakedGamma = gamma >= 0.5f ? (gamma - 0.5f) * 1.12f + 1.08f : gamma * 0.96f + 0.6f;
             //? if <1.21.5 {
             /*gammaEffect.passes.forEach(p-> p./^? if <1.21.2 {^//^getEffect^//^?} else {^/getShader/^?}^/().safeGetUniform("gamma").set(tweakedGamma));
             *///?}
-            gammaEffect.process(/*? if <1.21.2 {*//*partialTick*//*?} else {*/mc.getMainRenderTarget(), mc.gameRenderer.resourcePool/*?}*//*? if >1.21.4 {*/, pass-> pass.setUniform("gamma", tweakedGamma)/*?}*/);
+            gammaEffect.process(mc.getMainRenderTarget(), mc.gameRenderer.resourcePool);
             FactoryScreenUtil.enableDepthTest();
             FactoryScreenUtil.disableBlend();
         }

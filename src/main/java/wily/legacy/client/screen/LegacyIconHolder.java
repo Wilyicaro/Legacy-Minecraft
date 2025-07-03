@@ -171,7 +171,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
 
     public void applyOffset(GuiGraphics graphics){
-        if (!offset.equals(Vec3.ZERO)) graphics.pose().translate(offset.x,offset.y,offset.z);
+        if (!offset.equals(Vec3.ZERO)) graphics.pose().translate((float) offset.x, (float) offset.y);
     }
     public boolean isWarning(){
         return isWarning;
@@ -194,19 +194,22 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         }
         renderItem(graphics,i,j,f);
     }
+
     public void renderIcon(ResourceLocation location,GuiGraphics graphics, boolean scaled, int width, int height){
         renderChild(graphics,getX(),getY(),()->{
             FactoryGuiGraphics.of(graphics).disableDepthTest();
             if (scaled) {
-                graphics.pose().scale(getSelectableWidth() / width,getSelectableHeight() / height,getSelectableHeight() / 16f);
-            }else graphics.pose().translate((getSelectableWidth() - width) / 2,(getSelectableHeight() - height) / 2,0);
+                graphics.pose().scale(getSelectableWidth() / width,getSelectableHeight() / height);
+            }else graphics.pose().translate((getSelectableWidth() - width) / 2,(getSelectableHeight() - height) / 2);
             FactoryGuiGraphics.of(graphics).blitSprite(location, 0, 0, width, height);
             FactoryGuiGraphics.of(graphics).enableDepthTest();
         });
     }
+
     public void renderItem(GuiGraphics graphics, int i, int j, float f){
         renderItem(graphics,itemIcon,getX(),getY(),isWarning());
     }
+
     public void renderItem(GuiGraphics graphics, ItemStack item, int x, int y, boolean isWarning){
         if (!item.isEmpty()) renderItem(graphics,()->{
             graphics.renderFakeItem(item, 0,0);
@@ -214,6 +217,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
                 graphics.renderItemDecorations(Minecraft.getInstance().font, item,0,0);
         },x,y,isWarning);
     }
+
     public void renderItem(GuiGraphics graphics, Runnable itemRender, int x, int y, boolean isWarning){
         renderScaled(graphics,x,y,itemRender);
         if (isWarning) renderWarning(graphics);
@@ -222,7 +226,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     public void renderWarning(GuiGraphics graphics, float z){
         renderChild(graphics,x,y,()->{
             FactoryGuiGraphics.of(graphics).disableDepthTest();
-            graphics.pose().translate(0,0,z);
+            graphics.pose().translate(0,0);
             FactoryGuiGraphics.of(graphics).blitSprite(WARNING_ICON,0,0,8,8);
             FactoryGuiGraphics.of(graphics).enableDepthTest();
         });
@@ -245,27 +249,30 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         LegacyRenderUtil.renderEntity(graphics,getX() + getWidth() / 2f,getYCorner() + Math.min(getSelectableWidth(),getSelectableHeight()),(int)Math.min(getSelectableWidth(),getSelectableHeight()),f, new Vector3f(),new Quaternionf().rotationXYZ(0.0f, (float) Math.PI/ 4, (float) Math.PI), null, entity,true);
         graphics.disableScissor();
     }
+
     public void renderSelection(GuiGraphics graphics, int i, int j, float f){
         renderChild(graphics,getXCorner() - 4.5f, getYCorner() - 4.5f,()-> {
-            graphics.pose().translate(0,0,332);
             FactoryGuiGraphics.of(graphics).disableDepthTest();
             FactoryGuiGraphics.of(graphics).blitSprite(SELECT_ICON_HIGHLIGHT,0,0,36,36);
             FactoryGuiGraphics.of(graphics).enableDepthTest();
         });
     }
+
     public void renderScaled(GuiGraphics graphics, float x, float y, Runnable render){
         renderChild(graphics,x,y,()->{
-            graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f,getSelectableHeight() / 16f);
+            graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f);
             render.run();
         });
     }
+
     public void renderChild(GuiGraphics graphics, float x, float y, Runnable render){
         graphics.pose().pushMatrix();
-        graphics.pose().translate(x,y,0);
+        graphics.pose().translate(x, y);
         applyOffset(graphics);
         render.run();
         graphics.pose().popMatrix();
     }
+
     public void renderHighlight(GuiGraphics graphics){
         renderScaled(graphics,getX(),getY(),()-> {
             FactoryScreenUtil.enableBlend();
@@ -273,15 +280,19 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             FactoryScreenUtil.disableBlend();
         });
     }
+
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics,int i, int j){
         if (isHovered || (allowFocusedItemTooltip && isFocused())) renderTooltip(minecraft,graphics,itemIcon, !isHovered ? (int) getMiddleX() : i,!isHovered ? (int) getMiddleY() : j);
     }
+
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics,ItemStack stack, int i, int j){
-        if (!stack.isEmpty()) Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(),MOJANGLES_11_FONT, b->graphics.renderTooltip(minecraft.font, stack, i, j));
+        if (!stack.isEmpty()) Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(),MOJANGLES_11_FONT, b->graphics.setTooltipForNextFrame(minecraft.font, stack, i, j));
     }
+
     public boolean isHoveredOrFocused(){
         return isHovered || isFocused();
     }
+
     @Override
     public void setFocused(boolean bl) {
         focused = bl;

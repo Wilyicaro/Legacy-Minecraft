@@ -288,6 +288,7 @@ public class LegacyBlockBehaviors {
     public static InteractionResult successInteraction() {
         return InteractionResult.SUCCESS;
     }
+
     public static InteractionResult consumeInteraction() {
         return InteractionResult.CONSUME;
     }

@@ -107,8 +107,8 @@ public abstract class CraftingScreenMixin extends AbstractContainerScreen<Crafti
         ci.cancel();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 105,topPos + 43,0);
-        guiGraphics.pose().scale(1.5f,1.5f,1.5f);
+        guiGraphics.pose().translate(leftPos + 105,topPos + 43);
+        guiGraphics.pose().scale(1.5f,1.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW,0,0,22,15);
         guiGraphics.pose().popMatrix();
         //? if <1.21.2 {

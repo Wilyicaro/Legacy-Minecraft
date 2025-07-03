@@ -36,8 +36,9 @@ import java.util.Optional;
 
 @Mixin(EnchantmentScreen.class)
 public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<EnchantmentMenu> {
-    @Shadow protected abstract void renderBook(GuiGraphics arg, int i, int j, float g);
     @Shadow private BookModel bookModel;
+
+    @Shadow protected abstract void renderBook(GuiGraphics arg, int m, int n);
 
     public EnchantmentScreenMixin(EnchantmentMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
@@ -73,16 +74,10 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         }
     }
 
-    //? if >1.20.1 {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    //?} else {
-    /*@Override
-    public void renderBackground(GuiGraphics guiGraphics) {
-    }
-    *///?}
 
     @Inject(method = "mouseClicked",at = @At("HEAD"), cancellable = true)
     public void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
@@ -103,16 +98,16 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos, imageWidth,imageHeight);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 79,  topPos+ 22, 123, 66);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 2,topPos + 4,0);
-        guiGraphics.pose().scale(1.25f,1.25f,1.25f);
-        this.renderBook(guiGraphics, 0, 0, f);
+        guiGraphics.pose().translate(leftPos + 2,topPos + 4);
+        guiGraphics.pose().scale(1.25f,1.25f);
+        this.renderBook(guiGraphics, 0, 0);
         guiGraphics.pose().popMatrix();
         EnchantmentNames.getInstance().initSeed(this.menu.getEnchantmentSeed());
         int m = this.menu.getGoldCount();
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 80.5f,topPos+ 2.5f,0f);
+        guiGraphics.pose().translate(leftPos + 80.5f,topPos+ 2.5f);
         for (int n = 0; n < 3; ++n) {
-            guiGraphics.pose().translate(0f,21f,0f);
+            guiGraphics.pose().translate(0f,21f);
             int enchantCost = this.menu.costs[n];
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ENCHANTMENT_BUTTON_EMPTY, 0, 0, 120, 21);
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.DISABLED_LEVEL_SPRITES[n], -1, -1, 24, 24);
@@ -152,7 +147,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         int k = this.menu.getGoldCount();
         for (int l = 0; l < 3; ++l) {
             int m = this.menu.costs[l];
-            Optional<Holder.Reference<Enchantment>> optional = this.minecraft.level.registryAccess()./*? if <1.21.2 {*//*registryOrThrow(Registries.ENCHANTMENT).getHolder(this.menu.enchantClue[l])*//*?} else {*/lookupOrThrow(Registries.ENCHANTMENT).get(this.menu.enchantClue[l])/*?}*/;
+            Optional<Holder.Reference<Enchantment>> optional = this.minecraft.level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).get(this.menu.enchantClue[l]);
             int n = this.menu.levelClue[l];
             int o = l + 1;
             double t = i - (leftPos + 80.5);
@@ -160,7 +155,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
             if (!(t >= 0 && u >= 0 && t < 120 && u < 21) || m <= 0 || n < 0 || optional.isEmpty()) continue;
             ArrayList<Component> list = Lists.newArrayList();
             optional.get().value();
-            list.add(Component.translatable("container.enchant.clue", /*? if <1.20.5 {*//*optional.get().value().getFullname(n)*//*?} else {*/Enchantment.getFullname(optional.get(), n)/*?}*/).withStyle(ChatFormatting.WHITE));
+            list.add(Component.translatable("container.enchant.clue", Enchantment.getFullname(optional.get(), n)).withStyle(ChatFormatting.WHITE));
             if (!bl) {
                 list.add(CommonComponents.EMPTY);
                 if (this.minecraft.player.experienceLevel < m) {
@@ -172,7 +167,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
                     list.add(mutableComponent2.withStyle(ChatFormatting.GRAY));
                 }
             }
-            guiGraphics.renderComponentTooltip(this.font, list, i, j);
+            guiGraphics.setComponentTooltipForNextFrame(this.font, list, i, j);
             break;
         }
     }

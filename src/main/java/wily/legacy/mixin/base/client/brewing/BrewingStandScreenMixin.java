@@ -113,7 +113,7 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
         int fuel = this.menu.getFuel();
         int n = Mth.clamp((27 * fuel + 20 - 1) / 20, 0, 27);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(65.5f,66, 0f);
+        guiGraphics.pose().translate(65.5f,66);
         if (n > 0) {
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.FUEL_LENGTH_SPRITE, 27, 6, 0, 0, 0, 0, 0, n, 6);
         }
@@ -125,21 +125,21 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
         ci.cancel();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 58.5f,topPos + 22.5, 0f);
+        guiGraphics.pose().translate(leftPos + 58.5f, topPos + 22.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BREWING_SLOTS, 0, 0,96, 96);
         guiGraphics.pose().popMatrix();
         int o;
         if ((o = this.menu.getBrewingTicks()) > 0) {
             guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(leftPos + 121.5f,topPos + 22.5, 0f);
-            guiGraphics.pose().scale(0.5f,0.5f,0.5f);
+            guiGraphics.pose().translate(leftPos + 121.5f,topPos + 22.5f);
+            guiGraphics.pose().scale(0.5f,0.5f);
             int p = (int)(84.0f * (1.0f - (float)o / 400.0f));
             if (p > 0)
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BREW_PROGRESS_SPRITE, 27, 84, 0, 0, 0, 0, 0,27, p);
             guiGraphics.pose().popMatrix();
             guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(leftPos + 71f,topPos + 21, 0f);
-            guiGraphics.pose().scale(1.5f,1.5f,1.5f);
+            guiGraphics.pose().translate(leftPos + 71f,topPos + 21);
+            guiGraphics.pose().scale(1.5f,1.5f);
             if ((p = BUBBLELENGTHS[o / 2 % 7]) > 0) {
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BUBBLES_SPRITE, 12, 29, 0, 29 - p, 0, 29 - p, 0,12, p);
             }

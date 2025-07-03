@@ -169,7 +169,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
     }
     @Override
     public void renderItem(GuiGraphics graphics, int i, int j, float f) {
-        LegacyRenderUtil.secureTranslucentRender(graphics,!itemIcon.isEmpty() && !hasItem(itemIcon),0.5f,(u)-> renderItem(graphics,itemIcon,getX(),getY(),false));
+        LegacyRenderUtil.secureTranslucentRender(graphics,!itemIcon.isEmpty() && !hasItem(itemIcon),0.5f,(u)-> renderItem(graphics,itemIcon, getX(), getY(),false));
     }
     public boolean canAddIngredient(){
         return hasItem(itemIcon) && addedIngredientsItems != null && canAddIngredient.test(this) && getIngredientsGrid().stream().anyMatch(Optional::isEmpty);

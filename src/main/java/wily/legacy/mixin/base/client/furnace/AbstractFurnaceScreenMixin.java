@@ -129,26 +129,26 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
         ci.cancel();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 77,topPos + 48,0);
-        guiGraphics.pose().scale(19/13f,19/13f,1.0f);
+        guiGraphics.pose().translate(leftPos + 77,topPos + 48);
+        guiGraphics.pose().scale(19/13f,19/13f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.LIT,0,0, 13, 13);
         guiGraphics.pose().popMatrix();
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 75.5,topPos + 46.5,0);
-        guiGraphics.pose().scale(19/39f,19/39f,1.0f);
+        guiGraphics.pose().translate(leftPos + 75.5f, topPos + 46.5f);
+        guiGraphics.pose().scale(19/39f,19/39f);
         if (menu.isLit()) {
             int n = Mth.ceil(/*? if >1.20.1 {*/menu.getLitProgress()/*?} else {*//*Mth.clamp(menu.getLitProgress()/ 13f,0,1)*//*?}*/ * 39.0f) + 1;
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.LIT_PROGRESS, 42, 42, 0, 42 - n, 0, 42 - n, 42, n);
         }
         guiGraphics.pose().popMatrix();
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 114,topPos + 48,0);
-        guiGraphics.pose().scale(1.5f,1.5f,1.0f);
+        guiGraphics.pose().translate(leftPos + 114,topPos + 48);
+        guiGraphics.pose().scale(1.5f,1.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW,0,0,22,15);
         guiGraphics.pose().popMatrix();
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 114,topPos + 46.5,0);
-        guiGraphics.pose().scale(0.5f,0.5f,1.0f);
+        guiGraphics.pose().translate(leftPos + 114,topPos + 46.5f);
+        guiGraphics.pose().scale(0.5f,0.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.FULL_ARROW,66,48,0,0,0,2,  (int) Math.ceil(/*? if >1.20.1 {*/menu.getBurnProgress()/*?} else {*//*Mth.clamp(menu.getBurnProgress() / 24f ,0,1)*//*?}*/ * 66), 48);
         guiGraphics.pose().popMatrix();
         //? <1.21.2 {
