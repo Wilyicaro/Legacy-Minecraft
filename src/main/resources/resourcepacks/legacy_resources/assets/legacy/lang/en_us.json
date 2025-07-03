@@ -1,5 +1,8 @@
 {
   "argument.component.invalid": "Invalid json: %s",
+  "block.minecraft.bed.no_sleep": "You can only sleep at night and during thunderstorms",
+  "block.minecraft.bed.not_safe": "You may not rest now, there are monsters nearby",
+  "block.minecraft.bed.too_far_away": "You may not rest now, the bed is too far away",
   "connect.connecting": "Connecting",
   "connect.failed": "Can't Join Game",
   "command.failed": "An unknown error occurred while attempting to perform this command",
@@ -20,6 +23,7 @@
   "commands.gamerule.set": "Game rule %s has been updated to %s",
   "commands.item.source.not_a_container": "Block at %s, %s, %s is not a container",
   "commands.item.target.not_a_container": "Block at %s, %s, %s is not a container",
+  "commands.kick.success": "Kicked %s from the game: '%s'",
   "commands.locate.structure.not_found": "Unable to locate any %s feature",
   "commands.locate.structure.success": "Located %s at %s",
   "commands.op.success": "Opped %s",
@@ -35,6 +39,10 @@
   "disconnect.lost": "Connection lost",
   "disconnect.quitting": "Exiting the game",
   "gameMode.changed": "Your game mode has changed",
+  "gameMode.creative": "Creative",
+  "gameMode.hardcore": "Hardcore!",
+  "gameMode.spectator": "Spectator",
+  "gameMode.survival": "Survival",
   "gamerule.announceAdvancements": "Announce Advancements",
   "gamerule.announceAdvancements.description": "When enabled, players who receive advancements will be announced in chat.",
   "gamerule.blockExplosionDropDecay": "Block Explosion Drop Decay",
@@ -149,6 +157,8 @@
   "options.key.toggleSprint": "Toggle Sprint",
   "options.language": "Languages",
   "parsing.int.invalid": "'%sis not a valid number",
+  "selectServer.delete": "Delete Server",
+  "selectWorld.delete": "Delete Save",
   "selectWorld.mapFeatures.info": "When enabled, structures such as Villages and Strongholds will generate in the world.",
   "soundCategory.master": "Sound"
 }
