@@ -85,11 +85,11 @@ public class FlatWorldLayerSelector extends ItemViewerScreen {
         guiGraphics.drawString(this.font, selectedLayer.getName(),panel.x + 70,panel. y + 197, 0xFFFFFF, true);
 
 
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(panel.x + 50, panel.y + 190, 0);
         guiGraphics.pose().scale(1.25f, 1.25f, 1.25f);
         guiGraphics.renderItem(displayLayer, 0, 0);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
 
 }

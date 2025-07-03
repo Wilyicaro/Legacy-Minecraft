@@ -14,7 +14,5 @@ public interface BackupConfirmScreenAccessor {
 
     Component getDescription();
 
-    //? if >1.20.2 {
     void cancel();
-    //?}
 }

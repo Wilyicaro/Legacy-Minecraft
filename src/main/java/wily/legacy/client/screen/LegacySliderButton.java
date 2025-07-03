@@ -1,6 +1,5 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.navigation.CommonInputs;
@@ -9,7 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.init.LegacyRegistries;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -127,7 +126,7 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
         T oldValue = objectValue;
         setObjectValue(valueGetter.apply(this));
         if (!oldValue.equals(objectValue)){
-            ScreenUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
+            LegacyRenderUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
             onChange.accept(this);
         }
     }

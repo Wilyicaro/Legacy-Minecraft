@@ -1,48 +1,5 @@
 {
-    //? if <1.21.2 {
-    "targets": [
-        "swap"
-    ],
-    "passes": [
-        {
-            "name": "gamma",
-            "intarget": "minecraft:main",
-            "outtarget": "swap"
-        },
-        {
-            "name": "blit",
-            "intarget": "swap",
-            "outtarget": "minecraft:main"
-        }
-    ],
-    //?} else if <1.21.5 {
-    /*"targets": {
-        "swap": {}
-    },
-    "passes": [
-        {
-            "program": "minecraft:program/gamma",
-            "inputs": [
-                {
-                    "sampler_name": "In",
-                    "target": "minecraft:main"
-                }
-            ],
-            "output": "swap"
-        },
-        {
-            "program": "minecraft:post/blit",
-            "inputs": [
-                {
-                    "sampler_name": "In",
-                    "target": "swap"
-                }
-            ],
-            "output": "minecraft:main"
-        }
-    ]
-    *///?} else {
-    /*"targets": {
+    "targets": {
         "swap": {}
     },
     "passes": [
@@ -82,5 +39,4 @@
             "output": "minecraft:main"
         }
     ]
-    *///?}
 }

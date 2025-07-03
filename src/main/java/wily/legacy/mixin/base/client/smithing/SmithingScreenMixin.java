@@ -93,18 +93,18 @@ public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMen
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class), leftPos, topPos, imageWidth, imageHeight);
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 13.5, topPos + 9.5,0f);
         guiGraphics.pose().scale(2.5f,2.5f,2.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMITHING_HAMMER,0,0,15,15);
-        guiGraphics.pose().popPose();
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().popMatrix();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 82, topPos + 59,0f);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ARROW,0,0,22,15);
         if (hasRecipeError())
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
         InventoryScreen.renderEntityInInventory(guiGraphics, this.leftPos + 182, this.topPos + 95, 35/*? if >1.20.1 {*/, ARMOR_STAND_TRANSLATION/*?}*/, ARMOR_STAND_ANGLE, null, this.armorStandPreview);
     }
 

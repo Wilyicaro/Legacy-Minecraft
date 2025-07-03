@@ -21,20 +21,14 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.CommonColor;
-import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.LegacyClientWorldSettings;
-import wily.legacy.client.PackAlbum;
+import wily.legacy.client.*;
 import wily.legacy.client.screen.*;
-import wily.legacy.init.LegacyRegistries;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -65,10 +59,10 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     }
 
     @Inject(method = "<init>",at = @At("RETURN"))
-    public void initReturn(Minecraft minecraft, Screen screen, WorldCreationContext worldCreationContext, Optional optional, OptionalLong optionalLong,/*? if >=1.21.2 {*/ /*CreateWorldCallback createWorldCallback, *//*?}*/ CallbackInfo ci){
+    public void initReturn(Minecraft minecraft, Screen screen, WorldCreationContext worldCreationContext, Optional optional, OptionalLong optionalLong,/*? if >=1.21.2 {*/ CreateWorldCallback createWorldCallback, /*?}*/ CallbackInfo ci){
         uiState.setDifficulty(LegacyOptions.createWorldDifficulty.get());
-        panel = Panel.createPanel(this, p-> (width - (p.width + (ScreenUtil.hasTooltipBoxes(UIAccessor.of(this)) ? 160 : 0))) / 2, p-> (height - p.height) / 2, 245, 228);
-        resourceAssortSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 106, 220,45, !ScreenUtil.hasTooltipBoxes());
+        panel = Panel.createPanel(this, p-> (width - (p.width + (LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(this)) ? 160 : 0))) / 2, p-> (height - p.height) / 2, 245, 228);
+        resourceAssortSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 106, 220,45, !LegacyRenderUtil.hasTooltipBoxes());
         publishScreen = new PublishScreen(this, uiState.getGameMode().gameType);
     }
 
@@ -115,7 +109,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         ci.cancel();
     }
 
-    @Inject(method = /*? if >=1.21.2 {*/ /*"createWorldAndCleanup"*//*?} else {*/"createNewWorld"/*?}*/,at = @At("RETURN"))
+    @Inject(method = /*? if >=1.21.2 {*/ "createWorldAndCleanup"/*?} else {*//*"createNewWorld"*//*?}*/,at = @At("RETURN"))
     private void onCreate(CallbackInfo ci) {
         resourceAssortSelector.applyChanges(true);
         Legacy4JClient.serverPlayerJoinConsumer = s->{
@@ -128,14 +122,14 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
     @ModifyExpressionValue(method = "createNewWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;createWorldOpenFlows()Lnet/minecraft/client/gui/screens/worldselection/WorldOpenFlows;"))
     private WorldOpenFlows createNewWorld(WorldOpenFlows original) {
-        return LegacyOptions.saveCache.get() ? new WorldOpenFlows(minecraft,Legacy4JClient.currentWorldSource) : original;
+        return LegacyOptions.saveCache.get() ? new WorldOpenFlows(minecraft, LegacySaveCache.currentWorldSource) : original;
     }
 
     @Inject(method = "createNewWorldDirectory", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/storage/LevelStorageSource;createAccess(Ljava/lang/String;)Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;"))
-    private /*? >=1.21.2 {*//*static*//*?}*/ void createNewWorldDirectory(/*? >=1.21.2 {*//*Minecraft minecraft, String string, @Nullable Path path, *//*?}*/CallbackInfoReturnable<Optional<LevelStorageSource.LevelStorageAccess>> cir) {
+    private /*? >=1.21.2 {*/static/*?}*/ void createNewWorldDirectory(/*? >=1.21.2 {*/Minecraft minecraft, String string, @Nullable Path path, /*?}*/CallbackInfoReturnable<Optional<LevelStorageSource.LevelStorageAccess>> cir) {
         if (!LegacyOptions.saveCache.get()) return;
         try {
-            LevelStorageSource.LevelStorageAccess access = Legacy4JClient.currentWorldSource.createAccess(/*? <1.21.2 {*/uiState.getTargetFolder()/*?} else {*//*string*//*?}*/);
+            LevelStorageSource.LevelStorageAccess access = LegacySaveCache.currentWorldSource.createAccess(/*? <1.21.2 {*//*uiState.getTargetFolder()*//*?} else {*/string/*?}*/);
             access.close();
             if (Files.exists(access.getDimensionPath(Level.OVERWORLD))) FileUtils.deleteDirectory(access.getDimensionPath(Level.OVERWORLD).toFile());
         } catch (IOException e) {
@@ -144,8 +138,8 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     }
 
     @ModifyExpressionValue(method = "createNewWorldDirectory", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getLevelSource()Lnet/minecraft/world/level/storage/LevelStorageSource;"))
-    private /*? if >=1.21.2 {*//*static*//*?}*/ LevelStorageSource createNewWorldDirectory(LevelStorageSource original) {
-        return LegacyOptions.saveCache.get() ? Legacy4JClient.currentWorldSource : original;
+    private /*? if >=1.21.2 {*/static/*?}*/ LevelStorageSource createNewWorldDirectory(LevelStorageSource original) {
+        return LegacyOptions.saveCache.get() ? LegacySaveCache.currentWorldSource : original;
     }
 
     //? if >1.20.1 {
@@ -163,7 +157,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
         resourceAssortSelector.renderTooltipBox(guiGraphics,panel);
         super.render(guiGraphics, i, j, f);
         guiGraphics.drawString(font,NAME_LABEL, panel.x + 14, panel.y + 15, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
@@ -176,7 +170,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
     @Override
     public void onClose() {
-        ScreenUtil.playBackSound();
+        LegacyRenderUtil.playBackSound();
         popScreen();
     }
 }

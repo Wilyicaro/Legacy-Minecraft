@@ -29,10 +29,10 @@ public class ScrollableRenderer {
         FactoryGuiGraphics.of(graphics).enableScissor(x,y, x + width, y + height);
         oldSmoothScrolled = smoothScrolled;
         smoothScrolled = Mth.lerp(FactoryAPIClient.getPartialTick() * 0.5f, oldSmoothScrolled, scrolled.get());
-        graphics.pose().pushPose();
+        graphics.pose().pushMatrix();
         graphics.pose().translate(0, -getYOffset(),0);
         scrollable.run();
-        graphics.pose().popPose();
+        graphics.pose().popMatrix();
         graphics.disableScissor();
         if (scrolled.max > 0){
             if (scrolled.get() < scrolled.max) scrollRenderer.renderScroll(graphics, ScreenDirection.DOWN,x + width - 13, y + 3 + height);

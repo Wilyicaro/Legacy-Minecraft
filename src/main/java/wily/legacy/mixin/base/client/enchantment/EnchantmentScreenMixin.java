@@ -102,14 +102,14 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         ci.cancel();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos, imageWidth,imageHeight);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 79,  topPos+ 22, 123, 66);
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 2,topPos + 4,0);
         guiGraphics.pose().scale(1.25f,1.25f,1.25f);
         this.renderBook(guiGraphics, 0, 0, f);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
         EnchantmentNames.getInstance().initSeed(this.menu.getEnchantmentSeed());
         int m = this.menu.getGoldCount();
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 80.5f,topPos+ 2.5f,0f);
         for (int n = 0; n < 3; ++n) {
             guiGraphics.pose().translate(0f,21f,0f);
@@ -123,7 +123,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
             FormattedText formattedText = EnchantmentNames.getInstance().getRandomName(this.font, r);
             int s = CommonColor.ENCHANTMENT_TEXT.get();
             if (!(m >= n + 1 && this.minecraft.player.experienceLevel >= enchantCost || this.minecraft.player.getAbilities().instabuild)) {
-                guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, (s & 0xFEFEFE) >> 1/*? if >=1.21.4 {*//*, false*//*?}*/);
+                guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, (s & 0xFEFEFE) >> 1/*? if >=1.21.4 {*/, false/*?}*/);
                 s = CommonColor.INSUFFICIENT_EXPERIENCE_TEXT.get();
             } else {
                 double t = i - (leftPos + 80.5);
@@ -135,12 +135,12 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ENCHANTMENT_BUTTON_ACTIVE, 0, 0, 120, 21);
                 }
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ENABLED_LEVEL_SPRITES[n], -1, -1, 24, 24);
-                guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, s/*? if >=1.21.4 {*//*, false*//*?}*/);
+                guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, s/*? if >=1.21.4 {*/, false/*?}*/);
                 s = CommonColor.EXPERIENCE_TEXT.get();
             }
             guiGraphics.drawString(this.font, string, 120 - this.font.width(string), 12, s);
         }
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
 
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
@@ -152,7 +152,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         int k = this.menu.getGoldCount();
         for (int l = 0; l < 3; ++l) {
             int m = this.menu.costs[l];
-            Optional<Holder.Reference<Enchantment>> optional = this.minecraft.level.registryAccess()./*? if <1.21.2 {*/registryOrThrow(Registries.ENCHANTMENT).getHolder(this.menu.enchantClue[l])/*?} else {*//*lookupOrThrow(Registries.ENCHANTMENT).get(this.menu.enchantClue[l])*//*?}*/;
+            Optional<Holder.Reference<Enchantment>> optional = this.minecraft.level.registryAccess()./*? if <1.21.2 {*//*registryOrThrow(Registries.ENCHANTMENT).getHolder(this.menu.enchantClue[l])*//*?} else {*/lookupOrThrow(Registries.ENCHANTMENT).get(this.menu.enchantClue[l])/*?}*/;
             int n = this.menu.levelClue[l];
             int o = l + 1;
             double t = i - (leftPos + 80.5);

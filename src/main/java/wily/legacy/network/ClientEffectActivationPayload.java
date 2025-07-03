@@ -1,15 +1,11 @@
 package wily.legacy.network;
 
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.entity.player.Player;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
-import wily.legacy.Legacy4JClient;
-
-import java.util.function.Supplier;
+import wily.legacy.client.LegacyActivationAnim;
 
 public record ClientEffectActivationPayload(/*? if <1.20.5 {*//*MobEffect*//*?} else {*/Holder<MobEffect>/*?}*/ effect) implements CommonNetwork.Payload {
     public static final CommonNetwork.Identifier<ClientEffectActivationPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("client_effect_activation"), ClientEffectActivationPayload::new);
@@ -28,7 +24,7 @@ public record ClientEffectActivationPayload(/*? if <1.20.5 {*//*MobEffect*//*?} 
 
     @Override
     public void apply(Context context) {
-        if (FactoryAPIPlatform.isClient()) Legacy4JClient.displayEffectActivationAnimation(effect);
+        if (FactoryAPIPlatform.isClient()) LegacyActivationAnim.displayEffect(effect);
     }
 
     @Override

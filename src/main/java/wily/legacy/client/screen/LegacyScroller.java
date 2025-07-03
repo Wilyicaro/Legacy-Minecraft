@@ -7,7 +7,7 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.function.Supplier;
 
@@ -47,7 +47,7 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable{
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(this.getX() + offset.x, getY() + offset.y, offset.z);
         Stocker.Sizeable scroll = getScroll();
         if (scroll.max > 0) {
@@ -60,12 +60,12 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable{
         guiGraphics.pose().translate(-2f, -1f + (scroll.max > 0 ? scroll.get() * getScrollerHeight() / scroll.max : 0), 0f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
         FactoryGuiGraphics.of(guiGraphics).clearColor(true);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
 
     @Override
     public boolean isHovered(double mouseX, double mouseY) {
-        return ScreenUtil.isMouseOver(mouseX, mouseY, this.getX() + offset.x, this.getY() + offset.y, this.getWidth(), this.getHeight());
+        return LegacyRenderUtil.isMouseOver(mouseX, mouseY, this.getX() + offset.x, this.getY() + offset.y, this.getWidth(), this.getHeight());
     }
 
     public boolean mouseScrolled(double g){

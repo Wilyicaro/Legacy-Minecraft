@@ -55,7 +55,7 @@ public class JsonUtil {
                 }
             });
         }
-        return t -> !tipExclusions.contains(t) && (tip.contains(t) || tipTags.stream().anyMatch(registry./*? if <1.21.2 {*/getHolderOrThrow/*?} else {*//*getOrThrow*//*?}*/(registry.getResourceKey(t).orElseThrow())::is));
+        return t -> !tipExclusions.contains(t) && (tip.contains(t) || tipTags.stream().anyMatch(registry./*? if <1.21.2 {*//*getHolderOrThrow*//*?} else {*/getOrThrow/*?}*/(registry.getResourceKey(t).orElseThrow())::is));
     }
 
     public static BiPredicate<Item, /*? if <1.20.5 {*/ /*CompoundTag*//*?} else {*/DataComponentPatch/*?}*/> registryMatchesItem(JsonObject o){

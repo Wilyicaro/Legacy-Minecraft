@@ -6,9 +6,8 @@ import net.minecraft.resources.ResourceLocation;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -102,7 +101,7 @@ public class Panel extends SimpleLayoutRenderable {
 
             @Override
             public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-                ScreenUtil.renderPointerPanel(guiGraphics,getX(),getY(),getWidth(),getHeight());
+                LegacyRenderUtil.renderPointerPanel(guiGraphics,getX(),getY(),getWidth(),getHeight());
             }
         };
         p.init();

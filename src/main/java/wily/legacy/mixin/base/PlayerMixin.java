@@ -22,6 +22,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.entity.PlayerYBobbing;
 import wily.legacy.init.LegacyGameRules;
+import wily.legacy.util.LegacyItemUtil;
 
 @Mixin(Player.class)
 public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing {
@@ -79,7 +80,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
 
     @ModifyExpressionValue(method = "attack", at = @At(value = "INVOKE", target = /*? if <1.20.5 {*//*"Lnet/minecraft/world/entity/player/Player;getAttributeValue(Lnet/minecraft/world/entity/ai/attributes/Attribute;)D"*//*?} else {*/"Lnet/minecraft/world/entity/player/Player;getAttributeValue(Lnet/minecraft/core/Holder;)D"/*?}*/))
     protected double modifyAttackDamage(double original) {
-        return original + Legacy4J.getItemDamageModifier(getMainHandItem());
+        return original + LegacyItemUtil.getItemDamageModifier(getMainHandItem());
     }
 
     @ModifyVariable(method = "attack", at = @At(value = "STORE"), ordinal = 3)

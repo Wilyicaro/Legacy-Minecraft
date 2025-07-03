@@ -26,7 +26,7 @@ import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -160,7 +160,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
     @Override
     public void setTooltipForNextRenderPass(Tooltip tooltip, ClientTooltipPositioner clientTooltipPositioner, boolean bl) {
-        if (ScreenUtil.hasTooltipBoxes(accessor)) {
+        if (LegacyRenderUtil.hasTooltipBoxes(accessor)) {
             tooltipBoxLabel = tooltip.toCharSequence(minecraft);
             scrollableRenderer.scrolled.max = Math.max(0,tooltipBoxLabel.size() - (tooltipBox.getHeight() - 44) / 12);
         }else super.setTooltipForNextRenderPass(tooltip, clientTooltipPositioner, bl);
@@ -189,8 +189,8 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
-        if (ScreenUtil.hasTooltipBoxes(accessor)) {
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        if (LegacyRenderUtil.hasTooltipBoxes(accessor)) {
             if (tooltipBoxLabel != null && getChildAt(i,j).map(g-> g instanceof AbstractWidget w ? w.getTooltip() : null).isEmpty() && (!(getFocused() instanceof AbstractWidget w) || w.getTooltip() == null)) {
                 tooltipBoxLabel = null;
                 scrollableRenderer.scrolled.set(0);
@@ -222,7 +222,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
     @Override
     public void renderableVListInit() {
-        if (ScreenUtil.hasTooltipBoxes(accessor)) tooltipBox.init();
+        if (LegacyRenderUtil.hasTooltipBoxes(accessor)) tooltipBox.init();
         super.renderableVListInit();
     }
 

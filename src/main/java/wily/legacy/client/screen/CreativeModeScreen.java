@@ -1,17 +1,15 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeInventoryListener;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 //? if <1.21.2 {
-import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
-//?}
+/*import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
+*///?}
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 //? if >=1.20.5 {
 import net.minecraft.core.component.DataComponents;
@@ -36,12 +34,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
-import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryItemUtil;
-import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.PagedList;
-import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
@@ -52,13 +47,14 @@ import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.*;
 import java.util.function.Supplier;
 
 import static wily.legacy.client.screen.ControlTooltip.*;
 
-public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInventoryScreen/*?} else {*//*AbstractContainerScreen*//*?}*/<CreativeModeScreen.CreativeModeMenu> implements Controller.Event,ControlTooltip.Event{
+public class CreativeModeScreen extends /*? if <=1.21.2 {*//*EffectRenderingInventoryScreen*//*?} else {*/AbstractContainerScreen/*?}*/<CreativeModeScreen.CreativeModeMenu> implements Controller.Event,ControlTooltip.Event{
     protected Stocker.Sizeable page = new Stocker.Sizeable(0);
     protected final TabList tabList = new TabList(UIAccessor.of(this), new PagedList<>(page,8));
     protected final Panel panel;
@@ -235,8 +231,8 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
 
         this.renderTooltip(guiGraphics, i, j);
         //? if >=1.21.2 {
-        /*ScreenUtil.renderContainerEffects(guiGraphics,leftPos,topPos,imageWidth,imageHeight,i,j);
-        *///?}
+        LegacyRenderUtil.renderContainerEffects(guiGraphics,leftPos,topPos,imageWidth,imageHeight,i,j);
+        //?}
     }
 
     @Override
@@ -294,7 +290,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         if (i == InputConstants.KEY_X && canClearQuickSelect()) {
             for (int n = 36; n < 45; ++n) {
                 //? if >=1.21.2
-                /*this.minecraft.player.inventoryMenu.getSlot(n).set(ItemStack.EMPTY);*/
+                this.minecraft.player.inventoryMenu.getSlot(n).set(ItemStack.EMPTY);
                 this.minecraft.gameMode.handleCreativeModeItemAdd(ItemStack.EMPTY, n);
             }
             return true;
@@ -327,7 +323,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
                     return;
                 }
                 if (clickType == ClickType.THROW) {
-                    if (!itemStack2.isEmpty()/*? if >=1.21.2 {*/ /*&& minecraft.player.canDropItems()*//*?}*/) {
+                    if (!itemStack2.isEmpty()/*? if >=1.21.2 {*/ && minecraft.player.canDropItems()/*?}*/) {
                         ItemStack itemStack3 = itemStack2.copyWithCount(j == 0 ? 1 : itemStack2.getMaxStackSize());
                         this.minecraft.player.drop(itemStack3, true);
                         this.minecraft.gameMode.handleCreativeModeItemDrop(itemStack3);
@@ -374,21 +370,21 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
                         this.minecraft.gameMode.handleCreativeModeItemAdd(itemStack, l - menu.slots.size() + 9 + 36);
                     }
                     //? if <1.21.2 {
-                    else if (clickType == ClickType.THROW && !itemStack.isEmpty()) {
+                    /*else if (clickType == ClickType.THROW && !itemStack.isEmpty()) {
                         ItemStack itemStack4 = itemStack.copyWithCount(j == 0 ? 1 : itemStack.getMaxStackSize());
                         this.minecraft.player.drop(itemStack4, true);
                         this.minecraft.gameMode.handleCreativeModeItemDrop(itemStack4);
                     }
-                    //?}
+                    *///?}
                     this.minecraft.player.inventoryMenu.broadcastChanges();
                 }
             }
         } else if (!menu.getCarried().isEmpty() && this.hasClickedOutside) {
             //? if >=1.21.2 {
-            /*if (!this.minecraft.player.canDropItems()) {
+            if (!this.minecraft.player.canDropItems()) {
                 return;
             }
-            *///?}
+            //?}
             if (j == 0) {
                 this.minecraft.player.drop(menu.getCarried(), true);
                 this.minecraft.gameMode.handleCreativeModeItemDrop(menu.getCarried());

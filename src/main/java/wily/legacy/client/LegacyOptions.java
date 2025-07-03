@@ -23,7 +23,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.vehicle./*? if <1.21.2 {*/Boat/*?} else {*//*AbstractBoat*//*?}*/;
+import net.minecraft.world.entity.vehicle./*? if <1.21.2 {*//*Boat*//*?} else {*/AbstractBoat/*?}*/;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.config.FactoryConfig;
@@ -303,7 +303,7 @@ public class LegacyOptions {
 
     public static float getLeftStickDeadZone(){
         Minecraft minecraft = Minecraft.getInstance();
-        return minecraft.player != null && minecraft.player.getControlledVehicle() instanceof /*? if <1.21.2 {*/Boat/*?} else {*//*AbstractBoat*//*?}*/ ? 0.5f + leftStickDeadZone.get().floatValue() / 2 : leftStickDeadZone.get().floatValue();
+        return minecraft.player != null && minecraft.player.getControlledVehicle() instanceof /*? if <1.21.2 {*//*Boat*//*?} else {*/AbstractBoat/*?}*/ ? 0.5f + leftStickDeadZone.get().floatValue() / 2 : leftStickDeadZone.get().floatValue();
     }
 
     public enum VehicleCameraRotation implements StringRepresentable {

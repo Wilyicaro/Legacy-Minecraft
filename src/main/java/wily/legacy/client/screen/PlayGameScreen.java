@@ -23,10 +23,11 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.screen.compat.FriendsServerRenderableList;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -130,13 +131,13 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
         if (hasTabList()) tabList.render(guiGraphics,i,j,f);
         panel.render(guiGraphics,i,j,f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, accessor.getInteger("panelRecess.x",panel.x + 9), accessor.getInteger("panelRecess.y",panel.y + 9), accessor.getInteger("panelRecess.width",panel.width - 18), accessor.getInteger("panelRecess.height",panel.height - 18 - (tabList.selectedTab == 0 ? 21 : 0)));
         if (hasTabList() && tabList.selectedTab == 0){
             if (saveRenderableList.currentlyDisplayedLevels != null) {
-                guiGraphics.pose().pushPose();
+                guiGraphics.pose().pushMatrix();
                 guiGraphics.pose().translate(panel.x + 11.25f, panel.y + panel.height - 22.75, 0);
                 long storage = new File("/").getTotalSpace();
                 FactoryGuiGraphics.of(guiGraphics).enableScissor(0, 0, panel.width - 24, panel.height - 10);
@@ -144,19 +145,19 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
                     Long size;
                     if ((size = SaveRenderableList.sizeCache.getIfPresent(level)) == null) continue;
                     float scaledSize = Math.max(1,size * (panel.width - 21f)/ storage);
-                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().pushMatrix();
                     guiGraphics.pose().scale(scaledSize,1,1);
                     guiGraphics.fill(0, 0, 1, 11,getFocused() instanceof AbstractButton b && saveRenderableList.renderables.contains(b) && saveRenderableList.renderables.indexOf(b) == saveRenderableList.currentlyDisplayedLevels.indexOf(level) ? CommonColor.SELECTED_STORAGE_SAVE.get() : CommonColor.STORAGE_SAVE.get());
-                    guiGraphics.pose().popPose();
+                    guiGraphics.pose().popMatrix();
                     guiGraphics.pose().translate(scaledSize, 0, 0);
                 }
-                guiGraphics.pose().popPose();
+                guiGraphics.pose().popMatrix();
                 guiGraphics.disableScissor();
             }
-            ScreenUtil.renderPanelTranslucentRecess(guiGraphics, panel.x + 9, panel.y + panel.height - 25, panel.width - 18 , 16);
+            LegacyRenderUtil.renderPanelTranslucentRecess(guiGraphics, panel.x + 9, panel.y + panel.height - 25, panel.width - 18 , 16);
         }
         if (isLoading)
-            ScreenUtil.drawGenericLoading(guiGraphics, panel.x + 112, panel.y + 66);
+            LegacyRenderUtil.drawGenericLoading(guiGraphics, panel.x + 112, panel.y + 66);
     }
 
     @Override
@@ -259,7 +260,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.import_save"), Component.translatable("legacy.menu.import_save_message", string), (b) -> {
                 list.forEach(p -> {
                     try {
-                        Legacy4JClient.importSaveFile(new FileInputStream(p.toFile()),minecraft.getLevelSource(), FileNameUtils.getBaseName(p.getFileName().toString()));
+                        LegacySaveCache.importSaveFile(new FileInputStream(p.toFile()),minecraft.getLevelSource(), FileNameUtils.getBaseName(p.getFileName().toString()));
                     } catch (FileNotFoundException e) {
                         throw new RuntimeException(e);
                     }

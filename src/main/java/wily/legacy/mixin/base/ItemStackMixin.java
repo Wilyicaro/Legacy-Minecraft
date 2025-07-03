@@ -28,8 +28,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 //? if >=1.21.5 {
-/*import net.minecraft.world.item.component.TooltipDisplay;
-*///?}
+import net.minecraft.world.item.component.TooltipDisplay;
+//?}
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -44,7 +44,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4J;
-import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.config.LegacyCommonOptions;import wily.legacy.util.LegacyItemUtil;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -55,16 +55,16 @@ import java.util.function.Consumer;
 public abstract class ItemStackMixin {
 
     //? if <1.21.2 {
-    @ModifyArg(method = "getTooltipLines",at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = /*? if neoforge || (forge && <1.20.5) {*/ /*0*//*?} else {*/ 1/*?}*/))
+    /*@ModifyArg(method = "getTooltipLines",at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = /^? if neoforge || (forge && <1.20.5) {^/ /^0^//^?} else {^/ 1/^?}^/))
     public ChatFormatting getTooltipLines(ChatFormatting arg) {
         return ChatFormatting.GOLD;
     }
-    //?} else {
-    /*@ModifyArg(method = "getStyledHoverName",at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = /^? if neoforge {^/ /^0^//^?} else {^/1/^?}^/))
+    *///?} else {
+    @ModifyArg(method = "getStyledHoverName",at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = /*? if neoforge {*/ /*0*//*?} else {*/1/*?}*/))
     public ChatFormatting getStyledHoverName(ChatFormatting arg) {
         return ChatFormatting.GOLD;
     }
-    *///?}
+    //?}
 
     @Unique
     private DecimalFormat getLegacyDecimalFormat(DecimalFormat instance) {
@@ -89,7 +89,7 @@ public abstract class ItemStackMixin {
 
     @ModifyExpressionValue(method = "addModifierTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/attributes/AttributeModifier;amount()D"))
     private double addModifierTooltip(double original, @Local(argsOnly = true) AttributeModifier modifier) {
-        return (modifier.is(Item.BASE_ATTACK_DAMAGE_ID) ? Legacy4J.getItemDamageModifier((ItemStack) (Object)this) : 0) + original;
+        return (modifier.is(Item.BASE_ATTACK_DAMAGE_ID) ? LegacyItemUtil.getItemDamageModifier((ItemStack) (Object)this) : 0) + original;
     }
 
     @Inject(method = "addModifierTooltip", at = @At("RETURN"))
@@ -105,7 +105,7 @@ public abstract class ItemStackMixin {
     }
 
     @Redirect(method = "addAttributeTooltips", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;forEachModifier(Lnet/minecraft/world/entity/EquipmentSlotGroup;Ljava/util/function/BiConsumer;)V"))
-    private void addAttributeTooltips(ItemStack instance, EquipmentSlotGroup equipmentSlotGroup, BiConsumer<Holder<Attribute>, AttributeModifier> biConsumer, Consumer<Component> consumer/*? if >=1.21.5 {*//*, TooltipDisplay tooltipDisplay*//*?}*/, @Nullable Player player) {
+    private void addAttributeTooltips(ItemStack instance, EquipmentSlotGroup equipmentSlotGroup, BiConsumer<Holder<Attribute>, AttributeModifier> biConsumer, Consumer<Component> consumer/*? if >=1.21.5 {*/, TooltipDisplay tooltipDisplay/*?}*/, @Nullable Player player) {
         Bearer<Boolean> noSpace = Bearer.of(true);
         forEachModifier(equipmentSlotGroup, (holder, attributeModifier)->{
             if (noSpace.get()){

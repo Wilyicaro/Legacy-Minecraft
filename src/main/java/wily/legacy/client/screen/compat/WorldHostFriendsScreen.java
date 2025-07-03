@@ -1,7 +1,6 @@
 package wily.legacy.client.screen.compat;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.gaming32.worldhost.WorldHost;
 import io.github.gaming32.worldhost.WorldHostComponents;
 import io.github.gaming32.worldhost.gui.screen.AddFriendScreen;
@@ -10,7 +9,6 @@ import io.github.gaming32.worldhost.gui.widget.UserListWidget;
 import io.github.gaming32.worldhost.plugin.FriendAdder;
 import io.github.gaming32.worldhost.plugin.FriendListFriend;
 import io.github.gaming32.worldhost.plugin.ProfileInfo;
-import io.github.gaming32.worldhost.plugin.vanilla.WorldHostFriendListFriend;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -31,7 +29,7 @@ import wily.legacy.client.ControlType;
 import wily.legacy.client.screen.*;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.*;
 
@@ -81,7 +79,7 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        if (minecraft.level == null) ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        if (minecraft.level == null) LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
     }
 
     protected void addFriendButtons(Runnable afterButtonsAdd){
@@ -113,7 +111,7 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
                     }
                     @Override
                     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                        ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 45, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
+                        LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 45, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
                     }
                     @Override
                     public void onPress() {
@@ -218,7 +216,7 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
 
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-            ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 30, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
+            LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 30, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
         }
 
         @Override

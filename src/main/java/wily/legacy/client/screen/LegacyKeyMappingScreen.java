@@ -1,7 +1,6 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -28,7 +27,7 @@ import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -117,7 +116,7 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
             super.renderWidget(guiGraphics, i, j, f);
             Component c = isPressed() ? SELECTION : isNone() ? NONE : null;
             if (c != null){
-                guiGraphics.drawString(font, c, getX() + width - 20 - Minecraft.getInstance().font.width(c) / 2, getY() + (height -  font.lineHeight) / 2 + 1, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                guiGraphics.drawString(font, c, getX() + width - 20 - Minecraft.getInstance().font.width(c) / 2, getY() + (height -  font.lineHeight) / 2 + 1, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
                 return;
             }
             ControlTooltip.Icon icon = getIcon();
@@ -132,7 +131,7 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
 
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-            ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 8, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j,true);
+            LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 8, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j,true);
         }
         @Override
         protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -182,7 +181,7 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
     }
 
     public Component getCancelTooltip(){
@@ -238,7 +237,7 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
                 int tooltipHeight = mappingTooltipLines.getHeight() + 18;
                 int tooltipX = panel.getX() + panel.getWidth() - 2;
                 int tooltipY = Math.max(panel.getY() + 2, Math.min(b.getY() + (b.getHeight() - tooltipHeight) / 2, panel.getY() + panel.getHeight() - tooltipHeight - 2));
-                ScreenUtil.renderPointerPanel(guiGraphics, tooltipX, tooltipY, 129,  tooltipHeight);
+                LegacyRenderUtil.renderPointerPanel(guiGraphics, tooltipX, tooltipY, 129,  tooltipHeight);
                 mappingTooltipLines.setPosition(tooltipX + 4, tooltipY + 9);
                 mappingTooltipLines.render(guiGraphics, i, j, f);
             }

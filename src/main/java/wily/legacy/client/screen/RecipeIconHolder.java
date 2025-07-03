@@ -1,14 +1,11 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -27,7 +24,7 @@ import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.network.ServerMenuCraftPayload;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,7 +54,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
     @Override
     public void renderItem(GuiGraphics graphics, int i, int j, float f) {
         if (!isValidIndex()) return;
-        ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(0)),0.5f, (u)->super.renderItem(graphics,i,j,f));
+        LegacyRenderUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(0)),0.5f, (u)->super.renderItem(graphics,i,j,f));
     }
 
     protected abstract boolean canCraft(RecipeInfo<R> rcp);
@@ -110,7 +107,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
                 renderer.updateScroll(i == 263 ? ScreenDirection.LEFT : ScreenDirection.RIGHT);
                 focusedRecipes = null;
             }
-            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+            LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             return true;
         }
         return false;
@@ -122,7 +119,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
             selectionOffset = 0;
             toggleCraftableRecipes();
             updateRecipeDisplay();
-            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+            LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             return true;
         }
         int oldSelection = selectionOffset;
@@ -132,7 +129,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
             if (i == InputConstants.KEY_DOWN && getRecipes().size() >= 2)
                 selectionOffset = Math.min(selectionOffset + 1, 1);
             if (oldSelection != selectionOffset || canScroll()) {
-                ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+                LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
                 if (oldSelection == selectionOffset && selectionOffset != 0)
                     Collections.rotate(getFocusedRecipes(), -selectionOffset);
                 updateRecipeDisplay(getFocusedRecipe());
@@ -151,7 +148,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
     @Override
     public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
         if (isValidIndex()) {
-            graphics.pose().pushPose();
+            graphics.pose().pushMatrix();
             graphics.pose().translate(getXCorner() - 4.5f, getYCorner(), 0f);
             applyOffset(graphics);
             FactoryGuiGraphics.of(graphics).disableDepthTest();
@@ -159,17 +156,17 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
                 FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.CRAFTING_2_SLOTS_SELECTION, 0, -12, 36, 78);
             }else if (getFocusedRecipes().size() > 2)
                 FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.CRAFTING_SELECTION, 0, -39, 36, 105);
-            graphics.pose().popPose();
+            graphics.pose().popMatrix();
             if (getFocusedRecipes().size() >= 2){
-                ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(1)), 0.5f, (u)-> renderItem(graphics, getFocusedRecipes().get(1).getResultItem(),getX(),getY() + 27,false));
-                if (getFocusedRecipes().size() >= 3) ScreenUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(getFocusedRecipes().size() - 1)), 0.5f, (u)-> renderItem(graphics, getFocusedRecipes().get(getFocusedRecipes().size() - 1).getResultItem(),getX(),getY() - 27,false));
+                LegacyRenderUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(1)), 0.5f, (u)-> renderItem(graphics, getFocusedRecipes().get(1).getResultItem(),getX(),getY() + 27,false));
+                if (getFocusedRecipes().size() >= 3) LegacyRenderUtil.secureTranslucentRender(graphics, !canCraft(getFocusedRecipes().get(getFocusedRecipes().size() - 1)), 0.5f, (u)-> renderItem(graphics, getFocusedRecipes().get(getFocusedRecipes().size() - 1).getResultItem(),getX(),getY() - 27,false));
             }
             FactoryGuiGraphics.of(graphics).enableDepthTest();
         }
-        graphics.pose().pushPose();
+        graphics.pose().pushMatrix();
         graphics.pose().translate(0,selectionOffset * 27,0);
         super.renderSelection(graphics,i,j,f);
-        graphics.pose().popPose();
+        graphics.pose().popMatrix();
     }
     protected boolean canScroll(){
         return getRecipes().size() >= 3;
@@ -190,7 +187,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
         return false;
     }
     protected boolean isMouseOver(double d, double e, int selection){
-        return ScreenUtil.isMouseOver(d,e,getXCorner(),getYCorner() + selection * 27,getWidth(),getHeight());
+        return LegacyRenderUtil.isMouseOver(d,e,getXCorner(),getYCorner() + selection * 27,getWidth(),getHeight());
     }
 
     @Override
@@ -222,7 +219,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
                     m.showedNotEnoughIngredientsHint = true;
                     LegacyTipManager.setActualTip(new LegacyTip(null,NOT_ENOUGH_INGREDIENTS));
                 }
-                ScreenUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(), 1.0f);
+                LegacyRenderUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(), 1.0f);
             }
         }
     }

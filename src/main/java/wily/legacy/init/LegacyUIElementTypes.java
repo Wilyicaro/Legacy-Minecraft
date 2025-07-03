@@ -4,14 +4,10 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraft.client.model.BookModel;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -19,8 +15,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.inventory.EnchantmentMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -32,15 +26,13 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.client.UIDefinitionManager;
 import wily.factoryapi.util.DynamicUtil;
-import wily.legacy.Legacy4J;
 import wily.legacy.client.screen.*;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiFunction;
 
 public class LegacyUIElementTypes {
     private static final Container emptyFakeContainer = new SimpleContainer();
@@ -128,7 +120,7 @@ public class LegacyUIElementTypes {
             int y = a.getInteger(elementName + ".y", 0);
             int width = a.getInteger(elementName + ".width", 0);
             int height = a.getInteger(elementName + ".height", 0);
-            if (a.getBoolean(elementName+".hasBackground", true)) ScreenUtil.blitTranslucentOverlaySprite(guiGraphics, a.getResourceLocation(elementName+".backgroundSprite", LegacySprites.POINTER_PANEL), x, y, width, height );
+            if (a.getBoolean(elementName+".hasBackground", true)) LegacyRenderUtil.blitTranslucentOverlaySprite(guiGraphics, a.getResourceLocation(elementName+".backgroundSprite", LegacySprites.POINTER_PANEL), x, y, width, height );
             a.getElement(elementName, ScrollableRenderer.class).ifPresent(s-> s.render(guiGraphics, x + 11, y + 11, width - 22, height - 28, ()-> {
                 int yOffset = 0;
                 for (Renderable r : a.getElementValue(elementName+".renderables", a, UIAccessor.class).getChildrenRenderables()) {
@@ -187,7 +179,7 @@ public class LegacyUIElementTypes {
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "x", "y", "color", "outlineColor", "order");
         UIDefinitionManager.ElementType.parseTranslationElements(uiDefinition, elementName, element);
         uiDefinition.getDefinitions().add(UIDefinition.createAfterInit(elementName, (a) -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (guiGraphics, i, j, f) -> {
-            a.getElement(elementName + ".component", Component.class).ifPresent((c) -> ScreenUtil.drawOutlinedString(guiGraphics ,Minecraft.getInstance().font, c, a.getInteger(elementName + ".x", 0), a.getInteger(elementName + ".y", 0), a.getInteger(elementName + ".color", 16777215), a.getInteger(elementName + ".outlineColor", 0), a.getFloat(elementName + ".outline", 0.5f)));
+            a.getElement(elementName + ".component", Component.class).ifPresent((c) -> LegacyRenderUtil.drawOutlinedString(guiGraphics ,Minecraft.getInstance().font, c, a.getInteger(elementName + ".x", 0), a.getInteger(elementName + ".y", 0), a.getInteger(elementName + ".color", 16777215), a.getInteger(elementName + ".outlineColor", 0), a.getFloat(elementName + ".outline", 0.5f)));
         }))));
     }));
 
@@ -238,7 +230,7 @@ public class LegacyUIElementTypes {
             float f1 = Mth.lerp(f, oFlip.get(), flip.get());
             guiGraphics.flush();
             Lighting.setupForEntityInInventory();
-            guiGraphics.pose().pushPose();
+            guiGraphics.pose().pushMatrix();
             guiGraphics.pose().translate( a.getInteger(elementName+".x", 0) + 33.0F, a.getInteger(elementName+".y", 0) + 31.0F, 100.0F);
             guiGraphics.pose().scale(-40.0F, 40.0F, 40.0F);
             guiGraphics.pose().mulPose(Axis.XP.rotationDegrees(25.0F));
@@ -253,7 +245,7 @@ public class LegacyUIElementTypes {
             bookModel.get().renderToBuffer(guiGraphics.pose(), vertexconsumer, 15728880, OverlayTexture.NO_OVERLAY/*? <1.20.5 {*//*, 1.0F, 1.0F, 1.0F, 1.0F*//*?}*/);
             FactoryGuiGraphics.of(guiGraphics).getBufferSource().endBatch();
             guiGraphics.flush();
-            guiGraphics.pose().popPose();
+            guiGraphics.pose().popMatrix();
             Lighting.setupFor3DItems();
         }))));
     }));

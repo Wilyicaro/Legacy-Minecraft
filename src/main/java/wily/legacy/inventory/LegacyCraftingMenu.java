@@ -91,17 +91,17 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
 
     public static List<Optional<Ingredient>> getRecipeOptionalIngredients(Recipe<?> recipe){
         //? if <1.21.2 {
-        return convertIngredientsToOptional(recipe.getIngredients());
-        //?} else {
-        /*return recipe instanceof ShapedRecipe rcp ? rcp.getIngredients() : recipe instanceof ShapelessRecipe sr ? sr.placementInfo().ingredients().stream().map(Optional::of).toList() : recipe instanceof StonecutterRecipe stonecutterRecipe ? Collections.singletonList(Optional.of(stonecutterRecipe.input())) : Collections.emptyList();
-        *///?}
+        /*return convertIngredientsToOptional(recipe.getIngredients());
+        *///?} else {
+        return recipe instanceof ShapedRecipe rcp ? rcp.getIngredients() : recipe instanceof ShapelessRecipe sr ? sr.placementInfo().ingredients().stream().map(Optional::of).toList() : recipe instanceof StonecutterRecipe stonecutterRecipe ? Collections.singletonList(Optional.of(stonecutterRecipe.input())) : Collections.emptyList();
+        //?}
     }
 
     //? if <1.21.2 {
-    static List<Optional<Ingredient>> convertIngredientsToOptional(List<Ingredient> ingredients){
+    /*static List<Optional<Ingredient>> convertIngredientsToOptional(List<Ingredient> ingredients){
         return ingredients.stream().map(i-> i.isEmpty() ? Optional.<Ingredient>empty() : Optional.of(i)).toList();
     }
-    //?}
+    *///?}
 
     public static LegacyCraftingMenu playerCraftingMenu(int window, Inventory inventory){
         return craftingMenu(inventory, LegacyRegistries.PLAYER_CRAFTING_PANEL_MENU.get(),window,null,2);
@@ -219,15 +219,15 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
         return LOOM_PATTERN_EXTRA_INGREDIENT_CACHE.computeIfAbsent(pattern,key->{
             Holder<BannerPattern> holder = registryAccess.lookupOrThrow(Registries.BANNER_PATTERN).getOrThrow(pattern);
             for (Item item : BuiltInRegistries.ITEM) {
-                if (/*? if <1.21.5 {*/item instanceof BannerPatternItem p && holder.is(p.getBannerPattern())/*?} else {*//*item.components().has(DataComponents.PROVIDES_BANNER_PATTERNS) && holder.is(item.components().get(DataComponents.PROVIDES_BANNER_PATTERNS))*//*?}*/) return Optional.of(Ingredient.of(item));
+                if (/*? if <1.21.5 {*//*item instanceof BannerPatternItem p && holder.is(p.getBannerPattern())*//*?} else {*/item.components().has(DataComponents.PROVIDES_BANNER_PATTERNS) && holder.is(item.components().get(DataComponents.PROVIDES_BANNER_PATTERNS))/*?}*/) return Optional.of(Ingredient.of(item));
             }
             return Optional.empty();
         });
     }
 
 
-    public /*? if >=1.21.2 {*//*ResourceKey<Recipe<?>>*//*?} else {*/ResourceLocation/*?}*/ getRecipeKey(ResourceLocation id){
-        return /*? if >=1.21.2 {*//*ResourceKey.create(Registries.RECIPE,id)*//*?} else {*/id/*?}*/;
+    public /*? if >=1.21.2 {*/ResourceKey<Recipe<?>>/*?} else {*//*ResourceLocation*//*?}*/ getRecipeKey(ResourceLocation id){
+        return /*? if >=1.21.2 {*/ResourceKey.create(Registries.RECIPE,id)/*?} else {*//*id*//*?}*/;
     }
 
     public void addInventorySlotGrid(Container container, int startIndex, int x, int y, int rows){
@@ -311,7 +311,7 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
         return getMenuProvider((i,inv,p)-> stoneCutterMenu(i,inv,pos), STONECUTTER_TITLE);
     }
     public void onCraft(Player player, ServerMenuCraftPayload packet, ItemStack result) {
-        result.onCraftedBy(/*? if <1.21.5 {*/player.level(),/*?}*/player,result.getCount());
+        result.onCraftedBy(/*? if <1.21.5 {*//*player.level(),*//*?}*/player,result.getCount());
 
     }
 }

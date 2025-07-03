@@ -13,7 +13,7 @@ import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.init.LegacyRegistries;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class TabList implements Renderable,GuiEventListener, NarratableEntry {
     protected final UIAccessor accessor;
@@ -156,7 +155,7 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
         if (opt.isPresent()){
             if (tabButtons.indexOf(opt.get()) != selectedTab){
                 opt.get().onPress();
-                ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+                LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
                 return true;
             }
         }
@@ -177,7 +176,7 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
     public void numberControlTab(int i){
         if (i <= 57 && i > 48 && i - 49 < tabButtons.size()) {
             tabButtons.get(i - 49).onPress();
-            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+            LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
         }
     }
 

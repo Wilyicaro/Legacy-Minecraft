@@ -1,6 +1,5 @@
 package wily.legacy.client.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,7 +15,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.LegacyBiomeOverride;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.function.Consumer;
 
@@ -43,11 +42,11 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
                 super.renderWidget(guiGraphics, i, j, f);
                 ItemStack s = LegacyBiomeOverride.getOrDefault(biome.unwrapKey()).icon();
                 if (!s.isEmpty()){
-                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().pushMatrix();
                     guiGraphics.pose().translate(getX() + 26, getY() + 5,0);
                     guiGraphics.pose().scale(1.25f,1.25f,1.25f);
                     guiGraphics.renderItem(s,0, 0);
-                    guiGraphics.pose().popPose();
+                    guiGraphics.pose().popMatrix();
                 }
                 FactoryScreenUtil.enableBlend();
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(TickBox.SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);
@@ -58,7 +57,7 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
             protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                 int k = this.getX() + 54;
                 int l = this.getX() + this.getWidth();
-                ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true);
+                LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true);
             }
             @Override
             protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -69,7 +68,7 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package wily.legacy.mixin.base.client.bosshealth;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -12,7 +11,6 @@ import net.minecraft.world.BossEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -23,7 +21,7 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyIconHolder;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.function.Function;
 
@@ -33,14 +31,14 @@ public abstract class BossHealthOverlayMixin {
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)I"))
     public int drawString(GuiGraphics graphics, Font font, Component component, int i, int j, int k) {
-        Legacy4JClient.applyFontOverrideIf(ScreenUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b->{
+        Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b->{
             Legacy4JClient.forceVanillaFontShadowColor = true;
-            graphics.pose().pushPose();
+            graphics.pose().pushMatrix();
             graphics.pose().translate(graphics.guiWidth() / 2f,j,0);
             if (!b) graphics.pose().scale(2/3f,2/3f,2/3f);
             graphics.pose().translate(-font.width(component) / 2f,0,0);
             graphics.drawString(font,component,0,0,k);
-            graphics.pose().popPose();
+            graphics.pose().popMatrix();
             Legacy4JClient.forceVanillaFontShadowColor = false;
         });
         return 0;
@@ -54,7 +52,7 @@ public abstract class BossHealthOverlayMixin {
     }
     @Inject(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At("HEAD"))
     private void drawBar(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, CallbackInfo ci) {
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         FactoryScreenUtil.enableBlend();
         guiGraphics.pose().translate((guiGraphics.guiWidth() - 203) / 2f,j,0);
         guiGraphics.pose().scale(0.5f,0.5f,0.5f);
@@ -62,7 +60,7 @@ public abstract class BossHealthOverlayMixin {
     @Inject(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At("RETURN"))
     private void drawBarReturn(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, CallbackInfo ci) {
         FactoryScreenUtil.disableBlend();
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
     //? if >1.20.1 {
     @Redirect(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/BossHealthOverlay;drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/ResourceLocation;[Lnet/minecraft/resources/ResourceLocation;)V", ordinal = 0))
@@ -74,8 +72,8 @@ public abstract class BossHealthOverlayMixin {
         guiGraphics.pose().translate(3f,0,0);
         drawBar(guiGraphics,0,0,bossEvent, Mth.lerpDiscrete(bossEvent.getProgress(), 0, 400),resourceLocations,resourceLocations2);
     }
-    @Redirect(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/ResourceLocation;[Lnet/minecraft/resources/ResourceLocation;)V", at = @At(value = "INVOKE", target = /*? if <1.21.2 {*/"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIIIIIII)V"/*?} else {*//*"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIIIIIII)V"*//*?}*/))
-    private void drawBar(GuiGraphics guiGraphics, /*? if >=1.21.2 {*//*Function function, *//*?}*/ ResourceLocation resourceLocation, int i, int j, int k, int l, int m, int n, int o, int p) {
+    @Redirect(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/ResourceLocation;[Lnet/minecraft/resources/ResourceLocation;)V", at = @At(value = "INVOKE", target = /*? if <1.21.2 {*//*"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIIIIIII)V"*//*?} else {*/"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIIIIIII)V"/*?}*/))
+    private void drawBar(GuiGraphics guiGraphics, /*? if >=1.21.2 {*/Function function, /*?}*/ ResourceLocation resourceLocation, int i, int j, int k, int l, int m, int n, int o, int p) {
         FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation,o <= 400 ? 400 : 406,j * 3,k,l,m,n,0,o,p * 3);
     }
     //?} else {

@@ -83,8 +83,8 @@ public class WaterCauldronBlockEntity extends BlockEntity {
     public void /*? if <1.20.5 {*//*load*//*?} else {*/loadAdditional/*?}*/(CompoundTag compoundTag/*? if >=1.20.5 {*/, HolderLookup.Provider provider/*?}*/) {
         super./*? if <1.20.5 {*//*load*//*?} else {*/loadAdditional/*?}*/(compoundTag/*? if >=1.20.5 {*/, provider/*?}*/);
         CompoundTagUtil.getInt(compoundTag, "dyeColor").ifPresent(i-> waterColor = i);
-        CompoundTagUtil.getString(compoundTag, "potion").flatMap(id -> BuiltInRegistries.POTION./*? if <1.21.2 {*/getHolder/*?} else {*//*get*//*?}*/(ResourceKey.create(Registries.POTION, ResourceLocation.tryParse(id)))).ifPresent(p -> potion = p);
-        CompoundTagUtil.getString(compoundTag, "lastPotionItemUsed").flatMap(id ->BuiltInRegistries.ITEM./*? if <1.21.2 {*/getHolder/*?} else {*//*get*//*?}*/(ResourceKey.create(Registries.ITEM, ResourceLocation.tryParse(id)))).ifPresent(p-> lastPotionItemUsed = p);
+        CompoundTagUtil.getString(compoundTag, "potion").flatMap(id -> BuiltInRegistries.POTION./*? if <1.21.2 {*//*getHolder*//*?} else {*/get/*?}*/(ResourceKey.create(Registries.POTION, ResourceLocation.tryParse(id)))).ifPresent(p -> potion = p);
+        CompoundTagUtil.getString(compoundTag, "lastPotionItemUsed").flatMap(id ->BuiltInRegistries.ITEM./*? if <1.21.2 {*//*getHolder*//*?} else {*/get/*?}*/(ResourceKey.create(Registries.ITEM, ResourceLocation.tryParse(id)))).ifPresent(p-> lastPotionItemUsed = p);
     }
 
     @Override

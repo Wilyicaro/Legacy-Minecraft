@@ -1,12 +1,10 @@
 package wily.legacy.client.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
 import net.minecraft.client.GameNarrator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
-import net.minecraft.client.gui.screens.ReceivingLevelScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.SpriteContents;
@@ -22,7 +20,7 @@ import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -84,7 +82,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
     //? if >1.20.1 {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, true, true, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, true, true, false);
     }
     //?}
     @Override
@@ -115,15 +113,15 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
                     tip.render(guiGraphics, i, j, f);
                 }
             }
-        }else ScreenUtil.drawGenericLoading(guiGraphics,(width - 75 )/ 2, height / 2);
+        }else LegacyRenderUtil.drawGenericLoading(guiGraphics,(width - 75 )/ 2, height / 2);
         if (getLoadingHeader() != null) {
             Legacy4JClient.applyFontOverrideIf(fontOverride != null, fontOverride, b -> {
-                guiGraphics.pose().pushPose();
+                guiGraphics.pose().pushMatrix();
                 float scaleX = accessor.getFloat("loadingHeader.scaleX", 2.0f);
                 guiGraphics.pose().translate(accessor.getFloat("loadingHeader.x", (width - minecraft.font.width(getLoadingHeader()) * scaleX) / 2), accessor.getFloat("loadingHeader.y", height / 2 - 23), 0);
                 guiGraphics.pose().scale(scaleX, accessor.getFloat("loadingHeader.scaleY", 2.0f), 1.0f);
-                ScreenUtil.drawOutlinedString(guiGraphics, minecraft.font, getLoadingHeader(), 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), accessor.getFloat("loadingHeader.outline", 0.5f));
-                guiGraphics.pose().popPose();
+                LegacyRenderUtil.drawOutlinedString(guiGraphics, minecraft.font, getLoadingHeader(), 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), accessor.getFloat("loadingHeader.outline", 0.5f));
+                guiGraphics.pose().popMatrix();
             });
         }
         FactoryScreenUtil.enableDepthTest();

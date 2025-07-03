@@ -12,19 +12,16 @@ import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.Stocker;
-import wily.factoryapi.base.client.FactoryConfigWidgets;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.LegacyOptions;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class RenderableVList {
@@ -254,7 +251,7 @@ public class RenderableVList {
     }
 
     public boolean isHovered(double x, double y){
-        return ScreenUtil.isMouseOver(x,y,leftPos,topPos,listWidth,listHeight == 0 ? getScreen().height : listHeight);
+        return LegacyRenderUtil.isMouseOver(x,y,leftPos,topPos,listWidth,listHeight == 0 ? getScreen().height : listHeight);
     }
 
     public boolean isInvalidFocus(ComponentPath path, boolean allowExternalListener){

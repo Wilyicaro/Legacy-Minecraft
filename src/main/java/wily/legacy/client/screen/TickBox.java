@@ -1,6 +1,5 @@
 package wily.legacy.client.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -9,12 +8,11 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -59,10 +57,10 @@ public class TickBox extends AbstractButton {
         FactoryGuiGraphics.of(guiGraphics).blitSprite(SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX(), this.getY(), 12, 12);
         if (selected) FactoryGuiGraphics.of(guiGraphics).blitSprite(TICK, this.getX(), this.getY(), 14, 12);
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 1.0F);
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.5f,0.5f,0f);
-        this.renderString(guiGraphics, minecraft.font, isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get());
-        guiGraphics.pose().popPose();
+        this.renderString(guiGraphics, minecraft.font, isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get());
+        guiGraphics.pose().popMatrix();
     }
 
 
@@ -86,6 +84,6 @@ public class TickBox extends AbstractButton {
 
     @Override
     public void renderString(GuiGraphics guiGraphics, Font font, int i) {
-        ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 13, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), i,isHoveredOrFocused());
+        LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 13, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), i,isHoveredOrFocused());
     }
 }

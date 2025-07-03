@@ -1,5 +1,5 @@
 //? if >=1.21.2 {
-/*package wily.legacy.client;
+package wily.legacy.client;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemUseAnimation;
@@ -22,4 +22,4 @@ public class LegacyLivingEntityRenderState implements FactoryRenderStateExtensio
         fireImmune = entity.fireImmune();
     }
 }
-*///?}
+//?}

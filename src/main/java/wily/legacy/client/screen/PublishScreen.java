@@ -12,7 +12,6 @@ import net.minecraft.server.commands.PublishCommand;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.GameType;
 import wily.factoryapi.FactoryAPI;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyClientWorldSettings;
 
 import java.util.function.Consumer;
@@ -45,6 +44,24 @@ public class PublishScreen extends ConfirmationScreen{
     public PublishScreen(Screen parent, GameType gameType) {
         this(parent,gameType,s-> {});
     }
+
+    public static Pair<Integer,Component> tryParsePort(String string) {
+        if (string.isBlank())
+            return Pair.of(HttpUtil.getAvailablePort(),null);
+        try {
+            int port = Integer.parseInt(string);
+            if (port < 1024 || port > 65535) {
+                return Pair.of(port,Component.translatable("lanServer.port.invalid.new", 1024, 65535));
+            }
+            if (!HttpUtil.isPortAvailable(port)) {
+                return Pair.of(port,Component.translatable("lanServer.port.unavailable.new", 1024, 65535));
+            }
+            return Pair.of(port,null);
+        } catch (NumberFormatException numberFormatException) {
+            return  Pair.of(HttpUtil.getAvailablePort(),Component.translatable("lanServer.port.invalid.new", 1024, 65535));
+        }
+    }
+
     @Override
     public void repositionElements() {
         String string = this.portEdit.getValue();
@@ -58,7 +75,7 @@ public class PublishScreen extends ConfirmationScreen{
         portEdit.setHint(Component.literal("" + this.port).withStyle(ChatFormatting.DARK_GRAY));
         portEdit.setMaxLength(128);
         portEdit.setResponder(string -> {
-            Pair<Integer,Component> p = Legacy4JClient.tryParsePort(string);
+            Pair<Integer,Component> p = tryParsePort(string);
             if(p.getFirst() != null) port = p.getFirst();
             portEdit.setHint(Component.literal("" + this.port).withStyle(ChatFormatting.DARK_GRAY));
             if (p.getSecond() == null) {

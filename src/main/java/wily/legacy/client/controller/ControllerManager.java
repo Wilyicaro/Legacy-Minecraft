@@ -31,7 +31,7 @@ import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.mixin.base.MouseHandlerAccessor;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -115,7 +115,7 @@ public class ControllerManager {
         Window window = minecraft.getWindow();
         if (minecraft.screen instanceof LegacyMenuAccess<?> && LegacyOptions.limitCursor.get()) {
             ScreenRectangle rect = ((LegacyMenuAccess<?>) minecraft.screen).getMenuRectangle();
-            double scale = ScreenUtil.getGuiScale();
+            double scale = LegacyRenderUtil.getGuiScale();
             int left = rect.left() - (minecraft.screen instanceof LegacyCraftingScreen ? 35 : 0);
             int top = rect.top() - (minecraft.screen instanceof CreativeModeScreen || minecraft.screen instanceof LegacyCraftingScreen ? 35 : 0);
             int paddingH = 20;
@@ -143,7 +143,7 @@ public class ControllerManager {
             if (state.pressed) {
                 setControllerTheLastInput(true);
                 //? if >=1.21.2
-                /*minecraft.getFramerateLimitTracker().onInputReceived();*/
+                minecraft.getFramerateLimitTracker().onInputReceived();
             }
 
             if (getCursorMode().isAuto() && state.pressed && !isCursorDisabled) disableCursor();
@@ -172,7 +172,7 @@ public class ControllerManager {
                     if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && state.pressed) {
                         double moveX;
                         double moveY;
-                        double scale = ScreenUtil.getGuiScale();
+                        double scale = LegacyRenderUtil.getGuiScale();
                         double moveSensitivity = LegacyOptions.interfaceSensitivity.get() * 0.5;
                         double deadzone = stick.getDeadZone();
                         double deadzoneY = Math.max(deadzone, Mth.lerp(affectY, 1, 0.35));
@@ -208,19 +208,19 @@ public class ControllerManager {
                         if (state.pressed && state.canClick()) {
                             if (state.is(ControllerBinding.DPAD_UP)) {
                                 screen.movePointerToSlotIn(ScreenDirection.UP);
-                                if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
+                                if (LegacyOptions.inventoryHoverFocusSound.get()) LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
                             }
                             else if (state.is(ControllerBinding.DPAD_DOWN)) {
                                 screen.movePointerToSlotIn(ScreenDirection.DOWN);
-                                if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
+                                if (LegacyOptions.inventoryHoverFocusSound.get()) LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
                             }
                             else if (state.is(ControllerBinding.DPAD_RIGHT)) {
                                 screen.movePointerToSlotIn(ScreenDirection.RIGHT);
-                                if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
+                                if (LegacyOptions.inventoryHoverFocusSound.get()) LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
                             }
                             else if (state.is(ControllerBinding.DPAD_LEFT)) {
                                 screen.movePointerToSlotIn(ScreenDirection.LEFT);
-                                if (LegacyOptions.inventoryHoverFocusSound.get()) ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
+                                if (LegacyOptions.inventoryHoverFocusSound.get()) LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
                             }
                         } else if (state.is(ControllerBinding.LEFT_STICK) && state.released && !LegacyOptions.legacyCursor.get())
                             screen.movePointerToSlot(screen.findSlotAt(getPointerX(), getPointerY()));
@@ -242,12 +242,12 @@ public class ControllerManager {
                                 ScreenDirection direction = null;
                                 // copy of the canClick method, not very elegant in this context
                                 if ((timeCursorPressed == 0 || timeCursorPressed >= 300) && timeCursorPressed % 100 == 0 && !state.isBlocked()) {
-                                    if (snapY && absY >= deadzoneY) direction = ScreenUtil.getScreenDirection(0, stick.y);
-                                    if (snapX && absX >= deadzone) direction = ScreenUtil.getScreenDirection(stick.x, 0);
+                                    if (snapY && absY >= deadzoneY) direction = LegacyRenderUtil.getScreenDirection(0, stick.y);
+                                    if (snapX && absX >= deadzone) direction = LegacyRenderUtil.getScreenDirection(stick.x, 0);
                                     lastHoveredSlot = screen.findSlotAt(getPointerX(), getPointerY());
                                 } else if (timeCursorPressed == 50 && !snapX) {
-                                    if (xPressed && absX < pressLimitX) direction = ScreenUtil.getScreenDirection(stick.x, 0);
-                                    else if (!snapY && yPressed && absY < pressLimitY) direction = ScreenUtil.getScreenDirection(0, stick.y);
+                                    if (xPressed && absX < pressLimitX) direction = LegacyRenderUtil.getScreenDirection(stick.x, 0);
+                                    else if (!snapY && yPressed && absY < pressLimitY) direction = LegacyRenderUtil.getScreenDirection(0, stick.y);
                                 }
                                 if (direction != null) screen.movePointerToSlotIn(direction);
 
@@ -264,7 +264,7 @@ public class ControllerManager {
                                     boolean validBump = (!snapX && xPrecedence) || (!snapY && !xPrecedence);
                                     boolean bump = absLastX > releaseLimit || absLastY > releaseLimitY;
                                     if (validBump && bump) {
-                                        ScreenDirection direction = ScreenUtil.getScreenDirection(lastCursorDirection.x, lastCursorDirection.y);
+                                        ScreenDirection direction = LegacyRenderUtil.getScreenDirection(lastCursorDirection.x, lastCursorDirection.y);
                                         Slot hoveredSlot = screen.findSlotAt(getPointerX(), getPointerY());
                                         if (direction != null && hoveredSlot == lastHoveredSlot)
                                             screen.movePointerToSlotIn(direction);
@@ -294,7 +294,7 @@ public class ControllerManager {
                     if (state.is(ControllerBinding.UP_BUTTON) && state.justPressed && minecraft.screen instanceof LegacyMenuAccess<?> a && a.isMouseDragging()) {
                         minecraft.gameMode.handleInventoryMouseClick(a.getMenu().containerId, a.getHoveredSlot().index, 0, ClickType.QUICK_MOVE, minecraft.player);
                         minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
-                        ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
+                        LegacyRenderUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
                     }
                     int mouseClick = Controller.Event.of(minecraft.screen).getBindingMouseClick(state);
                     if (mouseClick != -1 && (!state.is(ControllerBinding.LEFT_TRIGGER) || (minecraft.screen instanceof LegacyMenuAccess<?> a && a.isOutsideClick(mouseClick)))) {

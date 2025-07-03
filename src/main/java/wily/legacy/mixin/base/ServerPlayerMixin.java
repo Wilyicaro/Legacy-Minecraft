@@ -157,16 +157,16 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     }
     @Inject(method = "readAdditionalSaveData", at = @At("RETURN"))
     public void readAdditionalSaveData(CompoundTag compoundTag, CallbackInfo ci) {
-        setDisableExhaustion(compoundTag.getBoolean("DisableExhaustion")/*? if >=1.21.5 {*//*.orElse(false)*//*?}*/);
-        setMayFlySurvival(compoundTag.getBoolean("MayFlySurvival")/*? if >=1.21.5 {*//*.orElse(false)*//*?}*/);
+        setDisableExhaustion(compoundTag.getBoolean("DisableExhaustion")/*? if >=1.21.5 {*/.orElse(false)/*?}*/);
+        setMayFlySurvival(compoundTag.getBoolean("MayFlySurvival")/*? if >=1.21.5 {*/.orElse(false)/*?}*/);
     }
 
     @Inject(method = "startSleepInBed", at = @At("RETURN"), cancellable = true)
     public void startSleepInBed(BlockPos blockPos, CallbackInfoReturnable<Either<BedSleepingProblem, Unit>> cir) {
         Either<BedSleepingProblem,Unit> either = cir.getReturnValue();
-        if (level()./*? if <1.21.5 {*/isDay/*?} else {*//*isBrightOutside*//*?}*/() && either.left().isPresent() && either.left().get() == BedSleepingProblem.NOT_POSSIBLE_NOW && !this.isCreative()) {
+        if (level()./*? if <1.21.5 {*//*isDay*//*?} else {*/isBrightOutside/*?}*/() && either.left().isPresent() && either.left().get() == BedSleepingProblem.NOT_POSSIBLE_NOW && !this.isCreative()) {
             Vec3 vec3 = Vec3.atBottomCenterOf(blockPos);
-            if (!this.level().getEntitiesOfClass(Monster.class, new AABB(vec3.x() - 8.0, vec3.y() - 5.0, vec3.z() - 8.0, vec3.x() + 8.0, vec3.y() + 5.0, vec3.z() + 8.0), (argx) -> argx.isPreventingPlayerRest(/*? if >=1.21.2 {*//*this.serverLevel(), *//*?}*/this)).isEmpty()) {
+            if (!this.level().getEntitiesOfClass(Monster.class, new AABB(vec3.x() - 8.0, vec3.y() - 5.0, vec3.z() - 8.0, vec3.x() + 8.0, vec3.y() + 5.0, vec3.z() + 8.0), (argx) -> argx.isPreventingPlayerRest(/*? if >=1.21.2 {*/this.serverLevel(), /*?}*/this)).isEmpty()) {
                 cir.setReturnValue(Either.left(BedSleepingProblem.NOT_SAFE));
             }
         }

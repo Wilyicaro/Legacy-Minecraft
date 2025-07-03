@@ -4,11 +4,9 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.common.hash.Hashing;
 import com.google.gson.*;
-import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -45,12 +43,11 @@ import wily.factoryapi.util.DynamicUtil;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -360,7 +357,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
 
         public void renderTooltipBox(GuiGraphics graphics, int x, int y, int width, int height){
             if (hasTooltip) return;
-            ScreenUtil.renderPointerPanel(graphics,x, y,width,height);
+            LegacyRenderUtil.renderPointerPanel(graphics,x, y,width,height);
             if (getSelectedAlbum() != null){
                 boolean p = getSelectedAlbum().isValidPackDisplay(packRepository);
                 if (getSelectedAlbum().iconSprite().isPresent()) FactoryGuiGraphics.of(graphics).blitSprite(getSelectedAlbum().iconSprite().get(),x + 7,y + 5,32,32);
@@ -393,7 +390,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 if (i == 263 || i == 262) {
                     if (selectedIndex == scrolledList.get() + (i == 263 ? 0 : getMaxPacks() - 1)) updateScroll(i == 263 ? - 1 : 1,true);
                     setSelectedIndex(selectedIndex + (i == 263 ? - 1 : 1));
-                    ScreenUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
+                    LegacyRenderUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
                     return true;
                 }
                 if (i == InputConstants.KEY_O){
@@ -512,7 +509,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
             for (int index = 0; index < albums.size(); index++) {
                 if (visibleCount>=getMaxPacks()) break;
                 visibleCount++;
-                if (ScreenUtil.isMouseOver(d,e, getX() + 20 + 30 * index, getY() + minecraft.font.lineHeight +  3, 30,  30)) {
+                if (LegacyRenderUtil.isMouseOver(d,e, getX() + 20 + 30 * index, getY() + minecraft.font.lineHeight +  3, 30,  30)) {
                     setSelectedIndex(index + scrolledList.get());
                     savedAlbum = getSelectedAlbum();
                     playDownSound(Minecraft.getInstance().getSoundManager());
@@ -557,10 +554,10 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 visibleCount++;
             }
             FactoryScreenUtil.disableBlend();
-            guiGraphics.pose().pushPose();
+            guiGraphics.pose().pushMatrix();
             if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.5f,0.5f,0f);
-            guiGraphics.drawString(font,getMessage(),getX() + 2,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused());
-            guiGraphics.pose().popPose();
+            guiGraphics.drawString(font,getMessage(),getX() + 2,getY(),isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused());
+            guiGraphics.pose().popMatrix();
             if (scrolledList.max > 0){
                 if (scrolledList.get() < scrolledList.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
                 if (scrolledList.get() > 0) scrollRenderer.renderScroll(guiGraphics,ScreenDirection.LEFT,getX() + 8, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
@@ -579,7 +576,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
                     InputStream inputStream = ioSupplier.get();
                     try {
                         NativeImage nativeImage = NativeImage.read(inputStream);
-                        textureManager.register(resourceLocation3, new DynamicTexture(/*? if >1.21.4 {*//*resourceLocation3::toString, *//*?}*/nativeImage));
+                        textureManager.register(resourceLocation3, new DynamicTexture(/*? if >1.21.4 {*/resourceLocation3::toString, /*?}*/nativeImage));
                         resourceLocation = resourceLocation3;
                     } catch (Throwable throwable) {
                         try {

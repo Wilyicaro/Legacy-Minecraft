@@ -1,7 +1,6 @@
 package wily.legacy.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.Util;
@@ -24,19 +23,17 @@ import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.FactoryAPIPlatform;
-import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.LegacyScrollRenderer;
-import wily.legacy.client.screen.Panel;
 import wily.legacy.client.screen.ScrollableRenderer;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -128,7 +125,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
 
         public void renderTooltipBox(GuiGraphics graphics, int x, int y, int width, int height){
             if (hasTooltip) return;
-            ScreenUtil.renderPointerPanel(graphics,x, y,width,height);
+            LegacyRenderUtil.renderPointerPanel(graphics,x, y,width,height);
             if (selectedPack != null){
                 FactoryGuiGraphics.of(graphics).blit(PackAlbum.Selector.getPackIcon(selectedPack), x + 7,y + 5,0.0f, 0.0f, 32, 32, 32, 32);
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4,x + 148, y + 44);
@@ -156,11 +153,11 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 if (i == 263) {
                     if (selectedIndex == scrolledList.get()) updateScroll(-1,true);
                     setSelectedPack(selectedIndex - 1);
-                    ScreenUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
+                    LegacyRenderUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
                 } else if (i == 262) {
                     if (selectedIndex == scrolledList.get() + getMaxPacks() - 1) updateScroll(1,true);
                     setSelectedPack(selectedIndex + 1);
-                    ScreenUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
+                    LegacyRenderUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
                 }
             }
             return super.keyPressed(i, j, k);
@@ -276,7 +273,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 visibleCount++;
             }
             FactoryScreenUtil.disableBlend();
-            guiGraphics.drawString(font,getMessage(),getX() + 1,getY(),isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused());
+            guiGraphics.drawString(font,getMessage(),getX() + 1,getY(),isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused());
             if (scrolledList.max > 0){
                 if (scrolledList.get() < scrolledList.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
                 if (scrolledList.get() > 0) scrollRenderer.renderScroll(guiGraphics,ScreenDirection.LEFT,getX() + 8, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);

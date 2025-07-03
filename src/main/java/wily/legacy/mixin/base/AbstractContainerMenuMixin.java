@@ -14,8 +14,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4J;
+import wily.legacy.util.LegacyItemUtil;
 
-import static wily.legacy.Legacy4J.canRepair;
+import static wily.legacy.util.LegacyItemUtil.canRepair;
 
 @Mixin(AbstractContainerMenu.class)
 public abstract class AbstractContainerMenuMixin {
@@ -36,8 +37,8 @@ public abstract class AbstractContainerMenuMixin {
                 if (!/*? if <1.20.5 {*//*player.getAbilities().instabuild*//*?} else {*/player.hasInfiniteMaterials()/*?}*/)
                     setCarried(ItemStack.EMPTY);
                 ci.cancel();
-            } else if (Legacy4J.isDyeableItem(slot.getItem().getItemHolder()) && getCarried().getItem() instanceof DyeItem d) {
-                Legacy4J.dyeItem(slot.getItem(), Legacy4J.getDyeColor(d.getDyeColor()));
+            } else if (LegacyItemUtil.isDyeableItem(slot.getItem().getItemHolder()) && getCarried().getItem() instanceof DyeItem d) {
+                LegacyItemUtil.dyeItem(slot.getItem(), LegacyItemUtil.getDyeColor(d.getDyeColor()));
                 slot.setChanged();
                 if (!/*? if <1.20.5 {*//*player.getAbilities().instabuild*//*?} else {*/player.hasInfiniteMaterials()/*?}*/)
                     getCarried().shrink(1);

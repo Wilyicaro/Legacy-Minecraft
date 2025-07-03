@@ -4,7 +4,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.mojang.authlib.minecraft.BanDetails;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
 import com.mojang.realmsclient.RealmsMainScreen;
 import net.minecraft.ChatFormatting;
@@ -21,7 +20,6 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.FaviconTexture;
-import net.minecraft.client.gui.screens.LoadingDotsText;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
@@ -39,19 +37,15 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
-import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.CommonColor;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.net.UnknownHostException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -191,12 +185,12 @@ public class ServerRenderableList extends RenderableVList {
                 @Override
                 protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                     super.renderWidget(guiGraphics, i, j, f);
-                    ScreenUtil.drawGenericLoading(guiGraphics, getX() + 5, getY() + 5, 6, 1);
+                    LegacyRenderUtil.drawGenericLoading(guiGraphics, getX() + 5, getY() + 5, 6, 1);
                 }
 
                 @Override
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                    ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
+                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
                 }
 
                 @Override
@@ -276,14 +270,14 @@ public class ServerRenderableList extends RenderableVList {
             refreshStatus();
             *///?}
             guiGraphics.drawString(minecraft.font, getMessage(), getX() + 32 + 3, getY() + 3, 0xFFFFFF);
-            guiGraphics.pose().pushPose();
+            guiGraphics.pose().pushMatrix();
             guiGraphics.pose().translate(getX() + 35,  getY() + 10,0);
             guiGraphics.pose().scale(2/3f,2/3f,2/3f);
             List<FormattedCharSequence> list = minecraft.font.split(server.motd, Math.max(width-36,minecraft.font.width(server.motd) / 2 + 20));
             for (int p = 0; p < Math.min(2,list.size()); ++p) {
-                ScreenUtil.renderScrollingString(guiGraphics,minecraft.font, list.get(p), 0,  minecraft.font.lineHeight * p,width-36 , 11 + minecraft.font.lineHeight * p, -8355712, false,minecraft.font.width(list.get(p))* 2/3);
+                LegacyRenderUtil.renderScrollingString(guiGraphics,minecraft.font, list.get(p), 0,  minecraft.font.lineHeight * p,width-36 , 11 + minecraft.font.lineHeight * p, -8355712, false,minecraft.font.width(list.get(p))* 2/3);
             }
-            guiGraphics.pose().popPose();
+            guiGraphics.pose().popMatrix();
             Component component = !this.isCompatible() ? server.version.copy().withStyle(ChatFormatting.RED) : server.status;
             int q = minecraft.font.width(component);
             guiGraphics.drawString(minecraft.font, component, getX() + width - q - 15 - 2, getY() + 3, -8355712, false);

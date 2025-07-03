@@ -15,7 +15,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Set;
 import java.util.function.Consumer;
@@ -35,17 +35,17 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen{
                     @Override
                     protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                         super.renderWidget(guiGraphics, i, j, f);
-                        guiGraphics.pose().pushPose();
+                        guiGraphics.pose().pushMatrix();
                         guiGraphics.pose().translate(getX() + 5, getY() + 5,0);
                         guiGraphics.pose().scale(1.25f,1.25f,1.25f);
                         guiGraphics.renderItem(preset.displayItem().value().getDefaultInstance(),0, 0);
-                        guiGraphics.pose().popPose();
+                        guiGraphics.pose().popMatrix();
                     }
                     @Override
                     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                         int k = this.getX() + 33;
                         int l = this.getX() + this.getWidth();
-                        ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true);
+                        LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true);
                     }
                     @Override
                     public void onPress() {
@@ -67,7 +67,7 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen{
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
     }
 
     @Override

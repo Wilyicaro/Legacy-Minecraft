@@ -34,11 +34,11 @@ public class BookPanel extends WidgetPanel {
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(getX(),getY(),0);
         guiGraphics.pose().scale(getWidth() / 146f,getHeight() / 180f,1f);
         FactoryGuiGraphics.of(guiGraphics).blit(BookViewScreen.BOOK_LOCATION,0,0,20,1,146,180);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
 
     @Override
@@ -60,13 +60,13 @@ public class BookPanel extends WidgetPanel {
             private long lastPressTime;
             @Override
             public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                isHovered = Util.getMillis() - lastPressTime <= 300 || /*? if <1.21.4 {*/clicked/*?} else {*//*isMouseOver*//*?}*/(i,j);
-                guiGraphics.pose().pushPose();
+                isHovered = Util.getMillis() - lastPressTime <= 300 || /*? if <1.21.4 {*//*clicked*//*?} else {*/isMouseOver/*?}*/(i,j);
+                guiGraphics.pose().pushMatrix();
                 guiGraphics.pose().translate(getX(),getY(),1.5f);
                 guiGraphics.pose().scale(1.5f,1.5f,1.5f);
                 guiGraphics.pose().translate(-getX(),-getY(),1.5f);
                 super.renderWidget(guiGraphics, i, j, f);
-                guiGraphics.pose().popPose();
+                guiGraphics.pose().popMatrix();
             }
 
             @Override
@@ -82,7 +82,7 @@ public class BookPanel extends WidgetPanel {
             }
 
             @Override
-            public boolean /*? if <1.21.4 {*/clicked/*?} else {*//*isMouseOver*//*?}*/(double d, double e) {
+            public boolean /*? if <1.21.4 {*//*clicked*//*?} else {*/isMouseOver/*?}*/(double d, double e) {
                 return this.active && this.visible && d >= (double)this.getX() && e >= (double)this.getY() && d < (double)(this.getX() + this.getWidth() * 3/2) && e < (double)(this.getY() + this.getHeight() * 3/2);
             }
         };

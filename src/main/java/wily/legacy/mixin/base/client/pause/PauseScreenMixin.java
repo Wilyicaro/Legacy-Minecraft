@@ -12,11 +12,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.screen.*;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Collections;
 import java.util.List;
@@ -56,13 +56,13 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event,Ren
                 ,Button.builder(Component.translatable("gui.advancements"), button -> this.minecraft.setScreen(new LegacyAdvancementsScreen(this))).build()
         );
         minecraft = Minecraft.getInstance();
-        if (Legacy4JClient.hasSaveSystem(minecraft))
+        if (LegacySaveCache.hasSaveSystem(minecraft))
              renderableVList.addRenderable(saveButton = Button.builder(LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE : LegacyComponents.SAVE_GAME, button -> minecraft.setScreen(new ConfirmationScreen(this,LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE : LegacyComponents.SAVE_GAME,LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE_MESSAGE : LegacyComponents.SAVE_GAME_MESSAGE, b->{
                 if (LegacyOptions.autoSaveInterval.get() > 0){
                     setAutoSave(0,button);
                     minecraft.setScreen(PauseScreenMixin.this);
                 }else{
-                    Legacy4JClient.manualSave = Legacy4JClient.retakeWorldIcon = true;
+                    LegacySaveCache.manualSave = LegacySaveCache.retakeWorldIcon = true;
                     minecraft.setScreen(new ConfirmationScreen(PauseScreenMixin.this,LegacyComponents.ENABLE_AUTO_SAVE,LegacyComponents.ENABLE_AUTO_SAVE_MESSAGE,b1-> {
                         setAutoSave(1,button);
                         minecraft.setScreen(PauseScreenMixin.this);
@@ -76,7 +76,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event,Ren
     @Inject(method = "renderBackground",at = @At("HEAD"), cancellable = true)
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics);
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics);
     }
     //?}
 
@@ -94,7 +94,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event,Ren
         renderableVListInit();
         if (saveButton != null) {
             if (minecraft.isDemo()) saveButton.active = false;
-            else if (Legacy4JClient.hasSaveSystem(minecraft))
+            else if (LegacySaveCache.hasSaveSystem(minecraft))
                 setAutoSave(LegacyOptions.autoSaveInterval.get(), saveButton);
         }
 

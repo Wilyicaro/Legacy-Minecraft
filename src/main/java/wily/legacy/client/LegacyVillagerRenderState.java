@@ -1,5 +1,5 @@
 //? if >=1.21.2 {
-/*package wily.legacy.client;
+package wily.legacy.client;
 
 import net.minecraft.world.entity.npc.AbstractVillager;
 import wily.factoryapi.base.client.FactoryRenderStateExtension;
@@ -17,4 +17,4 @@ public class LegacyVillagerRenderState implements FactoryRenderStateExtension<Ab
         isTrading = entity.isTrading();
     }
 }
-*///?}
+//?}

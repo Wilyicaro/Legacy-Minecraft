@@ -1,6 +1,5 @@
 package wily.legacy.client.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
@@ -10,7 +9,6 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -24,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
@@ -32,7 +29,7 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.inventory.LegacySlotDisplay;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEventListener, NarratableEntry, ControlTooltip.ActionHolder {
     public static final ResourceLocation ICON_HOLDER = Legacy4J.createModLocation("container/icon_holder");
@@ -143,7 +140,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             @Override
             public void render(GuiGraphics graphics, int i, int j, float f) {
                 super.render(graphics, i, j, f);
-                if (entity == null && Minecraft.getInstance().level != null) entity = entityType.create(Minecraft.getInstance().level/*? if >=1.21.2 {*//*, null*//*?}*/);
+                if (entity == null && Minecraft.getInstance().level != null) entity = entityType.create(Minecraft.getInstance().level/*? if >=1.21.2 {*/, null/*?}*/);
                 if (entity != null) renderEntity(graphics, entity, i, j, f);
             }
         };
@@ -167,7 +164,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         return getHeight() - 2 * (isSizeable() ?  1 : getHeight() / 20f);
     }
     public boolean isSizeable(){
-        return Math.min(getWidth(),getHeight()) < 18 && ScreenUtil.is720p();
+        return Math.min(getWidth(),getHeight()) < 18 && LegacyRenderUtil.is720p();
     }
     public boolean canSizeIcon(){
         return Math.min(getWidth(),getHeight()) > 21;
@@ -188,7 +185,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
 
     @Override
     public void render(GuiGraphics graphics, int i, int j, float f) {
-        isHovered = ScreenUtil.isMouseOver(i, j, getXCorner(), getYCorner(), width, height);
+        isHovered = LegacyRenderUtil.isMouseOver(i, j, getXCorner(), getYCorner(), width, height);
         ResourceLocation sprite = getIconHolderSprite();
         if (sprite != null)
             renderChild(graphics,getXCorner(),getYCorner(),()->FactoryGuiGraphics.of(graphics).blitSprite(sprite, 0, 0, getWidth(), getHeight()));
@@ -245,7 +242,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             e.yHeadRotO = e.yHeadRot;
         }
         FactoryGuiGraphics.of(graphics).enableScissor(getX(),getY(),getX() + Math.round(getSelectableWidth()),getY() + Math.round(getSelectableHeight()));
-        ScreenUtil.renderEntity(graphics,getX() + getWidth() / 2f,getYCorner() + Math.min(getSelectableWidth(),getSelectableHeight()),(int)Math.min(getSelectableWidth(),getSelectableHeight()),f, new Vector3f(),new Quaternionf().rotationXYZ(0.0f, (float) Math.PI/ 4, (float) Math.PI), null, entity,true);
+        LegacyRenderUtil.renderEntity(graphics,getX() + getWidth() / 2f,getYCorner() + Math.min(getSelectableWidth(),getSelectableHeight()),(int)Math.min(getSelectableWidth(),getSelectableHeight()),f, new Vector3f(),new Quaternionf().rotationXYZ(0.0f, (float) Math.PI/ 4, (float) Math.PI), null, entity,true);
         graphics.disableScissor();
     }
     public void renderSelection(GuiGraphics graphics, int i, int j, float f){
@@ -263,11 +260,11 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         });
     }
     public void renderChild(GuiGraphics graphics, float x, float y, Runnable render){
-        graphics.pose().pushPose();
+        graphics.pose().pushMatrix();
         graphics.pose().translate(x,y,0);
         applyOffset(graphics);
         render.run();
-        graphics.pose().popPose();
+        graphics.pose().popMatrix();
     }
     public void renderHighlight(GuiGraphics graphics){
         renderScaled(graphics,getX(),getY(),()-> {
@@ -280,7 +277,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         if (isHovered || (allowFocusedItemTooltip && isFocused())) renderTooltip(minecraft,graphics,itemIcon, !isHovered ? (int) getMiddleX() : i,!isHovered ? (int) getMiddleY() : j);
     }
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics,ItemStack stack, int i, int j){
-        if (!stack.isEmpty()) Legacy4JClient.applyFontOverrideIf(ScreenUtil.is720p(),MOJANGLES_11_FONT,b->graphics.renderTooltip(minecraft.font, stack, i, j));
+        if (!stack.isEmpty()) Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(),MOJANGLES_11_FONT, b->graphics.renderTooltip(minecraft.font, stack, i, j));
     }
     public boolean isHoveredOrFocused(){
         return isHovered || isFocused();
@@ -306,7 +303,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         return false;
     }
     public void playClickSound(){
-        if (!isFocused()) ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0F);
+        if (!isFocused()) LegacyRenderUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0F);
     }
     public void onClick(double d, double e){
         playClickSound();

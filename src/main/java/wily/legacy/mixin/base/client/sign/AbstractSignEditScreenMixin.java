@@ -115,11 +115,11 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
         ci.cancel();
         super.render(guiGraphics, i, j, f);
         Lighting.setupForFlatItems();
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate((width - font.width(title)*1.5f)/ 2f, height / 2f - 96, 0);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
         guiGraphics.drawString(this.font, this.title, 0, 0, 16777215);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
         this.renderSign(guiGraphics);
         Lighting.setupFor3DItems();
     }

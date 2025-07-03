@@ -1,30 +1,25 @@
 package wily.legacy.mixin.base.client.gui;
 
 //? if >=1.21.1 {
-import com.mojang.blaze3d.audio.ListenerTransform;
 //?}
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.PlayerTabOverlay;
-import net.minecraft.client.gui.components.SubtitleOverlay;
+        import net.minecraft.client.gui.components.SubtitleOverlay;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.scores.Objective;
-import net.minecraft.world.scores.Scoreboard;
-import org.spongepowered.asm.mixin.Final;
+        import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+        import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Iterator;
 import java.util.List;
@@ -94,11 +89,11 @@ public class SubtitleOverlayMixin {
 
                 j += 36;
                 int lineHeight = 12;
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(guiGraphics.guiWidth() - 10, (float)(guiGraphics.guiHeight() - 35), 0.0);
+                guiGraphics.pose().pushMatrix();
+                guiGraphics.pose().translate(guiGraphics.guiWidth() - 10, (float)(guiGraphics.guiHeight() - 35));
                 int height = list.size() * 12;
-                ScreenUtil.renderPointerPanel(guiGraphics, -j, -height, j, height + 10);
-                guiGraphics.pose().translate( - (j / 2.0) - 2.0, 0 ,0);
+                LegacyRenderUtil.renderPointerPanel(guiGraphics, -j, -height, j, height + 10);
+                guiGraphics.pose().translate( - (j / 2.0f) - 2.0f, 0 );
                 for(SubtitleOverlay.Subtitle subtitle2 : list) {
                     Component component = subtitle2.getText();
                     //? if >=1.20.5 {
@@ -124,9 +119,9 @@ public class SubtitleOverlayMixin {
                         FactoryGuiGraphics.of(guiGraphics).clearColor(true);
                     }
                     guiGraphics.drawString(this.minecraft.font, component, -o / 2, -n, r);
-                    guiGraphics.pose().translate(0, -(lineHeight + 1), 0);
+                    guiGraphics.pose().translate(0, -(lineHeight + 1));
                 }
-                guiGraphics.pose().popPose();
+                guiGraphics.pose().popMatrix();
             }
         }
     }

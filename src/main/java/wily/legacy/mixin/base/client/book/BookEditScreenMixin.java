@@ -230,7 +230,7 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
             guiGraphics.drawString(this.font, EDIT_TITLE_LABEL, panel.x + 20, panel.y + 37, 0, false);
             guiGraphics.drawString(this.font, formattedCharSequence, panel.x + 20, panel.y + 50, 0, false);
             guiGraphics.drawString(this.font, this.ownerText, panel.x + 20, panel.y + 61, 0, false);
-            guiGraphics.drawWordWrap(this.font, FINALIZE_WARNING_LABEL, panel.x + 20, panel.y + 85, 159, 0/*? if >=1.21.4 {*//*, false*//*?}*/);
+            guiGraphics.drawWordWrap(this.font, FINALIZE_WARNING_LABEL, panel.x + 20, panel.y + 85, 159, 0/*? if >=1.21.4 {*/, false/*?}*/);
         } else {
             guiGraphics.drawString(this.font, this.pageMsg, panel.x + panel.width - 24 - font.width(pageMsg), panel.y + 22, 0, false);
             BookEditScreen.DisplayCache displayCache = this.getDisplayCache();

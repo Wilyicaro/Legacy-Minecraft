@@ -1,7 +1,6 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ComponentPath;
@@ -36,7 +35,7 @@ import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -98,13 +97,13 @@ public class KeyboardScreen extends OverlayPanelScreen {
                 long millis = Util.getMillis();
                 if (!shiftLock){
                     if (pressTime >= 6 || millis - lastRelease <= 300) {
-                        ScreenUtil.playSimpleUISound(LegacyRegistries.SHIFT_LOCK.get(),1.0f);
+                        LegacyRenderUtil.playSimpleUISound(LegacyRegistries.SHIFT_LOCK.get(),1.0f);
                         shiftLock = true;
                     }
                     shift = !shift || shiftLock;
                 }else {
                     shiftLock = false;
-                    ScreenUtil.playSimpleUISound(LegacyRegistries.SHIFT_UNLOCK.get(),1.0f);
+                    LegacyRenderUtil.playSimpleUISound(LegacyRegistries.SHIFT_UNLOCK.get(),1.0f);
                 }
                 lastRelease = millis;
                 super.onRelease();
@@ -188,20 +187,20 @@ public class KeyboardScreen extends OverlayPanelScreen {
         FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).setColor(1f,1f,1f,0.8f);
         panel.render(guiGraphics,i,j,f);
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(panel.getX() + 4.5f,panel.getY() + 25.5,0);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0,0,53, 123);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,panel.getWidth() - 62,0,53, 123);
         guiGraphics.pose().translate(-4.5f,0,0);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,(panel.getWidth() - 267) / 2,-1,267, 125);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
         FactoryScreenUtil.disableBlend();
         FactoryGuiGraphics.of(guiGraphics).clearColor();
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(panel.getX() + (panel.getWidth() - font.width(KEYBOARD) * 1.5f) / 2,panel.getY() + 8,0);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
         guiGraphics.drawString(font,KEYBOARD,0,0, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
 
     public record CharButtonBuilder(int width, String chars, String shiftChars, ControllerBinding binding, ResourceLocation iconSprite, SoundEvent downSound){
@@ -237,7 +236,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
                     width += font.width(s) + (i1 == 0 ? 0 : 2);
                 }
                 int diffX = 0;
-                ScreenUtil.renderPointerPanel(guiGraphics, getX() + (getWidth() - width) / 2, getY() - 17,width,15);
+                LegacyRenderUtil.renderPointerPanel(guiGraphics, getX() + (getWidth() - width) / 2, getY() - 17,width,15);
                 for (char c : chars) {
                     String s = String.valueOf(c);
                     guiGraphics.drawString(font,s,getX() + (getWidth() - width) / 2 + diffX + 9, getY() - 14,c == getSelectedChar() ? 0xFFFF00 : 0xFFFFFF);
@@ -316,7 +315,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(),getX(),getY(),getWidth(),getHeight());
             FactoryScreenUtil.enableBlend();
-            renderString(guiGraphics,Minecraft.getInstance().font, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
+            renderString(guiGraphics,Minecraft.getInstance().font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
             FactoryScreenUtil.disableBlend();
         }
         public ResourceLocation getSprite(){
@@ -353,7 +352,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
         @Override
         public void playDownSound(SoundManager soundManager) {
-            if (playSoundOnClick()) ScreenUtil.playSimpleUISound(getDownSoundEvent(),1.0f);
+            if (playSoundOnClick()) LegacyRenderUtil.playSimpleUISound(getDownSoundEvent(),1.0f);
         }
         public boolean playSoundOnClick(){
             return pressTime == 0;
@@ -417,7 +416,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
             }
         });
         if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis a && state.canClick(20)){
-            if (state.canClick()) ScreenUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
+            if (state.canClick()) LegacyRenderUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
             xDiff = Math.max(0, Math.min(panel.getX() + Math.round(a.x*4), width - panel.getWidth())) - lastX;
             yDiff = Math.max(0, Math.min(panel.getY() + Math.round(a.y*4), height - panel.getHeight())) - lastY;
             repositionElements();

@@ -4,13 +4,12 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.components.toasts.Toast;
 //? if <1.21.2 {
-import net.minecraft.client.gui.components.toasts.ToastComponent;
-//?} else {
-/*import net.minecraft.client.gui.components.toasts.ToastManager;
-*///?}
+/*import net.minecraft.client.gui.components.toasts.ToastComponent;
+*///?} else {
+import net.minecraft.client.gui.components.toasts.ToastManager;
+//?}
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -20,7 +19,7 @@ import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.client.screen.LegacyIconHolder;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.function.Supplier;
 
@@ -111,14 +110,14 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
     }
 
     @Override
-    public /*? if <1.21.2 {*/Visibility/*?} else {*//*void*//*?}*/ render(GuiGraphics guiGraphics, /*? if <1.21.2 {*/ToastComponent toastComponent/*?} else {*//*Font font*//*?}*/, long l) {
+    public /*? if <1.21.2 {*//*Visibility*//*?} else {*/void/*?}*/ render(GuiGraphics guiGraphics, /*? if <1.21.2 {*//*ToastComponent toastComponent*//*?} else {*/Font font/*?}*/, long l) {
         renderTip(guiGraphics,0,0,0,l);
         //? if <1.21.2 {
-        return visibility;
-        //?}
+        /*return visibility;
+        *///?}
     }
     //? if >=1.21.2 {
-    /*@Override
+    @Override
     public Visibility getWantedVisibility() {
         return visibility;
     }
@@ -126,11 +125,11 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
     @Override
     public void update(ToastManager toastManager, long l) {
     }
-    *///?}
+    //?}
 
     @Override
-    public int /*? if <1.21.2 {*/slotCount/*?} else {*//*occcupiedSlotCount*//*?}*/() {
-        return Math.min(5,Toast.super./*? if <1.21.2 {*/slotCount/*?} else {*//*occcupiedSlotCount*//*?}*/());
+    public int /*? if <1.21.2 {*//*slotCount*//*?} else {*/occcupiedSlotCount/*?}*/() {
+        return Math.min(5,Toast.super./*? if <1.21.2 {*//*slotCount*//*?} else {*/occcupiedSlotCount/*?}*/());
     }
 
     @Override
@@ -140,12 +139,12 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
 
     public void renderTip(GuiGraphics guiGraphics, int i, int j, float f, float l) {
         if (canRemove.get() || l >= disappearTime) visibility = Visibility.HIDE;
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(getX(),getY(),800);
-        ScreenUtil.renderPointerPanel(guiGraphics,0,0,getWidth(),getHeight());
+        LegacyRenderUtil.renderPointerPanel(guiGraphics,0,0,getWidth(),getHeight());
         if (title != null) guiGraphics.drawString(minecraft.font,title, (centered ? (width() - minecraft.font.width(title)) / 2 : 13),13, CommonColor.TIP_TITLE_TEXT.get());
         tipLabel.centered(centered).withShadow(centered).withPos(13, title == null ? 13 : 25).render(guiGraphics, i, j, f);
         if (holder != null) holder.render(guiGraphics,i,j,f);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
 }

@@ -27,13 +27,13 @@ import net.minecraft.core.component.DataComponents;
 //?}
 import net.minecraft.world.level.block.Block;
 //? if <1.21.2 {
-import net.minecraft.world.level.block.SuspiciousEffectHolder;
-//?}
+/*import net.minecraft.world.level.block.SuspiciousEffectHolder;
+*///?}
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.RegisterListing;
 import wily.factoryapi.base.StackIngredient;
 import wily.factoryapi.util.ListMap;
-import wily.legacy.Legacy4J;
+import wily.legacy.Legacy4J;import wily.legacy.util.LegacyItemUtil;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -152,11 +152,11 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
 
         ResourceLocation TIPPED_ARROW = FactoryAPI.createVanillaLocation("tipped_arrow");
         //? if <1.21.2
-        ResourceLocation SUSPICIOUS_STEW = FactoryAPI.createVanillaLocation("suspicious_stew");
+        /*ResourceLocation SUSPICIOUS_STEW = FactoryAPI.createVanillaLocation("suspicious_stew");*/
         Map<ResourceLocation, IdOverride> ID_RECIPE_INFO_OVERRIDES = new HashMap<>(Map.of(TIPPED_ARROW, (validRecipes, recipeAdder) -> BuiltInRegistries.POTION.asHolderIdMap().forEach(p -> {
             if (p.value().getEffects().isEmpty() && !p./*? if <1.20.5 {*//*value().*//*?}*/equals(Potions.WATER)) return;
-            ItemStack potion = Legacy4J.setItemStackPotion(Items.LINGERING_POTION.getDefaultInstance(),p);
-            ItemStack result = Legacy4J.setItemStackPotion(new ItemStack(Items.TIPPED_ARROW,8),p);
+            ItemStack potion = LegacyItemUtil.setItemStackPotion(Items.LINGERING_POTION.getDefaultInstance(),p);
+            ItemStack result = LegacyItemUtil.setItemStackPotion(new ItemStack(Items.TIPPED_ARROW,8),p);
             List<Optional<Ingredient>> ings = new ArrayList<>();
             Optional<Ingredient> arrowOptional = Optional.of(Ingredient.of(Items.ARROW));
             for (int i = 0; i < 8; i++) ings.add(arrowOptional);
@@ -164,23 +164,23 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
             List<Component> description = new ArrayList<>();
             recipeAdder.accept(RecipeInfo.create(TIPPED_ARROW, null, ings, result, ()-> {
                 description.clear();
-                Legacy4J.addPotionTooltip(p, description, 0.125F/*? if >=1.20.3 {*/, Minecraft.getInstance().level.tickRateManager().tickrate()/*?}*/);
+                LegacyItemUtil.addPotionTooltip(p, description, 0.125F/*? if >=1.20.3 {*/, Minecraft.getInstance().level.tickRateManager().tickrate()/*?}*/);
                 return description.get(0);
             }));
-        })/*? if <1.21.2 {*/,SUSPICIOUS_STEW,(validRecipes, recipeAdder)-> BuiltInRegistries.ITEM.getTag(ItemTags.SMALL_FLOWERS).ifPresent(s->s.forEach(h->{
+        })/*? if <1.21.2 {*//*,SUSPICIOUS_STEW,(validRecipes, recipeAdder)-> BuiltInRegistries.ITEM.getTag(ItemTags.SMALL_FLOWERS).ifPresent(s->s.forEach(h->{
             ItemStack result = Items.SUSPICIOUS_STEW.getDefaultInstance();
             SuspiciousEffectHolder suspiciousEffectHolder = SuspiciousEffectHolder.tryGet(h.value());
             if (suspiciousEffectHolder != null) {
                 //? if <=1.20.1 {
-                /*SuspiciousStewItem.saveMobEffect(result, suspiciousEffectHolder.getSuspiciousEffect(), suspiciousEffectHolder.getEffectDuration());
-                *///?} else if <1.20.5 {
-                /*SuspiciousStewItem.saveMobEffects(result, suspiciousEffectHolder.getSuspiciousEffects());
-                *///?} else {
+                /^SuspiciousStewItem.saveMobEffect(result, suspiciousEffectHolder.getSuspiciousEffect(), suspiciousEffectHolder.getEffectDuration());
+                ^///?} else if <1.20.5 {
+                /^SuspiciousStewItem.saveMobEffects(result, suspiciousEffectHolder.getSuspiciousEffects());
+                ^///?} else {
                 result.set(DataComponents.SUSPICIOUS_STEW_EFFECTS, suspiciousEffectHolder.getSuspiciousEffects());
                 //?}
             }
             recipeAdder.accept(RecipeInfo.create(SUSPICIOUS_STEW,null,List.of(Optional.of(Ingredient.of(Items.BROWN_MUSHROOM)),Optional.of(Ingredient.of(Items.RED_MUSHROOM)),Optional.of(Ingredient.of(h.value())),Optional.of(Ingredient.of(Items.BOWL))),result));
-        }))/*?}*/));
+        }))*//*?}*/));
 
         default <T> void addRecipes(Iterable<RecipeInfo<T>> validRecipes, Consumer<RecipeInfo<T>> recipeAdder) {
             for (RecipeInfo<T> validRecipe : validRecipes) {

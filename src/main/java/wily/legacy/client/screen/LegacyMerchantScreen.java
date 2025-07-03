@@ -1,7 +1,6 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -21,10 +20,8 @@ import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.util.LegacyComponents;
@@ -35,7 +32,7 @@ import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.inventory.LegacyMerchantMenu;
 import wily.legacy.inventory.LegacyMerchantOffer;
 import wily.legacy.network.ServerMenuCraftPayload;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -124,20 +121,20 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
             public void render(GuiGraphics graphics, int i, int j, float f) {
                 itemIcon = isValidIndex() ? menu.merchant.getOffers().get(getIndex()).getResult() : ItemStack.EMPTY;
                 super.render(graphics, i, j, f);
-                graphics.pose().pushPose();
+                graphics.pose().pushMatrix();
                 graphics.pose().translate(0,0,432);
                 if (isValidIndex() && ((LegacyMerchantOffer)menu.merchant.getOffers().get(getIndex())).getRequiredLevel() > menu.merchantLevel) {
                     renderIcon(LegacySprites.PADLOCK, graphics, false, 16, 16);
                 } else if (isValidIndex() && menu.merchant.getOffers().get(getIndex()).isOutOfStock()) {
                     renderIcon(LegacySprites.ERROR_CROSS, graphics, false, 15, 15);
                 }
-                graphics.pose().popPose();
+                graphics.pose().popMatrix();
             }
 
             @Override
             public void renderItem(GuiGraphics graphics, int i, int j, float f) {
                 if(itemIcon.isEmpty()) return;
-                ScreenUtil.secureTranslucentRender(graphics,isValidIndex() && menu.merchant.getOffers().get(getIndex()).isOutOfStock(),0.5f, (u)-> super.renderItem(graphics, i, j, f));
+                LegacyRenderUtil.secureTranslucentRender(graphics,isValidIndex() && menu.merchant.getOffers().get(getIndex()).isOutOfStock(),0.5f, (u)-> super.renderItem(graphics, i, j, f));
             }
 
             @Override
@@ -145,7 +142,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
                 for (int index = 0; index < 3; index++) {
                     MerchantOffer offer = getSelectedMerchantOffer();
                     if (index == 1 && (offer == null || offer.getCostB().isEmpty())) continue;
-                    LegacyIconHolder iconHolder = ScreenUtil.iconHolderRenderer.itemHolder(leftPos + (index == 2 ? 86 : 17), topPos +  (index == 0 ? 114 + (offer == null || offer.getCostB().isEmpty() ? 16 : 0) : index == 1 ? 144 : 130), 27,27,offer == null || index == 0 ? ItemStack.EMPTY : index == 1 ? offer.getCostB() : offer.getResult(),offer != null && displaySlotsWarning[index], Vec3.ZERO);
+                    LegacyIconHolder iconHolder = LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos + (index == 2 ? 86 : 17), topPos +  (index == 0 ? 114 + (offer == null || offer.getCostB().isEmpty() ? 16 : 0) : index == 1 ? 144 : 130), 27,27,offer == null || index == 0 ? ItemStack.EMPTY : index == 1 ? offer.getCostB() : offer.getResult(),offer != null && displaySlotsWarning[index], Vec3.ZERO);
                     iconHolder.render(graphics, i, j, f);
                     if (offer == null || index != 0) continue;
                     iconHolder.renderItem(graphics,()->{
@@ -157,10 +154,10 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
                         } else {
                             graphics.renderItemDecorations(font, baseCostA, -12, 0, baseCostA.getCount() == 1 ? "1" : null);
                             graphics.renderItemDecorations(font, costA, 0, 0, costA.getCount() == 1 ? "1" : null);
-                            graphics.pose().pushPose();
+                            graphics.pose().pushMatrix();
                             graphics.pose().translate(0.0f, 0.0f, 300.0f);
                             FactoryGuiGraphics.of(graphics).blitSprite(DISCOUNT_STRIKETHRUOGH_SPRITE, -5, +12, 0, 9, 2);
-                            graphics.pose().popPose();
+                            graphics.pose().popMatrix();
                         }
                     }, iconHolder.getX(),iconHolder.getY(),iconHolder.isWarning());
                 }
@@ -179,7 +176,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
                 if (offer != null)
                     for (int index = 0; index < 3; index++) {
                         ItemStack s = index == 0 ? offer.getCostA() : index == 1 ? offer.getCostB() : offer.getResult();
-                        if (!s.isEmpty() && ScreenUtil.isMouseOver(i,j,leftPos + (index == 2 ? 86 : 17), topPos +  (index == 0 ? 114 + (offer.getCostB().isEmpty() ? 16 : 0) : index == 1 ? 144 : 130), 27,27)) renderTooltip(minecraft,graphics,s, i, j);
+                        if (!s.isEmpty() && LegacyRenderUtil.isMouseOver(i,j,leftPos + (index == 2 ? 86 : 17), topPos +  (index == 0 ? 114 + (offer.getCostB().isEmpty() ? 16 : 0) : index == 1 ? 144 : 130), 27,27)) renderTooltip(minecraft,graphics,s, i, j);
                     }
             }
 
@@ -193,7 +190,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
                         scrollRenderer.updateScroll(i == 263 ? ScreenDirection.LEFT : ScreenDirection.RIGHT);
                         updateSlotsDisplay();
                     }
-                    ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+                    LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
                     return true;
                 }
                 return super.keyPressed(i, j, k);
@@ -219,7 +216,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
                     MerchantOffer offer = menu.merchant.getOffers().get(getIndex());
                     if (((LegacyMerchantOffer)offer).getRequiredLevel() <= menu.merchantLevel && !offer.isOutOfStock() && !displaySlotsWarning[2]) {
                         CommonNetwork.sendToServer(new ServerMenuCraftPayload(Collections.emptyList(),getIndex(),hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed));
-                    }else ScreenUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
+                    }else LegacyRenderUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
                 }
             }
         };
@@ -301,13 +298,13 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
         if (k >= 5) {
             return;
         }
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + (imageWidth - 1.5f* 161) / 2,topPos + 28,0);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.EXPERIENCE_BAR_BACKGROUND, 0, 0, 0, 161, 4);
         int m = VillagerData.getMinXpPerLevel(k);
         if (l < m || !VillagerData.canLevelUp(k)) {
-            guiGraphics.pose().popPose();
+            guiGraphics.pose().popMatrix();
             return;
         }
         float f = 161.0f / (float)(VillagerData.getMaxXpPerLevel(k) - m);
@@ -318,7 +315,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
             int q = Math.min(Mth.floor((float)p * f), 161 - o);
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.EXPERIENCE_BAR_RESULT, 161, 4, o, 0, o, 0, 0, q, 4);
         }
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
 
     public static MutableComponent getMerchantTile(Component title, int i){
@@ -349,13 +346,13 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 12,topPos + 79,110,93);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 126,topPos + 79,157,93);
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 47,topPos + 131,0);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ARROW,0,0,22,15);
         if (getSelectedMerchantOffer() != null && getSelectedMerchantOffer().isOutOfStock())
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
         if (getSelectedMerchantOffer() instanceof LegacyMerchantOffer o && o.getRequiredLevel() > menu.merchantLevel)
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PADLOCK, leftPos + 56,  topPos + 134, 16, 16);
         if (UIAccessor.of(this).getBoolean("showProgressBar", menu.showProgressBar))

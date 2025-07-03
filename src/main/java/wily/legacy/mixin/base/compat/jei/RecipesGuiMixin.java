@@ -1,5 +1,5 @@
 //? if <=1.21.1 {
-package wily.legacy.mixin.base.compat.jei;
+/*package wily.legacy.mixin.base.compat.jei;
 
 import mezz.jei.gui.recipes.RecipesGui;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,4 +13,4 @@ public class RecipesGuiMixin implements Controller.Event, ControlTooltip.Event {
         return false;
     }
 }
-//?}
+*///?}

@@ -1,5 +1,5 @@
 //? if <1.21.2 {
-package wily.legacy.client.screen;
+/*package wily.legacy.client.screen;
 
 import com.google.common.collect.Lists;
 import net.minecraft.client.Minecraft;
@@ -33,7 +33,7 @@ public class DisplayRecipe extends GhostRecipe {
         for (int k = 0; k < this.ingredients.size(); ++k) {
             GhostIngredient ghostIngredient = this.ingredients.get(k);
             LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(ingredientSlots.get(k));
-            guiGraphics.pose().pushPose();
+            guiGraphics.pose().pushMatrix();
             guiGraphics.pose().translate(ghostIngredient.getX() + leftPos, ghostIngredient.getY() + topPos, 0);
             holder.applyOffset(guiGraphics);
             guiGraphics.pose().scale(holder.getSelectableWidth() / 16f,holder.getSelectableHeight() / 16f,holder.getSelectableHeight() / 16f);
@@ -44,8 +44,8 @@ public class DisplayRecipe extends GhostRecipe {
             guiGraphics.fill(RenderType.guiGhostRecipeOverlay(), 0, 0, 16,16, 0x30FFFFFF);
             if (k == 0)
                 guiGraphics.renderItemDecorations(minecraft.font, itemStack, 0, 0);
-            guiGraphics.pose().popPose();
+            guiGraphics.pose().popMatrix();
         }
     }
 }
-//?}
+*///?}

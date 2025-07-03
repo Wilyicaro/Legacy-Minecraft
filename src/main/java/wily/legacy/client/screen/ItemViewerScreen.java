@@ -1,9 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,17 +16,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import wily.factoryapi.base.Stocker;
-import wily.factoryapi.base.client.FactoryGuiGraphics;
-import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.ControlType;
-import wily.legacy.client.LegacyCreativeTabListing;
-import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,7 +114,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy()))) {
-            ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+            LegacyRenderUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
             return true;
         }
         return super.keyPressed(i, j, k);
@@ -145,7 +138,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
         super.render(guiGraphics, i, j, f);
         setHoveredSlot(null);
         menu.slots.forEach(s -> {
-            LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBoundsWithItem(panel.x, panel.y, s);
+            LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBoundsWithItem(panel.x, panel.y, s);
             holder.render(guiGraphics, i, j, f);
             if (holder.isHovered) {
                 if (s.isHighlightable()) holder.renderHighlight(guiGraphics);
@@ -158,7 +151,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
         panel.render(guiGraphics, i, j, f);
         renderScroll(guiGraphics,i,j,f);
     }

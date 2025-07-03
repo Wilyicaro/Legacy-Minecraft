@@ -5,7 +5,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -18,7 +17,6 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIClient;
@@ -27,21 +25,18 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
-import wily.factoryapi.util.ListMap;
 import wily.factoryapi.util.ModInfo;
-import wily.legacy.Legacy4J;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.PackAlbum;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 public class ModsScreen extends PanelVListScreen {
@@ -51,7 +46,7 @@ public class ModsScreen extends PanelVListScreen {
             try {
                 NativeImage image = NativeImage.read(Files.newInputStream(mod.findResource(opt.get()).get()));
                 ResourceLocation location = FactoryAPI.createLocation(mod.getId(),opt.get().toLowerCase(Locale.ENGLISH));
-                Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(/*? if >=1.21.5 {*//*location::toString, *//*?}*/image));
+                Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(/*? if >=1.21.5 {*/location::toString, /*?}*/image));
                 if (location != null) return new SizedLocation(location,image.getWidth(),image.getHeight());
             } catch (IOException e) {
             }
@@ -99,7 +94,7 @@ public class ModsScreen extends PanelVListScreen {
     });
 
     public static ClickEvent urlClickEvent(String url){
-        return /*? if <1.21.5 {*/new ClickEvent(ClickEvent.Action.OPEN_URL, url)/*?} else {*//*new ClickEvent.OpenUrl(URI.create(url))*//*?}*/;
+        return /*? if <1.21.5 {*//*new ClickEvent(ClickEvent.Action.OPEN_URL, url)*//*?} else {*/new ClickEvent.OpenUrl(URI.create(url))/*?}*/;
     }
 
     public ModsScreen(Screen parent) {
@@ -135,7 +130,7 @@ public class ModsScreen extends PanelVListScreen {
                 @Override
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                     SizedLocation logo = modLogosCache.apply(mod);
-                    ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(),this.getX() + 10 + (logo == null ? 20 : logo.getScaledWidth(20)), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j,true);
+                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(),this.getX() + 10 + (logo == null ? 20 : logo.getScaledWidth(20)), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j,true);
                 }
                 @Override
                 protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -147,7 +142,7 @@ public class ModsScreen extends PanelVListScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
         tooltipBox.render(guiGraphics,i,j,f);
         if (focusedMod != null) {
             AdvancedTextWidget label = modLabelsCache.getUnchecked(focusedMod).withPos(panel.x + panel.width + 5, panel.y + 41);
@@ -157,8 +152,8 @@ public class ModsScreen extends PanelVListScreen {
             if (logo != null)
                 FactoryGuiGraphics.of(guiGraphics).blit(logo.location, panel.x + panel.width + 5, panel.y + 10, 0.0f, 0.0f, logo.getScaledWidth(28), 28, logo.getScaledWidth(28), 28);
             if (logo == null || logo.getScaledWidth(28) < 120) {
-                ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.id", focusedMod.getId()), x, panel.y + 12, panel.x + panel.width + 185, panel.y + 24, 0xFFFFFF, true);
-                ScreenUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.version",focusedMod.getVersion()), x, panel.y + 24, panel.x + panel.width + 185, panel.y + 36, 0xFFFFFF, true);
+                LegacyRenderUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.id", focusedMod.getId()), x, panel.y + 12, panel.x + panel.width + 185, panel.y + 24, 0xFFFFFF, true);
+                LegacyRenderUtil.renderScrollingString(guiGraphics, font, Component.translatable("legacy.menu.mods.version",focusedMod.getVersion()), x, panel.y + 24, panel.x + panel.width + 185, panel.y + 36, 0xFFFFFF, true);
             }
             scrollableRenderer.render(guiGraphics, panel.x + panel.width + 5, panel.y + 38, tooltipBox.getWidth() - 16, tooltipBox.getHeight() - 50, () -> label.render(guiGraphics, i, j + Math.round(scrollableRenderer.getYOffset()), f));
         }
@@ -166,7 +161,7 @@ public class ModsScreen extends PanelVListScreen {
 
     @Override
     public boolean mouseClicked(double d, double e, int i) {
-        if (focusedMod != null && ScreenUtil.isMouseOver(d, e, panel.x + panel.width + 5, panel.y + 38, tooltipBox.getWidth() - 16, tooltipBox.getHeight() - 50)) {
+        if (focusedMod != null && LegacyRenderUtil.isMouseOver(d, e, panel.x + panel.width + 5, panel.y + 38, tooltipBox.getWidth() - 16, tooltipBox.getHeight() - 50)) {
             AdvancedTextWidget label = modLabelsCache.getUnchecked(focusedMod);
             if (label.mouseClicked(d, e + scrollableRenderer.getYOffset(), i)) return true;
         }

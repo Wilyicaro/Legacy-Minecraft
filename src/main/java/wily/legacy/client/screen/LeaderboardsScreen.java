@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -20,22 +19,18 @@ import net.minecraft.network.protocol.game.ServerboundClientCommandPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.StatType;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import wily.factoryapi.FactoryAPI;
-import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
-import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
@@ -48,7 +43,7 @@ import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.JsonUtil;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -157,9 +152,9 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                     int y = getY() + (getHeight() - font.lineHeight) / 2 + 1;
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.LEADERBOARD_BUTTON_HIGHLIGHTED : LegacySprites.LEADERBOARD_BUTTON,getX(),getY(),getWidth(),getHeight());
-                    guiGraphics.drawString(font,rank,getX() + 40 - font.width(rank) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
-                    guiGraphics.drawString(font,getMessage(),getX() + 120 -(font.width(getMessage())) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
-                    guiGraphics.drawString(font,getMessage(),getX() + 120 -(font.width(getMessage())) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                    guiGraphics.drawString(font,rank,getX() + 40 - font.width(rank) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                    guiGraphics.drawString(font,getMessage(),getX() + 120 -(font.width(getMessage())) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                    guiGraphics.drawString(font,getMessage(),getX() + 120 -(font.width(getMessage())) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
                     int added = 0;
                     Component hoveredValue = null;
                     for (int index = page; index < statsBoards.get(selectedStatBoard).statsList.size(); index++) {
@@ -168,8 +163,8 @@ public class LeaderboardsScreen extends PanelVListScreen {
                         Component value = ControlTooltip.CONTROL_ICON_FUNCTION.apply(stat.format((Legacy4JClient.hasModOnServer() ? info.getStatsMap() : minecraft.player.getStats().stats).getInt(stat)), Style.EMPTY).getComponent();
                         SimpleLayoutRenderable renderable = statsBoards.get(selectedStatBoard).renderables.get(index);
                         int w = font.width(value);
-                        ScreenUtil.renderScrollingString(guiGraphics,font, value,renderable.getX() + Math.max(0,renderable.getWidth() - w) / 2, getY(),renderable.getX() + Math.min(renderable.getWidth(),(renderable.getWidth() - w)/ 2 + getWidth()), getY() + getHeight(), ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()),true);
-                        if (ScreenUtil.isMouseOver(i,j,renderable.getX() + Math.max(0,renderable.getWidth() - w) / 2, getY(),Math.min(renderable.getWidth(),w), getHeight())) hoveredValue = value;
+                        LegacyRenderUtil.renderScrollingString(guiGraphics,font, value,renderable.getX() + Math.max(0,renderable.getWidth() - w) / 2, getY(),renderable.getX() + Math.min(renderable.getWidth(),(renderable.getWidth() - w)/ 2 + getWidth()), getY() + getHeight(), LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()),true);
+                        if (LegacyRenderUtil.isMouseOver(i,j,renderable.getX() + Math.max(0,renderable.getWidth() - w) / 2, getY(),Math.min(renderable.getWidth(),w), getHeight())) hoveredValue = value;
                         added++;
                     }
                     if (hoveredValue != null) guiGraphics.renderTooltip(font,hoveredValue,i,j);
@@ -198,36 +193,36 @@ public class LeaderboardsScreen extends PanelVListScreen {
     protected void panelInit() {
         super.panelInit();
         addRenderableOnly((guiGraphics, i, j, f) -> {
-            ScreenUtil.renderPointerPanel(guiGraphics,panel.x + 8,panel.y - 18,166,18);
-            ScreenUtil.renderPointerPanel(guiGraphics,panel.x + (panel.width - 211) / 2,panel.y - 18,211,18);
-            ScreenUtil.renderPointerPanel(guiGraphics,panel.x +  panel.width - 174 ,panel.y - 18,166,18);
+            LegacyRenderUtil.renderPointerPanel(guiGraphics,panel.x + 8,panel.y - 18,166,18);
+            LegacyRenderUtil.renderPointerPanel(guiGraphics,panel.x + (panel.width - 211) / 2,panel.y - 18,211,18);
+            LegacyRenderUtil.renderPointerPanel(guiGraphics,panel.x +  panel.width - 174 ,panel.y - 18,166,18);
             if (!statsBoards.isEmpty() && selectedStatBoard < statsBoards.size()){
                 StatsBoard board = statsBoards.get(selectedStatBoard);
-                Legacy4JClient.applyFontOverrideIf(ScreenUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b-> {
-                    guiGraphics.pose().pushPose();
+                Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b-> {
+                    guiGraphics.pose().pushMatrix();
                     Component filter = Component.translatable("legacy.menu.leaderboard.filter", this.filter.get() == 0 ? OVERALL :  MY_SCORE);
                     guiGraphics.pose().translate(panel.x + 91 - font.width(filter) / 3f, panel.y - 12, 0);
                     if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
                     guiGraphics.drawString(font, filter, 0, 0, 0xFFFFFF);
-                    guiGraphics.pose().popPose();
-                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().popMatrix();
+                    guiGraphics.pose().pushMatrix();
                     guiGraphics.pose().translate(panel.x + (panel.width - font.width(board.displayName) * 2/3f) / 2, panel.y - 12,0);
                     if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
                     guiGraphics.drawString(font,board.displayName,0, 0,0xFFFFFF);
-                    guiGraphics.pose().popPose();
-                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().popMatrix();
+                    guiGraphics.pose().pushMatrix();
                     Component entries = Component.translatable("legacy.menu.leaderboard.entries",actualRankBoard.size());
                     guiGraphics.pose().translate(panel.x + 477 - font.width(entries) / 3f, panel.y - 12,0);
                     if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
                     guiGraphics.drawString(font,entries,0, 0,0xFFFFFF);
-                    guiGraphics.pose().popPose();
+                    guiGraphics.pose().popMatrix();
                 });
                 if (board.statsList.isEmpty()) {
-                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().pushMatrix();
                     guiGraphics.pose().translate(panel.x + (panel.width - font.width(NO_RESULTS) * 1.5f)/2f, panel.y + (panel.height - 13.5f) / 2f,0);
                     guiGraphics.pose().scale(1.5f,1.5f,1.5f);
                     guiGraphics.drawString(font,NO_RESULTS,0,0, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-                    guiGraphics.pose().popPose();
+                    guiGraphics.pose().popMatrix();
                     return;
                 }
                 guiGraphics.drawString(font,RANK,panel.x + 40, panel.y + 20,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
@@ -241,7 +236,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
                     totalWidth = newWidth;
                 }
                 FactoryScreenUtil.enableBlend();
-                guiGraphics.pose().pushPose();
+                guiGraphics.pose().pushMatrix();
                 guiGraphics.pose().translate(panel.x + (panel.width - 211) / 2f, panel.y - 12,0);
                 guiGraphics.pose().scale(0.5f,0.5f,0.5f);
                 (ControlType.getActiveType().isKbm() ? ControlTooltip.ComponentIcon.compoundOf(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(guiGraphics,4,0,false, false);
@@ -249,7 +244,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
                     ControlTooltip.Icon pageControl = ControlTooltip.ComponentIcon.compoundOf(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
                     pageControl.render(guiGraphics,422 - pageControl.render(guiGraphics,0,0,false,true) - 8, 0,false,false);
                 }
-                guiGraphics.pose().popPose();
+                guiGraphics.pose().popMatrix();
                 FactoryScreenUtil.disableBlend();
                 if (statsInScreen == 0) return;
                 int x = (351 - totalWidth) / (statsInScreen + 1);
@@ -273,7 +268,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
     }
 
     public void onStatsUpdated() {
@@ -310,12 +305,12 @@ public class LeaderboardsScreen extends PanelVListScreen {
             }
             Component name = Component.translatable("stat." + stat.getValue().toString().replace(':', '.'));
             return SimpleLayoutRenderable.create(Minecraft.getInstance().font.width(name) * 2/3 + 8,7, (l)->((guiGraphics, i, j, f) ->
-                Legacy4JClient.applyFontOverrideIf(ScreenUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b-> {
-                guiGraphics.pose().pushPose();
+                Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b-> {
+                guiGraphics.pose().pushMatrix();
                 guiGraphics.pose().translate(l.getX() + 4, l.getY(),0);
                 if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
                 guiGraphics.drawString(Minecraft.getInstance().font,name,0,0,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-                guiGraphics.pose().popPose();
+                guiGraphics.pose().popMatrix();
             })));
 
         }

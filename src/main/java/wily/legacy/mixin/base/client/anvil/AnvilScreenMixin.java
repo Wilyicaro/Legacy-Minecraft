@@ -137,22 +137,22 @@ public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 13.5, topPos + 9.5,0f);
         guiGraphics.pose().scale(2.5f,2.5f,2.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ANVIL_HAMMER,0,0,15,15);
-        guiGraphics.pose().popPose();
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().popMatrix();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 53, topPos + 60,0f);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.COMBINER_PLUS,0,0,13,13);
-        guiGraphics.pose().popPose();
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().popMatrix();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 122, topPos + 59,0f);
         guiGraphics.pose().scale(1.5f,1.5f,1.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ARROW,0,0,22,15);
         if ((this.menu.getSlot(0).hasItem() || this.menu.getSlot(1).hasItem()) && !this.menu.getSlot(this.menu.getResultSlot()).hasItem())
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
 }

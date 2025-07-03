@@ -16,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -29,6 +30,7 @@ import wily.legacy.util.ArmorStandPose;
 public abstract class ArmorStandMixin extends LivingEntity {
     @Shadow protected abstract byte setBit(byte b, int i, boolean bl);
 
+    @Unique
     protected int lastSignal = 0;
 
     protected ArmorStandMixin(EntityType<? extends LivingEntity> entityType, Level level) {
@@ -42,7 +44,7 @@ public abstract class ArmorStandMixin extends LivingEntity {
             ArmorStandPose.getNextPose(((ArmorStand)(Object)this)).applyPose((ArmorStand)(Object)this);
         }
     }
-    @Inject(method = "tick", at = @At("RETURN"))
+    @Inject(method = "tickHeadTurn", at = @At("RETURN"))
     public void tick(CallbackInfo ci) {
         if (level().isClientSide) return;
 
@@ -58,17 +60,10 @@ public abstract class ArmorStandMixin extends LivingEntity {
             lastSignal = 0;
         }
     }
-    //? if <1.20.5 {
-    /*@Redirect(method = "defineSynchedData", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/syncher/SynchedEntityData;define(Lnet/minecraft/network/syncher/EntityDataAccessor;Ljava/lang/Object;)V", ordinal = 0))
-    public void defineSynchedData(SynchedEntityData instance, EntityDataAccessor<Object> entityDataAccessor, Object arg) {
-        GameRules gameRules = level() instanceof ServerLevel l ? l.getGameRules() : Legacy4JClient.gameRules;
-        instance.define(entityDataAccessor, this.setBit((byte)arg, 4, gameRules.getBoolean(LegacyGameRules.DEFAULT_SHOW_ARMOR_STANDS_ARMS)));
-    }
-    *///?} else {
+
     @Redirect(method = "defineSynchedData", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/syncher/SynchedEntityData$Builder;define(Lnet/minecraft/network/syncher/EntityDataAccessor;Ljava/lang/Object;)Lnet/minecraft/network/syncher/SynchedEntityData$Builder;", ordinal = 0))
     public SynchedEntityData.Builder defineSynchedData(SynchedEntityData.Builder instance, EntityDataAccessor<Object> i, Object arg) {
         GameRules gameRules = level() instanceof ServerLevel l ? l.getGameRules() : Legacy4JClient.gameRules;
-        return instance.define(i, this.setBit((byte)arg, 4, gameRules.getBoolean(LegacyGameRules.DEFAULT_SHOW_ARMOR_STANDS_ARMS)));
+        return instance.define(i, this.setBit((byte) arg, 4, gameRules.getBoolean(LegacyGameRules.DEFAULT_SHOW_ARMOR_STANDS_ARMS)));
     }
-    //?}
 }

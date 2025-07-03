@@ -239,7 +239,7 @@
       "y":"-17"
     },
     //? if >=1.21.2 {
-    /*{
+    {
       "name": "air_empty",
       "type": "blit_sprite",
       "sprite": "hud/air_empty",
@@ -253,7 +253,7 @@
       "x":"-(${air_empty.index}+1)*8-49",
       "y":"-27"
     },
-    *///?}
+    //?}
     {
       "name": "air",
       "type": "blit_sprite",

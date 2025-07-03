@@ -144,7 +144,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.invertedFrontCameraPitch,
                                 LegacyOptions.headFollowsTheCamera,
                                 LegacyOptions.vehicleCameraRotation
-                                /*? if >=1.21.2 {*//*,LegacyOptions.create(mc.options.rotateWithMinecart())*//*?}*/,
+                                /*? if >=1.21.2 {*/,LegacyOptions.create(mc.options.rotateWithMinecart())/*?}*/,
                                 LegacyOptions.legacyCreativeBlockPlacing,
                                 LegacyOptions.mapsWithCoords,
                                 LegacyOptions.vanillaTutorial),
@@ -276,7 +276,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.of(mc.options.enableVsync()),
                                 LegacyOptions.of(mc.options.framerateLimit()),
                                 LegacyOptions.of(mc.options.fov()),
-                                /*? if >=1.21.2 {*//*LegacyOptions.of(mc.options.inactivityFpsLimit()),*//*?}*/
+                                /*? if >=1.21.2 {*/LegacyOptions.of(mc.options.inactivityFpsLimit()),/*?}*/
                                 LegacyOptions.of(mc.options.renderDistance()),
                                 LegacyOptions.of(mc.options.simulationDistance()),
                                 LegacyOptions.of(mc.options.prioritizeChunkUpdates()),

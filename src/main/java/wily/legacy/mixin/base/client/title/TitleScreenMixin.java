@@ -11,7 +11,6 @@ import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.SplashRenderer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.network.chat.Component;
 //? if forge {
 /*import net.minecraftforge.client.gui.TitleScreenModUpdateIndicator;
@@ -29,14 +28,12 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
 import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
-import wily.legacy.util.ScreenUtil;
 
 import java.io.IOException;
-import java.util.function.BiConsumer;
-import java.util.function.ObjIntConsumer;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen implements ControlTooltip.Event,RenderableVList.Access{
@@ -56,7 +53,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.play_game"), (button) -> {
             if (minecraft.isDemo()){
                 try {
-                    LoadSaveScreen.loadWorld(this,minecraft,Legacy4JClient.getLevelStorageSource(),Legacy4JClient.importSaveFile(minecraft.getResourceManager().getResourceOrThrow(Legacy4J.createModLocation("tutorial/tutorial.mcsave")).open(), Legacy4JClient.getLevelStorageSource(),"Tutorial"));
+                    LoadSaveScreen.loadWorld(this,minecraft, LegacySaveCache.getLevelStorageSource(), LegacySaveCache.importSaveFile(minecraft.getResourceManager().getResourceOrThrow(Legacy4J.createModLocation("tutorial/tutorial.mcsave")).open(), LegacySaveCache.getLevelStorageSource(),"Tutorial"));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

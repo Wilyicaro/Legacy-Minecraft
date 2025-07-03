@@ -1,7 +1,6 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.advancements.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,7 +15,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.phys.Vec3;
 import wily.factoryapi.FactoryAPI;
-import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
@@ -29,6 +27,7 @@ import wily.legacy.util.*;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.network.ClientAdvancementsPayload;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.*;
 import java.util.stream.StreamSupport;
@@ -120,10 +119,10 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         @Override
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             if (isFocused()) {
-                guiGraphics.pose().pushPose();
+                guiGraphics.pose().pushMatrix();
                 guiGraphics.pose().translate(-1.5f, -1.5f, 0);
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_HIGHLIGHT, getX(), getY(), 41, 41);
-                guiGraphics.pose().popPose();
+                guiGraphics.pose().popMatrix();
             }
             FactoryScreenUtil.enableBlend();
             if (!isUnlocked()) FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 0.5f);
@@ -135,11 +134,11 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             FactoryScreenUtil.disableBlend();
             FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 1.0f);
             if (!isUnlocked()) return;
-            guiGraphics.pose().pushPose();
+            guiGraphics.pose().pushMatrix();
             guiGraphics.pose().translate(getX() + (getWidth() - 32) / 2f, getY() + (getHeight() - 32) / 2f, 0);
             guiGraphics.pose().scale(2f, 2f, 2f);
             guiGraphics.renderFakeItem(info.getIcon(), 0, 0);
-            guiGraphics.pose().popPose();
+            guiGraphics.pose().popMatrix();
         }
 
 
@@ -163,10 +162,10 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         addRenderableOnly(((guiGraphics, i, j, f) ->{
             guiGraphics.drawString(font,showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle(),panel.x + (panel.width - font.width(showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle()))/ 2,panel.y + 10, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
             if (!displayInfos.isEmpty()) {
-                ResourceLocation background = displayInfos.get(tabList.selectedTab).getBackground()/*? if >1.20.1 {*/.orElse(null)/*?}*//*? if >=1.21.5 {*//*.texturePath()*//*?}*/;
+                ResourceLocation background = displayInfos.get(tabList.selectedTab).getBackground()/*? if >1.20.1 {*/.orElse(null)/*?}*//*? if >=1.21.5 {*/.texturePath()/*?}*/;
                 if (background != null) FactoryGuiGraphics.of(guiGraphics).blit(background,panel.x + 14, panel.y + 24,0,0,422,23,16,16);
             }
-            ScreenUtil.renderPanelTranslucentRecess(guiGraphics,panel.x + 12, panel.y + 22, 426, 27);
+            LegacyRenderUtil.renderPanelTranslucentRecess(guiGraphics,panel.x + 12, panel.y + 22, 426, 27);
             if (getFocused() instanceof AdvancementButton a) guiGraphics.drawString(font,a.info.getTitle(),panel.x + (panel.width - font.width(a.info.getTitle()))/ 2,panel.y + 32,0xFFFFFF);
             FactoryScreenUtil.disableBlend();
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 12, panel.y + 50, 426, 186);
@@ -232,7 +231,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
     }
 
     public static /*? if >1.20.1 {*/AdvancementTree/*?} else {*//*AdvancementList*//*?}*/ getActualAdvancements(){

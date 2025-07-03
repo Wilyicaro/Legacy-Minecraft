@@ -1,6 +1,5 @@
 package wily.legacy.mixin.base.client.stonecutter;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
@@ -15,11 +14,11 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.StonecutterMenu;
 import net.minecraft.world.item.ItemStack;
 //? if >=1.21.2 {
-/*import net.minecraft.world.item.crafting.SelectableRecipe;
+import net.minecraft.world.item.crafting.SelectableRecipe;
 import net.minecraft.world.item.crafting.display.SlotDisplayContext;
-*///?} else if >1.20.1 {
-import net.minecraft.world.item.crafting.RecipeHolder;
-//?}
+//?} else if >1.20.1 {
+/*import net.minecraft.world.item.crafting.RecipeHolder;
+*///?}
 import net.minecraft.world.item.crafting.StonecutterRecipe;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -35,7 +34,7 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.List;
 
@@ -71,7 +70,7 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
     }
     *///?}
 
-    @Redirect(method = "isScrollBarActive",at = @At(value = "INVOKE",target = /*? if <1.21.2 {*/"Lnet/minecraft/world/inventory/StonecutterMenu;getNumRecipes()I"/*?} else {*//*"Lnet/minecraft/world/inventory/StonecutterMenu;getNumberOfVisibleRecipes()I"*//*?}*/))
+    @Redirect(method = "isScrollBarActive",at = @At(value = "INVOKE",target = /*? if <1.21.2 {*//*"Lnet/minecraft/world/inventory/StonecutterMenu;getNumRecipes()I"*//*?} else {*/"Lnet/minecraft/world/inventory/StonecutterMenu;getNumberOfVisibleRecipes()I"/*?}*/))
     private int isScrollBarActive(StonecutterMenu instance){
         return getNumRecipes() - 4;
     }
@@ -82,17 +81,17 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
 
     @Unique
     private int getNumRecipes(){
-        return menu./*? if <1.21.2 {*/getNumRecipes/*?} else {*//*getNumberOfVisibleRecipes*//*?}*/();
+        return menu./*? if <1.21.2 {*//*getNumRecipes*//*?} else {*/getNumberOfVisibleRecipes/*?}*/();
     }
 
     @Unique
-    private List</*? if <1.20.2 {*//*StonecutterRecipe*//*?} else if <1.21.2 {*/RecipeHolder<StonecutterRecipe>/*?} else {*//*SelectableRecipe.SingleInputEntry<StonecutterRecipe>*//*?}*/> getRecipes(){
-        return menu./*? if <1.21.2 {*/getRecipes/*?} else {*//*getVisibleRecipes().entries*//*?}*/();
+    private List</*? if <1.20.2 {*//*StonecutterRecipe*//*?} else if <1.21.2 {*//*RecipeHolder<StonecutterRecipe>*//*?} else {*/SelectableRecipe.SingleInputEntry<StonecutterRecipe>/*?}*/> getRecipes(){
+        return menu./*? if <1.21.2 {*//*getRecipes*//*?} else {*/getVisibleRecipes().entries/*?}*/();
     }
 
     @Unique
-    private ItemStack getResultItem(/*? if <1.20.2 {*//*StonecutterRecipe*//*?} else if <1.21.2 {*/RecipeHolder<StonecutterRecipe>/*?} else {*//*SelectableRecipe.SingleInputEntry<StonecutterRecipe>*//*?}*/ recipe){
-        return /*? if <1.21.2 {*/recipe/*? if >1.20.1 {*/.value()/*?}*/.getResultItem(this.minecraft.level.registryAccess())/*?} else {*//*recipe.recipe().optionDisplay().resolveForFirstStack(SlotDisplayContext.fromLevel(this.minecraft.level))*//*?}*/;
+    private ItemStack getResultItem(/*? if <1.20.2 {*//*StonecutterRecipe*//*?} else if <1.21.2 {*//*RecipeHolder<StonecutterRecipe>*//*?} else {*/SelectableRecipe.SingleInputEntry<StonecutterRecipe>/*?}*/ recipe){
+        return /*? if <1.21.2 {*//*recipe/^? if >1.20.1 {^/.value()/^?}^/.getResultItem(this.minecraft.level.registryAccess())*//*?} else {*/recipe.recipe().optionDisplay().resolveForFirstStack(SlotDisplayContext.fromLevel(this.minecraft.level))/*?}*/;
     }
 
     @Override
@@ -131,7 +130,7 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
         ci.cancel();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 70,  topPos+ 18, 75, 75);
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 148.5, topPos + 18, 0f);
         if (isScrollBarActive() && getOffscreenRows() > 0) {
             if (getOffscreenRows() != startIndex)
@@ -145,8 +144,8 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,1.0f);
         FactoryScreenUtil.disableBlend();
-        guiGraphics.pose().popPose();
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().popMatrix();
+        guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 71.5f,topPos + 19.5f,0);
         if (this.displayRecipes) {
             int size = getRecipes().size();
@@ -157,12 +156,12 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
                     if (s >= size) break block0;
                     int t = q * 18;
                     int u = p * 18;
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(s == menu.getSelectedRecipeIndex() ? BUTTON_SLOT_SELECTED : (ScreenUtil.isMouseOver(i,j,leftPos + 73.5f + t,topPos + 19.5f + u,18,18)? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, 18, 18);
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(s == menu.getSelectedRecipeIndex() ? BUTTON_SLOT_SELECTED : (LegacyRenderUtil.isMouseOver(i,j,leftPos + 73.5f + t,topPos + 19.5f + u,18,18)? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, 18, 18);
                     guiGraphics.renderItem(getResultItem(getRecipes().get(s)), 1 + t, 1 + u);
                 }
             }
         }
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
     @Inject(method = "mouseClicked",at = @At("HEAD"), cancellable = true)
     public void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
@@ -180,7 +179,7 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
                 cir.setReturnValue(true);
                 return;
             }
-            if (ScreenUtil.isMouseOver(d,e,leftPos + 148.5,topPos + 18,13,75)) this.scrolling = true;
+            if (LegacyRenderUtil.isMouseOver(d,e,leftPos + 148.5,topPos + 18,13,75)) this.scrolling = true;
         }
         cir.setReturnValue(super.mouseClicked(d, e, i));
     }
@@ -195,7 +194,7 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
                     int r = p + this.startIndex;
                     int s = r * 4 + q;
                     if (s >= size) break block0;
-                    if (ScreenUtil.isMouseOver(i,j,leftPos + 73.5f + q * 18,topPos + 19.5f + p * 18,18,18)) guiGraphics.renderTooltip(this.font, getResultItem(getRecipes().get(s)), i, j);
+                    if (LegacyRenderUtil.isMouseOver(i,j,leftPos + 73.5f + q * 18,topPos + 19.5f + p * 18,18,18)) guiGraphics.renderTooltip(this.font, getResultItem(getRecipes().get(s)), i, j);
                 }
             }
         }

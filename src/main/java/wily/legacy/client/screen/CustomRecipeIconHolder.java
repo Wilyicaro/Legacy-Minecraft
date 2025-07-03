@@ -24,7 +24,7 @@ import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.ServerMenuCraftPayload;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
     List<ItemStack> addedIngredientsItems = null;
     Predicate<CustomRecipeIconHolder> canAddIngredient = h->true;
     public ItemStack nextItem(Inventory inventory, Predicate<ItemStack> isValid) {
-        List<ItemStack> items = inventory./*? if <1.21.5 {*/items/*?} else {*//*getNonEquipmentItems()*//*?}*/;
+        List<ItemStack> items = inventory./*? if <1.21.5 {*//*items*//*?} else {*/getNonEquipmentItems()/*?}*/;
         for (int i = Math.max(0,items.indexOf(itemIcon)); i < items.size(); i++)
             if (itemIcon != items.get(i) && isValid.test(items.get(i))) return items.get(i);
         for (int i = 0; i < Math.max(0,items.indexOf(itemIcon)); i++)
@@ -52,7 +52,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
         return ItemStack.EMPTY;
     }
     public ItemStack previousItem(Inventory inventory, Predicate<ItemStack> isValid) {
-        List<ItemStack> items = inventory./*? if <1.21.5 {*/items/*?} else {*//*getNonEquipmentItems()*//*?}*/;
+        List<ItemStack> items = inventory./*? if <1.21.5 {*//*items*//*?} else {*/getNonEquipmentItems()/*?}*/;
         for (int i = Math.max(0,items.indexOf(itemIcon)); i >= 0; i--)
             if (itemIcon != items.get(i) && isValid.test(items.get(i))) return items.get(i);
         for (int i = items.size() - 1; i >= Math.max(0,items.indexOf(itemIcon)); i--)
@@ -126,7 +126,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
             if (canCraft()){
                 craft();
                 updateRecipe();
-            } else ScreenUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
+            } else LegacyRenderUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
         }
     }
 
@@ -142,7 +142,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
     public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
         int i = (int)Math.signum(g);
         if (isFocused() && !nextItem.isEmpty() && i > 0 || !previousItem.isEmpty() && i < 0 ){
-            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+            LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             itemIcon = i > 0 ? nextItem : previousItem;
             updateRecipe();
             return true;
@@ -165,11 +165,11 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
         return hasItem(itemIcon);
     }
     protected boolean hasItem(ItemStack stack) {
-        return !stack.isEmpty() && minecraft.player.getInventory()./*? if <1.21.5 {*/items/*?} else {*//*getNonEquipmentItems()*//*?}*/.stream().filter(s-> FactoryItemUtil.equalItems(s,stack)).mapToInt(ItemStack::getCount).sum() >= stack.getCount();
+        return !stack.isEmpty() && minecraft.player.getInventory()./*? if <1.21.5 {*//*items*//*?} else {*/getNonEquipmentItems()/*?}*/.stream().filter(s-> FactoryItemUtil.equalItems(s,stack)).mapToInt(ItemStack::getCount).sum() >= stack.getCount();
     }
     @Override
     public void renderItem(GuiGraphics graphics, int i, int j, float f) {
-        ScreenUtil.secureTranslucentRender(graphics,!itemIcon.isEmpty() && !hasItem(itemIcon),0.5f,(u)-> renderItem(graphics,itemIcon,getX(),getY(),false));
+        LegacyRenderUtil.secureTranslucentRender(graphics,!itemIcon.isEmpty() && !hasItem(itemIcon),0.5f,(u)-> renderItem(graphics,itemIcon,getX(),getY(),false));
     }
     public boolean canAddIngredient(){
         return hasItem(itemIcon) && addedIngredientsItems != null && canAddIngredient.test(this) && getIngredientsGrid().stream().anyMatch(Optional::isEmpty);
@@ -187,7 +187,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
             return true;
         }
         if (!nextItem.isEmpty() && i == 265 || !previousItem.isEmpty() && i == 264){
-            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+            LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             itemIcon = i == 265 ? nextItem : previousItem;
             updateRecipe();
             return true;
@@ -201,15 +201,15 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
         int matchSlot;
         if (!itemIcon.isEmpty() && hasItem(itemIcon) && minecraft.screen instanceof LegacyMenuAccess<?> a && (matchSlot = findInventoryMatchSlot()) > 0){
             Slot s = a.getMenu().getSlot(matchSlot);
-            ScreenUtil.iconHolderRenderer.slotBounds(a.getMenuRectangle().left(),a.getMenuRectangle().top(),s).renderHighlight(graphics);
+            LegacyRenderUtil.iconHolderRenderer.slotBounds(a.getMenuRectangle().left(),a.getMenuRectangle().top(),s).renderHighlight(graphics);
         }
-        graphics.pose().pushPose();
+        graphics.pose().pushMatrix();
         applyOffset(graphics);
         if (!previousItem.isEmpty() && previousItem!=itemIcon || !nextItem.isEmpty() && nextItem!=itemIcon){
             getScrollRenderer().renderScroll(graphics, ScreenDirection.UP,getX() + 5,getY() - 14);
             getScrollRenderer().renderScroll(graphics, ScreenDirection.DOWN,getX() + 5,getY() + 31);
         }
-        graphics.pose().popPose();
+        graphics.pose().popMatrix();
     }
 
     @Override
