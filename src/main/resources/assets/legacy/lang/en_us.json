@@ -1191,8 +1191,6 @@
   "legacy.menu.choose_user.stage.finalizing": "Finalizing login",
   "legacy.menu.choose_user.success": "Welcome, %s!",
   "legacy.menu.choose_user_message": "What type of login would you like to do?",
-  "legacy.menu.connection.failed": "Can't Join Game",
-  "legacy.menu.connection.lost": "Connection lost",
   "legacy.menu.copySave": "Copy Save",
   "legacy.menu.copySaveMessage": "Are you sure you would like to copy this save?",
   "legacy.menu.create": "Create",
