@@ -17,3 +17,4 @@ classes/
 .vscode
 .settings
 *.launch
+/src/main/resources/assets/legacy/lang/.vs
