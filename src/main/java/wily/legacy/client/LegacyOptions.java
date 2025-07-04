@@ -65,7 +65,7 @@ public class LegacyOptions {
             loadDeprecated();
             super.load();
             Legacy4JClient.isNewerVersion = Legacy4J.isNewerVersion(Legacy4J.VERSION.get(), lastLoadedVersion.get());
-            Legacy4JClient.isNewerMinecraftVersion = Legacy4J.isNewerVersion(SharedConstants.getCurrentVersion().getName(), lastLoadedMinecraftVersion.get());
+            Legacy4JClient.isNewerMinecraftVersion = Legacy4J.isNewerVersion(SharedConstants.getCurrentVersion().name(), lastLoadedMinecraftVersion.get());
         }
     }.withFile("legacy/client_options.json");
 

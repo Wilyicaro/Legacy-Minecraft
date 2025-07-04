@@ -76,6 +76,7 @@ import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.ItemContainerPlatform;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.ColorUtil;
 import wily.factoryapi.util.FactoryItemUtil;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
@@ -268,6 +269,10 @@ public interface ControlTooltip {
         return create(()-> getIconFromKeyMapping(mapping),action);
     }
 
+    static float getAlpha(){
+        return Math.max(Minecraft.getInstance().screen == null ? 0.0f : 0.2f,  LegacyRenderUtil.getHUDOpacity());
+    }
+
     interface Icon {
         int render(GuiGraphics graphics, int x, int y, boolean allowPressed, boolean simulate);
         static Icon createCompound(Icon[] icons){
@@ -292,7 +297,7 @@ public interface ControlTooltip {
                 @Override
                 public int render(GuiGraphics graphics, int x, int y, boolean allowPressed, boolean simulate)  {
                     Font font = Minecraft.getInstance().font;
-                    if (!simulate) graphics.drawString(font,getComponent(),x,y,0xFFFFFF,false);
+                    if (!simulate) graphics.drawString(font,getComponent(), x, y, ColorUtil.withAlpha(0xFFFFFF, getAlpha()),false);
                     return font.width(getComponent());
                 };
             };
@@ -349,19 +354,16 @@ public interface ControlTooltip {
             lastPressed = pressed();
 
             if (!simulate && c != null) {
-                graphics.drawString(font,c,x + (co == null || cw > cow ? 0 : (cow - cw) / 2),y,0xFFFFFF,false);
+                graphics.drawString(font,c,x + (co == null || cw > cow ? 0 : (cow - cw) / 2),y,ColorUtil.withAlpha(0xFFFFFF, getAlpha()) ,false);
             }
             if (!simulate && co != null){
                 float rel = startPressTime == 0 ? 0 : canLoop() ? getPressInterval() % 1 : Math.min(getPressInterval(),1);
                 float d = 1 - Math.max(0,(rel >= 0.5f ? 1 - rel: rel) * 2/5);
 
                 graphics.pose().pushMatrix();
-                graphics.pose().translate(x + (c == null || cow > cw ? (cow - cow * d) / 2 : (cw  - cow * d) / 2f),y + (9 - 9 * d) / 2 ,0);
-                graphics.pose().scale(d,d,d);
-                float alpha = FactoryGuiGraphics.of(graphics).getColor()[3];
-                FactoryGuiGraphics.of(graphics).setColor(1.0f,1.0f,1.0f,alpha * (0.8f + (rel >= 0.5f ? 0.2f : 0)));
-                graphics.drawString(font,co,0,0,0xFFFFFF,false);
-                FactoryGuiGraphics.of(graphics).setColor(1.0f,1.0f,1.0f,alpha);
+                graphics.pose().translate(x + (c == null || cow > cw ? (cow - cow * d) / 2 : (cw  - cow * d) / 2f),y + (9 - 9 * d) / 2);
+                graphics.pose().scale(d,d);
+                graphics.drawString(font,co,0,0, ColorUtil.withAlpha(0xFFFFFF, getAlpha() * (0.8f + (rel >= 0.5f ? 0.2f : 0))),false);
                 graphics.pose().popMatrix();
             }
             return Math.max(cw,cow);
@@ -494,35 +496,31 @@ public interface ControlTooltip {
                 if ((action = tooltip.getAction()) == null || (icon = tooltip.getIcon()) == null) continue;
                 renderTooltips.compute(action, (k, existingIcon) -> existingIcon == null ? icon : existingIcon.equals(icon) || !LegacyOptions.displayMultipleControlsFromAction.get() ? existingIcon : COMPOUND_ICON_FUNCTION.apply(new Icon[]{existingIcon,SPACE_ICON, icon}));
             }
-            RenderSystem.setShaderColor(1.0f,1.0f,1.0f, Math.max(minecraft.screen == null ? 0.0f : 0.2f,  LegacyRenderUtil.getHUDOpacity()));
             guiGraphics.pose().pushMatrix();
             boolean left = LegacyOptions.controlTooltipDisplay.get().isLeft();
-            double hudDiff = (1 - LegacyOptions.hudDistance.get()) * 60D;
-            double xDiff = -Math.min(hudDiff,30);
-            guiGraphics.pose().translate(left ? xDiff : guiGraphics.guiWidth() - xDiff, Math.min(hudDiff,16),1000);
+            float hudDiff = (1 - LegacyOptions.hudDistance.get().floatValue()) * 60f;
+            float xDiff = -Math.min(hudDiff,30);
+            guiGraphics.pose().translate(left ? xDiff : guiGraphics.guiWidth() - xDiff, Math.min(hudDiff,16));
             int baseHeight = guiGraphics.guiHeight() - 29;
 
             renderTooltips.forEach((action,icon)->{
                 if (left) {
                     int controlWidth = icon.render(guiGraphics, 32, baseHeight, allowPressed(), false);
                     if (controlWidth > 0) {
-                        guiGraphics.drawString(minecraft.font, action, 34 + controlWidth, baseHeight, CommonColor.ACTION_TEXT.get());
-                        guiGraphics.pose().translate(controlWidth + minecraft.font.width(action) + 12, 0, 0);
-                        guiGraphics.flush();
+                        guiGraphics.drawString(minecraft.font, action, 34 + controlWidth, baseHeight, ColorUtil.withAlpha(CommonColor.ACTION_TEXT.get(), getAlpha()));
+                        guiGraphics.pose().translate(controlWidth + minecraft.font.width(action) + 12, 0);
                     }
                 } else {
                     int controlWidth = icon.render(guiGraphics, -32, baseHeight, allowPressed(), true);
                     if (controlWidth > 0) {
-                        guiGraphics.pose().translate(-controlWidth - minecraft.font.width(action), 0, 0);
+                        guiGraphics.pose().translate(-controlWidth - minecraft.font.width(action), 0);
                         icon.render(guiGraphics, -32, baseHeight, allowPressed(), false);
-                        guiGraphics.drawString(minecraft.font, action, -30 + controlWidth, baseHeight, CommonColor.ACTION_TEXT.get());
-                        guiGraphics.pose().translate(-12, 0, 0);
-                        guiGraphics.flush();
+                        guiGraphics.drawString(minecraft.font, action, -30 + controlWidth, baseHeight, ColorUtil.withAlpha(CommonColor.ACTION_TEXT.get(), getAlpha()));
+                        guiGraphics.pose().translate(-12, 0);
                     }
                 }
             });
             guiGraphics.pose().popMatrix();
-            RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
             FactoryScreenUtil.disableBlend();
         }
     }

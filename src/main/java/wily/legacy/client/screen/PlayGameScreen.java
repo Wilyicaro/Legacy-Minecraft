@@ -132,13 +132,14 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
-        if (hasTabList()) tabList.render(guiGraphics,i,j,f);
+        if (hasTabList()) tabList.render(guiGraphics, i, j, f);
         panel.render(guiGraphics,i,j,f);
+        tabList.renderSelected(guiGraphics, i, j, f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, accessor.getInteger("panelRecess.x",panel.x + 9), accessor.getInteger("panelRecess.y",panel.y + 9), accessor.getInteger("panelRecess.width",panel.width - 18), accessor.getInteger("panelRecess.height",panel.height - 18 - (tabList.selectedTab == 0 ? 21 : 0)));
         if (hasTabList() && tabList.selectedTab == 0){
             if (saveRenderableList.currentlyDisplayedLevels != null) {
                 guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(panel.x + 11.25f, panel.y + panel.height - 22.75, 0);
+                guiGraphics.pose().translate(panel.x + 11.25f, panel.y + panel.height - 22.75f);
                 long storage = new File("/").getTotalSpace();
                 FactoryGuiGraphics.of(guiGraphics).enableScissor(0, 0, panel.width - 24, panel.height - 10);
                 for (LevelSummary level : saveRenderableList.currentlyDisplayedLevels) {
@@ -146,10 +147,10 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
                     if ((size = SaveRenderableList.sizeCache.getIfPresent(level)) == null) continue;
                     float scaledSize = Math.max(1,size * (panel.width - 21f)/ storage);
                     guiGraphics.pose().pushMatrix();
-                    guiGraphics.pose().scale(scaledSize,1,1);
+                    guiGraphics.pose().scale(scaledSize,1);
                     guiGraphics.fill(0, 0, 1, 11,getFocused() instanceof AbstractButton b && saveRenderableList.renderables.contains(b) && saveRenderableList.renderables.indexOf(b) == saveRenderableList.currentlyDisplayedLevels.indexOf(level) ? CommonColor.SELECTED_STORAGE_SAVE.get() : CommonColor.STORAGE_SAVE.get());
                     guiGraphics.pose().popMatrix();
-                    guiGraphics.pose().translate(scaledSize, 0, 0);
+                    guiGraphics.pose().translate(scaledSize, 0);
                 }
                 guiGraphics.pose().popMatrix();
                 guiGraphics.disableScissor();

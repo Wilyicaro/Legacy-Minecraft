@@ -1,8 +1,6 @@
 package wily.legacy.util.client;
 
 import com.google.common.collect.Ordering;
-import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.Util;
@@ -16,11 +14,10 @@ import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -40,7 +37,6 @@ import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -54,7 +50,6 @@ import net.minecraft.world.item.TooltipFlag;
 //?}
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
@@ -73,7 +68,6 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.LegacyIconHolder;
-import wily.legacy.client.screen.LegacyScreen;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.LegacySprites;
@@ -91,12 +85,9 @@ public class LegacyRenderUtil {
     public static final ResourceLocation GUI_ATLAS = FactoryAPI.createVanillaLocation("textures/atlas/gui.png");
     private static final Minecraft mc = Minecraft.getInstance();
     public static long lastHotbarSelectionChange = -1;
-    public static long animatedCharacterTime;
-    public static long remainingAnimatedCharacterTime;
     public static int lastHotbarSelection = -1;
     public static long lastGui = -1;
     protected static final LogoRenderer logoRenderer = new LogoRenderer(false);
-    public static final PanoramaRenderer panoramaRenderer = /*? if <1.20.5 {*//*new PanoramaRenderer(TitleScreen.CUBE_MAP)*//*?} else {*/LegacyScreen.PANORAMA_RENDERER/*?}*/;
     public static final LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
     public static final ResourceLocation MINECRAFT = Legacy4J.createModLocation( "textures/gui/title/minecraft.png");
     public static final ResourceLocation PANORAMA_DAY = Legacy4J.createModLocation( "textures/gui/title/panorama_day.png");
@@ -108,8 +99,8 @@ public class LegacyRenderUtil {
     public static final Bearer<Integer> actualPlayerTabHeight = Bearer.of(0);
 
     public static void updateAnimatedCharacterTime(long remainingTime){
-        animatedCharacterTime = Util.getMillis();
-        remainingAnimatedCharacterTime = remainingTime;
+        AnimatedCharacterRenderer.animatedCharacterTime = Util.getMillis();
+        AnimatedCharacterRenderer.remainingAnimatedCharacterTime = remainingTime;
     }
 
     public static void renderPointerPanel(GuiGraphics graphics, int x, int y, int width, int height){
@@ -191,7 +182,7 @@ public class LegacyRenderUtil {
     }
 
     public static void renderPanorama(GuiGraphics guiGraphics){
-        panoramaRenderer.render(guiGraphics, guiGraphics.guiWidth(), guiGraphics.guiHeight(), true);
+        mc.gameRenderer.getPanorama().render(guiGraphics, guiGraphics.guiWidth(), guiGraphics.guiHeight(), true);
     }
 
     public static void renderLegacyPanorama(GuiGraphics guiGraphics){
@@ -369,11 +360,9 @@ public class LegacyRenderUtil {
         }
 
         //FactoryGuiGraphics.of(graphics).pushBufferSource(BufferSourceWrapper.translucent(FactoryGuiGraphics.of(graphics).getBufferSource()));
-        RenderSystem.setShaderColor(1.0f,1.0f,1.0f,alpha);
-        FactoryScreenUtil.enableBlend();
+        //RenderSystem.setShaderColor(1.0f,1.0f,1.0f,alpha);
         render.accept(true);
-        FactoryScreenUtil.disableBlend();
-        RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
+        //RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
         //FactoryGuiGraphics.of(graphics).popBufferSource();
     }
 
@@ -386,61 +375,20 @@ public class LegacyRenderUtil {
         return (d -= leftPos) >= xCorner && d < (xCorner + width) && (e -= topPos) >= yCorner && e < (yCorner + height);
     }
 
-    public static void renderEntity(GuiGraphics guiGraphics, float x, float y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity) {
-        renderEntity(guiGraphics,x,y,size,partialTicks,vector3f,quaternionf,quaternionf2,entity,false);
+    public static void renderEntity(GuiGraphics guiGraphics, int x, int y, int x0, int y0, int size, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity) {
+        renderEntity(guiGraphics, x, y, x0, y0, size, vector3f, quaternionf, quaternionf2, entity, false);
     }
 
-    public static void renderEntity(GuiGraphics guiGraphics, int x, int y, int size, float partialTicks, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity, boolean forceSize) {
-        InventoryScreen.renderEntityInInventory(guiGraphics, x, y, size, partialTicks, vector3f, quaternionf, quaternionf2, entity, forceSize);
+    public static void renderEntity(GuiGraphics guiGraphics, int x, int y, int x0, int y0, int size, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity, boolean forceSize) {
+        float h = forceSize ? Math.max(1,Math.max(entity.getBbWidth(), entity.getBbHeight())) * size : size;
 
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(x, y, 50.0);
-        float h = forceSize ? Math.max(1f,Math.max(entity.getBbWidth(), entity.getBbHeight())) : 1;
-        guiGraphics.pose()./*? if <1.20.5 {*//*mulPoseMatrix*//*?} else {*/mulPose/*?}*/(new Matrix4f().scaling(size / h, size / h, -size / h));
-        guiGraphics.pose().translate(vector3f.x, vector3f.y, vector3f.z);
-        guiGraphics.pose().mulPose(quaternionf);
-        Lighting.setupForEntityInInventory();
+        if (entity instanceof LivingEntity living) h /= living.getScale();
+
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-        if (quaternionf2 != null) {
-            quaternionf2.conjugate();
-            entityRenderDispatcher.overrideCameraOrientation(quaternionf2);
-        }
-
-        entityRenderDispatcher.setRenderShadow(false);
-        entityRenderDispatcher.render(entity, 0.0, 0.0, 0.0, /*? if <1.21.2 {*//*0.0f,*//*?}*/ partialTicks, guiGraphics.pose(), FactoryGuiGraphics.of(guiGraphics).getBufferSource(), 0xF000F0);
-        guiGraphics.flush();
-        entityRenderDispatcher.setRenderShadow(true);
-        guiGraphics.pose().popMatrix();
-        Lighting.setupFor3DItems();
-    }
-
-    public static void renderEntityInInventoryFollowsMouse(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, float f, float g, float h, LivingEntity livingEntity) {
-        float n = (float)(i + k) / 2.0f;
-        float o = (float)(j + l) / 2.0f;
-        FactoryGuiGraphics.of(guiGraphics).enableScissor(i, j, k, l);
-        float p = (float)Math.atan((n - g) / 40.0f);
-        float q = (float)Math.atan((o - h) / 40.0f);
-        Quaternionf quaternionf = new Quaternionf().rotateZ((float)Math.PI);
-        Quaternionf quaternionf2 = new Quaternionf().rotateX(q * 20.0f * ((float)Math.PI / 180));
-        quaternionf.mul(quaternionf2);
-        float r = livingEntity.yBodyRot;
-        float s = livingEntity.getYRot();
-        float t = livingEntity.getXRot();
-        float u = livingEntity.yHeadRotO;
-        float v = livingEntity.yHeadRot;
-        livingEntity.yBodyRot = 180.0f + p * 20.0f;
-        livingEntity.setYRot(180.0f + p * 40.0f);
-        livingEntity.setXRot(-q * 20.0f);
-        livingEntity.yHeadRot = livingEntity.getYRot();
-        livingEntity.yHeadRotO = livingEntity.getYRot();
-        Vector3f vector3f = new Vector3f(0.0f, livingEntity.getBbHeight() / 2.0f + f, 0.0f);
-        renderEntity(guiGraphics, n, o, m,1, vector3f, quaternionf, quaternionf2, livingEntity);
-        livingEntity.yBodyRot = r;
-        livingEntity.setYRot(s);
-        livingEntity.setXRot(t);
-        livingEntity.yHeadRotO = u;
-        livingEntity.yHeadRot = v;
-        guiGraphics.disableScissor();
+        EntityRenderer<? super Entity, ?> entityRenderer = entityRenderDispatcher.getRenderer(entity);
+        EntityRenderState entityRenderState = entityRenderer.createRenderState(entity, 1.0F);
+        entityRenderState.hitboxesRenderState = null;
+        guiGraphics.submitEntityRenderState(entityRenderState, h, vector3f, quaternionf, quaternionf2, x, y, x0, y0);
     }
 
     public static void renderLocalPlayerHead(GuiGraphics guiGraphics, int x, int y, int size) {
@@ -490,31 +438,6 @@ public class LegacyRenderUtil {
     public static boolean canDisplayHUD(){
         int hudDelay = LegacyOptions.hudDelay.get();
         return mc.screen == null && (hudDelay == 0 || Util.getMillis() - lastGui > hudDelay);
-    }
-
-    public static void renderAnimatedCharacter(GuiGraphics guiGraphics){
-        if (!LegacyOptions.animatedCharacter.get()) return;
-        if (mc.getCameraEntity() instanceof LivingEntity character) {
-            boolean hasRemainingTime = character.isSprinting() || character.isCrouching() || character.isFallFlying() || character.isVisuallySwimming() || !(character instanceof Player);
-            if ((hasRemainingTime || character instanceof Player p && p.getAbilities().flying) && !character.isSleeping()) {
-                LegacyRenderUtil.updateAnimatedCharacterTime(450);
-            }
-            if (Util.getMillis() - LegacyRenderUtil.animatedCharacterTime <= LegacyRenderUtil.remainingAnimatedCharacterTime) {
-                float xRot = character.getXRot();
-                float xRotO = character.xRotO;
-                if (!character.isFallFlying()) character.setXRot(character.xRotO = -2.5f);
-                guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(32f, character.isFallFlying() ? 44 : 18);
-                LegacyRenderUtil.applyHUDScale(guiGraphics);
-                float f = LegacyOptions.smoothAnimatedCharacter.get() ? FactoryAPIClient.getPartialTick() : 0;
-                ClientEntityAccessor.of(character).setAllowDisplayFireAnimation(false);
-                LegacyRenderUtil.renderEntity(guiGraphics, 10f, (character.isFallFlying() ? -character.getViewXRot(f) / 180 * 40 : 36), 12, f,new Vector3f(), new Quaternionf().rotationXYZ(-5* Mth.PI/180f, (165 -Mth.lerp(f, character.yBodyRotO, character.yBodyRot)) * Mth.PI/180f, Mth.PI), null, character);
-                ClientEntityAccessor.of(character).setAllowDisplayFireAnimation(true);
-                guiGraphics.pose().popMatrix();
-                character.setXRot(xRot);
-                character.xRotO = xRotO;
-            }
-        }
     }
 
     public static void renderContainerEffects(GuiGraphics guiGraphics, int leftPos, int topPos, int imageWidth, int imageHeight, int mouseX, int mouseY){
@@ -717,15 +640,22 @@ public class LegacyRenderUtil {
         PostChain gammaEffect = Legacy4JClient.getGammaEffect();
         if (gammaEffect != null && LegacyOptions.displayLegacyGamma.get()) {
             float gamma = LegacyOptions.legacyGamma.get().floatValue();
-            FactoryScreenUtil.enableBlend();
-            FactoryScreenUtil.disableDepthTest();
             float tweakedGamma = gamma >= 0.5f ? (gamma - 0.5f) * 1.12f + 1.08f : gamma * 0.96f + 0.6f;
             //? if <1.21.5 {
             /*gammaEffect.passes.forEach(p-> p./^? if <1.21.2 {^//^getEffect^//^?} else {^/getShader/^?}^/().safeGetUniform("gamma").set(tweakedGamma));
             *///?}
-            gammaEffect.process(mc.getMainRenderTarget(), mc.gameRenderer.resourcePool);
-            FactoryScreenUtil.enableDepthTest();
-            FactoryScreenUtil.disableBlend();
+            //Custom Uniform buffers can't be modified, looking for an alternative
+            //gammaEffect.passes.forEach(p-> {
+            //    CommandEncoder commandEncoder = RenderSystem.getDevice().createCommandEncoder();
+
+            //    GpuBuffer buffer = p.customUniforms.get("GammaConfig");
+            //    if (buffer != null) {
+            //        try (GpuBuffer.MappedView mappedView = commandEncoder.mapBuffer(buffer, false, true)) {
+            //            Std140Builder.intoBuffer(mappedView.data()).putFloat(tweakedGamma);
+            //        }
+            //    }
+            //});
+            //gammaEffect.process(mc.getMainRenderTarget(), mc.gameRenderer.resourcePool);
         }
     }
 

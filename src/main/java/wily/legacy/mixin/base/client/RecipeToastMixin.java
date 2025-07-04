@@ -82,8 +82,8 @@ public abstract class RecipeToastMixin implements Toast {
 
         LegacyRenderUtil.renderPointerPanel(guiGraphics,0,0,width(),height());
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate((width() - 1.5f * Minecraft.getInstance().font.width(TITLE_TEXT)) / 2, 10,0);
-        guiGraphics.pose().scale(1.5f,1.5f,1.5f);
+        guiGraphics.pose().translate((width() - 1.5f * Minecraft.getInstance().font.width(TITLE_TEXT)) / 2, 10);
+        guiGraphics.pose().scale(1.5f,1.5f);
         guiGraphics.drawString(Minecraft.getInstance().font, TITLE_TEXT, 0,0, 0xFFFFFF);
         guiGraphics.pose().popMatrix();
         guiGraphics.drawString(Minecraft.getInstance().font, DESCRIPTION_TEXT, (width() - Minecraft.getInstance().font.width(DESCRIPTION_TEXT)) / 2 , 27, 0xFFFFFF);

@@ -177,7 +177,7 @@ public class ServerRenderableList extends RenderableVList {
                     }
                 });
                 if (getScreen().children.contains(lanButton))
-                    this.minecraft.getNarrator().say(Component.translatable("multiplayer.lan.server_found", Component.empty().append(LAN_SERVER_HEADER).append(CommonComponents.SPACE).append(lanServer.getMotd())));
+                    this.minecraft.getNarrator().saySystemNow(Component.translatable("multiplayer.lan.server_found", Component.empty().append(LAN_SERVER_HEADER).append(CommonComponents.SPACE).append(lanServer.getMotd())));
             }
         }else {
             AbstractButton scanningButton;
@@ -235,7 +235,7 @@ public class ServerRenderableList extends RenderableVList {
                 THREAD_POOL.submit(() -> {
                     try {
                         getScreen(PlayGameScreen.class).getPinger().pingServer(server, () -> minecraft.execute(this::updateServerList), () -> {
-                            server.setState(server.protocol == SharedConstants.getCurrentVersion().getProtocolVersion() ? ServerData.State.SUCCESSFUL : ServerData.State.INCOMPATIBLE);
+                            server.setState(server.protocol == SharedConstants.getCurrentVersion().protocolVersion() ? ServerData.State.SUCCESSFUL : ServerData.State.INCOMPATIBLE);
                             minecraft.execute(this::refreshStatus);
                         });
                     } catch (UnknownHostException unknownHostException) {
@@ -271,8 +271,8 @@ public class ServerRenderableList extends RenderableVList {
             *///?}
             guiGraphics.drawString(minecraft.font, getMessage(), getX() + 32 + 3, getY() + 3, 0xFFFFFF);
             guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(getX() + 35,  getY() + 10,0);
-            guiGraphics.pose().scale(2/3f,2/3f,2/3f);
+            guiGraphics.pose().translate(getX() + 35,  getY() + 10);
+            guiGraphics.pose().scale(2/3f,2/3f);
             List<FormattedCharSequence> list = minecraft.font.split(server.motd, Math.max(width-36,minecraft.font.width(server.motd) / 2 + 20));
             for (int p = 0; p < Math.min(2,list.size()); ++p) {
                 LegacyRenderUtil.renderScrollingString(guiGraphics,minecraft.font, list.get(p), 0,  minecraft.font.lineHeight * p,width-36 , 11 + minecraft.font.lineHeight * p, -8355712, false,minecraft.font.width(list.get(p))* 2/3);
@@ -310,9 +310,9 @@ public class ServerRenderableList extends RenderableVList {
             int s = mouseX - getX();
             int t = mouseY - getY();
             if (statusIconTooltip != null && s >= width - 15 && s <= width - 5 && t >= 2 && t <= 10) {
-                guiGraphics.renderTooltip(minecraft.font,statusIconTooltip, mouseX,mouseY);
+                guiGraphics.setTooltipForNextFrame(minecraft.font, statusIconTooltip, mouseX,mouseY);
             } else if (showOnlinePlayersTooltip && s >= width - q - 15 - 2 && s <= width - 15 - 2 && t >= 2 && t <= 10) {
-                guiGraphics.renderComponentTooltip(minecraft.font,server.playerList, mouseX,mouseY);
+                guiGraphics.setComponentTooltipForNextFrame(minecraft.font,server.playerList, mouseX,mouseY);
             }
             if (minecraft.options.touchscreen().get().booleanValue() || isHovered) {
                 guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
@@ -392,7 +392,7 @@ public class ServerRenderableList extends RenderableVList {
         }
 
         private boolean isCompatible() {
-            return server.protocol == SharedConstants.getCurrentVersion().getProtocolVersion();
+            return server.protocol == SharedConstants.getCurrentVersion().protocolVersion();
         }
 
         public void updateServerList() {

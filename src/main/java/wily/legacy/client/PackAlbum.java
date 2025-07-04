@@ -267,7 +267,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
 
     public static ConfirmationScreen createAlbumEditScreen(Screen parent, Component title, Component defaultName, Component defaultDescription, BiConsumer<Component,Component> editAlbum){
         EditBox nameBox = new EditBox(Minecraft.getInstance().font, 0,0,200, 20, Component.translatable("legacy.menu.album_info"));
-        MultiLineEditBox descriptionBox = new MultiLineEditBox(Minecraft.getInstance().font, 0,0,200, 60, defaultDescription, nameBox.getMessage());
+        MultiLineEditBox descriptionBox = MultiLineEditBox.builder().setPlaceholder(nameBox.getMessage()).build(Minecraft.getInstance().font, 200, 60, defaultDescription);
         nameBox.setHint(defaultName);
         return new ConfirmationScreen(parent, 230, 184, title, nameBox.getMessage(), p -> editAlbum.accept(nameBox.getValue().isBlank() ? defaultName : Component.literal(nameBox.getValue()), descriptionBox.getValue().isBlank() ? defaultDescription : Component.literal(descriptionBox.getValue()))) {
             @Override
@@ -555,7 +555,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
             }
             FactoryScreenUtil.disableBlend();
             guiGraphics.pose().pushMatrix();
-            if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.5f,0.5f,0f);
+            if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.5f,0.5f);
             guiGraphics.drawString(font,getMessage(),getX() + 2,getY(),isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused());
             guiGraphics.pose().popMatrix();
             if (scrolledList.max > 0){

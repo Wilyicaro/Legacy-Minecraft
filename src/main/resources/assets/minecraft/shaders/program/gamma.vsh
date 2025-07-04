@@ -1,9 +1,17 @@
 #version 150
 
+#moj_import <minecraft:projection.glsl>
+
 in vec4 Position;
 
-uniform mat4 ProjMat;
-uniform vec2 InSize;
+layout(std140) uniform SamplerInfo {
+    vec2 OutSize;
+    vec2 InSize;
+};
+
+layout(std140) uniform GammaConfig {
+    float gamma;
+};
 
 out vec2 texCoord;
 out float aspectRatio;
@@ -13,6 +21,6 @@ void main(){
 
     gl_Position = vec4(outPos.xy, 0.2, 1.0);
 
-    aspectRatio = InSize.x / InSize.y;
+    aspectRatio = SamplerInfo.InSize.x / SamplerInfo.InSize.y;
     texCoord = outPos.xy * 0.5 + 0.5;
 }

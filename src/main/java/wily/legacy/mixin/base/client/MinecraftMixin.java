@@ -267,11 +267,6 @@ public abstract class MinecraftMixin {
         return false;
     }
 
-    @WrapWithCondition(method = "pauseGame",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/sounds/SoundManager;pause()V"))
-    public boolean pauseGame(SoundManager instance) {
-        return false;
-    }
-
     @ModifyArg(method = "setLevel",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/Minecraft;updateScreenAndTick(Lnet/minecraft/client/gui/screens/Screen;)V"))
     public Screen setLevelLoadingScreen(Screen arg, @Local(argsOnly = true) ClientLevel newLevel) {
         return LegacyOptions.legacyLoadingAndConnecting.get() ? LegacyLoadingScreen.getDimensionChangeScreen(level, newLevel) : arg;
@@ -285,7 +280,7 @@ public abstract class MinecraftMixin {
     }
 
     @Inject(method = "addInitialScreens", at = @At("HEAD"))
-    private void addInitialScreens(List<Function<Runnable, Screen>> list, CallbackInfo ci) {
+    private void addInitialScreens(List<Function<Runnable, Screen>> list, CallbackInfoReturnable<Boolean> cir) {
         if (gameConfig.quickPlay.isEnabled()) return;
         list.add(r-> LegacyRenderUtil.getInitialScreen());
     }

@@ -146,7 +146,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
             }
         });
         if (hoveredSlot != null && !hoveredSlot.getItem().isEmpty())
-            guiGraphics.renderTooltip(font, hoveredSlot.getItem(), i, j);
+            guiGraphics.setTooltipForNextFrame(font, hoveredSlot.getItem(), i, j);
     }
 
     @Override

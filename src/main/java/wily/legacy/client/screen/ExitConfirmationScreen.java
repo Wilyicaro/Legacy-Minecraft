@@ -3,8 +3,10 @@ package wily.legacy.client.screen;
 import com.mojang.realmsclient.RealmsMainScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.chat.Component;
 import wily.legacy.client.LegacyOptions;
@@ -35,11 +37,11 @@ public class ExitConfirmationScreen extends ConfirmationScreen {
         //? if <=1.20.2
         /*boolean wasInRealms = minecraft.isConnectedToRealms();*/
         if (minecraft.level != null) {
-            minecraft.level.disconnect();
+            minecraft.level.disconnect(ClientLevel.DEFAULT_QUIT_MESSAGE);
         }
         SoundManagerAccessor.of(minecraft.getSoundManager()).stopAllSound();
 
-        minecraft./*? if >1.20.2 {*/disconnect/*?} else {*//*clearLevel*//*?}*/(new LegacyLoadingScreen(Component.translatable(save ? "menu.savingLevel": "disconnect.quitting"),Component.empty()));
+        minecraft./*? if >1.20.2 {*/disconnect/*?} else {*//*clearLevel*//*?}*/(new LegacyLoadingScreen(Component.translatable(save ? "menu.savingLevel": "disconnect.quitting"),Component.empty()), false);
         ServerData serverData = minecraft.getCurrentServer();
         TitleScreen mainMenuScreen = new TitleScreen();
         if (serverData != null && /*? if >1.20.2 {*/serverData.isRealm()/*?} else {*//*wasInRealms*//*?}*/) {

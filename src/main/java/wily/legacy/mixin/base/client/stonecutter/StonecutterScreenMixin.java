@@ -131,7 +131,7 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 70,  topPos+ 18, 75, 75);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 148.5, topPos + 18, 0f);
+        guiGraphics.pose().translate(leftPos + 148.5f, topPos + 18);
         if (isScrollBarActive() && getOffscreenRows() > 0) {
             if (getOffscreenRows() != startIndex)
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, 0, 79);
@@ -140,13 +140,13 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
         }else FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,0.5f);
         FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0, 0,13,75);
-        guiGraphics.pose().translate(-2f, -1f + (this.isScrollBarActive() ?  61.5f * startIndex / getOffscreenRows() : 0), 0f);
+        guiGraphics.pose().translate(-2f, -1f + (this.isScrollBarActive() ?  61.5f * startIndex / getOffscreenRows() : 0));
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,1.0f);
         FactoryScreenUtil.disableBlend();
         guiGraphics.pose().popMatrix();
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 71.5f,topPos + 19.5f,0);
+        guiGraphics.pose().translate(leftPos + 71.5f,topPos + 19.5f);
         if (this.displayRecipes) {
             int size = getRecipes().size();
             block0: for (int p = 0; p < 4; ++p) {
@@ -194,7 +194,7 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
                     int r = p + this.startIndex;
                     int s = r * 4 + q;
                     if (s >= size) break block0;
-                    if (LegacyRenderUtil.isMouseOver(i,j,leftPos + 73.5f + q * 18,topPos + 19.5f + p * 18,18,18)) guiGraphics.renderTooltip(this.font, getResultItem(getRecipes().get(s)), i, j);
+                    if (LegacyRenderUtil.isMouseOver(i,j,leftPos + 73.5f + q * 18,topPos + 19.5f + p * 18,18,18)) guiGraphics.setTooltipForNextFrame(this.font, getResultItem(getRecipes().get(s)), i, j);
                 }
             }
         }

@@ -30,9 +30,10 @@ public abstract class OverlayPanelScreen extends PanelBackgroundScreen{
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         if (parent != null){
             parent.render(guiGraphics, 0, 0, f);
-            deferredTooltipRendering = null;
+            guiGraphics.deferredTooltip = null;
         }
-        guiGraphics.pose().translate(0,0, 1200);
+        guiGraphics.nextStratum();
+        renderBackground(guiGraphics, i, j, f);
         super.render(guiGraphics, i, j, f);
     }
 

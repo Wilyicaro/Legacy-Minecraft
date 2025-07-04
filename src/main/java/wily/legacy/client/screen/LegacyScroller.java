@@ -48,7 +48,7 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable{
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(this.getX() + offset.x, getY() + offset.y, offset.z);
+        guiGraphics.pose().translate(this.getX() + (float) offset.x, getY() + (float) offset.y);
         Stocker.Sizeable scroll = getScroll();
         if (scroll.max > 0) {
             if (scroll.get() != scroll.max)
@@ -57,7 +57,7 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable{
                 scrollRenderer.renderScroll(guiGraphics,ScreenDirection.UP, 0, -11);
         }else FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,0.5f, true);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0, width, height);
-        guiGraphics.pose().translate(-2f, -1f + (scroll.max > 0 ? scroll.get() * getScrollerHeight() / scroll.max : 0), 0f);
+        guiGraphics.pose().translate(-2f, -1f + (scroll.max > 0 ? scroll.get() * getScrollerHeight() / scroll.max : 0));
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
         FactoryGuiGraphics.of(guiGraphics).clearColor(true);
         guiGraphics.pose().popMatrix();

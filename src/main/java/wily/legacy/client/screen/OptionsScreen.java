@@ -244,7 +244,7 @@ public class OptionsScreen extends PanelVListScreen {
                             if (selectorTooltipVisibility > 0){
                                 if (getFocused() != globalPackSelector) selector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -161));
                                 else globalPackSelector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -161));
-                                guiGraphics.pose().translate(0, 0, 0.03f);
+                                guiGraphics.nextStratum();
                             }
                         }
 

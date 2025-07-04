@@ -410,7 +410,7 @@ public class Legacy4JClient {
             } : 1f;
             UIAccessor accessor = FactoryScreenUtil.getGuiAccessor();
             FactoryGuiElement.HOTBAR.pre().register(guiGraphics -> {
-                LegacyRenderUtil.renderAnimatedCharacter(guiGraphics);
+                AnimatedCharacterRenderer.render(guiGraphics);
                 int newSelection = Minecraft.getInstance().player != null ? Minecraft.getInstance().player.getInventory()./*? if <1.21.5 {*//*selected*//*?} else {*/getSelectedSlot()/*?}*/ : -1;
                 if (LegacyRenderUtil.lastHotbarSelection >= 0 && LegacyRenderUtil.lastHotbarSelection != newSelection) LegacyRenderUtil.lastHotbarSelectionChange = Util.getMillis();
                 LegacyRenderUtil.lastHotbarSelection = newSelection;
@@ -422,7 +422,7 @@ public class Legacy4JClient {
             });
             FactoryGuiElement.SPECTATOR_HOTBAR.pre().register(guiGraphics -> {
                 Legacy4JClient.legacyFont = false;
-                LegacyRenderUtil.renderAnimatedCharacter(guiGraphics);
+                AnimatedCharacterRenderer.render(guiGraphics);
             });
             FactoryGuiElement.SPECTATOR_HOTBAR.post().register(guiGraphics -> Legacy4JClient.legacyFont = true);
             accessor.getStaticDefinitions().add(UIDefinition.createBeforeInit(a->{

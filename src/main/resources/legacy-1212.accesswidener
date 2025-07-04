@@ -98,8 +98,6 @@ accessible field net/minecraft/client/gui/screens/AlertScreen messageText Lnet/m
 accessible field net/minecraft/world/level/block/entity/DecoratedPotPatterns ITEM_TO_POT_TEXTURE Ljava/util/Map;
 accessible class net/minecraft/client/gui/screens/inventory/BookEditScreen$DisplayCache
 accessible class net/minecraft/client/gui/screens/inventory/BookEditScreen$LineInfo
-accessible class net/minecraft/client/gui/screens/inventory/BookEditScreen$Pos2i
-accessible method net/minecraft/client/gui/screens/inventory/BookEditScreen$Pos2i <init> (II)V
 accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$LineInfo asComponent Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$LineInfo x I
 accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$LineInfo y I
@@ -120,7 +118,6 @@ accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEnt
 accessible class net/minecraft/world/inventory/MenuType$MenuSupplier
 accessible method net/minecraft/world/inventory/MenuType <init> (Lnet/minecraft/world/inventory/MenuType$MenuSupplier;Lnet/minecraft/world/flag/FeatureFlagSet;)V
 accessible field net/minecraft/world/item/CreativeModeTabs OP_BLOCKS Lnet/minecraft/resources/ResourceKey;
-accessible field net/minecraft/client/gui/screens/Screen deferredTooltipRendering Lnet/minecraft/client/gui/screens/Screen$DeferredTooltipRendering;
 accessible method net/minecraft/client/gui/Font getFontSet (Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/gui/font/FontSet;
 accessible field net/minecraft/client/gui/components/CommandSuggestions suggestions Lnet/minecraft/client/gui/components/CommandSuggestions$SuggestionsList;
 transitive-accessible class net/minecraft/client/renderer/RenderType$CompositeRenderType
@@ -148,3 +145,5 @@ accessible method net/minecraft/world/level/GameRules$BooleanValue create (ZLjav
 accessible class net/minecraft/client/gui/components/SubtitleOverlay$Subtitle
 accessible class net/minecraft/client/gui/components/SubtitleOverlay$SoundPlayedAt
 accessible class net/minecraft/client/gui/Gui$HeartType
+accessible field net/minecraft/client/gui/GuiGraphics deferredTooltip Ljava/lang/Runnable;
+accessible field net/minecraft/client/renderer/PostPass customUniforms Ljava/util/Map;

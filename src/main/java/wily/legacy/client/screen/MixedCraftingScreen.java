@@ -183,9 +183,9 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
                                 ItemStack ing = compactItemStackList.get(i1);
                                 LegacyRenderUtil.iconHolderRenderer.itemHolder(inventoryPanelX + 4, 124 + 15 * i1, 14, 14, ing, false, Vec3.ZERO).render(guiGraphics, i, j, 0);
                                 guiGraphics.pose().pushMatrix();
-                                guiGraphics.pose().translate(inventoryPanelX + 22, 128 + 15 * i1, 0);
+                                guiGraphics.pose().translate(inventoryPanelX + 22, 128 + 15 * i1);
                                 Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b -> {
-                                    if (!b) guiGraphics.pose().scale(2 / 3f, 2 / 3f, 2 / 3f);
+                                    if (!b) guiGraphics.pose().scale(2 / 3f, 2 / 3f);
                                     guiGraphics.drawString(font, ing.getHoverName(), 0, 0, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
                                 });
                                 guiGraphics.pose().popMatrix();
@@ -195,11 +195,11 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
                 }
             }
         }
-        guiGraphics.pose().translate(-leftPos, -topPos, 0);
+        guiGraphics.pose().translate(-leftPos, -topPos);
         getCraftingButtons().forEach(b -> b.render(guiGraphics, i, j, 0));
         if (selectedCraftingButton < getCraftingButtons().size())
             getCraftingButtons().get(selectedCraftingButton).renderSelection(guiGraphics, i, j, 0);
-        guiGraphics.pose().translate(leftPos, topPos, 0);
+        guiGraphics.pose().translate(leftPos, topPos);
     }
 
     @Override

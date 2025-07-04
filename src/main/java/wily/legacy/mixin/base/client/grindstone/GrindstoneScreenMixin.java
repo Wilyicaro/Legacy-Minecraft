@@ -73,8 +73,8 @@ public abstract class GrindstoneScreenMixin extends AbstractContainerScreen<Grin
         ci.cancel();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos, imageWidth,imageHeight);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 85,topPos + 50,0);
-        guiGraphics.pose().scale(1.5f,1.5f,1.5f);
+        guiGraphics.pose().translate(leftPos + 85,topPos + 50);
+        guiGraphics.pose().scale(1.5f,1.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW,0,0,22,15);
         if ((this.menu.getSlot(0).hasItem() || this.menu.getSlot(1).hasItem()) && !this.menu.getSlot(2).hasItem())
             FactoryGuiGraphics.of(guiGraphics).blitSprite(ERROR_CROSS, 2, 0, 15, 15);

@@ -3,6 +3,8 @@ package wily.legacy.mixin.base.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,8 +30,8 @@ public abstract class ToastComponentMixin {
     }
     *///?}
 
-    @Redirect(method = "render", at = @At(value = "INVOKE",target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"))
-    private void render(PoseStack instance, float f, float g, float h, /*? if >=1.21.2 {*/GuiGraphics guiGraphics, /*?}*/int i){
-        instance.translate((i - this.toast.width()) / 2f,-toast.height() + (50 + toast.height() + this./*? if >=1.21.2 {*/firstSlotIndex/*?} else {*//*index*//*?}*/ * 32f) * /*? if <1.21.2 {*//*this.getVisibility(Util.getMillis())*//*?} else {*/visiblePortion/*?}*/, h);
+    @Redirect(method = "render", at = @At(value = "INVOKE",target = "Lorg/joml/Matrix3x2fStack;translate(FF)Lorg/joml/Matrix3x2f;", remap = false))
+    private Matrix3x2f render(Matrix3x2fStack instance, float f, float g, /*? if >=1.21.2 {*/GuiGraphics guiGraphics, /*?}*/int i){
+        return instance.translate((i - this.toast.width()) / 2f,-toast.height() + (50 + toast.height() + this./*? if >=1.21.2 {*/firstSlotIndex/*?} else {*//*index*//*?}*/ * 32f) * /*? if <1.21.2 {*//*this.getVisibility(Util.getMillis())*//*?} else {*/visiblePortion/*?}*/);
     }
 }

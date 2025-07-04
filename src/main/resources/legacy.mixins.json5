@@ -7,7 +7,7 @@
   "client": [
     //? if >=1.20.5 {
     "client.GustParticleMixin",
-    "PanoramaRendererMixin",
+    "client.PanoramaRendererMixin",
     //?}
     //? if <1.21.2 {
     /*"AbstractFurnaceRecipeBookComponentMixin",
@@ -17,7 +17,7 @@
     "OldMinecartBehaviorMixin",
     "ServerExplosionMixin",
     "client.MapDecorationRenderStateMixin",
-    "AbstractRecipeBookScreenMixin",
+    "client.AbstractRecipeBookScreenMixin",
     //?}
     //? if <1.20.5 && (forge || neoforge) {
     /*"client.gui.ForgeGuiMixin",
@@ -92,7 +92,7 @@
     "client.EndCrystalRendererMixin",
     "client.EntityRendererMixin",
     "client.FireworkEntityRendererMixin",
-    "client.FogRendererMixin",
+    "client.AtmosphericFogEnvironmentMixin",
     "client.FontMixin",
     "client.FrustumMixin",
     "client.GameRendererMixin",
@@ -175,7 +175,7 @@
     "client.TutorialMixin",
     "client.LogoRendererMixin",
     "client.LightTextureMixin",
-    "client.RenderSystemMixin",
+    "client.LightingMixin",
     "client.CompositeRenderTypeAccessor",
     "client.ClientLivingEntityMixin",
     "client.VillagerModelMixin",
@@ -183,7 +183,10 @@
     "client.gui.SubtitleOverlayMixin",
     "client.ItemPickupParticleMixin",
     "client.SdlGamepadMixin",
-    "client.gui.ExperienceBarRendererMixin"
+    "client.gui.ExperienceBarRendererMixin",
+    "client.book.BookSignScreenMixin",
+    "client.AbstractWidgetAccessor",
+    "client.WaterFogEnvironmentMixin"
   ],
   "mixins": [
     //? if <1.20.5 {

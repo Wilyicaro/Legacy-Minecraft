@@ -70,14 +70,13 @@ public abstract class MultilineEditBoxMixin extends AbstractWidget implements Co
         return this.isFocused() && (Util.getMillis()/*? if >1.20.1 {*/ - this.focusedTime/*?}*/) / 180L % 2 == 0L;
     }
 
-    @Redirect(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;III)I", ordinal = 3))
-    public int renderWidget(GuiGraphics instance, Font arg, String string, int i, int j, int k) {
+    @Redirect(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V", ordinal = 3))
+    public void renderWidget(GuiGraphics instance, Font arg, String string, int i, int j, int k, boolean bl) {
         instance.pose().pushMatrix();
-        instance.pose().translate(i-(textField.cursor() == 0 ? 3 : 4),j+8.5f,0);
-        instance.pose().scale(6,1.5f,1f);
+        instance.pose().translate(i-(textField.cursor() == 0 ? 3 : 4),j+8.5f);
+        instance.pose().scale(6,1.5f);
         instance.fill(0,0,1,1, CommonColor.WIDGET_TEXT.get() | 0xFF000000);
         instance.pose().popMatrix();
-        return 0;
     }
 
     @Override

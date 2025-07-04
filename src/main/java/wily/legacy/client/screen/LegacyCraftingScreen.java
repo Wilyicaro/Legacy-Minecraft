@@ -445,9 +445,9 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                                 ItemStack ing = compactItemStackList.get(i1);
                                 LegacyRenderUtil.iconHolderRenderer.itemHolder(inventoryPanelX + 4, 124 + 15 * i1, 14, 14, ing, false, Vec3.ZERO).render(guiGraphics, i, j, 0);
                                 guiGraphics.pose().pushMatrix();
-                                guiGraphics.pose().translate(inventoryPanelX + 22, 128 + 15 * i1, 0);
+                                guiGraphics.pose().translate(inventoryPanelX + 22, 128 + 15 * i1);
                                 Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b -> {
-                                    if (!b) guiGraphics.pose().scale(2 / 3f, 2 / 3f, 2 / 3f);
+                                    if (!b) guiGraphics.pose().scale(2 / 3f, 2 / 3f);
                                     guiGraphics.drawString(font, ing.getHoverName(), 0, 0, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
                                 });
                                 guiGraphics.pose().popMatrix();
@@ -457,10 +457,10 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                 }
             }
         }
-        guiGraphics.pose().translate(-leftPos,-topPos,0);
+        guiGraphics.pose().translate(-leftPos, -topPos);
         getCraftingButtons().forEach(b-> b.render(guiGraphics, i, j, 0));
         if (selectedCraftingButton < getCraftingButtons().size()) getCraftingButtons().get(selectedCraftingButton).renderSelection(guiGraphics, i, j, 0);
-        guiGraphics.pose().translate(leftPos,topPos,0);
+        guiGraphics.pose().translate(leftPos, topPos);
     }
 
     @Override
@@ -688,6 +688,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         if (hasTypeTabList()) typeTabList.render(guiGraphics, i, j, f);
         getTabList().render(guiGraphics, i, j, f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class), leftPos, topPos, imageWidth, imageHeight);
+        getTabList().renderSelected(guiGraphics, i, j, f);
         int panelWidth = accessor.getInteger("craftingGridPanelWidth",163);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 9, topPos + 103, panelWidth, 105);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + accessor.getInteger("inventoryPanelX",176), topPos + accessor.getInteger("inventoryPanelY",103), accessor.getInteger("inventoryPanelWidth",163), 105);
@@ -770,9 +771,9 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                     }
                 });
             }
-            if (LegacyRenderUtil.isMouseOver(i,j,xDiff + contentsWidth - 36, topPos + 151,36,36)) guiGraphics.renderTooltip(font, resultStack,i,j);
+            if (LegacyRenderUtil.isMouseOver(i,j,xDiff + contentsWidth - 36, topPos + 151,36,36)) guiGraphics.setTooltipForNextFrame(font, resultStack, i, j);
         }
-        for (int index = 0; index < ingredientsGrid.size(); index++) if (!getActualItem(ingredientsGrid.get(index)).isEmpty() && LegacyRenderUtil.isMouseOver(i,j,xDiff + index % gridDimension * 23, topPos + (is2x2 ? 145 : 133) + index / gridDimension * 23,23,23)) guiGraphics.renderTooltip(font,getActualItem(ingredientsGrid.get(index)),i,j);
+        for (int index = 0; index < ingredientsGrid.size(); index++) if (!getActualItem(ingredientsGrid.get(index)).isEmpty() && LegacyRenderUtil.isMouseOver(i,j,xDiff + index % gridDimension * 23, topPos + (is2x2 ? 145 : 133) + index / gridDimension * 23,23,23)) guiGraphics.setTooltipForNextFrame(font,getActualItem(ingredientsGrid.get(index)), i, j);
         getCraftingButtons().forEach(h -> h.renderTooltip(minecraft, guiGraphics, i, j));
 
         renderTooltip(guiGraphics, i, j);

@@ -3,6 +3,7 @@ package wily.legacy.mixin.base.client.inventory;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.HorseInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
@@ -73,7 +74,7 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
         FactoryGuiGraphics.of(graphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL,leftPos + 34,topPos + 20,63,63);
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 97,topPos + 20,105,63);
-        LegacyRenderUtil.renderEntityInInventoryFollowsMouse(graphics,leftPos + 35,topPos + 21,leftPos + 95,topPos + 81,25,0.0625f,i,j, horse);
+        InventoryScreen.renderEntityInInventoryFollowsMouse(graphics,leftPos + 35,topPos + 21,leftPos + 95,topPos + 81,25,0.0625f, i, j, horse);
 
     }
 

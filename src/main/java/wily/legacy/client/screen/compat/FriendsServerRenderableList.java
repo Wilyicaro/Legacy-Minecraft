@@ -162,7 +162,7 @@ public class FriendsServerRenderableList extends ServerRenderableList {
                     }
                 });
                 if (accessor.getChildren().contains(onlineButton))
-                    this.minecraft.getNarrator().say(Component.translatable("multiplayer.lan.server_found", onlineButton.getMessage()));
+                    this.minecraft.getNarrator().saySystemNow(Component.translatable("multiplayer.lan.server_found", onlineButton.getMessage()));
             }
             ));
             if (!WorldHost.ONLINE_FRIENDS.isEmpty()) accessor.reloadUI();

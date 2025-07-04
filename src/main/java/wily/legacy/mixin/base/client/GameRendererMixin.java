@@ -31,13 +31,13 @@ import java.util.function.Consumer;
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
     @Shadow @Final
-    Minecraft minecraft;
+    private Minecraft minecraft;
 
     @Shadow private boolean hasWorldScreenshot;
 
     @Shadow protected abstract void takeAutoScreenshot(Path path);
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;render(Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V"))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/toasts/ToastManager;render(Lnet/minecraft/client/gui/GuiGraphics;)V", shift = At.Shift.AFTER))
     private void render(CallbackInfo ci, @Local(ordinal = 0) GuiGraphics graphics){
         LegacyRenderUtil.renderGameOverlay(graphics);
     }

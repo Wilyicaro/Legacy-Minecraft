@@ -86,8 +86,8 @@ public class FlatWorldLayerSelector extends ItemViewerScreen {
 
 
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(panel.x + 50, panel.y + 190, 0);
-        guiGraphics.pose().scale(1.25f, 1.25f, 1.25f);
+        guiGraphics.pose().translate(panel.x + 50, panel.y + 190);
+        guiGraphics.pose().scale(1.25f, 1.25f);
         guiGraphics.renderItem(displayLayer, 0, 0);
         guiGraphics.pose().popMatrix();
     }

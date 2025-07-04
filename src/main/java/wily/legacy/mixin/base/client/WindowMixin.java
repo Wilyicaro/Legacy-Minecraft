@@ -9,7 +9,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 @Mixin(Window.class)
 public class WindowMixin {
     @ModifyVariable(method = "setGuiScale", at = @At("HEAD"), argsOnly = true)
-    public double setGuiScale(double d) {
-        return LegacyRenderUtil.getGuiScale();
+    public int setGuiScale(int d) {
+        return (int) Math.round(LegacyRenderUtil.getGuiScale());
     }
 }

@@ -12,12 +12,15 @@
                     "target": "minecraft:main"
                 }
             ],
-            "uniforms": [
-                {
-                    "name": "gamma",
-                    "type": "float"
-                }
-            ],
+            "uniforms": {
+                "GammaConfig": [
+                    {
+                        "name": "gamma",
+                        "type": "float",
+                        "value": 1.0
+                    }
+                ]
+            },
             "output": "swap"
         },
         {
@@ -29,13 +32,15 @@
                     "target": "swap"
                 }
             ],
-            "uniforms": [
-                {
-                    "name": "ColorModulate",
-                    "type": "vec4",
-                    "values": [ 1.0, 1.0, 1.0, 1.0 ]
-                }
-            ],
+            "uniforms": {
+                "BlitConfig": [
+                    {
+                        "name": "ColorModulate",
+                        "type": "vec4",
+                        "value": [ 1.0, 1.0, 1.0, 1.0 ]
+                    }
+                ]
+            },
             "output": "minecraft:main"
         }
     ]

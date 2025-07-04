@@ -6,6 +6,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
@@ -25,12 +26,14 @@ import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.mixin.base.client.AbstractWidgetAccessor;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlTooltip.Event, DatapackRepositoryAccessor {
@@ -158,14 +161,6 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         return super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g);
     }
 
-    @Override
-    public void setTooltipForNextRenderPass(Tooltip tooltip, ClientTooltipPositioner clientTooltipPositioner, boolean bl) {
-        if (LegacyRenderUtil.hasTooltipBoxes(accessor)) {
-            tooltipBoxLabel = tooltip.toCharSequence(minecraft);
-            scrollableRenderer.scrolled.max = Math.max(0,tooltipBoxLabel.size() - (tooltipBox.getHeight() - 44) / 12);
-        }else super.setTooltipForNextRenderPass(tooltip, clientTooltipPositioner, bl);
-    }
-
     public WorldMoreOptionsScreen(LoadSaveScreen parent) {
         super(parent,244, 199, Component.translatable("createWorld.tab.more.title"));
         renderableVLists.add(gameRenderables);
@@ -191,10 +186,15 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
         if (LegacyRenderUtil.hasTooltipBoxes(accessor)) {
-            if (tooltipBoxLabel != null && getChildAt(i,j).map(g-> g instanceof AbstractWidget w ? w.getTooltip() : null).isEmpty() && (!(getFocused() instanceof AbstractWidget w) || w.getTooltip() == null)) {
-                tooltipBoxLabel = null;
+            Optional<GuiEventListener> listener;
+            if (getFocused() instanceof AbstractWidgetAccessor widget && widget.getTooltip() != null) tooltipBoxLabel = widget.getTooltip().get().toCharSequence(minecraft);
+            else if ((listener = getChildAt(i,j)).isPresent() && listener.get() instanceof AbstractWidgetAccessor widget && widget.getTooltip() != null) widget.getTooltip().get().toCharSequence(minecraft);
+            else tooltipBoxLabel = null;
+
+            if (tooltipBoxLabel == null)
                 scrollableRenderer.scrolled.set(0);
-            }
+            else scrollableRenderer.scrolled.max = Math.max(0,tooltipBoxLabel.size() - (tooltipBox.getHeight() - 44) / 12);
+
             tooltipBox.render(guiGraphics,i,j,f);
             if (tooltipBoxLabel != null) {
                 scrollableRenderer.render(guiGraphics,panel.x + panel.width + 3, panel.y + 13,tooltipBox.width - 10, tooltipBox.getHeight() - 44, ()-> tooltipBoxLabel.forEach(c-> guiGraphics.drawString(font,c, panel.x + panel.width + 3, panel.y + 13 + tooltipBoxLabel.indexOf(c) * 12, 0xFFFFFF)));
@@ -217,6 +217,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     protected void init() {
         addRenderableWidget(tabList);
         super.init();
+        addRenderableOnly(tabList::renderSelected);
         tabList.init(panel.x,panel.y - 24,panel.width);
     }
 

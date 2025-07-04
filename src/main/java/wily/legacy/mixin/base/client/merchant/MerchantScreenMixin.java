@@ -101,7 +101,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         if (!merchantOffers.isEmpty()) {
 
             guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(leftPos + 8.5F, topPos + 22.5F, 0F);
+            guiGraphics.pose().translate(leftPos + 8.5F, topPos + 22.5F);
             for (int index = 0; index < 9; index++) {
                 if (index + scrollOff >= merchantOffers.size()) break;
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(index + scrollOff == shopItem ? LegacySprites.BUTTON_SLOT_SELECTED : LegacyRenderUtil.isMouseOver(i,j,leftPos + 8.5f,topPos + 22.5f + index * 18,102,18) ? LegacySprites.BUTTON_SLOT_HIGHLIGHTED : LegacySprites.BUTTON_SLOT, 0, 0, 102, 18);
@@ -119,7 +119,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                 if (((LegacyMerchantOffer)merchantOffer).getRequiredLevel() > menu.getTraderLevel()) FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PADLOCK, 52, 1, 16, 16);
                 guiGraphics.renderFakeItem(itemStack4, 68, 1);
                 guiGraphics.renderItemDecorations(this.font, itemStack4, 68, 1);
-                guiGraphics.pose().translate(0, 18, 0F);
+                guiGraphics.pose().translate(0, 18);
             }
             guiGraphics.pose().popMatrix();
 
@@ -127,14 +127,14 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                 if (index + scrollOff >= merchantOffers.size()) break;
                 MerchantOffer merchantOffer = merchantOffers.get(index + scrollOff);
                 int diffY = index * 18;
-                if (LegacyRenderUtil.isMouseOver(i,j,leftPos + 18.5F, topPos + diffY + 23.5F,16,16)) guiGraphics.renderTooltip(font,merchantOffer.getCostA(),i,j);
-                else if (!merchantOffer.getCostB().isEmpty() && LegacyRenderUtil.isMouseOver(i,j,leftPos + 43.5F, topPos + diffY + 23.5F,16,16)) guiGraphics.renderTooltip(font,merchantOffer.getCostB(),i,j);
-                else if (LegacyRenderUtil.isMouseOver(i,j,leftPos + 76.5F, topPos + diffY + 23.5F,16,16)) guiGraphics.renderTooltip(font,merchantOffer.getResult(),i,j);
+                if (LegacyRenderUtil.isMouseOver(i,j,leftPos + 18.5F, topPos + diffY + 23.5F,16,16)) guiGraphics.setTooltipForNextFrame(font, merchantOffer.getCostA(), i, j);
+                else if (!merchantOffer.getCostB().isEmpty() && LegacyRenderUtil.isMouseOver(i,j,leftPos + 43.5F, topPos + diffY + 23.5F,16,16)) guiGraphics.setTooltipForNextFrame(font, merchantOffer.getCostB(), i, j);
+                else if (LegacyRenderUtil.isMouseOver(i,j,leftPos + 76.5F, topPos + diffY + 23.5F,16,16)) guiGraphics.setTooltipForNextFrame(font, merchantOffer.getResult(), i, j);
             }
 
             MerchantOffer merchantOffer = merchantOffers.get(this.shopItem);
             if (shopItem - scrollOff < 9 && shopItem - scrollOff >= 0 && merchantOffer.isOutOfStock() && this.isHovering( 7,21 + 18 * (shopItem - scrollOff),105,18, i, j) && this.menu.canRestock()) {
-                guiGraphics.renderTooltip(this.font, DEPRECATED_TOOLTIP, i, j);
+                guiGraphics.setTooltipForNextFrame(this.font, DEPRECATED_TOOLTIP, i, j);
             }
         }
 
@@ -226,12 +226,12 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 7,topPos + 21,105,165);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 219.5,topPos + 42.5,0);
-        guiGraphics.pose().scale(1.5f,1.5f,1.0f);
+        guiGraphics.pose().translate(leftPos + 219.5f, topPos + 42.5f);
+        guiGraphics.pose().scale(1.5f,1.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW,0,0,22,15);
         guiGraphics.pose().popMatrix();
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 115, topPos + 21, 0f);
+        guiGraphics.pose().translate(leftPos + 115, topPos + 21);
         if (menu.getOffers().size() > 9) {
             if (scrollOff != menu.getOffers().size() - 9)
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, 0, 169);
@@ -240,7 +240,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         }else FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,0.5f);
         FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0, 0,13,165);
-        guiGraphics.pose().translate(-2f, -1f + (menu.getOffers().size() > 9 ?  151.5f * scrollOff / (menu.getOffers().size() - 9) : 0), 0f);
+        guiGraphics.pose().translate(-2f, -1f + (menu.getOffers().size() > 9 ?  151.5f * scrollOff / (menu.getOffers().size() - 9) : 0));
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
         FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,1.0f);
         FactoryScreenUtil.disableBlend();
@@ -252,7 +252,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                 return;
             }
             guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(leftPos + 144.5,topPos + 21,0);
+            guiGraphics.pose().translate(leftPos + 144.5f, topPos + 21);
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.EXPERIENCE_BAR_BACKGROUND, 0, 0, 0, 161, 4);
             int m = VillagerData.getMinXpPerLevel(k);
             if (l < m || !VillagerData.canLevelUp(k)) {

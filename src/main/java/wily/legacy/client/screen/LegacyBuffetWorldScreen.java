@@ -43,8 +43,8 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
                 ItemStack s = LegacyBiomeOverride.getOrDefault(biome.unwrapKey()).icon();
                 if (!s.isEmpty()){
                     guiGraphics.pose().pushMatrix();
-                    guiGraphics.pose().translate(getX() + 26, getY() + 5,0);
-                    guiGraphics.pose().scale(1.25f,1.25f,1.25f);
+                    guiGraphics.pose().translate(getX() + 26, getY() + 5);
+                    guiGraphics.pose().scale(1.25f,1.25f);
                     guiGraphics.renderItem(s,0, 0);
                     guiGraphics.pose().popMatrix();
                 }

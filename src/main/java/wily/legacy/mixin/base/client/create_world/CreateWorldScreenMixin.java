@@ -113,9 +113,9 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     private void onCreate(CallbackInfo ci) {
         resourceAssortSelector.applyChanges(true);
         Legacy4JClient.serverPlayerJoinConsumer = s->{
-            LegacyClientWorldSettings.of(s.server.getWorldData()).setTrustPlayers(trustPlayers.get());
-            s.server.getPlayerList().sendPlayerPermissionLevel(s);
-            publishScreen.publish((IntegratedServer) s.server);
+            LegacyClientWorldSettings.of(s.getServer().getWorldData()).setTrustPlayers(trustPlayers.get());
+            s.getServer().getPlayerList().sendPlayerPermissionLevel(s);
+            publishScreen.publish((IntegratedServer) s.getServer());
             LegacyClientWorldSettings.of(minecraft.getSingleplayerServer().getWorldData()).setSelectedResourceAlbum(resourceAssortSelector.getSelectedAlbum());
         };
     }

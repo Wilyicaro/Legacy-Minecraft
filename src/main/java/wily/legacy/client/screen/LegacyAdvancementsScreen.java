@@ -23,7 +23,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.util.*;
+import wily.legacy.mixin.base.client.AbstractWidgetAccessor;import wily.legacy.util.*;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.network.ClientAdvancementsPayload;
@@ -107,7 +107,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             AdvancementProgress p = null;
             lastUnlocked = unlocked;
             unlocked = (a = getAdvancements()/*? if <=1.20.1 {*//*.getAdvancements()*//*?}*/.get(id)) != null && (p = getAdvancements().progress.getOrDefault(a, null)) != null && p.isDone();
-            if (lastUnlocked == unlocked && getTooltip() != null) return;
+            if (lastUnlocked == unlocked && ((AbstractWidgetAccessor)this).getTooltip() != null) return;
             Component progressText = p == null || p .getProgressText() == null ? null : /*? if >1.20.1 {*/p.getProgressText()/*?} else {*//*Component.literal(p.getProgressText())*//*?}*/;
             setTooltip(progressText == null ? Tooltip.create(info.getDescription()) : new MultilineTooltip(List.of(info.getDescription().getVisualOrderText(),progressText.getVisualOrderText())));
         }
@@ -120,7 +120,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             if (isFocused()) {
                 guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(-1.5f, -1.5f, 0);
+                guiGraphics.pose().translate(-1.5f, -1.5f);
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_HIGHLIGHT, getX(), getY(), 41, 41);
                 guiGraphics.pose().popMatrix();
             }
@@ -135,8 +135,8 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 1.0f);
             if (!isUnlocked()) return;
             guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(getX() + (getWidth() - 32) / 2f, getY() + (getHeight() - 32) / 2f, 0);
-            guiGraphics.pose().scale(2f, 2f, 2f);
+            guiGraphics.pose().translate(getX() + (getWidth() - 32) / 2f, getY() + (getHeight() - 32) / 2f);
+            guiGraphics.pose().scale(2f, 2f);
             guiGraphics.renderFakeItem(info.getIcon(), 0, 0);
             guiGraphics.pose().popMatrix();
         }
@@ -159,6 +159,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
     protected void panelInit() {
         addRenderableWidget(tabList);
         super.panelInit();
+        addRenderableOnly(tabList::renderSelected);
         addRenderableOnly(((guiGraphics, i, j, f) ->{
             guiGraphics.drawString(font,showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle(),panel.x + (panel.width - font.width(showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.selectedTab).getMessage() : getTitle()))/ 2,panel.y + 10, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
             if (!displayInfos.isEmpty()) {
@@ -223,15 +224,16 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         super.removed();
         LegacyOptions.legacyItemTooltipScaling.set(oldLegacyTooltipsValue);
     }
-    @Override
-    public void setTooltipForNextRenderPass(List<FormattedCharSequence> list, ClientTooltipPositioner clientTooltipPositioner, boolean bl) {
-        if (!showDescription) return;
-        super.setTooltipForNextRenderPass(list, clientTooltipPositioner, bl);
-    }
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        super.render(guiGraphics, i, j, f);
+        if (!showDescription) guiGraphics.deferredTooltip = null;
     }
 
     public static /*? if >1.20.1 {*/AdvancementTree/*?} else {*//*AdvancementList*//*?}*/ getActualAdvancements(){

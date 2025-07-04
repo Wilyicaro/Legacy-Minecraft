@@ -1,5 +1,7 @@
 package wily.legacy.mixin.base.client.chat;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.CommandSuggestions;
 import net.minecraft.client.gui.components.EditBox;
@@ -65,20 +67,15 @@ public abstract class ChatScreenMixin extends Screen implements Controller.Event
     @Redirect(method = "init",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;setBordered(Z)V"))
     private void setBordered(EditBox instance, boolean bl){
     }
-    //? if <1.20.5 {
-    /*@Redirect(method = "render",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;render(Lnet/minecraft/client/gui/GuiGraphics;II)V"))
-    private void render(CommandSuggestions instance, GuiGraphics guiGraphics, int i, int j){
+
+    @WrapOperation(method = "render",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;render(Lnet/minecraft/client/gui/GuiGraphics;II)V"))
+    private void render(CommandSuggestions instance, GuiGraphics guiGraphics, int i, int j, Operation<Void> original){
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(0,(int)(ScreenUtil.getHUDDistance() - 56),200);
-        instance.render(guiGraphics,i,j);
+        guiGraphics.pose().translate(0, (int)(LegacyRenderUtil.getHUDDistance() - 56));
+        original.call(instance, guiGraphics, i, j);
         guiGraphics.pose().popMatrix();
     }
-    *///?} else {
-    @ModifyArg(method = "render",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"), index = 1)
-    private float render(float value){
-        return (int)(LegacyRenderUtil.getHUDDistance() - 56);
-    }
-    //?}
+
     @ModifyArg(method = "render",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/CommandSuggestions;render(Lnet/minecraft/client/gui/GuiGraphics;II)V"),index = 2)
     private int render(int i){
         return i - (int)(LegacyRenderUtil.getHUDDistance() - 56);
@@ -103,7 +100,7 @@ public abstract class ChatScreenMixin extends Screen implements Controller.Event
     @Override
     public void bindingStateTick(BindingState state) {
         if (state.is(ControllerBinding.START) && state.justPressed) {
-            if (/*? if >1.20.1 {*/commandSuggestions.isVisible()/*?} else {*//*commandSuggestions.suggestions != null*//*?}*/) {
+            if (commandSuggestions.isVisible()) {
                 commandSuggestions.suggestions.useSuggestion();
                 commandSuggestions.hide();
             }else {

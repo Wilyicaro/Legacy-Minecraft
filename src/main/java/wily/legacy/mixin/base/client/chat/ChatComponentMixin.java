@@ -62,10 +62,9 @@ public abstract class ChatComponentMixin {
     private void stopRender(GuiGraphics guiGraphics, int i, int j, int k, /*? if >=1.20.5 {*/boolean bl,/*?}*/ CallbackInfo ci) {
         if (minecraft.screen != null && !isChatFocused()) ci.cancel();
     }
-    @Inject(method = "render",at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", shift = At.Shift.AFTER, ordinal = 0))
+    @Inject(method = "render",at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;pushMatrix()Lorg/joml/Matrix3x2fStack;", shift = At.Shift.AFTER, ordinal = 0, remap = false))
     private void changeRenderTranslation(GuiGraphics guiGraphics, int i, int j, int k, /*? if >=1.20.5 {*/boolean bl,/*?}*/ CallbackInfo ci) {
-        RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
-        guiGraphics.pose().translate(LegacyRenderUtil.getChatSafeZone(), LegacyRenderUtil.getHUDDistance() - 42,0.0F);
+        guiGraphics.pose().translate(LegacyRenderUtil.getChatSafeZone(), LegacyRenderUtil.getHUDDistance() - 42);
     }
     @Inject(method = "screenToChatX",at = @At("RETURN"), cancellable = true)
     private void screenToChatX(double d, CallbackInfoReturnable<Double> cir) {

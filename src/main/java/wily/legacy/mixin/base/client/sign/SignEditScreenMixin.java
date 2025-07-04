@@ -1,12 +1,12 @@
 package wily.legacy.mixin.base.client.sign;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.SignEditScreen;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(SignEditScreen.class)
 public abstract class SignEditScreenMixin extends Screen {
@@ -16,13 +16,13 @@ public abstract class SignEditScreenMixin extends Screen {
         super(component);
     }
 
-    @Redirect(method = "offsetSign", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"))
-    private void offsetSign(PoseStack instance, float x, float y, float z){
-        instance.translate(x, 42,z);
+    @ModifyReturnValue(method = "getSignYOffset", at = @At("RETURN"))
+    private float offsetSign(float original){
+        return height + 15.5f;
     }
 
-    @Redirect(method = "renderSignBackground", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;scale(FFF)V"))
-    private void renderSignBackground(PoseStack instance, float x, float y, float z){
-        instance.scale(x * 144/93,y * 144/93,z * 144/93);
+    @ModifyArg(method = "renderSignBackground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitSignRenderState(Lnet/minecraft/client/model/Model;FLnet/minecraft/world/level/block/state/properties/WoodType;IIII)V"))
+    private float renderSignBackground(float original){
+        return original * 144/93;
     }
 }

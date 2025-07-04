@@ -36,8 +36,8 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen{
                     protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                         super.renderWidget(guiGraphics, i, j, f);
                         guiGraphics.pose().pushMatrix();
-                        guiGraphics.pose().translate(getX() + 5, getY() + 5,0);
-                        guiGraphics.pose().scale(1.25f,1.25f,1.25f);
+                        guiGraphics.pose().translate(getX() + 5, getY() + 5);
+                        guiGraphics.pose().scale(1.25f,1.25f);
                         guiGraphics.renderItem(preset.displayItem().value().getDefaultInstance(),0, 0);
                         guiGraphics.pose().popMatrix();
                     }

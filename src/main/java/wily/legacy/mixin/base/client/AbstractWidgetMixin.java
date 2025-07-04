@@ -59,9 +59,9 @@ public abstract class AbstractWidgetMixin implements ControlTooltip.ActionHolder
         return ControlTooltip.getSelectAction((GuiEventListener) this,context);
     }
 
-    @Redirect(method = /*? if >1.20.1 {*/"renderScrollingString(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIIII)V"/*?} else {*//*"renderScrollingString(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIII)V"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)I"))
-    private static int renderScrollingString(GuiGraphics instance, Font arg, Component arg2, int i, int j, int k) {
-        return instance.drawString(arg, arg2, i, j, k, CommonValue.WIDGET_TEXT_SHADOW.get());
+    @Redirect(method = "renderScrollingString(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIIII)V"/*?} else {*//*"renderScrollingString(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIII)V"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V"))
+    private static void renderScrollingString(GuiGraphics instance, Font arg, Component arg2, int i, int j, int k) {
+        instance.drawString(arg, arg2, i, j, k, CommonValue.WIDGET_TEXT_SHADOW.get());
     }
     @Redirect(method = /*? if >1.20.1 {*/"renderScrollingString(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIIII)V"/*?} else {*//*"renderScrollingString(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIII)V"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V"))
     private static void renderCenteredScrollingString(GuiGraphics instance, Font arg, Component arg2, int i, int j, int k) {

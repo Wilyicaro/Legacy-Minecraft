@@ -32,6 +32,7 @@ import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyBiomeOverride;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.mixin.base.client.AbstractWidgetAccessor;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -115,8 +116,8 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
                 ItemStack s = LegacyBiomeOverride.getOrDefault(biome.unwrapKey()).icon();
                 if (!s.isEmpty()){
                     guiGraphics.pose().pushMatrix();
-                    guiGraphics.pose().translate(getX() + 26, getY() + 5,0);
-                    guiGraphics.pose().scale(1.25f,1.25f,1.25f);
+                    guiGraphics.pose().translate(getX() + 26, getY() + 5);
+                    guiGraphics.pose().scale(1.25f,1.25f);
                     guiGraphics.renderItem(s,0, 0);
                     guiGraphics.pose().popMatrix();
                 }
@@ -170,8 +171,8 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
             super.renderWidget(guiGraphics, i, j, f);
             guiGraphics.drawString(font,Component.translatable("legacy.menu.create_flat_world.layer_count",flatLayerInfo.getHeight()),getX() + 12, getY() + 1 + (height - font.lineHeight) / 2, 0xFFFFFF);
             guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(getX() + 39, getY() + 5,0);
-            guiGraphics.pose().scale(1.25f,1.25f,1.25f);
+            guiGraphics.pose().translate(getX() + 39, getY() + 5);
+            guiGraphics.pose().scale(1.25f,1.25f);
             guiGraphics.renderItem(flatLayerInfo.getBlockState().getBlock().asItem().getDefaultInstance(),0, 0);
             guiGraphics.pose().popMatrix();
         }
@@ -257,13 +258,6 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         LegacyRenderUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
     }
 
-    @Override
-    public void setTooltipForNextRenderPass(Tooltip tooltip, ClientTooltipPositioner clientTooltipPositioner, boolean bl) {
-        if (LegacyRenderUtil.hasTooltipBoxes(accessor))
-            tooltipBoxLabel = tooltip.toCharSequence(minecraft);
-        else super.setTooltipForNextRenderPass(tooltip, clientTooltipPositioner, bl);
-    }
-
     public FlatLevelGeneratorSettings settings() {
         return this.generator;
     }
@@ -284,13 +278,18 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         if (movingLayer != null && tabList.selectedTab != 0) tabList.selectedTab = 0;
         addRenderableOnly(((guiGraphics, i, j, f) -> {
             if (LegacyRenderUtil.hasTooltipBoxes(accessor)) {
-                if (tooltipBoxLabel != null && getChildAt(i,j).map(g-> g instanceof AbstractWidget w ? w.getTooltip() : null).isEmpty() && (!(getFocused() instanceof AbstractWidget w) || w.getTooltip() == null)) tooltipBoxLabel = null;
+                Optional<GuiEventListener> listener;
+                if (getFocused() instanceof AbstractWidgetAccessor widget && widget.getTooltip() != null) tooltipBoxLabel = widget.getTooltip().get().toCharSequence(minecraft);
+                else if ((listener = getChildAt(i,j)).isPresent() && listener.get() instanceof AbstractWidgetAccessor widget && widget.getTooltip() != null) widget.getTooltip().get().toCharSequence(minecraft);
+                else tooltipBoxLabel = null;
+
                 LegacyRenderUtil.renderPointerPanel(guiGraphics,panel.x + panel.width - 2, panel.y + 5,194,panel.height - 10);
                 if (tooltipBoxLabel != null) tooltipBoxLabel.forEach(c-> guiGraphics.drawString(font,c,panel.x + panel.width + 3, panel.y + 13 + 12 * tooltipBoxLabel.indexOf(c),0xFFFFFF));
             }
         }));
         addRenderableWidget(tabList);
         super.init();
+        addRenderableOnly(tabList::renderSelected);
         tabList.init(panel.x,panel.y - 24, panel.width);
         this.generator.updateLayers();
     }

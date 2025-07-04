@@ -146,7 +146,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.ENTITY_PANEL,leftPos + 40 + (LegacyRenderUtil.hasClassicCrafting() ? 0 : 50),topPos + 13,63,84);
         Pose pose = minecraft.player.getPose();
         minecraft.player.setPose(Pose.STANDING);
-        LegacyRenderUtil.renderEntityInInventoryFollowsMouse(graphics,leftPos + 40 + (LegacyRenderUtil.hasClassicCrafting() ? 0 : 50),topPos + 13,leftPos + 103 + (LegacyRenderUtil.hasClassicCrafting() ? 0 : 50),topPos + 97,35,0.0625f,i,j, minecraft.player);
+        InventoryScreen.renderEntityInInventoryFollowsMouse(graphics,leftPos + 40 + (LegacyRenderUtil.hasClassicCrafting() ? 0 : 50),topPos + 13,leftPos + 103 + (LegacyRenderUtil.hasClassicCrafting() ? 0 : 50),topPos + 97,35,0.0625f,i,j, minecraft.player);
         minecraft.player.setPose(pose);
         if (LegacyRenderUtil.hasClassicCrafting()) {
             graphics.drawString(this.font, this.title, leftPos + 111, topPos + 16, CommonColor.INVENTORY_GRAY_TEXT.get(), false);

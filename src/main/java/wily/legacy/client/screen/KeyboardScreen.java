@@ -188,17 +188,17 @@ public class KeyboardScreen extends OverlayPanelScreen {
         FactoryGuiGraphics.of(guiGraphics).setColor(1f,1f,1f,0.8f);
         panel.render(guiGraphics,i,j,f);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(panel.getX() + 4.5f,panel.getY() + 25.5,0);
+        guiGraphics.pose().translate(panel.getX() + 4.5f,panel.getY() + 25.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0,0,53, 123);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,panel.getWidth() - 62,0,53, 123);
-        guiGraphics.pose().translate(-4.5f,0,0);
+        guiGraphics.pose().translate(-4.5f,0);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,(panel.getWidth() - 267) / 2,-1,267, 125);
         guiGraphics.pose().popMatrix();
         FactoryScreenUtil.disableBlend();
         FactoryGuiGraphics.of(guiGraphics).clearColor();
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(panel.getX() + (panel.getWidth() - font.width(KEYBOARD) * 1.5f) / 2,panel.getY() + 8,0);
-        guiGraphics.pose().scale(1.5f,1.5f,1.5f);
+        guiGraphics.pose().translate(panel.getX() + (panel.getWidth() - font.width(KEYBOARD) * 1.5f) / 2,panel.getY() + 8);
+        guiGraphics.pose().scale(1.5f,1.5f);
         guiGraphics.drawString(font,KEYBOARD,0,0, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
         guiGraphics.pose().popMatrix();
     }

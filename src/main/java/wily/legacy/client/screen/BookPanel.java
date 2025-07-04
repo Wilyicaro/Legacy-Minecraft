@@ -35,8 +35,8 @@ public class BookPanel extends WidgetPanel {
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(getX(),getY(),0);
-        guiGraphics.pose().scale(getWidth() / 146f,getHeight() / 180f,1f);
+        guiGraphics.pose().translate(getX(), getY());
+        guiGraphics.pose().scale(getWidth() / 146f,getHeight() / 180f);
         FactoryGuiGraphics.of(guiGraphics).blit(BookViewScreen.BOOK_LOCATION,0,0,20,1,146,180);
         guiGraphics.pose().popMatrix();
     }
@@ -62,9 +62,9 @@ public class BookPanel extends WidgetPanel {
             public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                 isHovered = Util.getMillis() - lastPressTime <= 300 || /*? if <1.21.4 {*//*clicked*//*?} else {*/isMouseOver/*?}*/(i,j);
                 guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(getX(),getY(),1.5f);
-                guiGraphics.pose().scale(1.5f,1.5f,1.5f);
-                guiGraphics.pose().translate(-getX(),-getY(),1.5f);
+                guiGraphics.pose().translate(getX(),getY());
+                guiGraphics.pose().scale(1.5f,1.5f);
+                guiGraphics.pose().translate(-getX(),-getY());
                 super.renderWidget(guiGraphics, i, j, f);
                 guiGraphics.pose().popMatrix();
             }

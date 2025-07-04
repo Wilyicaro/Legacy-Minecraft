@@ -171,6 +171,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*//*EffectRenderingInve
         }
         addRenderableWidget(tabList);
         addRenderableOnly(panel);
+        addRenderableOnly(tabList::renderSelected);
         panel.init();
         imageWidth = panel.width;
         imageHeight = panel.height;

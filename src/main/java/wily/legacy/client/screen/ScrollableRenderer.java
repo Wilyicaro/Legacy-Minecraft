@@ -30,7 +30,7 @@ public class ScrollableRenderer {
         oldSmoothScrolled = smoothScrolled;
         smoothScrolled = Mth.lerp(FactoryAPIClient.getPartialTick() * 0.5f, oldSmoothScrolled, scrolled.get());
         graphics.pose().pushMatrix();
-        graphics.pose().translate(0, -getYOffset(),0);
+        graphics.pose().translate(0, -getYOffset());
         scrollable.run();
         graphics.pose().popMatrix();
         graphics.disableScissor();

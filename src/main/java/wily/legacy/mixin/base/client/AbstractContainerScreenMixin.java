@@ -77,7 +77,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     @Unique private long lastUpPressedTime;
 
-    @ModifyArg(method = "renderLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)I"), index = 4)
+    @ModifyArg(method = "renderLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 4)
     private int renderLabels(int i){
         return CommonColor.INVENTORY_GRAY_TEXT.get();
     }
@@ -118,8 +118,8 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Inject(method = "renderFloatingItem", at = @At(value = "HEAD"), cancellable = true)
     private void renderFloatingItem(GuiGraphics guiGraphics, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(Legacy4JClient.controllerManager.getPointerX() - leftPos - 10, Legacy4JClient.controllerManager.getPointerY() - topPos - 10, 432.0f);
-        guiGraphics.pose().scale(27/18f, 27/18f, 27/18f);
+        guiGraphics.pose().translate((float)Legacy4JClient.controllerManager.getPointerX() - i - 10, (float)Legacy4JClient.controllerManager.getPointerY() - j - 10);
+        guiGraphics.pose().scale(27/18f, 27/18f);
         guiGraphics.renderItem(itemStack, 0, 0);
         guiGraphics.renderItemDecorations(Minecraft.getInstance().font, itemStack, 0, (this.draggingItem.isEmpty() ? 0 : -8), string == null && this.isQuickCrafting && this.quickCraftSlots.size() > 1 && itemStack.getCount() == 1 ? String.valueOf(itemStack.getCount()) : string);
         guiGraphics.pose().popMatrix();
@@ -161,8 +161,8 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         if (LegacyRenderUtil.isHovering(slot,leftPos,topPos,Legacy4JClient.controllerManager.getPointerX(),Legacy4JClient.controllerManager.getPointerY())) holder.renderHighlight(graphics);
         graphics.pose().pushMatrix();
         holder.applyOffset(graphics);
-        graphics.pose().translate(slot.x,slot.y,0);
-        graphics.pose().scale(holder.getSelectableWidth() / 16f,holder.getSelectableHeight() / 16f,holder.getSelectableHeight() / 16f);
+        graphics.pose().translate(slot.x, slot.y);
+        graphics.pose().scale(holder.getSelectableWidth() / 16f,holder.getSelectableHeight() / 16f);
 
         ItemStack itemStack = slot.getItem();
         boolean bl = false;
@@ -192,7 +192,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
             }
         }
 
-        graphics.pose().translate(0.0f, 0.0f, 100.0f);
+        graphics.nextStratum();
         //? if <1.21.4 {
         /*Pair<ResourceLocation, ResourceLocation> pair;
         if (itemStack.isEmpty() && (pair = slot.getNoItemIcon()) != null && holder.iconSprite == null) {

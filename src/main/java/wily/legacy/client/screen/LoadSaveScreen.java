@@ -160,14 +160,14 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         LegacyClientWorldSettings.of(summary.getSettings()).setSelectedResourceAlbum(resourceAssortSelector.getSelectedAlbum());
         loadWorld(this,minecraft, LegacySaveCache.getLevelStorageSource(),summary);
         Legacy4JClient.serverPlayerJoinConsumer = s-> {
-            if (dimensionsToReset.contains(Level.END)) s.server.getLevel(Level.END).setDragonFight(new EndDragonFight(minecraft.getSingleplayerServer().getLevel(Level.END),minecraft.getSingleplayerServer().getWorldData().worldGenOptions().seed(), EndDragonFight.Data.DEFAULT));
-            s.server.setDefaultGameType(gameTypeSlider.getObjectValue());
-            s.server.setDifficulty(difficulty, false);
-            applyGameRules.accept(s.server.getGameRules(), minecraft.getSingleplayerServer());
-            publishScreen.publish((IntegratedServer) s.server);
-            LegacyClientWorldSettings.of(s.server.getWorldData()).setAllowCommands(hostPrivileges);
-            s.server.getPlayerList().sendPlayerPermissionLevel(s);
-            LegacyClientWorldSettings.of(s.server.getWorldData()).setSelectedResourceAlbum(resourceAssortSelector.getSelectedAlbum());
+            if (dimensionsToReset.contains(Level.END)) s.getServer().getLevel(Level.END).setDragonFight(new EndDragonFight(minecraft.getSingleplayerServer().getLevel(Level.END),minecraft.getSingleplayerServer().getWorldData().worldGenOptions().seed(), EndDragonFight.Data.DEFAULT));
+            s.getServer().setDefaultGameType(gameTypeSlider.getObjectValue());
+            s.getServer().setDifficulty(difficulty, false);
+            applyGameRules.accept(s.getServer().getGameRules(), minecraft.getSingleplayerServer());
+            publishScreen.publish((IntegratedServer) s.getServer());
+            LegacyClientWorldSettings.of(s.getServer().getWorldData()).setAllowCommands(hostPrivileges);
+            s.getServer().getPlayerList().sendPlayerPermissionLevel(s);
+            LegacyClientWorldSettings.of(s.getServer().getWorldData()).setSelectedResourceAlbum(resourceAssortSelector.getSelectedAlbum());
             if (s.gameMode.getGameModeForPlayer() != gameTypeSlider.getObjectValue()) s.setGameMode(gameTypeSlider.getObjectValue());
         };
     }
@@ -223,11 +223,11 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         resourceAssortSelector.renderTooltipBox(guiGraphics,panel);
         panel.render(guiGraphics,i,j,f);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(0.5f,0,0);
+        guiGraphics.pose().translate(0.5f,0);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL,panel.x + 12, panel.y + 9, 32,32);
         guiGraphics.pose().popMatrix();
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(0,0.5f,0);
+        guiGraphics.pose().translate(0,0.5f);
         FactoryGuiGraphics.of(guiGraphics).blit(SaveRenderableList.iconCache.getUnchecked(summary).textureLocation(),panel.x + 14, panel.y + 10, 0,0,29,29,29,29);
         guiGraphics.drawString(font,summary.getLevelName(),panel.x + 48, panel.y + 12, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
         guiGraphics.drawString(font,Component.translatable("legacy.menu.load_save.created_in", (hasCommands(summary) ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()),panel.x + 48, panel.y + 29, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
@@ -238,7 +238,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
-        if (LegacyRenderUtil.isMouseOver(i,j,panel.x + 14.5, panel.y + 10,29,29)) guiGraphics.renderTooltip(font,Component.translatable("selectWorld.targetFolder", Component.literal(summary.getLevelId()).withStyle(ChatFormatting.ITALIC)),i,j);
+        if (LegacyRenderUtil.isMouseOver(i,j,panel.x + 14.5, panel.y + 10,29,29)) guiGraphics.setTooltipForNextFrame(font, Component.translatable("selectWorld.targetFolder", Component.literal(summary.getLevelId()).withStyle(ChatFormatting.ITALIC)),i,j);
     }
 
     public static void loadWorld(Screen screen, Minecraft minecraft, LevelStorageSource source, String levelId) {

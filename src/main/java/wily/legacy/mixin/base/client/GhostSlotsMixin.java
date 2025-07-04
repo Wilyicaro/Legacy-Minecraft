@@ -31,13 +31,13 @@ public class GhostSlotsMixin {
             LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(slot);
             guiGraphics.pose().pushMatrix();
             holder.applyOffset(guiGraphics);
-            guiGraphics.pose().translate(slot.x, slot.y, 0);
-            guiGraphics.pose().scale(holder.getSelectableWidth() / 16f,holder.getSelectableHeight() / 16f,holder.getSelectableHeight() / 16f);
+            guiGraphics.pose().translate(slot.x, slot.y);
+            guiGraphics.pose().scale(holder.getSelectableWidth() / 16f,holder.getSelectableHeight() / 16f);
 
             guiGraphics.fill(0, 0, 16, 16, 0x30FF0000);
             ItemStack itemStack = ghostSlot.getItem(this.slotSelectTime.currentIndex());
             guiGraphics.renderFakeItem(itemStack, 0, 0);
-            guiGraphics.fill(RenderType.guiGhostRecipeOverlay(), 0, 0, 16,16, 0x30FFFFFF);
+            guiGraphics.fill(0, 0, 16,16, 0x30FFFFFF);
             if (ghostSlot.isResultSlot())
                 guiGraphics.renderItemDecorations(minecraft.font, itemStack, 0, 0);
             guiGraphics.pose().popMatrix();

@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base.client;
 
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTextTooltip;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.FormattedCharSequence;
@@ -20,10 +21,10 @@ public class ClientTextTooltipMixin {
     @Shadow @Final private FormattedCharSequence text;
 
     @Inject(method = "renderText", at = @At("HEAD"), cancellable = true)
-    public void renderText(Font font, int i, int j, Matrix4f matrix4f, MultiBufferSource.BufferSource bufferSource, CallbackInfo ci) {
+    public void renderText(GuiGraphics guiGraphics, Font font, int i, int j, CallbackInfo ci) {
         if (!LegacyOptions.legacyItemTooltips.get()) return;
         ci.cancel();
-        font.drawInBatch(this.text, (float)i, (float)j, -1, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0, 15728880);
+        guiGraphics.drawString(font, this.text, i, j, -1, false);
     }
     @Inject(method = "getHeight", at = @At("HEAD"), cancellable = true)
     public void getHeight(CallbackInfoReturnable<Integer> cir) {

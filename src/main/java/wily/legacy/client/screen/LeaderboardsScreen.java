@@ -167,7 +167,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
                         if (LegacyRenderUtil.isMouseOver(i,j,renderable.getX() + Math.max(0,renderable.getWidth() - w) / 2, getY(),Math.min(renderable.getWidth(),w), getHeight())) hoveredValue = value;
                         added++;
                     }
-                    if (hoveredValue != null) guiGraphics.renderTooltip(font,hoveredValue,i,j);
+                    if (hoveredValue != null) guiGraphics.setTooltipForNextFrame(font,hoveredValue,i,j);
                 }
 
                 @Override
@@ -201,26 +201,26 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b-> {
                     guiGraphics.pose().pushMatrix();
                     Component filter = Component.translatable("legacy.menu.leaderboard.filter", this.filter.get() == 0 ? OVERALL :  MY_SCORE);
-                    guiGraphics.pose().translate(panel.x + 91 - font.width(filter) / 3f, panel.y - 12, 0);
-                    if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
+                    guiGraphics.pose().translate(panel.x + 91 - font.width(filter) / 3f, panel.y - 12);
+                    if (!b) guiGraphics.pose().scale(2/3f,2/3f);
                     guiGraphics.drawString(font, filter, 0, 0, 0xFFFFFF);
                     guiGraphics.pose().popMatrix();
                     guiGraphics.pose().pushMatrix();
-                    guiGraphics.pose().translate(panel.x + (panel.width - font.width(board.displayName) * 2/3f) / 2, panel.y - 12,0);
-                    if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
+                    guiGraphics.pose().translate(panel.x + (panel.width - font.width(board.displayName) * 2/3f) / 2, panel.y - 12);
+                    if (!b) guiGraphics.pose().scale(2/3f,2/3f);
                     guiGraphics.drawString(font,board.displayName,0, 0,0xFFFFFF);
                     guiGraphics.pose().popMatrix();
                     guiGraphics.pose().pushMatrix();
                     Component entries = Component.translatable("legacy.menu.leaderboard.entries",actualRankBoard.size());
-                    guiGraphics.pose().translate(panel.x + 477 - font.width(entries) / 3f, panel.y - 12,0);
-                    if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
+                    guiGraphics.pose().translate(panel.x + 477 - font.width(entries) / 3f, panel.y - 12);
+                    if (!b) guiGraphics.pose().scale(2/3f,2/3f);
                     guiGraphics.drawString(font,entries,0, 0,0xFFFFFF);
                     guiGraphics.pose().popMatrix();
                 });
                 if (board.statsList.isEmpty()) {
                     guiGraphics.pose().pushMatrix();
-                    guiGraphics.pose().translate(panel.x + (panel.width - font.width(NO_RESULTS) * 1.5f)/2f, panel.y + (panel.height - 13.5f) / 2f,0);
-                    guiGraphics.pose().scale(1.5f,1.5f,1.5f);
+                    guiGraphics.pose().translate(panel.x + (panel.width - font.width(NO_RESULTS) * 1.5f)/2f, panel.y + (panel.height - 13.5f) / 2f);
+                    guiGraphics.pose().scale(1.5f,1.5f);
                     guiGraphics.drawString(font,NO_RESULTS,0,0, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
                     guiGraphics.pose().popMatrix();
                     return;
@@ -237,8 +237,8 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 }
                 FactoryScreenUtil.enableBlend();
                 guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(panel.x + (panel.width - 211) / 2f, panel.y - 12,0);
-                guiGraphics.pose().scale(0.5f,0.5f,0.5f);
+                guiGraphics.pose().translate(panel.x + (panel.width - 211) / 2f, panel.y - 12);
+                guiGraphics.pose().scale(0.5f,0.5f);
                 (ControlType.getActiveType().isKbm() ? ControlTooltip.ComponentIcon.compoundOf(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(guiGraphics,4,0,false, false);
                 if (statsInScreen < statsBoards.get(selectedStatBoard).renderables.size()) {
                     ControlTooltip.Icon pageControl = ControlTooltip.ComponentIcon.compoundOf(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
@@ -256,7 +256,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
                     if (r.isHovered(i,j)) hovered = index;
                     x+= r.getWidth() + (351 - totalWidth) / statsInScreen;
                 }
-                if (hovered != null) guiGraphics.renderTooltip(font, board.statsList.get(hovered).getValue() instanceof EntityType<?> e ? e.getDescription() : board.statsList.get(hovered).getValue() instanceof ItemLike item && item.asItem() != Items.AIR ? Component.translatable(item.asItem().getDescriptionId()) : ControlTooltip.getAction("stat." + board.statsList.get(hovered).getValue().toString().replace(':', '.')), i, j);
+                if (hovered != null) guiGraphics.setTooltipForNextFrame(font, board.statsList.get(hovered).getValue() instanceof EntityType<?> e ? e.getDescription() : board.statsList.get(hovered).getValue() instanceof ItemLike item && item.asItem() != Items.AIR ? Component.translatable(item.asItem().getDescriptionId()) : ControlTooltip.getAction("stat." + board.statsList.get(hovered).getValue().toString().replace(':', '.')), i, j);
             }
         });
     }
@@ -307,8 +307,8 @@ public class LeaderboardsScreen extends PanelVListScreen {
             return SimpleLayoutRenderable.create(Minecraft.getInstance().font.width(name) * 2/3 + 8,7, (l)->((guiGraphics, i, j, f) ->
                 Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b-> {
                 guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(l.getX() + 4, l.getY(),0);
-                if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
+                guiGraphics.pose().translate(l.getX() + 4, l.getY());
+                if (!b) guiGraphics.pose().scale(2/3f,2/3f);
                 guiGraphics.drawString(Minecraft.getInstance().font,name,0,0,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
                 guiGraphics.pose().popMatrix();
             })));

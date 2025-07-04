@@ -90,14 +90,14 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
             ServerPlayer affectPlayer;
             if (sp.getUUID().equals(player)) {
                 switch (sync) {
-                    case ASK_ALL -> CommonNetwork.sendToPlayer(sp, All.fromPlayerList(sp.server));
+                    case ASK_ALL -> CommonNetwork.sendToPlayer(sp, All.fromPlayerList(sp.getServer()));
                     case CLASSIC_CRAFTING, LEGACY_CRAFTING -> ((LegacyPlayer) sp).setCrafting(sync == Sync.CLASSIC_CRAFTING);
                     case CLASSIC_TRADING, LEGACY_TRADING -> ((LegacyPlayer) sp).setTrading(sync == Sync.CLASSIC_TRADING);
                     case CLASSIC_STONECUTTING, LEGACY_STONECUTTING -> ((LegacyPlayer) sp).setStonecutting(sync == Sync.CLASSIC_STONECUTTING);
                     case CLASSIC_LOOM, LEGACY_LOOM -> ((LegacyPlayer) sp).setLoom(sync == Sync.CLASSIC_LOOM);
                 }
                 affectPlayer = sp;
-            } else affectPlayer = sp.server.getPlayerList().getPlayer(player);
+            } else affectPlayer = sp.getServer().getPlayerList().getPlayer(player);
             if (affectPlayer == null) return;
             if (sp.hasPermissions(2)){
                 switch (sync){

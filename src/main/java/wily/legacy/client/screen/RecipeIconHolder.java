@@ -149,7 +149,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
     public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
         if (isValidIndex()) {
             graphics.pose().pushMatrix();
-            graphics.pose().translate(getXCorner() - 4.5f, getYCorner(), 0f);
+            graphics.pose().translate(getXCorner() - 4.5f, getYCorner());
             applyOffset(graphics);
             FactoryGuiGraphics.of(graphics).disableDepthTest();
             if (getFocusedRecipes().size() == 2) {
@@ -164,7 +164,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
             FactoryGuiGraphics.of(graphics).enableDepthTest();
         }
         graphics.pose().pushMatrix();
-        graphics.pose().translate(0,selectionOffset * 27,0);
+        graphics.pose().translate(0,selectionOffset * 27);
         super.renderSelection(graphics,i,j,f);
         graphics.pose().popMatrix();
     }

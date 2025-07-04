@@ -25,6 +25,7 @@ import java.util.function.Consumer;
 public class TabList implements Renderable,GuiEventListener, NarratableEntry {
     protected final UIAccessor accessor;
     public final List<LegacyTabButton> tabButtons;
+    public LegacyTabButton lastSelected = null;
     public int selectedTab = 0;
     boolean focused = false;
 
@@ -108,9 +109,16 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
         for (int index = 0; index < tabButtons.size(); index++) {
             LegacyTabButton tabButton = tabButtons.get(index);
             tabButton.selected = selectedTab == index;
+            if (tabButton.selected) lastSelected = tabButton;
             tabButton.render(graphics,i, j, f);
         }
     }
+
+    public void renderSelected(GuiGraphics graphics, int i, int j, float f) {
+        if (lastSelected != null) lastSelected.render(graphics, i, j, f);
+    }
+
+
 
     public void resetSelectedTab(){
         if (!tabButtons.isEmpty()){

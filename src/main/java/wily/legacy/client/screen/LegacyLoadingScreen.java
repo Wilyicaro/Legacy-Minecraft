@@ -88,8 +88,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         FactoryScreenUtil.disableDepthTest();
-        //? if <=1.20.1
-        /*ScreenUtil.renderDefaultBackground(accessor, guiGraphics, true, true, false);*/
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, true, true, false);
         super.render(guiGraphics, i, j, f);
         int x = width / 2 - 160;
         int y = height / 2 + 16;
@@ -118,8 +117,8 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
             Legacy4JClient.applyFontOverrideIf(fontOverride != null, fontOverride, b -> {
                 guiGraphics.pose().pushMatrix();
                 float scaleX = accessor.getFloat("loadingHeader.scaleX", 2.0f);
-                guiGraphics.pose().translate(accessor.getFloat("loadingHeader.x", (width - minecraft.font.width(getLoadingHeader()) * scaleX) / 2), accessor.getFloat("loadingHeader.y", height / 2 - 23), 0);
-                guiGraphics.pose().scale(scaleX, accessor.getFloat("loadingHeader.scaleY", 2.0f), 1.0f);
+                guiGraphics.pose().translate(accessor.getFloat("loadingHeader.x", (width - minecraft.font.width(getLoadingHeader()) * scaleX) / 2), accessor.getFloat("loadingHeader.y", height / 2 - 23));
+                guiGraphics.pose().scale(scaleX, accessor.getFloat("loadingHeader.scaleY", 2.0f));
                 LegacyRenderUtil.drawOutlinedString(guiGraphics, minecraft.font, getLoadingHeader(), 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), accessor.getFloat("loadingHeader.outline", 0.5f));
                 guiGraphics.pose().popMatrix();
             });

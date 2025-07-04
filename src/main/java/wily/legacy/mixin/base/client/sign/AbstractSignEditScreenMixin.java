@@ -89,13 +89,10 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
         addWidget(panel);
         setFocused(panel);
     }
-    @ModifyArg(method = "offsetSign", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"), index = 1)
-    private float offsetSign(float f){
-        return height/2f - 26.5f;
-    }
-    @Redirect(method = "renderSignText", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"))
-    private void renderSignText(PoseStack instance, float x, float y, float z){
-        instance.translate(x,isSign() ? y - 14.5 : y + 10,10);
+
+    @Inject(method = "renderSignText", at = @At("HEAD"))
+    private void renderSignText(GuiGraphics guiGraphics, CallbackInfo ci){
+        guiGraphics.pose().translate(0, isSign() ? - 14.5f : 10);
     }
     @Unique
     private boolean isSign(){
@@ -106,22 +103,22 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
         return instance.getTextLineHeight() + 5;
     }
 
-    @Redirect(method = "renderSignText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)I", ordinal = 1))
-    private int renderSignText(GuiGraphics instance, Font arg, String string, int i, int j, int k, boolean bl){
-        return getFocused() == panel ? instance.drawString(arg,string,i,j,k,bl) : -1;
+    @Redirect(method = "renderSignText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V", ordinal = 1))
+    private void renderSignText(GuiGraphics instance, Font arg, String string, int i, int j, int k, boolean bl){
+        if (getFocused() == panel) instance.drawString(arg,string,i,j,k,bl);
     }
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         super.render(guiGraphics, i, j, f);
-        Lighting.setupForFlatItems();
+        minecraft.gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_FLAT);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate((width - font.width(title)*1.5f)/ 2f, height / 2f - 96, 0);
-        guiGraphics.pose().scale(1.5f,1.5f,1.5f);
+        guiGraphics.pose().translate((width - font.width(title)*1.5f)/ 2f, height / 2f - 96);
+        guiGraphics.pose().scale(1.5f,1.5f);
         guiGraphics.drawString(this.font, this.title, 0, 0, 16777215);
         guiGraphics.pose().popMatrix();
         this.renderSign(guiGraphics);
-        Lighting.setupFor3DItems();
+        minecraft.gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
     }
     @Inject(method = "keyPressed",at = @At("HEAD"), cancellable = true)
     public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {

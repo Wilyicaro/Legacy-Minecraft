@@ -6,6 +6,8 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
+import net.minecraft.client.gui.render.state.pip.GuiBookModelRenderState;
+import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraft.client.model.BookModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -228,25 +230,9 @@ public class LegacyUIElementTypes {
         uiDefinition.getDefinitions().add(UIDefinition.createAfterInit(elementName, (a) -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (guiGraphics, i, j, f) -> {
             float g = Mth.lerp(f, oOpen.get(), open.get());
             float f1 = Mth.lerp(f, oFlip.get(), flip.get());
-            guiGraphics.flush();
-            Lighting.setupForEntityInInventory();
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate( a.getInteger(elementName+".x", 0) + 33.0F, a.getInteger(elementName+".y", 0) + 31.0F, 100.0F);
-            guiGraphics.pose().scale(-40.0F, 40.0F, 40.0F);
-            guiGraphics.pose().mulPose(Axis.XP.rotationDegrees(25.0F));
-            guiGraphics.pose().translate((1.0F - g) * 0.2F, (1.0F - g) * 0.1F, (1.0F - g) * 0.25F);
-            float f3 = -(1.0F - g) * 90.0F - 90.0F;
-            guiGraphics.pose().mulPose(Axis.YP.rotationDegrees(f3));
-            guiGraphics.pose().mulPose(Axis.XP.rotationDegrees(180.0F));
-            float f4 = Mth.clamp(Mth.frac(f1 + 0.25F) * 1.6F - 0.3F, 0.0F, 1.0F);
-            float f5 = Mth.clamp(Mth.frac(f1 + 0.75F) * 1.6F - 0.3F, 0.0F, 1.0F);
-            bookModel.get().setupAnim(0.0F, f4, f5, g);
-            VertexConsumer vertexconsumer = FactoryGuiGraphics.of(guiGraphics).getBufferSource().getBuffer(bookModel.get().renderType(ENCHANTING_TABLE_BOOK));
-            bookModel.get().renderToBuffer(guiGraphics.pose(), vertexconsumer, 15728880, OverlayTexture.NO_OVERLAY/*? <1.20.5 {*//*, 1.0F, 1.0F, 1.0F, 1.0F*//*?}*/);
-            FactoryGuiGraphics.of(guiGraphics).getBufferSource().endBatch();
-            guiGraphics.flush();
-            guiGraphics.pose().popMatrix();
-            Lighting.setupFor3DItems();
+            int x = a.getInteger(elementName+".x", 0) + 33;
+            int y = a.getInteger(elementName+".y", 0) + 31;
+            guiGraphics.submitBookModelRenderState(bookModel.get(), ENCHANTING_TABLE_BOOK, g, f1, 40, x, y, x + 24, y + 17);
         }))));
     }));
 

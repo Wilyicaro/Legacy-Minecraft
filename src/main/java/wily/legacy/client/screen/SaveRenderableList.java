@@ -273,29 +273,29 @@ public class SaveRenderableList extends RenderableVList {
                 if (summary.isLocked()) {
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
                     if (hoverIcon) {
-                        getScreen().setTooltipForNextRenderPass(minecraft.font.split(WORLD_LOCKED_TOOLTIP, 175));
+                        guiGraphics.setTooltipForNextFrame(minecraft.font, minecraft.font.split(WORLD_LOCKED_TOOLTIP, 175), i, j);
                     }
                 } else if (summary.requiresManualConversion()) {
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
                     if (hoverIcon) {
-                        getScreen().setTooltipForNextRenderPass(minecraft.font.split(WORLD_REQUIRES_CONVERSION, 175));
+                        guiGraphics.setTooltipForNextFrame(minecraft.font, minecraft.font.split(WORLD_REQUIRES_CONVERSION, 175), i, j);
                     }
                 } else if (!summary.isCompatible()) {
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
                     if (hoverIcon) {
-                        getScreen().setTooltipForNextRenderPass(minecraft.font.split(INCOMPATIBLE_VERSION_TOOLTIP, 175));
+                        guiGraphics.setTooltipForNextFrame(minecraft.font, minecraft.font.split(INCOMPATIBLE_VERSION_TOOLTIP, 175), i, j);
                     }
                 } else if (summary./*? if >1.20.2 {*/shouldBackup/*?} else {*//*markVersionInList*//*?}*/()) {
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation4, getX() + 5, getY() + 5, 20, 20);
                     if (summary./*? if >1.20.2 {*/isDowngrade/*?} else {*//*requiresManualConversion*//*?}*/()) {
                         FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
                         if (hoverIcon) {
-                            getScreen().setTooltipForNextRenderPass(ImmutableList.of(FROM_NEWER_TOOLTIP_1.getVisualOrderText(), FROM_NEWER_TOOLTIP_2.getVisualOrderText()));
+                            guiGraphics.setTooltipForNextFrame(minecraft.font, ImmutableList.of(FROM_NEWER_TOOLTIP_1.getVisualOrderText(), FROM_NEWER_TOOLTIP_2.getVisualOrderText()), i, j);
                         }
-                    } else if (!SharedConstants.getCurrentVersion().isStable()) {
+                    } else if (!SharedConstants.getCurrentVersion().stable()) {
                         FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation2, getX() + 5, getY() + 5, 20, 20);
                         if (hoverIcon) {
-                            getScreen().setTooltipForNextRenderPass(ImmutableList.of(SNAPSHOT_TOOLTIP_1.getVisualOrderText(), SNAPSHOT_TOOLTIP_2.getVisualOrderText()));
+                            guiGraphics.setTooltipForNextFrame(minecraft.font, ImmutableList.of(SNAPSHOT_TOOLTIP_1.getVisualOrderText(), SNAPSHOT_TOOLTIP_2.getVisualOrderText()), i, j);
                         }
                     }
                 } else {

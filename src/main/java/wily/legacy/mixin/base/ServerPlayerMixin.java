@@ -17,6 +17,8 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Final;
@@ -33,11 +35,15 @@ import wily.legacy.entity.LegacyPlayerInfo;
 public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, LegacyPlayerInfo {
     @Shadow @Final public ServerPlayerGameMode gameMode;
 
+    public ServerPlayerMixin(Level level, GameProfile gameProfile) {
+        super(level, gameProfile);
+    }
+
     @Shadow public abstract void onUpdateAbilities();
 
     @Shadow public abstract ServerStatsCounter getStats();
 
-    @Shadow public abstract ServerLevel serverLevel();
+    @Shadow public abstract ServerLevel level();
 
     int position = -1;
     boolean classicCrafting = true;
@@ -46,11 +52,6 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     boolean classicLoom = true;
     boolean disableExhaustion = false;
     boolean mayFlySurvival = false;
-
-
-    public ServerPlayerMixin(Level level, BlockPos blockPos, float f, GameProfile gameProfile) {
-        super(level, blockPos, f, gameProfile);
-    }
 
 
     @Override
@@ -150,15 +151,15 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("RETURN"))
-    public void addAdditionalSaveData(CompoundTag compoundTag, CallbackInfo ci) {
-        compoundTag.putBoolean("DisableExhaustion", isExhaustionDisabled());
-        compoundTag.putBoolean("MayFlySurvival", mayFlySurvival());
+    public void addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo ci) {
+        valueOutput.putBoolean("DisableExhaustion", isExhaustionDisabled());
+        valueOutput.putBoolean("MayFlySurvival", mayFlySurvival());
 
     }
     @Inject(method = "readAdditionalSaveData", at = @At("RETURN"))
-    public void readAdditionalSaveData(CompoundTag compoundTag, CallbackInfo ci) {
-        setDisableExhaustion(compoundTag.getBoolean("DisableExhaustion")/*? if >=1.21.5 {*/.orElse(false)/*?}*/);
-        setMayFlySurvival(compoundTag.getBoolean("MayFlySurvival")/*? if >=1.21.5 {*/.orElse(false)/*?}*/);
+    public void readAdditionalSaveData(ValueInput input, CallbackInfo ci) {
+        setDisableExhaustion(input.getBooleanOr("DisableExhaustion", false));
+        setMayFlySurvival(input.getBooleanOr("MayFlySurvival", false));
     }
 
     @Inject(method = "startSleepInBed", at = @At("RETURN"), cancellable = true)
@@ -166,7 +167,7 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
         Either<BedSleepingProblem,Unit> either = cir.getReturnValue();
         if (level()./*? if <1.21.5 {*//*isDay*//*?} else {*/isBrightOutside/*?}*/() && either.left().isPresent() && either.left().get() == BedSleepingProblem.NOT_POSSIBLE_NOW && !this.isCreative()) {
             Vec3 vec3 = Vec3.atBottomCenterOf(blockPos);
-            if (!this.level().getEntitiesOfClass(Monster.class, new AABB(vec3.x() - 8.0, vec3.y() - 5.0, vec3.z() - 8.0, vec3.x() + 8.0, vec3.y() + 5.0, vec3.z() + 8.0), (argx) -> argx.isPreventingPlayerRest(/*? if >=1.21.2 {*/this.serverLevel(), /*?}*/this)).isEmpty()) {
+            if (!this.level().getEntitiesOfClass(Monster.class, new AABB(vec3.x() - 8.0, vec3.y() - 5.0, vec3.z() - 8.0, vec3.x() + 8.0, vec3.y() + 5.0, vec3.z() + 8.0), (argx) -> argx.isPreventingPlayerRest(level(), this)).isEmpty()) {
                 cir.setReturnValue(Either.left(BedSleepingProblem.NOT_SAFE));
             }
         }

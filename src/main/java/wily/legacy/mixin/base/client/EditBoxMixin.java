@@ -79,7 +79,7 @@ public abstract class EditBoxMixin extends AbstractWidget implements ControlTool
         return false;
     }
 
-    @ModifyArg(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 0), index = 5)
+    @ModifyArg(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 0), index = 4)
     public int renderWidget(int i) {
         return CommonColor.WIDGET_TEXT.get() | 0xFF000000;
     }

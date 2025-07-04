@@ -14,7 +14,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(ContextualBarRenderer.class)
-public class ExperienceBarRendererMixin {
+public interface ExperienceBarRendererMixin {
 
     @Inject(method = "renderExperienceLevel", at = @At("HEAD"), cancellable = true)
     private static void renderExperienceLevel(GuiGraphics guiGraphics, Font font, int i, CallbackInfo ci) {

@@ -53,8 +53,8 @@ public abstract class AdvancementToastMixin implements Toast, AdvancementToastAc
             if (l < 1500L) guiGraphics.drawString(font, displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName(),(width() - font.width(displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName())) / 2, height() - 18, i | Mth.floor(Mth.clamp((float)(1500L - l) / 300.0f, 0.0f, 1.0f) * 255.0f) << 24 | 0x4000000);
             else guiGraphics.drawString(font, holdToView,(width() - font.width(holdToView)) / 2, height() - 18, 0xFFFFFF | Mth.floor(Mth.clamp((float)(l - 1500L) / 300.0f, 0.0f, 1.0f) * 252.0f) << 24 | 0x4000000);
             guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate((width() - font.width(displayInfo.getTitle()) * 1.5f) / 2,10,0);
-            guiGraphics.pose().scale(1.5f,1.5f,1.5f);
+            guiGraphics.pose().translate((width() - font.width(displayInfo.getTitle()) * 1.5f) / 2,10);
+            guiGraphics.pose().scale(1.5f,1.5f);
             guiGraphics.drawString(font, displayInfo.getTitle(), 0, 0, -1);
             guiGraphics.pose().popMatrix();
             //? if <1.21.5 {

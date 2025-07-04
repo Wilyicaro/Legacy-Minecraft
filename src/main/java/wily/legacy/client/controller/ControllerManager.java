@@ -30,7 +30,7 @@ import wily.legacy.client.screen.LegacyCraftingScreen;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.init.LegacyRegistries;
-import wily.legacy.mixin.base.MouseHandlerAccessor;
+import wily.legacy.mixin.base.client.MouseHandlerAccessor;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.*;

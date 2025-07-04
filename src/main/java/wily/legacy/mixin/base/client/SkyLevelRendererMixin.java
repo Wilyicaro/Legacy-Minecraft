@@ -47,7 +47,7 @@ public class SkyLevelRendererMixin {
         return LegacyOptions.legacySkyShape.get() ? VertexFormat.Mode.QUADS : par1;
     }
     *///?} else {
-    @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/ByteBufferBuilder;<init>(I)V"))
+    @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/ByteBufferBuilder;exactlySized(I)Lcom/mojang/blaze3d/vertex/ByteBufferBuilder;"))
     private int changeSkyBufferVertexCount(int vertices){
         return legacySkyShape ? 576 * DefaultVertexFormat.POSITION.getVertexSize() : vertices;
     }
@@ -64,7 +64,7 @@ public class SkyLevelRendererMixin {
     private void changeSkyRenderVertexCount(RenderPass instance, int i, int size, Operation<Void> original, @Local RenderPass renderPass, @Share("autoStorageIndexBuffer") LocalRef<RenderSystem.AutoStorageIndexBuffer> autoStorageIndexBuffer, @Share("gpuBuffer") LocalRef<GpuBuffer> gpuBuffer){
         if (legacySkyShape){
             instance.setIndexBuffer(gpuBuffer.get(), autoStorageIndexBuffer.get().type());
-            instance.drawIndexed(0, 864);
+            instance.drawIndexed(0, 0, 864, 1);
         }else original.call(instance, i, size);
     }
 

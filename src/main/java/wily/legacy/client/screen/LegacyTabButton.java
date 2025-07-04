@@ -96,8 +96,8 @@ public class LegacyTabButton extends AbstractButton {
 
     public  void renderItemIcon(ItemStack itemIcon, GuiGraphics guiGraphics){
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(getX() + width / 2f - 12, getY() + height / 2f - 12, 0);
-        guiGraphics.pose().scale(1.5f, 1.5f, 1.5f);
+        guiGraphics.pose().translate(getX() + width / 2f - 12, getY() + height / 2f - 12);
+        guiGraphics.pose().scale(1.5f, 1.5f);
         guiGraphics.renderItem(itemIcon, 0, 0);
         guiGraphics.pose().popMatrix();
     }
@@ -111,12 +111,11 @@ public class LegacyTabButton extends AbstractButton {
         guiGraphics.pose().pushMatrix();
         Vec3 translate = offset.apply(this);
         if (!translate.equals(Vec3.ZERO)) {
-            guiGraphics.pose().translate(translate.x,translate.y,translate.z);
+            guiGraphics.pose().translate((float)translate.x, (float)translate.y);
             isHovered = isMouseOver(i,j);
         }
-        if (selected) guiGraphics.pose().translate(0F,0f,1F);
         spriteRender.render(this, guiGraphics, i, j, f);
-        if (!selected) guiGraphics.pose().translate(0,-1,0);
+        if (!selected) guiGraphics.pose().translate(0,-1);
         if (active) {
             if (icon == null) this.renderString(guiGraphics, minecraft.font, CommonColor.INVENTORY_GRAY_TEXT.get() | Mth.ceil(this.alpha * 255.0f) << 24);
             else icon.render(this, guiGraphics,i,j,f);
