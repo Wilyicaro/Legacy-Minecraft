@@ -1,0 +1,12 @@
+{
+  "overrides": [
+    {
+    "blocks": ["cobblestone_wall","mossy_cobblestone_wall"],
+    "tip": {"translate": "block.minecraft.cobblestone_wall.tip"}
+    },
+    {
+    "blocks": ["sandstone_wall","red_sandstone_wall"],
+    "tip": {"translate": "block.minecraft.sandstone_wall.tip"}
+    }
+  ]
+}
