@@ -65,8 +65,18 @@ public abstract class LevelRendererMixin implements LevelRendererAccessor {
     }
     *///?}
 
-    //? if <1.20.5 {
-    /*@Redirect(method = "playStreamingMusic", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;play(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
+    //? if <1.20.5 && (forge || neoforge) {
+    /*@Redirect(method = "playStreamingMusic(Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/RecordItem;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;play(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
+    public void waitToPlaySong(SoundManager instance, SoundInstance soundInstance) {
+        LegacyMusicFader.fadeInMusic(soundInstance, true);
+    }
+
+    @Redirect(method = "playStreamingMusic(Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/item/RecordItem;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;stop(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
+    public void fadeJukeboxSong(SoundManager instance, SoundInstance soundInstance) {
+        LegacyMusicFader.fadeOutMusic(soundInstance, true, true);
+    }
+    *///?} else if <1.20.5 {
+    /*@Redirect(method = "playStreamingMusic*", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/SoundManager;play(Lnet/minecraft/client/resources/sounds/SoundInstance;)V"))
     public void waitToPlaySong(SoundManager instance, SoundInstance soundInstance) {
         LegacyMusicFader.fadeInMusic(soundInstance, true);
     }
