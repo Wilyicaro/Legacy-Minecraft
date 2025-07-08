@@ -1,6 +1,6 @@
 {
   "overrides": {
-    "block": "#fences",
+    "blocks": ["#fences","!nether_brick_fence"],
     "tip": {"translate": "block.minecraft.fence.tip"}
   }
 }
