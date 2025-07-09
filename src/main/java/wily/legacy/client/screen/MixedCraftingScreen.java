@@ -155,7 +155,7 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
     @Override
     protected void renderLabels(GuiGraphics guiGraphics,int i, int j){
         if (!searchMode) {
-            Component title = getTabList() == craftingTabList ? getTabList().tabButtons.get(getTabList().selectedTab).getMessage() : CommonComponents.EMPTY;
+            Component title = getTabList() == craftingTabList ? getTabList().tabButtons.get(getTabList().selectedIndex).getMessage() : CommonComponents.EMPTY;
             guiGraphics.drawString(this.font, title, (imageWidth - font.width(title)) / 2, 17, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         }
         int inventoryPanelX = accessor.getInteger("inventoryPanelX", 176);
@@ -223,7 +223,7 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
         stackedContents.clear();
         inventory.fillStackedContents(stackedContents);
         menu.fillCraftSlotsStackedContents(stackedContents);
-        var collections = Minecraft.getInstance().player.getRecipeBook().getCollection(VANILLA_CATEGORIES[getTabList().selectedTab]);
+        var collections = Minecraft.getInstance().player.getRecipeBook().getCollection(VANILLA_CATEGORIES[getTabList().selectedIndex]);
         allowRecipeDisplay = false;
         //? if <1.21.2 {
         /*int dim = menu.getGridWidth() * menu.getGridHeight();

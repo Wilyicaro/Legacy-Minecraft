@@ -169,7 +169,7 @@ public class SaveRenderableList extends RenderableVList {
             return CompletableFuture.completedFuture(List.of());
         }
         if (levelCandidates.isEmpty()) {
-            getScreen(PlayGameScreen.class).tabList.selectedTab = 1;
+            getScreen(PlayGameScreen.class).tabList.selectedIndex = 1;
             return CompletableFuture.completedFuture(List.of());
         }
 

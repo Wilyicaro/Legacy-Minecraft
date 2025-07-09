@@ -24,10 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.AnimatedCharacterRenderer;
-import wily.legacy.client.CommonColor;
-import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.LegacyTipManager;
+import wily.legacy.client.*;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.LegacyIconHolder;
@@ -120,8 +117,10 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     private void renderFloatingItem(GuiGraphics guiGraphics, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate((float)Legacy4JClient.controllerManager.getPointerX() - 10, (float)Legacy4JClient.controllerManager.getPointerY() - 10);
-        guiGraphics.pose().scale(27/18f, 27/18f);
+        guiGraphics.pose().scale(1.5f, 1.5f);
+        LegacyGuiItemRenderer.pushSubmitSize(24);
         guiGraphics.renderItem(itemStack, 0, 0);
+        LegacyGuiItemRenderer.popSubmitSize();
         guiGraphics.renderItemDecorations(Minecraft.getInstance().font, itemStack, 0, (this.draggingItem.isEmpty() ? 0 : -8), string == null && this.isQuickCrafting && this.quickCraftSlots.size() > 1 && itemStack.getCount() == 1 ? String.valueOf(itemStack.getCount()) : string);
         guiGraphics.pose().popMatrix();
         ci.cancel();
@@ -211,7 +210,9 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
             if (bl) {
                 graphics.fill(0, 0, 16, 16, -2130706433);
             }
+            LegacyGuiItemRenderer.pushSubmitSize(holder.getItemRenderSize());
             graphics.renderItem(itemStack, 0, 0, slot.x + slot.y * this.imageWidth);
+            LegacyGuiItemRenderer.popSubmitSize();
             graphics.renderItemDecorations(minecraft.font, itemStack, 0, 0, string);
         }
         graphics.pose().popMatrix();

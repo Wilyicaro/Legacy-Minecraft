@@ -33,10 +33,10 @@ public class LegacyGuiElements {
             int newSelection = minecraft.player != null ? minecraft.player.getInventory().getSelectedSlot() : -1;
             if (lastHotbarSelection >= 0 && lastHotbarSelection != newSelection) lastHotbarSelectionChange = Util.getMillis();
             lastHotbarSelection = newSelection;
-            FactoryGuiGraphics.of(guiGraphics).setBlitColor( 1.0f, 1.0f, 1.0f, LegacyRenderUtil.getHUDOpacity());
+            LegacyGuiItemRenderer.pushSubmitSize(Math.round(48 / LegacyRenderUtil.getHUDScale()));
         });
         FactoryGuiElement.HOTBAR.post().register(guiGraphics -> {
-            FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
+            LegacyGuiItemRenderer.popSubmitSize();
             if (minecraft.player != null) ControlTooltip.Renderer.of(minecraft.gui).render(guiGraphics, 0,0, FactoryAPIClient.getPartialTick());
             LegacyRenderUtil.renderTopText(guiGraphics, TopMessage.small,21,1.0f, TopMessage.smallTicks);
             LegacyRenderUtil.renderTopText(guiGraphics, TopMessage.medium,37,1.5f, TopMessage.mediumTicks);

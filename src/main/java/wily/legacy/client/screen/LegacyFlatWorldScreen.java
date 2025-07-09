@@ -8,7 +8,6 @@ import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -78,7 +77,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.add(()-> movingLayer != null || tabList.selectedTab != 0 || getFocused() == null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()-> LegacyComponents.MOVE_LAYER).
+        renderer.add(()-> movingLayer != null || tabList.selectedIndex != 0 || getFocused() == null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()-> LegacyComponents.MOVE_LAYER).
                 add(()-> movingLayer != null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(),()-> LegacyComponents.PRESETS).
                 addCompound(()-> new ControlTooltip.Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(),ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon()},()-> movingLayer != null ? null : LegacyComponents.SELECT_TAB).
                 add(()-> movingLayer == null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_PAGEUP) : ControllerBinding.LEFT_TRIGGER.getIcon(),()-> LegacyComponents.PAGE_UP).
@@ -275,7 +274,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
 
     @Override
     protected void init() {
-        if (movingLayer != null && tabList.selectedTab != 0) tabList.selectedTab = 0;
+        if (movingLayer != null && tabList.selectedIndex != 0) tabList.selectedIndex = 0;
         addRenderableOnly(((guiGraphics, i, j, f) -> {
             if (LegacyRenderUtil.hasTooltipBoxes(accessor)) {
                 Optional<GuiEventListener> listener;
@@ -306,7 +305,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
     }
 
     public RenderableVList getRenderableVList(){
-        return getRenderableVLists().get(tabList.selectedTab);
+        return getRenderableVLists().get(tabList.selectedIndex);
     }
 
     @Override

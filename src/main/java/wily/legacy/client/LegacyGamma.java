@@ -16,7 +16,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 
-public class LegacyGamma {
+public class LegacyGamma implements AutoCloseable {
     public static final LegacyGamma INSTANCE = new LegacyGamma();
 
     private final MappableRingBuffer ubo;
@@ -50,6 +50,7 @@ public class LegacyGamma {
         profilerFiller.pop();
     }
 
+    @Override
     public void close() {
         ubo.close();
     }

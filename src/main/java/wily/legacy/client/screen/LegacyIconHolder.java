@@ -29,6 +29,7 @@ import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyGuiItemRenderer;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -134,6 +135,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         this.offset = offset;
         return this;
     }
+
     public static LegacyIconHolder entityHolder(int x, int y, int width, int height, EntityType<?> entityType){
         return new LegacyIconHolder(x, y, width, height) {
             Entity entity;
@@ -148,24 +150,35 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             }
         };
     }
+
     public double getMiddleX(){
         return getXCorner() + offset.x() + getWidth() / 2f;
     }
+
     public double getMiddleY(){
         return getYCorner() + offset.y() + getHeight() / 2f;
     }
+
     public float getXCorner(){
         return getX() - (isSizeable() ?  1 : getWidth() / 20f);
     }
+
     public float getYCorner(){
         return getY() - (isSizeable() ?  1 : getHeight() / 20f);
     }
+
     public float getSelectableWidth(){
         return getWidth() - 2 * (isSizeable() ?  1 : getWidth() / 20f);
     }
+
     public float getSelectableHeight(){
         return getHeight() - 2 * (isSizeable() ?  1 : getHeight() / 20f);
     }
+
+    public int getItemRenderSize() {
+        return Math.round(Math.min(getSelectableWidth(), getSelectableHeight()));
+    }
+
     public boolean isSizeable(){
         return Math.min(getWidth(),getHeight()) < 18 && LegacyRenderUtil.is720p();
     }
@@ -210,12 +223,14 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
 
     public void renderItem(GuiGraphics graphics, int i, int j, float f){
-        renderItem(graphics,itemIcon,getX(),getY(),isWarning());
+        renderItem(graphics, itemIcon, getX(), getY(), isWarning());
     }
 
     public void renderItem(GuiGraphics graphics, ItemStack item, int x, int y, boolean isWarning){
         if (!item.isEmpty()) renderItem(graphics,()->{
+            LegacyGuiItemRenderer.pushSubmitSize(getItemRenderSize());
             graphics.renderFakeItem(item, 0,0);
+            LegacyGuiItemRenderer.popSubmitSize();
             if (allowItemDecorations)
                 graphics.renderItemDecorations(Minecraft.getInstance().font, item,0,0);
         },x,y,isWarning);

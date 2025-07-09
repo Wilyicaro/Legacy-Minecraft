@@ -188,7 +188,9 @@
     "client.AbstractWidgetAccessor",
     "client.WaterFogEnvironmentMixin",
     "client.GuiEntityRenderStateMixin",
-    "client.GuiEntityRendererMixin"
+    "client.GuiEntityRendererMixin",
+    "client.GuiRendererMixin",
+    "client.GuiItemRenderStateMixin"
   ],
   "mixins": [
     //? if <1.20.5 {
