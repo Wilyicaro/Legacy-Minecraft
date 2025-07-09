@@ -186,7 +186,9 @@
     "client.gui.ExperienceBarRendererMixin",
     "client.book.BookSignScreenMixin",
     "client.AbstractWidgetAccessor",
-    "client.WaterFogEnvironmentMixin"
+    "client.WaterFogEnvironmentMixin",
+    "client.GuiEntityRenderStateMixin",
+    "client.GuiEntityRendererMixin"
   ],
   "mixins": [
     //? if <1.20.5 {

@@ -12,5 +12,13 @@ import wily.legacy.Legacy4J;
 
 public class LegacyRenderPipelines {
     public static final RenderPipeline LEGACY_SKY = RenderPipelinesAccessor.register(RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET).withLocation(Legacy4J.createModLocation("pipeline/sky")).withVertexShader("core/position").withFragmentShader("core/position").withDepthWrite(false).withVertexFormat(DefaultVertexFormat.POSITION, VertexFormat.Mode.QUADS).build());
-
+    public static final RenderPipeline GAMMA = RenderPipelinesAccessor.register(
+            RenderPipeline.builder(RenderPipelines.POST_PROCESSING_SNIPPET)
+                    .withLocation(Legacy4J.createModLocation("pipeline/gamma"))
+                    .withSampler("InSampler")
+                    .withVertexShader("core/blit_screen")
+                    .withFragmentShader(Legacy4J.createModLocation("core/gamma"))
+                    .withUniform("GammaInfo", UniformType.UNIFORM_BUFFER)
+                    .build()
+    );
 }

@@ -114,9 +114,9 @@ public class SubtitleOverlayMixin {
 
                     int r = q - 16777216;
                     if (!bl && e != 0) {
-                        FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f, 1.0f, p / 255f, true);
+                        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f,1.0f, 1.0f, p / 255f);
                         FactoryGuiGraphics.of(guiGraphics).blitSprite(e > 0 ? LegacySprites.SCROLL_RIGHT : LegacySprites.SCROLL_LEFT, e > 0 ? l - 8 : -l + 4, -n - 2, 6, 11);
-                        FactoryGuiGraphics.of(guiGraphics).clearColor(true);
+                        FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
                     }
                     guiGraphics.drawString(this.minecraft.font, component, -o / 2, -n, r);
                     guiGraphics.pose().translate(0, -(lineHeight + 1));

@@ -62,7 +62,6 @@ accessible method net/minecraft/client/gui/screens/worldselection/PresetEditor f
 accessible method net/minecraft/world/level/GameRules register (Ljava/lang/String;Lnet/minecraft/world/level/GameRules$Category;Lnet/minecraft/world/level/GameRules$Type;)Lnet/minecraft/world/level/GameRules$Key;
 accessible method net/minecraft/world/level/GameRules$BooleanValue create (Z)Lnet/minecraft/world/level/GameRules$Type;
 accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData$HoldingPlayer <init> (Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData;Lnet/minecraft/world/entity/player/Player;)V
-accessible field net/minecraft/client/renderer/chunk/RenderChunkRegion level Lnet/minecraft/world/level/Level;
 accessible field net/minecraft/client/gui/screens/ConnectScreen status Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/client/gui/components/Tooltip message Lnet/minecraft/network/chat/Component;
 accessible method net/minecraft/client/gui/components/Tooltip <init> (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/Component;)V
@@ -83,7 +82,6 @@ accessible field net/minecraft/world/item/AxeItem STRIPPABLES Ljava/util/Map;
 accessible field net/minecraft/world/item/ShovelItem FLATTENABLES Ljava/util/Map;
 accessible field net/minecraft/world/item/FoodOnAStickItem canInteractWith Lnet/minecraft/world/entity/EntityType;
 accessible field net/minecraft/client/renderer/texture/TextureAtlas texturesByName Ljava/util/Map;
-accessible class net/minecraft/client/renderer/FogRenderer$FogData
 accessible field net/minecraft/client/renderer/PostChain passes Ljava/util/List;
 accessible field net/minecraft/world/item/crafting/FireworkStarRecipe SHAPE_BY_ITEM Ljava/util/Map;
 accessible field net/minecraft/world/item/crafting/FireworkStarRecipe TRAIL_INGREDIENT Lnet/minecraft/world/item/crafting/Ingredient;
@@ -96,16 +94,6 @@ accessible field net/minecraft/client/gui/screens/AlertScreen callback Ljava/lan
 accessible field net/minecraft/client/gui/screens/AlertScreen okButton Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/client/gui/screens/AlertScreen messageText Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/world/level/block/entity/DecoratedPotPatterns ITEM_TO_POT_TEXTURE Ljava/util/Map;
-accessible class net/minecraft/client/gui/screens/inventory/BookEditScreen$DisplayCache
-accessible class net/minecraft/client/gui/screens/inventory/BookEditScreen$LineInfo
-accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$LineInfo asComponent Lnet/minecraft/network/chat/Component;
-accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$LineInfo x I
-accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$LineInfo y I
-accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$DisplayCache lines [Lnet/minecraft/client/gui/screens/inventory/BookEditScreen$LineInfo;
-accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$DisplayCache selection [Lnet/minecraft/client/renderer/Rect2i;
-accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$DisplayCache cursor Lnet/minecraft/client/gui/screens/inventory/BookEditScreen$Pos2i;
-accessible field net/minecraft/client/gui/screens/inventory/BookEditScreen$DisplayCache cursorAtEnd Z
-accessible class net/minecraft/client/gui/Font$StringRenderOutput
 accessible field net/minecraft/client/resources/TextureAtlasHolder textureAtlas Lnet/minecraft/client/renderer/texture/TextureAtlas;
 accessible field net/minecraft/client/multiplayer/ClientAdvancements progress Ljava/util/Map;
 accessible field net/minecraft/stats/StatsCounter stats Lit/unimi/dsi/fastutil/objects/Object2IntMap;

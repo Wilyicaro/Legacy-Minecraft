@@ -203,18 +203,18 @@ public class LeaderboardsScreen extends PanelVListScreen {
                     Component filter = Component.translatable("legacy.menu.leaderboard.filter", this.filter.get() == 0 ? OVERALL :  MY_SCORE);
                     guiGraphics.pose().translate(panel.x + 91 - font.width(filter) / 3f, panel.y - 12);
                     if (!b) guiGraphics.pose().scale(2/3f,2/3f);
-                    guiGraphics.drawString(font, filter, 0, 0, 0xFFFFFF);
+                    guiGraphics.drawString(font, filter, 0, 0, 0xFFFFFFFF);
                     guiGraphics.pose().popMatrix();
                     guiGraphics.pose().pushMatrix();
                     guiGraphics.pose().translate(panel.x + (panel.width - font.width(board.displayName) * 2/3f) / 2, panel.y - 12);
                     if (!b) guiGraphics.pose().scale(2/3f,2/3f);
-                    guiGraphics.drawString(font,board.displayName,0, 0,0xFFFFFF);
+                    guiGraphics.drawString(font,board.displayName,0, 0,0xFFFFFFFF);
                     guiGraphics.pose().popMatrix();
                     guiGraphics.pose().pushMatrix();
                     Component entries = Component.translatable("legacy.menu.leaderboard.entries",actualRankBoard.size());
                     guiGraphics.pose().translate(panel.x + 477 - font.width(entries) / 3f, panel.y - 12);
                     if (!b) guiGraphics.pose().scale(2/3f,2/3f);
-                    guiGraphics.drawString(font,entries,0, 0,0xFFFFFF);
+                    guiGraphics.drawString(font,entries,0, 0,0xFFFFFFFF);
                     guiGraphics.pose().popMatrix();
                 });
                 if (board.statsList.isEmpty()) {
@@ -300,7 +300,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 LegacyIconHolder h = new LegacyIconHolder(24,24);
                 h.itemIcon = i.asItem().getDefaultInstance();
                 return h;
-            }else if (stat.getValue() instanceof EntityType<?> e){
+            } else if (stat.getValue() instanceof EntityType<?> e){
                 return LegacyIconHolder.entityHolder(0,0,24,24, e);
             }
             Component name = Component.translatable("stat." + stat.getValue().toString().replace(':', '.'));
@@ -319,9 +319,11 @@ public class LeaderboardsScreen extends PanelVListScreen {
             this.type = type;
             this.displayName = displayName;
         }
+
         public static StatsBoard create(StatType<?> type, Component displayName){
             return new StatsBoard(type, displayName);
         }
+
         public static StatsBoard create(StatType<?> type, Component displayName, Predicate<Stat<?>> canAccept){
             return new StatsBoard(type, displayName){
                 @Override
@@ -330,9 +332,11 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 }
             };
         }
+
         public boolean canAdd(Stat<?> stat){
             return stat.getType() == type;
         }
+
         public boolean add(Stat<?> stat){
             if (canAdd(stat)){
                 if (!statsList.contains(stat)){

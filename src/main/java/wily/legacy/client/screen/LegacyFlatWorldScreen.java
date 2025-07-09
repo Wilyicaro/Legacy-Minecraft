@@ -169,7 +169,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         @Override
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             super.renderWidget(guiGraphics, i, j, f);
-            guiGraphics.drawString(font,Component.translatable("legacy.menu.create_flat_world.layer_count",flatLayerInfo.getHeight()),getX() + 12, getY() + 1 + (height - font.lineHeight) / 2, 0xFFFFFF);
+            guiGraphics.drawString(font,Component.translatable("legacy.menu.create_flat_world.layer_count",flatLayerInfo.getHeight()),getX() + 12, getY() + 1 + (height - font.lineHeight) / 2, 0xFFFFFFFF);
             guiGraphics.pose().pushMatrix();
             guiGraphics.pose().translate(getX() + 39, getY() + 5);
             guiGraphics.pose().scale(1.25f,1.25f);
@@ -284,7 +284,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
                 else tooltipBoxLabel = null;
 
                 LegacyRenderUtil.renderPointerPanel(guiGraphics,panel.x + panel.width - 2, panel.y + 5,194,panel.height - 10);
-                if (tooltipBoxLabel != null) tooltipBoxLabel.forEach(c-> guiGraphics.drawString(font,c,panel.x + panel.width + 3, panel.y + 13 + 12 * tooltipBoxLabel.indexOf(c),0xFFFFFF));
+                if (tooltipBoxLabel != null) tooltipBoxLabel.forEach(c-> guiGraphics.drawString(font,c,panel.x + panel.width + 3, panel.y + 13 + 12 * tooltipBoxLabel.indexOf(c),0xFFFFFFFF));
             }
         }));
         addRenderableWidget(tabList);

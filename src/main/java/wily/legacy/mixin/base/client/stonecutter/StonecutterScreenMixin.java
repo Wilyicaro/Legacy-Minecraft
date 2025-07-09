@@ -137,12 +137,12 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, 0, 79);
             if (startIndex > 0)
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP,0,-11);
-        }else FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,0.5f);
+        }else FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f,1.0f,1.0f,0.5f);
         FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0, 0,13,75);
         guiGraphics.pose().translate(-2f, -1f + (this.isScrollBarActive() ?  61.5f * startIndex / getOffscreenRows() : 0));
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
-        FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,1.0f);
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f,1.0f,1.0f,1.0f);
         FactoryScreenUtil.disableBlend();
         guiGraphics.pose().popMatrix();
         guiGraphics.pose().pushMatrix();

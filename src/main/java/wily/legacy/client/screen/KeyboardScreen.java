@@ -185,7 +185,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         super.renderDefaultBackground(guiGraphics, i, j, f);
         FactoryScreenUtil.enableBlend();
-        FactoryGuiGraphics.of(guiGraphics).setColor(1f,1f,1f,0.8f);
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1f,1f,1f,0.8f);
         panel.render(guiGraphics,i,j,f);
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(panel.getX() + 4.5f,panel.getY() + 25.5f);
@@ -195,7 +195,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,(panel.getWidth() - 267) / 2,-1,267, 125);
         guiGraphics.pose().popMatrix();
         FactoryScreenUtil.disableBlend();
-        FactoryGuiGraphics.of(guiGraphics).clearColor();
+        FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(panel.getX() + (panel.getWidth() - font.width(KEYBOARD) * 1.5f) / 2,panel.getY() + 8);
         guiGraphics.pose().scale(1.5f,1.5f);
@@ -239,7 +239,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
                 LegacyRenderUtil.renderPointerPanel(guiGraphics, getX() + (getWidth() - width) / 2, getY() - 17,width,15);
                 for (char c : chars) {
                     String s = String.valueOf(c);
-                    guiGraphics.drawString(font,s,getX() + (getWidth() - width) / 2 + diffX + 9, getY() - 14,c == getSelectedChar() ? 0xFFFF00 : 0xFFFFFF);
+                    guiGraphics.drawString(font,s,getX() + (getWidth() - width) / 2 + diffX + 9, getY() - 14,c == getSelectedChar() ? 0xFFFF00 : 0xFFFFFFFF);
                     diffX += font.width(s) + 2;
                 }
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT,getX() + (getWidth() - width) / 2 + 2, getY() - 15);

@@ -143,8 +143,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.unfocusedInputs,
                                 LegacyOptions.invertedFrontCameraPitch,
                                 LegacyOptions.headFollowsTheCamera,
-                                LegacyOptions.vehicleCameraRotation
-                                /*? if >=1.21.2 {*/,LegacyOptions.create(mc.options.rotateWithMinecart())/*?}*/,
+                                LegacyOptions.vehicleCameraRotation,
+                                LegacyOptions.create(mc.options.rotateWithMinecart()),
                                 LegacyOptions.legacyCreativeBlockPlacing,
                                 LegacyOptions.mapsWithCoords,
                                 LegacyOptions.vanillaTutorial),
@@ -162,7 +162,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.of(mc.options.notificationDisplayTime()),
                                 LegacyOptions.of(mc.options.panoramaSpeed()),
                                 LegacyOptions.of(mc.options.narrator()),
-                                /*? if >1.20.1 {*/LegacyOptions.of(mc.options.narratorHotkey()),/*?}*/
+                                LegacyOptions.of(mc.options.narratorHotkey()),
                                 LegacyOptions.of(mc.options.darkMojangStudiosBackground()),
                                 LegacyOptions.of(mc.options.highContrast()),
                                 LegacyOptions.of(mc.options.hideLightningFlash()),
@@ -276,9 +276,10 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.of(mc.options.enableVsync()),
                                 LegacyOptions.of(mc.options.framerateLimit()),
                                 LegacyOptions.of(mc.options.fov()),
-                                /*? if >=1.21.2 {*/LegacyOptions.of(mc.options.inactivityFpsLimit()),/*?}*/
+                                LegacyOptions.of(mc.options.inactivityFpsLimit()),
                                 LegacyOptions.of(mc.options.renderDistance()),
                                 LegacyOptions.of(mc.options.simulationDistance()),
+                                LegacyOptions.of(mc.options.cloudRange()),
                                 LegacyOptions.of(mc.options.prioritizeChunkUpdates()),
                                 LegacyOptions.of(mc.options.biomeBlendRadius()),
                                 LegacyOptions.of(mc.options.entityDistanceScaling()),

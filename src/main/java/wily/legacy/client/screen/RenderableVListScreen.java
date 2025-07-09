@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class RenderableVListScreen extends LegacyScreen implements RenderableVList.Access{
+public class RenderableVListScreen extends LegacyScreen implements RenderableVList.Access {
     protected final RenderableVList renderableVList = new RenderableVList(accessor).layoutSpacing(l->5);
     private final List<RenderableVList> renderableVLists = Collections.singletonList(renderableVList);
 
@@ -38,6 +38,7 @@ public class RenderableVListScreen extends LegacyScreen implements RenderableVLi
     public void repositionElements() {
         super.repositionElements();
     }
+
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (renderableVList.keyPressed(i)) return true;

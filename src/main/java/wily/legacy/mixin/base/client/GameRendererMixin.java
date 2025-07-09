@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
@@ -18,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.client.LegacyGamma;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
 import wily.legacy.entity.PlayerYBobbing;
@@ -40,6 +42,11 @@ public abstract class GameRendererMixin {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/toasts/ToastManager;render(Lnet/minecraft/client/gui/GuiGraphics;)V", shift = At.Shift.AFTER))
     private void render(CallbackInfo ci, @Local(ordinal = 0) GuiGraphics graphics){
         LegacyRenderUtil.renderGameOverlay(graphics);
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;render(Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", shift = At.Shift.AFTER))
+    private void render(DeltaTracker deltaTracker, boolean bl, CallbackInfo ci) {
+        if (minecraft.isGameLoadFinished() && LegacyOptions.displayLegacyGamma.get()) LegacyGamma.INSTANCE.render();
     }
 
     @Inject(method = "bobView", at = @At("RETURN"))

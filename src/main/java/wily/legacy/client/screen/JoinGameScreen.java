@@ -60,6 +60,6 @@ public class JoinGameScreen extends PanelVListScreen{
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         super.renderDefaultBackground(guiGraphics, i, j, f);
         tooltipBox.render(guiGraphics,i,j,f);
-        scrollableRenderer.render(guiGraphics,panel.x + panel.width + 3, panel.y + 13,tooltipBox.width - 10, tooltipBox.getHeight() - 44, ()-> label.renderLeftAligned(guiGraphics, panel.x + panel.width + 3, panel.y + 13, 12, 0xFFFFFF));
+        scrollableRenderer.render(guiGraphics,panel.x + panel.width + 3, panel.y + 13,tooltipBox.width - 10, tooltipBox.getHeight() - 44, ()-> label.renderLeftAligned(guiGraphics, panel.x + panel.width + 3, panel.y + 13, 12, 0xFFFFFFFF));
     }
 }

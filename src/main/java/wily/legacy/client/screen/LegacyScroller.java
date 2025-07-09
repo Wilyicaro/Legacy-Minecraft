@@ -55,11 +55,11 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable{
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN,0, getHeight() + 4);
             if (scroll.get() > 0)
                 scrollRenderer.renderScroll(guiGraphics,ScreenDirection.UP, 0, -11);
-        }else FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,0.5f, true);
+        }else FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 0.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0, width, height);
         guiGraphics.pose().translate(-2f, -1f + (scroll.max > 0 ? scroll.get() * getScrollerHeight() / scroll.max : 0));
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
-        FactoryGuiGraphics.of(guiGraphics).clearColor(true);
+        FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
         guiGraphics.pose().popMatrix();
     }
 

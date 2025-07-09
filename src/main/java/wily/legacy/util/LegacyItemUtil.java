@@ -104,7 +104,7 @@ public class LegacyItemUtil {
     }
 
     public static float getItemDamageModifier(ItemStack stack){
-        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat)){
+        if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat)) {
             if (stack.is(ItemTags.SWORDS)) return 1;
             else if (stack.getItem() instanceof ShovelItem) return -0.5f;
             else if (stack.is(ItemTags.PICKAXES)) return 1;

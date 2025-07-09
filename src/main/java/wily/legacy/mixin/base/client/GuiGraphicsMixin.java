@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base.client;
 
+import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;
@@ -7,6 +8,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.render.state.GuiItemRenderState;
 import net.minecraft.client.gui.render.state.GuiRenderState;
+import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.resources.language.I18n;
@@ -30,9 +32,11 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.FactoryAPIClient;
+import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.MutablePIPRenderState;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -134,8 +138,14 @@ public abstract class GuiGraphicsMixin {
         } else original.call(instance, arg);
     }
 
-    @Redirect(method = /*? if <1.21.2 {*//*"renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V"*//*?} else {*/"renderItemCount"/*?}*/, at = @At(value = "INVOKE", target = "Ljava/lang/String;valueOf(I)Ljava/lang/String;"))
+    @Redirect(method = "renderItemCount", at = @At(value = "INVOKE", target = "Ljava/lang/String;valueOf(I)Ljava/lang/String;"))
     private String renderItemDecorationsTail(int i, Font font, ItemStack itemStack){
         return i > itemStack.getMaxStackSize() && LegacyOptions.legacyOverstackedItems.get() ? I18n.get("legacy.container.overstack",itemStack.getMaxStackSize()) : String.valueOf(i);
+    }
+
+    @ModifyReceiver(method = {"submitEntityRenderState", "submitBookModelRenderState", "submitBannerPatternRenderState"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiRenderState;submitPicturesInPictureState(Lnet/minecraft/client/gui/render/state/pip/PictureInPictureRenderState;)V"))
+    private GuiRenderState submitEntityRenderState(GuiRenderState instance, PictureInPictureRenderState pictureInPictureRenderState){
+        MutablePIPRenderState.of(pictureInPictureRenderState).setPose(self().pose());
+        return instance;
     }
 }

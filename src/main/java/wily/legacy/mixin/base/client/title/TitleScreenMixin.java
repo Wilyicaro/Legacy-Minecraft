@@ -137,12 +137,4 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     public boolean realmsNotificationsEnabled(boolean original) {
         return false;
     }
-
-    //? if <1.20.5 {
-    /*@WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/PanoramaRenderer;render(FF)V"))
-    public boolean render(PanoramaRenderer instance, float partialTick, float speed, GuiGraphics guiGraphics) {
-        ScreenUtil.renderPanorama(guiGraphics, speed, partialTick);
-        return false;
-    }
-    *///?}
 }

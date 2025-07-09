@@ -81,8 +81,8 @@ public class FlatWorldLayerSelector extends ItemViewerScreen {
 
         guiGraphics.drawString(this.font, this.title,panel.x + (panel.width - font.width(title)) / 2,panel. y + 8, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         Component layerCount = Component.translatable("legacy.menu.create_flat_world.layer_count", layerSlider.getObjectValue());
-        guiGraphics.drawString(this.font, layerCount,panel.x + 49 - font.width(layerCount),panel. y + 197, 0xFFFFFF, true);
-        guiGraphics.drawString(this.font, selectedLayer.getName(),panel.x + 70,panel. y + 197, 0xFFFFFF, true);
+        guiGraphics.drawString(this.font, layerCount,panel.x + 49 - font.width(layerCount),panel. y + 197, 0xFFFFFFFF, true);
+        guiGraphics.drawString(this.font, selectedLayer.getName(),panel.x + 70,panel. y + 197, 0xFFFFFFFF, true);
 
 
         guiGraphics.pose().pushMatrix();

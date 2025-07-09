@@ -31,6 +31,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.ControlTooltip;
@@ -52,6 +53,8 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
     @Shadow @Final private boolean poem;
     @Unique
     private IntSet titleLines;
+    @Unique
+    private IntSet nameLines;
 
     protected WinScreenMixin(Component component) {
         super(component);
@@ -81,20 +84,12 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
-        this.scroll = Math.max(0.0F, this.scroll + f * this.scrollSpeed);
+        this.scroll = Math.max(0.0F, this.scroll + f * this.scrollSpeed * (poem ? 1.0f : 4f));
         float g = -this.scroll;
         int m = height;
-        if (poem){
+        if (poem) {
             FactoryGuiGraphics.of(guiGraphics).blit(POEM_BACKGROUND,0,0,0,Util.getMillis() / 280f, guiGraphics.guiWidth(), guiGraphics.guiHeight(),80,80);
-            //? if >=1.20.5 {
             renderVignette(guiGraphics);
-            //?} else {
-            /*FactoryScreenUtil.enableBlend();
-            RenderSystem.blendFunc(GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.ONE_MINUS_SRC_COLOR);
-            guiGraphics.blit(VIGNETTE_LOCATION, 0, 0, 0, 0.0F, 0.0F, this.width, this.height, this.width, this.height);
-            FactoryScreenUtil.disableBlend();
-            RenderSystem.defaultBlendFunc();
-            *///?}
             guiGraphics.pose().pushMatrix();
             guiGraphics.pose().translate(0.0F, g);
             Legacy4JClient.defaultFontOverride = LegacyIconHolder.MOJANGLES_11_FONT;
@@ -114,9 +109,9 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
                     guiGraphics.pose().translate(k,centered ? width / 2 : m);
                     guiGraphics.pose().scale(2,2);
                     if (centered) {
-                        guiGraphics.drawCenteredString(this.font, formattedCharSequence, 0,0, 0xFFFFFF);
+                        guiGraphics.drawCenteredString(this.font, formattedCharSequence, 0,0, 0xFFFFFFFF);
                     } else {
-                        guiGraphics.drawString(this.font, formattedCharSequence, 0,0, 0xFFFFFF);
+                        guiGraphics.drawString(this.font, formattedCharSequence, 0,0, 0xFFFFFFFF);
                     }
                     guiGraphics.pose().popMatrix();
                 }
@@ -150,7 +145,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
                     guiGraphics.pose().pushMatrix();
                     guiGraphics.pose().translate(k - font.width(formattedCharSequence) * (title ? 1.5f : 1) / 2, m);
                     if (title) guiGraphics.pose().scale(1.5f,1.5f);
-                    LegacyRenderUtil.drawOutlinedString(guiGraphics, font, formattedCharSequence, 0, 0, 15728880, 0, 0.4f);
+                    LegacyRenderUtil.drawOutlinedString(guiGraphics, font, formattedCharSequence, 0, 0, (nameLines.contains(n) ? CommonColor.YELLOW : CommonColor.WHITE).get(), 0xFF000000, 0.4f);
                     guiGraphics.pose().popMatrix();
                 }
 
@@ -162,10 +157,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
             FactoryGuiGraphics.of(guiGraphics).blit(CREDITS_BACKGROUND_FADE,0,0, x, y, guiGraphics.guiWidth(), guiGraphics.guiHeight(), fixedWidth, fixedHeight);
             FactoryGuiGraphics.of(guiGraphics).enableDepthTest();
             FactoryScreenUtil.disableBlend();
-            guiGraphics.pose().pushMatrix();
-            guiGraphics.nextStratum();
             LegacyRenderUtil.renderLogo(guiGraphics);
-            guiGraphics.pose().popMatrix();
         }
         ci.cancel();
     }
@@ -184,7 +176,9 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
     @Inject(method = "init", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/WinScreen;lines:Ljava/util/List;", opcode = Opcodes.PUTFIELD))
     private void init(CallbackInfo ci){
         this.titleLines = new IntOpenHashSet();
+        this.nameLines = new IntOpenHashSet();
     }
+
     @Redirect(method = "addPoemFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/WinScreen;addEmptyLine()V", ordinal = 0))
     private void addPoemFile(WinScreen instance) {
     }
@@ -203,16 +197,8 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
     private String addCreditsFileSectionToUppercase(String string) {
         return string.toUpperCase();
     }
-    @Redirect(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = 0))
+    @Redirect(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;"))
     private MutableComponent addCreditsFileSectionStyle(MutableComponent instance, ChatFormatting arg) {
-        return instance;
-    }
-    @Redirect(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = 1))
-    private MutableComponent addCreditsFileDisciplineStyle(MutableComponent instance, ChatFormatting arg) {
-        return instance;
-    }
-    @Redirect(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = 2))
-    private MutableComponent addCreditsFileTitleStyle(MutableComponent instance, ChatFormatting arg) {
         return instance;
     }
     @Inject(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/WinScreen;addCreditsLine(Lnet/minecraft/network/chat/Component;ZZ)V", ordinal = 1))
@@ -223,6 +209,12 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
     private void addCreditsFileDisciplineTitle(Reader reader, CallbackInfo ci) {
         titleLines.add(lines.size());
     }
+
+    @Inject(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/WinScreen;addCreditsLine(Lnet/minecraft/network/chat/Component;ZZ)V", ordinal = 5))
+    private void addCreditsFileNames(Reader reader, CallbackInfo ci) {
+        nameLines.add(lines.size());
+    }
+
     @Redirect(method = "addCreditsFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Component;literal(Ljava/lang/String;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = 3))
     private MutableComponent addCreditsFileRemoveNameSpacing(String string) {
         return Component.empty();

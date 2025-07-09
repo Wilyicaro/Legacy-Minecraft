@@ -237,12 +237,12 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, 0, 169);
             if (scrollOff > 0)
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP,0,-11);
-        }else FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,0.5f);
+        } else FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f,1.0f,1.0f,0.5f);
         FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0, 0,13,165);
         guiGraphics.pose().translate(-2f, -1f + (menu.getOffers().size() > 9 ?  151.5f * scrollOff / (menu.getOffers().size() - 9) : 0));
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
-        FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,1.0f);
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f,1.0f,1.0f,1.0f);
         FactoryScreenUtil.disableBlend();
         guiGraphics.pose().popMatrix();
         if (this.menu.showProgressBar()) {

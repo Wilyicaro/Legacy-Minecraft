@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -92,16 +93,17 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
        cir.setReturnValue(super.mouseClicked(d, e, i));
     }
 
+    @ModifyArg(method = "renderBook",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitBookModelRenderState(Lnet/minecraft/client/model/BookModel;Lnet/minecraft/resources/ResourceLocation;FFFIIII)V"), index = 2)
+    public float changeBookScale(float original) {
+        return original * 1.25f;
+    }
+
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos, imageWidth,imageHeight);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 79,  topPos+ 22, 123, 66);
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 2,topPos + 4);
-        guiGraphics.pose().scale(1.25f,1.25f);
-        this.renderBook(guiGraphics, 0, 0);
-        guiGraphics.pose().popMatrix();
+        this.renderBook(guiGraphics, leftPos + 12,topPos + 14);
         EnchantmentNames.getInstance().initSeed(this.menu.getEnchantmentSeed());
         int m = this.menu.getGoldCount();
         guiGraphics.pose().pushMatrix();

@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.render.state.pip.GuiBannerResultRenderState;import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
@@ -39,7 +39,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryScreenUtil;
-import wily.legacy.client.screen.LegacyScrollRenderer;
+import wily.legacy.client.MutablePIPRenderState;import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -134,25 +134,19 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
         this.flag = this.minecraft.getEntityModels().bakeLayer(ModelLayers./*? if <1.21.4 {*//*BANNER*//*?} else {*/STANDING_BANNER_FLAG/*?}*/).getChild("flag");
     }
 
-    //? if >1.20.1 {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    //?} else {
-    /*@Override
-    public void renderBackground(GuiGraphics guiGraphics) {
-    }
-    *///?}
 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos, imageWidth,imageHeight);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 72,  topPos+ 18, 75, 75);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 72,  topPos + 18, 75, 75);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 164.5f, topPos + 7);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0,  0, 32, 64);
+        guiGraphics.pose().translate(0.5f, 0);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 164,  topPos + 7, 32, 64);
         guiGraphics.pose().popMatrix();
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 149.5f, topPos + 18);
@@ -161,20 +155,20 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, 0, 79);
             if (startRow > 0)
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP,0,-11);
-        }else FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,0.5f);
-        FactoryScreenUtil.enableBlend();
+        } else FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f,1.0f,1.0f,0.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0, 0,13,75);
         guiGraphics.pose().translate(-2f, -1f + (menu.getSelectablePatterns().size() > 4 && displayPatterns ?  61.5f * startRow  / (totalRowCount() - 4) : 0));
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
-        FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,1.0f);
-        FactoryScreenUtil.disableBlend();
+        FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
         guiGraphics.pose().popMatrix();
         if (this.resultBannerPatterns != null && !this.hasMaxPatterns) {
             guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(leftPos + 168.5f, topPos + 69);
-            guiGraphics.pose().scale(1.5f, 1.5f);
+            guiGraphics.pose().translate(0.5f, 0.0f);
             DyeColor dyeColor = ((BannerItem)menu.getResultSlot().getItem().getItem()).getColor();
-            guiGraphics.submitBannerPatternRenderState(this.flag, dyeColor, this.resultBannerPatterns, 0, 0, 30, 60);
+            GuiBannerResultRenderState renderState = new GuiBannerResultRenderState(this.flag, dyeColor, this.resultBannerPatterns, leftPos, topPos, leftPos + 360, topPos + 69, guiGraphics.scissorStack.peek());
+            MutablePIPRenderState.of(renderState).setScale(24);
+            MutablePIPRenderState.of(renderState).setPose(guiGraphics.pose());
+            guiGraphics.guiRenderState.submitPicturesInPictureState(renderState);
             guiGraphics.pose().popMatrix();
         } else if (this.hasMaxPatterns) {
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LOOM_ERROR, leftPos + menu.slots.get(3).x - 5, topPos + menu.slots.get(3).y - 5, 26, 26);
@@ -190,9 +184,18 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
                     if (s >= list.size()) break block0;
                     int t = q * 18;
                     int u = p * 18;
-                    FactoryGuiGraphics.of(guiGraphics).blitSprite(s == menu.getSelectedBannerPatternIndex() ? BUTTON_SLOT_SELECTED : (LegacyRenderUtil.isMouseOver(i,j,leftPos + 73.5f + t,topPos + 19.5f + u,18,18)? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, 18, 18);
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(s == menu.getSelectedBannerPatternIndex() ? BUTTON_SLOT_SELECTED : (LegacyRenderUtil.isMouseOver(i,j,leftPos + 73.5f + t,topPos + 19.5f + u,18,18) ? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, 18, 18);
+
+                    TextureAtlasSprite sprite = Sheets.getBannerMaterial(list.get(s)).sprite();
                     guiGraphics.pose().pushMatrix();
-                    this.renderBannerOnButton(guiGraphics, t + 3, u + 3, Sheets.getBannerMaterial(list.get(t)).sprite());
+                    guiGraphics.pose().translate(t + 5.5f, u + 1.5f);
+                    float u0 = sprite.getU0();
+                    float g = u0 + (sprite.getU1() - sprite.getU0()) * 21.0F / 64.0F;
+                    float h = sprite.getV1() - sprite.getV0();
+                    float k = sprite.getV0() + h / 64.0F;
+                    float l = k + h * 40.0F / 64.0F;
+                    guiGraphics.fill(0, 0, 7, 15, DyeColor.GRAY.getTextureDiffuseColor());
+                    guiGraphics.blit(sprite.atlasLocation(), 0, 0, 7, 15, u0, g, k, l);
                     guiGraphics.pose().popMatrix();
                 }
             }

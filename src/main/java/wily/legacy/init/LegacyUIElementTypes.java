@@ -181,7 +181,7 @@ public class LegacyUIElementTypes {
         UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "x", "y", "color", "outlineColor", "order");
         UIDefinitionManager.ElementType.parseTranslationElements(uiDefinition, elementName, element);
         uiDefinition.getDefinitions().add(UIDefinition.createAfterInit(elementName, (a) -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (guiGraphics, i, j, f) -> {
-            a.getElement(elementName + ".component", Component.class).ifPresent((c) -> LegacyRenderUtil.drawOutlinedString(guiGraphics ,Minecraft.getInstance().font, c, a.getInteger(elementName + ".x", 0), a.getInteger(elementName + ".y", 0), a.getInteger(elementName + ".color", 16777215), a.getInteger(elementName + ".outlineColor", 0), a.getFloat(elementName + ".outline", 0.5f)));
+            a.getElement(elementName + ".component", Component.class).ifPresent((c) -> LegacyRenderUtil.drawOutlinedString(guiGraphics ,Minecraft.getInstance().font, c, a.getInteger(elementName + ".x", 0), a.getInteger(elementName + ".y", 0), a.getInteger(elementName + ".color", 16777215), a.getInteger(elementName + ".outlineColor", 0xFF000000), a.getFloat(elementName + ".outline", 0.5f)));
         }))));
     }));
 

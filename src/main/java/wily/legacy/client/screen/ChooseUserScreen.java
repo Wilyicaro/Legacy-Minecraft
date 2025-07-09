@@ -138,7 +138,7 @@ public class ChooseUserScreen extends PanelVListScreen {
                             usernameBox.setPosition(panel.getX() + 15, panel.getY() + 45);
                             usernameBox.setResponder(s-> {
                                 boolean matches = usernamePattern.matcher(s).matches();
-                                usernameBox.setTextColor(matches ? 0xFFFFFF : 0xFF5555);
+                                usernameBox.setTextColor(matches ? 0xFFFFFFFF : 0xFF5555);
                                 okButton.active = matches;
                             });
                             addRenderableWidget(usernameBox);

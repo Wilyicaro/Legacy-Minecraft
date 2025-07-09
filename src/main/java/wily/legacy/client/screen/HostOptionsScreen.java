@@ -151,11 +151,11 @@ public class HostOptionsScreen extends PanelVListScreen {
 
     public static void drawPlayerIcon(LegacyPlayerInfo info, GuiGraphics guiGraphics, int x, int y){
         float[] color = Legacy4JClient.getVisualPlayerColor(info);
-        FactoryGuiGraphics.of(guiGraphics).setColor(color[0],color[1],color[2],1.0f);
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(color[0],color[1],color[2],1.0f);
         FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(PlayerIdentifier.of(info.getIdentifierIndex()).optionsMapSprite(),x,y, 20,20);
         FactoryScreenUtil.disableBlend();
-        FactoryGuiGraphics.of(guiGraphics).clearColor();
+        FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
     }
 
     protected void addPlayerButtons(){
@@ -343,11 +343,11 @@ public class HostOptionsScreen extends PanelVListScreen {
         oldAlpha = alpha;
         alpha = Mth.lerp(f * 0.1f, oldAlpha, shouldFade ? 1.0f : getDefaultOpacity());
         shouldFade = false;
-        FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f, alpha);
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f,1.0f,1.0f, alpha);
         FactoryScreenUtil.enableBlend();
         panel.render(guiGraphics,i,j,f);
         FactoryScreenUtil.disableBlend();
-        FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,1.0f);
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f,1.0f,1.0f,1.0f);
         guiGraphics.drawString(font,title,panel.x + 11, panel.y + 8, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
 

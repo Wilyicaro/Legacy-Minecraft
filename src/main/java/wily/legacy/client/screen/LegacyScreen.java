@@ -20,7 +20,7 @@ public class LegacyScreen extends Screen implements Controller.Event, ControlToo
         this.parent = parent;
     }
 
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f){
+    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, true);
     }
 

@@ -43,6 +43,7 @@ import wily.legacy.client.*;
 import wily.legacy.client.SoundManagerAccessor;
 import wily.legacy.client.screen.*;
 import wily.legacy.network.ServerPlayerMissHitPayload;
+import wily.legacy.util.client.LegacyGuiElements;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.List;
@@ -256,7 +257,7 @@ public abstract class MinecraftMixin {
         }
         if (Minecraft.getInstance().screen == null && Minecraft.getInstance().level != null && screen != null && (screen instanceof PauseScreen || !screen.isPauseScreen())) LegacyRenderUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
         if (screen == null && level != null) {
-            LegacyRenderUtil.lastGui = Util.getMillis();
+            LegacyGuiElements.lastGui = Util.getMillis();
             ControlTooltip.Event.of(gui).setupControlTooltips();
             ControlTooltip.Renderer.GUI_EVENT.invoker.accept(gui,ControlTooltip.Event.of(gui).getControlTooltips());
         }

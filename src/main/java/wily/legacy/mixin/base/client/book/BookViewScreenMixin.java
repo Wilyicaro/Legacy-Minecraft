@@ -98,23 +98,25 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
             this.pageMsg = Component.translatable("book.pageIndicator", this.currentPage + 1, Math.max(this.getNumPages(), 1));
         }
         this.cachedPage = this.currentPage;
-        guiGraphics.drawString(this.font, this.pageMsg, panel.x + panel.width - 24 - font.width(pageMsg), panel.y + 22, 0, false);
+        guiGraphics.drawString(this.font, this.pageMsg, panel.x + panel.width - 24 - font.width(pageMsg), panel.y + 22, 0xFF000000, false);
         int n = Math.min(176 / this.font.lineHeight, this.cachedPageComponents.size());
         for (int o = 0; o < n; ++o) {
             FormattedCharSequence formattedCharSequence = this.cachedPageComponents.get(o);
-            guiGraphics.drawString(this.font, formattedCharSequence, panel.x + 20, panel.y + 37 + o * this.font.lineHeight, 0, false);
+            guiGraphics.drawString(this.font, formattedCharSequence, panel.x + 20, panel.y + 37 + o * this.font.lineHeight, 0xFF000000, false);
         }
         Style style = this.getClickedComponentStyleAt(i, j);
         if (style != null) {
             guiGraphics.renderComponentHoverEffect(this.font, style, i, j);
         }
     }
+
     @Override
     public void bindingStateTick(BindingState state) {
         if ((state.is(ControllerBinding.RIGHT_BUMPER) || state.is(ControllerBinding.LEFT_BUMPER)) && state.canClick()){
             (state.is(ControllerBinding.RIGHT_BUMPER) ? forwardButton : backButton).keyPressed(InputConstants.KEY_RETURN,0,0);
         }
     }
+
     @Inject(method = "keyPressed",at = @At("HEAD"), cancellable = true)
     public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
         if (ControlType.getActiveType().isKbm() && (i == InputConstants.KEY_RIGHT || i == InputConstants.KEY_LEFT)){
@@ -124,6 +126,7 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         }
         cir.setReturnValue(super.keyPressed(i,j,k));
     }
+    
     @Inject(method = "getClickedComponentStyleAt",at = @At("HEAD"), cancellable = true)
     public void getClickedComponentStyleAt(double d, double e, CallbackInfoReturnable<Style> cir) {
         if (this.cachedPageComponents.isEmpty()) {

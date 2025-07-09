@@ -197,7 +197,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
             tooltipBox.render(guiGraphics,i,j,f);
             if (tooltipBoxLabel != null) {
-                scrollableRenderer.render(guiGraphics,panel.x + panel.width + 3, panel.y + 13,tooltipBox.width - 10, tooltipBox.getHeight() - 44, ()-> tooltipBoxLabel.forEach(c-> guiGraphics.drawString(font,c, panel.x + panel.width + 3, panel.y + 13 + tooltipBoxLabel.indexOf(c) * 12, 0xFFFFFF)));
+                scrollableRenderer.render(guiGraphics,panel.x + panel.width + 3, panel.y + 13,tooltipBox.width - 10, tooltipBox.getHeight() - 44, ()-> tooltipBoxLabel.forEach(c-> guiGraphics.drawString(font,c, panel.x + panel.width + 3, panel.y + 13 + tooltipBoxLabel.indexOf(c) * 12, 0xFFFFFFFF)));
             }
         }
     }

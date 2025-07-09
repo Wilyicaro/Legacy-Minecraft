@@ -125,14 +125,14 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
                 guiGraphics.pose().popMatrix();
             }
             FactoryScreenUtil.enableBlend();
-            if (!isUnlocked()) FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 0.5f);
+            if (!isUnlocked()) FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 0.5f);
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL, getX(), getY(), getWidth(), getHeight());
             FactoryScreenUtil.disableDepthTest();
             if (!isUnlocked())
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PADLOCK, getX() + (getWidth() - 32) / 2, getY() + (getHeight() - 32) / 2, 32, 32);
             FactoryScreenUtil.enableDepthTest();
             FactoryScreenUtil.disableBlend();
-            FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 1.0f);
+            FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 1.0f);
             if (!isUnlocked()) return;
             guiGraphics.pose().pushMatrix();
             guiGraphics.pose().translate(getX() + (getWidth() - 32) / 2f, getY() + (getHeight() - 32) / 2f);
@@ -167,7 +167,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
                 if (background != null) FactoryGuiGraphics.of(guiGraphics).blit(background,panel.x + 14, panel.y + 24,0,0,422,23,16,16);
             }
             LegacyRenderUtil.renderPanelTranslucentRecess(guiGraphics,panel.x + 12, panel.y + 22, 426, 27);
-            if (getFocused() instanceof AdvancementButton a) guiGraphics.drawString(font,a.info.getTitle(),panel.x + (panel.width - font.width(a.info.getTitle()))/ 2,panel.y + 32,0xFFFFFF);
+            if (getFocused() instanceof AdvancementButton a) guiGraphics.drawString(font,a.info.getTitle(),panel.x + (panel.width - font.width(a.info.getTitle()))/ 2,panel.y + 32,0xFFFFFFFF);
             FactoryScreenUtil.disableBlend();
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 12, panel.y + 50, 426, 186);
         }));

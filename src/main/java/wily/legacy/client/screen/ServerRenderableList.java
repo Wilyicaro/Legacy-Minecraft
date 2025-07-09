@@ -157,7 +157,7 @@ public class ServerRenderableList extends RenderableVList {
                 addRenderable(lanButton = new AbstractButton(0,0,0,30,Component.literal(lanServer.getMotd())) {
                     @Override
                     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                        guiGraphics.drawString(minecraft.font, LAN_SERVER_HEADER, getX() + 32 + 3, getY() + 1, 0xFFFFFF, false);
+                        guiGraphics.drawString(minecraft.font, LAN_SERVER_HEADER, getX() + 32 + 3, getY() + 1, 0xFFFFFFFF, false);
                         guiGraphics.drawString(minecraft.font, lanServer.getMotd(), getX() + 32 + 3, getY() + 12, -8355712, false);
                         if (minecraft.options.hideServerAddress) {
                             guiGraphics.drawString(minecraft.font, HIDDEN_ADDRESS_TEXT, getX() + 32 + 3,getY() + 12 + 11, 0x303030, false);
@@ -269,7 +269,7 @@ public class ServerRenderableList extends RenderableVList {
             }
             refreshStatus();
             *///?}
-            guiGraphics.drawString(minecraft.font, getMessage(), getX() + 32 + 3, getY() + 3, 0xFFFFFF);
+            guiGraphics.drawString(minecraft.font, getMessage(), getX() + 32 + 3, getY() + 3, 0xFFFFFFFF);
             guiGraphics.pose().pushMatrix();
             guiGraphics.pose().translate(getX() + 35,  getY() + 10);
             guiGraphics.pose().scale(2/3f,2/3f);

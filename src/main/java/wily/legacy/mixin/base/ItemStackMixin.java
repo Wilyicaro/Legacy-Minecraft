@@ -62,8 +62,9 @@ public abstract class ItemStackMixin implements DataComponentHolder {
     public void forEachModifier(EquipmentSlotGroup equipmentSlotGroup, TriConsumer<Holder<Attribute>, AttributeModifier, ItemAttributeModifiers.Display> triConsumer, CallbackInfo ci) {
         if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat)) {
             ci.cancel();
+            LegacyItemAttributeDisplay display = new LegacyItemAttributeDisplay(self());
             ItemAttributeModifiers itemAttributeModifiers = this.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-            itemAttributeModifiers.forEach(equipmentSlotGroup, triConsumer);
+            itemAttributeModifiers.forEach(equipmentSlotGroup, ((attributeHolder, attributeModifier, u) -> triConsumer.accept(attributeHolder, attributeModifier, display)));
             EnchantmentHelper.forEachModifier(self(), equipmentSlotGroup, (holder, attributeModifier) -> triConsumer.accept(holder, attributeModifier, new LegacyItemAttributeDisplay(self())));
         }
     }

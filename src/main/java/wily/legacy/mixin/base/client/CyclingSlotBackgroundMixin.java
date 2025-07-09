@@ -18,20 +18,12 @@ import wily.legacy.util.client.LegacyRenderUtil;
 public class CyclingSlotBackgroundMixin {
     @Inject(method = "renderIcon", at = @At("HEAD"), cancellable = true)
     private void renderIcon(Slot slot, ResourceLocation resourceLocation, float f, GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
-        if (slot instanceof LegacySlotDisplay) ci.cancel();
-        else return;
+        ci.cancel();
         LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(slot);
-        holder.renderScaled(guiGraphics, i + slot.x,j + slot.y, ()->{
-            FactoryScreenUtil.enableBlend();
-            FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,f);
-            //? if <1.21.4 {
-            /*TextureAtlasSprite textureAtlasSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(resourceLocation);
-            FactoryGuiGraphics.of(guiGraphics).blit(0, 0, 0, 16, 16, textureAtlasSprite);
-            *///?} else {
+        holder.renderScaled(guiGraphics, i + slot.x,j + slot.y, ()-> {
+            FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f,1.0f,1.0f, f);
             FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation, 0, 0, 16, 16);
-            //?}
-            FactoryGuiGraphics.of(guiGraphics).clearColor();
-            FactoryScreenUtil.disableBlend();
+            FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
         });
     }
 }

@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyGuiElements;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(SpectatorGui.class)
@@ -34,6 +35,6 @@ public abstract class SpectatorGuiMixin {
     }
     @Inject(method = "onHotbarSelected", at = @At("HEAD"))
     public void onHotbarSelected(int i, CallbackInfo ci) {
-        if (menu != null && i != menu.getSelectedSlot()) LegacyRenderUtil.lastHotbarSelectionChange = Util.getMillis();
+        if (menu != null && i != menu.getSelectedSlot()) LegacyGuiElements.lastHotbarSelectionChange = Util.getMillis();
     }
 }

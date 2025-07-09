@@ -267,7 +267,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
 
     public static ConfirmationScreen createAlbumEditScreen(Screen parent, Component title, Component defaultName, Component defaultDescription, BiConsumer<Component,Component> editAlbum){
         EditBox nameBox = new EditBox(Minecraft.getInstance().font, 0,0,200, 20, Component.translatable("legacy.menu.album_info"));
-        MultiLineEditBox descriptionBox = MultiLineEditBox.builder().setPlaceholder(nameBox.getMessage()).build(Minecraft.getInstance().font, 200, 60, defaultDescription);
+        MultiLineEditBox descriptionBox = MultiLineEditBox.builder().setCursorColor(0xFFFFFFFF).setPlaceholder(nameBox.getMessage()).build(Minecraft.getInstance().font, 200, 60, defaultDescription);
         nameBox.setHint(defaultName);
         return new ConfirmationScreen(parent, 230, 184, title, nameBox.getMessage(), p -> editAlbum.accept(nameBox.getValue().isBlank() ? defaultName : Component.literal(nameBox.getValue()), descriptionBox.getValue().isBlank() ? defaultDescription : Component.literal(descriptionBox.getValue()))) {
             @Override
@@ -363,11 +363,11 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 if (getSelectedAlbum().iconSprite().isPresent()) FactoryGuiGraphics.of(graphics).blitSprite(getSelectedAlbum().iconSprite().get(),x + 7,y + 5,32,32);
                 else FactoryGuiGraphics.of(graphics).blit(p ? getPackIcon(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : DEFAULT_ICON, x + 7,y + 5,0.0f, 0.0f, 32, 32, 32, 32);
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4,x + 148, y + 44);
-                labelsCache.apply(getSelectedAlbum().displayName(),108).renderLeftAligned(graphics,x + 43, y + 8,12,0xFFFFFF);
+                labelsCache.apply(getSelectedAlbum().displayName(),108).renderLeftAligned(graphics,x + 43, y + 8,12,0xFFFFFFFF);
                 graphics.disableScissor();
                 ResourceLocation background = getSelectedAlbum().backgroundSprite.orElse(p ? getPackBackground(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : null);
                 MultiLineLabel label = labelsCache.apply(getSelectedAlbum().description(),145);
-                scrollableRenderer.render(graphics, x + 8,y + 40, 146, 12 * (background == null ? 14 : 7), ()->label.renderLeftAligned(graphics,x + 8, y + 40,12,0xFFFFFF));
+                scrollableRenderer.render(graphics, x + 8,y + 40, 146, 12 * (background == null ? 14 : 7), ()->label.renderLeftAligned(graphics,x + 8, y + 40,12,0xFFFFFFFF));
                 if (background != null) {
                     if (getSelectedAlbum().backgroundSprite().isPresent()) FactoryGuiGraphics.of(graphics).blitSprite(background, x + 8,y + height - 78,145, 72);
                     else FactoryGuiGraphics.of(graphics).blit(background, x + 8,y + height - 78,0.0f, 0.0f, 145, 72, 145, 72);

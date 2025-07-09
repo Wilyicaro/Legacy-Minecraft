@@ -129,11 +129,11 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
             if (selectedPack != null){
                 FactoryGuiGraphics.of(graphics).blit(PackAlbum.Selector.getPackIcon(selectedPack), x + 7,y + 5,0.0f, 0.0f, 32, 32, 32, 32);
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4,x + 148, y + 44);
-                labelsCache.apply(selectedPack.getTitle(),108).renderLeftAligned(graphics,x + 43, y + 8,12,0xFFFFFF);
+                labelsCache.apply(selectedPack.getTitle(),108).renderLeftAligned(graphics,x + 43, y + 8,12,0xFFFFFFFF);
                 graphics.disableScissor();
                 ResourceLocation background = PackAlbum.Selector.getPackBackground(selectedPack);
                 MultiLineLabel label = labelsCache.apply(selectedPack.getDescription(), 145);
-                scrollableRenderer.render(graphics, x + 8,y + 40, 146, 12 * (background == null ? 14 : 7), ()->label.renderLeftAligned(graphics,x + 8, y + 40,12,0xFFFFFF));
+                scrollableRenderer.render(graphics, x + 8,y + 40, 146, 12 * (background == null ? 14 : 7), ()->label.renderLeftAligned(graphics,x + 8, y + 40,12,0xFFFFFFFF));
                 if (background != null) FactoryGuiGraphics.of(graphics).blit(background, x + 8,y + height - 78,0.0f, 0.0f, 145, 72, 145, 72);
             }
         }

@@ -105,7 +105,7 @@ public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMen
         if (hasRecipeError())
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
         guiGraphics.pose().popMatrix();
-        InventoryScreen.renderEntityInInventory(guiGraphics, this.leftPos + 198, this.topPos + 95,this.leftPos + 246, this.topPos + 155, 35/*? if >1.20.1 {*/, ARMOR_STAND_TRANSLATION/*?}*/, ARMOR_STAND_ANGLE, null, this.armorStandPreview);
+        InventoryScreen.renderEntityInInventory(guiGraphics, this.leftPos, this.topPos,this.leftPos + 364, this.topPos + 150, 35, ARMOR_STAND_TRANSLATION, ARMOR_STAND_ANGLE, null, this.armorStandPreview);
     }
 
     @Inject(method = "render",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/ItemCombinerScreen;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))

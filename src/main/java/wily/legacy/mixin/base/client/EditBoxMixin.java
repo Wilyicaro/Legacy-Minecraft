@@ -27,9 +27,7 @@ import wily.legacy.util.LegacySprites;
 
 @Mixin(EditBox.class)
 public abstract class EditBoxMixin extends AbstractWidget implements ControlTooltip.ActionHolder {
-    //? if >1.20.2 {
     @Shadow private long focusedTime;
-    //?}
 
     @Shadow private int cursorPos;
 
@@ -49,6 +47,7 @@ public abstract class EditBoxMixin extends AbstractWidget implements ControlTool
     private void init(EditBox instance, int value){
         textColor = CommonColor.WIDGET_TEXT.get();
     }
+
     public EditBoxMixin(int i, int j, int k, int l, Component component) {
         super(i, j, k, l, component);
     }
@@ -79,15 +78,11 @@ public abstract class EditBoxMixin extends AbstractWidget implements ControlTool
         return false;
     }
 
-    @ModifyArg(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 0), index = 4)
-    public int renderWidget(int i) {
-        return CommonColor.WIDGET_TEXT.get() | 0xFF000000;
-    }
     @ModifyVariable(method = "renderWidget", at = @At(value = "STORE"), ordinal = 1)
     public boolean renderWidget(boolean bl) {
         int l = this.cursorPos - this.displayPos;
         String string = this.font.plainSubstrByWidth(this.value.substring(this.displayPos), this.getInnerWidth());
-        return l >= 0 && l <= string.length() && this.isFocused() && (Util.getMillis()/*? if >1.20.1 {*/ - this.focusedTime/*?}*/) / 180L % 2 == 0L;
+        return l >= 0 && l <= string.length() && this.isFocused() && (Util.getMillis() - this.focusedTime) / 180L % 2 == 0L;
     }
 
     @WrapOperation(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V", ordinal = 1))
@@ -95,9 +90,15 @@ public abstract class EditBoxMixin extends AbstractWidget implements ControlTool
         instance.pose().pushMatrix();
         instance.pose().translate(i-(cursorPos == 0 ? 3 : 4),j+ 8.5f);
         instance.pose().scale(6,1.5f);
-        instance.fill(0,0,1,1, CommonColor.WIDGET_TEXT.get() | 0xFF000000);
+        instance.fill(0,0,1,1, k);
         instance.pose().popMatrix();
     }
+
+    @ModifyArg(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 0), index = 4)
+    public int renderWidget(int i) {
+        return textColor;
+    }
+
     @Override
     public @Nullable Component getAction(Context context) {
         return isFocused() ? context.actionOfContext(KeyContext.class, ControlTooltip::getKeyboardAction) : null;

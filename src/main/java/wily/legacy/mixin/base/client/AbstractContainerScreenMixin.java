@@ -24,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.AnimatedCharacterRenderer;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
@@ -118,7 +119,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Inject(method = "renderFloatingItem", at = @At(value = "HEAD"), cancellable = true)
     private void renderFloatingItem(GuiGraphics guiGraphics, ItemStack itemStack, int i, int j, String string, CallbackInfo ci) {
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate((float)Legacy4JClient.controllerManager.getPointerX() - i - 10, (float)Legacy4JClient.controllerManager.getPointerY() - j - 10);
+        guiGraphics.pose().translate((float)Legacy4JClient.controllerManager.getPointerX() - 10, (float)Legacy4JClient.controllerManager.getPointerY() - 10);
         guiGraphics.pose().scale(27/18f, 27/18f);
         guiGraphics.renderItem(itemStack, 0, 0);
         guiGraphics.renderItemDecorations(Minecraft.getInstance().font, itemStack, 0, (this.draggingItem.isEmpty() ? 0 : -8), string == null && this.isQuickCrafting && this.quickCraftSlots.size() > 1 && itemStack.getCount() == 1 ? String.valueOf(itemStack.getCount()) : string);
@@ -237,7 +238,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     @Inject(method = "onClose",at = @At("RETURN"))
     public void onClose(CallbackInfo ci) {
         if (LegacyItemUtil.anyArmorSlotMatch(minecraft.player.getInventory(), i-> !i.isEmpty())) {
-            LegacyRenderUtil.updateAnimatedCharacterTime(1500);
+            AnimatedCharacterRenderer.updateTime(1500);
         }
         menu.slots.forEach(s-> LegacySlotDisplay.override(s, LegacySlotDisplay.VANILLA));
     }

@@ -51,12 +51,12 @@ public class TickBox extends AbstractButton {
     protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
         setAlpha(active ? 1.0F : 0.5F);
         Minecraft minecraft = Minecraft.getInstance();
-        FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, this.alpha);
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, this.alpha);
         FactoryScreenUtil.enableBlend();
         FactoryScreenUtil.enableDepthTest();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX(), this.getY(), 12, 12);
         if (selected) FactoryGuiGraphics.of(guiGraphics).blitSprite(TICK, this.getX(), this.getY(), 14, 12);
-        FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, 1.0F);
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 1.0F);
         guiGraphics.pose().pushMatrix();
         if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.5f,0.5f);
         this.renderString(guiGraphics, minecraft.font, isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get());

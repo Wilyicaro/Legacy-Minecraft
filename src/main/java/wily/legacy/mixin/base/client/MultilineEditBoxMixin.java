@@ -33,7 +33,7 @@ public abstract class MultilineEditBoxMixin extends AbstractWidget implements Co
 
     @Shadow @Final private MultilineTextField textField;
 
-    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
+    @Shadow @Final private int cursorColor;@Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir){
         Screen screen = Minecraft.getInstance().screen;
         if (KeyboardScreen.isOpenKey(i) && screen != null){
@@ -41,15 +41,7 @@ public abstract class MultilineEditBoxMixin extends AbstractWidget implements Co
             cir.setReturnValue(true);
         }
     }
-    //? if <1.21.4 {
-    /*@Override
-    public void onClick(double d, double e){
-        Screen screen = Minecraft.getInstance().screen;
-        if (Screen.hasShiftDown() || Legacy4JClient.controllerManager.isControllerTheLastInput()) {
-            Minecraft.getInstance().setScreen(KeyboardScreen.fromStaticListener(this, screen));
-        }
-    }
-    *///?} else {
+
     @Inject(method = "onClick", at = @At("HEAD"), cancellable = true)
     private void onClick(double d, double e, CallbackInfo ci){
         Screen screen = Minecraft.getInstance().screen;
@@ -58,12 +50,8 @@ public abstract class MultilineEditBoxMixin extends AbstractWidget implements Co
             ci.cancel();
         }
     }
-    //?}
 
-    @ModifyArg(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 0), index = 4)
-    public int renderWidget(int i) {
-        return CommonColor.WIDGET_TEXT.get() | 0xFF000000;
-    }
+
 
     @ModifyVariable(method = "renderContents", at = @At(value = "STORE"), ordinal = 0)
     public boolean renderWidget(boolean bl) {
@@ -73,9 +61,9 @@ public abstract class MultilineEditBoxMixin extends AbstractWidget implements Co
     @Redirect(method = "renderContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V", ordinal = 3))
     public void renderWidget(GuiGraphics instance, Font arg, String string, int i, int j, int k, boolean bl) {
         instance.pose().pushMatrix();
-        instance.pose().translate(i-(textField.cursor() == 0 ? 3 : 4),j+8.5f);
+        instance.pose().translate(i-(textField.cursor() == 0 ? 3 : 4),j + 8.5f);
         instance.pose().scale(6,1.5f);
-        instance.fill(0,0,1,1, CommonColor.WIDGET_TEXT.get() | 0xFF000000);
+        instance.fill(0,0,1,1, k);
         instance.pose().popMatrix();
     }
 

@@ -281,9 +281,9 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
         LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
         panel.render(guiGraphics, i, j, f);
         FactoryScreenUtil.enableBlend();
-        FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,0.6f);
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f,1.0f,1.0f,0.6f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 10, panel.y + 10, 190, 220);
-        FactoryGuiGraphics.of(guiGraphics).clearColor();
+        FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
         FactoryScreenUtil.disableBlend();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 210, panel.y + 10, 190, 220);
         guiGraphics.drawString(this.font, SELECTED_PACK, panel.x + 10 + (190 - font.width(SELECTED_PACK)) / 2, panel.y + 18, CommonColor.INVENTORY_GRAY_TEXT.get(),false);

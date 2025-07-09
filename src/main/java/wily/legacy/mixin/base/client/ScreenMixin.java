@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -76,7 +77,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     @Inject(method = "renderPanorama",at = @At("HEAD"), cancellable = true)
     public void renderPanorama(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
         ci.cancel();
-        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(self()), guiGraphics, true, false, true);
+        LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(self()), guiGraphics, true, false, !(self() instanceof TitleScreen));
     }
     //?}
     @Inject(method = "hasShiftDown",at = @At("HEAD"), cancellable = true)
