@@ -30,14 +30,14 @@ import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fStack;
 
 import java.util.Map;
 import java.util.Set;
 
 public class LegacyGuiItemRenderer implements AutoCloseable {
     public static final Logger LOGGER = LogManager.getLogger("legacy_gui_item_renderer");
-
-    public static int GUI_ITEM_SUBMIT_SIZE = 16;
 
     private final int size;
     private static final int MAXIMUM_ITEM_ATLAS_SIZE = RenderSystem.getDevice().getMaxTextureSize();
@@ -70,6 +70,12 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
         this.itemsAtlasDepth = gpuDevice.createTexture("UI items atlas depth", 8, TextureFormat.DEPTH32, i, i, 1, 1);
         this.itemsAtlasDepthView = gpuDevice.createTextureView(this.itemsAtlasDepth);
         gpuDevice.createCommandEncoder().clearColorAndDepthTextures(this.itemsAtlas, 0, this.itemsAtlasDepth, 1.0);
+    }
+
+    public static int getScale(Matrix3x2f matrix) {
+        float scaleX = Mth.sqrt(matrix.m00() * matrix.m00() + matrix.m01() * matrix.m01());
+        float scaleY = Mth.sqrt(matrix.m10() * matrix.m10() + matrix.m11() * matrix.m11());
+        return Math.round(Math.max(scaleX, scaleY) * 16);
     }
 
     public void prepareItemElements(MultiBufferSource.BufferSource bufferSource, GuiRenderState renderState, int frameNumber) {
@@ -245,14 +251,6 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
         }
 
         return i;
-    }
-
-    public static void pushSubmitSize(int size) {
-        GUI_ITEM_SUBMIT_SIZE = size;
-    }
-
-    public static void popSubmitSize() {
-        GUI_ITEM_SUBMIT_SIZE = 16;
     }
 
     @Override

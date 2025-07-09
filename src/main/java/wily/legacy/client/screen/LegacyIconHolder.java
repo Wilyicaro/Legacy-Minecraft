@@ -228,9 +228,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
 
     public void renderItem(GuiGraphics graphics, ItemStack item, int x, int y, boolean isWarning){
         if (!item.isEmpty()) renderItem(graphics,()->{
-            LegacyGuiItemRenderer.pushSubmitSize(getItemRenderSize());
             graphics.renderFakeItem(item, 0,0);
-            LegacyGuiItemRenderer.popSubmitSize();
             if (allowItemDecorations)
                 graphics.renderItemDecorations(Minecraft.getInstance().font, item,0,0);
         },x,y,isWarning);

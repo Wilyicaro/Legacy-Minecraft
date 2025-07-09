@@ -118,9 +118,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate((float)Legacy4JClient.controllerManager.getPointerX() - 10, (float)Legacy4JClient.controllerManager.getPointerY() - 10);
         guiGraphics.pose().scale(1.5f, 1.5f);
-        LegacyGuiItemRenderer.pushSubmitSize(24);
         guiGraphics.renderItem(itemStack, 0, 0);
-        LegacyGuiItemRenderer.popSubmitSize();
         guiGraphics.renderItemDecorations(Minecraft.getInstance().font, itemStack, 0, (this.draggingItem.isEmpty() ? 0 : -8), string == null && this.isQuickCrafting && this.quickCraftSlots.size() > 1 && itemStack.getCount() == 1 ? String.valueOf(itemStack.getCount()) : string);
         guiGraphics.pose().popMatrix();
         ci.cancel();
@@ -210,9 +208,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
             if (bl) {
                 graphics.fill(0, 0, 16, 16, -2130706433);
             }
-            LegacyGuiItemRenderer.pushSubmitSize(holder.getItemRenderSize());
             graphics.renderItem(itemStack, 0, 0, slot.x + slot.y * this.imageWidth);
-            LegacyGuiItemRenderer.popSubmitSize();
             graphics.renderItemDecorations(minecraft.font, itemStack, 0, 0, string);
         }
         graphics.pose().popMatrix();
