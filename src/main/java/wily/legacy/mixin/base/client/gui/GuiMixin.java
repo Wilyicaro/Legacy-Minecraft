@@ -1,6 +1,8 @@
 package wily.legacy.mixin.base.client.gui;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.client.AttackIndicatorStatus;
@@ -19,6 +21,7 @@ import net.minecraft.network.chat.Component;
 //? if >1.20.2 {
 import net.minecraft.network.chat.numbers.NumberFormat;
 import net.minecraft.network.chat.numbers.StyledFormat;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.scores.PlayerScoreEntry;
 //?} else {
 /*import net.minecraft.world.scores.Score;
@@ -44,6 +47,8 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.FactoryGuiElement;
+import wily.factoryapi.util.FactoryScreenUtil;
+import wily.legacy.client.LegacyGuiItemRenderer;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacySprites;
@@ -102,6 +107,14 @@ public abstract class GuiMixin implements ControlTooltip.Event {
     @Inject(method = "renderItemHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIII)V", ordinal = 1))
     private void renderHotbarSelection(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HOTBAR_SELECTION,24,24,0,23,guiGraphics.guiWidth() / 2 - 91 - 1 + minecraft.player.getInventory()./*? if <1.21.5 {*//*selected*//*?} else {*/getSelectedSlot()/*?}*/ * 20, guiGraphics.guiHeight(), 0,24, 1);
+    }
+
+    @WrapOperation(method = "renderSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;III)V"))
+    void renderslotitemopac(GuiGraphics graphics, LivingEntity entity, ItemStack item, int x, int y, int seed, Operation<Void> original) {
+        LegacyGuiItemRenderer.pushOpacity(LegacyRenderUtil.getHUDOpacity());
+        original.call(graphics, entity, item, x, y, seed);
+        LegacyGuiItemRenderer.popOpacity();
+
     }
 
     @Inject(method = "displayScoreboardSidebar", at = @At("HEAD"), cancellable = true)

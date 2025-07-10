@@ -17,10 +17,13 @@ public abstract class GuiItemRenderStateMixin implements LegacyGuiItemRenderStat
 
     @Unique
     private int size = 16;
+    @Unique
+    private float opacity = 1;
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(String string, Matrix3x2f matrix3x2f, TrackingItemStackRenderState trackingItemStackRenderState, int i, int j, ScreenRectangle screenRectangle, CallbackInfo ci) {
         size = LegacyGuiItemRenderer.getScale(matrix3x2f);
+        opacity = LegacyGuiItemRenderer.OPACITY;
     }
 
     @Override
@@ -31,5 +34,15 @@ public abstract class GuiItemRenderStateMixin implements LegacyGuiItemRenderStat
     @Override
     public void setSize(int size) {
         this.size = size;
+    }
+
+    @Override
+    public float opacity() {
+        return opacity;
+    }
+
+    @Override
+    public void setOpacity(float opacity) {
+        this.opacity = opacity;
     }
 }

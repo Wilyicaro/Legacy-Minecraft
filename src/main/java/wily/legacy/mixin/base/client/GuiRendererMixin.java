@@ -1,7 +1,7 @@
 package wily.legacy.mixin.base.client;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.state.GuiItemRenderState;
 import net.minecraft.client.gui.render.state.GuiRenderState;
@@ -26,13 +26,14 @@ public class GuiRendererMixin {
     GuiRenderState renderState;
     @Shadow private int frameNumber;
     @Unique
-    private Int2ObjectMap<LegacyGuiItemRenderer> guiItemRenderers = new Int2ObjectOpenHashMap<>();
+    private Long2ObjectMap<LegacyGuiItemRenderer> guiItemRenderers = new Long2ObjectArrayMap<>();
 
     @ModifyArg(method = "prepareItemElements", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiRenderState;forEachItem(Ljava/util/function/Consumer;)V"))
     private Consumer<GuiItemRenderState> prepareItemElements(Consumer<GuiItemRenderState> consumer) {
         return renderState -> {
-            if (LegacyGuiItemRenderState.of(renderState).size() == 16) consumer.accept(renderState);
-            else guiItemRenderers.computeIfAbsent(LegacyGuiItemRenderState.of(renderState).size(), LegacyGuiItemRenderer::new);
+            LegacyGuiItemRenderState legacyRenderState = LegacyGuiItemRenderState.of(renderState);
+            if (legacyRenderState.size() == 16 && legacyRenderState.opacity() == 1.0) consumer.accept(renderState);
+            else guiItemRenderers.computeIfAbsent(((long) legacyRenderState.size() << 32) | (Float.floatToIntBits(legacyRenderState.opacity()) & 4294967295L), LegacyGuiItemRenderer::new);
         };
     }
 
