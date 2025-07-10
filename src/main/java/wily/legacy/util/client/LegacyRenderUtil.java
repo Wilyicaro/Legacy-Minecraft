@@ -354,7 +354,9 @@ public class LegacyRenderUtil {
 
         //FactoryGuiGraphics.of(graphics).pushBufferSource(BufferSourceWrapper.translucent(FactoryGuiGraphics.of(graphics).getBufferSource()));
         //RenderSystem.setShaderColor(1.0f,1.0f,1.0f,alpha);
+        LegacyGuiItemRenderer.pushOpacity(alpha);
         render.accept(true);
+        LegacyGuiItemRenderer.popOpacity();
         //RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
         //FactoryGuiGraphics.of(graphics).popBufferSource();
     }
