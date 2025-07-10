@@ -190,9 +190,9 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                 );
     }
 
-    private void renderItemToAtlas(MultiBufferSource.BufferSource bufferSource, TrackingItemStackRenderState trackingItemStackRenderState, PoseStack poseStack, int i, int j, int k) {
+    private void renderItemToAtlas(MultiBufferSource.BufferSource bufferSource, TrackingItemStackRenderState trackingItemStackRenderState, PoseStack poseStack, int x, int y, int k) {
         poseStack.pushPose();
-        poseStack.translate(i + k / 2.0F, j + k / 2.0F, 0.0F);
+        poseStack.translate(x + k / 2.0F, y + k / 2.0F, 0.0F);
         poseStack.scale(k, -k, k);
         boolean bl = !trackingItemStackRenderState.usesBlockLight();
         if (bl) {
@@ -201,7 +201,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
             Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
         }
 
-        RenderSystem.enableScissorForRenderTypeDraws(i, this.itemsAtlas.getHeight(0) - j - k, k, k);
+        RenderSystem.enableScissorForRenderTypeDraws(x, this.itemsAtlas.getHeight(0) - y - k, k, k);
         trackingItemStackRenderState.render(poseStack, bufferSource, 15728880, OverlayTexture.NO_OVERLAY);
         bufferSource.endBatch();
         RenderSystem.disableScissorForRenderTypeDraws();
