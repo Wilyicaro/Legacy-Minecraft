@@ -2,6 +2,7 @@ package wily.legacy.mixin.base.client;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.state.GuiItemRenderState;
 import net.minecraft.client.gui.render.state.GuiRenderState;
@@ -16,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyGuiItemRenderState;
 import wily.legacy.client.LegacyGuiItemRenderer;
+import wily.legacy.client.LegacyOptions;
 
 import java.util.function.Consumer;
 
@@ -28,18 +30,30 @@ public class GuiRendererMixin {
     @Unique
     private Long2ObjectMap<LegacyGuiItemRenderer> guiItemRenderers = new Long2ObjectArrayMap<>();
 
+    @Inject(method = "prepareItemElements", at = @At("HEAD"))
+    private void prepareItemElementsHead(CallbackInfo ci) {
+        guiItemRenderers.forEach((i, renderer)-> renderer.markInvalid());
+    }
+
     @ModifyArg(method = "prepareItemElements", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiRenderState;forEachItem(Ljava/util/function/Consumer;)V"))
     private Consumer<GuiItemRenderState> prepareItemElements(Consumer<GuiItemRenderState> consumer) {
         return renderState -> {
             LegacyGuiItemRenderState legacyRenderState = LegacyGuiItemRenderState.of(renderState);
             if (legacyRenderState.size() == 16 && legacyRenderState.opacity() == 1.0) consumer.accept(renderState);
-            else guiItemRenderers.computeIfAbsent(((long) legacyRenderState.size() << 32) | (Float.floatToIntBits(legacyRenderState.opacity()) & 4294967295L), LegacyGuiItemRenderer::new);
+            else guiItemRenderers.computeIfAbsent(((long) legacyRenderState.size() << 32) | (Float.floatToIntBits(LegacyOptions.enhancedItemTranslucency.get() ? 1.0f : legacyRenderState.opacity()) & 4294967295L), LegacyGuiItemRenderer::new).markValid();
         };
     }
 
-    @Inject(method = "prepareItemElements", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiRenderState;forEachItem(Ljava/util/function/Consumer;)V", shift = At.Shift.AFTER))
+    @Inject(method = "prepareItemElements", at = @At("RETURN"))
     private void prepareItemElements(CallbackInfo ci) {
-        guiItemRenderers.forEach((i, renderer)-> renderer.prepareItemElements(bufferSource, renderState, frameNumber));
+        for (ObjectIterator<LegacyGuiItemRenderer> iter = guiItemRenderers.values().iterator(); iter.hasNext(); ) {
+            var renderer = iter.next();
+            if (renderer.isValid()) renderer.prepareItemElements(bufferSource, renderState, frameNumber);
+            else {
+                renderer.close();
+                iter.remove();
+            }
+        }
     }
 
     @Inject(method = "close", at = @At("RETURN"), remap = false)

@@ -33,6 +33,8 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
+import wily.factoryapi.util.ColorUtil;
+import wily.legacy.Legacy4J;
 
 import java.util.Map;
 import java.util.Set;
@@ -59,6 +61,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
     private int itemAtlasX;
     private int itemAtlasY;
     private int cachedGuiScale;
+    private boolean isValid = true;
 
     public static float OPACITY = 1;
     public LegacyGuiItemRenderer(int size, float opacity) {
@@ -114,7 +117,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                     .forEachItem(
                             guiItemRenderState -> {
                                 if (LegacyGuiItemRenderState.of(guiItemRenderState).size() != size) return;
-                                if (LegacyGuiItemRenderState.of(guiItemRenderState).opacity() != opacity) return;
+                                if (!LegacyOptions.enhancedItemTranslucency.get() && LegacyGuiItemRenderState.of(guiItemRenderState).opacity() != opacity) return;
                                 if (guiItemRenderState.oversizedItemBounds() != null) {
                                     mutableBoolean2.setTrue();
                                 } else {
@@ -167,7 +170,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                         .forEachItem(
                                 guiItemRenderState -> {
                                     if (LegacyGuiItemRenderState.of(guiItemRenderState).size() != size) return;
-                                    if (LegacyGuiItemRenderState.of(guiItemRenderState).opacity() != opacity) return;
+                                    if (!LegacyOptions.enhancedItemTranslucency.get() && LegacyGuiItemRenderState.of(guiItemRenderState).opacity() != opacity) return;
                                     if (guiItemRenderState.oversizedItemBounds() != null) {
                                         TrackingItemStackRenderState trackingItemStackRenderState = guiItemRenderState.itemStackRenderState();
                                         OversizedItemRenderer oversizedItemRenderer = oversizedItemRenderers
@@ -187,11 +190,11 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
     private void submitBlitFromItemAtlas(GuiRenderState renderState, GuiItemRenderState guiItemRenderState, float f, float g, int i, int j) {
         float h = f + (float)i / j;
         float k = g + (float)(-i) / j;
+        float opacity = LegacyGuiItemRenderState.of(guiItemRenderState).opacity();
         renderState
                 .submitBlitToCurrentLayer(
                         new BlitRenderState(
-                                // use GUI_TEXTURED instead of GUI_TEXTURED_PREMULTIPLIED_ALPHA since it looks better that way
-                                RenderPipelines.GUI_TEXTURED,
+                                opacity == 1.0f || !LegacyOptions.enhancedItemTranslucency.get() ? RenderPipelines.GUI_TEXTURED_PREMULTIPLIED_ALPHA : RenderPipelines.GUI_TEXTURED,
                                 TextureSetup.singleTexture(this.itemsAtlasView),
                                 guiItemRenderState.pose(),
                                 guiItemRenderState.x(),
@@ -202,7 +205,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                                 h,
                                 g,
                                 k,
-                                ARGB.color(opacity, 0xffffff),
+                                opacity == 1.0f || !LegacyOptions.enhancedItemTranslucency.get() ? 0xFFFFFFFF : ColorUtil.withAlpha(0xFFFFFF, opacity),
                                 guiItemRenderState.scissorArea(),
                                 null
                         )
@@ -221,6 +224,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
         }
 
         RenderSystem.enableScissorForRenderTypeDraws(x, this.itemsAtlas.getHeight(0) - y - k, k, k);
+        if (opacity != 1.0f && !LegacyOptions.enhancedItemTranslucency.get()) bufferSource = BufferSourceWrapper.translucent(bufferSource, opacity);
         trackingItemStackRenderState.render(poseStack, bufferSource, 15728880, OverlayTexture.NO_OVERLAY);
         bufferSource.endBatch();
         RenderSystem.disableScissorForRenderTypeDraws();
@@ -300,6 +304,18 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
             this.itemsAtlasDepthView.close();
             this.itemsAtlasDepthView = null;
         }
+    }
+
+    public boolean isValid() {
+        return isValid;
+    }
+
+    public void markValid() {
+        isValid = true;
+    }
+
+    public void markInvalid() {
+        isValid = false;
     }
 
     @Environment(EnvType.CLIENT)

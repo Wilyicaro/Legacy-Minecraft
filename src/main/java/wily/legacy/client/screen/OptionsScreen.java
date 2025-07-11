@@ -299,6 +299,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.fastLeavesCustomModels,
                                 LegacyOptions.displayNameTagBorder,
                                 LegacyOptions.itemLightingInHand,
+                                LegacyOptions.enhancedItemTranslucency,
                                 LegacyOptions.loyaltyLines,
                                 LegacyOptions.merchantTradingIndicator,
                                 LegacyOptions.legacyBabyVillagerHead,
@@ -309,7 +310,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.enhancedPistonMovingRenderer,
                                 FactoryOptions.RANDOM_BLOCK_ROTATIONS,
                                 LegacyOptions.defaultParticlePhysics,
-                                LegacyOptions.of(mc.options.particles())),
+                                LegacyOptions.of(mc.options.particles()),
+                                LegacyOptions.bubblesOutsideWater),
                         o->o.renderableVList.addLinkedOptions(
                                 FactoryOptions.NEAREST_MIPMAP_SCALING,
                                 b->!b.get(),

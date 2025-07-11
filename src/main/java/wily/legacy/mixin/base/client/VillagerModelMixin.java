@@ -18,9 +18,9 @@ public class VillagerModelMixin {
     @Shadow @Final private ModelPart head;
 
     @Inject(method = "setupAnim*", at = @At("RETURN"))
-    public void setupAnim(/*? if <1.21.2 {*/ /*Entity entity, float f, float g, float h, float i, float j*//*?} else {*/ VillagerRenderState villager/*?}*/, CallbackInfo ci) {
-        if (/*? if <1.21.2 {*//*entity instanceof Villager villager && *//*?}*/LegacyOptions.legacyBabyVillagerHead.get()){
-            head.xScale = head.yScale = head.zScale = (villager.isBaby/*? if <1.21.2 {*//*()*//*?}*/ ? 1.5f : 1);
+    public void setupAnim(VillagerRenderState villager, CallbackInfo ci) {
+        if (LegacyOptions.legacyBabyVillagerHead.get()){
+            head.xScale = head.yScale = head.zScale = (villager.isBaby ? 1.5f : 1);
         }
     }
 }
