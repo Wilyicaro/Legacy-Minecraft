@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base.client.gui;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -22,6 +23,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.numbers.NumberFormat;
 import net.minecraft.network.chat.numbers.StyledFormat;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerScoreEntry;
 //?} else {
 /*import net.minecraft.world.scores.Score;
@@ -108,10 +110,10 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HOTBAR_SELECTION,24,24,0,23,guiGraphics.guiWidth() / 2 - 91 - 1 + minecraft.player.getInventory()./*? if <1.21.5 {*//*selected*//*?} else {*/getSelectedSlot()/*?}*/ * 20, guiGraphics.guiHeight(), 0,24, 1);
     }
 
-    @WrapOperation(method = "renderSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;III)V"))
-    void renderslotitemopac(GuiGraphics graphics, LivingEntity entity, ItemStack item, int x, int y, int seed, Operation<Void> original) {
+    @WrapMethod(method = "renderSlot")
+    void renderSlotWithTransparency(GuiGraphics graphics, int i, int j, DeltaTracker deltaTracker, Player player, ItemStack itemStack, int k, Operation<Void> original) {
         LegacyRenderUtil.secureTranslucentRender(graphics, true, LegacyRenderUtil.getHUDOpacity(), b -> {
-            original.call(graphics, entity, item, x, y, seed);
+            original.call(graphics, i, j, deltaTracker, player, itemStack, k);
         });
     }
 
