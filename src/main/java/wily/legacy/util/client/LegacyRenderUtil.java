@@ -346,6 +346,7 @@ public class LegacyRenderUtil {
         }
     }
 
+    // TODO: only works when rendering items right now - Jab125
     public static void secureTranslucentRender(GuiGraphics graphics, boolean translucent, float alpha, Consumer<Boolean> render){
         if (!translucent){
             render.accept(false);
@@ -354,7 +355,9 @@ public class LegacyRenderUtil {
 
         //FactoryGuiGraphics.of(graphics).pushBufferSource(BufferSourceWrapper.translucent(FactoryGuiGraphics.of(graphics).getBufferSource()));
         //RenderSystem.setShaderColor(1.0f,1.0f,1.0f,alpha);
+        LegacyGuiItemRenderer.pushOpacity(alpha);
         render.accept(true);
+        LegacyGuiItemRenderer.popOpacity();
         //RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
         //FactoryGuiGraphics.of(graphics).popBufferSource();
     }

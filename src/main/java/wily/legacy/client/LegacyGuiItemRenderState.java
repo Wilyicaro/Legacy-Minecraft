@@ -11,4 +11,8 @@ public interface LegacyGuiItemRenderState {
     int size();
 
     void setSize(int size);
+
+    float opacity();
+
+    void setOpacity(float opacity);
 }

@@ -3,6 +3,9 @@ package wily.legacy.mixin.base.client;
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -13,6 +16,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -35,6 +39,7 @@ import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyGuiItemRenderer;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.MutablePIPRenderState;
 import wily.legacy.client.screen.LegacyMenuAccess;
@@ -147,5 +152,19 @@ public abstract class GuiGraphicsMixin {
     private GuiRenderState submitEntityRenderState(GuiRenderState instance, PictureInPictureRenderState pictureInPictureRenderState){
         MutablePIPRenderState.of(pictureInPictureRenderState).setPose(self().pose());
         return instance;
+    }
+
+    @WrapOperation(method = {"renderItemBar", "renderItemCooldown"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(Lcom/mojang/blaze3d/pipeline/RenderPipeline;IIIII)V"))
+    private void fill(GuiGraphics instance, RenderPipeline j, int i, int renderPipeline, int k, int l, int m, Operation<Void> original) {
+        float opacity = LegacyGuiItemRenderer.OPACITY;
+        if (opacity != 1f) m = ARGB.color((int) (ARGB.alpha(m) * opacity), ARGB.transparent(m));
+        original.call(instance, j, i, renderPipeline, k, l, m);
+    }
+
+    @WrapOperation(method = "renderItemCount", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V"))
+    private void drawString(GuiGraphics instance, Font arg, String string, int i, int j, int k, boolean bl, Operation<Void> original) {
+        float opacity = LegacyGuiItemRenderer.OPACITY;
+        if (opacity != 1f) k = ARGB.color((int) (ARGB.alpha(k) * opacity), ARGB.transparent(k));
+        original.call(instance, arg, string, i, j, k, bl);
     }
 }
