@@ -48,7 +48,6 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.FactoryGuiElement;
 import wily.factoryapi.util.FactoryScreenUtil;
-import wily.legacy.client.LegacyGuiItemRenderer;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacySprites;
@@ -111,10 +110,9 @@ public abstract class GuiMixin implements ControlTooltip.Event {
 
     @WrapOperation(method = "renderSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;III)V"))
     void renderslotitemopac(GuiGraphics graphics, LivingEntity entity, ItemStack item, int x, int y, int seed, Operation<Void> original) {
-        LegacyGuiItemRenderer.pushOpacity(LegacyRenderUtil.getHUDOpacity());
-        original.call(graphics, entity, item, x, y, seed);
-        LegacyGuiItemRenderer.popOpacity();
-
+        LegacyRenderUtil.secureTranslucentRender(graphics, true, LegacyRenderUtil.getHUDOpacity(), b -> {
+            original.call(graphics, entity, item, x, y, seed);
+        });
     }
 
     @Inject(method = "displayScoreboardSidebar", at = @At("HEAD"), cancellable = true)

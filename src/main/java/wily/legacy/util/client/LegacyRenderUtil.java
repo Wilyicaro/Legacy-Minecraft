@@ -346,6 +346,7 @@ public class LegacyRenderUtil {
         }
     }
 
+    // TODO: only works when rendering items right now - Jab125
     public static void secureTranslucentRender(GuiGraphics graphics, boolean translucent, float alpha, Consumer<Boolean> render){
         if (!translucent){
             render.accept(false);
