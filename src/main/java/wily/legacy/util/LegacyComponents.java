@@ -170,7 +170,7 @@ public class LegacyComponents {
     public static final Component ACCEPT = Component.translatable("legacy.menu.accept");
     public static final Component STRUCTURES = Component.translatable("legacy.container.tab.structures");
     public static final Component MECHANISMS = Component.translatable("legacy.container.tab.mechanisms");
-    public static final Component TOOLS_AND_ARMOUR = Component.translatable("legacy.container.tab.tools_and_armour");
+    public static final Component TOOLS_AND_ARMOR = Component.translatable("legacy.container.tab.tools_and_armor");
     public static final Component MISC = Component.translatable("legacy.container.tab.misc");
     public static final Component SEARCH_ITEMS = Component.translatable("itemGroup.search");
     public static final Component CONFLICTING_BUTTONS = Component.translatable("legacy.options.controllerMappingConflicting");

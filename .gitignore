@@ -19,3 +19,4 @@ classes/
 *.launch
 /src/main/resources/assets/legacy/lang/.vs
 *.lnk
+/src/main/java/wily/legacy/.vs
