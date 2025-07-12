@@ -141,12 +141,12 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             Entity entity;
 
             @Override
-            public void render(GuiGraphics graphics, int i, int j, float f) {
-                super.render(graphics, i, j, f);
+            public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+                super.render(graphics, mouseX, mouseY, delta);
                 if (entity == null && Minecraft.getInstance().level != null){
                     entity = entityType.create(Minecraft.getInstance().level, EntitySpawnReason.EVENT);
                 }
-                if (entity != null) renderEntity(graphics, entity, i, j, f);
+                if (entity != null) renderEntity(graphics, entity, mouseX, mouseY, delta);
             }
         };
     }
@@ -252,7 +252,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         renderWarning(graphics, 332);
     }
 
-    public void renderEntity(GuiGraphics graphics, Entity entity, int i, int j, float f){
+    public void renderEntity(GuiGraphics graphics, Entity entity, int mouseX, int mouseY, float deltaTime){
         entity.setYRot(180);
         entity.yRotO = entity.getYRot();
         entity.setXRot(entity.xRotO = 0);
@@ -261,7 +261,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
             e.yHeadRot = 180;
             e.yHeadRotO = e.yHeadRot;
         }
-        LegacyRenderUtil.renderEntity(graphics, getX(), getY(), getX() + Math.round(getSelectableWidth()), getY() + Math.round(getSelectableHeight()), (int)Math.min(getSelectableWidth(),getSelectableHeight()), new Vector3f(), new Quaternionf().rotationXYZ(0.0f, (float) Math.PI/ 4, (float) Math.PI), null, entity,true);
+        LegacyRenderUtil.renderEntity(graphics, getX(), getY(), getX() + Math.round(getSelectableWidth()), getY() + Math.round(getSelectableHeight()*2), (int)Math.min(getSelectableWidth(),getSelectableHeight()), new Vector3f(), new Quaternionf().rotationXYZ(0.0f, (float) Math.PI/ 4, (float) Math.PI), null, entity,true);
     }
 
     public void renderSelection(GuiGraphics graphics, int i, int j, float f){
