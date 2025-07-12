@@ -193,7 +193,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         graphics.nextStratum();
         //? if <1.21.4 {
         /*Pair<ResourceLocation, ResourceLocation> pair;
-        if (itemStack.isEmpty() && (pair = slot.getNoItemIcon()) != null && holder.iconSprite == null) {
+        if (itemStack.isEmpty() && (pair = slot.getNoItemIcon()) != null && icon.iconSprite == null) {
             TextureAtlasSprite textureAtlasSprite = minecraft.getTextureAtlas(pair.getFirst()).apply(pair.getSecond());
             FactoryGuiGraphics.of(graphics).blit(0, 0, 0, 16, 16, textureAtlasSprite);
             bl2 = true;

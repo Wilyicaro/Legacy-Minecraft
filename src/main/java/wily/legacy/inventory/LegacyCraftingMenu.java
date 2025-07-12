@@ -219,7 +219,7 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
         return LOOM_PATTERN_EXTRA_INGREDIENT_CACHE.computeIfAbsent(pattern,key->{
             Holder<BannerPattern> holder = registryAccess.lookupOrThrow(Registries.BANNER_PATTERN).getOrThrow(pattern);
             for (Item item : BuiltInRegistries.ITEM) {
-                if (/*? if <1.21.5 {*//*item instanceof BannerPatternItem p && holder.is(p.getBannerPattern())*//*?} else {*/item.components().has(DataComponents.PROVIDES_BANNER_PATTERNS) && holder.is(item.components().get(DataComponents.PROVIDES_BANNER_PATTERNS))/*?}*/) return Optional.of(Ingredient.of(item));
+                if (/*? if <1.21.5 {*//*item instanceof BannerPatternItem p && icon.is(p.getBannerPattern())*//*?} else {*/item.components().has(DataComponents.PROVIDES_BANNER_PATTERNS) && holder.is(item.components().get(DataComponents.PROVIDES_BANNER_PATTERNS))/*?}*/) return Optional.of(Ingredient.of(item));
             }
             return Optional.empty();
         });

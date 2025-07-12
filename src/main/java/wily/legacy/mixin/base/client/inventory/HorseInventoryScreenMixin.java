@@ -74,18 +74,12 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
         FactoryGuiGraphics.of(graphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL,leftPos + 34,topPos + 20,63,63);
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 97,topPos + 20,105,63);
-        InventoryScreen.renderEntityInInventoryFollowsMouse(graphics,leftPos + 35,topPos + 21,leftPos + 95,topPos + 81,25,0.0625f, i, j, horse);
+        LegacyRenderUtil.renderEntityInInventoryFollowsMouse(graphics,leftPos + 35,topPos + 21,leftPos + 95,topPos + 81,25,0.0625f, i, j, horse);
 
     }
 
-    //? if >1.20.1 {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    //?} else {
-    /*@Override
-    public void renderBackground(GuiGraphics guiGraphics) {
-    }
-    *///?}
 }

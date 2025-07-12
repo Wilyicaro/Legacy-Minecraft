@@ -62,10 +62,10 @@ public class RecipeBookComponentMixin {
         info.cancel();
         ItemStack itemStack = null;
         for (int m = 0; m < this.ghostRecipe.size(); ++m) {
-            LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(((DisplayRecipe) ghostRecipe).ingredientSlots.get(m));
-            int n = holder.getX() + leftPos;
-            int o = holder.getY() + topPos;
-            if (k < n || l < o || k >= n + holder.getSelectableWidth() || l >= o + holder.getSelectableHeight()) continue;
+            LegacyIconHolder icon = ScreenUtil.iconHolderRenderer.slotBounds(((DisplayRecipe) ghostRecipe).ingredientSlots.get(m));
+            int n = icon.getX() + leftPos;
+            int o = icon.getY() + topPos;
+            if (k < n || l < o || k >= n + icon.getSelectableWidth() || l >= o + icon.getSelectableHeight()) continue;
             itemStack = ghostRecipe.get(m).getItem();
         }
         if (itemStack != null && minecraft.screen != null) {

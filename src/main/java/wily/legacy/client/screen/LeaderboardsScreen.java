@@ -283,24 +283,31 @@ public class LeaderboardsScreen extends PanelVListScreen {
         public final StatType<?> type;
         public final List<Stat<?>> statsList = new ArrayList<>();
         public List<SimpleLayoutRenderable> renderables = new ArrayList<>();
-        public final Map<Predicate, LegacyIconHolder> statIconOverrides = new HashMap<>();
-        public void clear(){
+        public final List<StatIconOverride<?>> statIconOverrides = new ArrayList<>();
+
+        public void clear() {
             statsList.clear();
             renderables.clear();
         }
 
         public SimpleLayoutRenderable getRenderable(Stat<?> stat){
-            for (Map.Entry<Predicate, LegacyIconHolder> entry : statIconOverrides.entrySet()) {
-                if (entry.getKey().test(stat.getValue())){
-                    return entry.getValue();
+            for (var override : statIconOverrides) {
+                if (override.test(stat)){
+                    return override.icon();
                 }
             }
 
-            if (stat.getValue() instanceof ItemLike i){
+            if (stat.getValue() instanceof ItemLike i) {
                 LegacyIconHolder h = new LegacyIconHolder(24,24);
                 h.itemIcon = i.asItem().getDefaultInstance();
                 return h;
-            } else if (stat.getValue() instanceof EntityType<?> e){
+            } else if (stat.getValue() instanceof EntityType<?> e) {
+                ResourceLocation entityIcon = Legacy4J.createModLocation("icon/leaderboards/entity/" + e.builtInRegistryHolder().key().location().getPath());
+                if (Minecraft.getInstance().getGuiSprites().textureAtlas.texturesByName.containsKey(entityIcon)) {
+                    LegacyIconHolder h = new LegacyIconHolder(24, 24);
+                    h.iconSprite = entityIcon;
+                    return h;
+                }
                 return LegacyIconHolder.entityHolder(0,0,24,24, e);
             }
             Component name = Component.translatable("stat." + stat.getValue().toString().replace(':', '.'));
@@ -344,10 +351,18 @@ public class LeaderboardsScreen extends PanelVListScreen {
                     renderables.add(getRenderable(stat));
                 }
                 return true;
-            }return false;
+            } return false;
         }
-
     }
+
+    public record StatIconOverride<T>(StatType<T> statType, Predicate<T> isValid, LegacyIconHolder icon) implements Predicate<Stat<?>> {
+
+        @Override
+        public boolean test(Stat<?> stat) {
+            return stat.getType() == statType && isValid.test((T) stat.getValue());
+        }
+    }
+
     public static class Manager implements ResourceManagerReloadListener {
         public static final String LEADERBOARD_LISTING = "leaderboard_listing.json";
 
@@ -367,41 +382,46 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 }
             })));
         }
+
         protected StatsBoard statsBoardFromJson(JsonObject o){
-            StatType<?> statType = FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(o,"type")),BuiltInRegistries.STAT_TYPE);
+            var statType = FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(o,"type")),BuiltInRegistries.STAT_TYPE);
             Component name = o.has("displayName") ? Component.translatable(GsonHelper.getAsString(o,"displayName")) : statType.getDisplayName();
             StatsBoard statsBoard;
             if (o.get("predicate") instanceof JsonObject predObj){
-                Predicate predicate = JsonUtil.registryMatches(statType.getRegistry(),predObj);
-                statsBoard = StatsBoard.create(statType,name, s-> predicate.test(s.getValue()));
-            }else statsBoard = StatsBoard.create(statType,name);
-            if (o.get("overrides") instanceof JsonArray a) a.forEach(e->{
-                if (e instanceof JsonObject override && override.get("type") instanceof JsonPrimitive p) {
-                    String type = p.getAsString();
-                    Predicate predicate = JsonUtil.registryMatches(statType.getRegistry(),override.getAsJsonObject("predicate"));
-                    switch (type) {
-                        case "item" -> {
-                            Item item =  FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(override, "id")),BuiltInRegistries.ITEM);
-                            LegacyIconHolder h =  new LegacyIconHolder(24, 24);
-                            h.itemIcon = item.getDefaultInstance();
-                            statsBoard.statIconOverrides.put(predicate, h);
-                        }
-                        case "entity_type" -> {
-                            EntityType<?> entityType = FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(override, "id")),BuiltInRegistries.ENTITY_TYPE);
-                            statsBoard.statIconOverrides.put(predicate, LegacyIconHolder.entityHolder(0,0,24,24,entityType));
-                        }
-                        case "sprite" -> {
-                            ResourceLocation sprite = ResourceLocation.tryParse(GsonHelper.getAsString(override, "id"));
-                            LegacyIconHolder h = new LegacyIconHolder(24, 24);
-                            h.iconSprite = sprite;
-                            statsBoard.statIconOverrides.put(predicate, h);
-                        }
-                    }
-                }
-            });
+                Predicate predicate = JsonUtil.registryMatches(statType.getRegistry(), predObj);
+                statsBoard = StatsBoard.create(statType, name, s-> predicate.test(s.getValue()));
+            } else statsBoard = StatsBoard.create(statType, name);
+            if (o.get("overrides") instanceof JsonArray a) a.forEach(e-> parseOverride(statType, statsBoard, e));
 
             return statsBoard;
         }
+
+        protected <T> void parseOverride(StatType<T> statType, StatsBoard statsBoard, JsonElement e){
+            if (e instanceof JsonObject override && override.get("type") instanceof JsonPrimitive p) {
+                String type = p.getAsString();
+                var predicate = JsonUtil.registryMatches(statType.getRegistry(), override.getAsJsonObject("predicate"));
+                switch (type) {
+                    case "item" -> {
+                        Item item =  FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(override, "id")),BuiltInRegistries.ITEM);
+                        LegacyIconHolder h =  new LegacyIconHolder(24, 24);
+                        h.itemIcon = item.getDefaultInstance();
+                        statsBoard.statIconOverrides.add(new StatIconOverride<>(statType, predicate, h));
+                    }
+                    //Unused for now, as +1.21.6 gui rendering doesn't allow more than one entity rendering on the screen
+                    //case "entity_type" -> {
+                    //    EntityType<?> entityType = FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(override, "id")),BuiltInRegistries.ENTITY_TYPE);
+                    //    statsBoard.statIconOverrides.put(predicate, LegacyIconHolder.entityHolder(0,0,24,24,entityType));
+                    //}
+                    case "sprite" -> {
+                        ResourceLocation sprite = ResourceLocation.tryParse(GsonHelper.getAsString(override, "id"));
+                        LegacyIconHolder h = new LegacyIconHolder(24, 24);
+                        h.iconSprite = sprite;
+                        statsBoard.statIconOverrides.add(new StatIconOverride<>(statType, predicate, h));
+                    }
+                }
+            }
+        }
+
         @Override
         public String getName() {
             return "legacy:leaderboards_listing";

@@ -15,6 +15,7 @@ import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.render.state.pip.GuiEntityRenderState;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -353,13 +354,9 @@ public class LegacyRenderUtil {
             return;
         }
 
-        //FactoryGuiGraphics.of(graphics).pushBufferSource(BufferSourceWrapper.translucent(FactoryGuiGraphics.of(graphics).getBufferSource()));
-        //RenderSystem.setShaderColor(1.0f,1.0f,1.0f,alpha);
         LegacyGuiItemRenderer.pushOpacity(alpha);
         render.accept(true);
         LegacyGuiItemRenderer.popOpacity();
-        //RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
-        //FactoryGuiGraphics.of(graphics).popBufferSource();
     }
 
     public static boolean isHovering(Slot slot, int leftPos, int topPos,  double d, double e) {
@@ -369,6 +366,37 @@ public class LegacyRenderUtil {
         double xCorner = holder.getXCorner() + holder.offset.x();
         double yCorner = holder.getYCorner() + holder.offset.y();
         return (d -= leftPos) >= xCorner && d < (xCorner + width) && (e -= topPos) >= yCorner && e < (yCorner + height);
+    }
+
+    public static void renderEntityInInventoryFollowsMouse(GuiGraphics guiGraphics, int i, int j, int k, int l, int m, float f, float g, float h, LivingEntity livingEntity) {
+        guiGraphics.enableScissor(i, j, k, l);
+        float n = (i + k) / 2.0F;
+        float o = (j + l) / 2.0F;
+        float p = (float)Math.atan((n - g) / 40.0F);
+        float q = (float)Math.atan((o - h) / 40.0F);
+        Quaternionf quaternionf = new Quaternionf().rotateZ((float) Math.PI);
+        Quaternionf quaternionf2 = new Quaternionf().rotateX(q * 20.0F * (float) (Math.PI / 180.0));
+        quaternionf.mul(quaternionf2);
+        float r = livingEntity.yBodyRot;
+        float s = livingEntity.getYRot();
+        float t = livingEntity.getXRot();
+        float u = livingEntity.yHeadRotO;
+        float v = livingEntity.yHeadRot;
+        livingEntity.yBodyRot = 180.0F + p * 20.0F;
+        livingEntity.setYRot(180.0F + p * 40.0F);
+        livingEntity.setXRot(-q * 20.0F);
+        livingEntity.yHeadRot = livingEntity.getYRot();
+        livingEntity.yHeadRotO = livingEntity.getYRot();
+        float w = livingEntity.getScale();
+        Vector3f vector3f = new Vector3f(0.0F, livingEntity.getBbHeight() / 2.0F + f * w, 0.0F);
+        float x = m / w;
+        InventoryScreen.renderEntityInInventory(guiGraphics,  i - guiGraphics.guiWidth(),  j - guiGraphics.guiHeight(), k + guiGraphics.guiWidth(), l + guiGraphics.guiHeight(), x, vector3f, quaternionf, quaternionf2, livingEntity);
+        livingEntity.yBodyRot = r;
+        livingEntity.setYRot(s);
+        livingEntity.setXRot(t);
+        livingEntity.yHeadRotO = u;
+        livingEntity.yHeadRot = v;
+        guiGraphics.disableScissor();
     }
 
     public static void renderEntity(GuiGraphics guiGraphics, int x, int y, int x0, int y0, int size, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity) {

@@ -672,16 +672,10 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         return false;
     }
 
-    //? if >1.20.1 {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    //?} else {
-    /*@Override
-    public void renderBackground(GuiGraphics guiGraphics) {
-    }
-    *///?}
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
@@ -689,6 +683,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         getTabList().render(guiGraphics, i, j, f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class), leftPos, topPos, imageWidth, imageHeight);
         getTabList().renderSelected(guiGraphics, i, j, f);
+        if (hasTypeTabList()) typeTabList.renderSelected(guiGraphics, i, j, f);
         int panelWidth = accessor.getInteger("craftingGridPanelWidth",163);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 9, topPos + 103, panelWidth, 105);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + accessor.getInteger("inventoryPanelX",176), topPos + accessor.getInteger("inventoryPanelY",103), accessor.getInteger("inventoryPanelWidth",163), 105);
