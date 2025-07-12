@@ -47,6 +47,10 @@
     {
       "blocks": ["black_concrete","blue_concrete","light_blue_concrete","cyan_concrete","green_concrete","lime_concrete","pink_concrete","magenta_concrete","purple_concrete","red_concrete","brown_concrete","orange_concrete","yellow_concrete","white_concrete","light_gray_concrete","gray_concrete"],
       "tip": {"translate":"block.minecraft.concrete.tip"}
+    },
+	  {
+      "item": "#harnesses",
+      "tip": {"translate": "item.minecraft.harness.tip"}
     }
   ]
 }
