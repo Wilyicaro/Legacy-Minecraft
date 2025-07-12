@@ -41,10 +41,14 @@
       "tip": {"translate":"block.minecraft.stained_glass.tip"}
     },
     {
-      "blocks": ["black_stained_glass_pane","blue_stained_glass_pane","light_blue_stained_glass_pane","cyan_stained_glass_pane","green_stained_glass_pane","lime_stained_glass_pane","pink_stained_glass_pane","magenta_stained_glass_pane","purple_stained_glass_pane","red_stained_glass_pane","brown_stained_glass_pane","orange_stained_glass_pane","yellow_stained_glass_pane","white_stained_glass_pane","light_gray_stained_glass_pane","gray_stained_glass_paneww"],
+      "blocks": ["black_stained_glass_pane","blue_stained_glass_pane","light_blue_stained_glass_pane","cyan_stained_glass_pane","green_stained_glass_pane","lime_stained_glass_pane","pink_stained_glass_pane","magenta_stained_glass_pane","purple_stained_glass_pane","red_stained_glass_pane","brown_stained_glass_pane","orange_stained_glass_pane","yellow_stained_glass_pane","white_stained_glass_pane","light_gray_stained_glass_pane","gray_stained_glass_pane"],
       "tip": {"translate":"block.minecraft.stained_glass_pane.tip"}
     },
-	{
+    {
+      "blocks": ["black_concrete","blue_concrete","light_blue_concrete","cyan_concrete","green_concrete","lime_concrete","pink_concrete","magenta_concrete","purple_concrete","red_concrete","brown_concrete","orange_concrete","yellow_concrete","white_concrete","light_gray_concrete","gray_concrete"],
+      "tip": {"translate":"block.minecraft.concrete.tip"}
+    },
+	  {
       "item": "#harnesses",
       "tip": {"translate": "item.minecraft.harness.tip"}
     }

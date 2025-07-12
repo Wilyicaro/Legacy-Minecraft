@@ -1,6 +1,6 @@
 {
   "overrides": {
-    "blocks": ["short_grass","fern","legacy:shrub"],
+    "blocks": ["grass","short_grass","fern","legacy:shrub"],
     "tip": {"translate": "block.minecraft.short_grass.tip"}
   }
 }
