@@ -6,9 +6,10 @@ import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
+import wily.legacy.client.LegacyGuiEntityRenderer;
 
 @Mixin(PictureInPictureRenderer.class)
-public class GuiEntityRendererMixin {
+public class GuiEntityRendererMixin implements LegacyGuiEntityRenderer {
     @Unique
     PictureInPictureRenderState lastRenderState = null;
 
@@ -17,5 +18,23 @@ public class GuiEntityRendererMixin {
         boolean newInvalid = invalid || lastRenderState == null || !lastRenderState.equals(renderState);
         lastRenderState = renderState;
         return newInvalid;
+    }
+
+    @Unique
+    private boolean available;
+
+    @Override
+    public void available() {
+        this.available = true;
+    }
+
+    @Override
+    public boolean isAvailable() {
+        return available;
+    }
+
+    @Override
+    public void use() {
+        this.available = false;
     }
 }
