@@ -1,5 +1,7 @@
 package wily.legacy.mixin.base.client.chat;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -33,9 +35,9 @@ public abstract class ChatComponentMixin {
 
     @Shadow protected abstract double screenToChatX(double d);
 
-    @ModifyArg(method = "method_71992",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 0), index = 4)
-    private int changeChatBackground(int i) {
-        return CommonColor.CHAT_BACKGROUND.get() + i;
+    @WrapOperation(method = "method_71992",at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ARGB;color(FI)I", ordinal = 0))
+    private int changeChatBackground(float f, int i, Operation<Integer> original) {
+        return original.call(f, CommonColor.CHAT_BACKGROUND.get() + 0);
     }
 
     @ModifyArg(method = "method_71992",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 0), index = 0)
