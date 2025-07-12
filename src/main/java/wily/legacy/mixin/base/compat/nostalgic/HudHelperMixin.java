@@ -2,20 +2,16 @@
 package wily.legacy.mixin.base.compat.nostalgic;
 
 import mod.adrenix.nostalgic.helper.candy.hud.HudHelper;
-import mod.adrenix.nostalgic.util.client.gui.GuiUtil;
-import net.minecraft.client.gui.GuiGraphics;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(HudHelper.class)
 public class HudHelperMixin {
     @ModifyArg(method = "apply", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"), index = 1)
     private static float apply(float f) {
-        return f * 3 / ScreenUtil.getHUDScale();
+        return f * 3 / LegacyRenderUtil.getHUDScale();
     }
 
     //? if forge || neoforge {

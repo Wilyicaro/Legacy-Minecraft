@@ -7,7 +7,7 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.function.Supplier;
 
@@ -47,25 +47,25 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable{
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(this.getX() + offset.x, getY() + offset.y, offset.z);
+        guiGraphics.pose().pushMatrix();
+        guiGraphics.pose().translate(this.getX() + (float) offset.x, getY() + (float) offset.y);
         Stocker.Sizeable scroll = getScroll();
         if (scroll.max > 0) {
             if (scroll.get() != scroll.max)
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN,0, getHeight() + 4);
             if (scroll.get() > 0)
                 scrollRenderer.renderScroll(guiGraphics,ScreenDirection.UP, 0, -11);
-        }else FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,0.5f, true);
+        }else FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 0.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0, width, height);
-        guiGraphics.pose().translate(-2f, -1f + (scroll.max > 0 ? scroll.get() * getScrollerHeight() / scroll.max : 0), 0f);
+        guiGraphics.pose().translate(-2f, -1f + (scroll.max > 0 ? scroll.get() * getScrollerHeight() / scroll.max : 0));
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
-        FactoryGuiGraphics.of(guiGraphics).clearColor(true);
-        guiGraphics.pose().popPose();
+        FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
+        guiGraphics.pose().popMatrix();
     }
 
     @Override
     public boolean isHovered(double mouseX, double mouseY) {
-        return ScreenUtil.isMouseOver(mouseX, mouseY, this.getX() + offset.x, this.getY() + offset.y, this.getWidth(), this.getHeight());
+        return LegacyRenderUtil.isMouseOver(mouseX, mouseY, this.getX() + offset.x, this.getY() + offset.y, this.getWidth(), this.getHeight());
     }
 
     public boolean mouseScrolled(double g){

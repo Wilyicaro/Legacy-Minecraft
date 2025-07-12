@@ -7,11 +7,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 //? if <1.21.2 {
-import net.minecraft.world.item.UseAnim;
+/*import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.InteractionResultHolder;
-//?} else {
-/*import net.minecraft.world.item.ItemUseAnimation;
-*///?}
+*///?} else {
+import net.minecraft.world.item.ItemUseAnimation;
+//?}
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
@@ -49,25 +49,25 @@ public class ItemMixin /*? if <1.20.5 {*//*implements ItemAccessor*//*?}*/ {
     }
 
     //? <1.21.2 {
-    @Inject(method = "use", at = @At("HEAD"), cancellable = true)
+    /*@Inject(method = "use", at = @At("HEAD"), cancellable = true)
     public void use(Level level, Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResultHolder<ItemStack>> cir) {
         if (isSword() && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking) && (interactionHand == InteractionHand.OFF_HAND || !player.getOffhandItem().getUseAnimation().equals(UseAnim.BLOCK))) {
             player.startUsingItem(interactionHand);
             cir.setReturnValue(InteractionResultHolder.consume(player.getItemInHand(interactionHand)));
         }
     }
-    //?} else {
-    /*@Inject(method = "use", at = @At("HEAD"), cancellable = true)
+    *///?} else {
+    @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     public void use(Level level, Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
         if (isSword() && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking) && (interactionHand == InteractionHand.OFF_HAND || !player.getOffhandItem().getUseAnimation().equals(ItemUseAnimation.BLOCK))) {
             player.startUsingItem(interactionHand);
             cir.setReturnValue(InteractionResult.CONSUME);
         }
     }
-    *///?}
+    //?}
 
     @Inject(method = "getUseAnimation", at = @At("HEAD"), cancellable = true)
-    public void getUseAnimation(ItemStack itemStack, CallbackInfoReturnable</*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/> cir) {
-        if (isSword() && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking)) cir.setReturnValue(/*? if <1.21.2 {*/UseAnim/*?} else {*//*ItemUseAnimation*//*?}*/.BLOCK);
+    public void getUseAnimation(ItemStack itemStack, CallbackInfoReturnable</*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/> cir) {
+        if (isSword() && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking)) cir.setReturnValue(/*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.BLOCK);
     }
 }

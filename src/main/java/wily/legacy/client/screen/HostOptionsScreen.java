@@ -1,8 +1,6 @@
 package wily.legacy.client.screen;
 
-import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -17,12 +15,10 @@ import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
-import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
@@ -39,7 +35,7 @@ import wily.legacy.util.LegacySprites;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.entity.LegacyPlayerInfo;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -145,7 +141,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         }
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-            ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 68, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j,true);
+            LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 68, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j,true);
         }
         @Override
         protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -155,11 +151,11 @@ public class HostOptionsScreen extends PanelVListScreen {
 
     public static void drawPlayerIcon(LegacyPlayerInfo info, GuiGraphics guiGraphics, int x, int y){
         float[] color = Legacy4JClient.getVisualPlayerColor(info);
-        FactoryGuiGraphics.of(guiGraphics).setColor(color[0],color[1],color[2],1.0f);
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(color[0],color[1],color[2],1.0f);
         FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(PlayerIdentifier.of(info.getIdentifierIndex()).optionsMapSprite(),x,y, 20,20);
         FactoryScreenUtil.disableBlend();
-        FactoryGuiGraphics.of(guiGraphics).clearColor();
+        FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
     }
 
     protected void addPlayerButtons(){
@@ -347,11 +343,11 @@ public class HostOptionsScreen extends PanelVListScreen {
         oldAlpha = alpha;
         alpha = Mth.lerp(f * 0.1f, oldAlpha, shouldFade ? 1.0f : getDefaultOpacity());
         shouldFade = false;
-        FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f, alpha);
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f,1.0f,1.0f, alpha);
         FactoryScreenUtil.enableBlend();
         panel.render(guiGraphics,i,j,f);
         FactoryScreenUtil.disableBlend();
-        FactoryGuiGraphics.of(guiGraphics).setColor(1.0f,1.0f,1.0f,1.0f);
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f,1.0f,1.0f,1.0f);
         guiGraphics.drawString(font,title,panel.x + 11, panel.y + 8, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
 

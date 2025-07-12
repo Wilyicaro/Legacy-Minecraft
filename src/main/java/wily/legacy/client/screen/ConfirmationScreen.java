@@ -6,21 +6,17 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.Bearer;
-import wily.factoryapi.base.client.UIDefinition;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.KnownListing;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class ConfirmationScreen extends OverlayPanelScreen implements RenderableVList.Access{
     protected final MultiLineLabel messageLabel;
@@ -102,7 +98,7 @@ public class ConfirmationScreen extends OverlayPanelScreen implements Renderable
 
             public void render(GuiGraphics guiGraphics, int i, int j, float f) {
                 super.render(guiGraphics, i, j, f);
-                ScreenUtil.drawAutoSavingIcon(guiGraphics,panel.x + 127, panel.y + 36);
+                LegacyRenderUtil.drawAutoSavingIcon(guiGraphics,panel.x + 127, panel.y + 36);
             }
         };
     }
@@ -142,7 +138,7 @@ public class ConfirmationScreen extends OverlayPanelScreen implements Renderable
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
-        ScreenUtil.renderScrollingString(guiGraphics,font,title,panel.x + 15, panel.y + 15,panel.x + panel.width - 15, panel.y + 26, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+        LegacyRenderUtil.renderScrollingString(guiGraphics,font,title,panel.x + 15, panel.y + 15,panel.x + panel.width - 15, panel.y + 26, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
         messageLabel.renderLeftAlignedNoShadow(guiGraphics,panel.x + 15, panel.y + messageYOffset.get(), 12, CommonColor.INVENTORY_GRAY_TEXT.get());
     }
 }

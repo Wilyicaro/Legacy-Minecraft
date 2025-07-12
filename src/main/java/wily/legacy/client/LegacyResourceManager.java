@@ -31,7 +31,7 @@ import java.util.function.BiConsumer;
 public class LegacyResourceManager implements ResourceManagerReloadListener {
     public static final ResourceLocation GAMEPAD_MAPPINGS = Legacy4J.createModLocation("gamepad_mappings.txt");
     public static final ResourceLocation INTRO_LOCATION = Legacy4J.createModLocation("intro.json");
-    public static final ResourceLocation GAMMA_LOCATION = Legacy4J.createModLocation(/*? if >=1.21.2 {*//*"gamma" *//*?} else {*/"post_effect/gamma.json"/*?}*/);
+    public static final ResourceLocation GAMMA_LOCATION = Legacy4J.createModLocation(/*? if >=1.21.2 {*/"gamma" /*?} else {*//*"post_effect/gamma.json"*//*?}*/);
     public static final ResourceLocation DEFAULT_KEYBOARD_LAYOUT_LOCATION = Legacy4J.createModLocation("keyboard_layout/en_us.json");
     public static final ResourceLocation PLAYER_IDENTIFIERS_LOCATION = Legacy4J.createModLocation("player_identifiers.json");
 
@@ -58,7 +58,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
         });
 
         //? if <1.21.2 {
-        if (Legacy4JClient.gammaEffect != null) {
+        /*if (Legacy4JClient.gammaEffect != null) {
             Legacy4JClient.gammaEffect.close();
         }
         try {
@@ -69,7 +69,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
         } catch (JsonSyntaxException jsonSyntaxException) {
             Legacy4J.LOGGER.warn("Failed to parse shader: {}", GAMMA_LOCATION, jsonSyntaxException);
         }
-        //?}
+        *///?}
 
         PlayerIdentifier.list.clear();
         resourceManager.getResourceStack(PLAYER_IDENTIFIERS_LOCATION).forEach(r->{

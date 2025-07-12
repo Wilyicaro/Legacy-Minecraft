@@ -22,14 +22,14 @@ import wily.legacy.inventory.LegacyPistonMovingBlockEntity;
 
 @Mixin(PistonHeadRenderer.class)
 public abstract class PistonHeadRendererMixin {
-    @WrapOperation(method = /*? if >=1.21.5 {*//*"render(Lnet/minecraft/world/level/block/piston/PistonMovingBlockEntity;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IILnet/minecraft/world/phys/Vec3;)V"*//*?} else {*/"render(Lnet/minecraft/world/level/block/piston/PistonMovingBlockEntity;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II)V"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/blockentity/PistonHeadRenderer;renderBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/level/Level;ZI)V", ordinal = 3))
-    private void renderBlock(PistonHeadRenderer instance, BlockPos blockPos, BlockState blockState, PoseStack poseStack1, MultiBufferSource data, Level arg, boolean arg2, int arg3, Operation<Void> original, PistonMovingBlockEntity pistonMovingBlockEntity, float f, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, int j/*? if >=1.21.5 {*//*, Vec3 vec3*//*?}*/) {
+    @WrapOperation(method = /*? if >=1.21.5 {*/"render(Lnet/minecraft/world/level/block/piston/PistonMovingBlockEntity;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;IILnet/minecraft/world/phys/Vec3;)V"/*?} else {*//*"render(Lnet/minecraft/world/level/block/piston/PistonMovingBlockEntity;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II)V"*//*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/blockentity/PistonHeadRenderer;renderBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/level/Level;ZI)V", ordinal = 3))
+    private void renderBlock(PistonHeadRenderer instance, BlockPos blockPos, BlockState blockState, PoseStack poseStack1, MultiBufferSource data, Level arg, boolean arg2, int arg3, Operation<Void> original, PistonMovingBlockEntity pistonMovingBlockEntity, float f, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, int j/*? if >=1.21.5 {*/, Vec3 vec3/*?}*/) {
         BlockEntity be = ((LegacyPistonMovingBlockEntity)pistonMovingBlockEntity).getRenderingBlockEntity();
         BlockEntityRenderer<BlockEntity> beRenderer = be == null ? null : Minecraft.getInstance().getBlockEntityRenderDispatcher().getRenderer(be);
         if (be == null || beRenderer == null) {
             original.call(instance, pistonMovingBlockEntity.getBlockPos(), blockState, poseStack1, data, arg, arg2, arg3);
         } else if (LegacyOptions.enhancedPistonMovingRenderer.get()) {
-            beRenderer.render(be, f, poseStack, multiBufferSource, i , j/*? if >=1.21.5 {*//*, vec3*//*?}*/);
+            beRenderer.render(be, f, poseStack, multiBufferSource, i , j/*? if >=1.21.5 {*/, vec3/*?}*/);
         }
     }
 }

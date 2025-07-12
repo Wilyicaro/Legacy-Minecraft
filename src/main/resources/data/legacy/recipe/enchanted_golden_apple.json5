@@ -3,16 +3,16 @@
   "category": "food",
   "key": {
     //? if <1.21.2 {
-    "#": {
+    /*"#": {
       "item": "minecraft:gold_block"
     },
     "X": {
       "item": "minecraft:apple"
     }
-    //?} else {
-    /*"#": "minecraft:gold_block",
+    *///?} else {
+    "#": "minecraft:gold_block",
     "X": "minecraft:apple"
-    *///?}
+    //?}
   },
   "pattern": [
     "###",

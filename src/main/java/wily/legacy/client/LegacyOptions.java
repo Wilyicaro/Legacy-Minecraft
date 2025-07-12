@@ -23,7 +23,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.vehicle./*? if <1.21.2 {*/Boat/*?} else {*//*AbstractBoat*//*?}*/;
+import net.minecraft.world.entity.vehicle./*? if <1.21.2 {*//*Boat*//*?} else {*/AbstractBoat/*?}*/;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.config.FactoryConfig;
@@ -65,7 +65,7 @@ public class LegacyOptions {
             loadDeprecated();
             super.load();
             Legacy4JClient.isNewerVersion = Legacy4J.isNewerVersion(Legacy4J.VERSION.get(), lastLoadedVersion.get());
-            Legacy4JClient.isNewerMinecraftVersion = Legacy4J.isNewerVersion(SharedConstants.getCurrentVersion().getName(), lastLoadedMinecraftVersion.get());
+            Legacy4JClient.isNewerMinecraftVersion = Legacy4J.isNewerVersion(SharedConstants.getCurrentVersion().name(), lastLoadedMinecraftVersion.get());
         }
     }.withFile("legacy/client_options.json");
 
@@ -292,6 +292,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> inventoryHoverFocusSound = CLIENT_STORAGE.register(createBoolean("inventoryHoverFocusSound", false));
     public static final FactoryConfig<Boolean> legacyCursor = CLIENT_STORAGE.register(createBoolean("legacyCursor", true));
     public static final FactoryConfig<Boolean> limitCursor = CLIENT_STORAGE.register(createBoolean("limitCursor", true));
+    public static final FactoryConfig<Boolean> enhancedItemTranslucency = CLIENT_STORAGE.register(createBoolean("enhancedItemTranslucency", false));
 
     public static int getTerrainFogStart(){
         return Math.min(terrainFogStart.get(), Minecraft.getInstance().options.renderDistance().get());
@@ -303,7 +304,7 @@ public class LegacyOptions {
 
     public static float getLeftStickDeadZone(){
         Minecraft minecraft = Minecraft.getInstance();
-        return minecraft.player != null && minecraft.player.getControlledVehicle() instanceof /*? if <1.21.2 {*/Boat/*?} else {*//*AbstractBoat*//*?}*/ ? 0.5f + leftStickDeadZone.get().floatValue() / 2 : leftStickDeadZone.get().floatValue();
+        return minecraft.player != null && minecraft.player.getControlledVehicle() instanceof /*? if <1.21.2 {*//*Boat*//*?} else {*/AbstractBoat/*?}*/ ? 0.5f + leftStickDeadZone.get().floatValue() / 2 : leftStickDeadZone.get().floatValue();
     }
 
     public enum VehicleCameraRotation implements StringRepresentable {

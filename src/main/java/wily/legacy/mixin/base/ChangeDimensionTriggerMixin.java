@@ -17,7 +17,7 @@ public class ChangeDimensionTriggerMixin {
     @Inject(method = "trigger", at = @At("RETURN"))
     public void trigger(ServerPlayer serverPlayer, ResourceKey<Level> resourceKey, ResourceKey<Level> resourceKey2, CallbackInfo ci) {
         if (resourceKey2.equals(Level.END)){
-            serverPlayer.serverLevel().getServer().getPlayerList().broadcastSystemMessage(LegacyComponents.getEnteredDimensionMessage(serverPlayer.getDisplayName(), Level.END), false);
+            serverPlayer.level().getServer().getPlayerList().broadcastSystemMessage(LegacyComponents.getEnteredDimensionMessage(serverPlayer.getDisplayName(), Level.END), false);
             if (/*? if <1.21.1 {*//*((EntityAccessor)serverPlayer).getPortalEntrancePos()*//*?} else {*/serverPlayer.portalProcess/*?}*/ != null){
                 BlockPos entryPos = /*? if <1.21.1 {*//*((EntityAccessor)serverPlayer).getPortalEntrancePos()*//*?} else {*/serverPlayer.portalProcess.getEntryPosition()/*?}*/;
                 if (LegacyWorldOptions.usedEndPortalPositions.get().stream().noneMatch(pos-> pos.inRange(entryPos))){
@@ -26,7 +26,7 @@ public class ChangeDimensionTriggerMixin {
                 }
             }
         } else if (resourceKey.equals(Level.END)) {
-            serverPlayer.serverLevel().getServer().getPlayerList().broadcastSystemMessage(LegacyComponents.getLeftDimensionMessage(serverPlayer.getDisplayName(), Level.END), false);
+            serverPlayer.level().getServer().getPlayerList().broadcastSystemMessage(LegacyComponents.getLeftDimensionMessage(serverPlayer.getDisplayName(), Level.END), false);
         }
     }
 }

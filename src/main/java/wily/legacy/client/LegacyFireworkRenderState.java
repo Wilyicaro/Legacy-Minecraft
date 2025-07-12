@@ -1,5 +1,5 @@
 //? if >=1.21.2 {
-/*package wily.legacy.client;
+package wily.legacy.client;
 
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import wily.factoryapi.base.client.FactoryRenderStateExtension;
@@ -19,4 +19,4 @@ public class LegacyFireworkRenderState implements FactoryRenderStateExtension<Fi
         yRot = entity.getYRot(partialTicks);
     }
 }
-*///?}
+//?}

@@ -1,9 +1,11 @@
 package wily.legacy.mixin.base.client.sign;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.HangingSignEditScreen;
 import net.minecraft.network.chat.Component;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -16,13 +18,13 @@ public abstract class HangingSignEditScreenMixin extends Screen {
         super(component);
     }
 
-    @Redirect(method = "offsetSign", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"))
-    private void offsetSign(PoseStack instance, float x, float y, float z){
-        instance.translate(x, height/2f,z);
+    @ModifyReturnValue(method = "getSignYOffset", at = @At("RETURN"))
+    private float offsetSign(float original){
+        return height - 26.5f;
     }
 
-    @Redirect(method = "renderSignBackground", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;scale(FFF)V"))
-    private void renderSignBackground(PoseStack instance, float x, float y, float z){
-        instance.scale(x * 144/93,y * 144/93,z * 144/93);
+    @Redirect(method = "renderSignBackground", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;scale(FF)Lorg/joml/Matrix3x2f;", remap = false))
+    private Matrix3x2f renderSignBackground(Matrix3x2fStack instance, float x, float y){
+        return instance.scale(x * 144/93,y * 144/93);
     }
 }

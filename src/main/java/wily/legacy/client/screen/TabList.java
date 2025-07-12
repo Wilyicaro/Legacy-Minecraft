@@ -13,7 +13,7 @@ import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.init.LegacyRegistries;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,12 +21,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class TabList implements Renderable,GuiEventListener, NarratableEntry {
     protected final UIAccessor accessor;
     public final List<LegacyTabButton> tabButtons;
-    public int selectedTab = 0;
+    public LegacyTabButton selected = null;
+    public int selectedIndex = 0;
     boolean focused = false;
 
     public TabList(UIAccessor uiAccessor){
@@ -40,14 +40,15 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
 
     public LegacyTabButton addTabButton(LegacyTabButton button){
         tabButtons.add(button);
+        if (selected == null) selected = button;
         return button;
     }
 
     public LegacyTabButton addTabButton(int x, int y, int width, int height, LegacyTabButton.Type type, LegacyTabButton.Render icon, Component message, Tooltip tooltip, Consumer<LegacyTabButton> onPress){
         return this.addTabButton(new LegacyTabButton(x,y,width,height,type,icon,message,tooltip, t-> {
-            int index = tabButtons.indexOf(t);
-            if (selectedTab != index) {
-                selectedTab = index;
+            if (selected != t) {
+                selectedIndex = tabButtons.indexOf(t);
+                selected = t;
                 onPress.accept(t);
             }
         }));
@@ -100,22 +101,26 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
         int position = 0;
         for (LegacyTabButton b : tabButtons) {
             buttonManager.accept(b,position);
-            position+=vertical ? b.getHeight() : b.getWidth();
+            position += vertical ? b.getHeight() : b.getWidth();
         }
     }
 
     @Override
     public void render(GuiGraphics graphics, int i, int j, float f) {
-        for (int index = 0; index < tabButtons.size(); index++) {
-            LegacyTabButton tabButton = tabButtons.get(index);
-            tabButton.selected = selectedTab == index;
+        for (LegacyTabButton tabButton : tabButtons) {
+            tabButton.selected = tabButton == selected;
+            if (tabButton == selected) continue;
             tabButton.render(graphics,i, j, f);
         }
     }
 
+    public void renderSelected(GuiGraphics graphics, int i, int j, float f) {
+        if (selected != null) selected.render(graphics, i, j, f);
+    }
+
     public void resetSelectedTab(){
         if (!tabButtons.isEmpty()){
-            selectedTab = -1;
+            selectedIndex = -1;
             tabButtons.get(0).onPress();
         }
     }
@@ -150,13 +155,13 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
     public boolean controlTab(boolean left, boolean right){
         if (!left && !right || tabButtons.isEmpty()) return false;
         Optional<LegacyTabButton> opt = tabButtons.stream().filter(LegacyTabButton::isActive).min(Comparator.comparingInt(t -> {
-            int diff = tabButtons.indexOf(t) - selectedTab;
+            int diff = tabButtons.indexOf(t) - selectedIndex;
             return left ? diff < 0 ? -diff : tabButtons.size() * 2 - diff : diff > 0 ? diff : tabButtons.size() * 2 + diff;
         }));
         if (opt.isPresent()){
-            if (tabButtons.indexOf(opt.get()) != selectedTab){
+            if (tabButtons.indexOf(opt.get()) != selectedIndex){
                 opt.get().onPress();
-                ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+                LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
                 return true;
             }
         }
@@ -177,7 +182,7 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
     public void numberControlTab(int i){
         if (i <= 57 && i > 48 && i - 49 < tabButtons.size()) {
             tabButtons.get(i - 49).onPress();
-            ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+            LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
         }
     }
 
@@ -197,9 +202,9 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
 
     @Override
     public void updateNarration(NarrationElementOutput narrationElementOutput) {
-        Optional<LegacyTabButton> optional = this.tabButtons.stream().filter(AbstractWidget::isHovered).findFirst().or(() -> Optional.ofNullable(tabButtons.get(selectedTab)));
+        Optional<LegacyTabButton> optional = this.tabButtons.stream().filter(AbstractWidget::isHovered).findFirst().or(() -> Optional.ofNullable(tabButtons.get(selectedIndex)));
         optional.ifPresent(tabButton -> {
-            narrationElementOutput.add(NarratedElementType.POSITION, Component.translatable("narrator.position.tab", selectedTab + 1, tabButtons.size()));
+            narrationElementOutput.add(NarratedElementType.POSITION, Component.translatable("narrator.position.tab", selectedIndex + 1, tabButtons.size()));
             tabButton.updateNarration(narrationElementOutput);
         });
         if (this.isFocused()) {

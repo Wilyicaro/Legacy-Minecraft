@@ -19,15 +19,15 @@ import wily.legacy.config.LegacyCommonOptions;
 public class SectionOcclusionGraphMixin {
     @Shadow private @Nullable ViewArea viewArea;
     //? if <1.21.2 {
-    @Inject(method = "isInViewDistance", at = @At("HEAD"), cancellable = true)
+    /*@Inject(method = "isInViewDistance", at = @At("HEAD"), cancellable = true)
     private void isWithinDistance(BlockPos blockPos, BlockPos blockPos2, CallbackInfoReturnable<Boolean> cir) {
         if (LegacyCommonOptions.squaredViewDistance.get()) cir.setReturnValue(Legacy4J.isChunkPosVisibleInSquare(SectionPos.blockToSectionCoord(blockPos.getX()), SectionPos.blockToSectionCoord(blockPos.getZ()), viewArea.getViewDistance(), SectionPos.blockToSectionCoord(blockPos2.getX()), SectionPos.blockToSectionCoord(blockPos2.getZ()), false));
     }
-    //?} else {
-    /*@Inject(method = "isInViewDistance", at = @At("HEAD"), cancellable = true)
+    *///?} else {
+    @Inject(method = "isInViewDistance", at = @At("HEAD"), cancellable = true)
     private void isWithinDistance(long l, long m, CallbackInfoReturnable<Boolean> cir) {
         if (LegacyCommonOptions.squaredViewDistance.get()) cir.setReturnValue(Legacy4J.isChunkPosVisibleInSquare(SectionPos.x(l), SectionPos.z(l), viewArea.getViewDistance(), SectionPos.x(m), SectionPos.z(m), false));
     }
-    *///?}
+    //?}
 }
 //?}

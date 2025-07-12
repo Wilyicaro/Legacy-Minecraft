@@ -16,16 +16,14 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
-import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
-import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.MCAccount;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.MCAccount;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -140,7 +138,7 @@ public class ChooseUserScreen extends PanelVListScreen {
                             usernameBox.setPosition(panel.getX() + 15, panel.getY() + 45);
                             usernameBox.setResponder(s-> {
                                 boolean matches = usernamePattern.matcher(s).matches();
-                                usernameBox.setTextColor(matches ? 0xFFFFFF : 0xFF5555);
+                                usernameBox.setTextColor(matches ? 0xFFFFFFFF : 0xFF5555);
                                 okButton.active = matches;
                             });
                             addRenderableWidget(usernameBox);
@@ -173,18 +171,18 @@ public class ChooseUserScreen extends PanelVListScreen {
                     PlayerFaceRenderer.draw(guiGraphics, minecraft.getSkinManager()./*? if >1.20.1 {*/getInsecureSkin/*?} else {*//*getInsecureSkinLocation*//*?}*/(account.getProfile()), getX() + 5, getY() + 5, 20);
                     if (minecraft.options.touchscreen().get().booleanValue() || isHovered()) {
                         guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
-                        FactoryGuiGraphics.of(guiGraphics).blitSprite(ScreenUtil.isMouseOver(i,j,getX()+5,getY()+5,20,20) ? SaveRenderableList.JOIN_HIGHLIGHTED : SaveRenderableList.JOIN, getX() + 5, getY() + 5, 20, 20);
+                        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacyRenderUtil.isMouseOver(i,j,getX()+5,getY()+5,20,20) ? SaveRenderableList.JOIN_HIGHLIGHTED : SaveRenderableList.JOIN, getX() + 5, getY() + 5, 20, 20);
                     }
                 }
 
                 @Override
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                    ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 30, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
+                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 30, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
                 }
 
                 @Override
                 public boolean mouseClicked(double d, double e, int i) {
-                    if (ScreenUtil.isMouseOver(d,e,getX()+5,getY()+5,20,20)) manageLogin(account);
+                    if (LegacyRenderUtil.isMouseOver(d,e,getX()+5,getY()+5,20,20)) manageLogin(account);
                     return super.mouseClicked(d, e, i);
                 }
 

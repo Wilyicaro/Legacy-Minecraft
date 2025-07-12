@@ -12,8 +12,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 //? if >=1.21.2 {
-/*import net.minecraft.world.level.ScheduledTickAccess;
-*///?}
+import net.minecraft.world.level.ScheduledTickAccess;
+//?}
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Fallable;
 import net.minecraft.world.level.block.FallingBlock;
@@ -37,20 +37,20 @@ public class SnowLayerBlockMixin extends Block implements Fallable {
 
     @Inject(method = "updateShape", at = @At("HEAD"), cancellable = true)
     //? if >=1.21.2 {
-    /*private void updateShape(BlockState blockState, LevelReader levelReader, ScheduledTickAccess scheduledTickAccess, BlockPos blockPos, Direction direction, BlockPos blockPos2, BlockState blockState2, RandomSource randomSource, CallbackInfoReturnable<BlockState> cir) {
+    private void updateShape(BlockState blockState, LevelReader levelReader, ScheduledTickAccess scheduledTickAccess, BlockPos blockPos, Direction direction, BlockPos blockPos2, BlockState blockState2, RandomSource randomSource, CallbackInfoReturnable<BlockState> cir) {
         scheduledTickAccess.scheduleTick(blockPos, this, this.getDelayAfterPlace());
         cir.setReturnValue(super.updateShape(blockState, levelReader, scheduledTickAccess, blockPos, direction, blockPos2, blockState2, randomSource));
     }
-    *///?} else {
-    private void updateShape(BlockState blockState, Direction direction, BlockState blockState2, LevelAccessor levelAccessor, BlockPos blockPos, BlockPos blockPos2, CallbackInfoReturnable<BlockState> cir) {
+    //?} else {
+    /*private void updateShape(BlockState blockState, Direction direction, BlockState blockState2, LevelAccessor levelAccessor, BlockPos blockPos, BlockPos blockPos2, CallbackInfoReturnable<BlockState> cir) {
         levelAccessor.scheduleTick(blockPos, this, this.getDelayAfterPlace());
         cir.setReturnValue(super.updateShape(blockState, direction, blockState2, levelAccessor, blockPos, blockPos2));
     }
-    //?}
+    *///?}
 
     @Override
     public void tick(BlockState blockState, ServerLevel serverLevel, BlockPos blockPos, RandomSource randomSource) {
-        if (!FallingBlock.isFree(serverLevel.getBlockState(blockPos.below())) || blockPos.getY() < serverLevel./*? if >=1.21.2 {*//*getMinY*//*?} else {*/getMinBuildHeight/*?}*/())
+        if (!FallingBlock.isFree(serverLevel.getBlockState(blockPos.below())) || blockPos.getY() < serverLevel./*? if >=1.21.2 {*/getMinY/*?} else {*//*getMinBuildHeight*//*?}*/())
             return;
         FallingBlockEntity.fall(serverLevel, blockPos, blockState);
     }

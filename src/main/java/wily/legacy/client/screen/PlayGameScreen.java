@@ -23,10 +23,11 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.screen.compat.FriendsServerRenderableList;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,7 +43,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     private static final Component SAFETY_CHECK = Component.translatable("multiplayerWarning.check");
     public static final Component DIRECT_CONNECTION = Component.translatable("selectServer.direct");
     public boolean isLoading = false;
-    protected final TabList tabList = new TabList(accessor).add(31, LegacyTabButton.Type.LEFT,Component.translatable("legacy.menu.load"), b-> repositionElements()).add(31, LegacyTabButton.Type.MIDDLE,Component.translatable("legacy.menu.create"), b-> repositionElements()).add(31, LegacyTabButton.Type.RIGHT, (t, guiGraphics, i, j, f) -> t.renderString(guiGraphics,font,canNotifyOnlineFriends() ? 0xFFFFFF : CommonColor.INVENTORY_GRAY_TEXT.get(),canNotifyOnlineFriends()),Component.translatable("legacy.menu.join"), b-> {
+    protected final TabList tabList = new TabList(accessor).add(31, LegacyTabButton.Type.LEFT,Component.translatable("legacy.menu.load"), b-> repositionElements()).add(31, LegacyTabButton.Type.MIDDLE,Component.translatable("legacy.menu.create"), b-> repositionElements()).add(31, LegacyTabButton.Type.RIGHT, (t, guiGraphics, i, j, f) -> t.renderString(guiGraphics,font,canNotifyOnlineFriends() ? 0xFFFFFFFF : CommonColor.INVENTORY_GRAY_TEXT.get(),canNotifyOnlineFriends()),Component.translatable("legacy.menu.join"), b-> {
         if (this.minecraft.options.skipMultiplayerWarning)
             repositionElements();
         else minecraft.setScreen(new ConfirmationScreen(this,SAFETY_TITLE,Component.translatable("legacy.menu.multiplayer_warning").append("\n").append(SAFETY_CONTENT)){
@@ -65,12 +66,12 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
         renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(),()->ControlTooltip.getKeyMessage(InputConstants.KEY_O,this));
-        renderer.add(()-> tabList.selectedTab != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()->DIRECT_CONNECTION);
+        renderer.add(()-> tabList.selectedIndex != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()->DIRECT_CONNECTION);
     }
     public PlayGameScreen(Screen parent, int initialTab) {
         super(s-> Panel.centered(s,300,256,()-> 0, ()-> UIAccessor.of(s).getBoolean("hasTabList",true) ? 12 : 0),Component.translatable("legacy.menu.play_game"));
         this.parent = parent;
-        tabList.selectedTab = initialTab;
+        tabList.selectedIndex = initialTab;
         renderableVLists.clear();
         renderableVLists.add(saveRenderableList);
         renderableVLists.add(creationList);
@@ -124,44 +125,45 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     @Override
     public void renderableVListInit() {
-        getRenderableVList().init(panel.x + 15,panel.y + 15,270, panel.height - 30 - (tabList.selectedTab == 0 ? 21 : 0));
-        if (!hasTabList()) serverRenderableList.init("serverRenderableVList",panel.x + 15,panel.y + 15,270, panel.height - 30 - (tabList.selectedTab == 0 ? 21 : 0));
+        getRenderableVList().init(panel.x + 15,panel.y + 15,270, panel.height - 30 - (tabList.selectedIndex == 0 ? 21 : 0));
+        if (!hasTabList()) serverRenderableList.init("serverRenderableVList",panel.x + 15,panel.y + 15,270, panel.height - 30 - (tabList.selectedIndex == 0 ? 21 : 0));
     }
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
-        if (hasTabList()) tabList.render(guiGraphics,i,j,f);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        if (hasTabList()) tabList.render(guiGraphics, i, j, f);
         panel.render(guiGraphics,i,j,f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, accessor.getInteger("panelRecess.x",panel.x + 9), accessor.getInteger("panelRecess.y",panel.y + 9), accessor.getInteger("panelRecess.width",panel.width - 18), accessor.getInteger("panelRecess.height",panel.height - 18 - (tabList.selectedTab == 0 ? 21 : 0)));
-        if (hasTabList() && tabList.selectedTab == 0){
+        tabList.renderSelected(guiGraphics, i, j, f);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, accessor.getInteger("panelRecess.x",panel.x + 9), accessor.getInteger("panelRecess.y",panel.y + 9), accessor.getInteger("panelRecess.width",panel.width - 18), accessor.getInteger("panelRecess.height",panel.height - 18 - (tabList.selectedIndex == 0 ? 21 : 0)));
+        if (hasTabList() && tabList.selectedIndex == 0){
             if (saveRenderableList.currentlyDisplayedLevels != null) {
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(panel.x + 11.25f, panel.y + panel.height - 22.75, 0);
+                guiGraphics.pose().pushMatrix();
+                guiGraphics.pose().translate(panel.x + 11.25f, panel.y + panel.height - 22.75f);
                 long storage = new File("/").getTotalSpace();
                 FactoryGuiGraphics.of(guiGraphics).enableScissor(0, 0, panel.width - 24, panel.height - 10);
                 for (LevelSummary level : saveRenderableList.currentlyDisplayedLevels) {
                     Long size;
                     if ((size = SaveRenderableList.sizeCache.getIfPresent(level)) == null) continue;
                     float scaledSize = Math.max(1,size * (panel.width - 21f)/ storage);
-                    guiGraphics.pose().pushPose();
-                    guiGraphics.pose().scale(scaledSize,1,1);
+                    guiGraphics.pose().pushMatrix();
+                    guiGraphics.pose().scale(scaledSize,1);
                     guiGraphics.fill(0, 0, 1, 11,getFocused() instanceof AbstractButton b && saveRenderableList.renderables.contains(b) && saveRenderableList.renderables.indexOf(b) == saveRenderableList.currentlyDisplayedLevels.indexOf(level) ? CommonColor.SELECTED_STORAGE_SAVE.get() : CommonColor.STORAGE_SAVE.get());
-                    guiGraphics.pose().popPose();
-                    guiGraphics.pose().translate(scaledSize, 0, 0);
+                    guiGraphics.pose().popMatrix();
+                    guiGraphics.pose().translate(scaledSize, 0);
                 }
-                guiGraphics.pose().popPose();
+                guiGraphics.pose().popMatrix();
                 guiGraphics.disableScissor();
             }
-            ScreenUtil.renderPanelTranslucentRecess(guiGraphics, panel.x + 9, panel.y + panel.height - 25, panel.width - 18 , 16);
+            LegacyRenderUtil.renderPanelTranslucentRecess(guiGraphics, panel.x + 9, panel.y + panel.height - 25, panel.width - 18 , 16);
         }
         if (isLoading)
-            ScreenUtil.drawGenericLoading(guiGraphics, panel.x + 112, panel.y + 66);
+            LegacyRenderUtil.drawGenericLoading(guiGraphics, panel.x + 112, panel.y + 66);
     }
 
     @Override
     public RenderableVList getRenderableVList() {
-        return getRenderableVLists().get(hasTabList() ? tabList.selectedTab : 0);
+        return getRenderableVLists().get(hasTabList() ? tabList.selectedIndex : 0);
     }
 
     @Override
@@ -199,16 +201,16 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             return true;
         }
         if (i == InputConstants.KEY_F5) {
-            if (tabList.selectedTab == 0) {
+            if (tabList.selectedIndex == 0) {
                 saveRenderableList.reloadSaveList();
-            } else if (tabList.selectedTab == 2) {
+            } else if (tabList.selectedIndex == 2) {
                 serverRenderableList.servers.load();
                 serverRenderableList.updateServers();
             }
             this.rebuildWidgets();
             return true;
         }
-        if (i == InputConstants.KEY_X && tabList.selectedTab == 2){
+        if (i == InputConstants.KEY_X && tabList.selectedIndex == 2){
             EditBox serverBox = new EditBox(Minecraft.getInstance().font, 0,0,200,20,DIRECT_CONNECTION);
             minecraft.setScreen(new ConfirmationScreen(this, 230, 120, serverBox.getMessage(),Component.translatable("addServer.enterIp"), b1->  ConnectScreen.startConnecting(this, minecraft, ServerAddress.parseString(serverBox.getValue()), new ServerData("","",/*? if >1.20.2 {*/ ServerData.Type.OTHER/*?} else {*//*false*//*?}*/), false/*? if >=1.20.5 {*/,null/*?}*/)){
                 boolean released = false;
@@ -251,7 +253,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         return serverRenderableList.servers;
     }
     public void onFilesDrop(List<Path> list) {
-        if (tabList.selectedTab == 0) {
+        if (tabList.selectedIndex == 0) {
             for (Path path : list) {
                 if (!path.getFileName().toString().endsWith(".mcsave") && !path.getFileName().toString().endsWith(".zip")) return;
             }
@@ -259,7 +261,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.import_save"), Component.translatable("legacy.menu.import_save_message", string), (b) -> {
                 list.forEach(p -> {
                     try {
-                        Legacy4JClient.importSaveFile(new FileInputStream(p.toFile()),minecraft.getLevelSource(), FileNameUtils.getBaseName(p.getFileName().toString()));
+                        LegacySaveCache.importSaveFile(new FileInputStream(p.toFile()),minecraft.getLevelSource(), FileNameUtils.getBaseName(p.getFileName().toString()));
                     } catch (FileNotFoundException e) {
                         throw new RuntimeException(e);
                     }

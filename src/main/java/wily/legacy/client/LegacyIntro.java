@@ -35,16 +35,15 @@ public record LegacyIntro(List<ResourceLocation> brands, ResourceLocation backgr
     }
 
     public static void render(GuiGraphics guiGraphics, LegacyIntro intro, float timer){
-        guiGraphics.fill(RenderType.guiOverlay(), 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFFFFFFFF);
+        guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFFFFFFFF);
         int actual = (int) (timer % intro.brands().size());
         float last = (float) Math.ceil(timer) - timer;
         if (intro.crossFade() && last <= intro.fadeOut() && actual + 1 < intro.brands().size()){
             FactoryGuiGraphics.of(guiGraphics).blit(intro.brands().get(actual + 1), (guiGraphics.guiWidth() - guiGraphics.guiHeight() * 320 / 180) / 2, 0, 0, 0, guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight(), guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight());
         } else FactoryGuiGraphics.of(guiGraphics).blit(intro.background(), 0, 0, 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight());
         float alpha = last <= intro.fadeOut() ? last / intro.fadeOut() : last > 1 - intro.fadeIn() && !intro.crossFade() ? (1 - last) / intro.fadeIn() : 1.0f;
-        FactoryGuiGraphics.of(guiGraphics).setColor(1.0f, 1.0f, 1.0f, alpha, true);
-
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, alpha);
         FactoryGuiGraphics.of(guiGraphics).blit(intro.brands().get(actual), (guiGraphics.guiWidth() - guiGraphics.guiHeight() * 320 / 180) / 2, 0, 0, 0, guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight(), guiGraphics.guiHeight() * 320 / 180, guiGraphics.guiHeight());
-        FactoryGuiGraphics.of(guiGraphics).clearColor(true);
+        FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
     }
 }

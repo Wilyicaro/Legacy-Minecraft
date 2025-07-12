@@ -11,7 +11,7 @@ import net.minecraft.world.inventory.Slot;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.inventory.LegacySlotDisplay;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Comparator;
 
@@ -25,7 +25,7 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
         boolean horizontal = direction.getAxis() == ScreenAxis.HORIZONTAL;
         boolean positive = direction.isPositive();
         if (getMenu().slots.size() == 1 && movePointerToSlot(getMenu().slots.get(0),false)) return;
-        int part = getMenu().slots.stream().map(s->Math.round(ScreenUtil.iconHolderRenderer.slotBounds(s).getMinSize() / 2f)).sorted().findFirst().orElse(9);
+        int part = getMenu().slots.stream().map(s->Math.round(LegacyRenderUtil.iconHolderRenderer.slotBounds(s).getMinSize() / 2f)).sorted().findFirst().orElse(9);
         double r = horizontal ? height - pointerY : width - pointerX;
         double l = (horizontal ? pointerY : pointerX);
         for (int i = 0; i < Math.max(r,l); i+=part) {
@@ -58,7 +58,7 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
     default boolean movePointerToSlot(Slot s, boolean allowHovered){
         if (s == null || (!allowHovered && s == findHoveredSlot()) || !LegacySlotDisplay.isVisibleAndActive(s)) return false;
         Minecraft minecraft = Minecraft.getInstance();
-        LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(getMenuRectangle().left(), getMenuRectangle().top(), s);
+        LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(getMenuRectangle().left(), getMenuRectangle().top(), s);
         Legacy4JClient.controllerManager.setPointerPos(holder.getMiddleX() * ((double)minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth()), holder.getMiddleY() * ((double)minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()));
         return true;
     }
@@ -68,7 +68,7 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
         double pointerY = Legacy4JClient.controllerManager.getPointerY();
         if (getMenu().slots.size() == 1 && movePointerToSlot(getMenu().slots.get(0))) return;
         getMenu().slots.stream().min(Comparator.comparingInt(s->{
-            LegacyIconHolder holder = ScreenUtil.iconHolderRenderer.slotBounds(getMenuRectangle().left(),getMenuRectangle().top(),s);
+            LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(getMenuRectangle().left(),getMenuRectangle().top(),s);
             double deltaX = pointerX - holder.getMiddleX();
             double deltaY = pointerY - holder.getMiddleY();
             return (int) (deltaX *deltaX + deltaY * deltaY);
@@ -79,7 +79,7 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
     Slot getHoveredSlot();
     default Slot findSlotAt(double d, double e){
         for (Slot slot : getMenu().slots)
-            if (ScreenUtil.isHovering(slot,getMenuRectangle().left(), getMenuRectangle().top(),d,e)) return slot;
+            if (LegacyRenderUtil.isHovering(slot,getMenuRectangle().left(), getMenuRectangle().top(),d,e)) return slot;
         return null;
     }
     default Slot findHoveredSlot(){

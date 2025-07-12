@@ -15,6 +15,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.piston.PistonMovingBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -50,18 +53,18 @@ public class PistonMovingBlockEntityMixin extends BlockEntity implements LegacyP
         if (!isSourcePiston) load();
     }
     @Inject(method = /*? if <1.20.5 {*//*"load"*//*?} else {*/"loadAdditional"/*?}*/, at = @At("RETURN"))
-    protected void load(CompoundTag compoundTag/*? if >=1.20.5 {*/, HolderLookup.Provider provider/*?}*/, CallbackInfo ci) {
-        CompoundTag newMovedBeTag = CompoundTagUtil.getCompoundTagOrEmpty(compoundTag, "movedBlockEntityTag");
-        CompoundTagUtil.getString(compoundTag, "movedBlockEntityType").map(FactoryAPI::createLocation).ifPresent(beTypeId -> movingBlockEntityType = FactoryAPIPlatform.getRegistryValue(beTypeId, BuiltInRegistries.BLOCK_ENTITY_TYPE));
+    protected void load(ValueInput input, CallbackInfo ci) {
+        CompoundTag newMovedBeTag = input.read("movedBlockEntityTag", CompoundTag.CODEC).orElseGet(CompoundTag::new);
+        input.getString("movedBlockEntityType").map(FactoryAPI::createLocation).ifPresent(beTypeId -> movingBlockEntityType = FactoryAPIPlatform.getRegistryValue(beTypeId, BuiltInRegistries.BLOCK_ENTITY_TYPE));
         if (!newMovedBeTag.isEmpty()) {
             movedBeTag = newMovedBeTag;
             if (hasLevel() && getLevel().isClientSide() && movingBlockEntityType != null) createRenderingBlockEntity(getLevel());
         }
     }
     @Inject(method = "saveAdditional", at = @At("RETURN"))
-    protected void saveAdditional(CompoundTag compoundTag/*? if >=1.20.5 {*/, HolderLookup.Provider provider/*?}*/, CallbackInfo ci) {
-        if (movedBeTag != null) compoundTag.put("movedBlockEntityTag",movedBeTag);
-        if (movingBlockEntityType != null) compoundTag.putString("movedBlockEntityType", BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(movingBlockEntityType).toString());
+    protected void saveAdditional(ValueOutput output, CallbackInfo ci) {
+        if (movedBeTag != null) output.store("movedBlockEntityTag", CompoundTag.CODEC, movedBeTag);
+        if (movingBlockEntityType != null) output.putString("movedBlockEntityType", BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(movingBlockEntityType).toString());
     }
     @Override
     public CompoundTag getMovedBlockEntityTag() {

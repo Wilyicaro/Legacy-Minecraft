@@ -2,13 +2,10 @@ package wily.legacy.entity;
 
 import com.mojang.authlib.GameProfile;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stat;
 import wily.factoryapi.base.network.CommonNetwork;
-import wily.legacy.mixin.base.ClientBoundAwardStatsPacketAccessor;
+import wily.legacy.mixin.base.client.ClientBoundAwardStatsPacketAccessor;
 
 public interface LegacyPlayerInfo {
     static LegacyPlayerInfo of(Object obj) {

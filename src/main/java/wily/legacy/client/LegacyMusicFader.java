@@ -2,9 +2,10 @@ package wily.legacy.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.client.sounds.SoundManager;
-import wily.legacy.mixin.base.MusicManagerAccessor;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.mixin.base.client.MusicManagerAccessor;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -21,12 +22,14 @@ public class LegacyMusicFader {
     public static Map<SoundInstance, Long> fadingSongs = new HashMap<>();
     public static boolean musicManagerShouldTick = true;
 
-    public static void fadeInMusic(SoundInstance newSong, boolean stopMusicManager) {
+    public static SoundEngine.PlayResult fadeInMusic(SoundInstance newSong, boolean stopMusicManager) {
+        SoundEngine.PlayResult result = SoundEngine.PlayResult.STARTED;
         SoundInstance music;
         if ((music = musicManagerAccessor.getCurrentMusic()) != null) fadingSongs.putIfAbsent(music, ticks + FADE_TICKS);
-        if (fadingSongs.isEmpty()) soundManager.play(newSong);
+        if (fadingSongs.isEmpty()) result = soundManager.play(newSong);
         else queuedSong = newSong;
         if (stopMusicManager) musicManagerShouldTick = false;
+        return result;
     }
 
     public static void fadeOutMusic(SoundInstance fadeMusic, boolean startMusicManager, boolean delayMusicManager) {
@@ -52,7 +55,7 @@ public class LegacyMusicFader {
                 soundManager.stop(song);
                 it.remove();
             } else {
-                ScreenUtil.setSoundInstanceVolume(song, (songTick - ticks) / (float) FADE_TICKS);
+                LegacyRenderUtil.setSoundInstanceVolume(song, (songTick - ticks) / (float) FADE_TICKS);
             }
         }
         if (fadingSongs.isEmpty() && queuedSong != null) {

@@ -19,7 +19,7 @@ public class MerchantContainerMixin {
     @Shadow @Final private Merchant merchant;
 
     private int getActualMerchantLevel(){
-        return merchant.isClientSide() ? (merchant.getTradingPlayer().containerMenu instanceof MerchantMenu menu ? menu.getTraderLevel() : 0) : merchant instanceof VillagerDataHolder data ? data.getVillagerData()./*? if <1.21.5 {*/getLevel/*?} else {*//*level*//*?}*/() : 0;
+        return merchant.isClientSide() ? (merchant.getTradingPlayer().containerMenu instanceof MerchantMenu menu ? menu.getTraderLevel() : 0) : merchant instanceof VillagerDataHolder data ? data.getVillagerData()./*? if <1.21.5 {*//*getLevel*//*?} else {*/level/*?}*/() : 0;
     }
     @Redirect(method = "updateSellItem",at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/trading/MerchantOffers;getRecipeFor(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;I)Lnet/minecraft/world/item/trading/MerchantOffer;"))
     public MerchantOffer updateSellItem(MerchantOffers instance, ItemStack itemStack, ItemStack itemStack2, int i) {

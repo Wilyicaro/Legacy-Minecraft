@@ -1,5 +1,5 @@
 //? if >=1.21.2 {
-/*package wily.legacy.mixin.base;
+package wily.legacy.mixin.base;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
@@ -49,4 +49,4 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior {
         return false;
     }
 }
-*///?}
+//?}

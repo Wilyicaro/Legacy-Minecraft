@@ -27,6 +27,7 @@ import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.*;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.RecipeMenu;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -145,8 +146,8 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
     @Override
     public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
         //? if >=1.21.2 {
-        /*if (this.getChildAt(d, e).filter((guiEventListener) -> guiEventListener.mouseScrolled(d, e, f, g)).isPresent()) return true;
-        *///?}
+        if (this.getChildAt(d, e).filter((guiEventListener) -> guiEventListener.mouseScrolled(d, e, f, g)).isPresent()) return true;
+        //?}
         if (super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g)) return true;
         int scroll = (int)Math.signum(g);
         if (((craftingButtonsOffset.get() > 0 && scroll < 0) || (scroll > 0 && craftingButtonsOffset.max > 0)) && craftingButtonsOffset.add(scroll,false) != 0){
@@ -217,9 +218,9 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                 public void renderTooltip(Minecraft minecraft, GuiGraphics graphics, int i, int j) {
                     super.renderTooltip(minecraft, graphics, i, j);
                     if (isFocused()) {
-                        if (!ingredientSlot.isEmpty() && ScreenUtil.isMouseOver(i,j, leftPos + 38, topPos + 149, 36,36))
+                        if (!ingredientSlot.isEmpty() && LegacyRenderUtil.isMouseOver(i,j, leftPos + 38, topPos + 149, 36,36))
                             renderTooltip(minecraft, graphics, getActualItem(ingredientSlot.get(0)), i, j);
-                        if (ScreenUtil.isMouseOver(i,j, leftPos + 110, topPos + 149, 36,36))
+                        if (LegacyRenderUtil.isMouseOver(i,j, leftPos + 110, topPos + 149, 36,36))
                             renderTooltip(minecraft, graphics, getFocusedResult(), i, j);
                     }
                 }
@@ -227,12 +228,12 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                 @Override
                 public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
                     boolean warning = !canCraft(getFocusedRecipe());
-                    ScreenUtil.iconHolderRenderer.itemHolder(leftPos+38,topPos+149,36,36, getActualItem(ingredientSlot.get(0)), !onlyCraftableRecipes && !ingredientSlot.get(0).isEmpty() && warning, DISPLAY_OFFSET).render(graphics, i, j, f);
-                    ScreenUtil.iconHolderRenderer.itemHolder(leftPos+110,topPos+149,36,36,getFocusedResult(), warning, DISPLAY_OFFSET).render(graphics, i, j, f);
+                    LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos+38,topPos+149,36,36, getActualItem(ingredientSlot.get(0)), !onlyCraftableRecipes && !ingredientSlot.get(0).isEmpty() && warning, DISPLAY_OFFSET).render(graphics, i, j, f);
+                    LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos+110,topPos+149,36,36,getFocusedResult(), warning, DISPLAY_OFFSET).render(graphics, i, j, f);
 
                     if (getFocusedRecipe() != null) {
                         Component resultName = getFocusedRecipe().getName();
-                        ScreenUtil.renderScrollingString(graphics, font, resultName, leftPos + 11 + Math.max(163 - font.width(resultName), 0) / 2, topPos + 114, leftPos + 170, topPos + 125, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                        LegacyRenderUtil.renderScrollingString(graphics, font, resultName, leftPos + 11 + Math.max(163 - font.width(resultName), 0) / 2, topPos + 114, leftPos + 170, topPos + 125, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
                     }
                     super.renderSelection(graphics, i, j, f);
                 }

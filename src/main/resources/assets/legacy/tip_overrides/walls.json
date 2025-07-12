@@ -1,0 +1,24 @@
+{
+  "overrides": [
+    {
+    "blocks": ["andesite_wall","diorite_wall","granite_wall","stone_wall"],
+    "tip": {"translate": "block.minecraft.stone_wall.tip"}
+    },
+    {
+    "blocks": ["brick_wall","end_stone_brick_wall","mossy_stone_brick_wall","stone_brick_wall"],
+    "tip": {"translate": "block.minecraft.brick_wall.tip"}
+    },
+    {
+    "blocks": ["cobblestone_wall","mossy_cobblestone_wall"],
+    "tip": {"translate": "block.minecraft.cobblestone_wall.tip"}
+    },
+    {
+    "blocks": ["nether_brick_wall","red_nether_brick_wall"],
+    "tip": {"translate": "block.minecraft.nether_brick_wall.tip"}
+    },
+    {
+    "blocks": ["red_sandstone_wall","sandstone_wall"],
+    "tip": {"translate": "block.minecraft.sandstone_wall.tip"}
+    }
+  ]
+}

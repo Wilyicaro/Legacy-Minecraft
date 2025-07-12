@@ -86,7 +86,7 @@ public abstract class CrafterScreenMixin extends AbstractContainerScreen<Crafter
         ci.cancel();
         super.render(guiGraphics, i, j, f);
         this.renderTooltip(guiGraphics, i, j);
-        if (this.hoveredSlot instanceof CrafterSlot && !this.menu.isSlotDisabled(this.hoveredSlot.index) && this.menu.getCarried().isEmpty() && !this.hoveredSlot.hasItem()) guiGraphics.renderTooltip(this.font, DISABLED_SLOT_TOOLTIP, i, j);
+        if (this.hoveredSlot instanceof CrafterSlot && !this.menu.isSlotDisabled(this.hoveredSlot.index) && this.menu.getCarried().isEmpty() && !this.hoveredSlot.hasItem()) guiGraphics.setTooltipForNextFrame(this.font, DISABLED_SLOT_TOOLTIP, i, j);
     }
 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)

@@ -1,9 +1,11 @@
 package wily.legacy.inventory;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.storage.TagValueInput;
 
 public interface LegacyPistonMovingBlockEntity {
     CompoundTag getMovedBlockEntityTag();
@@ -21,6 +23,6 @@ public interface LegacyPistonMovingBlockEntity {
     }
     default void load(BlockEntity blockEntity){
         if (getMovedBlockEntityTag() == null) return;
-        if (blockEntity != null) blockEntity./*? if <1.20.5 {*//*load*//*?} else {*/loadCustomOnly/*?}*/(getMovedBlockEntityTag()/*? if >=1.20.5 {*/, blockEntity.getLevel().registryAccess()/*?}*/);
+        if (blockEntity != null) blockEntity.loadCustomOnly(TagValueInput.create(ProblemReporter.DISCARDING, blockEntity.getLevel().registryAccess(), getMovedBlockEntityTag()));
     }
 }

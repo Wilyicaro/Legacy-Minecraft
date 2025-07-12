@@ -4,14 +4,11 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
 import wily.legacy.client.ControlType;
-import wily.legacy.util.ScreenUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class GLFWControllerHandler implements Controller.Handler{

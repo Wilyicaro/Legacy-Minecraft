@@ -6,7 +6,6 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.CrashReport;
@@ -19,7 +18,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.*;
-import net.minecraft.client.gui.screens.worldselection.EditWorldScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -35,13 +33,12 @@ import org.slf4j.Logger;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.LegacySaveCache;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,7 +47,6 @@ import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -173,7 +169,7 @@ public class SaveRenderableList extends RenderableVList {
             return CompletableFuture.completedFuture(List.of());
         }
         if (levelCandidates.isEmpty()) {
-            getScreen(PlayGameScreen.class).tabList.selectedTab = 1;
+            getScreen(PlayGameScreen.class).tabList.selectedIndex = 1;
             return CompletableFuture.completedFuture(List.of());
         }
 
@@ -229,7 +225,7 @@ public class SaveRenderableList extends RenderableVList {
         @Override
         public void onClick(double d, double e) {
             if (summary.isDisabled()) return;
-            boolean hoverIcon = ScreenUtil.isMouseOver(d, e, getX() + 5, getY() + 5, 20, height);
+            boolean hoverIcon = LegacyRenderUtil.isMouseOver(d, e, getX() + 5, getY() + 5, 20, height);
             if (hoverIcon || isFocused()) onPress();
         }
 
@@ -264,7 +260,7 @@ public class SaveRenderableList extends RenderableVList {
             if (minecraft.options.touchscreen().get().booleanValue() || isHovered) {
                 guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
 
-                boolean hoverIcon = ScreenUtil.isMouseOver(i, j, getX() + 5, getY() + 5, 20, height);
+                boolean hoverIcon = LegacyRenderUtil.isMouseOver(i, j, getX() + 5, getY() + 5, 20, height);
                 ResourceLocation resourceLocation = hoverIcon ? JOIN_HIGHLIGHTED : JOIN;
                 ResourceLocation resourceLocation2 = hoverIcon ? WARNING_HIGHLIGHTED : WARNING;
                 ResourceLocation resourceLocation3 = hoverIcon ? ERROR_HIGHLIGHTED : ERROR;
@@ -277,29 +273,29 @@ public class SaveRenderableList extends RenderableVList {
                 if (summary.isLocked()) {
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
                     if (hoverIcon) {
-                        getScreen().setTooltipForNextRenderPass(minecraft.font.split(WORLD_LOCKED_TOOLTIP, 175));
+                        guiGraphics.setTooltipForNextFrame(minecraft.font, minecraft.font.split(WORLD_LOCKED_TOOLTIP, 175), i, j);
                     }
                 } else if (summary.requiresManualConversion()) {
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
                     if (hoverIcon) {
-                        getScreen().setTooltipForNextRenderPass(minecraft.font.split(WORLD_REQUIRES_CONVERSION, 175));
+                        guiGraphics.setTooltipForNextFrame(minecraft.font, minecraft.font.split(WORLD_REQUIRES_CONVERSION, 175), i, j);
                     }
                 } else if (!summary.isCompatible()) {
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
                     if (hoverIcon) {
-                        getScreen().setTooltipForNextRenderPass(minecraft.font.split(INCOMPATIBLE_VERSION_TOOLTIP, 175));
+                        guiGraphics.setTooltipForNextFrame(minecraft.font, minecraft.font.split(INCOMPATIBLE_VERSION_TOOLTIP, 175), i, j);
                     }
                 } else if (summary./*? if >1.20.2 {*/shouldBackup/*?} else {*//*markVersionInList*//*?}*/()) {
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation4, getX() + 5, getY() + 5, 20, 20);
                     if (summary./*? if >1.20.2 {*/isDowngrade/*?} else {*//*requiresManualConversion*//*?}*/()) {
                         FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + 5, getY() + 5, 20, 20);
                         if (hoverIcon) {
-                            getScreen().setTooltipForNextRenderPass(ImmutableList.of(FROM_NEWER_TOOLTIP_1.getVisualOrderText(), FROM_NEWER_TOOLTIP_2.getVisualOrderText()));
+                            guiGraphics.setTooltipForNextFrame(minecraft.font, ImmutableList.of(FROM_NEWER_TOOLTIP_1.getVisualOrderText(), FROM_NEWER_TOOLTIP_2.getVisualOrderText()), i, j);
                         }
-                    } else if (!SharedConstants.getCurrentVersion().isStable()) {
+                    } else if (!SharedConstants.getCurrentVersion().stable()) {
                         FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation2, getX() + 5, getY() + 5, 20, 20);
                         if (hoverIcon) {
-                            getScreen().setTooltipForNextRenderPass(ImmutableList.of(SNAPSHOT_TOOLTIP_1.getVisualOrderText(), SNAPSHOT_TOOLTIP_2.getVisualOrderText()));
+                            guiGraphics.setTooltipForNextFrame(minecraft.font, ImmutableList.of(SNAPSHOT_TOOLTIP_1.getVisualOrderText(), SNAPSHOT_TOOLTIP_2.getVisualOrderText()), i, j);
                         }
                     }
                 } else {
@@ -310,7 +306,7 @@ public class SaveRenderableList extends RenderableVList {
 
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-            ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
+            LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
         }
 
         @Override
@@ -407,12 +403,12 @@ public class SaveRenderableList extends RenderableVList {
     public void loadWorld(LevelSummary summary){
         SaveRenderableList.this.reloadSaveList();
         if (LegacyOptions.directSaveLoad.get()){
-            Legacy4JClient.copySaveBtwSources(LoadSaveScreen.getSummaryAccess(Minecraft.getInstance().getLevelSource(),summary),Legacy4JClient.getLevelStorageSource());
-            LoadSaveScreen.loadWorld(getScreen(),minecraft,Legacy4JClient.getLevelStorageSource(),summary);
-        }else minecraft.setScreen(new LoadSaveScreen(getScreen(), summary, Legacy4JClient.getLevelStorageSource()){
+            LegacySaveCache.copySaveBtwSources(LoadSaveScreen.getSummaryAccess(Minecraft.getInstance().getLevelSource(),summary), LegacySaveCache.getLevelStorageSource());
+            LoadSaveScreen.loadWorld(getScreen(),minecraft, LegacySaveCache.getLevelStorageSource(),summary);
+        }else minecraft.setScreen(new LoadSaveScreen(getScreen(), summary, LegacySaveCache.getLevelStorageSource()){
             @Override
             public void completeLoad() {
-                if (LegacyOptions.saveCache.get()) Legacy4JClient.copySaveBtwSources(LoadSaveScreen.getSummaryAccess(Minecraft.getInstance().getLevelSource(),summary),Legacy4JClient.currentWorldSource);
+                if (LegacyOptions.saveCache.get()) LegacySaveCache.copySaveBtwSources(LoadSaveScreen.getSummaryAccess(Minecraft.getInstance().getLevelSource(),summary), LegacySaveCache.currentWorldSource);
                 super.completeLoad();
             }
         });

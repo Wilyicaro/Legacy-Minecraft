@@ -1,5 +1,5 @@
 //? if <=1.21.1 {
-package wily.legacy.mixin.base.compat.jei;
+/*package wily.legacy.mixin.base.compat.jei;
 
 import mezz.jei.api.gui.handlers.IGuiClickableArea;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
@@ -51,4 +51,4 @@ public class VanillaPluginMixin {
         }
     }
 }
-//?}
+*///?}

@@ -5,7 +5,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -19,7 +18,7 @@ import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.JsonUtil;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -75,7 +74,7 @@ public class HowToPlayScreen extends LegacyScreen {
     public boolean keyPressed(int i, int j, int k) {
         boolean next;
         if ((next = i == InputConstants.KEY_RETURN) && hasNextPage() || i == InputConstants.KEY_X && hasPreviousPage()) {
-            ScreenUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
+            LegacyRenderUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
             minecraft.setScreen(Section.list.get(sectionIndex + (next ? 1 : -1)).build(parent));
             return true;
         }

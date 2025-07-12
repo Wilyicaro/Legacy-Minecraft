@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -20,22 +19,18 @@ import net.minecraft.network.protocol.game.ServerboundClientCommandPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.StatType;
 import net.minecraft.util.GsonHelper;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import wily.factoryapi.FactoryAPI;
-import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
-import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
@@ -48,7 +43,7 @@ import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.JsonUtil;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -157,9 +152,9 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                     int y = getY() + (getHeight() - font.lineHeight) / 2 + 1;
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.LEADERBOARD_BUTTON_HIGHLIGHTED : LegacySprites.LEADERBOARD_BUTTON,getX(),getY(),getWidth(),getHeight());
-                    guiGraphics.drawString(font,rank,getX() + 40 - font.width(rank) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
-                    guiGraphics.drawString(font,getMessage(),getX() + 120 -(font.width(getMessage())) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
-                    guiGraphics.drawString(font,getMessage(),getX() + 120 -(font.width(getMessage())) / 2, y, ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                    guiGraphics.drawString(font,rank,getX() + 40 - font.width(rank) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                    guiGraphics.drawString(font,getMessage(),getX() + 120 -(font.width(getMessage())) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                    guiGraphics.drawString(font,getMessage(),getX() + 120 -(font.width(getMessage())) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
                     int added = 0;
                     Component hoveredValue = null;
                     for (int index = page; index < statsBoards.get(selectedStatBoard).statsList.size(); index++) {
@@ -168,11 +163,11 @@ public class LeaderboardsScreen extends PanelVListScreen {
                         Component value = ControlTooltip.CONTROL_ICON_FUNCTION.apply(stat.format((Legacy4JClient.hasModOnServer() ? info.getStatsMap() : minecraft.player.getStats().stats).getInt(stat)), Style.EMPTY).getComponent();
                         SimpleLayoutRenderable renderable = statsBoards.get(selectedStatBoard).renderables.get(index);
                         int w = font.width(value);
-                        ScreenUtil.renderScrollingString(guiGraphics,font, value,renderable.getX() + Math.max(0,renderable.getWidth() - w) / 2, getY(),renderable.getX() + Math.min(renderable.getWidth(),(renderable.getWidth() - w)/ 2 + getWidth()), getY() + getHeight(), ScreenUtil.getDefaultTextColor(!isHoveredOrFocused()),true);
-                        if (ScreenUtil.isMouseOver(i,j,renderable.getX() + Math.max(0,renderable.getWidth() - w) / 2, getY(),Math.min(renderable.getWidth(),w), getHeight())) hoveredValue = value;
+                        LegacyRenderUtil.renderScrollingString(guiGraphics,font, value,renderable.getX() + Math.max(0,renderable.getWidth() - w) / 2, getY(),renderable.getX() + Math.min(renderable.getWidth(),(renderable.getWidth() - w)/ 2 + getWidth()), getY() + getHeight(), LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()),true);
+                        if (LegacyRenderUtil.isMouseOver(i,j,renderable.getX() + Math.max(0,renderable.getWidth() - w) / 2, getY(),Math.min(renderable.getWidth(),w), getHeight())) hoveredValue = value;
                         added++;
                     }
-                    if (hoveredValue != null) guiGraphics.renderTooltip(font,hoveredValue,i,j);
+                    if (hoveredValue != null) guiGraphics.setTooltipForNextFrame(font,hoveredValue,i,j);
                 }
 
                 @Override
@@ -198,36 +193,36 @@ public class LeaderboardsScreen extends PanelVListScreen {
     protected void panelInit() {
         super.panelInit();
         addRenderableOnly((guiGraphics, i, j, f) -> {
-            ScreenUtil.renderPointerPanel(guiGraphics,panel.x + 8,panel.y - 18,166,18);
-            ScreenUtil.renderPointerPanel(guiGraphics,panel.x + (panel.width - 211) / 2,panel.y - 18,211,18);
-            ScreenUtil.renderPointerPanel(guiGraphics,panel.x +  panel.width - 174 ,panel.y - 18,166,18);
+            LegacyRenderUtil.renderPointerPanel(guiGraphics,panel.x + 8,panel.y - 18,166,18);
+            LegacyRenderUtil.renderPointerPanel(guiGraphics,panel.x + (panel.width - 211) / 2,panel.y - 18,211,18);
+            LegacyRenderUtil.renderPointerPanel(guiGraphics,panel.x +  panel.width - 174 ,panel.y - 18,166,18);
             if (!statsBoards.isEmpty() && selectedStatBoard < statsBoards.size()){
                 StatsBoard board = statsBoards.get(selectedStatBoard);
-                Legacy4JClient.applyFontOverrideIf(ScreenUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b-> {
-                    guiGraphics.pose().pushPose();
+                Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b-> {
+                    guiGraphics.pose().pushMatrix();
                     Component filter = Component.translatable("legacy.menu.leaderboard.filter", this.filter.get() == 0 ? OVERALL :  MY_SCORE);
-                    guiGraphics.pose().translate(panel.x + 91 - font.width(filter) / 3f, panel.y - 12, 0);
-                    if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
-                    guiGraphics.drawString(font, filter, 0, 0, 0xFFFFFF);
-                    guiGraphics.pose().popPose();
-                    guiGraphics.pose().pushPose();
-                    guiGraphics.pose().translate(panel.x + (panel.width - font.width(board.displayName) * 2/3f) / 2, panel.y - 12,0);
-                    if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
-                    guiGraphics.drawString(font,board.displayName,0, 0,0xFFFFFF);
-                    guiGraphics.pose().popPose();
-                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().translate(panel.x + 91 - font.width(filter) / 3f, panel.y - 12);
+                    if (!b) guiGraphics.pose().scale(2/3f,2/3f);
+                    guiGraphics.drawString(font, filter, 0, 0, 0xFFFFFFFF);
+                    guiGraphics.pose().popMatrix();
+                    guiGraphics.pose().pushMatrix();
+                    guiGraphics.pose().translate(panel.x + (panel.width - font.width(board.displayName) * 2/3f) / 2, panel.y - 12);
+                    if (!b) guiGraphics.pose().scale(2/3f,2/3f);
+                    guiGraphics.drawString(font,board.displayName,0, 0,0xFFFFFFFF);
+                    guiGraphics.pose().popMatrix();
+                    guiGraphics.pose().pushMatrix();
                     Component entries = Component.translatable("legacy.menu.leaderboard.entries",actualRankBoard.size());
-                    guiGraphics.pose().translate(panel.x + 477 - font.width(entries) / 3f, panel.y - 12,0);
-                    if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
-                    guiGraphics.drawString(font,entries,0, 0,0xFFFFFF);
-                    guiGraphics.pose().popPose();
+                    guiGraphics.pose().translate(panel.x + 477 - font.width(entries) / 3f, panel.y - 12);
+                    if (!b) guiGraphics.pose().scale(2/3f,2/3f);
+                    guiGraphics.drawString(font,entries,0, 0,0xFFFFFFFF);
+                    guiGraphics.pose().popMatrix();
                 });
                 if (board.statsList.isEmpty()) {
-                    guiGraphics.pose().pushPose();
-                    guiGraphics.pose().translate(panel.x + (panel.width - font.width(NO_RESULTS) * 1.5f)/2f, panel.y + (panel.height - 13.5f) / 2f,0);
-                    guiGraphics.pose().scale(1.5f,1.5f,1.5f);
+                    guiGraphics.pose().pushMatrix();
+                    guiGraphics.pose().translate(panel.x + (panel.width - font.width(NO_RESULTS) * 1.5f)/2f, panel.y + (panel.height - 13.5f) / 2f);
+                    guiGraphics.pose().scale(1.5f,1.5f);
                     guiGraphics.drawString(font,NO_RESULTS,0,0, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-                    guiGraphics.pose().popPose();
+                    guiGraphics.pose().popMatrix();
                     return;
                 }
                 guiGraphics.drawString(font,RANK,panel.x + 40, panel.y + 20,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
@@ -241,15 +236,15 @@ public class LeaderboardsScreen extends PanelVListScreen {
                     totalWidth = newWidth;
                 }
                 FactoryScreenUtil.enableBlend();
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(panel.x + (panel.width - 211) / 2f, panel.y - 12,0);
-                guiGraphics.pose().scale(0.5f,0.5f,0.5f);
+                guiGraphics.pose().pushMatrix();
+                guiGraphics.pose().translate(panel.x + (panel.width - 211) / 2f, panel.y - 12);
+                guiGraphics.pose().scale(0.5f,0.5f);
                 (ControlType.getActiveType().isKbm() ? ControlTooltip.ComponentIcon.compoundOf(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(guiGraphics,4,0,false, false);
                 if (statsInScreen < statsBoards.get(selectedStatBoard).renderables.size()) {
                     ControlTooltip.Icon pageControl = ControlTooltip.ComponentIcon.compoundOf(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
                     pageControl.render(guiGraphics,422 - pageControl.render(guiGraphics,0,0,false,true) - 8, 0,false,false);
                 }
-                guiGraphics.pose().popPose();
+                guiGraphics.pose().popMatrix();
                 FactoryScreenUtil.disableBlend();
                 if (statsInScreen == 0) return;
                 int x = (351 - totalWidth) / (statsInScreen + 1);
@@ -261,7 +256,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
                     if (r.isHovered(i,j)) hovered = index;
                     x+= r.getWidth() + (351 - totalWidth) / statsInScreen;
                 }
-                if (hovered != null) guiGraphics.renderTooltip(font, board.statsList.get(hovered).getValue() instanceof EntityType<?> e ? e.getDescription() : board.statsList.get(hovered).getValue() instanceof ItemLike item && item.asItem() != Items.AIR ? Component.translatable(item.asItem().getDescriptionId()) : ControlTooltip.getAction("stat." + board.statsList.get(hovered).getValue().toString().replace(':', '.')), i, j);
+                if (hovered != null) guiGraphics.setTooltipForNextFrame(font, board.statsList.get(hovered).getValue() instanceof EntityType<?> e ? e.getDescription() : board.statsList.get(hovered).getValue() instanceof ItemLike item && item.asItem() != Items.AIR ? Component.translatable(item.asItem().getDescriptionId()) : ControlTooltip.getAction("stat." + board.statsList.get(hovered).getValue().toString().replace(':', '.')), i, j);
             }
         });
     }
@@ -273,7 +268,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        ScreenUtil.renderDefaultBackground(accessor, guiGraphics, false);
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
     }
 
     public void onStatsUpdated() {
@@ -288,34 +283,41 @@ public class LeaderboardsScreen extends PanelVListScreen {
         public final StatType<?> type;
         public final List<Stat<?>> statsList = new ArrayList<>();
         public List<SimpleLayoutRenderable> renderables = new ArrayList<>();
-        public final Map<Predicate, LegacyIconHolder> statIconOverrides = new HashMap<>();
-        public void clear(){
+        public final List<StatIconOverride<?>> statIconOverrides = new ArrayList<>();
+
+        public void clear() {
             statsList.clear();
             renderables.clear();
         }
 
         public SimpleLayoutRenderable getRenderable(Stat<?> stat){
-            for (Map.Entry<Predicate, LegacyIconHolder> entry : statIconOverrides.entrySet()) {
-                if (entry.getKey().test(stat.getValue())){
-                    return entry.getValue();
+            for (var override : statIconOverrides) {
+                if (override.test(stat)){
+                    return override.icon();
                 }
             }
 
-            if (stat.getValue() instanceof ItemLike i){
+            if (stat.getValue() instanceof ItemLike i) {
                 LegacyIconHolder h = new LegacyIconHolder(24,24);
                 h.itemIcon = i.asItem().getDefaultInstance();
                 return h;
-            }else if (stat.getValue() instanceof EntityType<?> e){
+            } else if (stat.getValue() instanceof EntityType<?> e) {
+                ResourceLocation entityIcon = Legacy4J.createModLocation("icon/leaderboards/entity/" + e.builtInRegistryHolder().key().location().getPath());
+                if (Minecraft.getInstance().getGuiSprites().textureAtlas.texturesByName.containsKey(entityIcon)) {
+                    LegacyIconHolder h = new LegacyIconHolder(24, 24);
+                    h.iconSprite = entityIcon;
+                    return h;
+                }
                 return LegacyIconHolder.entityHolder(0,0,24,24, e);
             }
             Component name = Component.translatable("stat." + stat.getValue().toString().replace(':', '.'));
             return SimpleLayoutRenderable.create(Minecraft.getInstance().font.width(name) * 2/3 + 8,7, (l)->((guiGraphics, i, j, f) ->
-                Legacy4JClient.applyFontOverrideIf(ScreenUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b-> {
-                guiGraphics.pose().pushPose();
-                guiGraphics.pose().translate(l.getX() + 4, l.getY(),0);
-                if (!b) guiGraphics.pose().scale(2/3f,2/3f,2/3f);
+                Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b-> {
+                guiGraphics.pose().pushMatrix();
+                guiGraphics.pose().translate(l.getX() + 4, l.getY());
+                if (!b) guiGraphics.pose().scale(2/3f,2/3f);
                 guiGraphics.drawString(Minecraft.getInstance().font,name,0,0,CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-                guiGraphics.pose().popPose();
+                guiGraphics.pose().popMatrix();
             })));
 
         }
@@ -324,9 +326,11 @@ public class LeaderboardsScreen extends PanelVListScreen {
             this.type = type;
             this.displayName = displayName;
         }
+
         public static StatsBoard create(StatType<?> type, Component displayName){
             return new StatsBoard(type, displayName);
         }
+
         public static StatsBoard create(StatType<?> type, Component displayName, Predicate<Stat<?>> canAccept){
             return new StatsBoard(type, displayName){
                 @Override
@@ -335,9 +339,11 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 }
             };
         }
+
         public boolean canAdd(Stat<?> stat){
             return stat.getType() == type;
         }
+
         public boolean add(Stat<?> stat){
             if (canAdd(stat)){
                 if (!statsList.contains(stat)){
@@ -345,10 +351,18 @@ public class LeaderboardsScreen extends PanelVListScreen {
                     renderables.add(getRenderable(stat));
                 }
                 return true;
-            }return false;
+            } return false;
         }
-
     }
+
+    public record StatIconOverride<T>(StatType<T> statType, Predicate<T> isValid, LegacyIconHolder icon) implements Predicate<Stat<?>> {
+
+        @Override
+        public boolean test(Stat<?> stat) {
+            return stat.getType() == statType && isValid.test((T) stat.getValue());
+        }
+    }
+
     public static class Manager implements ResourceManagerReloadListener {
         public static final String LEADERBOARD_LISTING = "leaderboard_listing.json";
 
@@ -368,41 +382,46 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 }
             })));
         }
+
         protected StatsBoard statsBoardFromJson(JsonObject o){
-            StatType<?> statType = FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(o,"type")),BuiltInRegistries.STAT_TYPE);
+            var statType = FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(o,"type")),BuiltInRegistries.STAT_TYPE);
             Component name = o.has("displayName") ? Component.translatable(GsonHelper.getAsString(o,"displayName")) : statType.getDisplayName();
             StatsBoard statsBoard;
             if (o.get("predicate") instanceof JsonObject predObj){
-                Predicate predicate = JsonUtil.registryMatches(statType.getRegistry(),predObj);
-                statsBoard = StatsBoard.create(statType,name, s-> predicate.test(s.getValue()));
-            }else statsBoard = StatsBoard.create(statType,name);
-            if (o.get("overrides") instanceof JsonArray a) a.forEach(e->{
-                if (e instanceof JsonObject override && override.get("type") instanceof JsonPrimitive p) {
-                    String type = p.getAsString();
-                    Predicate predicate = JsonUtil.registryMatches(statType.getRegistry(),override.getAsJsonObject("predicate"));
-                    switch (type) {
-                        case "item" -> {
-                            Item item =  FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(override, "id")),BuiltInRegistries.ITEM);
-                            LegacyIconHolder h =  new LegacyIconHolder(24, 24);
-                            h.itemIcon = item.getDefaultInstance();
-                            statsBoard.statIconOverrides.put(predicate, h);
-                        }
-                        case "entity_type" -> {
-                            EntityType<?> entityType = FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(override, "id")),BuiltInRegistries.ENTITY_TYPE);
-                            statsBoard.statIconOverrides.put(predicate, LegacyIconHolder.entityHolder(0,0,24,24,entityType));
-                        }
-                        case "sprite" -> {
-                            ResourceLocation sprite = ResourceLocation.tryParse(GsonHelper.getAsString(override, "id"));
-                            LegacyIconHolder h = new LegacyIconHolder(24, 24);
-                            h.iconSprite = sprite;
-                            statsBoard.statIconOverrides.put(predicate, h);
-                        }
-                    }
-                }
-            });
+                Predicate predicate = JsonUtil.registryMatches(statType.getRegistry(), predObj);
+                statsBoard = StatsBoard.create(statType, name, s-> predicate.test(s.getValue()));
+            } else statsBoard = StatsBoard.create(statType, name);
+            if (o.get("overrides") instanceof JsonArray a) a.forEach(e-> parseOverride(statType, statsBoard, e));
 
             return statsBoard;
         }
+
+        protected <T> void parseOverride(StatType<T> statType, StatsBoard statsBoard, JsonElement e){
+            if (e instanceof JsonObject override && override.get("type") instanceof JsonPrimitive p) {
+                String type = p.getAsString();
+                var predicate = JsonUtil.registryMatches(statType.getRegistry(), override.getAsJsonObject("predicate"));
+                switch (type) {
+                    case "item" -> {
+                        Item item =  FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(override, "id")),BuiltInRegistries.ITEM);
+                        LegacyIconHolder h =  new LegacyIconHolder(24, 24);
+                        h.itemIcon = item.getDefaultInstance();
+                        statsBoard.statIconOverrides.add(new StatIconOverride<>(statType, predicate, h));
+                    }
+                    //Unused for now, as +1.21.6 gui rendering doesn't allow more than one entity rendering on the screen
+                    //case "entity_type" -> {
+                    //    EntityType<?> entityType = FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(override, "id")),BuiltInRegistries.ENTITY_TYPE);
+                    //    statsBoard.statIconOverrides.put(predicate, LegacyIconHolder.entityHolder(0,0,24,24,entityType));
+                    //}
+                    case "sprite" -> {
+                        ResourceLocation sprite = ResourceLocation.tryParse(GsonHelper.getAsString(override, "id"));
+                        LegacyIconHolder h = new LegacyIconHolder(24, 24);
+                        h.iconSprite = sprite;
+                        statsBoard.statIconOverrides.add(new StatIconOverride<>(statType, predicate, h));
+                    }
+                }
+            }
+        }
+
         @Override
         public String getName() {
             return "legacy:leaderboards_listing";

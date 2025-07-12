@@ -13,7 +13,7 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
 import net.minecraft.world.level.validation.ContentValidationException;
 import wily.legacy.Legacy4J;
-import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacySaveCache;
 import wily.legacy.util.LegacyComponents;
 
 import java.io.IOException;
@@ -62,7 +62,7 @@ public class SaveOptionsScreen extends ConfirmationScreen{
 
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.copySave"),b-> minecraft.setScreen(new ConfirmationScreen(parent, Component.translatable("legacy.menu.copySave"), Component.translatable("legacy.menu.copySaveMessage"), b1->{
             String id = summary.getLevelId();
-            Legacy4JClient.copySaveFile(minecraft.getLevelSource().getBaseDir().resolve(id),minecraft.getLevelSource(),id);
+            LegacySaveCache.copySaveFile(minecraft.getLevelSource().getBaseDir().resolve(id),minecraft.getLevelSource(),id);
             parent.saveRenderableList.reloadSaveList();
             minecraft.setScreen(parent);
 
