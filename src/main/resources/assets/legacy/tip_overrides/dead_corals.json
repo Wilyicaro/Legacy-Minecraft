@@ -1,0 +1,16 @@
+{
+  "overrides": [
+    {
+    "blocks": ["dead_brain_coral","dead_bubble_coral","dead_fire_coral","dead_horn_coral","dead_tube_coral"],
+    "tip": {"translate": "block.minecraft.dead_coral.tip"}
+    },
+    {
+    "blocks": ["dead_brain_coral_block","dead_bubble_coral_block","dead_fire_coral_block","dead_horn_coral_block","dead_tube_coral_block"],
+    "tip": {"translate": "block.minecraft.dead_coral_block.tip"}
+    },
+    {
+    "blocks": ["dead_brain_coral_fan","dead_bubble_coral_fan","dead_fire_coral_fan","dead_horn_coral_fan","dead_tube_coral_fan"],
+    "tip": {"translate": "block.minecraft.dead_coral_fan.tip"}
+    }
+  ]
+}
