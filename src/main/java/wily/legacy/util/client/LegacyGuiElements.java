@@ -27,6 +27,7 @@ public class LegacyGuiElements {
             case 1,2 -> 0.9f;
             default -> 1f;
         } : 1f;
+        ArbitrarySupplier<Float> barAndHealthOffset = ()-> LegacyOptions.hudScale.get() == 2 && LegacyRenderUtil.getStandardHeight() >= 1080 ? -0.5f : 0.0f;
         UIAccessor accessor = FactoryScreenUtil.getGuiAccessor();
         FactoryGuiElement.HOTBAR.pre().register(guiGraphics -> {
             AnimatedCharacterRenderer.render(guiGraphics);
@@ -73,6 +74,13 @@ public class LegacyGuiElements {
                 a.putStaticElement(element.name()+".hud.scaledTranslateY", false);
                 a.putStaticElement(element.name()+".hud.scale", false);
             }
+
+            a.getElements().put(FactoryGuiElement.PLAYER_HEALTH.name()+".translateX", barAndHealthOffset);
+            a.getElements().put(FactoryGuiElement.VEHICLE_HEALTH.name()+".translateX", barAndHealthOffset);
+            a.getElements().put(FactoryGuiElement.EXPERIENCE_BAR.name()+".translateX", barAndHealthOffset);
+            a.getElements().put(FactoryGuiElement.LOCATOR_BAR.name()+".translateX", barAndHealthOffset);
+            a.getElements().put(FactoryGuiElement.JUMP_METER.name()+".translateX", barAndHealthOffset);
+
             a.getElements().put(FactoryGuiElement.OVERLAY_MESSAGE.name()+".translateY", ()-> LegacyRenderUtil.getHUDDistance() + 72 - LegacyOptions.selectedItemTooltipSpacing.get() - LegacyRenderUtil.getHUDSize() - (GuiAccessor.getInstance().getLastToolHighlight().isEmpty() || GuiAccessor.getInstance().getToolHighlightTimer() <= 0 || LegacyRenderUtil.getSelectedItemTooltipLines() == 0 ? 0 : (Math.min(LegacyRenderUtil.getSelectedItemTooltipLines() + 1, LegacyRenderUtil.getTooltip(GuiAccessor.getInstance().getLastToolHighlight()).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum()) - 1) * LegacyOptions.selectedItemTooltipSpacing.get()));
 
             a.getElements().put(FactoryGuiElement.CROSSHAIR.name()+".translateY", ()-> minecraft.getWindow().getGuiScaledHeight() / 2);

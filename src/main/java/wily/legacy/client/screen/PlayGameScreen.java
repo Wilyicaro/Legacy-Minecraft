@@ -64,7 +64,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     protected final ServerRenderableList serverRenderableList = PublishScreen.hasWorldHost() ? new FriendsServerRenderableList(accessor) : new ServerRenderableList(accessor);
 
     public PlayGameScreen(Screen parent, int initialTab) {
-        super(s-> Panel.centered(s,300,256,()-> 0, ()-> UIAccessor.of(s).getBoolean("hasTabList",true) ? 12 : 0),Component.translatable("legacy.menu.play_game"));
+        super(s-> Panel.createPanel(s, p-> p.appearance(300, Math.min(256, s.height - 52)), p-> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + (UIAccessor.of(s).getBoolean("hasTabList",true) ? 12 : 0))),Component.translatable("legacy.menu.play_game"));
         this.parent = parent;
         tabList.selectedIndex = initialTab;
         renderableVLists.clear();
@@ -118,7 +118,6 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     @Override
     protected void init() {
-        panel.height = Math.min(256, height-52);
         if (hasTabList()) addWidget(tabList);
         panel.init();
         renderableVListInit();

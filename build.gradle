@@ -131,7 +131,7 @@ dependencies {
 
 }
 
-def aw = "${mod_id}-${stonecutter.eval(stonecutter.current.version, ">=1.21.2") ? 1212 : 120}.accesswidener"
+def aw = "${mod_id}.accesswidener"
 
 loom {
     accessWidenerPath.set(getRootProject().file("src/main/resources/${aw}"))
