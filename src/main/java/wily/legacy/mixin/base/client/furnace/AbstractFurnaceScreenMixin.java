@@ -33,19 +33,12 @@ import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import static wily.legacy.util.LegacySprites.ARROW;
 
 @Mixin(AbstractFurnaceScreen.class)
 public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> extends AbstractContainerScreen<T> {
-    //? if <1.21.2 {
-    /*@Shadow private boolean widthTooNarrow;
-
-    @Shadow @Final public AbstractFurnaceRecipeBookComponent recipeBookComponent;
-
-    @Unique
-    private ImageButton recipeButton;
-    *///?}
     public AbstractFurnaceScreenMixin(T abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
@@ -55,17 +48,12 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
         super.added();
         ControlTooltip.Renderer.of(this).replace(3,i-> i, c-> hoveredSlot == null || hoveredSlot.getItem().isEmpty() || hoveredSlot.container != minecraft.player.getInventory() ? c : menu.canSmelt(hoveredSlot.getItem()) ? LegacyComponents.MOVE_INGREDIENT : /*? if <1.21.2 {*//*AbstractFurnaceBlockEntity.isFuel*//*?} else {*/minecraft.level.fuelValues().isFuel/*?}*/(hoveredSlot.getItem()) ? LegacyComponents.MOVE_FUEL : c);
     }
-    //? if >1.20.1 {
+
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    //?} else {
-    /*@Shadow @Final private static ResourceLocation RECIPE_BUTTON_LOCATION;
-    @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
-    }
-    *///?}
+
     @Inject(method = "init",at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
@@ -92,28 +80,12 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
                 LegacySlotDisplay.override(s, 14 + s.getContainerSlot() * 21,180);
             }
         }
-        //? if <1.21.2 {
-        /*this.widthTooNarrow = this.width < 379;
-        this.recipeBookComponent.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
-        if (LegacyOptions.showVanillaRecipeBook.get()) {
-            this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
-            recipeButton = this.addRenderableWidget(new ImageButton(this.leftPos + 49, topPos + 49, 20, 18, /^? if >1.20.1 {^/RecipeBookComponent.RECIPE_BUTTON_SPRITES/^?} else {^//^0, 19, RECIPE_BUTTON_LOCATION^//^?}^/, (button) -> {
-                this.recipeBookComponent.toggleVisibility();
-                this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
-                button.setPosition(this.leftPos + 49, topPos + 49);
-            }));
-            if (recipeBookComponent.isVisible()) recipeButton.setFocused(true);
-        }
-        else if (recipeBookComponent.isVisible()) recipeBookComponent.toggleVisibility();
-        *///?}
     }
 
-    //? if >=1.21.2 {
     @Inject(method = "getRecipeBookButtonPosition", at = @At("HEAD"), cancellable = true)
     protected void getRecipeBookButtonPosition(CallbackInfoReturnable<ScreenPosition> cir){
         cir.setReturnValue(new ScreenPosition(this.leftPos + 49, topPos + 49));
     }
-    //?}
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
@@ -127,7 +99,7 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL),leftPos,topPos,imageWidth,imageHeight);
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 77,topPos + 48);
         guiGraphics.pose().scale(19/13f,19/13f);
@@ -137,22 +109,16 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
         guiGraphics.pose().translate(leftPos + 75.5f, topPos + 46.5f);
         guiGraphics.pose().scale(19/39f,19/39f);
         if (menu.isLit()) {
-            int n = Mth.ceil(/*? if >1.20.1 {*/menu.getLitProgress()/*?} else {*//*Mth.clamp(menu.getLitProgress()/ 13f,0,1)*//*?}*/ * 39.0f) + 1;
+            int n = Mth.ceil(menu.getLitProgress() * 39.0f) + 1;
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.LIT_PROGRESS, 42, 42, 0, 42 - n, 0, 42 - n, 42, n);
         }
+        boolean is1080 = LegacyRenderUtil.getStandardHeight() >= 1080;
         guiGraphics.pose().popMatrix();
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW,leftPos + (is1080 ? 109 : 114),topPos + 47,33,24);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 114,topPos + 48);
-        guiGraphics.pose().scale(1.5f,1.5f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW,0,0,22,15);
-        guiGraphics.pose().popMatrix();
-        guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 114,topPos + 46.5f);
+        guiGraphics.pose().translate(leftPos + (is1080 ? 109 : 114),topPos + 47);
         guiGraphics.pose().scale(0.5f,0.5f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.FULL_ARROW,66,48,0,0,0,2,  (int) Math.ceil(/*? if >1.20.1 {*/menu.getBurnProgress()/*?} else {*//*Mth.clamp(menu.getBurnProgress() / 24f ,0,1)*//*?}*/ * 66), 48);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(is1080 ? LegacySprites.FULL_ARROW_1080 : LegacySprites.FULL_ARROW,66,48,0,0,0,0, (int) Math.ceil(menu.getBurnProgress() * 66), 48);
         guiGraphics.pose().popMatrix();
-        //? <1.21.2 {
-        /*if (!recipeBookComponent.isVisible() && recipeButton != null && !recipeButton.isHovered()) recipeButton.setFocused(false);
-        *///?}
     }
 }

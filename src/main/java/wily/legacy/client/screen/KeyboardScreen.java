@@ -184,22 +184,20 @@ public class KeyboardScreen extends OverlayPanelScreen {
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         super.renderDefaultBackground(guiGraphics, i, j, f);
-        FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).setBlitColor(1f,1f,1f,0.8f);
         panel.render(guiGraphics,i,j,f);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(panel.getX() + 4.5f,panel.getY() + 25.5f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,0,0,53, 123);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,panel.getWidth() - 62,0,53, 123);
+        guiGraphics.pose().translate(panel.getX() + 4.5f, panel.getY() + 25.4f);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0, 53, 123);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, panel.getWidth() - 62, 0, 53, 123);
         guiGraphics.pose().translate(-4.5f,0);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,(panel.getWidth() - 267) / 2,-1,267, 125);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,(panel.getWidth() - 267) / 2, -1, 267, 125);
         guiGraphics.pose().popMatrix();
-        FactoryScreenUtil.disableBlend();
         FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(panel.getX() + (panel.getWidth() - font.width(KEYBOARD) * 1.5f) / 2,panel.getY() + 8);
+        guiGraphics.pose().translate(panel.getX() + (panel.getWidth() - font.width(KEYBOARD) * 1.5f) / 2, panel.getY() + 8);
         guiGraphics.pose().scale(1.5f,1.5f);
-        guiGraphics.drawString(font,KEYBOARD,0,0, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+        guiGraphics.drawString(font,KEYBOARD,0,0, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         guiGraphics.pose().popMatrix();
     }
 
@@ -386,7 +384,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
             int bindingOffset = 0;
 
-            if (binding != null && Legacy4JClient.controllerManager.connectedController != null) bindingOffset = binding.getIcon().render(guiGraphics,getX() + i, getY() + (getHeight() - 9) / 2 + 1,true,false);
+            if (binding != null && Legacy4JClient.controllerManager.connectedController != null) bindingOffset = binding.getIcon().render(guiGraphics,getX() + i, getY() + (getHeight() - 9) / 2 + 1, true);
 
             if (iconSprite == null) renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + i + bindingOffset, this.getY(), this.getX() + this.getWidth() - i, this.getY() + this.getHeight(), j);
             else {

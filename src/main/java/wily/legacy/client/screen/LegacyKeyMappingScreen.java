@@ -121,7 +121,7 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
             }
             ControlTooltip.Icon icon = getIcon();
             FactoryScreenUtil.enableBlend();
-            icon.render(guiGraphics, getX() + width - 20 - icon.render(guiGraphics,0,0,false,true) / 2, getY() + (height -  font.lineHeight) / 2 + 1,false,false);
+            icon.render(guiGraphics, getX() + width - 20 - icon.getWidth() / 2, getY() + (height -  font.lineHeight) / 2 + 1,false);
             FactoryScreenUtil.disableBlend();
         }
 

@@ -70,7 +70,7 @@ import static wily.legacy.util.LegacySprites.SMALL_ARROW;
 import static wily.legacy.client.screen.ControlTooltip.*;
 import static wily.legacy.client.screen.RecipeIconHolder.getActualItem;
 
-public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCraftingMenu> implements Controller.Event,ControlTooltip.Event,TabList.Access {
+public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCraftingMenu> implements Controller.Event, ControlTooltip.Event, TabList.Access {
     private final Inventory inventory;
     protected final List<ItemStack> compactItemStackList = new ArrayList<>();
     private final boolean is2x2;
@@ -133,7 +133,6 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         container = new TransientCraftingContainer(abstractContainerMenu,gridDimension,gridDimension);
         warningSlots = new boolean[gridDimension * gridDimension];
         if (Minecraft.getInstance().level == null) return;
-        //? if >=1.20.5
         CraftingInput input = container.asCraftInput();
         List<RecipeInfo<CraftingRecipe>> allRecipes = CommonRecipeManager.byType(RecipeType.CRAFTING).stream().map(h-> RecipeInfo.create(h./*? if >1.20.1 {*/id()/*?} else {*//*getId()*//*?}*/, h/*? if >1.20.1 {*/.value()/*?}*/,h/*? if >1.20.1 {*/.value()/*?}*/ instanceof ShapedRecipe rcp ? LegacyCraftingMenu.updateShapedIngredients(new ArrayList<>(ingredientsGrid), LegacyCraftingMenu.getRecipeOptionalIngredients(rcp), gridDimension, rcp.getWidth(), rcp.getHeight()) : h/*? if >1.20.1 {*/.value()/*?}*/ instanceof ShapelessRecipe r ? LegacyCraftingMenu.getRecipeOptionalIngredients(r) : Collections.emptyList(),h/*? if >1.20.1 {*/.value()/*?}*/.isSpecial() ? ItemStack.EMPTY : h/*? if >1.20.1 {*/.value()/*?}*/.assemble(/*? if <1.20.5 {*//*container*//*?} else {*/input/*?}*/,Minecraft.getInstance().level.registryAccess()))).filter(h->h.getOptionalIngredients().size() <= ingredientsGrid.size()).toList();
         for (LegacyCraftingTabListing listing : LegacyCraftingTabListing.map.values()) {
@@ -153,7 +152,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
 
         }
 
-        var recipesByGroupsCollector = Collectors.<RecipeInfo<CraftingRecipe>, String>groupingBy(h -> h.get()./*? <1.21.2 {*//*getGroup*//*?} else {*/group/*?}*/().isEmpty() ? h.getId().toString() : h.get()./*? <1.21.2 {*//*getGroup*//*?} else {*/group/*?}*/());
+        var recipesByGroupsCollector = Collectors.<RecipeInfo<CraftingRecipe>, String>groupingBy(h -> h.get().group().isEmpty() ? h.getId().toString() : h.get().group());
 
 
         if (LegacyOptions.vanillaTabs.get()) {
@@ -169,7 +168,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                 craftingTabList.addTabButton(43, LegacyTabButton.Type.MIDDLE, LegacyTabButton.iconOf(VANILLA_CATEGORY_ICONS[category.ordinal()]), getTitle(), t -> resetElements());
             });
         }
-        if (LegacyOptions.modCraftingTabs.get()){
+        if (LegacyOptions.modCraftingTabs.get()) {
             allRecipes.stream().collect(Collectors.groupingBy(h -> h.getId().getNamespace(), () -> new TreeMap<>(Comparator.<String>naturalOrder()), recipesByGroupsCollector)).forEach((namespace, m) -> {
                 ModInfo modInfo = FactoryAPIPlatform.getModInfo(namespace);
                 if (modInfo == null || namespace.equals("minecraft") || namespace.equals(Legacy4J.MOD_ID) || m.isEmpty()) return;
@@ -187,12 +186,6 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         addCraftingButtons();
         accessor.getStaticDefinitions().add(UIDefinition.createBeforeInit(a->accessor.putStaticElement("is2x2",is2x2)));
         ItemStack redStar = Items.FIREWORK_STAR.getDefaultInstance();
-        //? if <1.20.5 {
-        /*CompoundTag redStarTag = redStar.getOrCreateTag();
-        CompoundTag explosionTag = new CompoundTag();
-        redStarTag.put("Explosion",explosionTag);
-        explosionTag.putIntArray("Colors", List.of(DyeColor.RED.getFireworkColor()));
-        *///?} else
         redStar.set(DataComponents.FIREWORK_EXPLOSION,new FireworkExplosion(FireworkExplosion.Shape.SMALL_BALL, IntList.of(DyeColor.RED.getFireworkColor()),IntList.of(),false,false));
 
         bannerTabList.add(0,0,0,43, LegacyTabButton.Type.MIDDLE,LegacyTabButton.iconOf(Items.WHITE_BANNER), CommonComponents.EMPTY,null, b-> resetElements());
@@ -341,7 +334,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             }
 
             public void updateRecipe() {
-                scrollableRenderer.scrolled.set(0);
+                scrollableRenderer.resetScrolled();
                 ingredientsGrid.clear();
                 ingredientsGrid.addAll(recipes.get(results.indexOf(itemIcon)).getOptionalIngredients());
                 resultStack = itemIcon.copyWithCount(1);
@@ -377,7 +370,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                 return 0;
             }
             public void updateRecipe() {
-                scrollableRenderer.scrolled.set(0);
+                scrollableRenderer.resetScrolled();
                 updateRecipe.accept(this);
             }
         };
@@ -472,14 +465,23 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     }
 
     @Override
+    public int getTabYOffset() {
+        return 18;
+    }
+
+    @Override
+    public int getTabXOffset() {
+        return hasTypeTabList() ? 21 : 0;
+    }
+
+    @Override
     protected void init() {
         resultStack = ItemStack.EMPTY;
         imageWidth = 348;
         imageHeight = 215;
         super.init();
-        if (hasTypeTabList())
-            leftPos+=21;
-        topPos+=18;
+        leftPos += getTabXOffset();
+        topPos += getTabYOffset();
         menu.addSlotListener(listener);
         menu.inventoryActive = infoType.get() <= 0;
         menu.inventoryOffset = accessor.getElementValue("inventoryOffset",LegacyCraftingMenu.DEFAULT_INVENTORY_OFFSET, Vec3.class);
@@ -505,13 +507,13 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             int index = getTabList().tabButtons.indexOf(t);
             t.type = LegacyTabButton.Type.bySize(index, getMaxTabCount() - 1);
             t.setWidth(51);
-            t.offset = (t1) -> new Vec3(accessor.getDouble("tabListXOffset",-1.5) * getTabList().tabButtons.indexOf(t), t1.selected ? 0 : accessor.getDouble("tabListSelectedYOffset",4.5), 0);
+            t.offset = (t1) -> new Vec3(accessor.getDouble("tabListXOffset", -1.5) * getTabList().tabButtons.indexOf(t), t1.selected ? 0 : accessor.getDouble("tabListSelectedYOffset",4.4), 0);
         });
         if (hasTypeTabList()) typeTabList.init((b, i)->{
             b.spriteRender = LegacyTabButton.ToggleableTabSprites.VERTICAL;
             b.setX(leftPos - b.getWidth() + 6);
             b.setY(topPos + i + 4);
-            b.offset = (t1) -> new Vec3(t1.selected ? 0 : 3.5, 0.5, 0);
+            b.offset = (t1) -> new Vec3(t1.selected ? 0 : 3.4, 0.4, 0);
         },true);
     }
 
@@ -603,7 +605,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                 }
 
                 protected void updateRecipeDisplay(RecipeInfo<CraftingRecipe> rcp) {
-                    scrollableRenderer.scrolled.set(0);
+                    scrollableRenderer.resetScrolled();
                     resultStack = getFocusedResult();
                     clearIngredients(ingredientsGrid);
                     if (rcp == null) return;

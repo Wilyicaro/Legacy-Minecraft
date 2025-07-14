@@ -75,7 +75,7 @@ public abstract class GrindstoneScreenMixin extends AbstractContainerScreen<Grin
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 85,topPos + 50);
         guiGraphics.pose().scale(1.5f,1.5f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW,0,0,22,15);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW,0,0,22,16);
         if ((this.menu.getSlot(0).hasItem() || this.menu.getSlot(1).hasItem()) && !this.menu.getSlot(2).hasItem())
             FactoryGuiGraphics.of(guiGraphics).blitSprite(ERROR_CROSS, 2, 0, 15, 15);
         guiGraphics.pose().popMatrix();

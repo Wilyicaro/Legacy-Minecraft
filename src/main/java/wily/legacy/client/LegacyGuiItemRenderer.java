@@ -10,8 +10,6 @@ import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.textures.TextureFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
@@ -318,7 +316,6 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
         isValid = false;
     }
 
-    @Environment(EnvType.CLIENT)
     public static final class AtlasPosition {
         final int x;
         final int y;

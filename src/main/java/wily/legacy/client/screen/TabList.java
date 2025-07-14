@@ -214,5 +214,17 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
 
     public interface Access {
         TabList getTabList();
+
+        default int getTabYOffset() {
+            int offset = 0;
+            for (LegacyTabButton tabButton : getTabList().tabButtons) {
+                if (tabButton.getHeight() > offset) offset = tabButton.getHeight();
+            }
+            return offset / 2;
+        }
+
+        default int getTabXOffset() {
+            return 0;
+        }
     }
 }

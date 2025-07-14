@@ -100,9 +100,9 @@ public class OptionsScreen extends PanelVListScreen {
         private static final Minecraft mc = Minecraft.getInstance();
         public static final List<Section> list = new ArrayList<>();
 
-        public static OptionInstance<?> createResolutionOptionInstance(){
+        public static OptionInstance<?> createResolutionOptionInstance(OptionsScreen screen) {
             Monitor monitor = mc.getWindow().findBestMonitor();
-            int j = monitor == null ? -1: mc.getWindow().getPreferredFullscreenVideoMode().map(monitor::getVideoModeIndex).orElse(-1);
+            int j = monitor == null ? -1 : mc.getWindow().getPreferredFullscreenVideoMode().map(monitor::getVideoModeIndex).orElse(-1);
             return new OptionInstance<>("options.fullscreen.resolution", OptionInstance.noTooltip(), (component, integer) -> {
                 if (monitor == null)
                     return Component.translatable("options.fullscreen.unavailable");
@@ -110,11 +110,12 @@ public class OptionsScreen extends PanelVListScreen {
                     return Options.genericValueLabel(component, Component.translatable("options.fullscreen.current"));
                 }
                 VideoMode videoMode = monitor.getMode(integer);
-                return Options.genericValueLabel(component, /*? if >1.20.1 {*/Component.translatable("options.fullscreen.entry", videoMode.getWidth(), videoMode.getHeight(), videoMode.getRefreshRate(), videoMode.getRedBits() + videoMode.getGreenBits() + videoMode.getBlueBits())/*?} else {*//*Component.literal(videoMode.toString())*//*?}*/);
+                return Options.genericValueLabel(component, Component.translatable("options.fullscreen.entry", videoMode.getWidth(), videoMode.getHeight(), videoMode.getRefreshRate(), videoMode.getRedBits() + videoMode.getGreenBits() + videoMode.getBlueBits()));
             }, new OptionInstance.IntRange(-1, monitor != null ? monitor.getModeCount() - 1 : -1), j, integer -> {
                 if (monitor == null)
                     return;
                 mc.getWindow().setPreferredFullscreenVideoMode(integer == -1 ? Optional.empty() : Optional.of(monitor.getMode(integer)));
+                FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(mc.getWindow()::changeFullscreenVideoMode, ()-> screen != mc.screen);
             });
         }
 
@@ -229,9 +230,14 @@ public class OptionsScreen extends PanelVListScreen {
                         }
 
                         @Override
+                        public boolean mouseScrolled(double d, double e, double f, double g) {
+                            return selectorTooltipVisibility > 0 && (globalPackSelector.scrollableRenderer.mouseScrolled(g) || selector.scrollableRenderer.mouseScrolled(g)) || super.mouseScrolled(d, e, f, g);
+                        }
+
+                        @Override
                         protected void panelInit() {
                             super.panelInit();
-                            panel.x-=Math.round(Math.min(10,getSelectorTooltipVisibility()) / 10f * 80);
+                            panel.x -= Math.round(Math.min(10,getSelectorTooltipVisibility()) / 10f * 80);
                         }
 
                         private float getSelectorTooltipVisibility(){
@@ -241,7 +247,7 @@ public class OptionsScreen extends PanelVListScreen {
                         @Override
                         public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
                             super.renderDefaultBackground(guiGraphics, i, j, f);
-                            if (selectorTooltipVisibility > 0){
+                            if (selectorTooltipVisibility > 0) {
                                 if (getFocused() != globalPackSelector) selector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -161));
                                 else globalPackSelector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -161));
                                 guiGraphics.nextStratum();
@@ -266,13 +272,13 @@ public class OptionsScreen extends PanelVListScreen {
                     return screen;
                 }));
         public static final Section ADVANCED_GRAPHICS = new Section(
-                Component.translatable("legacy.menu.settings.advanced_options",GRAPHICS.title()),
+                Component.translatable("legacy.menu.settings.advanced_options", GRAPHICS.title()),
                 s->Panel.centered(s, 250,215,0,20),
                 new ArrayList<>(List.of(
                         o->o.renderableVList.addOptionsCategory(
                                 Component.translatable("options.videoTitle"),
                                 LegacyOptions.of(mc.options.fullscreen()),
-                                LegacyOptions.of(createResolutionOptionInstance()),
+                                LegacyOptions.of(createResolutionOptionInstance(o)),
                                 LegacyOptions.of(mc.options.enableVsync()),
                                 LegacyOptions.of(mc.options.framerateLimit()),
                                 LegacyOptions.of(mc.options.fov()),
@@ -320,7 +326,7 @@ public class OptionsScreen extends PanelVListScreen {
                         o-> Legacy4JClient.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c-> o.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c))))));
         public static final Section USER_INTERFACE = add(new Section(
                 Component.translatable("legacy.menu.user_interface"),
-                s->Panel.centered(s,250,200,0,18),
+                s->Panel.centered(s,250,184,0,18),
                 new ArrayList<>(List.of(
                         o->o.renderableVList.addOptions(
                                 LegacyOptions.displayHUD,
@@ -333,9 +339,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.hudOpacity,
                                 LegacyOptions.hudDistance),
                         o -> o.renderableVList.addMultSliderOption(LegacyOptions.interfaceSensitivity, 2),
-                        o-> o.renderableVList.addLinkedOptions(
-                                LegacyOptions.autoResolution, b-> !b.get(),
-                                LegacyOptions.interfaceResolution),
+                        o-> o.renderableVList.addOptions(LegacyOptions.of(mc.options.guiScale())),
                         o-> o.getRenderableVList().addLinkedOptions(
                                 LegacyOptions.legacyItemTooltips,
                                 FactoryConfig::get,

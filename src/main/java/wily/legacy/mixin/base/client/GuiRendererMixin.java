@@ -1,7 +1,6 @@
 package wily.legacy.mixin.base.client;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -22,13 +21,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.LegacyGuiEntityRenderer;
 import wily.legacy.client.LegacyGuiItemRenderState;
 import wily.legacy.client.LegacyGuiItemRenderer;
 import wily.legacy.client.LegacyOptions;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -103,18 +102,17 @@ public class GuiRendererMixin {
         }
     }
 
-    @WrapOperation(method = "preparePictureInPictureState", at = @At(value = "INVOKE", target = "Ljava/util/Map;get(Ljava/lang/Object;)Ljava/lang/Object;"))
-    <B, V> V preparePictureInPictureState(Map<B, V> instance, Object o, Operation<V> original) {
-        //preparePictureInPictureState
-        return (V) preparePictureInPictureState2((Map<Class<? extends PictureInPictureRenderState>, PictureInPictureRenderer<?>>) instance, (Class<? extends PictureInPictureRenderState>) o, (Operation<PictureInPictureRenderer<?>>) original);
-    }
-
-    private <T extends PictureInPictureRenderState> PictureInPictureRenderer<?> preparePictureInPictureState2(Map<Class<? extends PictureInPictureRenderState>, PictureInPictureRenderer<?>> instance, Class<? extends PictureInPictureRenderState> o, Operation<PictureInPictureRenderer<?>> original) {
-        if (o == GuiEntityRenderState.class) {
+    @Inject(method = "preparePictureInPictureState", at = @At("HEAD"), cancellable = true/*? if neoforge {*//*, remap = false*//*?}*/)
+    void preparePictureInPictureState(PictureInPictureRenderState arg, int i, /*? if neoforge {*//*boolean firstPass, CallbackInfoReturnable<Boolean> cir*//*?} else {*/CallbackInfo ci/*?}*/) {
+        if (arg.getClass() == GuiEntityRenderState.class) {
             GuiEntityRenderer guiEntityRenderer = guiEntityRenderers.stream().map(LegacyGuiEntityRenderer::of).filter(LegacyGuiEntityRenderer::isAvailable).findFirst().map(a -> ((GuiEntityRenderer) a)).orElse(guiEntityRenderers.get(0));
             LegacyGuiEntityRenderer.of(guiEntityRenderer).use();
-            return guiEntityRenderer;
+            guiEntityRenderer.prepare((GuiEntityRenderState) arg, this.renderState, i);
+            //? if neoforge {
+            /*cir.setReturnValue(true);
+            *///?} else {
+            ci.cancel();
+            //?}
         }
-        return original.call(instance, o);
     }
 }

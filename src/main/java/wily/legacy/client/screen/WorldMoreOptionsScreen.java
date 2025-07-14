@@ -191,7 +191,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             else tooltipBoxLabel = null;
 
             if (tooltipBoxLabel == null)
-                scrollableRenderer.scrolled.set(0);
+                scrollableRenderer.resetScrolled();
             else scrollableRenderer.scrolled.max = Math.max(0,tooltipBoxLabel.size() - (tooltipBox.getHeight() - 44) / 12);
 
             tooltipBox.render(guiGraphics,i,j,f);

@@ -56,6 +56,7 @@ public class LegacySprites {
     public static final ResourceLocation FEET_SLOT = Legacy4J.createModLocation("container/feet_slot");
     public static final ResourceLocation SHIELD_SLOT = Legacy4J.createModLocation("container/shield_slot");
     public static final ResourceLocation FULL_ARROW = Legacy4J.createModLocation("container/full_arrow");
+    public static final ResourceLocation FULL_ARROW_1080 = Legacy4J.createModLocation("container/full_arrow_1080");
     public static final ResourceLocation SMALL_ARROW = Legacy4J.createModLocation("container/small_arrow");
     public static final ResourceLocation LIT = Legacy4J.createModLocation("container/lit");
     public static final ResourceLocation LIT_PROGRESS = Legacy4J.createModLocation("container/lit_progress");

@@ -225,14 +225,14 @@ public class LegacyUIElementTypes {
             flipA.set(flipA.get() + (f1 - flipA.get()) * 0.9F);
             flip.set(flip.get() + flipA.get());
         }));
-        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "x", "y");
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "x", "y", "width", "height", "scale");
         UIDefinitionManager.ElementType.parseTranslationElements(uiDefinition, elementName, element);
         uiDefinition.getDefinitions().add(UIDefinition.createAfterInit(elementName, (a) -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (guiGraphics, i, j, f) -> {
             float g = Mth.lerp(f, oOpen.get(), open.get());
             float f1 = Mth.lerp(f, oFlip.get(), flip.get());
-            int x = a.getInteger(elementName+".x", 0) + 33;
-            int y = a.getInteger(elementName+".y", 0) + 31;
-            guiGraphics.submitBookModelRenderState(bookModel.get(), ENCHANTING_TABLE_BOOK, g, f1, 40, x, y, x + 24, y + 17);
+            int x = a.getInteger(elementName+".x", 0);
+            int y = a.getInteger(elementName+".y", 0);
+            guiGraphics.submitBookModelRenderState(bookModel.get(), ENCHANTING_TABLE_BOOK, a.getFloat(elementName+".scale", 40.0f), g, f1, x, y, x + a.getInteger(elementName+".width", 38), y + a.getInteger(elementName+".height", 31));
         }))));
     }));
 

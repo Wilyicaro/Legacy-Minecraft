@@ -35,27 +35,27 @@ public abstract class ChatComponentMixin {
 
     @Shadow protected abstract double screenToChatX(double d);
 
-    @WrapOperation(method = "method_71992",at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ARGB;color(FI)I", ordinal = 0))
+    @WrapOperation(method = "method_71992",at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ARGB;color(FI)I", ordinal = 0), remap = false)
     private int changeChatBackground(float f, int i, Operation<Integer> original) {
-        return original.call(f, CommonColor.CHAT_BACKGROUND.get() + 0);
+        return original.call(f, CommonColor.CHAT_BACKGROUND.get().intValue());
     }
 
-    @ModifyArg(method = "method_71992",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 0), index = 0)
+    @ModifyArg(method = "method_71992",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 0), index = 0, remap = false)
     private int changeChatX(int i) {
         return i-Math.round(LegacyRenderUtil.getChatSafeZone());
     }
 
-    @ModifyArg(method = "method_71992",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 0), index = 2)
+    @ModifyArg(method = "method_71992",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 0), index = 2, remap = false)
     private int changeChatXD(int i) {
         return i+Math.round(LegacyRenderUtil.getChatSafeZone());
     }
 
-    @ModifyArg(method = "method_71992",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 1), index = 0)
+    @ModifyArg(method = "method_71992",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 1), index = 0, remap = false)
     private int changeMessageTagX(int i) {
         return i-Math.round(LegacyRenderUtil.getChatSafeZone());
     }
 
-    @ModifyArg(method = "method_71992",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 1), index = 2)
+    @ModifyArg(method = "method_71992",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 1), index = 2, remap = false)
     private int changeMessageTagXD(int i) {
         return i-Math.round(LegacyRenderUtil.getChatSafeZone());
     }

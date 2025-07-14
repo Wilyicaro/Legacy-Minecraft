@@ -9,10 +9,12 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.ScreenEffectRenderer;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -42,7 +44,10 @@ public abstract class ScreenEffectRendererMixin {
     @Shadow @Final private MultiBufferSource bufferSource;
 
     @ModifyArg(method = "renderScreenEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;renderTex(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V"))
-    private TextureAtlasSprite renderScreenEffect(TextureAtlasSprite f, PoseStack i, MultiBufferSource f1, @Local BlockState state) {
+    private TextureAtlasSprite renderScreenEffect(TextureAtlasSprite f, PoseStack i, MultiBufferSource f1, @Local /*? if neoforge {*//*Pair<BlockState, BlockPos> pair*//*?} else {*/BlockState state/*?}*/) {
+        //? if neoforge {
+        /*BlockState state = pair.getLeft();
+        *///?}
         List<BakedQuad> quads = Collections.emptyList();
         var parts = minecraft.getBlockRenderer().getBlockModelShaper().getBlockModel(state).collectParts(minecraft.player.getRandom());
         if (!parts.isEmpty()) quads = parts.get(0).getQuads(Direction.UP);

@@ -226,9 +226,9 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 7,topPos + 21,105,165);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 219.5f, topPos + 42.5f);
+        guiGraphics.pose().translate(leftPos + 219.5f, topPos + 42.4f);
         guiGraphics.pose().scale(1.5f,1.5f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW,0,0,22,15);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW,0,0,22,16);
         guiGraphics.pose().popMatrix();
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 115, topPos + 21);

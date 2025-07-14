@@ -21,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4J;import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.util.LegacyItemUtil;
 
 import java.util.function.Consumer;
 
@@ -44,7 +45,7 @@ public class AttributeUtilMixin {
 
     @ModifyArg(method = "applyTextFor", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/attributes/Attribute;toComponent(Lnet/minecraft/world/entity/ai/attributes/AttributeModifier;Lnet/minecraft/world/item/TooltipFlag;)Lnet/minecraft/network/chat/MutableComponent;"))
     private static AttributeModifier applyTextFor(AttributeModifier par1, @Local(argsOnly = true) ItemStack stack) {
-        return par1.is(Item.BASE_ATTACK_DAMAGE_ID) && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat) ? new AttributeModifier(par1.id(), Legacy4J.getItemDamageModifier(stack) + par1.amount(), par1.operation()) : par1;
+        return par1.is(Item.BASE_ATTACK_DAMAGE_ID) && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat) ? new AttributeModifier(par1.id(), LegacyItemUtil.getItemDamageModifier(stack) + par1.amount(), par1.operation()) : par1;
     }
 
     @ModifyExpressionValue(method = "applyTextFor", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/attributes/AttributeModifier;amount()D", ordinal = 6))

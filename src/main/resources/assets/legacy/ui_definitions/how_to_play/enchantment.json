@@ -54,11 +54,11 @@
         },
         "book": {
           "type": "render_enchanted_book",
-          "translateX": "${panel.x}-15",
-          "translateY": "${panel.y}-13",
-          "scaleX": 1.75,
-          "scaleY": 1.75,
-          "scaleZ": 1.75
+          "x": "${panel.x}+22",
+          "y": "${panel.y}+26",
+          "width": 44,
+          "height": 40,
+          "scale": 50
         },
         "buttons": {
           "type":"children",

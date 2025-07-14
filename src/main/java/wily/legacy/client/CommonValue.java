@@ -24,13 +24,6 @@ public class CommonValue<T> extends Stocker<T> {
 
     public static final CommonValue<Boolean> WIDGET_TEXT_SHADOW = registerCommonValue("widget_text_shadow",true, Codec.BOOL);
     public static final CommonValue<Float> LEGACY_FONT_DIM_FACTOR = registerCommonValue("legacy_font_dim_factor",0.0f, Codec.FLOAT);
-    public static final CommonValue<Double> SCALE_MULTIPLIER = registerCommonValue(FactoryAPI.createVanillaLocation("scale_multiplier"),new CommonValue<>(1.0d, Codec.DOUBLE){
-        @Override
-        public void set(Double obj) {
-            super.set(obj);
-            if (obj != 1) Minecraft.getInstance().execute(()->Minecraft.getInstance().resizeDisplay());
-        }
-    });
 
 
     public void parse(Dynamic<?> dynamic){

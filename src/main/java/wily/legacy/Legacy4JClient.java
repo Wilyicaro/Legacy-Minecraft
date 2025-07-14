@@ -73,8 +73,7 @@ import wily.legacy.client.controller.*;
 //? if fabric {
 import wily.legacy.client.screen.compat.ModMenuCompat;
 //?} else if forge {
-/*import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.client.event.RegisterPresetEditorsEvent;
+/*import net.minecraftforge.client.event.RegisterPresetEditorsEvent;
 *///?} else if neoforge {
 /*import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.client.event.RegisterPresetEditorsEvent;
@@ -316,13 +315,9 @@ public class Legacy4JClient {
 
     public static void postScreenInit(Screen screen){
         if (screen.getFocused() != null && !screen.children().contains(screen.getFocused())){
-            //? if >1.20.1 {
             screen.clearFocus();
-            //?} else {
-            /*screen.setFocused(null);
-            *///?}
         }
-        if ((Minecraft.getInstance().getLastInputType().isKeyboard() || controllerManager.connectedController != null || controllerManager.getCursorMode().isNever()) && !controllerManager.getCursorMode().isAlways()) {
+        if ((Minecraft.getInstance().getLastInputType().isKeyboard() || controllerManager.isControllerTheLastInput() || controllerManager.getCursorMode().isNever()) && !controllerManager.getCursorMode().isAlways()) {
             Controller.Event e = Controller.Event.of(screen);
             if (e.disableCursorOnInit() && !controllerManager.getCursorMode().isAlways()) controllerManager.disableCursor();
             if (controllerManager.isCursorDisabled && (!e.disableCursorOnInit() || controllerManager.getCursorMode().isAlways())) controllerManager.enableCursorAndScheduleReset();
@@ -492,6 +487,9 @@ public class Legacy4JClient {
         });
         //? if neoforge {
         /*FactoryAPIPlatform.getModEventBus().addListener(EventPriority.NORMAL,false, RegisterPresetEditorsEvent.class, e->Legacy4JClient.VANILLA_PRESET_EDITORS.forEach(((o, presetEditor) -> o.ifPresent(worldPresetResourceKey -> e.register(worldPresetResourceKey, presetEditor)))));
+        *///?}
+        //? if forge {
+        /*RegisterPresetEditorsEvent.getBus(FactoryAPIPlatform.getModEventBus()).addListener(e-> Legacy4JClient.VANILLA_PRESET_EDITORS.forEach(((o, presetEditor) -> o.ifPresent(worldPresetResourceKey -> e.register(worldPresetResourceKey, presetEditor)))));
         *///?}
         FactoryAPIClient.PlayerEvent.DISCONNECTED_EVENT.register(p-> PackAlbum.applyDefaultResourceAlbum());
         FactoryAPIClient.registerConfigScreen(FactoryAPIPlatform.getModInfo(MOD_ID),Legacy4JSettingsScreen::new);

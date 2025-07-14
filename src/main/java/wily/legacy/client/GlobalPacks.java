@@ -168,7 +168,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
             List<Pack> displayPacks = getDisplayPacks();
             this.selectedIndex = Stocker.cyclic(0,index,displayPacks.size());
             selectedPack = displayPacks.get(selectedIndex);
-            scrollableRenderer.scrolled.set(0);
+            scrollableRenderer.resetScrolled();
             ResourceLocation background = PackAlbum.Selector.getPackBackground(selectedPack);
             scrollableRenderer.scrolled.max = Math.max(0,labelsCache.apply(selectedPack.getDescription(), 145).getLineCount() - (background == null ? 20 : 7));
             updateTooltip();
@@ -239,9 +239,9 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         }
 
         @Override
-        public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
+        public boolean mouseScrolled(double d, double e, double f, double g) {
             if (updateScroll((int) Math.signum(g),false)) return true;
-            return super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g);
+            return super.mouseScrolled(d, e, f, g);
         }
 
         public boolean updateScroll(int i, boolean cyclic){
@@ -273,7 +273,10 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 visibleCount++;
             }
             FactoryScreenUtil.disableBlend();
-            guiGraphics.drawString(font,getMessage(),getX() + 1,getY(),isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(),isHoveredOrFocused());
+            guiGraphics.pose().pushMatrix();
+            if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.4f,0.4f);
+            guiGraphics.drawString(font,getMessage(),getX() + 2,getY(),isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(), isHoveredOrFocused());
+            guiGraphics.pose().popMatrix();
             if (scrolledList.max > 0){
                 if (scrolledList.get() < scrolledList.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, getX() + width - 12, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);
                 if (scrolledList.get() > 0) scrollRenderer.renderScroll(guiGraphics,ScreenDirection.LEFT,getX() + 8, getY() + font.lineHeight + (height - font.lineHeight - 11) / 2);

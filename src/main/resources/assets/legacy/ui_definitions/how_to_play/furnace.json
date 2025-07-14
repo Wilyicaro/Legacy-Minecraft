@@ -89,10 +89,10 @@
     "arrow": {
       "type":"blit_sprite",
       "sprite": "legacy:container/arrow",
-      "x": "${panel.x}+14+3*21+37",
-      "y": "${panel.y}+23+25",
+      "x": "${panel.x}+109",
+      "y": "${panel.y}+47",
       "width": 33,
-      "height": 22
+      "height": 24
     },
     "output": {
       "type":"put_legacy_slot",

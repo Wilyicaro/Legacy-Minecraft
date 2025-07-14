@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceLinkedOpenHashMap;
 import net.minecraft.ChatFormatting;
@@ -19,10 +18,8 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Direction;
-//? if >=1.20.5 {
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
-//?}
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -37,11 +34,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.*;
-//? if <1.21.5 {
-//?} else {
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.animal.wolf.Wolf;
-//?}
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.animal.horse.Llama;
@@ -58,9 +52,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
-//? if >=1.21.2 {
 import net.minecraft.world.item.crafting.RecipePropertySet;
-//?}
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.*;
@@ -75,7 +67,6 @@ import org.lwjgl.glfw.GLFW;
 import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.ItemContainerPlatform;
 import wily.factoryapi.base.ArbitrarySupplier;
-import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.ColorUtil;
 import wily.factoryapi.util.FactoryItemUtil;
 import wily.factoryapi.util.FactoryScreenUtil;
@@ -247,7 +238,7 @@ public interface ControlTooltip {
     }
 
     static boolean isBundle(ItemStack stack){
-        return /*? if <1.21.2 {*//*stack.getItem() instanceof BundleItem*//*?} else {*/stack.is(ItemTags.BUNDLES)/*?}*/;
+        return stack.is(ItemTags.BUNDLES);
     }
 
     static boolean isBundleAndAcceptItem(ItemStack stack, ItemStack itemToAccept){
@@ -269,16 +260,29 @@ public interface ControlTooltip {
         return create(()-> getIconFromKeyMapping(mapping),action);
     }
 
-    static float getAlpha(){
+    static float getAlpha() {
         return Math.max(Minecraft.getInstance().screen == null ? 0.0f : 0.2f,  LegacyRenderUtil.getHUDOpacity());
     }
 
     interface Icon {
-        int render(GuiGraphics graphics, int x, int y, boolean allowPressed, boolean simulate);
+        int render(GuiGraphics graphics, int x, int y, boolean allowPressed, int color, boolean simulate);
+
+        default int render(GuiGraphics graphics, int x, int y, boolean allowPressed, int color) {
+            return render(graphics, x, y, allowPressed, color, false);
+        }
+
+        default int render(GuiGraphics graphics, int x, int y, boolean allowPressed) {
+            return render(graphics, x, y, allowPressed, 0xFFFFFFFF);
+        }
+
+        default int getWidth() {
+            return render(null, 0, 0, false, 0xFFFFFFFF, true);
+        }
+
         static Icon createCompound(Icon[] icons){
-            return (graphics, x, y, allowPressed, simulate) -> {
+            return (graphics, x, y, allowPressed, color, simulate) -> {
                 int totalWidth = 0;
-                for (Icon icon : icons) totalWidth+= icon.render(graphics, x + totalWidth, y, allowPressed, simulate);
+                for (Icon icon : icons) totalWidth+= icon.render(graphics, x + totalWidth, y, allowPressed, color, simulate);
                 return totalWidth;
             };
         }
@@ -295,9 +299,9 @@ public interface ControlTooltip {
                 }
 
                 @Override
-                public int render(GuiGraphics graphics, int x, int y, boolean allowPressed, boolean simulate)  {
+                public int render(GuiGraphics graphics, int x, int y, boolean allowPressed, int color, boolean simulate)  {
                     Font font = Minecraft.getInstance().font;
-                    if (!simulate) graphics.drawString(font,getComponent(), x, y, ColorUtil.withAlpha(0xFFFFFF, getAlpha()),false);
+                    if (!simulate) graphics.drawString(font, getComponent(), x, y, color,false);
                     return font.width(getComponent());
                 };
             };
@@ -343,7 +347,7 @@ public interface ControlTooltip {
         }
 
         @Override
-        public int render(GuiGraphics graphics, int x, int y, boolean allowPressed, boolean simulate){
+        public int render(GuiGraphics graphics, int x, int y, boolean allowPressed, int color, boolean simulate){
             Component c = getComponent(allowPressed);
             Component co = getOverlayComponent(allowPressed);
             Font font = Minecraft.getInstance().font;
@@ -354,7 +358,7 @@ public interface ControlTooltip {
             lastPressed = pressed();
 
             if (!simulate && c != null) {
-                graphics.drawString(font,c,x + (co == null || cw > cow ? 0 : (cow - cw) / 2),y,ColorUtil.withAlpha(0xFFFFFF, getAlpha()) ,false);
+                graphics.drawString(font, c, x + (co == null || cw > cow ? 0 : (cow - cw) / 2), y, color,false);
             }
             if (!simulate && co != null){
                 float rel = startPressTime == 0 ? 0 : canLoop() ? getPressInterval() % 1 : Math.min(getPressInterval(),1);
@@ -363,7 +367,7 @@ public interface ControlTooltip {
                 graphics.pose().pushMatrix();
                 graphics.pose().translate(x + (c == null || cow > cw ? (cow - cow * d) / 2 : (cw  - cow * d) / 2f),y + (9 - 9 * d) / 2);
                 graphics.pose().scale(d,d);
-                graphics.drawString(font,co,0,0, ColorUtil.withAlpha(0xFFFFFF, getAlpha() * (0.8f + (rel >= 0.5f ? 0.2f : 0))),false);
+                graphics.drawString(font,co,0,0, ColorUtil.withAlpha(color, ColorUtil.getAlpha(color) * (0.8f + (rel >= 0.5f ? 0.2f : 0))),false);
                 graphics.pose().popMatrix();
             }
             return Math.max(cw,cow);
@@ -505,16 +509,16 @@ public interface ControlTooltip {
 
             renderTooltips.forEach((action,icon)->{
                 if (left) {
-                    int controlWidth = icon.render(guiGraphics, 32, baseHeight, allowPressed(), false);
+                    int controlWidth = icon.render(guiGraphics, 32, baseHeight, allowPressed(), ColorUtil.withAlpha(0xFFFFFF, getAlpha()), false);
                     if (controlWidth > 0) {
                         guiGraphics.drawString(minecraft.font, action, 34 + controlWidth, baseHeight, ColorUtil.withAlpha(CommonColor.ACTION_TEXT.get(), getAlpha()));
                         guiGraphics.pose().translate(controlWidth + minecraft.font.width(action) + 12, 0);
                     }
                 } else {
-                    int controlWidth = icon.render(guiGraphics, -32, baseHeight, allowPressed(), true);
+                    int controlWidth = icon.getWidth();
                     if (controlWidth > 0) {
                         guiGraphics.pose().translate(-controlWidth - minecraft.font.width(action), 0);
-                        icon.render(guiGraphics, -32, baseHeight, allowPressed(), false);
+                        icon.render(guiGraphics, -32, baseHeight, allowPressed(), ColorUtil.withAlpha(0xFFFFFF, getAlpha()), false);
                         guiGraphics.drawString(minecraft.font, action, -30 + controlWidth, baseHeight, ColorUtil.withAlpha(CommonColor.ACTION_TEXT.get(), getAlpha()));
                         guiGraphics.pose().translate(-12, 0);
                     }
@@ -590,7 +594,7 @@ public interface ControlTooltip {
 
         protected ControlTooltip guiControlTooltipFromJson(JsonObject o){
             LegacyKeyMapping mapping = LegacyKeyMapping.of(KeyMapping.ALL.get(GsonHelper.getAsString(o, "keyMapping")));
-            BiPredicate<Item, /*? if <1.20.5 {*//*CompoundTag*//*?} else {*/DataComponentPatch/*?}*/> itemPredicate = o.has("heldItem") ? o.get("heldItem") instanceof JsonObject obj ? JsonUtil.registryMatchesItem(obj) : o.get("heldItem").getAsBoolean() ? (i, t)-> i != null && i != Items.AIR : (i, t)-> false : (i, t)-> true;
+            BiPredicate<Item, DataComponentPatch> itemPredicate = o.has("heldItem") ? o.get("heldItem") instanceof JsonObject obj ? JsonUtil.registryMatchesItem(obj) : o.get("heldItem").getAsBoolean() ? (i, t)-> i != null && i != Items.AIR : (i, t)-> false : (i, t)-> true;
             Predicate<Block> blockPredicate = o.has("hitBlock") ? o.get("hitBlock") instanceof JsonObject obj ? JsonUtil.registryMatches(BuiltInRegistries.BLOCK,obj) : o.get("hitBlock").getAsBoolean() ? b-> !b.defaultBlockState().isAir() : b-> false : b-> true;
             Predicate<EntityType<?>> entityPredicate = o.has("hitEntity") ? o.get("hitEntity") instanceof JsonObject obj ? JsonUtil.registryMatches(BuiltInRegistries.ENTITY_TYPE,obj) : staticPredicate(o.get("hitEntity").getAsBoolean()) : e-> true;
             Minecraft minecraft = Minecraft.getInstance();

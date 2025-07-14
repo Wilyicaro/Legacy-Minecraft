@@ -13,6 +13,7 @@ import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacyComponents;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
@@ -76,6 +77,8 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
     protected void init() {
         addRenderableWidget(tabList);
         super.init();
+        panel.panelSprite = LegacySprites.SMALL_PANEL;
+        addRenderableOnly(tabList::renderSelected);
         addRenderableWidget(editBox);
         editBox.setPosition(panel.getX() + (panel.width - editBox.getWidth()) / 2, panel.getY() + 10);
         editBox.setResponder(s->resetElements());
@@ -83,7 +86,7 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
             b.spriteRender = LegacyTabButton.ToggleableTabSprites.VERTICAL;
             b.setX(panel.x - b.getWidth() + 6);
             b.setY(panel.y + i + 4);
-            b.offset = (t1) -> new Vec3(t1.selected ? 0 : 3.5, 0.5, 0);
+            b.offset = (t1) -> new Vec3(t1.selected ? 0 : 3.4, 0.4, 0);
         },true);
     }
 

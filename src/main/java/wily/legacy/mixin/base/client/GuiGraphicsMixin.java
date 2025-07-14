@@ -72,21 +72,20 @@ public abstract class GuiGraphicsMixin {
     private void renderItemDecorationsTail(Font font, ItemStack itemStack, int i, int j, String string, CallbackInfo ci){
         Legacy4JClient.legacyFont = true;
     }
-    @Inject(method = "renderTooltip", at = @At("HEAD"), cancellable = true)
-    private void renderTooltipInternal(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner,/*? if >=1.21.2 {*/ ResourceLocation location,/*?}*/ CallbackInfo ci){
+    @Inject(method = /*? if neoforge {*/ /*"renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/world/item/ItemStack;)V", remap = false*//*?} else {*/"renderTooltip"/*?}*/, at = @At("HEAD"), cancellable = true)
+    private void renderTooltipInternal(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner, ResourceLocation location/*? if neoforge {*//*, ItemStack tooltipStack*//*?}*/, CallbackInfo ci){
         if (!LegacyOptions.legacyItemTooltips.get()) return;
         ci.cancel();
         if (list.isEmpty()) return;
         //? if forge {
         /*RenderTooltipEvent.Pre preEvent = ForgeHooksClient.onRenderTooltipPre(this.tooltipStack, self(), i, j, this.guiWidth(), this.guiHeight(), list, font, clientTooltipPositioner);
-         *///?} else if neoforge {
-        /*RenderTooltipEvent.Pre preEvent = ClientHooks.onRenderTooltipPre(this.tooltipStack, self(), i, j, this.guiWidth(), this.guiHeight(), list, font, clientTooltipPositioner);
-         *///?}
-        //? if neoforge || forge {
-        /*if (preEvent.isCanceled()) {
-            return;
-        }
-        font = preEvent.getFont();
+        if (preEvent == null) return;
+        *///?} else if neoforge {
+        /*RenderTooltipEvent.Pre preEvent = ClientHooks.onRenderTooltipPre(tooltipStack, self(), i, j, this.guiWidth(), this.guiHeight(), list, font, clientTooltipPositioner);
+        if (preEvent.isCanceled()) return;
+        *///?}
+        //? if forge || neoforge {
+        /*font = preEvent.getFont();
         i = preEvent.getX();
         j = preEvent.getY();
         *///?}

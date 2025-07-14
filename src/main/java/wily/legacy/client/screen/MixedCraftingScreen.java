@@ -66,7 +66,7 @@ import static wily.legacy.client.screen.ControlTooltip.*;
 import static wily.legacy.util.LegacySprites.SMALL_ARROW;
 
 
-public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<CraftingContainer>*//*?} else if <1.21.2 {*//*RecipeBookMenu<CraftingInput, CraftingRecipe>*//*?} else {*/AbstractCraftingMenu/*?}*/> extends AbstractContainerScreen<T> implements Controller.Event, Event,TabList.Access {
+public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<CraftingContainer>*//*?} else if <1.21.2 {*//*RecipeBookMenu<CraftingInput, CraftingRecipe>*//*?} else {*/AbstractCraftingMenu/*?}*/> extends AbstractContainerScreen<T> implements Controller.Event, Event, TabList.Access {
     private final Inventory inventory;
     protected final List<ItemStack> compactItemStackList = new ArrayList<>();
     protected final /*? if <1.21.2 {*/ /*StackedContents*//*?} else {*/StackedItemContents/*?}*/ stackedContents = new /*? if <1.21.2 {*/ /*StackedContents*//*?} else {*/StackedItemContents/*?}*/();
@@ -85,7 +85,7 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
     protected final EditBox searchBox = new EditBox(Minecraft.getInstance().font, 0, 0, 200,20, LegacyComponents.SEARCH_ITEMS);
     protected boolean searchMode = false;
 
-    public static final /*? if <1.21.2 {*//*RecipeBookCategories*//*?} else {*/ExtendedRecipeBookCategory/*?}*/[] VANILLA_CATEGORIES = new /*? if <1.21.2 {*//*RecipeBookCategories*//*?} else {*/ExtendedRecipeBookCategory/*?}*/[]{RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_REDSTONE, RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_MISC, /*? if <1.21.2 {*//*RecipeBookCategories.CRAFTING_SEARCH*//*?} else {*/SearchRecipeBookCategory.CRAFTING/*?}*/};
+    public static final ExtendedRecipeBookCategory[] VANILLA_CATEGORIES = new ExtendedRecipeBookCategory[]{RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_REDSTONE, RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_MISC, SearchRecipeBookCategory.CRAFTING};
 
     protected int selectedCraftingButton;
 
@@ -225,15 +225,6 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
         menu.fillCraftSlotsStackedContents(stackedContents);
         var collections = Minecraft.getInstance().player.getRecipeBook().getCollection(VANILLA_CATEGORIES[getTabList().selectedIndex]);
         allowRecipeDisplay = false;
-        //? if <1.21.2 {
-        /*int dim = menu.getGridWidth() * menu.getGridHeight();
-        for (int i = 1; i <= dim; i++) {
-            if (menu.getSlot(i).hasItem()) {
-                break;
-            } else if (i == dim) allowRecipeDisplay = true;
-        }
-        collections.forEach(collection-> collection.canCraft(stackedContents, menu.getGridWidth(), menu.getGridHeight(), Minecraft.getInstance().player.getRecipeBook()));
-        *///?} else {
         var context = SlotDisplayContext.fromLevel(minecraft.level);
         allowRecipeDisplay = menu.getInputGridSlots().stream().noneMatch(Slot::hasItem);
         collections.forEach(collection-> collection.selectRecipes(stackedContents, d -> switch (d) {
@@ -241,7 +232,6 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
             case ShapelessCraftingRecipeDisplay shapelessCraftingRecipeDisplay -> menu.getGridWidth() * menu.getGridHeight() >= shapelessCraftingRecipeDisplay.ingredients().size();
             default -> false;
         }));
-        //?}
         recipesByGroup.clear();
 
 
@@ -249,14 +239,11 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
         if (!searchBox.getValue().isBlank()){
             ClientPacketListener clientPacketListener = this.minecraft.getConnection();
             if (clientPacketListener != null) {
-                searchCollections = /*? if <1.21 {*//*minecraft.getSearchTree(SearchRegistry.RECIPE_COLLECTIONS)*//*?} else {*/clientPacketListener.searchTrees().recipes()/*?}*/.search(searchBox.getValue().toLowerCase(Locale.ROOT));
+                searchCollections = clientPacketListener.searchTrees().recipes().search(searchBox.getValue().toLowerCase(Locale.ROOT));
             }
         }
         for (RecipeCollection collection : collections) {
-            if (!collection./*? if <1.21.2 {*//*hasFitting*//*?} else {*/hasAnySelected/*?}*/() || searchCollections != null && !searchCollections.contains(collection)) continue;
-            //? if <1.21.2 {
-            /*var selectedRecipes = collection.getRecipes(onlyCraftableRecipes);
-            *///?} else
+            if (!collection.hasAnySelected() || searchCollections != null && !searchCollections.contains(collection)) continue;
             var selectedRecipes = collection.getSelectedRecipes(onlyCraftableRecipes ? RecipeCollection.CraftableStatus.CRAFTABLE : RecipeCollection.CraftableStatus.ANY);
 
 
@@ -266,14 +253,6 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
             recipesByGroup.add(selectedRecipes.stream().map(e->{
                 List<Optional<Ingredient>> ings = new ArrayList<>(Collections.nCopies(menu.getGridWidth() * menu.getGridHeight(), Optional.empty()));
                 boolean[] warningSlots = new boolean[menu.getGridWidth() * menu.getGridHeight()];
-                //? if <1.21.2 {
-                /*Recipe<?> recipe = /^? if <1.20.2 {^//^e^//^?} else {^/e.value()/^?}^/;
-                if (recipe instanceof ShapedRecipe shapedRecipe) {
-                    LegacyCraftingMenu.updateShapedIngredients(ings, LegacyCraftingMenu.getRecipeOptionalIngredients(shapedRecipe), menu.getGridWidth(), shapedRecipe.getWidth(), shapedRecipe.getHeight());
-                } else for (int i = 0; i < recipe.getIngredients().size(); i++) {
-                    ings.set(i, Optional.of(recipe.getIngredients().get(i)));
-                }
-                *///?} else {
                 List<List<ItemStack>> displays = new ArrayList<>(Collections.nCopies(menu.getGridWidth() * menu.getGridHeight(), Collections.singletonList(ItemStack.EMPTY)));
                 switch (e.display()){
                     case ShapedCraftingRecipeDisplay shapedCraftingRecipeDisplay ->
@@ -292,14 +271,10 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
                         ings.set(index, Optional.of(ingredients.get(index)));
                     }
                 });
-                //?}
 
                 if (allowRecipeDisplay) {
                     compactItemStackList.clear();
                     RecipeMenu.handleCompactInventoryList(compactItemStackList, inventory, ItemStack.EMPTY);
-                    //? if <1.21.2 {
-                    /*LegacyCraftingScreen.canCraft(compactItemStackList, ings, warningSlots);
-                    *///?} else {
                     main : for (int i = 0; i < displays.size(); i++) {
                         List<ItemStack> stacks = displays.get(i);
                         if (stacks.isEmpty() || stacks.get(0).isEmpty()) {
@@ -315,23 +290,18 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
                         }
                         warningSlots[i] = true;
                     }
-                    //?}
                 }
                 VanillaCrafting crafting = new VanillaCrafting() {
                     @Override
                     public ItemStack getItemFromGrid(int index) {
-                        //? if <1.21.2 {
-                        /*return RecipeIconHolder.getActualItem(ings.get(index));
-                        *///?} else {
                         List<ItemStack> items = displays.get(index);
                         if (items.isEmpty()) return ItemStack.EMPTY;
                         return items.get((int) ((Util.getMillis() / 800) % items.size()));
-                        //?}
                     }
 
                     @Override
                     public boolean canCraft() {
-                        return collection.isCraftable(/*? if <1.21.2 {*//*e*//*?} else {*/e.id()/*?}*/);
+                        return collection.isCraftable(e.id());
                     }
 
                     @Override
@@ -388,11 +358,16 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
     }
 
     @Override
+    public int getTabYOffset() {
+        return 18;
+    }
+
+    @Override
     protected void init() {
         imageWidth = 349;
         imageHeight = 215;
         super.init();
-        topPos += 18;
+        topPos += getTabYOffset();
         for (int i = 0; i < menu.slots.size(); i++) {
             Slot s = menu.slots.get(i);
             if (i == 0){
@@ -494,7 +469,7 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
             int index = getTabList().tabButtons.indexOf(t);
             t.type = LegacyTabButton.Type.bySize(index, getMaxTabCount());
             t.setWidth(accessor.getInteger("tabListButtonWidth", 71));
-            t.offset = (t1) -> new Vec3(accessor.getDouble("tabListXOffset", -1.5) * getTabList().tabButtons.indexOf(t), t1.selected ? 0 : accessor.getDouble("tabListSelectedYOffset", 4.5), 0);
+            t.offset = (t1) -> new Vec3(accessor.getDouble("tabListXOffset", -1.5) * getTabList().tabButtons.indexOf(t), t1.selected ? 0 : accessor.getDouble("tabListSelectedYOffset", 4.4), 0);
         });
     }
 
@@ -546,7 +521,7 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
                 }
 
                 protected void updateRecipeDisplay(RecipeInfo<VanillaCrafting> rcp) {
-                    scrollableRenderer.scrolled.set(0);
+                    scrollableRenderer.resetScrolled();
                 }
 
                 @Override

@@ -54,7 +54,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     public final List<ResourceKey<Level>> dimensionsToReset = new ArrayList<>();
     public Difficulty difficulty;
     public final LevelSummary summary;
-    protected final PackAlbum.Selector resourceAssortSelector;
+    protected final PackAlbum.Selector resourceAlbumSelector;
     protected final TickBox onlineTickBox;
     protected final PublishScreen publishScreen;
     public static final List<GameType> GAME_TYPES = Arrays.stream(GameType.values()).toList();
@@ -75,7 +75,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         });
         hostPrivileges = hasCommands(summary);
         trustPlayers = LegacyClientWorldSettings.of(summary.getSettings()).trustPlayers();
-        (resourceAssortSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 112, 220,45, !LegacyRenderUtil.hasTooltipBoxes(accessor),LegacyClientWorldSettings.of(summary.getSettings()).getSelectedResourceAlbum())).active = !this.isLocked;
+        (resourceAlbumSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 112, 220,45, !LegacyRenderUtil.hasTooltipBoxes(accessor),LegacyClientWorldSettings.of(summary.getSettings()).getSelectedResourceAlbum())).active = !this.isLocked;
     }
 
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource source) {
@@ -89,7 +89,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     }
 
     public static boolean hasCommands(LevelSummary levelSummary){
-        return levelSummary./*? if <1.20.5 {*//*hasCheats*//*?} else {*/hasCommands/*?}*/();
+        return levelSummary.hasCommands();
     }
 
     public static LevelStorageSource.LevelStorageAccess getSummaryAccess(LevelStorageSource source, LevelSummary summary){
@@ -112,9 +112,9 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         onlineTickBox.setPosition(panel.x+ 14, panel.y+161);
         addRenderableWidget(onlineTickBox);
         setInitialFocus(loadButton);
-        resourceAssortSelector.setX(panel.x + 13);
-        resourceAssortSelector.setY(panel.y + 112);
-        addRenderableWidget(resourceAssortSelector);
+        resourceAlbumSelector.setX(panel.x + 13);
+        resourceAlbumSelector.setY(panel.y + 112);
+        addRenderableWidget(resourceAlbumSelector);
     }
 
     public void onLoad() {
@@ -157,7 +157,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
                 throw new RuntimeException(e);
             }
         });
-        LegacyClientWorldSettings.of(summary.getSettings()).setSelectedResourceAlbum(resourceAssortSelector.getSelectedAlbum());
+        LegacyClientWorldSettings.of(summary.getSettings()).setSelectedResourceAlbum(resourceAlbumSelector.getSelectedAlbum());
         loadWorld(this,minecraft, LegacySaveCache.getLevelStorageSource(),summary);
         Legacy4JClient.serverPlayerJoinConsumer = s-> {
             if (dimensionsToReset.contains(Level.END)) s.getServer().getLevel(Level.END).setDragonFight(new EndDragonFight(minecraft.getSingleplayerServer().getLevel(Level.END),minecraft.getSingleplayerServer().getWorldData().worldGenOptions().seed(), EndDragonFight.Data.DEFAULT));
@@ -167,7 +167,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
             publishScreen.publish((IntegratedServer) s.getServer());
             LegacyClientWorldSettings.of(s.getServer().getWorldData()).setAllowCommands(hostPrivileges);
             s.getServer().getPlayerList().sendPlayerPermissionLevel(s);
-            LegacyClientWorldSettings.of(s.getServer().getWorldData()).setSelectedResourceAlbum(resourceAssortSelector.getSelectedAlbum());
+            LegacyClientWorldSettings.of(s.getServer().getWorldData()).setSelectedResourceAlbum(resourceAlbumSelector.getSelectedAlbum());
             if (s.gameMode.getGameModeForPlayer() != gameTypeSlider.getObjectValue()) s.setGameMode(gameTypeSlider.getObjectValue());
         };
     }
@@ -213,14 +213,14 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
 
     @Override
     public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
-        if (resourceAssortSelector.scrollableRenderer.mouseScrolled(g)) return true;
+        if (resourceAlbumSelector.scrollableRenderer.mouseScrolled(g)) return true;
         return super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g);
     }
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         super.renderDefaultBackground(guiGraphics, i, j, f);
-        resourceAssortSelector.renderTooltipBox(guiGraphics,panel);
+        resourceAlbumSelector.renderTooltipBox(guiGraphics,panel);
         panel.render(guiGraphics,i,j,f);
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(0.5f,0);

@@ -37,16 +37,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.Event, TabList.Access{
+public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.Event, TabList.Access {
     private static final Component SAFETY_TITLE = Component.translatable("multiplayerWarning.header").withStyle(ChatFormatting.BOLD);
     private static final Component SAFETY_CONTENT = Component.translatable("multiplayerWarning.message");
     private static final Component SAFETY_CHECK = Component.translatable("multiplayerWarning.check");
     public static final Component DIRECT_CONNECTION = Component.translatable("selectServer.direct");
     public boolean isLoading = false;
-    protected final TabList tabList = new TabList(accessor).add(31, LegacyTabButton.Type.LEFT,Component.translatable("legacy.menu.load"), b-> repositionElements()).add(31, LegacyTabButton.Type.MIDDLE,Component.translatable("legacy.menu.create"), b-> repositionElements()).add(31, LegacyTabButton.Type.RIGHT, (t, guiGraphics, i, j, f) -> t.renderString(guiGraphics,font,canNotifyOnlineFriends() ? 0xFFFFFFFF : CommonColor.INVENTORY_GRAY_TEXT.get(),canNotifyOnlineFriends()),Component.translatable("legacy.menu.join"), b-> {
+    protected final TabList tabList = new TabList(accessor).add(31, LegacyTabButton.Type.LEFT, Component.translatable("legacy.menu.load"), b-> repositionElements()).add(31, LegacyTabButton.Type.MIDDLE,Component.translatable("legacy.menu.create"), b-> repositionElements()).add(31, LegacyTabButton.Type.RIGHT, (t, guiGraphics, i, j, f) -> t.renderString(guiGraphics,font,canNotifyOnlineFriends() ? 0xFFFFFFFF : CommonColor.INVENTORY_GRAY_TEXT.get(),canNotifyOnlineFriends()),Component.translatable("legacy.menu.join"), b-> {
         if (this.minecraft.options.skipMultiplayerWarning)
             repositionElements();
-        else minecraft.setScreen(new ConfirmationScreen(this,SAFETY_TITLE,Component.translatable("legacy.menu.multiplayer_warning").append("\n").append(SAFETY_CONTENT)){
+        else minecraft.setScreen(new ConfirmationScreen(this, SAFETY_TITLE, Component.translatable("legacy.menu.multiplayer_warning").append("\n").append(SAFETY_CONTENT)){
             @Override
             protected void addButtons() {
                 renderableVList.addRenderable(Button.builder(SAFETY_CHECK, b-> {
@@ -62,12 +62,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     public final SaveRenderableList saveRenderableList = new SaveRenderableList(accessor);
     public final CreationList creationList = new CreationList(accessor);
     protected final ServerRenderableList serverRenderableList = PublishScreen.hasWorldHost() ? new FriendsServerRenderableList(accessor) : new ServerRenderableList(accessor);
-    @Override
-    public void addControlTooltips(ControlTooltip.Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(),()->ControlTooltip.getKeyMessage(InputConstants.KEY_O,this));
-        renderer.add(()-> tabList.selectedIndex != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()->DIRECT_CONNECTION);
-    }
+
     public PlayGameScreen(Screen parent, int initialTab) {
         super(s-> Panel.centered(s,300,256,()-> 0, ()-> UIAccessor.of(s).getBoolean("hasTabList",true) ? 12 : 0),Component.translatable("legacy.menu.play_game"));
         this.parent = parent;
@@ -76,6 +71,13 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         renderableVLists.add(saveRenderableList);
         renderableVLists.add(creationList);
         renderableVLists.add(serverRenderableList);
+    }
+
+    @Override
+    public void addControlTooltips(ControlTooltip.Renderer renderer) {
+        super.addControlTooltips(renderer);
+        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(),()->ControlTooltip.getKeyMessage(InputConstants.KEY_O,this));
+        renderer.add(()-> tabList.selectedIndex != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()->DIRECT_CONNECTION);
     }
 
     public boolean hasTabList(){
@@ -116,11 +118,11 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     @Override
     protected void init() {
-        panel.height = Math.min(256,height-52);
+        panel.height = Math.min(256, height-52);
         if (hasTabList()) addWidget(tabList);
         panel.init();
         renderableVListInit();
-        if (hasTabList()) tabList.init(panel.x,panel.y - 25,panel.width);
+        if (hasTabList()) tabList.init(panel.x, panel.y - 25, panel.width);
     }
 
     @Override

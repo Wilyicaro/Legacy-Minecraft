@@ -16,6 +16,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import java.util.Comparator;
 
 public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuAccess<T>, GuiEventListener, Controller.Event {
+
     default void movePointerToSlotIn(ScreenDirection direction){
         if (getMenu().slots.isEmpty() || Legacy4JClient.controllerManager.isCursorDisabled || findHoveredSlot() == null) return;
         double pointerX = Legacy4JClient.controllerManager.getPointerX();
@@ -38,6 +39,7 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
         }
 
     }
+
     default boolean movePointerToSlotIn(boolean positive, boolean horizontal, int size, int pos, int pointerX, int pointerY, int part){
         if (positive) {
             for (int j = part * 2; j < size - (horizontal ? pointerX : pointerY); j+=part) if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)),false)) return true;
@@ -45,6 +47,7 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
             for (int j = -part * 2; j >= -(horizontal ? pointerX : pointerY); j-=part) if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)),false)) return true;
         } return false;
     }
+
     default boolean movePointerToSlotInReverse(boolean positive, boolean horizontal, int size, int pos, int pointerX, int pointerY, int part){
         if (positive) {
             for (int j = -(horizontal ? pointerX : pointerY) + part * 2; j < 0; j+=part) if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)),false)) return true;
@@ -52,17 +55,20 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
             for (int j = size -(horizontal ? pointerX : pointerY) - part * 2; j >= 0; j-=part) if (movePointerToSlot(findSlotAt(pointerX + (horizontal ? j : pos), pointerY + (horizontal ? pos : j)),false)) return true;
         } return false;
     }
+
     default boolean movePointerToSlot(Slot s){
         return movePointerToSlot(s,true);
     }
-    default boolean movePointerToSlot(Slot s, boolean allowHovered){
+
+    default boolean movePointerToSlot(Slot s, boolean allowHovered) {
         if (s == null || (!allowHovered && s == findHoveredSlot()) || !LegacySlotDisplay.isVisibleAndActive(s)) return false;
         Minecraft minecraft = Minecraft.getInstance();
         LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(getMenuRectangle().left(), getMenuRectangle().top(), s);
         Legacy4JClient.controllerManager.setPointerPos(holder.getMiddleX() * ((double)minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth()), holder.getMiddleY() * ((double)minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight()));
         return true;
     }
-    default void movePointerToNextSlot(){
+
+    default void movePointerToNextSlot() {
         if (getMenu().slots.isEmpty() || Legacy4JClient.controllerManager.isCursorDisabled || getHoveredSlot() == null) return;
         double pointerX = Legacy4JClient.controllerManager.getPointerX();
         double pointerY = Legacy4JClient.controllerManager.getPointerY();
@@ -74,23 +80,30 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
             return (int) (deltaX *deltaX + deltaY * deltaY);
         })).ifPresent(this::movePointerToSlot);
     }
+
     ScreenRectangle getMenuRectangle();
     boolean isOutsideClick(int i);
     Slot getHoveredSlot();
+
     default Slot findSlotAt(double d, double e){
+        ScreenRectangle rectangle = getMenuRectangle();
         for (Slot slot : getMenu().slots)
-            if (LegacyRenderUtil.isHovering(slot,getMenuRectangle().left(), getMenuRectangle().top(),d,e)) return slot;
+            if (LegacyRenderUtil.isHovering(slot, rectangle.left(), rectangle.top(), d, e)) return slot;
         return null;
     }
+
     default Slot findHoveredSlot(){
         return findSlotAt(Legacy4JClient.controllerManager.getPointerX(),Legacy4JClient.controllerManager.getPointerY());
     }
+
     default int getTipXDiff(){
         return -132;
     }
+
     default boolean allowItemPopping(){
         return false;
     }
+
     default boolean isMouseDragging() {
         return false;
     }

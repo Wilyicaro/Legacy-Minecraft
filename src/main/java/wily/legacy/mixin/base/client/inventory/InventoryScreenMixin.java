@@ -66,7 +66,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
         for (int i = 0; i < menu.slots.size(); i++) {
             Slot s = menu.slots.get(i);
             if (i == 0){
-                LegacySlotDisplay.override(s,180, 40,new LegacySlotDisplay(){
+                LegacySlotDisplay.override(s,180, 40, new LegacySlotDisplay(){
                     public boolean isVisible() {
                         return LegacyRenderUtil.hasClassicCrafting();
                     }
@@ -79,7 +79,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
                 });
             } else if (i < 9) {
                 int index = 39 - s.getContainerSlot();
-                LegacySlotDisplay.override(s, 14, 14 + index * 21,new LegacySlotDisplay(){
+                LegacySlotDisplay.override(s, 14, 14 + index * 21, new LegacySlotDisplay(){
                     public ResourceLocation getIconSprite() {
                         return s.getItem().isEmpty() ? EQUIPMENT_SLOT_SPRITES[index] : null;
                     }

@@ -34,7 +34,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class LegacyTabButton extends AbstractButton {
-    public static final Vec3 DEFAULT_DESACTIVE_OFFSET = new Vec3(0,22,0);
+    public static final Vec3 DEFAULT_INACTIVE_OFFSET = new Vec3(0,22,0);
     public static final Vec3 DEFAULT_UNSELECTED_OFFSET = new Vec3(0,4,0);
     public final Render icon;
     public Render spriteRender = ToggleableTabSprites.DEFAULT;
@@ -43,7 +43,7 @@ public class LegacyTabButton extends AbstractButton {
     public Type type;
 
     public Function<LegacyTabButton, Vec3> offset = (t)-> {
-        if (!isActive()) return DEFAULT_DESACTIVE_OFFSET;
+        if (!isActive()) return DEFAULT_INACTIVE_OFFSET;
         if (!t.selected) return DEFAULT_UNSELECTED_OFFSET;
         return Vec3.ZERO;
     };
@@ -135,13 +135,6 @@ public class LegacyTabButton extends AbstractButton {
         narrationElementOutput.add(NarratedElementType.TITLE, Component.translatable("gui.narrate.tab", this.getMessage().getString()));
     }
 
-    //? if <1.21.4 {
-    /*@Override
-    protected boolean clicked(double d, double e) {
-        return isMouseOver(d,e);
-    }
-    *///?}
-
     @Override
     public void renderString(GuiGraphics guiGraphics, Font font, int i) {
         renderString(guiGraphics,font,i,false);
@@ -180,7 +173,7 @@ public class LegacyTabButton extends AbstractButton {
     public record ToggleableTabSprites(TabSprites high, TabSprite down) implements SpriteRender {
         public static final ToggleableTabSprites DEFAULT = new ToggleableTabSprites(new TabSprites(LegacySprites.HIGH_TAB_LEFT, LegacySprites.HIGH_TAB_MIDDLE, LegacySprites.HIGH_TAB_RIGHT), new TabSprite(LegacySprites.LOW_TAB));
         public static final ToggleableTabSprites VERTICAL = new ToggleableTabSprites(new TabSprites(LegacySprites.HIGH_VERT_TAB_DOWN, LegacySprites.HIGH_VERT_TAB_MIDDLE, LegacySprites.HIGH_VERT_TAB_UP), new TabSprite(LegacySprites.LOW_VERT_TAB));
-        public static final Codec<ToggleableTabSprites> CODEC = RecordCodecBuilder.create(i-> i.group(TabSprites.CODEC.fieldOf("high").forGetter(ToggleableTabSprites::high),TabSprite.CODEC.fieldOf("down").forGetter(ToggleableTabSprites::down)).apply(i, ToggleableTabSprites::new));
+        public static final Codec<ToggleableTabSprites> CODEC = RecordCodecBuilder.create(i-> i.group(TabSprites.CODEC.fieldOf("high").forGetter(ToggleableTabSprites::high), TabSprite.CODEC.fieldOf("down").forGetter(ToggleableTabSprites::down)).apply(i, ToggleableTabSprites::new));
 
         @Override
         public ResourceLocation getSprite(LegacyTabButton button) {

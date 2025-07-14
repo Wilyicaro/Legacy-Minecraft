@@ -42,25 +42,25 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
     public static final List<ResourceLocation> vanillaOrder = List.of(FactoryAPI.createVanillaLocation("story/root"),FactoryAPI.createVanillaLocation("adventure/root"),FactoryAPI.createVanillaLocation("husbandry/root"),FactoryAPI.createVanillaLocation("nether/root"),FactoryAPI.createVanillaLocation("end/root"));
 
     public LegacyAdvancementsScreen(Screen parent) {
-        super(parent,s-> Panel.createPanel(s, p-> p.centeredLeftPos(s), p-> p.centeredTopPos(s) + (((LegacyAdvancementsScreen)s).displayInfos.isEmpty() ? 0 : 18), 450,252),TITLE);
+        super(parent,s-> Panel.createPanel(s, p-> p.centeredLeftPos(s), p-> p.centeredTopPos(s) + (((LegacyAdvancementsScreen)s).displayInfos.isEmpty() ? 0 : ((LegacyAdvancementsScreen)s).getTabYOffset()), 450,252),TITLE);
         renderableVLists.clear();
-        StreamSupport.stream(getActualAdvancements()./*? if >1.20.1 {*/roots/*?} else {*//*getRoots*//*?}*/().spliterator(),false).sorted(Comparator.comparingInt(n->vanillaOrder.contains(n./*? if >1.20.1 {*/holder().id/*?} else {*//*getId*//*?}*/()) ? vanillaOrder.indexOf(n./*? if >1.20.1 {*/holder().id/*?} else {*//*getId*//*?}*/()): Integer.MAX_VALUE)).forEach(a-> {
-            DisplayInfo displayInfo = a./*? if >1.20.1 {*/advancement().display().orElse(null)/*?} else {*//*getDisplay()*//*?}*/;
+        StreamSupport.stream(getActualAdvancements().roots().spliterator(),false).sorted(Comparator.comparingInt(n->vanillaOrder.contains(n./*? if >1.20.1 {*/holder().id/*?} else {*//*getId*//*?}*/()) ? vanillaOrder.indexOf(n./*? if >1.20.1 {*/holder().id/*?} else {*//*getId*//*?}*/()): Integer.MAX_VALUE)).forEach(a-> {
+            DisplayInfo displayInfo = a.advancement().display().orElse(null);
             if (displayInfo == null) return;
 
             tabList.addTabButton(43, LegacyTabButton.Type.MIDDLE, LegacyTabButton.iconOf(displayInfo.getIcon()), displayInfo.getTitle(), b -> repositionElements());
             RenderableVList renderableVList = new RenderableVList(this).layoutSpacing(l -> 4).forceWidth(false).cyclic(false);
             renderableVLists.add(renderableVList);
             displayInfos.add(displayInfo);
-            getActualAdvancements()./*? if >1.20.1 {*/nodes/*?} else {*//*getAllAdvancements*//*?}*/().stream().filter(n1 -> !n1.equals(a) && n1./*? if >1.20.1 {*/root/*?} else {*//*getRoot*//*?}*/().equals(a)).sorted(Comparator.comparingInt(LegacyAdvancementsScreen::getRootDistance)).forEach(node -> addAdvancementButton(renderableVList, node));
+            getActualAdvancements().nodes().stream().filter(n1 -> !n1.equals(a) && n1.root().equals(a)).sorted(Comparator.comparingInt(LegacyAdvancementsScreen::getRootDistance)).forEach(node -> addAdvancementButton(renderableVList, node));
         });
     }
 
-    public static int getRootDistance( /*? if >1.20.1 {*/AdvancementNode/*?} else {*//*Advancement*//*?}*/ advancement) {
-        /*? if >1.20.1 {*/AdvancementNode/*?} else {*//*Advancement*//*?}*/ advancement2 = advancement;
-        /*? if >1.20.1 {*/AdvancementNode/*?} else {*//*Advancement*//*?}*/ advancement3;
+    public static int getRootDistance( AdvancementNode advancement) {
+        AdvancementNode advancement2 = advancement;
+        AdvancementNode advancement3;
         int i = 0;
-        while ((advancement3 = advancement2./*? if >1.20.1 {*/parent/*?} else {*//*getParent*//*?}*/()) != null) {
+        while ((advancement3 = advancement2.parent()) != null) {
             advancement2 = advancement3;
             i++;
         }
@@ -68,16 +68,17 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
     }
 
     protected void addAdvancementButton(RenderableVList renderableVList, /*? if >1.20.1 {*/AdvancementNode advancementNode/*?} else {*//*Advancement advancement*//*?}*/){
-        //? if >1.20.1 {
         advancementNode.advancement().display().ifPresent(info-> renderableVList.addRenderable(new AdvancementButton(0,0,38,38,advancementNode,info)));
-        //?} else {
-        /*if (advancement.getDisplay() != null) renderableVList.addRenderable(new AdvancementButton(0,0,38,38,advancement,advancement.getDisplay()));
-        *///?}
     }
 
     @Override
     public TabList getTabList() {
         return tabList;
+    }
+
+    @Override
+    public int getTabYOffset() {
+        return 18;
     }
 
     @Override
@@ -92,21 +93,21 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         protected boolean unlocked;
         public final DisplayInfo info;
 
-        public AdvancementButton(int x, int y, int width, int height, /*? if >1.20.1 {*/AdvancementNode/*?} else {*//*Advancement*//*?}*/ advancement, DisplayInfo info) {
+        public AdvancementButton(int x, int y, int width, int height, AdvancementNode advancement, DisplayInfo info) {
             super(x, y, width, height, info.getTitle());
             this.info = info;
-            this.id = advancement./*? if >1.20.1 {*/holder().id/*?} else {*//*getId*//*?}*/();
-            this.advancement = advancement/*? if >1.20.1 {*/.advancement()/*?}*/;
+            this.id = advancement.holder().id();
+            this.advancement = advancement.advancement();
             update();
         }
 
         public void update(){
-            /*? if >1.20.1 {*/AdvancementHolder/*?} else {*//*Advancement*//*?}*/ a;
+            AdvancementHolder a;
             AdvancementProgress p = null;
             lastUnlocked = unlocked;
-            unlocked = (a = getAdvancements()/*? if <=1.20.1 {*//*.getAdvancements()*//*?}*/.get(id)) != null && (p = getAdvancements().progress.getOrDefault(a, null)) != null && p.isDone();
+            unlocked = (a = getAdvancements().get(id)) != null && (p = getAdvancements().progress.getOrDefault(a, null)) != null && p.isDone();
             if (lastUnlocked == unlocked && ((AbstractWidgetAccessor)this).getTooltip() != null) return;
-            Component progressText = p == null || p .getProgressText() == null ? null : /*? if >1.20.1 {*/p.getProgressText()/*?} else {*//*Component.literal(p.getProgressText())*//*?}*/;
+            Component progressText = p == null || p .getProgressText() == null ? null : p.getProgressText();
             setTooltip(progressText == null ? Tooltip.create(info.getDescription()) : new MultilineTooltip(List.of(info.getDescription().getVisualOrderText(),progressText.getVisualOrderText())));
         }
 
@@ -118,7 +119,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             if (isFocused()) {
                 guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(-1.5f, -1.5f);
+                guiGraphics.pose().translate(-1.5f, -1.4f);
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_HIGHLIGHT, getX(), getY(), 41, 41);
                 guiGraphics.pose().popMatrix();
             }
@@ -161,7 +162,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         addRenderableOnly(((guiGraphics, i, j, f) ->{
             guiGraphics.drawString(font,showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.selectedIndex).getMessage() : getTitle(),panel.x + (panel.width - font.width(showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.selectedIndex).getMessage() : getTitle()))/ 2,panel.y + 10, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
             if (!displayInfos.isEmpty()) {
-                ResourceLocation background = displayInfos.get(tabList.selectedIndex).getBackground()/*? if >1.20.1 {*/.orElse(null)/*?}*//*? if >=1.21.5 {*/.texturePath()/*?}*/;
+                ResourceLocation background = displayInfos.get(tabList.selectedIndex).getBackground().orElse(null).texturePath();
                 if (background != null) FactoryGuiGraphics.of(guiGraphics).blit(background,panel.x + 14, panel.y + 24,0,0,422,23,16,16);
             }
             LegacyRenderUtil.renderPanelTranslucentRecess(guiGraphics,panel.x + 12, panel.y + 22, 426, 27);
@@ -173,7 +174,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             int index = tabList.tabButtons.indexOf(b);
             b.type = LegacyTabButton.Type.bySize(index, 9);
             b.setWidth(45);
-            b.offset = (t1) -> new Vec3(0, t1.selected ? 0 : 4.5, 0);
+            b.offset = (t1) -> new Vec3(0, t1.selected ? 0 : 4.4, 0);
         });
     }
 
@@ -234,8 +235,8 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         if (!showDescription) guiGraphics.deferredTooltip = null;
     }
 
-    public static /*? if >1.20.1 {*/AdvancementTree/*?} else {*//*AdvancementList*//*?}*/ getActualAdvancements(){
-        return Legacy4JClient.hasModOnServer() ? ClientAdvancementsPayload.advancements : getAdvancements(). /*? if >1.20.1 {*/getTree/*?} else {*//*getAdvancements*//*?}*/();
+    public static AdvancementTree getActualAdvancements(){
+        return Legacy4JClient.hasModOnServer() ? ClientAdvancementsPayload.advancements : getAdvancements(). getTree();
     }
     public static ClientAdvancements getAdvancements(){
         return Minecraft.getInstance().getConnection().getAdvancements();

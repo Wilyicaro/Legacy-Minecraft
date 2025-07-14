@@ -54,7 +54,7 @@ import java.util.function.Supplier;
 
 import static wily.legacy.client.screen.ControlTooltip.*;
 
-public class CreativeModeScreen extends /*? if <=1.21.2 {*//*EffectRenderingInventoryScreen*//*?} else {*/AbstractContainerScreen/*?}*/<CreativeModeScreen.CreativeModeMenu> implements Controller.Event,ControlTooltip.Event{
+public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScreen.CreativeModeMenu> implements TabList.Access, Controller.Event, ControlTooltip.Event {
     protected Stocker.Sizeable page = new Stocker.Sizeable(0);
     protected final TabList tabList = new TabList(UIAccessor.of(this), new PagedList<>(page,8));
     protected final Panel panel;
@@ -126,6 +126,8 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*//*EffectRenderingInve
         displayListing.forEach(t-> tabsScrolledList.add(new Stocker.Sizeable(0)));
     }
 
+
+
     public void pressCommonTab(){
         if (canRemoveSearch) {
             canRemoveSearch = false;
@@ -179,7 +181,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*//*EffectRenderingInve
         topPos = panel.y;
         addRenderableOnly(scroller);
         scroller.setPosition(panel.x + 296, panel.y + 27);
-        scroller.offset(new Vec3(0.5f, 0.5f, 0));
+        scroller.offset(new Vec3(0.5f, 0.4f, 0));
         if (arrangement.get() == 2){
             searchBox.setPosition(panel.getX() + (panel.getWidth() - searchBox.getWidth()) / 2 - 6, panel.getY() + 7);
             addRenderableWidget(searchBox);
@@ -191,7 +193,7 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*//*EffectRenderingInve
             int index = tabList.tabButtons.indexOf(t);
             t.type = LegacyTabButton.Type.bySize(index, 7);
             t.offset = (b)-> {
-                if (!t.selected) return new Vec3(0,1.5,0);
+                if (!t.selected) return new Vec3(0,1.4,0);
                 return Vec3.ZERO;
             };
             t.setWidth(41);
@@ -408,6 +410,16 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*//*EffectRenderingInve
         if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s && s.pressed && s.canClick() && tabList.controlPage(page,s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y))){
             repositionElements();
         }
+    }
+
+    @Override
+    public TabList getTabList() {
+        return tabList;
+    }
+
+    @Override
+    public int getTabYOffset() {
+        return 19;
     }
 
     public static class CreativeModeMenu extends AbstractContainerMenu {

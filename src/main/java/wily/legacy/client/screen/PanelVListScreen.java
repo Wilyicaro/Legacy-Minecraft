@@ -47,10 +47,11 @@ public class PanelVListScreen extends PanelBackgroundScreen implements Renderabl
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
+    public boolean mouseScrolled(double d, double e, double f, double g) {
+        if (super.mouseScrolled(d, e, f, g)) return true;
         RenderableVList vList = getRenderableVListAt(d,e);
         if (vList != null && vList.renderables.stream().anyMatch(children::contains)) vList.mouseScrolled(g);
-        return super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g);
+        return false;
     }
 
     @Override

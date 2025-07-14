@@ -76,6 +76,7 @@ import wily.legacy.util.LegacySprites;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -416,26 +417,12 @@ public class LegacyRenderUtil {
 
     public static void renderLocalPlayerHead(GuiGraphics guiGraphics, int x, int y, int size) {
         if (mc.player == null) return;
-        PlayerFaceRenderer.draw(guiGraphics, mc.player./*? if >1.20.1 {*/getSkin/*?} else {*//*getSkinTextureLocation*//*?}*/(), x, y, size);
+        PlayerFaceRenderer.draw(guiGraphics, mc.player.getSkin(), x, y, size);
     }
 
-    public static double getInterfaceResolution(){
-        return 1.5 - LegacyOptions.interfaceResolution.get();
-    }
 
-    public static double getGuiScale(){
-        int h = (LegacyOptions.autoResolution.get() ? LegacyRenderUtil.getStandardHeight() : mc.getWindow().getHeight());
-        return h / 360d * LegacyRenderUtil.getTweakedHeightScale(h) * CommonValue.SCALE_MULTIPLIER.get();
-    }
-
-    public static double getTweakedHeightScale(int height) {
-        if (LegacyOptions.autoResolution.get()){
-            if (height == 1080) return 0.999623452;
-            else if (height % 720 != 0) return 1.001d;
-
-            return 1d;
-        }
-        return getInterfaceResolution();
+    public static float getAutoGuiScale() {
+        return LegacyRenderUtil.getStandardHeight() / 360.0f;
     }
 
     public static int getStandardHeight(){
@@ -651,14 +638,10 @@ public class LegacyRenderUtil {
         }
 
         if (GLFW.glfwGetInputMode(mc.getWindow().getWindow(),GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerManager.isCursorDisabled && !LegacyOptions.hasSystemCursor()) {
-            FactoryScreenUtil.disableDepthTest();
-            FactoryScreenUtil.enableBlend();
             graphics.pose().pushMatrix();
-            graphics.pose().translate((float) (Legacy4JClient.controllerManager.getPointerX() + LegacyTipManager.getTipXDiff()), (float) Legacy4JClient.controllerManager.getPointerY());
+            graphics.pose().translate(Legacy4JClient.controllerManager.getVisualPointerX() + LegacyTipManager.getTipXDiff(), Legacy4JClient.controllerManager.getVisualPointerY());
             FactoryGuiGraphics.of(graphics).blitSprite(mc.getWindow().getScreenWidth() >= 1920 ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
             graphics.pose().popMatrix();
-            FactoryScreenUtil.disableBlend();
-            FactoryScreenUtil.enableDepthTest();
         }
     }
     public static Screen getInitialScreen(){

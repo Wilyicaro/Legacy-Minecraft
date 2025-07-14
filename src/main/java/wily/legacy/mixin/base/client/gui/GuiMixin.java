@@ -179,7 +179,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         LegacyRenderUtil.renderHUDTooltip(guiGraphics, /*? if forge || neoforge {*/ /*shift *//*?} else {*/0/*?}*/);
     }
 
-    @Redirect(method="renderPlayerHealth", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD))
+    @Redirect(method= /*? if neoforge {*//*"renderHealthLevel"*//*?} else {*/"renderPlayerHealth"/*?}*/, at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD))
     private void renderPlayerHealth(Gui instance, long value) {
         healthBlinkTime = value - (LegacyOptions.legacyHearts.get() ? 6 : 0);
     }

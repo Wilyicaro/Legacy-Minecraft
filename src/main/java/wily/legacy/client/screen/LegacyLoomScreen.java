@@ -125,7 +125,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
             clearIngredients(ingredientsGrid);
             resultStack = itemIcon.copyWithCount(1);
             ingredientsGrid.set(4, resultStack.isEmpty() ? Optional.empty() : Optional.of(StackIngredient.of(true, resultStack, 1)));
-            scrollableRenderer.scrolled.set(0);
+            scrollableRenderer.resetScrolled();
         }
 
         @Override
@@ -148,19 +148,8 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                 previewStack = selectedStack.copy();
                 selectedIngredients.add(Optional.of(StackIngredient.of(true, selectedStack, 1)));
                 if (!selectedPatterns.isEmpty()) {
-                    //? if <1.20.5 {
-                    /*CompoundTag beTag = previewStack.getOrCreateTagElement("BlockEntityTag");
-                    ListTag patternsTag = beTag.getList("Patterns", 10);
-                    if (!beTag.contains("Patterns", 9)) beTag.put("Patterns", patternsTag);
-                    *///?} else
                     List<BannerPatternLayers.Layer> layersList = previewStack.get(DataComponents.BANNER_PATTERNS) == null ? new ArrayList<>() : new ArrayList<>(previewStack.get(DataComponents.BANNER_PATTERNS).layers());
                     selectedPatterns.forEach(rcp -> {
-                        //? if <1.20.5 {
-                        /*CompoundTag patternTag = new CompoundTag();
-                        patternsTag.add(patternTag);
-                        patternTag.putString("Pattern", BuiltInRegistries.BANNER_PATTERN.get(rcp.get().pattern()).getHashname());
-                        patternTag.putInt("Color", rcp.get().color.getId());
-                        *///?} else
                         layersList.add(new BannerPatternLayers.Layer(Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN).getOrThrow(rcp.get().pattern),rcp.get().color));
                         for (int i1 = 1; i1 < rcp.getOptionalIngredients().size(); i1++) {
                             Optional<Ingredient> ing = rcp.getOptionalIngredients().get(i1);
@@ -168,25 +157,14 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                             selectedIngredients.add(ing);
                         }
                     });
-                    //? if >=1.20.5
                     previewStack.set(DataComponents.BANNER_PATTERNS,new BannerPatternLayers(layersList));
                 }
                 Optional<Ingredient> previewIng = Optional.of(StackIngredient.of(true,previewStack,1));
                 loomTabListings.get(craftingTabList.selectedIndex - 1).patterns().stream().filter(p->Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN).listElementIds().anyMatch(p::equals)).forEach(p -> recipesByGroup.add(Arrays.stream(DyeColor.values()).map(color -> {
                     ItemStack result = previewStack.copy();
-                    //? if <1.20.5 {
-                    /*CompoundTag beTag = result.getOrCreateTagElement("BlockEntityTag");
-                    ListTag patternsTag = beTag.getList("Patterns", 10);
-                    if (!beTag.contains("Patterns", 9)) beTag.put("Patterns", patternsTag);
-                    CompoundTag addPattern = new CompoundTag();
-                    patternsTag.add(addPattern);
-                    addPattern.putString("Pattern", BuiltInRegistries.BANNER_PATTERN.get(p).getHashname());
-                    addPattern.putInt("Color", color.getId());
-                    *///?} else {
                     List<BannerPatternLayers.Layer> layersList = result.get(DataComponents.BANNER_PATTERNS) == null ? new ArrayList<>() : new ArrayList<>(result.get(DataComponents.BANNER_PATTERNS).layers());
                     layersList.add(new BannerPatternLayers.Layer(Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN).getOrThrow(p),color));
                     result.set(DataComponents.BANNER_PATTERNS,new BannerPatternLayers(layersList));
-                    //?}
                     Optional<Ingredient> dye = Optional.of(Ingredient.of(DyeItem.byColor(color)));
                     ArrayList<Optional<Ingredient>> previewIngs = new ArrayList<>(selectedIngredients);
                     previewIngs.add(dye);
@@ -250,6 +228,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         if (guiEventListener instanceof TabList) return;
         super.setFocused(guiEventListener);
     }
+
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         Component title = craftingTabList.selectedIndex != 0 ? craftingTabList.tabButtons.get(craftingTabList.selectedIndex).getMessage() : getFocused() instanceof CustomRecipeIconHolder h ? h.getDisplayName() : Component.empty();
@@ -261,6 +240,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         if (selectedCraftingButton < getCraftingButtons().size()) getCraftingButtons().get(selectedCraftingButton).renderSelection(guiGraphics, i, j, 0);
         guiGraphics.pose().translate(leftPos,topPos);
     }
+
     @Override
     public void bindingStateTick(BindingState state) {
         if (state.pressed && state.canClick() && state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s) controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
@@ -269,6 +249,11 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
     @Override
     public TabList getTabList() {
         return craftingTabList;
+    }
+
+    @Override
+    public int getTabYOffset() {
+        return 18;
     }
 
     @Override
@@ -287,7 +272,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         imageWidth = 348;
         imageHeight = 215;
         super.init();
-        topPos+=18;
+        topPos += getTabYOffset();
         menu.addSlotListener(listener);
         craftingTabList.selectedIndex = selectedStack.isEmpty() ? 0 : Math.max(craftingTabList.selectedIndex,1);
         menu.inventoryActive = selectedStack.isEmpty();
@@ -313,7 +298,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
             t.active = index == 0 && selectedStack.isEmpty() || index != 0 && !selectedStack.isEmpty();
             t.type = LegacyTabButton.Type.bySize(index, 6);
             t.setWidth(51);
-            t.offset = (t1) -> new Vec3(-1.5 * craftingTabList.tabButtons.indexOf(t), t1.active ? t1.selected ? 0 : 4.5: 26.5, 0);
+            t.offset = (t1) -> new Vec3(-1.5 * craftingTabList.tabButtons.indexOf(t), t1.active ? t1.selected ? 0 : 4.4 : 26.4, 0);
         });
     }
     protected boolean canCraft(){

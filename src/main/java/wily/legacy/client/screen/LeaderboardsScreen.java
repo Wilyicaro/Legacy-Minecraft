@@ -239,10 +239,10 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 guiGraphics.pose().pushMatrix();
                 guiGraphics.pose().translate(panel.x + (panel.width - 211) / 2f, panel.y - 12);
                 guiGraphics.pose().scale(0.5f,0.5f);
-                (ControlType.getActiveType().isKbm() ? ControlTooltip.ComponentIcon.compoundOf(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(guiGraphics,4,0,false, false);
+                (ControlType.getActiveType().isKbm() ? ControlTooltip.ComponentIcon.compoundOf(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(guiGraphics,4,0, false);
                 if (statsInScreen < statsBoards.get(selectedStatBoard).renderables.size()) {
                     ControlTooltip.Icon pageControl = ControlTooltip.ComponentIcon.compoundOf(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
-                    pageControl.render(guiGraphics,422 - pageControl.render(guiGraphics,0,0,false,true) - 8, 0,false,false);
+                    pageControl.render(guiGraphics,422 - pageControl.getWidth() - 8, 0, false);
                 }
                 guiGraphics.pose().popMatrix();
                 FactoryScreenUtil.disableBlend();

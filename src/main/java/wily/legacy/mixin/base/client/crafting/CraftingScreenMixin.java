@@ -29,29 +29,15 @@ import static wily.legacy.util.LegacySprites.ARROW;
 
 @Mixin(CraftingScreen.class)
 public abstract class CraftingScreenMixin extends AbstractContainerScreen<CraftingMenu> {
-
-    //? if <1.21.2 {
-    /*@Shadow private boolean widthTooNarrow;
-
-    @Shadow @Final private RecipeBookComponent recipeBookComponent;
-
-    @Unique
-    private ImageButton recipeButton;
-    *///?}
     public CraftingScreenMixin(CraftingMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
-    //? if >1.20.1 {
+
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    //?} else {
-    /*@Shadow @Final private static ResourceLocation RECIPE_BUTTON_LOCATION;
-    @Override
-    public void renderBackground(GuiGraphics guiGraphics) {
-    }
-    *///?}
+
     @Inject(method = "init",at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
@@ -62,22 +48,6 @@ public abstract class CraftingScreenMixin extends AbstractContainerScreen<Crafti
         titleLabelX = (imageWidth - font.width(title)) / 2;
         titleLabelY = 11;
         super.init();
-        //? if <1.21.2 {
-        /*this.widthTooNarrow = this.width < 379;
-        this.recipeBookComponent.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
-        if (LegacyOptions.showVanillaRecipeBook.get()) {
-            this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
-            recipeButton = this.addRenderableWidget(new ImageButton(this.leftPos + 9, topPos + 44, 20, 18, /^? if >1.20.1 {^/RecipeBookComponent.RECIPE_BUTTON_SPRITES/^?} else {^//^0, 19, RECIPE_BUTTON_LOCATION^//^?}^/, (button) -> {
-                this.recipeBookComponent.toggleVisibility();
-                this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
-                button.setPosition(this.leftPos + 9, topPos + 44);
-            }));
-            this.addWidget(this.recipeBookComponent);
-            this.setInitialFocus(this.recipeBookComponent);
-            if (recipeBookComponent.isVisible()) recipeButton.setFocused(true);
-        }
-        else if (recipeBookComponent.isVisible()) recipeBookComponent.toggleVisibility();
-        *///?}
         int slotsAmount = menu.getGridHeight() * menu.getGridWidth();
         for (int i = 0; i < menu.slots.size(); i++) {
             Slot s = menu.slots.get(i);
@@ -95,12 +65,11 @@ public abstract class CraftingScreenMixin extends AbstractContainerScreen<Crafti
         }
     }
 
-    //? if >=1.21.2 {
     @Inject(method = "getRecipeBookButtonPosition", at = @At("HEAD"), cancellable = true)
     protected void getRecipeBookButtonPosition(CallbackInfoReturnable<ScreenPosition> cir){
         cir.setReturnValue(new ScreenPosition(this.leftPos + 9, topPos + 44));
     }
-    //?}
+
 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
@@ -109,11 +78,8 @@ public abstract class CraftingScreenMixin extends AbstractContainerScreen<Crafti
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 105,topPos + 43);
         guiGraphics.pose().scale(1.5f,1.5f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW,0,0,22,15);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW,0,0,22,16);
         guiGraphics.pose().popMatrix();
-        //? if <1.21.2 {
-        /*if (!recipeBookComponent.isVisible() && recipeButton != null && !recipeButton.isHovered()) recipeButton.setFocused(false);
-        *///?}
     }
 
 }

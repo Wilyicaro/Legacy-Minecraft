@@ -40,6 +40,11 @@ public class ScrollableRenderer {
         }
     }
 
+    public void resetScrolled() {
+        oldSmoothScrolled = smoothScrolled = 0;
+        scrolled.set(0);
+    }
+
     public float getYOffset(){
         return smoothScrolled * lineHeight;
     }

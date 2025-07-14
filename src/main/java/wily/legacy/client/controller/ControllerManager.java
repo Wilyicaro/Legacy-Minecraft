@@ -28,6 +28,7 @@ import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.client.screen.LegacyCraftingScreen;
 import wily.legacy.client.screen.LegacyMenuAccess;
+import wily.legacy.client.screen.TabList;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.mixin.base.client.MouseHandlerAccessor;
@@ -107,17 +108,17 @@ public class ControllerManager {
         });
     }
 
-    public void setPointerPos(double x, double y){
+    public void setPointerPos(double x, double y) {
         setPointerPos(x, y, isControllerTheLastInput() && LegacyOptions.controllerVirtualCursor.get());
     }
 
     public void setPointerPos(double x, double y, boolean onlyVirtual){
         Window window = minecraft.getWindow();
-        if (minecraft.screen instanceof LegacyMenuAccess<?> && LegacyOptions.limitCursor.get()) {
-            ScreenRectangle rect = ((LegacyMenuAccess<?>) minecraft.screen).getMenuRectangle();
-            double scale = LegacyRenderUtil.getGuiScale();
-            int left = rect.left() - (minecraft.screen instanceof LegacyCraftingScreen ? 35 : 0);
-            int top = rect.top() - (minecraft.screen instanceof CreativeModeScreen || minecraft.screen instanceof LegacyCraftingScreen ? 35 : 0);
+        if (minecraft.screen instanceof LegacyMenuAccess<?> a && LegacyOptions.limitCursor.get()) {
+            ScreenRectangle rect = a.getMenuRectangle();
+            int scale = minecraft.getWindow().getGuiScale();
+            int left = rect.left() - (minecraft.screen instanceof TabList.Access tabList ? tabList.getTabXOffset() * 2 : 0);
+            int top = rect.top() - (minecraft.screen instanceof TabList.Access tabList ? tabList.getTabYOffset() * 2 : 0);
             int paddingH = 20;
             int paddingV = 10;
             minecraft.mouseHandler.xpos = Mth.clamp(x, (left - paddingH) * scale, (rect.right() + paddingH) * scale);
@@ -142,7 +143,6 @@ public class ControllerManager {
 
             if (state.pressed) {
                 setControllerTheLastInput(true);
-                //? if >=1.21.2
                 minecraft.getFramerateLimitTracker().onInputReceived();
             }
 
@@ -172,7 +172,7 @@ public class ControllerManager {
                     if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && state.pressed) {
                         double moveX;
                         double moveY;
-                        double scale = LegacyRenderUtil.getGuiScale();
+                        int scale = minecraft.getWindow().getGuiScale();
                         double moveSensitivity = LegacyOptions.interfaceSensitivity.get() * 0.5;
                         double deadzone = stick.getDeadZone();
                         double deadzoneY = Math.max(deadzone, Mth.lerp(affectY, 1, 0.35));
@@ -390,12 +390,20 @@ public class ControllerManager {
         else minecraft.screen.keyReleased(key, 0, 0);
     }
 
-    public double getPointerX(){
+    public double getPointerX() {
         return minecraft.mouseHandler.xpos() * (double)this.minecraft.getWindow().getGuiScaledWidth() / (double)this.minecraft.getWindow().getScreenWidth();
     }
 
-    public double getPointerY(){
+    public double getPointerY() {
         return minecraft.mouseHandler.ypos() * (double)this.minecraft.getWindow().getGuiScaledHeight() / (double)this.minecraft.getWindow().getScreenHeight();
+    }
+
+    public float getVisualPointerX() {;
+        return Math.round(minecraft.mouseHandler.xpos()) / (float) minecraft.getWindow().getGuiScale();
+    }
+
+    public float getVisualPointerY() {
+        return Math.round(minecraft.mouseHandler.ypos()) / (float) minecraft.getWindow().getGuiScale();
     }
 
     public <T extends BindingState> T getButtonState(ControllerBinding<T> button){
@@ -464,7 +472,7 @@ public class ControllerManager {
     }
 
     public void setCursorInputMode(boolean hidden){
-        GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().getWindow(),GLFW.GLFW_CURSOR, hidden ? GLFW.GLFW_CURSOR_HIDDEN : GLFW.GLFW_CURSOR_NORMAL);
+        GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_CURSOR, hidden ? GLFW.GLFW_CURSOR_HIDDEN : GLFW.GLFW_CURSOR_NORMAL);
     }
 
     public void updateCursorInputMode(){

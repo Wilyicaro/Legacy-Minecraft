@@ -19,19 +19,18 @@ public class LegacyScrollRenderer {
         lastDirection = direction;
         lastScroll = (lastScrolled[direction.ordinal()] = Util.getMillis());
     }
+
     public void renderScroll(GuiGraphics graphics, ScreenDirection direction, int x, int y){
         boolean h = direction.getAxis() == ScreenAxis.HORIZONTAL;
-        FactoryScreenUtil.enableBlend();
         long l = lastScrolled[direction.ordinal()];
         if (l > 0) {
             float f = (Util.getMillis() - l) / 320f;
             float fade = Math.min(1.0f,f < 0.5f ? 1 - f * 2f : (f - 0.5f) * 2f);
             FactoryGuiGraphics.of(graphics).setBlitColor(1.0f,1.0f,1.0f, fade);
         }
-        FactoryGuiGraphics.of(graphics).blitSprite(SCROLLS[direction.ordinal()],x,y, h ? 6 : 13, h ? 11 : 7);
+        FactoryGuiGraphics.of(graphics).blitSprite(SCROLLS[direction.ordinal()], x, y, h ? 6 : 13, h ? 11 : 7);
         if (l > 0)
             FactoryGuiGraphics.of(graphics).clearBlitColor();
-        FactoryScreenUtil.disableBlend();
     }
 
 }

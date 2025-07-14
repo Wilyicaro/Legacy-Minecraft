@@ -88,7 +88,6 @@ public class LegacyGuiElements {
             for (KeyMapping keyMapping : minecraft.options.keyMappings) {
                 a.getElements().put("controlIcon."+keyMapping.getName(), ()-> ControlTooltip.getIconComponentFromKeyMapping(LegacyKeyMapping.of(keyMapping)));
             }
-            a.getElements().put("interfaceResolution", LegacyRenderUtil::getInterfaceResolution);
             ControlType.types.forEach((s,c)->{
                 a.getElements().put("activeControlType."+s, ()-> ControlType.getActiveType().equals(c));
             });

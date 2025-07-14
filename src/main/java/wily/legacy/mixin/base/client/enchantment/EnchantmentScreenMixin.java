@@ -98,16 +98,26 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         return original * 1.25f;
     }
 
+    @ModifyArg(method = "renderBook",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitBookModelRenderState(Lnet/minecraft/client/model/BookModel;Lnet/minecraft/resources/ResourceLocation;FFFIIII)V"), index = 7)
+    public int changeBookX1(int original) {
+        return original + 6;
+    }
+
+    @ModifyArg(method = "renderBook",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitBookModelRenderState(Lnet/minecraft/client/model/BookModel;Lnet/minecraft/resources/ResourceLocation;FFFIIII)V"), index = 8)
+    public int changeBookY1(int original) {
+        return original + 9;
+    }
+
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos, imageWidth,imageHeight);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 79,  topPos+ 22, 123, 66);
-        this.renderBook(guiGraphics, leftPos + 12,topPos + 14);
+        this.renderBook(guiGraphics, leftPos + 8,topPos + 12);
         EnchantmentNames.getInstance().initSeed(this.menu.getEnchantmentSeed());
         int m = this.menu.getGoldCount();
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 80.5f,topPos+ 2.5f);
+        guiGraphics.pose().translate(leftPos + 80.5f,topPos + 2.4f);
         for (int n = 0; n < 3; ++n) {
             guiGraphics.pose().translate(0f,21f);
             int enchantCost = this.menu.costs[n];
@@ -120,11 +130,11 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
             FormattedText formattedText = EnchantmentNames.getInstance().getRandomName(this.font, r);
             int s = CommonColor.ENCHANTMENT_TEXT.get();
             if (!(m >= n + 1 && this.minecraft.player.experienceLevel >= enchantCost || this.minecraft.player.getAbilities().instabuild)) {
-                guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, (s & 0xFEFEFE) >> 1/*? if >=1.21.4 {*/, false/*?}*/);
+                guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, (s & 0xFEFEFE) >> 1, false);
                 s = CommonColor.INSUFFICIENT_EXPERIENCE_TEXT.get();
             } else {
                 double t = i - (leftPos + 80.5);
-                double u = j - (topPos + 23.5 + 21 * n);
+                double u = j - (topPos + 23.4 + 21 * n);
                 if (t >= 0 && u >= 0 && t < 120 && u < 21) {
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ENCHANTMENT_BUTTON_SELECTED, 0, 0, 120, 21);
                     s = CommonColor.HIGHLIGHTED_ENCHANTMENT_TEXT.get();
@@ -132,7 +142,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ENCHANTMENT_BUTTON_ACTIVE, 0, 0, 120, 21);
                 }
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ENABLED_LEVEL_SPRITES[n], -1, -1, 24, 24);
-                guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, s/*? if >=1.21.4 {*/, false/*?}*/);
+                guiGraphics.drawWordWrap(this.font, formattedText, 24, 3, r, s, false);
                 s = CommonColor.EXPERIENCE_TEXT.get();
             }
             guiGraphics.drawString(this.font, string, 120 - this.font.width(string), 12, s);
