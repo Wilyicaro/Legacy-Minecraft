@@ -63,17 +63,16 @@ public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
             }
         }
     }
+
     public AnvilScreenMixin(AnvilMenu itemCombinerMenu, Inventory inventory, Component component, ResourceLocation resourceLocation) {
         super(itemCombinerMenu, inventory, component, resourceLocation);
     }
 
-    //? if >=1.20.5 {
     @Inject(method = "setInitialFocus",at = @At("HEAD"), cancellable = true)
     protected void setInitialFocus(CallbackInfo ci) {
         ci.cancel();
         super.setInitialFocus();
     }
-    //?}
 
     @Override
     public void repositionElements() {
@@ -117,21 +116,15 @@ public abstract class AnvilScreenMixin extends ItemCombinerScreen<AnvilMenu> {
         this.name.setMaxLength(50);
         this.name.setResponder(this::onNameChanged);
         this.name.setValue("");
-        this.addWidget(this.name);
+        this.addRenderableWidget(this.name);
         this.setInitialFocus(this.name);
         this.name.setEditable(this.menu.getSlot(0).hasItem());
     }
 
-    //? if >1.20.1 {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    //?} else {
-    /*@Override
-    public void renderBackground(GuiGraphics guiGraphics) {
-    }
-    *///?}
 
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {

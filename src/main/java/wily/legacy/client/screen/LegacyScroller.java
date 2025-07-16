@@ -11,7 +11,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.function.Supplier;
 
-public abstract class LegacyScroller extends SimpleLayoutRenderable{
+public abstract class LegacyScroller extends SimpleLayoutRenderable {
     public final LegacyScrollRenderer scrollRenderer;
     public Vec3 offset = Vec3.ZERO;
     public boolean dragged = false;

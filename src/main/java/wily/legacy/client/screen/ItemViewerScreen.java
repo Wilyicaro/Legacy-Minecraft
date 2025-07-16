@@ -81,7 +81,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     protected void init() {
         panel.init();
         scroller.setPosition(panel.x + 299, panel.y + 23);
-        scroller.offset(new Vec3(0.5f, 0, 0));
+        scroller.offset(new Vec3(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.4f : 0.5f, 0, 0));
         fillLayerGrid();
     }
 

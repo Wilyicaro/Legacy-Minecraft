@@ -33,6 +33,7 @@ import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
 import wily.factoryapi.util.ColorUtil;
 import wily.legacy.Legacy4J;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Map;
 import java.util.Set;

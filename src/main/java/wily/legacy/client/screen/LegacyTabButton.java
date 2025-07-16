@@ -165,7 +165,7 @@ public class LegacyTabButton extends AbstractButton {
     public enum Type {
         LEFT,MIDDLE,RIGHT;
 
-        public static Type bySize(int actual, int size){
+        public static Type bySize(int actual, int size) {
             return actual == 0 ? LEFT : actual >= size ? RIGHT : MIDDLE;
         }
     }

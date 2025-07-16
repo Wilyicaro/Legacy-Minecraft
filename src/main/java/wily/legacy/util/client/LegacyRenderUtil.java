@@ -12,11 +12,9 @@ import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.navigation.ScreenDirection;
-import net.minecraft.client.gui.render.state.pip.GuiEntityRenderState;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
@@ -55,6 +53,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
+import oshi.SystemInfo;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.Bearer;
@@ -76,7 +75,6 @@ import wily.legacy.util.LegacySprites;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -85,6 +83,7 @@ import java.util.stream.Collectors;
 import static wily.legacy.client.screen.ControlTooltip.MORE;
 
 public class LegacyRenderUtil {
+    public static final boolean isNvidia;
     public static final ResourceLocation GUI_ATLAS = FactoryAPI.createVanillaLocation("textures/atlas/gui.png");
     private static final Minecraft mc = Minecraft.getInstance();
     protected static final LogoRenderer logoRenderer = new LogoRenderer(false);
@@ -429,12 +428,12 @@ public class LegacyRenderUtil {
         return Math.round(mc.getWindow().getHeight() / 180f) * 180;
     }
 
-    public static boolean is720p(){
+    public static boolean is720p() {
         return getStandardHeight() <= 720;
     }
 
     public static float getTextScale(){
-        return LegacyOptions.legacyItemTooltipScaling.get() ? Math.max(2/3f,Math.min(720f/getStandardHeight(),4/3f)) : 1.0f;
+        return LegacyOptions.legacyItemTooltipScaling.get() ? Math.clamp(2.0f / mc.getWindow().getGuiScale(), 2/3.0f, 1.0f) : 1.0f;
     }
 
     public static float getChatSafeZone(){
@@ -667,5 +666,14 @@ public class LegacyRenderUtil {
 
     public static void setSoundInstanceVolume(SoundInstance soundInstance, float volume) {
         SoundManagerAccessor.of(mc.getSoundManager()).setVolume(soundInstance, volume);
+    }
+
+
+    public static boolean hasHorizontalArtifacts() {
+        return isNvidia;
+    }
+
+    static {
+        isNvidia = new SystemInfo().getHardware().getGraphicsCards().stream().anyMatch(s-> s.getVendor().contains("nvidia"));
     }
 }

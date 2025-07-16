@@ -80,6 +80,7 @@ public class LegacyGuiElements {
             a.getElements().put(FactoryGuiElement.EXPERIENCE_BAR.name()+".translateX", barAndHealthOffset);
             a.getElements().put(FactoryGuiElement.LOCATOR_BAR.name()+".translateX", barAndHealthOffset);
             a.getElements().put(FactoryGuiElement.JUMP_METER.name()+".translateX", barAndHealthOffset);
+            a.getElements().put(FactoryGuiElement.HOTBAR.name()+".translateX", ()-> LegacyOptions.hudScale.get() == 2 && LegacyRenderUtil.getStandardHeight() >= 1080 ? 0.5f : 0.0f);
 
             a.getElements().put(FactoryGuiElement.OVERLAY_MESSAGE.name()+".translateY", ()-> LegacyRenderUtil.getHUDDistance() + 72 - LegacyOptions.selectedItemTooltipSpacing.get() - LegacyRenderUtil.getHUDSize() - (GuiAccessor.getInstance().getLastToolHighlight().isEmpty() || GuiAccessor.getInstance().getToolHighlightTimer() <= 0 || LegacyRenderUtil.getSelectedItemTooltipLines() == 0 ? 0 : (Math.min(LegacyRenderUtil.getSelectedItemTooltipLines() + 1, LegacyRenderUtil.getTooltip(GuiAccessor.getInstance().getLastToolHighlight()).stream().filter(c->!c.getString().isEmpty()).mapToInt(c->1).sum()) - 1) * LegacyOptions.selectedItemTooltipSpacing.get()));
 

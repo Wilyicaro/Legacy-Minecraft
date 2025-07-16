@@ -92,20 +92,15 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
                                 ItemStack itemStack = new ItemStack(Items.PAPER);
                                 Component component = Minecraft.getInstance().options.keyHotbarSlots[i].getTranslatedKeyMessage();
                                 Component component2 = Minecraft.getInstance().options.keySaveHotbarActivator.getTranslatedKeyMessage();
-                                //? if <1.20.5 {
-                                /*itemStack.getOrCreateTagElement("CustomCreativeLock");
-                                itemStack.setHoverName(Component.translatable("inventory.hotbarInfo", component2, component));
-                                *///?} else {
                                 itemStack.set(DataComponents.CREATIVE_SLOT_LOCK, Unit.INSTANCE);
                                 itemStack.set(DataComponents.ITEM_NAME, Component.translatable("inventory.hotbarInfo", component2, component));
-                                //?}
                                 displayItems.add(itemStack);
                             } else {
                                 displayItems.add(ItemStack.EMPTY);
                             }
                         }
                     } else {
-                        displayItems.addAll(hotbar/*? if >=1.20.5 {*/.load(Minecraft.getInstance().level.registryAccess())/*?}*/);
+                        displayItems.addAll(hotbar.load(Minecraft.getInstance().level.registryAccess()));
                         displayItems.add(ItemStack.EMPTY);
                     }
                 }
@@ -181,7 +176,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
         topPos = panel.y;
         addRenderableOnly(scroller);
         scroller.setPosition(panel.x + 296, panel.y + 27);
-        scroller.offset(new Vec3(0.5f, 0.4f, 0));
+        scroller.offset(new Vec3(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.4f : 0.5f, 0.4f, 0));
         if (arrangement.get() == 2){
             searchBox.setPosition(panel.getX() + (panel.getWidth() - searchBox.getWidth()) / 2 - 6, panel.getY() + 7);
             addRenderableWidget(searchBox);
@@ -214,28 +209,20 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
     }
 
     public static List<ItemStack> getItemsSearchResult(Minecraft minecraft, String value){
-        return (value.startsWith("#") ? /*? if <1.20.5 {*//*minecraft.getSearchTree(SearchRegistry.CREATIVE_TAGS)*//*?} else {*/minecraft.getConnection().searchTrees().creativeTagSearch()/*?}*/.search(value.substring(1).toLowerCase(Locale.ROOT)) : /*? if <1.20.5 {*//*minecraft.getSearchTree(SearchRegistry.CREATIVE_NAMES)*//*?} else {*/minecraft.getConnection().searchTrees().creativeNameSearch()/*?}*/.search(value.toLowerCase(Locale.ROOT)));
+        return (value.startsWith("#") ? minecraft.getConnection().searchTrees().creativeTagSearch().search(value.substring(1).toLowerCase(Locale.ROOT)) : minecraft.getConnection().searchTrees().creativeNameSearch().search(value.toLowerCase(Locale.ROOT)));
     }
 
-    //? if >1.20.1 {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    //?} else {
-    /*@Override
-    public void renderBackground(GuiGraphics guiGraphics) {
-    }
-    *///?}
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
 
         this.renderTooltip(guiGraphics, i, j);
-        //? if >=1.21.2 {
-        LegacyRenderUtil.renderContainerEffects(guiGraphics,leftPos,topPos,imageWidth,imageHeight,i,j);
-        //?}
+        LegacyRenderUtil.renderContainerEffects(guiGraphics, leftPos, topPos, imageWidth, imageHeight,i,j);
     }
 
     @Override
@@ -257,8 +244,8 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
-        if (super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g)) return true;
+    public boolean mouseScrolled(double d, double e, double f, double g) {
+        if (super.mouseScrolled(d, e, f, g)) return true;
         else if (scroller.mouseScrolled(g)){
             fillCreativeGrid();
             return true;
@@ -292,7 +279,6 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
         if (hasShiftDown() && tabList.controlPage(page,i == 263 , i == 262)) repositionElements();
         if (i == InputConstants.KEY_X && canClearQuickSelect()) {
             for (int n = 36; n < 45; ++n) {
-                //? if >=1.21.2
                 this.minecraft.player.inventoryMenu.getSlot(n).set(ItemStack.EMPTY);
                 this.minecraft.gameMode.handleCreativeModeItemAdd(ItemStack.EMPTY, n);
             }
@@ -372,22 +358,13 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
                     if (clickType == ClickType.SWAP) {
                         this.minecraft.gameMode.handleCreativeModeItemAdd(itemStack, l - menu.slots.size() + 9 + 36);
                     }
-                    //? if <1.21.2 {
-                    /*else if (clickType == ClickType.THROW && !itemStack.isEmpty()) {
-                        ItemStack itemStack4 = itemStack.copyWithCount(j == 0 ? 1 : itemStack.getMaxStackSize());
-                        this.minecraft.player.drop(itemStack4, true);
-                        this.minecraft.gameMode.handleCreativeModeItemDrop(itemStack4);
-                    }
-                    *///?}
                     this.minecraft.player.inventoryMenu.broadcastChanges();
                 }
             }
         } else if (!menu.getCarried().isEmpty() && this.hasClickedOutside) {
-            //? if >=1.21.2 {
             if (!this.minecraft.player.canDropItems()) {
                 return;
             }
-            //?}
             if (j == 0) {
                 this.minecraft.player.drop(menu.getCarried(), true);
                 this.minecraft.gameMode.handleCreativeModeItemDrop(menu.getCarried());
