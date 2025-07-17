@@ -65,7 +65,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
     protected final Stocker.Sizeable filter = new Stocker.Sizeable(0,1);
     protected List<LegacyPlayerInfo> actualRankBoard = Collections.emptyList();
     public LeaderboardsScreen(Screen parent) {
-        super(parent,568,275, CommonComponents.EMPTY);
+        super(parent, s -> Panel.createPanel(s, p-> p.appearance(568, 275)), CommonComponents.EMPTY);
         rebuildRenderableVList(Minecraft.getInstance());
         renderableVList.layoutSpacing(l-> 1);
     }

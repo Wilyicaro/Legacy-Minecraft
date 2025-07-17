@@ -223,7 +223,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         resourceAlbumSelector.renderTooltipBox(guiGraphics,panel);
         panel.render(guiGraphics,i,j,f);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(0.5f,0);
+        guiGraphics.pose().translate(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.46f : 0.5f,0);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL,panel.x + 12, panel.y + 9, 32,32);
         guiGraphics.pose().popMatrix();
         guiGraphics.pose().pushMatrix();
