@@ -39,7 +39,8 @@ import static wily.legacy.client.screen.ControlTooltip.*;
 
 
 public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraftingMenu> implements Controller.Event,ControlTooltip.Event {
-    public static final Vec3 DISPLAY_OFFSET = new Vec3(0.5,0,0);
+    public static final Vec3 DISPLAY_OFFSET = new Vec3(0.5, 0, 0);
+    public static final Vec3 ALT_DISPLAY_OFFSET = new Vec3(0.4, 0, 0);
     protected List<RecipeIconHolder<StonecutterRecipe>>  craftingButtons = new ArrayList<>();;
     protected List<List<RecipeInfo<StonecutterRecipe>>> recipesByGroup = new ArrayList<>();
     protected List<List<RecipeInfo<StonecutterRecipe>>> filteredRecipesByGroup = Collections.emptyList();
@@ -108,20 +109,17 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
         });
         craftingButtonsOffset.max = Math.max(0,recipesByGroup.size() - 12);
     }
-    //? if >1.20.1 {
+
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    //?} else {
-    /*@Override
-    public void renderBackground(GuiGraphics guiGraphics) {
-    }
-    *///?}
+
     public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         guiGraphics.drawString(this.font, title,(imageWidth - font.width(title)) / 2, 17, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         guiGraphics.drawString(this.font, this.playerInventoryTitle, (355 + 160 - font.width(playerInventoryTitle))/ 2, 109, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
+
     @Override
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
         FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
@@ -134,9 +132,6 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        //? if >1.20.1 {
-        renderBackground(guiGraphics, i, j, f);
-         //?}
         super.render(guiGraphics, i, j, f);
         craftingButtons.get(selectedCraftingButton).renderSelection(guiGraphics,i,j,f);
         craftingButtons.forEach(h-> h.renderTooltip(minecraft,guiGraphics,i,j));
@@ -228,8 +223,8 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                 @Override
                 public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
                     boolean warning = !canCraft(getFocusedRecipe());
-                    LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos+38,topPos+149,36,36, getActualItem(ingredientSlot.get(0)), !onlyCraftableRecipes && !ingredientSlot.get(0).isEmpty() && warning, DISPLAY_OFFSET).render(graphics, i, j, f);
-                    LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos+110,topPos+149,36,36,getFocusedResult(), warning, DISPLAY_OFFSET).render(graphics, i, j, f);
+                    LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos + 38,topPos + 149,36,36, getActualItem(ingredientSlot.get(0)), !onlyCraftableRecipes && !ingredientSlot.get(0).isEmpty() && warning, LegacyRenderUtil.hasHorizontalArtifacts() ? ALT_DISPLAY_OFFSET : DISPLAY_OFFSET).render(graphics, i, j, f);
+                    LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos + 110,topPos + 149,36,36,getFocusedResult(), warning, LegacyRenderUtil.hasHorizontalArtifacts() ? ALT_DISPLAY_OFFSET : DISPLAY_OFFSET).render(graphics, i, j, f);
 
                     if (getFocusedRecipe() != null) {
                         Component resultName = getFocusedRecipe().getName();

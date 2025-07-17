@@ -473,7 +473,7 @@ public class LegacyRenderUtil {
                     if (!b) guiGraphics.pose().scale(2/3f,2/3f);
                     guiGraphics.drawString(mc.font, effect, 0, 0, 0xFFFFFFFF);
                     guiGraphics.pose().translate(0, 10 * (b ? 1 : 1.5f));
-                    guiGraphics.drawString(mc.font, MobEffectUtil.formatDuration(mobEffectInstance, 1.0f/*? if >1.20.2 {*/, mc.level.tickRateManager().tickrate()/*?}*/), 0,0, 0x7F7F7F);
+                    guiGraphics.drawString(mc.font, MobEffectUtil.formatDuration(mobEffectInstance, 1.0f, mc.level.tickRateManager().tickrate()), 0,0, 0xFF7F7F7F);
                 });
                 guiGraphics.pose().popMatrix();
             }
@@ -490,7 +490,7 @@ public class LegacyRenderUtil {
                 n -= m;
             }
             if (mobEffectInstance != null) {
-                List<Component> list = List.of(getEffectName(mobEffectInstance), MobEffectUtil.formatDuration(mobEffectInstance, 1.0f/*? if >1.20.2 {*/, mc.level.tickRateManager().tickrate()/*?}*/));
+                List<Component> list = List.of(getEffectName(mobEffectInstance), MobEffectUtil.formatDuration(mobEffectInstance, 1.0f, mc.level.tickRateManager().tickrate()));
                 guiGraphics.setTooltipForNextFrame(mc.font, list, Optional.empty(), mouseX, mouseY);
             }
         }
@@ -674,6 +674,6 @@ public class LegacyRenderUtil {
     }
 
     static {
-        isNvidia = new SystemInfo().getHardware().getGraphicsCards().stream().anyMatch(s-> s.getVendor().contains("nvidia"));
+        isNvidia = new SystemInfo().getHardware().getGraphicsCards().stream().anyMatch(s-> s.getVendor().contains("nvidia") || s.getVendor().contains("NVIDIA"));
     }
 }

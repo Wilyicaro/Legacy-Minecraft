@@ -82,10 +82,10 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
         addRenderableWidget(editBox);
         editBox.setPosition(panel.getX() + (panel.width - editBox.getWidth()) / 2, panel.getY() + 10);
         editBox.setResponder(s->resetElements());
-        tabList.init((b, i)->{
+        tabList.init((b, i)-> {
             b.spriteRender = LegacyTabButton.ToggleableTabSprites.VERTICAL;
             b.setX(panel.x - b.getWidth() + 6);
-            b.setY(panel.y + i + 4);
+            b.setY(panel.y + i + 5);
             b.offset = (t1) -> new Vec3(t1.selected ? 0 : 3.4, 0.4, 0);
         },true);
     }

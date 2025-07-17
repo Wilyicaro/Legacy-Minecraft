@@ -298,7 +298,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
             t.active = index == 0 && selectedStack.isEmpty() || index != 0 && !selectedStack.isEmpty();
             t.type = LegacyTabButton.Type.bySize(index, 6);
             t.setWidth(51);
-            t.offset = (t1) -> new Vec3(-1.5 * craftingTabList.tabButtons.indexOf(t), t1.active ? t1.selected ? 0 : 4.4 : 26.4, 0);
+            t.offset = (t1) -> new Vec3((LegacyRenderUtil.hasHorizontalArtifacts() && index % 2 != 0 ? 0.0125 : 0.0f) - 1.5 * craftingTabList.tabButtons.indexOf(t), t1.active ? t1.selected ? 0 : 4.4 : 26.4, 0);
         });
     }
     protected boolean canCraft(){
@@ -406,16 +406,10 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
 
     }
 
-    //? if >1.20.1 {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    //?} else {
-    /*@Override
-    public void renderBackground(GuiGraphics guiGraphics) {
-    }
-    *///?}
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
@@ -464,13 +458,10 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
     }
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        //? if >1.20.1 {
-        renderBackground(guiGraphics, i, j, f);
-        //?}
         super.render(guiGraphics, i, j, f);
         for (int index = 0; index < ingredientsGrid.size(); index++)
-            LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos + 21 + index % 3 * 23, topPos +  133 + index / 3 * 23, 23, 23, getActualItem(ingredientsGrid.get(index)), !getActualItem(ingredientsGrid.get(index)).isEmpty() &&  warningSlots[index], new Vec3(0.5, 0.5, 0)).render(guiGraphics, i, j, f);;
-        LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos +  124, topPos + 151, 36, 36, resultStack, getFocused() instanceof RecipeIconHolder<?> r && r.isValidIndex() && !r.canCraft(), new Vec3(0.5, 0, 0)).render(guiGraphics, i, j, f);
+            LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos + 21 + index % 3 * 23, topPos +  133 + index / 3 * 23, 23, 23, getActualItem(ingredientsGrid.get(index)), !getActualItem(ingredientsGrid.get(index)).isEmpty() &&  warningSlots[index], new Vec3(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.4f : 0.5, 0.4f, 0)).render(guiGraphics, i, j, f);;
+        LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos +  124, topPos + 151, 36, 36, resultStack, getFocused() instanceof RecipeIconHolder<?> r && r.isValidIndex() && !r.canCraft(), new Vec3(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.4f : 0.5, 0, 0)).render(guiGraphics, i, j, f);
         if (!resultStack.isEmpty()) {
             Component resultName = resultStack.getHoverName();
             LegacyRenderUtil.renderScrollingString(guiGraphics, font, resultName, leftPos + 11 + Math.max(163 - font.width(resultName), 0) / 2, topPos + 114, leftPos + 170, topPos + 125, CommonColor.INVENTORY_GRAY_TEXT.get(), false);

@@ -176,7 +176,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
         topPos = panel.y;
         addRenderableOnly(scroller);
         scroller.setPosition(panel.x + 296, panel.y + 27);
-        scroller.offset(new Vec3(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.4f : 0.5f, 0.4f, 0));
+        scroller.offset(new Vec3(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.0f : 0.5f, 0.4f, 0));
         if (arrangement.get() == 2){
             searchBox.setPosition(panel.getX() + (panel.getWidth() - searchBox.getWidth()) / 2 - 6, panel.getY() + 7);
             addRenderableWidget(searchBox);

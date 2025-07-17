@@ -19,10 +19,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.factoryapi.base.client.UIDefinition;
-import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import static wily.legacy.util.LegacySprites.BREWING_FUEL_SLOT;
 
@@ -113,7 +112,7 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
         int fuel = this.menu.getFuel();
         int n = Mth.clamp((27 * fuel + 20 - 1) / 20, 0, 27);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(65.5f,66);
+        guiGraphics.pose().translate(LegacyRenderUtil.hasHorizontalArtifacts() ? 65.4f : 65.5f,66);
         if (n > 0) {
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.FUEL_LENGTH_SPRITE, 27, 6, 0, 0, 0, 0, 0, n, 6);
         }
@@ -125,13 +124,13 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
         ci.cancel();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 58.5f, topPos + 22.5f);
+        guiGraphics.pose().translate(leftPos + (LegacyRenderUtil.hasHorizontalArtifacts() ? 58.4f : 58.5f), topPos + 22.4f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BREWING_SLOTS, 0, 0,96, 96);
         guiGraphics.pose().popMatrix();
         int o;
         if ((o = this.menu.getBrewingTicks()) > 0) {
             guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate(leftPos + 121.5f,topPos + 22.5f);
+            guiGraphics.pose().translate(leftPos + (LegacyRenderUtil.hasHorizontalArtifacts() ? 121.4f : 121.5f),topPos + 22.4f);
             guiGraphics.pose().scale(0.5f,0.5f);
             int p = (int)(84.0f * (1.0f - (float)o / 400.0f));
             if (p > 0)

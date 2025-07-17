@@ -497,7 +497,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             int size = getCraftingButtons().size();
             getCraftingButtons().forEach(b->{
                 b.setPos(leftPos + (size == 1 ? 77 : size == 2 ? 52 : size == 3 ? 21 : 8) + getCraftingButtons().indexOf(b) * (size == 2 ? 62 : size == 3 ? 55 : 45),topPos + 39);
-                if (size == 3) b.offset = new Vec3(0.5 + getCraftingButtons().indexOf(b) * 0.5,0,0);
+                if (size == 3) b.offset = new Vec3((LegacyRenderUtil.hasHorizontalArtifacts() ? 0.0125 : 0.0f) + 0.5 + getCraftingButtons().indexOf(b) * 0.5,0,0);
                 b.init();
                 addWidget(b);
             });
@@ -507,9 +507,9 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             int index = getTabList().tabButtons.indexOf(t);
             t.type = LegacyTabButton.Type.bySize(index, getMaxTabCount() - 1);
             t.setWidth(51);
-            t.offset = (t1) -> new Vec3(accessor.getDouble("tabListXOffset", -1.5) * getTabList().tabButtons.indexOf(t), t1.selected ? 0 : accessor.getDouble("tabListSelectedYOffset",4.4), 0);
+            t.offset = (t1) -> new Vec3((LegacyRenderUtil.hasHorizontalArtifacts() && index % 2 != 0 ? 0.0125 : 0.0f) + accessor.getDouble("tabListXOffset", -1.5) * getTabList().tabButtons.indexOf(t), t1.selected ? 0 : accessor.getDouble("tabListSelectedYOffset",4.4), 0);
         });
-        if (hasTypeTabList()) typeTabList.init((b, i)->{
+        if (hasTypeTabList()) typeTabList.init((b, i)-> {
             b.spriteRender = LegacyTabButton.ToggleableTabSprites.VERTICAL;
             b.setX(leftPos - b.getWidth() + 6);
             b.setY(topPos + i + 4);
@@ -739,20 +739,17 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     }
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        //? if >1.20.1 {
-        renderBackground(guiGraphics, i, j, f);
-        //?}
         super.render(guiGraphics, i, j, f);
         int panelWidth = accessor.getInteger("craftingGridPanelWidth",163);
         int contentsWidth = (is2x2 ? 2 : 3) * 23 + 69;
         int xDiff = leftPos + 9 + (panelWidth - contentsWidth) / 2;
         boolean anyWarning = false;
         for (int index = 0; index < ingredientsGrid.size(); index++) {
-            LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.itemHolder(xDiff + index % gridDimension * 23, topPos + (is2x2 ? 145 : 133) + index / gridDimension * 23, 23, 23, getActualItem(ingredientsGrid.get(index)), ((!onlyCraftableRecipes || typeTabList.selectedIndex != 0) && !getActualItem(ingredientsGrid.get(index)).isEmpty() && warningSlots[index]), new Vec3(0.5, is2x2 ? 0 : 0.5, 0));
+            LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.itemHolder(xDiff + index % gridDimension * 23, topPos + (is2x2 ? 145 : 133) + index / gridDimension * 23, 23, 23, getActualItem(ingredientsGrid.get(index)), ((!onlyCraftableRecipes || typeTabList.selectedIndex != 0) && !getActualItem(ingredientsGrid.get(index)).isEmpty() && warningSlots[index]), new Vec3(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.4f : 0.5, is2x2 ? 0 : 0.4, 0));
             if (holder.isWarning()) anyWarning = true;
             holder.render(guiGraphics, i, j, f);
         }
-        LegacyRenderUtil.iconHolderRenderer.itemHolder(xDiff + contentsWidth - 36, topPos + 151, 36, 36, resultStack, anyWarning, new Vec3(0.5, 0, 0)).render(guiGraphics, i, j, f);
+        LegacyRenderUtil.iconHolderRenderer.itemHolder(xDiff + contentsWidth - 36, topPos + 151, 36, 36, resultStack, anyWarning, new Vec3(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.4f : 0.5, 0, 0)).render(guiGraphics, i, j, f);
         if (!resultStack.isEmpty()) {
             Component resultName = getCraftingButtons().get(selectedCraftingButton) instanceof RecipeIconHolder<?> h ? h.getFocusedRecipe().getName() : resultStack.getHoverName();
             Component description = getCraftingButtons().get(selectedCraftingButton) instanceof RecipeIconHolder<?> h ? h.getFocusedRecipe().getDescription() : null;

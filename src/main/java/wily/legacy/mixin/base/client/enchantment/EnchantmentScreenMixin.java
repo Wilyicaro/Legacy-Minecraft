@@ -31,6 +31,7 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.CommonColor;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -117,7 +118,7 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
         EnchantmentNames.getInstance().initSeed(this.menu.getEnchantmentSeed());
         int m = this.menu.getGoldCount();
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 80.5f,topPos + 2.4f);
+        guiGraphics.pose().translate(leftPos + (LegacyRenderUtil.hasHorizontalArtifacts() ? 80.4f : 80.5f),topPos + 2.4f);
         for (int n = 0; n < 3; ++n) {
             guiGraphics.pose().translate(0f,21f);
             int enchantCost = this.menu.costs[n];

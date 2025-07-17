@@ -66,10 +66,10 @@ import static wily.legacy.client.screen.ControlTooltip.*;
 import static wily.legacy.util.LegacySprites.SMALL_ARROW;
 
 
-public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<CraftingContainer>*//*?} else if <1.21.2 {*//*RecipeBookMenu<CraftingInput, CraftingRecipe>*//*?} else {*/AbstractCraftingMenu/*?}*/> extends AbstractContainerScreen<T> implements Controller.Event, Event, TabList.Access {
+public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends AbstractContainerScreen<T> implements Controller.Event, Event, TabList.Access {
     private final Inventory inventory;
     protected final List<ItemStack> compactItemStackList = new ArrayList<>();
-    protected final /*? if <1.21.2 {*/ /*StackedContents*//*?} else {*/StackedItemContents/*?}*/ stackedContents = new /*? if <1.21.2 {*/ /*StackedContents*//*?} else {*/StackedItemContents/*?}*/();
+    protected final StackedItemContents stackedContents = new StackedItemContents();
     private int timesInventoryChanged;
     private final boolean is2x2;
     private boolean onlyCraftableRecipes = false;
@@ -469,7 +469,7 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
             int index = getTabList().tabButtons.indexOf(t);
             t.type = LegacyTabButton.Type.bySize(index, getMaxTabCount());
             t.setWidth(accessor.getInteger("tabListButtonWidth", 71));
-            t.offset = (t1) -> new Vec3(accessor.getDouble("tabListXOffset", -1.5) * getTabList().tabButtons.indexOf(t), t1.selected ? 0 : accessor.getDouble("tabListSelectedYOffset", 4.4), 0);
+            t.offset = (t1) -> new Vec3((LegacyRenderUtil.hasHorizontalArtifacts() && index % 2 != 0 ? 0.0125 : 0.0f) + accessor.getDouble("tabListXOffset", -1.5) * getTabList().tabButtons.indexOf(t), t1.selected ? 0 : accessor.getDouble("tabListSelectedYOffset", 4.4), 0);
         });
     }
 
@@ -546,12 +546,10 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g){
-        //? if >=1.21.2 {
+    public boolean mouseScrolled(double d, double e, double f, double g){
         if (this.getChildAt(d, e).filter((guiEventListener) -> guiEventListener.mouseScrolled(d, e, f, g)).isPresent())
             return true;
-        //?}
-        if (super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g)) return true;
+        if (super.mouseScrolled(d, e, f, g)) return true;
         if (scrollableRenderer.mouseScrolled(g)) return true;
         int scroll = (int) Math.signum(g);
         if (((craftingButtonsOffset.get() > 0 && scroll < 0) || (scroll > 0 && craftingButtonsOffset.max > 0)) && craftingButtonsOffset.add(scroll, false) != 0) {
@@ -567,21 +565,16 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
         return super.mouseClicked(d, e, i);
     }
 
-    //? if >1.20.1 {
     @Override
     public void renderBackground(GuiGraphics guiGraphics,int i, int j, float f){
         renderBg(guiGraphics, f, i, j);
     }
-    //?} else {
-    /*@Override
-    public void renderBackground(GuiGraphics guiGraphics) {
-    }
-    *///?}
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float f, int i, int j){
         getTabList().render(guiGraphics, i, j, f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getElementValue("imageSprite", LegacySprites.SMALL_PANEL, ResourceLocation.class), leftPos, topPos, imageWidth, imageHeight);
+        getTabList().renderSelected(guiGraphics, i, j, f);
         int panelWidth = accessor.getInteger("craftingGridPanelWidth", 163);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 9, topPos + 103, panelWidth, 105);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + accessor.getInteger("inventoryPanelX", 176), topPos + accessor.getInteger("inventoryPanelY", 103), accessor.getInteger("inventoryPanelWidth", 163), 105);
@@ -630,9 +623,6 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f){
-        //? if >1.20.1 {
-        renderBackground(guiGraphics, i, j, f);
-        //?}
         super.render(guiGraphics, i, j, f);
         int panelWidth = accessor.getInteger("craftingGridPanelWidth", 163);
         ItemStack resultStack = craftingButtons.get(selectedCraftingButton).getFocusedResult();
