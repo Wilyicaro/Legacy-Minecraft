@@ -8,6 +8,7 @@
   "createWorld.tab.more.title": "More Options",
   "createWorld.tab.world.title": "World Options",
   "disconnect.quitting": "Exiting the game",
+  "gameMode.adventure": "Adventure",
   "gameMode.creative": "Creative",
   "gameMode.hardcore": "Hardcore!",
   "gameMode.spectator": "Spectator",
