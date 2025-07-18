@@ -55,6 +55,16 @@ public class GuiRendererMixin {
                 new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
                 new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
                 new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
                 new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher())
         );
     }
