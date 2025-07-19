@@ -32,7 +32,6 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.util.PagedList;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.ControlType;
 import wily.legacy.client.RecipeInfo;
 import wily.legacy.client.LoomTabListing;
 import wily.legacy.util.*;
@@ -44,6 +43,7 @@ import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.RecipeMenu;
 import wily.legacy.network.ServerMenuCraftPayload;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -144,7 +144,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         public void slotChanged(AbstractContainerMenu abstractContainerMenu, int i, ItemStack itemStack) {
             recipesByGroup.clear();
             selectedIngredients.clear();
-            if (craftingTabList.selectedIndex != 0 && !selectedStack.isEmpty()) {
+            if (craftingTabList.getIndex() != 0 && !selectedStack.isEmpty()) {
                 previewStack = selectedStack.copy();
                 selectedIngredients.add(Optional.of(StackIngredient.of(true, selectedStack, 1)));
                 if (!selectedPatterns.isEmpty()) {
@@ -160,7 +160,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                     previewStack.set(DataComponents.BANNER_PATTERNS,new BannerPatternLayers(layersList));
                 }
                 Optional<Ingredient> previewIng = Optional.of(StackIngredient.of(true,previewStack,1));
-                loomTabListings.get(craftingTabList.selectedIndex - 1).patterns().stream().filter(p->Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN).listElementIds().anyMatch(p::equals)).forEach(p -> recipesByGroup.add(Arrays.stream(DyeColor.values()).map(color -> {
+                loomTabListings.get(craftingTabList.getIndex() - 1).patterns().stream().filter(p->Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN).listElementIds().anyMatch(p::equals)).forEach(p -> recipesByGroup.add(Arrays.stream(DyeColor.values()).map(color -> {
                     ItemStack result = previewStack.copy();
                     List<BannerPatternLayers.Layer> layersList = result.get(DataComponents.BANNER_PATTERNS) == null ? new ArrayList<>() : new ArrayList<>(result.get(DataComponents.BANNER_PATTERNS).layers());
                     layersList.add(new BannerPatternLayers.Layer(Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(Registries.BANNER_PATTERN).getOrThrow(p),color));
@@ -212,8 +212,8 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         renderer.
                 add(OPTION::get, ()-> ControlTooltip.getKeyMessage(InputConstants.KEY_O,this)).
                 add(ControlTooltip.EXTRA::get, ()-> getFocused() instanceof RecipeIconHolder<?> r && r.getFocusedRecipe() != null && selectedPatterns.contains(r.getFocusedRecipe()) ? LegacyComponents.REMOVE : null).
-                addCompound(()-> getTabList().selectedIndex == 0 ? new ControlTooltip.Icon[]{} : new ControlTooltip.Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(),ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon()},()->LegacyComponents.GROUP).
-                add(()-> page.max > 0 ? ControlType.getActiveType().isKbm() ? COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.RIGHT_STICK.getIcon() : null,()->LegacyComponents.PAGE);
+                add(CONTROL_TAB::get, () -> getTabList().getIndex() == 0 ? null : LegacyComponents.GROUP).
+                add(CONTROL_TYPE::get, () -> page.max > 0 ? LegacyComponents.PAGE : null);
     }
 
     public void resetElements(){
@@ -231,8 +231,8 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        Component title = craftingTabList.selectedIndex != 0 ? craftingTabList.tabButtons.get(craftingTabList.selectedIndex).getMessage() : getFocused() instanceof CustomRecipeIconHolder h ? h.getDisplayName() : Component.empty();
-        guiGraphics.drawString(this.font, title,((craftingTabList.selectedIndex != 0 ? imageWidth : imageWidth / 2) - font.width(title)) / 2,17, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        Component title = craftingTabList.getIndex() != 0 ? craftingTabList.tabButtons.get(craftingTabList.getIndex()).getMessage() : getFocused() instanceof CustomRecipeIconHolder h ? h.getDisplayName() : Component.empty();
+        guiGraphics.drawString(this.font, title,((craftingTabList.getIndex() != 0 ? imageWidth : imageWidth / 2) - font.width(title)) / 2,17, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         if (menu.inventoryActive) guiGraphics.drawString(this.font, this.playerInventoryTitle, (355 + 160 - font.width(playerInventoryTitle))/ 2, 114, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         else guiGraphics.drawString(this.font, LegacyComponents.PREVIEW, (355 + 160 - font.width(LegacyComponents.PREVIEW))/ 2, 114, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         guiGraphics.pose().translate(-leftPos,-topPos);
@@ -243,7 +243,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
 
     @Override
     public void bindingStateTick(BindingState state) {
-        if (state.pressed && state.canClick() && state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s) controlPage(s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
+        if (state.pressed && state.canClick() && state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s && craftingTabList.getIndex() != 0 ) craftingTabList.controlPage(page, s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
     }
 
     @Override
@@ -274,11 +274,11 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         super.init();
         topPos += getTabYOffset();
         menu.addSlotListener(listener);
-        craftingTabList.selectedIndex = selectedStack.isEmpty() ? 0 : Math.max(craftingTabList.selectedIndex,1);
+        craftingTabList.setSelected(selectedStack.isEmpty() ? 0 : Math.max(craftingTabList.getIndex(), 1));
         menu.inventoryActive = selectedStack.isEmpty();
         if (selectedCraftingButton < getCraftingButtons().size()) setFocused(getCraftingButtons().get(selectedCraftingButton));
-        if (craftingTabList.selectedIndex != 0) {
-            craftingButtonsOffset.max = Math.max(0,loomTabListings.get(page.get() * 7 + craftingTabList.selectedIndex - 1).patterns().size() - 12);
+        if (craftingTabList.getIndex() != 0) {
+            craftingButtonsOffset.max = Math.max(0,loomTabListings.get(page.get() * 7 + craftingTabList.getIndex() - 1).patterns().size() - 12);
             craftingButtons.forEach(b->{
                 b.setPos(leftPos + 13 + craftingButtons.indexOf(b) * 27,topPos + 38);
                 addWidget(b);
@@ -359,7 +359,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                         if (i == InputConstants.KEY_O){
                             if (this.canCraft()){
                                 selectedPatterns.add(getFocusedRecipe());
-                                LegacyRenderUtil.playSimpleUISound(SoundEvents.UI_LOOM_SELECT_PATTERN,1.0f);
+                                LegacySoundUtil.playSimpleUISound(SoundEvents.UI_LOOM_SELECT_PATTERN,1.0f);
                             }
                         } else selectedPatterns.remove(getFocusedRecipe());
                         int cycle = getFocusedRecipes().indexOf(getFocusedRecipe()) - getRecipes().indexOf(getFocusedRecipe());
@@ -386,13 +386,13 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                 public void onPress(){
                     if (isFocused() && isValidIndex()){
                         if (LegacyLoomScreen.this.canCraft()){
-                            LegacyRenderUtil.playSimpleUISound(SoundEvents.UI_LOOM_TAKE_RESULT,1.0f);
+                            LegacySoundUtil.playSimpleUISound(SoundEvents.UI_LOOM_TAKE_RESULT,1.0f);
                             selectedPatterns.forEach(b-> CommonNetwork.sendToServer(new ServerMenuCraftPayload(Optional.of(b.get().pattern.location()),b.getOptionalIngredients(),-1, Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed)));
                             selectedPatterns.clear();
                             selectedStack = ItemStack.EMPTY;
                             previewStack = ItemStack.EMPTY;
                             craftingTabList.tabButtons.get(0).onPress();
-                        } else LegacyRenderUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
+                        } else LegacySoundUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
                     }
                 }
 
@@ -425,9 +425,9 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
             guiGraphics.renderItem(previewStack,0,0);
             guiGraphics.pose().popMatrix();
         }
-        if (craftingTabList.selectedIndex == 0) FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 176, topPos + 8, 163, 93);
+        if (craftingTabList.getIndex() == 0) FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 176, topPos + 8, 163, 93);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(SMALL_ARROW, leftPos + 97, topPos + 161, 16, 13);
-        if (craftingTabList.selectedIndex != 0) {
+        if (craftingTabList.getIndex() != 0) {
             if (craftingButtonsOffset.get() > 0)
                 scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + 5, topPos + 45);
             if (craftingButtonsOffset.max > 0 && craftingButtonsOffset.get() < craftingButtonsOffset.max)
@@ -438,23 +438,13 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (hasShiftDown() && controlPage(i == 263, i == 262)) return true;
+        if (hasShiftDown() && craftingTabList.getIndex() != 0 && craftingTabList.controlPage(page,i == 263, i == 262)) return true;
         if (craftingTabList.controlTab(i)) return true;
         return super.keyPressed(i, j, k);
     }
-    protected boolean controlPage(boolean left, boolean right){
-        if ((left || right) && page.max > 0 && craftingTabList.selectedIndex != 0){
-            int lastPage = page.get();
-            page.add(left ? -1 : 1);
-            if (lastPage != page.get()) {
-                craftingTabList.resetSelectedTab();
-                rebuildWidgets();
-                return true;
-            }
-        }return false;
-    }
+
     public List<? extends LegacyIconHolder> getCraftingButtons(){
-        return craftingTabList.selectedIndex == 0 ? selectBannerButton : craftingButtons;
+        return craftingTabList.getIndex() == 0 ? selectBannerButton : craftingButtons;
     }
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
@@ -465,7 +455,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         if (!resultStack.isEmpty()) {
             Component resultName = resultStack.getHoverName();
             LegacyRenderUtil.renderScrollingString(guiGraphics, font, resultName, leftPos + 11 + Math.max(163 - font.width(resultName), 0) / 2, topPos + 114, leftPos + 170, topPos + 125, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-            if (craftingTabList.selectedIndex == 0){
+            if (craftingTabList.getIndex() == 0){
                 List<Component> list = LegacyRenderUtil.getTooltip(resultStack);
                 scrollableRenderer.scrolled.max = Math.max(0,list.size()-6);
                 scrollableRenderer.render(guiGraphics,leftPos + 180, topPos + 15, 152, 72,()->{

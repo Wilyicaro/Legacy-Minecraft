@@ -34,6 +34,7 @@ import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -153,11 +154,11 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 if (i == 263) {
                     if (selectedIndex == scrolledList.get()) updateScroll(-1,true);
                     setSelectedPack(selectedIndex - 1);
-                    LegacyRenderUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
+                    LegacySoundUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
                 } else if (i == 262) {
                     if (selectedIndex == scrolledList.get() + getMaxPacks() - 1) updateScroll(1,true);
                     setSelectedPack(selectedIndex + 1);
-                    LegacyRenderUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
+                    LegacySoundUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
                 }
             }
             return super.keyPressed(i, j, k);

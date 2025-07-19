@@ -18,7 +18,7 @@ import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.JsonUtil;
 import wily.legacy.util.LegacyComponents;
-import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -74,7 +74,7 @@ public class HowToPlayScreen extends LegacyScreen {
     public boolean keyPressed(int i, int j, int k) {
         boolean next;
         if ((next = i == InputConstants.KEY_RETURN) && hasNextPage() || i == InputConstants.KEY_X && hasPreviousPage()) {
-            LegacyRenderUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
+            LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
             minecraft.setScreen(Section.list.get(sectionIndex + (next ? 1 : -1)).build(parent));
             return true;
         }

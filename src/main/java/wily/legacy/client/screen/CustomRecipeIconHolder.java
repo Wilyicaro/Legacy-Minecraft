@@ -25,6 +25,7 @@ import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.ServerMenuCraftPayload;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,7 +127,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
             if (canCraft()){
                 craft();
                 updateRecipe();
-            } else LegacyRenderUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
+            } else LegacySoundUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
         }
     }
 
@@ -142,7 +143,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
     public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
         int i = (int)Math.signum(g);
         if (isFocused() && !nextItem.isEmpty() && i > 0 || !previousItem.isEmpty() && i < 0 ){
-            LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+            LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             itemIcon = i > 0 ? nextItem : previousItem;
             updateRecipe();
             return true;
@@ -187,7 +188,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
             return true;
         }
         if (!nextItem.isEmpty() && i == 265 || !previousItem.isEmpty() && i == 264){
-            LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+            LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             itemIcon = i == 265 ? nextItem : previousItem;
             updateRecipe();
             return true;

@@ -58,6 +58,7 @@ import wily.legacy.inventory.RecipeMenu;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 
 import java.util.*;
@@ -126,8 +127,8 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Abstrac
         renderer.
                 add(EXTRA::get, () -> LegacyComponents.INFO).
                 add(OPTION::get, () -> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES).
-                add(()-> searchMode ? VERTICAL_NAVIGATION.get() : ControlTooltip.ComponentIcon.compoundOf(ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LSHIFT) : ControllerBinding.LEFT_STICK_BUTTON.getIcon(),PLUS_ICON,OPTION.get()), () -> searchMode ? LegacyComponents.EXIT_SEARCH_MODE : LegacyComponents.SEARCH_MODE).
-                addCompound(() -> new Icon[]{ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), SPACE_ICON, ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon()}, () -> LegacyComponents.GROUP);
+                add(() -> searchMode ? VERTICAL_NAVIGATION.get() : CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? getKeyIcon(InputConstants.KEY_LSHIFT) : ControllerBinding.LEFT_STICK_BUTTON.getIcon(), PLUS_ICON, OPTION.get()), () -> searchMode ? LegacyComponents.EXIT_SEARCH_MODE : LegacyComponents.SEARCH_MODE).
+                add(CONTROL_TAB::get, () -> LegacyComponents.GROUP);
     }
 
     public void resetElements() {
@@ -155,7 +156,7 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Abstrac
     @Override
     protected void renderLabels(GuiGraphics guiGraphics,int i, int j){
         if (!searchMode) {
-            Component title = getTabList() == craftingTabList ? getTabList().tabButtons.get(getTabList().selectedIndex).getMessage() : CommonComponents.EMPTY;
+            Component title = getTabList() == craftingTabList ? getTabList().tabButtons.get(getTabList().getIndex()).getMessage() : CommonComponents.EMPTY;
             guiGraphics.drawString(this.font, title, (imageWidth - font.width(title)) / 2, 17, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         }
         int inventoryPanelX = accessor.getInteger("inventoryPanelX", 176);
@@ -223,7 +224,7 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Abstrac
         stackedContents.clear();
         inventory.fillStackedContents(stackedContents);
         menu.fillCraftSlotsStackedContents(stackedContents);
-        var collections = Minecraft.getInstance().player.getRecipeBook().getCollection(VANILLA_CATEGORIES[getTabList().selectedIndex]);
+        var collections = Minecraft.getInstance().player.getRecipeBook().getCollection(VANILLA_CATEGORIES[getTabList().getIndex()]);
         allowRecipeDisplay = false;
         var context = SlotDisplayContext.fromLevel(minecraft.level);
         allowRecipeDisplay = menu.getInputGridSlots().stream().noneMatch(Slot::hasItem);
@@ -514,7 +515,7 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Abstrac
                         return true;
                     if (i == InputConstants.KEY_X) {
                         infoType.add(1, true);
-                        LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
+                        LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
                         return true;
                     }
                     return super.keyPressed(i, j, k);
@@ -526,7 +527,7 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Abstrac
 
                 @Override
                 public void craft() {
-                    LegacyRenderUtil.playSimpleUISound(SoundEvents.ITEM_PICKUP, 1.0f);
+                    LegacySoundUtil.playSimpleUISound(SoundEvents.ITEM_PICKUP, 1.0f);
                     getFocusedRecipe().get().craft();
                     //? if <1.21.2 {
                     /*slotClicked(menu.getSlot(menu.getResultSlotIndex()), menu.getResultSlotIndex(), 0, ClickType.QUICK_MOVE);

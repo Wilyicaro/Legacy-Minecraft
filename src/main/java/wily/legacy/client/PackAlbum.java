@@ -40,7 +40,6 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.DynamicUtil;
-import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.screen.*;
@@ -48,6 +47,7 @@ import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -390,7 +390,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 if (i == 263 || i == 262) {
                     if (selectedIndex == scrolledList.get() + (i == 263 ? 0 : getMaxPacks() - 1)) updateScroll(i == 263 ? - 1 : 1,true);
                     setSelectedIndex(selectedIndex + (i == 263 ? - 1 : 1));
-                    LegacyRenderUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
+                    LegacySoundUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
                     return true;
                 }
                 if (i == InputConstants.KEY_O){

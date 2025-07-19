@@ -101,7 +101,6 @@ import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.client.LegacyGuiElements;
 import wily.legacy.util.client.MCAccount;
-import wily.legacy.util.client.LegacyRenderUtil;
 
 
 import java.io.File;
@@ -201,7 +200,7 @@ public class Legacy4JClient {
     public static Screen getReplacementScreen(Screen screen){
         if (!LegacyMixinOptions.legacyTitleScreen.get()) return screen;
         if (screen instanceof JoinMultiplayerScreen)
-            return new PlayGameScreen(new TitleScreen(),2);
+            return new PlayGameScreen(new TitleScreen(), 2);
         else if (screen instanceof DisconnectedScreen s)
             return ConfirmationScreen.createInfoScreen(getReplacementScreen(DisconnectedScreenAccessor.of(s).getParent()), s.getTitle(),DisconnectedScreenAccessor.of(s).getReason());
         else if (screen instanceof AlertScreen s) {
@@ -248,10 +247,10 @@ public class Legacy4JClient {
             }
             if (minecraft.hitResult instanceof BlockHitResult r && minecraft.level.getBlockState(r.getBlockPos()).getBlock() instanceof CraftingTableBlock && controllerManager.isControllerTheLastInput()){
                 minecraft.gameMode.useItemOn(minecraft.player, InteractionHand.MAIN_HAND, r);
-            } else if (LegacyRenderUtil.hasClassicCrafting()) {
+            } else if (LegacyOptions.hasClassicCrafting()) {
                 minecraft.getTutorial().onOpenInventory();
                 minecraft.setScreen(new InventoryScreen(minecraft.player));
-            } else if (LegacyRenderUtil.hasMixedCrafting()) {
+            } else if (LegacyOptions.hasMixedCrafting()) {
                 minecraft.setScreen(MixedCraftingScreen.playerCraftingScreen(minecraft.player));
             } else CommonNetwork.sendToServer(ServerOpenClientMenuPayload.playerCrafting());
         }

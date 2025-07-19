@@ -29,6 +29,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.*;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -170,7 +171,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
 
     @Override
     public void onClose() {
-        LegacyRenderUtil.playBackSound();
+        LegacySoundUtil.playBackSound();
         popScreen();
     }
 }

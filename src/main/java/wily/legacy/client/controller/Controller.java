@@ -29,31 +29,37 @@ public interface Controller {
 
     float axisValue(int i);
 
-    default boolean hasLED(){
+    default boolean hasLED() {
         return false;
     }
 
-    default void setLED(byte r, byte g, byte b){}
+    default void setLED(byte r, byte g, byte b) {
 
-    default void connect(ControllerManager manager){
+    }
+
+    default void connect(ControllerManager manager) {
         manager.setControllerTheLastInput(true);
         if (!manager.isCursorDisabled && manager.minecraft.screen != null) manager.minecraft.execute(()-> manager.minecraft.screen.repositionElements());
         addOrSetControllerToast(CONTROLLER_DETECTED);
     }
 
-    default void rumble(char low_frequency_rumble, char high_frequency_rumble, int duration_ms){}
+    default void rumble(char low_frequency_rumble, char high_frequency_rumble, int duration_ms) {
 
-    default void rumbleTriggers(char left_rumble, char right_rumble, int duration_ms){}
+    }
 
-    default int getTouchpadsCount(){
+    default void rumbleTriggers(char left_rumble, char right_rumble, int duration_ms) {
+
+    }
+
+    default int getTouchpadsCount() {
         return 0;
     }
 
-    default int getTouchpadFingersCount(int touchpad){
+    default int getTouchpadFingersCount(int touchpad) {
         return 0;
     }
 
-    default boolean hasFingerInTouchpad(int touchpad, int finger, Byte state, Float x, Float y, Float pressure){
+    default boolean hasFingerInTouchpad(int touchpad, int finger, Byte state, Float x, Float y, Float pressure) {
         return false;
     }
 
@@ -61,7 +67,7 @@ public interface Controller {
 
     boolean hasAxis(ControllerBinding.Axis axis);
 
-    default void disconnect(ControllerManager manager){
+    default void disconnect(ControllerManager manager) {
         manager.setControllerTheLastInput(false);
         if (manager.isCursorDisabled && !manager.getCursorMode().isNever()) manager.enableCursor();
         manager.updateBindings(Controller.EMPTY);
@@ -69,7 +75,7 @@ public interface Controller {
         addOrSetControllerToast(CONTROLLER_DISCONNECTED);
     }
 
-    default void addOrSetControllerToast(Component component){
+    default void addOrSetControllerToast(Component component) {
         if (!LegacyOptions.controllerToasts.get()) return;
         LegacyTip oldToast = FactoryAPIClient.getToasts().getToast(LegacyTip.class, Toast.NO_TOKEN);
         Component tip = Component.literal(getName());

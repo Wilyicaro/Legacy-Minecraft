@@ -13,8 +13,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.MixedCraftingScreen;
-import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Map;
 
@@ -27,7 +27,7 @@ public class MenuScreensMixin {
         SCREENS.put(MenuType.CRAFTING, new MenuScreens.ScreenConstructor<CraftingMenu, AbstractContainerScreen<CraftingMenu>>() {
             @Override
             public AbstractContainerScreen<CraftingMenu> create(CraftingMenu abstractContainerMenu, Inventory inventory, Component component) {
-                return LegacyRenderUtil.hasMixedCrafting() ? MixedCraftingScreen.craftingScreen(abstractContainerMenu, inventory, component) : new CraftingScreen(abstractContainerMenu, inventory, component);
+                return LegacyOptions.hasMixedCrafting() ? MixedCraftingScreen.craftingScreen(abstractContainerMenu, inventory, component) : new CraftingScreen(abstractContainerMenu, inventory, component);
             }
         });
     }

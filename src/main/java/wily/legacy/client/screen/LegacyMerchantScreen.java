@@ -33,6 +33,7 @@ import wily.legacy.inventory.LegacyMerchantMenu;
 import wily.legacy.inventory.LegacyMerchantOffer;
 import wily.legacy.network.ServerMenuCraftPayload;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -191,7 +192,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
                         scrollRenderer.updateScroll(i == 263 ? ScreenDirection.LEFT : ScreenDirection.RIGHT);
                         updateSlotsDisplay();
                     }
-                    LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+                    LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
                     return true;
                 }
                 return super.keyPressed(i, j, k);
@@ -217,7 +218,7 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
                     MerchantOffer offer = menu.merchant.getOffers().get(getIndex());
                     if (((LegacyMerchantOffer)offer).getRequiredLevel() <= menu.merchantLevel && !offer.isOutOfStock() && !displaySlotsWarning[2]) {
                         CommonNetwork.sendToServer(new ServerMenuCraftPayload(Collections.emptyList(),getIndex(),hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed));
-                    }else LegacyRenderUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
+                    }else LegacySoundUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
                 }
             }
         };

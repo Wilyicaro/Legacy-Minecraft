@@ -28,6 +28,13 @@ public class CompoundControllerBinding extends ControllerBinding<BindingState> {
             }
 
             @Override
+            public void nextUpdatePress() {
+                for (ControllerBinding<?> controllerBinding : bindings) {
+                    controllerBinding.state().nextUpdatePress();
+                }
+            }
+
+            @Override
             public void block() {
                 super.block();
                 for (ControllerBinding<?> controllerBinding : bindings) {
@@ -65,7 +72,7 @@ public class CompoundControllerBinding extends ControllerBinding<BindingState> {
             boolean isDelimiter = i % 2 != 0 && i < icons.length - 1;
             icons[i] = isDelimiter ? ControlTooltip.PLUS_ICON : bindings[i / 2].getIcon();
         }
-        return ControlTooltip.ComponentIcon.compoundOf(icons);
+        return ControlTooltip.CompoundComponentIcon.of(icons);
     }
 
     @Override

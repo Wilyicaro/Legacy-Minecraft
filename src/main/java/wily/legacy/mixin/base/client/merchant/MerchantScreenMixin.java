@@ -33,6 +33,7 @@ import wily.legacy.inventory.LegacyMerchantOffer;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import static wily.legacy.util.LegacySprites.ARROW;
 
@@ -162,7 +163,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             boolean hovered = false;
             if (index + scrollOff >= this.menu.getOffers().size() || (hovered = LegacyRenderUtil.isMouseOver(d,e,leftPos + 8.5f,topPos + 22.5f + index * 18,102,18))){
                 if (hovered){
-                    LegacyRenderUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+                    LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
                     if (shopItem == index + scrollOff && ((LegacyMerchantOffer)menu.getOffers().get(index + scrollOff)).getRequiredLevel() <= menu.getTraderLevel()) postButtonClick();
                     else shopItem = index + scrollOff;
                     cir.setReturnValue(true);
@@ -202,7 +203,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (CommonInputs.selected(i) && shopItem + scrollOff < menu.getOffers().size()){
-            LegacyRenderUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+            LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
             postButtonClick();
             return true;
         }

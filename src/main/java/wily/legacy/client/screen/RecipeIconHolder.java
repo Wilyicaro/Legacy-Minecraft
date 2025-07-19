@@ -25,6 +25,7 @@ import wily.legacy.util.LegacySprites;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.network.ServerMenuCraftPayload;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -107,7 +108,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
                 renderer.updateScroll(i == 263 ? ScreenDirection.LEFT : ScreenDirection.RIGHT);
                 focusedRecipes = null;
             }
-            LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+            LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             return true;
         }
         return false;
@@ -119,7 +120,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
             selectionOffset = 0;
             toggleCraftableRecipes();
             updateRecipeDisplay();
-            LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+            LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             return true;
         }
         int oldSelection = selectionOffset;
@@ -129,7 +130,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
             if (i == InputConstants.KEY_DOWN && getRecipes().size() >= 2)
                 selectionOffset = Math.min(selectionOffset + 1, 1);
             if (oldSelection != selectionOffset || canScroll()) {
-                LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+                LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
                 if (oldSelection == selectionOffset && selectionOffset != 0)
                     Collections.rotate(getFocusedRecipes(), -selectionOffset);
                 updateRecipeDisplay(getFocusedRecipe());
@@ -219,7 +220,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
                     m.showedNotEnoughIngredientsHint = true;
                     LegacyTipManager.setActualTip(new LegacyTip(null,NOT_ENOUGH_INGREDIENTS));
                 }
-                LegacyRenderUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(), 1.0f);
+                LegacySoundUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(), 1.0f);
             }
         }
     }

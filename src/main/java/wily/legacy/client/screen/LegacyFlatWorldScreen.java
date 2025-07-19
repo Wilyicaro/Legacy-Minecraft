@@ -35,6 +35,7 @@ import wily.legacy.mixin.base.client.AbstractWidgetAccessor;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,12 +78,12 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.add(()-> movingLayer != null || tabList.selectedIndex != 0 || getFocused() == null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()-> LegacyComponents.MOVE_LAYER).
+        renderer.add(()-> movingLayer != null || tabList.getIndex() != 0 || getFocused() == null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()-> LegacyComponents.MOVE_LAYER).
                 add(()-> movingLayer != null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(),()-> LegacyComponents.PRESETS).
-                addCompound(()-> new ControlTooltip.Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(),ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon()},()-> movingLayer != null ? null : LegacyComponents.SELECT_TAB).
+                add(ControlTooltip.CONTROL_TAB::get, () -> movingLayer != null ? null : LegacyComponents.SELECT_TAB).
                 add(()-> movingLayer == null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_PAGEUP) : ControllerBinding.LEFT_TRIGGER.getIcon(),()-> LegacyComponents.PAGE_UP).
                 add(()-> movingLayer == null ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_PAGEDOWN) : ControllerBinding.RIGHT_TRIGGER.getIcon(),()-> LegacyComponents.PAGE_DOWN).
-                addCompound(()-> ControlType.getActiveType().isKbm() ? new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_UP),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_DOWN)}  : new ControlTooltip.Icon[]{ControllerBinding.LEFT_STICK.getIcon()}, ()-> movingLayer == null ? null : LegacyComponents.MOVE_UP_DOWN);
+                add(ControlTooltip.VERTICAL_NAVIGATION::get , () -> movingLayer == null ? null : LegacyComponents.MOVE_UP_DOWN);
     }
 
     public void addStructure(Holder.Reference<StructureSet> structure){
@@ -254,7 +255,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         displayLayers.renderables.set(aimIndex,selected);
         displayLayers.renderables.set(selectedIndex,aimPlace);
         repositionElements();
-        LegacyRenderUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+        LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
     }
 
     public FlatLevelGeneratorSettings settings() {
@@ -274,7 +275,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
 
     @Override
     protected void init() {
-        if (movingLayer != null && tabList.selectedIndex != 0) tabList.selectedIndex = 0;
+        if (movingLayer != null && tabList.getIndex() != 0) tabList.setSelected(0);
         addRenderableOnly(((guiGraphics, i, j, f) -> {
             if (LegacyRenderUtil.hasTooltipBoxes(accessor)) {
                 Optional<GuiEventListener> listener;
@@ -305,7 +306,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
     }
 
     public RenderableVList getRenderableVList(){
-        return getRenderableVLists().get(tabList.selectedIndex);
+        return getRenderableVLists().get(tabList.getIndex());
     }
 
     @Override

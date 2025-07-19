@@ -23,6 +23,7 @@ import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.KeyboardScreen;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 @Mixin(Screen.class)
 public abstract class ScreenMixin extends AbstractContainerEventHandler {
@@ -52,11 +53,11 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
 
     @Inject(method = "changeFocus",at = @At("HEAD"))
     private void changeFocus(ComponentPath componentPath, CallbackInfo ci){
-        LegacyRenderUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+        LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
     }
     @Inject(method = "onClose",at = @At("HEAD"))
     private void onClose(CallbackInfo ci){
-        LegacyRenderUtil.playBackSound();
+        LegacySoundUtil.playBackSound();
     }
     //? if >1.20.1 {
     @Inject(method = "renderTransparentBackground",at = @At("HEAD"), cancellable = true)
@@ -82,7 +83,7 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     //?}
     @Inject(method = "hasShiftDown",at = @At("HEAD"), cancellable = true)
     private static void hasShiftDown(CallbackInfoReturnable<Boolean> cir){
-        if (Minecraft.getInstance().screen instanceof KeyboardScreen s && s.shift) cir.setReturnValue(true);
+        if (Legacy4JClient.controllerManager.simulateShift || Minecraft.getInstance().screen instanceof KeyboardScreen s && s.shift) cir.setReturnValue(true);
     }
     @Inject(method = "keyPressed",at = @At("HEAD"))
     private void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir){

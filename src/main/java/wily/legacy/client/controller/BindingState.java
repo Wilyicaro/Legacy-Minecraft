@@ -19,8 +19,9 @@ public abstract class BindingState {
     public int blockAmount = 0;
     public boolean pressed;
     public boolean released;
+    protected boolean nextUpdatePress = false;
 
-    public static BindingState create(ControllerBinding<?> component, Predicate<Controller> update){
+    public static BindingState create(ControllerBinding<?> component, Predicate<Controller> update) {
         return new BindingState(component) {
             @Override
             public void update(Controller controller) {
@@ -29,11 +30,15 @@ public abstract class BindingState {
         };
     }
 
-    protected BindingState(ControllerBinding<?> binding){
+    protected BindingState(ControllerBinding<?> binding) {
         this.binding = binding;
     }
 
-    public void update(boolean pressed){
+    public void update(boolean pressed) {
+        if (nextUpdatePress) {
+            pressed = true;
+            nextUpdatePress = false;
+        }
         if (this.released = (!pressed && this.pressed)) timePressed = -1;
         if (pressed) timePressed++;
         this.justPressed = pressed && !this.pressed;
@@ -41,29 +46,33 @@ public abstract class BindingState {
         if (justPressed) blockAmount--;
     }
 
-    public ControlTooltip.ComponentIcon getIcon(){
+    public void nextUpdatePress() {
+        nextUpdatePress = true;
+    }
+
+    public ControlTooltip.ComponentIcon getIcon() {
         return binding.getIcon();
     }
 
-    public boolean canClick(){
+    public boolean canClick() {
         return canClick(getDefaultDelay());
     }
 
-    public boolean canClick(int delay){
+    public boolean canClick(int delay) {
         return (timePressed == 0 || timePressed >= 3 * delay) && timePressed % delay == 0 && !isBlocked();
     }
 
-    public boolean onceClick(int timeDelay){
+    public boolean onceClick(int timeDelay) {
         int lastTimePressed = timePressed;
         if (timePressed == 0) timePressed = timeDelay;
         return lastTimePressed == 0 && !isBlocked();
     }
 
-    public int getDefaultDelay(){
+    public int getDefaultDelay() {
         return 100;
     }
 
-    public boolean onceClick(boolean block){
+    public boolean onceClick(boolean block) {
         boolean onceClick = onceClick(-(justPressed ? 3 : 1) * getDefaultDelay());
         if (block) block();
         return onceClick;
@@ -71,19 +80,19 @@ public abstract class BindingState {
 
     public abstract void update(Controller controller);
 
-    public boolean is(ControllerBinding<?> b){
+    public boolean is(ControllerBinding<?> b) {
         return binding == b;
     }
 
-    public <T extends BindingState> boolean isAnd(ControllerBinding<T> binding, Predicate<T> predicate){
+    public <T extends BindingState> boolean isAnd(ControllerBinding<T> binding, Predicate<T> predicate) {
         return is(binding) && predicate.test((T) this);
     }
 
-    public void block(){
+    public void block() {
         block(1);
     }
 
-    public void block(int blockAmount){
+    public void block(int blockAmount) {
         this.blockAmount = blockAmount;
     }
 
@@ -91,15 +100,15 @@ public abstract class BindingState {
         return blockAmount > 0;
     }
 
-    public boolean canDownKeyMapping(KeyMapping mapping){
+    public boolean canDownKeyMapping(KeyMapping mapping) {
         return !(mapping instanceof ToggleKeyMapping) && canClick() || timePressed == 0;
     }
 
-    public boolean canReleaseKeyMapping(KeyMapping mapping){
+    public boolean canReleaseKeyMapping(KeyMapping mapping) {
         return released;
     }
 
-    public boolean matches(KeyMapping mapping){
+    public boolean matches(KeyMapping mapping) {
         return ((LegacyKeyMapping)mapping).getBinding() == binding;
     }
 
@@ -134,7 +143,7 @@ public abstract class BindingState {
             this.yAxis = yAxis;
         }
 
-        public static Axis createStick(ControllerBinding<?> component, Supplier<Float> deadZoneGetter, BiConsumer<Axis, Controller> update, boolean left){
+        public static Axis createStick(ControllerBinding<?> component, Supplier<Float> deadZoneGetter, BiConsumer<Axis, Controller> update, boolean left) {
             return new Axis(component, ()-> left ? ControllerBinding.Axis.LEFT_STICK_X : ControllerBinding.Axis.RIGHT_STICK_X, ()-> left ? ControllerBinding.Axis.LEFT_STICK_Y : ControllerBinding.Axis.RIGHT_STICK_Y) {
 
                 @Override
@@ -149,7 +158,7 @@ public abstract class BindingState {
             };
         }
 
-        public static Axis createTrigger(ControllerBinding<?> component, Supplier<Float> deadZoneGetter, boolean left){
+        public static Axis createTrigger(ControllerBinding<?> component, Supplier<Float> deadZoneGetter, boolean left) {
             return new Axis(component, ArbitrarySupplier.empty(), ()-> left ? ControllerBinding.Axis.LEFT_TRIGGER : ControllerBinding.Axis.RIGHT_TRIGGER) {
                 @Override
                 public float getDeadZone() {
@@ -167,15 +176,15 @@ public abstract class BindingState {
 
         public abstract float getDeadZone();
 
-        public float getMagnitude(){
+        public float getMagnitude() {
             return Math.max(Math.abs(y),Math.abs(x));
         }
 
-        public float getSmoothX(){
+        public float getSmoothX() {
             return (x > getDeadZone() ? x - getDeadZone() : x < -getDeadZone() ? x + getDeadZone() : 0)  / (1 - getDeadZone());
         }
 
-        public float getSmoothY(){
+        public float getSmoothY() {
             return (y > getDeadZone() ? y - getDeadZone() : y < -getDeadZone() ? y + getDeadZone() : 0)  / (1 - getDeadZone());
         }
 

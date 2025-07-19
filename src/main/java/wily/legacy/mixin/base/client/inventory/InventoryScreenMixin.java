@@ -8,14 +8,11 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,6 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.client.screen.ReplaceableScreen;
@@ -68,13 +66,13 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
             if (i == 0){
                 LegacySlotDisplay.override(s,180, 40, new LegacySlotDisplay(){
                     public boolean isVisible() {
-                        return LegacyRenderUtil.hasClassicCrafting();
+                        return LegacyOptions.hasClassicCrafting();
                     }
                 });
             } else if (i < 5) {
                 LegacySlotDisplay.override(s,111 + s.getContainerSlot() % 2 * 21, 30 + s.getContainerSlot() / 2 * 21,new LegacySlotDisplay(){
                     public boolean isVisible() {
-                        return LegacyRenderUtil.hasClassicCrafting();
+                        return LegacyOptions.hasClassicCrafting();
                     }
                 });
             } else if (i < 9) {
@@ -84,7 +82,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
                         return s.getItem().isEmpty() ? EQUIPMENT_SLOT_SPRITES[index] : null;
                     }
                     public Vec3 getOffset() {
-                        return LegacyRenderUtil.hasClassicCrafting() ? Vec3.ZERO : EQUIP_SLOT_OFFSET;
+                        return LegacyOptions.hasClassicCrafting() ? Vec3.ZERO : EQUIP_SLOT_OFFSET;
                     }
                 });
             } else if (i < menu.slots.size() - 10) {
@@ -94,7 +92,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
             } else {
                 LegacySlotDisplay.override(s,111, 77, new LegacySlotDisplay(){
                     public Vec3 getOffset() {
-                        return LegacyRenderUtil.hasClassicCrafting() ? Vec3.ZERO : EQUIP_SLOT_OFFSET;
+                        return LegacyOptions.hasClassicCrafting() ? Vec3.ZERO : EQUIP_SLOT_OFFSET;
                     }
                     public ResourceLocation getIconSprite() {
                         return s.getItem().isEmpty() ? SHIELD_SLOT : null;
@@ -113,12 +111,12 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
     public void renderBg(GuiGraphics graphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
         FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SMALL_PANEL, leftPos, topPos, imageWidth, imageHeight);
-        FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.ENTITY_PANEL, leftPos + 40 + (LegacyRenderUtil.hasClassicCrafting() ? 0 : 50), topPos + 13, 63, 84);
+        FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.ENTITY_PANEL, leftPos + 40 + (LegacyOptions.hasClassicCrafting() ? 0 : 50), topPos + 13, 63, 84);
         Pose pose = minecraft.player.getPose();
         minecraft.player.setPose(Pose.STANDING);
-        LegacyRenderUtil.renderEntityInInventoryFollowsMouse(graphics,leftPos + 40 + (LegacyRenderUtil.hasClassicCrafting() ? 0 : 50),topPos + 13,leftPos + 103 + (LegacyRenderUtil.hasClassicCrafting() ? 0 : 50),topPos + 97,35,0.0625f,i,j, minecraft.player);
+        LegacyRenderUtil.renderEntityInInventoryFollowsMouse(graphics,leftPos + 40 + (LegacyOptions.hasClassicCrafting() ? 0 : 50),topPos + 13,leftPos + 103 + (LegacyOptions.hasClassicCrafting() ? 0 : 50),topPos + 97,35,0.0625f,i,j, minecraft.player);
         minecraft.player.setPose(pose);
-        if (LegacyRenderUtil.hasClassicCrafting()) {
+        if (LegacyOptions.hasClassicCrafting()) {
             graphics.drawString(this.font, this.title, leftPos + 111, topPos + 16, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
             FactoryGuiGraphics.of(graphics).blitSprite(SMALL_ARROW,leftPos + 158,topPos + 43,16,13);
         }

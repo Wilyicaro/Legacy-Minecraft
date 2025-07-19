@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 public class LegacyScreen extends Screen implements Controller.Event, ControlTooltip.Event {
     public Screen parent;
@@ -31,7 +32,7 @@ public class LegacyScreen extends Screen implements Controller.Event, ControlToo
 
     @Override
     public void onClose() {
-        LegacyRenderUtil.playBackSound();
+        LegacySoundUtil.playBackSound();
         this.minecraft.setScreen(parent);
     }
 }

@@ -29,9 +29,9 @@ import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.LegacyGuiItemRenderer;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEventListener, NarratableEntry, ControlTooltip.ActionHolder {
     public static final ResourceLocation ICON_HOLDER = Legacy4J.createModLocation("container/icon_holder");
@@ -328,7 +328,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         return false;
     }
     public void playClickSound(){
-        if (!isFocused()) LegacyRenderUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0F);
+        if (!isFocused()) LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0F);
     }
     public void onClick(double d, double e){
         playClickSound();

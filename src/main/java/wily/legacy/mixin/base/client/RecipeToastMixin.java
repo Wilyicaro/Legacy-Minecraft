@@ -24,6 +24,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -62,7 +63,7 @@ public abstract class RecipeToastMixin implements Toast {
 
     @Inject(method = "addOrUpdate", at = @At("HEAD"), cancellable = true)
     private static void addOrUpdate(CallbackInfo ci) {
-        if (!LegacyRenderUtil.hasClassicCrafting()) ci.cancel();
+        if (!LegacyOptions.hasClassicCrafting()) ci.cancel();
     }
     @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, /*? if <1.21.2 {*/ /*ToastComponent toastComponent*//*?} else {*/Font font /*?}*/, long l, /*? if <1.21.2 {*/ /*CallbackInfoReturnable<Visibility> cir*//*?} else {*/CallbackInfo ci/*?}*/) {

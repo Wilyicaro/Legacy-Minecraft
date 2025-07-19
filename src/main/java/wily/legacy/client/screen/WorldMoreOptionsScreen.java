@@ -1,6 +1,5 @@
 package wily.legacy.client.screen;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -23,8 +22,6 @@ import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.DatapackRepositoryAccessor;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.ControlType;
-import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.mixin.base.client.AbstractWidgetAccessor;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -52,7 +49,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.addCompound(()-> new ControlTooltip.Icon[]{ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(),ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon()},()->tabList.selectedIndex == 0 ? LegacyComponents.GAME_OPTIONS : LegacyComponents.WORLD_OPTIONS);
+        renderer.add(ControlTooltip.CONTROL_TAB::get, () -> tabList.getIndex() == 0 ? LegacyComponents.GAME_OPTIONS : LegacyComponents.WORLD_OPTIONS);
     }
 
     public WorldMoreOptionsScreen(CreateWorldScreen parent, Bearer<Boolean> trustPlayers) {
@@ -155,15 +152,15 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
+    public boolean mouseScrolled(double d, double e, double f, double g) {
         if (tooltipBox.isHovered(d,e) && scrollableRenderer.mouseScrolled(g)) return true;
-        return super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g);
+        return super.mouseScrolled(d, e, f, g);
     }
 
     public WorldMoreOptionsScreen(LoadSaveScreen parent) {
         super(parent,244, 199, Component.translatable("createWorld.tab.more.title"));
         renderableVLists.add(gameRenderables);
-        tabList.selectedIndex = 1;
+        tabList.setSelected(1);
         GameRules gameRules = parent.summary.getSettings().gameRules();
         LoadSaveScreen.RESETTABLE_DIMENSIONS.forEach(d-> renderableVList.addRenderable(new TickBox(0,0, parent.dimensionsToReset.contains(d), b-> Component.translatable("legacy.menu.load_save.reset", LegacyComponents.getDimensionName(d)), b-> null, t-> {
             if (t.selected) parent.dimensionsToReset.add(d);
@@ -209,7 +206,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
     @Override
     public RenderableVList getRenderableVList() {
-        return renderableVLists.get(tabList.selectedIndex);
+        return renderableVLists.get(tabList.getIndex());
     }
 
     @Override
@@ -217,7 +214,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         addRenderableWidget(tabList);
         super.init();
         addRenderableOnly(tabList::renderSelected);
-        tabList.init(panel.x,panel.y - 24,panel.width);
+        tabList.init(panel.x,panel.y - 24, panel.width);
     }
 
     @Override

@@ -19,7 +19,6 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.PagedList;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.ControlType;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.mixin.base.client.AbstractWidgetAccessor;import wily.legacy.util.*;
 import wily.legacy.client.controller.BindingState;
@@ -83,7 +82,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
 
     @Override
     public RenderableVList getRenderableVList() {
-        return getRenderableVLists().get(tabList.selectedIndex);
+        return getRenderableVLists().get(tabList.getIndex());
     }
 
     public static class AdvancementButton extends AbstractWidget {
@@ -160,9 +159,9 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         super.panelInit();
         addRenderableOnly(tabList::renderSelected);
         addRenderableOnly(((guiGraphics, i, j, f) ->{
-            guiGraphics.drawString(font,showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.selectedIndex).getMessage() : getTitle(),panel.x + (panel.width - font.width(showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.selectedIndex).getMessage() : getTitle()))/ 2,panel.y + 10, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+            guiGraphics.drawString(font,showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.getIndex()).getMessage() : getTitle(),panel.x + (panel.width - font.width(showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.getIndex()).getMessage() : getTitle()))/ 2,panel.y + 10, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
             if (!displayInfos.isEmpty()) {
-                ResourceLocation background = displayInfos.get(tabList.selectedIndex).getBackground().orElse(null).texturePath();
+                ResourceLocation background = displayInfos.get(tabList.getIndex()).getBackground().orElse(null).texturePath();
                 if (background != null) FactoryGuiGraphics.of(guiGraphics).blit(background,panel.x + 14, panel.y + 24,0,0,422,23,16,16);
             }
             LegacyRenderUtil.renderPanelTranslucentRecess(guiGraphics,panel.x + 12, panel.y + 22, 426, 27);
@@ -199,8 +198,8 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         super.addControlTooltips(renderer);
         renderer.tooltips.remove(0);
         renderer.
-                add(ControlTooltip.EXTRA::get,()-> LegacyComponents.SHOW_DESCRIPTION).
-                add(()-> page.max > 0 ? ControlType.getActiveType().isKbm() ? COMPOUND_ICON_FUNCTION.apply(new Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT),ControlTooltip.SPACE_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)}) : ControllerBinding.RIGHT_STICK.getIcon() : null,()->LegacyComponents.PAGE);
+                add(EXTRA::get, () -> LegacyComponents.SHOW_DESCRIPTION).
+                add(CONTROL_PAGE::get, () -> page.max > 0 ? LegacyComponents.PAGE : null);
     }
 
     @Override

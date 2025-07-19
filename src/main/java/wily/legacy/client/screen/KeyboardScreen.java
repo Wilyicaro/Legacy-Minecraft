@@ -36,6 +36,7 @@ import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -97,13 +98,13 @@ public class KeyboardScreen extends OverlayPanelScreen {
                 long millis = Util.getMillis();
                 if (!shiftLock){
                     if (pressTime >= 6 || millis - lastRelease <= 300) {
-                        LegacyRenderUtil.playSimpleUISound(LegacyRegistries.SHIFT_LOCK.get(),1.0f);
+                        LegacySoundUtil.playSimpleUISound(LegacyRegistries.SHIFT_LOCK.get(),1.0f);
                         shiftLock = true;
                     }
                     shift = !shift || shiftLock;
                 }else {
                     shiftLock = false;
-                    LegacyRenderUtil.playSimpleUISound(LegacyRegistries.SHIFT_UNLOCK.get(),1.0f);
+                    LegacySoundUtil.playSimpleUISound(LegacyRegistries.SHIFT_UNLOCK.get(),1.0f);
                 }
                 lastRelease = millis;
                 super.onRelease();
@@ -350,7 +351,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
         @Override
         public void playDownSound(SoundManager soundManager) {
-            if (playSoundOnClick()) LegacyRenderUtil.playSimpleUISound(getDownSoundEvent(),1.0f);
+            if (playSoundOnClick()) LegacySoundUtil.playSimpleUISound(getDownSoundEvent(),1.0f);
         }
         public boolean playSoundOnClick(){
             return pressTime == 0;
@@ -414,7 +415,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
             }
         });
         if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis a && state.canClick(20)){
-            if (state.canClick()) LegacyRenderUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
+            if (state.canClick()) LegacySoundUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
             xDiff = Math.max(0, Math.min(panel.getX() + Math.round(a.x*4), width - panel.getWidth())) - lastX;
             yDiff = Math.max(0, Math.min(panel.getY() + Math.round(a.y*4), height - panel.getHeight())) - lastY;
             repositionElements();

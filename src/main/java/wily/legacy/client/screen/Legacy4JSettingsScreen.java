@@ -58,9 +58,9 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
     protected void addActualRenderables(){
         String value = editBox.getValue().toLowerCase(Locale.ROOT);
         if (value.isBlank()) {
-            getRenderableVList().renderables.addAll(renderablesByTab.get(getTabList().selectedIndex));
+            getRenderableVList().renderables.addAll(renderablesByTab.get(getTabList().getIndex()));
         } else {
-            for (Renderable renderable : renderablesByTab.get(getTabList().selectedIndex)) {
+            for (Renderable renderable : renderablesByTab.get(getTabList().getIndex())) {
                 if (renderable instanceof AbstractWidget w && w.getMessage().getString().toLowerCase(Locale.ROOT).contains(value)){
                     getRenderableVList().renderables.add(w);
                 }

@@ -168,8 +168,8 @@ public class SaveRenderableList extends RenderableVList {
             handleLevelLoadFailure(minecraft,levelStorageException.getMessageComponent());
             return CompletableFuture.completedFuture(List.of());
         }
+
         if (levelCandidates.isEmpty()) {
-            getScreen(PlayGameScreen.class).tabList.selectedIndex = 1;
             return CompletableFuture.completedFuture(List.of());
         }
 

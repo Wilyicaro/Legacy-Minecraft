@@ -19,18 +19,13 @@ import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffectUtil;
@@ -54,7 +49,6 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import oshi.SystemInfo;
-import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -69,7 +63,6 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.LegacyIconHolder;
-import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.LegacySprites;
 
@@ -85,7 +78,6 @@ import static wily.legacy.client.screen.ControlTooltip.MORE;
 
 public class LegacyRenderUtil {
     public static final boolean isNvidia;
-    public static final ResourceLocation GUI_ATLAS = FactoryAPI.createVanillaLocation("textures/atlas/gui.png");
     private static final Minecraft mc = Minecraft.getInstance();
     protected static final LogoRenderer logoRenderer = new LogoRenderer(false);
     public static final LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
@@ -234,14 +226,6 @@ public class LegacyRenderUtil {
         FactoryScreenUtil.disableBlend();
     }
 
-    public static boolean hasClassicCrafting(){
-        return LegacyOptions.classicCrafting.get();
-    }
-
-    public static boolean hasMixedCrafting(){
-        return (LegacyOptions.forceMixedCrafting.get() || !Legacy4JClient.hasModOnServer()) && !LegacyOptions.classicCrafting.get();
-    }
-
     public static float getHUDScale(){
         return Math.max(1.5f, 4 - LegacyOptions.hudScale.get());
     }
@@ -281,27 +265,6 @@ public class LegacyRenderUtil {
 
     public static boolean hasProgrammerArt(){
         return mc.getResourcePackRepository().getSelectedPacks().stream().anyMatch(p->p.getId().equals("programmer_art"));
-    }
-
-    public static void playSimpleUISound(SoundEvent sound, float volume, float pitch, boolean randomPitch){
-        RandomSource source = SoundInstance.createUnseededRandom();
-        mc.getSoundManager().play(new SimpleSoundInstance(sound./*? if <1.21.2 {*//*getLocation*//*?} else {*/location/*?}*/(), SoundSource.MASTER, volume,pitch + (randomPitch ? (source.nextFloat() - 0.5f) / 10 : 0), source, false, 0, SoundInstance.Attenuation.NONE, 0.0, 0.0, 0.0, true));
-    }
-
-    public static void playSimpleUISound(SoundEvent sound, float pitch, boolean randomPitch){
-        playSimpleUISound(sound,1.0f, pitch,randomPitch);
-    }
-
-    public static void playSimpleUISound(SoundEvent sound, float pitch){
-        playSimpleUISound(sound, pitch,false);
-    }
-
-    public static void playSimpleUISound(SoundEvent sound, boolean randomPitch){
-        playSimpleUISound(sound,1.0f,randomPitch);
-    }
-
-    public static void playBackSound(){
-        if (LegacyOptions.backSound.get()) LegacyRenderUtil.playSimpleUISound(LegacyRegistries.BACK.get(),1.0f);
     }
 
     public static void drawGenericLoading(GuiGraphics graphics, int x, int y) {
@@ -664,11 +627,6 @@ public class LegacyRenderUtil {
             return ScreenDirection.UP;
         return null;
     }
-
-    public static void setSoundInstanceVolume(SoundInstance soundInstance, float volume) {
-        SoundManagerAccessor.of(mc.getSoundManager()).setVolume(soundInstance, volume);
-    }
-
 
     public static boolean hasHorizontalArtifacts() {
         return isNvidia;

@@ -66,18 +66,18 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     public PlayGameScreen(Screen parent, int initialTab) {
         super(s-> Panel.createPanel(s, p-> p.appearance(300, Math.min(256, s.height - 52)), p-> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + (UIAccessor.of(s).getBoolean("hasTabList",true) ? 12 : 0))),Component.translatable("legacy.menu.play_game"));
         this.parent = parent;
-        tabList.selectedIndex = initialTab;
         renderableVLists.clear();
         renderableVLists.add(saveRenderableList);
         renderableVLists.add(creationList);
         renderableVLists.add(serverRenderableList);
+        tabList.setSelected(initialTab);
     }
 
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
         renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(),()->ControlTooltip.getKeyMessage(InputConstants.KEY_O,this));
-        renderer.add(()-> tabList.selectedIndex != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()->DIRECT_CONNECTION);
+        renderer.add(()-> tabList.getIndex() != 2 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()->DIRECT_CONNECTION);
     }
 
     public boolean hasTabList(){
@@ -126,8 +126,8 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     @Override
     public void renderableVListInit() {
-        getRenderableVList().init(panel.x + 15,panel.y + 15,270, panel.height - 30 - (tabList.selectedIndex == 0 ? 21 : 0));
-        if (!hasTabList()) serverRenderableList.init("serverRenderableVList",panel.x + 15,panel.y + 15,270, panel.height - 30 - (tabList.selectedIndex == 0 ? 21 : 0));
+        getRenderableVList().init(panel.x + 15,panel.y + 15,270, panel.height - 30 - (tabList.getIndex() == 0 ? 21 : 0));
+        if (!hasTabList()) serverRenderableList.init("serverRenderableVList",panel.x + 15,panel.y + 15,270, panel.height - 30 - (tabList.getIndex() == 0 ? 21 : 0));
     }
 
     @Override
@@ -136,8 +136,8 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         if (hasTabList()) tabList.render(guiGraphics, i, j, f);
         panel.render(guiGraphics,i,j,f);
         tabList.renderSelected(guiGraphics, i, j, f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, accessor.getInteger("panelRecess.x",panel.x + 9), accessor.getInteger("panelRecess.y",panel.y + 9), accessor.getInteger("panelRecess.width",panel.width - 18), accessor.getInteger("panelRecess.height",panel.height - 18 - (tabList.selectedIndex == 0 ? 21 : 0)));
-        if (hasTabList() && tabList.selectedIndex == 0){
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, accessor.getInteger("panelRecess.x",panel.x + 9), accessor.getInteger("panelRecess.y",panel.y + 9), accessor.getInteger("panelRecess.width",panel.width - 18), accessor.getInteger("panelRecess.height",panel.height - 18 - (tabList.getIndex() == 0 ? 21 : 0)));
+        if (hasTabList() && tabList.getIndex() == 0){
             if (saveRenderableList.currentlyDisplayedLevels != null) {
                 guiGraphics.pose().pushMatrix();
                 guiGraphics.pose().translate(panel.x + 11.25f, panel.y + panel.height - 22.75f);
@@ -164,7 +164,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
 
     @Override
     public RenderableVList getRenderableVList() {
-        return getRenderableVLists().get(hasTabList() ? tabList.selectedIndex : 0);
+        return getRenderableVLists().get(hasTabList() ? tabList.getIndex() : 0);
     }
 
     @Override
@@ -202,16 +202,16 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             return true;
         }
         if (i == InputConstants.KEY_F5) {
-            if (tabList.selectedIndex == 0) {
+            if (tabList.getIndex() == 0) {
                 saveRenderableList.reloadSaveList();
-            } else if (tabList.selectedIndex == 2) {
+            } else if (tabList.getIndex() == 2) {
                 serverRenderableList.servers.load();
                 serverRenderableList.updateServers();
             }
             this.rebuildWidgets();
             return true;
         }
-        if (i == InputConstants.KEY_X && tabList.selectedIndex == 2){
+        if (i == InputConstants.KEY_X && tabList.getIndex() == 2){
             EditBox serverBox = new EditBox(Minecraft.getInstance().font, 0,0,200,20,DIRECT_CONNECTION);
             minecraft.setScreen(new ConfirmationScreen(this, 230, 120, serverBox.getMessage(),Component.translatable("addServer.enterIp"), b1->  ConnectScreen.startConnecting(this, minecraft, ServerAddress.parseString(serverBox.getValue()), new ServerData("","",/*? if >1.20.2 {*/ ServerData.Type.OTHER/*?} else {*//*false*//*?}*/), false/*? if >=1.20.5 {*/,null/*?}*/)){
                 boolean released = false;
@@ -254,7 +254,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         return serverRenderableList.servers;
     }
     public void onFilesDrop(List<Path> list) {
-        if (tabList.selectedIndex == 0) {
+        if (tabList.getIndex() == 0) {
             for (Path path : list) {
                 if (!path.getFileName().toString().endsWith(".mcsave") && !path.getFileName().toString().endsWith(".zip")) return;
             }

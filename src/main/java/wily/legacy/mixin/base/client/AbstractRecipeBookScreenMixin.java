@@ -11,7 +11,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(AbstractRecipeBookScreen.class)
 public class AbstractRecipeBookScreenMixin {
@@ -19,7 +18,7 @@ public class AbstractRecipeBookScreenMixin {
 
     @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/recipebook/RecipeBookComponent;init(IILnet/minecraft/client/Minecraft;Z)V", shift = At.Shift.AFTER), cancellable = true)
     protected void init(CallbackInfo ci) {
-        if (!LegacyOptions.showVanillaRecipeBook.get() || ((Object)this) instanceof InventoryScreen && !LegacyRenderUtil.hasClassicCrafting()) {
+        if (!LegacyOptions.showVanillaRecipeBook.get() || ((Object)this) instanceof InventoryScreen && !LegacyOptions.hasClassicCrafting()) {
             ci.cancel();
             if (recipeBookComponent.isVisible()) recipeBookComponent.toggleVisibility();
         }

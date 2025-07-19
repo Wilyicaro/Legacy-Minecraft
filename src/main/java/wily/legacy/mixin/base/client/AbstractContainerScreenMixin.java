@@ -32,6 +32,7 @@ import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.Set;
 
@@ -87,13 +88,13 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
             cir.setReturnValue(true);
         }
         if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && !this.minecraft.screen.isDragging() && LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy()))) {
-            LegacyRenderUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+            LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
         }
     }
 
     @Inject(method = "mouseClicked", at = @At("RETURN"))
     private void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
-        if (getChildAt(d,e).isEmpty()) LegacyRenderUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+        if (getChildAt(d,e).isEmpty()) LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
 
         boolean downPressed = Legacy4JClient.controllerManager.getButtonState(ControllerBinding.DOWN_BUTTON).justPressed;
         boolean upPressed = Legacy4JClient.controllerManager.getButtonState(ControllerBinding.UP_BUTTON).justPressed;

@@ -8,7 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.init.LegacyRegistries;
-import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -126,7 +126,7 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
         T oldValue = objectValue;
         setObjectValue(valueGetter.apply(this));
         if (!oldValue.equals(objectValue)){
-            LegacyRenderUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
+            LegacySoundUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
             onChange.accept(this);
         }
     }
