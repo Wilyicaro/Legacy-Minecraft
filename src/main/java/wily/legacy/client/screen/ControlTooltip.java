@@ -508,16 +508,12 @@ public interface ControlTooltip {
 
             if (key.getType() == InputConstants.Type.KEYSYM)
                 Minecraft.getInstance().keyboardHandler.keyPress(Minecraft.getInstance().getWindow().getWindow(), key.getValue(), 0, 1, 0);
-            else if (key.getType() == InputConstants.Type.MOUSE)
-                ((MouseHandlerAccessor)Minecraft.getInstance().mouseHandler).pressMouse(Minecraft.getInstance().getWindow().getWindow(), key.getValue(), 1, 0);
         }
 
         @Override
         public void release(double x, double y, int button) {
             if (key.getType() == InputConstants.Type.KEYSYM)
                 Minecraft.getInstance().keyboardHandler.keyPress(Minecraft.getInstance().getWindow().getWindow(), key.getValue(), 0, 0, 0);
-            else if (key.getType() == InputConstants.Type.MOUSE)
-                ((MouseHandlerAccessor) Minecraft.getInstance().mouseHandler).pressMouse(Minecraft.getInstance().getWindow().getWindow(), key.getValue(), 0, 0);
         }
 
         @Override
