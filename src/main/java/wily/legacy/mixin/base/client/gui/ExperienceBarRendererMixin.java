@@ -34,7 +34,7 @@ public interface ExperienceBarRendererMixin {
         boolean is720p = Minecraft.getInstance().getWindow().getHeight() % 720 == 0;
         guiGraphics.pose().translate(0,-36f);
         if (!is720p && hudScale != 1) guiGraphics.pose().scale(7/8f,7/8f);
-        LegacyRenderUtil.drawOutlinedString(guiGraphics, font, Language.getInstance().getVisualOrder(FormattedText.of(exp)), -font.width(exp) / 2,-2, ColorUtil.withAlpha(CommonColor.EXPERIENCE_TEXT.get(), LegacyRenderUtil.getHUDOpacity()),ColorUtil.withAlpha(0xFF000000, LegacyRenderUtil.getHUDOpacity()), is720p && hudScale == 3 || !is720p && hudScale == 2 || hudScale == 1 ? 0.55f : 2/3f);
+        LegacyRenderUtil.drawOutlinedString(guiGraphics, font, Language.getInstance().getVisualOrder(FormattedText.of(exp)), -font.width(exp) / 2,-2, ColorUtil.withAlpha(CommonColor.EXPERIENCE_TEXT.get(), LegacyRenderUtil.getHUDOpacity()),ColorUtil.withAlpha(0xFF000000, LegacyRenderUtil.getHUDOpacity()), is720p && hudScale == 3 || !is720p && hudScale == 2 || hudScale == 1 ? 0.51f : 2/3f);
         FactoryAPIClient.getProfiler().pop();
         guiGraphics.pose().popMatrix();
     }
