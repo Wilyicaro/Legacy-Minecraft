@@ -28,8 +28,8 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
@@ -42,8 +42,6 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     public static final ResourceLocation WARNING_ICON = Legacy4J.createModLocation("container/icon_warning");
     public static final ResourceLocation SLOT_HIGHLIGHT = Legacy4J.createModLocation("container/slot_highlight");
 
-    public static final ResourceLocation MOJANGLES_11_FONT = Legacy4J.createModLocation("default_11");
-    
     public Vec3 offset = Vec3.ZERO;
     public ResourceLocation iconSprite = null;
     public ArbitrarySupplier<ResourceLocation> iconHolderOverride = null;
@@ -300,7 +298,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
 
     public void renderTooltip(Minecraft minecraft, GuiGraphics graphics,ItemStack stack, int i, int j){
-        if (!stack.isEmpty()) Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(),MOJANGLES_11_FONT, b->graphics.setTooltipForNextFrame(minecraft.font, stack, i, j));
+        if (!stack.isEmpty()) LegacyFontUtil.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyFontUtil.MOJANGLES_11_FONT, b->graphics.setTooltipForNextFrame(minecraft.font, stack, i, j));
     }
 
     public boolean isHoveredOrFocused(){

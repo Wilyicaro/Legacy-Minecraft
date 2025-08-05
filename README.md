@@ -74,9 +74,9 @@ WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
 ## Linux & MacOS
 ```
 sudo chmod +x gradlew
-./gradlew chiseledBuild
+./gradlew build
 ```
 ## Windows
 ```
-.\gradlew.bat chiseledBuild
+.\gradlew.bat build
 ```

@@ -43,6 +43,7 @@ import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.JsonUtil;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.BufferedReader;
@@ -198,7 +199,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
             LegacyRenderUtil.renderPointerPanel(guiGraphics,panel.x +  panel.width - 174 ,panel.y - 18,166,18);
             if (!statsBoards.isEmpty() && selectedStatBoard < statsBoards.size()){
                 StatsBoard board = statsBoards.get(selectedStatBoard);
-                Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b-> {
+                LegacyFontUtil.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyFontUtil.MOJANGLES_11_FONT, b-> {
                     guiGraphics.pose().pushMatrix();
                     Component filter = Component.translatable("legacy.menu.leaderboard.filter", this.filter.get() == 0 ? OVERALL :  MY_SCORE);
                     guiGraphics.pose().translate(panel.x + 91 - font.width(filter) / 3f, panel.y - 12);
@@ -312,7 +313,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
             }
             Component name = Component.translatable("stat." + stat.getValue().toString().replace(':', '.'));
             return SimpleLayoutRenderable.create(Minecraft.getInstance().font.width(name) * 2/3 + 8,7, (l)->((guiGraphics, i, j, f) ->
-                Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b-> {
+                LegacyFontUtil.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyFontUtil.MOJANGLES_11_FONT, b-> {
                 guiGraphics.pose().pushMatrix();
                 guiGraphics.pose().translate(l.getX() + 4, l.getY());
                 if (!b) guiGraphics.pose().scale(2/3f,2/3f);

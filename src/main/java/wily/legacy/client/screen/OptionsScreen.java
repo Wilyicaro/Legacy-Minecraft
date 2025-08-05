@@ -357,7 +357,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.vanillaTabs,
                                 LegacyOptions.searchCreativeTab,
                                 LegacyOptions.of(mc.options.operatorItemsTab()),
-                                LegacyOptions.vignette))),
+                                LegacyOptions.vignette,
+                                LegacyOptions.displayControlTooltips))),
                 ()-> Section.ADVANCED_USER_INTERFACE));
         public static final Section ADVANCED_USER_INTERFACE = new Section(
                 Component.translatable("legacy.menu.settings.advanced_options",USER_INTERFACE.title()),

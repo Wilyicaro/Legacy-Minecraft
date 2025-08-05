@@ -36,13 +36,13 @@ public class MouseHandlerMixin {
         onChange(l,ci);
     }
 
-    @WrapOperation(method = "onPress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseClicked(DDI)Z"))
+    @WrapOperation(method = "onPress", at = @At(value = "INVOKE", target = /*? if forge {*//*"Lnet/minecraftforge/client/event/ForgeEventFactoryClient;onScreenMouseClicked(Lnet/minecraft/client/gui/screens/Screen;DDI)Z", remap = false*//*?} else {*/"Lnet/minecraft/client/gui/screens/Screen;mouseClicked(DDI)Z"/*?}*/))
     private boolean onPress(Screen instance, double x, double y, int i, Operation<Boolean> original) {
         ControlTooltip.Renderer.of(instance).press(x, y, i, true);
         return original.call(instance, x, y, i);
     }
 
-    @WrapOperation(method = "onPress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseReleased(DDI)Z"))
+    @WrapOperation(method = "onPress", at = @At(value = "INVOKE", target = /*? if forge {*/ /*"Lnet/minecraftforge/client/event/ForgeEventFactoryClient;onScreenMouseReleased(Lnet/minecraft/client/gui/screens/Screen;DDI)Z", remap = false*//*?} else {*/"Lnet/minecraft/client/gui/screens/Screen;mouseReleased(DDI)Z"/*?}*/))
     private boolean onRelease(Screen instance, double x, double y, int i, Operation<Boolean> original) {
         ControlTooltip.Renderer.of(instance).press(x, y, i, false);
         return original.call(instance, x, y, i);

@@ -87,26 +87,19 @@ public class LegacyRenderUtil {
     public static final ResourceLocation MENU_BACKGROUND = Legacy4J.createModLocation( "textures/gui/menu_background.png");
     public static final ResourceLocation LOADING_BACKGROUND = Legacy4J.createModLocation( "textures/gui/loading_background.png");
 
-    public static final Bearer<Integer> actualPlayerTabWidth = Bearer.of(0);
-    public static final Bearer<Integer> actualPlayerTabHeight = Bearer.of(0);
-
-    public static void renderPointerPanel(GuiGraphics graphics, int x, int y, int width, int height){
+    public static void renderPointerPanel(GuiGraphics graphics, int x, int y, int width, int height) {
         blitTranslucentOverlaySprite(graphics, LegacySprites.POINTER_PANEL, x, y, width, height);
     }
 
-    public static void blitTranslucentOverlaySprite(GuiGraphics graphics, ResourceLocation sprite, int x, int y, int width, int height){
-        FactoryGuiGraphics.of(graphics).disableDepthTest();
+    public static void blitTranslucentOverlaySprite(GuiGraphics graphics, ResourceLocation sprite, int x, int y, int width, int height) {
         blitTranslucentSprite(graphics, sprite, x, y, width,height);
-        FactoryGuiGraphics.of(graphics).enableDepthTest();
     }
 
-    public static void blitTranslucentSprite(GuiGraphics graphics, ResourceLocation sprite, int x, int y, int width, int height){
-        FactoryScreenUtil.enableBlend();
-        FactoryGuiGraphics.of(graphics).blitSprite(sprite, x, y, width,height);
-        FactoryScreenUtil.disableBlend();
+    public static void blitTranslucentSprite(GuiGraphics graphics, ResourceLocation sprite, int x, int y, int width, int height) {
+        FactoryGuiGraphics.of(graphics).blitSprite(sprite, x, y, width, height);
     }
 
-    public static void renderPanelTranslucentRecess(GuiGraphics graphics, int x, int y, int width, int height){
+    public static void renderPanelTranslucentRecess(GuiGraphics graphics, int x, int y, int width, int height) {
         blitTranslucentSprite(graphics, LegacySprites.PANEL_TRANSLUCENT_RECESS, x, y, width, height);
     }
 
@@ -122,19 +115,19 @@ public class LegacyRenderUtil {
         graphics.pose().popMatrix();
     }
 
-    public static void renderDefaultBackground(UIAccessor accessor, GuiGraphics guiGraphics){
+    public static void renderDefaultBackground(UIAccessor accessor, GuiGraphics guiGraphics) {
         renderDefaultBackground(accessor, guiGraphics, true);
     }
 
-    public static void renderDefaultBackground(UIAccessor accessor, GuiGraphics guiGraphics, boolean title){
+    public static void renderDefaultBackground(UIAccessor accessor, GuiGraphics guiGraphics, boolean title) {
         renderDefaultBackground(accessor, guiGraphics, false, title, true);
     }
 
-    public static boolean isVisualNight(){
+    public static boolean isVisualNight() {
         return mc.level != null && mc.level./*? if <1.21.5 {*//*isNight*//*?} else {*/isDarkOutside/*?}*/();
     }
 
-    public static void renderDefaultBackground(UIAccessor accessor, GuiGraphics guiGraphics, boolean forcePanorama, boolean title, boolean username){
+    public static void renderDefaultBackground(UIAccessor accessor, GuiGraphics guiGraphics, boolean forcePanorama, boolean title, boolean username) {
         if (mc.level == null || accessor.getBoolean("forcePanorama", forcePanorama)) {
            renderPanorama(guiGraphics);
         } else accessor.getScreen().renderTransparentBackground(guiGraphics);
@@ -142,11 +135,11 @@ public class LegacyRenderUtil {
         if (accessor.getBoolean("hasUsername", username)) renderUsername(guiGraphics);
     }
 
-    public static void renderLogo(GuiGraphics guiGraphics){
+    public static void renderLogo(GuiGraphics guiGraphics) {
         logoRenderer.renderLogo(guiGraphics, guiGraphics.guiWidth(), 1.0F);
     }
 
-    public static void renderLegacyLogo(GuiGraphics guiGraphics){
+    public static void renderLegacyLogo(GuiGraphics guiGraphics) {
         FactoryScreenUtil.enableBlend();
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate((guiGraphics.guiWidth() - 285.5f) / 2, 30);
@@ -156,27 +149,27 @@ public class LegacyRenderUtil {
         FactoryScreenUtil.disableBlend();
     }
 
-    public static void renderTransparentBackground(GuiGraphics graphics){
+    public static void renderTransparentBackground(GuiGraphics graphics) {
         FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(graphics).blit(LegacyRenderUtil.MENU_BACKGROUND,0,0,0,0,graphics.guiWidth(),graphics.guiHeight(),graphics.guiWidth(),graphics.guiHeight());
         FactoryScreenUtil.disableBlend();
     }
 
-    public static void renderUsername(GuiGraphics graphics){
+    public static void renderUsername(GuiGraphics graphics) {
         if (mc.level != null) return;
         String username = MCAccount.isOfflineUser() ? I18n.get("legacy.menu.offline_user",mc.getUser().getName()) : mc.getUser().getName();
         graphics.drawString(mc.font, username, graphics.guiWidth() - 33 - mc.font.width(username), graphics.guiHeight() - 27, 0xFFFFFFFF);
     }
 
-    public static void renderPanorama(GuiGraphics guiGraphics){
+    public static void renderPanorama(GuiGraphics guiGraphics) {
         mc.gameRenderer.getPanorama().render(guiGraphics, guiGraphics.guiWidth(), guiGraphics.guiHeight(), true);
     }
 
-    public static void renderLegacyPanorama(GuiGraphics guiGraphics){
+    public static void renderLegacyPanorama(GuiGraphics guiGraphics) {
         renderLegacyPanorama(guiGraphics, isVisualNight());
     }
 
-    public static void renderLegacyPanorama(GuiGraphics guiGraphics, boolean isNight){
+    public static void renderLegacyPanorama(GuiGraphics guiGraphics, boolean isNight) {
         FactoryGuiGraphics.of(guiGraphics).disableDepthTest();
         FactoryGuiGraphics.of(guiGraphics).blit(isNight ? PANORAMA_NIGHT : PANORAMA_DAY, 0, 0, mc.options.panoramaSpeed().get().floatValue() * Util.getMillis() * guiGraphics.guiHeight() / 360 / 66.32f, 1, guiGraphics.guiWidth(), guiGraphics.guiHeight() + 2, guiGraphics.guiHeight() * 820/144, guiGraphics.guiHeight() + 2);
         FactoryGuiGraphics.of(guiGraphics).enableDepthTest();
@@ -205,65 +198,65 @@ public class LegacyRenderUtil {
         }
     }
 
-     public static boolean isMouseOver(double mouseX, double mouseY, double x, double y, int width, int height){
+     public static boolean isMouseOver(double mouseX, double mouseY, double x, double y, int width, int height) {
         return mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height;
     }
 
-    public static void applyHUDScale(GuiGraphics graphics){
+    public static void applyHUDScale(GuiGraphics graphics) {
         graphics.pose().scale(3f / getHUDScale(), 3f / getHUDScale());
     }
 
-    public static void prepareHUDRender(GuiGraphics graphics){
+    public static void prepareHUDRender(GuiGraphics graphics) {
         graphics.pose().pushMatrix();
         FactoryGuiGraphics.of(graphics).setBlitColor(1.0f,1.0f,1.0f, getHUDOpacity());
         graphics.pose().translate(0, getHUDDistance());
         FactoryScreenUtil.enableBlend();
     }
 
-    public static void finalizeHUDRender(GuiGraphics graphics){
+    public static void finalizeHUDRender(GuiGraphics graphics) {
         graphics.pose().popMatrix();
         FactoryGuiGraphics.of(graphics).setBlitColor(1.0f,1.0f,1.0f,1.0f);
         FactoryScreenUtil.disableBlend();
     }
 
-    public static float getHUDScale(){
+    public static float getHUDScale() {
         return Math.max(1.5f, 4 - LegacyOptions.hudScale.get());
     }
 
-    public static float getHUDSize(){
+    public static float getHUDSize() {
         return 6 + 3f / LegacyRenderUtil.getHUDScale() * (35 + (mc.gameMode.canHurtPlayer() ?  Math.max(2,Mth.ceil((Math.max(mc.player.getAttributeValue(Attributes.MAX_HEALTH), Math.max(mc.gui.displayHealth, mc.player.getHealth())) + mc.player.getAbsorptionAmount()) / 20f) + (mc.player.getArmorValue() > 0 ? 1 : 0))* 10 : 0));
     }
 
-    public static float getHUDDistance(){
+    public static float getHUDDistance() {
         return -LegacyOptions.hudDistance.get().floatValue() * (22.5f + (LegacyOptions.inGameTooltips.get() ? 17.5f : 0));
     }
 
-    public static float getHUDOpacity(){
+    public static float getHUDOpacity() {
         float f = (Util.getMillis() - LegacyGuiElements.lastHotbarSelectionChange) / 1200f;
         return getInterfaceOpacity() <= 0.8f ? Math.min(0.8f, getInterfaceOpacity() + (1 - getInterfaceOpacity()) * (f >= 3f ? Math.max(4 - f, 0) : 1)) : getInterfaceOpacity();
     }
 
-    public static boolean hasTooltipBoxes(){
+    public static boolean hasTooltipBoxes() {
         return LegacyOptions.tooltipBoxes.get();
     }
 
-    public static boolean hasTooltipBoxes(UIAccessor accessor){
+    public static boolean hasTooltipBoxes(UIAccessor accessor) {
         return hasTooltipBoxes() && accessor.getBoolean("hasTooltipBox",true);
     }
 
-    public static float getInterfaceOpacity(){
+    public static float getInterfaceOpacity() {
         return LegacyOptions.hudOpacity.get().floatValue();
     }
 
-    public static int getDefaultTextColor(boolean forceWhite){
+    public static int getDefaultTextColor(boolean forceWhite) {
         return !forceWhite ? CommonColor.HIGHLIGHTED_WIDGET_TEXT.get() : CommonColor.WIDGET_TEXT.get();
     }
 
-    public static int getDefaultTextColor(){
+    public static int getDefaultTextColor() {
         return getDefaultTextColor(false);
     }
 
-    public static boolean hasProgrammerArt(){
+    public static boolean hasProgrammerArt() {
         return mc.getResourcePackRepository().getSelectedPacks().stream().anyMatch(p->p.getId().equals("programmer_art"));
     }
 
@@ -312,8 +305,8 @@ public class LegacyRenderUtil {
     }
 
     // TODO: only works when rendering items right now - Jab125
-    public static void secureTranslucentRender(GuiGraphics graphics, boolean translucent, float alpha, Consumer<Boolean> render){
-        if (!translucent){
+    public static void secureTranslucentRender(GuiGraphics graphics, boolean translucent, float alpha, Consumer<Boolean> render) {
+        if (!translucent) {
             render.accept(false);
             return;
         }
@@ -388,7 +381,7 @@ public class LegacyRenderUtil {
         return LegacyRenderUtil.getStandardHeight() / 360.0f;
     }
 
-    public static int getStandardHeight(){
+    public static int getStandardHeight() {
         return Math.round(mc.getWindow().getHeight() / 180f) * 180;
     }
 
@@ -396,24 +389,24 @@ public class LegacyRenderUtil {
         return getStandardHeight() <= 720;
     }
 
-    public static float getTextScale(){
+    public static float getTextScale() {
         return LegacyOptions.legacyItemTooltipScaling.get() ? Math.clamp(2.0f / mc.getWindow().getGuiScale(), 2/3.0f, 1.0f) : 1.0f;
     }
 
-    public static float getChatSafeZone(){
+    public static float getChatSafeZone() {
         return 29 * LegacyOptions.hudDistance.get().floatValue();
     }
 
-    public static int getSelectedItemTooltipLines(){
+    public static int getSelectedItemTooltipLines() {
         return LegacyOptions.selectedItemTooltipLines.get() == 0 ? 0 : LegacyOptions.selectedItemTooltipLines.get() + (LegacyOptions.itemTooltipEllipsis.get() ? 1 : 0);
     }
 
-    public static boolean canDisplayHUD(){
+    public static boolean canDisplayHUD() {
         int hudDelay = LegacyOptions.hudDelay.get();
         return mc.screen == null && (hudDelay == 0 || Util.getMillis() - LegacyGuiElements.lastGui > hudDelay);
     }
 
-    public static void renderContainerEffects(GuiGraphics guiGraphics, int leftPos, int topPos, int imageWidth, int imageHeight, int mouseX, int mouseY){
+    public static void renderContainerEffects(GuiGraphics guiGraphics, int leftPos, int topPos, int imageWidth, int imageHeight, int mouseX, int mouseY) {
         int x = leftPos + imageWidth + 3;
         int l = guiGraphics.guiWidth() - x;
         Collection<MobEffectInstance> collection = mc.player.getActiveEffects();
@@ -432,7 +425,7 @@ public class LegacyRenderUtil {
             if (bl) {
                 guiGraphics.pose().pushMatrix();
                 guiGraphics.pose().translate(x + 25, y + 7);
-                Legacy4JClient.applyFontOverrideIf(is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b->{
+                LegacyFontUtil.applyFontOverrideIf(is720p(), LegacyFontUtil.MOJANGLES_11_FONT, b->{
                     Component effect = getEffectName(mobEffectInstance);
                     if (!b) guiGraphics.pose().scale(2/3f,2/3f);
                     guiGraphics.drawString(mc.font, effect, 0, 0, 0xFFFFFFFF);
@@ -474,7 +467,7 @@ public class LegacyRenderUtil {
         return stack.getTooltipLines(/*? if >1.20.5 {*/Item.TooltipContext.of(mc.level),/*?}*/ mc.player, LegacyOptions.advancedHeldItemTooltip.get() ? TooltipFlag.ADVANCED : TooltipFlag.NORMAL);
     }
 
-    public static void renderHUDTooltip(GuiGraphics guiGraphics, int shift){
+    public static void renderHUDTooltip(GuiGraphics guiGraphics, int shift) {
         if (!FactoryGuiElement.SELECTED_ITEM_NAME.isVisible(FactoryScreenUtil.getGuiAccessor()) || LegacyRenderUtil.getSelectedItemTooltipLines() == 0) return;
         LegacyRenderUtil.prepareHUDRender(guiGraphics);
         guiGraphics.pose().translate(0, guiGraphics.guiHeight() - Math.max(shift, LegacyRenderUtil.getHUDSize()));
@@ -507,7 +500,7 @@ public class LegacyRenderUtil {
         LegacyRenderUtil.finalizeHUDRender(guiGraphics);
     }
 
-    public static void renderGuiEffects(GuiGraphics guiGraphics){
+    public static void renderGuiEffects(GuiGraphics guiGraphics) {
         Collection<MobEffectInstance> collection = mc.player.getActiveEffects();
         if (!FactoryGuiElement.EFFECTS.isVisible(FactoryScreenUtil.getGuiAccessor()) || collection.isEmpty()) {
             return;
@@ -533,7 +526,7 @@ public class LegacyRenderUtil {
             float f = 1.0f;
             FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, backAlpha);
             LegacyRenderUtil.renderPointerPanel(guiGraphics, k, l, 24, 24);
-            if (mobEffectInstance.endsWithin(200)){
+            if (mobEffectInstance.endsWithin(200)) {
                 int m = mobEffectInstance.getDuration();
                 f = Mth.clamp((float)m / 10.0f / 5.0f * 0.5f, 0.0f, 0.5f) + Mth.cos((float)m * (float)Math.PI / 5.0f) * Mth.clamp((10 - m / 20) / 10.0f * 0.25f, 0.0f, 0.25f);
             }
@@ -566,8 +559,8 @@ public class LegacyRenderUtil {
         }
     }
 
-    public static float getFlyingViewRollingRotation(float original){
-        if (LegacyOptions.flyingViewRolling.get() && mc.player != null && mc.player.isFallFlying()){
+    public static float getFlyingViewRollingRotation(float original) {
+        if (LegacyOptions.flyingViewRolling.get() && mc.player != null && mc.player.isFallFlying()) {
             float f = FactoryAPIClient.getGamePartialTick(false);
             Vec3 vec3 = mc.player.getViewVector(f);
             Vec3 vec32 = mc.player.getDeltaMovementLerped(f);
@@ -582,7 +575,7 @@ public class LegacyRenderUtil {
         return original;
     }
 
-    public static void renderGameOverlay(GuiGraphics graphics){
+    public static void renderGameOverlay(GuiGraphics graphics) {
         if (!MinecraftAccessor.getInstance().hasGameLoaded()) return;
         float partialTick = FactoryAPIClient.getPartialTick();
         boolean canRenderElement = (mc.screen != null || !mc.options.hideGui);
@@ -607,9 +600,9 @@ public class LegacyRenderUtil {
             graphics.pose().popMatrix();
         }
     }
-    public static Screen getInitialScreen(){
+    public static Screen getInitialScreen() {
         TitleScreen titleScreen = new TitleScreen(LegacyOptions.titleScreenFade.get());
-        if (LegacyOptions.skipInitialSaveWarning.get()){
+        if (LegacyOptions.skipInitialSaveWarning.get()) {
             return titleScreen;
         } else return ConfirmationScreen.createSaveInfoScreen(titleScreen);
     }

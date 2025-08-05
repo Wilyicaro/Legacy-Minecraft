@@ -34,7 +34,7 @@ import static wily.legacy.client.screen.ControlTooltip.*;
 public class LegacyAdvancementsScreen extends PanelVListScreen implements TabList.Access {
     public static final Component TITLE = Component.translatable("gui.advancements");
     protected final Stocker.Sizeable page = new Stocker.Sizeable(0);
-    protected final TabList tabList = new TabList(accessor, new PagedList<>(page,10));
+    protected final TabList tabList = new TabList(accessor, new PagedList<>(page, 10));
     protected final List<DisplayInfo> displayInfos = new ArrayList<>();
     protected boolean showDescription = false;
     protected boolean oldLegacyTooltipsValue;
@@ -43,7 +43,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
     public LegacyAdvancementsScreen(Screen parent) {
         super(parent,s-> Panel.createPanel(s, p-> p.centeredLeftPos(s), p-> p.centeredTopPos(s) + (((LegacyAdvancementsScreen)s).displayInfos.isEmpty() ? 0 : ((LegacyAdvancementsScreen)s).getTabYOffset()), 450,252),TITLE);
         renderableVLists.clear();
-        StreamSupport.stream(getActualAdvancements().roots().spliterator(),false).sorted(Comparator.comparingInt(n->vanillaOrder.contains(n./*? if >1.20.1 {*/holder().id/*?} else {*//*getId*//*?}*/()) ? vanillaOrder.indexOf(n./*? if >1.20.1 {*/holder().id/*?} else {*//*getId*//*?}*/()): Integer.MAX_VALUE)).forEach(a-> {
+        StreamSupport.stream(getActualAdvancements().roots().spliterator(),false).sorted(Comparator.comparingInt(n->vanillaOrder.contains(n.holder().id()) ? vanillaOrder.indexOf(n.holder().id()): Integer.MAX_VALUE)).forEach(a-> {
             DisplayInfo displayInfo = a.advancement().display().orElse(null);
             if (displayInfo == null) return;
 
@@ -66,8 +66,8 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         return i;
     }
 
-    protected void addAdvancementButton(RenderableVList renderableVList, /*? if >1.20.1 {*/AdvancementNode advancementNode/*?} else {*//*Advancement advancement*//*?}*/){
-        advancementNode.advancement().display().ifPresent(info-> renderableVList.addRenderable(new AdvancementButton(0,0,38,38,advancementNode,info)));
+    protected void addAdvancementButton(RenderableVList renderableVList, AdvancementNode advancementNode) {
+        advancementNode.advancement().display().ifPresent(info-> renderableVList.addRenderable(new AdvancementButton(0, 0, 38, 38, advancementNode, info)));
     }
 
     @Override
@@ -82,7 +82,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
 
     @Override
     public RenderableVList getRenderableVList() {
-        return getRenderableVLists().get(tabList.getIndex());
+        return getRenderableVLists().get(page.get() * 10 + tabList.getIndex());
     }
 
     public static class AdvancementButton extends AbstractWidget {
@@ -100,7 +100,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             update();
         }
 
-        public void update(){
+        public void update() {
             AdvancementHolder a;
             AdvancementProgress p = null;
             lastUnlocked = unlocked;
@@ -110,7 +110,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             setTooltip(progressText == null ? Tooltip.create(info.getDescription()) : new MultilineTooltip(List.of(info.getDescription().getVisualOrderText(),progressText.getVisualOrderText())));
         }
 
-        public boolean isUnlocked(){
+        public boolean isUnlocked() {
             return unlocked;
         }
 
@@ -148,7 +148,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
 
     @Override
     public void bindingStateTick(BindingState state) {
-        if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s && s.pressed && s.canClick()){
+        if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s && s.pressed && s.canClick()) {
             tabList.controlPage(page,s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y));
         }
     }
@@ -166,10 +166,9 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             }
             LegacyRenderUtil.renderPanelTranslucentRecess(guiGraphics,panel.x + 12, panel.y + 22, 426, 27);
             if (getFocused() instanceof AdvancementButton a) guiGraphics.drawString(font,a.info.getTitle(),panel.x + (panel.width - font.width(a.info.getTitle()))/ 2,panel.y + 32,0xFFFFFFFF);
-            FactoryScreenUtil.disableBlend();
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 12, panel.y + 50, 426, 186);
         }));
-        tabList.init(panel.x,panel.y - 37,panel.width,(b,i)->{
+        tabList.init(panel.x, panel.y - 37, panel.width, (b,i) -> {
             int index = tabList.tabButtons.indexOf(b);
             b.type = LegacyTabButton.Type.bySize(index, 9);
             b.setWidth(45);
@@ -184,7 +183,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
 
     @Override
     public boolean keyPressed(int i, int j, int k) {
-        if (i == InputConstants.KEY_X){
+        if (i == InputConstants.KEY_X) {
             showDescription = !showDescription;
             return true;
         }
@@ -234,10 +233,11 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         if (!showDescription) guiGraphics.deferredTooltip = null;
     }
 
-    public static AdvancementTree getActualAdvancements(){
+    public static AdvancementTree getActualAdvancements() {
         return Legacy4JClient.hasModOnServer() ? ClientAdvancementsPayload.advancements : getAdvancements(). getTree();
     }
-    public static ClientAdvancements getAdvancements(){
+
+    public static ClientAdvancements getAdvancements() {
         return Minecraft.getInstance().getConnection().getAdvancements();
     }
 }

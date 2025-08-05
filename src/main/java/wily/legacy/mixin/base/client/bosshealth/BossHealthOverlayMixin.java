@@ -19,12 +19,9 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.screen.LegacyIconHolder;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
-
-import java.util.function.Function;
 
 @Mixin(BossHealthOverlay.class)
 public abstract class BossHealthOverlayMixin {
@@ -32,15 +29,15 @@ public abstract class BossHealthOverlayMixin {
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V"))
     public void drawString(GuiGraphics graphics, Font font, Component component, int i, int j, int k) {
-        Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b->{
-            Legacy4JClient.forceVanillaFontShadowColor = true;
+        LegacyFontUtil.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyFontUtil.MOJANGLES_11_FONT, b->{
+            LegacyFontUtil.forceVanillaFontShadowColor = true;
             graphics.pose().pushMatrix();
             graphics.pose().translate(graphics.guiWidth() / 2f,j);
             if (!b) graphics.pose().scale(2/3f,2/3f);
             graphics.pose().translate(-font.width(component) / 2f,0);
             graphics.drawString(font,component,0,0,k);
             graphics.pose().popMatrix();
-            Legacy4JClient.forceVanillaFontShadowColor = false;
+            LegacyFontUtil.forceVanillaFontShadowColor = false;
         });
     }
     //? if >1.20.1 {

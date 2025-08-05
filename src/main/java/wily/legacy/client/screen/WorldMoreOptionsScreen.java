@@ -56,7 +56,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         super(parent,244, 199, Component.translatable("createWorld.tab.more.title"));
         renderableVLists.add(gameRenderables);
         renderableVList.addRenderable(SimpleLayoutRenderable.createDrawString(ENTER_SEED,0,1,2,9, CommonColor.INVENTORY_GRAY_TEXT.get(),false));
-        EditBox editBox = new EditBox(Minecraft.getInstance().font, 0, 0, 308, 20, ENTER_SEED){
+        EditBox editBox = new EditBox(Minecraft.getInstance().font, 0, 0, 308, 20, ENTER_SEED) {
             protected MutableComponent createNarrationMessage() {
                 return super.createNarrationMessage().append(CommonComponents.NARRATION_SEPARATOR).append(SEED_INFO);
             }
@@ -80,7 +80,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         parent.getUiState().addListener(s-> hostPrivileges.active = !s.isDebug() && !s.isHardcore());
         GameRules gameRules = parent.getUiState().getGameRules();
         Pair<Path,PackRepository> pair = parent.getDataPackSelectionSettings(parent.getUiState().getSettings().dataConfiguration());
-        if (pair != null){
+        if (pair != null) {
             renderableVList.addRenderable(SimpleLayoutRenderable.create(0,9,r-> ((guiGraphics, i, j, f) -> guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("selectWorld.experiments"),r.x + 1,r.y + 2,CommonColor.INVENTORY_GRAY_TEXT.get(),false))));
             PackRepository dataRepository = pair.getSecond();
             List<String> selectedExperiments = new ArrayList<>(dataRepository.getSelectedIds());
@@ -108,7 +108,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         }
         parent.getUiState().onChanged();
     }
-    public void addGameRulesOptions(RenderableVList list, GameRules gameRules, Predicate<GameRules.Key<?>> allowGamerule){
+    public void addGameRulesOptions(RenderableVList list, GameRules gameRules, Predicate<GameRules.Key<?>> allowGamerule) {
         gameRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
 
             @Override
@@ -128,15 +128,15 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 GameRules.IntegerValue defaultValue = type.createRule();
                 Component tooltip = Component.translatable(key.getDescriptionId() + ".description");
                 Component valueTooltip = Component.translatable("editGamerule.default", defaultValue.serialize()).withStyle(ChatFormatting.GRAY);
-                EditBox integerEdit = new EditBox(Minecraft.getInstance().font,0, 0, 220,20,Component.translatable(key.getDescriptionId()));
+                EditBox integerEdit = new EditBox(Minecraft.getInstance().font,0, 0, 220,20, Component.translatable(key.getDescriptionId()));
                 integerEdit.setTooltip(new MultilineTooltip(tooltipBox.width - 10,tooltip,valueTooltip));
                 integerEdit.setValue(Integer.toString(value.get()));
                 integerEdit.setResponder(string -> {
-                    if (value.tryDeserialize(string)){
-                        integerEdit.setTextColor(14737632);
+                    if (value.tryDeserialize(string)) {
+                        integerEdit.setTextColor(0xFFE0E0E0);
                         value.set(Integer.parseInt(string), null);
                     } else {
-                        integerEdit.setTextColor(-65536);
+                        integerEdit.setTextColor(0xFFFF0000);
                     }
                 });
                 list.addRenderable(SimpleLayoutRenderable.create(0,9,r-> ((guiGraphics, i, j, f) -> guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable(key.getDescriptionId()),r.x + 1,r.y + 2,CommonColor.INVENTORY_GRAY_TEXT.get(),false))));

@@ -117,9 +117,6 @@ public class Legacy4JClient {
     public static boolean isNewerVersion = false;
     public static boolean isNewerMinecraftVersion = false;
     public static final List<Runnable> whenResetOptions = new ArrayList<>();
-    public static boolean legacyFont = true;
-    public static boolean forceVanillaFontShadowColor = false;
-    public static ResourceLocation defaultFontOverride = null;
     public static ControlType lastControlType;
     public static boolean canSprint = false;
     public static int sprintTicksLeft = -1;
@@ -176,12 +173,6 @@ public class Legacy4JClient {
             LegacyOptions.classicStonecutting.set(LegacyOptions.classicStonecutting.get());
             LegacyOptions.classicLoom.set(LegacyOptions.classicLoom.get());
         }
-    }
-
-    public static void applyFontOverrideIf(boolean b, ResourceLocation override, Consumer<Boolean> fontRender){
-        if (b) defaultFontOverride = override;
-        fontRender.accept(b);
-        if (b) defaultFontOverride = null;
     }
 
     public static boolean playerHasInfiniteMaterials(){

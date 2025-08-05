@@ -30,12 +30,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.ControlTooltip;
-import wily.legacy.client.screen.LegacyIconHolder;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.Reader;
@@ -92,7 +91,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
             renderVignette(guiGraphics);
             guiGraphics.pose().pushMatrix();
             guiGraphics.pose().translate(0.0F, g);
-            Legacy4JClient.defaultFontOverride = LegacyIconHolder.MOJANGLES_11_FONT;
+            LegacyFontUtil.defaultFontOverride = LegacyFontUtil.MOJANGLES_11_FONT;
             int k = this.width / 2 - 161;
             for(int n = 0; n < this.lines.size(); ++n) {
                 if (n == this.lines.size() - 1) {
@@ -119,7 +118,7 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
                 m += 72;
             }
             guiGraphics.pose().popMatrix();
-            Legacy4JClient.defaultFontOverride = null;
+            LegacyFontUtil.defaultFontOverride = null;
         } else {
             int fixedWidth = Math.max(guiGraphics.guiHeight() * 16 / 9, guiGraphics.guiWidth());
             int fixedHeight = Math.max(guiGraphics.guiWidth() * 9 / 16, guiGraphics.guiHeight());

@@ -46,7 +46,6 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.util.PagedList;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
@@ -57,6 +56,7 @@ import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.inventory.RecipeMenu;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
@@ -185,7 +185,7 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Abstrac
                                 LegacyRenderUtil.iconHolderRenderer.itemHolder(inventoryPanelX + 4, 124 + 15 * i1, 14, 14, ing, false, Vec3.ZERO).render(guiGraphics, i, j, 0);
                                 guiGraphics.pose().pushMatrix();
                                 guiGraphics.pose().translate(inventoryPanelX + 22, 128 + 15 * i1);
-                                Legacy4JClient.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyIconHolder.MOJANGLES_11_FONT, b -> {
+                                LegacyFontUtil.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyFontUtil.MOJANGLES_11_FONT, b -> {
                                     if (!b) guiGraphics.pose().scale(2 / 3f, 2 / 3f);
                                     guiGraphics.drawString(font, ing.getHoverName(), 0, 0, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
                                 });

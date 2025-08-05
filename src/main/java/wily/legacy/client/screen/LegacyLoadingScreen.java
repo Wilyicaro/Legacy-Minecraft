@@ -15,11 +15,11 @@ import net.minecraft.world.level.Level;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryScreenUtil;
-import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.util.LegacyComponents;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.concurrent.ExecutorService;
@@ -96,7 +96,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
         if (!isGenericLoading()) {
             if (getProgress() != -1) {
                 if (getLoadingStage() != null)
-                    Legacy4JClient.applyFontOverrideIf(fontOverride != null,fontOverride,b-> guiGraphics.drawString(minecraft.font, getLoadingStage(), accessor.getInteger("loadingStage.x",x + 1), accessor.getInteger("loadingStage.y",height / 2 + 5), CommonColor.STAGE_TEXT.get()));
+                    LegacyFontUtil.applyFontOverrideIf(fontOverride != null, fontOverride, b-> guiGraphics.drawString(minecraft.font, getLoadingStage(), accessor.getInteger("loadingStage.x",x + 1), accessor.getInteger("loadingStage.y",height / 2 + 5), CommonColor.STAGE_TEXT.get()));
                 try (SpriteContents contents = FactoryGuiGraphics.getSprites().getSprite(LOADING_BACKGROUND).contents()){
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BACKGROUND, x, y - 1, 320, 320 * contents.height() / contents.width());
                 }
@@ -114,7 +114,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
             }
         }else LegacyRenderUtil.drawGenericLoading(guiGraphics,(width - 75 )/ 2, height / 2);
         if (getLoadingHeader() != null) {
-            Legacy4JClient.applyFontOverrideIf(fontOverride != null, fontOverride, b -> {
+            LegacyFontUtil.applyFontOverrideIf(fontOverride != null, fontOverride, b -> {
                 guiGraphics.pose().pushMatrix();
                 float scaleX = accessor.getFloat("loadingHeader.scaleX", 2.0f);
                 guiGraphics.pose().translate(accessor.getFloat("loadingHeader.x", (width - minecraft.font.width(getLoadingHeader()) * scaleX) / 2), accessor.getFloat("loadingHeader.y", height / 2 - 23));
