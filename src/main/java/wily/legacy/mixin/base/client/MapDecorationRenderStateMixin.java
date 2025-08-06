@@ -1,4 +1,3 @@
-//? if >=1.21.2 {
 package wily.legacy.mixin.base.client;
 
 import net.minecraft.client.renderer.state.MapRenderState;
@@ -21,4 +20,3 @@ public class MapDecorationRenderStateMixin implements LegacyMapDecorationRenderS
         this.type = type;
     }
 }
-//?}

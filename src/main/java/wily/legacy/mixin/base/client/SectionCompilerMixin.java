@@ -1,4 +1,4 @@
-package wily.legacy.mixin.base;
+package wily.legacy.mixin.base.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;

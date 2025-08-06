@@ -1,4 +1,4 @@
-package wily.legacy.mixin.base;
+package wily.legacy.mixin.base.client;
 
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;

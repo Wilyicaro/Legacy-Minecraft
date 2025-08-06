@@ -35,7 +35,7 @@ WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
 - cloud54 for providing Steam Control Icons and sounds for the keyboard screen
 - Permdog99 and ItzJustAPlayer for helping with the PlayStation® 5 Control Icons
 - NicSonic-_- for providing the Stadia Control Icons
-- Cjnator38 for providing the LE default font converted to JE, and the 1.21.x credits background
+- Cjnator38 for providing the LE default font converted to JE, and the 1.21.x credits background, and helping with the 1.21.6 port
 - Androser for contributing to the controller bindings
 - pizzart for contributing with some QOL and accuracy changes
 

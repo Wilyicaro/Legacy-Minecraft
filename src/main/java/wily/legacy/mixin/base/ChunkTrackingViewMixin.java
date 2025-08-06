@@ -1,5 +1,5 @@
 //? >1.20.1 {
-package wily.legacy.mixin.base.client;
+package wily.legacy.mixin.base;
 
 import net.minecraft.server.level.ChunkTrackingView;
 import net.minecraft.world.level.ChunkPos;

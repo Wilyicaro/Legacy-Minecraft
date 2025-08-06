@@ -1,4 +1,3 @@
-//? if >=1.21.2 {
 package wily.legacy.mixin.base;
 
 import net.minecraft.core.BlockPos;
@@ -47,10 +46,9 @@ public abstract class ServerExplosionMixin implements Explosion {
                 d3 = d3 * d7;
                 d4 = d4 * d7;
                 d5 = d5 * d7;
-                if (d <= 18) level.sendParticles(player, ParticleTypes.POOF, false,/*? if >=1.21.4 {*/false, /*?}*/ (d0 + center.x) / 2.0D, (d1 + center.y) / 2.0D, (d2 + center.z) / 2.0D, 0, d3, d4, d5, 1);
-                level.sendParticles(player, ParticleTypes.SMOKE, false,/*? if >=1.21.4 {*/false, /*?}*/ d0, d1, d2, 0, d3, d4, d5,1);
+                if (d <= 18) level.sendParticles(player, ParticleTypes.POOF, false, false, (d0 + center.x) / 2.0D, (d1 + center.y) / 2.0D, (d2 + center.z) / 2.0D, 0, d3, d4, d5, 1);
+                level.sendParticles(player, ParticleTypes.SMOKE, false, false,  d0, d1, d2, 0, d3, d4, d5,1);
             }
         }
     }
 }
-//?}

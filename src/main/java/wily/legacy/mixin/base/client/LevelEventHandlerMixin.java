@@ -1,5 +1,4 @@
-//? if >=1.21.3 {
-package wily.legacy.mixin.base;
+package wily.legacy.mixin.base.client;
 
 import net.minecraft.client.renderer.LevelEventHandler;
 import net.minecraft.client.resources.sounds.SoundInstance;
@@ -22,4 +21,3 @@ public abstract class LevelEventHandlerMixin {
         LegacyMusicFader.fadeOutMusic(soundInstance, true, true);
     }
 }
-//?}

@@ -118,23 +118,6 @@ public abstract class MinecraftMixin {
     }
     *///?}
 
-    //? if <1.21.4 {
-    /*@Inject(method = "pickBlock", at = @At("HEAD"), cancellable = true)
-    private void pickBlock(CallbackInfo ci){
-        if (player != null && hitResult != null && hitResult.getType() == HitResult.Type.ENTITY && !player.getAbilities().instabuild) {
-            Entity entity = ((EntityHitResult) this.hitResult).getEntity();
-            if (entity.getPickResult() != null) {
-                int i= player.getInventory().findSlotMatchingItem(entity.getPickResult());
-                if (i != -1) {
-                    if (Inventory.isHotbarSlot(i)) player.getInventory().selected = i;
-                    else gameMode.handlePickItem(i);
-                }
-            }
-            ci.cancel();
-        }
-    }
-    *///?}
-
     @Inject(method = "handleKeybinds", at = @At("HEAD"))
     private void handleKeybinds(CallbackInfo ci) {
         if (!options.keyUse.isDown()) lastPlayerBlockUsePos = null;
@@ -225,6 +208,7 @@ public abstract class MinecraftMixin {
         if (screen instanceof ReplaceableScreen s) s.setCanReplace(false);
         return true;
     }
+
     @ModifyArg(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", ordinal = 2))
     private Screen handleKeybinds(Screen arg){
         return new LegacyAdvancementsScreen(null);
@@ -278,7 +262,6 @@ public abstract class MinecraftMixin {
         return LegacyOptions.legacyLoadingAndConnecting.get() ? LegacyLoadingScreen.getDimensionChangeScreen(level, newLevel) : arg;
     }
 
-    //? if >1.20.1 {
     @Unique GameConfig gameConfig;
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(GameConfig gameConfig, CallbackInfo ci){
@@ -290,11 +273,4 @@ public abstract class MinecraftMixin {
         if (gameConfig.quickPlay.isEnabled()) return;
         list.add(r-> LegacyRenderUtil.getInitialScreen());
     }
-    //?} else {
-    /*@Inject(method = "setInitialScreen", at = @At("HEAD"), cancellable = true)
-    private void addInitialScreens(RealmsClient realmsClient, ReloadInstance reloadInstance, GameConfig.QuickPlayData quickPlayData, CallbackInfo ci) {
-        ci.cancel();
-        FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(() -> setScreen(ScreenUtil.getInitialScreen()), MinecraftAccessor.getInstance()::hasGameLoaded);
-    }
-    *///?}
 }

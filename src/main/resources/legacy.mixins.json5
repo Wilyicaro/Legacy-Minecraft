@@ -5,26 +5,12 @@
   "compatibilityLevel": "JAVA_17",
   "plugin": "wily.legacy.mixin.LegacyMixinPlugin",
   "client": [
-    //? if >=1.20.5 {
     "client.GustParticleMixin",
     "client.PanoramaRendererMixin",
-    //?}
-    //? if <1.21.2 {
-    /*"AbstractFurnaceRecipeBookComponentMixin",
-    "ClientExplosionMixin",
-    *///?} else {
     "client.GhostSlotsMixin",
-    "OldMinecartBehaviorMixin",
-    "ServerExplosionMixin",
     "client.MapDecorationRenderStateMixin",
     "client.AbstractRecipeBookScreenMixin",
-    //?}
-    //? if <1.20.5 && (forge || neoforge) {
-    /*"client.gui.ForgeGuiMixin",
-    *///?}
-    //? if >1.20.2 {
     "client.crafter.CrafterScreenMixin",
-    //?}
     //? if >=1.21 && (fabric || neoforge) {
     "compat.sodium.FluidRendererFactoryMixin",
     "compat.sodium.BlockRendererMixin",
@@ -32,25 +18,14 @@
     //? (fabric || >=1.21 && neoforge) {
     "compat.sodium.OcclusionCullerMixin",
     //?}
-    //? (fabric && <1.21) {
-    /*"compat.sodium.BlockRenderContextMixin",
-    *///?}
-    //? (>=1.21 && (fabric || neoforge)) || (1.20.1 && (forge || fabric)) {
+    //? if (>=1.21 && (fabric || neoforge)) || (1.20.1 && (forge || fabric)) {
     "compat.nostalgic.HudHelperMixin",
     //?}
-    //? if <=1.21.1 {
-    /*"compat.jei.VanillaPluginMixin",
-    "compat.jei.RecipesGuiMixin",
-    *///?}
     //? if fabric {
     "client.TerrainRenderContextMixin",
     //?}
-    //? if >=1.20.2 {
-    "SectionOcclusionGraphMixin",
-    //?}
-    //? if >=1.21.3 {
-    "LevelEventHandlerMixin",
-    //?}
+    "client.SectionOcclusionGraphMixin",
+    "client.LevelEventHandlerMixin",
     "client.inventory.EffectRenderingInventoryScreenMixin",
     "client.AbstractButtonMixin",
     "client.AbstractContainerScreenMixin",
@@ -96,7 +71,7 @@
     "client.FontMixin",
     "client.FrustumMixin",
     "client.GameRendererMixin",
-    "SectionCompilerMixin",
+    "client.SectionCompilerMixin",
     "client.GlyphInfoMixin",
     "client.grindstone.GrindstoneScreenMixin",
     "client.GuiGameRendererMixin",
@@ -190,25 +165,21 @@
     "client.GuiEntityRenderStateMixin",
     "client.GuiEntityRendererMixin",
     "client.GuiRendererMixin",
-    "client.GuiItemRenderStateMixin"
+    "client.bosshealth.EndDragonFightMixin",
+    "client.bosshealth.WitherBossMixin",
+    "client.GuiItemRenderStateMixin",
+    "client.chat.ChatFormattingMixin",
+    "client.StyleMixin",
+    "client.ClientBoundAwardStatsPacketAccessor"
   ],
   "mixins": [
-    //? if <1.20.5 {
-    /*"MerchantOffersMixin",
-    "RecordItemMixin",
-    *///?}
-    //? if <1.21.2 {
-    /*"RecipeManagerAccessor",
-    *///?}
-    //? if >1.20.1 {
-    "client.ChunkTrackingViewMixin",
-    //?} else {
-    /*"ChunkMapMixin",
-    *///?}
+    "ChunkTrackingViewMixin",
     //? if >=1.20.5 && neoforge {
     /*"AttributeUtilMixin",
     "IAttributeExtensionMixin",
     *///?}
+    "OldMinecartBehaviorMixin",
+    "ServerExplosionMixin",
     "ItemMixin",
     "AbstractContainerMenuMixin",
     "AbstractMinecartMixin",
@@ -220,7 +191,6 @@
     "CraftingTableBlockMixin",
     "CriteriaTriggersMixin",
     "EmptyMapItemMixin",
-    "client.bosshealth.EndDragonFightMixin",
     "EntityTypeMixin",
     "FlowerBlockMixin",
     "FoodDataMixin",
@@ -246,22 +216,18 @@
     "SnowLayerBlockMixin",
     "SquidMixin",
     "StonecutterBlockMixin",
-    "StyleMixin",
     "SugarCanesBlockMixin",
     "TntBlockMixin",
     "VillagerGoalPackagesMixin",
     "VillagerMixin",
-    "client.bosshealth.WitherBossMixin",
     "WoodlandMansionPiecesSecondFloor",
     "FireworkStarRecipeAccessor",
     "FireworkRocketRecipeAccessor",
     "ThrownTridentMixin",
-    "client.chat.ChatFormattingMixin",
     "ChangeDimensionTriggerMixin",
     "EnchantmentMixin",
     "EntityMixin",
     "WitherSkullBlockMixin",
-    "client.ClientBoundAwardStatsPacketAccessor",
     "EntityAccessor",
     "EndPortalBlockMixin",
     "ScaffoldingBlockItemMixin",

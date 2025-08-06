@@ -20,16 +20,9 @@ import wily.legacy.Legacy4JClient;
 
 @Mixin(TerrainRenderContext.class)
 public class TerrainRenderContextMixin {
-    //? if <1.21.5 {
-    /*@Inject(method = "tessellateBlock", at = @At("HEAD"))
-    public void tessellateBlock(BlockState blockState, BlockPos blockPos, BakedModel model, PoseStack matrixStack, CallbackInfo ci, @Local(argsOnly = true) LocalRef<BakedModel> bakedModelLocalRef) {
-        bakedModelLocalRef.set(Legacy4JClient.getFastLeavesModelReplacement(Minecraft.getInstance().level, blockPos, blockState, model));
-    }
-    *///?} else {
     @Inject(method = "bufferModel", at = @At("HEAD"))
     public void bufferModel(BlockStateModel model, BlockState blockState, BlockPos blockPos, CallbackInfo ci, @Local(argsOnly = true) LocalRef<BlockStateModel> bakedModelLocalRef) {
         bakedModelLocalRef.set(Legacy4JClient.getFastLeavesModelReplacement(Minecraft.getInstance().level, blockPos, blockState, model));
     }
-    //?}
 }
 //?}
