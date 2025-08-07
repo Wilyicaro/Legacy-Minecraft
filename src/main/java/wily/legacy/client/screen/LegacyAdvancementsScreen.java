@@ -85,7 +85,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
 
     @Override
     public RenderableVList getRenderableVList() {
-        return getRenderableVLists().get(tabList.selectedTab);
+        return getRenderableVLists().get(page.get() * 10 + tabList.selectedTab);
     }
 
     public static class AdvancementButton extends AbstractWidget {

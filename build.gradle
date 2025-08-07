@@ -259,6 +259,15 @@ processResources {
             it.exclude()
         }
     }
+
+    //Fixes the magma cube texture format change in 1.21.4
+    filesMatching("resourcepacks/console_aspects/assets/minecraft/textures/entity/slime/magmacube1214.png"){
+        if (stonecutter.eval(stonecutter.current.version, ">=1.21.4")) {
+            it.copyTo(new File(outputs.files.asPath, "resourcepacks/console_aspects/assets/minecraft/textures/entity/slime/magmacube.png"))
+        }
+        it.exclude()
+    }
+
 }
 
 tasks.register('renameJarForPublication', Zip) {

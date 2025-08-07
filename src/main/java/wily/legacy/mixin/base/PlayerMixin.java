@@ -77,7 +77,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
         if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat)) cir.setReturnValue(1.0f);
     }
 
-    @ModifyExpressionValue(method = "attack", at = @At(value = "INVOKE", target = /*? if <1.20.5 {*//*"Lnet/minecraft/world/entity/player/Player;getAttributeValue(Lnet/minecraft/world/entity/ai/attributes/Attribute;)D"*//*?} else {*/"Lnet/minecraft/world/entity/player/Player;getAttributeValue(Lnet/minecraft/core/Holder;)D"/*?}*/))
+    @ModifyExpressionValue(method = "attack", at = @At(value = "INVOKE", target = /*? if <1.20.5 {*//*"Lnet/minecraft/world/entity/player/Player;getAttributeValue(Lnet/minecraft/world/entity/ai/attributes/Attribute;)D"*//*?} else {*/"Lnet/minecraft/world/entity/player/Player;getAttributeValue(Lnet/minecraft/core/Holder;)D"/*?}*/, ordinal = 0))
     protected double modifyAttackDamage(double original) {
         return original + Legacy4J.getItemDamageModifier(getMainHandItem());
     }

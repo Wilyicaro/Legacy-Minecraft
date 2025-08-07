@@ -2,7 +2,11 @@ package wily.legacy.mixin.base;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
+//? if >=1.21.5 {
+import net.minecraft.network.chat.ComponentSerialization;
+//?}
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,7 +21,11 @@ public class BonusChestFeatureMixin {
     public boolean place(WorldGenLevel instance, BlockPos blockPos, BlockState blockState, int i) {
         boolean b = instance.setBlock(blockPos,blockState,i);
         CompoundTag customNameTag = new CompoundTag();
+        //? if >=1.21.5 {
+        ComponentSerialization.CODEC.encode(Component.translatable("selectWorld.bonusItems"), NbtOps.INSTANCE, new CompoundTag()).ifSuccess(t-> customNameTag.put("CustomName", t));
+        //?} else {
         customNameTag.putString("CustomName", Component.Serializer.toJson(Component.translatable("selectWorld.bonusItems")/*? if >=1.20.5 {*/, instance.registryAccess()/*?}*/));
+        //?}
         instance.getBlockEntity(blockPos, BlockEntityType.CHEST).ifPresent(e-> e./*? if <1.20.5 {*//*load(customNameTag)*//*?} else {*/loadCustomOnly(customNameTag,instance.registryAccess())/*?}*/);
         return b;
     }

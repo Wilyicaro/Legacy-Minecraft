@@ -100,7 +100,7 @@ public class OptionsScreen extends PanelVListScreen {
         private static final Minecraft mc = Minecraft.getInstance();
         public static final List<Section> list = new ArrayList<>();
 
-        public static OptionInstance<?> createResolutionOptionInstance(){
+        public static OptionInstance<?> createResolutionOptionInstance(OptionsScreen screen) {
             Monitor monitor = mc.getWindow().findBestMonitor();
             int j = monitor == null ? -1: mc.getWindow().getPreferredFullscreenVideoMode().map(monitor::getVideoModeIndex).orElse(-1);
             return new OptionInstance<>("options.fullscreen.resolution", OptionInstance.noTooltip(), (component, integer) -> {
@@ -115,6 +115,7 @@ public class OptionsScreen extends PanelVListScreen {
                 if (monitor == null)
                     return;
                 mc.getWindow().setPreferredFullscreenVideoMode(integer == -1 ? Optional.empty() : Optional.of(monitor.getMode(integer)));
+                FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(mc.getWindow()::changeFullscreenVideoMode, ()-> screen != mc.screen);
             });
         }
 
@@ -272,7 +273,7 @@ public class OptionsScreen extends PanelVListScreen {
                         o->o.renderableVList.addOptionsCategory(
                                 Component.translatable("options.videoTitle"),
                                 LegacyOptions.of(mc.options.fullscreen()),
-                                LegacyOptions.of(createResolutionOptionInstance()),
+                                LegacyOptions.of(createResolutionOptionInstance(o)),
                                 LegacyOptions.of(mc.options.enableVsync()),
                                 LegacyOptions.of(mc.options.framerateLimit()),
                                 LegacyOptions.of(mc.options.fov()),
@@ -308,7 +309,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.enhancedPistonMovingRenderer,
                                 FactoryOptions.RANDOM_BLOCK_ROTATIONS,
                                 LegacyOptions.defaultParticlePhysics,
-                                LegacyOptions.of(mc.options.particles())),
+                                LegacyOptions.of(mc.options.particles()),
+                                LegacyOptions.bubblesOutsideWater),
                         o->o.renderableVList.addLinkedOptions(
                                 FactoryOptions.NEAREST_MIPMAP_SCALING,
                                 b->!b.get(),
@@ -350,7 +352,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.vanillaTabs,
                                 LegacyOptions.searchCreativeTab,
                                 LegacyOptions.of(mc.options.operatorItemsTab()),
-                                LegacyOptions.vignette))),
+                                LegacyOptions.vignette,
+                                LegacyOptions.displayControlTooltips))),
                 ()-> Section.ADVANCED_USER_INTERFACE));
         public static final Section ADVANCED_USER_INTERFACE = new Section(
                 Component.translatable("legacy.menu.settings.advanced_options",USER_INTERFACE.title()),
