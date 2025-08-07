@@ -169,8 +169,7 @@
     "client.bosshealth.WitherBossMixin",
     "client.GuiItemRenderStateMixin",
     "client.chat.ChatFormattingMixin",
-    "client.StyleMixin",
-    "client.ClientBoundAwardStatsPacketAccessor"
+    "client.StyleMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",
@@ -232,7 +231,9 @@
     "EndPortalBlockMixin",
     "ScaffoldingBlockItemMixin",
     "FlowerPotBlockAccessor",
-    "HangingEntityItemAccessor"
+    "HangingEntityItemAccessor",
+    "ClientBoundAwardStatsPacketAccessor",
+    "BaseContainerBlockEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

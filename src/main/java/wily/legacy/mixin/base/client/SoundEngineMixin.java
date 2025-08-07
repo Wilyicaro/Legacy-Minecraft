@@ -57,23 +57,6 @@ public abstract class SoundEngineMixin implements SoundEngineAccessor {
         }
     }
 
-    @ModifyArg(method = "updateCategoryVolume", at = @At(value = "INVOKE", target = "Ljava/util/Map;forEach(Ljava/util/function/BiConsumer;)V"))
-    private BiConsumer<SoundInstance, ChannelAccess.ChannelHandle> noStopMusic(BiConsumer<SoundInstance, ChannelAccess.ChannelHandle> action) {
-        return (instance, handle) -> {
-            float f = this.calculateVolume(instance);
-            handle.execute((channel) -> {
-                if (f <= 0 && instance.getSource() != SoundSource.MUSIC && instance.getSource() != SoundSource.RECORDS) channel.stop();
-                else channel.setVolume(f);
-            });
-        };
-    }
-
-    @WrapOperation(method = "getVolume", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Options;getSoundSourceVolume(Lnet/minecraft/sounds/SoundSource;)F"))
-    private float getSoundSourceVolumeNotMusic(Options instance, SoundSource soundSource, Operation<Float> original) {
-        if (soundSource == SoundSource.MUSIC || soundSource == SoundSource.RECORDS) return 1;
-        else return original.call(instance, soundSource);
-    }
-
     @Override
     public void setVolume(SoundInstance soundInstance, float volume) {
         ChannelAccess.ChannelHandle channelHandle = this.instanceToChannel.get(soundInstance);

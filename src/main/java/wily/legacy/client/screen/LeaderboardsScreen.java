@@ -11,6 +11,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.achievement.StatsScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -37,6 +38,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.entity.LegacyPlayerInfo;
@@ -65,10 +67,15 @@ public class LeaderboardsScreen extends PanelVListScreen {
     public static final Component NO_RESULTS = Component.translatable("legacy.menu.leaderboard.no_results");
     protected final Stocker.Sizeable filter = new Stocker.Sizeable(0,1);
     protected List<LegacyPlayerInfo> actualRankBoard = Collections.emptyList();
+
     public LeaderboardsScreen(Screen parent) {
         super(parent, s -> Panel.createPanel(s, p-> p.appearance(568, 275)), CommonComponents.EMPTY);
         rebuildRenderableVList(Minecraft.getInstance());
         renderableVList.layoutSpacing(l-> 1);
+    }
+
+    public static Screen getActualLeaderboardsScreenInstance(Screen parent) {
+        return LegacyOptions.legacyLeaderboards.get() ? parent : new StatsScreen(parent, Minecraft.getInstance().player.getStats());
     }
 
     @Override

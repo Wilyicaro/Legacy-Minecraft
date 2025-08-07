@@ -112,7 +112,7 @@ public class ControllerManager {
         setPointerPos(x, y, isControllerTheLastInput() && LegacyOptions.controllerVirtualCursor.get());
     }
 
-    public void setPointerPos(double x, double y, boolean onlyVirtual){
+    public void setPointerPos(double x, double y, boolean onlyVirtual) {
         Window window = minecraft.getWindow();
         if (minecraft.screen instanceof LegacyMenuAccess<?> a && LegacyOptions.limitCursor.get()) {
             ScreenRectangle rect = a.getMenuRectangle();

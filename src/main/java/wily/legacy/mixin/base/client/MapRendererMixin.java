@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.state.MapRenderState;
 import net.minecraft.client.renderer.MapRenderer;
+import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyMapDecorationRenderState;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -58,7 +59,7 @@ public abstract class MapRendererMixin {
             poseStack.pushPose();
             poseStack.translate(-0.2f,0.4f,-0.1f);
             poseStack.scale(1f, 0.95f, 1);
-            font.drawInBatch(I18n.get("legacy.map.coords",(int)minecraft.player.getX(), (int)minecraft.player.getEyeY(),(int)minecraft.player.getZ()), 0.0f, 0.0f, 0, false, poseStack.last().pose(), multiBufferSource, Font.DisplayMode.NORMAL, 0, i);
+            font.drawInBatch(I18n.get("legacy.map.coords",(int)minecraft.player.getX(), (int)minecraft.player.getEyeY(),(int)minecraft.player.getZ()), 0.0f, 0.0f, CommonColor.BLACK.get(), false, poseStack.last().pose(), multiBufferSource, Font.DisplayMode.NORMAL, 0, i);
             poseStack.popPose();
         }
     }

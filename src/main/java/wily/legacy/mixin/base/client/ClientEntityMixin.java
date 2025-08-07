@@ -21,6 +21,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.ClientEntityAccessor;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.init.LegacyGameRules;
 
 import static wily.legacy.Legacy4JClient.keyFlyLeft;
 import static wily.legacy.Legacy4JClient.keyFlyRight;
@@ -116,7 +117,7 @@ public abstract class ClientEntityMixin implements ClientEntityAccessor {
 
     @Inject(method = "moveRelative", at = @At("HEAD"), cancellable = true)
     public void moveRelative(float f, Vec3 vec3, CallbackInfo ci) {
-        if (((Object)this) instanceof LocalPlayer p && Legacy4JClient.hasModOnServer() && p.getAbilities().flying && p.isCreative() && !p.isSprinting()){
+        if (((Object)this) instanceof LocalPlayer p && Legacy4JClient.hasModOnServer() && p.getAbilities().flying && p.isCreative() && !p.isSprinting() && Legacy4JClient.gameRules.getBoolean(LegacyGameRules.LEGACY_FLIGHT)){
             p.setDeltaMovement(p.getDeltaMovement().add(Legacy4J.getRelativeMovement(p,f,vec3,(keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown()) && p.input./*? if <1.21.5 {*//*leftImpulse*//*?} else {*/getMoveVector().x/*?}*/ == 0 ? 90 : 45)));
             ci.cancel();
         }

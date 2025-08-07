@@ -159,7 +159,6 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.cursorMode),
                         o-> o.renderableVList.addOptionsCategory(
                                 Component.translatable("options.accessibility.title"),
-                                LegacyOptions.of(mc.options.showSubtitles()),
                                 LegacyOptions.of(mc.options.notificationDisplayTime()),
                                 LegacyOptions.of(mc.options.panoramaSpeed()),
                                 LegacyOptions.of(mc.options.narrator()),
@@ -189,9 +188,10 @@ public class OptionsScreen extends PanelVListScreen {
                 Component.translatable("legacy.menu.audio"),
                 s->Panel.centered(s,250,88,0,-30),
                 new ArrayList<>(List.of(
-                        o->o.renderableVList.addOptions(Streams.concat(
-                                Arrays.stream(SoundSource.values()).filter(s->s.ordinal() <= 1).sorted(Comparator.comparingInt(s->s == SoundSource.MUSIC ? 0 : 1)).map(s->LegacyOptions.of(mc.options.getSoundSourceOptionInstance(s))),
-                                Stream.of(LegacyOptions.caveSounds,LegacyOptions.minecartSounds))))),
+                        o-> o.renderableVList.addOptions(
+                                LegacyOptions.of(mc.options.getSoundSourceOptionInstance(SoundSource.MUSIC)),
+                                LegacyOptions.of(mc.options.getSoundSourceOptionInstance(SoundSource.MASTER)),
+                                LegacyOptions.caveSounds,LegacyOptions.minecartSounds))),
                 ()-> Section.ADVANCED_AUDIO));
         public static final Section ADVANCED_AUDIO = new Section(
                 Component.translatable("legacy.menu.settings.advanced_options",AUDIO.title()),
@@ -201,7 +201,11 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.of(mc.options.soundDevice()),
                                 LegacyOptions.backSound,
                                 LegacyOptions.hoverFocusSound,
-                                LegacyOptions.inventoryHoverFocusSound),
+                                LegacyOptions.inventoryHoverFocusSound,
+                                LegacyOptions.of(mc.options.showSubtitles()),
+                                LegacyOptions.of(mc.options.directionalAudio()),
+                                LegacyOptions.of(mc.options.musicFrequency()),
+                                LegacyOptions.of(mc.options.showNowPlayingToast())),
                         o->o.renderableVList.addOptions(Arrays.stream(SoundSource.values()).filter(ss->ss.ordinal() > 1).map(mc.options::getSoundSourceOptionInstance).map(LegacyOptions::of)))));
         public static final Section GRAPHICS = add(new Section(
                 Component.translatable("legacy.menu.graphics"),
@@ -368,6 +372,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 Component.translatable("legacy.menu.in_game_settings"),
                                 LegacyOptions.invertedCrosshair,
                                 LegacyOptions.legacyCreativeTab,
+                                LegacyOptions.legacyAdvancements,
+                                LegacyOptions.legacyLeaderboards,
                                 LegacyOptions.legacyOverstackedItems,
                                 LegacyOptions.legacyHearts),
                         o-> o.renderableVList.addMultSliderOption(LegacyOptions.hudDelay, 2),

@@ -31,6 +31,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event,Ren
     protected RenderableVList renderableVList;
     @Unique
     private List<RenderableVList> renderableVLists;
+    private Button leaderboardsButton;
     private Button saveButton;
     @Override
     public boolean keyPressed(int i, int j, int k) {
@@ -48,12 +49,14 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event,Ren
     private void initScreen(CallbackInfo ci){
         renderableVList = new RenderableVList(this).layoutSpacing(l->5);
         renderableVLists = Collections.singletonList(renderableVList);
-        renderableVList.addRenderables(Button.builder(Component.translatable("menu.returnToGame"), button -> {
+        renderableVList.addRenderables(
+                Button.builder(Component.translatable("menu.returnToGame"), button -> {
                     this.minecraft.setScreen(null);
                     this.minecraft.mouseHandler.grabMouse();
-                }).build(),Button.builder(Component.translatable("menu.options"), button -> this.minecraft.setScreen(new HelpAndOptionsScreen(this))).build()
-                ,Button.builder(Component.translatable("legacy.menu.leaderboards"), button -> this.minecraft.setScreen(new LeaderboardsScreen(this))).build()
-                ,Button.builder(Component.translatable("gui.advancements"), button -> this.minecraft.setScreen(new LegacyAdvancementsScreen(this))).build()
+                }).build(),
+                Button.builder(Component.translatable("menu.options"), button -> this.minecraft.setScreen(new HelpAndOptionsScreen(this))).build(),
+                leaderboardsButton = Button.builder(Component.empty(), button -> this.minecraft.setScreen(LeaderboardsScreen.getActualLeaderboardsScreenInstance(this))).build(),
+                Button.builder(Component.translatable("gui.advancements"), button -> this.minecraft.setScreen(LegacyAdvancementsScreen.getActualAdvancementsScreenInstance(this))).build()
         );
         minecraft = Minecraft.getInstance();
         if (LegacySaveCache.hasSaveSystem(minecraft))
@@ -98,6 +101,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event,Ren
                 setAutoSave(LegacyOptions.autoSaveInterval.get(), saveButton);
         }
 
+        if (leaderboardsButton != null) leaderboardsButton.setMessage(LegacyOptions.legacyLeaderboards.get() ? Component.translatable("legacy.menu.leaderboards") : Component.translatable("gui.stats"));
     }
 
     @Override

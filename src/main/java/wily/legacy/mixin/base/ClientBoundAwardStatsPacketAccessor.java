@@ -1,4 +1,4 @@
-package wily.legacy.mixin.base.client;
+package wily.legacy.mixin.base;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 //? if >=1.20.5 {
@@ -12,19 +12,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(ClientboundAwardStatsPacket.class)
 public interface ClientBoundAwardStatsPacketAccessor {
-    //? if >=1.20.5 {
     @Accessor("STAT_VALUES_STREAM_CODEC")
-    static StreamCodec<RegistryFriendlyByteBuf, Object2IntMap<Stat<?>>> getStatsValueCodec(){
+    static StreamCodec<RegistryFriendlyByteBuf, Object2IntMap<Stat<?>>> getStatsValueCodec() {
         return null;
     }
-    //?} else {
-    /*@Invoker("readStatCap")
-    static <T> Stat<T> decodeStatCap(FriendlyByteBuf friendlyByteBuf, StatType<T> statType) {
-        return null;
-    }
-    @Invoker("writeStatCap")
-    static <T> void encodeStatCap(FriendlyByteBuf friendlyByteBuf, Stat<T> stat) {
-
-    }
-    *///?}
 }

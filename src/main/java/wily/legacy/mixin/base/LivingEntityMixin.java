@@ -27,6 +27,8 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.init.LegacyGameRules;
 
+import static wily.legacy.Legacy4JClient.gameRules;
+
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
     @Shadow protected ItemStack useItem;
@@ -41,18 +43,21 @@ public abstract class LivingEntityMixin extends Entity {
     }
 
     private boolean isLegacyFlying(){
-        return ((LivingEntity)(Object)this instanceof Player p && p.getAbilities().flying && (!level().isClientSide || Legacy4JClient.hasModOnServer()));
+        return ((LivingEntity)(Object)this instanceof Player p && p.getAbilities().flying && (!level().isClientSide || Legacy4JClient.hasModOnServer())) && LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT);
     }
+
     @Redirect(method = /*? if <1.21.2 {*//*"travel"*//*?} else {*/"travelInAir"/*?}*/, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setDeltaMovement(DDD)V", ordinal = /*? if <1.21.2 {*//*3*//*?} else {*/1/*?}*/))
     public void travelFlight(LivingEntity instance, double x, double y, double z) {
         setDeltaMovement((isLegacyFlying() ? 0.6 : 1) * x,(isLegacyFlying() ? 0.546 : 1) * y,(isLegacyFlying() ? 0.6 : 1) * z);
     }
+
     @Inject(method =  /*? if <1.21.2 {*//*"hurt"*//*?} else {*/"hurtServer"/*?}*/, at = @At("HEAD"), cancellable = true)
     public void hurt(/*? if >=1.21.2 {*/ServerLevel level, /*?}*/ DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> cir) {
         if (!level().isClientSide && !level().getServer().isPvpAllowed() && damageSource.getDirectEntity() instanceof Player && (this instanceof OwnableEntity o && damageSource.getDirectEntity().equals(o.getOwner()) || ((Object)this) instanceof IronGolem i && i.isPlayerCreated() || ((Object)this) instanceof SnowGolem)){
             cir.setReturnValue(false);
         }
     }
+
     //? if >=1.21.2 {
     @Redirect(method = "calculateEntityAnimation", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isAlive()Z"))
     public boolean render(LivingEntity instance){

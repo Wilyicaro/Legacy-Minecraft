@@ -13,7 +13,7 @@ import wily.legacy.init.LegacyRegistries;
 public class LegacySoundUtil {
     public static void playSimpleUISound(SoundEvent sound, float volume, float pitch, boolean randomPitch){
         RandomSource source = SoundInstance.createUnseededRandom();
-        Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(sound.location(), SoundSource.MASTER, volume,pitch + (randomPitch ? (source.nextFloat() - 0.5f) / 10 : 0), source, false, 0, SoundInstance.Attenuation.NONE, 0.0, 0.0, 0.0, true));
+        Minecraft.getInstance().getSoundManager().play(new SimpleSoundInstance(sound.location(), SoundSource.UI, volume,pitch + (randomPitch ? (source.nextFloat() - 0.5f) / 10 : 0), source, false, 0, SoundInstance.Attenuation.NONE, 0.0, 0.0, 0.0, true));
     }
 
     public static void playSimpleUISound(SoundEvent sound, float pitch, boolean randomPitch){
@@ -25,11 +25,11 @@ public class LegacySoundUtil {
     }
 
     public static void playSimpleUISound(SoundEvent sound, boolean randomPitch){
-        playSimpleUISound(sound,1.0f,randomPitch);
+        playSimpleUISound(sound,1.0f, randomPitch);
     }
 
     public static void playBackSound(){
-        if (LegacyOptions.backSound.get()) playSimpleUISound(LegacyRegistries.BACK.get(),1.0f);
+        if (LegacyOptions.backSound.get()) playSimpleUISound(LegacyRegistries.BACK.get(), 1.0f);
     }
 
     public static void setSoundInstanceVolume(SoundInstance soundInstance, float volume) {

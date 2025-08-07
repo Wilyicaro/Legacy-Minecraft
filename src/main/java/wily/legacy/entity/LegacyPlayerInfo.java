@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stat;
 import wily.factoryapi.base.network.CommonNetwork;
-import wily.legacy.mixin.base.client.ClientBoundAwardStatsPacketAccessor;
+import wily.legacy.mixin.base.ClientBoundAwardStatsPacketAccessor;
 
 public interface LegacyPlayerInfo {
     static LegacyPlayerInfo of(Object obj) {

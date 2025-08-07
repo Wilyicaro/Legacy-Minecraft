@@ -8,6 +8,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.multiplayer.ClientAdvancements;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -68,6 +69,10 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
 
     protected void addAdvancementButton(RenderableVList renderableVList, AdvancementNode advancementNode) {
         advancementNode.advancement().display().ifPresent(info-> renderableVList.addRenderable(new AdvancementButton(0, 0, 38, 38, advancementNode, info)));
+    }
+
+    public static Screen getActualAdvancementsScreenInstance(Screen parent) {
+        return LegacyOptions.legacyAdvancements.get() ? new LegacyAdvancementsScreen(parent) : new AdvancementsScreen(getAdvancements(), parent);
     }
 
     @Override

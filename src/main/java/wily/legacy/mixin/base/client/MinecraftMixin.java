@@ -193,7 +193,7 @@ public abstract class MinecraftMixin {
         AdvancementToast toast = FactoryAPIClient.getToasts().getToast(AdvancementToast.class, Toast.NO_TOKEN);
         if (toast == null) return true;
         inventoryKeyHold++;
-        if (!(inventoryKeyLastPressed = inventoryKeyHold < 10)){
+        if (!(inventoryKeyLastPressed = inventoryKeyHold < 10)) {
             FactoryAPIClient.getToasts().clear();
             inventoryKeyHold = 0;
             LegacyAdvancementsScreen screen = new LegacyAdvancementsScreen(null);
@@ -211,7 +211,7 @@ public abstract class MinecraftMixin {
 
     @ModifyArg(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", ordinal = 2))
     private Screen handleKeybinds(Screen arg){
-        return new LegacyAdvancementsScreen(null);
+        return LegacyOptions.legacyAdvancements.get() ? new LegacyAdvancementsScreen(null) : arg;
     }
 
     @WrapWithCondition(method = "setScreen",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;removed()V"))

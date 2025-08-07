@@ -59,7 +59,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
 
     @Inject(method = "getFlyingSpeed", at = @At(value = "RETURN"), cancellable = true)
     protected void getFlyingSpeed(CallbackInfoReturnable<Float> cir) {
-        if (level().isClientSide && !Legacy4JClient.hasModOnServer()) return;
+        if (!LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT)) return;
         cir.setReturnValue(cir.getReturnValueF() * (getAbilities().flying ? (isSprinting() ? 6 : 2) : 1));
     }
 
@@ -78,7 +78,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
         if (FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat)) cir.setReturnValue(1.0f);
     }
 
-    @ModifyExpressionValue(method = "attack", at = @At(value = "INVOKE", target = /*? if <1.20.5 {*//*"Lnet/minecraft/world/entity/player/Player;getAttributeValue(Lnet/minecraft/world/entity/ai/attributes/Attribute;)D"*//*?} else {*/"Lnet/minecraft/world/entity/player/Player;getAttributeValue(Lnet/minecraft/core/Holder;)D"/*?}*/))
+    @ModifyExpressionValue(method = "attack", at = @At(value = "INVOKE", target = /*? if <1.20.5 {*//*"Lnet/minecraft/world/entity/player/Player;getAttributeValue(Lnet/minecraft/world/entity/ai/attributes/Attribute;)D"*//*?} else {*/"Lnet/minecraft/world/entity/player/Player;getAttributeValue(Lnet/minecraft/core/Holder;)D"/*?}*/, ordinal = 0))
     protected double modifyAttackDamage(double original) {
         return original + LegacyItemUtil.getItemDamageModifier(getMainHandItem());
     }
@@ -105,6 +105,10 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
         return false;
     }
 
+    @ModifyExpressionValue(method = {"updateSwimming", "isSwimming"}, at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/player/Abilities;flying:Z", ordinal = 0))
+    protected boolean updateSwimming(boolean original) {
+        return !LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SWIMMING) && original;
+    }
 
     @ModifyArg(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/BlockPos;containing(DDD)Lnet/minecraft/core/BlockPos;"), index = 1)
     protected double travel(double original) {
