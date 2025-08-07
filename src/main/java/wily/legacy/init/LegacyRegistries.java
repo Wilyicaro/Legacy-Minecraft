@@ -16,17 +16,20 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.RegisterListing;
 import wily.legacy.Legacy4J;
+import wily.legacy.block.ColoredWaterCauldronBlock;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.config.LegacyMixinToggles;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.LegacyMerchantMenu;
+import wily.legacy.util.LegacyTags;
 
 import java.util.Optional;
 import java.util.Set;
@@ -48,9 +51,11 @@ public class LegacyRegistries {
     public static final RegisterListing.Holder<Item> WATER = ITEM_REGISTER.add("water",id-> new BlockItem(Blocks.WATER, FactoryAPIPlatform.setupBlockItemProperties(new Item.Properties(),id)));
     public static final RegisterListing.Holder<Item> LAVA = ITEM_REGISTER.add("lava",id-> new BlockItem(Blocks.LAVA, FactoryAPIPlatform.setupBlockItemProperties(new Item.Properties(),id)));
 
+    public static final RegisterListing.Holder<ColoredWaterCauldronBlock> COLORED_WATER_CAULDRON = BLOCK_REGISTER.add("colored_water_cauldron", id-> new ColoredWaterCauldronBlock(FactoryAPIPlatform.setupBlockProperties(BlockBehaviour.Properties./*? if <1.20.2 {*//*copy*//*?} else {*/ofLegacyCopy/*?}*/(Blocks.CAULDRON),id)));
+
     public static final RegisterListing.Holder<Block> SHRUB = BLOCK_ITEMS_REGISTER.add("shrub",id-> new TallGrassBlock(FactoryAPIPlatform.setupBlockProperties(BlockBehaviour.Properties.of().mapColor(MapColor.PLANT).replaceable().noCollission().instabreak().sound(SoundType.GRASS).offsetType(BlockBehaviour.OffsetType.XYZ).ignitedByLava().pushReaction(PushReaction.DESTROY), id)));
 
-    public static final RegisterListing.Holder<BlockEntityType<WaterCauldronBlockEntity>> WATER_CAULDRON_BLOCK_ENTITY = BLOCK_ENTITIES_REGISTER.add("water_cauldron",()-> FactoryAPIPlatform.createBlockEntityType(WaterCauldronBlockEntity::new, Blocks.WATER_CAULDRON));
+    public static final RegisterListing.Holder<BlockEntityType<WaterCauldronBlockEntity>> WATER_CAULDRON_BLOCK_ENTITY = BLOCK_ENTITIES_REGISTER.add("water_cauldron",()-> FactoryAPIPlatform.createBlockEntityType(WaterCauldronBlockEntity::new, Blocks.WATER_CAULDRON, LegacyRegistries.COLORED_WATER_CAULDRON.get()));
 
     public static final RegisterListing.Holder<SoundEvent> SCROLL = SOUND_EVENT_REGISTER.add("random.scroll",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.scroll")));
     public static final RegisterListing.Holder<SoundEvent> CRAFT_FAIL = SOUND_EVENT_REGISTER.add("random.craft_fail",()->SoundEvent.createVariableRangeEvent(Legacy4J.createModLocation("random.craft_fail")));
@@ -64,9 +69,9 @@ public class LegacyRegistries {
 
 
     public static boolean isInvalidCauldron(BlockState blockState, Level level, BlockPos blockPos){
-        Optional<WaterCauldronBlockEntity> opt;
-        return blockState.is(Blocks.WATER_CAULDRON) && (opt = level.getBlockEntity(blockPos, LegacyRegistries.WATER_CAULDRON_BLOCK_ENTITY.get())).isPresent() && (!opt.get().hasWater() || opt.get().waterColor != null);
+        return blockState.is(LegacyTags.WATER_CAULDRONS) && level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be && (!be.hasWater() || be.waterColor != null);
     }
+
     public static void register(){
         BLOCK_REGISTER.register();
         if (LegacyMixinToggles.legacyCauldrons.get()) BLOCK_ENTITIES_REGISTER.register();

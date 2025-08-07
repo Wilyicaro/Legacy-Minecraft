@@ -78,7 +78,6 @@ public record PackAlbum(String id, int version, Component displayName, Component
     public static final Component ADD_ALBUM = Component.translatable("legacy.menu.add_album");
     public static final Component EDIT_ALBUM = Component.translatable("legacy.menu.edit_album");
     public static final Component REMOVE_ALBUM = Component.translatable("legacy.menu.remove_album");
-    public static final Gson GSON = new GsonBuilder().create();
 
     public static List<String> getMinecraftResourcePacks(){
         return new ArrayList<>(List.of("vanilla", /*? if forge || neoforge {*/ /*"mod_resources"*//*?} else {*/"fabric"/*?}*/, "legacy:legacy_waters"));
@@ -133,12 +132,14 @@ public record PackAlbum(String id, int version, Component displayName, Component
         Path orderJson = path.resolveSibling(path.getFileName() +".json");
         String defaultAlbum = MINECRAFT.id;
         try (BufferedReader r = Files.newBufferedReader(orderJson, Charsets.UTF_8)){
-            JsonObject obj = GSON.getAdapter(JsonObject.class).read(new JsonReader(r));
-            defaultAlbum = obj.getAsJsonPrimitive("default").getAsString();
-            for (JsonElement e : obj.getAsJsonArray("order")) {
-                if (e instanceof JsonPrimitive) order.add(e.getAsString());
+            if (JsonParser.parseReader(r) instanceof JsonObject obj) {
+                defaultAlbum = obj.getAsJsonPrimitive("default").getAsString();
+                for (JsonElement e : obj.getAsJsonArray("order")) {
+                    if (e instanceof JsonPrimitive) order.add(e.getAsString());
+                }
             }
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException e) {
+            Legacy4J.LOGGER.warn("Failed to load albums definition in {}", orderJson, e);
         }
         for (int i = defaultAlbums.size() - 1; i >= 0; i--) {
             PackAlbum a = defaultAlbums.get(i);
@@ -152,13 +153,13 @@ public record PackAlbum(String id, int version, Component displayName, Component
             for (Path p : ((Iterable<Path>) s::iterator)) {
                 if (!p.toString().endsWith(".json")) continue;
                 try (BufferedReader r = Files.newBufferedReader(p, Charsets.UTF_8)){
-                    CODEC.parse(JsonOps.INSTANCE,GsonHelper.parse(r)).result().ifPresent(list::add);
-                } catch (IOException e) {
-                    Legacy4J.LOGGER.warn("Failed to load {}, this album won't be loaded",p,e);
+                    CODEC.parse(JsonOps.INSTANCE, JsonParser.parseReader(r)).result().ifPresent(list::add);
+                } catch (IOException | RuntimeException e) {
+                    Legacy4J.LOGGER.warn("Failed to load {}, this album won't be loaded", p, e);
                 }
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (IOException | RuntimeException e) {
+            Legacy4J.LOGGER.warn("Failed to read albums in {}", path, e);
         }
         if (deprecated) {
             FileUtils.deleteQuietly(path.toFile());
@@ -170,7 +171,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
         for (int i = defaultAlbums.size() - 1; i >= 0; i--) {
             PackAlbum a = defaultAlbums.get(i);
             int index = list.indexOf(a);
-            if (index < 0) list.add(0,a);
+            if (index < 0) list.add(0, a);
             else if (a.version > list.get(index).version) list.set(index,a);
         }
         selected.set(defaultAlbum);
@@ -209,10 +210,11 @@ public record PackAlbum(String id, int version, Component displayName, Component
             JsonArray a = new JsonArray();
             order.forEach(a::add);
             JsonObject obj = new JsonObject();
-            obj.add("default",new JsonPrimitive(selected.get()));
+            obj.add("default", new JsonPrimitive(selected.get()));
             obj.add("order",a);
             GsonHelper.writeValue(w,obj,null);
         } catch (IOException e) {
+            Legacy4J.LOGGER.warn("Failed to write {}, the albums definition won't be saved", orderJson, e);
         }
     }
 

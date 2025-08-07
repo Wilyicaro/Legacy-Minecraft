@@ -1,0 +1,28 @@
+{
+  "overrides": [
+    {
+      "item": "charcoal",
+      "tip": {"translate": "item.minecraft.coal.tip"}
+    },
+    {
+    "blocks": ["deepslate_bricks","cracked_deepslate_bricks"],
+    "tip": {"translate": "block.minecraft.deepslate_bricks.tip"}
+    },
+    {
+    "blocks": ["red_sandstone","smooth_red_sandstone","chiseled_red_sandstone","cut_red_sandstone"],
+    "tip": {"translate": "block.minecraft.red_sandstone.tip"}
+    },
+    {
+    "blocks": ["sandstone","smooth_sandstone","chiseled_sandstone","cut_sandstone"],
+    "tip": {"translate": "block.minecraft.quartz_block.tip"}
+    },
+    {
+    "block": "#stone_bricks",
+    "tip": {"translate": "block.minecraft.stone_bricks.tip"}
+    },
+    {
+    "blocks": ["quartz_block","chiseled_quartz_block","quartz_pillar","smooth_quartz","quartz_bricks"],
+    "tip": {"translate": "block.minecraft.quartz_block.tip"}
+    }
+  ]
+}

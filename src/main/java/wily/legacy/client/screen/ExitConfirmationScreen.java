@@ -11,6 +11,7 @@ import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PackAlbum;
+import wily.legacy.client.SoundManagerAccessor;
 
 public class ExitConfirmationScreen extends ConfirmationScreen {
     public ExitConfirmationScreen(Screen parent) {
@@ -38,7 +39,7 @@ public class ExitConfirmationScreen extends ConfirmationScreen {
         if (minecraft.level != null) {
             minecraft.level.disconnect();
         }
-        minecraft.getSoundManager().stop();
+        SoundManagerAccessor.of(minecraft.getSoundManager()).stopAllSound();
 
         minecraft./*? if >1.20.2 {*/disconnect/*?} else {*//*clearLevel*//*?}*/(new LegacyLoadingScreen(Component.translatable(save ? "menu.savingLevel": "disconnect.quitting"),Component.empty()));
         ServerData serverData = minecraft.getCurrentServer();

@@ -1,6 +1,6 @@
 {
   "overrides": {
-    "item": "#saplings",
+    "block": "#saplings",
     "tip": {"translate": "block.minecraft.sapling.tip"}
   }
 }

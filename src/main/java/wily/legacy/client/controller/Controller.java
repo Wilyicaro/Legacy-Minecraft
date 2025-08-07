@@ -1,11 +1,13 @@
 package wily.legacy.client.controller;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.screen.LegacyMenuAccess;
 
@@ -68,6 +70,7 @@ public interface Controller {
     }
 
     default void addOrSetControllerToast(Component component){
+        if (!LegacyOptions.controllerToasts.get()) return;
         LegacyTip oldToast = FactoryAPIClient.getToasts().getToast(LegacyTip.class, Toast.NO_TOKEN);
         Component tip = Component.literal(getName());
         if (oldToast == null || (oldToast.title != CONTROLLER_DETECTED && oldToast.title != CONTROLLER_DISCONNECTED) || oldToast.visibility == Toast.Visibility.HIDE) {
@@ -211,6 +214,24 @@ public interface Controller {
 
         default void bindingStateTick(BindingState state){
 
+        }
+
+        default int getBindingMouseClick(BindingState state){
+            return state.is(ControllerBinding.DOWN_BUTTON) || state.is(ControllerBinding.UP_BUTTON) ? 0 : state.is(ControllerBinding.LEFT_BUTTON) ? 1 : -1;
+        }
+
+        default void simulateKeyAction(ControllerManager manager, BindingState state){
+            if (manager.isCursorDisabled) manager.simulateKeyAction(s-> s.is(ControllerBinding.DOWN_BUTTON), InputConstants.KEY_RETURN, state);
+            manager.simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_BUTTON),InputConstants.KEY_ESCAPE, state, true);
+            manager.simulateKeyAction(s-> s.is(ControllerBinding.LEFT_BUTTON),InputConstants.KEY_X, state);
+            manager.simulateKeyAction(s-> s.is(ControllerBinding.UP_BUTTON),InputConstants.KEY_O, state);
+            if (manager.isCursorDisabled) manager.simulateKeyAction(s-> s.is(ControllerBinding.LEFT_TRIGGER),InputConstants.KEY_PAGEUP, state);
+            else manager.simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_W, state);
+            manager.simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_TRIGGER),InputConstants.KEY_PAGEDOWN, state);
+            manager.simulateKeyAction(s-> s.is(ControllerBinding.RIGHT_BUMPER),InputConstants.KEY_RBRACKET, state);
+            manager.simulateKeyAction(s-> s.is(ControllerBinding.LEFT_BUMPER),InputConstants.KEY_LBRACKET, state);
+            manager.simulateKeyAction(s-> s.is(ControllerBinding.TOUCHPAD_BUTTON),InputConstants.KEY_T, state);
+            manager.simulateKeyAction(s-> s.is(ControllerBinding.CAPTURE),InputConstants.KEY_F2, state);
         }
 
         default boolean onceClickBindings(BindingState state){

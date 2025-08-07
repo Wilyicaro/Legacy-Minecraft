@@ -1,6 +1,5 @@
 package wily.legacy;
 
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.datafixers.util.Pair;
@@ -10,6 +9,7 @@ import net.minecraft.Util;
 import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
@@ -64,7 +64,6 @@ import net.minecraft.client.gui.screens.options.OptionsScreen;
 /*import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.client.gui.screens.OptionsScreen;
 *///?}
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.base.config.FactoryConfig;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
@@ -109,6 +108,7 @@ import wily.legacy.client.screen.compat.IrisCompat;
 import wily.legacy.client.screen.compat.SodiumCompat;
 //?}
 import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.entity.LegacyLocalPlayer;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.init.LegacyUIElementTypes;
 import wily.legacy.inventory.LegacyPistonMovingBlockEntity;
@@ -145,6 +145,8 @@ public class Legacy4JClient {
     public static boolean manualSave = false;
     public static boolean saveExit = false;
     public static boolean retakeWorldIcon = false;
+    public static boolean canSprint = false;
+    public static int sprintTicksLeft = -1;
     public static LegacyLoadingScreen legacyLoadingScreen = new LegacyLoadingScreen();
     public static Renderable itemActivationRenderReplacement = null;
     public static final LegacyTipManager legacyTipManager = new LegacyTipManager();
@@ -240,7 +242,7 @@ public class Legacy4JClient {
     }
 
     public static void saveLevel(LevelStorageSource.LevelStorageAccess storageSource){
-        if (isCurrentWorldSource(storageSource)) Legacy4JClient.copySaveBtwSources(storageSource,Minecraft.getInstance().getLevelSource());
+        if (isCurrentWorldSource(storageSource)) Legacy4JClient.copySaveBtwSources(storageSource,Minecraft.getInstance().getLevelSource(), false);
     }
 
     public static void displayEffectActivationAnimation(/*? if <1.20.5 {*//*MobEffect*//*?} else {*/Holder<MobEffect>/*?}*/ effect){
@@ -349,9 +351,25 @@ public class Legacy4JClient {
                 }
             }
         }
-        if (minecraft.player != null) {
-            if (minecraft.player.isSprinting() && controllerManager.getButtonState(ControllerBinding.LEFT_STICK).getSmoothY() > -0.6 && controllerManager.isControllerTheLastInput())
-                minecraft.player.setSprinting(false);
+
+        if (sprintTicksLeft > 0) --sprintTicksLeft;
+        if (minecraft.player != null && controllerManager.isControllerTheLastInput()) {
+            BindingState.Axis stick = controllerManager.getButtonState(ControllerBinding.LEFT_STICK);
+            float y = Math.abs(stick.y) > stick.getDeadZone() ? stick.y : 0;
+            if (((LegacyLocalPlayer)minecraft.player).canSprintController()) {
+                if (y < -0.85) {
+                    if (!canSprint && sprintTicksLeft == -1) sprintTicksLeft = 9;
+                    else if (canSprint && sprintTicksLeft > 0) minecraft.player.setSprinting(true);
+                    else canSprint = false;
+                } else if (y > -0.85 && sprintTicksLeft == 0) {
+                    canSprint = false;
+                    sprintTicksLeft = -1;
+                } else if (y > -0.5 && !canSprint && sprintTicksLeft > 0) canSprint = true;
+            } else {
+                if (y > -0.85) minecraft.player.setSprinting(false);
+                canSprint = false;
+                sprintTicksLeft = -1;
+            }
         }
 
         if (!Minecraft.getInstance().isPaused()) {
@@ -536,8 +554,7 @@ public class Legacy4JClient {
 
         FactoryAPIClient.registerBlockColor(registry->{
             registry.accept((blockState, blockAndTintGetter, blockPos, i) -> blockAndTintGetter == null || blockPos == null ? GrassColor.getDefaultColor() : BiomeColors.getAverageGrassColor(blockAndTintGetter, blockPos), SHRUB.get());
-
-            registry.accept((blockState, blockAndTintGetter, blockPos, i) -> {
+            BlockColor blockColor = (blockState, blockAndTintGetter, blockPos, i) -> {
                 if (blockAndTintGetter != null && blockPos != null){
                     BlockEntity blockEntity = blockAndTintGetter.getBlockEntity(blockPos);
                     if (blockEntity instanceof LegacyPistonMovingBlockEntity e && e.getRenderingBlockEntity() != null && LegacyOptions.enhancedPistonMovingRenderer.get()) {
@@ -550,7 +567,9 @@ public class Legacy4JClient {
                     return BiomeColors.getAverageWaterColor(blockAndTintGetter, blockPos);
                 }
                 return -1;
-            }, Blocks.WATER_CAULDRON);
+            };
+            registry.accept(blockColor, Blocks.WATER_CAULDRON);
+            registry.accept(blockColor, LegacyRegistries.COLORED_WATER_CAULDRON.get());
         });
         fastLeavesModels.put(Blocks.OAK_LEAVES, FactoryAPI.createVanillaLocation("fast_oak_leaves"));
         fastLeavesModels.put(Blocks.SPRUCE_LEAVES, FactoryAPI.createVanillaLocation("fast_spruce_leaves"));
@@ -767,11 +786,20 @@ public class Legacy4JClient {
         },source::levelExists,source,saveDirName);
     }
 
-    public static void copySaveBtwSources(LevelStorageSource.LevelStorageAccess sendSource, LevelStorageSource destSource){
+    public static void copySaveBtwSources(LevelStorageSource.LevelStorageAccess sendSource, LevelStorageSource destSource) {
+        copySaveBtwSources(sendSource, destSource, true);
+    }
+
+    public static void copySaveBtwSources(LevelStorageSource.LevelStorageAccess sendSource, LevelStorageSource destSource, boolean deleteOldDest){
         try {
             File destLevelDirectory = destSource.getBaseDir().resolve(sendSource.getLevelId()).toFile();
-            if (destLevelDirectory.exists()) FileUtils.deleteQuietly(destLevelDirectory);
-            FileUtils.copyDirectory(sendSource.getDimensionPath(Level.OVERWORLD).toFile(), destLevelDirectory, p -> !p.getName().equals("session.lock"));
+            if (deleteOldDest && destLevelDirectory.exists()) FileUtils.deleteQuietly(destLevelDirectory);
+            FileUtils.copyDirectory(sendSource.getDimensionPath(Level.OVERWORLD).toFile(), destLevelDirectory, p -> {
+                if (p.getName().equals("session.lock")) return false;
+                if (deleteOldDest) return true;
+                File destFile = p.toPath().relativize(destLevelDirectory.toPath()).toFile();
+                return !destFile.exists() || FileUtils.isFileNewer(p, destFile);
+            });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.ScreenUtil;
@@ -25,6 +26,7 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
     private final Function<LegacySliderButton<T>,Tooltip> tooltipSupplier;
     private int slidingMul = 1;
     private int lastSliderInput = -1;
+    private double rangeMul = 1;
     protected T objectValue;
     public LegacySliderButton(int i, int j, int k, int l, Function<LegacySliderButton<T>,Component> messageGetter, Function<LegacySliderButton<T>,Tooltip> tooltipSupplier, T initialValue, Function<LegacySliderButton<T>,T> valueGetter, Function<T, Double> valueSetter, Consumer<LegacySliderButton<T>> onChange) {
         super(i, j, k, l, Component.empty(), valueSetter.apply(initialValue));
@@ -38,15 +40,20 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
     }
 
     public static <T> LegacySliderButton<T> createFromInt(int i, int j, int k, int l, Function<LegacySliderButton<T>,Component> messageGetter, Function<LegacySliderButton<T>,Tooltip> tooltipSupplier, T initialValue, Function<Integer,T> valueGetter, Function<T, Integer> valueSetter, Supplier<Integer> valuesSize, Consumer<LegacySliderButton<T>> onChange) {
-        return new LegacySliderButton<>(i, j, k, l, messageGetter, tooltipSupplier, initialValue, b-> valueGetter.apply((int) Math.round(b.value * (valuesSize.get() - 1))),t->Math.max(0d,valueSetter.apply(t))/ (valuesSize.get() - 1),onChange);
+        return new LegacySliderButton<>(i, j, k, l, messageGetter, tooltipSupplier, initialValue, b-> valueGetter.apply((int) Math.round(b.value * (valuesSize.get() - 1))),t->Math.max(0d,valueSetter.apply(t))/ (valuesSize.get() - 1),onChange,-1);
     }
 
     public LegacySliderButton(int i, int j, int k, int l, Function<LegacySliderButton<T>,Component> messageGetter, Function<LegacySliderButton<T>,Tooltip> tooltipSupplier, T initialValue, Supplier<List<T>> values, Consumer<LegacySliderButton<T>> onChange) {
         this(i, j, k, l, messageGetter, tooltipSupplier, initialValue, b-> values.get().get((int) Math.round(b.value * (values.get().size() - 1))),t->Math.max(0d,values.get().indexOf(t))/ (values.get().size() - 1),onChange);
     }
 
+    public LegacySliderButton(int i, int j, int k, int l, Function<LegacySliderButton<T>,Component> messageGetter, Function<LegacySliderButton<T>,Tooltip> tooltipSupplier, T initialValue, Function<LegacySliderButton<T>,T> valueGetter, Function<T, Double> valueSetter, Consumer<LegacySliderButton<T>> onChange, double rangeMultiplier) {
+        this(i, j, k, l, messageGetter, tooltipSupplier, initialValue, valueGetter, valueSetter, onChange);
+        this.rangeMul = rangeMultiplier;
+    }
+
     public static LegacySliderButton<Integer> createFromIntRange(int i, int j, int k, int l, Function<LegacySliderButton<Integer>,Component> messageGetter, Function<LegacySliderButton<Integer>,Tooltip> tooltipSupplier, Integer initialValue, int min, IntSupplier max, Consumer<LegacySliderButton<Integer>> onChange) {
-        return new LegacySliderButton<>(i, j, k, l, messageGetter, tooltipSupplier, initialValue, b-> min + (int) Math.round(b.value * (max.getAsInt() - min)),t->Math.max(0d,Math.min((double)(t-min) / (max.getAsInt()-min),1d)),onChange);
+        return new LegacySliderButton<>(i, j, k, l, messageGetter, tooltipSupplier, initialValue, b-> min + (int) Math.round(b.value * (max.getAsInt() - min)),t-> Mth.clamp((double)(t-min) / (max.getAsInt()-min),0d,1d),onChange,-1);
     }
 
     public static LegacySliderButton<Integer> createFromIntRange(int i, int j, int k, int l, Function<LegacySliderButton<Integer>,Component> messageGetter, Function<LegacySliderButton<Integer>,Tooltip> tooltipSupplier, Integer initialValue, int min, int max, Consumer<LegacySliderButton<Integer>> onChange) {
@@ -66,14 +73,9 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
     }
 
     @Override
-    protected void updateMessage() {
+    public void updateMessage() {
         setTooltip(tooltipSupplier.apply(this));
-    }
-
-    @Override
-    public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
         setMessage(messageGetter.apply(this));
-        super.renderWidget(guiGraphics, i, j, f);
     }
 
     public void setFocused(boolean bl) {
@@ -94,9 +96,12 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
                 if (slidingMul > 0 && i != lastSliderInput) slidingMul = 1;
                 lastSliderInput = i;
                 double part = 1d / (width - 8) * slidingMul;
+                double precision = 100 * rangeMul;
                 T v = getObjectValue();
                 while (v.equals(getObjectValue())) {
-                    setValue(this.value + (bl ? -part : part));
+                    double newValue = this.value + (bl ? -part : part);
+                    double flooredValue = rangeMul != -1 ? Math.floor(newValue * precision) / precision : newValue;
+                    setValue(flooredValue + ((int)flooredValue < flooredValue ? 0e-10 : 0));
                     if (part >= 1) break;
                     part= Math.min(part * 2,1);
                 }

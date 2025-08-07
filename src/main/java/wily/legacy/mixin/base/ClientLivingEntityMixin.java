@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -22,7 +23,7 @@ public abstract class ClientLivingEntityMixin extends Entity {
 
     @Inject(method = "onEquipItem", at = @At("HEAD"))
     public void onEquipItem(EquipmentSlot arg, ItemStack itemStack, ItemStack itemStack2, CallbackInfo ci) {
-        if (!FactoryItemUtil.equalItems(itemStack, itemStack2) && !this.firstTick){
+        if (((Entity)this) == Minecraft.getInstance().player && !FactoryItemUtil.equalItems(itemStack, itemStack2) && !this.firstTick){
             ScreenUtil.updateAnimatedCharacterTime(1500);
         }
     }

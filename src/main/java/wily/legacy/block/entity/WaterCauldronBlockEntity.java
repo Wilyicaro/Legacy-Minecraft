@@ -16,13 +16,16 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import wily.factoryapi.util.CompoundTagUtil;
 import wily.legacy.init.LegacyRegistries;
 
 public class WaterCauldronBlockEntity extends BlockEntity {
-    public Holder<Potion> potion = /*? if <1.20.5 {*//*BuiltInRegistries.POTION.wrapAsHolder(Potions.WATER)*//*?} else {*/Potions.WATER/*?}*/;
+    public Holder<Potion> potion = getDefaultPotion();
     public Holder<Item> lastPotionItemUsed = Items.POTION.builtInRegistryHolder();
     public Integer waterColor;
     public WaterCauldronBlockEntity(BlockPos blockPos, BlockState blockState) {
@@ -45,6 +48,29 @@ public class WaterCauldronBlockEntity extends BlockEntity {
         }
     }
 
+    public void convertToColored(){
+        convertTo(LegacyRegistries.COLORED_WATER_CAULDRON.get());
+    }
+
+    public void convertTo(LayeredCauldronBlock block){
+        if (getBlockState().is(block)) return;
+        BlockState coloredBlockState = block.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, getBlockState().getValue(LayeredCauldronBlock.LEVEL));
+        level.setBlock(getBlockPos(), coloredBlockState, 3);
+        setBlockState(coloredBlockState);
+        level.setBlockEntity(this);
+    }
+
+    public void setWaterColor(Integer waterColor){
+        if (waterColor == null){
+            convertTo((LayeredCauldronBlock) Blocks.WATER_CAULDRON);
+        } else convertToColored();
+        this.waterColor = waterColor;
+    }
+
+    public Holder<Potion> getDefaultPotion(){
+        return /*? if <1.20.5 {*//*BuiltInRegistries.POTION.wrapAsHolder(Potions.WATER)*//*?} else {*/Potions.WATER/*?}*/;
+    }
+
     public boolean hasWater(){
         return potion.value().equals(Potions.WATER/*? if >=1.20.5 {*/.value()/*?}*/);
     }
@@ -64,7 +90,10 @@ public class WaterCauldronBlockEntity extends BlockEntity {
     @Override
     protected void saveAdditional(CompoundTag compoundTag/*? if >=1.20.5 {*/, HolderLookup.Provider provider/*?}*/) {
         super.saveAdditional(compoundTag/*? if >=1.20.5 {*/, provider/*?}*/);
-        if (waterColor != null) compoundTag.putInt("dyeColor",waterColor);
+        if (waterColor != null) {
+            compoundTag.putInt("dyeColor", waterColor);
+            convertToColored();
+        }
         potion.unwrapKey().ifPresent(r-> compoundTag.putString("potion",r.location().toString()));
         lastPotionItemUsed.unwrapKey().ifPresent(r-> compoundTag.putString("lastPotionItemUsed",r.location().toString()));
     }

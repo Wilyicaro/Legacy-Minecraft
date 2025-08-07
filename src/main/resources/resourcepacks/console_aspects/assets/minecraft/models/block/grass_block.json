@@ -18,8 +18,8 @@
                 "east":  { "uv": [ 0, 0, 16, 16 ], "texture": "#side",   "cullface": "east" }
             }
         },
-        {   "from": [ -0.05, -0.05, -0.05 ],
-            "to": [ 16.05, 16.05, 16.05 ],
+        {   "from": [ -0.005, 0.05, -0.005 ],
+            "to": [ 16.005, 16.05, 16.005 ],
             "faces": {
                 "north": { "uv": [ 0, 0, 16, 16 ], "texture": "#overlay", "tintindex": 0, "cullface": "north" },
                 "south": { "uv": [ 0, 0, 16, 16 ], "texture": "#overlay", "tintindex": 0, "cullface": "south" },

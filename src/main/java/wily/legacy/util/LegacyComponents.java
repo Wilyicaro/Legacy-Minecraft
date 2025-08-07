@@ -50,15 +50,18 @@ public class LegacyComponents {
     public static final Component FOLLOW_ME = Component.translatable("legacy.action.follow_me");
     public static final Component GROUP = Component.translatable("legacy.action.group");
     public static final Component GROW = Component.translatable("legacy.action.grow");
+    public static final Component HANG = Component.translatable("legacy.action.hang");
     public static final Component HEAL = Component.translatable("legacy.action.heal");
     public static final Component HIT = Component.translatable("legacy.action.hit");
     public static final Component IGNITE = Component.translatable("legacy.action.ignite");
     public static final Component INFO = Component.translatable("legacy.action.info");
+    public static final Component INVERT = Component.translatable("legacy.action.invert");
     public static final Component LAUNCH = Component.translatable("legacy.action.launch");
     public static final Component LEASH = Component.translatable("legacy.action.leash");
     public static final Component LOCK = Component.translatable("legacy.action.lock");
     public static final Component LOVE_MODE = Component.translatable("legacy.action.love_mode");
     public static final Component MINE = Component.translatable("legacy.action.mine");
+    public static final Component MIX = Component.translatable("legacy.action.mix");
     public static final Component MOUNT = Component.translatable("legacy.action.mount");
     public static final Component MOVE_FUEL = Component.translatable("legacy.action.move_fuel");
     public static final Component MOVE_INGREDIENT = Component.translatable("legacy.action.move_ingredient");
@@ -76,6 +79,7 @@ public class LegacyComponents {
     public static final Component PICK_ENTITY = Component.translatable("legacy.action.pick_entity");
     public static final Component PICK_UP = Component.translatable("legacy.action.pick_up");
     public static final Component PLACE = Component.translatable("legacy.action.place");
+    public static final Component PLACE_ALL = Component.translatable("legacy.action.place_all");
     public static final Component PLACE_ONE = Component.translatable("legacy.action.place_one");
     public static final Component PLANT = Component.translatable("legacy.action.plant");
     public static final Component PLAY = Component.translatable("legacy.action.play");
@@ -86,6 +90,7 @@ public class LegacyComponents {
     public static final Component REMOVE = Component.translatable("legacy.action.remove");
     public static final Component REPAIR = Component.translatable("legacy.action.repair");
     public static final Component RIDE = Component.translatable("legacy.action.ride");
+    public static final Component ROTATE = Component.translatable("legacy.action.rotate");
     public static final Component SADDLE = Component.translatable("legacy.action.saddle");
     public static final Component SAIL = Component.translatable("legacy.action.sail");
     public static final Component SEARCH_MODE = Component.translatable("legacy.action.search_mode");

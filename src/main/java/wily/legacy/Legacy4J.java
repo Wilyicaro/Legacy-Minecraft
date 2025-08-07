@@ -12,11 +12,14 @@ import net.minecraft.core.dispenser.BlockSource;
 *///?}
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.OptionalDispenseItemBehavior;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.sounds.SoundEvents;
@@ -27,13 +30,13 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.ItemInteractionResult;
 //?}
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.alchemy.Potion;
 //? if >=1.20.5 {
-import net.minecraft.world.item.crafting.RecipeType;import net.minecraft.world.level.GameRules;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -48,6 +51,7 @@ import wily.legacy.util.ItemAccessor;
 import net.minecraft.world.entity.MobSpawnType;
 //?} else {
 /*import net.minecraft.world.entity.EntitySpawnReason;
+import wily.factoryapi.base.network.CommonRecipeManager;
 *///?}
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potions;
@@ -66,7 +70,7 @@ import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.base.network.CommonNetwork;
-import wily.factoryapi.base.network.CommonRecipeManager;
+import wily.legacy.block.ColoredWaterCauldronBlock;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.config.LegacyMixinToggles;
@@ -93,9 +97,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -209,9 +211,55 @@ public class Legacy4J {
         /*CommonRecipeManager.addRecipeTypeToSync(RecipeType.CRAFTING);
         CommonRecipeManager.addRecipeTypeToSync(RecipeType.STONECUTTING);
         *///?}
-        if (!LegacyMixinToggles.legacyCauldrons.get()) return;
+
+        //? if <1.21.5 {
+        DispenserBlock.registerBehavior(Blocks.TNT, new OptionalDispenseItemBehavior() {
+            @Override
+            protected ItemStack execute(BlockSource blockSource, ItemStack itemStack) {
+                setSuccess(blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/().getGameRules().getBoolean(LegacyGameRules.TNT_EXPLODES));
+                if (isSuccess()){
+                    BlockPos blockPos = blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/().relative(blockSource./*? if >1.20.1 {*/state/*?} else {*//*getBlockState*//*?}*/().getValue(DispenserBlock.FACING));
+                    TntBlock.explode(blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/(), blockPos);
+                    blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/().gameEvent(null, GameEvent.ENTITY_PLACE, blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/());
+                    itemStack.shrink(1);
+                }
+                return itemStack;
+            }
+
+            @Override
+            protected void playAnimation(BlockSource blockSource, Direction direction) {
+                if (isSuccess()) super.playAnimation(blockSource, direction);
+            }
+        });
+        //?}
+
+        DefaultDispenseItemBehavior defaultDispenseItemBehavior = new DefaultDispenseItemBehavior() {
+            public ItemStack execute(BlockSource blockSource, ItemStack itemStack) {
+                Direction direction = blockSource./*? if >1.20.1 {*/state/*?} else {*//*getBlockState*//*?}*/().getValue(DispenserBlock.FACING);
+                EntityType<?> entityType = ((SpawnEggItem)itemStack.getItem()).getType(/*? if >=1.21.4 {*//*blockSource.level().registryAccess(), *//*?}*//*? if <1.20.5 {*//*null*//*?} else {*/itemStack/*?}*/);
+
+                try {
+                    if (entityType.spawn(blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/(), itemStack, null, blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/().relative(direction), /*? if <1.21.3 {*/MobSpawnType/*?} else {*//*EntitySpawnReason*//*?}*/.DISPENSER, direction != Direction.UP, false) != null){
+                        itemStack.shrink(1);
+                        blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/().gameEvent(null, GameEvent.ENTITY_PLACE, blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/());
+                    }
+                } catch (Exception var6) {
+                    LOGGER.error("Error while dispensing spawn egg from dispenser at {}", blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/(), var6);
+                    return ItemStack.EMPTY;
+                }
+
+                return itemStack;
+            }
+        };
+
+        for (SpawnEggItem spawnEggItem : SpawnEggItem.eggs()) {
+            DispenserBlock.registerBehavior(spawnEggItem, defaultDispenseItemBehavior);
+        }
+
         Map<Item, CauldronInteraction> emptyCauldron = CauldronInteraction.EMPTY/*? if >1.20.1 {*/.map()/*?}*/;
         Map<Item, CauldronInteraction> waterCauldron = CauldronInteraction.WATER/*? if >1.20.1 {*/.map()/*?}*/;
+        Map<Item, CauldronInteraction> powderSnowCauldron = CauldronInteraction.POWDER_SNOW/*? if >1.20.1 {*/.map()/*?}*/;
+        Map<Item, CauldronInteraction> lavaCauldron = CauldronInteraction.LAVA/*? if >1.20.1 {*/.map()/*?}*/;
         CauldronInteraction emptyCauldronPotion = (blockState, level, blockPos, player, interactionHand, itemStack) ->{
             Holder<Potion> p;
             if (/*? if <1.20.5 {*//*(p = BuiltInRegistries.POTION.wrapAsHolder(PotionUtils.getPotion(itemStack))).value() == Potions.EMPTY*//*?} else {*/ (p = itemStack.getOrDefault(DataComponents.POTION_CONTENTS,PotionContents.EMPTY).potion().orElse(null)) == null/*?}*/) {
@@ -222,6 +270,7 @@ public class Legacy4J {
                 be.potion = p;
                 be.lastPotionItemUsed = itemStack.getItemHolder();
                 be.setChanged();
+                if (be.hasWater()) sendCauldronBubblesParticles(level, blockPos);
             });
             if (!level.isClientSide) {
                 Item item = itemStack.getItem();
@@ -234,18 +283,18 @@ public class Legacy4J {
             }
             return successInteraction();
         };
-        emptyCauldron.put(Items.POTION,emptyCauldronPotion);
-        emptyCauldron.put(Items.SPLASH_POTION,emptyCauldronPotion);
-        emptyCauldron.put(Items.LINGERING_POTION,emptyCauldronPotion);
-        waterCauldron.put(Items.GLASS_BOTTLE, (blockState, level, blockPos, player, interactionHand, itemStack) -> {
-            Optional<WaterCauldronBlockEntity> opt = level.getBlockEntity(blockPos,LegacyRegistries.WATER_CAULDRON_BLOCK_ENTITY.get());
-            if (opt.isEmpty() || opt.map(be->be.waterColor).orElse(null) != null) return defaultPassInteraction();
+        putInteractionOrFallback(emptyCauldron, Items.POTION,emptyCauldronPotion);
+        putInteractionOrFallback(emptyCauldron, Items.SPLASH_POTION,emptyCauldronPotion);
+        putInteractionOrFallback(emptyCauldron, Items.LINGERING_POTION,emptyCauldronPotion);
+        putInteractionOrFallback(waterCauldron, Items.GLASS_BOTTLE, (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+            if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || be.waterColor != null) return defaultPassInteraction();
             if (!level.isClientSide) {
                 Item item = itemStack.getItem();
-                player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, setItemStackPotion(new ItemStack(opt.get().lastPotionItemUsed),opt.get().potion)));
+                player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, setItemStackPotion(new ItemStack(be.lastPotionItemUsed),be.potion)));
                 player.awardStat(Stats.USE_CAULDRON);
                 player.awardStat(Stats.ITEM_USED.get(item));
                 LayeredCauldronBlock.lowerFillLevel(blockState, level, blockPos);
+                sendCauldronSplashParticles(level, blockPos);
                 level.playSound(null, blockPos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0f, 1.0f);
                 level.gameEvent(null, GameEvent.FLUID_PICKUP, blockPos);
                 return consumeInteraction();
@@ -254,36 +303,36 @@ public class Legacy4J {
         });
         CauldronInteraction waterCauldronPotion = (blockState, level, blockPos, player, interactionHand, itemStack) -> {
             Holder<Potion> p;
-            Optional<WaterCauldronBlockEntity> opt = level.getBlockEntity(blockPos,LegacyRegistries.WATER_CAULDRON_BLOCK_ENTITY.get());
-            if (/*? if <1.20.5 {*//*(p = BuiltInRegistries.POTION.wrapAsHolder(PotionUtils.getPotion(itemStack))).value() == Potions.EMPTY*//*?} else {*/ (p = itemStack.getOrDefault(DataComponents.POTION_CONTENTS,PotionContents.EMPTY).potion().orElse(null)) == null/*?}*/ || (blockState.getValue(LayeredCauldronBlock.LEVEL) == 3 && (opt.isEmpty() || opt.get().potion.equals(p)))) {
+            if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || (p = getPotionContent(itemStack)) == null || (blockState.getValue(LayeredCauldronBlock.LEVEL) == 3 && be.potion.equals(p))) {
                 return defaultPassInteraction();
             }
-            if (opt.isPresent() && !opt.get().potion.equals(p)){
+            if (!be.potion.equals(p)){
                 level.setBlockAndUpdate(blockPos, CAULDRON.defaultBlockState());
-                if (!opt.get().potion.equals(p)) level.playSound(null, blockPos, SoundEvents.GENERIC_EXPLODE/*? if >1.20.5 {*/.value()/*?}*/, SoundSource.BLOCKS, 1.0f, 1.0f);
+                if (!be.potion.equals(p) && !level.isClientSide) level.playSound(null, blockPos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0f, 1.0f);
             }else{
-                if (opt.isEmpty() || opt.get().waterColor == null) level.setBlockAndUpdate(blockPos, blockState.cycle(LayeredCauldronBlock.LEVEL));
-                else {
-                    opt.get().waterColor = null;
+                level.setBlockAndUpdate(blockPos, blockState.cycle(LayeredCauldronBlock.LEVEL));
+                if (be.waterColor != null) {
+                    be.setWaterColor(null);
                     level.setBlockAndUpdate(blockPos, blockState.setValue(LayeredCauldronBlock.LEVEL,1));
-                    opt.get().setChanged();
+                    be.setRemoved();
                 }
-                opt.get().lastPotionItemUsed = itemStack.getItemHolder();
-                level.playSound(null, blockPos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0f, 1.0f);
+                be.lastPotionItemUsed = itemStack.getItemHolder();
+                if (!level.isClientSide) level.playSound(null, blockPos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0f, 1.0f);
             }
             if (!level.isClientSide) {
                 player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, new ItemStack(Items.GLASS_BOTTLE)));
                 player.awardStat(Stats.USE_CAULDRON);
                 player.awardStat(Stats.ITEM_USED.get(itemStack.getItem()));
                 level.gameEvent(null, GameEvent.FLUID_PLACE, blockPos);
+                if (be.hasWater() && !be.isRemoved()) sendCauldronBubblesParticles(level, blockPos);
                 return consumeInteraction();
             }
             return successInteraction();
         };
-        waterCauldron.put(Items.POTION, waterCauldronPotion);
-        waterCauldron.put(Items.SPLASH_POTION, waterCauldronPotion);
-        waterCauldron.put(Items.LINGERING_POTION, waterCauldronPotion);
-        waterCauldron.put(Items.ARROW, (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+        putInteractionOrFallback(waterCauldron, Items.POTION, waterCauldronPotion);
+        putInteractionOrFallback(waterCauldron, Items.SPLASH_POTION, waterCauldronPotion);
+        putInteractionOrFallback(waterCauldron, Items.LINGERING_POTION, waterCauldronPotion);
+        putInteractionOrFallback(waterCauldron, Items.ARROW, (blockState, level, blockPos, player, interactionHand, itemStack) -> {
             if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || be.hasWater()) {
                 return defaultPassInteraction();
             }
@@ -308,64 +357,86 @@ public class Legacy4J {
             return successInteraction();
         });
 
+        BiFunction<CauldronInteraction,CauldronInteraction,CauldronInteraction> beforeInteraction = (a, b)-> (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+            if (LegacyMixinToggles.legacyCauldrons.get()) b.interact(blockState, level, blockPos, player, interactionHand, itemStack);
+            return a.interact(blockState, level, blockPos, player, interactionHand, itemStack);
+        };
+
+        CauldronInteraction fillWater = (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+            sendCauldronBubblesParticles(level, blockPos);
+            if (level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) {
+                be.setWaterColor(null);
+                if (!be.hasWater()) {
+                    be.potion = be.getDefaultPotion();
+                    if (!level.isClientSide) level.playSound(null, blockPos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0f, 1.0f);
+                }
+            }
+            return successInteraction();
+        };
+
+        waterCauldron.merge(Items.WATER_BUCKET, fillWater, beforeInteraction);
+        emptyCauldron.merge(Items.WATER_BUCKET, fillWater, beforeInteraction);
+        powderSnowCauldron.merge(Items.WATER_BUCKET, fillWater, beforeInteraction);
+        lavaCauldron.merge(Items.WATER_BUCKET, fillWater, beforeInteraction);
+
+        CauldronInteraction fillLava = (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+            if (level instanceof ServerLevel sl) {
+                Vec3 center = blockPos.getCenter();
+                sl.sendParticles(ParticleTypes.LAVA, center.x, center.y + 0.5F, center.z, 2, 0.2, 0.1, 0.2, 0.02f);
+            }
+            return successInteraction();
+        };
+
+        waterCauldron.merge(Items.LAVA_BUCKET, fillLava, beforeInteraction);
+        emptyCauldron.merge(Items.LAVA_BUCKET, fillLava, beforeInteraction);
+        powderSnowCauldron.merge(Items.LAVA_BUCKET, fillLava, beforeInteraction);
+        lavaCauldron.merge(Items.LAVA_BUCKET, fillLava, beforeInteraction);
+
+        putInteractionOrFallback(waterCauldron, Items.BUCKET, (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+            if (!LegacyRegistries.isInvalidCauldron(blockState, level, blockPos)){
+                sendCauldronSplashParticles(level, blockPos);
+                return CauldronInteraction.fillBucket(blockState, level, blockPos, player, interactionHand, itemStack, new ItemStack(Items.WATER_BUCKET), (blockStatex) -> blockStatex.getValue(LayeredCauldronBlock.LEVEL) == 3, SoundEvents.BUCKET_FILL);
+            }
+            return consumeInteraction();
+        });
+
         for (DyeColor color : DyeColor.values()) {
-            waterCauldron.put(DyeItem.byColor(color),(blockState, level, blockPos, player, interactionHand, itemStack) -> {
-                Optional<WaterCauldronBlockEntity> opt = level.getBlockEntity(blockPos,LegacyRegistries.WATER_CAULDRON_BLOCK_ENTITY.get());
-                if (!(itemStack.getItem() instanceof DyeItem) || opt.isEmpty() || !opt.get().hasWater()) {
+            putInteractionOrFallback(waterCauldron, DyeItem.byColor(color),(blockState, level, blockPos, player, interactionHand, itemStack) -> {
+                if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || !(itemStack.getItem() instanceof DyeItem) || !be.hasWater()) {
                     return defaultPassInteraction();
                 }
                 int dyeColor = getDyeColor(color);
-                if (opt.get().waterColor == null) opt.get().waterColor = dyeColor;
-                else opt.get().waterColor = Legacy4J.mixColors(List.of(opt.get().waterColor,dyeColor).iterator());
-                opt.get().setChanged();
+                if (be.waterColor == null) be.setWaterColor(dyeColor);
+                else be.setWaterColor(be.waterColor = Legacy4J.mixColors(List.of(be.waterColor,dyeColor).iterator()));
+                be.setChanged();
+
+                if (!level.isClientSide) {
+                    level.playSound(null, blockPos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.25f, 1.0f);
+                    sendCauldronBubblesParticles(level, blockPos);
+                }
+
                 return level.isClientSide ? successInteraction() : consumeInteraction();
             });
         }
-        //? if <1.21.5 {
-        DispenserBlock.registerBehavior(Blocks.TNT, new OptionalDispenseItemBehavior() {
-            @Override
-            protected ItemStack execute(BlockSource blockSource, ItemStack itemStack) {
-                setSuccess(blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/().getGameRules().getBoolean(LegacyGameRules.TNT_EXPLODES));
-                if (isSuccess()){
-                    BlockPos blockPos = blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/().relative(blockSource./*? if >1.20.1 {*/state/*?} else {*//*getBlockState*//*?}*/().getValue(DispenserBlock.FACING));
-                    TntBlock.explode(blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/(), blockPos);
-                    blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/().gameEvent(null, GameEvent.ENTITY_PLACE, blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/());
-                    itemStack.shrink(1);
-                }
-                return itemStack;
-            }
 
-            @Override
-            protected void playAnimation(BlockSource blockSource, Direction direction) {
-                if (isSuccess()) super.playAnimation(blockSource, direction);
-            }
-        });
-        //?}
-        DefaultDispenseItemBehavior defaultDispenseItemBehavior = new DefaultDispenseItemBehavior() {
-            public ItemStack execute(BlockSource blockSource, ItemStack itemStack) {
-                Direction direction = blockSource./*? if >1.20.1 {*/state/*?} else {*//*getBlockState*//*?}*/().getValue(DispenserBlock.FACING);
-                EntityType<?> entityType = ((SpawnEggItem)itemStack.getItem()).getType(/*? if >=1.21.4 {*//*blockSource.level().registryAccess(), *//*?}*//*? if <1.20.5 {*//*null*//*?} else {*/itemStack/*?}*/);
 
-                try {
-                    if (entityType.spawn(blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/(), itemStack, null, blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/().relative(direction), /*? if <1.21.3 {*/MobSpawnType/*?} else {*//*EntitySpawnReason*//*?}*/.DISPENSER, direction != Direction.UP, false) != null){
-                        itemStack.shrink(1);
-                        blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/().gameEvent(null, GameEvent.ENTITY_PLACE, blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/());
-                    }
-                } catch (Exception var6) {
-                    LOGGER.error("Error while dispensing spawn egg from dispenser at {}", blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/(), var6);
-                    return ItemStack.EMPTY;
-                }
-
-                return itemStack;
-            }
-        };
-
-        for (SpawnEggItem spawnEggItem : SpawnEggItem.eggs()) {
-            DispenserBlock.registerBehavior(spawnEggItem, defaultDispenseItemBehavior);
-        }
         //? if <1.20.5 {
         /*registerDyedWaterCauldronInteraction(waterCauldron);
         *///?}
+    }
+
+    public static void putInteractionOrFallback(Map<Item, CauldronInteraction> interactionMap, Item item, CauldronInteraction cauldronInteraction){
+        putInteractionOrFallback(interactionMap, item, cauldronInteraction, LegacyMixinToggles.legacyCauldrons::get);
+    }
+
+    public static void putInteractionOrFallback(Map<Item, CauldronInteraction> interactionMap, Item item, CauldronInteraction cauldronInteraction, BooleanSupplier supplier){
+        interactionMap.merge(item, cauldronInteraction, (a, b) -> (blockState, level, blockPos, player, interactionHand, itemStack) -> {
+            if (supplier.getAsBoolean()) {
+                return b.interact(blockState, level, blockPos, player, interactionHand, itemStack);
+            }
+            return a.interact(blockState, level, blockPos, player, interactionHand, itemStack);
+        });
+
     }
 
     public static boolean isChunkPosVisibleInSquare(int centerX, int centerZ, int viewDistance, int x, int z, boolean offset){
@@ -374,6 +445,15 @@ public class Legacy4J {
         long p = Math.max(0, Math.max(n, o) - (offset ? 1 : 0));
         long q = Math.min(n, o);
         return Math.max(p, q) < viewDistance;
+    }
+
+    public static Holder<Potion> getPotionContent(ItemStack itemStack){
+        //? if <1.20.5 {
+        /*Holder<Potion> potion = BuiltInRegistries.POTION.wrapAsHolder(PotionUtils.getPotion(itemStack));
+        return potion.value() == Potions.EMPTY ? null : potion;
+        *///?} else {
+        return itemStack.getOrDefault(DataComponents.POTION_CONTENTS,PotionContents.EMPTY).potion().orElse(null);
+        //?}
     }
 
     public static ItemStack setItemStackPotion(ItemStack stack, Holder<Potion> potion){
@@ -422,21 +502,38 @@ public class Legacy4J {
         BuiltInRegistries.ITEM.asHolderIdMap().forEach(i-> {
             if (!isDyeableItem(i)) return;
             waterCauldron.put(i.value(),(blockState, level, blockPos, player, interactionHand, itemStack) -> {
-                Optional<WaterCauldronBlockEntity> opt = level.getBlockEntity(blockPos,LegacyRegistries.WATER_CAULDRON_BLOCK_ENTITY.get());
-                if ((opt.isPresent() && !opt.get().hasWater()) || (/*? if <1.20.5 {*//*((DyeableLeatherItem)itemStack.getItem()).hasCustomColor(itemStack) *//*?} else {*/itemStack.get(DataComponents.DYED_COLOR) == null/*?}*/ && (opt.isEmpty() || opt.get().waterColor == null))) {
+                if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || !be.hasWater() || (isDyedItem(itemStack) && be.waterColor == null)) {
                     return defaultPassInteraction();
                 }
 
                 if (!level.isClientSide) {
                     player.awardStat(Stats.USE_CAULDRON);
                     player.awardStat(Stats.ITEM_USED.get(itemStack.getItem()));
-                    if (opt.isEmpty() || opt.get().waterColor == null) /*? if <1.20.5 {*//*((DyeableLeatherItem)itemStack.getItem()).clearColor(itemStack)*//*?} else {*/itemStack.set(DataComponents.DYED_COLOR,null)/*?}*/;
-                    else Legacy4J.dyeItem(itemStack,opt.get().waterColor);
-                    LayeredCauldronBlock.lowerFillLevel(blockState, level, blockPos);
+                    if (be.waterColor == null) /*? if <1.20.5 {*//*((DyeableLeatherItem)itemStack.getItem()).clearColor(itemStack)*//*?} else {*/itemStack.set(DataComponents.DYED_COLOR,null)/*?}*/;
+                    else {
+                        Legacy4J.dyeItem(itemStack, be.waterColor);
+                        level.playSound(null, blockPos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.25f, 1.0f);
+                        sendCauldronSplashParticles(level, blockPos);
+                    }
+                    ColoredWaterCauldronBlock.lowerFillLevel(be);
                 }
                 return successInteraction();
             });
         });
+    }
+
+    public static void sendCauldronBubblesParticles(Level level, BlockPos blockPos){
+        if (level instanceof ServerLevel sl) {
+            Vec3 center = blockPos.getCenter();
+            sl.sendParticles(ParticleTypes.BUBBLE, center.x, center.y + 0.5F, center.z, 2, 0.2, 0.1, 0.2, 0.02f);
+        }
+    }
+
+    public static void sendCauldronSplashParticles(Level level, BlockPos blockPos){
+        if (level instanceof ServerLevel sl) {
+            Vec3 center = blockPos.getCenter();
+            sl.sendParticles(ParticleTypes.SPLASH, center.x, center.y + 0.5F, center.z, 2, 0.2, 0.2, 0.2, 1);
+        }
     }
 
     public static Vec3 getRelativeMovement(LivingEntity entity, float f, Vec3 vec3, int relRot){
@@ -463,6 +560,10 @@ public class Legacy4J {
 
     public static boolean canRepair(ItemStack repairItem, ItemStack ingredient){
         return repairItem.is(ingredient.getItem()) && repairItem.getCount() == 1 && ingredient.getCount() == 1 && /*? if <1.20.5 {*//*repairItem.getItem().canBeDepleted()*//*?} else {*/repairItem.getItem().components().has(DataComponents.DAMAGE) && !repairItem.isEnchanted()/*?}*/ && !ingredient.isEnchanted();
+    }
+
+    public static boolean isDyedItem(ItemStack itemStack){
+        return /*? if <1.20.5 {*//*((DyeableLeatherItem)itemStack.getItem()).hasCustomColor(itemStack) *//*?} else {*/itemStack.get(DataComponents.DYED_COLOR) == null/*?}*/;
     }
 
     public static boolean isDyeableItem(Holder<Item> item){
