@@ -84,6 +84,11 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
     }
 
     @Override
+    public int getTabYOffset() {
+        return 18;
+    }
+
+    @Override
     public RenderableVList getRenderableVList() {
         return getRenderableVLists().get(page.get() * 10 + tabList.selectedTab);
     }

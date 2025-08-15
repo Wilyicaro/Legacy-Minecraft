@@ -2,6 +2,8 @@ package wily.legacy.mixin.base;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.realmsclient.client.RealmsClient;
@@ -274,6 +276,7 @@ public abstract class MinecraftMixin {
 
     @WrapWithCondition(method = "updateScreenAndTick",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/sounds/SoundManager;stop()V"))
     public boolean updateScreenAndTick(SoundManager instance) {
+        SoundManagerAccessor.of(instance).stopAllSound();
         return false;
     }
 
@@ -288,22 +291,20 @@ public abstract class MinecraftMixin {
     }
 
     //? if >1.20.1 {
-    @Unique GameConfig gameConfig;
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(GameConfig gameConfig, CallbackInfo ci){
-        this.gameConfig = gameConfig;
-    }
-
-    @Inject(method = "addInitialScreens", at = @At("HEAD"))
-    private void addInitialScreens(List<Function<Runnable, Screen>> list, CallbackInfo ci) {
-        if (gameConfig.quickPlay.isEnabled()) return;
-        list.add(r-> ScreenUtil.getInitialScreen());
+    @ModifyVariable(method = "buildInitialScreens", at = @At(value = "STORE"))
+    private Runnable addInitialScreens(Runnable run) {
+        return ()-> {
+            run.run();
+            if (screen != null) setScreen(ScreenUtil.getInitialScreen());
+        };
     }
     //?} else {
     /*@Inject(method = "setInitialScreen", at = @At("HEAD"), cancellable = true)
     private void addInitialScreens(RealmsClient realmsClient, ReloadInstance reloadInstance, GameConfig.QuickPlayData quickPlayData, CallbackInfo ci) {
-        ci.cancel();
-        FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(() -> setScreen(ScreenUtil.getInitialScreen()), MinecraftAccessor.getInstance()::hasGameLoaded);
+        if (!quickPlayData.isEnabled()) {
+               ci.cancel();
+               setScreen(ScreenUtil.getInitialScreen());
+        }
     }
     *///?}
 }

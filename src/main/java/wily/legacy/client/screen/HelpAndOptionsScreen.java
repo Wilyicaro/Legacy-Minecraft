@@ -20,7 +20,10 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
     public static List<AbstractWidget> createPlayerSkinWidgets(){
         List<AbstractWidget> list = new ArrayList<>();
         for (PlayerModelPart p : PlayerModelPart.values()) {
-            list.add(new TickBox(0,0,Minecraft.getInstance().options.isModelPartEnabled(p),b->p.getName(),b->null,t->Minecraft.getInstance().options./*? if <1.21.2 {*/toggleModelPart/*?} else {*//*setModelPart*//*?}*/(p,t.selected)));
+            list.add(new TickBox(0,0,Minecraft.getInstance().options.isModelPartEnabled(p),b->p.getName(),b->null,t->{
+                Minecraft.getInstance().options./*? if <1.21.2 {*/toggleModelPart/*?} else {*//*setModelPart*//*?}*/(p,t.selected);
+                Minecraft.getInstance().options.save();
+            }));
         }
         list.add(LegacyConfigWidgets.createWidget(LegacyOptions.of(Minecraft.getInstance().options.mainHand())));
         return list;

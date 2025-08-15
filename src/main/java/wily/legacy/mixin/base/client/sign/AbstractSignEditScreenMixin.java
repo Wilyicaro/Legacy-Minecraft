@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.KeyboardScreen;
 import wily.legacy.client.screen.WidgetPanel;
+import wily.legacy.util.ScreenUtil;
 
 @Mixin(AbstractSignEditScreen.class)
 public abstract class AbstractSignEditScreenMixin extends Screen implements ControlTooltip.Event {
@@ -80,27 +81,33 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
     protected AbstractSignEditScreenMixin(Component component) {
         super(component);
     }
+
     @ModifyArg(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/Button$Builder;bounds(IIII)Lnet/minecraft/client/gui/components/Button$Builder;"), index = 1)
     private int init(int i) {
         return height/ 2 + 80;
     }
+
     @Inject(method = "init", at = @At("HEAD"))
     private void init(CallbackInfo ci) {
         addWidget(panel);
         setFocused(panel);
     }
+
     @ModifyArg(method = "offsetSign", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"), index = 1)
     private float offsetSign(float f){
         return height/2f - 26.5f;
     }
+
     @Redirect(method = "renderSignText", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"))
     private void renderSignText(PoseStack instance, float x, float y, float z){
         instance.translate(x,isSign() ? y - 14.5 : y + 10,10);
     }
+
     @Unique
     private boolean isSign(){
         return this.sign.getBlockState().getBlock() instanceof StandingSignBlock || this.sign.getBlockState().getBlock() instanceof WallSignBlock;
     }
+
     @Redirect(method = "renderSignText", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/SignBlockEntity;getTextLineHeight()I"))
     private int renderSignText(SignBlockEntity instance){
         return instance.getTextLineHeight() + 5;
@@ -110,6 +117,7 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
     private int renderSignText(GuiGraphics instance, Font arg, String string, int i, int j, int k, boolean bl){
         return getFocused() == panel ? instance.drawString(arg,string,i,j,k,bl) : -1;
     }
+
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
@@ -123,13 +131,20 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
         this.renderSign(guiGraphics);
         Lighting.setupFor3DItems();
     }
+
     @Inject(method = "keyPressed",at = @At("HEAD"), cancellable = true)
     public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(super.keyPressed(i,j,k));
     }
+
     @Inject(method = "charTyped",at = @At("HEAD"), cancellable = true)
     public void charTyped(char c, int i, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(super.charTyped(c,i));
+    }
+
+    @Inject(method = "onClose", at = @At("RETURN"))
+    public void onClose(CallbackInfo info){
+        ScreenUtil.playBackSound();
     }
 
     //? if >1.20.1 {

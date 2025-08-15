@@ -6,11 +6,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.Bearer;
-import wily.factoryapi.base.client.UIDefinition;
-import wily.legacy.Legacy4JClient;
+import wily.factoryapi.base.client.AdvancedTextWidget;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.KnownListing;
 import wily.legacy.util.LegacyComponents;
@@ -18,40 +17,51 @@ import wily.legacy.util.ScreenUtil;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
-public class ConfirmationScreen extends OverlayPanelScreen implements RenderableVList.Access{
-    protected final MultiLineLabel messageLabel;
+public class ConfirmationScreen extends OverlayPanelScreen implements RenderableVList.Access {
+    protected final AdvancedTextWidget messageLabel;
     protected Consumer<ConfirmationScreen> okAction;
     public Button okButton;
     protected Bearer<Integer> messageYOffset = Bearer.of(0);
     protected final RenderableVList renderableVList = new RenderableVList(accessor).layoutSpacing(l->2);
     private final List<RenderableVList> renderableVLists = Collections.singletonList(renderableVList);
     protected boolean initialized = false;
+    private final Consumer<AdvancedTextWidget> textWidgetConsumer;
 
-    public ConfirmationScreen(Screen parent, Function<Screen,Panel> panelConstructor, Component title, MultiLineLabel messageLabel, Consumer<ConfirmationScreen> okAction) {
-        super(parent, panelConstructor, title);
-        this.messageLabel = messageLabel;
+    public ConfirmationScreen(Screen parent, Function<ConfirmationScreen, Panel> panelConstructor, Component title, Consumer<AdvancedTextWidget> textWidgetConsumer, Consumer<ConfirmationScreen> okAction) {
+        super(parent, s-> panelConstructor.apply((ConfirmationScreen)s), title);
+        this.textWidgetConsumer = textWidgetConsumer;
+        this.messageLabel = new AdvancedTextWidget(UIAccessor.of(this));
+        //? if >1.20.1 {
+        textWidgetConsumer.accept(messageLabel);
+        //?}
         this.okAction = okAction;
         this.parent = parent;
     }
-    public ConfirmationScreen(Screen parent, int imageWidth, int baseHeight, int xOffset, int yOffset, Component title, MultiLineLabel messageLines, Consumer<ConfirmationScreen> okAction) {
-        this(parent,s-> Panel.centered(s, imageWidth, baseHeight + messageLines.getLineCount() * 12, xOffset, yOffset),title,messageLines, okAction);
+
+    public ConfirmationScreen(Screen parent, int imageWidth, int baseHeight, int xOffset, int yOffset, Component title, Consumer<AdvancedTextWidget> textWidgetConsumer, Consumer<ConfirmationScreen> okAction) {
+        this(parent,s-> Panel.createPanel(s, p-> p.appearance(imageWidth, baseHeight + s.messageLabel.height), p-> p.pos( p.centeredLeftPos(s) + xOffset, p.centeredTopPos(s) + yOffset)), title, textWidgetConsumer, okAction);
     }
+
     public ConfirmationScreen(Screen parent, int imageWidth, int baseHeight, int xOffset, int yOffset, Component title, Component message, Consumer<ConfirmationScreen> okAction) {
-        this(parent, imageWidth, baseHeight, xOffset , yOffset, title, MultiLineLabel.create(Minecraft.getInstance().font,message,imageWidth - 30), okAction);
+        this(parent, imageWidth, baseHeight, xOffset , yOffset, title, w -> w.withLines(message, imageWidth - 30), okAction);
     }
+
     public ConfirmationScreen(Screen parent, int imageWidth, int baseHeight, Component title, Component message, Consumer<ConfirmationScreen> okAction) {
         this(parent, imageWidth, baseHeight, 0, 0, title, message, okAction);
     }
+
     public ConfirmationScreen(Screen parent, Component title, Component message, Consumer<ConfirmationScreen> okAction) {
         this(parent,230, 97,title,message,okAction);
     }
+
     public ConfirmationScreen(Screen parent, int imageWidth, int baseHeight, Component title, Component message) {
         this(parent, imageWidth, baseHeight, title, message, LegacyScreen::onClose);
     }
+
     public ConfirmationScreen(Screen parent, Component title, Component message) {
         this(parent,230,97,title,message);
     }
@@ -115,7 +125,7 @@ public class ConfirmationScreen extends OverlayPanelScreen implements Renderable
         }
         super.init();
         renderableVListInit();
-        accessor.putIntegerBearer("messageYOffset",messageYOffset);
+        accessor.putIntegerBearer("messageYOffset", messageYOffset);
     }
 
     @Override
@@ -141,8 +151,14 @@ public class ConfirmationScreen extends OverlayPanelScreen implements Renderable
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        //? if <=1.20.1 {
+        if (messageLabel.getLines().isEmpty()) {
+            textWidgetConsumer.accept(messageLabel);
+            repositionElements();
+        }
+        //?}
         super.render(guiGraphics, i, j, f);
         ScreenUtil.renderScrollingString(guiGraphics,font,title,panel.x + 15, panel.y + 15,panel.x + panel.width - 15, panel.y + 26, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
-        messageLabel.renderLeftAlignedNoShadow(guiGraphics,panel.x + 15, panel.y + messageYOffset.get(), 12, CommonColor.INVENTORY_GRAY_TEXT.get());
+        messageLabel.withPos(panel.x + 15, panel.y + messageYOffset.get()).withColor(CommonColor.INVENTORY_GRAY_TEXT.get()).withShadow(false).render(guiGraphics, i, j, f);
     }
 }

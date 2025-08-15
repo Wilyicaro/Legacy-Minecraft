@@ -276,6 +276,11 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
     }
 
     @Override
+    public int getTabYOffset() {
+        return 18;
+    }
+
+    @Override
     public boolean disableCursorOnInit() {
         return true;
     }

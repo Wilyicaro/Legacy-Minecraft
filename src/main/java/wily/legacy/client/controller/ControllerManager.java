@@ -28,6 +28,7 @@ import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.CreativeModeScreen;
 import wily.legacy.client.screen.LegacyCraftingScreen;
 import wily.legacy.client.screen.LegacyMenuAccess;
+import wily.legacy.client.screen.TabList;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.mixin.base.MouseHandlerAccessor;
@@ -111,22 +112,23 @@ public class ControllerManager {
         setPointerPos(x, y, isControllerTheLastInput() && LegacyOptions.controllerVirtualCursor.get());
     }
 
-    public void setPointerPos(double x, double y, boolean onlyVirtual){
+    public void setPointerPos(double x, double y, boolean onlyVirtual) {
         Window window = minecraft.getWindow();
-        if (minecraft.screen instanceof LegacyMenuAccess<?> && LegacyOptions.limitCursor.get()) {
-            ScreenRectangle rect = ((LegacyMenuAccess<?>) minecraft.screen).getMenuRectangle();
-            double scale = ScreenUtil.getGuiScale();
-            int left = rect.left() - (minecraft.screen instanceof LegacyCraftingScreen ? 35 : 0);
-            int top = rect.top() - (minecraft.screen instanceof CreativeModeScreen || minecraft.screen instanceof LegacyCraftingScreen ? 35 : 0);
+        if (minecraft.screen instanceof LegacyMenuAccess<?> a && LegacyOptions.limitCursor.get()) {
+            ScreenRectangle rect = a.getMenuRectangle();
+            double scaleX = getGuiScaleX();
+            double scaleY = getGuiScaleY();
+            int left = rect.left() - (minecraft.screen instanceof TabList.Access tabList ? tabList.getTabXOffset() * 2 : 0);
+            int top = rect.top() - (minecraft.screen instanceof TabList.Access tabList ? tabList.getTabYOffset() * 2 : 0);
             int paddingH = 20;
             int paddingV = 10;
-            minecraft.mouseHandler.xpos = Mth.clamp(x, (left - paddingH) * scale, (rect.right() + paddingH) * scale);
-            minecraft.mouseHandler.ypos = Mth.clamp(y, (top - paddingV) * scale, (rect.bottom() + paddingV) * scale);
+            minecraft.mouseHandler.xpos = Mth.clamp(x, (left - paddingH) * scaleX, (rect.right() + paddingH) * scaleX);
+            minecraft.mouseHandler.ypos = Mth.clamp(y, (top - paddingV) * scaleY, (rect.bottom() + paddingV) * scaleY);
         } else {
             minecraft.mouseHandler.xpos = Mth.clamp(x, 0, window.getScreenWidth());
             minecraft.mouseHandler.ypos = Mth.clamp(y, 0, window.getScreenHeight());
         }
-        if (!onlyVirtual) GLFW.glfwSetCursorPos(Minecraft.getInstance().getWindow().getWindow(), minecraft.mouseHandler.xpos, minecraft.mouseHandler.ypos);
+        if (!onlyVirtual) GLFW.glfwSetCursorPos(window.getWindow(), minecraft.mouseHandler.xpos, minecraft.mouseHandler.ypos);
     }
 
     public synchronized void updateBindings() {
@@ -390,12 +392,28 @@ public class ControllerManager {
         else minecraft.screen.keyReleased(key, 0, 0);
     }
 
-    public double getPointerX(){
-        return minecraft.mouseHandler.xpos() * (double)this.minecraft.getWindow().getGuiScaledWidth() / (double)this.minecraft.getWindow().getScreenWidth();
+    public double getGuiScaleX() {
+        return (double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth();
     }
 
-    public double getPointerY(){
-        return minecraft.mouseHandler.ypos() * (double)this.minecraft.getWindow().getGuiScaledHeight() / (double)this.minecraft.getWindow().getScreenHeight();
+    public double getGuiScaleY() {
+        return (double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight();
+    }
+
+    public double getPointerX() {
+        return minecraft.mouseHandler.xpos() / getGuiScaleX();
+    }
+
+    public double getPointerY() {
+        return minecraft.mouseHandler.ypos() / getGuiScaleY();
+    }
+
+    public float getVisualPointerX() {
+        return Math.round(minecraft.mouseHandler.xpos()) / ((float) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth());
+    }
+
+    public float getVisualPointerY() {
+        return Math.round(minecraft.mouseHandler.ypos()) / ((float) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight());
     }
 
     public <T extends BindingState> T getButtonState(ControllerBinding<T> button){

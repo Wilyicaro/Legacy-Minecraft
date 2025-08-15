@@ -58,7 +58,7 @@ import java.util.function.Supplier;
 
 import static wily.legacy.client.screen.ControlTooltip.*;
 
-public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInventoryScreen/*?} else {*//*AbstractContainerScreen*//*?}*/<CreativeModeScreen.CreativeModeMenu> implements Controller.Event,ControlTooltip.Event{
+public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInventoryScreen/*?} else {*//*AbstractContainerScreen*//*?}*/<CreativeModeScreen.CreativeModeMenu> implements Controller.Event, ControlTooltip.Event, TabList.Access {
     protected Stocker.Sizeable page = new Stocker.Sizeable(0);
     protected final TabList tabList = new TabList(UIAccessor.of(this), new PagedList<>(page,8));
     protected final Panel panel;
@@ -411,6 +411,16 @@ public class CreativeModeScreen extends /*? if <=1.21.2 {*/EffectRenderingInvent
         if (state.is(ControllerBinding.RIGHT_STICK) && state instanceof BindingState.Axis s && s.pressed && s.canClick() && tabList.controlPage(page,s.x < 0 && -s.x > Math.abs(s.y),s.x > 0 && s.x > Math.abs(s.y))){
             repositionElements();
         }
+    }
+
+    @Override
+    public TabList getTabList() {
+        return tabList;
+    }
+
+    @Override
+    public int getTabYOffset() {
+        return 19;
     }
 
     public static class CreativeModeMenu extends AbstractContainerMenu {

@@ -7,7 +7,8 @@
         "overlay": "block/grass_block_side_overlay"
     },
     "elements": [
-        {   "from": [ 0, 0, 0 ],
+        {
+            "from": [ 0, 0, 0 ],
             "to": [ 16, 16, 16 ],
             "faces": {
                 "down":  { "uv": [ 0, 0, 16, 16 ], "texture": "#bottom", "cullface": "down" },
@@ -18,13 +19,14 @@
                 "east":  { "uv": [ 0, 0, 16, 16 ], "texture": "#side",   "cullface": "east" }
             }
         },
-        {   "from": [ -0.005, 0.05, -0.005 ],
-            "to": [ 16.005, 16.05, 16.005 ],
+        {
+            "from": [ 0, 0, 0 ],
+            "to": [ 16, 16, 16 ],
             "faces": {
-                "north": { "uv": [ 0, 0, 16, 16 ], "texture": "#overlay", "tintindex": 0, "cullface": "north" },
-                "south": { "uv": [ 0, 0, 16, 16 ], "texture": "#overlay", "tintindex": 0, "cullface": "south" },
-                "west":  { "uv": [ 0, 0, 16, 16 ], "texture": "#overlay", "tintindex": 0, "cullface": "west" },
-                "east":  { "uv": [ 0, 0, 16, 16 ], "texture": "#overlay", "tintindex": 0, "cullface": "east" }
+                "north": { "uv": [ 0, 0.1, 16, 16 ], "texture": "#overlay", "tintindex": 0, "cullface": "north" },
+                "south": { "uv": [ 0, 0.1, 16, 16 ], "texture": "#overlay", "tintindex": 0, "cullface": "south" },
+                "west":  { "uv": [ 0, 0.1, 16, 16 ], "texture": "#overlay", "tintindex": 0, "cullface": "west" },
+                "east":  { "uv": [ 0, 0.1, 16, 16 ], "texture": "#overlay", "tintindex": 0, "cullface": "east" }
             }
         }
     ]

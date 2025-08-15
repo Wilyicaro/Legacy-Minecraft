@@ -501,8 +501,14 @@ public class MixedCraftingScreen<T extends /*? if <1.20.5 {*//*RecipeBookMenu<Cr
         });
     }
 
+    @Override
     public TabList getTabList() {
         return craftingTabList;
+    }
+
+    @Override
+    public int getTabYOffset() {
+        return 18;
     }
 
     protected int getMaxTabCount(){
