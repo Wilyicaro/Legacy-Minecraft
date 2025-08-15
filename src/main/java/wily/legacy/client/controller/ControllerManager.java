@@ -69,19 +69,19 @@ public class ControllerManager {
         return LegacyOptions.selectedControllerHandler.get();
     }
 
-    public static void updatePlayerCamera(BindingState.Axis stick, Controller controller){
+    public static void updatePlayerCamera(BindingState.Axis stick, Controller controller) {
         Minecraft minecraft = Minecraft.getInstance();
         if (!minecraft.mouseHandler.isMouseGrabbed() || !minecraft.isWindowActive() || !stick.pressed || minecraft.player == null) return;
-        double f = Math.pow(LegacyOptions.controllerSensitivity.get() * (double)0.6f + (double)0.2f,3) * 7.5f * (minecraft.player.isScoping() ? 0.125: 1.0);
+        double f = Math.pow(LegacyOptions.controllerSensitivity.get() * 0.6 + 0.2, 3) * 7.5f * (minecraft.player.isScoping() ? 0.125 : 1.0);
         minecraft.player.turn(getCameraCurve(stick.getSmoothX()) * f, getCameraCurve(stick.getSmoothY()) * f * (LegacyOptions.invertYController.get() ? -1 : 1));
     }
 
-    public static float getCameraCurve(float f){
+    public static float getCameraCurve(float f) {
         if (LegacyOptions.linearCameraMovement.get()) return f;
         return f * f * Math.signum(f);
     }
 
-    public void setup(Minecraft minecraft){
+    public void setup(Minecraft minecraft) {
         this.minecraft = minecraft;
         this.orderedKeyMappings = minecraft.options.keyMappings.clone();
         updateCursorInputMode();
@@ -116,18 +116,19 @@ public class ControllerManager {
         Window window = minecraft.getWindow();
         if (minecraft.screen instanceof LegacyMenuAccess<?> a && LegacyOptions.limitCursor.get()) {
             ScreenRectangle rect = a.getMenuRectangle();
-            int scale = minecraft.getWindow().getGuiScale();
+            double scaleX = getGuiScaleX();
+            double scaleY = getGuiScaleY();
             int left = rect.left() - (minecraft.screen instanceof TabList.Access tabList ? tabList.getTabXOffset() * 2 : 0);
             int top = rect.top() - (minecraft.screen instanceof TabList.Access tabList ? tabList.getTabYOffset() * 2 : 0);
             int paddingH = 20;
             int paddingV = 10;
-            minecraft.mouseHandler.xpos = Mth.clamp(x, (left - paddingH) * scale, (rect.right() + paddingH) * scale);
-            minecraft.mouseHandler.ypos = Mth.clamp(y, (top - paddingV) * scale, (rect.bottom() + paddingV) * scale);
+            minecraft.mouseHandler.xpos = Mth.clamp(x, (left - paddingH) * scaleX, (rect.right() + paddingH) * scaleX);
+            minecraft.mouseHandler.ypos = Mth.clamp(y, (top - paddingV) * scaleY, (rect.bottom() + paddingV) * scaleY);
         } else {
             minecraft.mouseHandler.xpos = Mth.clamp(x, 0, window.getScreenWidth());
             minecraft.mouseHandler.ypos = Mth.clamp(y, 0, window.getScreenHeight());
         }
-        if (!onlyVirtual) GLFW.glfwSetCursorPos(minecraft.getWindow().getWindow(), minecraft.mouseHandler.xpos, minecraft.mouseHandler.ypos);
+        if (!onlyVirtual) GLFW.glfwSetCursorPos(window.getWindow(), minecraft.mouseHandler.xpos, minecraft.mouseHandler.ypos);
     }
 
     public synchronized void updateBindings() {
@@ -172,7 +173,6 @@ public class ControllerManager {
                     if (state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && state.pressed) {
                         double moveX;
                         double moveY;
-                        int scale = minecraft.getWindow().getGuiScale();
                         double moveSensitivity = LegacyOptions.interfaceSensitivity.get() * 0.5;
                         double deadzone = stick.getDeadZone();
                         double deadzoneY = Math.max(deadzone, Mth.lerp(affectY, 1, 0.35));
@@ -200,8 +200,8 @@ public class ControllerManager {
                             moveX = stick.x * moveSensitivity;
                             moveY = stick.y * moveSensitivity;
                         }
-                        setPointerPos(minecraft.mouseHandler.xpos() + moveX * scale,
-                                minecraft.mouseHandler.ypos() + moveY * scale);
+                        setPointerPos(minecraft.mouseHandler.xpos() + moveX * getGuiScaleX(),
+                                minecraft.mouseHandler.ypos() + moveY * getGuiScaleY());
                     }
 
                     if (minecraft.screen instanceof LegacyMenuAccess<?> screen) {
@@ -390,20 +390,28 @@ public class ControllerManager {
         else minecraft.screen.keyReleased(key, 0, 0);
     }
 
+    public double getGuiScaleX() {
+        return (double) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth();
+    }
+
+    public double getGuiScaleY() {
+        return (double) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight();
+    }
+
     public double getPointerX() {
-        return minecraft.mouseHandler.xpos() * (double)this.minecraft.getWindow().getGuiScaledWidth() / (double)this.minecraft.getWindow().getScreenWidth();
+        return minecraft.mouseHandler.xpos() / getGuiScaleX();
     }
 
     public double getPointerY() {
-        return minecraft.mouseHandler.ypos() * (double)this.minecraft.getWindow().getGuiScaledHeight() / (double)this.minecraft.getWindow().getScreenHeight();
+        return minecraft.mouseHandler.ypos() / getGuiScaleY();
     }
 
-    public float getVisualPointerX() {;
-        return Math.round(minecraft.mouseHandler.xpos()) / (float) minecraft.getWindow().getGuiScale();
+    public float getVisualPointerX() {
+        return Math.round(minecraft.mouseHandler.xpos()) / (float) Math.round((float)minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth());
     }
 
     public float getVisualPointerY() {
-        return Math.round(minecraft.mouseHandler.ypos()) / (float) minecraft.getWindow().getGuiScale();
+        return Math.round(minecraft.mouseHandler.ypos()) / (float) Math.round((float) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight());
     }
 
     public <T extends BindingState> T getButtonState(ControllerBinding<T> button){

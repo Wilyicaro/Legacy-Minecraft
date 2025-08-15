@@ -23,17 +23,14 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.item.TrackingItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
-import org.joml.Matrix3x2fStack;
 import wily.factoryapi.util.ColorUtil;
 import wily.legacy.Legacy4J;
-import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Map;
 import java.util.Set;
@@ -90,10 +87,16 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
         gpuDevice.createCommandEncoder().clearColorAndDepthTextures(this.itemsAtlas, 0, this.itemsAtlasDepth, 1.0);
     }
 
+    public static float getXScale(Matrix3x2f matrix) {
+        return Mth.sqrt(matrix.m00() * matrix.m00() + matrix.m01() * matrix.m01());
+    }
+
+    public static float getYScale(Matrix3x2f matrix) {
+        return Mth.sqrt(matrix.m10() * matrix.m10() + matrix.m11() * matrix.m11());
+    }
+
     public static int getScale(Matrix3x2f matrix) {
-        float scaleX = Mth.sqrt(matrix.m00() * matrix.m00() + matrix.m01() * matrix.m01());
-        float scaleY = Mth.sqrt(matrix.m10() * matrix.m10() + matrix.m11() * matrix.m11());
-        return Math.round(Math.max(scaleX, scaleY) * 16);
+        return Math.round(Math.max(getXScale(matrix), getYScale(matrix)) * 16);
     }
 
     public void prepareItemElements(MultiBufferSource.BufferSource bufferSource, GuiRenderState renderState, int frameNumber) {

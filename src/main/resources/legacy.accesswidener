@@ -139,3 +139,4 @@ accessible field net/minecraft/client/gui/GuiGraphics guiRenderState Lnet/minecr
 accessible field net/minecraft/client/gui/GuiGraphics scissorStack Lnet/minecraft/client/gui/GuiGraphics$ScissorStack;
 accessible class net/minecraft/client/gui/GuiGraphics$ScissorStack
 accessible class net/minecraft/client/gui/components/ChatComponent$LineConsumer
+accessible class net/minecraft/client/Minecraft$GameLoadCookie

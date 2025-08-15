@@ -18,10 +18,12 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.PagedList;
+import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.mixin.base.client.AbstractWidgetAccessor;import wily.legacy.util.*;
+import wily.legacy.mixin.base.client.AbstractWidgetAccessor;
+import wily.legacy.util.*;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.network.ClientAdvancementsPayload;
@@ -110,7 +112,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
             AdvancementProgress p = null;
             lastUnlocked = unlocked;
             unlocked = (a = getAdvancements().get(id)) != null && (p = getAdvancements().progress.getOrDefault(a, null)) != null && p.isDone();
-            if (lastUnlocked == unlocked && ((AbstractWidgetAccessor)this).getTooltip() != null) return;
+            if (lastUnlocked == unlocked && ((AbstractWidgetAccessor)this).getTooltip().get() != null) return;
             Component progressText = p == null || p .getProgressText() == null ? null : p.getProgressText();
             setTooltip(progressText == null ? Tooltip.create(info.getDescription()) : new MultilineTooltip(List.of(info.getDescription().getVisualOrderText(),progressText.getVisualOrderText())));
         }

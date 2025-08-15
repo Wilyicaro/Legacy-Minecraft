@@ -1,7 +1,5 @@
 package wily.legacy.mixin.base.client.sign;
 
-import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.font.TextFieldHelper;
@@ -25,6 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.KeyboardScreen;
 import wily.legacy.client.screen.WidgetPanel;
+import wily.legacy.util.client.LegacySoundUtil;
 
 @Mixin(AbstractSignEditScreen.class)
 public abstract class AbstractSignEditScreenMixin extends Screen implements ControlTooltip.Event {
@@ -69,8 +68,6 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
         }
     };
 
-    @Shadow protected abstract void renderSign(GuiGraphics arg);
-
     @Shadow @Final private SignBlockEntity sign;
 
     @Shadow private int line;
@@ -80,10 +77,12 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
     protected AbstractSignEditScreenMixin(Component component) {
         super(component);
     }
+
     @ModifyArg(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/Button$Builder;bounds(IIII)Lnet/minecraft/client/gui/components/Button$Builder;"), index = 1)
     private int init(int i) {
-        return height/ 2 + 80;
+        return height / 2 + 80;
     }
+
     @Inject(method = "init", at = @At("HEAD"))
     private void init(CallbackInfo ci) {
         addWidget(panel);
@@ -94,10 +93,12 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
     private void renderSignText(GuiGraphics guiGraphics, CallbackInfo ci){
         guiGraphics.pose().translate(0, isSign() ? - 14.5f : 10);
     }
+
     @Unique
     private boolean isSign(){
         return this.sign.getBlockState().getBlock() instanceof StandingSignBlock || this.sign.getBlockState().getBlock() instanceof WallSignBlock;
     }
+
     @Redirect(method = "renderSignText", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/SignBlockEntity;getTextLineHeight()I"))
     private int renderSignText(SignBlockEntity instance){
         return instance.getTextLineHeight() + 5;
@@ -107,36 +108,32 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
     private void renderSignText(GuiGraphics instance, Font arg, String string, int i, int j, int k, boolean bl){
         if (getFocused() == panel) instance.drawString(arg,string,i,j,k,bl);
     }
-    @Inject(method = "render",at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
-        ci.cancel();
-        super.render(guiGraphics, i, j, f);
-        minecraft.gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_FLAT);
+
+    @Redirect(method = "render",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V"))
+    public void render(GuiGraphics guiGraphics, Font font, Component component, int i, int j, int k) {
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate((width - font.width(title)*1.5f)/ 2f, height / 2f - 96);
         guiGraphics.pose().scale(1.5f,1.5f);
-        guiGraphics.drawString(this.font, this.title, 0, 0, 16777215);
+        guiGraphics.drawString(this.font, this.title, 0, 0, -1);
         guiGraphics.pose().popMatrix();
-        this.renderSign(guiGraphics);
-        minecraft.gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
     }
+
     @Inject(method = "keyPressed",at = @At("HEAD"), cancellable = true)
     public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(super.keyPressed(i,j,k));
     }
+
     @Inject(method = "charTyped",at = @At("HEAD"), cancellable = true)
     public void charTyped(char c, int i, CallbackInfoReturnable<Boolean> cir) {
         cir.setReturnValue(super.charTyped(c,i));
     }
 
-    //? if >1.20.1 {
+    @Inject(method = "onClose", at = @At("RETURN"))
+    public void onClose(CallbackInfo info){
+        LegacySoundUtil.playBackSound();
+    }
+
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
     }
-    //?} else {
-    /*@Override
-    public void renderBackground(GuiGraphics guiGraphics) {
-    }
-    *///?}
-
 }

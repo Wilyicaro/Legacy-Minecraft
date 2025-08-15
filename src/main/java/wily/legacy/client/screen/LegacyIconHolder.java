@@ -173,8 +173,12 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         return getHeight() - 2 * (isSizeable() ?  1 : getHeight() / 20f);
     }
 
-    public int getItemRenderSize() {
-        return Math.round(Math.min(getSelectableWidth(), getSelectableHeight()));
+    public float getScaleX() {
+        return getWidth() / 18f;
+    }
+
+    public float getScaleY() {
+        return getHeight() / 18f;
     }
 
     public boolean isSizeable(){
@@ -264,15 +268,13 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
 
     public void renderSelection(GuiGraphics graphics, int i, int j, float f){
         renderChild(graphics,getXCorner() - 4.5f, getYCorner() - 4.5f,()-> {
-            FactoryGuiGraphics.of(graphics).disableDepthTest();
             FactoryGuiGraphics.of(graphics).blitSprite(SELECT_ICON_HIGHLIGHT,0,0,36,36);
-            FactoryGuiGraphics.of(graphics).enableDepthTest();
         });
     }
 
     public void renderScaled(GuiGraphics graphics, float x, float y, Runnable render){
         renderChild(graphics,x,y,()->{
-            graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f);
+            graphics.pose().scale(getWidth() / 18f,getHeight() / 18f);
             render.run();
         });
     }
@@ -285,11 +287,10 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         graphics.pose().popMatrix();
     }
 
-    public void renderHighlight(GuiGraphics graphics){
-        renderScaled(graphics,getX(),getY(),()-> {
-            FactoryScreenUtil.enableBlend();
+    public void renderHighlight(GuiGraphics graphics) {
+        renderChild(graphics,x,y,()-> {
+            graphics.pose().scale(getSelectableWidth() / 16f,getSelectableHeight() / 16f);
             FactoryGuiGraphics.of(graphics).blitSprite(SLOT_HIGHLIGHT, 0, 0, 16, 16);
-            FactoryScreenUtil.disableBlend();
         });
     }
 

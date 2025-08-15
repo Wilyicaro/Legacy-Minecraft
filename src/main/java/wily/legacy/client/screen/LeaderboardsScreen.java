@@ -75,7 +75,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
     }
 
     public static Screen getActualLeaderboardsScreenInstance(Screen parent) {
-        return LegacyOptions.legacyLeaderboards.get() ? parent : new StatsScreen(parent, Minecraft.getInstance().player.getStats());
+        return LegacyOptions.legacyLeaderboards.get() ? new LeaderboardsScreen(parent) : new StatsScreen(parent, Minecraft.getInstance().player.getStats());
     }
 
     @Override

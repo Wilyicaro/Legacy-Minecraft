@@ -279,7 +279,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         addRenderableOnly(((guiGraphics, i, j, f) -> {
             if (LegacyRenderUtil.hasTooltipBoxes(accessor)) {
                 Optional<GuiEventListener> listener;
-                if (getFocused() instanceof AbstractWidgetAccessor widget && widget.getTooltip() != null) tooltipBoxLabel = widget.getTooltip().get().toCharSequence(minecraft);
+                if (getFocused() instanceof AbstractWidgetAccessor widget && widget.getTooltip() != null && widget.getTooltip().get() != null) tooltipBoxLabel = widget.getTooltip().get().toCharSequence(minecraft);
                 else if ((listener = getChildAt(i,j)).isPresent() && listener.get() instanceof AbstractWidgetAccessor widget && widget.getTooltip() != null) widget.getTooltip().get().toCharSequence(minecraft);
                 else tooltipBoxLabel = null;
 

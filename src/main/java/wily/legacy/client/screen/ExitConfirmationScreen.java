@@ -28,7 +28,7 @@ public class ExitConfirmationScreen extends ConfirmationScreen {
     }
 
     public static void exit(Minecraft minecraft, boolean save) {
-        if (minecraft.getConnection() == null){
+        if (minecraft.getConnection() == null) {
             minecraft.stop();
             return;
         }
@@ -39,7 +39,6 @@ public class ExitConfirmationScreen extends ConfirmationScreen {
         if (minecraft.level != null) {
             minecraft.level.disconnect(ClientLevel.DEFAULT_QUIT_MESSAGE);
         }
-        SoundManagerAccessor.of(minecraft.getSoundManager()).stopAllSound();
 
         minecraft./*? if >1.20.2 {*/disconnect/*?} else {*//*clearLevel*//*?}*/(new LegacyLoadingScreen(Component.translatable(save ? "menu.savingLevel": "disconnect.quitting"),Component.empty()), false);
         ServerData serverData = minecraft.getCurrentServer();

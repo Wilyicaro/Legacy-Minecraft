@@ -130,7 +130,10 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
         boolean lastOd = isOtherDimension(lastLevel);
         boolean od = isOtherDimension(newLevel);
         LegacyLoadingScreen screen = new LegacyLoadingScreen(od || lastOd ? Component.translatable("legacy.menu." + (lastOd ? "leaving" : "entering"), LegacyComponents.getDimensionName((lastOd ? lastLevel : newLevel).dimension())) : Component.empty(), Component.empty());
-        if (od || lastOd) screen.setGenericLoading(true);
+        if (od || lastOd) {
+            screen.setGenericLoading(true);
+
+        }
         return screen;
     }
 

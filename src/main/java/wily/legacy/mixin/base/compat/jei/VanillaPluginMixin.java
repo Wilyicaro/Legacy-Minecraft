@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screens.inventory.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import wily.legacy.client.LegacyMixinOptions;
 import wily.legacy.client.LegacyOptions;
 
 import java.util.Collection;
@@ -19,31 +20,31 @@ import java.util.Collections;
 public class VanillaPluginMixin {
     @Redirect(method = "registerGuiHandlers", at = @At(value = "INVOKE", target = "Lmezz/jei/api/registration/IGuiHandlerRegistration;addRecipeClickArea(Ljava/lang/Class;IIII[Lmezz/jei/api/recipe/RecipeType;)V"))
     public void fixRecipeClickAreas(IGuiHandlerRegistration instance, Class<? extends AbstractContainerScreen<?>> containerScreenClass, int xPos, int yPos, int width, int height, RecipeType<?>[] recipeTypes) {
-        if (containerScreenClass == CraftingScreen.class) {
+        if (containerScreenClass == CraftingScreen.class && LegacyMixinOptions.legacyClassicCraftingScreen.get()) {
             instance.addRecipeClickArea(containerScreenClass, 105, 43, 33, 22, recipeTypes);
         }
         //? if >1.20.2 {
-        else if (containerScreenClass == CrafterScreen.class) {
+        else if (containerScreenClass == CrafterScreen.class && LegacyMixinOptions.legacyCrafterScreen.get()) {
             instance.addRecipeClickArea(containerScreenClass, 105, 43, 24, 24, recipeTypes);
         }
         //?}
-        else if (containerScreenClass == InventoryScreen.class) {
+        else if (containerScreenClass == InventoryScreen.class && LegacyMixinOptions.legacyInventoryScreen.get()) {
             instance.addGuiContainerHandler(containerScreenClass, new IGuiContainerHandler<AbstractContainerScreen<?>>() {
                 public Collection<IGuiClickableArea> getGuiClickableAreas(AbstractContainerScreen<?> containerScreen, double mouseX, double mouseY) {
                     return LegacyOptions.classicCrafting.get() ? Collections.singleton(IGuiClickableArea.createBasic(158, 43, 16, 13, recipeTypes)) : Collections.emptyList();
                 }
             });
         }
-        else if (containerScreenClass == BrewingStandScreen.class) {
+        else if (containerScreenClass == BrewingStandScreen.class && LegacyMixinOptions.legacyBrewingStandScreen.get()) {
             instance.addRecipeClickArea(containerScreenClass, 121, 22, 13, 42, recipeTypes);
         }
-        else if (containerScreenClass == FurnaceScreen.class || containerScreenClass == SmokerScreen.class || containerScreenClass == BlastFurnaceScreen.class) {
+        else if ((containerScreenClass == FurnaceScreen.class || containerScreenClass == SmokerScreen.class || containerScreenClass == BlastFurnaceScreen.class) && LegacyMixinOptions.legacyFurnaceScreen.get()) {
             instance.addRecipeClickArea(containerScreenClass, 114, 48, 33, 22, recipeTypes);
         }
-        else if (containerScreenClass == AnvilScreen.class) {
+        else if (containerScreenClass == AnvilScreen.class && LegacyMixinOptions.legacyAnvilScreen.get()) {
             instance.addRecipeClickArea(containerScreenClass, 122, 59, 33, 22, recipeTypes);
         }
-        else if (containerScreenClass == SmithingScreen.class) {
+        else if (containerScreenClass == SmithingScreen.class && LegacyMixinOptions.legacySmithingScreen.get()) {
             instance.addRecipeClickArea(containerScreenClass, 82, 59, 33, 22, recipeTypes);
         }
         else {

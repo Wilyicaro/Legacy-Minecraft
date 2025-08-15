@@ -2,6 +2,8 @@ package wily.legacy.mixin.base.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.Util;
@@ -23,6 +25,7 @@ import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
 import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.block.BedBlock;
@@ -252,8 +255,14 @@ public abstract class MinecraftMixin {
         }
     }
 
+    @WrapWithCondition(method = "runTick",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/sounds/SoundManager;pauseAllExcept([Lnet/minecraft/sounds/SoundSource;)V"))
+    public boolean pauseGame(SoundManager instance, SoundSource[] soundSources) {
+        return false;
+    }
+
     @WrapWithCondition(method = "updateScreenAndTick",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/sounds/SoundManager;stop()V"))
     public boolean updateScreenAndTick(SoundManager instance) {
+        SoundManagerAccessor.of(instance).stopAllSound();
         return false;
     }
 
@@ -262,15 +271,11 @@ public abstract class MinecraftMixin {
         return LegacyOptions.legacyLoadingAndConnecting.get() ? LegacyLoadingScreen.getDimensionChangeScreen(level, newLevel) : arg;
     }
 
-    @Unique GameConfig gameConfig;
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(GameConfig gameConfig, CallbackInfo ci){
-        this.gameConfig = gameConfig;
-    }
-
-    @Inject(method = "addInitialScreens", at = @At("HEAD"))
-    private void addInitialScreens(List<Function<Runnable, Screen>> list, CallbackInfoReturnable<Boolean> cir) {
-        if (gameConfig.quickPlay.isEnabled()) return;
-        list.add(r-> LegacyRenderUtil.getInitialScreen());
+    @ModifyVariable(method = "buildInitialScreens", at = @At(value = "STORE"))
+    private Runnable addInitialScreens(Runnable run) {
+        return ()-> {
+            run.run();
+            if (screen != null) setScreen(LegacyRenderUtil.getInitialScreen());
+        };
     }
 }

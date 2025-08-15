@@ -106,7 +106,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     protected final ContainerListener listener = new ContainerListener() {
         public void slotChanged(AbstractContainerMenu abstractContainerMenu, int i, ItemStack itemStack) {
             if (onlyCraftableRecipes && typeTabList.getIndex() == 0) {
-                filteredRecipesByGroup = recipesByTab.get(craftingTabList.getIndex()).stream().map(l -> l.stream().filter(r -> RecipeMenu.canCraft(r.getOptionalIngredients(), inventory,abstractContainerMenu.getCarried())).toList()).filter(l -> !l.isEmpty()).toList();
+                filteredRecipesByGroup = recipesByTab.get(page.get() * getMaxTabCount() + craftingTabList.getIndex()).stream().map(l -> l.stream().filter(r -> RecipeMenu.canCraft(r.getOptionalIngredients(), inventory,abstractContainerMenu.getCarried())).toList()).filter(l -> !l.isEmpty()).toList();
                 craftingButtons.get(selectedCraftingButton).updateRecipeDisplay();
             }else {
                 if (getCraftingButtons().size() > selectedCraftingButton && getCraftingButtons().get(selectedCraftingButton) instanceof CustomCraftingIconHolder h) h.updateRecipe();

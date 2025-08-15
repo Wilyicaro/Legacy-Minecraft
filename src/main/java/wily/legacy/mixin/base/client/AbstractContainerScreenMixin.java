@@ -161,7 +161,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
         graphics.pose().pushMatrix();
         holder.applyOffset(graphics);
         graphics.pose().translate(slot.x, slot.y);
-        graphics.pose().scale(holder.getSelectableWidth() / 16f,holder.getSelectableHeight() / 16f);
+        graphics.pose().scale(holder.getScaleX(), holder.getScaleY());
 
         ItemStack itemStack = slot.getItem();
         boolean bl = false;

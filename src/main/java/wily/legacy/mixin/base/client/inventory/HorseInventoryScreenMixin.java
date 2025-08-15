@@ -58,8 +58,8 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
                     }
                 });
             } else if (i < menu.slots.size() - 36) {
-                int slotOffset = s.getContainerSlot() - /*? if <1.20.5 {*//*2*//*?} else {*/1/*?}*/;
-                LegacySlotDisplay.override(s, 98 + slotOffset % ((AbstractChestedHorse)horse).getInventoryColumns() * 21,21 + slotOffset / ((AbstractChestedHorse)horse).getInventoryColumns() * 21);
+                int slotOffset = s.getContainerSlot();
+                LegacySlotDisplay.override(s, 98 + slotOffset % horse.getInventoryColumns() * 21,21 + slotOffset / horse.getInventoryColumns() * 21);
             } else if (i < menu.slots.size() - 9) {
                 LegacySlotDisplay.override(s, 14 + (s.getContainerSlot() - 9) % 9 * 21,104 + (s.getContainerSlot() - 9) / 9 * 21);
             } else {
