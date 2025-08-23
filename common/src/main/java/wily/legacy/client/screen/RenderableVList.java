@@ -3,6 +3,7 @@ package wily.legacy.client.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
+import net.minecraft.client.Options;
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
@@ -12,7 +13,7 @@ import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
-import wily.legacy.init.LegacySoundEvents;
+import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.ScreenUtil;
 import wily.legacy.util.Stocker;
 
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class RenderableVList {
     protected final Stocker<Integer> scrolledList = Stocker.of(0);
@@ -35,17 +37,30 @@ public class RenderableVList {
     protected LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
 
     protected Function<LayoutElement,Integer> layoutSeparation = w-> 3;
-
     public RenderableVList addRenderables(Renderable... renderables){
-        this.renderables.addAll(List.of(renderables));
+        return addRenderables(-1,renderables);
+    }
+    public RenderableVList addRenderables(int indexOffset, Renderable... renderables){
+        for (Renderable renderable : renderables) this.renderables.add(indexOffset < 0 ? this.renderables.size() : indexOffset, renderable);
         return this;
     }
     public RenderableVList addRenderable(Renderable renderable){
         renderables.add(renderable);
         return this;
     }
+    public <T> RenderableVList addLinkedOptions(int indexOffset, OptionInstance<T> dependency, Predicate<OptionInstance<T>> activeDependent, OptionInstance<?> dependent){
+        Options options = Minecraft.getInstance().options;
+        AbstractWidget dependentWidget = dependent.createButton(options,0,0,0);
+        dependentWidget.active = activeDependent.test(dependency);
+        AbstractWidget dependencyWidget = dependency.createButton(options,0,0,0,b-> dependentWidget.active = activeDependent.test(dependency));
+        addRenderables(indexOffset,dependentWidget,dependencyWidget);
+        return this;
+    }
     public RenderableVList addOptions(OptionInstance<?>... optionInstances){
-        return addRenderables(Arrays.stream(optionInstances).map(i-> i.createButton(Minecraft.getInstance().options, 0,0,0)).toList().toArray(AbstractWidget[]::new));
+        return addOptions(-1,optionInstances);
+    }
+    public RenderableVList addOptions(int indexOffset, OptionInstance<?>... optionInstances){
+        return addRenderables(indexOffset,Arrays.stream(optionInstances).map(i-> i.createButton(Minecraft.getInstance().options, 0,0,0)).toList().toArray(AbstractWidget[]::new));
     }
     public RenderableVList layoutSpacing(Function<LayoutElement,Integer> layoutSeparation){
         this.layoutSeparation = layoutSeparation;
@@ -84,8 +99,10 @@ public class RenderableVList {
                 renderablesCount++;
                 if (r instanceof AbstractWidget w && forceWidth)
                     w.setWidth(listWidth);
-                if (r instanceof GuiEventListener g)
+                if (r instanceof GuiEventListener g) {
                     screen.children.add(g);
+                    if (g.isFocused()) screen.setFocused(g);
+                }
                 if (r instanceof NarratableEntry e)
                     screen.narratables.add(e);
                 screen.renderables.add(r);
@@ -99,7 +116,7 @@ public class RenderableVList {
         if (forceWidth) return scroll;
         int xDiff = 0;
         int rowAmount = 0;
-        for (int i = scrolledList.get() + renderablesCount - 1; i >= scrolledList.get(); i--) {
+        for (int i = scrolledList.get(); i < scrolledList.get() + renderablesCount; i++) {
             if (renderables.get(i) instanceof LayoutElement e) xDiff += (xDiff == 0 ? 0 : layoutSeparation.apply(e)) + e.getWidth();
             rowAmount += scroll;
             if (xDiff + 30 > listWidth) break;
@@ -107,61 +124,91 @@ public class RenderableVList {
         return rowAmount;
     }
 
-
     public void mouseScrolled(double g) {
-        int scroll = (int) -Math.signum(g);
-        if ((canScrollDown && scroll > 0) || (scrolledList.get() > 0 && scroll < 0)){
-            int setScroll = Math.max(0,scrolledList.get() + getLineAmount(scroll));
+        mouseScrolled((int) -Math.signum(g) > 0);
+    }
+    public void mouseScrolled(boolean down) {
+        if ((canScrollDown && down) || (scrolledList.get() > 0 && !down)){
+            int setScroll = Math.max(0,scrolledList.get() + getLineAmount(down ? 1 : -1));
             if (setScroll != scrolledList.get()) {
-                scrollRenderer.updateScroll(scroll > 0 ? ScreenDirection.DOWN : ScreenDirection.UP);
+                scrollRenderer.updateScroll(down ? ScreenDirection.DOWN : ScreenDirection.UP);
                 scrolledList.set(setScroll);
                 screen.repositionElements();
             }
         }
     }
+    public boolean isFocused(ScreenDirection direction, boolean allowExternalListener){
+        ComponentPath path = getDirectionalNextFocusPath(direction);
+        return path == null || allowExternalListener && !renderables.contains(path.component());
+    }
     public boolean isFocused(ScreenDirection direction){
-        ComponentPath path = screen.nextFocusPath(new FocusNavigationEvent.ArrowNavigation(direction));
-        return renderables.contains(screen.getFocused()) && (path == null || path.component() == screen.getFocused());
+        return isFocused(direction,false);
+    }
+    public ComponentPath getDirectionalNextFocusPath(ScreenDirection direction){
+        return screen.nextFocusPathInDirection(screen.getFocused().getRectangle(),direction,screen.getFocused(),new FocusNavigationEvent.ArrowNavigation(direction));
+    }
+    public void setLastFocusInDirection(ScreenDirection direction){
+        if (screen.getFocused() != null) {
+            ComponentPath path;
+            while ((path = getDirectionalNextFocusPath(direction)) != null) screen.setFocused(path.component());
+        }
     }
     public boolean keyPressed(int i, boolean cyclic){
+        if (screen.getFocused() == null || !renderables.contains(screen.getFocused())) return false;
         if (renderablesCount > 1) {
             if (i == InputConstants.KEY_DOWN) {
-                if (isFocused(ScreenDirection.DOWN)) {
+                ComponentPath path = getDirectionalNextFocusPath(ScreenDirection.DOWN);
+                if (path == null || !renderables.contains(path.component())) {
                     if (canScrollDown) {
-                        while (canScrollDown && isFocused(ScreenDirection.DOWN)) mouseScrolled( -1);
-                    } else if (cyclic) {
+                        while (canScrollDown && isFocused(ScreenDirection.DOWN,true)) mouseScrolled(true);
+                    } else if (cyclic && path == null) {
                         if (scrolledList.get() > 0) {
                             scrolledList.set(0);
                             screen.repositionElements();
+                            setLastFocusInDirection(ScreenDirection.DOWN);
                         }
-                        screen.setFocused(null);
                     }
                 }
             }
             if (i == InputConstants.KEY_UP) {
-                if (isFocused(ScreenDirection.UP)) {
+                ComponentPath path = getDirectionalNextFocusPath(ScreenDirection.UP);
+                if (path == null || !renderables.contains(path.component())) {
                     if (scrolledList.get() > 0) {
-                        while (scrolledList.get() > 0 && isFocused(ScreenDirection.UP)) mouseScrolled( 1);
-                    } else if (cyclic){
+                        while (scrolledList.get() > 0 && isFocused(ScreenDirection.UP,true)) mouseScrolled(false);
+                    } else if (cyclic && path == null){
                         while (canScrollDown)
-                            mouseScrolled( -1);
-                        screen.setFocused(null);
+                            mouseScrolled(true);
                     }
+                }
+            }
+            if (listHeight > 0) {
+                GuiEventListener lastFocus = screen.getFocused();
+                if (i == InputConstants.KEY_PAGEDOWN) {
+                    if (isFocused(ScreenDirection.DOWN)) while (screen.children().contains(lastFocus) && canScrollDown) mouseScrolled(true);
+                    setLastFocusInDirection(ScreenDirection.DOWN);
+                    return true;
+                }
+                if (i == InputConstants.KEY_PAGEUP) {
+                    if (isFocused(ScreenDirection.UP)) while (screen.children().contains(lastFocus) && scrolledList.get() > 0) mouseScrolled(false);
+                    setLastFocusInDirection(ScreenDirection.UP);
+                    return true;
                 }
             }
             if (forceWidth) return false;
             if (i == InputConstants.KEY_RIGHT && isFocused(ScreenDirection.RIGHT) || i == InputConstants.KEY_LEFT && isFocused(ScreenDirection.LEFT)){
-                int focused = screen.children().indexOf(screen.getFocused()) + (i == InputConstants.KEY_RIGHT ? 1 : -1);
+                int focused = renderables.indexOf(screen.getFocused()) + (i == InputConstants.KEY_RIGHT ? 1 : -1);
                 if (i == InputConstants.KEY_LEFT && isFocused(ScreenDirection.UP) || i == InputConstants.KEY_RIGHT && isFocused(ScreenDirection.DOWN)) keyPressed(i == InputConstants.KEY_LEFT ? InputConstants.KEY_UP : InputConstants.KEY_DOWN,false);
-                GuiEventListener newFocus;
-                if (focused >= 0 && focused < screen.children().size() && renderables.contains(newFocus = screen.children().get(focused))){
+                if (focused >= 0 && focused < renderables.size() && renderables.get(focused) instanceof GuiEventListener newFocus){
                     screen.setFocused(newFocus);
-                    ScreenUtil.playSimpleUISound(LegacySoundEvents.FOCUS.get(),1.0f);
+                    ScreenUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
                     return true;
                 }
             }
         }
         return false;
     }
-
+    public interface Access {
+        void renderableVListInit();
+        RenderableVList getRenderableVList();
+    }
 }

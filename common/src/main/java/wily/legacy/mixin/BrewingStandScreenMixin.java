@@ -64,7 +64,7 @@ public abstract class BrewingStandScreenMixin extends AbstractContainerScreen<Br
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderPanel(guiGraphics,leftPos,topPos,imageWidth,imageHeight,2f);
+        guiGraphics.blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(leftPos + 58.5f,topPos + 22.5, 0f);
         guiGraphics.blitSprite(LegacySprites.BREWING_SLOTS, 0, 0,96, 96);

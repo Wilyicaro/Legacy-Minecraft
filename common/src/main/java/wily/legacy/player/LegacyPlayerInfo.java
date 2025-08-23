@@ -7,7 +7,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundAwardStatsPacket;
 import net.minecraft.stats.Stat;
-import net.minecraft.stats.StatType;
 
 public interface LegacyPlayerInfo {
     default GameProfile legacyMinecraft$getProfile(){

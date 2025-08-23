@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.client.Offset;
+import wily.legacy.util.Offset;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.inventory.LegacySlot;
 

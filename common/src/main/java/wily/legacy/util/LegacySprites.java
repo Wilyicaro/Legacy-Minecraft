@@ -27,6 +27,8 @@ public class LegacySprites {
     public static final ResourceLocation PACK_HIGHLIGHTED = new ResourceLocation(Legacy4J.MOD_ID,"widget/pack_highlighted");
     public static final ResourceLocation PACK_SELECTED = new ResourceLocation(Legacy4J.MOD_ID, "widget/pack_selected");
     public static final ResourceLocation MAP_PLAYER = new ResourceLocation(Legacy4J.MOD_ID,"icon/map/player");
+    public static final ResourceLocation BACK = new ResourceLocation(Legacy4J.MOD_ID,"widget/back");
+    public static final ResourceLocation SHIFT = new ResourceLocation(Legacy4J.MOD_ID,"widget/shift");
     public static final ResourceLocation SCROLL_DOWN = new ResourceLocation(Legacy4J.MOD_ID,"widget/scroll_down");
     public static final ResourceLocation SCROLL_UP = new ResourceLocation(Legacy4J.MOD_ID,"widget/scroll_up");
     public static final ResourceLocation SCROLL_RIGHT = new ResourceLocation(Legacy4J.MOD_ID,"widget/scroll_right");
@@ -74,4 +76,16 @@ public class LegacySprites {
     public static final ResourceLocation TRANSFER_MOVE_DOWN_HIGHLIGHTED = new ResourceLocation("transferable_list/move_down_highlighted");
     public static final ResourceLocation TRANSFER_MOVE_DOWN = new ResourceLocation("transferable_list/move_down");
 
+    public static final ResourceLocation SAVE_CHEST = new ResourceLocation(Legacy4J.MOD_ID,"hud/save_chest");
+    public static final ResourceLocation SAVE_ARROW = new ResourceLocation(Legacy4J.MOD_ID,"hud/save_arrow");
+    public static final ResourceLocation LOADING_BLOCK = new ResourceLocation(Legacy4J.MOD_ID,"widget/loading_block");
+    public static final ResourceLocation POINTER_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/pointer_panel");
+    public static final ResourceLocation PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel");
+    public static final ResourceLocation SMALL_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/small_panel");
+    public static final ResourceLocation CREATIVE_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/creative_panel");
+    public static final ResourceLocation PANEL_RECESS = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel_recess");
+    public static final ResourceLocation PANEL_TRANSLUCENT_RECESS = new ResourceLocation(Legacy4J.MOD_ID,"tiles/panel_translucent_recess");
+    public static final ResourceLocation ENTITY_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/entity_panel");
+    public static final ResourceLocation SQUARE_RECESSED_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/square_recessed_panel");
+    public static final ResourceLocation SQUARE_ENTITY_PANEL = new ResourceLocation(Legacy4J.MOD_ID,"tiles/square_entity_panel");
 }

@@ -2,13 +2,16 @@ package wily.legacy.mixin;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.Legacy4JClient;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin {
@@ -29,6 +32,9 @@ public abstract class EntityMixin {
     @Shadow public abstract float getXRot();
 
     @Shadow public abstract float getYRot();
+
+    @Shadow public abstract boolean isUnderWater();
+
     @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", at = @At("HEAD"))
     private void startRiding(Entity entity, boolean force, CallbackInfoReturnable<Boolean> cir) {
         this.ridingEntityXRotDelta = 0.0F;
@@ -67,4 +73,12 @@ public abstract class EntityMixin {
         this.setXRot(this.getXRot() + ridingEntityXRotDeltaSmooth);
     }
 
+    @Redirect(method = "collide", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;onGround()Z"))
+    protected boolean getFlyingSpeed(Entity instance) {
+        return instance.onGround() || instance instanceof Player p && p.getAbilities().flying;
+    }
+    @Redirect(method = "updateSwimming", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isUnderWater()Z"))
+    protected boolean updateSwimming(Entity instance) {
+        return (!instance.level().isClientSide || Legacy4JClient.isModEnabledOnServer() || isUnderWater()) && instance.isInWater();
+    }
 }

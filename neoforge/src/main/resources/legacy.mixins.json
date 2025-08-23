@@ -3,17 +3,14 @@
   "package": "wily.legacy.neoforge.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "AbstractContainerScreenMixin",
     "ExtendedGuiMixin",
-    "GuiGraphicsMixin",
     "GuiMixin",
+    "LiquidBlockRendererMixin",
     "MinecraftMixin",
-    "TitleScreenMixin",
     "TooltipRenderUtilMixin"
   ],
   "mixins": [
-    "ItemStackMixin",
-    "LivingEntityMixin"
+    "ItemStackMixin"
   ],
   "injectors": {
     "defaultRequire": 1

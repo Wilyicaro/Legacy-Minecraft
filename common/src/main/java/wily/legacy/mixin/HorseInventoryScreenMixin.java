@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.util.LegacySprites;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(HorseInventoryScreen.class)
@@ -38,10 +39,14 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
     @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics graphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        ScreenUtil.renderPanel(graphics,leftPos,topPos,imageWidth,imageHeight,2f);
-        ScreenUtil.renderSquareEntityPanel(graphics,leftPos + 34,topPos + 20,63,63,2);
-        ScreenUtil.renderSquareRecessedPanel(graphics,leftPos + 97,topPos + 20,105,63,2);
+        graphics.blitSprite(LegacySprites.SMALL_PANEL,leftPos,topPos,imageWidth,imageHeight);
+        graphics.blitSprite(LegacySprites.SQUARE_ENTITY_PANEL,leftPos + 34,topPos + 20,63,63);
+        graphics.blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 97,topPos + 20,105,63);
         InventoryScreen.renderEntityInInventoryFollowsMouse(graphics,leftPos + 35,topPos + 21,leftPos + 95,topPos + 81,25,0.0625f,i,j, horse);
 
+    }
+    @Override
+    public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+        renderBg(guiGraphics, f, i, j);
     }
 }

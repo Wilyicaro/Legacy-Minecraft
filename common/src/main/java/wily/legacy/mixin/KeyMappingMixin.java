@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.controller.ControllerManager;
 import wily.legacy.client.controller.LegacyKeyMapping;
 
 @Mixin(KeyMapping.class)
@@ -19,7 +18,7 @@ public abstract class KeyMappingMixin implements LegacyKeyMapping {
     private ControllerBinding button;
     @Inject(method = "<init>(Ljava/lang/String;Lcom/mojang/blaze3d/platform/InputConstants$Type;ILjava/lang/String;)V",at = @At("RETURN"))
     private void init(String string, InputConstants.Type type, int i, String string2, CallbackInfo ci){
-        ControllerBinding b = ControllerManager.getDefaultKeyMappingComponent(i);
+        ControllerBinding b = ControllerBinding.getDefaultKeyMappingBinding(i);
         setDefaultBinding(b);
         setBinding(b);
     }

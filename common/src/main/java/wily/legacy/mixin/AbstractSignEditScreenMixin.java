@@ -1,12 +1,15 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.font.TextFieldHelper;
+import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
+import net.minecraft.client.gui.screens.inventory.HangingSignEditScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.StandingSignBlock;
 import net.minecraft.world.level.block.WallSignBlock;
@@ -14,6 +17,7 @@ import net.minecraft.world.level.block.entity.SignBlockEntity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -21,12 +25,42 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.screen.KeyboardScreen;
 import wily.legacy.client.screen.WidgetPanel;
 
 @Mixin(AbstractSignEditScreen.class)
-public abstract class AbstractSignEditScreenMixin extends Screen {
-    private ControlTooltip.Renderer controlTooltipRenderer = ControlTooltip.defaultScreen(this);
-    private WidgetPanel panel = new WidgetPanel(this,100,100);
+public abstract class AbstractSignEditScreenMixin extends Screen implements ControlTooltip.Event {
+    @Unique
+    boolean canSaveChanges = true;
+
+    private WidgetPanel panel = new WidgetPanel(this,100,100){
+        @Override
+        public boolean charTyped(char c, int i) {
+            if (signField.charTyped(c)) return true;
+            return super.charTyped(c, i);
+        }
+
+        @Override
+        public boolean keyPressed(int i, int j, int k) {
+            if (i == InputConstants.KEY_RETURN) {
+                canSaveChanges = false;
+                minecraft.setScreen(new KeyboardScreen(isSign() ? 60 : -100,()->this,AbstractSignEditScreenMixin.this));
+                return true;
+            }
+            if (i == 265 && line > 0) {
+                line = line - 1;
+                signField.setCursorToEnd();
+                return true;
+            } else if (i != 264 && i != 335) {
+                return signField.keyPressed(i) || super.keyPressed(i, j, k);
+            } else if (line < 3) {
+                line = line + 1;
+                signField.setCursorToEnd();
+                return true;
+            }
+            return super.keyPressed(i, j, k);
+        }
+    };
 
     @Shadow protected abstract void renderSign(GuiGraphics arg);
 
@@ -54,7 +88,11 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
     }
     @Redirect(method = "renderSignText", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"))
     private void renderSignText(PoseStack instance, float x, float y, float z){
-        instance.translate(x,this.sign.getBlockState().getBlock() instanceof StandingSignBlock || this.sign.getBlockState().getBlock() instanceof WallSignBlock ? y - 14.5 : y + 10,10);
+        instance.translate(x,isSign() ? y - 14.5 : y + 10,10);
+    }
+    @Unique
+    private boolean isSign(){
+        return this.sign.getBlockState().getBlock() instanceof StandingSignBlock || this.sign.getBlockState().getBlock() instanceof WallSignBlock;
     }
     @Redirect(method = "renderSignText", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/entity/SignBlockEntity;getTextLineHeight()I"))
     private int renderSignText(SignBlockEntity instance){
@@ -77,26 +115,25 @@ public abstract class AbstractSignEditScreenMixin extends Screen {
         guiGraphics.pose().popPose();
         this.renderSign(guiGraphics);
         Lighting.setupFor3DItems();
-        controlTooltipRenderer.render(guiGraphics, i, j, f);
     }
     @Inject(method = "keyPressed",at = @At("HEAD"), cancellable = true)
     public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
-        if (i == 265) {
-            setFocused(panel);
-            this.line = Math.max(0,this.line - 1);
-            this.signField.setCursorToEnd();
-            cir.setReturnValue(true);
-            return;
-        } else if (i != 264 && i != 257 && i != 335) {
-            cir.setReturnValue(this.signField.keyPressed(i) || super.keyPressed(i, j, k));
-            return;
-        } else if (line < 3) {
-            setFocused(panel);
-            this.line = this.line + 1;
-            this.signField.setCursorToEnd();
-            cir.setReturnValue(true);
-            return;
-        }cir.setReturnValue(super.keyPressed(i,j,k));
+        cir.setReturnValue(super.keyPressed(i,j,k));
+    }
+    @Inject(method = "charTyped",at = @At("HEAD"), cancellable = true)
+    public void charTyped(char c, int i, CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue(super.charTyped(c,i));
+    }
+
+    @Override
+    public void added() {
+        super.added();
+        canSaveChanges = true;
+    }
+
+    @Inject(method = "removed",at = @At("HEAD"), cancellable = true)
+    public void removed(CallbackInfo ci) {
+        if (!canSaveChanges) ci.cancel();
     }
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {

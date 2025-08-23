@@ -5,18 +5,18 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.Offset;
-import wily.legacy.util.ScreenUtil;
+import wily.legacy.client.CommonColor;
+import wily.legacy.util.Offset;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -24,34 +24,52 @@ import java.util.function.Function;
 public class LegacyTabButton extends AbstractButton {
     public static final ResourceLocation[][] SPRITES = new ResourceLocation[][]{new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID, "tiles/high_tab_left"),new ResourceLocation(Legacy4J.MOD_ID, "tiles/low_tab_left")}, new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID, "tiles/high_tab_middle"),new ResourceLocation(Legacy4J.MOD_ID, "tiles/low_tab_middle")}, new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID, "tiles/high_tab_right"),new ResourceLocation(Legacy4J.MOD_ID, "tiles/low_tab_right")},
                                                                                 new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID, "tiles/high_vert_tab_up"),new ResourceLocation(Legacy4J.MOD_ID, "tiles/low_vert_tab_up")}, new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID, "tiles/high_vert_tab_middle"),new ResourceLocation(Legacy4J.MOD_ID, "tiles/low_vert_tab_middle")}, new ResourceLocation[]{new ResourceLocation(Legacy4J.MOD_ID, "tiles/high_vert_tab_down"),new ResourceLocation(Legacy4J.MOD_ID, "tiles/low_vert_tab_down")}};
-    public static final Offset DEFAULT_OFFSET = new Offset(0,4,0);
     public static final Offset DEFAULT_DESACTIVE_OFFSET = new Offset(0,22,0);
-    public final ResourceLocation icon;
-    public ItemStack itemIcon;
+    public static final Offset DEFAULT_UNSELECTED_OFFSET = new Offset(0,4,0);
+    public final Function<LegacyTabButton,Renderable> icon;
     private final Consumer<LegacyTabButton> onPress;
     public boolean selected;
     protected int type;
     public Function<LegacyTabButton, Offset> offset = (t)-> {
         if (!isActive()) return DEFAULT_DESACTIVE_OFFSET;
-        if (!t.selected) return DEFAULT_OFFSET;
+        if (!t.selected) return DEFAULT_UNSELECTED_OFFSET;
         return Offset.ZERO;
     };
 
-    public LegacyTabButton(int i, int j, int width, int height, int type, ResourceLocation iconSprite, CompoundTag itemIconTag, Component text, Tooltip tooltip, Consumer<LegacyTabButton> onPress) {
+    public LegacyTabButton(int i, int j, int width, int height, int type, Function<LegacyTabButton,Renderable> icon, Component text, Tooltip tooltip, Consumer<LegacyTabButton> onPress) {
         super(i, j, width, height, text);
         setTooltip(tooltip);
         this.onPress = onPress;
         this.type = type;
-        icon = iconSprite;
-        if (itemIcon == null && icon != null)
-            if (BuiltInRegistries.ITEM.containsKey(icon))
-                (itemIcon = BuiltInRegistries.ITEM.get(icon).getDefaultInstance()).setTag(itemIconTag);
+        this.icon = icon;
     }
 
     @Override
     public void onPress() {
         selected = !selected;
         onPress.accept(this);
+    }
+    public static Function<LegacyTabButton,Renderable> iconOf(Item item){
+        return t-> (guiGraphics, i, j, f) -> t.renderItemIcon(item.getDefaultInstance(),guiGraphics);
+    }
+    public static Function<LegacyTabButton,Renderable> iconOf(ItemStack stack){
+        return t-> (guiGraphics, i, j, f) -> t.renderItemIcon(stack,guiGraphics);
+    }
+    public static Function<LegacyTabButton,Renderable> iconOf(ResourceLocation sprite){
+        return t-> (guiGraphics, i, j, f) -> t.renderIconSprite(sprite,guiGraphics);
+    }
+    public  void renderString(GuiGraphics guiGraphics, Font font, int i, boolean shadow){
+        guiGraphics.drawString(font,getMessage(),getX() + (width - font.width(getMessage())) / 2,getY() + (height - 7) / 2,i,shadow);
+    }
+    public  void renderIconSprite(ResourceLocation icon, GuiGraphics guiGraphics){
+        guiGraphics.blitSprite(icon, getX() + width / 2 - 12, getY() + height / 2 - 12, 24, 24);
+    }
+    public  void renderItemIcon(ItemStack itemIcon, GuiGraphics guiGraphics){
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(getX() + width / 2f - 12, getY() + height / 2f - 12, 0);
+        guiGraphics.pose().scale(1.5f, 1.5f, 1.5f);
+        guiGraphics.renderItem(itemIcon, 0, 0);
+        guiGraphics.pose().popPose();
     }
 
     @Override
@@ -67,21 +85,11 @@ public class LegacyTabButton extends AbstractButton {
             isHovered = isMouseOver(i,j);
         }
         if (selected) guiGraphics.pose().translate(0F,0f,1F);
-        ScreenUtil.renderTiles(SPRITES[type][selected ? 0 : 1],guiGraphics, getX(), getY(), getWidth(), this.getHeight(),2);
+        guiGraphics.blitSprite(SPRITES[type][selected ? 0 : 1], getX(), getY(), getWidth(), this.getHeight());
+        if (!selected) guiGraphics.pose().translate(0,-1,0);
         if (active) {
-            if (icon == null)
-                this.renderString(guiGraphics, minecraft.font, 0x383838 | Mth.ceil(this.alpha * 255.0f) << 24);
-            else {
-                if (itemIcon == null)
-                    guiGraphics.blitSprite(icon, getX() + width / 2 - 12, getY() + height / 2 - 12, 24, 24);
-                else {
-                    guiGraphics.pose().pushPose();
-                    guiGraphics.pose().translate(getX() + width / 2f - 12, getY() + height / 2f - 12, 0);
-                    guiGraphics.pose().scale(1.5f, 1.5f, 1.5f);
-                    guiGraphics.renderItem(itemIcon, 0, 0);
-                    guiGraphics.pose().popPose();
-                }
-            }
+            if (icon == null) this.renderString(guiGraphics, minecraft.font, CommonColor.INVENTORY_GRAY_TEXT.get() | Mth.ceil(this.alpha * 255.0f) << 24);
+            else icon.apply(this).render(guiGraphics,i,j,f);
         }
         guiGraphics.pose().popPose();
     }
@@ -104,6 +112,6 @@ public class LegacyTabButton extends AbstractButton {
 
     @Override
     public void renderString(GuiGraphics guiGraphics, Font font, int i) {
-        guiGraphics.drawString(font,getMessage(),getX() + (width - font.width(getMessage())) / 2,getY() + (height - 7) / 2,i,false);
+        renderString(guiGraphics,font,i,false);
     }
 }

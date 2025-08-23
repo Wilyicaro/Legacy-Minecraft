@@ -1,7 +1,6 @@
 package wily.legacy.mixin;
 
 import com.mojang.serialization.Dynamic;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.WorldDataConfiguration;
 import org.spongepowered.asm.mixin.Final;
@@ -11,35 +10,32 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import wily.legacy.client.LegacyWorldSettings;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import wily.legacy.client.LegacyClientWorldSettings;
+import wily.legacy.client.screen.Assort;
 
 @Mixin(LevelSettings.class)
-public class ClientLevelSettingsMixin implements LegacyWorldSettings {
+public class ClientLevelSettingsMixin implements LegacyClientWorldSettings {
     @Mutable
     @Shadow @Final private boolean allowCommands;
     long seed;
     boolean difficultyLocked = false;
     boolean trustPlayers = true;
 
-    List<String> selectedResourcePacks = Collections.emptyList();
+    Assort selectedResourceAssort = Assort.MINECRAFT;
     @Inject(method = "parse", at = @At("RETURN"))
     private static void parse(Dynamic<?> dynamic, WorldDataConfiguration worldDataConfiguration, CallbackInfoReturnable<LevelSettings> cir) {
-        ((LegacyWorldSettings) (Object)cir.getReturnValue()).setDifficultyLocked(dynamic.get("DifficultyLocked").asBoolean(false));
-        ((LegacyWorldSettings) (Object)cir.getReturnValue()).setTrustPlayers(dynamic.get("TrustPlayers").asBoolean(true));
-        ((LegacyWorldSettings) (Object)cir.getReturnValue()).setDisplaySeed(dynamic.get("WorldGenSettings").orElseEmptyMap().get("seed").asLong(0));
-        ((LegacyWorldSettings) (Object)cir.getReturnValue()).setSelectedResourcePacks(dynamic.get("SelectedResourcePacks").asStream().flatMap(r->r.asString().result().stream()).toList());
+        ((LegacyClientWorldSettings) (Object)cir.getReturnValue()).setDifficultyLocked(dynamic.get("DifficultyLocked").asBoolean(false));
+        ((LegacyClientWorldSettings) (Object)cir.getReturnValue()).setTrustPlayers(dynamic.get("TrustPlayers").asBoolean(true));
+        ((LegacyClientWorldSettings) (Object)cir.getReturnValue()).setDisplaySeed(dynamic.get("WorldGenSettings").orElseEmptyMap().get("seed").asLong(0));
+        ((LegacyClientWorldSettings) (Object)cir.getReturnValue()).setSelectedResourceAssort(Assort.resourceById(dynamic.get("SelectedResourceAssort").asString(Assort.MINECRAFT.id())));
     }
     @Inject(method = "copy", at = @At("RETURN"))
     private void copy(CallbackInfoReturnable<LevelSettings> cir) {
-        LegacyWorldSettings settings = ((LegacyWorldSettings) (Object)cir.getReturnValue());
+        LegacyClientWorldSettings settings = ((LegacyClientWorldSettings) (Object)cir.getReturnValue());
         settings.setDifficultyLocked(isDifficultyLocked());
         settings.setTrustPlayers(trustPlayers());
         settings.setDisplaySeed(getDisplaySeed());
-        settings.setSelectedResourcePacks(getSelectedResourcePacks());
+        settings.setSelectedResourceAssort(getSelectedResourceAssort());
     }
 
     public long getDisplaySeed() {
@@ -76,12 +72,12 @@ public class ClientLevelSettingsMixin implements LegacyWorldSettings {
     }
 
     @Override
-    public void setSelectedResourcePacks(List<String> packs) {
-        selectedResourcePacks = packs;
+    public void setSelectedResourceAssort(Assort assort) {
+        selectedResourceAssort = assort;
     }
 
     @Override
-    public List<String> getSelectedResourcePacks() {
-        return selectedResourcePacks;
+    public Assort getSelectedResourceAssort() {
+        return selectedResourceAssort;
     }
 }

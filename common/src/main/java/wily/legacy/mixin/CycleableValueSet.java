@@ -36,11 +36,11 @@ public interface CycleableValueSet<T> extends OptionInstance.ValueSet<T> {
                     consumer.accept(optionInstance.value);
                 });
             }else {
-                return new LegacySliderButton<>(i,j,k,16, (b)-> b.getDefaultMessage(optionInstance.caption,optionInstance.toString.apply(optionInstance.value)),()->tooltipSupplier.apply(optionInstance.value),optionInstance.value,()->valueListSupplier().getSelectedList(),s->{
-                    if (optionInstance.value != s.objectValue) {
-                        valueSetter().set(optionInstance, s.objectValue);
+                return new LegacySliderButton<>(i,j,k,16, (b)-> b.getDefaultMessage(optionInstance.caption,optionInstance.toString.apply(optionInstance.value)),b->tooltipSupplier.apply(optionInstance.value),optionInstance.value,()->valueListSupplier().getSelectedList(),s->{
+                    if (optionInstance.value != s.getObjectValue()) {
+                        valueSetter().set(optionInstance, s.getObjectValue());
                         options.save();
-                        consumer.accept(s.objectValue);
+                        consumer.accept(s.getObjectValue());
                     }
                 });
             }

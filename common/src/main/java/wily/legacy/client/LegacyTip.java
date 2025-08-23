@@ -23,6 +23,8 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
 
     public Component title = Component.empty();
 
+    protected boolean centered = false;
+
     protected Minecraft minecraft = Minecraft.getInstance();
     protected Screen initScreen = minecraft.screen;
 
@@ -46,7 +48,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
         canRemove(()-> initScreen != minecraft.screen);
     }
     public LegacyTip(ItemStack stack){
-        this(Component.translatable(stack.getDescriptionId()),ScreenUtil.getTip(stack));
+        this(Component.translatable(stack.getDescriptionId()), LegacyTipManager.getTipComponent(stack));
         itemStack(stack);
     }
     public LegacyTip canRemove(Supplier<Boolean> canRemove){
@@ -60,6 +62,10 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
     }
     public LegacyTip autoHeight(){
         height = 26 + tipLabel.getLineCount() * 12;
+        return this;
+    }
+    public LegacyTip centered(){
+        centered = true;
         return this;
     }
     public LegacyTip tip(Component tip){
@@ -97,7 +103,7 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
 
     @Override
     public Visibility render(GuiGraphics guiGraphics, ToastComponent toastComponent, long l) {
-        renderTip(guiGraphics,0,0,0);
+        renderTip(guiGraphics,0,0,0,l);
         return visibility;
     }
 
@@ -108,18 +114,16 @@ public class LegacyTip extends SimpleLayoutRenderable implements Toast, Controll
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderTip(guiGraphics, i, j, f);
+        renderTip(guiGraphics, i, j, f,Util.getMillis() - createdTime);
     }
-    public void renderTip(GuiGraphics guiGraphics, int i, int j, float f) {
-        if (canRemove.get() || Util.getMillis() - createdTime >= disappearTime) visibility = Visibility.HIDE;
+    public void renderTip(GuiGraphics guiGraphics, int i, int j, float f, float l) {
+        if (canRemove.get() || l >= disappearTime) visibility = Visibility.HIDE;
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(getX(),getY(),800);
         ScreenUtil.renderPointerPanel(guiGraphics,0,0,getWidth(),getHeight());
-        if (!title.getString().isEmpty()) {
-            guiGraphics.drawString(minecraft.font,title,13,13,0xFFFFFF);
-            tipLabel.renderLeftAlignedNoShadow(guiGraphics,13,25, 12,0xFFFFFF);
-        }else
-            tipLabel.renderCentered(guiGraphics,width / 2,13,12,0xFFFFFF);
+        if (!title.getString().isEmpty()) guiGraphics.drawString(minecraft.font,title,13,13,0xFFFFFF);
+        if (centered) tipLabel.renderCentered(guiGraphics,width / 2, title.getString().isEmpty() ? 13 : 25,12,CommonColor.WIDGET_TEXT.get());
+        else tipLabel.renderLeftAlignedNoShadow(guiGraphics,13,title.getString().isEmpty() ? 13 : 25, 12,CommonColor.WIDGET_TEXT.get());
         if (holder != null) holder.render(guiGraphics,i,j,f);
         guiGraphics.pose().popPose();
     }

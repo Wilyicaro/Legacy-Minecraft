@@ -16,7 +16,7 @@ public abstract class ToastComponentMixin {
     @Shadow protected abstract float getVisibility(long l);
 
     @Shadow @Final private Toast toast;
-    @Shadow @Final private int index;
+    @Shadow @Final int index;
 
     @Redirect(method = "render", at = @At(value = "INVOKE",target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V"))
     private void render(PoseStack instance, float f, float g, float h, int i){

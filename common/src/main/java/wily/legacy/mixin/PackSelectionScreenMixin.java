@@ -1,18 +1,17 @@
 package wily.legacy.mixin;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
+import net.minecraft.Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.packs.PackSelectionModel;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
-import net.minecraft.client.gui.screens.worldselection.ConfirmExperimentalFeaturesScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Final;
@@ -21,13 +20,15 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.legacy.Legacy4JClient;
+import wily.legacy.client.CommonColor;
+import wily.legacy.client.ControlType;
+import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
-import wily.legacy.init.LegacySoundEvents;
 import wily.legacy.util.ScreenUtil;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -36,7 +37,7 @@ import static wily.legacy.util.LegacySprites.UNSELECT_HIGHLIGHTED;
 import static wily.legacy.util.LegacySprites.UNSELECT;
 
 @Mixin(PackSelectionScreen.class)
-public abstract class PackSelectionScreenMixin extends Screen {
+public abstract class PackSelectionScreenMixin extends Screen implements ControlTooltip.Event {
     private static final Component INCOMPATIBLE_TITLE = Component.translatable("pack.incompatible").withStyle(ChatFormatting.RED);
     private static final Component INCOMPATIBLE_CONFIRM_TITLE = Component.translatable("pack.incompatible.confirm.title");
     private static final Component AVAILABLE_PACK = Component.translatable("pack.selected.title");
@@ -45,8 +46,8 @@ public abstract class PackSelectionScreenMixin extends Screen {
     @Shadow protected abstract void reload();
 
     @Shadow private Button doneButton;
-    public ControlTooltip.Renderer controlTooltipRenderer = ControlTooltip.defaultScreen(this);
 
+    @Shadow @Final private Path packDir;
     private Panel panel = Panel.centered(this,410,240);
     private RenderableVList selectedPacksList = new RenderableVList().layoutSpacing(l->0);
     private RenderableVList unselectedPacksList = new RenderableVList().layoutSpacing(l->0);
@@ -66,20 +67,27 @@ public abstract class PackSelectionScreenMixin extends Screen {
         selectedPacksList.init(this,panel.x + 215, panel.y + 30, 180, 210);
         this.doneButton = Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).build();
     }
+
+    @Override
+    public void added() {
+        super.added();
+        ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.bindingState.getIcon(), ()-> ControlTooltip.getAction("legacy.action.open_directory"));
+    }
+
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         ScreenUtil.renderDefaultBackground(guiGraphics);
         panel.render(guiGraphics, i, j, f);
         RenderSystem.enableBlend();
         guiGraphics.setColor(1.0f,1.0f,1.0f,0.6f);
-        ScreenUtil.renderPanelRecess(guiGraphics,panel.x + 10, panel.y + 10, 190, 220,2f);
+        guiGraphics.blitSprite(LegacySprites.PANEL_RECESS,panel.x + 10, panel.y + 10, 190, 220);
         guiGraphics.setColor(1.0f,1.0f,1.0f,1.0f);
         RenderSystem.disableBlend();
-        ScreenUtil.renderPanelRecess(guiGraphics,panel.x + 210, panel.y + 10, 190, 220,2f);
-        guiGraphics.drawString(this.font, SELECTED_PACK, panel.x + 10 + (190 - font.width(SELECTED_PACK)) / 2, panel.y + 18, 0x383838,false);
-        guiGraphics.drawString(this.font, AVAILABLE_PACK, panel.x + 210 + (190 - font.width(AVAILABLE_PACK)) / 2, panel.y + 18, 0x383838, false);
-        controlTooltipRenderer.render(guiGraphics, i, j, f);
+        guiGraphics.blitSprite(LegacySprites.PANEL_RECESS,panel.x + 210, panel.y + 10, 190, 220);
+        guiGraphics.drawString(this.font, SELECTED_PACK, panel.x + 10 + (190 - font.width(SELECTED_PACK)) / 2, panel.y + 18, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+        guiGraphics.drawString(this.font, AVAILABLE_PACK, panel.x + 210 + (190 - font.width(AVAILABLE_PACK)) / 2, panel.y + 18, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
+
     @Inject(method = "<init>", at = @At("RETURN"))
     public void initConstruct(CallbackInfo info){
         reload();
@@ -94,7 +102,7 @@ public abstract class PackSelectionScreenMixin extends Screen {
     }
     @Inject(method = "onClose", at = @At("RETURN"))
     public void onClose(CallbackInfo info){
-        ScreenUtil.playSimpleUISound(LegacySoundEvents.BACK.get(),1.0f);
+        ScreenUtil.playSimpleUISound(LegacyRegistries.BACK.get(),1.0f);
     }
     private void addPacks(RenderableVList list,Stream<PackSelectionModel.Entry> stream){
         list.renderables.clear();
@@ -118,16 +126,16 @@ public abstract class PackSelectionScreenMixin extends Screen {
                         int q = mouseY - getY();
                         if (e.canSelect()) {
                             if (p < 32) {
-                                guiGraphics.blitSprite(LegacySprites.JOIN_HIGHLIGHTED, getX(), getY(), 32, 32);
+                                guiGraphics.blitSprite(LegacySprites.JOIN_HIGHLIGHTED, getX() + 5, getY() + 5, 20, 20);
                             } else {
-                                guiGraphics.blitSprite(LegacySprites.JOIN, getX(), getY(), 32, 32);
+                                guiGraphics.blitSprite(LegacySprites.JOIN, getX() + 5, getY() + 5, 20, 20);
                             }
                         } else {
                             if (e.canUnselect()) {
                                 if (p < 16) {
-                                    guiGraphics.blitSprite(UNSELECT_HIGHLIGHTED, getX(), getY(), 32, 32);
+                                    guiGraphics.blitSprite(UNSELECT_HIGHLIGHTED, getX() + 5, getY() + 5, 20, 20);
                                 } else {
-                                    guiGraphics.blitSprite(UNSELECT, getX(), getY(), 32, 32);
+                                    guiGraphics.blitSprite(UNSELECT, getX() + 5, getY() + 5, 20, 20);
                                 }
                             }
                             if (e.canMoveUp()) {
@@ -195,11 +203,15 @@ public abstract class PackSelectionScreenMixin extends Screen {
                     if (Screen.hasShiftDown() || ControllerBinding.LEFT_BUTTON.bindingState.pressed) {
                         switch (i) {
                             case 265 -> {
+                                int oldFocused = getFocused() == null ? -1 : children().indexOf(getFocused());
                                 if (e.canMoveUp()) e.moveUp();
+                                if (oldFocused >= 0 && oldFocused < children.size()) PackSelectionScreenMixin.this.setFocused(children().get(oldFocused));
                                 return false;
                             }
                             case 264 -> {
+                                int oldFocused = getFocused() == null ? -1 : children().indexOf(getFocused());
                                 if (e.canMoveDown()) e.moveDown();
+                                if (oldFocused >= 0 && oldFocused < children.size()) PackSelectionScreenMixin.this.setFocused(children().get(oldFocused));
                                 return false;
                             }
                         }
@@ -227,6 +239,10 @@ public abstract class PackSelectionScreenMixin extends Screen {
     public boolean keyPressed(int i, int j, int k) {
         if (unselectedPacksList.keyPressed(i,true)) return true;
         if (selectedPacksList.keyPressed(i,true)) return true;
+        if (i == InputConstants.KEY_O){
+            Util.getPlatform().openUri(this.packDir.toUri());
+            return true;
+        }
         return super.keyPressed(i, j, k);
     }
 

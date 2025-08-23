@@ -15,9 +15,10 @@ import net.minecraft.client.gui.screens.inventory.PageButton;
 import org.jetbrains.annotations.Nullable;
 
 public class BookPanel extends WidgetPanel implements GuiEventListener, NarratableEntry {
-    boolean focused;
+    private final Screen screen;
     public BookPanel(Screen screen) {
         super(l-> l.centeredLeftPos(screen),l-> l.centeredTopPos(screen) - 30,201,248);
+        this.screen = screen;
     }
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
@@ -26,33 +27,6 @@ public class BookPanel extends WidgetPanel implements GuiEventListener, Narratab
         guiGraphics.pose().scale(getWidth() / 146f,getHeight() / 180f,1f);
         guiGraphics.blit(BookViewScreen.BOOK_LOCATION,0,0,20,1,146,180);
         guiGraphics.pose().popPose();
-    }
-    public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
-        return !this.isFocused() ? ComponentPath.leaf(this) : null;
-    }
-    @Override
-    public void setFocused(boolean bl) {
-        this.focused = bl;
-    }
-
-    @Override
-    public boolean isFocused() {
-        return focused;
-    }
-
-    @Override
-    public ScreenRectangle getRectangle() {
-        return super.getRectangle();
-    }
-
-    @Override
-    public NarrationPriority narrationPriority() {
-        return NarrationPriority.NONE;
-    }
-
-    @Override
-    public void updateNarration(NarrationElementOutput narrationElementOutput) {
-
     }
     public PageButton createLegacyPageButton(int i, int j, boolean bl, Button.OnPress onPress, boolean bl2){
         return new PageButton(i,j,bl,onPress,bl2){
@@ -72,10 +46,6 @@ public class BookPanel extends WidgetPanel implements GuiEventListener, Narratab
             public void onPress() {
                 super.onPress();
                 lastPressTime = Util.getMillis();
-            }
-
-            @Override
-            public void setFocused(boolean bl) {
             }
 
             @Nullable

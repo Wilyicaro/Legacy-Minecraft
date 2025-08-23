@@ -1,6 +1,5 @@
 package wily.legacy.mixin;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -11,25 +10,22 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.Offset;
+import wily.legacy.util.Offset;
 import wily.legacy.inventory.LegacySlotDisplay;
+import wily.legacy.util.ScreenUtil;
 
 import static wily.legacy.util.LegacySprites.SHIELD_SLOT;
 
 @Mixin(InventoryMenu.class)
 public class InventoryMenuMixin {
     @Shadow @Final private static EquipmentSlot[] SLOT_IDS;
-    private boolean hasClassicCrafting(){
-        return ((LegacyOptions)Minecraft.getInstance().options).classicCrafting().get();
-    }
     private static final Offset EQUIP_SLOT_OFFSET = new Offset(50,0,0);
 
     @ModifyArg(method = "<init>",at = @At(value = "INVOKE",target = "Lnet/minecraft/world/inventory/InventoryMenu;addSlot(Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;", ordinal = 0))
     private Slot addSlotFirst(Slot originalSlot){
         return LegacySlotDisplay.override(originalSlot,180, 40,new LegacySlotDisplay(){
             public boolean isVisible() {
-                return hasClassicCrafting();
+                return ScreenUtil.hasClassicCrafting();
             }
         });
     }
@@ -37,7 +33,7 @@ public class InventoryMenuMixin {
     private Slot addSlotSecond(Slot originalSlot){
         return LegacySlotDisplay.override(originalSlot,111 + originalSlot.getContainerSlot() % 2 * 21, 30 + originalSlot.getContainerSlot() / 2 * 21,new LegacySlotDisplay(){
             public boolean isVisible() {
-                return hasClassicCrafting();
+                return ScreenUtil.hasClassicCrafting();
             }
         });
     }
@@ -49,7 +45,7 @@ public class InventoryMenuMixin {
                 return originalSlot.getItem().isEmpty() ? new ResourceLocation(Legacy4J.MOD_ID,"container/"+ SLOT_IDS[i].getName()+ "_slot") : null;
             }
             public Offset getOffset() {
-                return hasClassicCrafting() ? Offset.ZERO : EQUIP_SLOT_OFFSET;
+                return ScreenUtil.hasClassicCrafting() ? Offset.ZERO : EQUIP_SLOT_OFFSET;
             }
         });
     }
@@ -65,7 +61,7 @@ public class InventoryMenuMixin {
     private Slot addSlotSixth(Slot originalSlot){
         return LegacySlotDisplay.override(originalSlot,111, 77,new LegacySlotDisplay(){
             public Offset getOffset() {
-                return hasClassicCrafting() ? Offset.ZERO : EQUIP_SLOT_OFFSET;
+                return ScreenUtil.hasClassicCrafting() ? Offset.ZERO : EQUIP_SLOT_OFFSET;
             }
             public ResourceLocation getIconSprite() {
                 return originalSlot.getItem().isEmpty() ? SHIELD_SLOT : null;

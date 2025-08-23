@@ -17,7 +17,7 @@ public class LegacyLoadingScreenMixin extends Screen {
         super(component);
     }
 
-    Object obj(){
+    Screen self(){
         return this;
     }
 
@@ -26,6 +26,7 @@ public class LegacyLoadingScreenMixin extends Screen {
         this.minecraft.setScreen(null);
     }
 
+
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
@@ -33,22 +34,22 @@ public class LegacyLoadingScreenMixin extends Screen {
         Component lastLoadingStage = null;
         boolean genericLoading = false;
         int progress = 0;
-        if (obj() instanceof ReceivingLevelScreen) progress = -1;
-        if (obj() instanceof LevelLoadingScreen loading) {
+        if (self() instanceof ReceivingLevelScreen) progress = -1;
+        if (self() instanceof LevelLoadingScreen loading) {
             lastLoadingHeader = Component.translatable("legacy.connect.initializing");
             lastLoadingStage = Component.translatable("legacy.loading_spawn_area");
             progress = loading.progressListener.getProgress();
         }
-        if (obj() instanceof GenericDirtMessageScreen p)
+        if (self() instanceof GenericDirtMessageScreen p)
             lastLoadingHeader = p.getTitle();
-        if (obj() instanceof ProgressScreen p) {
+        if (self() instanceof ProgressScreen p) {
             lastLoadingHeader = p.header;
             lastLoadingStage = p.stage;
             if (minecraft.level != null && minecraft.level.dimension() != Level.OVERWORLD){
                 genericLoading = true;
             }
         }
-        if (obj() instanceof ConnectScreen p) {
+        if (self() instanceof ConnectScreen p) {
             lastLoadingHeader = p.status;
         }
         legacyLoadingScreen.prepareRender(minecraft,width, height,lastLoadingHeader,lastLoadingStage,progress,genericLoading);

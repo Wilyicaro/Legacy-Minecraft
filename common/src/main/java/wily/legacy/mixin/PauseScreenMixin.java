@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -15,7 +16,7 @@ import wily.legacy.client.screen.*;
 import wily.legacy.util.ScreenUtil;
 
 @Mixin(PauseScreen.class)
-public class PauseScreenMixin extends Screen {
+public class PauseScreenMixin extends Screen implements ControlTooltip.Event,RenderableVList.Access{
     private Component SAVE_GAME = Component.translatable("legacy.menu.save");
     private Component SAVE_GAME_MESSAGE = Component.translatable("legacy.menu.save_message");
     private Component ENABLE_AUTO_SAVE = Component.translatable("legacy.menu.enable_autosave");
@@ -26,19 +27,16 @@ public class PauseScreenMixin extends Screen {
         super(component);
     }
     protected RenderableVList renderableVList;
-    protected boolean updateAutoSaveIndicator;
-    private ControlTooltip.Renderer controlTooltipRenderer = ControlTooltip.defaultScreen(this);
-
     @Override
     public boolean keyPressed(int i, int j, int k) {
         if (renderableVList.keyPressed(i,true)) return true;
         return super.keyPressed(i, j, k);
     }
-    public void setAutoSave(boolean autoSave, Button button){
-        ScreenUtil.getLegacyOptions().autoSave().set(autoSave);
+    @Unique
+    private void setAutoSave(int autoSave, Button button){
+        ScreenUtil.getLegacyOptions().autoSaveInterval().set(autoSave);
         minecraft.options.save();
-        minecraft.setScreen(PauseScreenMixin.this);
-        button.setMessage(ScreenUtil.getLegacyOptions().autoSave().get() ? DISABLE_AUTO_SAVE : SAVE_GAME);
+        button.setMessage(ScreenUtil.getLegacyOptions().autoSaveInterval().get() > 0 ? DISABLE_AUTO_SAVE : SAVE_GAME);
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
@@ -53,13 +51,15 @@ public class PauseScreenMixin extends Screen {
         );
         minecraft = Minecraft.getInstance();
         if (minecraft.level != null && minecraft.hasSingleplayerServer())
-            renderableVList.addRenderable(Button.builder(ScreenUtil.getLegacyOptions().autoSave().get() ? DISABLE_AUTO_SAVE : SAVE_GAME, button -> minecraft.setScreen(new ConfirmationScreen(this,ScreenUtil.getLegacyOptions().autoSave().get() ? DISABLE_AUTO_SAVE: SAVE_GAME,ScreenUtil.getLegacyOptions().autoSave().get() ? DISABLE_AUTO_SAVE_MESSAGE : SAVE_GAME_MESSAGE, b->{
-                if (ScreenUtil.getLegacyOptions().autoSave().get()){
-                  setAutoSave(false,button);
+            renderableVList.addRenderable(Button.builder(ScreenUtil.getLegacyOptions().autoSaveInterval().get() > 0 && !minecraft.isDemo() ? DISABLE_AUTO_SAVE : SAVE_GAME, button -> minecraft.setScreen(new ConfirmationScreen(this,ScreenUtil.getLegacyOptions().autoSaveInterval().get() > 0 ? DISABLE_AUTO_SAVE: SAVE_GAME,ScreenUtil.getLegacyOptions().autoSaveInterval().get() > 0 ? DISABLE_AUTO_SAVE_MESSAGE : SAVE_GAME_MESSAGE, b->{
+                if (ScreenUtil.getLegacyOptions().autoSaveInterval().get() > 0){
+                    setAutoSave(0,button);
+                    minecraft.setScreen(PauseScreenMixin.this);
                 }else{
-                    Legacy4JClient.manualSave = Legacy4JClient.retakeWorldIcon = updateAutoSaveIndicator = true;
+                    Legacy4JClient.manualSave = Legacy4JClient.retakeWorldIcon = true;
                     minecraft.setScreen(new ConfirmationScreen(PauseScreenMixin.this,ENABLE_AUTO_SAVE,ENABLE_AUTO_SAVE_MESSAGE,b1-> {
-                        setAutoSave(true,button);
+                        setAutoSave(1,button);
+                        minecraft.setScreen(PauseScreenMixin.this);
                     }));
                 }
             }))).build());
@@ -69,25 +69,30 @@ public class PauseScreenMixin extends Screen {
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         ScreenUtil.renderDefaultBackground(guiGraphics);
-        controlTooltipRenderer.render(guiGraphics, i, j, f);
     }
 
     @Inject(method = "render",at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         super.render(guiGraphics, i, j, f);
-        if (updateAutoSaveIndicator){
-            updateAutoSaveIndicator = false;
-            minecraft.gui.autosaveIndicatorValue = 1.0F;
-        }
-        if (minecraft.gui.autosaveIndicatorValue > 0.002){
-            minecraft.gui.renderSavingIndicator(guiGraphics);
-        }
     }
 
     @Inject(method = "init",at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
+        renderableVListInit();
+        if (minecraft.isDemo()) ((Button)renderableVList.renderables.get(4)).active = false;
+        else if (minecraft.level != null && minecraft.hasSingleplayerServer()) setAutoSave(ScreenUtil.getLegacyOptions().autoSaveInterval().get(),(Button)renderableVList.renderables.get(4));
+
+    }
+
+    @Override
+    public void renderableVListInit() {
         renderableVList.init(this,width / 2 - 112,this.height / 3 + 10,225,0);
+    }
+
+    @Override
+    public RenderableVList getRenderableVList() {
+        return renderableVList;
     }
 }

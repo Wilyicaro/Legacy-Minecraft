@@ -1,11 +1,11 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.network.chat.Component;
+import wily.legacy.client.CommonColor;
 
 import java.util.Arrays;
 
@@ -34,16 +34,16 @@ public class ServerEditScreen extends ConfirmationScreen{
         };
     }
     @Override
-    public void resize(Minecraft minecraft, int i, int j) {
+    public void repositionElements() {
         String string = this.ipBox.getValue();
         String string2 = this.nameBox.getValue();
-        this.init(minecraft, i, j);
+        super.repositionElements();
         this.ipBox.setValue(string);
         this.nameBox.setValue(string2);
     }
     @Override
-    protected void initButtons() {
-        super.initButtons();
+    protected void init() {
+        super.init();
         nameBox = new EditBox(font, width / 2 - 100,panel.y + 47,200, 20, Component.empty());
         ipBox = new EditBox(font, width / 2 - 100,panel.y + 87,200, 20, Component.translatable("addServer.enterIp"));
         nameBox.setValue(serverData.name);
@@ -53,7 +53,7 @@ public class ServerEditScreen extends ConfirmationScreen{
         ipBox.setResponder(s-> updateAddButtonStatus());
         addRenderableWidget(nameBox);
         addRenderableWidget(ipBox);
-        this.addRenderableWidget(new LegacySliderButton<>(this.width / 2 - 100, panel.y + 112, 200, 16, b-> b.getDefaultMessage(Component.translatable("addServer.resourcePack"),b.getObjectValue().getName()),()-> null,this.serverData.getResourcePackStatus(), ()->Arrays.stream(ServerData.ServerPackStatus.values()).toList(), b->this.serverData.setResourcePackStatus(b.objectValue)));
+        this.addRenderableWidget(new LegacySliderButton<>(this.width / 2 - 100, panel.y + 112, 200, 16, b-> b.getDefaultMessage(Component.translatable("addServer.resourcePack"),b.getObjectValue().getName()),b-> null,this.serverData.getResourcePackStatus(), ()->Arrays.stream(ServerData.ServerPackStatus.values()).toList(), b->this.serverData.setResourcePackStatus(b.objectValue)));
         this.setInitialFocus(this.nameBox);
         updateAddButtonStatus();
     }
@@ -61,7 +61,7 @@ public class ServerEditScreen extends ConfirmationScreen{
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
-        guiGraphics.drawString(this.font, ipBox.getMessage(), panel.x + 15, panel.y + 73, 0x383838,false);
+        guiGraphics.drawString(this.font, ipBox.getMessage(), panel.x + 15, panel.y + 73, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
     }
 
     private void updateAddButtonStatus() {

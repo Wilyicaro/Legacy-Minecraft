@@ -6,7 +6,7 @@ import net.minecraft.world.inventory.Slot;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import wily.legacy.client.Offset;
+import wily.legacy.util.Offset;
 import wily.legacy.inventory.LegacySlotDisplay;
 
 import static wily.legacy.util.LegacySprites.BREWING_FUEL_SLOT;

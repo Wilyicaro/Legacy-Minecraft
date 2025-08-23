@@ -26,5 +26,40 @@
         "name": "legacy:scroll"
       }
     ]
+  },
+  "random.action": {
+    "sounds": [
+      {
+        "name": "legacy:action"
+      }
+    ]
+  },
+  "random.shift_lock": {
+    "sounds": [
+      {
+        "name": "legacy:shift_lock"
+      }
+    ]
+  },
+  "random.shift_unlock": {
+    "sounds": [
+      {
+        "name": "legacy:shift_unlock"
+      }
+    ]
+  },
+  "random.space": {
+    "sounds": [
+      {
+        "name": "legacy:space"
+      }
+    ]
+  },
+  "random.backspace": {
+    "sounds": [
+      {
+        "name": "legacy:backspace"
+      }
+    ]
   }
 }

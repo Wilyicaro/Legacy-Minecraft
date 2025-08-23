@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.stats.ServerStatsCounter;
 import net.minecraft.stats.Stat;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Final;
@@ -16,6 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.player.LegacyPlayer;
 import wily.legacy.player.LegacyPlayerInfo;
 
@@ -26,6 +28,8 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     @Shadow public abstract void onUpdateAbilities();
 
     @Shadow public abstract ServerStatsCounter getStats();
+
+    @Shadow protected abstract boolean isPvpAllowed();
 
     int position = -1;
     boolean classicCrafting = true;

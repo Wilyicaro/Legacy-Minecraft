@@ -7,7 +7,6 @@ import com.google.gson.*;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -32,6 +31,7 @@ import java.util.function.Predicate;
 public record LegacyTipOverride(BiPredicate<Item,CompoundTag> matchItemOverride, Predicate<Block> matchBlockOverride, Predicate<EntityType<?>> matchEntityOverride, Component tip) {
     public static final List<LegacyTipOverride> list = new ArrayList<>();
     private static final String TIP_OVERRIDES = "tip_overrides";
+
     public static final Component SPAWN_EGG_TIP = Component.translatable("item.minecraft.spawn_egg.tip");
 
     public static final LoadingCache<Pair<Item,CompoundTag>,Component> itemOverrideCache = CacheBuilder.newBuilder().build(new CacheLoader<>() {
@@ -60,6 +60,7 @@ public record LegacyTipOverride(BiPredicate<Item,CompoundTag> matchItemOverride,
         return entityOverrideCache.getUnchecked(entity);
     }
     public static class Manager extends SimplePreparableReloadListener<List<LegacyTipOverride>> {
+
         @Override
         protected List<LegacyTipOverride> prepare(ResourceManager resourceManager, ProfilerFiller profilerFiller) {
             List<LegacyTipOverride> overrides = new ArrayList<>();

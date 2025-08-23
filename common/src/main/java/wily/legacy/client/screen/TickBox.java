@@ -10,6 +10,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.CommonColor;
 import wily.legacy.util.ScreenUtil;
 
 import java.util.function.Consumer;
@@ -54,9 +55,11 @@ public class TickBox extends AbstractButton {
         RenderSystem.enableDepthTest();
         guiGraphics.blitSprite(SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX(), this.getY(), 12, 12);
         if (selected) guiGraphics.blitSprite(TICK, this.getX(), this.getY(), 14, 12);
-        int k = isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : 0x383838;
         guiGraphics.setColor(1.0f, 1.0f, 1.0f, 1.0F);
-        this.renderString(guiGraphics, minecraft.font, k);
+        guiGraphics.pose().pushPose();
+        if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.5f,0.5f,0f);
+        this.renderString(guiGraphics, minecraft.font, isHoveredOrFocused() ? ScreenUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get());
+        guiGraphics.pose().popPose();
     }
 
 
@@ -80,6 +83,6 @@ public class TickBox extends AbstractButton {
 
     @Override
     public void renderString(GuiGraphics guiGraphics, Font font, int i) {
-        ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 14, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), i,isHoveredOrFocused());
+        ScreenUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 13, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), i,isHoveredOrFocused());
     }
 }

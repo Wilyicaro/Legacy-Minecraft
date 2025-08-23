@@ -4,17 +4,13 @@
   "compatibilityLevel": "JAVA_17",
   "plugin": "wily.legacy.LegacyMixinPlugin",
   "client": [
-    "AbstractContainerScreenMixin",
-    "GuiGraphicsMixin",
     "GuiMixin",
     "LiquidBlockRendererMixin",
     "PresetEditorMixin",
     "TooltipRenderUtilMixin"
   ],
   "mixins": [
-    "CustomIngredientImplMixin",
-    "ItemStackMixin",
-    "LivingEntityMixin"
+    "ItemStackMixin"
   ],
   "injectors": {
     "defaultRequire": 1
