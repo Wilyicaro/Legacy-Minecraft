@@ -364,8 +364,6 @@ public class Legacy4JClient {
         FactoryAPIClient.setup(m->{
             MCAccount.loadAll();
             controllerManager.setup(m);
-            FactoryOptions.NEAREST_MIPMAP_SCALING.set(true);
-            FactoryOptions.RANDOM_BLOCK_ROTATIONS.set(false);
             knownBlocks = new KnownListing<>(BuiltInRegistries.BLOCK,m.gameDirectory.toPath());
             knownEntities = new KnownListing<>(BuiltInRegistries.ENTITY_TYPE,m.gameDirectory.toPath());
             LegacySaveCache.setup(m);

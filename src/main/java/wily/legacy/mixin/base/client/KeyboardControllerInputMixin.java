@@ -33,7 +33,7 @@ public class KeyboardControllerInputMixin extends /*? if <1.21.2 {*//*Input*//*?
     //? if >=1.21.5 {
     @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec2;normalized()Lnet/minecraft/world/phys/Vec2;"))
     private Vec2 normalize(Vec2 instance, Operation<Vec2> original) {
-        return Legacy4JClient.controllerManager.isControllerTheLastInput() && Legacy4JClient.hasModOnServer() ? instance : original.call(instance);
+        return Legacy4JClient.controllerManager.isControllerTheLastInput() && (LegacyOptions.forceSmoothMovement.get() || Legacy4JClient.hasModOnServer()) ? instance : original.call(instance);
     }
     //?}
 }

@@ -18,7 +18,7 @@ public class SettingsScreen extends RenderableVListScreen {
         SETTINGS_BUTTONS.forEach(f->renderableVList.addRenderable(f.apply(this)));
         renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.reset_defaults"),()->new ConfirmationScreen(this,Component.translatable("legacy.menu.reset_settings"),Component.translatable("legacy.menu.reset_message"), b1->{
             Legacy4JClient.resetOptions(minecraft);
-            minecraft.setScreen(this);
+            b1.onClose();
         })).build());
     }
 

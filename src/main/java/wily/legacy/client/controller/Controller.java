@@ -21,18 +21,43 @@ import static wily.legacy.client.controller.ControllerManager.CONTROLLER_DISCONN
 
 public interface Controller {
 
+    /**
+     * @return Controller name given by the Controller Handler implementation
+     */
     String getName();
 
+    /**
+     * @return ControlType corresponding to the Controller Handler's controller type, this is based on the controller name if the handler does not provide this information, as in GLFW
+     */
     ControlType getType();
 
+
+    /**
+     * @param i Controller Handler Button Index, the available buttons are in {@link ControllerBinding.Button}
+     * @return If this button is being pressed
+     */
     boolean buttonPressed(int i);
 
+
+    /**
+     * @param i Controller Handler Axis Index, the available axes are in {@link ControllerBinding.Axis}
+     * @return Axis value in 0,1 range
+     */
     float axisValue(int i);
 
+    /**
+     * @return If this controller has LED
+     * This always returns true on SDL3 and false on GLFW
+     */
     default boolean hasLED() {
         return false;
     }
 
+    /**
+     * @param r Red RGB value
+     * @param g Green RGB value
+     * @param b Blue RGB value
+     */
     default void setLED(byte r, byte g, byte b) {
 
     }
@@ -63,15 +88,19 @@ public interface Controller {
         return false;
     }
 
+    /**
+     * @param button {@link ControllerBinding.Button}
+     * @return If this controller contains this button
+     */
     boolean hasButton(ControllerBinding.Button button);
 
+    /**
+     * @param axis {@link ControllerBinding.Axis}
+     * @return If this controller contains this axis
+     */
     boolean hasAxis(ControllerBinding.Axis axis);
 
     default void disconnect(ControllerManager manager) {
-        manager.setControllerTheLastInput(false);
-        if (manager.isCursorDisabled && !manager.getCursorMode().isNever()) manager.enableCursor();
-        manager.updateBindings(Controller.EMPTY);
-        manager.connectedController = null;
         addOrSetControllerToast(CONTROLLER_DISCONNECTED);
     }
 
@@ -86,8 +115,14 @@ public interface Controller {
         }
     }
 
+    /**
+     * @return {@link Controller.Handler} used by this controller
+     */
     Handler getHandler();
 
+    /**
+     * Empty controller, used when disconnecting or while the window isn't focused
+     */
     Controller EMPTY = new Controller() {
         public String getName() {
             return "Empty";
@@ -130,22 +165,48 @@ public interface Controller {
         Component DOWNLOADING_NATIVES = Component.translatable("legacy.menu.downloading_natives");
         Component LOADING_NATIVES = Component.translatable("legacy.menu.loading_natives");
 
+        /**
+         * @return Controller Handler display name
+         */
         Component getName();
 
+        /**
+         * Starts the game pad mappings downloading, and the library if needed
+         */
         void init();
 
         boolean update();
 
+        /**
+         * Manages the connected controller bindings
+         * @param manager Controller Manager instance
+         */
         default void setup(ControllerManager manager) {
             manager.connectedController.manageBindings(manager::updateBindings);
         }
 
+        /**
+         * @param jid Controller ID, generally based on the connection order
+         * @return The controller corresponding to this ID, or null if it's invalid
+         */
         Controller getController(int jid);
 
+        /**
+         * @param jid Controller ID, generally based on the connection order
+         * @return If this ID corresponds to a valid controller
+         */
         boolean isValidController(int jid);
 
+        /**
+         * @param button {@link ControllerBinding.Button} to convert to a button index used by this Controller Handler
+         * @return Button index used by this Controller Handler
+         */
         int getButtonIndex(ControllerBinding.Button button);
 
+        /**
+         * @param axis {@link ControllerBinding.Axis} to convert to an axis index used by this Controller Handler
+         * @return Axis index used by this Controller Handler
+         */
         int getAxisIndex(ControllerBinding.Axis axis);
 
         void applyGamePadMappingsFromBuffer(BufferedReader reader) throws IOException;

@@ -26,6 +26,7 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.vehicle./*? if <1.21.2 {*//*Boat*//*?} else {*/AbstractBoat/*?}*/;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.Bearer;
+import wily.factoryapi.base.client.FactoryOptions;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.base.config.FactoryConfigControl;
 import wily.factoryapi.base.config.FactoryConfigDisplay;
@@ -55,15 +56,19 @@ public class LegacyOptions {
     public static final Map<Component, Component> vanillaCaptionOverrideMap = new HashMap<>(Map.of(Component.translatable("key.sprint"),Component.translatable("options.key.toggleSprint"),Component.translatable("key.sneak"),Component.translatable("options.key.toggleSneak")));
 
     
-    public static final FactoryConfig.StorageHandler CLIENT_STORAGE = new FactoryConfig.StorageHandler(){
+    public static final FactoryConfig.StorageHandler CLIENT_STORAGE = new FactoryConfig.StorageHandler() {
         @Override
         public void load() {
             for (KeyMapping keyMapping : Minecraft.getInstance().options.keyMappings) {
                 LegacyKeyMapping mapping = LegacyKeyMapping.of(keyMapping);
                 register(FactoryConfig.create("component_" + keyMapping.getName(), null, Optional.ofNullable(((LegacyKeyMapping) keyMapping).getDefaultBinding()), Bearer.of(()->Optional.ofNullable(mapping.getBinding()),o->mapping.setBinding(o.filter(b -> b.isBindable).orElse(null))), ()->ControllerBinding.OPTIONAL_CODEC, m->{}, this));
             }
-            loadDeprecated();
             super.load();
+            if (lastLoadedVersion.get().isEmpty()) {
+                FactoryOptions.NEAREST_MIPMAP_SCALING.set(true);
+                FactoryOptions.RANDOM_BLOCK_ROTATIONS.set(false);
+                FactoryOptions.CLIENT_STORAGE.save();
+            }
             Legacy4JClient.isNewerVersion = Legacy4J.isNewerVersion(Legacy4J.VERSION.get(), lastLoadedVersion.get());
             Legacy4JClient.isNewerMinecraftVersion = Legacy4J.isNewerVersion(SharedConstants.getCurrentVersion().name(), lastLoadedMinecraftVersion.get());
         }
@@ -77,7 +82,7 @@ public class LegacyOptions {
 
     public static <T> FactoryConfig<T> create(OptionInstance<T> optionInstance) {
         FactoryConfigControl<T> control;
-        if (optionInstance.values().equals(OptionInstance.BOOLEAN_VALUES)){
+        if (optionInstance.values().equals(OptionInstance.BOOLEAN_VALUES)) {
             control = (FactoryConfigControl<T>) FactoryConfigControl.TOGGLE;
         } else if (optionInstance.values() instanceof OptionInstance.CycleableValueSet<T> set) {
             control = new FactoryConfigControl.FromInt<>(optionInstance.codec(), i-> set.valueListSupplier().getSelectedList().get(i), v-> set.valueListSupplier().getSelectedList().indexOf(v), ()->set.valueListSupplier().getSelectedList().size());
@@ -91,7 +96,7 @@ public class LegacyOptions {
         }), control, v->{}, VANILLA_STORAGE_ACCESS);
     }
 
-    public static Component componentFromTooltip(Tooltip tooltip){
+    public static Component componentFromTooltip(Tooltip tooltip) {
         return tooltip == null ? null : tooltip.message;
     }
 
@@ -193,11 +198,8 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> legacyItemTooltipScaling = CLIENT_STORAGE.register(createBoolean("legacyItemTooltipsScaling", true));
     public static final FactoryConfig<Boolean> invertYController = CLIENT_STORAGE.register(createBoolean("invertYController", false));
     public static final FactoryConfig<Boolean> invertControllerButtons = CLIENT_STORAGE.register(createBoolean("invertControllerButtons", false, (b)-> ControllerBinding.RIGHT_BUTTON.state().block(2)));
-    public static final FactoryConfig<Integer> selectedController = CLIENT_STORAGE.register(createInteger("selectedController", (c, i)-> Component.translatable("options.generic_value",c,Component.literal(i+1 + (Legacy4JClient.controllerManager.connectedController == null ? "" : " (%s)".formatted(Legacy4JClient.controllerManager.connectedController.getName())))),  0, ()->15, 0, d -> { if (Legacy4JClient.controllerManager.connectedController!= null) Legacy4JClient.controllerManager.connectedController.disconnect(Legacy4JClient.controllerManager);}));
-    public static final FactoryConfig<Controller.Handler> selectedControllerHandler = CLIENT_STORAGE.register(create("selectedControllerHandler", (c, h)-> Component.translatable("options.generic_value",c,h.getName()), ()->((List<Controller.Handler>)ControllerManager.handlers.values()), SDLControllerHandler.getInstance(), d-> {
-        ControllerBinding.LEFT_STICK.state().block(2);
-        if (Legacy4JClient.controllerManager.connectedController != null) Legacy4JClient.controllerManager.connectedController.disconnect(Legacy4JClient.controllerManager);
-    }));
+    public static final FactoryConfig<Integer> selectedController = CLIENT_STORAGE.register(createInteger("selectedController", (c, i)-> Component.translatable("options.generic_value",c,Component.literal(i+1 + (Legacy4JClient.controllerManager.connectedController == null ? "" : " (%s)".formatted(Legacy4JClient.controllerManager.connectedController.getName())))),  0, ()->15, 0, Legacy4JClient.controllerManager::connectTo));
+    public static final FactoryConfig<Controller.Handler> selectedControllerHandler = CLIENT_STORAGE.register(create("selectedControllerHandler", (c, h)-> Component.translatable("options.generic_value",c,h.getName()), ()->((List<Controller.Handler>)ControllerManager.handlers.values()), SDLControllerHandler.getInstance(), Legacy4JClient.controllerManager::updateHandler));
     public static final FactoryConfig<Boolean> controllerVirtualCursor = CLIENT_STORAGE.register(createBoolean("controllerVirtualCursor", true, b-> {}));
     public static final FactoryConfig<CursorMode> cursorMode = CLIENT_STORAGE.register(create("cursorMode", (c, d) -> CommonComponents.optionNameValue(c, d.displayName), i-> CursorMode.values()[i], CursorMode::ordinal, ()->CursorMode.values().length, CursorMode.AUTO, d -> Legacy4JClient.controllerManager.updateCursorMode(), CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> unfocusedInputs = CLIENT_STORAGE.register(createBoolean("unfocusedInputs", false));
@@ -294,24 +296,24 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> limitCursor = CLIENT_STORAGE.register(createBoolean("limitCursor", true));
     public static final FactoryConfig<Boolean> enhancedItemTranslucency = CLIENT_STORAGE.register(createBoolean("enhancedItemTranslucency", false));
 
-    public static int getTerrainFogStart(){
+    public static int getTerrainFogStart() {
         return Math.min(terrainFogStart.get(), Minecraft.getInstance().options.renderDistance().get());
     }
 
-    public static boolean hasSystemCursor(){
+    public static boolean hasSystemCursor() {
         return systemCursor.get() && !Legacy4JClient.controllerManager.isControllerTheLastInput();
     }
 
-    public static float getLeftStickDeadZone(){
+    public static float getLeftStickDeadZone() {
         Minecraft minecraft = Minecraft.getInstance();
         return minecraft.player != null && minecraft.player.getControlledVehicle() instanceof /*? if <1.21.2 {*//*Boat*//*?} else {*/AbstractBoat/*?}*/ ? 0.5f + leftStickDeadZone.get().floatValue() / 2 : leftStickDeadZone.get().floatValue();
     }
 
-    public static boolean hasClassicCrafting(){
+    public static boolean hasClassicCrafting() {
         return classicCrafting.get();
     }
 
-    public static boolean hasMixedCrafting(){
+    public static boolean hasMixedCrafting() {
         return (forceMixedCrafting.get() || !Legacy4JClient.hasModOnServer()) && !classicCrafting.get();
     }
 
@@ -321,17 +323,17 @@ public class LegacyOptions {
         private final String name;
         public final Component displayName;
 
-        VehicleCameraRotation(String name, Component displayName){
+        VehicleCameraRotation(String name, Component displayName) {
             this.name = name;
             this.displayName = displayName;
         }
-        VehicleCameraRotation(String name){
+        VehicleCameraRotation(String name) {
             this(name,Component.translatable("legacy.options.vehicleCameraRotation."+name));
         }
-        public boolean isForLivingEntities(){
+        public boolean isForLivingEntities() {
             return this == ALL_ENTITIES || this == ONLY_LIVING_ENTITIES;
         }
-        public boolean isForNonLivingEntities(){
+        public boolean isForNonLivingEntities() {
             return this == ALL_ENTITIES || this == ONLY_NON_LIVING_ENTITIES;
         }
         @Override
@@ -346,7 +348,7 @@ public class LegacyOptions {
         private final String name;
         public final Component displayName;
 
-        AdvancedOptionsMode(String name, Component displayName){
+        AdvancedOptionsMode(String name, Component displayName) {
             this.name = name;
             this.displayName = displayName;
         }
@@ -365,24 +367,24 @@ public class LegacyOptions {
         private final String name;
         public final Component displayName;
 
-        CursorMode(String name, Component displayName){
+        CursorMode(String name, Component displayName) {
             this.name = name;
             this.displayName = displayName;
         }
 
-        CursorMode(String name){
+        CursorMode(String name) {
             this(name, Component.translatable("legacy.options.cursorMode."+name));
         }
 
-        public boolean isAuto(){
+        public boolean isAuto() {
             return this == AUTO;
         }
 
-        public boolean isAlways(){
+        public boolean isAlways() {
             return this == ALWAYS;
         }
 
-        public boolean isNever(){
+        public boolean isNever() {
             return this == NEVER;
         }
         @Override
@@ -397,20 +399,20 @@ public class LegacyOptions {
         private final String name;
         public final Component displayName;
 
-        ControlTooltipDisplay(String name, Component displayName){
+        ControlTooltipDisplay(String name, Component displayName) {
             this.name = name;
             this.displayName = displayName;
         }
 
-        ControlTooltipDisplay(String name){
+        ControlTooltipDisplay(String name) {
             this(name, Component.translatable("legacy.options.controlTooltipDisplay."+name));
         }
 
-        public boolean isRight(){
+        public boolean isRight() {
             return this == RIGHT || this == AUTO && Minecraft.getInstance().options.mainHand().get() == HumanoidArm.LEFT;
         }
 
-        public boolean isLeft(){
+        public boolean isLeft() {
             return this == LEFT || this == AUTO && Minecraft.getInstance().options.mainHand().get() == HumanoidArm.RIGHT;
         }
 
@@ -418,47 +420,5 @@ public class LegacyOptions {
         public String getSerializedName() {
             return name;
         }
-    }
-
-    @Deprecated
-    private static <T> DataResult<T> parseDeprecatedOptionFromString(String string, FactoryConfig<T> config){
-        JsonReader jsonReader = new JsonReader(new StringReader(string));
-        JsonElement jsonElement = JsonParser.parseReader(jsonReader);
-        DataResult<T> dataResult = config.decode(new Dynamic<>(JsonOps.INSTANCE, jsonElement));
-        dataResult.error().ifPresent(error -> Legacy4J.LOGGER.error("Error parsing option value {} for option {}: {}",string,config,error.message()));
-        return dataResult;
-    }
-
-    @Deprecated
-    private static void loadDeprecated(){
-        if (!deprecatedLegacyOptionssFile.exists()) return;
-        try {
-            CompoundTag compoundTag = new CompoundTag();
-            BufferedReader bufferedReader = Files.newReader(deprecatedLegacyOptionssFile, Charsets.UTF_8);
-
-            try {
-                bufferedReader.lines().forEach(string -> {
-                    try {
-                        Iterator<String> iterator = OPTION_SPLITTER.split(string).iterator();
-                        compoundTag.putString(iterator.next(), iterator.next());
-                    } catch (Exception var3) {
-                        Legacy4J.LOGGER.warn("Skipping bad option: {}", string);
-                    }
-                });
-            } catch (Throwable var6) {
-                try {
-                    bufferedReader.close();
-                } catch (Throwable var5) {
-                    var6.addSuppressed(var5);
-                }
-
-                throw var6;
-            }
-            bufferedReader.close();
-            CLIENT_STORAGE.configMap.forEach((s,o)-> CompoundTagUtil.getString(compoundTag, s).ifPresent(value -> parseDeprecatedOptionFromString(value.isEmpty() ? "\"\"" : value,o)));
-        } catch (IOException e) {
-            Legacy4J.LOGGER.error("Failed to load options", e);
-        }
-        deprecatedLegacyOptionssFile.delete();
     }
 }

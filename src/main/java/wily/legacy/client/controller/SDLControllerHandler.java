@@ -36,7 +36,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 
-public class SDLControllerHandler implements Controller.Handler{
+public class SDLControllerHandler implements Controller.Handler {
     private SDL_JoystickID[] actualIds = new SDL_JoystickID[0];
     private boolean init = false;
 
@@ -44,7 +44,7 @@ public class SDLControllerHandler implements Controller.Handler{
     public static final String SDL_VERSION = SdlVersionConst.SDL_MAJOR_VERSION + "." + SdlVersionConst.SDL_MINOR_VERSION+ "." + SdlVersionConst.SDL_MICRO_VERSION + "." + SdlVersionConst.SDL_COMMIT;
 
     public static final String nativesMainURLFormat = "https://maven.isxander.dev/releases/dev/isxander/libsdl4j-natives/%s/%s";
-    public File nativesFile;
+    public NativesStatus natives;
 
     public static final Component TITLE = Component.literal("SDL3 (isXander's libsdl4j)");
     @Override
@@ -52,38 +52,38 @@ public class SDLControllerHandler implements Controller.Handler{
         return TITLE;
     }
 
-    public static SDLControllerHandler getInstance(){
+    public static SDLControllerHandler getInstance() {
         return INSTANCE;
     }
 
     public void init() {
         if (!init) {
             Minecraft minecraft = Minecraft.getInstance();
-            if (nativesFile == null) {
-                String fileName = getNativesFileName();
-                if (fileName == null) {
+            if (natives == null) {
+                natives = getNativesStatus(minecraft);
+                if (natives.file() == null) {
                     Legacy4J.LOGGER.warn("{} isn't supported in this system. GLFW will be used instead.", getName());
                     LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
                     LegacyOptions.selectedControllerHandler.save();
                     init = true;
                     return;
-                } else {
-                    nativesFile = new File(minecraft.gameDirectory, "natives/" + fileName);
                 }
             }
 
-            if (!nativesFile.exists()){
-                LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
-                LegacyOptions.selectedControllerHandler.save();
-                FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(()-> openNativesScreen(minecraft), ()-> !(minecraft.screen instanceof OverlayPanelScreen) && MinecraftAccessor.getInstance().hasGameLoaded());
-                init = true;
-                return;
-            } else try {
-                SdlNativeLibraryLoader.loadLibSDL3FromFilePathNow(nativesFile.getPath());
-            } catch (Exception e) {
-                Legacy4J.LOGGER.warn("Failed to load {} natives: {}", getName(), e.getMessage());
-                init = true;
-                return;
+            if (!natives.alreadyLoaded()) {
+                if (!natives.file().exists()) {
+                    LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
+                    LegacyOptions.selectedControllerHandler.save();
+                    FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(() -> openNativesScreen(minecraft), () -> !(minecraft.screen instanceof OverlayPanelScreen) && MinecraftAccessor.getInstance().hasGameLoaded());
+                    init = true;
+                    return;
+                } else try {
+                    SdlNativeLibraryLoader.loadLibSDL3FromFilePathNow(natives.file().getPath());
+                } catch (Exception | UnsatisfiedLinkError e) {
+                    Legacy4J.LOGGER.warn("Failed to load {} natives: {}", getName(), e.getMessage());
+                    init = true;
+                    return;
+                }
             }
 
             if (!SdlInit.SDL_Init(SdlSubSystemConst.SDL_INIT_JOYSTICK | SdlSubSystemConst.SDL_INIT_GAMEPAD)) {
@@ -95,12 +95,12 @@ public class SDLControllerHandler implements Controller.Handler{
         }
     }
 
-    public void openNativesScreen(Minecraft minecraft){
+    public void openNativesScreen(Minecraft minecraft) {
         Screen s = minecraft.screen;
         minecraft.setScreen(new ConfirmationScreen(s, Component.translatable("legacy.menu.download_natives",getName()), Controller.Handler.DOWNLOAD_MESSAGE, b -> {
             Stocker<Long> fileSize = new Stocker<>(1L);
             ExecutorService executor = Executors.newSingleThreadExecutor();
-            LegacyLoadingScreen screen = new LegacyLoadingScreen(Controller.Handler.DOWNLOADING_NATIVES, CommonComponents.EMPTY){
+            LegacyLoadingScreen screen = new LegacyLoadingScreen(Controller.Handler.DOWNLOADING_NATIVES, CommonComponents.EMPTY) {
                 @Override
                 public void tick() {
                     if (getProgress() == 100) {
@@ -109,7 +109,7 @@ public class SDLControllerHandler implements Controller.Handler{
                         onClose();
                         return;
                     }
-                    setProgress(nativesFile.exists() ? Math.round(Math.min(1,FileUtils.sizeOf(nativesFile) / (float) fileSize.get()) * 80) : 0);
+                    setProgress(natives.file().exists() ? Math.round(Math.min(1,FileUtils.sizeOf(natives.file()) / (float) fileSize.get()) * 80) : 0);
                     super.tick();
                 }
 
@@ -128,7 +128,7 @@ public class SDLControllerHandler implements Controller.Handler{
             CompletableFuture.runAsync(()->{
                 try {
                     fileSize.set(getNativesURI().toURL().openConnection().getContentLengthLong());
-                    FileUtils.copyURLToFile(getNativesURI().toURL(), nativesFile);
+                    FileUtils.copyURLToFile(getNativesURI().toURL(), natives.file());
                     screen.setLoadingHeader(Controller.Handler.LOADING_NATIVES);
                     screen.setProgress(100);
                     init = false;
@@ -136,7 +136,7 @@ public class SDLControllerHandler implements Controller.Handler{
                     throw new RuntimeException(e);
                 }
             }, executor);
-        }){
+        }) {
             @Override
             public void onClose() {
                 super.onClose();
@@ -149,11 +149,21 @@ public class SDLControllerHandler implements Controller.Handler{
         return new URI(nativesMainURLFormat.formatted(SDL_VERSION, getNativesFileName()));
     }
 
-    public static String getNativesFileName(){
-        if (System.getenv("POJAV_NATIVEDIR") != null){
-            Legacy4J.LOGGER.warn("PojavLauncher Detected.");
-            return null;
+    public static NativesStatus getNativesStatus(Minecraft minecraft) {
+        String fileName = getNativesFileName();
+        boolean loaded = false;
+
+        try {
+            System.loadLibrary(SdlNativeLibraryLoader.SDL_LIBRARY_NAME);
+            Legacy4J.LOGGER.warn("SDL3 library was already loaded!");
+            loaded = true;
+        } catch (Exception | UnsatisfiedLinkError e) {
         }
+
+        return new NativesStatus(fileName == null ? null : new File(minecraft.gameDirectory, "natives/" + fileName), loaded);
+    }
+
+    public static String getNativesFileName() {
         try {
             Class.forName("com.sun.jna.Native");
         } catch (ClassNotFoundException e) {
@@ -161,7 +171,7 @@ public class SDLControllerHandler implements Controller.Handler{
             return null;
         }
         String arch = System.getProperty("os.arch");
-        String base = switch (Util.getPlatform()){
+        String base = switch (Util.getPlatform()) {
             case WINDOWS -> arch.contains("64") ? "libsdl4j-natives-%s-windows-x86_64.dll" : "libsdl4j-natives-%s-windows-x86.dll";
             case OSX -> "libsdl4j-natives-%s-macos-universal.dylib";
             case LINUX -> arch.contains("aarch") || arch.contains("arm") ? "libsdl4j-natives-%s-linux-aarch64.so" : "libsdl4j-natives-%s-linux-x86_64.so";
@@ -194,7 +204,7 @@ public class SDLControllerHandler implements Controller.Handler{
             @Override
             public ControlType getType() {
                 int type = SdlGamepad.SDL_GetGamepadType(controller);
-                return switch (type){
+                return switch (type) {
                     case SDL_GamepadType.SDL_GAMEPAD_TYPE_PS3 -> ControlType.PS3;
                     case SDL_GamepadType.SDL_GAMEPAD_TYPE_PS4 -> ControlType.PS4;
                     case SDL_GamepadType.SDL_GAMEPAD_TYPE_PS5 -> ControlType.PS5;
@@ -226,26 +236,26 @@ public class SDLControllerHandler implements Controller.Handler{
             }
 
             @Override
-            public void rumble(char low_frequency_rumble, char high_frequency_rumble, int duration_ms){
+            public void rumble(char low_frequency_rumble, char high_frequency_rumble, int duration_ms) {
                 SdlGamepad.SDL_RumbleGamepad(controller,low_frequency_rumble,high_frequency_rumble,duration_ms);
             }
             @Override
-            public void rumbleTriggers(char left_rumble, char right_rumble, int duration_ms){
+            public void rumbleTriggers(char left_rumble, char right_rumble, int duration_ms) {
                 SdlGamepad.SDL_RumbleGamepadTriggers(controller,left_rumble,right_rumble,duration_ms);
             }
 
             @Override
-            public int getTouchpadsCount(){
+            public int getTouchpadsCount() {
                 return SdlGamepad.SDL_GetNumGamepadTouchpads(controller);
             }
 
             @Override
-            public int getTouchpadFingersCount(int touchpad){
+            public int getTouchpadFingersCount(int touchpad) {
                 return SdlGamepad.SDL_GetNumGamepadTouchpadFingers(controller,touchpad);
             }
 
             @Override
-            public boolean hasFingerInTouchpad(int touchpad, int finger, Byte state, Float x, Float y, Float pressure){
+            public boolean hasFingerInTouchpad(int touchpad, int finger, Byte state, Float x, Float y, Float pressure) {
                 return SdlGamepad.SDL_GetGamepadTouchpadFinger(controller,touchpad,finger,state == null ? null : new ByteByReference(state),x == null ? null : new FloatByReference(x),y == null ? null : new FloatByReference(y),pressure == null ? null : new FloatByReference(pressure));
             }
 
@@ -282,7 +292,7 @@ public class SDLControllerHandler implements Controller.Handler{
 
     @Override
     public int getButtonIndex(ControllerBinding.Button button) {
-        return switch (button){
+        return switch (button) {
             case DOWN-> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_SOUTH;
             case RIGHT -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_EAST;
             case LEFT-> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_WEST;
@@ -309,7 +319,7 @@ public class SDLControllerHandler implements Controller.Handler{
 
     @Override
     public int getAxisIndex(ControllerBinding.Axis axis) {
-        return switch (axis){
+        return switch (axis) {
             case LEFT_STICK_X -> SDL_GamepadAxis.SDL_GAMEPAD_AXIS_LEFTX;
             case LEFT_STICK_Y -> SDL_GamepadAxis.SDL_GAMEPAD_AXIS_LEFTY;
             case RIGHT_STICK_X -> SDL_GamepadAxis.SDL_GAMEPAD_AXIS_RIGHTX;
@@ -324,6 +334,10 @@ public class SDLControllerHandler implements Controller.Handler{
         String s = reader.lines().collect(Collectors.joining());
         int i = SdlGamepad.SDL_AddGamepadMapping(s);
         Legacy4J.LOGGER.warn("Added SDL Controller Mappings: {} Code", i);
+    }
+
+
+    public record NativesStatus(File file, boolean alreadyLoaded) {
     }
 
 }

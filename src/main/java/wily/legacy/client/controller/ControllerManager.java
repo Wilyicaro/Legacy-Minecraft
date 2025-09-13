@@ -93,7 +93,10 @@ public class ControllerManager {
                 if (minecraft.isRunning() && getHandler().update()) {
                     Setup.EVENT.invoker.accept(ControllerManager.this);
                     if (!getHandler().isValidController(LegacyOptions.selectedController.get())) {
-                        if (connectedController != null) connectedController.disconnect(ControllerManager.this);
+                        if (connectedController != null) {
+                            connectedController.disconnect(ControllerManager.this);
+                            safeDisconnect();
+                        }
                         return;
                     }
                     if (connectedController == null && (connectedController = getHandler().getController(LegacyOptions.selectedController.get())) != null) connectedController.connect(ControllerManager.this);
@@ -129,6 +132,31 @@ public class ControllerManager {
             minecraft.mouseHandler.ypos = Mth.clamp(y, 0, window.getScreenHeight());
         }
         if (!onlyVirtual) GLFW.glfwSetCursorPos(window.getWindow(), minecraft.mouseHandler.xpos, minecraft.mouseHandler.ypos);
+    }
+
+    public void safeDisconnect() {
+        if (connectedController == null) return;
+        setControllerTheLastInput(false);
+        if (isCursorDisabled && !getCursorMode().isNever()) enableCursor();
+        updateBindings(Controller.EMPTY);
+        connectedController = null;
+    }
+
+    public void connectTo(int jid) {
+        if (connectedController != null) connectedController.disconnect(this);
+        if (getHandler().isValidController(jid)) {
+            Controller controller = getHandler().getController(jid);
+            if (controller != null) {
+                connectedController = controller;
+                controller.connect(this);
+            }
+        } else safeDisconnect();
+    }
+
+    public void updateHandler(Controller.Handler handler) {
+        if (connectedController != null && connectedController.getHandler() != handler) {
+            connectTo(LegacyOptions.selectedController.get());
+        }
     }
 
     public synchronized void updateBindings() {
