@@ -56,21 +56,24 @@ public class SDLControllerHandler implements Controller.Handler {
         return INSTANCE;
     }
 
+    public void fallback() {
+        Legacy4J.LOGGER.warn("{} isn't supported in this system. GLFW will be used instead.", getName());
+        LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
+        LegacyOptions.selectedControllerHandler.save();
+        init = true;
+    }
+
     public void init() {
         if (!init) {
             Minecraft minecraft = Minecraft.getInstance();
             if (natives == null) {
                 natives = getNativesStatus(minecraft);
                 if (natives.file() == null) {
-                    Legacy4J.LOGGER.warn("{} isn't supported in this system. GLFW will be used instead.", getName());
-                    LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
-                    LegacyOptions.selectedControllerHandler.save();
-                    init = true;
-                    return;
+                    fallback();
                 }
             }
 
-            if (!natives.alreadyLoaded()) {
+            if (!natives.isPojav()) {
                 if (!natives.file().exists()) {
                     LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
                     LegacyOptions.selectedControllerHandler.save();
@@ -88,6 +91,7 @@ public class SDLControllerHandler implements Controller.Handler {
 
             if (!SdlInit.SDL_Init(SdlSubSystemConst.SDL_INIT_JOYSTICK | SdlSubSystemConst.SDL_INIT_GAMEPAD)) {
                 Legacy4J.LOGGER.warn("SDL Game Controller failed to start!");
+                fallback();
                 return;
             }
             tryDownloadAndApplyNewMappings();
@@ -151,19 +155,17 @@ public class SDLControllerHandler implements Controller.Handler {
 
     public static NativesStatus getNativesStatus(Minecraft minecraft) {
         String fileName = getNativesFileName();
-        boolean loaded = false;
+        boolean pojav = false;
 
-        try {
-            System.loadLibrary(SdlNativeLibraryLoader.SDL_LIBRARY_NAME);
-            Legacy4J.LOGGER.warn("SDL3 library was already loaded!");
-            loaded = true;
-        } catch (Exception | UnsatisfiedLinkError e) {
+        if (System.getenv("POJAV_NATIVEDIR") != null){
+            Legacy4J.LOGGER.warn("Pojav-based Launcher Detected.");
+            pojav = true;
         }
 
-        return new NativesStatus(fileName == null ? null : new File(minecraft.gameDirectory, "natives/" + fileName), loaded);
+        return new NativesStatus(fileName == null ? null : new File(minecraft.gameDirectory, "natives/" + fileName), pojav);
     }
 
-    public static String getNativesFileName() {
+    public static String getNativesFileName(){
         try {
             Class.forName("com.sun.jna.Native");
         } catch (ClassNotFoundException e) {
@@ -171,7 +173,7 @@ public class SDLControllerHandler implements Controller.Handler {
             return null;
         }
         String arch = System.getProperty("os.arch");
-        String base = switch (Util.getPlatform()) {
+        String base = switch (Util.getPlatform()){
             case WINDOWS -> arch.contains("64") ? "libsdl4j-natives-%s-windows-x86_64.dll" : "libsdl4j-natives-%s-windows-x86.dll";
             case OSX -> "libsdl4j-natives-%s-macos-universal.dylib";
             case LINUX -> arch.contains("aarch") || arch.contains("arm") ? "libsdl4j-natives-%s-linux-aarch64.so" : "libsdl4j-natives-%s-linux-x86_64.so";
@@ -337,7 +339,7 @@ public class SDLControllerHandler implements Controller.Handler {
     }
 
 
-    public record NativesStatus(File file, boolean alreadyLoaded) {
+    public record NativesStatus(File file, boolean isPojav) {
     }
 
 }
