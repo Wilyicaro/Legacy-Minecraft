@@ -96,9 +96,9 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     }
 
     @Inject(method = "renderContents",at = @At("HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+    public void renderContents(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
-        super.render(guiGraphics, i, j, f);
+        super.renderContents(guiGraphics, i, j, f);
         MerchantOffers merchantOffers = this.menu.getOffers();
         if (!merchantOffers.isEmpty()) {
 
