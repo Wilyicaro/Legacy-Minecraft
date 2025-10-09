@@ -1,8 +1,4 @@
 {
-    "parent": "builtin/entity",
-    "textures": {
-        "particle": "block/chest"
-    },
     "display": {
         "gui": {
             "rotation": [ 30, 45, 0 ],
