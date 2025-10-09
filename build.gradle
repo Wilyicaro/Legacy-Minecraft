@@ -73,11 +73,13 @@ repositories {
         }
     }
 }
+
 configurations.configureEach {
     resolutionStrategy {
         force("net.fabricmc:fabric-loader:${fabric_loader_version}")
     }
 }
+
 dependencies {
     minecraft "com.mojang:minecraft:${stonecutter.current.version}"
     mappings loom.officialMojangMappings()

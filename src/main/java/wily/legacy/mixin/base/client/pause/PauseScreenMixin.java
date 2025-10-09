@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -34,9 +35,9 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event,Ren
     private Button leaderboardsButton;
     private Button saveButton;
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (renderableVList.keyPressed(i)) return true;
-        return super.keyPressed(i, j, k);
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (renderableVList.keyPressed(keyEvent.key())) return true;
+        return super.keyPressed(keyEvent);
     }
     @Unique
     private void setAutoSave(int autoSave, Button button){

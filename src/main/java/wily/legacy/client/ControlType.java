@@ -2,6 +2,7 @@ package wily.legacy.client;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import wily.factoryapi.FactoryAPI;
@@ -38,8 +39,8 @@ public interface ControlType  {
         defaultTypes.add(type);
         return type;
     }
-    static ControlType create(ResourceLocation id, Component displayName, boolean isKbm){
-        return create(id, new HashMap<>(), displayName == null ? Component.translatable("legacy.options.controlType." + id.getPath()) : displayName,Style.EMPTY.withFont(id), isKbm, id.withPath("textures/gui/title/minecraft/%s.png".formatted(id.getPath())));
+    static ControlType create(ResourceLocation id, Component displayName, boolean isKbm) {
+        return create(id, new HashMap<>(), displayName == null ? Component.translatable("legacy.options.controlType." + id.getPath()) : displayName,Style.EMPTY.withFont(new FontDescription.Resource(id)), isKbm, id.withPath("textures/gui/title/minecraft/%s.png".formatted(id.getPath())));
     }
     static ControlType create(ResourceLocation id, Map<String, ControlTooltip.LegacyIcon> map, Component displayName, Style style, boolean isKbm, ResourceLocation minecraftLogoLocation){
         return new ControlType() {

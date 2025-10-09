@@ -130,6 +130,8 @@
   "options.autosaveIndicator": "Display Save Icon",
   "options.key.toggleSneak": "Toggle Sneak",
   "options.key.toggleSprint": "Toggle Sprint",
+  "options.key.toggleUse": "Toggle Use",
+  "options.key.toggleAttack": "Toggle Attack",
   "options.language": "Languages",
   "options.reducedDebugInfo": "Reduced Debug Information",
   "selectServer.delete": "Delete Server",

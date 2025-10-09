@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceLinkedOpenHashMap;
 import net.minecraft.ChatFormatting;
@@ -17,6 +18,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
@@ -82,6 +85,7 @@ import wily.legacy.client.controller.LegacyKeyMapping;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.mixin.base.FlowerPotBlockAccessor;
 import wily.legacy.mixin.base.HangingEntityItemAccessor;
+import wily.legacy.mixin.base.client.KeyboardHandlerAccessor;
 import wily.legacy.mixin.base.client.MouseHandlerAccessor;
 import wily.legacy.util.JsonUtil;
 import wily.legacy.util.LegacyComponents;
@@ -165,13 +169,13 @@ public interface ControlTooltip {
     static Component getKeyMessage(int key, Screen screen) {
         for (GuiEventListener child : screen.children()) {
             Component component;
-            if (child instanceof ActionHolder accessor && (component = accessor.getAction(new ActionHolder.KeyContext(key,screen))) != null) return component;
+            if (child instanceof ActionHolder accessor && (component = accessor.getAction(new ActionHolder.KeyContext(new KeyEvent(key, 0, 0), screen))) != null) return component;
         }
         return null;
     }
 
     static Component getKeyboardAction(ActionHolder.KeyContext keyContext) {
-        return keyContext.key == InputConstants.KEY_NUMPADENTER && ControlType.getActiveType().isKbm() || keyContext.key == InputConstants.KEY_RETURN  && !ControlType.getActiveType().isKbm() ? LegacyComponents.SHOW_KEYBOARD : null;
+        return keyContext.key() == InputConstants.KEY_NUMPADENTER && ControlType.getActiveType().isKbm() || keyContext.key() == InputConstants.KEY_RETURN  && !ControlType.getActiveType().isKbm() ? LegacyComponents.SHOW_KEYBOARD : null;
     }
 
     static ControlTooltip.Renderer setupDefaultButtons(Renderer renderer, Screen screen) {
@@ -272,15 +276,15 @@ public interface ControlTooltip {
     interface Icon {
         int render(GuiGraphics graphics, int x, int y, boolean allowPressed, int color, boolean simulate);
 
-        default void clickIfInside(double tooltipX, double x, double y, int button) {
-            click(x, y, button);
+        default void clickIfInside(double tooltipX, MouseButtonEvent event) {
+            click(event);
         }
 
-        default void click(double x, double y, int button) {
+        default void click(MouseButtonEvent event) {
 
         }
 
-        default void release(double x, double y, int button) {
+        default void release(MouseButtonEvent event) {
 
         }
 
@@ -306,13 +310,13 @@ public interface ControlTooltip {
         Icon[] getIcons();
 
         @Override
-        default void clickIfInside(double tooltipX, double x, double y, int button) {
+        default void clickIfInside(double tooltipX, MouseButtonEvent event) {
             Icon[] icons = getIcons();
             for (int i = 0; i < icons.length; i ++) {
                 Icon icon = icons[i];
-                double diffX = x - tooltipX;
+                double diffX = event.x() - tooltipX;
                 if (isAdditive() || (diffX >= 0 && diffX < icon.getWidth() || i == icons.length - 1)) {
-                    icon.clickIfInside(tooltipX, x, y, button);
+                    icon.clickIfInside(tooltipX, event);
                     if (!isAdditive()) break;
                 }
                 tooltipX += icon.getWidth();
@@ -325,8 +329,8 @@ public interface ControlTooltip {
         }
 
         @Override
-        default void release(double x, double y, int button) {
-            for (Icon icon : getIcons()) icon.release(x, y, button);
+        default void release(MouseButtonEvent event) {
+            for (Icon icon : getIcons()) icon.release(event);
         }
 
         @Override
@@ -412,7 +416,7 @@ public interface ControlTooltip {
         }
 
         @Override
-        public void click(double x, double y, int button) {
+        public void click(MouseButtonEvent event) {
             startPressTime = Util.getMillis();
         }
 
@@ -478,16 +482,16 @@ public interface ControlTooltip {
                 }
 
                 @Override
-                public void click(double x, double y, int button) {
-                    super.click(x, y, button);
+                public void click(MouseButtonEvent event) {
+                    super.click(event);
                     stateGetter.get().nextUpdatePress();
                 }
             };
         }
 
         public static LegacyIcon create(InputConstants.Key key, BiFunction<InputConstants.Key,BooleanSupplier, LegacyIcon> iconGetter) {
-            long window = Minecraft.getInstance().getWindow().getWindow();
-            return iconGetter.apply(key,()->(key.getType() == InputConstants.Type.KEYSYM ? InputConstants.isKeyDown(window, key.getValue()) : GLFW.glfwGetMouseButton(window, key.getValue()) == 1));
+            Window window = Minecraft.getInstance().getWindow();
+            return iconGetter.apply(key,()->(key.getType() == InputConstants.Type.KEYSYM ? InputConstants.isKeyDown(window, key.getValue()) : GLFW.glfwGetMouseButton(window.handle(), key.getValue()) == 1));
         }
     }
 
@@ -499,27 +503,27 @@ public interface ControlTooltip {
         }
 
         @Override
-        public void click(double x, double y, int button) {
-            super.click(x, y, button);
+        public void click(MouseButtonEvent event) {
+            super.click(event);
 
             if (key.getValue() == InputConstants.KEY_LSHIFT || key.getValue() == InputConstants.KEY_RSHIFT) {
                 Legacy4JClient.controllerManager.simulateShift = true;
             }
 
             if (key.getType() == InputConstants.Type.KEYSYM)
-                Minecraft.getInstance().keyboardHandler.keyPress(Minecraft.getInstance().getWindow().getWindow(), key.getValue(), 0, 1, 0);
+                ((KeyboardHandlerAccessor) Minecraft.getInstance().keyboardHandler).invokeKeyPress(Minecraft.getInstance().getWindow().handle(), 1, new KeyEvent(key.getValue(), 0, 0));
         }
 
         @Override
-        public void release(double x, double y, int button) {
+        public void release(MouseButtonEvent event) {
             if (key.getType() == InputConstants.Type.KEYSYM)
-                Minecraft.getInstance().keyboardHandler.keyPress(Minecraft.getInstance().getWindow().getWindow(), key.getValue(), 0, 0, 0);
+                ((KeyboardHandlerAccessor) Minecraft.getInstance().keyboardHandler).invokeKeyPress(Minecraft.getInstance().getWindow().handle(), 0, new KeyEvent(key.getValue(), 0, 0));
         }
 
         @Override
         public boolean pressed() {
-            long window = Minecraft.getInstance().getWindow().getWindow();
-            return (key.getType() == InputConstants.Type.KEYSYM ? InputConstants.isKeyDown(window, key.getValue()) : GLFW.glfwGetMouseButton(window, key.getValue()) == 1);
+            Window window = Minecraft.getInstance().getWindow();
+            return (key.getType() == InputConstants.Type.KEYSYM ? InputConstants.isKeyDown(window, key.getValue()) : GLFW.glfwGetMouseButton(window.handle(), key.getValue()) == 1);
         }
 
         @Override
@@ -662,7 +666,7 @@ public interface ControlTooltip {
         }
 
 
-        public void press(double x, double y, int button, boolean clicked) {
+        public void press(MouseButtonEvent event, boolean clicked) {
             boolean left = LegacyOptions.controlTooltipDisplay.get().isLeft();
             float hudDiff = (1 - LegacyOptions.hudDistance.get().floatValue()) * 60f;
             float xDiff = -Math.min(hudDiff,30);
@@ -671,11 +675,11 @@ public interface ControlTooltip {
             for (Map.Entry<Component, Icon> e : renderTooltips.entrySet()) {
                 int tooltipWidth = e.getValue().getWidth() + minecraft.font.width(e.getKey());
                 if (!left) tooltipX -= tooltipWidth;
-                if (LegacyRenderUtil.isMouseOver(x, y, tooltipX, tooltipY, tooltipWidth, 7)) {
+                if (LegacyRenderUtil.isMouseOver(event.x(), event.y(), tooltipX, tooltipY, tooltipWidth, 7)) {
                     if (clicked)
-                        e.getValue().clickIfInside(tooltipX, x, y, button);
+                        e.getValue().clickIfInside(tooltipX, event);
                     else
-                        e.getValue().release(x, y, button);
+                        e.getValue().release(event);
                     return;
                 }
                 tooltipX += left ? tooltipWidth + 12 : -12;
@@ -915,7 +919,7 @@ public interface ControlTooltip {
 
     static boolean canPlace(Minecraft minecraft, ItemStack usedItem, InteractionHand hand) {
         BlockPlaceContext c;
-        return minecraft.hitResult != null && minecraft.hitResult.getType() != HitResult.Type.MISS && !usedItem.isEmpty() && ((usedItem.getItem() instanceof SpawnEggItem e && (!(minecraft.hitResult instanceof EntityHitResult r) || r.getEntity().getType() == e.getType(/*? if >=1.21.4 {*/minecraft.level.registryAccess(), /*?}*/usedItem/*? if <1.20.5 {*//*.getTag()*//*?}*/))) || minecraft.hitResult instanceof BlockHitResult r && (usedItem.getItem() instanceof BlockItem b && (c =new BlockPlaceContext(minecraft.player,hand,usedItem,r)).canPlace() && b.getPlacementState(c) != null));
+        return minecraft.hitResult != null && minecraft.hitResult.getType() != HitResult.Type.MISS && !usedItem.isEmpty() && ((usedItem.getItem() instanceof SpawnEggItem e && (!(minecraft.hitResult instanceof EntityHitResult r) || r.getEntity().getType() == e.getType(usedItem))) || minecraft.hitResult instanceof BlockHitResult r && (usedItem.getItem() instanceof BlockItem b && (c =new BlockPlaceContext(minecraft.player,hand,usedItem,r)).canPlace() && b.getPlacementState(c) != null));
     }
 
     static boolean canHang(Minecraft minecraft, BlockHitResult hitResult, BlockState blockState, ItemStack usedItem) {
@@ -959,7 +963,11 @@ public interface ControlTooltip {
         interface ScreenContext extends Context {
             Screen screen();
         }
-        record KeyContext(int key, Screen screen) implements ScreenContext {
+        record KeyContext(KeyEvent keyEvent, Screen screen) implements ScreenContext {
+
+            public int key() {
+                return keyEvent.key();
+            }
 
         }
 

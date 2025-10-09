@@ -21,7 +21,7 @@ public class BabyVillagerFollowIronGolemBehavior extends Behavior<Villager> {
     protected boolean checkExtraStartConditions(ServerLevel serverLevel, Villager villager) {
         if (villager.getAge() >= 0) {
             return false;
-        } else if (!serverLevel./*? if <1.21.5 {*//*isDay*//*?} else {*/isBrightOutside/*?}*/()) {
+        } else if (!serverLevel.isBrightOutside()) {
             return false;
         } else {
             List<IronGolem> list = serverLevel.getEntitiesOfClass(IronGolem.class, villager.getBoundingBox().inflate(6.0D, 2.0D, 6.0D));

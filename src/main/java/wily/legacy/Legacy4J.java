@@ -69,7 +69,7 @@ public class Legacy4J {
     public Legacy4J(){
         init();
         //? if forge || neoforge {
-        /*if (FMLEnvironment.dist == Dist.CLIENT)
+        /*if (FactoryAPI.isClient())
             Legacy4JClient.init();
         *///?}
     }
@@ -182,13 +182,14 @@ public class Legacy4J {
         return new Vec3(length*Math.cos(quantizedAngle), vec3.y,length*Math.sin(quantizedAngle));
     }
 
-    public static void onServerPlayerJoin(ServerPlayer p){
-        if (p.getServer() == null) return;
+    public static void onServerPlayerJoin(ServerPlayer p) {
+        MinecraftServer server = FactoryAPIPlatform.getEntityServer(p);
+        if (server == null) return;
         int pos = 0;
         boolean b = true;
         main : while (b) {
             b = false;
-            for (ServerPlayer player : p.getServer().getPlayerList().getPlayers())
+            for (ServerPlayer player : server.getPlayerList().getPlayers())
                 if (player != p && ((LegacyPlayerInfo)player).getIdentifierIndex() == pos){
                     pos++;
                     b = true;
@@ -196,17 +197,17 @@ public class Legacy4J {
                 }
         }
         ((LegacyPlayerInfo)p).setIdentifierIndex(pos);
-        CommonNetwork.sendToPlayers(p.getServer().getPlayerList().getPlayers().stream().filter(sp-> sp != p).collect(Collectors.toSet()), new PlayerInfoSync.All(Map.of(p.getUUID(),(LegacyPlayerInfo)p), Collections.emptyMap(), p.getServer().getDefaultGameType(),PlayerInfoSync.All.ID_S2C));
+        CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers().stream().filter(sp-> sp != p).collect(Collectors.toSet()), new PlayerInfoSync.All(Map.of(p.getUUID(),(LegacyPlayerInfo)p), Collections.emptyMap(), server.getDefaultGameType(),PlayerInfoSync.All.ID_S2C));
 
-        CommonNetwork.sendToPlayer(p, PlayerInfoSync.All.fromPlayerList(p.getServer()), true);
+        CommonNetwork.sendToPlayer(p, PlayerInfoSync.All.fromPlayerList(server), true);
         playerInitialPayloads.forEach(payload->CommonNetwork.sendToPlayer(p, payload, true));
 
-        if (!p.getServer().isDedicatedServer()) Legacy4JClient.serverPlayerJoin(p);
+        if (!FactoryAPIPlatform.getEntityServer(p).isDedicatedServer()) Legacy4JClient.serverPlayerJoin(p);
     }
 
     public static void onServerStart(MinecraftServer server){
         playerInitialPayloads = createPlayerInitialPayloads(server);
-        LegacyWorldOptions.WORLD_STORAGE.withServerFile(server, "legacy_data.json").load();
+        LegacyWorldOptions.WORLD_STORAGE.withServerFile(server, "legacy_data.json").resetAndLoad();
     }
 
     public static void onResourcesReload(PlayerList playerList){

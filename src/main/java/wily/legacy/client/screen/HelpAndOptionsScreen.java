@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HelpAndOptionsScreen extends RenderableVListScreen {
-    //public static final List<Function<Screen, AbstractButton>> HOW_TO_PLAY_BUTTONS = new ArrayList<>(List.of(s->RenderableVListScreen.openScreenButton(Component.literal("Minecraft Wiki"),()->ConfirmationScreen.createLinkScreen(s,"https://minecraft.wiki/")).build(), s->RenderableVListScreen.openScreenButton(Component.literal("Legacy4J Wiki"),()->ConfirmationScreen.createLinkScreen(s,"https://github.com/Wilyicaro/Legacy-Minecraft/wiki")).build(),s->RenderableVListScreen.openScreenButton(Component.translatable("legacy.options.hints"),()->new ItemViewerScreen(s,s1->Panel.centered(s1,325,180), CommonComponents.EMPTY)).build()));
 
     public static List<AbstractWidget> createPlayerSkinWidgets(){
         List<AbstractWidget> list = new ArrayList<>();
@@ -49,11 +48,12 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
                                 o -> o.renderableVList.addMultSliderOption(LegacyOptions.of(Minecraft.getInstance().options.sensitivity()), 2),
                                 o -> o.renderableVList.addMultSliderOption(LegacyOptions.of(Minecraft.getInstance().options.mouseWheelSensitivity()), 2),
                                 o -> o.renderableVList.addOptions(
-                                LegacyOptions.of(minecraft.options.invertYMouse()),
-                                LegacyOptions.of(minecraft.options.discreteMouseScroll()),
-                                LegacyOptions.of(minecraft.options.touchscreen()),
-                                LegacyOptions.cursorAtFirstInventorySlot,
-                                LegacyOptions.systemCursor
+                                        LegacyOptions.of(minecraft.options.invertMouseX()),
+                                        LegacyOptions.of(minecraft.options.invertMouseY()),
+                                        LegacyOptions.of(minecraft.options.discreteMouseScroll()),
+                                        LegacyOptions.of(minecraft.options.touchscreen()),
+                                        LegacyOptions.cursorAtFirstInventorySlot,
+                                        LegacyOptions.systemCursor
                         ))))))).build(),Button.builder(Component.translatable("controls.keybinds.title"), button -> this.minecraft.setScreen(new LegacyKeyMappingScreen(r.getScreen()))).build(),Button.builder(Component.translatable("legacy.options.selectedController"), button -> this.minecraft.setScreen(new ControllerMappingScreen(r.getScreen()))).build()))).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.settings"),()->new SettingsScreen(this)).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("credits_and_attribution.button.credits"),()->new RenderableVListScreen(this,Component.translatable("credits_and_attribution.screen.title"),r-> r.addRenderables(openScreenButton(Component.translatable("credits_and_attribution.button.credits"),()->new WinScreen(false, () -> this.minecraft.setScreen(r.getScreen()))).build(),Button.builder(Component.translatable("credits_and_attribution.button.attribution"), b-> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaAttribution"))).build(),Button.builder(Component.translatable("credits_and_attribution.button.licenses"), b-> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaLicenses"))).build()))).build());

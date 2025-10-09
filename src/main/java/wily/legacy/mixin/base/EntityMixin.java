@@ -26,6 +26,6 @@ public abstract class EntityMixin {
 
     @ModifyExpressionValue(method = "updateSwimming", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isUnderWater()Z"))
     protected boolean updateSwimming(boolean original) {
-        return ((!self().level().isClientSide && self().level().getServer().getGameRules().getBoolean(LegacyGameRules.LEGACY_SWIMMING)) && (self().isInWater() && self().getXRot() > 0) || original) && !(self() instanceof Player p && p.getAbilities().flying);
+        return ((!self().level().isClientSide() && self().level().getServer().getGameRules().getBoolean(LegacyGameRules.LEGACY_SWIMMING)) && (self().isInWater() && self().getXRot() > 0) || original) && !(self() instanceof Player p && p.getAbilities().flying);
     }
 }

@@ -8,6 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
 import wily.factoryapi.FactoryAPIClient;
+import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
@@ -63,7 +64,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
     }
 
     public PlayerInfoSync(Sync sync, GameProfile profile){
-        this(sync,profile.getId());
+        this(sync, profile.id());
     }
 
     @Override
@@ -90,14 +91,14 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
             ServerPlayer affectPlayer;
             if (sp.getUUID().equals(player)) {
                 switch (sync) {
-                    case ASK_ALL -> CommonNetwork.sendToPlayer(sp, All.fromPlayerList(sp.getServer()));
+                    case ASK_ALL -> CommonNetwork.sendToPlayer(sp, All.fromPlayerList(FactoryAPIPlatform.getEntityServer(sp)));
                     case CLASSIC_CRAFTING, LEGACY_CRAFTING -> ((LegacyPlayer) sp).setCrafting(sync == Sync.CLASSIC_CRAFTING);
                     case CLASSIC_TRADING, LEGACY_TRADING -> ((LegacyPlayer) sp).setTrading(sync == Sync.CLASSIC_TRADING);
                     case CLASSIC_STONECUTTING, LEGACY_STONECUTTING -> ((LegacyPlayer) sp).setStonecutting(sync == Sync.CLASSIC_STONECUTTING);
                     case CLASSIC_LOOM, LEGACY_LOOM -> ((LegacyPlayer) sp).setLoom(sync == Sync.CLASSIC_LOOM);
                 }
                 affectPlayer = sp;
-            } else affectPlayer = sp.getServer().getPlayerList().getPlayer(player);
+            } else affectPlayer = FactoryAPIPlatform.getEntityServer(sp).getPlayerList().getPlayer(player);
             if (affectPlayer == null) return;
             if (sp.hasPermissions(2)){
                 switch (sync){
@@ -140,7 +141,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
         }
 
         public static All fromPlayerList(MinecraftServer server){
-            return new All(server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().getId(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(server.getGameRules()), server.getDefaultGameType(), All.ID_S2C);
+            return new All(server.getPlayerList().getPlayers().stream().collect(Collectors.toMap(e -> e.getGameProfile().id(), e -> (LegacyPlayerInfo) e)), getWritableGameRules(server.getGameRules()), server.getDefaultGameType(), All.ID_S2C);
         }
 
         @Override
@@ -165,11 +166,11 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
                 return false;
             });
             context.executor().execute(()-> {
-                GameRules displayRules = context.player() instanceof ServerPlayer sp ? sp.getServer().getGameRules() : Legacy4JClient.gameRules;
+                GameRules displayRules = context.player() instanceof ServerPlayer sp ? FactoryAPIPlatform.getEntityServer(sp).getGameRules() : Legacy4JClient.gameRules;
                 displayRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
                     @Override
                     public <T extends GameRules.Value<T>> void visit(GameRules.Key<T> key, GameRules.Type<T> type) {
-                        if (gameRules.containsKey(key.getId()) && (context.player().level().isClientSide || NON_OP_GAMERULES.contains(key) || context.player().hasPermissions(2))) {
+                        if (gameRules.containsKey(key.getId()) && (context.player().level().isClientSide() || NON_OP_GAMERULES.contains(key) || context.player().hasPermissions(2))) {
                             if (gameRules.get(key.getId()) instanceof Boolean b && displayRules.getRule(key) instanceof GameRules.BooleanValue v)
                                 v.set(b, null);
                             if (gameRules.get(key.getId()) instanceof Integer i && displayRules.getRule(key) instanceof GameRules.IntegerValue v)

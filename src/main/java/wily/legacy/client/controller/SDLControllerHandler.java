@@ -57,7 +57,7 @@ public class SDLControllerHandler implements Controller.Handler {
     }
 
     public void fallback() {
-        Legacy4J.LOGGER.warn("{} isn't supported in this system. GLFW will be used instead.", getName());
+        Legacy4J.LOGGER.warn("{} isn't supported in this system. {} will be used instead.", getName(), GLFWControllerHandler.getInstance().getName());
         LegacyOptions.selectedControllerHandler.set(GLFWControllerHandler.getInstance());
         LegacyOptions.selectedControllerHandler.save();
         init = true;

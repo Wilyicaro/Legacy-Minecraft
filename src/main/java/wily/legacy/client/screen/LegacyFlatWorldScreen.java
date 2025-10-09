@@ -9,6 +9,8 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
@@ -106,7 +108,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         AbstractButton b;
         displayBiomes.addRenderable(b = new AbstractButton(0,0,260,30, Component.translatable("biome."+biome.key().location().toLanguageKey())) {
             @Override
-            public void onPress() {
+            public void onPress(InputWithModifiers input) {
                 generator.biome = biome;
             }
 
@@ -190,16 +192,16 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         }
 
         @Override
-        public boolean keyPressed(int i, int j, int k) {
-            if (i == InputConstants.KEY_X){
+        public boolean keyPressed(KeyEvent keyEvent) {
+            if (keyEvent.key() == InputConstants.KEY_X) {
                 movingLayer = this;
                 return true;
             }
-            return super.keyPressed(i, j, k);
+            return super.keyPressed(keyEvent);
         }
 
         @Override
-        public void onPress() {
+        public void onPress(InputWithModifiers inputWithModifiers) {
             if (movingLayer != null){
                 if (isFocused()) movingLayer = null;
                 return;
@@ -325,13 +327,13 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
+    public boolean keyPressed(KeyEvent keyEvent) {
         if (movingLayer == null) {
-            if (tabList.controlTab(i)) return true;
-            if (i == InputConstants.KEY_O)
+            if (tabList.controlTab(keyEvent.key())) return true;
+            if (keyEvent.key() == InputConstants.KEY_O)
                 minecraft.setScreen(new LegacyFlatPresetsScreen(this, uiState.getSettings().worldgenLoadContext().lookupOrThrow(Registries.FLAT_LEVEL_GENERATOR_PRESET), uiState.getSettings().dataConfiguration().enabledFeatures(), f -> setPreset(f.value().settings())));
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyEvent);
     }
 
     @Override

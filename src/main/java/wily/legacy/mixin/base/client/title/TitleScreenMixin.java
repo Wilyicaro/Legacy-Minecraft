@@ -11,6 +11,7 @@ import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.SplashRenderer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 //? if forge {
 /*import net.minecraftforge.client.gui.TitleScreenModUpdateIndicator;
@@ -102,21 +103,21 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (renderableVList.keyPressed(i)) return true;
-        if (i == InputConstants.KEY_X) {
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (renderableVList.keyPressed(keyEvent.key())) return true;
+        if (keyEvent.key() == InputConstants.KEY_X) {
             minecraft.setScreen(new ChooseUserScreen(this));
             return true;
         }
-        if (i == InputConstants.KEY_O && PublishScreen.hasWorldHost()) {
+        if (keyEvent.key() == InputConstants.KEY_O && PublishScreen.hasWorldHost()) {
             minecraft.setScreen(new WorldHostFriendsScreen(this));
             return true;
         }
-        if (Legacy4JClient.keyLegacy4JSettings.matches(i,j)) {
+        if (Legacy4JClient.keyLegacy4JSettings.matches(keyEvent)) {
             minecraft.setScreen(new Legacy4JSettingsScreen(this));
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyEvent);
     }
 
     //? if forge || neoforge {

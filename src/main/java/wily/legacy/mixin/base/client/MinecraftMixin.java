@@ -2,9 +2,8 @@ package wily.legacy.mixin.base.client;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
@@ -15,7 +14,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.toasts.AdvancementToast;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.screens.*;
-import net.minecraft.client.main.GameConfig;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -51,16 +50,13 @@ import wily.legacy.util.client.LegacyGuiElements;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
     Vec3 lastPlayerBlockUsePos = null;
-    @Shadow protected abstract void updateScreenAndTick(Screen screen);
 
     @Shadow @Nullable public ClientLevel level;
 
@@ -201,7 +197,7 @@ public abstract class MinecraftMixin {
             inventoryKeyHold = 0;
             LegacyAdvancementsScreen screen = new LegacyAdvancementsScreen(null);
             setScreen(screen);
-            screen.focusRenderable(r-> r instanceof LegacyAdvancementsScreen.AdvancementButton b && b.id.equals(AdvancementToastAccessor.of(toast).getAdvancementId()), i-> screen.getTabList().tabButtons.get(i).onPress());
+            screen.focusRenderable(r-> r instanceof LegacyAdvancementsScreen.AdvancementButton b && b.id.equals(AdvancementToastAccessor.of(toast).getAdvancementId()), i-> screen.getTabList().tabButtons.get(i).onPress(new KeyEvent(InputConstants.KEY_RETURN, 0, 0)));
         }
         return false;
     }
@@ -260,15 +256,10 @@ public abstract class MinecraftMixin {
         return false;
     }
 
-    @WrapWithCondition(method = "updateScreenAndTick",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/sounds/SoundManager;stop()V"))
+    @WrapWithCondition(method = "updateLevelInEngines",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/sounds/SoundManager;stop()V"))
     public boolean updateScreenAndTick(SoundManager instance) {
         SoundManagerAccessor.of(instance).stopAllSound();
         return false;
-    }
-
-    @ModifyArg(method = "setLevel",at = @At(value = "INVOKE",target = "Lnet/minecraft/client/Minecraft;updateScreenAndTick(Lnet/minecraft/client/gui/screens/Screen;)V"))
-    public Screen setLevelLoadingScreen(Screen arg, @Local(argsOnly = true) ClientLevel newLevel) {
-        return LegacyOptions.legacyLoadingAndConnecting.get() ? LegacyLoadingScreen.getDimensionChangeScreen(level, newLevel) : arg;
     }
 
     @ModifyVariable(method = "buildInitialScreens", at = @At(value = "STORE"))

@@ -11,6 +11,9 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -86,50 +89,50 @@ public class HostOptionsScreen extends PanelVListScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (Legacy4JClient.keyHostOptions.matches(i,j)){
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (Legacy4JClient.keyHostOptions.matches(keyEvent)){
             onClose();
             return true;
         }
-        if (i== InputConstants.KEY_O){
-            minecraft.setScreen(new ChatScreen(""){
+        if (keyEvent.key() == InputConstants.KEY_O){
+            minecraft.setScreen(new ChatScreen("", false) {
                 boolean released = false;
-                public boolean charTyped(char c, int i) {
+                public boolean charTyped(CharacterEvent characterEvent) {
                     if (!released) return false;
-                    return super.charTyped(c, i);
+                    return super.charTyped(characterEvent);
                 }
                 @Override
-                public boolean keyReleased(int i2, int j, int k) {
-                    if (i2 == i) released = true;
-                    return super.keyReleased(i2, j, k);
+                public boolean keyReleased(KeyEvent keyEvent1) {
+                    if (keyEvent.key() == keyEvent1.key()) released = true;
+                    return super.keyReleased(keyEvent1);
                 }
             });
             return true;
         }
-        if (i == InputConstants.KEY_X && minecraft.hasSingleplayerServer()){
+        if (keyEvent.key() == InputConstants.KEY_X && minecraft.hasSingleplayerServer()){
             if (!minecraft.getSingleplayerServer().isPublished()) minecraft.setScreen(new PublishScreen(this, minecraft.getSingleplayerServer().getDefaultGameType(), s -> s.publish(minecraft.getSingleplayerServer())){
                 boolean released = false;
-                public boolean charTyped(char c, int i) {
+                public boolean charTyped(CharacterEvent characterEvent) {
                     if (!released) return false;
-                    return super.charTyped(c, i);
+                    return super.charTyped(characterEvent);
                 }
                 @Override
-                public boolean keyReleased(int i2, int j, int k) {
-                    if (i2 == i) released = true;
-                    return super.keyReleased(i2, j, k);
+                public boolean keyReleased(KeyEvent keyEvent1) {
+                    if (keyEvent.key() == keyEvent1.key()) released = true;
+                    return super.keyReleased(keyEvent1);
                 }
             });
             else if (PublishScreen.hasWorldHost()) minecraft.setScreen(new WorldHostFriendsScreen(this));
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyEvent);
     }
 
     protected abstract class PlayerButton extends AbstractButton {
         public final PlayerInfo playerInfo;
 
         public PlayerButton(int x, int y, int width, int height, PlayerInfo playerInfo) {
-            super(x, y, width, height, Component.literal(playerInfo.getProfile().getName()));
+            super(x, y, width, height, Component.literal(playerInfo.getProfile().name()));
             this.playerInfo = playerInfo;
         }
 
@@ -188,7 +191,7 @@ public class HostOptionsScreen extends PanelVListScreen {
                 public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
                     panel.render(guiGraphics,i,j,f);
                     drawPlayerIcon((LegacyPlayerInfo) playerInfo, guiGraphics, panel.x + 7,panel.y + 5);
-                    guiGraphics.drawString(font, playerInfo.getProfile().getName(),panel.x + 31, panel.y + 12, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+                    guiGraphics.drawString(font, playerInfo.getProfile().name(), panel.x + 31, panel.y + 12, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
                 }
             };
             List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
@@ -196,11 +199,11 @@ public class HostOptionsScreen extends PanelVListScreen {
                 if (initialVisibility != b1.selected){
                     COMMAND_MAP.put(b1,()->{
                     if (b1.selected) {
-                        minecraft.player.connection.sendCommand("effect give %s minecraft:invisibility infinite 255 true".formatted(playerInfo.getProfile().getName()));
-                        minecraft.player.connection.sendCommand("effect give %s minecraft:resistance infinite 255 true".formatted(playerInfo.getProfile().getName()));
+                        minecraft.player.connection.sendCommand("effect give %s minecraft:invisibility infinite 255 true".formatted(playerInfo.getProfile().name()));
+                        minecraft.player.connection.sendCommand("effect give %s minecraft:resistance infinite 255 true".formatted(playerInfo.getProfile().name()));
                     }else {
-                        minecraft.player.connection.sendCommand("effect clear %s minecraft:invisibility".formatted(playerInfo.getProfile().getName()));
-                        minecraft.player.connection.sendCommand("effect clear %s minecraft:resistance".formatted(playerInfo.getProfile().getName()));
+                        minecraft.player.connection.sendCommand("effect clear %s minecraft:invisibility".formatted(playerInfo.getProfile().name()));
+                        minecraft.player.connection.sendCommand("effect clear %s minecraft:resistance".formatted(playerInfo.getProfile().name()));
                     }});
                 }
             }));
@@ -208,17 +211,17 @@ public class HostOptionsScreen extends PanelVListScreen {
                 screen.renderableVList.addRenderable(new TickBox(0,0,((LegacyPlayerInfo) playerInfo).mayFlySurvival(),b1-> Component.translatable("legacy.menu.host_options.player.mayFly"),b1-> null, b1-> CommonNetwork.sendToServer(PlayerInfoSync.mayFlySurvival(b1.selected, playerInfo.getProfile()))));
                 screen.renderableVList.addRenderable(new TickBox(0,0,((LegacyPlayerInfo) playerInfo).isExhaustionDisabled(),b1-> Component.translatable("legacy.menu.host_options.player.disableExhaustion"),b1-> null, b1-> CommonNetwork.sendToServer(PlayerInfoSync.disableExhaustion(b1.selected, playerInfo.getProfile()))));
             }
-            screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230,16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL,b1.getObjectValue().getShortDisplayName()),(b1)->Tooltip.create(Component.translatable("selectWorld.gameMode."+playerInfo.getGameMode().getName()+ ".info")),playerInfo.getGameMode(),()->gameTypes, b1->COMMAND_MAP.put(b1,()-> minecraft.getConnection().sendCommand("gamemode %s %s".formatted(b1.getObjectValue().getName(),playerInfo.getProfile().getName())))));
-            screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_player_spawn"),b1-> COMMAND_MAP.put(b1,()-> minecraft.player.connection.sendCommand("spawnpoint %s ~ ~ ~".formatted(playerInfo.getProfile().getName())))).bounds(0,0,215,20).build());minecraft.setScreen(screen);
+            screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230,16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL,b1.getObjectValue().getShortDisplayName()),(b1)->Tooltip.create(Component.translatable("selectWorld.gameMode."+playerInfo.getGameMode().getName()+ ".info")),playerInfo.getGameMode(),()->gameTypes, b1->COMMAND_MAP.put(b1,()-> minecraft.getConnection().sendCommand("gamemode %s %s".formatted(b1.getObjectValue().getName(),playerInfo.getProfile().name())))));
+            screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_player_spawn"),b1-> COMMAND_MAP.put(b1,()-> minecraft.player.connection.sendCommand("spawnpoint %s ~ ~ ~".formatted(playerInfo.getProfile().name())))).bounds(0,0,215,20).build());minecraft.setScreen(screen);
         });
     }
 
     protected void addPlayerButtons(boolean includeLocal, BiConsumer<PlayerInfo, AbstractButton> onPress){
         for (PlayerInfo playerInfo : getActualPlayerInfos()) {
-            if (!includeLocal && Objects.equals(playerInfo.getProfile().getName(), Minecraft.getInstance().player.getGameProfile().getName())) continue;
+            if (!includeLocal && Objects.equals(playerInfo.getProfile().name(), Minecraft.getInstance().player.getGameProfile().name())) continue;
             renderableVList.addRenderable(new PlayerButton(0,0, 230, 30, playerInfo) {
                 @Override
-                public void onPress() {
+                public void onPress(InputWithModifiers input) {
                     onPress.accept(playerInfo,this);
                 }
             });
@@ -228,7 +231,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     public static List<PlayerInfo> getActualPlayerInfos(){
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player != null && !minecraft.player.connection.getOnlinePlayers().isEmpty())
-            return minecraft.player.connection.getOnlinePlayers().stream().sorted(Comparator.comparingInt((p -> minecraft.hasSingleplayerServer() && minecraft.getSingleplayerServer().isSingleplayerOwner(p.getProfile()) ? 0 : ((LegacyPlayerInfo)p).getIdentifierIndex()))).toList();
+            return minecraft.player.connection.getOnlinePlayers().stream().sorted(Comparator.comparingInt((p -> minecraft.hasSingleplayerServer() && minecraft.player.getGameProfile().equals(p.getProfile()) ? 0 : ((LegacyPlayerInfo)p).getIdentifierIndex()))).toList();
         return Collections.emptyList();
     }
 
@@ -321,8 +324,8 @@ public class HostOptionsScreen extends PanelVListScreen {
             @Override
             protected void addPlayerButtons() {
                 addPlayerButtons(false,(profile,b1)->{
-                    if (bol) minecraft.player.connection.sendCommand("tp %s".formatted(profile.getProfile().getName()));
-                    else minecraft.player.connection.sendCommand("tp %s ~ ~ ~".formatted(profile.getProfile().getName()));
+                    if (bol) minecraft.player.connection.sendCommand("tp %s".formatted(profile.getProfile().name()));
+                    else minecraft.player.connection.sendCommand("tp %s ~ ~ ~".formatted(profile.getProfile().name()));
                 });
             }
 

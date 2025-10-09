@@ -46,14 +46,13 @@ import static wily.legacy.util.LegacyComponents.optionName;
 
 
 public class LegacyOptions {
-    @Deprecated
-    private static final File deprecatedLegacyOptionssFile = FactoryAPI.getConfigDirectory().resolve("legacy_options.txt").toFile();
-    @Deprecated
-    private static final Splitter OPTION_SPLITTER = Splitter.on(':').limit(2);
-
     public static final Function<OptionInstance<?>,FactoryConfig<?>> LEGACY_OPTION_OPTION_INSTANCE_CACHE = Util.memoize(LegacyOptions::create);
 
-    public static final Map<Component, Component> vanillaCaptionOverrideMap = new HashMap<>(Map.of(Component.translatable("key.sprint"),Component.translatable("options.key.toggleSprint"),Component.translatable("key.sneak"),Component.translatable("options.key.toggleSneak")));
+    public static final Map<Component, Component> vanillaCaptionOverrideMap = new HashMap<>(Map.of(
+            Component.translatable("key.sprint"),Component.translatable("options.key.toggleSprint"),
+            Component.translatable("key.sneak"),Component.translatable("options.key.toggleSneak"),
+            Component.translatable("key.use"),Component.translatable("options.key.toggleUse"),
+            Component.translatable("key.attack"),Component.translatable("options.key.toggleAttack")));
 
     
     public static final FactoryConfig.StorageHandler CLIENT_STORAGE = new FactoryConfig.StorageHandler() {
@@ -229,6 +228,8 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> loyaltyLines = CLIENT_STORAGE.register(createBoolean("loyaltyLines",true));
     public static final FactoryConfig<Boolean> controllerToggleCrouch = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerToggleCrouch", new FactoryConfigDisplay.Instance<>(Component.translatable("options.key.toggleSneak")),true, b->{}, CLIENT_STORAGE));;
     public static final FactoryConfig<Boolean> controllerToggleSprint = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerToggleSprint", new FactoryConfigDisplay.Instance<>(Component.translatable("options.key.toggleSprint")),false, b-> {}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> controllerToggleUse = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerToggleUse", new FactoryConfigDisplay.Instance<>(Component.translatable("options.key.toggleUse")),true, b->{}, CLIENT_STORAGE));
+    public static final FactoryConfig<Boolean> controllerToggleAttack = CLIENT_STORAGE.register(FactoryConfig.createBoolean("controllerToggleAttack", new FactoryConfigDisplay.Instance<>(Component.translatable("options.key.toggleAttack")),false, b-> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> lockControlTypeChange = CLIENT_STORAGE.register(createBoolean("lockControlTypeChange",false));
     public static final FactoryConfig<Integer> selectedItemTooltipLines = CLIENT_STORAGE.register(createInteger("selectedItemTooltipLines", Options::genericValueLabel, 0,()->6, 4));
     public static final FactoryConfig<Boolean> itemTooltipEllipsis = CLIENT_STORAGE.register(createBoolean("itemTooltipEllipsis",true));
@@ -295,6 +296,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> legacyCursor = CLIENT_STORAGE.register(createBoolean("legacyCursor", true));
     public static final FactoryConfig<Boolean> limitCursor = CLIENT_STORAGE.register(createBoolean("limitCursor", true));
     public static final FactoryConfig<Boolean> enhancedItemTranslucency = CLIENT_STORAGE.register(createBoolean("enhancedItemTranslucency", false));
+    public static final FactoryConfig<Boolean> legacyFireworks = CLIENT_STORAGE.register(createBoolean("legacyFireworks", true));
 
     public static int getTerrainFogStart() {
         return Math.min(terrainFogStart.get(), Minecraft.getInstance().options.renderDistance().get());

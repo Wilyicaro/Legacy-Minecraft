@@ -21,6 +21,9 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.FaviconTexture;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
@@ -167,7 +170,7 @@ public class ServerRenderableList extends RenderableVList {
                     }
 
                     @Override
-                    public void onPress() {
+                    public void onPress(InputWithModifiers input) {
                         if (isFocused()) joinLanServer(lanServer);
                     }
 
@@ -194,7 +197,7 @@ public class ServerRenderableList extends RenderableVList {
                 }
 
                 @Override
-                public void onPress() {
+                public void onPress(InputWithModifiers input) {
                 }
 
                 @Override
@@ -417,9 +420,9 @@ public class ServerRenderableList extends RenderableVList {
         }
 
         @Override
-        public void onClick(double d, double e) {
-            double f = d - (double) getX();
-            double g = e - (double) getY();
+        public void onClick(MouseButtonEvent event, boolean bl) {
+            double f = event.x() - (double) getX();
+            double g = event.y() - (double) getY();
             if (f <= 32.0) {
                 if (f < 16.0 && g < 16.0 && serverIndex > 0) {
                     this.swap(serverIndex, serverIndex - 1);
@@ -431,12 +434,12 @@ public class ServerRenderableList extends RenderableVList {
                 }
                 join(server);
             }else {
-                super.onClick(d,e);
+                super.onClick(event, bl);
             }
         }
 
         @Override
-        public void onPress() {
+        public void onPress(InputWithModifiers input) {
             if (isFocused()) join(server);
         }
 
@@ -447,19 +450,20 @@ public class ServerRenderableList extends RenderableVList {
             if (j < renderables.size() && renderables.get(j) instanceof GuiEventListener l) getScreen().setFocused(l);
         }
 
-        public boolean keyPressed(int i, int j, int k) {
-            if (Screen.hasShiftDown()) {
-                if (i == 264 && serverIndex < servers.size() - 1 || i == 265 && serverIndex > 0) {
-                    this.swap(serverIndex, i == 264 ? serverIndex + 1 : serverIndex - 1);
+        @Override
+        public boolean keyPressed(KeyEvent keyEvent) {
+            if (keyEvent.hasShiftDown()) {
+                if (keyEvent.isDown() && serverIndex < servers.size() - 1 || keyEvent.isUp() && serverIndex > 0) {
+                    this.swap(serverIndex, keyEvent.isDown() ? serverIndex + 1 : serverIndex - 1);
                     return true;
                 }
             }
-            if (i == InputConstants.KEY_O) {
+            if (keyEvent.key() == InputConstants.KEY_O) {
                 minecraft.setScreen(new ServerOptionsScreen(getScreen(PlayGameScreen.class),server));
                 getScreen().setFocused(this);
                 return true;
             }
-            return super.keyPressed(i, j, k);
+            return super.keyPressed(keyEvent);
         }
 
         @Override

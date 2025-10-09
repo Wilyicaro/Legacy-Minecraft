@@ -13,6 +13,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
 import net.minecraft.client.gui.screens.inventory.LecternScreen;
 import net.minecraft.client.gui.screens.inventory.PageButton;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -42,25 +44,25 @@ public class BookPanel extends WidgetPanel {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (canTakeBook(i)){
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (canTakeBook(keyEvent)) {
             Minecraft.getInstance().gameMode.handleInventoryButtonClick(Minecraft.getInstance().player.containerMenu.containerId,3);
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyEvent);
     }
 
-    public boolean canTakeBook(int key){
-        return key == InputConstants.KEY_RETURN && accessor.getScreen() instanceof LecternScreen && Minecraft.getInstance().player.mayBuild();
+    public boolean canTakeBook(KeyEvent keyEvent){
+        return keyEvent.key() == InputConstants.KEY_RETURN && accessor.getScreen() instanceof LecternScreen && Minecraft.getInstance().player.mayBuild();
     }
 
 
     public PageButton createLegacyPageButton(int i, int j, boolean bl, Button.OnPress onPress, boolean bl2){
-        return new PageButton(i,j,bl,onPress,bl2){
+        return new PageButton(i,j,bl,onPress,bl2) {
             private long lastPressTime;
             @Override
             public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                isHovered = Util.getMillis() - lastPressTime <= 300 || /*? if <1.21.4 {*//*clicked*//*?} else {*/isMouseOver/*?}*/(i,j);
+                isHovered = Util.getMillis() - lastPressTime <= 300 || isMouseOver(i,j);
                 guiGraphics.pose().pushMatrix();
                 guiGraphics.pose().translate(getX(),getY());
                 guiGraphics.pose().scale(1.5f,1.5f);
@@ -70,8 +72,8 @@ public class BookPanel extends WidgetPanel {
             }
 
             @Override
-            public void onPress() {
-                super.onPress();
+            public void onPress(InputWithModifiers input) {
+                super.onPress(input);
                 lastPressTime = Util.getMillis();
             }
 
@@ -82,7 +84,7 @@ public class BookPanel extends WidgetPanel {
             }
 
             @Override
-            public boolean /*? if <1.21.4 {*//*clicked*//*?} else {*/isMouseOver/*?}*/(double d, double e) {
+            public boolean isMouseOver(double d, double e) {
                 return this.active && this.visible && d >= (double)this.getX() && e >= (double)this.getY() && d < (double)(this.getX() + this.getWidth() * 3/2) && e < (double)(this.getY() + this.getHeight() * 3/2);
             }
         };
@@ -90,6 +92,6 @@ public class BookPanel extends WidgetPanel {
 
     @Override
     public @Nullable Component getAction(Context context) {
-        return isFocused() ? context.actionOfContext(KeyContext.class, c-> canTakeBook(c.key()) ? LegacyComponents.TAKE_BOOK : null) : super.getAction(context);
+        return isFocused() ? context.actionOfContext(KeyContext.class, c-> canTakeBook(c.keyEvent()) ? LegacyComponents.TAKE_BOOK : null) : super.getAction(context);
     }
 }

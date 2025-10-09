@@ -16,7 +16,7 @@ public class ServerEditScreen extends ConfirmationScreen{
     private final ServerData serverData;
 
     public ServerEditScreen(PlayGameScreen parent, ServerData serverData, boolean add) {
-        super(parent, 230, 187, Component.translatable("addServer.title"), Component.translatable("addServer.enterName"), (b)->{});
+        super(parent, 230, 187, Component.translatable( add ? "manageServer.add.title" : "manageServer.edit.title"), Component.translatable("manageServer.enterName"), (b)->{});
         this.serverData = serverData;
         okAction =  s->{
             serverData.name = nameBox.getValue();
@@ -34,6 +34,7 @@ public class ServerEditScreen extends ConfirmationScreen{
             onClose();
         };
     }
+
     @Override
     public void repositionElements() {
         String string = this.ipBox.getValue();
@@ -42,11 +43,12 @@ public class ServerEditScreen extends ConfirmationScreen{
         this.ipBox.setValue(string);
         this.nameBox.setValue(string2);
     }
+
     @Override
     protected void init() {
         super.init();
         nameBox = new EditBox(font, width / 2 - 100,panel.y + 47,200, 20, Component.empty());
-        ipBox = new EditBox(font, width / 2 - 100,panel.y + 87,200, 20, Component.translatable("addServer.enterIp"));
+        ipBox = new EditBox(font, width / 2 - 100,panel.y + 87,200, 20, Component.translatable("manageServer.enterIp"));
         nameBox.setValue(serverData.name);
         ipBox.setValue(serverData.ip);
         ipBox.setMaxLength(128);
@@ -54,7 +56,7 @@ public class ServerEditScreen extends ConfirmationScreen{
         ipBox.setResponder(s-> updateAddButtonStatus());
         addRenderableWidget(nameBox);
         addRenderableWidget(ipBox);
-        this.addRenderableWidget(new LegacySliderButton<>(this.width / 2 - 100, panel.y + 112, 200, 16, b-> b.getDefaultMessage(Component.translatable("addServer.resourcePack"),b.getObjectValue().getName()),b-> null,this.serverData.getResourcePackStatus(), ()->Arrays.stream(ServerData.ServerPackStatus.values()).toList(), b->this.serverData.setResourcePackStatus(b.objectValue)));
+        this.addRenderableWidget(new LegacySliderButton<>(this.width / 2 - 100, panel.y + 112, 200, 16, b-> b.getDefaultMessage(Component.translatable("manageServer.resourcePack"),b.getObjectValue().getName()),b-> null,this.serverData.getResourcePackStatus(), ()->Arrays.stream(ServerData.ServerPackStatus.values()).toList(), b->this.serverData.setResourcePackStatus(b.objectValue)));
         this.setInitialFocus(this.nameBox);
         updateAddButtonStatus();
     }

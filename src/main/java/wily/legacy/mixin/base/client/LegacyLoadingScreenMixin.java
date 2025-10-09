@@ -14,7 +14,7 @@ import wily.legacy.client.screen.LegacyLoading;
 
 import static wily.legacy.Legacy4JClient.legacyLoadingScreen;
 
-@Mixin({LevelLoadingScreen.class, ProgressScreen.class, ReceivingLevelScreen.class, ConnectScreen.class})
+@Mixin({LevelLoadingScreen.class, ProgressScreen.class, ConnectScreen.class})
 public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
     protected LegacyLoadingScreenMixin(Component component) {
         super(component);
@@ -39,11 +39,10 @@ public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
             Component lastLoadingStage = null;
             boolean genericLoading = false;
             int progress = 0;
-            if (self() instanceof ReceivingLevelScreen) progress = -1;
             if (self() instanceof LevelLoadingScreen loading) {
                 lastLoadingHeader = Component.translatable("legacy.connect.initializing");
                 lastLoadingStage = Component.translatable("legacy.loading_spawn_area");
-                progress = loading.progressListener.getProgress();
+                progress = Math.round(((LevelLoadingScreenAccessor)loading).getSmoothedProgress() * 100);
             }
             if (self() instanceof ProgressScreen p) {
                 lastLoadingHeader = p.header;

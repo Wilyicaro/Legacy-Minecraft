@@ -7,6 +7,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.render.state.pip.GuiBannerResultRenderState;import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.LoomScreen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.model.BannerFlagModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.Sheets;
@@ -60,7 +62,7 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
 
     @Shadow private int startRow;
 
-    @Shadow private ModelPart flag;
+    @Shadow private BannerFlagModel flag;
 
     @Shadow private boolean scrolling;
 
@@ -76,9 +78,8 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
         super(abstractContainerMenu, inventory, component);
     }
 
-    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "init",at = @At("HEAD"))
     public void init(CallbackInfo ci) {
-        ci.cancel();
         imageWidth = 215;
         imageHeight = 217;
         inventoryLabelX = 14;
@@ -131,7 +132,6 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
                 LegacySlotDisplay.override(s, 14 + s.getContainerSlot() * 21,185);
             }
         }
-        this.flag = this.minecraft.getEntityModels().bakeLayer(ModelLayers./*? if <1.21.4 {*//*BANNER*//*?} else {*/STANDING_BANNER_FLAG/*?}*/).getChild("flag");
     }
 
     @Override
@@ -186,7 +186,7 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
                     int u = p * 18;
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(s == menu.getSelectedBannerPatternIndex() ? BUTTON_SLOT_SELECTED : (LegacyRenderUtil.isMouseOver(i,j,leftPos + 73.5f + t,topPos + 19.5f + u,18,18) ? BUTTON_SLOT_HIGHLIGHTED : BUTTON_SLOT), t, u, 18, 18);
 
-                    TextureAtlasSprite sprite = Sheets.getBannerMaterial(list.get(s)).sprite();
+                    TextureAtlasSprite sprite = guiGraphics.getSprite(Sheets.getBannerMaterial(list.get(s)));
                     guiGraphics.pose().pushMatrix();
                     guiGraphics.pose().translate(t + 5.5f, u + 1.5f);
                     float u0 = sprite.getU0();
@@ -204,15 +204,15 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
         Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
     }
     @Inject(method = "mouseClicked",at = @At("HEAD"), cancellable = true)
-    public void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
+    public void mouseClicked(MouseButtonEvent event, boolean bl, CallbackInfoReturnable<Boolean> cir) {
         this.scrolling = false;
         if (this.displayPatterns) {
             double j = leftPos + 73.5f;
             double k = topPos + 19.5f;
             for (int l = 0; l < 4; ++l) {
                 for (int m = 0; m < 4; ++m) {
-                    double f = d - (j + m * 18);
-                    double g = e - (k + l * 18);
+                    double f = event.x() - (j + m * 18);
+                    double g = event.y() - (k + l * 18);
                     int n = l + this.startRow;
                     int o = n * 4 + m;
                     if (!(f >= 0.0) || !(g >= 0.0) || !(f < 18.0) || !(g < 18.0) || !menu.clickMenuButton(this.minecraft.player, o)) continue;
@@ -222,23 +222,23 @@ public abstract class LoomScreenMixin extends AbstractContainerScreen<LoomMenu> 
                     return;
                 }
             }
-            if (LegacyRenderUtil.isMouseOver(d,e,leftPos+ 149.5,topPos + 18,13,75)) this.scrolling = true;
+            if (LegacyRenderUtil.isMouseOver(event.x(), event.y(),leftPos+ 149.5,topPos + 18,13,75)) this.scrolling = true;
         }
-        cir.setReturnValue(super.mouseClicked(d, e, i));
+        cir.setReturnValue(super.mouseClicked(event, bl));
     }
     @Inject(method = "mouseDragged",at = @At("HEAD"), cancellable = true)
-    public void mouseDragged(double d, double e, int i, double f, double g, CallbackInfoReturnable<Boolean> cir) {
+    public void mouseDragged(MouseButtonEvent event, double f, double g, CallbackInfoReturnable<Boolean> cir) {
         int j = this.totalRowCount() - 4;
         if (this.scrolling && this.displayPatterns && j > 0) {
             int oldRow = startRow;
-            this.startRow = (int) Math.max(Math.round(j * Math.min(1,(e - (topPos + 18)) / 75)), 0);
+            this.startRow = (int) Math.max(Math.round(j * Math.min(1, (event.y() - (topPos + 18)) / 75)), 0);
             if (oldRow != startRow){
                 scrollRenderer.updateScroll(oldRow - startRow > 0 ? ScreenDirection.UP : ScreenDirection.DOWN);
             }
             cir.setReturnValue(true);
             return;
         }
-        cir.setReturnValue(super.mouseDragged(d, e, i, f, g));
+        cir.setReturnValue(super.mouseDragged(event, f, g));
     }
     @Redirect(method = "mouseScrolled",at = @At(value = "FIELD",target = "Lnet/minecraft/client/gui/screens/inventory/LoomScreen;startRow:I"))
     private void mouseScrolled(LoomScreen instance, int value){

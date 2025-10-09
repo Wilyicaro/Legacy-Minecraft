@@ -35,7 +35,7 @@ public class WaterCauldronBlockEntity extends BlockEntity {
         super(LegacyRegistries.WATER_CAULDRON_BLOCK_ENTITY.get(),blockPos, blockState);
     }
     @Override
-    public CompoundTag getUpdateTag(/*? if >=1.20.5 {*/HolderLookup.Provider provider/*?}*/) {
+    public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
         TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, provider);
         saveAdditional(output);
         return output.buildResult();
@@ -44,7 +44,7 @@ public class WaterCauldronBlockEntity extends BlockEntity {
     @Override
     public void setChanged() {
         super.setChanged();
-        if (level.isClientSide){
+        if (level.isClientSide()){
             level.sendBlockUpdated(getBlockPos(),getBlockState(),getBlockState(),2);
         }else if (level instanceof ServerLevel l){
             l.getChunkSource().blockChanged(getBlockPos());
@@ -75,7 +75,7 @@ public class WaterCauldronBlockEntity extends BlockEntity {
     }
 
     public boolean hasWater(){
-        return potion.value().equals(Potions.WATER/*? if >=1.20.5 {*/.value()/*?}*/);
+        return potion.value().equals(Potions.WATER.value());
     }
 
     public Packet<ClientGamePacketListener> getUpdatePacket() {

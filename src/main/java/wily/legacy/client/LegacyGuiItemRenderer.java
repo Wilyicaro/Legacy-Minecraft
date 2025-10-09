@@ -18,9 +18,8 @@ import net.minecraft.client.gui.render.state.BlitRenderState;
 import net.minecraft.client.gui.render.state.GuiItemRenderState;
 import net.minecraft.client.gui.render.state.GuiRenderState;
 import net.minecraft.client.gui.render.state.pip.OversizedItemRenderState;
-import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.item.TrackingItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
@@ -99,7 +98,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
         return Math.round(Math.max(getXScale(matrix), getYScale(matrix)) * 16);
     }
 
-    public void prepareItemElements(MultiBufferSource.BufferSource bufferSource, GuiRenderState renderState, int frameNumber) {
+    public void prepareItemElements(FeatureRenderDispatcher dispatcher, SubmitNodeCollector submitNodeCollector, MultiBufferSource.BufferSource bufferSource, GuiRenderState renderState, int frameNumber) {
         if (!renderState.getItemModelIdentities().isEmpty()) {
             int i = this.getGuiScaleInvalidatingItemAtlasIfChanged();
             int j = size * i;
@@ -144,7 +143,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                                                 RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(this.itemsAtlas, 0, this.itemsAtlasDepth, 1.0, kx, k - l - j, j, j);
                                             }
 
-                                            this.renderItemToAtlas(bufferSource, trackingItemStackRenderState, poseStack, kx, l, j);
+                                            this.renderItemToAtlas(dispatcher, submitNodeCollector, bufferSource, trackingItemStackRenderState, poseStack, kx, l, j);
                                             float f = (float)kx / k;
                                             float g = (float)(k - l) / k;
                                             this.submitBlitFromItemAtlas(renderState, guiItemRenderState, f, g, j, k);
@@ -214,7 +213,7 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                 );
     }
 
-    private void renderItemToAtlas(MultiBufferSource.BufferSource bufferSource, TrackingItemStackRenderState trackingItemStackRenderState, PoseStack poseStack, int x, int y, int k) {
+    private void renderItemToAtlas(FeatureRenderDispatcher featureRenderDispatcher, SubmitNodeCollector submitNodeCollector, MultiBufferSource.BufferSource bufferSource, TrackingItemStackRenderState trackingItemStackRenderState, PoseStack poseStack, int x, int y, int k) {
         poseStack.pushPose();
         poseStack.translate(x + k / 2.0F, y + k / 2.0F, 0.0F);
         poseStack.scale(k, -k, k);
@@ -224,11 +223,12 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
         } else {
             Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
         }
-
+        if (opacity != 1.0f && !LegacyOptions.enhancedItemTranslucency.get()) LegacyFeatureRenderDispatcher.of(featureRenderDispatcher).setBufferSource(BufferSourceWrapper.translucent(bufferSource, opacity));
         RenderSystem.enableScissorForRenderTypeDraws(x, this.itemsAtlas.getHeight(0) - y - k, k, k);
-        if (opacity != 1.0f && !LegacyOptions.enhancedItemTranslucency.get()) bufferSource = BufferSourceWrapper.translucent(bufferSource, opacity);
-        trackingItemStackRenderState.render(poseStack, bufferSource, 15728880, OverlayTexture.NO_OVERLAY);
+        trackingItemStackRenderState.submit(poseStack, submitNodeCollector, 15728880, OverlayTexture.NO_OVERLAY, 0);
+        featureRenderDispatcher.renderAllFeatures();
         bufferSource.endBatch();
+        LegacyFeatureRenderDispatcher.of(featureRenderDispatcher).setBufferSource(bufferSource);
         RenderSystem.disableScissorForRenderTypeDraws();
         poseStack.popPose();
     }

@@ -11,6 +11,9 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.sounds.SoundEvents;
@@ -29,6 +32,7 @@ import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.client.screen.TabList;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.init.LegacyRegistries;
+import wily.legacy.mixin.base.client.KeyboardHandlerAccessor;
 import wily.legacy.mixin.base.client.MouseHandlerAccessor;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
@@ -131,7 +135,7 @@ public class ControllerManager {
             minecraft.mouseHandler.xpos = Mth.clamp(x, 0, window.getScreenWidth());
             minecraft.mouseHandler.ypos = Mth.clamp(y, 0, window.getScreenHeight());
         }
-        if (!onlyVirtual) GLFW.glfwSetCursorPos(window.getWindow(), minecraft.mouseHandler.xpos, minecraft.mouseHandler.ypos);
+        if (!onlyVirtual) GLFW.glfwSetCursorPos(window.handle(), minecraft.mouseHandler.xpos, minecraft.mouseHandler.ypos);
     }
 
     public void safeDisconnect() {
@@ -308,29 +312,29 @@ public class ControllerManager {
 
                     if (state.is(ControllerBinding.LEFT_TRIGGER) && state.justPressed && minecraft.screen instanceof LegacyMenuAccess<?> m && m.getMenu().getCarried().getCount() > 1){
                         if (minecraft.screen.isDragging()) {
-                            minecraft.screen.mouseReleased(getPointerX(), getPointerY(), 0);
+                            minecraft.screen.mouseReleased(new MouseButtonEvent(getPointerX(), getPointerY(), new MouseButtonInfo(0, 0)));
                             minecraft.screen.setDragging(false);
                         } else {
-                            minecraft.screen.mouseClicked(getPointerX(), getPointerY(), 0);
-                            minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
+                            minecraft.screen.mouseClicked(getMouseEvent(0), false);
+                            minecraft.screen.mouseDragged(getMouseEvent(0), 0,0);
                             minecraft.screen.setDragging(true);
                         }
                     }
                     if (minecraft.screen.isDragging() && (state.is(ControllerBinding.LEFT_STICK) || state.is(ControllerBinding.DPAD_DOWN) || state.is(ControllerBinding.DPAD_LEFT) || state.is(ControllerBinding.DPAD_RIGHT) || state.is(ControllerBinding.DPAD_UP)) && state.pressed)
-                        minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
+                        minecraft.screen.mouseDragged(getMouseEvent(0), 0,0);
 
                     if (state.is(ControllerBinding.UP_BUTTON) && state.justPressed && minecraft.screen instanceof LegacyMenuAccess<?> a && a.isMouseDragging()) {
                         minecraft.gameMode.handleInventoryMouseClick(a.getMenu().containerId, a.getHoveredSlot().index, 0, ClickType.QUICK_MOVE, minecraft.player);
-                        minecraft.screen.mouseDragged(getPointerX(), getPointerY(), 0,0,0);
+                        minecraft.screen.mouseDragged(getMouseEvent(0), 0,0);
                         LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
                     }
                     int mouseClick = Controller.Event.of(minecraft.screen).getBindingMouseClick(state);
                     if (mouseClick != -1 && (!state.is(ControllerBinding.LEFT_TRIGGER) || (minecraft.screen instanceof LegacyMenuAccess<?> a && a.isOutsideClick(mouseClick)))) {
                         isControllerSimulatingInput = true;
                         if (state.pressed && state.onceClick(true))
-                            ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), mouseClick, 1, 0);
+                            ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().handle(), new MouseButtonInfo(mouseClick, 0), 1);
                         else if (state.released)
-                            ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().getWindow(), mouseClick, 0, 0);
+                            ((MouseHandlerAccessor)minecraft.mouseHandler).pressMouse(minecraft.getWindow().handle(), new MouseButtonInfo(mouseClick, 0), 0);
                         isControllerSimulatingInput = false;
                     }
                 }
@@ -409,13 +413,13 @@ public class ControllerManager {
     public void simulateKeyAction(int key, boolean press, boolean onlyScreen){
         isControllerSimulatingInput = true;
         if (onlyScreen) simulateScreenKeyAction(key, press);
-        else minecraft.keyboardHandler.keyPress(minecraft.getWindow().getWindow(), key, 0, press ? 1 : 0, 0);
+        else ((KeyboardHandlerAccessor)minecraft.keyboardHandler).invokeKeyPress(minecraft.getWindow().handle(), press ? 1 : 0, new KeyEvent(key, 0, 0));
         isControllerSimulatingInput = false;
     }
 
     public void simulateScreenKeyAction(int key, boolean press){
-        if (press) minecraft.screen.keyPressed(key, 0, 0);
-        else minecraft.screen.keyReleased(key, 0, 0);
+        if (press) minecraft.screen.keyPressed(new KeyEvent(key, 0, 0));
+        else minecraft.screen.keyReleased(new KeyEvent(key, 0, 0));
     }
 
     public double getGuiScaleX() {
@@ -432,6 +436,10 @@ public class ControllerManager {
 
     public double getPointerY() {
         return minecraft.mouseHandler.ypos() / getGuiScaleY();
+    }
+
+    protected MouseButtonEvent getMouseEvent(int button) {
+        return new MouseButtonEvent(getPointerX(), getPointerY(), new MouseButtonInfo(button, 0));
     }
 
     public float getVisualPointerX() {
@@ -508,7 +516,7 @@ public class ControllerManager {
     }
 
     public void setCursorInputMode(boolean hidden){
-        GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().getWindow(), GLFW.GLFW_CURSOR, hidden ? GLFW.GLFW_CURSOR_HIDDEN : GLFW.GLFW_CURSOR_NORMAL);
+        GLFW.glfwSetInputMode(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_CURSOR, hidden ? GLFW.GLFW_CURSOR_HIDDEN : GLFW.GLFW_CURSOR_NORMAL);
     }
 
     public void updateCursorInputMode(){

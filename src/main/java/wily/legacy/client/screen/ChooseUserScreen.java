@@ -12,6 +12,9 @@ import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -59,12 +62,12 @@ public class ChooseUserScreen extends PanelVListScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == InputConstants.KEY_X){
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.key() == InputConstants.KEY_X){
             minecraft.setScreen(accountScreen(DIRECT_LOGIN,this,false, this::manageLogin));
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyEvent);
     }
 
     public void reloadAccountButtons(){
@@ -86,8 +89,8 @@ public class ChooseUserScreen extends PanelVListScreen {
 
     public static ConfirmationScreen passwordScreen(Screen parent, Consumer<String> pass){
         EditBox passWordBox = new EditBox(Minecraft.getInstance().font, 0,0,200,20,Component.translatable("legacy.menu.choose_user.add.encryption.password"));
-        TickBox tickBox = new TickBox(0,0,true, bol->VISIBLE_PASSWORD,bol-> null, t->passWordBox.setFormatter((s,i)-> FormattedCharSequence.forward(t.selected ? s : "*".repeat(s.length()), Style.EMPTY)));
-        tickBox.onPress();
+        TickBox tickBox = new TickBox(0,0,true, bol->VISIBLE_PASSWORD,bol-> null, t->passWordBox.addFormatter((s,i)-> FormattedCharSequence.forward(t.selected ? s : "*".repeat(s.length()), Style.EMPTY)));
+        tickBox.onPress(new KeyEvent(InputConstants.KEY_RETURN, 0 , 0));
         return new ConfirmationScreen(parent,230, 120,passWordBox.getMessage(),Component.translatable("legacy.menu.choose_user.add.encryption.password_message"), b1-> pass.accept(passWordBox.getValue())){
             @Override
             protected void addButtons() {
@@ -164,11 +167,11 @@ public class ChooseUserScreen extends PanelVListScreen {
             minecraft.setScreen(ChooseUserScreen.this);
         })));
         for (MCAccount account : MCAccount.list) {
-            renderableVList.addRenderable(new AbstractButton(0, 0, 230, 30, account.getMSARefreshToken(null).isEmpty() ? Component.translatable("legacy.menu.offline_user",account.getProfile().getName()) : Component.literal(account.getProfile().getName())) {
+            renderableVList.addRenderable(new AbstractButton(0, 0, 230, 30, account.getMSARefreshToken(null).isEmpty() ? Component.translatable("legacy.menu.offline_user",account.getProfile().name()) : Component.literal(account.getProfile().name())) {
                 @Override
                 protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                     super.renderWidget(guiGraphics, i, j, f);
-                    PlayerFaceRenderer.draw(guiGraphics, minecraft.getSkinManager()./*? if >1.20.1 {*/getInsecureSkin/*?} else {*//*getInsecureSkinLocation*//*?}*/(account.getProfile()), getX() + 5, getY() + 5, 20);
+                    PlayerFaceRenderer.draw(guiGraphics, minecraft.getSkinManager().createLookup(account.getProfile(), true).get(), getX() + 5, getY() + 5, 20);
                     if (minecraft.options.touchscreen().get().booleanValue() || isHovered()) {
                         guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
                         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacyRenderUtil.isMouseOver(i,j,getX()+5,getY()+5,20,20) ? SaveRenderableList.JOIN_HIGHLIGHTED : SaveRenderableList.JOIN, getX() + 5, getY() + 5, 20, 20);
@@ -181,14 +184,14 @@ public class ChooseUserScreen extends PanelVListScreen {
                 }
 
                 @Override
-                public boolean mouseClicked(double d, double e, int i) {
-                    if (LegacyRenderUtil.isMouseOver(d,e,getX()+5,getY()+5,20,20)) manageLogin(account);
-                    return super.mouseClicked(d, e, i);
+                public boolean mouseClicked(MouseButtonEvent event, boolean bl) {
+                    if (LegacyRenderUtil.isMouseOver(event.x(), event.y(), getX()+5,getY()+5,20,20)) manageLogin(account);
+                    return super.mouseClicked(event, bl);
                 }
 
                 @Override
-                public boolean keyPressed(int i, int j, int k) {
-                    if (i == InputConstants.KEY_O) {
+                public boolean keyPressed(KeyEvent keyEvent) {
+                    if (keyEvent.key() == InputConstants.KEY_O) {
                         minecraft.setScreen(new ConfirmationScreen(ChooseUserScreen.this, 230, 120, ACCOUNT_OPTIONS, ACCOUNT_OPTIONS_MESSAGE, b -> {}){
                             @Override
                             protected void addButtons() {
@@ -209,11 +212,11 @@ public class ChooseUserScreen extends PanelVListScreen {
                         });
                         return true;
                     }
-                    return super.keyPressed(i, j, k);
+                    return super.keyPressed(keyEvent);
                 }
 
                 @Override
-                public void onPress() {
+                public void onPress(InputWithModifiers input) {
                     if (isFocused()) manageLogin(account);
                 }
 

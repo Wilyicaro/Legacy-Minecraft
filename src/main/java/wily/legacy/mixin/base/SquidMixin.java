@@ -22,7 +22,7 @@ public abstract class SquidMixin extends PathfinderMob {
 
     @Inject(method = "aiStep", at = @At("RETURN"))
     private void aiStep(CallbackInfo ci){
-        if (!level().isClientSide || !isUnderWater() || getDeltaMovement().length() <= 0.1) return;
+        if (!level().isClientSide() || !isUnderWater() || getDeltaMovement().length() <= 0.1) return;
         Vec3 vec3 = this.rotateVector(new Vec3(0.0, -0.5, -0.5));
         this.level().addParticle(ParticleTypes.BUBBLE, this.getX() + vec3.x, this.getY() + vec3.y, this.getZ() + vec3.z, 0.0,0.0,0.0);
     }

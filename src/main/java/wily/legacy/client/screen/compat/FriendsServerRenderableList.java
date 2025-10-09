@@ -12,8 +12,10 @@ import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.FaviconTexture;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.players.NameAndId;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
@@ -56,8 +58,8 @@ public class FriendsServerRenderableList extends ServerRenderableList {
         Util.backgroundExecutor().execute(()-> {
             WorldHost.ONLINE_FRIENDS.forEach(((uuid, id) -> {
                 AbstractButton onlineButton;
-                GameProfile profile = WorldHost.fetchProfile(minecraft.getMinecraftSessionService(), uuid);
-                addRenderable(onlineButton = new AbstractButton(0, 0, 270, 30, Component.literal(profile.getName())) {
+                GameProfile profile = WorldHost.fetchProfile(minecraft.services().sessionService(), uuid);
+                addRenderable(onlineButton = new AbstractButton(0, 0, 270, 30, Component.literal(profile.name())) {
                     final ServerData serverData = new ServerData("", "", /*? if >1.20.2 {*/ServerData.Type.OTHER/*?} else {*//*false*//*?}*/);
                     final FaviconTexture icon = FaviconTexture.forServer(minecraft.getTextureManager(), serverData.ip);
                     private byte @Nullable [] lastIconBytes;
@@ -90,7 +92,7 @@ public class FriendsServerRenderableList extends ServerRenderableList {
                             if (this.uploadServerIcon(bs)) this.lastIconBytes = bs;
                             else serverData.setIconBytes(null);
                         }
-                        if (serverData.getIconBytes() == null) PlayerFaceRenderer.draw(guiGraphics, minecraft.getSkinManager()./*? if >1.20.1 {*/getInsecureSkin/*?} else {*//*getInsecureSkinLocation*//*?}*/(profile),getX() + 5, getY() + 5, 20);
+                        if (serverData.getIconBytes() == null) PlayerFaceRenderer.draw(guiGraphics, minecraft.getSkinManager().createLookup(profile, true).get(),getX() + 5, getY() + 5, 20);
                         else drawIcon(guiGraphics, getX(), getY(),icon.textureLocation());
                         if (minecraft.options.touchscreen().get().booleanValue() || isHovered) {
                             guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
@@ -101,18 +103,18 @@ public class FriendsServerRenderableList extends ServerRenderableList {
 
 
                     @Override
-                    public void onPress() {
+                    public void onPress(InputWithModifiers input) {
                         if (isFocused()) {
                             minecraft.setScreen(new JoinGameScreen(getScreen(), serverData,b-> {
-                                WorldHost.LOGGER.info("Requesting to join {}", profile.getId());
+                                WorldHost.LOGGER.info("Requesting to join {}", profile.id());
                                 if (WorldHost.protoClient != null) id.joinWorld(getScreen());
                             }));
                         }
                     }
 
                     private void updateServerInfo() {
-                        serverData.name = profile.getName();
-                        final var metadata = WorldHost.ONLINE_FRIEND_PINGS.get(profile.getId());
+                        serverData.name = profile.name();
+                        final var metadata = WorldHost.ONLINE_FRIEND_PINGS.get(profile.id());
                         if (metadata == null) {
                             serverData.status = Component.empty();
                             serverData.motd = Component.empty();
@@ -133,8 +135,8 @@ public class FriendsServerRenderableList extends ServerRenderableList {
                             if (!players.sample().isEmpty()) {
                                 final List<Component> playerList = new ArrayList<>(players.sample().size());
 
-                                for (GameProfile gameProfile : players.sample()) {
-                                    playerList.add(Component.literal(gameProfile.getName()));
+                                for (NameAndId gameProfile : players.sample()) {
+                                    playerList.add(Component.literal(gameProfile.name()));
                                 }
 
                                 if (players.sample().size() < players.online()) {

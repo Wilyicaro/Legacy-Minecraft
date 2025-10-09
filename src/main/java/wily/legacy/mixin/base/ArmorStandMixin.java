@@ -40,16 +40,16 @@ public abstract class ArmorStandMixin extends LivingEntity {
     public void interactAt(Player player, Vec3 vec3, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
         if (player.isShiftKeyDown()){
             cir.setReturnValue(InteractionResult.SUCCESS);
-            if (level().isClientSide) return;
+            if (level().isClientSide()) return;
             ArmorStandPose.getNextPose(((ArmorStand)(Object)this)).applyPose((ArmorStand)(Object)this);
         }
     }
     @Inject(method = "tickHeadTurn", at = @At("RETURN"))
     public void tick(CallbackInfo ci) {
-        if (level().isClientSide) return;
+        if (level().isClientSide()) return;
 
         int signal;
-        if (!level().isClientSide){
+        if (!level().isClientSide()) {
             BlockPos onPos = getOnPos();
             for (Direction dir : Direction.values()) {
                 if ((signal = level().getSignal(onPos.relative(dir),dir)) > 0){

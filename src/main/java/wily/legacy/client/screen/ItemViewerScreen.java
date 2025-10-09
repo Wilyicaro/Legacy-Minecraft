@@ -4,6 +4,8 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -94,40 +96,40 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
+    public boolean mouseScrolled(double d, double e, double f, double g) {
         if (scroller.mouseScrolled(g)) fillLayerGrid();
-        return super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g);
+        return super.mouseScrolled(d, e, f, g);
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        if (scroller.mouseClicked(d, e, i)) fillLayerGrid();;
+    public boolean mouseClicked(MouseButtonEvent event, boolean bl) {
+        if (scroller.mouseClicked(event)) fillLayerGrid();;
         if (hoveredSlot != null) slotClicked(hoveredSlot);
-        return super.mouseClicked(d, e, i);
+        return super.mouseClicked(event, bl);
     }
 
     @Override
-    public boolean mouseReleased(double d, double e, int i) {
-        scroller.mouseReleased(d, e, i);
-        return super.mouseReleased(d, e, i);
+    public boolean mouseReleased(MouseButtonEvent event) {
+        scroller.mouseReleased(event);
+        return super.mouseReleased(event);
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy()))) {
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.key() == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy()))) {
             LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyEvent);
     }
 
     protected void slotClicked(Slot slot) {
     }
 
     @Override
-    public boolean mouseDragged(double d, double e, int i, double f, double g) {
-        if (scroller.mouseDragged(e)) fillLayerGrid();;
-        return super.mouseDragged(d, e, i, f, g);
+    public boolean mouseDragged(MouseButtonEvent event, double f, double g) {
+        if (scroller.mouseDragged(event.y())) fillLayerGrid();;
+        return super.mouseDragged(event, f, g);
     }
 
     public void setHoveredSlot(Slot hoveredSlot) {

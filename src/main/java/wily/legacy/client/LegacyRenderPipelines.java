@@ -16,7 +16,7 @@ public class LegacyRenderPipelines {
             RenderPipeline.builder(RenderPipelines.POST_PROCESSING_SNIPPET)
                     .withLocation(Legacy4J.createModLocation("pipeline/gamma"))
                     .withSampler("InSampler")
-                    .withVertexShader("core/blit_screen")
+                    .withVertexShader("core/screenquad")
                     .withFragmentShader(Legacy4J.createModLocation("core/gamma"))
                     .withUniform("GammaInfo", UniformType.UNIFORM_BUFFER)
                     .build()

@@ -13,6 +13,7 @@ import net.minecraft.util.ARGB;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix4f;
+import wily.factoryapi.base.client.FactoryGuiGraphics;
 
 public class LegacyActivationAnim {
 
@@ -28,7 +29,7 @@ public class LegacyActivationAnim {
         display(((pose, f, source) -> {
             pose.pushPose();
             pose.scale(0.5f,0.5f, 0.5f);
-            TextureAtlasSprite sprite = Minecraft.getInstance().getGuiSprites().getSprite(Gui.getMobEffectSprite(effect));
+            TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().getSprite(Gui.getMobEffectSprite(effect));
             renderTex(sprite, pose, source);
             pose.pushPose();
             pose.translate(0.5f, 0.5f, 0.5f);

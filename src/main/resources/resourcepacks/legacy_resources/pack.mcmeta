@@ -2,6 +2,8 @@
   "pack": {
     "description": "§4Legacy4J Vanilla Replacement Resources",
     "pack_format": 16,
+    "min_format": 16,
+    "max_format": 999,
     "supported_formats": [ 16, 999 ]
   }
 }

@@ -54,8 +54,8 @@ public abstract class ClientEntityMixin implements ClientEntityAccessor {
 
     @Shadow public abstract boolean isInWater();
 
-    @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", at = @At("HEAD"))
-    private void startRiding(Entity entity, boolean force, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;)Z", at = @At("HEAD"))
+    private void startRiding(Entity entity, CallbackInfoReturnable<Boolean> cir) {
         this.ridingEntityXRotDelta = 0.0F;
         this.ridingEntityYRotDelta = 0.0F;
     }

@@ -5,6 +5,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.font.TextFieldHelper;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.StandingSignBlock;
 import net.minecraft.world.level.block.WallSignBlock;
@@ -30,9 +32,9 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
 
     private WidgetPanel panel = new WidgetPanel(this){
         @Override
-        public boolean charTyped(char c, int i) {
-            if (signField.charTyped(c)) return true;
-            return super.charTyped(c, i);
+        public boolean charTyped(CharacterEvent characterEvent) {
+            if (signField.charTyped(characterEvent)) return true;
+            return super.charTyped(characterEvent);
         }
 
         @Override
@@ -43,23 +45,23 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
         }
 
         @Override
-        public boolean keyPressed(int i, int j, int k) {
-            if (KeyboardScreen.isOpenKey(i)) {
+        public boolean keyPressed(KeyEvent keyEvent) {
+            if (KeyboardScreen.isOpenKey(keyEvent.key())) {
                 minecraft.setScreen(new KeyboardScreen(isSign() ? 60 : -100,()->this,AbstractSignEditScreenMixin.this));
                 return true;
             }
-            if (i == 265 && line > 0) {
+            if (keyEvent.isUp() && line > 0) {
                 line = line - 1;
                 signField.setCursorToEnd();
                 return true;
-            } else if (i != 264 && i != 257) {
-                return signField.keyPressed(i) || super.keyPressed(i, j, k);
+            } else if (!keyEvent.isDown() && keyEvent.key() != 257) {
+                return signField.keyPressed(keyEvent) || super.keyPressed(keyEvent);
             } else if (line < 3) {
                 line = line + 1;
                 signField.setCursorToEnd();
                 return true;
             }
-            return super.keyPressed(i, j, k);
+            return super.keyPressed(keyEvent);
         }
 
         @Override
@@ -119,13 +121,13 @@ public abstract class AbstractSignEditScreenMixin extends Screen implements Cont
     }
 
     @Inject(method = "keyPressed",at = @At("HEAD"), cancellable = true)
-    public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(super.keyPressed(i,j,k));
+    public void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue(super.keyPressed(keyEvent));
     }
 
     @Inject(method = "charTyped",at = @At("HEAD"), cancellable = true)
-    public void charTyped(char c, int i, CallbackInfoReturnable<Boolean> cir) {
-        cir.setReturnValue(super.charTyped(c,i));
+    public void charTyped(CharacterEvent characterEvent, CallbackInfoReturnable<Boolean> cir) {
+        cir.setReturnValue(super.charTyped(characterEvent));
     }
 
     @Inject(method = "onClose", at = @At("RETURN"))

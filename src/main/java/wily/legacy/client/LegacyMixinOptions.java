@@ -28,6 +28,7 @@ public class LegacyMixinOptions {
     public static final FactoryMixinToggle legacyCreateWorldScreen = createAndRegisterMixin("legacy.mixin.base.client.create_world", "legacyCreateWorldScreen");
     public static final FactoryMixinToggle legacyTitleScreen = createAndRegisterMixin("legacy.mixin.base.client.title", "legacyTitleScreen");
     public static final FactoryMixinToggle legacyPauseScreen = createAndRegisterMixin("legacy.mixin.base.client.pause", "legacyPauseScreen");
+    public static final FactoryMixinToggle legacyPackSelectionScreen = createAndRegisterMixin("legacy.mixin.base.client.packselection", "legacyPackSelectionScreen");
     public static final FactoryMixinToggle legacyGui = createAndRegisterMixin("legacy.mixin.base.client.gui", "legacyGui");
     public static final FactoryMixinToggle legacyChat = createAndRegisterMixin("legacy.mixin.base.client.chat", "legacyChat");
     public static final FactoryMixinToggle legacyBossHealth = createAndRegisterMixin("legacy.mixin.base.client.bosshealth", "legacyBossHealth");

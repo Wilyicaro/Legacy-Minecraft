@@ -5,6 +5,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -45,7 +47,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
     List<ItemStack> addedIngredientsItems = null;
     Predicate<CustomRecipeIconHolder> canAddIngredient = h->true;
     public ItemStack nextItem(Inventory inventory, Predicate<ItemStack> isValid) {
-        List<ItemStack> items = inventory./*? if <1.21.5 {*//*items*//*?} else {*/getNonEquipmentItems()/*?}*/;
+        List<ItemStack> items = inventory.getNonEquipmentItems();
         for (int i = Math.max(0,items.indexOf(itemIcon)); i < items.size(); i++)
             if (itemIcon != items.get(i) && isValid.test(items.get(i))) return items.get(i);
         for (int i = 0; i < Math.max(0,items.indexOf(itemIcon)); i++)
@@ -53,7 +55,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
         return ItemStack.EMPTY;
     }
     public ItemStack previousItem(Inventory inventory, Predicate<ItemStack> isValid) {
-        List<ItemStack> items = inventory./*? if <1.21.5 {*//*items*//*?} else {*/getNonEquipmentItems()/*?}*/;
+        List<ItemStack> items = inventory.getNonEquipmentItems();
         for (int i = Math.max(0,items.indexOf(itemIcon)); i >= 0; i--)
             if (itemIcon != items.get(i) && isValid.test(items.get(i))) return items.get(i);
         for (int i = items.size() - 1; i >= Math.max(0,items.indexOf(itemIcon)); i--)
@@ -119,20 +121,20 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
         }
         //? if >=1.20.5
         CraftingInput input = container.asCraftInput();
-        return CommonRecipeManager.getResultFor(RecipeType.CRAFTING,/*? if <1.20.5 {*//*container*//*?} else {*/input/*?}*/,level).orElse(ItemStack.EMPTY);
+        return CommonRecipeManager.getResultFor(RecipeType.CRAFTING, input, level).orElse(ItemStack.EMPTY);
     }
     @Override
-    public void onPress() {
+    public void onPress(InputWithModifiers input) {
         if (isFocused()){
             if (canCraft()){
-                craft();
+                craft(input);
                 updateRecipe();
             } else LegacySoundUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
         }
     }
 
-    public void craft(){
-        CommonNetwork.sendToServer(new ServerMenuCraftPayload(getRecipeId(),List.copyOf(getIngredientsGrid()),-1,Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed));
+    public void craft(InputWithModifiers input) {
+        CommonNetwork.sendToServer(new ServerMenuCraftPayload(getRecipeId(),List.copyOf(getIngredientsGrid()),-1,input.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed));
     }
 
     public Optional<ResourceLocation> getRecipeId(){
@@ -140,7 +142,7 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
+    public boolean mouseScrolled(double d, double e, double f, double g) {
         int i = (int)Math.signum(g);
         if (isFocused() && !nextItem.isEmpty() && i > 0 || !previousItem.isEmpty() && i < 0 ){
             LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
@@ -176,24 +178,24 @@ public abstract class CustomRecipeIconHolder extends LegacyIconHolder implements
         return hasItem(itemIcon) && addedIngredientsItems != null && canAddIngredient.test(this) && getIngredientsGrid().stream().anyMatch(Optional::isEmpty);
     }
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == InputConstants.KEY_O && canAddIngredient()) {
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.key() == InputConstants.KEY_O && canAddIngredient()) {
             addedIngredientsItems.add(itemIcon.copyWithCount(1));
             updateRecipe();
             return true;
         }
-        if (i == InputConstants.KEY_X && addedIngredientsItems != null && !addedIngredientsItems.isEmpty()) {
+        if (keyEvent.key() == InputConstants.KEY_X && addedIngredientsItems != null && !addedIngredientsItems.isEmpty()) {
             addedIngredientsItems.remove(addedIngredientsItems.size() - 1);
             updateRecipe();
             return true;
         }
-        if (!nextItem.isEmpty() && i == 265 || !previousItem.isEmpty() && i == 264){
+        if (!nextItem.isEmpty() && keyEvent.isUp() || !previousItem.isEmpty() && keyEvent.isDown()){
             LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
-            itemIcon = i == 265 ? nextItem : previousItem;
+            itemIcon = keyEvent.isUp() ? nextItem : previousItem;
             updateRecipe();
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyEvent);
     }
 
     @Override

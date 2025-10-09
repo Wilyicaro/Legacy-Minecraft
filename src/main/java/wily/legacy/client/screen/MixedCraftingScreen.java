@@ -14,6 +14,9 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.recipebook.RecipeCollection;
 //? if >=1.21.2 {
 import net.minecraft.client.gui.screens.recipebook.SearchRecipeBookCategory;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.world.item.crafting.display.*;
 import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.recipebook.PlaceRecipeHelper;
@@ -306,8 +309,8 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Abstrac
                     }
 
                     @Override
-                    public void craft() {
-                        minecraft.gameMode.handlePlaceRecipe(minecraft.player.containerMenu.containerId, /*? if <1.21.2 {*//*e*//*?} else {*/e.id()/*?}*/, Screen.hasShiftDown());
+                    public void craft(InputWithModifiers input) {
+                        minecraft.gameMode.handlePlaceRecipe(minecraft.player.containerMenu.containerId, e.id(), input.hasShiftDown());
                     }
 
                     @Override
@@ -315,7 +318,7 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Abstrac
                         return warningSlots[index];
                     }
                 };
-                List<ItemStack> resultDisplay = /*? if <1.21.2 {*//*Collections.singletonList(recipe.getResultItem(minecraft.getConnection().registryAccess()))*//*?} else {*/e.resultItems(context)/*?}*/;
+                List<ItemStack> resultDisplay = e.resultItems(context);
                 RecipeInfo<VanillaCrafting> info = new RecipeInfo<>() {
 
                     @Override
@@ -503,22 +506,22 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Abstrac
                 }
 
                 @Override
-                protected void toggleCraftableRecipes() {
-                    if (hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed) return;
+                protected void toggleCraftableRecipes(InputWithModifiers input) {
+                    if (input.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed) return;
                     onlyCraftableRecipes = !onlyCraftableRecipes;
                     updateStackedContents();
                 }
 
                 @Override
-                public boolean keyPressed(int i, int j, int k) {
-                    if (controlCyclicNavigation(i, index, craftingButtons, craftingButtonsOffset, scrollRenderer, MixedCraftingScreen.this))
+                public boolean keyPressed(KeyEvent keyEvent) {
+                    if (controlCyclicNavigation(keyEvent.key(), index, craftingButtons, craftingButtonsOffset, scrollRenderer, MixedCraftingScreen.this))
                         return true;
-                    if (i == InputConstants.KEY_X) {
+                    if (keyEvent.key() == InputConstants.KEY_X) {
                         infoType.add(1, true);
                         LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
                         return true;
                     }
-                    return super.keyPressed(i, j, k);
+                    return super.keyPressed(keyEvent);
                 }
 
                 protected void updateRecipeDisplay(RecipeInfo<VanillaCrafting> rcp) {
@@ -526,9 +529,9 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Abstrac
                 }
 
                 @Override
-                public void craft() {
+                public void craft(InputWithModifiers input) {
                     LegacySoundUtil.playSimpleUISound(SoundEvents.ITEM_PICKUP, 1.0f);
-                    getFocusedRecipe().get().craft();
+                    getFocusedRecipe().get().craft(input);
                     //? if <1.21.2 {
                     /*slotClicked(menu.getSlot(menu.getResultSlotIndex()), menu.getResultSlotIndex(), 0, ClickType.QUICK_MOVE);
                     *///?} else
@@ -542,7 +545,7 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Abstrac
     public interface VanillaCrafting {
         ItemStack getItemFromGrid(int index);
         boolean canCraft();
-        void craft();
+        void craft(InputWithModifiers input);
         boolean isWarning(int index);
     }
 
@@ -561,9 +564,9 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Abstrac
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        if (searchBox.isFocused() && searchMode && !searchBox.isMouseOver(d,e)) disableSearchMode();
-        return super.mouseClicked(d, e, i);
+    public boolean mouseClicked(MouseButtonEvent event, boolean bl) {
+        if (searchBox.isFocused() && searchMode && !searchBox.isMouseOver(event.x(), event.y())) disableSearchMode();
+        return super.mouseClicked(event, bl);
     }
 
     @Override
@@ -599,23 +602,23 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Abstrac
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k){
-        if (searchMode && (i == InputConstants.KEY_UP || i == InputConstants.KEY_DOWN)){
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (searchMode && (keyEvent.key() == InputConstants.KEY_UP || keyEvent.key() == InputConstants.KEY_DOWN)){
             disableSearchMode();
             return true;
         }
-        if (getTabList().controlTab(i)) return true;
-        if (i != InputConstants.KEY_ESCAPE && searchBox.isFocused()) return searchBox.keyPressed(i,j,k);
-        return super.keyPressed(i, j, k);
+        if (getTabList().controlTab(keyEvent.key())) return true;
+        if (keyEvent.key() != InputConstants.KEY_ESCAPE && searchBox.isFocused()) return searchBox.keyPressed(keyEvent);
+        return super.keyPressed(keyEvent);
     }
 
     @Override
-    public boolean keyReleased(int i, int j, int k) {
-        if (!searchBox.isFocused() && !searchMode && i == InputConstants.KEY_O && (hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed)){
+    public boolean keyReleased(KeyEvent keyEvent) {
+        if (!searchBox.isFocused() && !searchMode && keyEvent.key() == InputConstants.KEY_O && (keyEvent.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed)){
             enableSearchMode(false);
             return true;
         }
-        return super.keyReleased(i, j, k);
+        return super.keyReleased(keyEvent);
     }
 
     public List<RecipeIconHolder<VanillaCrafting>> getCraftingButtons() {

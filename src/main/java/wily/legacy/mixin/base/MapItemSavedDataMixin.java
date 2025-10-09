@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
@@ -28,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.factoryapi.FactoryAPI;
+import wily.factoryapi.FactoryAPIPlatform;
 import wily.legacy.Legacy4J;
 import wily.legacy.config.LegacyWorldOptions;
 import wily.legacy.init.LegacyGameRules;
@@ -55,7 +57,7 @@ public abstract class MapItemSavedDataMixin {
 
     @Shadow @Final private Map<Player, MapItemSavedData.HoldingPlayer> carriedByPlayers;
 
-    @Shadow protected abstract void addDecoration(/*? if <1.20.5 {*//*MapDecoration.Type*//*?} else {*/Holder<MapDecorationType>/*?}*/ arg, LevelAccessor arg2, String string, double d, double e, double f, Component arg3);
+    @Shadow protected abstract void addDecoration(Holder<MapDecorationType> arg, LevelAccessor arg2, String string, double d, double e, double f, Component arg3);
 
     @Shadow protected abstract void removeDecoration(String string);public MapItemSavedData self(){
         return (MapItemSavedData) (Object) this;
@@ -63,26 +65,27 @@ public abstract class MapItemSavedDataMixin {
 
     @ModifyExpressionValue(method = "tickCarriedBy", at = @At(value = "INVOKE", target = "Ljava/util/Map;containsKey(Ljava/lang/Object;)Z", ordinal = 0))
     public boolean tickCarriedByAddGlobalPlayers(boolean original, Player player) {
-        if (!player.getServer().getGameRules().getBoolean(LegacyGameRules.GLOBAL_MAP_PLAYER_ICON)) return original;
-        if (player instanceof ServerPlayer sp && sp.getServer() != null){
-            sp.getServer().getPlayerList().getPlayers().forEach(p-> {
+        MinecraftServer server = FactoryAPIPlatform.getEntityServer(player);
+        if (!server.getGameRules().getBoolean(LegacyGameRules.GLOBAL_MAP_PLAYER_ICON)) return original;
+        if (player instanceof ServerPlayer sp && server != null){
+            server.getPlayerList().getPlayers().forEach(p-> {
                 if (!carriedByPlayers.containsKey(p)){
                     MapItemSavedData.HoldingPlayer hp = self().new HoldingPlayer(p);
                     carriedBy.add(hp);
                     carriedByPlayers.put(p,hp);
                 }
                 if (p.level().dimension() != dimension){
-                    removeDecoration(sp.getGameProfile().getName());
+                    removeDecoration(sp.getGameProfile().name());
                 }
             });
         }
         return true;
     }
-    @ModifyExpressionValue(method = "tickCarriedBy", at = @At(value = "INVOKE", target = /*? if <1.20.5 {*//*"Lnet/minecraft/world/entity/player/Inventory;contains(Lnet/minecraft/world/item/ItemStack;)Z"*//*?} else {*/"Lnet/minecraft/world/entity/player/Inventory;contains(Ljava/util/function/Predicate;)Z"/*?}*/))
+    @ModifyExpressionValue(method = "tickCarriedBy", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;contains(Ljava/util/function/Predicate;)Z"))
     public boolean tickCarriedByRemoveInvalid(boolean original, Player player) {
-        return player.getServer().getGameRules().getBoolean(LegacyGameRules.GLOBAL_MAP_PLAYER_ICON) || original;
+        return FactoryAPIPlatform.getEntityServer(player).getGameRules().getBoolean(LegacyGameRules.GLOBAL_MAP_PLAYER_ICON) || original;
     }
-    @ModifyArg(method = "tickCarriedBy", at = @At(value = "INVOKE", target = /*? if <1.20.5 {*//*"Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData;addDecoration(Lnet/minecraft/world/level/saveddata/maps/MapDecoration$Type;Lnet/minecraft/world/level/LevelAccessor;Ljava/lang/String;DDDLnet/minecraft/network/chat/Component;)V"*//*?} else {*/"Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData;addDecoration(Lnet/minecraft/core/Holder;Lnet/minecraft/world/level/LevelAccessor;Ljava/lang/String;DDDLnet/minecraft/network/chat/Component;)V"/*?}*/, ordinal = 0))
+    @ModifyArg(method = "tickCarriedBy", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData;addDecoration(Lnet/minecraft/core/Holder;Lnet/minecraft/world/level/LevelAccessor;Ljava/lang/String;DDDLnet/minecraft/network/chat/Component;)V", ordinal = 0))
     public Component tickCarriedBy(Component original, @Local MapItemSavedData.HoldingPlayer player) {
         return player.player.getName();
     }
@@ -94,8 +97,8 @@ public abstract class MapItemSavedDataMixin {
         while (iterator.hasNext()){
             var next = iterator.next();
             boolean valid;
-            if ((valid = next.isValid(player.getServer())) && dimension == Level.OVERWORLD){
-                addDecoration(/*? if <1.20.5 {*//*MapDecoration.Type*//*?} else {*/MapDecorationTypes/*?}*/.TARGET_X, player.getServer().overworld(), next.identifier(), next.pos().getX(), next.pos().getZ(), 0, null);
+            if ((valid = next.isValid(FactoryAPIPlatform.getEntityServer(player))) && dimension == Level.OVERWORLD){
+                addDecoration(MapDecorationTypes.TARGET_X, FactoryAPIPlatform.getEntityServer(player).overworld(), next.identifier(), next.pos().getX(), next.pos().getZ(), 0, null);
             } else {
                 removeDecoration(next.identifier());
                 if (!valid) {

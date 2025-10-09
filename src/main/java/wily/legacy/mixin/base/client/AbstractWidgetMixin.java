@@ -49,7 +49,7 @@ public abstract class AbstractWidgetMixin implements ControlTooltip.ActionHolder
         }
     }
 
-    @Redirect(method = "nextFocusPath", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/components/AbstractWidget;active:Z"))
+    @Redirect(method = "nextFocusPath", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractWidget;isActive()Z"))
     public boolean nextFocusPath(AbstractWidget instance) {
         return true;
     }

@@ -30,6 +30,7 @@ import net.minecraft.core.component.DataComponents;
 //?}
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.FactoryIngredient;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.network.ServerMenuCraftPayload;
@@ -58,24 +59,24 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
             @Override
             public void onCraft(Player player, ServerMenuCraftPayload packet, ItemStack result) {
                 super.onCraft(player, packet, result);
-                if (packet.craftId().isPresent() || customRcp != null) player.getServer().getRecipeManager().byKey(customRcp == null ? getRecipeKey(packet.craftId().get()) : customRcp.id()).ifPresent(h-> player.triggerRecipeCrafted(h,container.getItems()));
+                if (packet.craftId().isPresent() || customRcp != null) FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(customRcp == null ? getRecipeKey(packet.craftId().get()) : customRcp.id()).ifPresent(h-> player.triggerRecipeCrafted(h,container.getItems()));
             }
 
             @Override
             public ItemStack getResult(Player player, ServerMenuCraftPayload packet) {
                 input = container.asCraftInput();
-                if (packet.craftId().isEmpty()) return player.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, player.level()).map(h-> (customRcp = h).value().assemble(input, player.level().registryAccess())).orElse(ItemStack.EMPTY);
-                return player.getServer().getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(h-> h.value() instanceof CraftingRecipe rcp ? rcp.assemble(input,player.level().registryAccess()) : null).orElse(ItemStack.EMPTY);
+                if (packet.craftId().isEmpty()) return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, player.level()).map(h-> (customRcp = h).value().assemble(input, player.level().registryAccess())).orElse(ItemStack.EMPTY);
+                return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(h-> h.value() instanceof CraftingRecipe rcp ? rcp.assemble(input,player.level().registryAccess()) : null).orElse(ItemStack.EMPTY);
             }
 
             @Override
             public List<ItemStack> getRemainingItems(Player player, ServerMenuCraftPayload packet) {
-                return player.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, player.level()).map(h->(List<ItemStack>) h.value().getRemainingItems(input)).orElse(super.getRemainingItems(player,packet));
+                return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, player.level()).map(h->(List<ItemStack>) h.value().getRemainingItems(input)).orElse(super.getRemainingItems(player,packet));
             }
 
             @Override
             public List<Optional<Ingredient>> getIngredients(Player player, ServerMenuCraftPayload packet) {
-                return packet.craftId().isEmpty() || !packet.customIngredients().isEmpty() ? super.getIngredients(player,packet) : player.getServer().getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(r-> getRecipeOptionalIngredients(r/*? if >1.20.1 {*/.value()/*?}*/)).orElse(Collections.emptyList());
+                return packet.craftId().isEmpty() || !packet.customIngredients().isEmpty() ? super.getIngredients(player,packet) : FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(r-> getRecipeOptionalIngredients(r.value())).orElse(Collections.emptyList());
             }
 
             @Override
@@ -165,12 +166,12 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
 
             @Override
             public List<Optional<Ingredient>> getIngredients(Player player, ServerMenuCraftPayload packet) {
-                return player.getServer().getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(r-> getRecipeOptionalIngredients(r/*? if >1.20.1 {*/.value()/*?}*/)).orElse(Collections.emptyList());
+                return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(r-> getRecipeOptionalIngredients(r.value())).orElse(Collections.emptyList());
             }
 
             @Override
             public ItemStack getResult(Player player, ServerMenuCraftPayload packet) {
-                return player.getServer().getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(h->h/*? if >1.20.1 {*/.value()/*?}*/ instanceof StonecutterRecipe rcp ? rcp.assemble( null,player.level().registryAccess()) : null).orElse(ItemStack.EMPTY);
+                return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(h->h.value() instanceof StonecutterRecipe rcp ? rcp.assemble( null,player.level().registryAccess()) : null).orElse(ItemStack.EMPTY);
             }
         };
     }

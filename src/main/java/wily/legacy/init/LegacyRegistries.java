@@ -1,38 +1,27 @@
 package wily.legacy.init;
 
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
-import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.RegisterListing;
 import wily.legacy.Legacy4J;
 import wily.legacy.block.ColoredWaterCauldronBlock;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
-import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.config.LegacyMixinToggles;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.LegacyMerchantMenu;
 import wily.legacy.util.LegacyTags;
-
-import java.util.Optional;
-import java.util.Set;
 
 public class LegacyRegistries {
     private static final RegisterListing<BlockEntityType<?>> BLOCK_ENTITIES_REGISTER = FactoryAPIPlatform.createRegister(Legacy4J.MOD_ID, BuiltInRegistries.BLOCK_ENTITY_TYPE);
@@ -53,7 +42,7 @@ public class LegacyRegistries {
 
     public static final RegisterListing.Holder<ColoredWaterCauldronBlock> COLORED_WATER_CAULDRON = BLOCK_REGISTER.add("colored_water_cauldron", id-> new ColoredWaterCauldronBlock(FactoryAPIPlatform.setupBlockProperties(BlockBehaviour.Properties./*? if <1.20.2 {*//*copy*//*?} else {*/ofLegacyCopy/*?}*/(Blocks.CAULDRON),id)));
 
-    public static final RegisterListing.Holder<Block> SHRUB = BLOCK_ITEMS_REGISTER.add("shrub",id-> new TallGrassBlock(FactoryAPIPlatform.setupBlockProperties(BlockBehaviour.Properties.of().mapColor(MapColor.PLANT).replaceable().noCollission().instabreak().sound(SoundType.GRASS).offsetType(BlockBehaviour.OffsetType.XYZ).ignitedByLava().pushReaction(PushReaction.DESTROY), id)));
+    public static final RegisterListing.Holder<Block> SHRUB = BLOCK_ITEMS_REGISTER.add("shrub",id-> new TallGrassBlock(FactoryAPIPlatform.setupBlockProperties(BlockBehaviour.Properties.of().mapColor(MapColor.PLANT).replaceable().noCollision().instabreak().sound(SoundType.GRASS).offsetType(BlockBehaviour.OffsetType.XYZ).ignitedByLava().pushReaction(PushReaction.DESTROY), id)));
 
     public static final RegisterListing.Holder<BlockEntityType<WaterCauldronBlockEntity>> WATER_CAULDRON_BLOCK_ENTITY = BLOCK_ENTITIES_REGISTER.add("water_cauldron",()-> FactoryAPIPlatform.createBlockEntityType(WaterCauldronBlockEntity::new, Blocks.WATER_CAULDRON, LegacyRegistries.COLORED_WATER_CAULDRON.get()));
 

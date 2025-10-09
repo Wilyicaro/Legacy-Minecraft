@@ -19,6 +19,8 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -114,7 +116,7 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
                         LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 45, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
                     }
                     @Override
-                    public void onPress() {
+                    public void onPress(InputWithModifiers input) {
                         if (friendsToAdd.contains(friend)) {
                             friendsToAdd.remove(friend);
                             addableFriends.add(friend);
@@ -220,8 +222,8 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
         }
 
         @Override
-        public boolean keyPressed(int i, int j, int k) {
-            if (i == InputConstants.KEY_X) {
+        public boolean keyPressed(KeyEvent keyEvent) {
+            if (keyEvent.key() == InputConstants.KEY_X) {
                 minecraft.setScreen(new ConfirmationScreen(WorldHostFriendsScreen.this, WORLD_HOST_REMOVE_FRIEND, Component.translatable("world-host.friends.remove.title"), b -> {
                     friend.removeFriend(()->{
                         minecraft.setScreen(WorldHostFriendsScreen.this);
@@ -230,11 +232,11 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
                 }));
                 return true;
             }
-            return super.keyPressed(i, j, k);
+            return super.keyPressed(keyEvent);
         }
 
         @Override
-        public void onPress() {
+        public void onPress(InputWithModifiers input) {
             friend.showFriendInfo(WorldHostFriendsScreen.this);
         }
 

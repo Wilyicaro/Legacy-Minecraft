@@ -7,6 +7,8 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -90,7 +92,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         }
 
         @Override
-        public void craft() {
+        public void craft(InputWithModifiers input) {
         }
 
         public List<Optional<Ingredient>> getIngredientsGrid() {
@@ -111,14 +113,14 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
         }
 
         @Override
-        public boolean keyPressed(int i, int j, int k) {
-            if (i == InputConstants.KEY_O && !itemIcon.isEmpty() && hasItem()) {
+        public boolean keyPressed(KeyEvent keyEvent) {
+            if (keyEvent.key() == InputConstants.KEY_O && !itemIcon.isEmpty() && hasItem()) {
                 updateRecipe();
                 selectedStack = itemIcon.copyWithCount(1);
-                craftingTabList.tabButtons.get(1).onPress();
+                craftingTabList.tabButtons.get(1).onPress(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
                 return true;
             }
-            return super.keyPressed(i, j, k);
+            return super.keyPressed(keyEvent);
         }
 
         void updateRecipe() {
@@ -350,13 +352,13 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                 }
 
                 @Override
-                protected void toggleCraftableRecipes() {
+                protected void toggleCraftableRecipes(InputWithModifiers input) {
                 }
 
                 @Override
-                public boolean keyPressed(int i, int j, int k) {
-                    if ((i == InputConstants.KEY_O || i == InputConstants.KEY_X) && isValidIndex()){
-                        if (i == InputConstants.KEY_O){
+                public boolean keyPressed(KeyEvent keyEvent) {
+                    if ((keyEvent.key() == InputConstants.KEY_O || keyEvent.key() == InputConstants.KEY_X) && isValidIndex()){
+                        if (keyEvent.key() == InputConstants.KEY_O){
                             if (this.canCraft()){
                                 selectedPatterns.add(getFocusedRecipe());
                                 LegacySoundUtil.playSimpleUISound(SoundEvents.UI_LOOM_SELECT_PATTERN,1.0f);
@@ -369,9 +371,9 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                         updateRecipeDisplay();
                         return true;
                     }
-                    if (controlCyclicNavigation(i, index, craftingButtons, craftingButtonsOffset, scrollRenderer, LegacyLoomScreen.this))
+                    if (controlCyclicNavigation(keyEvent.key(), index, craftingButtons, craftingButtonsOffset, scrollRenderer, LegacyLoomScreen.this))
                         return true;
-                    return super.keyPressed(i, j, k);
+                    return super.keyPressed(keyEvent);
                 }
 
                 protected void updateRecipeDisplay(RecipeInfo<BannerRecipe> rcp) {
@@ -383,15 +385,17 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
                     for (int i = 0; i < rcp.get().displayIngredients().size(); i++)
                         ingredientsGrid.set(i, rcp.get().displayIngredients().get(i));
                 }
-                public void onPress(){
+
+                @Override
+                public void onPress(InputWithModifiers input) {
                     if (isFocused() && isValidIndex()){
-                        if (LegacyLoomScreen.this.canCraft()){
+                        if (LegacyLoomScreen.this.canCraft()) {
                             LegacySoundUtil.playSimpleUISound(SoundEvents.UI_LOOM_TAKE_RESULT,1.0f);
-                            selectedPatterns.forEach(b-> CommonNetwork.sendToServer(new ServerMenuCraftPayload(Optional.of(b.get().pattern.location()),b.getOptionalIngredients(),-1, Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed)));
+                            selectedPatterns.forEach(b-> CommonNetwork.sendToServer(new ServerMenuCraftPayload(Optional.of(b.get().pattern.location()),b.getOptionalIngredients(),-1, input.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed)));
                             selectedPatterns.clear();
                             selectedStack = ItemStack.EMPTY;
                             previewStack = ItemStack.EMPTY;
-                            craftingTabList.tabButtons.get(0).onPress();
+                            craftingTabList.tabButtons.get(0).onPress(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
                         } else LegacySoundUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
                     }
                 }
@@ -437,10 +441,10 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
 
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (hasShiftDown() && craftingTabList.getIndex() != 0 && craftingTabList.controlPage(page,i == 263, i == 262)) return true;
-        if (craftingTabList.controlTab(i)) return true;
-        return super.keyPressed(i, j, k);
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.hasShiftDown() && craftingTabList.getIndex() != 0 && craftingTabList.controlPage(page, keyEvent.isLeft(), keyEvent.isRight())) return true;
+        if (craftingTabList.controlTab(keyEvent.key())) return true;
+        return super.keyPressed(keyEvent);
     }
 
     public List<? extends LegacyIconHolder> getCraftingButtons(){

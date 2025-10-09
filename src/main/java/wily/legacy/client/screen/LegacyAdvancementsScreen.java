@@ -9,6 +9,7 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.ClientAdvancements;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -189,14 +190,14 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == InputConstants.KEY_X) {
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.key() == InputConstants.KEY_X) {
             showDescription = !showDescription;
             return true;
         }
-        if (tabList.controlTab(i)) return true;
-        if (hasShiftDown()) tabList.controlPage(page,i == 263 , i == 262);
-        return super.keyPressed(i, j, k);
+        if (tabList.controlTab(keyEvent.key())) return true;
+        if (keyEvent.hasShiftDown()) tabList.controlPage(page, keyEvent.isLeft(), keyEvent.isRight());
+        return super.keyPressed(keyEvent);
     }
 
     @Override

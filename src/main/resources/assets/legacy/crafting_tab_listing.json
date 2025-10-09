@@ -9,7 +9,7 @@
       {"group": "compact_stone", "recipes": ["quartz_block","chiseled_quartz_block","quartz_pillar","quartz_bricks","stone_bricks","chiseled_stone_bricks","mossy_stone_bricks_from_vine","mossy_stone_bricks_from_moss_block","mossy_cobblestone_from_vine","mossy_cobblestone_from_moss_block","deepslate_bricks","deepslate_tiles","chiseled_deepslate","polished_blackstone_bricks","chiseled_polished_blackstone","red_nether_bricks","diorite","granite","andesite","polished_diorite","polished_granite","polished_andesite","polished_basalt","polished_deepslate","polished_blackstone","polished_tuff","purpur_pillar","end_stone_bricks","dripstone_block","chiseled_tuff","tuff_bricks","chiseled_tuff_bricks"]},
       {"group": "compact", "recipes": ["sandstone","red_sandstone","cut_sandstone","cut_red_sandstone","chiseled_sandstone","chiseled_red_sandstone","nether_bricks","chiseled_nether_bricks","coarse_dirt","prismarine","prismarine_bricks","dark_prismarine","snow_block","snow","clay","bricks","packed_mud","mud_bricks","bone_block","honeycomb_block"]},
       {"group": "utility", "recipes": ["crafting_table","furnace","blast_furnace","smoker","campfire","soul_campfire","enchanting_table","anvil","brewing_stand","cartography_table","loom","fletching_table","smithing_table","stonecutter","grindstone"]},
-      {"group": "chest", "recipes": ["chest","trapped_chest","ender_chest","barrel","shulker_box"]},
+      {"group": "chest", "recipes": ["chest","trapped_chest","ender_chest","copper_chest","barrel","shulker_box"]},
       {"group": "bed", "recipes": ["white_bed","orange_bed","magenta_bed","light_blue_bed","yellow_bed","lime_bed","pink_bed","gray_bed","light_gray_bed","cyan_bed","purple_bed","blue_bed","brown_bed","green_bed","red_bed","black_bed"]},
       {"group": "barrier", "recipes": ["oak_fence","birch_fence","spruce_fence","jungle_fence","acacia_fence","dark_oak_fence","mangrove_fence","pale_oak_fence","bamboo_fence","cherry_fence","crimson_fence","warped_fence","cobblestone_wall","mossy_cobblestone_wall","cobbled_deepslate_wall","polished_deepslate_wall","deepslate_brick_wall","deepslate_tile_wall","blackstone_wall","polished_blackstone_wall","blackstone_brick_wall","granite_wall","diorite_wall","andesite_wall","brick_wall","stone_brick_wall","mossy_stone_brick_wall","nether_brick_wall","red_nether_brick_wall","sandstone_wall","red_sandstone_wall","mud_brick_wall","end_stone_brick_wall","prismarine_wall","tuff_wall","tuff_brick_wall","polished_tuff_wall","resin_brick_wall","nether_brick_fence","iron_bars"]},
       {"group": "gate", "recipes": ["oak_fence_gate","birch_fence_gate","spruce_fence_gate","jungle_fence_gate","acacia_fence_gate","dark_oak_fence_gate","mangrove_fence_gate","pale_oak_fence_gate","bamboo_fence_gate","cherry_fence_gate","crimson_fence_gate","warped_fence_gate"]},
@@ -23,14 +23,14 @@
     "name": {"translate": "legacy.container.tab.tools"},
     "icon": "legacy:icon/tools",
     "listing": [
-      {"group": "pickaxe", "recipes": ["wooden_pickaxe","stone_pickaxe","iron_pickaxe","diamond_pickaxe","golden_pickaxe"]},
-      {"group": "shovel", "recipes": ["wooden_shovel","stone_shovel","iron_shovel","diamond_shovel","golden_shovel"]},
-      {"group": "axe", "recipes": ["wooden_axe","stone_axe","iron_axe","diamond_axe","golden_axe"]},
-      {"group": "hoe", "recipes": ["wooden_hoe","stone_hoe","iron_hoe","diamond_hoe","golden_hoe"]},
+      {"group": "pickaxe", "recipes": ["wooden_pickaxe","stone_pickaxe","iron_pickaxe","diamond_pickaxe","golden_pickaxe","copper_pickaxe"]},
+      {"group": "shovel", "recipes": ["wooden_shovel","stone_shovel","iron_shovel","diamond_shovel","golden_shovel","copper_shovel"]},
+      {"group": "axe", "recipes": ["wooden_axe","stone_axe","iron_axe","diamond_axe","golden_axe","copper_axe"]},
+      {"group": "hoe", "recipes": ["wooden_hoe","stone_hoe","iron_hoe","diamond_hoe","golden_hoe","copper_hoe"]},
       {"group": "misc", "recipes": ["shears","tnt","flint_and_steel","bundle","brush","wind_charge","mace"]},
       {"group": "rod", "recipes": ["fishing_rod","carrot_on_a_stick","warped_fungus_on_a_stick"]},
       {"group": "archery", "recipes": ["bow","crossbow","arrow","spectral_arrow","tipped_arrow"]},
-      {"group": "sword", "recipes": ["wooden_sword","stone_sword","iron_sword","diamond_sword","golden_sword"]},
+      {"group": "sword", "recipes": ["wooden_sword","stone_sword","iron_sword","diamond_sword","golden_sword","copper_sword"]},
       "shield",
       {"group": "container", "recipes": ["bucket","bowl","glass_bottle","cauldron","composter"]},
       {"group": "lighting", "recipes": ["torch","soul_torch","glowstone","sea_lantern","fire_charge","jack_o_lantern","end_rod","lantern","soul_lantern"]},
@@ -56,10 +56,10 @@
     "name": {"translate": "legacy.container.tab.armour"},
     "icon": "legacy:icon/armour",
     "listing": [
-      {"group": "helmet", "recipes": ["leather_helmet","iron_helmet","diamond_helmet","golden_helmet","turtle_helmet"]},
-      {"group": "chestplate", "recipes": ["leather_chestplate","iron_chestplate","diamond_chestplate","golden_chestplate"]},
-      {"group": "leggings", "recipes": ["leather_leggings","iron_leggings","diamond_leggings","golden_leggings"]},
-      {"group": "boots", "recipes": ["leather_boots","iron_boots","diamond_boots","golden_boots"]},
+      {"group": "helmet", "recipes": ["leather_helmet","iron_helmet","diamond_helmet","golden_helmet","turtle_helmet","copper_helmet"]},
+      {"group": "chestplate", "recipes": ["leather_chestplate","iron_chestplate","diamond_chestplate","golden_chestplate","copper_chestplate"]},
+      {"group": "leggings", "recipes": ["leather_leggings","iron_leggings","diamond_leggings","golden_leggings","copper_leggings"]},
+      {"group": "boots", "recipes": ["leather_boots","iron_boots","diamond_boots","golden_boots","copper_boots"]},
       {"group": "horse", "recipes": ["leather_horse_armor"]},
       {"group": "wolf", "recipes": ["wolf_armor"]},
       "netherite_upgrade_smithing_template",
@@ -109,10 +109,10 @@
       {"group": "dye", "recipes": [{"type": "item_id", "value": {"id": "yellow_dye", "onlyFirstMatch": false}},{"type": "item_id", "value": {"id": "red_dye", "onlyFirstMatch": false}},{"type": "item_id", "value": {"id": "white_dye", "onlyFirstMatch": false}},{"type": "item_id", "value": {"id": "pink_dye", "onlyFirstMatch": false}},{"type": "item_id", "value": {"id": "orange_dye", "onlyFirstMatch": false}},{"type": "item_id", "value": {"id": "lime_dye", "onlyFirstMatch": false}},{"type": "item_id", "value": {"id": "brown_dye", "onlyFirstMatch": false}},{"type": "item_id", "value": {"id": "black_dye", "onlyFirstMatch": false}},{"type": "item_id", "value": {"id": "gray_dye", "onlyFirstMatch": false}},{"type": "item_id", "value": {"id": "gray_dye", "onlyFirstMatch": false}},{"type": "item_id", "value": {"id": "light_gray_dye", "onlyFirstMatch": false}},{"type": "item_id", "value": {"id": "light_blue_dye", "onlyFirstMatch": false}},{"type": "item_id", "value": {"id": "cyan_dye", "onlyFirstMatch": false}},{"type": "item_id", "value": {"id": "purple_dye", "onlyFirstMatch": false}},{"type": "item_id", "value": {"id": "magenta_dye", "onlyFirstMatch": false}},{"type": "item_id", "value": {"id": "blue_dye", "onlyFirstMatch": false}}]},
       {"group": "carpet", "recipes": ["white_carpet","orange_carpet","magenta_carpet","light_blue_carpet","yellow_carpet","lime_carpet","pink_carpet","gray_carpet","light_gray_carpet","cyan_carpet","purple_carpet","blue_carpet","brown_carpet","green_carpet","red_carpet","black_carpet","moss_carpet"]},
       {"group": "candle", "recipes": ["#candles"]},
-      {"group": "misc", "recipes": ["flower_pot","jukebox","chain","beehive","music_disc_5","creaking_heart","dried_ghast"]},
+      {"group": "misc", "recipes": ["flower_pot","jukebox","iron_chain","copper_chain","beehive","music_disc_5","creaking_heart","dried_ghast"]},
       {"group": "utility", "recipes": ["armor_stand","painting","item_frame","glow_item_frame","oak_sign","birch_sign","spruce_sign","jungle_sign","acacia_sign","dark_oak_sign","mangrove_sign","pale_oak_sign","bamboo_sign","cherry_sign","crimson_sign","warped_sign","oak_hanging_sign","birch_hanging_sign","spruce_hanging_sign","jungle_hanging_sign","acacia_hanging_sign","dark_oak_hanging_sign","mangrove_hanging_sign","pale_oak_hanging_sign","bamboo_hanging_sign","cherry_hanging_sign","crimson_hanging_sign","warped_hanging_sign"]},
-      {"group": "library", "recipes": ["paper","book","writable_book","bookshelf","chiseled_bookshelf","lectern","leather","creeper_banner_pattern","flower_banner_pattern","globe_banner_pattern","mojang_banner_pattern","piglin_banner_pattern","skull_banner_pattern"]},
-      {"group": "unboxing", "recipes": ["dried_kelp","gold_ingot_from_gold_block","iron_ingot_from_iron_block","netherite_ingot_from_netherite_block","copper_ingot","diamond","emerald","lapis_lazuli","redstone","coal","wheat","slime_ball","legacy:string","bone_meal","bone_meal_from_bone_block","raw_gold","raw_iron","raw_copper","gold_ingot_from_nuggets","gold_nugget","iron_ingot_from_nuggets","iron_nugget","netherite_ingot","resin_clump"]}
+      {"group": "library", "recipes": ["paper","book","writable_book","bookshelf","chiseled_bookshelf","oak_shelf","birch_shelf","spruce_shelf","jungle_shelf","acacia_shelf","dark_oak_shelf","mangrove_shelf","pale_oak_shelf","bamboo_shelf","cherry_shelf","crimson_shelf","warped_shelf","lectern","leather","creeper_banner_pattern","flower_banner_pattern","globe_banner_pattern","mojang_banner_pattern","piglin_banner_pattern","skull_banner_pattern"]},
+      {"group": "unboxing", "recipes": ["dried_kelp","gold_ingot_from_gold_block","iron_ingot_from_iron_block","netherite_ingot_from_netherite_block","copper_ingot","diamond","emerald","lapis_lazuli","redstone","coal","wheat","slime_ball","legacy:string","bone_meal","bone_meal_from_bone_block","raw_gold","raw_iron","raw_copper","gold_ingot_from_nuggets","gold_nugget","iron_ingot_from_nuggets","iron_nugget","copper_nugget","netherite_ingot","resin_clump"]}
     ]
   }
 ]

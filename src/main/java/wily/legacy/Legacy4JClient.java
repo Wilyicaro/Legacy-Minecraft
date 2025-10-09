@@ -147,7 +147,7 @@ public class Legacy4JClient {
     public static final RenderType DROWNED_GLOW = RenderType.eyes(FactoryAPI.createVanillaLocation("textures/entity/zombie/drowned_glow.png"));
 
     public static float[] getVisualPlayerColor(LegacyPlayerInfo info){
-        return getVisualPlayerColor(info.getIdentifierIndex() >= 0 ? info.getIdentifierIndex() : info.legacyMinecraft$getProfile().getId().hashCode());
+        return getVisualPlayerColor(info.getIdentifierIndex() >= 0 ? info.getIdentifierIndex() : info.legacyMinecraft$getProfile().id().hashCode());
     }
 
     public static float[] getVisualPlayerColor(int i){
@@ -232,7 +232,7 @@ public class Legacy4JClient {
         if (LegacyOptions.unfocusedInputs.get()) minecraft.setWindowActive(true);
         while (keyCrafting.consumeClick()){
             if (minecraft.player != null && (minecraft.player.isCreative() || minecraft.player.isSpectator())) {
-                if (minecraft.player.isSpectator()) minecraft.gui.getSpectatorGui().onMouseMiddleClick();
+                if (minecraft.player.isSpectator()) minecraft.gui.getSpectatorGui().onHotbarActionKeyPressed();
                 else minecraft.setScreen(CreativeModeScreen.getActualCreativeScreenInstance(minecraft));
                 continue;
             }
@@ -452,11 +452,11 @@ public class Legacy4JClient {
 
         FactoryAPIClient.registerRenderLayer(r->{
             if (r.getEntityRenderer(EntityType.GHAST) instanceof GhastRenderer renderer){
-                r.register(renderer, new EyesLayer<>(renderer){
+                r.register(renderer, new EyesLayer<>(renderer) {
                     @Override
-                    public void render(PoseStack poseStack, MultiBufferSource multiBufferSource, int i, GhastRenderState ghastRenderState, float f, float g/*? if <1.21.2 {*//*, float h, float j, float k, float l*//*?}*/) {
-                        if (!ghastRenderState.isCharging) return;
-                        super.render(poseStack, multiBufferSource, i, ghastRenderState, f, g);
+                    public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int i, GhastRenderState entityRenderState, float f, float g) {
+                        if (!entityRenderState.isCharging) return;
+                        super.submit(poseStack, submitNodeCollector, i, entityRenderState, f, g);
                     }
                     @Override
                     public RenderType renderType() {
@@ -465,7 +465,7 @@ public class Legacy4JClient {
                 });
             }
             if (r.getEntityRenderer(EntityType.DROWNED) instanceof DrownedRenderer renderer){
-                r.register(renderer, new EyesLayer<>(renderer){
+                r.register(renderer, new EyesLayer<>(renderer) {
                     @Override
                     public RenderType renderType() {
                         return DROWNED_GLOW;
@@ -539,16 +539,16 @@ public class Legacy4JClient {
         }
     }
 
-    public static final KeyMapping keyCrafting = new KeyMapping("legacy.key.crafting", InputConstants.KEY_E, "key.categories.inventory");
-    public static final KeyMapping keyCycleHeldLeft = new KeyMapping("legacy.key.cycleHeldLeft", InputConstants.KEY_PAGEDOWN, "key.categories.inventory");
-    public static final KeyMapping keyCycleHeldRight = new KeyMapping("legacy.key.cycleHeldRight", InputConstants.KEY_PAGEUP, "key.categories.inventory");
-    public static final KeyMapping keyToggleCursor = new KeyMapping("legacy.key.toggleCursor", -1, "key.categories.misc");
-    public static KeyMapping keyHostOptions = new KeyMapping( MOD_ID +".key.host_options", InputConstants.KEY_H, "key.categories.misc");
-    public static KeyMapping keyLegacy4JSettings = new KeyMapping( MOD_ID +".key.legacy4JSettings", InputConstants.KEY_Y, "key.categories.misc");
-    public static KeyMapping keyFlyUp = new KeyMapping( MOD_ID +".key.flyUp", InputConstants.KEY_UP, "key.categories.movement");
-    public static KeyMapping keyFlyDown = new KeyMapping( MOD_ID +".key.flyDown", InputConstants.KEY_DOWN, "key.categories.movement");
-    public static KeyMapping keyFlyLeft = new KeyMapping( MOD_ID +".key.flyLeft", InputConstants.KEY_LEFT, "key.categories.movement");
-    public static KeyMapping keyFlyRight = new KeyMapping( MOD_ID +".key.flyRight", InputConstants.KEY_RIGHT, "key.categories.movement");
+    public static final KeyMapping keyCrafting = new KeyMapping("legacy.key.crafting", InputConstants.KEY_E, KeyMapping.Category.INVENTORY);
+    public static final KeyMapping keyCycleHeldLeft = new KeyMapping("legacy.key.cycleHeldLeft", InputConstants.KEY_PAGEDOWN, KeyMapping.Category.INVENTORY);
+    public static final KeyMapping keyCycleHeldRight = new KeyMapping("legacy.key.cycleHeldRight", InputConstants.KEY_PAGEUP, KeyMapping.Category.INVENTORY);
+    public static final KeyMapping keyToggleCursor = new KeyMapping("legacy.key.toggleCursor", -1, KeyMapping.Category.MISC);
+    public static KeyMapping keyHostOptions = new KeyMapping( MOD_ID +".key.host_options", InputConstants.KEY_H, KeyMapping.Category.MISC);
+    public static KeyMapping keyLegacy4JSettings = new KeyMapping( MOD_ID +".key.legacy4JSettings", InputConstants.KEY_Y, KeyMapping.Category.MISC);
+    public static KeyMapping keyFlyUp = new KeyMapping( MOD_ID +".key.flyUp", InputConstants.KEY_UP, KeyMapping.Category.MOVEMENT);
+    public static KeyMapping keyFlyDown = new KeyMapping( MOD_ID +".key.flyDown", InputConstants.KEY_DOWN, KeyMapping.Category.MOVEMENT);
+    public static KeyMapping keyFlyLeft = new KeyMapping( MOD_ID +".key.flyLeft", InputConstants.KEY_LEFT, KeyMapping.Category.MOVEMENT);
+    public static KeyMapping keyFlyRight = new KeyMapping( MOD_ID +".key.flyRight", InputConstants.KEY_RIGHT, KeyMapping.Category.MOVEMENT);
 
 
     public static void resetOptions(Minecraft minecraft){

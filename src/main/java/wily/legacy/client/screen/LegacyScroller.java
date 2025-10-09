@@ -2,6 +2,7 @@ package wily.legacy.client.screen;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.world.phys.Vec3;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -16,15 +17,15 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable {
     public Vec3 offset = Vec3.ZERO;
     public boolean dragged = false;
 
-    public LegacyScroller(LegacyScrollRenderer scrollRenderer){
+    public LegacyScroller(LegacyScrollRenderer scrollRenderer) {
         this.scrollRenderer = scrollRenderer;
     }
 
-    public static LegacyScroller create(int height, Supplier<Stocker.Sizeable> scrollSupplier){
+    public static LegacyScroller create(int height, Supplier<Stocker.Sizeable> scrollSupplier) {
         return create(13, height, scrollSupplier);
     }
 
-    public static LegacyScroller create(int width, int height, Supplier<Stocker.Sizeable> scrollSupplier){
+    public static LegacyScroller create(int width, int height, Supplier<Stocker.Sizeable> scrollSupplier) {
         LegacyScroller scroller = new LegacyScroller(new LegacyScrollRenderer()) {
             @Override
             public Stocker.Sizeable getScroll() {
@@ -35,11 +36,11 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable {
         return scroller;
     }
 
-    public float getScrollerHeight(){
+    public float getScrollerHeight() {
         return getHeight() - 13.5f;
     }
 
-    public void offset(Vec3 offset){
+    public void offset(Vec3 offset) {
         this.offset = offset;
     }
 
@@ -68,10 +69,10 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable {
         return LegacyRenderUtil.isMouseOver(mouseX, mouseY, this.getX() + offset.x, this.getY() + offset.y, this.getWidth(), this.getHeight());
     }
 
-    public boolean mouseScrolled(double g){
+    public boolean mouseScrolled(double g) {
         int i = (int) -Math.signum(g);
         Stocker.Sizeable scroll = getScroll();
-        if (scroll.max > 0 || scroll.get() > 0){
+        if (scroll.max > 0 || scroll.get() > 0) {
             int lastScrolled = scroll.get();
             scroll.set(Math.max(0,Math.min(scroll.get() + i,scroll.max)));
             if (lastScrolled != scroll.get()) {
@@ -82,22 +83,22 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable {
         return false;
     }
 
-    public boolean mouseClicked(double mouseX, double mouseY, int button){
-        if(isHovered(mouseX, mouseY)) {
+    public boolean mouseClicked(MouseButtonEvent event) {
+        if(isHovered(event.x(), event.y())) {
             dragged = true;
-            return mouseDragged(mouseY);
+            return mouseDragged(event.y());
         }
         return false;
     }
 
-    public void mouseReleased(double mouseX, double mouseY, int button){
+    public void mouseReleased(MouseButtonEvent event) {
         if (dragged) {
             dragged = false;
         }
     }
 
-    public boolean mouseDragged(double mouseY){
-        if (dragged){
+    public boolean mouseDragged(double mouseY) {
+        if (dragged) {
             Stocker.Sizeable scrolledList = getScroll();
             int lastScroll = scrolledList.get();
             scrolledList.set((int) Math.round(scrolledList.max * (mouseY - y) / getHeight()));

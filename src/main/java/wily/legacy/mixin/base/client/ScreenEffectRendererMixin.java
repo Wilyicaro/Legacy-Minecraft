@@ -7,7 +7,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.ScreenEffectRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -49,7 +51,7 @@ public abstract class ScreenEffectRendererMixin {
         /*BlockState state = pair.getLeft();
         *///?}
         List<BakedQuad> quads = Collections.emptyList();
-        var parts = minecraft.getBlockRenderer().getBlockModelShaper().getBlockModel(state).collectParts(minecraft.player.getRandom());
+        List<BlockModelPart> parts = minecraft.getBlockRenderer().getBlockModelShaper().getBlockModel(state).collectParts(minecraft.player.getRandom());
         if (!parts.isEmpty()) quads = parts.get(0).getQuads(Direction.UP);
         if (!quads.isEmpty()) {
             BakedQuad quad = quads.get(0);
@@ -70,8 +72,8 @@ public abstract class ScreenEffectRendererMixin {
         if (itemActivationItem == null && LegacyActivationAnim.itemActivationRenderReplacement != null) LegacyActivationAnim.itemActivationRenderReplacement = null;
     }
 
-    @Inject(method = "renderItemActivationAnimation", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;renderStatic(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;IILcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/world/level/Level;I)V"), cancellable = true)
-    private void renderItemActivationAnimation(PoseStack poseStack, float f, CallbackInfo ci){
+    @Inject(method = "renderItemActivationAnimation", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/item/ItemStackRenderState;submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;III)V"), cancellable = true)
+    private void renderItemActivationAnimation(PoseStack poseStack, float f, SubmitNodeCollector submitNodeCollector, CallbackInfo ci){
         if (LegacyActivationAnim.itemActivationRenderReplacement != null){
             ci.cancel();
             LegacyActivationAnim.itemActivationRenderReplacement.render(poseStack, f, bufferSource);

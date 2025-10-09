@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
@@ -33,7 +34,7 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
     public void addBiome(Holder.Reference<Biome> biome){
         renderableVList.addRenderable(new AbstractButton(0,0,260,30, Component.translatable("biome."+biome.key().location().toLanguageKey())) {
             @Override
-            public void onPress() {
+            public void onPress(InputWithModifiers input) {
                 selectedBiome = biome;
             }
 

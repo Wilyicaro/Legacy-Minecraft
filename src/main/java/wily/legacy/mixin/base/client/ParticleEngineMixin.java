@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base.client;
 
+import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,7 +12,7 @@ import wily.factoryapi.FactoryAPIClient;
 
 import java.util.List;
 
-@Mixin(targets = {"net.minecraft.client.particle.ParticleEngine$MutableSpriteSet"})
+@Mixin(targets = {"net.minecraft.client.particle.ParticleResources$MutableSpriteSet"})
 public class ParticleEngineMixin {
     @Shadow private List<TextureAtlasSprite> sprites;
 

@@ -19,6 +19,7 @@ import net.minecraft.world.level.dimension.end.EndDragonFight;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
 import org.jetbrains.annotations.Nullable;
+import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
@@ -160,14 +161,15 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         LegacyClientWorldSettings.of(summary.getSettings()).setSelectedResourceAlbum(resourceAlbumSelector.getSelectedAlbum());
         loadWorld(this,minecraft, LegacySaveCache.getLevelStorageSource(),summary);
         Legacy4JClient.serverPlayerJoinConsumer = s-> {
-            if (dimensionsToReset.contains(Level.END)) s.getServer().getLevel(Level.END).setDragonFight(new EndDragonFight(minecraft.getSingleplayerServer().getLevel(Level.END),minecraft.getSingleplayerServer().getWorldData().worldGenOptions().seed(), EndDragonFight.Data.DEFAULT));
-            s.getServer().setDefaultGameType(gameTypeSlider.getObjectValue());
-            s.getServer().setDifficulty(difficulty, false);
-            applyGameRules.accept(s.getServer().getGameRules(), minecraft.getSingleplayerServer());
-            publishScreen.publish((IntegratedServer) s.getServer());
-            LegacyClientWorldSettings.of(s.getServer().getWorldData()).setAllowCommands(hostPrivileges);
-            s.getServer().getPlayerList().sendPlayerPermissionLevel(s);
-            LegacyClientWorldSettings.of(s.getServer().getWorldData()).setSelectedResourceAlbum(resourceAlbumSelector.getSelectedAlbum());
+            MinecraftServer server = FactoryAPIPlatform.getEntityServer(s);
+            if (dimensionsToReset.contains(Level.END)) server.getLevel(Level.END).setDragonFight(new EndDragonFight(minecraft.getSingleplayerServer().getLevel(Level.END),minecraft.getSingleplayerServer().getWorldData().worldGenOptions().seed(), EndDragonFight.Data.DEFAULT));
+            server.setDefaultGameType(gameTypeSlider.getObjectValue());
+            server.setDifficulty(difficulty, false);
+            applyGameRules.accept(server.getGameRules(), minecraft.getSingleplayerServer());
+            publishScreen.publish((IntegratedServer) server);
+            LegacyClientWorldSettings.of(server.getWorldData()).setAllowCommands(hostPrivileges);
+            server.getPlayerList().sendPlayerPermissionLevel(s);
+            LegacyClientWorldSettings.of(server.getWorldData()).setSelectedResourceAlbum(resourceAlbumSelector.getSelectedAlbum());
             if (s.gameMode.getGameModeForPlayer() != gameTypeSlider.getObjectValue()) s.setGameMode(gameTypeSlider.getObjectValue());
         };
     }

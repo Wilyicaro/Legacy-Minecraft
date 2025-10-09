@@ -3,9 +3,11 @@ package wily.legacy.client.screen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
@@ -37,9 +39,12 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
     protected void addOptionSection(OptionsScreen.Section section){
         tabList.add(0,0,100, 25, LegacyTabButton.Type.MIDDLE, null, section.title(),null, b->resetElements());
         section.elements().forEach(c->c.accept(this));
+        if (section == Section.GAME_OPTIONS)
+            getRenderableVList().addRenderables(Button.builder(Component.translatable("controls.keybinds.title"), button -> this.minecraft.setScreen(new LegacyKeyMappingScreen(this))).build(),Button.builder(Component.translatable("legacy.options.selectedController"), button -> this.minecraft.setScreen(new ControllerMappingScreen(this))).build());
         section.advancedSection().ifPresent(s1-> {
             getRenderableVList().addRenderable(SimpleLayoutRenderable.createDrawString(s1.title(),0,1,200,9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
-            if (s1 == Section.ADVANCED_USER_INTERFACE) getRenderableVList().addOptions(LegacyOptions.advancedOptionsMode);
+            if (s1 == Section.ADVANCED_USER_INTERFACE)
+                getRenderableVList().addOptions(LegacyOptions.advancedOptionsMode);
             s1.elements().forEach(c -> c.accept(this));
         });
         List<Renderable> renderables = List.copyOf(getRenderableVList().renderables);
@@ -96,9 +101,9 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (tabList.controlTab(i)) return true;
-        return super.keyPressed(i, j, k);
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (tabList.controlTab(keyEvent.key())) return true;
+        return super.keyPressed(keyEvent);
     }
 
     @Override

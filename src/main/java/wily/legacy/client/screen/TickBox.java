@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -41,7 +42,7 @@ public class TickBox extends AbstractButton {
         this(i,j,200,initialState,message,tooltip,onPress);
     }
     @Override
-    public void onPress() {
+    public void onPress(InputWithModifiers input) {
         selected = !selected;
         onPress.accept(this);
         setTooltip(tooltip.apply(selected));

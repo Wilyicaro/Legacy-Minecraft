@@ -29,7 +29,7 @@ public abstract class AnimalMixin extends AgeableMob {
     }
     @Redirect(method = "aiStep", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/animal/Animal;inLove:I", opcode = Opcodes.PUTFIELD))
     public void aiStep(Animal instance, int value) {
-        if (!level().isClientSide) setInLoveTime(value);
+        if (!level().isClientSide()) setInLoveTime(value);
     }
     @Inject(method = "aiStep", at = @At("HEAD"))
     public void aiStep(CallbackInfo ci) {

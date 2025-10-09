@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base.client;
 
+import com.mojang.blaze3d.font.GlyphInfo;
 import com.mojang.blaze3d.font.GlyphProvider;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.gui.font.CodepointMap;
@@ -59,9 +60,10 @@ public abstract class BitmapProviderMixin {
                     if (o != 0) {
                         int q = this.getActualGlyphWidth(nativeImage, k, l, p, m);
                         BitmapProvider.Glyph glyph = codepointMap.put(o, new BitmapProvider.Glyph(f, nativeImage, p * k, m * l, k, l, (int) (0.5 + (double) ((float) q * f)) + 1, this.ascent) {
+
                             @Override
-                            public float getAdvance() {
-                                return (q + 1) * f;
+                            public GlyphInfo info() {
+                                return GlyphInfo.simple((q + 1) * f);
                             }
                         });
                         if (glyph != null) {

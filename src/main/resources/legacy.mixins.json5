@@ -65,7 +65,7 @@
     "client.EditBoxMixin",
     "client.enchantment.EnchantmentScreenMixin",
     "client.EndCrystalRendererMixin",
-    "client.EntityRendererMixin",
+    "client.NameTagFeatureMixin",
     "client.FireworkEntityRendererMixin",
     "client.AtmosphericFogEnvironmentMixin",
     "client.FontMixin",
@@ -105,7 +105,7 @@
     "client.MusicsMixin",
     "client.OptionInstanceMixin",
     "client.OptionsMixin",
-    "client.PackSelectionScreenMixin",
+    "client.packselection.PackSelectionScreenMixin",
     "client.ParticleEngineMixin",
     "client.ParticleMixin",
     "client.pause.PauseScreenMixin",
@@ -169,7 +169,20 @@
     "client.bosshealth.WitherBossMixin",
     "client.GuiItemRenderStateMixin",
     "client.chat.ChatFormattingMixin",
-    "client.StyleMixin"
+    "client.StyleMixin",
+    "client.KeyboardHandlerAccessor",
+    "client.InputWithModifiersMixin",
+    "client.ItemPickupParticleGroupMixin",
+    "client.NameTagSubmitMixin",
+    "client.EntityRendererMixin",
+    "client.NameTagFeatureRendererStorageMixin",
+    "client.SubmitNodeCollectorMixin",
+    "client.AvatarRendererMixin",
+    "client.LevelLoadingScreenAccessor",
+    "client.FeatureRenderDispatcherMixin",
+    "client.MovingBlockRenderStateMixin",
+    "client.ClientAvatarStateMixin",
+    "client.SubmitNodeStorageMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",
@@ -204,7 +217,6 @@
     "MerchantMixin",
     "MerchantOfferMixin",
     "MinecartFurnaceMixin",
-    "MinecraftServerMixin",
     "piston.PistonBaseBlockMixin",
     "piston.PistonMovingBlockEntityMixin",
     "PlayerListMixin",
@@ -233,7 +245,8 @@
     "FlowerPotBlockAccessor",
     "HangingEntityItemAccessor",
     "ClientBoundAwardStatsPacketAccessor",
-    "BaseContainerBlockEntityMixin"
+    "BaseContainerBlockEntityMixin",
+    "PrepareSpawnTaskMixin"
   ],
   "injectors": {
     "defaultRequire": 1

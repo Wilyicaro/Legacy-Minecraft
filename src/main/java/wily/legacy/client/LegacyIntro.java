@@ -31,7 +31,7 @@ public record LegacyIntro(List<ResourceLocation> brands, ResourceLocation backgr
     }
 
     public static boolean canSkip(float timer, LegacyIntro intro){
-        return timer >= intro.brands().size() || LegacyOptions.skipIntro.get() || InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), InputConstants.KEY_RETURN) || GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(),GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS || ControllerBinding.DOWN_BUTTON.state().pressed;
+        return timer >= intro.brands().size() || LegacyOptions.skipIntro.get() || InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), InputConstants.KEY_RETURN) || GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), GLFW.GLFW_MOUSE_BUTTON_1) == GLFW.GLFW_PRESS || ControllerBinding.DOWN_BUTTON.state().pressed;
     }
 
     public static void render(GuiGraphics guiGraphics, LegacyIntro intro, float timer){

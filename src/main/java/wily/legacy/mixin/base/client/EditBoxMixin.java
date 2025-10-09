@@ -9,6 +9,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
@@ -52,17 +54,17 @@ public abstract class EditBoxMixin extends AbstractWidget implements ControlTool
         super(i, j, k, l, component);
     }
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-    private void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir){
+    private void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir){
         Screen screen = Minecraft.getInstance().screen;
-        if (KeyboardScreen.isOpenKey(i) && screen != null){
+        if (KeyboardScreen.isOpenKey(keyEvent.key()) && screen != null){
             Minecraft.getInstance().setScreen(KeyboardScreen.fromStaticListener(this,screen));
             cir.setReturnValue(true);
         }
     }
     @Inject(method = "onClick", at = @At("HEAD"), cancellable = true)
-    private void onClick(double d, double e, CallbackInfo ci){
+    private void onClick(MouseButtonEvent event, boolean bl, CallbackInfo ci){
         Screen screen = Minecraft.getInstance().screen;
-        if (Screen.hasShiftDown() || Legacy4JClient.controllerManager.isControllerTheLastInput()) {
+        if (event.hasShiftDown() || Legacy4JClient.controllerManager.isControllerTheLastInput()) {
             Minecraft.getInstance().setScreen(KeyboardScreen.fromStaticListener(this, screen));
             ci.cancel();
         }

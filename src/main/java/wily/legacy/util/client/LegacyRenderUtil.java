@@ -368,6 +368,10 @@ public class LegacyRenderUtil {
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         EntityRenderer<? super Entity, ?> entityRenderer = entityRenderDispatcher.getRenderer(entity);
         EntityRenderState entityRenderState = entityRenderer.createRenderState(entity, 1.0F);
+        entityRenderState.lightCoords = 15728880;
+        entityRenderState.hitboxesRenderState = null;
+        entityRenderState.shadowPieces.clear();
+        entityRenderState.outlineColor = 0;
         guiGraphics.submitEntityRenderState(entityRenderState, h, vector3f, quaternionf, quaternionf2, x, y, x0, y0);
     }
 
@@ -563,7 +567,7 @@ public class LegacyRenderUtil {
         if (LegacyOptions.flyingViewRolling.get() && mc.player != null && mc.player.isFallFlying()) {
             float f = FactoryAPIClient.getGamePartialTick(false);
             Vec3 vec3 = mc.player.getViewVector(f);
-            Vec3 vec32 = mc.player.getDeltaMovementLerped(f);
+            Vec3 vec32 = mc.player.getDeltaMovement();
             double d = vec32.horizontalDistanceSqr();
             double e = vec3.horizontalDistanceSqr();
             if (d > 0.0 && e > 0.0) {
@@ -593,7 +597,7 @@ public class LegacyRenderUtil {
             FactoryScreenUtil.enableDepthTest();
         }
 
-        if (GLFW.glfwGetInputMode(mc.getWindow().getWindow(),GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerManager.isCursorDisabled && !LegacyOptions.hasSystemCursor()) {
+        if (GLFW.glfwGetInputMode(mc.getWindow().handle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerManager.isCursorDisabled && !LegacyOptions.hasSystemCursor()) {
             graphics.pose().pushMatrix();
             graphics.pose().translate(Legacy4JClient.controllerManager.getVisualPointerX() + LegacyTipManager.getTipXDiff(), Legacy4JClient.controllerManager.getVisualPointerY());
             FactoryGuiGraphics.of(graphics).blitSprite(mc.getWindow().getScreenWidth() >= 1920 ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);

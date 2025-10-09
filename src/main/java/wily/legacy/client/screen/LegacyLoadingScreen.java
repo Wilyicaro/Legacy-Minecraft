@@ -9,9 +9,12 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FontDescription;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
+import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryScreenUtil;
@@ -22,6 +25,7 @@ import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
@@ -92,11 +96,11 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
         super.render(guiGraphics, i, j, f);
         int x = width / 2 - 160;
         int y = height / 2 + 16;
-        ResourceLocation fontOverride = accessor.getElementValue("fontOverride",null,ResourceLocation.class);
+        ArbitrarySupplier<ResourceLocation> fontOverride = accessor.getElement("fontOverride", ResourceLocation.class);
         if (!isGenericLoading()) {
             if (getProgress() != -1) {
                 if (getLoadingStage() != null)
-                    LegacyFontUtil.applyFontOverrideIf(fontOverride != null, fontOverride, b-> guiGraphics.drawString(minecraft.font, getLoadingStage(), accessor.getInteger("loadingStage.x",x + 1), accessor.getInteger("loadingStage.y",height / 2 + 5), CommonColor.STAGE_TEXT.get()));
+                    LegacyFontUtil.applyFontOverrideIf(fontOverride.isPresent(), fontOverride.map(FontDescription.Resource::new).orElse(FontDescription.DEFAULT), b-> guiGraphics.drawString(minecraft.font, getLoadingStage(), accessor.getInteger("loadingStage.x",x + 1), accessor.getInteger("loadingStage.y",height / 2 + 5), CommonColor.STAGE_TEXT.get()));
                 try (SpriteContents contents = FactoryGuiGraphics.getSprites().getSprite(LOADING_BACKGROUND).contents()){
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(LOADING_BACKGROUND, x, y - 1, 320, 320 * contents.height() / contents.width());
                 }
@@ -114,7 +118,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
             }
         }else LegacyRenderUtil.drawGenericLoading(guiGraphics,(width - 75 )/ 2, height / 2);
         if (getLoadingHeader() != null) {
-            LegacyFontUtil.applyFontOverrideIf(fontOverride != null, fontOverride, b -> {
+            LegacyFontUtil.applyFontOverrideIf(fontOverride.isPresent(), fontOverride.map(FontDescription.Resource::new).orElse(FontDescription.DEFAULT), b -> {
                 guiGraphics.pose().pushMatrix();
                 float scaleX = accessor.getFloat("loadingHeader.scaleX", 2.0f);
                 guiGraphics.pose().translate(accessor.getFloat("loadingHeader.x", (width - minecraft.font.width(getLoadingHeader()) * scaleX) / 2), accessor.getFloat("loadingHeader.y", height / 2 - 23));
@@ -126,10 +130,21 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
         FactoryScreenUtil.enableDepthTest();
     }
 
-    public static LegacyLoadingScreen getDimensionChangeScreen(ClientLevel lastLevel, ClientLevel newLevel){
+    public static LegacyLoadingScreen getDimensionChangeScreen(BooleanSupplier levelReady, ResourceKey<Level> lastLevel, ResourceKey<Level> newLevel) {
+        long createdTime = Util.getMillis();
         boolean lastOd = isOtherDimension(lastLevel);
         boolean od = isOtherDimension(newLevel);
-        LegacyLoadingScreen screen = new LegacyLoadingScreen(od || lastOd ? Component.translatable("legacy.menu." + (lastOd ? "leaving" : "entering"), LegacyComponents.getDimensionName((lastOd ? lastLevel : newLevel).dimension())) : Component.empty(), Component.empty());
+        LegacyLoadingScreen screen = new LegacyLoadingScreen(od || lastOd ? Component.translatable("legacy.menu." + (lastOd ? "leaving" : "entering"), LegacyComponents.getDimensionName((lastOd ? lastLevel : newLevel))) : Component.empty(), Component.empty()) {
+            @Override
+            public void tick() {
+                if (levelReady.getAsBoolean() || Util.getMillis() - createdTime >= 30000) minecraft.setScreen(null);
+            }
+
+            @Override
+            public boolean isPauseScreen() {
+                return false;
+            }
+        };
         if (od || lastOd) {
             screen.setGenericLoading(true);
 
@@ -137,13 +152,13 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
         return screen;
     }
 
-    public static boolean isOtherDimension(Level level){
-        return level != null && level.dimension() != Level.OVERWORLD;
+    public static boolean isOtherDimension(ResourceKey<Level> level){
+        return level != null && level != Level.OVERWORLD;
     }
 
-    public static LegacyLoadingScreen getRespawningScreen(BooleanSupplier levelReady){
+    public static LegacyLoadingScreen getRespawningScreen(BooleanSupplier levelReady) {
         long createdTime = Util.getMillis();
-        LegacyLoadingScreen screen = new LegacyLoadingScreen(LegacyComponents.RESPAWNING, Component.empty()){
+        LegacyLoadingScreen screen = new LegacyLoadingScreen(LegacyComponents.RESPAWNING, Component.empty()) {
             @Override
             public void tick() {
                 if (levelReady.getAsBoolean() || Util.getMillis() - createdTime >= 30000) minecraft.setScreen(null);
@@ -173,7 +188,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
         };
     }
 
-    public static void closeExecutor(ExecutorService executor){
+    public static void closeExecutor(ExecutorService executor) {
         executor.shutdown();
         boolean bl;
         try {

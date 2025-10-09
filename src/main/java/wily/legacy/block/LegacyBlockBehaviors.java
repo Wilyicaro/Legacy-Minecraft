@@ -43,13 +43,13 @@ public class LegacyBlockBehaviors {
     public static void setup(){
         DefaultDispenseItemBehavior defaultDispenseItemBehavior = new DefaultDispenseItemBehavior() {
             public ItemStack execute(BlockSource blockSource, ItemStack itemStack) {
-                Direction direction = blockSource./*? if >1.20.1 {*/state/*?} else {*//*getBlockState*//*?}*/().getValue(DispenserBlock.FACING);
-                EntityType<?> entityType = ((SpawnEggItem)itemStack.getItem()).getType(/*? if >=1.21.4 {*/blockSource.level().registryAccess(), /*?}*//*? if <1.20.5 {*//*null*//*?} else {*/itemStack/*?}*/);
+                Direction direction = blockSource.state().getValue(DispenserBlock.FACING);
+                EntityType<?> entityType = ((SpawnEggItem)itemStack.getItem()).getType(itemStack);
 
                 try {
-                    if (entityType.spawn(blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/(), itemStack, null, blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/().relative(direction), /*? if <1.21.3 {*//*MobSpawnType*//*?} else {*/EntitySpawnReason/*?}*/.DISPENSER, direction != Direction.UP, false) != null){
+                    if (entityType.spawn(blockSource.level(), itemStack, null, blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/().relative(direction), /*? if <1.21.3 {*//*MobSpawnType*//*?} else {*/EntitySpawnReason/*?}*/.DISPENSER, direction != Direction.UP, false) != null){
                         itemStack.shrink(1);
-                        blockSource./*? if >1.20.1 {*/level/*?} else {*//*getLevel*//*?}*/().gameEvent(null, GameEvent.ENTITY_PLACE, blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/());
+                        blockSource.level().gameEvent(null, GameEvent.ENTITY_PLACE, blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/());
                     }
                 } catch (Exception var6) {
                     LOGGER.error("Error while dispensing spawn egg from dispenser at {}", blockSource./*? if >1.20.1 {*/pos/*?} else {*//*getPos*//*?}*/(), var6);
@@ -80,7 +80,7 @@ public class LegacyBlockBehaviors {
                 be.setChanged();
                 if (be.hasWater()) sendCauldronBubblesParticles(level, blockPos);
             });
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 Item item = itemStack.getItem();
                 player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, new ItemStack(Items.GLASS_BOTTLE)));
                 player.awardStat(Stats.USE_CAULDRON);
@@ -96,7 +96,7 @@ public class LegacyBlockBehaviors {
         putInteractionOrFallback(emptyCauldron, Items.LINGERING_POTION,emptyCauldronPotion);
         putInteractionOrFallback(waterCauldron, Items.GLASS_BOTTLE, (blockState, level, blockPos, player, interactionHand, itemStack) -> {
             if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || be.waterColor != null) return defaultPassInteraction();
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 Item item = itemStack.getItem();
                 player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, LegacyItemUtil.setItemStackPotion(new ItemStack(be.lastPotionItemUsed),be.potion)));
                 player.awardStat(Stats.USE_CAULDRON);
@@ -116,7 +116,7 @@ public class LegacyBlockBehaviors {
             }
             if (!be.potion.equals(p)){
                 level.setBlockAndUpdate(blockPos, CAULDRON.defaultBlockState());
-                if (!be.potion.equals(p) && !level.isClientSide) level.playSound(null, blockPos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0f, 1.0f);
+                if (!be.potion.equals(p) && !level.isClientSide()) level.playSound(null, blockPos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0f, 1.0f);
             }else{
                 level.setBlockAndUpdate(blockPos, blockState.cycle(LayeredCauldronBlock.LEVEL));
                 if (be.waterColor != null) {
@@ -125,9 +125,9 @@ public class LegacyBlockBehaviors {
                     be.setRemoved();
                 }
                 be.lastPotionItemUsed = itemStack.getItemHolder();
-                if (!level.isClientSide) level.playSound(null, blockPos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0f, 1.0f);
+                if (!level.isClientSide()) level.playSound(null, blockPos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0f, 1.0f);
             }
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 player.setItemInHand(interactionHand, ItemUtils.createFilledResult(itemStack, player, new ItemStack(Items.GLASS_BOTTLE)));
                 player.awardStat(Stats.USE_CAULDRON);
                 player.awardStat(Stats.ITEM_USED.get(itemStack.getItem()));
@@ -144,7 +144,7 @@ public class LegacyBlockBehaviors {
             if (!(level.getBlockEntity(blockPos) instanceof WaterCauldronBlockEntity be) || be.hasWater()) {
                 return defaultPassInteraction();
             }
-            if (!level.isClientSide) {
+            if (!level.isClientSide()) {
                 int l = blockState.getValue(LayeredCauldronBlock.LEVEL);
                 int arrowCount = Math.min(itemStack.getCount(), l < 3 ? l * 16 : 64);
                 //? if <1.20.5 {
@@ -176,7 +176,7 @@ public class LegacyBlockBehaviors {
                 be.setWaterColor(null);
                 if (!be.hasWater()) {
                     be.potion = be.getDefaultPotion();
-                    if (!level.isClientSide) level.playSound(null, blockPos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0f, 1.0f);
+                    if (!level.isClientSide()) level.playSound(null, blockPos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0f, 1.0f);
                 }
             }
             return successInteraction();
@@ -218,12 +218,12 @@ public class LegacyBlockBehaviors {
                 else be.setWaterColor(be.waterColor = LegacyItemUtil.mixColors(List.of(be.waterColor,dyeColor).iterator()));
                 be.setChanged();
 
-                if (!level.isClientSide) {
+                if (!level.isClientSide()) {
                     level.playSound(null, blockPos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.25f, 1.0f);
                     sendCauldronBubblesParticles(level, blockPos);
                 }
 
-                return level.isClientSide ? successInteraction() : consumeInteraction();
+                return level.isClientSide() ? successInteraction() : consumeInteraction();
             });
         }
     }
@@ -251,7 +251,7 @@ public class LegacyBlockBehaviors {
                     return defaultPassInteraction();
                 }
 
-                if (!level.isClientSide) {
+                if (!level.isClientSide()) {
                     player.awardStat(Stats.USE_CAULDRON);
                     player.awardStat(Stats.ITEM_USED.get(itemStack.getItem()));
                     if (be.waterColor == null) /*? if <1.20.5 {*//*((DyeableLeatherItem)itemStack.getItem()).clearColor(itemStack)*//*?} else {*/itemStack.set(DataComponents.DYED_COLOR,null)/*?}*/;

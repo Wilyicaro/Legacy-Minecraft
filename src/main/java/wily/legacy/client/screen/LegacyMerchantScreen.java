@@ -6,6 +6,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -183,19 +185,19 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
             }
 
             @Override
-            public boolean keyPressed(int i, int j, int k) {
-                if ((i == 263 && index == 0) || (i == 262 && index == merchantTradeButtons.size() - 1)){
+            public boolean keyPressed(KeyEvent keyEvent) {
+                if ((keyEvent.isLeft() && index == 0) || (keyEvent.isRight() && index == merchantTradeButtons.size() - 1)){
                     int oldOffset = tradingButtonsOffset.get();
-                    tradingButtonsOffset.add(i == 263 ? -1 : 1,true);
-                    if ((oldOffset == tradingButtonsOffset.max && i == 262) || (oldOffset == 0 && i == 263)) LegacyMerchantScreen.this.setFocused(merchantTradeButtons.get(i == 263 ? merchantTradeButtons.size() - 1 : 0));
+                    tradingButtonsOffset.add(keyEvent.isLeft() ? -1 : 1,true);
+                    if ((oldOffset == tradingButtonsOffset.max && keyEvent.isRight()) || (oldOffset == 0 && keyEvent.isLeft())) LegacyMerchantScreen.this.setFocused(merchantTradeButtons.get(keyEvent.isLeft() ? merchantTradeButtons.size() - 1 : 0));
                     else {
-                        scrollRenderer.updateScroll(i == 263 ? ScreenDirection.LEFT : ScreenDirection.RIGHT);
+                        scrollRenderer.updateScroll(keyEvent.isLeft() ? ScreenDirection.LEFT : ScreenDirection.RIGHT);
                         updateSlotsDisplay();
                     }
                     LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
                     return true;
                 }
-                return super.keyPressed(i, j, k);
+                return super.keyPressed(keyEvent);
             }
 
 
@@ -213,11 +215,11 @@ public class LegacyMerchantScreen extends AbstractContainerScreen<LegacyMerchant
             }
 
             @Override
-            public void onPress() {
+            public void onPress(InputWithModifiers input) {
                 if (isValidIndex() && isFocused()) {
                     MerchantOffer offer = menu.merchant.getOffers().get(getIndex());
                     if (((LegacyMerchantOffer)offer).getRequiredLevel() <= menu.merchantLevel && !offer.isOutOfStock() && !displaySlotsWarning[2]) {
-                        CommonNetwork.sendToServer(new ServerMenuCraftPayload(Collections.emptyList(),getIndex(),hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed));
+                        CommonNetwork.sendToServer(new ServerMenuCraftPayload(Collections.emptyList(),getIndex(),input.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed));
                     }else LegacySoundUtil.playSimpleUISound(LegacyRegistries.CRAFT_FAIL.get(),1.0f);
                 }
             }

@@ -5,8 +5,11 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.state.MapRenderState;
 import net.minecraft.client.renderer.MapRenderer;
+import net.minecraft.data.AtlasIds;
+import net.minecraft.network.chat.Component;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyMapDecorationRenderState;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -51,21 +54,20 @@ public abstract class MapRendererMixin {
         return iterable.stream().filter(s-> !isPlayerDecoration(LegacyMapDecorationRenderState.of(s).getType())).iterator();
     }
 
-    @Inject(method = "render", at = @At("HEAD"))
-    void draw(MapRenderState mapRenderState, PoseStack poseStack, MultiBufferSource multiBufferSource, boolean bl, int i, CallbackInfo ci) {
+    @Inject(method = "render", at = @At("RETURN"))
+    void draw(MapRenderState mapRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, boolean bl, int i, CallbackInfo ci) {
         Minecraft minecraft = Minecraft.getInstance();
-        Font font = minecraft.font;
         if (!bl && LegacyOptions.mapsWithCoords.get()) {
             poseStack.pushPose();
             poseStack.translate(-0.2f,0.4f,-0.1f);
-            poseStack.scale(1f, 0.95f, 1);
-            font.drawInBatch(I18n.get("legacy.map.coords",(int)minecraft.player.getX(), (int)minecraft.player.getEyeY(),(int)minecraft.player.getZ()), 0.0f, 0.0f, CommonColor.BLACK.get(), false, poseStack.last().pose(), multiBufferSource, Font.DisplayMode.NORMAL, 0, i);
+            poseStack.scale(1.0f, 0.95f, 1.0f);
+            submitNodeCollector.submitText(poseStack, 0.0f, 0.0f, Component.translatable("legacy.map.coords",(int)minecraft.player.getX(), (int)minecraft.player.getEyeY(),(int)minecraft.player.getZ()).getVisualOrderText(), false, Font.DisplayMode.NORMAL, i, CommonColor.BLACK.get(), 0, 0);
             poseStack.popPose();
         }
     }
 
     @Inject(method = "render", at = @At("RETURN"))
-    void drawReturn(MapRenderState mapRenderState, PoseStack poseStack, MultiBufferSource multiBufferSource, boolean bl, int i, CallbackInfo ci) {
+    void drawReturn(MapRenderState mapRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, boolean bl, int i, CallbackInfo ci) {
         int l = 0;
         for (MapRenderState.MapDecorationRenderState mapDecoration : mapRenderState.decorations) {
             Holder<MapDecorationType> type = LegacyMapDecorationRenderState.of(mapDecoration).getType();
@@ -79,16 +81,18 @@ public abstract class MapRendererMixin {
             Minecraft minecraft = Minecraft.getInstance();
             LegacyPlayerInfo playerInfo = mapDecoration.name == null || minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(mapDecoration.name.getString()) instanceof LegacyPlayerInfo info) ? null : info;
             float[] color = playerInfo == null ? new float[]{1.0f,1.0f,1.0f} : Legacy4JClient.getVisualPlayerColor(playerInfo);
-            TextureAtlasSprite textureAtlasSprite = playerInfo == null ? mapDecoration.atlasSprite : minecraft.getMapDecorationTextures().textureAtlas.getSprite(PlayerIdentifier.of(playerInfo.getIdentifierIndex()).spriteByMapDecorationType(type));
+            TextureAtlasSprite textureAtlasSprite = playerInfo == null ? mapDecoration.atlasSprite : minecraft.getAtlasManager().getAtlasOrThrow(AtlasIds.MAP_DECORATIONS).getSprite(PlayerIdentifier.of(playerInfo.getIdentifierIndex()).spriteByMapDecorationType(type));
             float g = textureAtlasSprite.getU0();
             float h = textureAtlasSprite.getV0();
             float m = textureAtlasSprite.getU1();
             float n = textureAtlasSprite.getV1();
-            VertexConsumer vertexConsumer2 = multiBufferSource.getBuffer(RenderType.text(textureAtlasSprite.atlasLocation()));
-            vertexConsumer2.addVertex(matrix4f2, -1.0f, 1.0f, (float)l * -0.001f).setColor(color[0], color[1], color[2], 1.0f).setUv(g, h).setLight(i);
-            vertexConsumer2.addVertex(matrix4f2, 1.0f, 1.0f, (float)l * -0.001f).setColor(color[0], color[1], color[2], 1.0f).setUv(m, h).setLight(i);
-            vertexConsumer2.addVertex(matrix4f2, 1.0f, -1.0f, (float)l * -0.001f).setColor(color[0], color[1], color[2], 1.0f).setUv(m, n).setLight(i);
-            vertexConsumer2.addVertex(matrix4f2, -1.0f, -1.0f, (float)l * -0.001f).setColor(color[0], color[1], color[2], 1.0f).setUv(g, n).setLight(i);
+            float z = l * -0.001f;
+            submitNodeCollector.submitCustomGeometry(poseStack, RenderType.text(textureAtlasSprite.atlasLocation()), ((pose, vertexConsumer) -> {
+                vertexConsumer.addVertex(matrix4f2, -1.0f, 1.0f, z).setColor(color[0], color[1], color[2], 1.0f).setUv(g, h).setLight(i);
+                vertexConsumer.addVertex(matrix4f2, 1.0f, 1.0f, z).setColor(color[0], color[1], color[2], 1.0f).setUv(m, h).setLight(i);
+                vertexConsumer.addVertex(matrix4f2, 1.0f, -1.0f, z).setColor(color[0], color[1], color[2], 1.0f).setUv(m, n).setLight(i);
+                vertexConsumer.addVertex(matrix4f2, -1.0f, -1.0f, z).setColor(color[0], color[1], color[2], 1.0f).setUv(g, n).setLight(i);
+            }));
             poseStack.popPose();
             ++l;
         }

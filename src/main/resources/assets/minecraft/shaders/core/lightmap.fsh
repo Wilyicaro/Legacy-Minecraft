@@ -10,6 +10,7 @@ layout(std140) uniform LightmapInfo {
     float DarkenWorldFactor;
     float BrightnessFactor;
     vec3 SkyLightColor;
+    vec3 AmbientColor;
     vec3 BlockLightColor;
 } lightmapInfo;
 
@@ -18,8 +19,7 @@ in vec2 texCoord;
 out vec4 fragColor;
 
 float get_brightness(float level) {
-    float curved_level = level / (4.0 - 3.0 * level);
-    return mix(curved_level, 1.0, lightmapInfo.AmbientLightFactor);
+    return level / (4.0 - 3.0 * level);
 }
 
 vec3 notGamma(vec3 x) {
@@ -37,6 +37,8 @@ void main() {
         block_brightness * ((block_brightness * 0.6 + 0.4) * 0.6 + 0.4),
         block_brightness * (block_brightness * block_brightness * 0.6 + 0.4)
     );
+
+    color = mix(color, lightmapInfo.AmbientColor, lightmapInfo.AmbientLightFactor);
 
     if (floor(texCoord.x * 16) < 15) {
         color = color * lightmapInfo.BlockLightColor;

@@ -34,16 +34,15 @@ public class ExitConfirmationScreen extends ConfirmationScreen {
         }
 
         if (save) LegacySaveCache.saveExit = LegacySaveCache.retakeWorldIcon = true;
-        //? if <=1.20.2
-        /*boolean wasInRealms = minecraft.isConnectedToRealms();*/
+
         if (minecraft.level != null) {
             minecraft.level.disconnect(ClientLevel.DEFAULT_QUIT_MESSAGE);
         }
 
-        minecraft./*? if >1.20.2 {*/disconnect/*?} else {*//*clearLevel*//*?}*/(new LegacyLoadingScreen(Component.translatable(save ? "menu.savingLevel": "disconnect.quitting"),Component.empty()), false);
+        minecraft.disconnect(new LegacyLoadingScreen(Component.translatable(save ? "menu.savingLevel": "disconnect.quitting"),Component.empty()), false);
         ServerData serverData = minecraft.getCurrentServer();
         TitleScreen mainMenuScreen = new TitleScreen();
-        if (serverData != null && /*? if >1.20.2 {*/serverData.isRealm()/*?} else {*//*wasInRealms*//*?}*/) {
+        if (serverData != null && serverData.isRealm()) {
             minecraft.setScreen(new RealmsMainScreen(mainMenuScreen));
         } else {
             minecraft.setScreen(mainMenuScreen);

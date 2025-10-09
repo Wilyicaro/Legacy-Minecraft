@@ -3,6 +3,7 @@ package wily.legacy.client.screen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.UIDefinition;
 
@@ -40,9 +41,9 @@ public class RenderableVListScreen extends LegacyScreen implements RenderableVLi
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (renderableVList.keyPressed(i)) return true;
-        return super.keyPressed(i, j, k);
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (renderableVList.keyPressed(keyEvent.key())) return true;
+        return super.keyPressed(keyEvent);
     }
 
     @Override

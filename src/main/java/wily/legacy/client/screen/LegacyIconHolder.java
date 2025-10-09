@@ -6,9 +6,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.navigation.FocusNavigationEvent;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -26,7 +28,6 @@ import org.joml.Vector3f;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
-import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.client.LegacyFontUtil;
@@ -312,30 +313,35 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (CommonInputs.selected(i)){
-            onPress();
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.isSelection()) {
+            onPress(keyEvent);
         }
         return false;
     }
 
-    public boolean mouseClicked(double d, double e, int i) {
-        if (isMouseOver(d,e) && i == 0) {
-            onClick(d,e);
+    @Override
+    public boolean mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl) {
+        if (isMouseOver(mouseButtonEvent.x(), mouseButtonEvent.y()) && mouseButtonEvent.button() == 0) {
+            onClick(mouseButtonEvent, bl);
             return !isFocused();
         }
         return false;
     }
+
     public void playClickSound(){
         if (!isFocused()) LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0F);
     }
-    public void onClick(double d, double e){
+
+    public void onClick(MouseButtonEvent event, boolean bl) {
         playClickSound();
-        onPress();
+        onPress(event);
     }
-    public void onPress(){
+
+    public void onPress(InputWithModifiers inputWithModifiers) {
 
     }
+
     @Override
     public boolean isFocused() {
         return focused;

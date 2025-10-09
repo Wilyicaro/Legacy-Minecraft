@@ -10,6 +10,7 @@ import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import wily.factoryapi.FactoryAPIClient;
@@ -74,9 +75,9 @@ public class OptionsScreen extends PanelVListScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (super.keyPressed(i, j, k)) return true;
-        if (i == InputConstants.KEY_O && advancedOptionsScreen != null){
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (super.keyPressed(keyEvent)) return true;
+        if (keyEvent.key() == InputConstants.KEY_O && advancedOptionsScreen != null){
             minecraft.setScreen(advancedOptionsScreen);
             return true;
         }
@@ -313,6 +314,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.loyaltyLines,
                                 LegacyOptions.merchantTradingIndicator,
                                 LegacyOptions.legacyBabyVillagerHead,
+                                LegacyOptions.legacyFireworks,
                                 LegacyOptions.legacyEvokerFangs,
                                 LegacyOptions.legacyDrownedAnimation,
                                 LegacyOptions.legacyEntityFireTint,

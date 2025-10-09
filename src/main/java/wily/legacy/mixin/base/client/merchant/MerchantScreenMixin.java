@@ -1,10 +1,11 @@
 package wily.legacy.mixin.base.client.merchant;
 
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.MerchantScreen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
@@ -94,7 +95,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         }
     }
 
-    @Inject(method = "render",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderContents",at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         super.render(guiGraphics, i, j, f);
@@ -157,11 +158,11 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
         guiGraphics.drawString(this.font, TRADES_LABEL, 7 + (105 - this.font.width(TRADES_LABEL)) / 2, 10, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
     @Inject(method = "mouseClicked",at = @At("HEAD"), cancellable = true)
-    public void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
+    public void mouseClicked(MouseButtonEvent event, boolean bl, CallbackInfoReturnable<Boolean> cir) {
         this.isDragging = false;
         for (int index = 0; index < 9; index++) {
             boolean hovered = false;
-            if (index + scrollOff >= this.menu.getOffers().size() || (hovered = LegacyRenderUtil.isMouseOver(d,e,leftPos + 8.5f,topPos + 22.5f + index * 18,102,18))){
+            if (index + scrollOff >= this.menu.getOffers().size() || (hovered = LegacyRenderUtil.isMouseOver(event.x(), event.y(), leftPos + 8.5f,topPos + 22.5f + index * 18,102,18))){
                 if (hovered){
                     LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
                     if (shopItem == index + scrollOff && ((LegacyMerchantOffer)menu.getOffers().get(index + scrollOff)).getRequiredLevel() <= menu.getTraderLevel()) postButtonClick();
@@ -173,19 +174,19 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             }
 
         }
-        if (this.menu.getOffers().size() > 9 && LegacyRenderUtil.isMouseOver(d,e,leftPos + 115,topPos + 21,13,165)) this.isDragging = true;
+        if (this.menu.getOffers().size() > 9 && LegacyRenderUtil.isMouseOver(event.x(), event.y(), leftPos + 115,topPos + 21,13,165)) this.isDragging = true;
 
-        cir.setReturnValue(super.mouseClicked(d, e, i));
+        cir.setReturnValue(super.mouseClicked(event, bl));
     }
     @Inject(method = "mouseDragged",at = @At("HEAD"), cancellable = true)
-    public void mouseDragged(double d, double e, int i, double f, double g, CallbackInfoReturnable<Boolean> cir) {
+    public void mouseDragged(MouseButtonEvent mouseButtonEvent, double d, double e, CallbackInfoReturnable<Boolean> cir) {
         if (this.isDragging) {
             int oldScroll = scrollOff;
-            this.scrollOff = (int) Math.round(Math.max(0,Math.min( (e - (topPos + 18)) / 165,menu.getOffers().size() - 9)));
+            this.scrollOff = (int) Math.round(Math.max(0,Math.min( (mouseButtonEvent.y() - (topPos + 18)) / 165,menu.getOffers().size() - 9)));
             if (scrollOff != oldScroll) scrollRenderer.updateScroll(oldScroll - scrollOff > 0 ? ScreenDirection.UP : ScreenDirection.DOWN);
             cir.setReturnValue(true);
         } else {
-            cir.setReturnValue(super.mouseDragged(d, e, i, f, g));
+            cir.setReturnValue(super.mouseDragged(mouseButtonEvent, d, e));
         }
     }
     @Inject(method = "mouseScrolled",at = @At("HEAD"), cancellable = true)
@@ -201,25 +202,19 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (CommonInputs.selected(i) && shopItem + scrollOff < menu.getOffers().size()){
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.isSelection() && shopItem + scrollOff < menu.getOffers().size()){
             LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
             postButtonClick();
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyEvent);
     }
 
-    //? if >1.20.1 {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         renderBg(guiGraphics, f, i, j);
     }
-    //?} else {
-    /*@Override
-    public void renderBackground(GuiGraphics guiGraphics) {
-    }
-    *///?}
 
     @Inject(method = "renderBg", at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {

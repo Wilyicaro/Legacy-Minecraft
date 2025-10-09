@@ -12,11 +12,12 @@ import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.packs.PackSelectionModel;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.repository.Pack;
@@ -130,38 +131,38 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
             if (selectedPack != null){
                 FactoryGuiGraphics.of(graphics).blit(PackAlbum.Selector.getPackIcon(selectedPack), x + 7,y + 5,0.0f, 0.0f, 32, 32, 32, 32);
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4,x + 148, y + 44);
-                labelsCache.apply(selectedPack.getTitle(),108).renderLeftAligned(graphics,x + 43, y + 8,12,0xFFFFFFFF);
+                labelsCache.apply(selectedPack.getTitle(),108).render(graphics, MultiLineLabel.Align.LEFT,  x + 43, y + 8,12,true, 0xFFFFFFFF);
                 graphics.disableScissor();
                 ResourceLocation background = PackAlbum.Selector.getPackBackground(selectedPack);
                 MultiLineLabel label = labelsCache.apply(selectedPack.getDescription(), 145);
-                scrollableRenderer.render(graphics, x + 8,y + 40, 146, 12 * (background == null ? 14 : 7), ()->label.renderLeftAligned(graphics,x + 8, y + 40,12,0xFFFFFFFF));
+                scrollableRenderer.render(graphics, x + 8,y + 40, 146, 12 * (background == null ? 14 : 7), ()->label.render(graphics, MultiLineLabel.Align.LEFT, x + 8, y + 40,12, true, 0xFFFFFFFF));
                 if (background != null) FactoryGuiGraphics.of(graphics).blit(background, x + 8,y + height - 78,0.0f, 0.0f, 145, 72, 145, 72);
             }
         }
 
         @Override
-        public boolean keyPressed(int i, int j, int k) {
+        public boolean keyPressed(KeyEvent  keyEvent) {
             if (isHoveredOrFocused() && active) {
-                if (i == InputConstants.KEY_X){
+                if (keyEvent.key() == InputConstants.KEY_X){
                     openPackSelectionScreen();
                     return true;
                 }
-                if (CommonInputs.selected(i)) {
+                if (keyEvent.isSelection()) {
                     tryChangePackState(selectedIndex);
                     playDownSound(Minecraft.getInstance().getSoundManager());
                     return true;
                 }
-                if (i == 263) {
+                if (keyEvent.isLeft()) {
                     if (selectedIndex == scrolledList.get()) updateScroll(-1,true);
                     setSelectedPack(selectedIndex - 1);
                     LegacySoundUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
-                } else if (i == 262) {
+                } else if (keyEvent.isRight()) {
                     if (selectedIndex == scrolledList.get() + getMaxPacks() - 1) updateScroll(1,true);
                     setSelectedPack(selectedIndex + 1);
                     LegacySoundUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
                 }
             }
-            return super.keyPressed(i, j, k);
+            return super.keyPressed(keyEvent);
         }
 
         public void setSelectedPack(int index) {
@@ -205,7 +206,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         }
 
         public void updateModel(){
-            model = new PackSelectionModel(()->{},PackAlbum.Selector::getPackIcon, packRepository,r-> {});
+            model = new PackSelectionModel(e -> {},PackAlbum.Selector::getPackIcon, packRepository,r-> {});
         }
 
         public void openPackSelectionScreen(){
@@ -222,21 +223,21 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
         }
 
         @Override
-        public void onClick(double d, double e) {
-            if ((Screen.hasShiftDown())) {
+        public void onClick(MouseButtonEvent event, boolean bl) {
+            if (event.hasShiftDown()) {
                 openPackSelectionScreen();
                 return;
             }
             int visibleCount = 0;
             for (int index = 0; index < getDisplayPacks().size(); index++) {
                 if (visibleCount>=getMaxPacks()) break;
-                if (d >= getX() + 20 + 30 * index && e >= getY() +minecraft.font.lineHeight +  3 && d < getX()+minecraft.font.lineHeight + 49 + 30 * index && e < getY() + minecraft.font.lineHeight + 32) {
+                if (event.x() >= getX() + 20 + 30 * index && event.y() >= getY() + minecraft.font.lineHeight +  3 && event.x() < getX() + minecraft.font.lineHeight + 49 + 30 * index && event.y() < getY() + minecraft.font.lineHeight + 32) {
                     if (selectedIndex == index + scrolledList.get()) tryChangePackState(index + scrolledList.get());
                     setSelectedPack(index + scrolledList.get());
                 }
                 visibleCount++;
             }
-            super.onClick(d, e);
+            super.onClick(event, bl);
         }
 
         @Override

@@ -10,6 +10,8 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.multiplayer.ServerStatusPinger;
@@ -196,12 +198,12 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (hasTabList() && (tabList.controlTab(i) || tabList.directionalControlTab(i))) return true;
-        if (super.keyPressed(i, j, k)) {
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (hasTabList() && (tabList.controlTab(keyEvent.key()) || tabList.directionalControlTab(keyEvent.key()))) return true;
+        if (super.keyPressed(keyEvent)) {
             return true;
         }
-        if (i == InputConstants.KEY_F5) {
+        if (keyEvent.key() == InputConstants.KEY_F5) {
             if (tabList.getIndex() == 0) {
                 saveRenderableList.reloadSaveList();
             } else if (tabList.getIndex() == 2) {
@@ -211,9 +213,9 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
             this.rebuildWidgets();
             return true;
         }
-        if (i == InputConstants.KEY_X && tabList.getIndex() == 2){
+        if (keyEvent.key() == InputConstants.KEY_X && tabList.getIndex() == 2){
             EditBox serverBox = new EditBox(Minecraft.getInstance().font, 0,0,200,20,DIRECT_CONNECTION);
-            minecraft.setScreen(new ConfirmationScreen(this, 230, 120, serverBox.getMessage(),Component.translatable("addServer.enterIp"), b1->  ConnectScreen.startConnecting(this, minecraft, ServerAddress.parseString(serverBox.getValue()), new ServerData("","",/*? if >1.20.2 {*/ ServerData.Type.OTHER/*?} else {*//*false*//*?}*/), false/*? if >=1.20.5 {*/,null/*?}*/)){
+            minecraft.setScreen(new ConfirmationScreen(this, 230, 120, serverBox.getMessage(),Component.translatable("manageServer.enterIp"), b1->  ConnectScreen.startConnecting(this, minecraft, ServerAddress.parseString(serverBox.getValue()), new ServerData("","",/*? if >1.20.2 {*/ ServerData.Type.OTHER/*?} else {*//*false*//*?}*/), false/*? if >=1.20.5 {*/,null/*?}*/)){
                 boolean released = false;
                 @Override
                 protected void addButtons() {
@@ -222,15 +224,15 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
                 }
 
                 @Override
-                public boolean charTyped(char c, int i) {
+                public boolean charTyped(CharacterEvent event) {
                     if (!released) return false;
-                    return super.charTyped(c, i);
+                    return super.charTyped(event);
                 }
 
                 @Override
-                public boolean keyReleased(int i2, int j, int k) {
-                    if (i2 == i) released = true;
-                    return super.keyReleased(i2, j, k);
+                public boolean keyReleased(KeyEvent event) {
+                    if (keyEvent.key() == event.key()) released = true;
+                    return super.keyReleased(event);
                 }
 
                 @Override

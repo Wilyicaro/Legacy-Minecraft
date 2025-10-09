@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.EnchantmentNames;
 import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.model.BookModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.core.Holder;
@@ -82,16 +83,16 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
     }
 
     @Inject(method = "mouseClicked",at = @At("HEAD"), cancellable = true)
-    public void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
+    public void mouseClicked(MouseButtonEvent event, boolean bl, CallbackInfoReturnable<Boolean> cir) {
         for (int l = 0; l < 3; ++l) {
-            double f = d - (leftPos + 80.5);
-            double g = e - (topPos + 23.5 + 21 * l);
+            double f = event.x() - (leftPos + 80.5);
+            double g = event.y() - (topPos + 23.5 + 21 * l);
             if (!(f >= 0.0) || !(g >= 0.0) || !(f < 120) || !(g < 21) || !this.menu.clickMenuButton(this.minecraft.player, l)) continue;
             this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, l);
             cir.setReturnValue(true);
             return;
         }
-       cir.setReturnValue(super.mouseClicked(d, e, i));
+       cir.setReturnValue(super.mouseClicked(event, bl));
     }
 
     @ModifyArg(method = "renderBook",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitBookModelRenderState(Lnet/minecraft/client/model/BookModel;Lnet/minecraft/resources/ResourceLocation;FFFIIII)V"), index = 2)

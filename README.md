@@ -42,9 +42,10 @@ WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
 <img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/modpage_related_projects.png?raw=true" width="600" >
 
 - [VDX: Legacy Console UI](https://www.curseforge.com/minecraft-bedrock/texture-packs/vdx-legacy-console-ui) | An experimental resource pack by CrisXolt that converts Legacy Edition UI designs to Bedrock Edition with high accuracy
+- [Legacy Skins](https://modrinth.com/modpack/legacy-skins) | a compatibility mod for Legacy4J and Customizable Player Models, improving the `Change Skin` interface to be accurate and functional!
+- [Minimega](https://modrinth.com/modpack/minimega) | a mod that aims to recreate the minigames from the discontinued Legacy Console Editions.
 - [Project4J](https://modrinth.com/modpack/project-4j) | Experience a timeline where Legacy Console Edition had mods!
 - [Re-Console](https://modrinth.com/modpack/legacy-minecraft) | Better performance, all tutorial worlds, and more!
-
 
 # 📝 Planned and Implemented Features
 | Feature                                                                    | Implemented | Planned |

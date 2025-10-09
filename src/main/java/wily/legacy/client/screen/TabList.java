@@ -9,6 +9,8 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.UIAccessor;
@@ -121,13 +123,13 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
     public void resetSelectedTab() {
         if (!tabButtons.isEmpty()) {
             selected = null;
-            tabButtons.get(0).onPress();
+            tabButtons.get(0).onPress(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
         }
     }
 
     public void setSelected(int selected) {
         if (!tabButtons.isEmpty() && selected < tabButtons.size()) {
-            tabButtons.get(selected).onPress();
+            tabButtons.get(selected).onPress(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
         }
     }
 
@@ -142,8 +144,8 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        return tabButtons.stream().anyMatch(t -> t.isHoveredOrFocused() && t.keyPressed(i, j, k));
+    public boolean keyPressed(KeyEvent keyEvent) {
+        return tabButtons.stream().anyMatch(t -> t.isHoveredOrFocused() && t.keyPressed(keyEvent));
     }
 
     public boolean controlTab(int i) {
@@ -166,7 +168,7 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
         }));
         if (opt.isPresent()) {
             if (tabButtons.indexOf(opt.get()) != getIndex()) {
-                opt.get().onPress();
+                opt.get().onPress(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
                 LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
                 return true;
             }
@@ -188,14 +190,14 @@ public class TabList implements Renderable,GuiEventListener, NarratableEntry {
 
     public void numberControlTab(int i) {
         if (i <= 57 && i > 48 && i - 49 < tabButtons.size()) {
-            tabButtons.get(i - 49).onPress();
+            tabButtons.get(i - 49).onPress(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
             LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
         }
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        return !tabButtons.stream().filter(t-> t.mouseClicked(d,e,i)).toList().isEmpty();
+    public boolean mouseClicked(MouseButtonEvent event, boolean bl) {
+        return !tabButtons.stream().filter(t-> t.mouseClicked(event, bl)).toList().isEmpty();
     }
 
     public boolean isMouseOver(double d, double e) {

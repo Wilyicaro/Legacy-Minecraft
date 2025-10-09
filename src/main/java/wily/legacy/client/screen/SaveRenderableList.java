@@ -18,6 +18,9 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.*;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -219,24 +222,25 @@ public class SaveRenderableList extends RenderableVList {
         }
 
         @Override
-        public void onPress() {
+        public void onPress(InputWithModifiers input) {
             joinWorld(summary);
-        }
-        @Override
-        public void onClick(double d, double e) {
-            if (summary.isDisabled()) return;
-            boolean hoverIcon = LegacyRenderUtil.isMouseOver(d, e, getX() + 5, getY() + 5, 20, height);
-            if (hoverIcon || isFocused()) onPress();
         }
 
         @Override
-        public boolean keyPressed(int i, int j, int k) {
-            if (i == InputConstants.KEY_O) {
+        public void onClick(MouseButtonEvent event, boolean bl) {
+            if (summary.isDisabled()) return;
+            boolean hoverIcon = LegacyRenderUtil.isMouseOver(event.x(), event.y(), getX() + 5, getY() + 5, 20, height);
+            if (hoverIcon || isFocused()) onPress(event);
+        }
+
+        @Override
+        public boolean keyPressed(KeyEvent keyEvent) {
+            if (keyEvent.key() == InputConstants.KEY_O) {
                 minecraft.setScreen(new SaveOptionsScreen(getScreen(PlayGameScreen.class), summary));
                 getScreen().setFocused(this);
                 return true;
             }
-            return super.keyPressed(i, j, k);
+            return super.keyPressed(keyEvent);
         }
 
         @Override

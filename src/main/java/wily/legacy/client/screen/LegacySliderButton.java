@@ -2,7 +2,7 @@ package wily.legacy.client.screen;
 
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.navigation.CommonInputs;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -83,17 +83,17 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
+    public boolean keyPressed(KeyEvent keyEvent) {
         if (!active) return false;
-        if (CommonInputs.selected(i)) {
+        if (keyEvent.isSelection()) {
             Legacy4JClient.controllerManager.canChangeSlidersValue = this.canChangeValue = !this.canChangeValue;
             return true;
         }
         if (this.canChangeValue) {
-            boolean bl = i == 263;
-            if ((bl && value > 0) || (i == 262 && value < 1.0)) {
-                if (slidingMul > 0 && i != lastSliderInput) slidingMul = 1;
-                lastSliderInput = i;
+            boolean bl = keyEvent.isLeft();
+            if ((bl && value > 0) || (keyEvent.isRight() && value < 1.0)) {
+                if (slidingMul > 0 && keyEvent.key() != lastSliderInput) slidingMul = 1;
+                lastSliderInput = keyEvent.key();
                 double part = 1d / (width - 8) * slidingMul;
                 double precision = 100 * rangeMul;
                 T v = getObjectValue();
@@ -111,8 +111,9 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
         return false;
     }
 
-    public boolean keyReleased(int i, int j, int k) {
-        if (this.canChangeValue && (i == 263 || i== 262)) slidingMul = 1;
+    @Override
+    public boolean keyReleased(KeyEvent keyEvent) {
+        if (this.canChangeValue && (keyEvent.isLeft() || keyEvent.isRight())) slidingMul = 1;
         return false;
     }
 

@@ -13,6 +13,8 @@ import net.minecraft.client.gui.render.state.GuiRenderState;
 import net.minecraft.client.gui.render.state.pip.GuiEntityRenderState;
 import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -38,13 +40,15 @@ public class GuiRendererMixin {
     @Shadow @Final
     GuiRenderState renderState;
     @Shadow private int frameNumber;
+    @Shadow @Final private SubmitNodeCollector submitNodeCollector;
+    @Shadow @Final private FeatureRenderDispatcher featureRenderDispatcher;
     @Unique
     private Long2ObjectMap<LegacyGuiItemRenderer> guiItemRenderers = new Long2ObjectArrayMap<>();
     @Unique
     private List<GuiEntityRenderer> guiEntityRenderers;
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    void initTail(GuiRenderState guiRenderState, MultiBufferSource.BufferSource bufferSource, List list, CallbackInfo ci) {
+    void initTail(GuiRenderState guiRenderState, MultiBufferSource.BufferSource bufferSource, SubmitNodeCollector submitNodeCollector, FeatureRenderDispatcher featureRenderDispatcher, List list, CallbackInfo ci) {
         guiEntityRenderers = List.of(
                 new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
                 new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
@@ -91,7 +95,7 @@ public class GuiRendererMixin {
     private void prepareItemElements(CallbackInfo ci) {
         for (ObjectIterator<LegacyGuiItemRenderer> iter = guiItemRenderers.values().iterator(); iter.hasNext(); ) {
             var renderer = iter.next();
-            if (renderer.isValid()) renderer.prepareItemElements(bufferSource, renderState, frameNumber);
+            if (renderer.isValid()) renderer.prepareItemElements(featureRenderDispatcher, submitNodeCollector, bufferSource, renderState, frameNumber);
             else {
                 renderer.close();
                 iter.remove();

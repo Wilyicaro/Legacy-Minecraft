@@ -2,6 +2,7 @@ package wily.legacy.client.screen;
 
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
 import wily.factoryapi.FactoryAPI;
@@ -37,9 +38,9 @@ public class PatchNotesScreen extends PanelBackgroundScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (getScrollableRenderer().keyPressed(i)) return true;
-        return super.keyPressed(i, j, k);
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (getScrollableRenderer().keyPressed(keyEvent.key())) return true;
+        return super.keyPressed(keyEvent);
     }
 
     @Override

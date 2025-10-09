@@ -8,7 +8,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.Services;
 import net.minecraft.server.WorldStem;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.progress.ChunkProgressListenerFactory;
+import net.minecraft.server.level.progress.LevelLoadListener;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -37,9 +37,10 @@ public abstract class IntegratedServerMixin extends MinecraftServer {
 
     @Shadow private boolean paused;
 
-    public IntegratedServerMixin(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, Services services, ChunkProgressListenerFactory chunkProgressListenerFactory) {
-        super(thread, levelStorageAccess, packRepository, worldStem, proxy, dataFixer, services, chunkProgressListenerFactory);
+    public IntegratedServerMixin(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, Services services, LevelLoadListener levelLoadListener) {
+        super(thread, levelStorageAccess, packRepository, worldStem, proxy, dataFixer, services, levelLoadListener);
     }
+
 
     public IntegratedServer self(){
         return (IntegratedServer) (Object) this;
@@ -62,7 +63,7 @@ public abstract class IntegratedServerMixin extends MinecraftServer {
 
     @Override
     public boolean isUnderSpawnProtection(ServerLevel serverLevel, BlockPos blockPos, Player player) {
-        if (!isSingleplayerOwner(player.getGameProfile()) && !LegacyClientWorldSettings.of(worldData).trustPlayers()) return true;
+        if (!isSingleplayerOwner(player.nameAndId()) && !LegacyClientWorldSettings.of(worldData).trustPlayers()) return true;
         return super.isUnderSpawnProtection(serverLevel, blockPos, player);
     }
 }

@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -71,21 +72,21 @@ public class HowToPlayScreen extends LegacyScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
+    public boolean keyPressed(KeyEvent keyEvent) {
         boolean next;
-        if ((next = i == InputConstants.KEY_RETURN) && hasNextPage() || i == InputConstants.KEY_X && hasPreviousPage()) {
+        if ((next = keyEvent.key() == InputConstants.KEY_RETURN) && hasNextPage() || keyEvent.key() == InputConstants.KEY_X && hasPreviousPage()) {
             LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
             minecraft.setScreen(Section.list.get(sectionIndex + (next ? 1 : -1)).build(parent));
             return true;
         }
-        if (getScrollableRenderer().keyPressed(i)) return true;
-        return super.keyPressed(i, j, k);
+        if (getScrollableRenderer().keyPressed(keyEvent.key())) return true;
+        return super.keyPressed(keyEvent);
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
+    public boolean mouseScrolled(double d, double e, double f, double g) {
         if (getScrollableRenderer().mouseScrolled(g)) return true;
-        return super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g);
+        return super.mouseScrolled(d, e, f, g);
     }
 
 

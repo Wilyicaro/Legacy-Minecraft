@@ -122,7 +122,7 @@ public interface MCAccount {
         },password);
     }
     default void login(Runnable onClose, @Nullable String password){
-        MCAccount.setUser(new User(getProfile().getName(),getProfile().getId()/*? if <=1.20.2 {*//*.toString()*//*?}*/,"invalidtoken", Optional.empty(),Optional.empty(),User.Type.LEGACY));
+        MCAccount.setUser(new User(getProfile().name(), getProfile().id(),"invalidtoken", Optional.empty(),Optional.empty()));
         onClose.run();
     }
 
@@ -185,8 +185,8 @@ public interface MCAccount {
     }
 
     static void serializeProfile(GameProfile profile, JsonObject object){
-        object.addProperty("id",profile.getId().toString());
-        object.addProperty("name",profile.getName());
+        object.addProperty("id",profile.id().toString());
+        object.addProperty("name",profile.name());
     }
     static GameProfile deserializeProfile(JsonObject object){
         return new GameProfile(UUID.fromString(object.get("id").getAsString()),object.get("name").getAsString());
@@ -201,7 +201,7 @@ public interface MCAccount {
     }
     static MCAccount create(GameProfile profile, boolean encrypted,  String mcAccessToken, String msaRefreshToken){
         if (mcAccessToken == null || msaRefreshToken == null) return ()-> profile;
-        CompletableFuture<GameProfile> result = CompletableFuture.supplyAsync(() -> /*? if >1.20.2 {*/Minecraft.getInstance().getMinecraftSessionService().fetchProfile(profile.getId(), true).profile(), Util.nonCriticalIoPool()/*?} else {*//*Minecraft.getInstance().getMinecraftSessionService().fillProfileProperties(profile, false)*//*?}*/);
+        CompletableFuture<GameProfile> result = CompletableFuture.supplyAsync(() -> Minecraft.getInstance().services().sessionService().fetchProfile(profile.id(), true).profile(), Util.nonCriticalIoPool());
         return new MCAccount() {
             @Override
             public GameProfile getProfile() {
@@ -799,8 +799,7 @@ public interface MCAccount {
                                        uuid/*? if <=1.20.2 {*//*.toString()*//*?}*/,
                                        mcToken,
                                        Optional.empty(),
-                                       Optional.empty(),
-                                       User.Type.MSA
+                                       Optional.empty()
                                    );
                                })
                                // Otherwise, throw an exception with the error description if present
@@ -832,9 +831,7 @@ public interface MCAccount {
                 public void renderTip(GuiGraphics guiGraphics, int i, int j, float f, float l) {
                     super.renderTip(guiGraphics, i, j, f, l);
                     GameProfile profile = /*? if >1.20.2 {*/Minecraft.getInstance().getGameProfile()/*?} else {*//*user.getGameProfile()*//*?}*/;
-                    //? if <=1.20.2
-                    /*if (profile.getProperties().isEmpty()) profile.getProperties().putAll(Minecraft.getInstance().getProfileProperties());*/
-                    PlayerFaceRenderer.draw(guiGraphics, Minecraft.getInstance().getSkinManager()./*? if >1.20.1 {*/getInsecureSkin/*?} else {*//*getInsecureSkinLocation*//*?}*/(profile), 7, (height() - 32) / 2, 32);
+                    PlayerFaceRenderer.draw(guiGraphics, Minecraft.getInstance().getSkinManager().createLookup(profile,true).get(), 7, (height() - 32) / 2, 32);
                 }
             }.centered().disappearTime(2400).canRemove(()->user != Minecraft.getInstance().getUser()));
             lastSessionCheck.set(null);
@@ -853,12 +850,8 @@ public interface MCAccount {
         CompletableFuture.runAsync(()->{
             try {
                 String server = UUID.randomUUID().toString();
-                //? if <=1.20.2 {
-                /*GameProfile profile = Minecraft.getInstance().getUser().getGameProfile();
-                if (profile.getProperties().isEmpty()) profile.getProperties().putAll(Minecraft.getInstance().getProfileProperties());
-                *///?}
-                Minecraft.getInstance().getMinecraftSessionService().joinServer(/*? if >1.20.2 {*/Minecraft.getInstance().getUser().getProfileId()/*?} else {*/ /*profile*//*?}*/,Minecraft.getInstance().getUser().getAccessToken(),server);
-                lastSessionCheck.set(Minecraft.getInstance().getMinecraftSessionService().hasJoinedServer(/*? if >1.20.2 {*/Minecraft.getInstance().getUser().getName()/*?} else {*/ /*profile*//*?}*/,server,null) == null);
+                Minecraft.getInstance().services().sessionService().joinServer(Minecraft.getInstance().getUser().getProfileId(),Minecraft.getInstance().getUser().getAccessToken(),server);
+                lastSessionCheck.set(Minecraft.getInstance().services().sessionService().hasJoinedServer(Minecraft.getInstance().getUser().getName(),server,null) == null);
             } catch (AuthenticationException e) {
                 lastSessionCheck.set(true);
             }

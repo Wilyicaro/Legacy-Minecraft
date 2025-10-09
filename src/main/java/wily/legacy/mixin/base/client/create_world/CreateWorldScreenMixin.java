@@ -9,8 +9,10 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.worldselection.*;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelStorageSource;
@@ -23,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4JClient;
@@ -60,7 +63,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     }
 
     @Inject(method = "<init>",at = @At("RETURN"))
-    public void initReturn(Minecraft minecraft, Screen screen, WorldCreationContext worldCreationContext, Optional optional, OptionalLong optionalLong,/*? if >=1.21.2 {*/ CreateWorldCallback createWorldCallback, /*?}*/ CallbackInfo ci){
+    public void initReturn(Minecraft minecraft, Runnable runnable, WorldCreationContext worldCreationContext, Optional optional, OptionalLong optionalLong, CreateWorldCallback createWorldCallback, CallbackInfo ci     /*? if >=1.21.2 {*/  /*?}*/){
         uiState.setDifficulty(LegacyOptions.createWorldDifficulty.get());
         panel = Panel.createPanel(this, p-> (width - (p.width + (LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(this)) ? 160 : 0))) / 2, p-> (height - p.height) / 2, 245, 228);
         resourceAssortSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 106, 220,45, !LegacyRenderUtil.hasTooltipBoxes());
@@ -110,13 +113,14 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         ci.cancel();
     }
 
-    @Inject(method = /*? if >=1.21.2 {*/ "createWorldAndCleanup"/*?} else {*//*"createNewWorld"*//*?}*/,at = @At("RETURN"))
+    @Inject(method = "createWorldAndCleanup",at = @At("RETURN"))
     private void onCreate(CallbackInfo ci) {
         resourceAssortSelector.applyChanges(true);
         Legacy4JClient.serverPlayerJoinConsumer = s->{
-            LegacyClientWorldSettings.of(s.getServer().getWorldData()).setTrustPlayers(trustPlayers.get());
-            s.getServer().getPlayerList().sendPlayerPermissionLevel(s);
-            publishScreen.publish((IntegratedServer) s.getServer());
+            MinecraftServer server = FactoryAPIPlatform.getEntityServer(s);
+            LegacyClientWorldSettings.of(server.getWorldData()).setTrustPlayers(trustPlayers.get());
+            server.getPlayerList().sendPlayerPermissionLevel(s);
+            publishScreen.publish((IntegratedServer) server);
             LegacyClientWorldSettings.of(minecraft.getSingleplayerServer().getWorldData()).setSelectedResourceAlbum(resourceAssortSelector.getSelectedAlbum());
         };
     }
@@ -165,8 +169,8 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        return super.keyPressed(i,j,k);
+    public boolean keyPressed(KeyEvent keyEvent) {
+        return super.keyPressed(keyEvent);
     }
 
     @Override

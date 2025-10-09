@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
 import net.minecraft.client.gui.screens.inventory.PageButton;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
@@ -113,18 +114,18 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
     @Override
     public void bindingStateTick(BindingState state) {
         if ((state.is(ControllerBinding.RIGHT_BUMPER) || state.is(ControllerBinding.LEFT_BUMPER)) && state.canClick()){
-            (state.is(ControllerBinding.RIGHT_BUMPER) ? forwardButton : backButton).keyPressed(InputConstants.KEY_RETURN,0,0);
+            (state.is(ControllerBinding.RIGHT_BUMPER) ? forwardButton : backButton).keyPressed(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
         }
     }
 
     @Inject(method = "keyPressed",at = @At("HEAD"), cancellable = true)
-    public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
-        if (ControlType.getActiveType().isKbm() && (i == InputConstants.KEY_RIGHT || i == InputConstants.KEY_LEFT)){
-            (i == InputConstants.KEY_RIGHT ? forwardButton : backButton).keyPressed(InputConstants.KEY_RETURN,0,0);
+    public void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
+        if (ControlType.getActiveType().isKbm() && (keyEvent.isRight() || keyEvent.isLeft())){
+            (keyEvent.isRight() ? forwardButton : backButton).keyPressed(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
             cir.setReturnValue(true);
             return;
         }
-        cir.setReturnValue(super.keyPressed(i,j,k));
+        cir.setReturnValue(super.keyPressed(keyEvent));
     }
     
     @Inject(method = "getClickedComponentStyleAt",at = @At("HEAD"), cancellable = true)

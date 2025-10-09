@@ -16,12 +16,13 @@ public interface LegacyPistonMovingBlockEntity {
     void setMovingBlockEntityType(BlockEntityType<?> type);
     void createRenderingBlockEntity(Level level);
 
-    default void load(){
-        if (this instanceof BlockEntity be){
+    default void load() {
+        if (this instanceof BlockEntity be) {
             load(be.getLevel().getBlockEntity(be.getBlockPos()));
         }
     }
-    default void load(BlockEntity blockEntity){
+
+    default void load(BlockEntity blockEntity) {
         if (getMovedBlockEntityTag() == null) return;
         if (blockEntity != null) blockEntity.loadCustomOnly(TagValueInput.create(ProblemReporter.DISCARDING, blockEntity.getLevel().registryAccess(), getMovedBlockEntityTag()));
     }

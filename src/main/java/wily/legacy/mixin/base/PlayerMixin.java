@@ -25,33 +25,10 @@ import wily.legacy.init.LegacyGameRules;
 import wily.legacy.util.LegacyItemUtil;
 
 @Mixin(Player.class)
-public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing {
-    @Unique
-    float oYBob;
-    @Unique
-    float yBob;
+public abstract class PlayerMixin extends LivingEntity {
 
     @Shadow public abstract Abilities getAbilities();
 
-    @Override
-    public float oYBob() {
-        return oYBob;
-    }
-
-    @Override
-    public void setOYBob(float bob) {
-        oYBob = bob;
-    }
-
-    @Override
-    public float yBob() {
-        return yBob;
-    }
-
-    @Override
-    public void setYBob(float bob) {
-        yBob = bob;
-    }
 
     protected PlayerMixin(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
@@ -61,11 +38,6 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerYBobbing
     protected void getFlyingSpeed(CallbackInfoReturnable<Float> cir) {
         if (!LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT)) return;
         cir.setReturnValue(cir.getReturnValueF() * (getAbilities().flying ? (isSprinting() ? 6 : 2) : 1));
-    }
-
-    @Inject(method = "aiStep", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/player/Player;bob:F", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
-    public void aiStep(CallbackInfo ci) {
-        handleYBobbing();
     }
 
     @Inject(method = "resetAttackStrengthTicker", at = @At(value = "HEAD"), cancellable = true)

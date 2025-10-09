@@ -18,7 +18,7 @@ public class ServerOptionsScreen extends ConfirmationScreen{
     @Override
     protected void addButtons() {
         renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b-> minecraft.setScreen(parent)).bounds(panel.x + 15, panel.y + panel.height - 74,200,20).build());
-        renderableVList.addRenderable(Button.builder(Component.translatable("addServer.title"),b-> minecraft.setScreen(new ServerEditScreen(parent, serverData,false))).bounds(panel.x + 15, panel.getRectangle().bottom() - 52,200,20).build());
+        renderableVList.addRenderable(Button.builder(Component.translatable("manageServer.edit.title"),b-> minecraft.setScreen(new ServerEditScreen(parent, serverData,false))).bounds(panel.x + 15, panel.getRectangle().bottom() - 52,200,20).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("selectServer.delete"),b-> minecraft.setScreen(new ConfirmationScreen(parent, Component.translatable("selectServer.delete"), Component.translatable("selectServer.deleteQuestion"), b1-> {
             parent.getServers().remove(serverData);
             parent.getServers().save();

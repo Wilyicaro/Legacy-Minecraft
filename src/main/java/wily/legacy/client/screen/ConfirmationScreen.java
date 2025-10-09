@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.AdvancedTextWidget;
@@ -135,9 +136,9 @@ public class ConfirmationScreen extends OverlayPanelScreen implements Renderable
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (renderableVList.keyPressed(i)) return true;
-        return super.keyPressed(i, j, k);
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (renderableVList.keyPressed(keyEvent.key())) return true;
+        return super.keyPressed(keyEvent);
     }
 
     protected void addButtons(){

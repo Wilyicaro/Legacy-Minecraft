@@ -7,6 +7,7 @@ import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -34,7 +35,7 @@ public class CreationList extends RenderableVList{
         super(accessor);
         layoutSpacing(l->0);
         minecraft = Minecraft.getInstance();
-        addIconButton(this, Legacy4J.createModLocation("creation_list/create_world"),Component.translatable("legacy.menu.create_world"), c-> CreateWorldScreen.openFresh(this.minecraft, getScreen()));
+        addIconButton(this, Legacy4J.createModLocation("creation_list/create_world"),Component.translatable("legacy.menu.create_world"), c-> CreateWorldScreen.openFresh(this.minecraft, () -> minecraft.setScreen(getScreen())));
         LegacyWorldTemplate.list.forEach(t-> addIconButton(this,t.icon(),t.buttonMessage(), c-> {
             if (t.isGamePath() && !Files.exists(t.getPath())){
                 minecraft.setScreen(ConfirmationScreen.createInfoScreen(getScreen(), LegacyComponents.MISSING_WORLD_TEMPLATE, Component.translatable("legacy.menu.missing_world_template_message",t.buttonMessage())));
@@ -83,7 +84,7 @@ public class CreationList extends RenderableVList{
             }
 
             @Override
-            public void onPress() {
+            public void onPress(InputWithModifiers input) {
                 onPress.accept(this);
             }
 

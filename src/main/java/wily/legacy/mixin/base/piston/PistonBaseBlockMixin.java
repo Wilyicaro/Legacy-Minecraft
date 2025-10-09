@@ -27,7 +27,7 @@ public class PistonBaseBlockMixin {
         if (original instanceof LegacyPistonMovingBlockEntity e) {
             BlockEntity be = level.getBlockEntity(bp.relative(bl ? direction.getOpposite() : direction));
             if (be != null) {
-                e.setMovedBlockEntityTag(be./*? if <1.20.5 {*//*saveWithoutMetadata()*//*?} else {*/saveCustomOnly(level.registryAccess())/*?}*/);
+                e.setMovedBlockEntityTag(be.saveCustomOnly(level.registryAccess()));
                 e.setMovingBlockEntityType(be.getType());
                 if (level.isClientSide()) e.createRenderingBlockEntity(level);
             }

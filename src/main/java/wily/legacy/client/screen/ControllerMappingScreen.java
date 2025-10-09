@@ -6,6 +6,8 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
 import wily.factoryapi.base.ArbitrarySupplier;
@@ -35,7 +37,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
     public void addButtons() {
         KeyMapping[] keyMappings = ArrayUtils.clone(Minecraft.getInstance().options.keyMappings);
         Arrays.sort(keyMappings);
-        String lastCategory = null;
+        KeyMapping.Category lastCategory = null;
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.reset_defaults"),button -> minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.reset_controls"),Component.translatable("legacy.menu.reset_controls_message"), b-> {
             for (KeyMapping keyMapping : keyMappings)
                 LegacyKeyMapping.of(keyMapping).setBinding(LegacyKeyMapping.of(keyMapping).getDefaultBinding());
@@ -47,6 +49,8 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
                 LegacyOptions.controllerToasts,
                 LegacyOptions.controllerToggleCrouch,
                 LegacyOptions.controllerToggleSprint,
+                LegacyOptions.controllerToggleUse,
+                LegacyOptions.controllerToggleAttack,
                 LegacyOptions.invertControllerButtons,
                 LegacyOptions.controllerVirtualCursor,
                 LegacyOptions.legacyCursor,
@@ -63,9 +67,9 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
                 LegacyOptions.rightTriggerDeadZone);
 
         for (KeyMapping keyMapping : keyMappings) {
-            String category = keyMapping.getCategory();
+            KeyMapping.Category category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category)) {
-                renderableVList.addCategory(Component.translatable(category));
+                renderableVList.addCategory(category.label());
                 if (category.equals("key.categories.movement"))
                     renderableVList.addOptions(
                             LegacyOptions.invertYController,
@@ -86,8 +90,8 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
                 }
 
                 @Override
-                public void onPress() {
-                    if (Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed){
+                public void onPress(InputWithModifiers input) {
+                    if (input.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed){
                         mapping.setBinding(mapping.getDefaultBinding());
                         LegacyOptions.CLIENT_STORAGE.save();
                         setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
@@ -115,14 +119,14 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == InputConstants.KEY_ESCAPE && selectedMapping != null && !Legacy4JClient.controllerManager.isControllerSimulatingInput) {
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.isEscape() && selectedMapping != null && !Legacy4JClient.controllerManager.isControllerSimulatingInput) {
             setSelectedMapping(null);
             setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
             return true;
         }
         if (selectedMapping != null) return false;
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyEvent);
     }
 
     @Override

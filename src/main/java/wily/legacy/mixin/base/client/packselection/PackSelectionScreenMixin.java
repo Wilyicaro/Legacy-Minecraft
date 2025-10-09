@@ -1,4 +1,4 @@
-package wily.legacy.mixin.base.client;
+package wily.legacy.mixin.base.client.packselection;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
@@ -11,6 +11,9 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.packs.PackSelectionModel;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Final;
@@ -77,13 +80,12 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
         selectedPacksList.init(panel.x + 215, panel.y + 30, 180, 192);
         this.doneButton = Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).build();
     }
-    //? if >=1.20.5 {
+
     @Inject(method = "repositionElements",at = @At("HEAD"), cancellable = true)
     public void repositionElements(CallbackInfo ci) {
         super.repositionElements();
         ci.cancel();
     }
-    //?}
 
     @Override
     public void added() {
@@ -91,11 +93,9 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
         ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), ()-> LegacyComponents.OPEN_DIRECTORY);
     }
 
-    //? if >1.20.1 {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
     }
-    //?}
 
     @Inject(method = "<init>", at = @At("RETURN"))
     public void initConstruct(CallbackInfo info){
@@ -165,16 +165,16 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                     }
                 }
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                    LegacyRenderUtil.renderScrollingString(guiGraphics,font,getMessage(),getX() + 30,getY(),getX() + width - 2,getY() + height,e.getCompatibility().isCompatible() ? LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()): 0xFF0000,true);
+                    LegacyRenderUtil.renderScrollingString(guiGraphics,font,getMessage(),getX() + 30,getY(),getX() + width - 2,getY() + height,e.getCompatibility().isCompatible() ? LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()): 0xFF0000FF,true);
                 }
 
                 @Override
-                public void onClick(double i, double j) {
-                    double f = i - getX();
-                    double g = j - getY();
+                public void onClick(MouseButtonEvent event, boolean bl) {
+                    double f = event.x() - getX();
+                    double g = event.y() - getY();
                     if (this.showHoverOverlay() && f <= 32.0) {
                         if (e.canSelect()) {
-                            onPress();
+                            onPress(event);
                             return;
                         }
                         if (f < 16.0 && e.canUnselect()) {
@@ -190,13 +190,15 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                             return;
                         }
                     }
-                    if (isFocused()) onPress();
+                    if (isFocused()) onPress(event);
                 }
+
                 private boolean showHoverOverlay() {
                     return !e.isFixedPosition() || !e.isRequired();
                 }
+
                 @Override
-                public void onPress() {
+                public void onPress(InputWithModifiers input) {
                     if (e.isSelected() && e.canUnselect()){
                         e.unselect();
                         return;
@@ -208,9 +210,11 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                         if (minecraft.screen != null) minecraft.screen.onClose();
                     }));
                 }
-                public boolean keyPressed(int i, int j, int k) {
-                    if (Screen.hasShiftDown() || ControllerBinding.LEFT_BUTTON.state().pressed) {
-                        switch (i) {
+
+                @Override
+                public boolean keyPressed(KeyEvent keyEvent) {
+                    if (keyEvent.hasShiftDown() || ControllerBinding.LEFT_BUTTON.state().pressed) {
+                        switch (keyEvent.key()) {
                             case 265 -> {
                                 int oldFocused = getFocused() == null ? -1 : children().indexOf(getFocused());
                                 if (e.canMoveUp()) e.moveUp();
@@ -225,7 +229,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                             }
                         }
                     }
-                    return super.keyPressed(i, j, k);
+                    return super.keyPressed(keyEvent);
                 }
                 @Override
                 protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -256,11 +260,11 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
+    public boolean keyPressed(KeyEvent keyEvent) {
         for (RenderableVList renderableVList : getRenderableVLists()) {
-            if (renderableVList.keyPressed(i)) return true;
+            if (renderableVList.keyPressed(keyEvent.key())) return true;
         }
-        if (i == InputConstants.KEY_O){
+        if (keyEvent.key() == InputConstants.KEY_O){
             //? if <1.20.5 {
             /*Util.getPlatform().openUri(this.packDir.toUri());
             *///?} else {
@@ -268,7 +272,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
             //?}
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyEvent);
     }
 
     //? if <=1.20.1 {

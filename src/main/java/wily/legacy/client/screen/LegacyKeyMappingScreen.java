@@ -11,6 +11,9 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
@@ -59,7 +62,7 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
     public void addButtons(){
         KeyMapping[] keyMappings = ArrayUtils.clone(Minecraft.getInstance().options.keyMappings);
         Arrays.sort(keyMappings);
-        String lastCategory = null;
+        KeyMapping.Category lastCategory = null;
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.reset_defaults"),button -> minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.reset_keyBinds"),Component.translatable("legacy.menu.reset_keyBinds_message"), b-> {
             for (KeyMapping keyMapping : keyMappings)
                 keyMapping.setKey(keyMapping.getDefaultKey());
@@ -67,11 +70,11 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
             Minecraft.getInstance().options.save();
             minecraft.setScreen(this);
         }))).size(240,20).build());
-        renderableVList.addOptions(LegacyOptions.unbindConflictingKeys,LegacyOptions.of(Minecraft.getInstance().options.toggleCrouch()),LegacyOptions.of(Minecraft.getInstance().options.toggleSprint()));
+        renderableVList.addOptions(LegacyOptions.unbindConflictingKeys,LegacyOptions.of(Minecraft.getInstance().options.toggleCrouch()),LegacyOptions.of(Minecraft.getInstance().options.toggleSprint()),LegacyOptions.of(Minecraft.getInstance().options.toggleUse()),LegacyOptions.of(Minecraft.getInstance().options.toggleAttack()));
         for (KeyMapping keyMapping : keyMappings) {
-            String category = keyMapping.getCategory();
+            KeyMapping.Category category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category))
-                renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> {}))), SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> graphics.drawString(font, Component.translatable(category), l.x + 1, l.y + 4, CommonColor.INVENTORY_GRAY_TEXT.get(), false)))));
+                renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> {}))), SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> graphics.drawString(font, category.label(), l.x + 1, l.y + 4, CommonColor.INVENTORY_GRAY_TEXT.get(), false)))));
             lastCategory = keyMapping.getCategory();
             renderableVList.addRenderable(new MappingButton(0,0,240,20, LegacyKeyMapping.of(keyMapping)) {
                 @Override
@@ -85,8 +88,8 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
                 }
 
                 @Override
-                public void onPress() {
-                    if (Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed) {
+                public void onPress(InputWithModifiers input) {
+                    if (input.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed) {
                         setAndUpdateKey(keyMapping, keyMapping.getDefaultKey());
                         setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
                     } else {
@@ -140,15 +143,15 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean bl) {
         if (selectedMapping != null && allowsKey()) {
-            setAndUpdateKey(selectedMapping.self(), InputConstants.Type.MOUSE.getOrCreate(i));
+            setAndUpdateKey(selectedMapping.self(), InputConstants.Type.MOUSE.getOrCreate(event.button()));
             setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
             resolveConflictingMappings();
             setSelectedMapping(null);
             return true;
         }
-        return super.mouseClicked(d, e, i);
+        return super.mouseClicked(event, bl);
     }
 
     public static void setAndUpdateKey(KeyMapping key, InputConstants.Key input){
@@ -158,15 +161,15 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
+    public boolean keyPressed(KeyEvent keyEvent) {
         if (selectedMapping != null && allowsKey()){
-            setAndUpdateKey(selectedMapping.self(), i == 256 ? InputConstants.UNKNOWN : InputConstants.getKey(i, j));
+            setAndUpdateKey(selectedMapping.self(), keyEvent.isEscape() ? InputConstants.UNKNOWN : InputConstants.getKey(keyEvent));
             setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
             resolveConflictingMappings();
             setSelectedMapping(null);
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyEvent);
     }
 
     public boolean allowsKey(){

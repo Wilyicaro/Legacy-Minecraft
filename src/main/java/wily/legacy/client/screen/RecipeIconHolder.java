@@ -6,6 +6,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -68,6 +71,11 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
         else if (focusedRecipes == null) focusedRecipes = new ArrayList<>(getRecipes());
         return focusedRecipes == null ? getRecipes() : focusedRecipes;
     }
+
+    public void invalidateFocused() {
+        focusedRecipes = null;
+    }
+
     protected abstract List<RecipeInfo<R>> getRecipes();
     @Override
     public void setFocused(boolean bl) {
@@ -97,7 +105,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
         updateRecipeDisplay(getFocusedRecipe());
     }
 
-    protected abstract void toggleCraftableRecipes();
+    protected abstract void toggleCraftableRecipes(InputWithModifiers input);
 
     public boolean controlCyclicNavigation(int i, int index, List<RecipeIconHolder<R>> craftingButtons, Stocker.Sizeable craftingOffset, LegacyScrollRenderer renderer, Screen screen){
         if ((i == 263 && index == 0) || (i == 262 && index == craftingButtons.size() - 1)){
@@ -114,20 +122,20 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
         return false;
     }
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == InputConstants.KEY_O && allowCraftableRecipesToggle) {
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.key() == InputConstants.KEY_O && allowCraftableRecipesToggle) {
             focusedRecipes = null;
             selectionOffset = 0;
-            toggleCraftableRecipes();
+            toggleCraftableRecipes(keyEvent);
             updateRecipeDisplay();
             LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
             return true;
         }
         int oldSelection = selectionOffset;
-        if ((i == 265 || i == 264) && isValidIndex()) {
-            if (i == InputConstants.KEY_UP && (getRecipes().size() > 2 || selectionOffset == 1))
+        if ((keyEvent.isUp() || keyEvent.isDown()) && isValidIndex()) {
+            if (keyEvent.key() == InputConstants.KEY_UP && (getRecipes().size() > 2 || selectionOffset == 1))
                 selectionOffset = Math.max(selectionOffset - 1, -1);
-            if (i == InputConstants.KEY_DOWN && getRecipes().size() >= 2)
+            if (keyEvent.key() == InputConstants.KEY_DOWN && getRecipes().size() >= 2)
                 selectionOffset = Math.min(selectionOffset + 1, 1);
             if (oldSelection != selectionOffset || canScroll()) {
                 LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
@@ -137,7 +145,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
                 return true;
             }
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyEvent);
     }
 
     protected abstract void updateRecipeDisplay(RecipeInfo<R> rcp);
@@ -197,23 +205,23 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
     }
 
     @Override
-    public void onClick(double d, double e) {
+    public void onClick(MouseButtonEvent event, boolean bl) {
         int oldSelection = selectionOffset;
         selectionOffset = isHoveredTop ? -1 : isHoveredBottom ? 1 : 0;
         if (oldSelection != selectionOffset) updateRecipeDisplay();
-        else super.onClick(d, e);
+        else super.onClick(event, bl);
     }
 
 
-    public void craft() {
-        CommonNetwork.sendToServer(new ServerMenuCraftPayload(getFocusedRecipe(), Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed));
+    public void craft(InputWithModifiers input) {
+        CommonNetwork.sendToServer(new ServerMenuCraftPayload(getFocusedRecipe(), input.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed));
     }
 
     @Override
-    public void onPress(){
+    public void onPress(InputWithModifiers input) {
         if (isFocused() && isValidIndex()){
             if (canCraft(getFocusedRecipe())){
-                craft();
+                craft(input);
                 updateRecipeDisplay(getFocusedRecipe());
             }else {
                 if (minecraft.player.containerMenu instanceof LegacyCraftingMenu m && !m.showedNotEnoughIngredientsHint && LegacyOptions.hints.get()){

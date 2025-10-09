@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -164,25 +165,26 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
         guiGraphics.pose().popMatrix();
     }
     @Inject(method = "mouseClicked",at = @At("HEAD"), cancellable = true)
-    public void mouseClicked(double d, double e, int i, CallbackInfoReturnable<Boolean> cir) {
+    public void mouseClicked(MouseButtonEvent event, boolean bl, CallbackInfoReturnable<Boolean> cir) {
         this.scrolling = false;
         if (this.displayRecipes) {
             double j = this.leftPos + 71.5;
             double k = this.topPos + 19.5;
             for (int m = this.startIndex; m < startIndex + 16; ++m) {
                 int n = m - this.startIndex;
-                double f = d - (j + n % 4 * 18);
-                double g = e - (k + n / 4 * 18);
+                double f = event.x() - (j + n % 4 * 18);
+                double g = event.y() - (k + n / 4 * 18);
                 if (!(f >= 0.0) || !(g >= 0.0) || !(f < 18.0) || !(g < 18.0) || !this.menu.clickMenuButton(this.minecraft.player, m)) continue;
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_STONECUTTER_SELECT_RECIPE, 1.0f));
                 this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, m);
                 cir.setReturnValue(true);
                 return;
             }
-            if (LegacyRenderUtil.isMouseOver(d,e,leftPos + 148.5,topPos + 18,13,75)) this.scrolling = true;
+            if (LegacyRenderUtil.isMouseOver(event.x(), event.y(), leftPos + 148.5, topPos + 18, 13, 75)) this.scrolling = true;
         }
-        cir.setReturnValue(super.mouseClicked(d, e, i));
+        cir.setReturnValue(super.mouseClicked(event, bl));
     }
+
     @Inject(method = "renderTooltip",at = @At("HEAD"), cancellable = true)
     public void renderTooltip(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
         ci.cancel();
@@ -200,18 +202,19 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
         }
     }
     @Inject(method = "mouseDragged",at = @At("HEAD"), cancellable = true)
-    public void mouseDragged(double d, double e, int i, double f, double g, CallbackInfoReturnable<Boolean> cir) {
+    public void mouseDragged(MouseButtonEvent event, double f, double g, CallbackInfoReturnable<Boolean> cir) {
         if (this.scrolling && this.displayRecipes && isScrollBarActive()) {
             int oldIndex = startIndex;
-            this.startIndex = (int) Math.max(Math.round(getOffscreenRows() * Math.min(1,(e - (topPos + 18)) / 75)), 0) * 4;
+            this.startIndex = (int) Math.max(Math.round(getOffscreenRows() * Math.min(1, (event.y() - (topPos + 18)) / 75)), 0) * 4;
             if (oldIndex != startIndex){
                 scrollRenderer.updateScroll(oldIndex - startIndex > 0 ? ScreenDirection.UP : ScreenDirection.DOWN);
             }
             cir.setReturnValue(true);
             return;
         }
-        cir.setReturnValue(super.mouseDragged(d, e, i, f, g));
+        cir.setReturnValue(super.mouseDragged(event, f, g));
     }
+
     @Redirect(method = "mouseScrolled",at = @At(value = "FIELD",target = "Lnet/minecraft/client/gui/screens/inventory/StonecutterScreen;startIndex:I"))
     private void mouseDragged(StonecutterScreen instance, int value){
         if (startIndex!= value){

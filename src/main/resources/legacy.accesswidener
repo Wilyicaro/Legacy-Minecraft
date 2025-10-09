@@ -15,7 +15,6 @@ accessible field net/minecraft/client/server/IntegratedServer publishedPort I
 accessible field net/minecraft/client/server/IntegratedServer lanPinger Lnet/minecraft/client/server/LanServerPinger;
 accessible field net/minecraft/client/server/IntegratedServer publishedGameType Lnet/minecraft/world/level/GameType;
 accessible field net/minecraft/client/gui/screens/LevelLoadingScreen lastNarration J
-accessible field net/minecraft/client/gui/screens/LevelLoadingScreen progressListener Lnet/minecraft/server/level/progress/StoringChunkProgressListener;
 accessible field net/minecraft/client/gui/screens/ProgressScreen progress I
 accessible field net/minecraft/client/gui/screens/ProgressScreen header Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/client/gui/screens/ProgressScreen stage Lnet/minecraft/network/chat/Component;
@@ -94,19 +93,16 @@ accessible field net/minecraft/client/gui/screens/AlertScreen callback Ljava/lan
 accessible field net/minecraft/client/gui/screens/AlertScreen okButton Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/client/gui/screens/AlertScreen messageText Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/world/level/block/entity/DecoratedPotPatterns ITEM_TO_POT_TEXTURE Ljava/util/Map;
-accessible field net/minecraft/client/resources/TextureAtlasHolder textureAtlas Lnet/minecraft/client/renderer/texture/TextureAtlas;
 accessible field net/minecraft/client/multiplayer/ClientAdvancements progress Ljava/util/Map;
 accessible field net/minecraft/stats/StatsCounter stats Lit/unimi/dsi/fastutil/objects/Object2IntMap;
 accessible field net/minecraft/client/KeyMapping clickCount I
 accessible method net/minecraft/world/item/trading/MerchantOffer <init> (Lnet/minecraft/world/item/trading/ItemCost;Ljava/util/Optional;Lnet/minecraft/world/item/ItemStack;IIZIIFI)V
-accessible field net/minecraft/client/player/AbstractClientPlayer deltaMovementOnPreviousTick Lnet/minecraft/world/phys/Vec3;
 accessible method net/minecraft/world/level/block/TallGrassBlock <init> (Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
 accessible class net/minecraft/client/gui/screens/MenuScreens$ScreenConstructor
 accessible class net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
 accessible class net/minecraft/world/inventory/MenuType$MenuSupplier
 accessible method net/minecraft/world/inventory/MenuType <init> (Lnet/minecraft/world/inventory/MenuType$MenuSupplier;Lnet/minecraft/world/flag/FeatureFlagSet;)V
 accessible field net/minecraft/world/item/CreativeModeTabs OP_BLOCKS Lnet/minecraft/resources/ResourceKey;
-accessible method net/minecraft/client/gui/Font getFontSet (Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/gui/font/FontSet;
 accessible field net/minecraft/client/gui/components/CommandSuggestions suggestions Lnet/minecraft/client/gui/components/CommandSuggestions$SuggestionsList;
 transitive-accessible class net/minecraft/client/renderer/RenderType$CompositeRenderType
 accessible method net/minecraft/client/Minecraft startUseItem ()V
@@ -121,7 +117,6 @@ accessible method net/minecraft/client/gui/font/providers/BitmapProvider$Glyph <
 accessible method net/minecraft/world/level/GameRules$IntegerValue create (IIILnet/minecraft/world/flag/FeatureFlagSet;Ljava/util/function/BiConsumer;)Lnet/minecraft/world/level/GameRules$Type;
 accessible class net/minecraft/world/level/GameRules$VisitorCaller
 accessible method net/minecraft/world/inventory/AbstractFurnaceMenu canSmelt (Lnet/minecraft/world/item/ItemStack;)Z
-accessible method net/minecraft/world/entity/Mob shouldDespawnInPeaceful ()Z
 accessible method net/minecraft/client/multiplayer/ClientPacketListener setKeyPair (Lnet/minecraft/world/entity/player/ProfileKeyPair;)V
 accessible class net/minecraft/client/gui/screens/recipebook/GhostSlots$GhostSlot
 accessible method net/minecraft/world/level/block/entity/BlockEntityType <init> (Lnet/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier;Ljava/util/Set;)V

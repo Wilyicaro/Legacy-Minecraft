@@ -66,7 +66,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
                 float g = this.fadeOutStart > -1L ? (float) (m - this.fadeOutStart) / 1000.0f : -1.0f;
                 h = this.fadeInStart > -1L ? (float) (m - this.fadeInStart) / 500.0f : -1.0f;
                 if ((MinecraftAccessor.getInstance().hasGameLoaded() && reload.isDone()) && minecraft.screen != null)
-                    this.minecraft.screen.renderWithTooltip(guiGraphics, 0, 0, f);
+                    this.minecraft.screen.renderWithTooltipAndSubtitles(guiGraphics, 0, 0, f);
                 else {
                     FactoryGuiGraphics.of(guiGraphics).blit(LegacyRenderUtil.LOADING_BACKGROUND, 0, 0, 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight());
                 }

@@ -1,9 +1,9 @@
 plugins {
     id("dev.kikugie.stonecutter")
-    id("dev.architectury.loom") version "1.10.+" apply false
+    id("dev.architectury.loom") version "1.11.+" apply false
 }
 
-stonecutter active "1.21.8-fabric" /* [SC] DO NOT EDIT */
+stonecutter active "1.21.10-fabric" /* [SC] DO NOT EDIT */
 
 stonecutter parameters {
     val loader = node.project.property("loom.platform").toString()

@@ -4,6 +4,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -180,11 +182,6 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                     return LegacyCraftingScreen.canCraft(compactInventoryList, isFocused() && getFocusedRecipe() == rcp ? ingredientSlot : rcp.getOptionalIngredients(), null);
                 }
 
-                public List<RecipeInfo<StonecutterRecipe>> getFocusedRecipes() {
-                    if (!isFocused() || !isValidIndex() || !canScroll()) focusedRecipes = null;
-                    else if (focusedRecipes == null) focusedRecipes = new ArrayList<>(getRecipes());
-                    return focusedRecipes == null ? getRecipes() : focusedRecipes;
-                }
 
                 protected List<RecipeInfo<StonecutterRecipe>> getRecipes() {
                     List<List<RecipeInfo<StonecutterRecipe>>> list = onlyCraftableRecipes ? filteredRecipesByGroup : recipesByGroup;
@@ -197,16 +194,16 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                 }
 
                 @Override
-                protected void toggleCraftableRecipes() {
+                protected void toggleCraftableRecipes(InputWithModifiers input) {
                     listener.slotChanged(menu, 0, ItemStack.EMPTY);
                     onlyCraftableRecipes = !onlyCraftableRecipes;
                 }
 
                 @Override
-                public boolean keyPressed(int i, int j, int k) {
-                    if (controlCyclicNavigation(i, index, craftingButtons, craftingButtonsOffset, scrollRenderer, LegacyStonecutterScreen.this))
+                public boolean keyPressed(KeyEvent keyEvent) {
+                    if (controlCyclicNavigation(keyEvent.key(), index, craftingButtons, craftingButtonsOffset, scrollRenderer, LegacyStonecutterScreen.this))
                         return true;
-                    return super.keyPressed(i, j, k);
+                    return super.keyPressed(keyEvent);
                 }
 
                 @Override

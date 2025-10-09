@@ -17,10 +17,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.network.chat.Component;
@@ -363,11 +364,11 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 if (getSelectedAlbum().iconSprite().isPresent()) FactoryGuiGraphics.of(graphics).blitSprite(getSelectedAlbum().iconSprite().get(),x + 7,y + 5,32,32);
                 else FactoryGuiGraphics.of(graphics).blit(p ? getPackIcon(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : DEFAULT_ICON, x + 7,y + 5,0.0f, 0.0f, 32, 32, 32, 32);
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4,x + 148, y + 44);
-                labelsCache.apply(getSelectedAlbum().displayName(),108).renderLeftAligned(graphics,x + 43, y + 8,12,0xFFFFFFFF);
+                labelsCache.apply(getSelectedAlbum().displayName(),108).render(graphics, MultiLineLabel.Align.LEFT,  x + 43, y + 8,12, true,0xFFFFFFFF);
                 graphics.disableScissor();
                 ResourceLocation background = getSelectedAlbum().backgroundSprite.orElse(p ? getPackBackground(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : null);
                 MultiLineLabel label = labelsCache.apply(getSelectedAlbum().description(),145);
-                scrollableRenderer.render(graphics, x + 8,y + 40, 146, 12 * (background == null ? 14 : 7), ()->label.renderLeftAligned(graphics,x + 8, y + 40,12,0xFFFFFFFF));
+                scrollableRenderer.render(graphics, x + 8,y + 40, 146, 12 * (background == null ? 14 : 7), ()->label.render(graphics, MultiLineLabel.Align.LEFT, x + 8, y + 40,12, true, 0xFFFFFFFF));
                 if (background != null) {
                     if (getSelectedAlbum().backgroundSprite().isPresent()) FactoryGuiGraphics.of(graphics).blitSprite(background, x + 8,y + height - 78,145, 72);
                     else FactoryGuiGraphics.of(graphics).blit(background, x + 8,y + height - 78,0.0f, 0.0f, 145, 72, 145, 72);
@@ -376,24 +377,24 @@ public record PackAlbum(String id, int version, Component displayName, Component
         }
 
         @Override
-        public boolean keyPressed(int i, int j, int k) {
+        public boolean keyPressed(KeyEvent keyEvent) {
             if (isHoveredOrFocused() && active) {
-                if (i == InputConstants.KEY_X){
+                if (keyEvent.key() == InputConstants.KEY_X){
                     openPackSelectionScreen();
                     return true;
                 }
-                if (CommonInputs.selected(i)) {
+                if (keyEvent.isSelection()) {
                     savedAlbum = getSelectedAlbum();
                     playDownSound(Minecraft.getInstance().getSoundManager());
                     return true;
                 }
-                if (i == 263 || i == 262) {
-                    if (selectedIndex == scrolledList.get() + (i == 263 ? 0 : getMaxPacks() - 1)) updateScroll(i == 263 ? - 1 : 1,true);
-                    setSelectedIndex(selectedIndex + (i == 263 ? - 1 : 1));
+                if (keyEvent.isLeft() || keyEvent.isRight()) {
+                    if (selectedIndex == scrolledList.get() + (keyEvent.key() == 263 ? 0 : getMaxPacks() - 1)) updateScroll(keyEvent.key() == 263 ? - 1 : 1,true);
+                    setSelectedIndex(selectedIndex + (keyEvent.key() == 263 ? - 1 : 1));
                     LegacySoundUtil.playSimpleUISound(LegacyRegistries.SCROLL.get(),1.0f);
                     return true;
                 }
-                if (i == InputConstants.KEY_O){
+                if (keyEvent.key() == InputConstants.KEY_O){
                     Screen screen = Minecraft.getInstance().screen;
                     minecraft.setScreen(new ConfirmationScreen(minecraft.screen,230,133, ALBUM_OPTIONS, ALBUM_OPTIONS_MESSAGE, b->{}){
                         @Override
@@ -439,7 +440,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
                     return true;
                 }
             }
-            return super.keyPressed(i, j, k);
+            return super.keyPressed(keyEvent);
         }
 
         public void setSelectedIndex(int index) {
@@ -500,8 +501,8 @@ public record PackAlbum(String id, int version, Component displayName, Component
         }
 
         @Override
-        public void onClick(double d, double e) {
-            if ((Screen.hasShiftDown())) {
+        public void onClick(MouseButtonEvent event, boolean bl) {
+            if (event.hasShiftDown()) {
                 openPackSelectionScreen();
                 return;
             }
@@ -509,20 +510,20 @@ public record PackAlbum(String id, int version, Component displayName, Component
             for (int index = 0; index < albums.size(); index++) {
                 if (visibleCount>=getMaxPacks()) break;
                 visibleCount++;
-                if (LegacyRenderUtil.isMouseOver(d,e, getX() + 20 + 30 * index, getY() + minecraft.font.lineHeight +  3, 30,  30)) {
+                if (LegacyRenderUtil.isMouseOver(event.x(), event.y(), getX() + 20 + 30 * index, getY() + minecraft.font.lineHeight +  3, 30,  30)) {
                     setSelectedIndex(index + scrolledList.get());
                     savedAlbum = getSelectedAlbum();
                     playDownSound(Minecraft.getInstance().getSoundManager());
                     return;
                 }
             }
-            super.onClick(d, e);
+            super.onClick(event, bl);
         }
 
         @Override
-        public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
+        public boolean mouseScrolled(double d, double e, double f, double g) {
             if (updateScroll((int) Math.signum(g),false)) return true;
-            return super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g);
+            return super.mouseScrolled(d, e, f, g);
         }
 
         public boolean updateScroll(int i, boolean cyclic){

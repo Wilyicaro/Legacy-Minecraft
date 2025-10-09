@@ -5,6 +5,8 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,24 +33,38 @@ public class MouseHandlerMixin {
         onChange(l,ci);
     }
 
-    @Inject(method = "onPress", at = @At("HEAD"), cancellable = true)
-    private void onPress(long l, int i, int j, int k, CallbackInfo ci) {
+    @Inject(method = "onButton", at = @At("HEAD"), cancellable = true)
+    private void onPress(long l, MouseButtonInfo mouseButtonInfo, int i, CallbackInfo ci) {
         onChange(l,ci);
     }
 
-    @WrapOperation(method = "onPress", at = @At(value = "INVOKE", target = /*? if forge {*//*"Lnet/minecraftforge/client/event/ForgeEventFactoryClient;onScreenMouseClicked(Lnet/minecraft/client/gui/screens/Screen;DDI)Z", remap = false*//*?} else {*/"Lnet/minecraft/client/gui/screens/Screen;mouseClicked(DDI)Z"/*?}*/))
-    private boolean onPress(Screen instance, double x, double y, int i, Operation<Boolean> original) {
-        ControlTooltip.Renderer.of(instance).press(x, y, i, true);
-        return original.call(instance, x, y, i);
+    //? if forge {
+    /*@WrapOperation(method = "onButton", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/event/ForgeEventFactoryClient;onScreenMouseClicked(Lnet/minecraft/client/gui/screens/Screen;DDLnet/minecraft/client/input/MouseButtonEvent;Z)Z", remap = false))
+    private boolean onPress(Screen screen, double mouseX, double mouseY, MouseButtonEvent event, boolean repeate, Operation<Boolean> original) {
+        ControlTooltip.Renderer.of(screen).press(event, true);
+        return original.call(screen, mouseX, mouseY, event, repeate);
     }
 
-    @WrapOperation(method = "onPress", at = @At(value = "INVOKE", target = /*? if forge {*/ /*"Lnet/minecraftforge/client/event/ForgeEventFactoryClient;onScreenMouseReleased(Lnet/minecraft/client/gui/screens/Screen;DDI)Z", remap = false*//*?} else {*/"Lnet/minecraft/client/gui/screens/Screen;mouseReleased(DDI)Z"/*?}*/))
-    private boolean onRelease(Screen instance, double x, double y, int i, Operation<Boolean> original) {
-        ControlTooltip.Renderer.of(instance).press(x, y, i, false);
-        return original.call(instance, x, y, i);
+    @WrapOperation(method = "onButton", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/event/ForgeEventFactoryClient;onScreenMouseReleased(Lnet/minecraft/client/gui/screens/Screen;DDLnet/minecraft/client/input/MouseButtonEvent;)Z", remap = false))
+    private boolean onRelease(Screen screen, double mouseX, double mouseY, MouseButtonEvent event, Operation<Boolean> original) {
+        ControlTooltip.Renderer.of(screen).press(event, false);
+        return original.call(screen, mouseX, mouseY, event);
+    }
+    *///?} else {
+    @WrapOperation(method = "onButton", at = @At(value = "INVOKE", target = /*? if forge {*//*"Lnet/minecraftforge/client/event/ForgeEventFactoryClient;onScreenMouseClicked(Lnet/minecraft/client/gui/screens/Screen;DDLnet/minecraft/client/input/MouseButtonEvent;Z)Z", remap = false*//*?} else {*/"Lnet/minecraft/client/gui/screens/Screen;mouseClicked(Lnet/minecraft/client/input/MouseButtonEvent;Z)Z"/*?}*/))
+    private boolean onPress(Screen instance, MouseButtonEvent event, boolean b, Operation<Boolean> original) {
+        ControlTooltip.Renderer.of(instance).press(event, true);
+        return original.call(instance, event, b);
     }
 
-    @Inject(method = "releaseMouse", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;grabOrReleaseMouse(JIDD)V", shift = At.Shift.AFTER))
+    @WrapOperation(method = "onButton", at = @At(value = "INVOKE", target = /*? if forge {*/ /*"Lnet/minecraftforge/client/event/ForgeEventFactoryClient;onScreenMouseReleased(Lnet/minecraft/client/gui/screens/Screen;DDLnet/minecraft/client/input/MouseButtonEvent;)Z", remap = false*//*?} else {*/"Lnet/minecraft/client/gui/screens/Screen;mouseReleased(Lnet/minecraft/client/input/MouseButtonEvent;)Z"/*?}*/))
+    private boolean onRelease(Screen instance, MouseButtonEvent event, Operation<Boolean> original) {
+        ControlTooltip.Renderer.of(instance).press(event, false);
+        return original.call(instance, event);
+    }
+    //?}
+
+    @Inject(method = "releaseMouse", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;grabOrReleaseMouse(Lcom/mojang/blaze3d/platform/Window;IDD)V", shift = At.Shift.AFTER))
     private void releaseMouse(CallbackInfo ci){
         Legacy4JClient.controllerManager.enableCursorAndScheduleReset();
         Legacy4JClient.controllerManager.updateCursorInputMode();
@@ -56,7 +72,7 @@ public class MouseHandlerMixin {
 
     @Unique
     private void onChange(long window, CallbackInfo ci){
-        if (window == Minecraft.getInstance().getWindow().getWindow()) {
+        if (window == Minecraft.getInstance().getWindow().handle()) {
             if (!Legacy4JClient.controllerManager.isControllerSimulatingInput) Legacy4JClient.controllerManager.setControllerTheLastInput(false);
             if (Legacy4JClient.controllerManager.isCursorDisabled) {
                 if (!Legacy4JClient.controllerManager.getCursorMode().isNever())

@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base.client.cartography;
 
 //? if >=1.20.5 {
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.core.component.DataComponents;
  //?}
 import net.minecraft.client.gui.GuiGraphics;
@@ -128,11 +129,11 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i != 256 && (this.name.keyPressed(i, j, k) || this.name.canConsumeInput())) {
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (!keyEvent.isEscape() && (this.name.keyPressed(keyEvent) || this.name.canConsumeInput())) {
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyEvent);
     }
 
 

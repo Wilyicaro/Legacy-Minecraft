@@ -12,6 +12,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.achievement.StatsScreen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -84,7 +85,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
         renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()-> LegacyComponents.CHANGE_FILTER);
     }
 
-    public static void refreshStatsBoards(Minecraft minecraft){
+    public static void refreshStatsBoards(Minecraft minecraft) {
         if (minecraft.getConnection() == null) return;
         statsBoards.forEach(StatsBoard::clear);
         if (Legacy4JClient.hasModOnServer()) {
@@ -101,13 +102,13 @@ public class LeaderboardsScreen extends PanelVListScreen {
         }
     }
 
-    public int changedPage(int count){
+    public int changedPage(int count) {
         return Math.max(0,(page + count) >= statsBoards.get(selectedStatBoard).renderables.size() ? page : page + count);
     }
 
-    public void changeStatBoard(boolean left){
+    public void changeStatBoard(boolean left) {
         int initialSelectedStatBoard = selectedStatBoard;
-        while (selectedStatBoard != (selectedStatBoard = Stocker.cyclic(0,selectedStatBoard + (left ? -1 : 1), statsBoards.size())) && selectedStatBoard != initialSelectedStatBoard){
+        while (selectedStatBoard != (selectedStatBoard = Stocker.cyclic(0,selectedStatBoard + (left ? -1 : 1), statsBoards.size())) && selectedStatBoard != initialSelectedStatBoard) {
             if (!statsBoards.get(selectedStatBoard).statsList.isEmpty()) {
                 page = 0;
                 rebuildRenderableVList(minecraft);
@@ -118,44 +119,44 @@ public class LeaderboardsScreen extends PanelVListScreen {
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (i == InputConstants.KEY_X){
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.key() == InputConstants.KEY_X) {
             filter.add(1,true);
             rebuildRenderableVList(minecraft);
             repositionElements();
         }
-        if (i == InputConstants.KEY_LEFT || i == InputConstants.KEY_RIGHT){
-            changeStatBoard(i == InputConstants.KEY_LEFT);
+        if (keyEvent.isLeft() || keyEvent.isRight()) {
+            changeStatBoard(keyEvent.isLeft());
             return true;
         }
-        if (i == InputConstants.KEY_LBRACKET || i == InputConstants.KEY_RBRACKET){
-            if (selectedStatBoard < statsBoards.size() && !statsBoards.get(selectedStatBoard).renderables.isEmpty()){
-                int newPage = changedPage(i == InputConstants.KEY_LBRACKET ? -lastStatsInScreen : statsInScreen);
-                if (newPage != page){
+        if (keyEvent.key() == InputConstants.KEY_LBRACKET || keyEvent.key() == InputConstants.KEY_RBRACKET) {
+            if (selectedStatBoard < statsBoards.size() && !statsBoards.get(selectedStatBoard).renderables.isEmpty()) {
+                int newPage = changedPage(keyEvent.key() == InputConstants.KEY_LBRACKET ? -lastStatsInScreen : statsInScreen);
+                if (newPage != page) {
                     lastStatsInScreen = statsInScreen;
                     page = newPage;
                     return true;
                 }
             }
         }
-        if (renderableVList.keyPressed(i)) return true;
-        return super.keyPressed(i, j, k);
+        if (renderableVList.keyPressed(keyEvent.key())) return true;
+        return super.keyPressed(keyEvent);
     }
 
     @Override
-    public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
+    public boolean mouseScrolled(double d, double e, double f, double g) {
         renderableVList.mouseScrolled(g);
-        return super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g);
+        return super.mouseScrolled(d, e, f, g);
     }
 
-    public void rebuildRenderableVList(Minecraft minecraft){
+    public void rebuildRenderableVList(Minecraft minecraft) {
         renderableVList.renderables.clear();
         if (minecraft.getConnection() == null ||  statsBoards.get(selectedStatBoard).statsList.isEmpty()) return;
-        actualRankBoard = Legacy4JClient.hasModOnServer() && filter.get() != 1 ? minecraft.getConnection().getOnlinePlayers().stream().map(p-> ((LegacyPlayerInfo)p)).filter(info-> info.getStatsMap().object2IntEntrySet().stream().filter(s-> statsBoards.get(selectedStatBoard).statsList.contains(s.getKey())).mapToInt(Object2IntMap.Entry::getIntValue).sum() > 0).sorted(filter.get() == 0 ? Comparator.comparingInt(info-> ((LegacyPlayerInfo)info).getStatsMap().object2IntEntrySet().stream().filter(s-> statsBoards.get(selectedStatBoard).statsList.contains(s.getKey())).mapToInt(Object2IntMap.Entry::getIntValue).sum()).reversed() : Comparator.comparing((LegacyPlayerInfo l) -> l.legacyMinecraft$getProfile().getName())).toList() : List.of((LegacyPlayerInfo) minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID()));
+        actualRankBoard = Legacy4JClient.hasModOnServer() && filter.get() != 1 ? minecraft.getConnection().getOnlinePlayers().stream().map(p-> ((LegacyPlayerInfo)p)).filter(info-> info.getStatsMap().object2IntEntrySet().stream().filter(s-> statsBoards.get(selectedStatBoard).statsList.contains(s.getKey())).mapToInt(Object2IntMap.Entry::getIntValue).sum() > 0).sorted(filter.get() == 0 ? Comparator.comparingInt(info-> ((LegacyPlayerInfo)info).getStatsMap().object2IntEntrySet().stream().filter(s-> statsBoards.get(selectedStatBoard).statsList.contains(s.getKey())).mapToInt(Object2IntMap.Entry::getIntValue).sum()).reversed() : Comparator.comparing((LegacyPlayerInfo l) -> l.legacyMinecraft$getProfile().name())).toList() : List.of((LegacyPlayerInfo) minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID()));
         for (int i = 0; i < actualRankBoard.size(); i++) {
             LegacyPlayerInfo info = actualRankBoard.get(i);
             String rank = i + 1 + "";
-            renderableVList.renderables.add(new AbstractWidget(0,0,551,20,Component.literal(info.legacyMinecraft$getProfile().getName())) {
+            renderableVList.renderables.add(new AbstractWidget(0,0,551,20,Component.literal(info.legacyMinecraft$getProfile().name())) {
                 @Override
                 protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                     int y = getY() + (getHeight() - font.lineHeight) / 2 + 1;
@@ -190,7 +191,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
     @Override
     public void tick() {
         super.tick();
-        if (updateTimer <= 0){
+        if (updateTimer <= 0) {
             updateTimer = 20;
             if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(PlayerInfoSync.askAll(minecraft.player));
             else minecraft.getConnection().send(new ServerboundClientCommandPacket(ServerboundClientCommandPacket.Action.REQUEST_STATS));
@@ -204,7 +205,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
             LegacyRenderUtil.renderPointerPanel(guiGraphics,panel.x + 8,panel.y - 18,166,18);
             LegacyRenderUtil.renderPointerPanel(guiGraphics,panel.x + (panel.width - 211) / 2,panel.y - 18,211,18);
             LegacyRenderUtil.renderPointerPanel(guiGraphics,panel.x +  panel.width - 174 ,panel.y - 18,166,18);
-            if (!statsBoards.isEmpty() && selectedStatBoard < statsBoards.size()){
+            if (!statsBoards.isEmpty() && selectedStatBoard < statsBoards.size()) {
                 StatsBoard board = statsBoards.get(selectedStatBoard);
                 LegacyFontUtil.applyFontOverrideIf(LegacyRenderUtil.is720p(), LegacyFontUtil.MOJANGLES_11_FONT, b-> {
                     guiGraphics.pose().pushMatrix();
@@ -280,7 +281,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
     }
 
     public void onStatsUpdated() {
-        if (!Legacy4JClient.hasModOnServer()){
+        if (!Legacy4JClient.hasModOnServer()) {
             refreshStatsBoards(minecraft);
             if (LeaderboardsScreen.statsBoards.get(selectedStatBoard).statsList.isEmpty()) minecraft.executeIfPossible(()-> changeStatBoard(false));
         }
@@ -298,9 +299,9 @@ public class LeaderboardsScreen extends PanelVListScreen {
             renderables.clear();
         }
 
-        public SimpleLayoutRenderable getRenderable(Stat<?> stat){
+        public SimpleLayoutRenderable getRenderable(Stat<?> stat) {
             for (var override : statIconOverrides) {
-                if (override.test(stat)){
+                if (override.test(stat)) {
                     return override.icon();
                 }
             }
@@ -311,7 +312,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 return h;
             } else if (stat.getValue() instanceof EntityType<?> e) {
                 ResourceLocation entityIcon = Legacy4J.createModLocation("icon/leaderboards/entity/" + e.builtInRegistryHolder().key().location().getPath());
-                if (Minecraft.getInstance().getGuiSprites().textureAtlas.texturesByName.containsKey(entityIcon)) {
+                if (FactoryGuiGraphics.getSprites().texturesByName.containsKey(entityIcon)) {
                     LegacyIconHolder h = new LegacyIconHolder(24, 24);
                     h.iconSprite = entityIcon;
                     return h;
@@ -330,17 +331,17 @@ public class LeaderboardsScreen extends PanelVListScreen {
 
         }
 
-        public StatsBoard(StatType<?> type, Component displayName){
+        public StatsBoard(StatType<?> type, Component displayName) {
             this.type = type;
             this.displayName = displayName;
         }
 
-        public static StatsBoard create(StatType<?> type, Component displayName){
+        public static StatsBoard create(StatType<?> type, Component displayName) {
             return new StatsBoard(type, displayName);
         }
 
-        public static StatsBoard create(StatType<?> type, Component displayName, Predicate<Stat<?>> canAccept){
-            return new StatsBoard(type, displayName){
+        public static StatsBoard create(StatType<?> type, Component displayName, Predicate<Stat<?>> canAccept) {
+            return new StatsBoard(type, displayName) {
                 @Override
                 public boolean canAdd(Stat<?> stat) {
                     return super.canAdd(stat) && canAccept.test(stat);
@@ -348,13 +349,13 @@ public class LeaderboardsScreen extends PanelVListScreen {
             };
         }
 
-        public boolean canAdd(Stat<?> stat){
+        public boolean canAdd(Stat<?> stat) {
             return stat.getType() == type;
         }
 
-        public boolean add(Stat<?> stat){
-            if (canAdd(stat)){
-                if (!statsList.contains(stat)){
+        public boolean add(Stat<?> stat) {
+            if (canAdd(stat)) {
+                if (!statsList.contains(stat)) {
                     statsList.add(stat);
                     renderables.add(getRenderable(stat));
                 }
@@ -391,11 +392,11 @@ public class LeaderboardsScreen extends PanelVListScreen {
             })));
         }
 
-        protected StatsBoard statsBoardFromJson(JsonObject o){
+        protected StatsBoard statsBoardFromJson(JsonObject o) {
             var statType = FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(o,"type")),BuiltInRegistries.STAT_TYPE);
             Component name = o.has("displayName") ? Component.translatable(GsonHelper.getAsString(o,"displayName")) : statType.getDisplayName();
             StatsBoard statsBoard;
-            if (o.get("predicate") instanceof JsonObject predObj){
+            if (o.get("predicate") instanceof JsonObject predObj) {
                 Predicate predicate = JsonUtil.registryMatches(statType.getRegistry(), predObj);
                 statsBoard = StatsBoard.create(statType, name, s-> predicate.test(s.getValue()));
             } else statsBoard = StatsBoard.create(statType, name);
@@ -404,7 +405,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
             return statsBoard;
         }
 
-        protected <T> void parseOverride(StatType<T> statType, StatsBoard statsBoard, JsonElement e){
+        protected <T> void parseOverride(StatType<T> statType, StatsBoard statsBoard, JsonElement e) {
             if (e instanceof JsonObject override && override.get("type") instanceof JsonPrimitive p) {
                 String type = p.getAsString();
                 var predicate = JsonUtil.registryMatches(statType.getRegistry(), override.getAsJsonObject("predicate"));
@@ -415,11 +416,10 @@ public class LeaderboardsScreen extends PanelVListScreen {
                         h.itemIcon = item.getDefaultInstance();
                         statsBoard.statIconOverrides.add(new StatIconOverride<>(statType, predicate, h));
                     }
-                    //Unused for now, as +1.21.6 gui rendering doesn't allow more than one entity rendering on the screen
-                    //case "entity_type" -> {
-                    //    EntityType<?> entityType = FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(override, "id")),BuiltInRegistries.ENTITY_TYPE);
-                    //    statsBoard.statIconOverrides.put(predicate, LegacyIconHolder.entityHolder(0,0,24,24,entityType));
-                    //}
+                    case "entity_type" -> {
+                        EntityType<?> entityType = FactoryAPIPlatform.getRegistryValue(ResourceLocation.tryParse(GsonHelper.getAsString(override, "id")),BuiltInRegistries.ENTITY_TYPE);
+                        statsBoard.statIconOverrides.add(new StatIconOverride<>(statType, predicate, LegacyIconHolder.entityHolder(0,0,24,24, entityType)));
+                    }
                     case "sprite" -> {
                         ResourceLocation sprite = ResourceLocation.tryParse(GsonHelper.getAsString(override, "id"));
                         LegacyIconHolder h = new LegacyIconHolder(24, 24);

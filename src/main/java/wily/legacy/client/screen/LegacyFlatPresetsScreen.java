@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
@@ -48,7 +49,7 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen{
                         LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j,true);
                     }
                     @Override
-                    public void onPress() {
+                    public void onPress(InputWithModifiers input) {
                         minecraft.setScreen(new ConfirmationScreen(LegacyFlatPresetsScreen.this, Component.translatable("legacy.menu.create_flat_world.load_preset"),Component.translatable("legacy.menu.create_flat_world.load_preset_message"),b->{
                             applyPreset.accept(holder);
                             minecraft.setScreen(parent);

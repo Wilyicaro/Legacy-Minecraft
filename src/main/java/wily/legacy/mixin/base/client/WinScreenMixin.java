@@ -11,6 +11,7 @@ import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.WinScreen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -161,14 +162,14 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
         ci.cancel();
     }
     @Inject(method = "keyPressed", at = @At("HEAD"))
-    public void keyPressed(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
-        if (i == InputConstants.KEY_UP || i == InputConstants.KEY_DOWN) {
+    public void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
+        if (keyEvent.isUp() || keyEvent.isDown()) {
             speedupActive = true;
         }
     }
     @Inject(method = "keyReleased", at = @At("HEAD"))
-    public void keyReleased(int i, int j, int k, CallbackInfoReturnable<Boolean> cir) {
-        if (i == InputConstants.KEY_UP || i == InputConstants.KEY_DOWN) {
+    public void keyReleased(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
+        if (keyEvent.isUp() || keyEvent.isDown()) {
             speedupActive = false;
         }
     }

@@ -21,10 +21,10 @@ public class LightTextureMixin {
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/MappableRingBuffer;<init>(Ljava/util/function/Supplier;II)V"), index = 2)
     public int changeBufferSize(int i) {
-        return (new Std140SizeCalculator()).putFloat().putFloat().putFloat().putInt().putFloat().putFloat().putFloat().putFloat().putVec3().putVec3().get();
+        return (new Std140SizeCalculator()).putFloat().putFloat().putFloat().putInt().putFloat().putFloat().putFloat().putFloat().putVec3().putVec3().putVec3().get();
     }
 
-    @ModifyExpressionValue(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/buffers/Std140Builder;putVec3(Lorg/joml/Vector3fc;)Lcom/mojang/blaze3d/buffers/Std140Builder;", remap = false))
+    @ModifyExpressionValue(method = "updateLightTexture", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/buffers/Std140Builder;putVec3(Lorg/joml/Vector3fc;)Lcom/mojang/blaze3d/buffers/Std140Builder;", remap = false, ordinal = 1))
     public Std140Builder updateLightTexture(Std140Builder original) {
         return original.putVec3(ColorUtil.getRed(CommonColor.BLOCK_LIGHT.get()), ColorUtil.getGreen(CommonColor.BLOCK_LIGHT.get()), ColorUtil.getBlue(CommonColor.BLOCK_LIGHT.get()));
     }

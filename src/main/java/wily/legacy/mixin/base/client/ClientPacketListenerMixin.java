@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base.client;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.multiplayer.*;
@@ -8,6 +9,7 @@ import net.minecraft.client.sounds.MusicManager;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.*;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -26,42 +28,20 @@ import wily.legacy.client.screen.LegacyLoadingScreen;
 import wily.legacy.inventory.LegacyMerchantMenu;
 
 @Mixin(ClientPacketListener.class)
-public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends ClientCommonPacketListenerImpl/*?}*/ {
-    //? if <=1.20.2 {
-    /*@Shadow @Final
-    private Minecraft minecraft;
-    @Inject(method = "handleRespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V", shift = At.Shift.AFTER))
-    public void handleRespawn(ClientboundRespawnPacket clientboundRespawnPacket, CallbackInfo ci) {
-        if (clientboundRespawnPacket.shouldKeep(ClientboundRespawnPacket.KEEP_ALL_DATA)) return;
-        LegacyLoadingScreen respawningScreen = LegacyLoadingScreen.getRespawningScreen(()-> false);
-        minecraft.setScreen(new ReceivingLevelScreen(){
-            @Override
-            protected void init() {
-                super.init();
-                respawningScreen.init(minecraft, width, height);
-            }
-
-            @Override
-            public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-                respawningScreen.render(guiGraphics, i, j, f);
-            }
-        });
-    }
-    *///?} else {
-    @Shadow private LevelLoadStatusManager levelLoadStatusManager;
-    @Shadow private ClientLevel level;
+public abstract class ClientPacketListenerMixin extends ClientCommonPacketListenerImpl {
+    @Shadow private LevelLoadTracker levelLoadTracker;
 
     protected ClientPacketListenerMixin(Minecraft minecraft, Connection connection, CommonListenerCookie commonListenerCookie) {
         super(minecraft, connection, commonListenerCookie);
     }
 
     @Inject(method = "handleRespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;setId(I)V"))
-    public void handleRespawn(ClientboundRespawnPacket clientboundRespawnPacket, CallbackInfo ci) {
+    public void handleRespawn(ClientboundRespawnPacket clientboundRespawnPacket, CallbackInfo ci, @Local(ordinal = 0) ResourceKey<Level> newLevel, @Local(ordinal = 1) ResourceKey<Level> oldLevel) {
         if (!clientboundRespawnPacket.shouldKeep(ClientboundRespawnPacket.KEEP_ALL_DATA)){
-            minecraft.setScreen(LegacyLoadingScreen.getRespawningScreen(levelLoadStatusManager::levelReady));
-        }
+            minecraft.setScreen(LegacyLoadingScreen.getRespawningScreen(levelLoadTracker::isLevelReady));
+        } else if (LegacyOptions.legacyLoadingAndConnecting.get() && oldLevel != newLevel) minecraft.setScreen(LegacyLoadingScreen.getDimensionChangeScreen(levelLoadTracker::isLevelReady, oldLevel, newLevel));
     }
-    //?}
+
 
     @Redirect(method = "handleRespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/MusicManager;stopPlaying()V"))
     public void handleRespawnMusic(MusicManager instance) {
@@ -88,7 +68,6 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
         return !(minecraft.screen instanceof CreativeModeScreen);
     }
 
-    //? if >=1.21.2 {
     @Inject(method = "handleContainerSetSlot", at = @At("RETURN"))
     public void handleContainerSetSlot(ClientboundContainerSetSlotPacket clientboundContainerSetSlotPacket, CallbackInfo ci) {
         if (this.minecraft.screen instanceof CreativeModeScreen) {
@@ -96,7 +75,6 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
             minecraft.player.inventoryMenu.broadcastChanges();
         }
     }
-    //?}
 
     @WrapWithCondition(method = "handleContainerSetSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/AbstractContainerMenu;setItem(IILnet/minecraft/world/item/ItemStack;)V", ordinal = 0))
     public boolean handleContainerSetSlot(AbstractContainerMenu instance, int i, int j, ItemStack itemStack) {
@@ -121,7 +99,7 @@ public abstract class ClientPacketListenerMixin /*? if >1.20.2 {*/extends Client
         if (minecraft.screen instanceof LeaderboardsScreen s) s.onStatsUpdated();
     }
 
-    @Inject(method = "handleSystemChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/util/thread/BlockableEventLoop;)V", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "handleSystemChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/PacketUtils;ensureRunningOnSameThread(Lnet/minecraft/network/protocol/Packet;Lnet/minecraft/network/PacketListener;Lnet/minecraft/network/PacketProcessor;)V", shift = At.Shift.AFTER), cancellable = true)
     public void handleSystemChat(ClientboundSystemChatPacket clientboundSystemChatPacket, CallbackInfo ci) {
         if (!LegacyOptions.systemMessagesAsOverlay.get()) {
             minecraft.getChatListener().handleSystemMessage(clientboundSystemChatPacket.content(), false);

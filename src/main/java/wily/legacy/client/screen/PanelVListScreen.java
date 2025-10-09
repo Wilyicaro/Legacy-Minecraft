@@ -1,6 +1,7 @@
 package wily.legacy.client.screen;
 
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.UIDefinition;
 
@@ -55,10 +56,10 @@ public class PanelVListScreen extends PanelBackgroundScreen implements Renderabl
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
+    public boolean keyPressed(KeyEvent keyEvent) {
         for (RenderableVList vList : getRenderableVLists()) {
-            if (vList.keyPressed(i)) return true;
+            if (vList.keyPressed(keyEvent.key())) return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyEvent);
     }
 }

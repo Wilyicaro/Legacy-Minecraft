@@ -12,6 +12,8 @@ import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 *///?}
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 //? if >=1.20.5 {
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.core.component.DataComponents;
 //?} else {
 /*import net.minecraft.client.searchtree.SearchRegistry;
@@ -238,9 +240,9 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
     }
 
     @Override
-    public boolean mouseReleased(double d, double e, int i) {
-        scroller.mouseReleased(d, e, i);
-        return super.mouseReleased(d, e, i);
+    public boolean mouseReleased(MouseButtonEvent event) {
+        scroller.mouseReleased(event);
+        return super.mouseReleased(event);
     }
 
     @Override
@@ -254,16 +256,16 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
     }
 
     @Override
-    public boolean mouseClicked(double d, double e, int i) {
-        if (searchBox.isFocused() && !searchBox.isMouseOver(d,e)) setFocused(null);
-        if (scroller.mouseClicked(d, e, i)) fillCreativeGrid();
-        return super.mouseClicked(d, e, i);
+    public boolean mouseClicked(MouseButtonEvent event, boolean bl) {
+        if (searchBox.isFocused() && !searchBox.isMouseOver(event.x(), event.y())) setFocused(null);
+        if (scroller.mouseClicked(event)) fillCreativeGrid();
+        return super.mouseClicked(event, bl);
     }
 
     @Override
-    public boolean mouseDragged(double d, double e, int i, double f, double g) {
-        if (scroller.mouseDragged(e)) fillCreativeGrid();
-        return super.mouseDragged(d, e, i, f, g);
+    public boolean mouseDragged(MouseButtonEvent event, double f, double g) {
+        if (scroller.mouseDragged(event.y())) fillCreativeGrid();
+        return super.mouseDragged(event, f, g);
     }
 
     @Override
@@ -272,19 +274,19 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (tabList.controlTab(i)) return true;
-        if (i != InputConstants.KEY_ESCAPE && searchBox.isFocused()) return searchBox.keyPressed(i,j,k);
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (tabList.controlTab(keyEvent.key())) return true;
+        if (!keyEvent.isEscape() && searchBox.isFocused()) return searchBox.keyPressed(keyEvent);
 
-        if (hasShiftDown() && tabList.controlPage(page,i == 263 , i == 262)) repositionElements();
-        if (i == InputConstants.KEY_X && canClearQuickSelect()) {
+        if (keyEvent.hasShiftDown() && tabList.controlPage(page, keyEvent.isLeft(), keyEvent.isRight())) repositionElements();
+        if (keyEvent.key() == InputConstants.KEY_X && canClearQuickSelect()) {
             for (int n = 36; n < 45; ++n) {
                 this.minecraft.player.inventoryMenu.getSlot(n).set(ItemStack.EMPTY);
                 this.minecraft.gameMode.handleCreativeModeItemAdd(ItemStack.EMPTY, n);
             }
             return true;
         }
-        return super.keyPressed(i, j, k);
+        return super.keyPressed(keyEvent);
     }
 
     protected void slotClicked(@Nullable Slot slot, int i, int j, ClickType clickType) {
@@ -378,8 +380,8 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
         }
     }
 
-    protected boolean hasClickedOutside(double d, double e, int i, int j, int k) {
-        return this.hasClickedOutside = super.hasClickedOutside(d, e, i, j, k) && !tabList.isMouseOver(d,e);
+    protected boolean hasClickedOutside(double d, double e, int j, int k) {
+        return this.hasClickedOutside = super.hasClickedOutside(d, e, j, k) && !tabList.isMouseOver(d,e);
     }
 
     @Override

@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.resources.language.LanguageManager;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -27,7 +28,7 @@ public class LegacyLanguageScreen extends PanelVListScreen {
             }
 
             @Override
-            public void onPress() {
+            public void onPress(InputWithModifiers input) {
                 selectedLang = autoCode;
             }
             @Override
@@ -43,7 +44,7 @@ public class LegacyLanguageScreen extends PanelVListScreen {
             }
 
             @Override
-            public void onPress() {
+            public void onPress(InputWithModifiers input) {
                 selectedLang = s;
             }
             @Override

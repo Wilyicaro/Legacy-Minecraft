@@ -8,6 +8,8 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -105,8 +107,8 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     private final boolean[] warningSlots;
     protected final ContainerListener listener = new ContainerListener() {
         public void slotChanged(AbstractContainerMenu abstractContainerMenu, int i, ItemStack itemStack) {
-            if (onlyCraftableRecipes && typeTabList.getIndex() == 0) {
-                filteredRecipesByGroup = recipesByTab.get(page.get() * getMaxTabCount() + craftingTabList.getIndex()).stream().map(l -> l.stream().filter(r -> RecipeMenu.canCraft(r.getOptionalIngredients(), inventory,abstractContainerMenu.getCarried())).toList()).filter(l -> !l.isEmpty()).toList();
+            if (typeTabList.getIndex() == 0) {
+                if (onlyCraftableRecipes) filteredRecipesByGroup = recipesByTab.get(page.get() * getMaxTabCount() + craftingTabList.getIndex()).stream().map(l -> l.stream().filter(r -> RecipeMenu.canCraft(r.getOptionalIngredients(), inventory,abstractContainerMenu.getCarried())).toList()).filter(l -> !l.isEmpty()).toList();
                 craftingButtons.get(selectedCraftingButton).updateRecipeDisplay();
             }else {
                 if (getCraftingButtons().size() > selectedCraftingButton && getCraftingButtons().get(selectedCraftingButton) instanceof CustomCraftingIconHolder h) h.updateRecipe();
@@ -119,12 +121,15 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     };
     protected int selectedCraftingButton;
     public static final Item[] VANILLA_CATEGORY_ICONS = new Item[]{Items.BRICKS,Items.REDSTONE,Items.GOLDEN_SWORD,Items.LAVA_BUCKET};
+
     public static LegacyCraftingScreen craftingScreen(LegacyCraftingMenu abstractContainerMenu, Inventory inventory, Component component) {
         return new LegacyCraftingScreen(abstractContainerMenu,inventory,component,false);
     }
+
     public static LegacyCraftingScreen playerCraftingScreen(LegacyCraftingMenu abstractContainerMenu, Inventory inventory, Component component) {
         return new LegacyCraftingScreen(abstractContainerMenu,inventory,component,true);
     }
+
     public LegacyCraftingScreen(LegacyCraftingMenu abstractContainerMenu, Inventory inventory, Component component, boolean is2x2) {
         super(abstractContainerMenu, inventory, component);
         this.inventory = inventory;
@@ -183,8 +188,8 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                 craftingTabList.addTabButton(43, LegacyTabButton.Type.MIDDLE,  LegacyTabButton.iconOf(ModsScreen.modLogosCache.apply(modInfo)), Component.literal(modInfo.getName()), t -> resetElements());
             });
         }
-        resetElements(false);
         addCraftingButtons();
+        resetElements(false);
         accessor.getStaticDefinitions().add(UIDefinition.createBeforeInit(a->accessor.putStaticElement("is2x2",is2x2)));
         ItemStack redStar = Items.FIREWORK_STAR.getDefaultInstance();
         redStar.set(DataComponents.FIREWORK_EXPLOSION,new FireworkExplosion(FireworkExplosion.Shape.SMALL_BALL, IntList.of(DyeColor.RED.getFireworkColor()),IntList.of(),false,false));
@@ -310,10 +315,11 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     }
 
     public void resetElements(boolean reposition) {
-        listener.slotChanged(menu,-1,ItemStack.EMPTY);
+        if (!reposition) listener.slotChanged(menu,-1,ItemStack.EMPTY);
         selectedCraftingButton = 0;
         infoType.set(0);
         craftingButtonsOffset.set(0);
+        if (typeTabList.getIndex() == 0) craftingButtons.get(selectedCraftingButton).invalidateFocused();
         if (reposition) repositionElements();
     }
     
@@ -352,9 +358,9 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                 return LegacyCraftingScreen.this.canCraft(recipes.get(results.indexOf(stack)).getOptionalIngredients(),false);
             }
             @Override
-            public void craft() {
+            public void craft(InputWithModifiers input) {
                 LegacySoundUtil.playSimpleUISound(SoundEvents.ITEM_PICKUP,1.0f);
-                CommonNetwork.sendToServer(new ServerMenuCraftPayload(recipes.get(results.indexOf(itemIcon)), Screen.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed));
+                CommonNetwork.sendToServer(new ServerMenuCraftPayload(recipes.get(results.indexOf(itemIcon)), input.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed));
             }
         };
     }
@@ -522,6 +528,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
             b.setY(topPos + i + 4);
             b.offset = (t1) -> new Vec3(t1.selected ? 0 : 3.4, 0.4, 0);
         },true);
+        listener.slotChanged(menu,-1,ItemStack.EMPTY);
     }
 
     public TabList getTabList() {
@@ -593,22 +600,22 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                 }
 
                 @Override
-                protected void toggleCraftableRecipes() {
+                protected void toggleCraftableRecipes(InputWithModifiers input) {
                     onlyCraftableRecipes = !onlyCraftableRecipes;
                     listener.slotChanged(menu, 0, ItemStack.EMPTY);
                 }
 
                 @Override
-                public boolean keyPressed(int i, int j, int k) {
-                    if (controlCyclicNavigation(i, index, craftingButtons, craftingButtonsOffset, scrollRenderer, LegacyCraftingScreen.this))
+                public boolean keyPressed(KeyEvent keyEvent) {
+                    if (controlCyclicNavigation(keyEvent.key(), index, craftingButtons, craftingButtonsOffset, scrollRenderer, LegacyCraftingScreen.this))
                         return true;
-                    if (i == InputConstants.KEY_X && (typeTabList.getIndex() == 0 || hasTypeTabList())) {
+                    if (keyEvent.key() == InputConstants.KEY_X && (typeTabList.getIndex() == 0 || hasTypeTabList())) {
                         infoType.add(1,true);
                         menu.inventoryActive = infoType.get() <= 0;
                         LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
                         return true;
                     }
-                    return super.keyPressed(i, j, k);
+                    return super.keyPressed(keyEvent);
                 }
 
                 protected void updateRecipeDisplay(RecipeInfo<CraftingRecipe> rcp) {
@@ -621,9 +628,9 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                 }
 
                 @Override
-                public void craft() {
+                public void craft(InputWithModifiers input) {
                     LegacySoundUtil.playSimpleUISound(SoundEvents.ITEM_PICKUP,1.0f);
-                    super.craft();
+                    super.craft(input);
                 }
             });
             h.offset = LegacyCraftingMenu.DEFAULT_INVENTORY_OFFSET;
@@ -660,9 +667,9 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         }
 
         @Override
-        public void craft() {
+        public void craft(InputWithModifiers input) {
             LegacySoundUtil.playSimpleUISound(SoundEvents.ITEM_PICKUP,1.0f);
-            super.craft();
+            super.craft(input);
         }
     }
 
@@ -717,13 +724,13 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
     }
 
     @Override
-    public boolean keyPressed(int i, int j, int k) {
-        if (hasTypeTabList() && hasShiftDown() && typeTabList.controlTab(i)) {
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (hasTypeTabList() && keyEvent.hasShiftDown() && typeTabList.controlTab(keyEvent.key())) {
             return true;
         }
-        getTabList().controlTab(i);
-        if (hasShiftDown() && typeTabList.getIndex() == 0 && craftingTabList.controlPage(page, i == 263, i == 262)) return true;
-        return super.keyPressed(i, j, k);
+        getTabList().controlTab(keyEvent.key());
+        if (keyEvent.hasShiftDown() && typeTabList.getIndex() == 0 && craftingTabList.controlPage(page, keyEvent.isLeft(), keyEvent.isRight())) return true;
+        return super.keyPressed(keyEvent);
     }
 
     public List<? extends LegacyIconHolder> getCraftingButtons() {
