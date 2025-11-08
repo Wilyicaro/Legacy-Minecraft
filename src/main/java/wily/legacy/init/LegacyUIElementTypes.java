@@ -1,16 +1,10 @@
 package wily.legacy.init;
 
-import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.layouts.LayoutElement;
-import net.minecraft.client.gui.render.state.pip.GuiBookModelRenderState;
-import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraft.client.model.BookModel;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -23,7 +17,6 @@ import net.minecraft.world.phys.Vec2;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.Bearer;
-import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.client.UIDefinitionManager;
@@ -44,8 +37,8 @@ public class LegacyUIElementTypes {
             a.putStaticElement(elementName, new ScrollableRenderer());
         }));
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "backgroundSprite", ResourceLocation.CODEC);
-        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "hasBackground", (s, d) -> UIDefinitionManager.ElementType.parseBooleanElement(elementName, s, d));
-        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "x", "y", "width", "height");
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "hasBackground", UIDefinitionManager.ElementType::parseBoolean);
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "width", "height");
         UIDefinitionManager.parseAllElements(uiDefinition, a -> a.getElementValue(elementName + ".renderables", a, UIAccessor.class), element, s -> s);
         uiDefinition.addStatic(UIDefinition.createAfterInit(a -> a.addRenderable(elementName, ((guiGraphics, i, j, f) -> {
             int x = a.getInteger(elementName + ".x", 0);
@@ -68,19 +61,19 @@ public class LegacyUIElementTypes {
         }))));
     }));
     public static final UIDefinitionManager.ElementType PUT_RENDERABLE_VLIST = UIDefinitionManager.ElementType.registerConditional("put_renderable_vertical_list", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
-        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseBooleanElement(elementName, s, d), "forceWidth", "cyclic");
-        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "x", "y", "width", "height", "layoutSpacing");
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseBoolean, "forceWidth", "cyclic");
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "width", "height", "layoutSpacing");
         uiDefinition.addStatic(UIDefinition.createBeforeInit(a -> {
             RenderableVList renderableVList = new RenderableVList(a).layoutSpacing(l -> a.getInteger(elementName + ".layoutSpacing", 5)).cyclic(a.getBoolean(elementName + ".forceWidth", true)).cyclic(a.getBoolean(elementName + ".cyclic", true));
             a.putStaticElement(elementName, renderableVList);
             a.putStaticElement(elementName + ".renderables", UIAccessor.createRenderablesWrapper(a, renderableVList.renderables));
         }));
-        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "x", "y", "width", "height");
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "width", "height");
         UIDefinitionManager.parseAllElements(uiDefinition, a -> a.getElementValue(elementName + ".renderables", a, UIAccessor.class), element, s -> s);
         uiDefinition.addStatic(UIDefinition.createAfterInit(a -> a.getElementValue(elementName, null, RenderableVList.class).init(elementName, 0, 0, 225, 0)));
     }));
     public static final UIDefinitionManager.ElementType MODIFY_RENDERABLE_VLIST = UIDefinitionManager.ElementType.registerConditional("modify_renderable_vertical_list", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
-        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "index");
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "index");
         UIDefinition renderableVListUIDefinition = new UIDefinition() {
             private final List<UIDefinition> definitions = new ArrayList<>();
 
@@ -107,8 +100,8 @@ public class LegacyUIElementTypes {
     }));
     public static final UIDefinitionManager.ElementType DRAW_OUTLINED_STRING = UIDefinitionManager.ElementType.registerConditional("draw_outlined_string", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "component", (s, d) -> UIDefinitionManager.ElementType.parseComponentElement(elementName, s, d));
-        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "outline");
-        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "x", "y", "color", "outlineColor", "order");
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "outline");
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "color", "outlineColor", "order");
         UIDefinitionManager.ElementType.parseTranslationElements(uiDefinition, elementName, element);
         uiDefinition.addStatic(UIDefinition.createAfterInit(a -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (guiGraphics, i, j, f) -> {
             a.getElement(elementName + ".component", Component.class).ifPresent((c) -> LegacyRenderUtil.drawOutlinedString(guiGraphics, Minecraft.getInstance().font, c, a.getInteger(elementName + ".x", 0), a.getInteger(elementName + ".y", 0), a.getInteger(elementName + ".color", 16777215), a.getInteger(elementName + ".outlineColor", 0xFF000000), a.getFloat(elementName + ".outline", 0.5f)));
@@ -154,7 +147,7 @@ public class LegacyUIElementTypes {
             flipA.set(flipA.get() + (f1 - flipA.get()) * 0.9F);
             flip.set(flip.get() + flipA.get());
         }));
-        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "x", "y", "width", "height", "scale");
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "width", "height", "scale");
         UIDefinitionManager.ElementType.parseTranslationElements(uiDefinition, elementName, element);
         uiDefinition.addStatic(UIDefinition.createAfterInit(a -> accessorFunction.apply(a).addRenderable(elementName, a.createModifiableRenderable(elementName, (guiGraphics, i, j, f) -> {
             float g = Mth.lerp(f, oOpen.get(), open.get());
@@ -169,12 +162,12 @@ public class LegacyUIElementTypes {
     private static final Container emptyFakeContainer = new SimpleContainer();
     public static final UIDefinitionManager.ElementType PUT_LEGACY_SLOT = UIDefinitionManager.ElementType.registerConditional("put_legacy_slot", UIDefinitionManager.ElementType.createIndexable(slots -> (uiDefinition, accessorFunction, elementName, element) -> {
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeContainer", (s, d) -> d.asListOpt(d1 -> DynamicUtil.getItemFromDynamic(d1, true)).result().map(l -> UIDefinition.createBeforeInit(a -> a.putStaticElement(s, new SimpleContainer(l.stream().map(ArbitrarySupplier::get).toArray(ItemStack[]::new))))).orElse(null));
-        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeItem", (s, d) -> UIDefinitionManager.ElementType.parseItemStackElement(elementName, s, d));
+        UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "fakeItem", (s, d) -> UIDefinitionManager.ElementType.parseItemStackElement(s, d));
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "spriteOverride", ResourceLocation.CODEC);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "iconSprite", ResourceLocation.CODEC);
         UIDefinitionManager.ElementType.parseElement(uiDefinition, elementName, element, "offset", DynamicUtil.VEC3_OBJECT_CODEC);
-        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseBooleanElement(elementName, s, d), "iconCondition", "iconHolderCondition", "isVisible", "isFake", "isWarning");
-        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, (s, d) -> UIDefinitionManager.ElementType.parseNumberElement(elementName, s, d), "x", "y", "width", "height");
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseBoolean, "iconCondition", "iconHolderCondition", "isVisible", "isFake", "isWarning");
+        UIDefinitionManager.ElementType.parseElements(uiDefinition, elementName, element, UIDefinitionManager.ElementType::parseNumber, "x", "y", "width", "height");
         uiDefinition.addStatic(UIDefinition.createAfterInit(a -> {
             Bearer<Integer> index = Bearer.of(0);
             a.getElements().put(elementName + ".index", index);

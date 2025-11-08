@@ -639,7 +639,7 @@ public class LegacyRenderUtil {
         if (LegacyOptions.flyingViewRolling.get() && mc.player != null && mc.player.isFallFlying()) {
             float f = FactoryAPIClient.getGamePartialTick(false);
             Vec3 vec3 = mc.player.getViewVector(f);
-            Vec3 vec32 = mc.player.getDeltaMovement();
+            Vec3 vec32 = mc.player.avatarState().deltaMovementOnPreviousTick().lerp(mc.player.getDeltaMovement(), f);
             double d = vec32.horizontalDistanceSqr();
             double e = vec3.horizontalDistanceSqr();
             if (d > 0.0 && e > 0.0) {
