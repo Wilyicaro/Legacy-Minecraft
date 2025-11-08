@@ -281,7 +281,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> limitCursor = CLIENT_STORAGE.register(createBoolean("limitCursor", true));
     public static final FactoryConfig<Boolean> enhancedItemTranslucency = CLIENT_STORAGE.register(createBoolean("enhancedItemTranslucency", false));
     public static final FactoryConfig<Boolean> legacyFireworks = CLIENT_STORAGE.register(createBoolean("legacyFireworks", true));
-    public static final FactoryConfig<UIMode> uiMode = CLIENT_STORAGE.register(create("uiMode", (c, d) -> CommonComponents.optionNameValue(c, d.displayName), i-> UIMode.values()[i], UIMode::ordinal, ()->UIMode.values().length, UIMode.CODEC, UIMode.AUTO, d -> Minecraft.getInstance().resizeDisplay(), CLIENT_STORAGE));
+    public static final FactoryConfig<UIMode> uiMode = CLIENT_STORAGE.register(create("uiMode", (c, d) -> CommonComponents.optionNameValue(c, d.displayName), i-> UIMode.values()[i], UIMode::ordinal, ()-> UIMode.values().length, UIMode.CODEC, UIMode.AUTO, d -> Minecraft.getInstance().execute(Minecraft.getInstance()::resizeDisplay), CLIENT_STORAGE));
 
     public static int getTerrainFogStart() {
         return Math.min(terrainFogStart.get(), Minecraft.getInstance().options.renderDistance().get());

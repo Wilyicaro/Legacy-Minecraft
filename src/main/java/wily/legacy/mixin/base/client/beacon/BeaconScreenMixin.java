@@ -1,7 +1,7 @@
 package wily.legacy.mixin.base.client.beacon;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.BeaconScreen;
 import net.minecraft.core.Holder;
@@ -11,7 +11,6 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.BeaconMenu;
 import net.minecraft.world.inventory.Slot;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
@@ -23,14 +22,17 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyFontUtil;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 @Mixin(BeaconScreen.class)
 public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMenu> {
-    private static final Item[] DISPLAY_ITEMS = new Item[]{Items.NETHERITE_INGOT, Items.EMERALD, Items.DIAMOND, Items.GOLD_INGOT, Items.IRON_INGOT};
+    private static final ItemStack[] DISPLAY_ITEMS = new ItemStack[]{Items.NETHERITE_INGOT.getDefaultInstance(), Items.EMERALD.getDefaultInstance(), Items.DIAMOND.getDefaultInstance(), Items.GOLD_INGOT.getDefaultInstance(), Items.IRON_INGOT.getDefaultInstance()};
     @Shadow
     @Final
     private static Component PRIMARY_EFFECT_LABEL;
@@ -58,28 +60,37 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
-        imageWidth = 260;
-        imageHeight = 255;
+        boolean sd = LegacyOptions.getUIMode().isSD();
+        imageWidth = sd ? 160 : 260;
+        imageHeight = sd ? 160 : 255;
+        int slotsSize = sd ? 13 : 21;
+        LegacySlotDisplay defaultDisplay = new LegacySlotDisplay() {
+            @Override
+            public int getWidth() {
+                return slotsSize;
+            }
+        };
         super.init();
         for (int i = 0; i < menu.slots.size(); i++) {
             Slot s = menu.slots.get(i);
             if (i == 0) {
-                LegacySlotDisplay.override(s, 141, 129);
+                LegacySlotDisplay.override(s, (sd ? 87 : 141), (sd ? 82 : 129), defaultDisplay);
             } else if (i < menu.slots.size() - 9) {
-                LegacySlotDisplay.override(s, 36 + (s.getContainerSlot() - 9) % 9 * 21, 155 + (s.getContainerSlot() - 9) / 9 * 21);
+                LegacySlotDisplay.override(s, (sd ? 22 : 36) + (s.getContainerSlot() - 9) % 9 * slotsSize, (sd ? 98 : 155) + (s.getContainerSlot() - 9) / 9 * slotsSize, defaultDisplay);
             } else {
-                LegacySlotDisplay.override(s, 36 + s.getContainerSlot() * 21, 223);
+                LegacySlotDisplay.override(s, (sd ? 22 : 36) + s.getContainerSlot() * slotsSize, (sd ? 140 : 223), defaultDisplay);
             }
         }
         this.beaconButtons.clear();
-        BeaconScreen.BeaconConfirmButton confirmButton = self().new BeaconConfirmButton(this.leftPos + 202, this.topPos + 127) {
+        BeaconScreen.BeaconConfirmButton confirmButton = self().new BeaconConfirmButton(this.leftPos + (sd ? 112 : 202), this.topPos + (sd ? 80 : 127)) {
             @Override
             protected void renderIcon(GuiGraphics guiGraphics) {
                 FactoryScreenUtil.enableBlend();
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_CONFIRM, this.getX() + 4, this.getY() + 4, 14, 14);
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_CONFIRM, this.getX() + (getWidth() - 14) / 2, this.getY() + (getHeight() - 14) / 2, 14, 14);
                 FactoryScreenUtil.disableBlend();
             }
         };
+        confirmButton.setSize(sd ? 16 : 22, sd ? 16 : 22);
         addRenderableWidget(confirmButton);
         beaconButtons.add(confirmButton);
 
@@ -91,27 +102,42 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
             j = getFrom(BeaconBlockEntity.BEACON_EFFECTS, i).size();
             for (l = 0; l < j; ++l) {
                 mobEffect = getFrom(getFrom(BeaconBlockEntity.BEACON_EFFECTS, i), l);
-                beaconPowerButton = self().new BeaconPowerButton(this.leftPos + 59 + (j > 1 ? l * 27 : 13), this.topPos + 38 + i * 30, mobEffect, true, i);
+                beaconPowerButton = self().new BeaconPowerButton(this.leftPos + (sd ? 29 : 59) + (j > 1 ? l * (sd ? 20 : 27) : (sd ? 10 : 13)), this.topPos + (sd ? 19 : 38) + i * (sd ? 18 : 30), mobEffect, true, i) {
+                    @Override
+                    protected void renderIcon(GuiGraphics arg) {
+                        renderBeaconIcon(arg, this, super::renderIcon);
+                    }
+                };
                 beaconPowerButton.active = false;
-                addRenderableWidget(beaconPowerButton);
+                addRenderableWidget(beaconPowerButton).setSize(sd ? 16 : 22, sd ? 16 : 22);
                 beaconButtons.add(beaconPowerButton);
             }
         }
 
         j = getFrom(BeaconBlockEntity.BEACON_EFFECTS, 3).size() + 1;
-        int k = j > 1 ? 0 : 13;
+        int k = j > 1 ? 0 : (sd ? 10 : 13);
 
         for (l = 0; l < j - 1; ++l) {
             mobEffect = getFrom(getFrom(BeaconBlockEntity.BEACON_EFFECTS, 3), l);
-            beaconPowerButton = self().new BeaconPowerButton(this.leftPos + 164 + l * 27 + k, this.topPos + 68, mobEffect, false, 3);
+            beaconPowerButton = self().new BeaconPowerButton(this.leftPos + (sd ? 98 : 164) + l * (sd ? 20 : 27) + k, this.topPos + (sd ? 37 : 68), mobEffect, false, 3) {
+                @Override
+                protected void renderIcon(GuiGraphics arg) {
+                    renderBeaconIcon(arg, this, super::renderIcon);
+                }
+            };
             beaconPowerButton.active = false;
-            addRenderableWidget(beaconPowerButton);
+            addRenderableWidget(beaconPowerButton).setSize(sd ? 16 : 22, sd ? 16 : 22);
             beaconButtons.add(beaconPowerButton);
         }
 
-        BeaconScreen.BeaconPowerButton beaconPowerButton2 = self().new BeaconUpgradePowerButton(this.leftPos + 165 + (j - 1) * 24 - k / 2, this.topPos + 68, getFrom(getFrom(BeaconBlockEntity.BEACON_EFFECTS, 0), 0));
+        BeaconScreen.BeaconPowerButton beaconPowerButton2 = self().new BeaconUpgradePowerButton(this.leftPos + (sd ? 98 : 165) + (j - 1) * 24 - k / 2, this.topPos + (sd ? 37 : 68), getFrom(getFrom(BeaconBlockEntity.BEACON_EFFECTS, 0), 0)) {
+            @Override
+            protected void renderIcon(GuiGraphics arg) {
+                renderBeaconIcon(arg, this, super::renderIcon);
+            }
+        };
         beaconPowerButton2.visible = false;
-        addRenderableWidget(beaconPowerButton2);
+        addRenderableWidget(beaconPowerButton2).setSize(sd ? 16 : 22, sd ? 16 : 22);
         beaconButtons.add(beaconPowerButton2);
     }
 
@@ -129,27 +155,56 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
     @Inject(method = "renderLabels", at = @At("HEAD"), cancellable = true)
     public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        guiGraphics.drawString(this.font, PRIMARY_EFFECT_LABEL, 9 + (121 - font.width(PRIMARY_EFFECT_LABEL)) / 2, 13, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        guiGraphics.drawString(this.font, SECONDARY_EFFECT_LABEL, 133 + (121 - font.width(SECONDARY_EFFECT_LABEL)) / 2, 13, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        LegacyFontUtil.applySDFont(b -> {
+            int panelWidth = b ? 75 : 120;
+            guiGraphics.drawString(this.font, PRIMARY_EFFECT_LABEL, (b ? 4 : 8) + (panelWidth - font.width(PRIMARY_EFFECT_LABEL)) / 2, (b ? 7 : 13), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            guiGraphics.drawString(this.font, SECONDARY_EFFECT_LABEL, (b ? 80 : 132) + (panelWidth - font.width(SECONDARY_EFFECT_LABEL)) / 2, (b ? 7 : 13), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        });
     }
 
     @Inject(method = "renderBg", at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 8, topPos + 9, 120, 115);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 132, topPos + 9, 120, 115);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_1, leftPos + 32, topPos + 39, 20, 19);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_2, leftPos + 32, topPos + 69, 20, 19);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_3, leftPos + 32, topPos + 97, 20, 19);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.BEACON_4, leftPos + 180, topPos + 42, 20, 19);
+        boolean sd = LegacyOptions.getUIMode().isSD();
+        int panelWidth = sd ? 75 : 120;
+        int panelHeight = sd ? 75 : 115;
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + (sd ? 4 : 8), topPos + (sd ? 4 : 9), panelWidth, panelHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + (sd ? 80 : 132), topPos + (sd ? 4 : 9), panelWidth, panelHeight);
+        renderBeaconSprite(guiGraphics, LegacySprites.BEACON_1, leftPos + (sd ? 12 : 32), topPos + (sd ? 22 : 39));
+        renderBeaconSprite(guiGraphics, LegacySprites.BEACON_2, leftPos + (sd ? 12 : 32), topPos + (sd ? 40 : 69));
+        renderBeaconSprite(guiGraphics, LegacySprites.BEACON_3, leftPos + (sd ? 12 : 32), topPos + (sd ? 58 : 97));
+        renderBeaconSprite(guiGraphics, LegacySprites.BEACON_4, leftPos + (sd ? 112 : 180), topPos + (sd ? 22 : 42));
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(leftPos + 15, topPos + 129);
-        guiGraphics.pose().scale(1.125f, 1.125f);
-        for (Item displayItem : DISPLAY_ITEMS) {
-            guiGraphics.renderItem(new ItemStack(displayItem), 0, 0);
+        guiGraphics.pose().translate(leftPos + (sd ? 9 : 15), topPos + (sd ? 81 : 129));
+        guiGraphics.pose().scale(sd ? 13 / 18f : 1.125f, sd ? 13 / 18f : 1.125f);
+        for (ItemStack displayItem : DISPLAY_ITEMS) {
+            guiGraphics.renderItem(displayItem, 0, 0);
             guiGraphics.pose().translate(18, 0);
         }
         guiGraphics.pose().popMatrix();
+    }
+
+    @Unique
+    private void renderBeaconSprite(GuiGraphics graphics, ResourceLocation sprite, int x, int y) {
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(x, y);
+        if (LegacyOptions.getUIMode().isSD())
+            graphics.pose().scale(0.5f);
+        FactoryGuiGraphics.of(graphics).blitSprite(sprite, 0, 0, 20, 19);
+        graphics.pose().popMatrix();
+    }
+
+    @Unique
+    private void renderBeaconIcon(GuiGraphics arg, AbstractWidget widget, Consumer<GuiGraphics> render) {
+        if (LegacyOptions.getUIMode().isSD()) {
+            arg.pose().pushMatrix();
+            arg.pose().translate(widget.getX() + widget.getWidth() / 2, widget.getY() + widget.getHeight() / 2);
+            arg.pose().scale(0.5f);
+            arg.pose().translate(-widget.getX() - 11, -widget.getY() - 11);
+            render.accept(arg);
+            arg.pose().popMatrix();
+        } else
+            render.accept(arg);
     }
 }

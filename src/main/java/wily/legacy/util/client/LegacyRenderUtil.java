@@ -156,7 +156,7 @@ public class LegacyRenderUtil {
         FactoryScreenUtil.enableBlend();
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate((guiGraphics.guiWidth() - 285.5f) * 0.5f * getLogoScale(), y);
-        guiGraphics.pose().scale(0.5f, 0.5f * getLogoScale());
+        guiGraphics.pose().scale(0.5f * getLogoScale(), 0.5f * getLogoScale());
         FactoryGuiGraphics.of(guiGraphics).blit(mc.getResourceManager().getResource(MINECRAFT).isPresent() ? MINECRAFT : ControlType.getActiveType().minecraftLogo().get(), 0, 0, 0, 0, 571, 138, 571, 138);
         guiGraphics.pose().popMatrix();
         FactoryScreenUtil.disableBlend();

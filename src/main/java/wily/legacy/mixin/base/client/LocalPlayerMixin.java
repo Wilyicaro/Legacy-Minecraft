@@ -107,6 +107,11 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
         return (Legacy4JClient.hasModOnServer() && gameRules.getRule(LegacyGameRules.LEGACY_SWIMMING).get() && isInWater()) || original;
     }
 
+    @ModifyExpressionValue(method = "isSprintingPossible", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isInShallowWater()Z"))
+    public boolean isSprintingPossible(boolean original) {
+        return !(Legacy4JClient.hasModOnServer() && gameRules.getRule(LegacyGameRules.LEGACY_SWIMMING).get() && isInWater()) && original;
+    }
+
     @Redirect(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V"))
     public void aiStepFlyUpDown(LocalPlayer instance, Vec3 vec3) {
         if (Legacy4JClient.hasModOnServer() && gameRules.getRule(LegacyGameRules.LEGACY_FLIGHT).get())
