@@ -60,13 +60,13 @@ import java.util.zip.ZipInputStream;
 public class Legacy4J {
 
     public static final String MOD_ID = "legacy";
-    public static final Supplier<String> VERSION = ()-> FactoryAPIPlatform.getModInfo(MOD_ID).getVersion();
+    public static final Supplier<String> VERSION = () -> FactoryAPIPlatform.getModInfo(MOD_ID).getVersion();
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     public static final FactoryConfig.StorageHandler MIXIN_CONFIGS_STORAGE = FactoryConfig.StorageHandler.fromMixin(LegacyMixinToggles.COMMON_STORAGE, true);
 
     private static Collection<CommonNetwork.Payload> playerInitialPayloads = Collections.emptySet();
 
-    public Legacy4J(){
+    public Legacy4J() {
         init();
         //? if forge || neoforge {
         /*if (FactoryAPI.isClient())
@@ -74,7 +74,7 @@ public class Legacy4J {
         *///?}
     }
 
-    public static List<Integer> getParsedVersion(String version){
+    public static List<Integer> getParsedVersion(String version) {
         List<Integer> parsedVersion = new ArrayList<>();
         String[] versions = version.split("[.\\-]");
         for (String s : versions) {
@@ -89,11 +89,11 @@ public class Legacy4J {
         return parsedVersion;
     }
 
-    public static boolean isNewerVersion(String actualVersion, String previous){
+    public static boolean isNewerVersion(String actualVersion, String previous) {
         return isNewerVersion(actualVersion, previous, 2);
     }
 
-    public static boolean isNewerVersion(String actualVersion, String previous, int limitCount){
+    public static boolean isNewerVersion(String actualVersion, String previous, int limitCount) {
         List<Integer> v = getParsedVersion(actualVersion);
         List<Integer> v1 = getParsedVersion(previous);
         int size = limitCount <= 0 ? v.size() : Math.min(limitCount, v.size());
@@ -103,12 +103,12 @@ public class Legacy4J {
         return false;
     }
 
-    public static void init(){
+    public static void init() {
         FactoryConfig.registerCommonStorage(createModLocation("common"), LegacyCommonOptions.COMMON_STORAGE);
         FactoryConfig.registerCommonStorage(createModLocation("mixin_common"), MIXIN_CONFIGS_STORAGE);
         LegacyRegistries.register();
         LegacyGameRules.init();
-        FactoryEvent.registerPayload(r->{
+        FactoryEvent.registerPayload(r -> {
             r.register(false, ClientAdvancementsPayload.ID);
             r.register(false, ClientAnimalInLoveSyncPayload.ID);
             r.register(false, ClientEffectActivationPayload.ID);
@@ -125,10 +125,8 @@ public class Legacy4J {
             r.register(false, TopMessage.Payload.ID);
         });
         ArmorStandPose.init();
-        FactoryEvent.setItemComponent(Items.CAKE,DataComponents.MAX_STACK_SIZE,64);
-        FactoryEvent.registerCommands((dispatcher,context,selection)->{
-            TipCommand.register(dispatcher,context,selection);
-        });
+        FactoryEvent.setItemComponent(Items.CAKE, DataComponents.MAX_STACK_SIZE, 64);
+        FactoryEvent.registerCommands(TipCommand::register);
         FactoryEvent.setup(Legacy4J::setup);
         FactoryEvent.tagsLoaded(Legacy4J::tagsLoaded);
         FactoryEvent.serverStarted(Legacy4J::onServerStart);
@@ -136,11 +134,11 @@ public class Legacy4J {
         FactoryEvent.PlayerEvent.RELOAD_RESOURCES_EVENT.register(Legacy4J::onResourcesReload);
     }
 
-    public static ResourceLocation createModLocation(String path){
-        return FactoryAPI.createLocation(MOD_ID,path);
+    public static ResourceLocation createModLocation(String path) {
+        return FactoryAPI.createLocation(MOD_ID, path);
     }
 
-    public static void setup(){
+    public static void setup() {
         LegacyCommonOptions.COMMON_STORAGE.load();
         CommonRecipeManager.addRecipeTypeToSync(RecipeType.CRAFTING);
         CommonRecipeManager.addRecipeTypeToSync(RecipeType.STONECUTTING);
@@ -148,7 +146,7 @@ public class Legacy4J {
         LegacyBlockBehaviors.setup();
     }
 
-    public static boolean isChunkPosVisibleInSquare(int centerX, int centerZ, int viewDistance, int x, int z, boolean offset){
+    public static boolean isChunkPosVisibleInSquare(int centerX, int centerZ, int viewDistance, int x, int z, boolean offset) {
         int n = Math.max(0, Math.abs(x - centerX) - 1);
         int o = Math.max(0, Math.abs(z - centerZ) - 1);
         long p = Math.max(0, Math.max(n, o) - (offset ? 1 : 0));
@@ -156,12 +154,12 @@ public class Legacy4J {
         return Math.max(p, q) < viewDistance;
     }
 
-    public static void tagsLoaded(){
+    public static void tagsLoaded() {
         LegacyBlockBehaviors.registerDyedWaterCauldronInteraction(CauldronInteraction.WATER.map());
     }
 
-    public static Vec3 getRelativeMovement(LivingEntity entity, float f, Vec3 vec3, int relRot){
-        vec3 = getNormal(vec3,Math.toRadians(relRot));
+    public static Vec3 getRelativeMovement(LivingEntity entity, float f, Vec3 vec3, int relRot) {
+        vec3 = getNormal(vec3, Math.toRadians(relRot));
         double d = vec3.lengthSqr();
         if (d < 1.0E-7) {
             return Vec3.ZERO;
@@ -174,12 +172,12 @@ public class Legacy4J {
         }
     }
 
-    public static Vec3 getNormal(Vec3 vec3, double relRot){
+    public static Vec3 getNormal(Vec3 vec3, double relRot) {
         if (relRot == 0) return vec3;
         double angleRad = Math.atan2(vec3.z, vec3.x);
         double quantizedAngle = Math.round(angleRad / relRot) * relRot;
         double length = vec3.length();
-        return new Vec3(length*Math.cos(quantizedAngle), vec3.y,length*Math.sin(quantizedAngle));
+        return new Vec3(length * Math.cos(quantizedAngle), vec3.y, length * Math.sin(quantizedAngle));
     }
 
     public static void onServerPlayerJoin(ServerPlayer p) {
@@ -187,48 +185,47 @@ public class Legacy4J {
         if (server == null) return;
         int pos = 0;
         boolean b = true;
-        main : while (b) {
+        main:
+        while (b) {
             b = false;
             for (ServerPlayer player : server.getPlayerList().getPlayers())
-                if (player != p && ((LegacyPlayerInfo)player).getIdentifierIndex() == pos){
+                if (player != p && ((LegacyPlayerInfo) player).getIdentifierIndex() == pos) {
                     pos++;
                     b = true;
                     continue main;
                 }
         }
-        ((LegacyPlayerInfo)p).setIdentifierIndex(pos);
-        CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers().stream().filter(sp-> sp != p).collect(Collectors.toSet()), new PlayerInfoSync.All(Map.of(p.getUUID(),(LegacyPlayerInfo)p), Collections.emptyMap(), server.getDefaultGameType(),PlayerInfoSync.All.ID_S2C));
+        ((LegacyPlayerInfo) p).setIdentifierIndex(pos);
+        CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers().stream().filter(sp -> sp != p).collect(Collectors.toSet()), new PlayerInfoSync.All(Map.of(p.getUUID(), (LegacyPlayerInfo) p), Collections.emptyMap(), server.getDefaultGameType(), PlayerInfoSync.All.ID_S2C));
 
         CommonNetwork.sendToPlayer(p, PlayerInfoSync.All.fromPlayerList(server), true);
-        playerInitialPayloads.forEach(payload->CommonNetwork.sendToPlayer(p, payload, true));
+        playerInitialPayloads.forEach(payload -> CommonNetwork.sendToPlayer(p, payload, true));
 
         if (!FactoryAPIPlatform.getEntityServer(p).isDedicatedServer()) Legacy4JClient.serverPlayerJoin(p);
     }
 
-    public static void onServerStart(MinecraftServer server){
+    public static void onServerStart(MinecraftServer server) {
         playerInitialPayloads = createPlayerInitialPayloads(server);
         LegacyWorldOptions.WORLD_STORAGE.withServerFile(server, "legacy_data.json").resetAndLoad();
     }
 
-    public static void onResourcesReload(PlayerList playerList){
+    public static void onResourcesReload(PlayerList playerList) {
         onServerStart(playerList.getServer());
-        playerInitialPayloads.forEach(payload->CommonNetwork.sendToPlayers(playerList.getPlayers(), payload));
+        playerInitialPayloads.forEach(payload -> CommonNetwork.sendToPlayers(playerList.getPlayers(), payload));
     }
 
-    public static Collection<CommonNetwork.Payload> createPlayerInitialPayloads(MinecraftServer server){
+    public static Collection<CommonNetwork.Payload> createPlayerInitialPayloads(MinecraftServer server) {
         HashSet<CommonNetwork.Payload> payloads = new HashSet<>();
         payloads.add(new ClientAdvancementsPayload(List.copyOf(server.getAdvancements().getAllAdvancements())));
         return payloads;
     }
 
-    public static void copySaveToDirectory(InputStream stream, File directory){
+    public static void copySaveToDirectory(InputStream stream, File directory) {
         if (directory.exists()) FileUtils.deleteQuietly(directory);
-        try (ZipInputStream inputStream = new ZipInputStream(stream))
-        {
+        try (ZipInputStream inputStream = new ZipInputStream(stream)) {
             ZipEntry zipEntry;
             byte[] buffer = new byte[1024];
-            while ((zipEntry = inputStream.getNextEntry()) != null)
-            {
+            while ((zipEntry = inputStream.getNextEntry()) != null) {
                 File newFile = new File(directory, zipEntry.getName());
                 if (zipEntry.isDirectory()) {
                     if (!newFile.isDirectory() && !newFile.mkdirs()) {

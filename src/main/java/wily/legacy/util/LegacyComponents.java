@@ -178,21 +178,33 @@ public class LegacyComponents {
     public static final Component PEACEFUL_SPAWN_TIP = Component.translatable("item.minecraft.spawn_egg.peaceful.tip");
     public static final Component HOST_PRIVILEGES = Component.translatable("legacy.menu.hostPrivileges");
     public static final Component HOST_PRIVILEGES_INFO = Component.translatable("legacy.menu.hostPrivileges.info");
+    public static final Component ADD_SERVER = Component.translatable("manageServer.add.title");
+    public static final Component EDIT_SERVER = Component.translatable("manageServer.edit.title");
+    public static final Component ENTER_NAME = Component.translatable("manageServer.enterName");
+    public static final Component ENTER_IP = Component.translatable("manageServer.enterIp");
+    public static final Component INITIALIZING = Component.translatable("legacy.connect.initializing");
+    public static final Component LOADING_SPAWN_AREA = Component.translatable("legacy.loading_spawn_area");
+    public static final Component SPAWN_EGG_TIP = Component.translatable("item.minecraft.spawn_egg.tip");
+    public static final Component MAP_NAME = Component.translatable("legacy.container.mapName");
+    public static final Component RENAME_MAP = Component.translatable("legacy.container.renameMap");
+    public static final Component ZOOM_MAP = Component.translatable("legacy.container.zoomMap");
+    public static final Component COPY_MAP = Component.translatable("legacy.container.copyMap");
+    public static final Component LOCK_MAP = Component.translatable("legacy.container.lockMap");
 
-    public static Component optionName(String key){
-        return Component.translatable("legacy.options."+key);
+    public static Component optionName(String key) {
+        return Component.translatable("legacy.options." + key);
     }
 
-    public static Component getDimensionName(ResourceKey<Level> dimension){
+    public static Component getDimensionName(ResourceKey<Level> dimension) {
         String s = dimension.location().toLanguageKey("dimension");
         return Component.translatable(!FactoryAPI.isClient() || LegacyTipManager.hasTip(s) ? s : "dimension.minecraft");
     }
 
-    public static Component getEnteredDimensionMessage(Component name, ResourceKey<Level> dimension){
+    public static Component getEnteredDimensionMessage(Component name, ResourceKey<Level> dimension) {
         return Component.translatable("legacy.chat.entered_dimension", name, getDimensionName(dimension));
     }
 
-    public static Component getLeftDimensionMessage(Component name, ResourceKey<Level> dimension){
+    public static Component getLeftDimensionMessage(Component name, ResourceKey<Level> dimension) {
         return Component.translatable("legacy.chat.left_dimension", name, getDimensionName(dimension));
     }
 }

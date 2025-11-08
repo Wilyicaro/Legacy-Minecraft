@@ -36,12 +36,20 @@ import java.util.function.Consumer;
 
 @Mixin(GuiRenderer.class)
 public class GuiRendererMixin {
-    @Shadow @Final private MultiBufferSource.BufferSource bufferSource;
-    @Shadow @Final
+    @Shadow
+    @Final
     GuiRenderState renderState;
-    @Shadow private int frameNumber;
-    @Shadow @Final private SubmitNodeCollector submitNodeCollector;
-    @Shadow @Final private FeatureRenderDispatcher featureRenderDispatcher;
+    @Shadow
+    @Final
+    private MultiBufferSource.BufferSource bufferSource;
+    @Shadow
+    private int frameNumber;
+    @Shadow
+    @Final
+    private SubmitNodeCollector submitNodeCollector;
+    @Shadow
+    @Final
+    private FeatureRenderDispatcher featureRenderDispatcher;
     @Unique
     private Long2ObjectMap<LegacyGuiItemRenderer> guiItemRenderers = new Long2ObjectArrayMap<>();
     @Unique
@@ -79,7 +87,7 @@ public class GuiRendererMixin {
             Legacy4J.LOGGER.error("that can't be!");
             guiItemRenderers = new Long2ObjectArrayMap<>();
         }
-        guiItemRenderers.forEach((i, renderer)-> renderer.markInvalid());
+        guiItemRenderers.forEach((i, renderer) -> renderer.markInvalid());
     }
 
     @ModifyArg(method = "prepareItemElements", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiRenderState;forEachItem(Ljava/util/function/Consumer;)V"))
@@ -87,7 +95,8 @@ public class GuiRendererMixin {
         return renderState -> {
             LegacyGuiItemRenderState legacyRenderState = LegacyGuiItemRenderState.of(renderState);
             if (legacyRenderState.size() == 16 && legacyRenderState.opacity() == 1.0) consumer.accept(renderState);
-            else guiItemRenderers.computeIfAbsent(((long) legacyRenderState.size() << 32) | (Float.floatToIntBits(LegacyOptions.enhancedItemTranslucency.get() ? 1.0f : legacyRenderState.opacity()) & 4294967295L), LegacyGuiItemRenderer::new).markValid();
+            else
+                guiItemRenderers.computeIfAbsent(((long) legacyRenderState.size() << 32) | (Float.floatToIntBits(LegacyOptions.enhancedItemTranslucency.get() ? 1.0f : legacyRenderState.opacity()) & 4294967295L), LegacyGuiItemRenderer::new).markValid();
         };
     }
 
@@ -95,7 +104,8 @@ public class GuiRendererMixin {
     private void prepareItemElements(CallbackInfo ci) {
         for (ObjectIterator<LegacyGuiItemRenderer> iter = guiItemRenderers.values().iterator(); iter.hasNext(); ) {
             var renderer = iter.next();
-            if (renderer.isValid()) renderer.prepareItemElements(featureRenderDispatcher, submitNodeCollector, bufferSource, renderState, frameNumber);
+            if (renderer.isValid())
+                renderer.prepareItemElements(featureRenderDispatcher, submitNodeCollector, bufferSource, renderState, frameNumber);
             else {
                 renderer.close();
                 iter.remove();
@@ -105,7 +115,7 @@ public class GuiRendererMixin {
 
     @Inject(method = "close", at = @At("RETURN"), remap = false)
     private void close(CallbackInfo ci) {
-        guiItemRenderers.forEach((i, renderer)-> renderer.close());
+        guiItemRenderers.forEach((i, renderer) -> renderer.close());
         guiEntityRenderers.forEach(PictureInPictureRenderer::close);
     }
 
@@ -124,7 +134,7 @@ public class GuiRendererMixin {
             guiEntityRenderer.prepare((GuiEntityRenderState) arg, this.renderState, i);
             //? if neoforge {
             /*cir.setReturnValue(true);
-            *///?} else {
+             *///?} else {
             ci.cancel();
             //?}
         }

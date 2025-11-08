@@ -29,40 +29,50 @@ import wily.legacy.util.LegacySprites;
 
 @Mixin(EditBox.class)
 public abstract class EditBoxMixin extends AbstractWidget implements ControlTooltip.ActionHolder {
-    @Shadow private long focusedTime;
+    @Shadow
+    private long focusedTime;
 
-    @Shadow private int cursorPos;
+    @Shadow
+    private int cursorPos;
 
-    @Shadow private int displayPos;
+    @Shadow
+    private int displayPos;
 
-    @Shadow @Final private Font font;
+    @Shadow
+    @Final
+    private Font font;
 
-    @Shadow private String value;
-
-    @Shadow public abstract int getInnerWidth();
-
-    @Shadow private int textColor;
-
-    @Shadow public abstract boolean isBordered();
-
-    @Redirect(method = "<init>(Lnet/minecraft/client/gui/Font;IIIILnet/minecraft/client/gui/components/EditBox;Lnet/minecraft/network/chat/Component;)V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/components/EditBox;textColor:I", opcode = Opcodes.PUTFIELD))
-    private void init(EditBox instance, int value){
-        textColor = CommonColor.WIDGET_TEXT.get();
-    }
+    @Shadow
+    private String value;
+    @Shadow
+    private int textColor;
 
     public EditBoxMixin(int i, int j, int k, int l, Component component) {
         super(i, j, k, l, component);
     }
+
+    @Shadow
+    public abstract int getInnerWidth();
+
+    @Shadow
+    public abstract boolean isBordered();
+
+    @Redirect(method = "<init>(Lnet/minecraft/client/gui/Font;IIIILnet/minecraft/client/gui/components/EditBox;Lnet/minecraft/network/chat/Component;)V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/components/EditBox;textColor:I", opcode = Opcodes.PUTFIELD))
+    private void init(EditBox instance, int value) {
+        textColor = CommonColor.WIDGET_TEXT.get();
+    }
+
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-    private void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir){
+    private void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
         Screen screen = Minecraft.getInstance().screen;
-        if (KeyboardScreen.isOpenKey(keyEvent.key()) && screen != null){
-            Minecraft.getInstance().setScreen(KeyboardScreen.fromStaticListener(this,screen));
+        if (KeyboardScreen.isOpenKey(keyEvent.key()) && screen != null) {
+            Minecraft.getInstance().setScreen(KeyboardScreen.fromStaticListener(this, screen));
             cir.setReturnValue(true);
         }
     }
+
     @Inject(method = "onClick", at = @At("HEAD"), cancellable = true)
-    private void onClick(MouseButtonEvent event, boolean bl, CallbackInfo ci){
+    private void onClick(MouseButtonEvent event, boolean bl, CallbackInfo ci) {
         Screen screen = Minecraft.getInstance().screen;
         if (event.hasShiftDown() || Legacy4JClient.controllerManager.isControllerTheLastInput()) {
             Minecraft.getInstance().setScreen(KeyboardScreen.fromStaticListener(this, screen));
@@ -71,7 +81,7 @@ public abstract class EditBoxMixin extends AbstractWidget implements ControlTool
     }
 
     @Redirect(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/EditBox;isBordered()Z"))
-    private boolean renderWidget(EditBox instance, GuiGraphics guiGraphics){
+    private boolean renderWidget(EditBox instance, GuiGraphics guiGraphics) {
         if (isBordered()) {
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TEXT_FIELD, getX(), getY(), getWidth(), getHeight());
             if (isHoveredOrFocused())
@@ -90,9 +100,9 @@ public abstract class EditBoxMixin extends AbstractWidget implements ControlTool
     @WrapOperation(method = "renderWidget", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Ljava/lang/String;IIIZ)V", ordinal = 1))
     public void renderWidget(GuiGraphics instance, Font arg, String string, int i, int j, int k, boolean bl, Operation<Void> original) {
         instance.pose().pushMatrix();
-        instance.pose().translate(i-(cursorPos == 0 ? 3 : 4),j+ 8.5f);
-        instance.pose().scale(6,1.5f);
-        instance.fill(0,0,1,1, k);
+        instance.pose().translate(i - (cursorPos == 0 ? 3 : 4), j + 8.5f);
+        instance.pose().scale(6, 1.5f);
+        instance.fill(0, 0, 1, 1, k);
         instance.pose().popMatrix();
     }
 

@@ -8,10 +8,12 @@ import java.util.stream.Stream;
 
 public class ImpossibleIngredient extends Ingredient {
     private final ItemStack[] stacks;
+
     public ImpossibleIngredient(ItemStack stack) {
         super(/*? if <1.21.2 {*//*Stream.empty()*//*?} else {*/HolderSet.direct(stack.getItemHolder())/*?}*/);
         stacks = new ItemStack[]{stack};
     }
+
     //? if <1.21.2 {
     /*@Override
     public boolean isEmpty() {

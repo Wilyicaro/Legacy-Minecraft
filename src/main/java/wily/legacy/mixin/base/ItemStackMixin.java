@@ -38,20 +38,22 @@ public abstract class ItemStackMixin implements DataComponentHolder {
         return (ItemStack) (Object) this;
     }
 
-    @ModifyArg(method = "getStyledHoverName",at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = /*? if neoforge {*/ /*0*//*?} else {*/1/*?}*/))
+    @ModifyArg(method = "getStyledHoverName", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/MutableComponent;withStyle(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/MutableComponent;", ordinal = /*? if neoforge {*/ /*0*//*?} else {*/1/*?}*/))
     public ChatFormatting getStyledHoverName(ChatFormatting arg) {
         return ChatFormatting.GOLD;
     }
 
-    @Shadow public abstract void forEachModifier(EquipmentSlotGroup arg, TriConsumer<Holder<Attribute>, AttributeModifier, ItemAttributeModifiers.Display> triConsumer);
+    @Shadow
+    public abstract void forEachModifier(EquipmentSlotGroup arg, TriConsumer<Holder<Attribute>, AttributeModifier, ItemAttributeModifiers.Display> triConsumer);
 
     @Redirect(method = "addAttributeTooltips", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;forEachModifier(Lnet/minecraft/world/entity/EquipmentSlotGroup;Lorg/apache/commons/lang3/function/TriConsumer;)V"))
     private void addAttributeTooltips(ItemStack instance, EquipmentSlotGroup equipmentSlotGroup, TriConsumer<Holder<Attribute>, AttributeModifier, ItemAttributeModifiers.Display> arg, Consumer<Component> consumer/*? if >=1.21.5 {*/, TooltipDisplay tooltipDisplay/*?}*/, @Nullable Player player) {
         Bearer<Boolean> noSpace = Bearer.of(true);
-        forEachModifier(equipmentSlotGroup, (holder, attributeModifier, display)->{
-            if (noSpace.get()){
+        forEachModifier(equipmentSlotGroup, (holder, attributeModifier, display) -> {
+            if (noSpace.get()) {
                 consumer.accept(CommonComponents.EMPTY);
-                if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat)) consumer.accept(Component.translatable("item.modifiers." + equipmentSlotGroup.getSerializedName()).withStyle(ChatFormatting.GRAY));
+                if (!FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacyCombat))
+                    consumer.accept(Component.translatable("item.modifiers." + equipmentSlotGroup.getSerializedName()).withStyle(ChatFormatting.GRAY));
                 noSpace.set(false);
             }
             display.apply(consumer, player, holder, attributeModifier);

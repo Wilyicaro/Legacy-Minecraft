@@ -17,37 +17,35 @@ import java.util.Optional;
 public class ClientBiomeMixin {
 
     @Unique
-    private Biome self(){
+    private Biome self() {
         return (Biome) (Object) this;
     }
 
     @Unique
-    private LegacyBiomeOverride biomeOverride(){
+    private LegacyBiomeOverride biomeOverride() {
         ClientPacketListener l = Minecraft.getInstance().getConnection();
         return LegacyBiomeOverride.getOrDefault(l != null ? l.registryAccess()./*? if <1.21.2 {*//*registryOrThrow*//*?} else {*/lookupOrThrow/*?}*/(Registries.BIOME).getResourceKey(self()) : Optional.empty());
     }
 
     @Inject(method = "getWaterColor", at = @At("HEAD"), cancellable = true)
-    private void getWaterColor(CallbackInfoReturnable<Integer> cir){
-        LegacyBiomeOverride o = biomeOverride();
-        if (o.waterColor() != null) cir.setReturnValue(o.waterColor());
+    private void getWaterColor(CallbackInfoReturnable<Integer> cir) {
+        biomeOverride().waterColor().ifPresent(cir::setReturnValue);
     }
 
     @Inject(method = "getWaterFogColor", at = @At("HEAD"), cancellable = true)
-    private void getWaterFogColor(CallbackInfoReturnable<Integer> cir){
+    private void getWaterFogColor(CallbackInfoReturnable<Integer> cir) {
         LegacyBiomeOverride o = biomeOverride();
-        if (o.waterFogColor() != null || o.waterColor() != null) cir.setReturnValue(o.waterFogColor() == null ? o.waterColor() : o.waterFogColor());
+        if (o.waterFogColor().isPresent() || o.waterColor().isPresent())
+            cir.setReturnValue(o.waterFogColor().isEmpty() ? o.waterColor().get() : o.waterFogColor().get());
     }
 
     @Inject(method = "getFogColor", at = @At("HEAD"), cancellable = true)
-    private void getFogColor(CallbackInfoReturnable<Integer> cir){
-        LegacyBiomeOverride o = biomeOverride();
-        if (o.fogColor() != null) cir.setReturnValue(o.fogColor());
+    private void getFogColor(CallbackInfoReturnable<Integer> cir) {
+        biomeOverride().fogColor().ifPresent(cir::setReturnValue);
     }
 
     @Inject(method = "getSkyColor", at = @At("HEAD"), cancellable = true)
-    private void getSkyColor(CallbackInfoReturnable<Integer> cir){
-        LegacyBiomeOverride o = biomeOverride();
-        if (o.skyColor() != null) cir.setReturnValue(o.skyColor());
+    private void getSkyColor(CallbackInfoReturnable<Integer> cir) {
+        biomeOverride().skyColor().ifPresent(cir::setReturnValue);
     }
 }

@@ -2,7 +2,13 @@
   {
     "id": "legacy:building_blocks",
     "name": {"translate": "legacy.container.tab.building_blocks"},
-    "icon": "legacy:icon/structures",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/structures",
+        "sd": "legacy:icon/structures_small"
+      }
+    },
     "listing": [
       "minecraft:stone", "minecraft:deepslate", "minecraft:basalt", "minecraft:blackstone", "minecraft:grass_block", "minecraft:dirt_path", "minecraft:dirt", "minecraft:farmland", "minecraft:cobblestone", "minecraft:cobbled_deepslate", "minecraft:smooth_stone",
       "minecraft:polished_deepslate", "minecraft:smooth_basalt", "minecraft:polished_basalt", "minecraft:polished_blackstone", "minecraft:sand", "minecraft:sandstone", "minecraft:smooth_sandstone", "minecraft:chiseled_sandstone", "minecraft:cut_sandstone", "minecraft:red_sand",
@@ -48,13 +54,19 @@
   {
     "id": "legacy:decoration",
     "name": {"translate": "legacy.container.tab.decoration"},
-    "icon": "legacy:icon/decoration",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/decoration",
+        "sd": "legacy:icon/decoration_small"
+      }
+    },
     "listing": [
       "minecraft:skeleton_skull", "minecraft:wither_skeleton_skull", "minecraft:zombie_head", "minecraft:player_head", "minecraft:creeper_head", "minecraft:piglin_head", "minecraft:dragon_head", "minecraft:sponge", "minecraft:wet_sponge", "minecraft:melon",
       "minecraft:pumpkin", "minecraft:carved_pumpkin", "minecraft:jack_o_lantern", "minecraft:bamboo", "minecraft:oak_sapling", "minecraft:spruce_sapling", "minecraft:birch_sapling", "minecraft:jungle_sapling", "minecraft:acacia_sapling", "minecraft:dark_oak_sapling",
       "minecraft:cherry_sapling", "minecraft:mangrove_propagule", "pale_oak_sapling", "minecraft:oak_leaves", "minecraft:spruce_leaves", "minecraft:birch_leaves", "minecraft:jungle_leaves", "minecraft:acacia_leaves", "minecraft:dark_oak_leaves", "minecraft:cherry_leaves", "minecraft:mangrove_leaves", "pale_oak_leaves",
       "minecraft:azalea_leaves", "minecraft:flowering_azalea_leaves", "minecraft:azalea", "minecraft:flowering_azalea", "minecraft:moss_block", "pale_moss_block", "minecraft:moss_carpet", "minecraft:pale_moss_carpet", "minecraft:spore_blossom", "minecraft:big_dripleaf", "minecraft:small_dripleaf", "minecraft:hanging_roots", "minecraft:pale_hanging_moss",
-      "minecraft:glow_lichen", "minecraft:vine", "minecraft:lily_pad", "minecraft:torch", "minecraft:soul_torch", "minecraft:lantern", "minecraft:soul_lantern", "minecraft:copper_lantern", "minecraft:exposed_copper_lantern", "minecraft:weathered_copper_lantern", "minecraft:oxidized_copper_lantern", "minecraft:waxed_copper_lantern", "minecraft:waxed_exposed_copper_lantern",
+      "minecraft:glow_lichen", "minecraft:vine", "minecraft:lily_pad", "minecraft:torch", "minecraft:soul_torch", "minecraft:copper_torch", "minecraft:lantern", "minecraft:soul_lantern", "minecraft:copper_lantern", "minecraft:exposed_copper_lantern", "minecraft:weathered_copper_lantern", "minecraft:oxidized_copper_lantern", "minecraft:waxed_copper_lantern", "minecraft:waxed_exposed_copper_lantern",
       "minecraft:waxed_weathered_copper_lantern", "minecraft:waxed_oxidized_copper_lantern", "minecraft:short_grass", "minecraft:fern", "minecraft:bush", "minecraft:firefly_bush", "minecraft:short_dry_grass", "minecraft:wildflowers", "minecraft:tall_dry_grass", "minecraft:dead_bush", "minecraft:leaf_litter", "minecraft:flower_pot",
       "minecraft:dandelion", "minecraft:poppy", "minecraft:blue_orchid", "minecraft:allium", "minecraft:azure_bluet", "minecraft:red_tulip", "minecraft:orange_tulip", "minecraft:white_tulip", "minecraft:pink_tulip", "minecraft:oxeye_daisy",
       "minecraft:cornflower", "minecraft:lily_of_the_valley", "minecraft:sunflower", "minecraft:lilac", "legacy:shrub" ,"minecraft:tall_grass", "minecraft:large_fern", "minecraft:rose_bush", "minecraft:peony", "minecraft:pink_petals", "minecraft:torchflower",
@@ -91,7 +103,13 @@
   {
     "id": "legacy:redstone_and_transport",
     "name": {"translate": "legacy.container.tab.redstone_and_transport"},
-    "icon": "legacy:icon/redstone_and_transport",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/redstone_and_transport",
+        "sd": "legacy:icon/redstone_and_transport_small"
+      }
+    },
     "listing": [
       "minecraft:rail", "minecraft:powered_rail", "minecraft:detector_rail", "minecraft:activator_rail", "minecraft:ladder", "minecraft:minecart", "minecraft:chest_minecart", "minecraft:furnace_minecart", "minecraft:hopper_minecart", "minecraft:tnt_minecart",
       "minecraft:elytra", "minecraft:saddle", "minecraft:black_harness", "minecraft:blue_harness", "minecraft:light_blue_harness", "minecraft:cyan_harness", "minecraft:green_harness", "minecraft:lime_harness", "minecraft:pink_harness", "minecraft:magenta_harness", "minecraft:purple_harness", "minecraft:red_harness",
@@ -108,13 +126,19 @@
   {
     "id": "legacy:materials",
     "name": {"translate": "legacy.container.tab.materials"},
-    "icon": "legacy:icon/materials",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/materials",
+        "sd": "legacy:icon/materials_small"
+      }
+    },
     "listing": [
       "minecraft:coal", "minecraft:charcoal", "minecraft:diamond", "minecraft:emerald", "minecraft:raw_copper", "minecraft:copper_ingot", "minecraft:raw_iron", "minecraft:iron_ingot", "minecraft:raw_gold", "minecraft:gold_ingot",
       "minecraft:netherite_scrap", "minecraft:netherite_ingot", "minecraft:quartz", "minecraft:amethyst_shard", "minecraft:disc_fragment_5", "minecraft:echo_shard", "minecraft:brick", "minecraft:nether_brick", "minecraft:resin_brick", "minecraft:stick", "minecraft:bowl",
       "minecraft:bone", "minecraft:string", "minecraft:feather", "minecraft:flint", "minecraft:leather", "minecraft:rabbit_hide", "minecraft:gunpowder", "minecraft:clay_ball", "minecraft:glowstone_dust", "minecraft:prismarine_crystals",
       "minecraft:prismarine_shard", "minecraft:nautilus_shell", "minecraft:heart_of_the_sea", "minecraft:resin_clump", "minecraft:wheat_seeds", "minecraft:melon_seeds", "minecraft:pumpkin_seeds", "minecraft:beetroot_seeds", "minecraft:torchflower_seeds", "minecraft:pitcher_pod", "minecraft:wheat",
-      "minecraft:sugar_cane", "minecraft:egg", "minecraft:blue_egg", "minecraft:brown_egg", "minecraft:sugar", "minecraft:slime_ball", "minecraft:blaze_rod", "minecraft:breeze_rod", "minecraft:heavy_core", "minecraft:gold_nugget", "minecraft:iron_nugget", "minecraft:shulker_shell", "minecraft:nether_wart", "minecraft:popped_chorus_fruit",
+      "minecraft:sugar_cane", "minecraft:egg", "minecraft:blue_egg", "minecraft:brown_egg", "minecraft:sugar", "minecraft:slime_ball", "minecraft:blaze_rod", "minecraft:breeze_rod", "minecraft:heavy_core", "minecraft:gold_nugget", "minecraft:iron_nugget", "minecraft:copper_nugget", "minecraft:shulker_shell", "minecraft:nether_wart", "minecraft:popped_chorus_fruit",
       "minecraft:turtle_scute", "minecraft:armadillo_scute", "minecraft:glow_ink_sac", "minecraft:ink_sac", "minecraft:lapis_lazuli", "minecraft:honeycomb", "minecraft:angler_pottery_sherd", "minecraft:archer_pottery_sherd", "minecraft:arms_up_pottery_sherd", "minecraft:blade_pottery_sherd", "minecraft:brewer_pottery_sherd",
       "minecraft:burn_pottery_sherd", "minecraft:danger_pottery_sherd", "minecraft:flow_pottery_sherd", "minecraft:explorer_pottery_sherd", "minecraft:friend_pottery_sherd", "minecraft:guster_pottery_sherd", "minecraft:heart_pottery_sherd", "minecraft:heartbreak_pottery_sherd", "minecraft:howl_pottery_sherd", "minecraft:miner_pottery_sherd", "minecraft:mourner_pottery_sherd", "minecraft:plenty_pottery_sherd",
       "minecraft:prize_pottery_sherd", "minecraft:scrape_pottery_sherd", "minecraft:sheaf_pottery_sherd", "minecraft:shelter_pottery_sherd", "minecraft:skull_pottery_sherd", "minecraft:snort_pottery_sherd", "minecraft:light_blue_dye", "minecraft:cyan_dye", "minecraft:green_dye", "minecraft:lime_dye", "minecraft:pink_dye",
@@ -124,7 +148,13 @@
   {
     "id": "legacy:food",
     "name": {"translate": "legacy.container.tab.food"},
-    "icon": "legacy:icon/food",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/food",
+        "sd": "legacy:icon/food_small"
+      }
+    },
     "listing": [
       "minecraft:apple", "minecraft:golden_apple", "minecraft:enchanted_golden_apple", "minecraft:melon_slice", "minecraft:mushroom_stew", "minecraft:rabbit_stew", "minecraft:beetroot_soup", "minecraft:bread", "minecraft:cake", "minecraft:cookie",
       "minecraft:cooked_cod", "minecraft:cod", "minecraft:cooked_salmon", "minecraft:salmon", "minecraft:tropical_fish", "minecraft:pufferfish", "minecraft:cooked_porkchop", "minecraft:porkchop", "minecraft:cooked_beef", "minecraft:beef",
@@ -135,7 +165,13 @@
   {
     "id": "legacy:tools_and_armour",
     "name": {"translate": "legacy.container.tab.tools_and_armour"},
-    "icon": "legacy:icon/tools",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/tools",
+        "sd": "legacy:icon/tools_small"
+      }
+    },
     "listing": [
       "minecraft:compass", "minecraft:leather_helmet", "minecraft:leather_chestplate", "minecraft:leather_leggings", "minecraft:leather_boots", "minecraft:wooden_sword", "minecraft:wooden_shovel", "minecraft:wooden_pickaxe", "minecraft:wooden_axe", "minecraft:wooden_hoe",
       "minecraft:map", "minecraft:chainmail_helmet", "minecraft:chainmail_chestplate", "minecraft:chainmail_leggings", "minecraft:chainmail_boots", "minecraft:stone_sword", "minecraft:stone_shovel", "minecraft:stone_pickaxe", "minecraft:stone_axe", "minecraft:stone_hoe",
@@ -161,7 +197,13 @@
   {
     "id": "legacy:brewing",
     "name": {"translate": "legacy.container.tab.brewing"},
-    "icon": "legacy:icon/brewing",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/brewing",
+        "sd": "legacy:icon/brewing_small"
+      }
+    },
     "listing": [
       "minecraft:experience_bottle", "minecraft:dragon_breath", "minecraft:ghast_tear", "minecraft:fermented_spider_eye", "minecraft:blaze_powder", "minecraft:magma_cream", "minecraft:glistering_melon_slice", "minecraft:rabbit_foot", "minecraft:phantom_membrane", "minecraft:glass_bottle", "minecraft:ominous_bottle",
       {"item": "minecraft:ominous_bottle", "components": {"minecraft:ominous_bottle_amplifier": 1}}, {"item": "minecraft:ominous_bottle", "components": {"minecraft:ominous_bottle_amplifier": 2}}, {"item": "minecraft:ominous_bottle", "components": {"minecraft:ominous_bottle_amplifier": 3}}, {"item": "minecraft:ominous_bottle", "components": {"minecraft:ominous_bottle_amplifier": 4}}, {"item": "minecraft:potion", "components": {"minecraft:potion_contents":{"potion": "minecraft:water"}}}, {"item": "minecraft:potion", "components": {"minecraft:potion_contents":{"potion": "minecraft:awkward"}}}, {"item": "minecraft:potion", "components": {"minecraft:potion_contents":{"potion": "minecraft:night_vision"}}}, {"item": "minecraft:potion", "components": {"minecraft:potion_contents":{"potion": "minecraft:invisibility"}}}, {"item": "minecraft:potion", "components": {"minecraft:potion_contents":{"potion": "minecraft:leaping"}}},
@@ -182,7 +224,13 @@
   {
     "id": "legacy:misc",
     "name": {"translate": "legacy.container.tab.misc"},
-    "icon": "legacy:icon/misc",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/misc",
+        "sd": "legacy:icon/misc_small"
+      }
+    },
     "listing": [
       "minecraft:chest", "minecraft:ender_chest", "minecraft:copper_chest", "minecraft:exposed_copper_chest", "minecraft:weathered_copper_chest", "minecraft:oxidized_copper_chest", "minecraft:waxed_copper_chest", "minecraft:waxed_exposed_copper_chest", "minecraft:waxed_weathered_copper_chest", "minecraft:waxed_oxidized_copper_chest", "minecraft:crafting_table", "minecraft:furnace", "minecraft:brewing_stand", "minecraft:enchanting_table", "minecraft:beacon", "minecraft:conduit", "minecraft:barrel", "minecraft:cartography_table",
       "minecraft:loom", "minecraft:lectern", "minecraft:blast_furnace", "minecraft:smoker", "minecraft:campfire", "minecraft:soul_campfire", "minecraft:composter", "minecraft:grindstone", "minecraft:stonecutter", "minecraft:fletching_table",
@@ -205,7 +253,18 @@
       "minecraft:hoglin_spawn_egg", "minecraft:piglin_spawn_egg", "minecraft:piglin_brute_spawn_egg", "minecraft:strider_spawn_egg", "minecraft:warden_spawn_egg", "minecraft:creaking_spawn_egg", "minecraft:zoglin_spawn_egg", "minecraft:iron_golem_spawn_egg",
       "minecraft:snow_golem_spawn_egg", "minecraft:copper_golem_spawn_egg", "minecraft:dragon_egg", "minecraft:music_disc_13", "minecraft:music_disc_cat", "minecraft:music_disc_blocks", "minecraft:music_disc_chirp", "minecraft:music_disc_far", "minecraft:music_disc_mall", "minecraft:music_disc_mellohi", "minecraft:music_disc_stal",
       "minecraft:music_disc_strad", "minecraft:music_disc_ward", "minecraft:music_disc_11", "minecraft:music_disc_wait", "minecraft:music_disc_otherside", "minecraft:music_disc_5", "minecraft:music_disc_pigstep", "minecraft:music_disc_relic", "minecraft:music_disc_creator", "minecraft:music_disc_creator_music_box", "minecraft:music_disc_precipice", "minecraft:music_disc_tears", "minecraft:music_disc_lava_chicken",
-      {"item": "minecraft:firework_rocket", "components": {"fireworks":{"flight_duration":1,"explosions":[{"shape": "small_ball","twinkle":true,"colors":[6719955]}]}}}, {"item": "minecraft:firework_rocket", "components": {"fireworks":{"flight_duration":2,"explosions":[{"shape":"creeper","colors":[3887386]}]}}}, {"item": "minecraft:firework_rocket", "components": {"fireworks":{"flight_duration":2,"explosions":[{"shape":"burst","colors":[11743532],"fade_colors":[15435844]}]}}}, {"item": "minecraft:firework_rocket", "components": {"fireworks":{"flight_duration":3,"explosions":[{"shape":"burst","twinkle":true,"colors":[12801229],"fade_colors":[2437522]}]}}}, {"item": "minecraft:firework_rocket", "components": {"fireworks":{"flight_duration":2,"explosions":[{"shape":"star","trail":true,"colors":[14602026],"fade_colors":[15435844]}]}}}
+      {"item": "minecraft:firework_rocket", "components": {"fireworks":{"flight_duration":1,"explosions":[{"shape": "small_ball","has_twinkle":true,"colors":[6719955]}]}}}, {"item": "minecraft:firework_rocket", "components": {"fireworks":{"flight_duration":2,"explosions":[{"shape":"creeper","colors":[3887386]}]}}}, {"item": "minecraft:firework_rocket", "components": {"fireworks":{"flight_duration":2,"explosions":[{"shape":"burst","colors":[11743532],"fade_colors":[15435844]}]}}}, {"item": "minecraft:firework_rocket", "components": {"fireworks":{"flight_duration":3,"explosions":[{"shape":"burst","has_twinkle":true,"colors":[12801229],"fade_colors":[2437522]}]}}}, {"item": "minecraft:firework_rocket", "components": {"fireworks":{"flight_duration":2,"explosions":[{"shape":"star","has_trail":true,"colors":[14602026],"fade_colors":[15435844]}]}}}
     ]
+  },
+  {
+    "id": "legacy:search",
+    "name": {"translate": "itemGroup.search"},
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/search",
+        "sd": "legacy:icon/search_small"
+      }
+    }
   }
 ]

@@ -18,7 +18,7 @@ public class EntityRendererMixin {
     @WrapOperation(method = "submitNameTag", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitNameTag(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZIDLnet/minecraft/client/renderer/state/CameraRenderState;)V"))
     private void submitNameTag(SubmitNodeCollector instance, PoseStack poseStack, Vec3 vec3, int color, Component component, boolean b, int i, double v, CameraRenderState cameraRenderState, Operation<Void> original) {
         if (LegacyOptions.displayNameTagBorder.get()) {
-            ((LegacySubmitNodeCollector)instance).submitLegacyNameTag(poseStack, vec3, color, component, b, i, v, cameraRenderState, new float[] {0, 0, 0});
+            ((LegacySubmitNodeCollector) instance).submitLegacyNameTag(poseStack, vec3, color, component, b, i, v, cameraRenderState, new float[]{0, 0, 0});
         } else original.call(instance, poseStack, vec3, color, component, b, i, v, cameraRenderState);
     }
 }

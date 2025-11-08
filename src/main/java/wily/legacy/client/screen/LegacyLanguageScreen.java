@@ -16,11 +16,13 @@ import java.util.Locale;
 
 public class LegacyLanguageScreen extends PanelVListScreen {
     public static final Component WARNING_LABEL = Component.translatable("options.languageAccuracyWarning");
+    protected final Panel panelRecess;
     protected String selectedLang;
+
     public LegacyLanguageScreen(Screen parent, LanguageManager manager) {
-        super(parent, s->Panel.centered( s,255, 240,0,24), Component.translatable("controls.keybinds.title"));
+        super(parent, s -> Panel.centered(s, 255, 240, 0, 24), Component.translatable("controls.keybinds.title"));
         String autoCode = getSystemLanguageCode();
-        renderableVList.addRenderable(new AbstractButton(0,0,260,20,Component.translatable("legacy.menu.system_language")) {
+        renderableVList.addRenderable(new AbstractButton(0, 0, 260, 20, Component.translatable("legacy.menu.system_language")) {
             @Override
             protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                 super.renderWidget(guiGraphics, i, j, f);
@@ -31,12 +33,13 @@ public class LegacyLanguageScreen extends PanelVListScreen {
             public void onPress(InputWithModifiers input) {
                 selectedLang = autoCode;
             }
+
             @Override
             protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
                 defaultButtonNarrationText(narrationElementOutput);
             }
         });
-        manager.getLanguages().forEach(((s, languageInfo) -> renderableVList.addRenderable(new AbstractButton(0,0,260,20,languageInfo.toComponent()) {
+        manager.getLanguages().forEach(((s, languageInfo) -> renderableVList.addRenderable(new AbstractButton(0, 0, 260, 20, languageInfo.toComponent()) {
             @Override
             protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                 super.renderWidget(guiGraphics, i, j, f);
@@ -47,14 +50,16 @@ public class LegacyLanguageScreen extends PanelVListScreen {
             public void onPress(InputWithModifiers input) {
                 selectedLang = s;
             }
+
             @Override
             protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
                 defaultButtonNarrationText(narrationElementOutput);
             }
         })));
+        panelRecess = Panel.createPanel(this, p -> p.appearance(LegacySprites.PANEL_RECESS, panel.width - 12, panel.height - 34), p -> p.pos(panel.x + 6, panel.y + 24));
     }
 
-    public static String getSystemLanguageCode(){
+    public static String getSystemLanguageCode() {
         String auto = Locale.getDefault().toString().toLowerCase(Locale.ENGLISH);
         return Minecraft.getInstance().getLanguageManager().getLanguage(auto) != null ? auto : "en_us";
     }
@@ -71,11 +76,16 @@ public class LegacyLanguageScreen extends PanelVListScreen {
     }
 
     @Override
-    protected void init() {
-        panel.init();
-        addRenderableOnly(panel);
-        addRenderableOnly(((guiGraphics, i, j, f) -> FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 6, panel.y + 24, panel.width - 12, panel.height - 34)));
-        getRenderableVList().init(panel.x + 10,panel.y + 30,panel.width - 20,panel.height - 46);
-        addRenderableWidget(LegacyConfigWidgets.createWidget(LegacyOptions.of(minecraft.options.forceUnicodeFont()),panel.x + 10, panel.y + 10, panel.width - 20, v->{}));
+    protected void panelInit() {
+        super.panelInit();
+        panelRecess.init("panelRecess");
+        addRenderableOnly(panelRecess);
+        addRenderableWidget(LegacyConfigWidgets.createWidget(LegacyOptions.of(minecraft.options.forceUnicodeFont()), panel.x + 10, panel.y + 10, panel.width - 20, v -> {
+        }));
+    }
+
+    @Override
+    public void renderableVListInit() {
+        getRenderableVList().init(panel.x + 10, panel.y + 30, panel.width - 20, panel.height - 46);
     }
 }

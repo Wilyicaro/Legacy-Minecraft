@@ -29,47 +29,52 @@ import wily.legacy.util.LegacyComponents;
 import java.util.List;
 
 @Mixin(BookViewScreen.class)
-public abstract class BookViewScreenMixin extends Screen implements Controller.Event,ControlTooltip.Event {
+public abstract class BookViewScreenMixin extends Screen implements Controller.Event, ControlTooltip.Event {
 
-    @Shadow protected abstract void updateButtonVisibility();
-
-
-    @Shadow private PageButton forwardButton;
-    @Shadow private PageButton backButton;
-
-    @Shadow protected abstract void pageBack();
-
-    @Shadow protected abstract void pageForward();
-
-    @Shadow private Component pageMsg;
-
-    @Shadow protected abstract int getNumPages();
-
-    @Shadow private int currentPage;
-    @Shadow private int cachedPage;
-    @Shadow private List<FormattedCharSequence> cachedPageComponents;
-    @Shadow private BookViewScreen.BookAccess bookAccess;
-
-
-    @Shadow public abstract @Nullable Style getClickedComponentStyleAt(double d, double e);
-
+    @Shadow
+    private PageButton forwardButton;
+    @Shadow
+    private PageButton backButton;
+    @Shadow
+    private Component pageMsg;
+    @Shadow
+    private int currentPage;
+    @Shadow
+    private int cachedPage;
+    @Shadow
+    private List<FormattedCharSequence> cachedPageComponents;
+    @Shadow
+    private BookViewScreen.BookAccess bookAccess;
     @Unique
-    private BookPanel panel = new BookPanel(this);
+    private final BookPanel panel = new BookPanel(this);
+    protected BookViewScreenMixin(Component component) {
+        super(component);
+    }
+
+    @Shadow
+    protected abstract void updateButtonVisibility();
+
+    @Shadow
+    protected abstract void pageBack();
+
+    @Shadow
+    protected abstract void pageForward();
+
+    @Shadow
+    protected abstract int getNumPages();
+
+    @Shadow
+    public abstract @Nullable Style getClickedComponentStyleAt(double d, double e);
 
     @Override
     public void added() {
         super.added();
         ControlTooltip.Renderer.of(this)
-                .add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT) : ControllerBinding.LEFT_BUMPER.getIcon(), ()-> currentPage != 0 ? LegacyComponents.PREVIOUS_PAGE : null)
-                .add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT) : ControllerBinding.RIGHT_BUMPER.getIcon(), ()-> this.currentPage < this.getNumPages() - 1 ? LegacyComponents.NEXT_PAGE : null);
+                .add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT) : ControllerBinding.LEFT_BUMPER.getIcon(), () -> currentPage != 0 ? LegacyComponents.PREVIOUS_PAGE : null)
+                .add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT) : ControllerBinding.RIGHT_BUMPER.getIcon(), () -> this.currentPage < this.getNumPages() - 1 ? LegacyComponents.NEXT_PAGE : null);
     }
 
-
-    protected BookViewScreenMixin(Component component) {
-        super(component);
-    }
-
-    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
         panel.init();
@@ -88,7 +93,7 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
     //?}
 
 
-    @Inject(method = "render",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
         super.render(guiGraphics, i, j, f);
@@ -113,22 +118,22 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
 
     @Override
     public void bindingStateTick(BindingState state) {
-        if ((state.is(ControllerBinding.RIGHT_BUMPER) || state.is(ControllerBinding.LEFT_BUMPER)) && state.canClick()){
+        if ((state.is(ControllerBinding.RIGHT_BUMPER) || state.is(ControllerBinding.LEFT_BUMPER)) && state.canClick()) {
             (state.is(ControllerBinding.RIGHT_BUMPER) ? forwardButton : backButton).keyPressed(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
         }
     }
 
-    @Inject(method = "keyPressed",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     public void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
-        if (ControlType.getActiveType().isKbm() && (keyEvent.isRight() || keyEvent.isLeft())){
+        if (ControlType.getActiveType().isKbm() && (keyEvent.isRight() || keyEvent.isLeft())) {
             (keyEvent.isRight() ? forwardButton : backButton).keyPressed(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
             cir.setReturnValue(true);
             return;
         }
         cir.setReturnValue(super.keyPressed(keyEvent));
     }
-    
-    @Inject(method = "getClickedComponentStyleAt",at = @At("HEAD"), cancellable = true)
+
+    @Inject(method = "getClickedComponentStyleAt", at = @At("HEAD"), cancellable = true)
     public void getClickedComponentStyleAt(double d, double e, CallbackInfoReturnable<Style> cir) {
         if (this.cachedPageComponents.isEmpty()) {
             cir.setReturnValue(null);
@@ -151,6 +156,7 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         }
         cir.setReturnValue(null);
     }
+
     @Override
     public boolean isPauseScreen() {
         return false;

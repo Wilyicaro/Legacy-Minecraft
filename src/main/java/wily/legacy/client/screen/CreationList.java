@@ -22,34 +22,36 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.LegacyWorldTemplate;
 import wily.legacy.util.LegacyComponents;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.function.Consumer;
 
-public class CreationList extends RenderableVList{
+public class CreationList extends RenderableVList {
     protected final Minecraft minecraft;
 
     public CreationList(UIAccessor accessor) {
         super(accessor);
-        layoutSpacing(l->0);
+        layoutSpacing(l -> 0);
         minecraft = Minecraft.getInstance();
-        addIconButton(this, Legacy4J.createModLocation("creation_list/create_world"),Component.translatable("legacy.menu.create_world"), c-> CreateWorldScreen.openFresh(this.minecraft, () -> minecraft.setScreen(getScreen())));
-        LegacyWorldTemplate.list.forEach(t-> addIconButton(this,t.icon(),t.buttonMessage(), c-> {
-            if (t.isGamePath() && !Files.exists(t.getPath())){
-                minecraft.setScreen(ConfirmationScreen.createInfoScreen(getScreen(), LegacyComponents.MISSING_WORLD_TEMPLATE, Component.translatable("legacy.menu.missing_world_template_message",t.buttonMessage())));
+        addIconButton(this, Legacy4J.createModLocation("creation_list/create_world"), Component.translatable("legacy.menu.create_world"), c -> CreateWorldScreen.openFresh(this.minecraft, () -> minecraft.setScreen(getScreen())));
+        LegacyWorldTemplate.list.forEach(t -> addIconButton(this, t.icon(), t.buttonMessage(), c -> {
+            if (t.isGamePath() && !Files.exists(t.getPath())) {
+                minecraft.setScreen(ConfirmationScreen.createInfoScreen(getScreen(), LegacyComponents.MISSING_WORLD_TEMPLATE, Component.translatable("legacy.menu.missing_world_template_message", t.buttonMessage())));
                 return;
             }
-            try (LevelStorageSource.LevelStorageAccess access = LegacySaveCache.getLevelStorageSource().createAccess(LegacySaveCache.importSaveFile(t.open(), minecraft.getLevelSource()::levelExists, LegacySaveCache.getLevelStorageSource(),t.folderName()))) {
+            try (LevelStorageSource.LevelStorageAccess access = LegacySaveCache.getLevelStorageSource().createAccess(LegacySaveCache.importSaveFile(t.open(), minecraft.getLevelSource()::levelExists, LegacySaveCache.getLevelStorageSource(), t.folderName()))) {
                 LevelSummary summary = access.getSummary(/*? if >1.20.2 {*/access.getDataTag()/*?}*/);
                 access.close();
                 if (t.directJoin()) {
                     LoadSaveScreen.loadWorld(getScreen(), minecraft, LegacySaveCache.getLevelStorageSource(), summary);
-                } else minecraft.setScreen(new LoadSaveScreen(getScreen(),summary,access,t.isLocked()) {
+                } else minecraft.setScreen(new LoadSaveScreen(getScreen(), summary, access, t.isLocked()) {
                     @Override
                     public void onClose() {
-                        if (!LegacyOptions.saveCache.get()) FileUtils.deleteQuietly(access.getDimensionPath(Level.OVERWORLD).toFile());
+                        if (!LegacyOptions.saveCache.get())
+                            FileUtils.deleteQuietly(access.getDimensionPath(Level.OVERWORLD).toFile());
                         super.onClose();
                     }
                 });
@@ -59,41 +61,68 @@ public class CreationList extends RenderableVList{
         }));
     }
 
-    public static void addIconButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress){
-        addIconButton(list,iconSprite,message,onPress,null);
+    public static void addIconButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress) {
+        addIconButton(list, iconSprite, message, onPress, null);
     }
 
-    public static void addIconButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress, Tooltip tooltip){
+    public static void addIconButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress, Tooltip tooltip) {
         AbstractButton button;
-        list.addRenderable(button = new AbstractButton(0,0,270,30,message) {
+        list.addRenderable(button = new ContentButton(list, 0, 0, 270, 30, message) {
             @Override
-            protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                super.renderWidget(guiGraphics, i, j, f);
-                if (!list.accessor.getBoolean("allowButtonsWithIcons",true)) return;
-                FactoryScreenUtil.enableBlend();
-                FactoryGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + 5, getY() + 5, 20, 20);
-                FactoryScreenUtil.disableBlend();
-                if (Minecraft.getInstance().options.touchscreen().get().booleanValue() || isHovered) {
-                    guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
-                }
-            }
-
-            @Override
-            protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
+            public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + x, getY() + y, width, height);
             }
 
             @Override
             public void onPress(InputWithModifiers input) {
                 onPress.accept(this);
             }
-
-            @Override
-            protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-                defaultButtonNarrationText(narrationElementOutput);
-            }
         });
         button.setTooltip(tooltip);
     }
 
+
+    public static abstract class ContentButton extends AbstractButton {
+
+        protected final RenderableVList list;
+
+        public ContentButton(RenderableVList list, int x, int y, int width, int height, Component component) {
+            super(x, y, width, height, component);
+            this.list = list;
+        }
+
+        @Override
+        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+            super.renderWidget(guiGraphics, i, j, f);
+            if (list.accessor.getBoolean(list.name + ".buttonIcon.isVisible", true))
+                renderIcon(guiGraphics, i, j, f);
+        }
+
+        public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, float f) {
+            int iconWidth = list.accessor.getInteger(list.name + ".buttonIcon.width", 20);
+            int iconHeight = list.accessor.getInteger(list.name + ".buttonIcon.height", 20);
+            int iconPos = (height - iconHeight) / 2;
+            renderIcon(guiGraphics, mouseX, mouseY, iconPos, iconPos, iconWidth, iconHeight);
+            if (Minecraft.getInstance().options.touchscreen().get().booleanValue() || isHovered) {
+                renderIconHighlight(guiGraphics, mouseX, mouseY, iconPos, iconPos, iconWidth, iconHeight);
+            }
+        }
+
+        public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+        }
+
+        public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+            guiGraphics.fill(getX() + x, getY() + y, getX() + x + width, getY() + y + height, -1601138544);
+        }
+
+        @Override
+        protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
+            LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + list.accessor.getInteger(list.name + ".buttonMessage.xOffset", 35), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true));
+        }
+
+        @Override
+        protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
+            defaultButtonNarrationText(narrationElementOutput);
+        }
+    }
 }

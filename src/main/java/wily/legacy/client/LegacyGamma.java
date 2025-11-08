@@ -35,13 +35,10 @@ public class LegacyGamma implements AutoCloseable {
         RenderTarget target = Minecraft.getInstance().getMainRenderTarget();
         ProfilerFiller profilerFiller = Profiler.get();
         profilerFiller.push("legacyGamma");
-        RenderSystem.AutoStorageIndexBuffer autoStorageIndexBuffer = RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS);
-        GpuBuffer gpuBuffer2 = autoStorageIndexBuffer.getBuffer(6);
         try (RenderPass renderPass = commandEncoder.createRenderPass(() -> "Display Legacy Gamma", target.getColorTextureView(), OptionalInt.empty(), target.useDepth ? target.getDepthTextureView() : null, OptionalDouble.empty())) {
             renderPass.setPipeline(LegacyRenderPipelines.GAMMA);
             RenderSystem.bindDefaultUniforms(renderPass);
             renderPass.setUniform("GammaInfo", this.ubo.currentBuffer());
-            renderPass.setIndexBuffer(gpuBuffer2, autoStorageIndexBuffer.type());
             renderPass.bindSampler("InSampler", target.getColorTextureView());
             renderPass.draw(0, 3);
         }

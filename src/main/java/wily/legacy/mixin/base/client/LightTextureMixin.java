@@ -8,7 +8,7 @@ import com.mojang.blaze3d.buffers.Std140SizeCalculator;
 import com.mojang.blaze3d.systems.RenderPass;
 //?} else if >=1.21.2 {
 /*import net.minecraft.client.renderer.CompiledShaderProgram;
-*///?}
+ *///?}
 import net.minecraft.client.renderer.LightTexture;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

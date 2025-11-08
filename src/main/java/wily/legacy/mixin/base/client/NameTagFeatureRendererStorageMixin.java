@@ -19,10 +19,12 @@ import java.util.List;
 
 @Mixin(NameTagFeatureRenderer.Storage.class)
 public class NameTagFeatureRendererStorageMixin implements LegacyNameTag.Storage {
-    @Shadow @Final
+    @Shadow
+    @Final
     List<SubmitNodeStorage.NameTagSubmit> nameTagSubmitsNormal;
 
-    @Shadow @Final
+    @Shadow
+    @Final
     List<SubmitNodeStorage.NameTagSubmit> nameTagSubmitsSeethrough;
 
     @Override
@@ -35,7 +37,7 @@ public class NameTagFeatureRendererStorageMixin implements LegacyNameTag.Storage
             poseStack.scale(0.025F, -0.025F, 0.025F);
             Matrix4f matrix4f = new Matrix4f(poseStack.last().pose());
             float f = -minecraft.font.width(component) / 2.0F;
-            int k = (int)(minecraft.options.getBackgroundOpacity(0.25F) * 255.0F) << 24;
+            int k = (int) (minecraft.options.getBackgroundOpacity(0.25F) * 255.0F) << 24;
             if (bl) {
                 this.nameTagSubmitsNormal.add(LegacyNameTag.withColor(new SubmitNodeStorage.NameTagSubmit(matrix4f, f, i, component, LightTexture.lightCoordsWithEmission(j, 2), -1, 0, d), color));
                 this.nameTagSubmitsSeethrough.add(LegacyNameTag.withColor(new SubmitNodeStorage.NameTagSubmit(matrix4f, f, i, component, j, -2130706433, k, d), color));

@@ -1,6 +1,7 @@
 package wily.legacy.client.controller;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWGamepadState;
 import wily.legacy.client.ControlType;
@@ -11,24 +12,23 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
-public class GLFWControllerHandler implements Controller.Handler{
-    private boolean init = false;
+public class GLFWControllerHandler implements Controller.Handler {
     public static final Component TITLE = Component.literal("GLFW");
+    private static final GLFWControllerHandler INSTANCE = new GLFWControllerHandler();
+    private boolean init = false;
+
+    public static GLFWControllerHandler getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public Component getName() {
         return TITLE;
     }
 
-    private static final GLFWControllerHandler INSTANCE = new GLFWControllerHandler();
-
-    public static GLFWControllerHandler getInstance(){
-        return INSTANCE;
-    }
-
     @Override
     public void init() {
-        if (!init){
+        if (!init) {
             tryDownloadAndApplyNewMappings();
             init = true;
         }
@@ -44,6 +44,7 @@ public class GLFWControllerHandler implements Controller.Handler{
         return new Controller() {
             GLFWGamepadState gamepadState;
             String name;
+
             @Override
             public String getName() {
                 if (name == null) name = GLFW.glfwGetGamepadName(jid);
@@ -53,16 +54,16 @@ public class GLFWControllerHandler implements Controller.Handler{
             @Override
             public ControlType getType() {
                 String name = getName();
+                ResourceLocation id = ControlType.x360;
                 if (name != null) {
-                    if (name.contains("PS3")) return ControlType.PS3;
-                    else if (name.contains("PS4")) return ControlType.PS4;
-                    else if (name.contains("PS5")) return ControlType.PS5;
-                    else if (name.contains("Xbox 360")) return ControlType.x360;
-                    else if (name.contains("Xbox One")) return ControlType.xONE;
-                    else if (name.contains("Nintendo Switch")) return ControlType.SWITCH;
-                    else if (name.contains("Wii U")) return ControlType.WII_U;
+                    if (name.contains("PS3")) id = ControlType.PS3;
+                    else if (name.contains("PS4")) id = ControlType.PS4;
+                    else if (name.contains("PS5")) id = ControlType.PS5;
+                    else if (name.contains("Xbox One")) id = ControlType.xONE;
+                    else if (name.contains("Nintendo Switch")) id = ControlType.SWITCH;
+                    else if (name.contains("Wii U")) id = ControlType.WII_U;
                 }
-                return ControlType.x360;
+                return ControlType.get(id);
             }
 
             @Override
@@ -73,8 +74,8 @@ public class GLFWControllerHandler implements Controller.Handler{
             @Override
             public float axisValue(int i) {
                 float value = gamepadState == null ? 0 : gamepadState.axes(i);
-                return switch (i){
-                    case GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER,GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER -> (value + 1) / 2;
+                return switch (i) {
+                    case GLFW.GLFW_GAMEPAD_AXIS_LEFT_TRIGGER, GLFW.GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER -> (value + 1) / 2;
                     default -> value;
                 };
             }
@@ -111,7 +112,7 @@ public class GLFWControllerHandler implements Controller.Handler{
 
     @Override
     public int getButtonIndex(ControllerBinding.Button button) {
-        return switch (button){
+        return switch (button) {
             case DOWN -> GLFW.GLFW_GAMEPAD_BUTTON_A;
             case RIGHT -> GLFW.GLFW_GAMEPAD_BUTTON_B;
             case LEFT -> GLFW.GLFW_GAMEPAD_BUTTON_X;
@@ -121,7 +122,7 @@ public class GLFWControllerHandler implements Controller.Handler{
             case START -> GLFW.GLFW_GAMEPAD_BUTTON_START;
             case LEFT_STICK -> GLFW.GLFW_GAMEPAD_BUTTON_LEFT_THUMB;
             case RIGHT_STICK -> GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_THUMB;
-            case LEFT_BUMPER ->  GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER;
+            case LEFT_BUMPER -> GLFW.GLFW_GAMEPAD_BUTTON_LEFT_BUMPER;
             case RIGHT_BUMPER -> GLFW.GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER;
             case DPAD_UP -> GLFW.GLFW_GAMEPAD_BUTTON_DPAD_UP;
             case DPAD_DOWN -> GLFW.GLFW_GAMEPAD_BUTTON_DPAD_DOWN;
@@ -133,7 +134,7 @@ public class GLFWControllerHandler implements Controller.Handler{
 
     @Override
     public int getAxisIndex(ControllerBinding.Axis axis) {
-        return switch (axis){
+        return switch (axis) {
             case LEFT_STICK_X -> GLFW.GLFW_GAMEPAD_AXIS_LEFT_X;
             case LEFT_STICK_Y -> GLFW.GLFW_GAMEPAD_AXIS_LEFT_Y;
             case RIGHT_STICK_X -> GLFW.GLFW_GAMEPAD_AXIS_RIGHT_X;

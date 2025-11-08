@@ -13,9 +13,10 @@ import java.util.Optional;
 
 @Mixin(BiomeAmbientSoundsHandler.class)
 public class BiomeAmbientSoundsHandlerMixin {
-    @Shadow private Optional<AmbientMoodSettings> moodSettings;
+    @Shadow
+    private Optional<AmbientMoodSettings> moodSettings;
 
-    @Redirect(method = "tick",at = @At(value = "FIELD", target = "Lnet/minecraft/client/resources/sounds/BiomeAmbientSoundsHandler;moodSettings:Ljava/util/Optional;", opcode = Opcodes.GETFIELD))
+    @Redirect(method = "tick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/resources/sounds/BiomeAmbientSoundsHandler;moodSettings:Ljava/util/Optional;", opcode = Opcodes.GETFIELD))
     public Optional<AmbientMoodSettings> tick(BiomeAmbientSoundsHandler instance) {
         return LegacyOptions.caveSounds.get() ? moodSettings : Optional.empty();
     }

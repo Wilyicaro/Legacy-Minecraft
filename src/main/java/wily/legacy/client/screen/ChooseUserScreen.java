@@ -23,6 +23,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.MCAccount;
@@ -48,50 +49,22 @@ public class ChooseUserScreen extends PanelVListScreen {
     public static final Component VISIBLE_PASSWORD = Component.translatable("legacy.menu.choose_user.add.encryption.visible_password");
     public static final Pattern usernamePattern = Pattern.compile("[A-Za-z0-9_]{2,16}");
 
+    protected final Panel panelRecess;
+
     public ChooseUserScreen(Screen parent) {
-        super(parent, s-> Panel.centered(s, 260,215,0,10), CHOOSE_USER);
-        renderableVList.layoutSpacing(i->0);
+        super(parent, s -> Panel.centered(s, 260, 215, 0, 10), CHOOSE_USER);
+        renderableVList.layoutSpacing(i -> 0);
         addAccountButtons();
+        panelRecess = Panel.createPanel(this, p -> p.appearance(LegacySprites.PANEL_RECESS, panel.getWidth() - 20, panel.getHeight() - 26), p -> p.pos(panel.getX() + 10, panel.getY() + 13));
     }
 
-    @Override
-    public void addControlTooltips(ControlTooltip.Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.add(()->getFocused() == null || renderableVList.renderables.indexOf(getFocused()) <= 0 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), ()-> ACCOUNT_OPTIONS);
-        renderer.add(()->ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), ()-> DIRECT_LOGIN);
-    }
-
-    @Override
-    public boolean keyPressed(KeyEvent keyEvent) {
-        if (keyEvent.key() == InputConstants.KEY_X){
-            minecraft.setScreen(accountScreen(DIRECT_LOGIN,this,false, this::manageLogin));
-            return true;
-        }
-        return super.keyPressed(keyEvent);
-    }
-
-    public void reloadAccountButtons(){
-        int i = renderableVList.renderables.indexOf(getFocused());
-        renderableVList.renderables.clear();
-        addAccountButtons();
-        repositionElements();
-        if (i >= 0 &&  i < renderableVList.renderables.size()) setFocused((GuiEventListener) renderableVList.renderables.get(i));
-    }
-
-    @Override
-    public void renderableVListInit() {
-        addRenderableOnly(((guiGraphics, i, j, f) -> {
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.getX() + 10, panel.getY() + 13, panel.getWidth() - 20, panel.getHeight() - 26);
-            guiGraphics.drawString(font,getTitle(),panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panel.y + 20, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        }));
-        getRenderableVList().init(panel.x + 15,panel.y + 32,panel.width - 30,panel.height - 50);
-    }
-
-    public static ConfirmationScreen passwordScreen(Screen parent, Consumer<String> pass){
-        EditBox passWordBox = new EditBox(Minecraft.getInstance().font, 0,0,200,20,Component.translatable("legacy.menu.choose_user.add.encryption.password"));
-        TickBox tickBox = new TickBox(0,0,true, bol->VISIBLE_PASSWORD,bol-> null, t->passWordBox.addFormatter((s,i)-> FormattedCharSequence.forward(t.selected ? s : "*".repeat(s.length()), Style.EMPTY)));
-        tickBox.onPress(new KeyEvent(InputConstants.KEY_RETURN, 0 , 0));
-        return new ConfirmationScreen(parent,230, 120,passWordBox.getMessage(),Component.translatable("legacy.menu.choose_user.add.encryption.password_message"), b1-> pass.accept(passWordBox.getValue())){
+    public static ConfirmationScreen passwordScreen(Screen parent, Consumer<String> pass) {
+        EditBox passWordBox = new EditBox(Minecraft.getInstance().font, 0, 0, 200, 20, Component.translatable("legacy.menu.choose_user.add.encryption.password"));
+        TickBox tickBox = new TickBox(0, 0, true, bol -> VISIBLE_PASSWORD, bol -> null, t -> {
+        });
+        passWordBox.addFormatter((s, i) -> FormattedCharSequence.forward(tickBox.selected ? s : "*".repeat(s.length()), Style.EMPTY));
+        tickBox.onPress(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
+        return new ConfirmationScreen(parent, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 98 : 120, passWordBox.getMessage(), Component.translatable("legacy.menu.choose_user.add.encryption.password_message"), b1 -> pass.accept(passWordBox.getValue())) {
             @Override
             protected void addButtons() {
                 super.addButtons();
@@ -101,34 +74,41 @@ public class ChooseUserScreen extends PanelVListScreen {
             @Override
             protected void init() {
                 super.init();
-                tickBox.setPosition(panel.getX() + 15, panel.getY() + 68);
-                addRenderableWidget(tickBox);
-                passWordBox.setPosition(panel.getX() + 15, panel.getY() + 45);
-                passWordBox.setResponder(s-> okButton.active = !s.isEmpty());
+                boolean sd = LegacyOptions.getUIMode().isSD();
+                int layoutX = panel.x + (panel.width - renderableVList.listWidth) / 2;
+                passWordBox.setPosition(layoutX, panel.getY() + (sd ? 32 : 45));
+                passWordBox.setWidth(renderableVList.listWidth);
+                passWordBox.setHeight(sd ? 16 : 20);
+                passWordBox.setResponder(s -> okButton.active = !s.isEmpty());
                 addRenderableWidget(passWordBox);
+                tickBox.setPosition(layoutX, panel.getY() + (sd ? 51 : 68));
+                tickBox.setWidth(renderableVList.listWidth);
+                tickBox.updateHeight();
+                addRenderableWidget(tickBox);
             }
         };
     }
 
-    public static ConfirmationScreen accountScreen(Component title, Screen parent, boolean allowEncryption, Consumer<MCAccount> press){
-        return new ConfirmationScreen(parent,230, 120,title, CHOOSE_USER_MESSAGE){
+    public static ConfirmationScreen accountScreen(Component title, Screen parent, boolean allowEncryption, Consumer<MCAccount> press) {
+        return new ConfirmationScreen(parent, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 80 : 120, title, CHOOSE_USER_MESSAGE) {
             @Override
             protected void addButtons() {
-                renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b-> this.onClose()).build());
-                renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.choose_user.microsoft"), b-> {
-                    if (allowEncryption) minecraft.setScreen(new ConfirmationScreen(this,ACCOUNT_ENCRYPTION,ACCOUNT_ENCRYPTION_MESSAGE){
-                        @Override
-                        protected void addButtons() {
-                            renderableVList.addRenderable(Button.builder(ADD_WITH_ENCRYPTION,b-> minecraft.setScreen(passwordScreen(this, s-> MCAccount.create(()-> minecraft.setScreen(this),s).thenAcceptAsync(press,minecraft)))).build());
-                            renderableVList.addRenderable(Button.builder(ADD_WITHOUT_ENCRYPTION,b-> MCAccount.create(()-> minecraft.setScreen(this),null).thenAcceptAsync(press,minecraft)).build());
-                        }
-                    });
-                    else MCAccount.create(()-> minecraft.setScreen(this),null).thenAcceptAsync(press,minecraft);
+                renderableVList.addRenderable(Button.builder(Component.translatable("gui.cancel"), b -> this.onClose()).build());
+                renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.choose_user.microsoft"), b -> {
+                    if (allowEncryption)
+                        minecraft.setScreen(new ConfirmationScreen(this, ACCOUNT_ENCRYPTION, ACCOUNT_ENCRYPTION_MESSAGE) {
+                            @Override
+                            protected void addButtons() {
+                                renderableVList.addRenderable(Button.builder(ADD_WITH_ENCRYPTION, b -> minecraft.setScreen(passwordScreen(this, s -> MCAccount.create(() -> minecraft.setScreen(this), s).thenAcceptAsync(press, minecraft)))).build());
+                                renderableVList.addRenderable(Button.builder(ADD_WITHOUT_ENCRYPTION, b -> MCAccount.create(() -> minecraft.setScreen(this), null).thenAcceptAsync(press, minecraft)).build());
+                            }
+                        });
+                    else MCAccount.create(() -> minecraft.setScreen(this), null).thenAcceptAsync(press, minecraft);
 
                 }).build());
-                renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.choose_user.offline"), b-> {
-                    EditBox usernameBox = new EditBox(Minecraft.getInstance().font, 0,0,200,20,Component.translatable("legacy.menu.choose_user.offline.username"));
-                    minecraft.setScreen(new ConfirmationScreen(this, 230, 120, usernameBox.getMessage(),Component.translatable("legacy.menu.choose_user.offline.username_message"), b1-> press.accept(MCAccount.create(new GameProfile(UUID.nameUUIDFromBytes(("offline:"+usernameBox.getValue()).getBytes()),usernameBox.getValue()),false,null,null))){
+                renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.choose_user.offline"), b -> {
+                    EditBox usernameBox = new EditBox(Minecraft.getInstance().font, 0, 0, 200, 20, Component.translatable("legacy.menu.choose_user.offline.username"));
+                    minecraft.setScreen(new ConfirmationScreen(this, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 87 : 120, usernameBox.getMessage(), Component.translatable("legacy.menu.choose_user.offline.username_message"), b1 -> press.accept(MCAccount.create(new GameProfile(UUID.nameUUIDFromBytes(("offline:" + usernameBox.getValue()).getBytes()), usernameBox.getValue()), false, null, null))) {
                         @Override
                         protected void addButtons() {
                             super.addButtons();
@@ -138,12 +118,16 @@ public class ChooseUserScreen extends PanelVListScreen {
                         @Override
                         protected void init() {
                             super.init();
-                            usernameBox.setPosition(panel.getX() + 15, panel.getY() + 45);
-                            usernameBox.setResponder(s-> {
+                            boolean sd = LegacyOptions.getUIMode().isSD();
+                            int layoutX = panel.x + (panel.width - renderableVList.listWidth) / 2;
+                            usernameBox.setPosition(layoutX, panel.getY() + (sd ? 32 : 45));
+                            usernameBox.setResponder(s -> {
                                 boolean matches = usernamePattern.matcher(s).matches();
-                                usernameBox.setTextColor(matches ? 0xFFFFFFFF : 0xFF5555);
+                                usernameBox.setTextColor(matches ? 0xFFFFFFFF : 0xFFFF5555);
                                 okButton.active = matches;
                             });
+                            usernameBox.setWidth(renderableVList.listWidth);
+                            usernameBox.setHeight(sd ? 16 : 20);
                             addRenderableWidget(usernameBox);
                         }
                     });
@@ -152,57 +136,99 @@ public class ChooseUserScreen extends PanelVListScreen {
         };
     }
 
-    public void manageLogin(MCAccount account){
+    @Override
+    public void addControlTooltips(ControlTooltip.Renderer renderer) {
+        super.addControlTooltips(renderer);
+        renderer.add(() -> getFocused() == null || renderableVList.renderables.indexOf(getFocused()) <= 0 ? null : ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), () -> ACCOUNT_OPTIONS);
+        renderer.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> DIRECT_LOGIN);
+    }
+
+    @Override
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (keyEvent.key() == InputConstants.KEY_X) {
+            minecraft.setScreen(accountScreen(DIRECT_LOGIN, this, false, this::manageLogin));
+            return true;
+        }
+        return super.keyPressed(keyEvent);
+    }
+
+    public void reloadAccountButtons() {
+        int i = renderableVList.renderables.indexOf(getFocused());
+        renderableVList.renderables.clear();
+        addAccountButtons();
+        repositionElements();
+        if (i >= 0 && i < renderableVList.renderables.size())
+            setFocused((GuiEventListener) renderableVList.renderables.get(i));
+    }
+
+    @Override
+    protected void panelInit() {
+        super.panelInit();
+        panelRecess.init("panelRecess");
+        addRenderableOnly(panelRecess);
+        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, getTitle(), panel.getX() + (panel.getWidth() - font.width(getTitle())) / 2, panel.y + 20, CommonColor.INVENTORY_GRAY_TEXT.get(), false)));
+
+    }
+
+    @Override
+    public void renderableVListInit() {
+        initRenderableVListHeight(30);
+        getRenderableVList().init(panel.x + 15, panel.y + 32, panel.width - 30, panel.height - 50);
+    }
+
+    public void manageLogin(MCAccount account) {
         if (account.isEncrypted())
             minecraft.setScreen(passwordScreen(ChooseUserScreen.this, s -> account.login(ChooseUserScreen.this, s)));
         else account.login(ChooseUserScreen.this, null);
     }
 
-    protected void addAccountButtons(){
-        Minecraft minecraft =  Minecraft.getInstance();
-        CreationList.addIconButton(renderableVList, Legacy4J.createModLocation("icon/add_user"),ADD_ACCOUNT, b->minecraft.setScreen(accountScreen(ADD_ACCOUNT, this,true, a-> {
+    protected void addAccountButtons() {
+        Minecraft minecraft = Minecraft.getInstance();
+        CreationList.addIconButton(renderableVList, Legacy4J.createModLocation("icon/add_user"), ADD_ACCOUNT, b -> minecraft.setScreen(accountScreen(ADD_ACCOUNT, this, true, a -> {
             MCAccount.list.add(a);
             MCAccount.saveAll();
             reloadAccountButtons();
             minecraft.setScreen(ChooseUserScreen.this);
         })));
         for (MCAccount account : MCAccount.list) {
-            renderableVList.addRenderable(new AbstractButton(0, 0, 230, 30, account.getMSARefreshToken(null).isEmpty() ? Component.translatable("legacy.menu.offline_user",account.getProfile().name()) : Component.literal(account.getProfile().name())) {
+            renderableVList.addRenderable(new CreationList.ContentButton(renderableVList, 0, 0, 230, 30, account.getMSARefreshToken(null).isEmpty() ? Component.translatable("legacy.menu.offline_user", account.getProfile().name()) : Component.literal(account.getProfile().name())) {
                 @Override
-                protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-                    super.renderWidget(guiGraphics, i, j, f);
-                    PlayerFaceRenderer.draw(guiGraphics, minecraft.getSkinManager().createLookup(account.getProfile(), true).get(), getX() + 5, getY() + 5, 20);
-                    if (minecraft.options.touchscreen().get().booleanValue() || isHovered()) {
-                        guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
-                        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacyRenderUtil.isMouseOver(i,j,getX()+5,getY()+5,20,20) ? SaveRenderableList.JOIN_HIGHLIGHTED : SaveRenderableList.JOIN, getX() + 5, getY() + 5, 20, 20);
-                    }
+                public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+                    PlayerFaceRenderer.draw(guiGraphics, minecraft.getSkinManager().createLookup(account.getProfile(), true).get(), getX() + x, getY() + y, Math.max(width, height));
                 }
 
                 @Override
-                protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 30, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
+                public void renderIconHighlight(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+                    super.renderIconHighlight(guiGraphics, mouseX, mouseY, x, y, width, height);
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacyRenderUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y, width, height) ? SaveRenderableList.JOIN_HIGHLIGHTED : SaveRenderableList.JOIN, getX() + x, getY() + y, width, height);
                 }
+
 
                 @Override
                 public boolean mouseClicked(MouseButtonEvent event, boolean bl) {
-                    if (LegacyRenderUtil.isMouseOver(event.x(), event.y(), getX()+5,getY()+5,20,20)) manageLogin(account);
+                    int iconWidth = list.accessor.getInteger(list.name + ".buttonIcon.width", 20);
+                    int iconHeight = list.accessor.getInteger(list.name + ".buttonIcon.height", 20);
+                    int iconPos = (height - iconHeight) / 2;
+                    if (LegacyRenderUtil.isMouseOver(event.x(), event.y(), getX() + iconPos, getY() + iconPos, iconWidth, iconHeight))
+                        manageLogin(account);
                     return super.mouseClicked(event, bl);
                 }
 
                 @Override
                 public boolean keyPressed(KeyEvent keyEvent) {
                     if (keyEvent.key() == InputConstants.KEY_O) {
-                        minecraft.setScreen(new ConfirmationScreen(ChooseUserScreen.this, 230, 120, ACCOUNT_OPTIONS, ACCOUNT_OPTIONS_MESSAGE, b -> {}){
+                        minecraft.setScreen(new ConfirmationScreen(ChooseUserScreen.this, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 87 : 120, ACCOUNT_OPTIONS, ACCOUNT_OPTIONS_MESSAGE, b -> {
+                        }) {
                             @Override
                             protected void addButtons() {
-                                renderableVList.addRenderable(Button.builder(CommonComponents.GUI_CANCEL, b-> onClose()).build());
-                                renderableVList.addRenderable(Button.builder(EDIT_ACCOUNT,b-> minecraft.setScreen(accountScreen(EDIT_ACCOUNT, this,true,a-> {
+                                renderableVList.addRenderable(Button.builder(CommonComponents.GUI_CANCEL, b -> onClose()).build());
+                                renderableVList.addRenderable(Button.builder(EDIT_ACCOUNT, b -> minecraft.setScreen(accountScreen(EDIT_ACCOUNT, this, true, a -> {
                                     MCAccount.list.set(MCAccount.list.indexOf(account), a);
                                     MCAccount.saveAll();
                                     reloadAccountButtons();
                                     minecraft.setScreen(ChooseUserScreen.this);
                                 }))).build());
-                                renderableVList.addRenderable(Button.builder(DELETE_ACCOUNT, b->{
+                                renderableVList.addRenderable(Button.builder(DELETE_ACCOUNT, b -> {
                                     MCAccount.list.remove(account);
                                     MCAccount.saveAll();
                                     reloadAccountButtons();
@@ -218,11 +244,6 @@ public class ChooseUserScreen extends PanelVListScreen {
                 @Override
                 public void onPress(InputWithModifiers input) {
                     if (isFocused()) manageLogin(account);
-                }
-
-                @Override
-                protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-                    defaultButtonNarrationText(narrationElementOutput);
                 }
             });
         }

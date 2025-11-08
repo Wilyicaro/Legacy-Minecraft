@@ -1,0 +1,13 @@
+{
+  "targetUI": "wily.legacy.client.screen.LegacyLoading",
+  "targetType": "class",
+  "applyCondition": { "reference": "uiMode.sd" },
+  "elements": {
+    "loadingHeader.scaleX": 1.0,
+    "loadingHeader.scaleY": 1.0,
+    "loadingHeader.y": 57,
+    "loadingStage.y": 75,
+    "loadingBar.y": 85,
+    "loadingTip.y": "${loadingBar.y}+44"
+  }
+}

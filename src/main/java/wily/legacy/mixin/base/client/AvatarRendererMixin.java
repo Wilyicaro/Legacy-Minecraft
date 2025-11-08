@@ -23,8 +23,8 @@ public class AvatarRendererMixin {
     private void submitNameTag(SubmitNodeCollector instance, PoseStack poseStack, Vec3 vec3, int color, Component component, boolean b, int i, double v, CameraRenderState cameraRenderState, Operation<Void> original, AvatarRenderState avatarRenderState) {
         if (LegacyOptions.displayNameTagBorder.get()) {
             Minecraft minecraft = Minecraft.getInstance();
-            float[] nameTagColor = minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(avatarRenderState.nameTag.getString()) instanceof LegacyPlayerInfo info) || info.getIdentifierIndex() == 0 ?  new float[]{0,0,0} : Legacy4JClient.getVisualPlayerColor(info);
-            ((LegacySubmitNodeCollector)instance).submitLegacyNameTag(poseStack, vec3, color, component, b, i, v, cameraRenderState, nameTagColor);
+            float[] nameTagColor = minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(avatarRenderState.nameTag.getString()) instanceof LegacyPlayerInfo info) || info.getIdentifierIndex() == 0 ? new float[]{0, 0, 0} : Legacy4JClient.getVisualPlayerColor(info);
+            ((LegacySubmitNodeCollector) instance).submitLegacyNameTag(poseStack, vec3, color, component, b, i, v, cameraRenderState, nameTagColor);
         } else original.call(instance, poseStack, vec3, color, component, b, i, v, cameraRenderState);
     }
 }

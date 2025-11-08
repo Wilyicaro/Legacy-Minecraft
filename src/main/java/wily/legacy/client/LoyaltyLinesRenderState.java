@@ -14,7 +14,7 @@ public class LoyaltyLinesRenderState implements FactoryRenderStateExtension<Thro
     public int clientSideReturnTridentTickCount;
     public double horizontalMovementFactor;
 
-    public static LoyaltyLinesRenderState of(ThrownTridentRenderState renderState){
+    public static LoyaltyLinesRenderState of(ThrownTridentRenderState renderState) {
         return FactoryRenderStateExtension.Accessor.of(renderState).getExtension(LoyaltyLinesRenderState.class);
     }
 
@@ -27,7 +27,7 @@ public class LoyaltyLinesRenderState implements FactoryRenderStateExtension<Thro
         if (!canRender) return;
         horizontalMovementFactor = Mth.lerp(partialTicks * 0.5F, trident.getOwner().yRotO, trident.getOwner().getYRot()) * (Math.PI / 180);
         x = Mth.lerp(partialTicks, trident.getOwner().xOld, trident.getOwner().getX()) - Mth.lerp(partialTicks, trident.xOld, trident.getX());
-        y = Mth.lerp(partialTicks, trident.getOwner().yOld + trident.getOwner().getEyeHeight() * 0.8D, trident.getOwner().getY() + trident.getOwner().getEyeHeight() * 0.8D) - Mth.lerp(partialTicks, trident.yOld, trident.getY());;
+        y = Mth.lerp(partialTicks, trident.getOwner().yOld + trident.getOwner().getEyeHeight() * 0.8D, trident.getOwner().getY() + trident.getOwner().getEyeHeight() * 0.8D) - Mth.lerp(partialTicks, trident.yOld, trident.getY());
         z = Mth.lerp(partialTicks, trident.getOwner().zOld, trident.getOwner().getZ()) - Mth.lerp(partialTicks, trident.zOld, trident.getZ());
         uniqueAge = trident.getId() + trident.tickCount + partialTicks;
         clientSideReturnTridentTickCount = trident.clientSideReturnTridentTickCount;

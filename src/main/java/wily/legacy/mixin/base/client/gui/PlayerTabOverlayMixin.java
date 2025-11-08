@@ -35,15 +35,23 @@ import java.util.stream.Collectors;
 @Mixin(PlayerTabOverlay.class)
 public abstract class PlayerTabOverlayMixin {
 
-    @Shadow @Nullable private Component footer;
+    @Shadow
+    @Nullable
+    private Component footer;
 
-    @Shadow @Nullable private Component header;
+    @Shadow
+    @Nullable
+    private Component header;
 
-    @Shadow @Final private Minecraft minecraft;
+    @Shadow
+    @Final
+    private Minecraft minecraft;
 
-    @Shadow protected abstract List<PlayerInfo> getPlayerInfos();
+    @Shadow
+    protected abstract List<PlayerInfo> getPlayerInfos();
 
-    @Shadow public abstract Component getNameForDisplay(PlayerInfo playerInfo);
+    @Shadow
+    public abstract Component getNameForDisplay(PlayerInfo playerInfo);
 
     @Inject(method = "render", at = @At("HEAD"))
     public void render(GuiGraphics guiGraphics, int i, Scoreboard scoreboard, Objective objective, CallbackInfo ci) {
@@ -56,7 +64,7 @@ public abstract class PlayerTabOverlayMixin {
         int k = 0;
         int l = 0;
 
-        for(PlayerInfo playerInfo : list) {
+        for (PlayerInfo playerInfo : list) {
             Component component = this.getNameForDisplay(playerInfo);
             k = Math.max(k, this.minecraft.font.width(component));
             int n;
@@ -76,7 +84,7 @@ public abstract class PlayerTabOverlayMixin {
         int p = o;
 
         int q;
-        for(q = 1; p > 20; p = (o + q - 1) / q) {
+        for (q = 1; p > 20; p = (o + q - 1) / q) {
             ++q;
         }
 
@@ -98,7 +106,7 @@ public abstract class PlayerTabOverlayMixin {
         if (this.header != null) {
             list3 = this.minecraft.font.split(this.header, i - 50);
 
-            for(FormattedCharSequence formattedCharSequence : list3) {
+            for (FormattedCharSequence formattedCharSequence : list3) {
                 u = Math.max(u, this.minecraft.font.width(formattedCharSequence));
             }
         }
@@ -107,7 +115,7 @@ public abstract class PlayerTabOverlayMixin {
         if (this.footer != null) {
             list4 = this.minecraft.font.split(this.footer, i - 50);
 
-            for(FormattedCharSequence formattedCharSequence2 : list4) {
+            for (FormattedCharSequence formattedCharSequence2 : list4) {
                 u = Math.max(u, this.minecraft.font.width(formattedCharSequence2));
             }
         }
@@ -123,7 +131,7 @@ public abstract class PlayerTabOverlayMixin {
             height += list4.size() * 9 + 1;
         }
 
-        LegacyRenderUtil.blitTranslucentSprite(guiGraphics, LegacySprites.POINTER_PANEL, (guiGraphics.guiWidth() - width) / 2,6, width, height + 8);
+        LegacyRenderUtil.blitTranslucentSprite(guiGraphics, LegacySprites.POINTER_PANEL, (guiGraphics.guiWidth() - width) / 2, 6, width, height + 8);
     }
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;fill(IIIII)V", ordinal = 0))

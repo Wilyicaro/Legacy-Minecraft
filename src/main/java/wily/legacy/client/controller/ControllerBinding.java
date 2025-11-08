@@ -27,39 +27,39 @@ public class ControllerBinding<T extends BindingState> {
     public final boolean isBindable;
     private final String key;
 
-    public ControllerBinding(String key, Function<ControllerBinding<T>,T> stateConstructor, boolean isBindable){
+    public ControllerBinding(String key, Function<ControllerBinding<T>, T> stateConstructor, boolean isBindable) {
         this.key = key;
         this.stateConstructor = stateConstructor;
         this.bindingState = stateConstructor.apply(this);
         this.isBindable = isBindable;
     }
 
-    public T state(){
+    public T state() {
         return bindingState;
     }
 
-    public ControllerBinding(String key, Function<ControllerBinding<T>,T> stateConstructor){
+    public ControllerBinding(String key, Function<ControllerBinding<T>, T> stateConstructor) {
         this(key, stateConstructor, true);
     }
 
-    public String getKey(){
+    public String getKey() {
         return key;
     }
 
-    public ControllerBinding<T> getMapped(){
+    public ControllerBinding<T> getMapped() {
         return this;
     }
 
-    public ControlTooltip.ComponentIcon getIcon(){
-        return ControlType.getActiveControllerType().getIcons().get(getMapped().getKey());
+    public ControlTooltip.ComponentIcon getIcon() {
+        return ControlType.getActiveControllerType().icons().get(getMapped().getKey());
     }
 
-    public boolean isSpecial(){
+    public boolean isSpecial() {
         return false;
     }
 
-    public static ControllerBinding<BindingState.Button> createButton(String key, ArbitrarySupplier<Button> button){
-        return new ControllerBinding<>(key, c-> new BindingState.Button(c, button)){
+    public static ControllerBinding<BindingState.Button> createButton(String key, ArbitrarySupplier<Button> button) {
+        return new ControllerBinding<>(key, c-> new BindingState.Button(c, button)) {
             @Override
             public ControllerBinding<BindingState.Button> getMapped() {
                 return button.get().binding;
@@ -67,25 +67,25 @@ public class ControllerBinding<T extends BindingState> {
         };
     }
 
-    public static ControllerBinding<BindingState.Button> createButton(String key, Button button, boolean isBindable){
+    public static ControllerBinding<BindingState.Button> createButton(String key, Button button, boolean isBindable) {
         return new ControllerBinding<>(key, c-> new BindingState.Button(c, ()->button), isBindable);
     }
 
-    public static ControllerBinding<BindingState.Button> createButton(String key, Button button){
+    public static ControllerBinding<BindingState.Button> createButton(String key, Button button) {
         return createButton(key, button, true);
     }
 
-    public static <B extends ControllerBinding<?>> B register(B binding){
+    public static <B extends ControllerBinding<?>> B register(B binding) {
         map.put(binding.getKey(), binding);
         return binding;
     }
 
-    private static <B extends ControllerBinding<?>> B registerWithDefaults(B binding, Function<Options, List<KeyMapping>> defaultKeyMappings){
+    private static <B extends ControllerBinding<?>> B registerWithDefaults(B binding, Function<Options, List<KeyMapping>> defaultKeyMappings) {
         defaultKeyMappingByBinding.put(binding, defaultKeyMappings);
         return register(binding);
     }
 
-    public static ControllerBinding<?> getOrCreate(String key){
+    public static ControllerBinding<?> getOrCreate(String key) {
         String[] keys = key.split(",");
         return keys.length == 1 ? map.get(key) : register(CompoundControllerBinding.getOrCreate(Arrays.stream(keys).map(map::get).toArray(ControllerBinding[]::new)));
     }
@@ -125,7 +125,7 @@ public class ControllerBinding<T extends BindingState> {
     public static final ControllerBinding<BindingState> RIGHT_STICK_LEFT = register(new ControllerBinding<>("right_stick_left",c-> BindingState.create(c, h->  RIGHT_STICK.state().x <= -RIGHT_STICK.state().getDeadZone())));
 
 
-    public static void setupDefaultBindings(Minecraft minecraft){
+    public static void setupDefaultBindings(Minecraft minecraft) {
         defaultKeyMappingByBinding.forEach(((binding, optionsListFunction) -> {
             for (KeyMapping keyMapping : optionsListFunction.apply(minecraft.options)) {
                 LegacyKeyMapping.of(keyMapping).setDefaultBinding(binding);
@@ -138,7 +138,7 @@ public class ControllerBinding<T extends BindingState> {
         DOWN(DOWN_BUTTON),RIGHT(RIGHT_BUTTON),LEFT(LEFT_BUTTON),UP(UP_BUTTON),BACK(ControllerBinding.BACK),GUIDE(ControllerBinding.GUIDE),START(ControllerBinding.START),LEFT_STICK(LEFT_STICK_BUTTON),RIGHT_STICK(RIGHT_STICK_BUTTON),LEFT_BUMPER(ControllerBinding.LEFT_BUMPER),RIGHT_BUMPER(ControllerBinding.RIGHT_BUMPER),DPAD_UP(ControllerBinding.DPAD_UP),DPAD_DOWN(ControllerBinding.DPAD_DOWN),DPAD_LEFT(ControllerBinding.DPAD_LEFT),DPAD_RIGHT(ControllerBinding.DPAD_RIGHT),TOUCHPAD(TOUCHPAD_BUTTON),CAPTURE(ControllerBinding.CAPTURE),LSL(LSL_BUTTON),LSR(LSR_BUTTON),RSL(RSL_BUTTON),RSR(RSR_BUTTON);
         public final ControllerBinding<BindingState.Button> binding;
 
-        Button(ControllerBinding<BindingState.Button> binding){
+        Button(ControllerBinding<BindingState.Button> binding) {
             this.binding = binding;
         }
     }

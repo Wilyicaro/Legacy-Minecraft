@@ -16,9 +16,13 @@ import wily.legacy.client.LegacyOptions;
 
 @Mixin(ItemPickupParticle.class)
 public abstract class ItemPickupParticleMixin extends Particle implements LegacyItemPickupParticle {
-    @Shadow private int life;
-    @Shadow private double targetY;
-    @Shadow @Final private Entity target;
+    @Shadow
+    private int life;
+    @Shadow
+    private double targetY;
+    @Shadow
+    @Final
+    private Entity target;
     @Unique
     private int lifetime = 3;
 

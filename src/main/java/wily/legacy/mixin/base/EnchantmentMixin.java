@@ -13,6 +13,7 @@ public class EnchantmentMixin {
     private static ChatFormatting getCurseFullname(ChatFormatting chatFormatting) {
         return ChatFormatting.DARK_RED;
     }
+
     @ModifyArg(method = "getFullname", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Style;withColor(Lnet/minecraft/ChatFormatting;)Lnet/minecraft/network/chat/Style;", ordinal = 1))
     private static ChatFormatting getFullname(ChatFormatting chatFormatting) {
         return ChatFormatting.WHITE;

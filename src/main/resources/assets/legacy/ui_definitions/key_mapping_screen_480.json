@@ -1,0 +1,15 @@
+{
+  "targetUI": "wily.legacy.client.screen.LegacyKeyMappingScreen",
+  "targetType": "class",
+  "applyCondition": { "reference": "uiMode.sd" },
+  "elements": {
+    "panel.width": {
+      "type": "put_number",
+      "value": 201
+    },
+    "panel.height": {
+      "type": "put_number",
+      "value": 180
+    }
+  }
+}

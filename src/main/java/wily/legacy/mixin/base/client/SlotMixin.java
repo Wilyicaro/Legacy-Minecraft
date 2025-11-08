@@ -16,29 +16,45 @@ import wily.legacy.inventory.LegacySlot;
 @Mixin(Slot.class)
 public abstract class SlotMixin implements LegacySlot {
     @Mutable
-    @Shadow @Final public int x;
+    @Shadow
+    @Final
+    public int x;
     @Mutable
-    @Shadow @Final public int y;
+    @Shadow
+    @Final
+    public int y;
 
-    @Unique private int defaultX;
+    @Unique
+    private int defaultX;
 
-    @Unique private int defaultY;
-
-    @Shadow public abstract ItemStack getItem();
-
-    @Shadow public abstract void setChanged();
-
+    @Unique
+    private int defaultY;
     private LegacySlotDisplay display = LegacySlotDisplay.VANILLA;
     private ItemStack lastItemStack = ItemStack.EMPTY;
     private long lastItemStackChange;
+
+    @Shadow
+    public abstract ItemStack getItem();
+
+    @Shadow
+    public abstract void setChanged();
 
     @Override
     public LegacySlotDisplay getDisplay() {
         return display;
     }
 
+    @Override
+    public void setDisplay(LegacySlotDisplay slot) {
+        display = slot;
+        if (slot == LegacySlotDisplay.VANILLA) {
+            x = defaultX;
+            y = defaultY;
+        }
+    }
+
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(Container container, int i, int j, int k, CallbackInfo ci){
+    private void init(Container container, int i, int j, int k, CallbackInfo ci) {
         defaultX = x;
         defaultY = y;
     }
@@ -46,22 +62,13 @@ public abstract class SlotMixin implements LegacySlot {
     @Inject(method = "getItem", at = @At("RETURN"), cancellable = true)
     public void getItem(CallbackInfoReturnable<ItemStack> cir) {
         ItemStack s = cir.getReturnValue();
-        if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.containerMenu.slots.contains(this) && !ItemStack.matches(s,lastItemStack) && lastItemStackChange != Util.getMillis()){
+        if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.containerMenu.slots.contains(this) && !ItemStack.matches(s, lastItemStack) && lastItemStackChange != Util.getMillis()) {
             lastItemStackChange = Util.getMillis();
             lastItemStack = s.copy();
             setChanged();
         }
         ItemStack override = LegacySlotDisplay.of((Slot) (Object) this).getItemOverride();
         if (override != null) cir.setReturnValue(override);
-    }
-
-    @Override
-    public void setDisplay(LegacySlotDisplay slot) {
-        display = slot;
-        if (slot == LegacySlotDisplay.VANILLA){
-            x = defaultX;
-            y = defaultY;
-        }
     }
 
     @Override

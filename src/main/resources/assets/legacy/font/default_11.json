@@ -2,6 +2,13 @@
     "providers": [
         {
             "type": "bitmap",
+            "file": "minecraft:font/icons.png",
+            "ascent": 10,
+            "height": 10,
+            "chars": ["\uD83C\uDF56\uD83D\uDC58"]
+        },
+        {
+            "type": "bitmap",
             "file": "legacy:font/default_11.png",
             "ascent": 8,
             "chars": [

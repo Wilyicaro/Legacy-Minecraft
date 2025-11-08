@@ -20,8 +20,8 @@ public class CyclingSlotBackgroundMixin {
     private void renderIcon(Slot slot, ResourceLocation resourceLocation, float f, GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
         ci.cancel();
         LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(slot);
-        holder.renderScaled(guiGraphics, i + slot.x,j + slot.y, ()-> {
-            FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f,1.0f,1.0f, f);
+        holder.renderScaled(guiGraphics, i + slot.x, j + slot.y, () -> {
+            FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, f);
             FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation, 0, 0, 16, 16);
             FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
         });

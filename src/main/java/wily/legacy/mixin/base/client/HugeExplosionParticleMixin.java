@@ -15,7 +15,9 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(HugeExplosionParticle.class)
 public abstract class HugeExplosionParticleMixin extends SingleQuadParticle {
-    @Shadow @Final private SpriteSet sprites;
+    @Shadow
+    @Final
+    private SpriteSet sprites;
 
     protected HugeExplosionParticleMixin(ClientLevel clientLevel, double d, double e, double f, TextureAtlasSprite textureAtlasSprite) {
         super(clientLevel, d, e, f, textureAtlasSprite);
@@ -25,7 +27,6 @@ public abstract class HugeExplosionParticleMixin extends SingleQuadParticle {
     protected float init(float h) {
         return h * 0.6f;
     }
-
 
 
     @Override

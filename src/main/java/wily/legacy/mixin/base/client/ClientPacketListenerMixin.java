@@ -29,7 +29,8 @@ import wily.legacy.inventory.LegacyMerchantMenu;
 
 @Mixin(ClientPacketListener.class)
 public abstract class ClientPacketListenerMixin extends ClientCommonPacketListenerImpl {
-    @Shadow private LevelLoadTracker levelLoadTracker;
+    @Shadow
+    private LevelLoadTracker levelLoadTracker;
 
     protected ClientPacketListenerMixin(Minecraft minecraft, Connection connection, CommonListenerCookie commonListenerCookie) {
         super(minecraft, connection, commonListenerCookie);
@@ -37,11 +38,11 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
     @Inject(method = "handleRespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;setId(I)V"))
     public void handleRespawn(ClientboundRespawnPacket clientboundRespawnPacket, CallbackInfo ci, @Local(ordinal = 0) ResourceKey<Level> newLevel, @Local(ordinal = 1) ResourceKey<Level> oldLevel) {
-        if (!clientboundRespawnPacket.shouldKeep(ClientboundRespawnPacket.KEEP_ALL_DATA)){
+        if (!clientboundRespawnPacket.shouldKeep(ClientboundRespawnPacket.KEEP_ALL_DATA)) {
             minecraft.setScreen(LegacyLoadingScreen.getRespawningScreen(levelLoadTracker::isLevelReady));
-        } else if (LegacyOptions.legacyLoadingAndConnecting.get() && oldLevel != newLevel) minecraft.setScreen(LegacyLoadingScreen.getDimensionChangeScreen(levelLoadTracker::isLevelReady, oldLevel, newLevel));
+        } else if (LegacyOptions.legacyLoadingAndConnecting.get() && oldLevel != newLevel)
+            minecraft.setScreen(LegacyLoadingScreen.getDimensionChangeScreen(levelLoadTracker::isLevelReady, oldLevel, newLevel));
     }
-
 
     @Redirect(method = "handleRespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/MusicManager;stopPlaying()V"))
     public void handleRespawnMusic(MusicManager instance) {
@@ -85,6 +86,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     public void handleSetEntityPassengersPacket(Gui instance, Component component, boolean bl) {
 
     }
+
     @Inject(method = "handleMerchantOffers", at = @At("RETURN"))
     public void handleMerchantOffers(ClientboundMerchantOffersPacket clientboundMerchantOffersPacket, CallbackInfo ci) {
         if (clientboundMerchantOffersPacket.getContainerId() == minecraft.player.containerMenu.containerId && minecraft.player.containerMenu instanceof LegacyMerchantMenu m) {
@@ -94,6 +96,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
             m.showProgressBar = clientboundMerchantOffersPacket.showProgress();
         }
     }
+
     @Inject(method = "handleAwardStats", at = @At("RETURN"))
     public void handleAwardStats(ClientboundAwardStatsPacket clientboundAwardStatsPacket, CallbackInfo ci) {
         if (minecraft.screen instanceof LeaderboardsScreen s) s.onStatsUpdated();

@@ -23,10 +23,10 @@ public class LiquidBlockRendererMixin {
         vertexConsumer.vertex(d, e, f).color(g, h, i, (arg5.is(FluidTags.WATER)) && reader != null ? LegacyBiomeOverride.getOrDefault(reader.getBiome(pos).unwrapKey()).waterTransparency() : /^? if forge || neoforge {^/ /^alpha^//^?} else {^/1.0f/^?}^/).uv(j, k).uv2(l).normal(0.0f, 1.0f, 0.0f).endVertex();
     }
     *///?} else {
-    @Redirect(method = "tesselate",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/LiquidBlockRenderer;vertex(Lcom/mojang/blaze3d/vertex/VertexConsumer;FFFFFFF" + /*? if forge {*/ /*"FIF)V" *//*?} else if neoforge {*//*"FFI)V"*//*?} else {*/"FI)V"/*?}*//*? if forge || neoforge {*//*, remap = false*//*?}*/))
+    @Redirect(method = "tesselate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/LiquidBlockRenderer;vertex(Lcom/mojang/blaze3d/vertex/VertexConsumer;FFFFFFF" + /*? if forge {*/ /*"FIF)V" *//*?} else if neoforge {*//*"FFI)V"*//*?} else {*/"FI)V"/*?}*//*? if forge || neoforge {*//*, remap = false*//*?}*/))
     public void tesselate(LiquidBlockRenderer instance, VertexConsumer vertexConsumer, float d, float e, float f, float g, float h, float i,/*? if neoforge {*/ /*float alpha, *//*?}*/float j, float k, int l,/*? if forge {*/ /*float alpha, *//*?}*/ BlockAndTintGetter getter, BlockPos pos, VertexConsumer arg3, BlockState state, FluidState arg5) {
         LevelReader reader = Minecraft.getInstance().level;
-        vertexConsumer.addVertex(d, e, f).setColor(g, h, i, (arg5.is(FluidTags.WATER)) && reader != null ? LegacyBiomeOverride.getOrDefault(reader.getBiome(pos).unwrapKey()).waterTransparency() : /*? if forge || neoforge {*/ /*alpha*//*?} else {*/1.0f/*?}*/).setUv(j, k).setLight(l).setNormal(0.0f, 1.0f, 0.0f);
+        vertexConsumer.addVertex(d, e, f).setColor(g, h, i, (arg5.is(FluidTags.WATER)) && reader != null ? LegacyBiomeOverride.getOrDefault(reader.getBiome(pos).unwrapKey()).getWaterTransparency() : /*? if forge || neoforge {*/ /*alpha*//*?} else {*/1.0f/*?}*/).setUv(j, k).setLight(l).setNormal(0.0f, 1.0f, 0.0f);
     }
     //?}
 }

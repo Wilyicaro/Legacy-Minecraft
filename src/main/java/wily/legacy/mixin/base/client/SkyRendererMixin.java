@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base.client;
 
 //? if >=1.21.2 {
+
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -23,33 +24,33 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 
 @Mixin(SkyRenderer.class)
-public class SkyLevelRendererMixin {
+public class SkyRendererMixin {
     @Unique
-    private boolean legacySkyShape = LegacyOptions.legacySkyShape.get();
+    private final boolean legacySkyShape = LegacyOptions.legacySkyShape.get();
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/ByteBufferBuilder;exactlySized(I)Lcom/mojang/blaze3d/vertex/ByteBufferBuilder;"))
-    private int changeSkyBufferVertexCount(int vertices){
+    private int changeSkyBufferVertexCount(int vertices) {
         return legacySkyShape ? 576 * DefaultVertexFormat.POSITION.getVertexSize() : vertices;
     }
 
     @Inject(method = {"renderDarkDisc", "renderSkyDisc"}, at = @At("HEAD"))
-    private void addShareParams(CallbackInfo ci, @Share("autoStorageIndexBuffer") LocalRef<RenderSystem.AutoStorageIndexBuffer> autoStorageIndexBuffer, @Share("gpuBuffer") LocalRef<GpuBuffer> gpuBuffer){
-        if (legacySkyShape){
+    private void addShareParams(CallbackInfo ci, @Share("autoStorageIndexBuffer") LocalRef<RenderSystem.AutoStorageIndexBuffer> autoStorageIndexBuffer, @Share("gpuBuffer") LocalRef<GpuBuffer> gpuBuffer) {
+        if (legacySkyShape) {
             autoStorageIndexBuffer.set(RenderSystem.getSequentialBuffer(VertexFormat.Mode.QUADS));
             gpuBuffer.set(autoStorageIndexBuffer.get().getBuffer(864));
         }
     }
 
     @WrapOperation(method = {"renderDarkDisc", "renderSkyDisc"}, at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;draw(II)V", remap = false))
-    private void changeSkyRenderVertexCount(RenderPass instance, int i, int size, Operation<Void> original, @Local RenderPass renderPass, @Share("autoStorageIndexBuffer") LocalRef<RenderSystem.AutoStorageIndexBuffer> autoStorageIndexBuffer, @Share("gpuBuffer") LocalRef<GpuBuffer> gpuBuffer){
-        if (legacySkyShape){
+    private void changeSkyRenderVertexCount(RenderPass instance, int i, int size, Operation<Void> original, @Local RenderPass renderPass, @Share("autoStorageIndexBuffer") LocalRef<RenderSystem.AutoStorageIndexBuffer> autoStorageIndexBuffer, @Share("gpuBuffer") LocalRef<GpuBuffer> gpuBuffer) {
+        if (legacySkyShape) {
             instance.setIndexBuffer(gpuBuffer.get(), autoStorageIndexBuffer.get().type());
             instance.drawIndexed(0, 0, 864, 1);
-        }else original.call(instance, i, size);
+        } else original.call(instance, i, size);
     }
 
     @ModifyArg(method = {"renderDarkDisc", "renderSkyDisc"}, at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setPipeline(Lcom/mojang/blaze3d/pipeline/RenderPipeline;)V", remap = false))
-    private RenderPipeline changeSkyRenderPipeline(RenderPipeline renderPipeline){
+    private RenderPipeline changeSkyRenderPipeline(RenderPipeline renderPipeline) {
         return legacySkyShape ? LegacyRenderPipelines.LEGACY_SKY : renderPipeline;
     }
 

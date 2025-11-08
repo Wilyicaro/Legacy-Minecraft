@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.UIDefinition;
+import wily.legacy.client.LegacyOptions;
 
 import java.util.Collections;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class RenderableVListScreen extends LegacyScreen implements RenderableVList.Access {
-    protected final RenderableVList renderableVList = new RenderableVList(accessor).layoutSpacing(l->5);
+    protected final RenderableVList renderableVList = new RenderableVList(accessor).layoutSpacing(l -> LegacyOptions.getUIMode().isSD() ? 4 : 5);
     private final List<RenderableVList> renderableVLists = Collections.singletonList(renderableVList);
 
     public RenderableVListScreen(Component component, Consumer<RenderableVList> vListBuild) {
@@ -53,6 +54,7 @@ public class RenderableVListScreen extends LegacyScreen implements RenderableVLi
 
     @Override
     public void renderableVListInit() {
-        renderableVList.init(width / 2 - 112,this.height / 3 + 10,225,0);
+        initRenderableVListHeight(20);
+        renderableVList.init(width / 2 - 112, this.height / 3 + 5, 225, 0);
     }
 }

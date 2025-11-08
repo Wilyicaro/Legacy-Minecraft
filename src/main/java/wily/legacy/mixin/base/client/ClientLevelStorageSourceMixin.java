@@ -11,10 +11,12 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(LevelStorageSource.class)
 public class ClientLevelStorageSourceMixin {
-    @Shadow @Final private static String TAG_DATA;
+    @Shadow
+    @Final
+    private static String TAG_DATA;
 
     @ModifyArg(method = "readLightweightData", at = @At(value = "INVOKE", target = "Lnet/minecraft/nbt/visitors/SkipFields;<init>([Lnet/minecraft/nbt/visitors/FieldSelector;)V"))
-    private static FieldSelector[] readLightweightData(FieldSelector[] args){
+    private static FieldSelector[] readLightweightData(FieldSelector[] args) {
         return new FieldSelector[]{new FieldSelector(TAG_DATA, CompoundTag.TYPE, "Player")};
     }
 }

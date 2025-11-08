@@ -1,0 +1,68 @@
+{
+  "targetUI": "wily.legacy.client.screen.PlayGameScreen",
+  "targetType": "class",
+  "applyCondition": { "reference": "uiMode.sd" },
+  "elements": {
+    "panel.width": {
+      "type": "put_number",
+      "value": 201
+    },
+    "panel.y": {
+      "type": "put_number",
+      "value": "(${height}-${panel.height})/2"
+    },
+    "panel.height": {
+      "type": "put_number",
+      "value": 153
+    },
+    "buttonsHeight": {
+      "type": "put_number",
+      "value": 17
+    },
+    "renderableVList.buttonIcon.width": {
+      "type": "put_number",
+      "value": 11
+    },
+    "renderableVList.buttonIcon.height": {
+      "type": "put_number",
+      "value": 11
+    },
+    "renderableVList.buttonMessage.xOffset": {
+      "type": "put_number",
+      "value": 22
+    },
+    "tabList.height": {
+      "type": "put_number",
+      "value": 21
+    },
+    "tabList.y": {
+      "type": "put_number",
+      "value": "${panel.y}-15"
+    },
+    "tabList.offset": {
+      "type": "put_tab_state_offset",
+      "value": {
+        "unselected": [0, 1.4]
+      }
+    },
+    "panelRecess.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/square_recessed_panel"
+    },
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "tabList.sprites": {
+      "type": "put_toggleable_tab_sprites",
+      "value": {
+        "high": {
+          "left": "legacy:tiles/big_high_tab_left",
+          "middle": "legacy:tiles/big_high_tab_middle",
+          "right": "legacy:tiles/big_high_tab_right"
+        },
+        "down": "legacy:tiles/big_low_tab"
+      }
+    }
+  }
+}

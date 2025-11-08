@@ -11,7 +11,10 @@ import wily.legacy.client.screen.CreativeModeScreen;
 
 @Mixin(MultiPlayerGameMode.class)
 public class MultiplayerGameModeMixin {
-    @Shadow @Final private Minecraft minecraft;
+    @Shadow
+    @Final
+    private Minecraft minecraft;
+
     //? if >=1.21.2 {
     @ModifyVariable(method = "handleCreativeModeItemDrop", at = @At("STORE"))
     public boolean handleCreativeModeItemDrop(boolean original) {

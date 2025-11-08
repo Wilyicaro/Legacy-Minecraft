@@ -28,22 +28,25 @@ import wily.legacy.util.ArmorStandPose;
 
 @Mixin(ArmorStand.class)
 public abstract class ArmorStandMixin extends LivingEntity {
-    @Shadow protected abstract byte setBit(byte b, int i, boolean bl);
-
     @Unique
     protected int lastSignal = 0;
 
     protected ArmorStandMixin(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
     }
+
+    @Shadow
+    protected abstract byte setBit(byte b, int i, boolean bl);
+
     @Inject(method = "interactAt", at = @At("HEAD"), cancellable = true)
     public void interactAt(Player player, Vec3 vec3, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> cir) {
-        if (player.isShiftKeyDown()){
+        if (player.isShiftKeyDown()) {
             cir.setReturnValue(InteractionResult.SUCCESS);
             if (level().isClientSide()) return;
-            ArmorStandPose.getNextPose(((ArmorStand)(Object)this)).applyPose((ArmorStand)(Object)this);
+            ArmorStandPose.getNextPose(((ArmorStand) (Object) this)).applyPose((ArmorStand) (Object) this);
         }
     }
+
     @Inject(method = "tickHeadTurn", at = @At("RETURN"))
     public void tick(CallbackInfo ci) {
         if (level().isClientSide()) return;
@@ -52,8 +55,9 @@ public abstract class ArmorStandMixin extends LivingEntity {
         if (!level().isClientSide()) {
             BlockPos onPos = getOnPos();
             for (Direction dir : Direction.values()) {
-                if ((signal = level().getSignal(onPos.relative(dir),dir)) > 0){
-                    if (lastSignal != signal) ArmorStandPose.getActualPose(lastSignal = signal).applyPose((ArmorStand)(Object)this);
+                if ((signal = level().getSignal(onPos.relative(dir), dir)) > 0) {
+                    if (lastSignal != signal)
+                        ArmorStandPose.getActualPose(lastSignal = signal).applyPose((ArmorStand) (Object) this);
                     return;
                 }
             }

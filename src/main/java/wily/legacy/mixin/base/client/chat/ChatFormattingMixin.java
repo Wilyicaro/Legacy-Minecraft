@@ -12,7 +12,7 @@ public class ChatFormattingMixin {
 
     @Inject(method = "getColor", at = @At("HEAD"), cancellable = true)
     public void getColor(CallbackInfoReturnable<Integer> cir) {
-        switch ((ChatFormatting)(Object)this){
+        switch ((ChatFormatting) (Object) this) {
             case BLACK -> cir.setReturnValue(CommonColor.BLACK.get());
             case DARK_BLUE -> cir.setReturnValue(CommonColor.DARK_BLUE.get());
             case DARK_GREEN -> cir.setReturnValue(CommonColor.DARK_GREEN.get());

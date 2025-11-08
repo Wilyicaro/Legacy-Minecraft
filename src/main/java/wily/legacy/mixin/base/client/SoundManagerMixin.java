@@ -11,16 +11,20 @@ import wily.legacy.client.SoundManagerAccessor;
 
 @Mixin(SoundManager.class)
 public class SoundManagerMixin implements SoundManagerAccessor {
-    @Shadow @Final private SoundEngine soundEngine;
+    @Shadow
+    @Final
+    private SoundEngine soundEngine;
 
     @Override
     public void setVolume(SoundInstance soundInstance, float volume) {
         SoundEngineAccessor.of(this.soundEngine).setVolume(soundInstance, volume);
     }
+
     @Override
     public void fadeAllMusic() {
         SoundEngineAccessor.of(this.soundEngine).fadeAllMusic();
     }
+
     @Override
     public void stopAllSound() {
         SoundEngineAccessor.of(this.soundEngine).stopAllSound();

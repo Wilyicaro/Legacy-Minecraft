@@ -14,10 +14,11 @@ import java.util.List;
 
 @Mixin(targets = {"net.minecraft.client.particle.ParticleResources$MutableSpriteSet"})
 public class ParticleEngineMixin {
-    @Shadow private List<TextureAtlasSprite> sprites;
+    @Shadow
+    private List<TextureAtlasSprite> sprites;
 
-    @Inject(method="get(II)Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "get(II)Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;", at = @At("HEAD"), cancellable = true)
     public void get(int i, int j, CallbackInfoReturnable<TextureAtlasSprite> cir) {
-        cir.setReturnValue(this.sprites.get(Mth.clamp(Math.round((i + FactoryAPIClient.getGamePartialTick(true)) * (this.sprites.size() - 1) / (float)j),0,sprites.size() - 1)));
+        cir.setReturnValue(this.sprites.get(Mth.clamp(Math.round((i + FactoryAPIClient.getGamePartialTick(true)) * (this.sprites.size() - 1) / (float) j), 0, sprites.size() - 1)));
     }
 }

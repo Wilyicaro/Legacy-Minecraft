@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyLoading;
+import wily.legacy.util.LegacyComponents;
 
 import static wily.legacy.Legacy4JClient.legacyLoadingScreen;
 
@@ -21,28 +22,22 @@ public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
     }
 
     @Unique
-    private Screen self(){
+    private Screen self() {
         return this;
     }
 
-    @Override
-    public void onClose() {
-        this.minecraft.setScreen(null);
-    }
-
-
-    @Inject(method = "render",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         if (LegacyOptions.legacyLoadingAndConnecting.get()) {
             ci.cancel();
             Component lastLoadingHeader = null;
             Component lastLoadingStage = null;
             boolean genericLoading = false;
-            int progress = 0;
+            float progress = 0;
             if (self() instanceof LevelLoadingScreen loading) {
-                lastLoadingHeader = Component.translatable("legacy.connect.initializing");
-                lastLoadingStage = Component.translatable("legacy.loading_spawn_area");
-                progress = Math.round(((LevelLoadingScreenAccessor)loading).getSmoothedProgress() * 100);
+                lastLoadingHeader = LegacyComponents.INITIALIZING;
+                lastLoadingStage = LegacyComponents.LOADING_SPAWN_AREA;
+                progress = ((LevelLoadingScreenAccessor) loading).getSmoothedProgress();
             }
             if (self() instanceof ProgressScreen p) {
                 lastLoadingHeader = p.header;
@@ -60,12 +55,12 @@ public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
     }
 
     @Override
-    public int getProgress() {
+    public float getProgress() {
         return legacyLoadingScreen.getProgress();
     }
 
     @Override
-    public void setProgress(int progress) {
+    public void setProgress(float progress) {
         legacyLoadingScreen.setProgress(progress);
     }
 

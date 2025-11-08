@@ -31,8 +31,8 @@ public abstract class SignEditScreenMixin extends AbstractSignEditScreen {
     }
 
     @ModifyArg(method = "renderSignBackground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitSignRenderState(Lnet/minecraft/client/model/Model$Simple;FLnet/minecraft/world/level/block/state/properties/WoodType;IIII)V"))
-    private float renderSignBackground(float original){
-        return original * 144/93;
+    private float renderSignBackground(float original) {
+        return original * 144 / 93;
     }
 
     @ModifyArg(method = "renderSignBackground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitSignRenderState(Lnet/minecraft/client/model/Model$Simple;FLnet/minecraft/world/level/block/state/properties/WoodType;IIII)V"), index = 3)
@@ -52,6 +52,6 @@ public abstract class SignEditScreenMixin extends AbstractSignEditScreen {
 
     @ModifyArg(method = "renderSignBackground", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;submitSignRenderState(Lnet/minecraft/client/model/Model$Simple;FLnet/minecraft/world/level/block/state/properties/WoodType;IIII)V"), index = 6)
     private int changeSignY1(int original) {
-        return  height / 2 + 120 + getYOffset();
+        return height / 2 + 120 + getYOffset();
     }
 }

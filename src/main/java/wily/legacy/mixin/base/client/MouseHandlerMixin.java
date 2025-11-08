@@ -28,14 +28,14 @@ public class MouseHandlerMixin {
         if (Legacy4JClient.controllerManager.isCursorDisabled) cir.setReturnValue(-1d);
     }
 
-    @Inject(method = {"onMove","onScroll"}, at = @At("HEAD"), cancellable = true)
+    @Inject(method = {"onMove", "onScroll"}, at = @At("HEAD"), cancellable = true)
     private void onMove(long l, double d, double e, CallbackInfo ci) {
-        onChange(l,ci);
+        onChange(l, ci);
     }
 
     @Inject(method = "onButton", at = @At("HEAD"), cancellable = true)
     private void onPress(long l, MouseButtonInfo mouseButtonInfo, int i, CallbackInfo ci) {
-        onChange(l,ci);
+        onChange(l, ci);
     }
 
     //? if forge {
@@ -65,15 +65,16 @@ public class MouseHandlerMixin {
     //?}
 
     @Inject(method = "releaseMouse", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;grabOrReleaseMouse(Lcom/mojang/blaze3d/platform/Window;IDD)V", shift = At.Shift.AFTER))
-    private void releaseMouse(CallbackInfo ci){
+    private void releaseMouse(CallbackInfo ci) {
         Legacy4JClient.controllerManager.enableCursorAndScheduleReset();
         Legacy4JClient.controllerManager.updateCursorInputMode();
     }
 
     @Unique
-    private void onChange(long window, CallbackInfo ci){
+    private void onChange(long window, CallbackInfo ci) {
         if (window == Minecraft.getInstance().getWindow().handle()) {
-            if (!Legacy4JClient.controllerManager.isControllerSimulatingInput) Legacy4JClient.controllerManager.setControllerTheLastInput(false);
+            if (!Legacy4JClient.controllerManager.isControllerSimulatingInput)
+                Legacy4JClient.controllerManager.setControllerTheLastInput(false);
             if (Legacy4JClient.controllerManager.isCursorDisabled) {
                 if (!Legacy4JClient.controllerManager.getCursorMode().isNever())
                     Legacy4JClient.controllerManager.enableCursor();

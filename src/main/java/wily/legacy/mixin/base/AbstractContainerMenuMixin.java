@@ -20,17 +20,21 @@ import static wily.legacy.util.LegacyItemUtil.canRepair;
 
 @Mixin(AbstractContainerMenu.class)
 public abstract class AbstractContainerMenuMixin {
-    @Shadow @Final public NonNullList<Slot> slots;
+    @Shadow
+    @Final
+    public NonNullList<Slot> slots;
 
-    @Shadow public abstract ItemStack getCarried();
+    @Shadow
+    public abstract ItemStack getCarried();
 
-    @Shadow public abstract void setCarried(ItemStack itemStack);
+    @Shadow
+    public abstract void setCarried(ItemStack itemStack);
 
     @Inject(method = "doClick", at = @At("HEAD"), cancellable = true)
     private void doClick(int i, int j, ClickType clickType, Player player, CallbackInfo ci) {
         Slot slot;
-        if ((clickType == ClickType.PICKUP || clickType == ClickType.QUICK_MOVE) && j == 1 && i >= 0 && i < slots.size() && (slot = slots.get(i)).hasItem() && !getCarried().isEmpty()){
-            if (canRepair(slot.getItem(),getCarried())) {
+        if ((clickType == ClickType.PICKUP || clickType == ClickType.QUICK_MOVE) && j == 1 && i >= 0 && i < slots.size() && (slot = slots.get(i)).hasItem() && !getCarried().isEmpty()) {
+            if (canRepair(slot.getItem(), getCarried())) {
                 ItemStack item = slot.getItem().getItem().getDefaultInstance();
                 item.setDamageValue(slot.getItem().getDamageValue() - (item.getMaxDamage() - getCarried().getDamageValue()));
                 slot.set(item);

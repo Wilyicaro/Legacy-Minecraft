@@ -33,11 +33,15 @@ public abstract class ItemInHandRendererMixin {
     @Shadow
     protected abstract void renderPlayerArm(PoseStack arg, SubmitNodeCollector arg2, int i, float g, float h, HumanoidArm arg3);
 
-    @Shadow protected abstract void applyItemArmTransform(PoseStack arg, HumanoidArm arg2, float f);
+    @Shadow
+    protected abstract void applyItemArmTransform(PoseStack arg, HumanoidArm arg2, float f);
 
-    @Shadow protected abstract void applyItemArmAttackTransform(PoseStack arg, HumanoidArm arg2, float g);
+    @Shadow
+    protected abstract void applyItemArmAttackTransform(PoseStack arg, HumanoidArm arg2, float g);
 
-    @Shadow public abstract void renderItem(LivingEntity arg, ItemStack arg2, ItemDisplayContext arg3, PoseStack arg4, SubmitNodeCollector arg5, int i);
+    @Shadow
+    public abstract void renderItem(LivingEntity arg, ItemStack arg2, ItemDisplayContext arg3, PoseStack arg4, SubmitNodeCollector arg5, int i);
+
     @Inject(method = "renderPlayerArm", at = @At(value = "HEAD"), cancellable = true)
     private void renderPlayerArm(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int i, float f, float g, HumanoidArm humanoidArm, CallbackInfo ci) {
         if (minecraft.player == null || minecraft.player.isRemoved()) ci.cancel();
@@ -50,12 +54,13 @@ public abstract class ItemInHandRendererMixin {
 
     @Inject(method = "renderHandsWithItems", at = @At("HEAD"))
     public void renderItemLight(float f, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, LocalPlayer localPlayer, int i, CallbackInfo ci, @Local(ordinal = 0, argsOnly = true) LocalIntRef original) {
-        int light =getLight(localPlayer.getMainHandItem(), localPlayer.getOffhandItem());
-        if (LegacyOptions.itemLightingInHand.get() && light > 0) original.set(LightTexture.pack(light,LightTexture.sky(i)));
+        int light = getLight(localPlayer.getMainHandItem(), localPlayer.getOffhandItem());
+        if (LegacyOptions.itemLightingInHand.get() && light > 0)
+            original.set(LightTexture.pack(light, LightTexture.sky(i)));
     }
 
     @Unique
-    private int getLight(ItemStack mainHand, ItemStack offHand){
+    private int getLight(ItemStack mainHand, ItemStack offHand) {
         return Math.max(mainHand.getItem() instanceof BlockItem item ? item.getBlock().defaultBlockState().getLightEmission() : 0, offHand.getItem() instanceof BlockItem item ? item.getBlock().defaultBlockState().getLightEmission() : 0);
     }
 
@@ -83,9 +88,9 @@ public abstract class ItemInHandRendererMixin {
                 this.renderPlayerArm(poseStack, submitNodeCollector, j, -1.0f, 0.5f, humanoidArm.getOpposite());
                 poseStack.popPose();
             }
-            applyItemTransforms(poseStack,h,humanoidArm,i,k);
-            float l = (float)itemStack.getUseDuration(/*? if >=1.20.5 {*/abstractClientPlayer/*?}*/) - ((float)abstractClientPlayer.getUseItemRemainingTicks() - f + 1.0F);
-            float m = l / (float)CrossbowItem.getChargeDuration(itemStack/*? if >=1.20.5 {*/, abstractClientPlayer/*?}*/);
+            applyItemTransforms(poseStack, h, humanoidArm, i, k);
+            float l = (float) itemStack.getUseDuration(/*? if >=1.20.5 {*/abstractClientPlayer/*?}*/) - ((float) abstractClientPlayer.getUseItemRemainingTicks() - f + 1.0F);
+            float m = l / (float) CrossbowItem.getChargeDuration(itemStack/*? if >=1.20.5 {*/, abstractClientPlayer/*?}*/);
             if (m > 1.0F) {
                 m = 1.0F;
             }
@@ -97,12 +102,12 @@ public abstract class ItemInHandRendererMixin {
                 poseStack.translate(p * 0.0F, p * 0.004F, p * 0.0F);
             }
 
-            poseStack.translate(k*0.2, -0.1F, m * 0.04F - 0.2);
+            poseStack.translate(k * 0.2, -0.1F, m * 0.04F - 0.2);
             poseStack.scale(1.0F, 1.0F, 1.0F + m * 0.2F);
-            poseStack.mulPose(Axis.ZP.rotationDegrees((float)k * 25.0F));
-            poseStack.mulPose(Axis.YP.rotationDegrees((float)k * 25.0F));
+            poseStack.mulPose(Axis.ZP.rotationDegrees((float) k * 25.0F));
+            poseStack.mulPose(Axis.YP.rotationDegrees((float) k * 25.0F));
         } else {
-            applyItemTransforms(poseStack,h,humanoidArm,i,k);
+            applyItemTransforms(poseStack, h, humanoidArm, i, k);
             if (CrossbowItem.isCharged(itemStack) && h < 0.001F && interactionHand == InteractionHand.MAIN_HAND) {
                 poseStack.translate((float) k * -0.641864F, 0.0F, 0.0F);
                 poseStack.mulPose(Axis.YP.rotationDegrees((float) k * 10.0F));
@@ -116,11 +121,11 @@ public abstract class ItemInHandRendererMixin {
     }
 
     @Unique
-    private void applyItemTransforms(PoseStack poseStack, float h, HumanoidArm humanoidArm, float i, int k){
+    private void applyItemTransforms(PoseStack poseStack, float h, HumanoidArm humanoidArm, float i, int k) {
         float lx = -0.4F * Mth.sin(Mth.sqrt(h) * (float) Math.PI);
         float mx = 0.2F * Mth.sin(Mth.sqrt(h) * (float) (Math.PI * 2));
         float n = -0.2F * Mth.sin(h * (float) Math.PI);
-        poseStack.translate((float)k * lx, mx, n);
+        poseStack.translate((float) k * lx, mx, n);
         this.applyItemArmTransform(poseStack, humanoidArm, i);
         this.applyItemArmAttackTransform(poseStack, humanoidArm, h);
     }

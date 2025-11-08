@@ -17,33 +17,38 @@ import wily.legacy.Legacy4J;
 
 @Mixin(OldMinecartBehavior.class)
 public abstract class OldMinecartBehaviorMixin extends MinecartBehavior {
+    boolean doubleTick = true;
+
     protected OldMinecartBehaviorMixin(AbstractMinecart arg) {
         super(arg);
     }
 
-    @Shadow public abstract void tick();
+    @Shadow
+    public abstract void tick();
 
     @Inject(method = "getMaxSpeed", at = @At("HEAD"), cancellable = true)
     protected void getMaxSpeed(CallbackInfoReturnable<Double> cir) {
         cir.setReturnValue(8d / 20d);
     }
-    boolean doubleTick = true;
 
     @Inject(method = "tick", at = @At("RETURN"))
-    public void tick(CallbackInfo ci){
-        if (doubleTick && !level().isClientSide()){
+    public void tick(CallbackInfo ci) {
+        if (doubleTick && !level().isClientSide()) {
             doubleTick = false;
             tick();
             doubleTick = true;
         }
     }
+
     @Redirect(method = "moveAlongTrack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;", ordinal = 4))
     public Vec3 movePlayerAlongTrack(Vec3 instance, double d, double e, double f) {
         ServerPlayer p = (ServerPlayer) minecart.getFirstPassenger();
-        if (!p.getLastClientInput().forward() || (this.getDeltaMovement().horizontalDistanceSqr()) >= 0.01D) return instance;
-        Vec3 movement = Legacy4J.getRelativeMovement(p,1.0f,new Vec3(0,0,1),0);
-        return instance.add(movement.x*0.1f,e,movement.z*0.1f);
+        if (!p.getLastClientInput().forward() || (this.getDeltaMovement().horizontalDistanceSqr()) >= 0.01D)
+            return instance;
+        Vec3 movement = Legacy4J.getRelativeMovement(p, 1.0f, new Vec3(0, 0, 1), 0);
+        return instance.add(movement.x * 0.1f, e, movement.z * 0.1f);
     }
+
     @Redirect(method = "moveAlongTrack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/AbstractMinecart;isInWater()Z"))
     public boolean moveAlongTrack(AbstractMinecart instance) {
         return false;

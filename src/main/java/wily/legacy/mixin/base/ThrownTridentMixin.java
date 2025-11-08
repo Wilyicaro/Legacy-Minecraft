@@ -12,7 +12,9 @@ import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(ThrownTrident.class)
 public abstract class ThrownTridentMixin extends AbstractArrow {
-    @Shadow @Final private static EntityDataAccessor<Byte> ID_LOYALTY;
+    @Shadow
+    @Final
+    private static EntityDataAccessor<Byte> ID_LOYALTY;
 
     protected ThrownTridentMixin(EntityType<? extends AbstractArrow> entityType, Level level) {
         super(entityType, level/*? if >1.20.2 && <1.20.5 {*//*, ItemStack.EMPTY*//*?}*/);

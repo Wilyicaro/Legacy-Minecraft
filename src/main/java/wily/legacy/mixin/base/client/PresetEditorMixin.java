@@ -15,8 +15,8 @@ import java.util.Optional;
 @Mixin(PresetEditor.class)
 public interface PresetEditorMixin {
     //? if fabric {
-    @Redirect(method = "<clinit>",at = @At(value = "INVOKE", target = "Ljava/util/Map;of(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/Map;"))
-    private static Map<Optional<ResourceKey<WorldPreset>>, PresetEditor> init(Object k1, Object v1, Object k2, Object v2){
+    @Redirect(method = "<clinit>", at = @At(value = "INVOKE", target = "Ljava/util/Map;of(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/util/Map;"))
+    private static Map<Optional<ResourceKey<WorldPreset>>, PresetEditor> init(Object k1, Object v1, Object k2, Object v2) {
         return Legacy4JClient.VANILLA_PRESET_EDITORS;
     }
     //?}

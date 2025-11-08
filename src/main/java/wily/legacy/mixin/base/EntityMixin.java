@@ -15,8 +15,8 @@ import wily.legacy.init.LegacyGameRules;
 @Mixin(Entity.class)
 public abstract class EntityMixin {
     @Unique
-    private Entity self(){
-        return (Entity) (Object)this;
+    private Entity self() {
+        return (Entity) (Object) this;
     }
 
     @Inject(method = "setCustomName", at = @At("RETURN"))

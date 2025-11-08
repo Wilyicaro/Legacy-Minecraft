@@ -18,6 +18,6 @@ public class LegacyMixinToggles {
     }
 
     public static FactoryMixinToggle createMixinOption(String key, String translationKey, boolean defaultValue) {
-        return new FactoryMixinToggle(key, defaultValue, ()-> new FactoryConfigDisplay.Instance<>(optionName(translationKey), b-> LegacyComponents.NEEDS_RESTART, (c,v)->c));
+        return new FactoryMixinToggle(key, defaultValue, () -> new FactoryConfigDisplay.Instance<>(optionName(translationKey), b -> LegacyComponents.NEEDS_RESTART, (c, v) -> c));
     }
 }

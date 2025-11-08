@@ -36,20 +36,28 @@ import java.util.List;
 @Mixin(ScreenEffectRenderer.class)
 public abstract class ScreenEffectRendererMixin {
 
-    @Shadow private ItemStack itemActivationItem;
-
     @Unique
     private static int texRenderColor = 0xFFFFFFFF;
+    @Shadow
+    private ItemStack itemActivationItem;
+    @Shadow
+    @Final
+    private Minecraft minecraft;
 
-    @Shadow @Final private Minecraft minecraft;
+    @Shadow
+    @Final
+    private MultiBufferSource bufferSource;
 
-    @Shadow @Final private MultiBufferSource bufferSource;
+    @ModifyArg(method = "renderTex", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/VertexConsumer;setColor(I)Lcom/mojang/blaze3d/vertex/VertexConsumer;"))
+    private static int renderTex(int i) {
+        return ColorUtil.mergeColors(texRenderColor, i);
+    }
 
     @ModifyArg(method = "renderScreenEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;renderTex(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V"))
     private TextureAtlasSprite renderScreenEffect(TextureAtlasSprite f, PoseStack i, MultiBufferSource f1, @Local /*? if neoforge {*//*Pair<BlockState, BlockPos> pair*//*?} else {*/BlockState state/*?}*/) {
         //? if neoforge {
         /*BlockState state = pair.getLeft();
-        *///?}
+         *///?}
         List<BakedQuad> quads = Collections.emptyList();
         List<BlockModelPart> parts = minecraft.getBlockRenderer().getBlockModelShaper().getBlockModel(state).collectParts(minecraft.player.getRandom());
         if (!parts.isEmpty()) quads = parts.get(0).getQuads(Direction.UP);
@@ -62,19 +70,15 @@ public abstract class ScreenEffectRendererMixin {
         return f;
     }
 
-    @ModifyArg(method = "renderTex", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/VertexConsumer;setColor(I)Lcom/mojang/blaze3d/vertex/VertexConsumer;"))
-    private static int renderTex(int i){
-        return ColorUtil.mergeColors(texRenderColor, i);
-    }
-
     @Inject(method = "tick", at = @At("RETURN"))
-    private void tick(CallbackInfo ci){
-        if (itemActivationItem == null && LegacyActivationAnim.itemActivationRenderReplacement != null) LegacyActivationAnim.itemActivationRenderReplacement = null;
+    private void tick(CallbackInfo ci) {
+        if (itemActivationItem == null && LegacyActivationAnim.itemActivationRenderReplacement != null)
+            LegacyActivationAnim.itemActivationRenderReplacement = null;
     }
 
     @Inject(method = "renderItemActivationAnimation", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/item/ItemStackRenderState;submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;III)V"), cancellable = true)
-    private void renderItemActivationAnimation(PoseStack poseStack, float f, SubmitNodeCollector submitNodeCollector, CallbackInfo ci){
-        if (LegacyActivationAnim.itemActivationRenderReplacement != null){
+    private void renderItemActivationAnimation(PoseStack poseStack, float f, SubmitNodeCollector submitNodeCollector, CallbackInfo ci) {
+        if (LegacyActivationAnim.itemActivationRenderReplacement != null) {
             ci.cancel();
             LegacyActivationAnim.itemActivationRenderReplacement.render(poseStack, f, bufferSource);
             poseStack.popPose();

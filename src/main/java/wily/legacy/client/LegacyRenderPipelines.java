@@ -1,4 +1,3 @@
-
 package wily.legacy.client;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;

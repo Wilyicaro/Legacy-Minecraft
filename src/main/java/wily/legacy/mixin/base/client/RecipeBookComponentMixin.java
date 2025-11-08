@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base.client;
 
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;import net.minecraft.client.Minecraft;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.world.inventory.RecipeBookMenu;
 //? if >1.20.1 {
@@ -25,15 +26,20 @@ public class RecipeBookComponentMixin {
     *///?}
 
 
-    @Shadow protected Minecraft minecraft;
-    @Shadow protected /*? if <1.20.5 {*/ /*RecipeBookMenu<?> *//*?} else if <1.21.2 {*/ /*RecipeBookMenu<?, ?> *//*?} else {*/ @Final RecipeBookMenu/*?}*/ menu;
+    @Shadow
+    protected Minecraft minecraft;
+    @Shadow
+    protected /*? if <1.20.5 {*/ /*RecipeBookMenu<?> *//*?} else if <1.21.2 {*/ /*RecipeBookMenu<?, ?> *//*?} else {*/
+    @Final RecipeBookMenu/*?}*/ menu;
 
-    @Shadow private int xOffset;
+    @Shadow
+    private int xOffset;
 
-    @Shadow private boolean widthTooNarrow;
+    @Shadow
+    private boolean widthTooNarrow;
 
     @Redirect(method = "initVisuals", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/recipebook/RecipeBookComponent;xOffset:I", opcode = Opcodes.PUTFIELD))
-    private void initVisuals(RecipeBookComponent instance, int value){
+    private void initVisuals(RecipeBookComponent instance, int value) {
         xOffset = this.widthTooNarrow ? 0 : minecraft.screen instanceof LegacyMenuAccess<?> a ? a.getMenuRectangle().width() / 2 - 2 : 86;
     }
 
@@ -74,7 +80,7 @@ public class RecipeBookComponentMixin {
     }
     *///?} else {
     @ModifyReturnValue(method = "isOffsetNextToMainGUI", at = @At("RETURN"))
-    private boolean isOffset(boolean original){
+    private boolean isOffset(boolean original) {
         return minecraft.screen instanceof LegacyMenuAccess<?> a ? a.getMenuRectangle().width() / 2 - 2 == xOffset : original;
     }
     //?}

@@ -15,9 +15,11 @@ import wily.legacy.client.PackAlbum;
 @Mixin(PrimaryLevelData.class)
 public abstract class ClientPrimaryLevelDataMixin implements LegacyClientWorldSettings {
 
-    @Shadow private boolean difficultyLocked;
+    @Shadow
+    private boolean difficultyLocked;
 
-    @Shadow private LevelSettings settings;
+    @Shadow
+    private LevelSettings settings;
 
     public boolean trustPlayers() {
         return LegacyClientWorldSettings.of(settings).trustPlayers();
@@ -43,11 +45,13 @@ public abstract class ClientPrimaryLevelDataMixin implements LegacyClientWorldSe
     public void setAllowCommands(boolean allow) {
         LegacyClientWorldSettings.of(settings).setAllowCommands(allow);
     }
-    @Inject(method = "setTagData",at = @At("TAIL"))
+
+    @Inject(method = "setTagData", at = @At("TAIL"))
     private void setTagData(RegistryAccess registryAccess, CompoundTag compoundTag, CompoundTag compoundTag2, CallbackInfo ci) {
-        compoundTag.putBoolean("TrustPlayers",trustPlayers());
+        compoundTag.putBoolean("TrustPlayers", trustPlayers());
         compoundTag.putString("SelectedResourceAssort", getSelectedResourceAlbum().id());
     }
+
     public long getDisplaySeed() {
         return LegacyClientWorldSettings.of(settings).getDisplaySeed();
     }

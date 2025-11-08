@@ -23,14 +23,6 @@ public interface LegacyNameTag {
         return nameTagSubmit;
     }
 
-    void setNameTagColor(float[] color);
-
-    float[] getNameTagColor();
-
-    default boolean hasColor() {
-        return getNameTagColor() != null;
-    }
-
     static float getThickness(double distanceToCameraSq) {
         return Math.max(0.1f, (float) Math.sqrt(distanceToCameraSq) / 16f);
     }
@@ -39,17 +31,17 @@ public interface LegacyNameTag {
         float thickness = getThickness(submit.distanceToCameraSq());
         float[] color = LegacyNameTag.of(submit).getNameTagColor();
         if (!LegacyOptions.displayNameTagBorder.get() || thickness >= 1 || color == null) return;
-        renderOutline(bufferSource.getBuffer(seeThrough ? RenderType.textBackgroundSeeThrough() : RenderType.textBackground()), submit.pose(), submit.x() - 1.1f, submit.y() - 1.1f, font.width(submit.text()) + 2.1f,10.1f, thickness, color[0],color[1],color[2],1.0f);
+        renderOutline(bufferSource.getBuffer(seeThrough ? RenderType.textBackgroundSeeThrough() : RenderType.textBackground()), submit.pose(), submit.x() - 1.1f, submit.y() - 1.1f, font.width(submit.text()) + 2.1f, 10.1f, thickness, color[0], color[1], color[2], 1.0f);
     }
 
-    static void renderOutline(VertexConsumer consumer, Matrix4f matrix4f, float x, float y, float width, float height, float thickness, float r, float g, float b , float a) {
-        fill(consumer, matrix4f, x, y, x + width, y + thickness, r,g,b,a);
-        fill(consumer, matrix4f, x, y + height - thickness, x + width, y + height, r,g,b,a);
-        fill(consumer, matrix4f, x, y + thickness, x + thickness, y + height - thickness, r,g,b,a);
-        fill(consumer, matrix4f, x + width - thickness, y + thickness, x + width, y + height - thickness, r,g,b,a);
+    static void renderOutline(VertexConsumer consumer, Matrix4f matrix4f, float x, float y, float width, float height, float thickness, float r, float g, float b, float a) {
+        fill(consumer, matrix4f, x, y, x + width, y + thickness, r, g, b, a);
+        fill(consumer, matrix4f, x, y + height - thickness, x + width, y + height, r, g, b, a);
+        fill(consumer, matrix4f, x, y + thickness, x + thickness, y + height - thickness, r, g, b, a);
+        fill(consumer, matrix4f, x + width - thickness, y + thickness, x + width, y + height - thickness, r, g, b, a);
     }
 
-    static void fill(VertexConsumer vertexConsumer, Matrix4f matrix4f, float i, float j, float k, float l, float r, float g, float b , float a) {
+    static void fill(VertexConsumer vertexConsumer, Matrix4f matrix4f, float i, float j, float k, float l, float r, float g, float b, float a) {
         float o;
         if (i < k) {
             o = i;
@@ -61,10 +53,18 @@ public interface LegacyNameTag {
             j = l;
             l = o;
         }
-        vertexConsumer.addVertex(matrix4f, i, j, 0).setColor(r,g,b,a).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, i, l, 0).setColor(r,g,b,a).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, k, l, 0).setColor(r,g,b,a).setLight(LightTexture.FULL_BRIGHT);
-        vertexConsumer.addVertex(matrix4f, k, j, 0).setColor(r,g,b,a).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, i, j, 0).setColor(r, g, b, a).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, i, l, 0).setColor(r, g, b, a).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, k, l, 0).setColor(r, g, b, a).setLight(LightTexture.FULL_BRIGHT);
+        vertexConsumer.addVertex(matrix4f, k, j, 0).setColor(r, g, b, a).setLight(LightTexture.FULL_BRIGHT);
+    }
+
+    float[] getNameTagColor();
+
+    void setNameTagColor(float[] color);
+
+    default boolean hasColor() {
+        return getNameTagColor() != null;
     }
 
     interface Storage {

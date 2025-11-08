@@ -8,7 +8,7 @@ public interface LegacyFeatureRenderDispatcher {
         return (LegacyFeatureRenderDispatcher) dispatcher;
     }
 
-    void setBufferSource(MultiBufferSource.BufferSource bufferSource);
-
     MultiBufferSource.BufferSource getBufferSource();
+
+    void setBufferSource(MultiBufferSource.BufferSource bufferSource);
 }

@@ -12,7 +12,32 @@ public interface LegacyPlayerInfo {
         return (LegacyPlayerInfo) obj;
     }
 
-    default GameProfile legacyMinecraft$getProfile(){
+    static void updateMayFlySurvival(ServerPlayer player, boolean mayFlySurvival, boolean updateAbilities) {
+        LegacyPlayerInfo.of(player).setMayFlySurvival(mayFlySurvival);
+        if (player.getAbilities().mayfly != mayFlySurvival && player.gameMode.isSurvival()) {
+            player.getAbilities().mayfly = mayFlySurvival;
+            if (!player.getAbilities().mayfly && player.getAbilities().flying) player.getAbilities().flying = false;
+            if (updateAbilities) player.onUpdateAbilities();
+        }
+    }
+
+    static LegacyPlayerInfo decode(CommonNetwork.PlayBuf buf) {
+        return new Instance(buf.get().readVarInt(), buf.get().readBoolean(), buf.get().readBoolean(), buf.get().readBoolean(),/*? if <1.20.5 {*//*buf.get().readMap(Object2IntOpenHashMap::new, b->ClientBoundAwardStatsPacketAccessor.decodeStatCap(b,BuiltInRegistries.STAT_TYPE.byId(b.readVarInt())),FriendlyByteBuf::readVarInt)*//*?} else {*/ClientBoundAwardStatsPacketAccessor.getStatsValueCodec().decode(buf.get())/*?}*/);
+    }
+
+    static void encode(CommonNetwork.PlayBuf buf, LegacyPlayerInfo info) {
+        buf.get().writeVarInt(info.getIdentifierIndex());
+        buf.get().writeBoolean(info.isVisible());
+        buf.get().writeBoolean(info.isExhaustionDisabled());
+        buf.get().writeBoolean(info.mayFlySurvival());
+        //? if <1.20.5 {
+        /*buf.get().writeMap(info.getStatsMap(), ClientBoundAwardStatsPacketAccessor::encodeStatCap, FriendlyByteBuf::writeVarInt);
+         *///?} else {
+        ClientBoundAwardStatsPacketAccessor.getStatsValueCodec().encode(buf.get(), info.getStatsMap());
+        //?}
+    }
+
+    default GameProfile legacyMinecraft$getProfile() {
         return null;
     }
 
@@ -32,36 +57,11 @@ public interface LegacyPlayerInfo {
 
     void setMayFlySurvival(boolean mayFly);
 
-    static void updateMayFlySurvival(ServerPlayer player, boolean mayFlySurvival, boolean updateAbilities){
-        LegacyPlayerInfo.of(player).setMayFlySurvival(mayFlySurvival);
-        if (player.getAbilities().mayfly != mayFlySurvival && player.gameMode.isSurvival()){
-            player.getAbilities().mayfly = mayFlySurvival;
-            if (!player.getAbilities().mayfly && player.getAbilities().flying) player.getAbilities().flying = false;
-            if (updateAbilities) player.onUpdateAbilities();
-        }
-    }
-
     Object2IntMap<Stat<?>> getStatsMap();
 
     void setStatsMap(Object2IntMap<Stat<?>> statsMap);
 
-    static LegacyPlayerInfo decode(CommonNetwork.PlayBuf buf){
-        return new Instance(buf.get().readVarInt(), buf.get().readBoolean(), buf.get().readBoolean(), buf.get().readBoolean(),/*? if <1.20.5 {*//*buf.get().readMap(Object2IntOpenHashMap::new, b->ClientBoundAwardStatsPacketAccessor.decodeStatCap(b,BuiltInRegistries.STAT_TYPE.byId(b.readVarInt())),FriendlyByteBuf::readVarInt)*//*?} else {*/ClientBoundAwardStatsPacketAccessor.getStatsValueCodec().decode(buf.get())/*?}*/);
-    }
-
-    static void encode(CommonNetwork.PlayBuf buf, LegacyPlayerInfo info){
-        buf.get().writeVarInt(info.getIdentifierIndex());
-        buf.get().writeBoolean(info.isVisible());
-        buf.get().writeBoolean(info.isExhaustionDisabled());
-        buf.get().writeBoolean(info.mayFlySurvival());
-        //? if <1.20.5 {
-        /*buf.get().writeMap(info.getStatsMap(), ClientBoundAwardStatsPacketAccessor::encodeStatCap, FriendlyByteBuf::writeVarInt);
-        *///?} else {
-        ClientBoundAwardStatsPacketAccessor.getStatsValueCodec().encode(buf.get(), info.getStatsMap());
-        //?}
-    }
-
-    default void copyFrom(LegacyPlayerInfo info){
+    default void copyFrom(LegacyPlayerInfo info) {
         this.setIdentifierIndex(info.getIdentifierIndex());
         this.setVisibility(info.isVisible());
         this.setDisableExhaustion(info.isExhaustionDisabled());
@@ -76,7 +76,7 @@ public interface LegacyPlayerInfo {
         boolean mayFlySurvival = false;
         Object2IntMap<Stat<?>> statsMap;
 
-        public Instance(int index, boolean invisible, boolean disableExhaustion, boolean mayFlySurvival, Object2IntMap<Stat<?>> object2IntMap){
+        public Instance(int index, boolean invisible, boolean disableExhaustion, boolean mayFlySurvival, Object2IntMap<Stat<?>> object2IntMap) {
             setIdentifierIndex(index);
             setVisibility(invisible);
             setDisableExhaustion(disableExhaustion);

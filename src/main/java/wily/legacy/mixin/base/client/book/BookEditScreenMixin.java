@@ -38,43 +38,57 @@ import java.util.List;
 import java.util.Objects;
 
 @Mixin(BookEditScreen.class)
-public abstract class BookEditScreenMixin extends Screen implements Controller.Event,ControlTooltip.Event {
+public abstract class BookEditScreenMixin extends Screen implements Controller.Event, ControlTooltip.Event {
 
-    @Shadow private PageButton forwardButton;
-    @Shadow private PageButton backButton;
-
-    @Shadow protected abstract void pageBack();
-
-    @Shadow protected abstract void pageForward();
     private static final Component EXIT_BOOK = Component.translatable("legacy.menu.exit_book");
     private static final Component EXIT_BOOK_MESSAGE = Component.translatable("legacy.menu.exit_book_message");
-
-    @Shadow protected abstract int getNumPages();
-
-    @Shadow private int currentPage;
-
-    @Shadow protected abstract void saveChanges();
-
-    @Shadow private MultiLineEditBox page;
-
-    @Shadow protected abstract void updatePageContent();
-
-    @Shadow private Component numberOfPages;
-
-    @Shadow protected abstract Component getPageNumberMessage();
-
+    @Shadow
+    private PageButton forwardButton;
+    @Shadow
+    private PageButton backButton;
+    @Shadow
+    private int currentPage;
+    @Shadow
+    private MultiLineEditBox page;
+    @Shadow
+    private Component numberOfPages;
     @Unique
     private List<String> initialPages;
-    @Shadow @Final private List<String> pages;
-    @Shadow @Final private BookSignScreen signScreen;
+    @Shadow
+    @Final
+    private List<String> pages;
+    @Shadow
+    @Final
+    private BookSignScreen signScreen;
     @Unique
-    private BookPanel panel = new BookPanel(this){
+    private final BookPanel panel = new BookPanel(this) {
         @Override
         public @Nullable Component getAction(Context context) {
             return page.isFocused() ? context.actionOfContext(KeyContext.class, ControlTooltip::getKeyboardAction) : null;
         }
     };
 
+    protected BookEditScreenMixin(Component component) {
+        super(component);
+    }
+
+    @Shadow
+    protected abstract void pageBack();
+
+    @Shadow
+    protected abstract void pageForward();
+
+    @Shadow
+    protected abstract int getNumPages();
+
+    @Shadow
+    protected abstract void saveChanges();
+
+    @Shadow
+    protected abstract void updatePageContent();
+
+    @Shadow
+    protected abstract Component getPageNumberMessage();
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initReturn(Player player, ItemStack itemStack, InteractionHand interactionHand, WritableBookContent writableBookContent, CallbackInfo ci) {
@@ -85,23 +99,18 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
     public void added() {
         super.added();
         ControlTooltip.Renderer.of(this)
-                .add(()-> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT)) : ControllerBinding.LEFT_BUMPER.getIcon(), ()-> currentPage != 0 ? LegacyComponents.PREVIOUS_PAGE : null)
-                .add(()-> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT),ControlTooltip.PLUS_ICON,ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.RIGHT_BUMPER.getIcon(), ()-> this.currentPage < this.getNumPages() - 1 ? LegacyComponents.NEXT_PAGE : LegacyComponents.ADD_PAGE);
-    }
-
-    protected BookEditScreenMixin(Component component) {
-        super(component);
+                .add(() -> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT), ControlTooltip.PLUS_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT)) : ControllerBinding.LEFT_BUMPER.getIcon(), () -> currentPage != 0 ? LegacyComponents.PREVIOUS_PAGE : null)
+                .add(() -> ControlType.getActiveType().isKbm() ? getFocused() == panel ? null : ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LSHIFT), ControlTooltip.PLUS_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.RIGHT_BUMPER.getIcon(), () -> this.currentPage < this.getNumPages() - 1 ? LegacyComponents.NEXT_PAGE : LegacyComponents.ADD_PAGE);
     }
 
     @Override
     public void onClose() {
         if (!pages.equals(initialPages)) {
-            minecraft.setScreen(new ConfirmationScreen(this, EXIT_BOOK, EXIT_BOOK_MESSAGE,b-> minecraft.setScreen(null)));
-        }
-        else super.onClose();
+            minecraft.setScreen(new ConfirmationScreen(this, EXIT_BOOK, EXIT_BOOK_MESSAGE, b -> minecraft.setScreen(null)));
+        } else super.onClose();
     }
 
-    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
         panel.init();
@@ -133,13 +142,14 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
 
     @Override
     public void bindingStateTick(BindingState state) {
-        if ((state.is(ControllerBinding.RIGHT_BUMPER) || state.is(ControllerBinding.LEFT_BUMPER)) && state.canClick()){
+        if ((state.is(ControllerBinding.RIGHT_BUMPER) || state.is(ControllerBinding.LEFT_BUMPER)) && state.canClick()) {
             (state.is(ControllerBinding.RIGHT_BUMPER) ? forwardButton : backButton).keyPressed(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
         }
     }
-    @Inject(method = "keyPressed",at = @At("HEAD"), cancellable = true)
+
+    @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     public void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
-        if ((keyEvent.hasShiftDown() && (keyEvent.isRight() || keyEvent.isLeft())) && getFocused() != panel){
+        if ((keyEvent.hasShiftDown() && (keyEvent.isRight() || keyEvent.isLeft())) && getFocused() != panel) {
             (keyEvent.isRight() ? forwardButton : backButton).keyPressed(new KeyEvent(InputConstants.KEY_RETURN, 0, 0));
             cir.setReturnValue(true);
             return;

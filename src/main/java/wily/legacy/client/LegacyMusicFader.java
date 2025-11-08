@@ -13,19 +13,19 @@ import java.util.Map;
 
 public class LegacyMusicFader {
     private static final long FADE_TICKS = 70;
-    private static long ticks = 0;
     private static final Minecraft mc = Minecraft.getInstance();
     private static final SoundManager soundManager = mc.getSoundManager();
     private static final MusicManagerAccessor musicManagerAccessor = (MusicManagerAccessor) mc.getMusicManager();
-
     public static SoundInstance queuedSong = null;
     public static Map<SoundInstance, Long> fadingSongs = new HashMap<>();
     public static boolean musicManagerShouldTick = true;
+    private static long ticks = 0;
 
     public static SoundEngine.PlayResult fadeInMusic(SoundInstance newSong, boolean stopMusicManager) {
         SoundEngine.PlayResult result = SoundEngine.PlayResult.STARTED;
         SoundInstance music;
-        if ((music = musicManagerAccessor.getCurrentMusic()) != null) fadingSongs.putIfAbsent(music, ticks + FADE_TICKS);
+        if ((music = musicManagerAccessor.getCurrentMusic()) != null)
+            fadingSongs.putIfAbsent(music, ticks + FADE_TICKS);
         if (fadingSongs.isEmpty()) result = soundManager.play(newSong);
         else queuedSong = newSong;
         if (stopMusicManager) musicManagerShouldTick = false;
@@ -47,7 +47,7 @@ public class LegacyMusicFader {
     public static void tick() {
         ++ticks;
 
-        for (Iterator<Map.Entry<SoundInstance, Long>> it = fadingSongs.entrySet().iterator(); it.hasNext();) {
+        for (Iterator<Map.Entry<SoundInstance, Long>> it = fadingSongs.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<SoundInstance, Long> entry = it.next();
             SoundInstance song = entry.getKey();
             long songTick = entry.getValue();

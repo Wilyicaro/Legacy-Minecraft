@@ -33,18 +33,9 @@ import wily.legacy.entity.LegacyPlayerInfo;
 
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, LegacyPlayerInfo {
-    @Shadow @Final public ServerPlayerGameMode gameMode;
-
-    public ServerPlayerMixin(Level level, GameProfile gameProfile) {
-        super(level, gameProfile);
-    }
-
-    @Shadow public abstract void onUpdateAbilities();
-
-    @Shadow public abstract ServerStatsCounter getStats();
-
-    @Shadow public abstract ServerLevel level();
-
+    @Shadow
+    @Final
+    public ServerPlayerGameMode gameMode;
     int position = -1;
     boolean classicCrafting = true;
     boolean classicTrading = true;
@@ -52,7 +43,18 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     boolean classicLoom = true;
     boolean disableExhaustion = false;
     boolean mayFlySurvival = false;
+    public ServerPlayerMixin(Level level, GameProfile gameProfile) {
+        super(level, gameProfile);
+    }
 
+    @Shadow
+    public abstract void onUpdateAbilities();
+
+    @Shadow
+    public abstract ServerStatsCounter getStats();
+
+    @Shadow
+    public abstract ServerLevel level();
 
     @Override
     public GameProfile legacyMinecraft$getProfile() {
@@ -156,6 +158,7 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
         valueOutput.putBoolean("MayFlySurvival", mayFlySurvival());
 
     }
+
     @Inject(method = "readAdditionalSaveData", at = @At("RETURN"))
     public void readAdditionalSaveData(ValueInput input, CallbackInfo ci) {
         setDisableExhaustion(input.getBooleanOr("DisableExhaustion", false));
@@ -164,7 +167,7 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
 
     @Inject(method = "startSleepInBed", at = @At("RETURN"), cancellable = true)
     public void startSleepInBed(BlockPos blockPos, CallbackInfoReturnable<Either<BedSleepingProblem, Unit>> cir) {
-        Either<BedSleepingProblem,Unit> either = cir.getReturnValue();
+        Either<BedSleepingProblem, Unit> either = cir.getReturnValue();
         if (level()./*? if <1.21.5 {*//*isDay*//*?} else {*/isBrightOutside/*?}*/() && either.left().isPresent() && either.left().get() == BedSleepingProblem.NOT_POSSIBLE_NOW && !this.isCreative()) {
             Vec3 vec3 = Vec3.atBottomCenterOf(blockPos);
             if (!this.level().getEntitiesOfClass(Monster.class, new AABB(vec3.x() - 8.0, vec3.y() - 5.0, vec3.z() - 8.0, vec3.x() + 8.0, vec3.y() + 5.0, vec3.z() + 8.0), (argx) -> argx.isPreventingPlayerRest(level(), this)).isEmpty()) {
@@ -175,8 +178,8 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
 
     @Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At(value = "RETURN"))
     public void drop(ItemStack itemStack, boolean bl, boolean bl2, CallbackInfoReturnable<ItemEntity> cir) {
-        if (cir.getReturnValue() != null && !level().isClientSide() && bl2){
-            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ITEM_PICKUP, this.getSoundSource(),1.0f,1.0f);
+        if (cir.getReturnValue() != null && !level().isClientSide() && bl2) {
+            this.level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.ITEM_PICKUP, this.getSoundSource(), 1.0f, 1.0f);
         }
     }
 }

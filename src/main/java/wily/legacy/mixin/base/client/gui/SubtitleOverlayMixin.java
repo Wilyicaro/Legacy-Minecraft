@@ -2,21 +2,22 @@ package wily.legacy.mixin.base.client.gui;
 
 //? if >=1.21.1 {
 //?}
+
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-        import net.minecraft.client.gui.components.SubtitleOverlay;
+import net.minecraft.client.gui.components.SubtitleOverlay;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
-        import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-        import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -28,18 +29,25 @@ import java.util.Objects;
 @Mixin(SubtitleOverlay.class)
 public class SubtitleOverlayMixin {
 
-    @Shadow @Final private Minecraft minecraft;
+    @Shadow
+    @Final
+    private Minecraft minecraft;
 
-    @Shadow private boolean isListening;
+    @Shadow
+    private boolean isListening;
 
     //? if >=1.20.5 {
-    @Shadow @Final private List<SubtitleOverlay.Subtitle> audibleSubtitles;
+    @Shadow
+    @Final
+    private List<SubtitleOverlay.Subtitle> audibleSubtitles;
     //?}
 
-    @Shadow @Final private List<SubtitleOverlay.Subtitle> subtitles;
+    @Shadow
+    @Final
+    private List<SubtitleOverlay.Subtitle> subtitles;
 
     @Unique
-    private SubtitleOverlay self(){
+    private SubtitleOverlay self() {
         return (SubtitleOverlay) (Object) this;
     }
 
@@ -63,7 +71,7 @@ public class SubtitleOverlayMixin {
 
             //? if >=1.20.5 {
             this.audibleSubtitles.clear();
-            for(SubtitleOverlay.Subtitle subtitle : this.subtitles) {
+            for (SubtitleOverlay.Subtitle subtitle : this.subtitles) {
                 if (subtitle.isAudibleFrom(vec3)) {
                     this.audibleSubtitles.add(subtitle);
                 }
@@ -75,7 +83,7 @@ public class SubtitleOverlayMixin {
                 double d = this.minecraft.options.notificationDisplayTime().get();
                 Iterator<SubtitleOverlay.Subtitle> iterator = list.iterator();
 
-                while(iterator.hasNext()) {
+                while (iterator.hasNext()) {
                     SubtitleOverlay.Subtitle subtitle2 = iterator.next();
                     //? if >=1.20.5 {
                     subtitle2.purgeOldInstances(3000.0 * d);
@@ -90,11 +98,11 @@ public class SubtitleOverlayMixin {
                 j += 36;
                 int lineHeight = 12;
                 guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(guiGraphics.guiWidth() - 10, (float)(guiGraphics.guiHeight() - 35));
+                guiGraphics.pose().translate(guiGraphics.guiWidth() - 10, (float) (guiGraphics.guiHeight() - 35));
                 int height = list.size() * 12;
                 LegacyRenderUtil.renderPointerPanel(guiGraphics, -j, -height, j, height + 10);
-                guiGraphics.pose().translate( - (j / 2.0f) - 2.0f, 0 );
-                for(SubtitleOverlay.Subtitle subtitle2 : list) {
+                guiGraphics.pose().translate(-(j / 2.0f) - 2.0f, 0);
+                for (SubtitleOverlay.Subtitle subtitle2 : list) {
                     Component component = subtitle2.getText();
                     //? if >=1.20.5 {
                     SubtitleOverlay.SoundPlayedAt soundPlayedAt = subtitle2.getClosest(vec3);
@@ -104,7 +112,7 @@ public class SubtitleOverlayMixin {
                     Vec3 vec34 = /*? if <1.20.5 {*//*subtitle2.getLocation()*//*?} else {*/soundPlayedAt.location()/*?}*/.subtract(vec3).normalize();
                     double e = vec33.dot(vec34);
                     double f = vec32.dot(vec34);
-                    boolean bl = f > (double)0.5F;
+                    boolean bl = f > (double) 0.5F;
                     int l = j / 2;
                     Objects.requireNonNull(this.minecraft.font);
                     int n = lineHeight / 2;
@@ -114,7 +122,7 @@ public class SubtitleOverlayMixin {
 
                     int r = q - 16777216;
                     if (!bl && e != 0) {
-                        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f,1.0f, 1.0f, p / 255f);
+                        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, p / 255f);
                         FactoryGuiGraphics.of(guiGraphics).blitSprite(e > 0 ? LegacySprites.SCROLL_RIGHT : LegacySprites.SCROLL_LEFT, e > 0 ? l - 8 : -l + 4, -n - 2, 6, 11);
                         FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
                     }

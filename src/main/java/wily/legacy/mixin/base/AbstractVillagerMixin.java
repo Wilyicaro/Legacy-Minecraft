@@ -19,17 +19,20 @@ import java.util.Optional;
 
 @Mixin(AbstractVillager.class)
 public abstract class AbstractVillagerMixin extends AgeableMob {
-    @Shadow public abstract boolean isClientSide();
-
     protected AbstractVillagerMixin(EntityType<? extends AgeableMob> entityType, Level level) {
         super(entityType, level);
     }
 
+    @Shadow
+    public abstract boolean isClientSide();
+
     @Override
     public void onSyncedDataUpdated(List<SynchedEntityData.DataValue<?>> list) {
         super.onSyncedDataUpdated(list);
-        if (isClientSide()) CommonNetwork.sendToServer(new ClientMerchantTradingPayload(getId(), Optional.empty(),ClientMerchantTradingPayload.ID_C2S));
+        if (isClientSide())
+            CommonNetwork.sendToServer(new ClientMerchantTradingPayload(getId(), Optional.empty(), ClientMerchantTradingPayload.ID_C2S));
     }
+
     @Inject(method = "setTradingPlayer", at = @At("RETURN"))
     public void setTradingPlayer(Player player, CallbackInfo ci) {
         if (!isClientSide()) ClientMerchantTradingPayload.sync((AbstractVillager) (Object) this);

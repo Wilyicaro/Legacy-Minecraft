@@ -45,38 +45,41 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
     public static final Component WORLD_HOST_FRIEND_USERNAME_TEXT = Component.translatable("world-host.add_friend.enter_username");
 
     public WorldHostFriendsScreen(Screen parent) {
-        this(parent, 250,190);
+        this(parent, 250, 190);
     }
+
     public WorldHostFriendsScreen(Screen parent, int imageWidth, int imageHeight) {
-        super(parent, s-> Panel.centered(s, LegacySprites.PANEL,imageWidth,imageHeight), WORLD_HOST_FRIENDS);
-        renderableVList.layoutSpacing(i->0);
-        addFriendButtons(()->{});
+        super(parent, s -> Panel.centered(s, LegacySprites.PANEL, imageWidth, imageHeight), WORLD_HOST_FRIENDS);
+        renderableVList.layoutSpacing(i -> 0);
+        addFriendButtons(() -> {
+        });
     }
 
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), ()-> ControlTooltip.getKeyMessage(InputConstants.KEY_X,this));
+        renderer.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> ControlTooltip.getKeyMessage(InputConstants.KEY_X, this));
     }
 
-    public void reloadFriendButtons(){
+    public void reloadFriendButtons() {
         int i = renderableVList.renderables.indexOf(getFocused());
         renderableVList.renderables.clear();
-        addFriendButtons(()-> {
-            if (i >= 0 &&  i < renderableVList.renderables.size()) setFocused((GuiEventListener) renderableVList.renderables.get(i));
+        addFriendButtons(() -> {
+            if (i >= 0 && i < renderableVList.renderables.size())
+                setFocused((GuiEventListener) renderableVList.renderables.get(i));
             repositionElements();
         });
     }
 
     @Override
     public void renderableVListInit() {
-        renderableVList.init(panel.x + 10,panel.y + 22,panel.width - 20,panel.height - 28);
+        renderableVList.init(panel.x + 10, panel.y + 22, panel.width - 20, panel.height - 28);
     }
 
     @Override
     protected void panelInit() {
         super.panelInit();
-        addRenderableOnly((guiGraphics, i, j, f) ->  guiGraphics.drawString(font,getTitle(),panel.x + 11, panel.y + panel.height - 182, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        addRenderableOnly((guiGraphics, i, j, f) -> guiGraphics.drawString(font, getTitle(), panel.x + 11, panel.y + panel.height - 182, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
     }
 
     @Override
@@ -84,15 +87,17 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
         if (minecraft.level == null) LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
     }
 
-    protected void addFriendButtons(Runnable afterButtonsAdd){
-        CreationList.addIconButton(renderableVList, Legacy4J.createModLocation("icon/add_user_portal"),FriendsScreen.ADD_FRIEND_TEXT,b-> minecraft.setScreen(new WorldHostFriendsScreen(this,250,234){
-            long lastTyping = -1;
-            private Runnable delayedLookup;
+    protected void addFriendButtons(Runnable afterButtonsAdd) {
+        CreationList.addIconButton(renderableVList, Legacy4J.createModLocation("icon/add_user_portal"), FriendsScreen.ADD_FRIEND_TEXT, b -> minecraft.setScreen(new WorldHostFriendsScreen(this, 250, 234) {
             final List<FriendListFriend> addableFriends = new ArrayList<>();
             final List<FriendListFriend> friendsToAdd = new ArrayList<>();
-            final TickBox silentAddBox = new TickBox(0,0,200,16,false, b1-> AddFriendScreen.ADD_FRIEND_SILENT_TEXT, b1-> ADD_SILENTLY_TEXT_TOOLTIP, t-> {});
-            final EditBox friendBox = new EditBox(Minecraft.getInstance().font, width / 2 - 100,0,200, 20, WORLD_HOST_FRIEND_USERNAME_TEXT);
+            final TickBox silentAddBox = new TickBox(0, 0, 200, false, b1 -> AddFriendScreen.ADD_FRIEND_SILENT_TEXT, b1 -> ADD_SILENTLY_TEXT_TOOLTIP, t -> {
+            });
+            final EditBox friendBox = new EditBox(Minecraft.getInstance().font, width / 2 - 100, 0, 200, 20, WORLD_HOST_FRIEND_USERNAME_TEXT);
             final List<FriendAdder> friendAdders = WorldHost.getFriendAdders();
+            long lastTyping = -1;
+            private Runnable delayedLookup;
+
             @Override
             protected void addFriendButtons(Runnable afterButtonsAdd) {
                 if (addableFriends == null) return;
@@ -101,20 +106,23 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
                 afterButtonsAdd.run();
             }
 
-            private void addFriendButton(FriendListFriend friend){
-                renderableVList.addRenderable(new FriendButton(0,0,230,30,friend){
+            private void addFriendButton(FriendListFriend friend) {
+                renderableVList.addRenderable(new FriendButton(0, 0, 230, 30, friend) {
                     @Override
                     protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                         super.renderWidget(guiGraphics, i, j, f);
                         FactoryScreenUtil.enableBlend();
-                        FactoryGuiGraphics.of(guiGraphics).blitSprite(TickBox.SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX() + 30, this.getY() + (height - 12) / 2, 12, 12);
-                        if (friendsToAdd.contains(friend)) FactoryGuiGraphics.of(guiGraphics).blitSprite(TickBox.TICK, this.getX() + 30, this.getY()  + (height - 12) / 2, 14, 12);
+                        FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.TICKBOX_HOVERED : LegacySprites.TICKBOX, this.getX() + 30, this.getY() + (height - 12) / 2, 12, 12);
+                        if (friendsToAdd.contains(friend))
+                            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TICK, this.getX() + 30, this.getY() + (height - 12) / 2, 14, 12);
                         FactoryScreenUtil.disableBlend();
                     }
+
                     @Override
                     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                         LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 45, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
                     }
+
                     @Override
                     public void onPress(InputWithModifiers input) {
                         if (friendsToAdd.contains(friend)) {
@@ -136,16 +144,16 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
 
             @Override
             public void onClose() {
-                friendsToAdd.forEach(f->f.addFriend(!silentAddBox.selected, WorldHostFriendsScreen.this::reloadFriendButtons));
+                friendsToAdd.forEach(f -> f.addFriend(!silentAddBox.selected, WorldHostFriendsScreen.this::reloadFriendButtons));
                 super.onClose();
             }
 
             @Override
             protected void init() {
                 super.init();
-                friendBox.setPosition(panel.x + (panel.getWidth() - friendBox.getWidth()) / 2,panel.y + 5);
+                friendBox.setPosition(panel.x + (panel.getWidth() - friendBox.getWidth()) / 2, panel.y + 5);
                 friendBox.setMaxLength(36);
-                friendBox.setResponder(s->{
+                friendBox.setResponder(s -> {
                     lastTyping = Util.getMillis();
                     addableFriends.clear();
                     final List<FriendAdder> delayedAdders = new ArrayList<>();
@@ -153,15 +161,17 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
                         if (s.length() > adder.maxValidNameLength()) continue;
                         if (adder.delayLookup(s)) {
                             delayedAdders.add(adder);
-                        } else adder.searchFriends(s,16- addableFriends.size(), f->{
-                            if (friendsToAdd.stream().anyMatch(f1->f1.fallbackProfileInfo().name().equals(f.fallbackProfileInfo().name()))) return;
+                        } else adder.searchFriends(s, 16 - addableFriends.size(), f -> {
+                            if (friendsToAdd.stream().anyMatch(f1 -> f1.fallbackProfileInfo().name().equals(f.fallbackProfileInfo().name())))
+                                return;
                             addableFriends.add(f);
                             this.reloadFriendButtons();
                         });
                     }
-                    delayedLookup = delayedAdders.isEmpty() ? null : ()-> delayedAdders.forEach(adder->
-                            adder.searchFriends(s,16- addableFriends.size(), f->{
-                                if (friendsToAdd.stream().anyMatch(f1->f1.fallbackProfileInfo().name().equals(f.fallbackProfileInfo().name()))) return;
+                    delayedLookup = delayedAdders.isEmpty() ? null : () -> delayedAdders.forEach(adder ->
+                            adder.searchFriends(s, 16 - addableFriends.size(), f -> {
+                                if (friendsToAdd.stream().anyMatch(f1 -> f1.fallbackProfileInfo().name().equals(f.fallbackProfileInfo().name())))
+                                    return;
                                 addableFriends.add(f);
                                 this.reloadFriendButtons();
                             }));
@@ -171,6 +181,7 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
                 addRenderableWidget(silentAddBox);
 
             }
+
             @Override
             public void tick() {
                 if (lastTyping != -1 && Util.getMillis() - 300 > lastTyping) {
@@ -179,13 +190,14 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
                     delayedLookup = null;
                 }
             }
+
             @Override
             public void renderableVListInit() {
-                renderableVList.init(panel.x + 10,panel.y + 66,panel.width - 20,panel.height - 72);
+                renderableVList.init(panel.x + 10, panel.y + 66, panel.width - 20, panel.height - 72);
             }
 
         }));
-        WorldHost.getPlugins().forEach(p-> p.plugin().listFriends(f-> renderableVList.addRenderable(new FriendButton(0, 0, 230, 30, f))));
+        WorldHost.getPlugins().forEach(p -> p.plugin().listFriends(f -> renderableVList.addRenderable(new FriendButton(0, 0, 230, 30, f))));
         afterButtonsAdd.run();
     }
 
@@ -207,13 +219,13 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
 
         @Override
         public Component getMessage() {
-            return UserListWidget.getNameWithTag(friend,profileInfo);
+            return UserListWidget.getNameWithTag(friend, profileInfo);
         }
 
         @Override
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             super.renderWidget(guiGraphics, i, j, f);
-            profileInfo.iconRenderer().draw(guiGraphics,getX() + 5, getY() + 5, 20,20);
+            profileInfo.iconRenderer().draw(guiGraphics, getX() + 5, getY() + 5, 20, 20);
         }
 
         @Override
@@ -225,7 +237,7 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
         public boolean keyPressed(KeyEvent keyEvent) {
             if (keyEvent.key() == InputConstants.KEY_X) {
                 minecraft.setScreen(new ConfirmationScreen(WorldHostFriendsScreen.this, WORLD_HOST_REMOVE_FRIEND, Component.translatable("world-host.friends.remove.title"), b -> {
-                    friend.removeFriend(()->{
+                    friend.removeFriend(() -> {
                         minecraft.setScreen(WorldHostFriendsScreen.this);
                         reloadFriendButtons();
                     });
@@ -245,13 +257,13 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
             defaultButtonNarrationText(narrationElementOutput);
         }
 
-        public boolean supportsRemoving(){
+        public boolean supportsRemoving() {
             return true;
         }
 
         @Override
         public @Nullable Component getAction(Context context) {
-            return context.actionOfContext(KeyContext.class,k->isFocused() && k.key() == InputConstants.KEY_X && supportsRemoving() ? WORLD_HOST_REMOVE_FRIEND : ControlTooltip.getSelectAction(this,context));
+            return context.actionOfContext(KeyContext.class, k -> isFocused() && k.key() == InputConstants.KEY_X && supportsRemoving() ? WORLD_HOST_REMOVE_FRIEND : ControlTooltip.getSelectAction(this, context));
         }
     }
 

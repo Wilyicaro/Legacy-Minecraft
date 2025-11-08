@@ -20,15 +20,15 @@ public class LegacyActivationAnim {
 
     public static Render itemActivationRenderReplacement = null;
 
-    public static void display(Render render){
+    public static void display(Render render) {
         itemActivationRenderReplacement = render;
         Minecraft.getInstance().gameRenderer.displayItemActivation(ItemStack.EMPTY);
     }
 
-    public static void displayEffect(Holder<MobEffect> effect){
+    public static void displayEffect(Holder<MobEffect> effect) {
         display(((pose, f, source) -> {
             pose.pushPose();
-            pose.scale(0.5f,0.5f, 0.5f);
+            pose.scale(0.5f, 0.5f, 0.5f);
             TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().getSprite(Gui.getMobEffectSprite(effect));
             renderTex(sprite, pose, source);
             pose.pushPose();

@@ -35,11 +35,9 @@ import wily.legacy.client.LegacyOptions;
 
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEntity, LivingEntityRenderState> {
-    @Shadow public abstract EntityModel<LivingEntityRenderState> getModel();
-
-
-    @Shadow @Final protected ItemModelResolver itemModelResolver;
-
+    @Shadow
+    @Final
+    protected ItemModelResolver itemModelResolver;
     @Unique
     ItemStack emerald = Items.EMERALD.getDefaultInstance();
 
@@ -47,8 +45,17 @@ public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEnt
         super(context);
     }
 
+    @Inject(method = "getOverlayCoords", at = @At("HEAD"), cancellable = true)
+    private static void getOverlayCoords(LivingEntityRenderState livingEntityRenderState, float f, CallbackInfoReturnable<Integer> cir) {
+        if (LegacyOptions.legacyEntityFireTint.get() && livingEntityRenderState.displayFireAnimation && !FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyLivingEntityRenderState.class).fireImmune)
+            cir.setReturnValue(OverlayTexture.pack(0, OverlayTexture.v(true)));
+    }
+
+    @Shadow
+    public abstract EntityModel<LivingEntityRenderState> getModel();
+
     @Redirect(method = "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isAlive()Z"))
-    public boolean render(LivingEntity instance){
+    public boolean render(LivingEntity instance) {
         return true;
     }
 
@@ -56,9 +63,9 @@ public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEnt
     public void render(LivingEntityRenderState livingEntityRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
         if (FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyVillagerRenderState.class) != null && FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyVillagerRenderState.class).isTrading && LegacyOptions.merchantTradingIndicator.get()) {
             poseStack.pushPose();
-            poseStack.translate(0, livingEntityRenderState.boundingBoxHeight + 0.5f,0);
+            poseStack.translate(0, livingEntityRenderState.boundingBoxHeight + 0.5f, 0);
             poseStack.mulPose(cameraRenderState.orientation);
-            poseStack.scale(1.0f,1.0f,0.0001f);
+            poseStack.scale(1.0f, 1.0f, 0.0001f);
             ItemStackRenderState itemStackRenderState = new ItemStackRenderState();
             this.itemModelResolver.updateForTopItem(itemStackRenderState, emerald, ItemDisplayContext.GROUND, Minecraft.getInstance().level, null, 0);
             itemStackRenderState.submit(poseStack, submitNodeCollector, livingEntityRenderState.lightCoords, OverlayTexture.NO_OVERLAY, 0);
@@ -68,22 +75,17 @@ public abstract class LivingEntityRendererMixin extends EntityRenderer<LivingEnt
 
     @ModifyReturnValue(method = "getModelTint", at = @At(value = "RETURN"))
     public int getModelTint(int color, LivingEntityRenderState livingEntityRenderState) {
-        return LegacyOptions.legacyEntityFireTint.get() && livingEntityRenderState.displayFireAnimation && !FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyLivingEntityRenderState.class).fireImmune ? ColorUtil.colorFromFloat(ColorUtil.getRed(color),ColorUtil.getGreen(color) * getGreenFireOverlayDiff(livingEntityRenderState.ageInTicks), ColorUtil.getBlue(color)/6,ColorUtil.getAlpha(color)) : color;
-    }
-
-    @Inject(method = "getOverlayCoords", at = @At("HEAD"), cancellable = true)
-    private static void getOverlayCoords(LivingEntityRenderState livingEntityRenderState, float f, CallbackInfoReturnable<Integer> cir) {
-        if (LegacyOptions.legacyEntityFireTint.get() && livingEntityRenderState.displayFireAnimation && !FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyLivingEntityRenderState.class).fireImmune) cir.setReturnValue(OverlayTexture.pack(0, OverlayTexture.v(true)));
+        return LegacyOptions.legacyEntityFireTint.get() && livingEntityRenderState.displayFireAnimation && !FactoryRenderStateExtension.Accessor.of(livingEntityRenderState).getExtension(LegacyLivingEntityRenderState.class).fireImmune ? ColorUtil.colorFromFloat(ColorUtil.getRed(color), ColorUtil.getGreen(color) * getGreenFireOverlayDiff(livingEntityRenderState.ageInTicks), ColorUtil.getBlue(color) / 6, ColorUtil.getAlpha(color)) : color;
     }
 
     @Unique
-    private float getGreenFireOverlayDiff(float age){
+    private float getGreenFireOverlayDiff(float age) {
         float range = (age / 10f) % 1f;
         return 0.6f + (range > 0.5f ? 1 - range : range) / 1.5f;
     }
 
     @ModifyExpressionValue(method = "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;rotLerp(FFF)F", ordinal = 0))
-    private float modifyHeadRotation(float original, LivingEntity entity, LivingEntityRenderState renderState, float f){
+    private float modifyHeadRotation(float original, LivingEntity entity, LivingEntityRenderState renderState, float f) {
         return LegacyOptions.headFollowsTheCamera.get() ? entity.getViewYRot(f) : original;
     }
 }

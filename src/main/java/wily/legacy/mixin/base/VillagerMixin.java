@@ -26,20 +26,22 @@ public abstract class VillagerMixin extends AbstractVillager {
         super(entityType, level);
     }
 
-    @Shadow public abstract VillagerData getVillagerData();
+    @Shadow
+    public abstract VillagerData getVillagerData();
 
     @Redirect(method = "increaseMerchantCareer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;updateTrades()V"))
-    private void increaseMerchantCareer(Villager instance){
-        if (getLevel() < 5){
+    private void increaseMerchantCareer(Villager instance) {
+        if (getLevel() < 5) {
             updateTrades(getLevel() + 1);
         }
     }
+
     @Unique
-    private int getLevel(){
+    private int getLevel() {
         return getVillagerData()./*? if <1.21.5 {*//*getLevel*//*?} else {*/level/*?}*/();
     }
 
-    public Villager self(){
+    public Villager self() {
         return (Villager) (Object) this;
     }
 
@@ -52,19 +54,21 @@ public abstract class VillagerMixin extends AbstractVillager {
         }
         return this.offers;
     }
+
     @Inject(method = "updateTrades", at = @At("HEAD"), cancellable = true)
     public void updateTrades(CallbackInfo ci) {
         ci.cancel();
         updateTrades(getLevel());
     }
 
-    protected void updateTrades(int level){
+    protected void updateTrades(int level) {
         Int2ObjectMap<VillagerTrades.ItemListing[]> int2ObjectMap;
         VillagerData villagerData = this.getVillagerData();
         var profession = villagerData./*? if <1.21.5 {*//*getProfession()*//*?} else {*/profession().unwrapKey().orElse(null)/*?}*/;
         Int2ObjectMap<VillagerTrades.ItemListing[]> int2ObjectMap2 = /*? if >=1.20.2 {*/this.level().enabledFeatures().contains(FeatureFlags.TRADE_REBALANCE) ? ((int2ObjectMap = VillagerTrades.EXPERIMENTAL_TRADES.get(profession))) : /*?}*/ VillagerTrades.TRADES.get(profession);
         VillagerTrades.ItemListing[] itemListings;
-        if (int2ObjectMap2 == null || int2ObjectMap2.isEmpty() || (itemListings = int2ObjectMap2.get(level)) == null) return;
+        if (int2ObjectMap2 == null || int2ObjectMap2.isEmpty() || (itemListings = int2ObjectMap2.get(level)) == null)
+            return;
 
         ArrayList<VillagerTrades.ItemListing> arrayList = Lists.newArrayList(itemListings);
         int j = 0;

@@ -12,6 +12,8 @@ import wily.legacy.client.LegacyGuiEntityRenderer;
 public class GuiEntityRendererMixin implements LegacyGuiEntityRenderer {
     @Unique
     PictureInPictureRenderState lastRenderState = null;
+    @Unique
+    private boolean available;
 
     @ModifyVariable(method = "prepare", at = @At("STORE"), ordinal = 0)
     protected boolean renderToTexture(boolean invalid, @Local(argsOnly = true) PictureInPictureRenderState renderState) {
@@ -19,9 +21,6 @@ public class GuiEntityRendererMixin implements LegacyGuiEntityRenderer {
         lastRenderState = renderState;
         return newInvalid;
     }
-
-    @Unique
-    private boolean available;
 
     @Override
     public void available() {

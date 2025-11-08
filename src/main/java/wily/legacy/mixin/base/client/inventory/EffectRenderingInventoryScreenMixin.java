@@ -5,7 +5,7 @@ import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 //? if <1.21.2 {
 /*import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
-*///?} else {
+ *///?} else {
 import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
 //?}
 import org.spongepowered.asm.mixin.Final;
@@ -24,9 +24,12 @@ public abstract class EffectRenderingInventoryScreenMixin /*? if <1.21.2 {*//*ex
         super(abstractContainerMenu, inventory, component);
     }
     *///?} else {
-    @Shadow @Final private AbstractContainerScreen<?> screen;
+    @Shadow
+    @Final
+    private AbstractContainerScreen<?> screen;
+
     //?}
-    @Inject(method = "renderEffects",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
         ci.cancel();
         //? if <1.21.2 {

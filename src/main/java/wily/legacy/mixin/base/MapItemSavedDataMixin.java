@@ -41,25 +41,46 @@ import java.util.function.Predicate;
 @Mixin(MapItemSavedData.class)
 public abstract class MapItemSavedDataMixin {
 
-    @Shadow @Final private List<MapItemSavedData.HoldingPlayer> carriedBy;
+    @Shadow
+    @Final
+    public int centerX;
+    @Shadow
+    @Final
+    public int centerZ;
+    @Shadow
+    @Final
+    public byte scale;
+    @Shadow
+    @Final
+    public ResourceKey<Level> dimension;
+    @Shadow
+    @Final
+    private List<MapItemSavedData.HoldingPlayer> carriedBy;
+    @Shadow
+    @Final
+    private boolean trackingPosition;
+    @Shadow
+    @Final
+    private boolean unlimitedTracking;
+    @Shadow
+    @Final
+    private Map<Player, MapItemSavedData.HoldingPlayer> carriedByPlayers;
 
-    @Shadow @Final public int centerX;
+    @Inject(method = "createFresh", at = @At("HEAD"), cancellable = true)
+    private static void createFresh(double d, double e, byte b, boolean bl, boolean bl2, ResourceKey<Level> resourceKey, CallbackInfoReturnable<MapItemSavedData> cir) {
+        if (FactoryAPI.currentServer != null && !FactoryAPI.currentServer.getGameRules().getBoolean(LegacyGameRules.LEGACY_MAP_GRID))
+            return;
+        int i = 128 * (1 << b);
+        cir.setReturnValue(new MapItemSavedData((((int) d + (i / 2) * Mth.sign(d)) / i) * i, (((int) e + (i / 2) * Mth.sign(e)) / i) * i, b, bl, bl2, false, resourceKey));
+    }
 
-    @Shadow @Final public int centerZ;
+    @Shadow
+    protected abstract void addDecoration(Holder<MapDecorationType> arg, LevelAccessor arg2, String string, double d, double e, double f, Component arg3);
 
-    @Shadow @Final public byte scale;
+    @Shadow
+    protected abstract void removeDecoration(String string);
 
-    @Shadow @Final private boolean trackingPosition;
-
-    @Shadow @Final private boolean unlimitedTracking;
-
-    @Shadow @Final public ResourceKey<Level> dimension;
-
-    @Shadow @Final private Map<Player, MapItemSavedData.HoldingPlayer> carriedByPlayers;
-
-    @Shadow protected abstract void addDecoration(Holder<MapDecorationType> arg, LevelAccessor arg2, String string, double d, double e, double f, Component arg3);
-
-    @Shadow protected abstract void removeDecoration(String string);public MapItemSavedData self(){
+    public MapItemSavedData self() {
         return (MapItemSavedData) (Object) this;
     }
 
@@ -67,24 +88,26 @@ public abstract class MapItemSavedDataMixin {
     public boolean tickCarriedByAddGlobalPlayers(boolean original, Player player) {
         MinecraftServer server = FactoryAPIPlatform.getEntityServer(player);
         if (!server.getGameRules().getBoolean(LegacyGameRules.GLOBAL_MAP_PLAYER_ICON)) return original;
-        if (player instanceof ServerPlayer sp && server != null){
-            server.getPlayerList().getPlayers().forEach(p-> {
-                if (!carriedByPlayers.containsKey(p)){
+        if (player instanceof ServerPlayer sp && server != null) {
+            server.getPlayerList().getPlayers().forEach(p -> {
+                if (!carriedByPlayers.containsKey(p)) {
                     MapItemSavedData.HoldingPlayer hp = self().new HoldingPlayer(p);
                     carriedBy.add(hp);
-                    carriedByPlayers.put(p,hp);
+                    carriedByPlayers.put(p, hp);
                 }
-                if (p.level().dimension() != dimension){
+                if (p.level().dimension() != dimension) {
                     removeDecoration(sp.getGameProfile().name());
                 }
             });
         }
         return true;
     }
+
     @ModifyExpressionValue(method = "tickCarriedBy", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Inventory;contains(Ljava/util/function/Predicate;)Z"))
     public boolean tickCarriedByRemoveInvalid(boolean original, Player player) {
         return FactoryAPIPlatform.getEntityServer(player).getGameRules().getBoolean(LegacyGameRules.GLOBAL_MAP_PLAYER_ICON) || original;
     }
+
     @ModifyArg(method = "tickCarriedBy", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData;addDecoration(Lnet/minecraft/core/Holder;Lnet/minecraft/world/level/LevelAccessor;Ljava/lang/String;DDDLnet/minecraft/network/chat/Component;)V", ordinal = 0))
     public Component tickCarriedBy(Component original, @Local MapItemSavedData.HoldingPlayer player) {
         return player.player.getName();
@@ -94,10 +117,10 @@ public abstract class MapItemSavedDataMixin {
     private void tickCarriedBy(Player player, ItemStack itemStack, CallbackInfo ci) {
         var iterator = LegacyWorldOptions.usedEndPortalPositions.get().iterator();
         boolean modified = false;
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             var next = iterator.next();
             boolean valid;
-            if ((valid = next.isValid(FactoryAPIPlatform.getEntityServer(player))) && dimension == Level.OVERWORLD){
+            if ((valid = next.isValid(FactoryAPIPlatform.getEntityServer(player))) && dimension == Level.OVERWORLD) {
                 addDecoration(MapDecorationTypes.TARGET_X, FactoryAPIPlatform.getEntityServer(player).overworld(), next.identifier(), next.pos().getX(), next.pos().getZ(), 0, null);
             } else {
                 removeDecoration(next.identifier());
@@ -110,16 +133,11 @@ public abstract class MapItemSavedDataMixin {
         if (modified) LegacyWorldOptions.usedEndPortalPositions.save();
     }
 
-    @Inject(method = "createFresh", at = @At("HEAD"), cancellable = true)
-    private static void createFresh(double d, double e, byte b, boolean bl, boolean bl2, ResourceKey<Level> resourceKey, CallbackInfoReturnable<MapItemSavedData> cir) {
-        if (FactoryAPI.currentServer != null && !FactoryAPI.currentServer.getGameRules().getBoolean(LegacyGameRules.LEGACY_MAP_GRID)) return;
-        int i = 128 * (1 << b);
-        cir.setReturnValue(new MapItemSavedData((((int)d + (i / 2) * Mth.sign(d)) / i) * i, (((int)e + (i / 2) * Mth.sign(e)) / i) * i, b, bl, bl2, false, resourceKey));
-    }
     @Inject(method = "scaled", at = @At("HEAD"), cancellable = true)
     public void scaled(CallbackInfoReturnable<MapItemSavedData> cir) {
-        if (FactoryAPI.currentServer != null && !FactoryAPI.currentServer.getGameRules().getBoolean(LegacyGameRules.LEGACY_MAP_GRID)) return;
+        if (FactoryAPI.currentServer != null && !FactoryAPI.currentServer.getGameRules().getBoolean(LegacyGameRules.LEGACY_MAP_GRID))
+            return;
         int i = 128 * (1 << (scale));
-        cir.setReturnValue(MapItemSavedData.createFresh(this.centerX - (i / 2) * Mth.sign(this.centerX), this.centerZ - (i / 2) * Mth.sign(this.centerZ), (byte)Mth.clamp(this.scale + 1, 0, 4), this.trackingPosition, this.unlimitedTracking, this.dimension));
+        cir.setReturnValue(MapItemSavedData.createFresh(this.centerX - (i / 2) * Mth.sign(this.centerX), this.centerZ - (i / 2) * Mth.sign(this.centerZ), (byte) Mth.clamp(this.scale + 1, 0, 4), this.trackingPosition, this.unlimitedTracking, this.dimension));
     }
 }

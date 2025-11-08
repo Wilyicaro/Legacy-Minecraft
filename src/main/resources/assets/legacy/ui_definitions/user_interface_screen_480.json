@@ -1,0 +1,15 @@
+{
+  "targetUI": { "translate": "legacy.menu.user_interface" },
+  "targetType": "screenTitle",
+  "applyCondition": { "reference": "uiMode.sd" },
+  "elements": {
+    "panel.height": {
+      "type": "put_number",
+      "value": 138
+    },
+    "panel.y": {
+      "type": "put_number",
+      "value": 50
+    }
+  }
+}

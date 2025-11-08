@@ -11,22 +11,25 @@ import wily.legacy.entity.LegacyPlayerInfo;
 
 @Mixin(PlayerInfo.class)
 public abstract class PlayerInfoMixin implements LegacyPlayerInfo {
-    @Shadow public abstract GameProfile getProfile();
+    int position = -1;
+    boolean visible = true;
+    boolean disableExhaustion = false;
+    boolean mayFlySurvival = false;
+    Object2IntMap<Stat<?>> statsMap = new Object2IntOpenHashMap<>();
+
+    @Shadow
+    public abstract GameProfile getProfile();
 
     @Override
     public GameProfile legacyMinecraft$getProfile() {
         return getProfile();
     }
 
-    int position = -1;
-    boolean visible = true;
-    boolean disableExhaustion = false;
-    boolean mayFlySurvival = false;
-    Object2IntMap<Stat<?>> statsMap = new Object2IntOpenHashMap<>();
     @Override
     public int getIdentifierIndex() {
         return position;
     }
+
     @Override
     public void setIdentifierIndex(int i) {
         position = i;
@@ -36,6 +39,7 @@ public abstract class PlayerInfoMixin implements LegacyPlayerInfo {
     public boolean isVisible() {
         return visible;
     }
+
     @Override
     public void setVisibility(boolean visible) {
         this.visible = visible;

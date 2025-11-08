@@ -13,13 +13,12 @@ import wily.legacy.client.DisconnectedScreenAccessor;
 
 @Mixin(DisconnectedScreen.class)
 public class DisconnectedScreenMixin implements DisconnectedScreenAccessor {
-    //? if <1.20.5 {
-    /*@Shadow @Final private Component reason;
-    *///?} else {
-    @Shadow @Final private DisconnectionDetails details;
-    //?}
-
-    @Shadow @Final public Screen parent;
+    @Shadow
+    @Final
+    public Screen parent;
+    @Shadow
+    @Final
+    private DisconnectionDetails details;
 
     @Override
     public Component getReason() {

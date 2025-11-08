@@ -9,12 +9,13 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(EndDragonFight.class)
 public class EndDragonFightMixin {
-    @ModifyArg(method = "<init>(Lnet/minecraft/server/level/ServerLevel;JLnet/minecraft/world/level/dimension/end/EndDragonFight$Data;Lnet/minecraft/core/BlockPos;)V",at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerBossEvent;<init>(Lnet/minecraft/network/chat/Component;Lnet/minecraft/world/BossEvent$BossBarColor;Lnet/minecraft/world/BossEvent$BossBarOverlay;)V"))
-    private Component init(Component component){
+    @ModifyArg(method = "<init>(Lnet/minecraft/server/level/ServerLevel;JLnet/minecraft/world/level/dimension/end/EndDragonFight$Data;Lnet/minecraft/core/BlockPos;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerBossEvent;<init>(Lnet/minecraft/network/chat/Component;Lnet/minecraft/world/BossEvent$BossBarColor;Lnet/minecraft/world/BossEvent$BossBarOverlay;)V"))
+    private Component init(Component component) {
         return component.copy().withStyle(ChatFormatting.DARK_PURPLE);
     }
-    @ModifyArg(method = "<init>(Lnet/minecraft/server/level/ServerLevel;JLnet/minecraft/world/level/dimension/end/EndDragonFight$Data;Lnet/minecraft/core/BlockPos;)V",at = @At(value = "INVOKE", target = "Lnet/minecraft/world/BossEvent;setCreateWorldFog(Z)Lnet/minecraft/world/BossEvent;"))
-    private boolean initCreateWorldFog(boolean bl){
+
+    @ModifyArg(method = "<init>(Lnet/minecraft/server/level/ServerLevel;JLnet/minecraft/world/level/dimension/end/EndDragonFight$Data;Lnet/minecraft/core/BlockPos;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/BossEvent;setCreateWorldFog(Z)Lnet/minecraft/world/BossEvent;"))
+    private boolean initCreateWorldFog(boolean bl) {
         return false;
     }
 }

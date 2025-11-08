@@ -90,7 +90,7 @@
     "client.KeyMappingMixin",
     "client.LegacyLoadingMessageScreenMixin",
     "client.LegacyLoadingScreenMixin",
-    "client.SkyLevelRendererMixin",
+    "client.SkyRendererMixin",
     "client.LiquidBlockRendererMixin",
     "client.LivingEntityRendererMixin",
     "client.LoadingOverlayMixin",
@@ -182,7 +182,8 @@
     "client.FeatureRenderDispatcherMixin",
     "client.MovingBlockRenderStateMixin",
     "client.ClientAvatarStateMixin",
-    "client.SubmitNodeStorageMixin"
+    "client.SubmitNodeStorageMixin",
+    "client.ComponentPathMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",

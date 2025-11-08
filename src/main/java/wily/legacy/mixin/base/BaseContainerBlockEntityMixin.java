@@ -21,13 +21,13 @@ public class BaseContainerBlockEntityMixin implements BaseContainerBlockEntityAc
     Component tempName;
 
     @Override
-    public void setTempName(Component component) {
-        this.tempName = component;
+    public Component getTempName() {
+        return tempName;
     }
 
     @Override
-    public Component getTempName() {
-        return tempName;
+    public void setTempName(Component component) {
+        this.tempName = component;
     }
 
     @Inject(method = "loadAdditional", at = @At("RETURN"))

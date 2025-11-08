@@ -1,0 +1,79 @@
+{
+  "targetUI": "wily.legacy.client.screen.LegacyLoomScreen",
+  "targetType": "class",
+  "applyCondition": { "reference": "uiMode.sd" },
+  "elements": {
+    "imageSprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "tabList.sprites": {
+      "type": "put_toggleable_tab_sprites",
+      "value": {
+        "high": {
+          "left": "legacy:tiles/big_high_tab_left",
+          "middle": "legacy:tiles/big_high_tab_middle",
+          "right": "legacy:tiles/big_high_tab_right"
+        },
+        "down": "legacy:tiles/big_low_tab"
+      }
+    },
+    "imageHeight": 121,
+    "imageWidth": 253,
+    "tabYOffset": 11,
+    "tabList.buttonWidth": 37,
+    "tabList.selectedOffset.y": 2.5,
+    "tabList.inactiveOffset.y": 13.5,
+    "tabList.buttonOffset.x": -1,
+    "tabList.height": 29,
+    "tabList.y": "${topPos}-23",
+    "bottomPanel.height": 71,
+    "craftingGridPanel.width": 117,
+    "inventoryPanel.width": 117,
+    "bottomPanel.y": 44,
+    "craftingGridSlot.size": 16,
+    "craftingGridPanel.x": 7,
+    "craftingResultSlot.size": 25,
+    "craftingButtons.size": 20,
+    "craftingButtons.y": 18,
+    "craftingButtons.x": "(${imageWidth}-${craftingButtons.size}*12)/2",
+    "craftingTitle.y": 7,
+    "craftingGridSlot.x": 10,
+    "craftingGridSlot.y": 20,
+    "craftingArrow.x": 56,
+    "craftingArrow.y": 37,
+    "descriptionPanel.x": 128,
+    "descriptionPanel.y":  4,
+    "descriptionPanel.width": 117,
+    "descriptionPanel.height": 39,
+    "descriptionText.x":  3,
+    "descriptionText.y": 3,
+    "inventoryPanel.x": 128,
+    "title.y": 6,
+    "typeTabList.buttonWidth": 24,
+    "typeTabList.height": 23,
+    "inventoryTitle.y": 3,
+    "resultSlot.x": 80,
+    "resultSlot.y": 32,
+    "customCraftingButtons.x": 56,
+    "preview.scale": 3,
+    "inventory": {
+      "type":"put_legacy_slot",
+      "range":"[0,26]",
+      "x":"${inventoryPanel.x}+9+(${inventory.index}%9)*11",
+      "y":"${bottomPanel.y}+16+(${inventory.index}/9)*11",
+      "width":11,
+      "height":11,
+      "isVisible": {"reference": "isInventoryActive"}
+    },
+    "quick_select": {
+      "type":"put_legacy_slot",
+      "range":"[27,36]",
+      "x":"${inventoryPanel.x}+9+(${quick_select.index}%9)*11",
+      "y":"${bottomPanel.y}+53",
+      "width":11,
+      "height":11,
+      "isVisible": {"reference": "isInventoryActive"}
+    }
+  }
+}

@@ -15,9 +15,9 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 //? if forge {
 /*import net.minecraftforge.client.gui.TitleScreenModUpdateIndicator;
-*///?} else if neoforge && <=1.20.4 {
+ *///?} else if neoforge && <=1.20.4 {
 /*import net.neoforged.neoforge.client.gui.TitleScreenModUpdateIndicator;
-*///?}
+ *///?}
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -39,13 +39,15 @@ import java.util.function.BiConsumer;
 import java.util.function.ObjIntConsumer;
 
 @Mixin(TitleScreen.class)
-public abstract class TitleScreenMixin extends Screen implements ControlTooltip.Event,RenderableVList.Access{
-    @Shadow @Nullable private SplashRenderer splash;
+public abstract class TitleScreenMixin extends Screen implements ControlTooltip.Event, RenderableVList.Access {
+    @Shadow
+    @Nullable
+    private SplashRenderer splash;
     //? if forge || neoforge && <=1.20.4 {
     /*@Shadow(remap = false) private TitleScreenModUpdateIndicator modUpdateNotification;
-    *///?}
+     *///?}
     @Unique
-    private RenderableVList renderableVList = new RenderableVList(this).layoutSpacing(l->5);
+    private final RenderableVList renderableVList = new RenderableVList(this).layoutSpacing(l -> LegacyOptions.getUIMode().isSD() ? 4 : 5);
 
     protected TitleScreenMixin(Component component) {
         super(component);
@@ -54,13 +56,13 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
     @Inject(method = "<init>(ZLnet/minecraft/client/gui/components/LogoRenderer;)V", at = @At("RETURN"))
     public void init(boolean bl, LogoRenderer logoRenderer, CallbackInfo ci) {
         renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.play_game"), (button) -> {
-            if (minecraft.isDemo()){
+            if (minecraft.isDemo()) {
                 try {
-                    LoadSaveScreen.loadWorld(this,minecraft, LegacySaveCache.getLevelStorageSource(), LegacySaveCache.importSaveFile(minecraft.getResourceManager().getResourceOrThrow(Legacy4J.createModLocation("tutorial/tutorial.mcsave")).open(), LegacySaveCache.getLevelStorageSource(),"Tutorial"));
+                    LoadSaveScreen.loadWorld(this, minecraft, LegacySaveCache.getLevelStorageSource(), LegacySaveCache.importSaveFile(minecraft.getResourceManager().getResourceOrThrow(Legacy4J.createModLocation("tutorial/tutorial.mcsave")).open(), LegacySaveCache.getLevelStorageSource(), "Tutorial"));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            }else minecraft.setScreen(PlayGameScreen.createAndCheckNewerVersions(this));
+            } else minecraft.setScreen(PlayGameScreen.createAndCheckNewerVersions(this));
         }).build());
         Button modButton;
         renderableVList.addRenderable(modButton = Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build());
@@ -69,7 +71,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
         //? if forge || neoforge && <=1.20.4 {
         /*this.modUpdateNotification = TitleScreenModUpdateIndicator.init((TitleScreen) (Object) this, modButton);
-        *///?}
+         *///?}
     }
 
 
@@ -87,13 +89,15 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
 
     @Override
     public void renderableVListInit() {
-        getRenderableVList().init(width / 2 - 112,this.height / 3 + 10,225,0);
+        initRenderableVListHeight(20);
+        getRenderableVList().init(width / 2 - 112, this.height / 3 + 5, 225, 0);
     }
 
     @Inject(method = "added", at = @At("RETURN"))
     public void added(CallbackInfo ci) {
-        ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(),()-> ChooseUserScreen.CHOOSE_USER);
-        if (PublishScreen.hasWorldHost()) ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), ()-> WorldHostFriendsScreen.FRIENDS);
+        ControlTooltip.Renderer.of(this).add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> ChooseUserScreen.CHOOSE_USER);
+        if (PublishScreen.hasWorldHost())
+            ControlTooltip.Renderer.of(this).add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), () -> WorldHostFriendsScreen.FRIENDS);
         if (splash == null) this.splash = Minecraft.getInstance().getSplashManager().getSplash();
     }
 

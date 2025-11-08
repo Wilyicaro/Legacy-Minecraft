@@ -16,23 +16,14 @@ import java.util.function.Supplier;
 public record ServerOpenClientMenuPayload(ClientMenu menu) implements CommonNetwork.Payload {
     public static final CommonNetwork.Identifier<ServerOpenClientMenuPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("server_open_client_menu_payload"), ServerOpenClientMenuPayload::new);
 
-    public enum ClientMenu {
-        PLAYER_CRAFTING(()->LegacyCraftingMenu.getMenuProvider(BlockPos.ZERO, true));
-
-        public final Supplier<MenuProvider> menuProviderSupplier;
-
-        ClientMenu(Supplier<MenuProvider> menuProviderSupplier){
-            this.menuProviderSupplier = menuProviderSupplier;
-        }
+    public ServerOpenClientMenuPayload(CommonNetwork.PlayBuf buf) {
+        this(buf.get().readEnum(ClientMenu.class));
     }
 
-    public static ServerOpenClientMenuPayload playerCrafting(){
+    public static ServerOpenClientMenuPayload playerCrafting() {
         return new ServerOpenClientMenuPayload(ClientMenu.PLAYER_CRAFTING);
     }
 
-    public ServerOpenClientMenuPayload(CommonNetwork.PlayBuf buf){
-        this(buf.get().readEnum(ClientMenu.class));
-    }
     @Override
     public void encode(CommonNetwork.PlayBuf buf) {
         buf.get().writeEnum(menu);
@@ -48,5 +39,15 @@ public record ServerOpenClientMenuPayload(ClientMenu menu) implements CommonNetw
     @Override
     public CommonNetwork.Identifier<? extends CommonNetwork.Payload> identifier() {
         return ID;
+    }
+
+    public enum ClientMenu {
+        PLAYER_CRAFTING(() -> LegacyCraftingMenu.getMenuProvider(BlockPos.ZERO, true));
+
+        public final Supplier<MenuProvider> menuProviderSupplier;
+
+        ClientMenu(Supplier<MenuProvider> menuProviderSupplier) {
+            this.menuProviderSupplier = menuProviderSupplier;
+        }
     }
 }

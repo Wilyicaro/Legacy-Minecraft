@@ -23,7 +23,7 @@ public class PrepareSpawnTaskMixin {
     @Inject(method = "spawn", at = @At(value = "INVOKE", target = "Ljava/util/Optional;ifPresent(Ljava/util/function/Consumer;)V", shift = At.Shift.AFTER, ordinal = 0))
     private void spawn(Connection connection, CommonListenerCookie commonListenerCookie, CallbackInfoReturnable<ServerPlayer> cir, @Local Optional<CompoundTag> playerTag, @Local ServerPlayer serverPlayer) {
         if (playerTag.isEmpty()) {
-            List<ItemStack> itemsToAdd = new ArrayList<>(LegacyWorldOptions.initialItems.get().stream().filter(i-> i.isEnabled(FactoryAPIPlatform.getEntityServer(serverPlayer))).map(LegacyWorldOptions.InitialItem::item).toList());
+            List<ItemStack> itemsToAdd = new ArrayList<>(LegacyWorldOptions.initialItems.get().stream().filter(i -> i.isEnabled(FactoryAPIPlatform.getEntityServer(serverPlayer))).map(LegacyWorldOptions.InitialItem::item).toList());
 
             for (int j = 0; j < 27; j++) {
                 if (itemsToAdd.isEmpty()) break;

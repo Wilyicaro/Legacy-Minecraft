@@ -12,34 +12,41 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-public record ClientMerchantTradingPayload(int entityID, Optional<UUID> player, CommonNetwork.Identifier<ClientMerchantTradingPayload> identifier) implements CommonNetwork.Payload {
-    public static final CommonNetwork.Identifier<ClientMerchantTradingPayload> ID_C2S = CommonNetwork.Identifier.create(Legacy4J.createModLocation("client_merchant_trading_c2s"), b-> new ClientMerchantTradingPayload(b,ClientMerchantTradingPayload.ID_C2S));
-    public static final CommonNetwork.Identifier<ClientMerchantTradingPayload> ID_S2C = CommonNetwork.Identifier.create(Legacy4J.createModLocation("client_merchant_trading_s2c"), b-> new ClientMerchantTradingPayload(b,ClientMerchantTradingPayload.ID_S2C));
+public record ClientMerchantTradingPayload(int entityID, Optional<UUID> player,
+                                           CommonNetwork.Identifier<ClientMerchantTradingPayload> identifier) implements CommonNetwork.Payload {
+    public ClientMerchantTradingPayload(CommonNetwork.PlayBuf buf, CommonNetwork.Identifier<ClientMerchantTradingPayload> identifier) {
+        this(buf.get().readVarInt(), buf.get().readOptional(b -> b.readUUID()), identifier);
+    }    public static final CommonNetwork.Identifier<ClientMerchantTradingPayload> ID_C2S = CommonNetwork.Identifier.create(Legacy4J.createModLocation("client_merchant_trading_c2s"), b -> new ClientMerchantTradingPayload(b, ClientMerchantTradingPayload.ID_C2S));
 
-    public static ClientMerchantTradingPayload of(AbstractVillager villager){
-        return new ClientMerchantTradingPayload(villager.getId(), Optional.ofNullable(villager.getTradingPlayer()).map(Player::getUUID),ID_S2C);
-    }
-    public static void sync(AbstractVillager entity){
+    public static ClientMerchantTradingPayload of(AbstractVillager villager) {
+        return new ClientMerchantTradingPayload(villager.getId(), Optional.ofNullable(villager.getTradingPlayer()).map(Player::getUUID), ID_S2C);
+    }    public static final CommonNetwork.Identifier<ClientMerchantTradingPayload> ID_S2C = CommonNetwork.Identifier.create(Legacy4J.createModLocation("client_merchant_trading_s2c"), b -> new ClientMerchantTradingPayload(b, ClientMerchantTradingPayload.ID_S2C));
+
+    public static void sync(AbstractVillager entity) {
         if (entity.level() instanceof ServerLevel l) {
             ClientMerchantTradingPayload packet = null;
             for (ServerPlayer player : l.getServer().getPlayerList().getPlayers()) {
-                if (player.level() == entity.level() && player.distanceTo(entity) < l.getServer().getPlayerList().getViewDistance() * 16) CommonNetwork.sendToPlayer(player,packet == null ? (packet = ClientMerchantTradingPayload.of(entity)) : packet);
+                if (player.level() == entity.level() && player.distanceTo(entity) < l.getServer().getPlayerList().getViewDistance() * 16)
+                    CommonNetwork.sendToPlayer(player, packet == null ? (packet = ClientMerchantTradingPayload.of(entity)) : packet);
             }
         }
     }
-    public ClientMerchantTradingPayload(CommonNetwork.PlayBuf buf, CommonNetwork.Identifier<ClientMerchantTradingPayload> identifier){
-        this(buf.get().readVarInt(),buf.get().readOptional(b->b.readUUID()),identifier);
-    }
+
     @Override
     public void encode(CommonNetwork.PlayBuf buf) {
         buf.get().writeVarInt(entityID());
-        buf.get().writeOptional(player,(b,u)-> b.writeUUID(u));
+        buf.get().writeOptional(player, (b, u) -> b.writeUUID(u));
     }
 
     @Override
     public void apply(Context context) {
         if (!(context.player().level().getEntity(entityID) instanceof AbstractVillager v)) return;
-        if (context.player().level().isClientSide()) v.setTradingPlayer(player.map(u-> v.level().getPlayerByUUID(u)).orElse(null));
+        if (context.player().level().isClientSide())
+            v.setTradingPlayer(player.map(u -> v.level().getPlayerByUUID(u)).orElse(null));
         else sync(v);
     }
+
+
+
+
 }

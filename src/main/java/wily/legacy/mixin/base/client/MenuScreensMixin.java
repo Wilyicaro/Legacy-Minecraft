@@ -20,10 +20,12 @@ import java.util.Map;
 
 @Mixin(MenuScreens.class)
 public class MenuScreensMixin {
-    @Shadow @Final private static Map<MenuType<?>, MenuScreens.ScreenConstructor<?, ?>> SCREENS;
+    @Shadow
+    @Final
+    private static Map<MenuType<?>, MenuScreens.ScreenConstructor<?, ?>> SCREENS;
 
     @Inject(method = "<clinit>", at = @At("RETURN"))
-    private static void init(CallbackInfo ci){
+    private static void init(CallbackInfo ci) {
         SCREENS.put(MenuType.CRAFTING, new MenuScreens.ScreenConstructor<CraftingMenu, AbstractContainerScreen<CraftingMenu>>() {
             @Override
             public AbstractContainerScreen<CraftingMenu> create(CraftingMenu abstractContainerMenu, Inventory inventory, Component component) {

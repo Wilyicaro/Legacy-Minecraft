@@ -31,7 +31,8 @@ import static wily.legacy.Legacy4JClient.gameRules;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
-    @Shadow protected ItemStack useItem;
+    @Shadow
+    protected ItemStack useItem;
 
     public LivingEntityMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -42,30 +43,31 @@ public abstract class LivingEntityMixin extends Entity {
         return !isLegacyFlying() && onGround();
     }
 
-    private boolean isLegacyFlying(){
-        return ((LivingEntity)(Object)this instanceof Player p && p.getAbilities().flying && (!level().isClientSide() || Legacy4JClient.hasModOnServer())) && LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT);
+    private boolean isLegacyFlying() {
+        return ((LivingEntity) (Object) this instanceof Player p && p.getAbilities().flying && (!level().isClientSide() || Legacy4JClient.hasModOnServer())) && LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT);
     }
 
     @Redirect(method = "travelInAir", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setDeltaMovement(DDD)V", ordinal = 1))
     public void travelFlight(LivingEntity instance, double x, double y, double z) {
-        setDeltaMovement((isLegacyFlying() ? 0.6 : 1) * x,(isLegacyFlying() ? 0.546 : 1) * y,(isLegacyFlying() ? 0.6 : 1) * z);
+        setDeltaMovement((isLegacyFlying() ? 0.6 : 1) * x, (isLegacyFlying() ? 0.546 : 1) * y, (isLegacyFlying() ? 0.6 : 1) * z);
     }
 
     @Inject(method = "hurtServer", at = @At("HEAD"), cancellable = true)
     public void hurt(ServerLevel level, DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> cir) {
-        if (!level().isClientSide() && !level().getServer().isPvpAllowed() && damageSource.getDirectEntity() instanceof Player && (this instanceof OwnableEntity o && damageSource.getDirectEntity().equals(o.getOwner()) || ((Object)this) instanceof IronGolem i && i.isPlayerCreated() || ((Object)this) instanceof SnowGolem)){
+        if (!level().isClientSide() && !level().getServer().isPvpAllowed() && damageSource.getDirectEntity() instanceof Player && (this instanceof OwnableEntity o && damageSource.getDirectEntity().equals(o.getOwner()) || ((Object) this) instanceof IronGolem i && i.isPlayerCreated() || ((Object) this) instanceof SnowGolem)) {
             cir.setReturnValue(false);
         }
     }
 
     @Redirect(method = "calculateEntityAnimation", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isAlive()Z"))
-    public boolean render(LivingEntity instance){
+    public boolean render(LivingEntity instance) {
         return true;
     }
 
     @Inject(method = "getDamageAfterArmorAbsorb", at = @At("RETURN"), cancellable = true)
     protected void getDamageAfterArmorAbsorb(DamageSource damageSource, float f, CallbackInfoReturnable<Float> cir) {
-        if (!damageSource.is(DamageTypeTags.BYPASSES_ARMOR) && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking) && useItem.is(ItemTags.SWORDS)) cir.setReturnValue(cir.getReturnValue()/2);
+        if (!damageSource.is(DamageTypeTags.BYPASSES_ARMOR) && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking) && useItem.is(ItemTags.SWORDS))
+            cir.setReturnValue(cir.getReturnValue() / 2);
     }
 
     @ModifyArg(method = "jumpInLiquid", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec3;add(DDD)Lnet/minecraft/world/phys/Vec3;"), index = 1)

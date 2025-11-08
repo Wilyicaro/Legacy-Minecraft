@@ -29,22 +29,20 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
 import wily.factoryapi.util.ColorUtil;
-import wily.legacy.Legacy4J;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class LegacyGuiItemRenderer implements AutoCloseable {
     public static final Logger LOGGER = LogManager.getLogger("legacy_gui_item_renderer");
-
+    private static final int MAXIMUM_ITEM_ATLAS_SIZE = RenderSystem.getDevice().getMaxTextureSize();
+    public static float OPACITY = 1;
     private final int size;
     private final float opacity;
-    private static final int MAXIMUM_ITEM_ATLAS_SIZE = RenderSystem.getDevice().getMaxTextureSize();
-
     private final Map<Object, AtlasPosition> atlasPositions = new Object2ObjectOpenHashMap<>();
     private final Map<Object, OversizedItemRenderer> oversizedItemRenderers = new Object2ObjectOpenHashMap<>();
     private final CachedOrthoProjectionMatrixBuffer itemsProjectionMatrixBuffer = new CachedOrthoProjectionMatrixBuffer("items", -1000.0F, 1000.0F, true);
-
     @Nullable
     private GpuTexture itemsAtlas;
     @Nullable
@@ -58,7 +56,6 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
     private int cachedGuiScale;
     private boolean isValid = true;
 
-    public static float OPACITY = 1;
     public LegacyGuiItemRenderer(int size, float opacity) {
         this.size = size;
         this.opacity = opacity;
@@ -76,14 +73,15 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
         OPACITY = 1;
     }
 
-    private void createAtlasTextures(int i) {
-        GpuDevice gpuDevice = RenderSystem.getDevice();
-        this.itemsAtlas = gpuDevice.createTexture("UI items atlas", 12, TextureFormat.RGBA8, i, i, 1, 1);
-        this.itemsAtlas.setTextureFilter(FilterMode.NEAREST, false);
-        this.itemsAtlasView = gpuDevice.createTextureView(this.itemsAtlas);
-        this.itemsAtlasDepth = gpuDevice.createTexture("UI items atlas depth", 8, TextureFormat.DEPTH32, i, i, 1, 1);
-        this.itemsAtlasDepthView = gpuDevice.createTextureView(this.itemsAtlasDepth);
-        gpuDevice.createCommandEncoder().clearColorAndDepthTextures(this.itemsAtlas, 0, this.itemsAtlasDepth, 1.0);
+    public static void secureTranslucentRender(boolean translucent, float alpha, Consumer<Boolean> render) {
+        if (!translucent) {
+            render.accept(false);
+            return;
+        }
+
+        pushOpacity(alpha);
+        render.accept(true);
+        popOpacity();
     }
 
     public static float getXScale(Matrix3x2f matrix) {
@@ -96,6 +94,16 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
 
     public static int getScale(Matrix3x2f matrix) {
         return Math.round(Math.max(getXScale(matrix), getYScale(matrix)) * 16);
+    }
+
+    private void createAtlasTextures(int i) {
+        GpuDevice gpuDevice = RenderSystem.getDevice();
+        this.itemsAtlas = gpuDevice.createTexture("UI items atlas", 12, TextureFormat.RGBA8, i, i, 1, 1);
+        this.itemsAtlas.setTextureFilter(FilterMode.NEAREST, false);
+        this.itemsAtlasView = gpuDevice.createTextureView(this.itemsAtlas);
+        this.itemsAtlasDepth = gpuDevice.createTexture("UI items atlas depth", 8, TextureFormat.DEPTH32, i, i, 1, 1);
+        this.itemsAtlasDepthView = gpuDevice.createTextureView(this.itemsAtlasDepth);
+        gpuDevice.createCommandEncoder().clearColorAndDepthTextures(this.itemsAtlas, 0, this.itemsAtlasDepth, 1.0);
     }
 
     public void prepareItemElements(FeatureRenderDispatcher dispatcher, SubmitNodeCollector submitNodeCollector, MultiBufferSource.BufferSource bufferSource, GuiRenderState renderState, int frameNumber) {
@@ -118,7 +126,8 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                     .forEachItem(
                             guiItemRenderState -> {
                                 if (LegacyGuiItemRenderState.of(guiItemRenderState).size() != size) return;
-                                if (!LegacyOptions.enhancedItemTranslucency.get() && LegacyGuiItemRenderState.of(guiItemRenderState).opacity() != opacity) return;
+                                if (!LegacyOptions.enhancedItemTranslucency.get() && LegacyGuiItemRenderState.of(guiItemRenderState).opacity() != opacity)
+                                    return;
                                 if (guiItemRenderState.oversizedItemBounds() != null) {
                                     mutableBoolean2.setTrue();
                                 } else {
@@ -144,8 +153,8 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                                             }
 
                                             this.renderItemToAtlas(dispatcher, submitNodeCollector, bufferSource, trackingItemStackRenderState, poseStack, kx, l, j);
-                                            float f = (float)kx / k;
-                                            float g = (float)(k - l) / k;
+                                            float f = (float) kx / k;
+                                            float g = (float) (k - l) / k;
                                             this.submitBlitFromItemAtlas(renderState, guiItemRenderState, f, g, j, k);
                                             if (bl) {
                                                 atlasPosition.lastAnimatedOnFrame = frameNumber;
@@ -171,7 +180,8 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                         .forEachItem(
                                 guiItemRenderState -> {
                                     if (LegacyGuiItemRenderState.of(guiItemRenderState).size() != size) return;
-                                    if (!LegacyOptions.enhancedItemTranslucency.get() && LegacyGuiItemRenderState.of(guiItemRenderState).opacity() != opacity) return;
+                                    if (!LegacyOptions.enhancedItemTranslucency.get() && LegacyGuiItemRenderState.of(guiItemRenderState).opacity() != opacity)
+                                        return;
                                     if (guiItemRenderState.oversizedItemBounds() != null) {
                                         TrackingItemStackRenderState trackingItemStackRenderState = guiItemRenderState.itemStackRenderState();
                                         OversizedItemRenderer oversizedItemRenderer = oversizedItemRenderers
@@ -189,8 +199,8 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
     }
 
     private void submitBlitFromItemAtlas(GuiRenderState renderState, GuiItemRenderState guiItemRenderState, float f, float g, int i, int j) {
-        float h = f + (float)i / j;
-        float k = g + (float)(-i) / j;
+        float h = f + (float) i / j;
+        float k = g + (float) (-i) / j;
         float opacity = LegacyGuiItemRenderState.of(guiItemRenderState).opacity();
         renderState
                 .submitBlitToCurrentLayer(
@@ -223,7 +233,8 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
         } else {
             Minecraft.getInstance().gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
         }
-        if (opacity != 1.0f && !LegacyOptions.enhancedItemTranslucency.get()) LegacyFeatureRenderDispatcher.of(featureRenderDispatcher).setBufferSource(BufferSourceWrapper.translucent(bufferSource, opacity));
+        if (opacity != 1.0f && !LegacyOptions.enhancedItemTranslucency.get())
+            LegacyFeatureRenderDispatcher.of(featureRenderDispatcher).setBufferSource(BufferSourceWrapper.translucent(bufferSource, opacity));
         RenderSystem.enableScissorForRenderTypeDraws(x, this.itemsAtlas.getHeight(0) - y - k, k, k);
         trackingItemStackRenderState.submit(poseStack, submitNodeCollector, 15728880, OverlayTexture.NO_OVERLAY, 0);
         featureRenderDispatcher.renderAllFeatures();

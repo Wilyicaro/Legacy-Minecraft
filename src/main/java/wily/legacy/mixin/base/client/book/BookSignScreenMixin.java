@@ -15,14 +15,14 @@ import wily.legacy.client.screen.BookPanel;
 public class BookSignScreenMixin extends Screen {
 
     @Unique
-    private BookPanel panel = new BookPanel(this);
+    private final BookPanel panel = new BookPanel(this);
 
     protected BookSignScreenMixin(Component component) {
         super(component);
     }
 
     @Inject(method = "init", at = @At("HEAD"))
-    private void init(CallbackInfo ci){
+    private void init(CallbackInfo ci) {
         panel.init();
         addRenderableOnly(panel);
     }
@@ -47,7 +47,7 @@ public class BookSignScreenMixin extends Screen {
         return this.width / 2 + 8;
     }
 
-    @ModifyArg(method = "init",  at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/Button$Builder;bounds(IIII)Lnet/minecraft/client/gui/components/Button$Builder;"), index = 1)
+    @ModifyArg(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/Button$Builder;bounds(IIII)Lnet/minecraft/client/gui/components/Button$Builder;"), index = 1)
     public int buttonsY(int x) {
         return panel.y + panel.height + 5;
     }

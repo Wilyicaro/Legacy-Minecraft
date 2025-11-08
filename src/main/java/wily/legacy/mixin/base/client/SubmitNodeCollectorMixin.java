@@ -25,16 +25,20 @@ import java.util.List;
 
 @Mixin(SubmitNodeCollection.class)
 public class SubmitNodeCollectorMixin implements LegacySubmitNodeCollector {
-    @Shadow private boolean wasUsed;
+    @Shadow
+    private boolean wasUsed;
 
-    @Shadow @Final private NameTagFeatureRenderer.Storage nameTagSubmits;
+    @Shadow
+    @Final
+    private NameTagFeatureRenderer.Storage nameTagSubmits;
 
-    @Unique private List<LoyaltyLinesRenderer.Submit> loyaltyLinesSubmits = new ArrayList<>();
+    @Unique
+    private final List<LoyaltyLinesRenderer.Submit> loyaltyLinesSubmits = new ArrayList<>();
 
     @Override
     public void submitLegacyNameTag(PoseStack poseStack, @Nullable Vec3 vec3, int i, Component component, boolean bl, int j, double d, CameraRenderState cameraRenderState, float[] color) {
         this.wasUsed = true;
-        ((LegacyNameTag.Storage)nameTagSubmits).add(poseStack, vec3, i, component, bl, j, d, cameraRenderState, color);
+        ((LegacyNameTag.Storage) nameTagSubmits).add(poseStack, vec3, i, component, bl, j, d, cameraRenderState, color);
     }
 
     @Override

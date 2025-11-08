@@ -36,7 +36,7 @@ import java.util.List;
 @Mixin(MapRenderer.class)
 public abstract class MapRendererMixin {
     @Inject(method = "extractRenderState", at = @At("RETURN"))
-    private void extractRenderState(MapId mapId, MapItemSavedData mapItemSavedData, MapRenderState mapRenderState, CallbackInfo ci){
+    private void extractRenderState(MapId mapId, MapItemSavedData mapItemSavedData, MapRenderState mapRenderState, CallbackInfo ci) {
         int i = 0;
         for (MapDecoration decoration : mapItemSavedData.getDecorations()) {
             LegacyMapDecorationRenderState.of(mapRenderState.decorations.get(i)).extractRenderState(decoration);
@@ -45,13 +45,13 @@ public abstract class MapRendererMixin {
     }
 
     @Unique
-    private boolean isPlayerDecoration(Holder<MapDecorationType> type){
+    private boolean isPlayerDecoration(Holder<MapDecorationType> type) {
         return type.equals(MapDecorationTypes.PLAYER) || type.equals(MapDecorationTypes.PLAYER_OFF_MAP) || type.equals(MapDecorationTypes.PLAYER_OFF_LIMITS);
     }
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Ljava/util/List;iterator()Ljava/util/Iterator;"))
-    Iterator<MapRenderState.MapDecorationRenderState> drawDecorations(List<MapRenderState.MapDecorationRenderState> iterable){
-        return iterable.stream().filter(s-> !isPlayerDecoration(LegacyMapDecorationRenderState.of(s).getType())).iterator();
+    Iterator<MapRenderState.MapDecorationRenderState> drawDecorations(List<MapRenderState.MapDecorationRenderState> iterable) {
+        return iterable.stream().filter(s -> !isPlayerDecoration(LegacyMapDecorationRenderState.of(s).getType())).iterator();
     }
 
     @Inject(method = "render", at = @At("RETURN"))
@@ -59,9 +59,9 @@ public abstract class MapRendererMixin {
         Minecraft minecraft = Minecraft.getInstance();
         if (!bl && LegacyOptions.mapsWithCoords.get()) {
             poseStack.pushPose();
-            poseStack.translate(-0.2f,0.4f,-0.1f);
+            poseStack.translate(-0.2f, 0.4f, -0.1f);
             poseStack.scale(1.0f, 0.95f, 1.0f);
-            submitNodeCollector.submitText(poseStack, 0.0f, 0.0f, Component.translatable("legacy.map.coords",(int)minecraft.player.getX(), (int)minecraft.player.getEyeY(),(int)minecraft.player.getZ()).getVisualOrderText(), false, Font.DisplayMode.NORMAL, i, CommonColor.BLACK.get(), 0, 0);
+            submitNodeCollector.submitText(poseStack, 0.0f, 0.0f, Component.translatable("legacy.map.coords", (int) minecraft.player.getX(), (int) minecraft.player.getEyeY(), (int) minecraft.player.getZ()).getVisualOrderText(), false, Font.DisplayMode.NORMAL, i, CommonColor.BLACK.get(), 0, 0);
             poseStack.popPose();
         }
     }
@@ -73,14 +73,14 @@ public abstract class MapRendererMixin {
             Holder<MapDecorationType> type = LegacyMapDecorationRenderState.of(mapDecoration).getType();
             if ((bl && !mapDecoration.renderOnFrame) || !isPlayerDecoration(type)) continue;
             poseStack.pushPose();
-            poseStack.translate(0.0f + (float)mapDecoration.x / 2.0f + 64.0f, 0.0f + (float)mapDecoration.y / 2.0f + 64.0f, -0.02f);
-            poseStack.mulPose(Axis.ZP.rotationDegrees((float)(mapDecoration.rot * 360) / 16.0f));
+            poseStack.translate(0.0f + (float) mapDecoration.x / 2.0f + 64.0f, 0.0f + (float) mapDecoration.y / 2.0f + 64.0f, -0.02f);
+            poseStack.mulPose(Axis.ZP.rotationDegrees((float) (mapDecoration.rot * 360) / 16.0f));
             poseStack.scale(4.0f, 4.0f, 3.0f);
             poseStack.translate(-0.125f, 0.125f, 0.0f);
             Matrix4f matrix4f2 = poseStack.last().pose();
             Minecraft minecraft = Minecraft.getInstance();
             LegacyPlayerInfo playerInfo = mapDecoration.name == null || minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(mapDecoration.name.getString()) instanceof LegacyPlayerInfo info) ? null : info;
-            float[] color = playerInfo == null ? new float[]{1.0f,1.0f,1.0f} : Legacy4JClient.getVisualPlayerColor(playerInfo);
+            float[] color = playerInfo == null ? new float[]{1.0f, 1.0f, 1.0f} : Legacy4JClient.getVisualPlayerColor(playerInfo);
             TextureAtlasSprite textureAtlasSprite = playerInfo == null ? mapDecoration.atlasSprite : minecraft.getAtlasManager().getAtlasOrThrow(AtlasIds.MAP_DECORATIONS).getSprite(PlayerIdentifier.of(playerInfo.getIdentifierIndex()).spriteByMapDecorationType(type));
             float g = textureAtlasSprite.getU0();
             float h = textureAtlasSprite.getV0();

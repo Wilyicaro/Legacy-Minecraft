@@ -20,17 +20,17 @@ public class ColoredWaterCauldronBlock extends LayeredCauldronBlock {
         this.registerDefaultState(defaultBlockState().setValue(MID, false));
     }
 
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder);
-        builder.add(MID);
-    }
-
     public static void lowerFillLevel(WaterCauldronBlockEntity be) {
         be.convertToColored();
         if (be.getBlockState().getValue(MID)) {
             LayeredCauldronBlock.lowerFillLevel(be.getBlockState().setValue(MID, false), be.getLevel(), be.getBlockPos());
         } else be.getLevel().setBlock(be.getBlockPos(), be.getBlockState().setValue(MID, true), 3);
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(MID);
     }
 
     @Override

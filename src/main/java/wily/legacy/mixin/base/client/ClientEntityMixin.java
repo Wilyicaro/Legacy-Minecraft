@@ -36,23 +36,29 @@ public abstract class ClientEntityMixin implements ClientEntityAccessor {
 
     @Unique
     private boolean allowDisplayFireAnimation = true;
+    @Shadow
+    private boolean onGround;
 
     @Shadow
     public abstract Entity getVehicle();
 
-    @Shadow public abstract void setYRot(float f);
+    @Shadow
+    public abstract float getXRot();
 
-    @Shadow public abstract void setXRot(float f);
+    @Shadow
+    public abstract void setXRot(float f);
 
-    @Shadow public abstract float getXRot();
+    @Shadow
+    public abstract float getYRot();
 
-    @Shadow public abstract float getYRot();
+    @Shadow
+    public abstract void setYRot(float f);
 
-    @Shadow private boolean onGround;
+    @Shadow
+    public abstract Level level();
 
-    @Shadow public abstract Level level();
-
-    @Shadow public abstract boolean isInWater();
+    @Shadow
+    public abstract boolean isInWater();
 
     @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;)Z", at = @At("HEAD"))
     private void startRiding(Entity entity, CallbackInfoReturnable<Boolean> cir) {
@@ -65,7 +71,8 @@ public abstract class ClientEntityMixin implements ClientEntityAccessor {
         //? if >=1.21.2 {
         if (getVehicle() instanceof AbstractMinecart && AbstractMinecart.useExperimentalMovement(level())) return;
         //?}
-        if (getVehicle() == null || getVehicle().getControllingPassenger() == (Object) this || LegacyOptions.vehicleCameraRotation.get() == LegacyOptions.VehicleCameraRotation.NONE || !(getVehicle() instanceof LivingEntity && LegacyOptions.vehicleCameraRotation.get().isForLivingEntities() || !(getVehicle() instanceof LivingEntity) && LegacyOptions.vehicleCameraRotation.get().isForNonLivingEntities())) return;
+        if (getVehicle() == null || getVehicle().getControllingPassenger() == (Object) this || LegacyOptions.vehicleCameraRotation.get() == LegacyOptions.VehicleCameraRotation.NONE || !(getVehicle() instanceof LivingEntity && LegacyOptions.vehicleCameraRotation.get().isForLivingEntities() || !(getVehicle() instanceof LivingEntity) && LegacyOptions.vehicleCameraRotation.get().isForNonLivingEntities()))
+            return;
 
         this.ridingEntityYRotDelta = this.ridingEntityYRotDelta + (this.getVehicle().getYRot() - this.getVehicle().yRotO);
 
@@ -97,7 +104,7 @@ public abstract class ClientEntityMixin implements ClientEntityAccessor {
     }
 
     @ModifyReturnValue(method = "displayFireAnimation", at = @At("RETURN"))
-    private boolean displayFireAnimation(boolean original){
+    private boolean displayFireAnimation(boolean original) {
         return original && allowDisplayFireAnimation;
     }
 
@@ -117,8 +124,8 @@ public abstract class ClientEntityMixin implements ClientEntityAccessor {
 
     @Inject(method = "moveRelative", at = @At("HEAD"), cancellable = true)
     public void moveRelative(float f, Vec3 vec3, CallbackInfo ci) {
-        if (((Object)this) instanceof LocalPlayer p && Legacy4JClient.hasModOnServer() && p.getAbilities().flying && p.isCreative() && !p.isSprinting() && Legacy4JClient.gameRules.getBoolean(LegacyGameRules.LEGACY_FLIGHT)){
-            p.setDeltaMovement(p.getDeltaMovement().add(Legacy4J.getRelativeMovement(p,f,vec3,(keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown()) && p.input./*? if <1.21.5 {*//*leftImpulse*//*?} else {*/getMoveVector().x/*?}*/ == 0 ? 90 : 45)));
+        if (((Object) this) instanceof LocalPlayer p && Legacy4JClient.hasModOnServer() && p.getAbilities().flying && p.isCreative() && !p.isSprinting() && Legacy4JClient.gameRules.getBoolean(LegacyGameRules.LEGACY_FLIGHT)) {
+            p.setDeltaMovement(p.getDeltaMovement().add(Legacy4J.getRelativeMovement(p, f, vec3, (keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown()) && p.input./*? if <1.21.5 {*//*leftImpulse*//*?} else {*/getMoveVector().x/*?}*/ == 0 ? 90 : 45)));
             ci.cancel();
         }
     }

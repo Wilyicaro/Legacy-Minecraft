@@ -18,7 +18,7 @@ public interface LegacyPlayer {
 
     void setLoom(boolean classic);
 
-    default void copyFrom(LegacyPlayer player){
+    default void copyFrom(LegacyPlayer player) {
         setCrafting(player.hasClassicCrafting());
         setTrading(player.hasClassicTrading());
         setStonecutting(player.hasClassicStonecutting());

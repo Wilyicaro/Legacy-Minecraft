@@ -26,7 +26,9 @@ import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(HorseInventoryScreen.class)
 public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<HorseInventoryMenu> {
-    @Shadow @Final private AbstractHorse horse;
+    @Shadow
+    @Final
+    private AbstractHorse horse;
 
     public HorseInventoryScreenMixin(HorseInventoryMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
@@ -44,14 +46,14 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
         for (int i = 0; i < menu.slots.size(); i++) {
             Slot s = menu.slots.get(i);
             if (i == 0) {
-                LegacySlotDisplay.override(s, 14, 21, new LegacySlotDisplay(){
+                LegacySlotDisplay.override(s, 14, 21, new LegacySlotDisplay() {
                     @Override
                     public ResourceLocation getIconSprite() {
                         return s.getItem().isEmpty() ? LegacySprites.SADDLE_SLOT : null;
                     }
                 });
             } else if (i == 1) {
-                LegacySlotDisplay.override(s, 14, 42, new LegacySlotDisplay(){
+                LegacySlotDisplay.override(s, 14, 42, new LegacySlotDisplay() {
                     @Override
                     public ResourceLocation getIconSprite() {
                         return s.getItem().isEmpty() ? horse instanceof Llama ? LegacySprites.LLAMA_ARMOR_SLOT : LegacySprites.ARMOR_SLOT : null;
@@ -59,22 +61,22 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
                 });
             } else if (i < menu.slots.size() - 36) {
                 int slotOffset = s.getContainerSlot();
-                LegacySlotDisplay.override(s, 98 + slotOffset % horse.getInventoryColumns() * 21,21 + slotOffset / horse.getInventoryColumns() * 21);
+                LegacySlotDisplay.override(s, 98 + slotOffset % horse.getInventoryColumns() * 21, 21 + slotOffset / horse.getInventoryColumns() * 21);
             } else if (i < menu.slots.size() - 9) {
-                LegacySlotDisplay.override(s, 14 + (s.getContainerSlot() - 9) % 9 * 21,104 + (s.getContainerSlot() - 9) / 9 * 21);
+                LegacySlotDisplay.override(s, 14 + (s.getContainerSlot() - 9) % 9 * 21, 104 + (s.getContainerSlot() - 9) / 9 * 21);
             } else {
-                LegacySlotDisplay.override(s, 14 + s.getContainerSlot() * 21,174);
+                LegacySlotDisplay.override(s, 14 + s.getContainerSlot() * 21, 174);
             }
         }
     }
 
-    @Inject(method = "renderBg",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderBg", at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics graphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        FactoryGuiGraphics.of(graphics).blitSprite(UIAccessor.of(this).getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
-        FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL,leftPos + 34,topPos + 20,63,63);
-        FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 97,topPos + 20,105,63);
-        LegacyRenderUtil.renderEntityInInventoryFollowsMouse(graphics,leftPos + 35,topPos + 21,leftPos + 95,topPos + 81,25,0.0625f, i, j, horse);
+        FactoryGuiGraphics.of(graphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL, leftPos + 34, topPos + 20, 63, 63);
+        FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 97, topPos + 20, 105, 63);
+        LegacyRenderUtil.renderEntityInInventoryFollowsMouse(graphics, leftPos + 35, topPos + 21, leftPos + 95, topPos + 81, 25, 0.0625f, i, j, horse);
 
     }
 

@@ -14,9 +14,11 @@ import wily.legacy.entity.PlayerYBobbing;
  */
 @Mixin(Frustum.class)
 public class FrustumMixin {
-    @Shadow @Final private Matrix4f matrix;
+    @Shadow
+    @Final
+    private Matrix4f matrix;
 
-    @ModifyExpressionValue(method = "calculateFrustum",at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4f;mul(Lorg/joml/Matrix4fc;Lorg/joml/Matrix4f;)Lorg/joml/Matrix4f;", remap = false))
+    @ModifyExpressionValue(method = "calculateFrustum", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4f;mul(Lorg/joml/Matrix4fc;Lorg/joml/Matrix4f;)Lorg/joml/Matrix4f;", remap = false))
     private Matrix4f calculateFrustum(Matrix4f original, Matrix4f right, Matrix4f matrix4f2) {
         float angle = PlayerYBobbing.getAngle(Minecraft.getInstance(), FactoryAPIClient.getPartialTick());
         return angle != 0 ? adjustProjectionFOV(matrix4f2, angle).mul(right, matrix) : original;

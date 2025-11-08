@@ -15,7 +15,8 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.SimpleContainer;import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
@@ -28,7 +29,7 @@ import net.minecraft.world.level.block.entity.BannerPattern;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import net.minecraft.core.component.DataComponents;
 //?}
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.Vec2;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.FactoryIngredient;
@@ -43,80 +44,94 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
     public static final Component CRAFTING_TITLE = Component.translatable("container.crafting");
     public static final Component STONECUTTER_TITLE = Component.translatable("container.stonecutter");
     public static final Component LOOM_TITLE = Component.translatable("container.loom");
-    public static final Map<ResourceKey<BannerPattern>,Optional<Ingredient>> LOOM_PATTERN_EXTRA_INGREDIENT_CACHE = new ConcurrentHashMap<>();
+    public static final Map<ResourceKey<BannerPattern>, Optional<Ingredient>> LOOM_PATTERN_EXTRA_INGREDIENT_CACHE = new ConcurrentHashMap<>();
+    public static final Vec2 DEFAULT_INVENTORY_OFFSET = new Vec2(0.5f, 0.5f);
     public final Predicate<Player> stillValid;
     public boolean inventoryActive = true;
-    public static final Vec3 DEFAULT_INVENTORY_OFFSET = new Vec3(0.5,0.5,0);
-    public Vec3 inventoryOffset = DEFAULT_INVENTORY_OFFSET;
+    public Vec2 inventoryOffset = DEFAULT_INVENTORY_OFFSET;
     public boolean showedNotEnoughIngredientsHint = false;
 
-    public static LegacyCraftingMenu craftingMenu(Inventory inventory, @Nullable MenuType<?> menuType, int i, BlockPos pos, int gridDimension){
-        return new LegacyCraftingMenu(inventory, menuType, i, p->pos == null || isValidBlock(p, pos, Blocks.CRAFTING_TABLE)) {
-            RecipeHolder<CraftingRecipe> customRcp;
+    public LegacyCraftingMenu(@Nullable MenuType<?> menuType, int i, Predicate<Player> stillValid) {
+        super(menuType, i);
+        this.stillValid = stillValid;
+    }
+
+    public LegacyCraftingMenu(Inventory inventory, @Nullable MenuType<?> menuType, int i, Predicate<Player> stillValid) {
+        this(menuType, i, stillValid);
+        addInventorySlotGrid(inventory, 9, 186, 133, 3);
+        addInventorySlotGrid(inventory, 0, 186, 186, 1);
+    }
+
+    public static LegacyCraftingMenu craftingMenu(Inventory inventory, @Nullable MenuType<?> menuType, int i, BlockPos pos, int gridDimension) {
+        return new LegacyCraftingMenu(inventory, menuType, i, p -> pos == null || isValidBlock(p, pos, Blocks.CRAFTING_TABLE)) {
             final CraftingContainer container = new TransientCraftingContainer(this, gridDimension, gridDimension);
+            RecipeHolder<CraftingRecipe> customRcp;
             CraftingInput input;
 
             @Override
             public void onCraft(Player player, ServerMenuCraftPayload packet, ItemStack result) {
                 super.onCraft(player, packet, result);
-                if (packet.craftId().isPresent() || customRcp != null) FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(customRcp == null ? getRecipeKey(packet.craftId().get()) : customRcp.id()).ifPresent(h-> player.triggerRecipeCrafted(h,container.getItems()));
+                if (packet.craftId().isPresent() || customRcp != null)
+                    FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(customRcp == null ? getRecipeKey(packet.craftId().get()) : customRcp.id()).ifPresent(h -> player.triggerRecipeCrafted(h, container.getItems()));
             }
 
             @Override
             public ItemStack getResult(Player player, ServerMenuCraftPayload packet) {
                 input = container.asCraftInput();
-                if (packet.craftId().isEmpty()) return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, player.level()).map(h-> (customRcp = h).value().assemble(input, player.level().registryAccess())).orElse(ItemStack.EMPTY);
-                return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(h-> h.value() instanceof CraftingRecipe rcp ? rcp.assemble(input,player.level().registryAccess()) : null).orElse(ItemStack.EMPTY);
+                if (packet.craftId().isEmpty())
+                    return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, player.level()).map(h -> (customRcp = h).value().assemble(input, player.level().registryAccess())).orElse(ItemStack.EMPTY);
+                return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(h -> h.value() instanceof CraftingRecipe rcp ? rcp.assemble(input, player.level().registryAccess()) : null).orElse(ItemStack.EMPTY);
             }
 
             @Override
             public List<ItemStack> getRemainingItems(Player player, ServerMenuCraftPayload packet) {
-                return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, player.level()).map(h->(List<ItemStack>) h.value().getRemainingItems(input)).orElse(super.getRemainingItems(player,packet));
+                return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, player.level()).map(h -> (List<ItemStack>) h.value().getRemainingItems(input)).orElse(super.getRemainingItems(player, packet));
             }
 
             @Override
             public List<Optional<Ingredient>> getIngredients(Player player, ServerMenuCraftPayload packet) {
-                return packet.craftId().isEmpty() || !packet.customIngredients().isEmpty() ? super.getIngredients(player,packet) : FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(r-> getRecipeOptionalIngredients(r.value())).orElse(Collections.emptyList());
+                return packet.craftId().isEmpty() || !packet.customIngredients().isEmpty() ? super.getIngredients(player, packet) : FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(r -> getRecipeOptionalIngredients(r.value())).orElse(Collections.emptyList());
             }
 
             @Override
             public void setupActualItems(Player player, ServerMenuCraftPayload packet, ItemStack setItem, int index) {
-               if (setItem == null)
-                   container.clearContent();
-               else container.setItem(index,setItem);
+                if (setItem == null)
+                    container.clearContent();
+                else container.setItem(index, setItem);
             }
         };
     }
 
-    public static List<Optional<Ingredient>> getRecipeOptionalIngredients(Recipe<?> recipe){
+    public static List<Optional<Ingredient>> getRecipeOptionalIngredients(Recipe<?> recipe) {
         return recipe instanceof ShapedRecipe rcp ? rcp.getIngredients() : recipe instanceof ShapelessRecipe sr ? sr.placementInfo().ingredients().stream().map(Optional::of).toList() : recipe instanceof StonecutterRecipe stonecutterRecipe ? Collections.singletonList(Optional.of(stonecutterRecipe.input())) : Collections.emptyList();
     }
 
-    public static LegacyCraftingMenu playerCraftingMenu(int window, Inventory inventory){
-        return craftingMenu(inventory, LegacyRegistries.PLAYER_CRAFTING_PANEL_MENU.get(),window,null,2);
+    public static LegacyCraftingMenu playerCraftingMenu(int window, Inventory inventory) {
+        return craftingMenu(inventory, LegacyRegistries.PLAYER_CRAFTING_PANEL_MENU.get(), window, null, 2);
     }
 
-    public static LegacyCraftingMenu craftingMenu(int window, Inventory inventory, BlockPos pos){
-        return craftingMenu(inventory, LegacyRegistries.CRAFTING_PANEL_MENU.get(),window,pos,3);
+    public static LegacyCraftingMenu craftingMenu(int window, Inventory inventory, BlockPos pos) {
+        return craftingMenu(inventory, LegacyRegistries.CRAFTING_PANEL_MENU.get(), window, pos, 3);
     }
 
-    public static LegacyCraftingMenu craftingMenu(int window, Inventory inventory){
-        return craftingMenu(window, inventory,null);
+    public static LegacyCraftingMenu craftingMenu(int window, Inventory inventory) {
+        return craftingMenu(window, inventory, null);
     }
 
-    public static LegacyCraftingMenu loomMenu(int window, Inventory inventory, BlockPos blockPos){
-        return new LegacyCraftingMenu(inventory, LegacyRegistries.LOOM_PANEL_MENU.get(), window, p->isValidBlock(p, blockPos, Blocks.LOOM)) {
+    public static LegacyCraftingMenu loomMenu(int window, Inventory inventory, BlockPos blockPos) {
+        return new LegacyCraftingMenu(inventory, LegacyRegistries.LOOM_PANEL_MENU.get(), window, p -> isValidBlock(p, blockPos, Blocks.LOOM)) {
             final Container container = new SimpleContainer(3);
 
             @Override
             public List<Optional<Ingredient>> getIngredients(Player player, ServerMenuCraftPayload packet) {
                 List<Optional<Ingredient>> customIngredients = super.getIngredients(player, packet);
-                if (packet.craftId().isPresent() && customIngredients.size() == 2 && Arrays.stream(FactoryIngredient.of(customIngredients.get(0).get()).getStacks()).allMatch(i->i.getItem() instanceof BannerItem) && Arrays.stream(FactoryIngredient.of(customIngredients.get(1).get()).getStacks()).allMatch(i->i.getItem() instanceof DyeItem)){
-                    return player.level().registryAccess().lookup(Registries.BANNER_PATTERN).flatMap(b->
-                            b.get(ResourceKey.create(Registries.BANNER_PATTERN, packet.craftId().get())).map(p-> {
-                                        Optional<Ingredient> extraIng = getBannerPatternExtraIngredient(player.level().registryAccess(),p.key());
+                if (packet.craftId().isPresent() && customIngredients.size() == 2 && Arrays.stream(FactoryIngredient.of(customIngredients.get(0).get()).getStacks()).allMatch(i -> i.getItem() instanceof BannerItem) && Arrays.stream(FactoryIngredient.of(customIngredients.get(1).get()).getStacks()).allMatch(i -> i.getItem() instanceof DyeItem)) {
+                    return player.level().registryAccess().lookup(Registries.BANNER_PATTERN).flatMap(b ->
+                            b.get(ResourceKey.create(Registries.BANNER_PATTERN, packet.craftId().get())).map(p -> {
+                                        Optional<Ingredient> extraIng = getBannerPatternExtraIngredient(player.level().registryAccess(), p.key());
                                         if (extraIng.isEmpty()) return customIngredients;
-                                        else return ImmutableList.<Optional<Ingredient>>builder().addAll(customIngredients).add(extraIng).build();
+                                        else
+                                            return ImmutableList.<Optional<Ingredient>>builder().addAll(customIngredients).add(extraIng).build();
                                     }
                             )).orElse(Collections.emptyList());
                 }
@@ -125,35 +140,36 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
 
             @Override
             public ItemStack getResult(Player player, ServerMenuCraftPayload packet) {
-                return player.level().registryAccess().lookup(Registries.BANNER_PATTERN).flatMap(b->
-                        b.get(ResourceKey.create(Registries.BANNER_PATTERN, packet.craftId().get())).map(p-> {
-                                    ItemStack banner = container.getItem(0);
-                                    banner.set(DataComponents.BANNER_PATTERNS, new BannerPatternLayers.Builder().addAll(banner.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY)).add(p, ((DyeItem) container.getItem(1).getItem()).getDyeColor()).build());
-                                    return banner;
-                                })).orElse(ItemStack.EMPTY);
+                return player.level().registryAccess().lookup(Registries.BANNER_PATTERN).flatMap(b ->
+                        b.get(ResourceKey.create(Registries.BANNER_PATTERN, packet.craftId().get())).map(p -> {
+                            ItemStack banner = container.getItem(0);
+                            banner.set(DataComponents.BANNER_PATTERNS, new BannerPatternLayers.Builder().addAll(banner.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY)).add(p, ((DyeItem) container.getItem(1).getItem()).getDyeColor()).build());
+                            return banner;
+                        })).orElse(ItemStack.EMPTY);
             }
 
             @Override
             public List<ItemStack> getRemainingItems(Player player, ServerMenuCraftPayload packet) {
-                return container.getItem(2).isEmpty() ? super.getRemainingItems(player,packet) : List.of(container.getItem(2));
+                return container.getItem(2).isEmpty() ? super.getRemainingItems(player, packet) : List.of(container.getItem(2));
             }
 
             @Override
             public void setupActualItems(Player player, ServerMenuCraftPayload packet, ItemStack setItem, int index) {
                 if (setItem == null)
                     container.clearContent();
-                else container.setItem(index,setItem);
+                else container.setItem(index, setItem);
             }
         };
     }
 
-    public static LegacyCraftingMenu loomMenu(int window, Inventory inventory){
-        return loomMenu(window,inventory,null);
+    public static LegacyCraftingMenu loomMenu(int window, Inventory inventory) {
+        return loomMenu(window, inventory, null);
     }
 
-    public static LegacyCraftingMenu stoneCutterMenu(int window, Inventory inventory, BlockPos blockPos){
-        return new LegacyCraftingMenu(inventory, LegacyRegistries.STONECUTTER_PANEL_MENU.get(),window, p->isValidBlock(p,blockPos, Blocks.STONECUTTER)){
+    public static LegacyCraftingMenu stoneCutterMenu(int window, Inventory inventory, BlockPos blockPos) {
+        return new LegacyCraftingMenu(inventory, LegacyRegistries.STONECUTTER_PANEL_MENU.get(), window, p -> isValidBlock(p, blockPos, Blocks.STONECUTTER)) {
             long lastSoundTime;
+
             @Override
             public void onCraft(Player player, ServerMenuCraftPayload packet, ItemStack result) {
                 super.onCraft(player, packet, result);
@@ -166,32 +182,21 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
 
             @Override
             public List<Optional<Ingredient>> getIngredients(Player player, ServerMenuCraftPayload packet) {
-                return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(r-> getRecipeOptionalIngredients(r.value())).orElse(Collections.emptyList());
+                return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(r -> getRecipeOptionalIngredients(r.value())).orElse(Collections.emptyList());
             }
 
             @Override
             public ItemStack getResult(Player player, ServerMenuCraftPayload packet) {
-                return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(h->h.value() instanceof StonecutterRecipe rcp ? rcp.assemble( null,player.level().registryAccess()) : null).orElse(ItemStack.EMPTY);
+                return FactoryAPIPlatform.getEntityServer(player).getRecipeManager().byKey(getRecipeKey(packet.craftId().get())).map(h -> h.value() instanceof StonecutterRecipe rcp ? rcp.assemble(null, player.level().registryAccess()) : null).orElse(ItemStack.EMPTY);
             }
         };
     }
 
-    public static LegacyCraftingMenu stoneCutterMenu(int window, Inventory inventory){
-        return stoneCutterMenu(window, inventory,null);
+    public static LegacyCraftingMenu stoneCutterMenu(int window, Inventory inventory) {
+        return stoneCutterMenu(window, inventory, null);
     }
 
-    public LegacyCraftingMenu(@Nullable MenuType<?> menuType, int i, Predicate<Player> stillValid) {
-        super(menuType, i);
-        this.stillValid = stillValid;
-    }
-
-    public LegacyCraftingMenu(Inventory inventory, @Nullable MenuType<?> menuType, int i, Predicate<Player> stillValid) {
-        this(menuType, i,stillValid);
-        addInventorySlotGrid(inventory, 9,186, 133,3);
-        addInventorySlotGrid(inventory, 0,186, 186,1);
-    }
-
-    public static List<Optional<Ingredient>> updateShapedIngredients(List<Optional<Ingredient>> ingredientsGrid, List<Optional<Ingredient>> recipeIngredients, int gridDimension, int rcpWidth, int rcpHeight){
+    public static List<Optional<Ingredient>> updateShapedIngredients(List<Optional<Ingredient>> ingredientsGrid, List<Optional<Ingredient>> recipeIngredients, int gridDimension, int rcpWidth, int rcpHeight) {
         int rcpDimension = Math.max(rcpWidth, rcpHeight);
         if (rcpDimension > gridDimension) return Collections.emptyList();
         Ingredient[] ingredients = new Ingredient[rcpDimension * rcpDimension];
@@ -202,41 +207,64 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
         return ingredientsGrid;
     }
 
-    public static Optional<Ingredient> getBannerPatternExtraIngredient(RegistryAccess registryAccess, ResourceKey<BannerPattern> pattern){
-        return LOOM_PATTERN_EXTRA_INGREDIENT_CACHE.computeIfAbsent(pattern,key->{
+    public static Optional<Ingredient> getBannerPatternExtraIngredient(RegistryAccess registryAccess, ResourceKey<BannerPattern> pattern) {
+        return LOOM_PATTERN_EXTRA_INGREDIENT_CACHE.computeIfAbsent(pattern, key -> {
             Holder<BannerPattern> holder = registryAccess.lookupOrThrow(Registries.BANNER_PATTERN).getOrThrow(pattern);
             for (Item item : BuiltInRegistries.ITEM) {
-                if (item.components().has(DataComponents.PROVIDES_BANNER_PATTERNS) && holder.is(item.components().get(DataComponents.PROVIDES_BANNER_PATTERNS))) return Optional.of(Ingredient.of(item));
+                if (item.components().has(DataComponents.PROVIDES_BANNER_PATTERNS) && holder.is(item.components().get(DataComponents.PROVIDES_BANNER_PATTERNS)))
+                    return Optional.of(Ingredient.of(item));
             }
             return Optional.empty();
         });
     }
 
+    public static boolean isValidBlock(Player player, BlockPos pos, Block wantedBlock) {
+        return player.level().getBlockState(pos).is(wantedBlock) && player.distanceToSqr((double) pos.getX() + 0.5, (double) pos.getY() + 0.5, (double) pos.getZ() + 0.5) <= 64.0;
+    }
 
-    public ResourceKey<Recipe<?>> getRecipeKey(ResourceLocation id){
+    public static MenuProvider getMenuProvider(BlockPos pos, boolean is2x2) {
+        return new SimpleMenuProvider((i, inventory, player) -> is2x2 ? playerCraftingMenu(i, inventory) : craftingMenu(i, inventory, pos), CRAFTING_TITLE);
+    }
+
+    public static MenuProvider getMenuProvider(MenuConstructor constructor, Component component) {
+        return new SimpleMenuProvider(constructor, component);
+    }
+
+    public static MenuProvider getLoomMenuProvider(BlockPos pos) {
+        return getMenuProvider((i, inv, p) -> loomMenu(i, inv, pos), LOOM_TITLE);
+    }
+
+    public static MenuProvider getStonecutterMenuProvider(BlockPos pos) {
+        return getMenuProvider((i, inv, p) -> stoneCutterMenu(i, inv, pos), STONECUTTER_TITLE);
+    }
+
+    public ResourceKey<Recipe<?>> getRecipeKey(ResourceLocation id) {
         return ResourceKey.create(Registries.RECIPE, id);
     }
 
-    public void addInventorySlotGrid(Container container, int startIndex, int x, int y, int rows){
+    public void addInventorySlotGrid(Container container, int startIndex, int x, int y, int rows) {
         for (int j = 0; j < rows; j++) {
             for (int k = 0; k < 9; k++) {
-                addSlot(LegacySlotDisplay.override(new Slot(container,startIndex +  j * 9 + k,x + k * 16,y + j * 16){
+                addSlot(LegacySlotDisplay.override(new Slot(container, startIndex + j * 9 + k, x + k * 16, y + j * 16) {
                     @Override
                     public void setChanged() {
                         super.setChanged();
                         slotsChanged(container);
                     }
+
                     @Override
                     public boolean isActive() {
                         return inventoryActive;
                     }
-                }, new LegacySlotDisplay(){
-                    public Vec3 getOffset() {
+                }, new LegacySlotDisplay() {
+                    public Vec2 getOffset() {
                         return inventoryOffset;
                     }
+
                     public int getWidth() {
                         return 16;
                     }
+
                     public int getHeight() {
                         return 16;
                     }
@@ -281,22 +309,6 @@ public abstract class LegacyCraftingMenu extends AbstractContainerMenu implement
         return stillValid.test(player);
     }
 
-    public static boolean isValidBlock(Player player, BlockPos pos, Block wantedBlock){
-        return player.level().getBlockState(pos).is(wantedBlock) && player.distanceToSqr((double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5) <= 64.0;
-    }
-
-    public static MenuProvider getMenuProvider(BlockPos pos, boolean is2x2) {
-        return new SimpleMenuProvider((i, inventory, player) ->  is2x2 ? playerCraftingMenu(i, inventory) : craftingMenu(i, inventory, pos), CRAFTING_TITLE);
-    }
-    public static MenuProvider getMenuProvider(MenuConstructor constructor, Component component) {
-        return new SimpleMenuProvider(constructor, component);
-    }
-    public static MenuProvider getLoomMenuProvider(BlockPos pos) {
-        return getMenuProvider((i,inv,p)-> loomMenu(i, inv, pos), LOOM_TITLE);
-    }
-    public static MenuProvider getStonecutterMenuProvider(BlockPos pos) {
-        return getMenuProvider((i,inv,p)-> stoneCutterMenu(i, inv, pos), STONECUTTER_TITLE);
-    }
     public void onCraft(Player player, ServerMenuCraftPayload packet, ItemStack result) {
         result.onCraftedBy(player, result.getCount());
 

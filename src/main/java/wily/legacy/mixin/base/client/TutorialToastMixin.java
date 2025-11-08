@@ -16,6 +16,6 @@ import java.util.function.Function;
 public abstract class TutorialToastMixin implements Toast {
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIII)V"))
     public void render(GuiGraphics instance, RenderPipeline renderPipeline, ResourceLocation resourceLocation, int i, int j, int k, int l) {
-        LegacyRenderUtil.renderPointerPanel(instance,0,0,width(),height());
+        LegacyRenderUtil.renderPointerPanel(instance, 0, 0, width(), height());
     }
 }

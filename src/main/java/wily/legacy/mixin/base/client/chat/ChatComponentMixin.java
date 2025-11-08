@@ -31,20 +31,31 @@ import java.util.Objects;
 @Mixin(ChatComponent.class)
 public abstract class ChatComponentMixin {
 
-    @Shadow @Final private Minecraft minecraft;
+    @Shadow
+    @Final
+    private Minecraft minecraft;
 
-    @Shadow public abstract double getScale();
+    @Inject(method = "getWidth(D)I", at = @At(value = "HEAD"), cancellable = true)
+    private static void getWidth(double d, CallbackInfoReturnable<Integer> cir) {
+        cir.setReturnValue(Mth.floor(d * (Minecraft.getInstance().getWindow().getGuiScaledWidth() - (4 + LegacyRenderUtil.getChatSafeZone()) * 2)));
+    }
 
-    @Shadow protected abstract int getLineHeight();
+    @Shadow
+    public abstract double getScale();
+
+    @Shadow
+    protected abstract int getLineHeight();
 
     @Shadow
     public abstract boolean isChatFocused();
 
-    @Shadow protected abstract void drawTagIcon(GuiGraphics guiGraphics, int i, int j, GuiMessageTag.Icon icon);
+    @Shadow
+    protected abstract void drawTagIcon(GuiGraphics guiGraphics, int i, int j, GuiMessageTag.Icon icon);
 
-    @Shadow protected abstract int getTagIconLeft(GuiMessage.Line line);
+    @Shadow
+    protected abstract int getTagIconLeft(GuiMessage.Line line);
 
-    @ModifyArg(method = "render",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;forEachLine(IIZILnet/minecraft/client/gui/components/ChatComponent$LineConsumer;)I", ordinal = 0), index = 4)
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;forEachLine(IIZILnet/minecraft/client/gui/components/ChatComponent$LineConsumer;)I", ordinal = 0), index = 4)
     private ChatComponent.LineConsumer changeChatX(ChatComponent.LineConsumer lineConsumer, @Local(argsOnly = true) GuiGraphics guiGraphics, @Local(ordinal = 5) int n, @Local(ordinal = 8) int q, @Local(ordinal = 9) int r, @Local(ordinal = 1) float g, @Local(ordinal = 2) float h) {
         return (lx, mx, nx, line, ox, hx) -> {
             int safeZone = Math.round(LegacyRenderUtil.getChatSafeZone());
@@ -60,39 +71,35 @@ public abstract class ChatComponentMixin {
         };
     }
 
-    @ModifyExpressionValue(method = "getMessageTagAt",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;screenToChatX(D)D"))
+    @ModifyExpressionValue(method = "getMessageTagAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;screenToChatX(D)D"))
     private double changeMessageTagXPos(double original) {
         return original + Math.round(LegacyRenderUtil.getChatSafeZone());
     }
 
-    @Inject(method = "render",at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
     private void stopRender(GuiGraphics guiGraphics, int i, int j, int k, boolean bl, CallbackInfo ci) {
         if (minecraft.screen != null && !isChatFocused()) ci.cancel();
     }
 
-    @Inject(method = "render",at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;pushMatrix()Lorg/joml/Matrix3x2fStack;", shift = At.Shift.AFTER, ordinal = 0, remap = false))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;pushMatrix()Lorg/joml/Matrix3x2fStack;", shift = At.Shift.AFTER, ordinal = 0, remap = false))
     private void changeRenderTranslation(GuiGraphics guiGraphics, int i, int j, int k, boolean bl, CallbackInfo ci) {
         guiGraphics.pose().translate(LegacyRenderUtil.getChatSafeZone(), LegacyRenderUtil.getHUDDistance() - 42);
     }
 
-    @Inject(method = "screenToChatX",at = @At("RETURN"), cancellable = true)
+    @Inject(method = "screenToChatX", at = @At("RETURN"), cancellable = true)
     private void screenToChatX(double d, CallbackInfoReturnable<Double> cir) {
         cir.setReturnValue(cir.getReturnValue() - LegacyRenderUtil.getChatSafeZone());
     }
 
-    @Inject(method = "screenToChatY",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "screenToChatY", at = @At("HEAD"), cancellable = true)
     private void screenToChatY(double d, CallbackInfoReturnable<Double> cir) {
-        double e = (double)this.minecraft.getWindow().getGuiScaledHeight() - d - 40 + LegacyRenderUtil.getHUDDistance() - 42;
-        cir.setReturnValue(e / (this.getScale() * (double)this.getLineHeight()));
+        double e = (double) this.minecraft.getWindow().getGuiScaledHeight() - d - 40 + LegacyRenderUtil.getHUDDistance() - 42;
+        cir.setReturnValue(e / (this.getScale() * (double) this.getLineHeight()));
     }
 
-    @Inject(method = "getWidth(D)I",at = @At(value = "HEAD"), cancellable = true)
-    private static void getWidth(double d, CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(Mth.floor(d * (Minecraft.getInstance().getWindow().getGuiScaledWidth() - (4 + LegacyRenderUtil.getChatSafeZone()) * 2)));
-    }
-    
-    @Inject(method = "isChatFocused",at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "isChatFocused", at = @At(value = "HEAD"), cancellable = true)
     private void isChatFocused(CallbackInfoReturnable<Boolean> cir) {
-        if (minecraft.screen instanceof OverlayPanelScreen s && s.parent instanceof ChatScreen) cir.setReturnValue(true);
+        if (minecraft.screen instanceof OverlayPanelScreen s && s.parent instanceof ChatScreen)
+            cir.setReturnValue(true);
     }
 }

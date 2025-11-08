@@ -10,10 +10,13 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(WitherBoss.class)
 public class WitherBossMixin {
-    @ModifyArg(method = "<init>",at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerBossEvent;<init>(Lnet/minecraft/network/chat/Component;Lnet/minecraft/world/BossEvent$BossBarColor;Lnet/minecraft/world/BossEvent$BossBarOverlay;)V"))
-    private Component init(Component component){
+    @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerBossEvent;<init>(Lnet/minecraft/network/chat/Component;Lnet/minecraft/world/BossEvent$BossBarColor;Lnet/minecraft/world/BossEvent$BossBarOverlay;)V"))
+    private Component init(Component component) {
         return component.copy().withStyle(ChatFormatting.DARK_PURPLE);
     }
-    @ModifyArg(method = "<init>",at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerBossEvent;<init>(Lnet/minecraft/network/chat/Component;Lnet/minecraft/world/BossEvent$BossBarColor;Lnet/minecraft/world/BossEvent$BossBarOverlay;)V"), index = 1)
-    private BossEvent.BossBarColor initColor(BossEvent.BossBarColor bossBarColor){return BossEvent.BossBarColor.PINK;}
+
+    @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerBossEvent;<init>(Lnet/minecraft/network/chat/Component;Lnet/minecraft/world/BossEvent$BossBarColor;Lnet/minecraft/world/BossEvent$BossBarOverlay;)V"), index = 1)
+    private BossEvent.BossBarColor initColor(BossEvent.BossBarColor bossBarColor) {
+        return BossEvent.BossBarColor.PINK;
+    }
 }

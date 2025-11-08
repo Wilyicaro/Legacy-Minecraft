@@ -95,65 +95,51 @@ public interface MCAccount {
     Path ACCOUNTS_PATH = Minecraft.getInstance().gameDirectory.toPath().resolve(".accounts.json");
 
     List<MCAccount> list = new ArrayList<>();
+    // A reusable Apache HTTP request config
+    // NB: We use Apache's HTTP implementation as the native HTTP client does
+    //     not appear to free its resources after use!
+    RequestConfig REQUEST_CONFIG = RequestConfig.custom().setConnectionRequestTimeout(30_000).setConnectTimeout(30_000).setSocketTimeout(30_000).build();
+    // Default URLs used in the configuration.
+    String CLIENT_ID = "2f63b52c-2aeb-4f21-a753-12adfd4ef9fc";
+    String AUTHORIZE_URL = "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize";
+    String TOKEN_URL = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
+    String XBOX_AUTH_URL = "https://user.auth.xboxlive.com/user/authenticate";
+    String XBOX_XSTS_URL = "https://xsts.auth.xboxlive.com/xsts/authorize";
+    String MC_AUTH_URL = "https://api.minecraftservices.com/authentication/login_with_xbox";
+    String MC_PROFILE_URL = "https://api.minecraftservices.com/minecraft/profile";
+    Stocker<Long> lastSessionCheckTime = Stocker.of(0L);
+    Stocker<Boolean> lastSessionCheck = Stocker.of(null);
 
-    GameProfile getProfile();
-
-    default boolean isEncrypted(){
-        return false;
-    }
-
-    default Optional<String> getToken(@Nullable String password, String tokenEntry){
-        return Optional.empty();
-    }
-    default Optional<String> getMCAccessToken(@Nullable String password){
-        return getToken(password, MC_ACCESS_TOKEN);
-    }
-    default Optional<String> getMSARefreshToken(@Nullable String password){
-        return getToken(password, MSA_REFRESH_TOKEN);
-    }
-
-    default void serialize(JsonObject object) {
-        serializeProfile(getProfile(),object);
-    }
-    default void login(ChooseUserScreen screen, @Nullable String password){
-        login(()->{
-            screen.reloadAccountButtons();
-            Minecraft.getInstance().setScreen(screen);
-        },password);
-    }
-    default void login(Runnable onClose, @Nullable String password){
-        MCAccount.setUser(new User(getProfile().name(), getProfile().id(),"invalidtoken", Optional.empty(),Optional.empty()));
-        onClose.run();
-    }
-
-    static void loadAll(){
+    static void loadAll() {
         list.clear();
         if (!Files.exists(ACCOUNTS_PATH)) return;
         try (BufferedReader r = Files.newBufferedReader(ACCOUNTS_PATH, Charsets.UTF_8)) {
-            GsonHelper.parseArray(r).forEach(e-> list.add(deserialize(e.getAsJsonObject())));
+            GsonHelper.parseArray(r).forEach(e -> list.add(deserialize(e.getAsJsonObject())));
         } catch (IOException e) {
-            Legacy4J.LOGGER.warn("Failed to load the saved accounts",e);
+            Legacy4J.LOGGER.warn("Failed to load the saved accounts", e);
         }
     }
-    static void saveAll(){
+
+    static void saveAll() {
         if (list.isEmpty()) return;
-        try (JsonWriter w = new JsonWriter(Files.newBufferedWriter(ACCOUNTS_PATH, Charsets.UTF_8))){
+        try (JsonWriter w = new JsonWriter(Files.newBufferedWriter(ACCOUNTS_PATH, Charsets.UTF_8))) {
             w.setSerializeNulls(false);
             w.setIndent("  ");
             JsonArray array = new JsonArray();
-            list.forEach(a->{
+            list.forEach(a -> {
                 JsonObject obj = new JsonObject();
                 a.serialize(obj);
                 array.add(obj);
             });
-            GsonHelper.writeValue(w,array,null);
-            if (Util.getPlatform().equals(Util.OS.WINDOWS)) Files.setAttribute(ACCOUNTS_PATH, "dos:hidden", Boolean.TRUE, LinkOption.NOFOLLOW_LINKS);
+            GsonHelper.writeValue(w, array, null);
+            if (Util.getPlatform().equals(Util.OS.WINDOWS))
+                Files.setAttribute(ACCOUNTS_PATH, "dos:hidden", Boolean.TRUE, LinkOption.NOFOLLOW_LINKS);
         } catch (IOException e) {
-            Legacy4J.LOGGER.warn("Failed to write the saved accounts",e);
+            Legacy4J.LOGGER.warn("Failed to write the saved accounts", e);
         }
     }
 
-    static String encryptToken(String password, String token){
+    static String encryptToken(String password, String token) {
         if (password == null) return token;
         try {
             byte[] salt = new byte[16];
@@ -175,21 +161,23 @@ public interface MCAccount {
 
 
             return Base64.getEncoder().encodeToString(encryptedWithSaltAndIv);
-        } catch (NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | BadPaddingException | InvalidKeyException e) {
+        } catch (NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException |
+                 InvalidAlgorithmParameterException | BadPaddingException | InvalidKeyException e) {
             return null;
         }
     }
 
-    static MCAccount deserialize(JsonObject object){
-        return create(deserializeProfile(object),GsonHelper.getAsBoolean(object, ENCRYPTED,false),GsonHelper.getAsString(object, MC_ACCESS_TOKEN,null), GsonHelper.getAsString(object, MSA_REFRESH_TOKEN,null));
+    static MCAccount deserialize(JsonObject object) {
+        return create(deserializeProfile(object), GsonHelper.getAsBoolean(object, ENCRYPTED, false), GsonHelper.getAsString(object, MC_ACCESS_TOKEN, null), GsonHelper.getAsString(object, MSA_REFRESH_TOKEN, null));
     }
 
-    static void serializeProfile(GameProfile profile, JsonObject object){
-        object.addProperty("id",profile.id().toString());
-        object.addProperty("name",profile.name());
+    static void serializeProfile(GameProfile profile, JsonObject object) {
+        object.addProperty("id", profile.id().toString());
+        object.addProperty("name", profile.name());
     }
-    static GameProfile deserializeProfile(JsonObject object){
-        return new GameProfile(UUID.fromString(object.get("id").getAsString()),object.get("name").getAsString());
+
+    static GameProfile deserializeProfile(JsonObject object) {
+        return new GameProfile(UUID.fromString(object.get("id").getAsString()), object.get("name").getAsString());
     }
 
     static SecretKeySpec getKeyFromPassword(String password, byte[] salt) {
@@ -199,8 +187,9 @@ public interface MCAccount {
             throw new RuntimeException(e);
         }
     }
-    static MCAccount create(GameProfile profile, boolean encrypted,  String mcAccessToken, String msaRefreshToken){
-        if (mcAccessToken == null || msaRefreshToken == null) return ()-> profile;
+
+    static MCAccount create(GameProfile profile, boolean encrypted, String mcAccessToken, String msaRefreshToken) {
+        if (mcAccessToken == null || msaRefreshToken == null) return () -> profile;
         CompletableFuture<GameProfile> result = CompletableFuture.supplyAsync(() -> Minecraft.getInstance().services().sessionService().fetchProfile(profile.id(), true).profile(), Util.nonCriticalIoPool());
         return new MCAccount() {
             @Override
@@ -216,7 +205,7 @@ public interface MCAccount {
             @Override
             public void login(Runnable onClose, @Nullable String password) {
                 if (password == null && isEncrypted()) return;
-                getMCAccessToken(password).ifPresent(s-> {
+                getMCAccessToken(password).ifPresent(s -> {
                     ExecutorService executor = Executors.newSingleThreadExecutor();
                     LegacyLoadingScreen screen = MCAccount.prepareLoginInScreen(onClose, executor);
                     Minecraft.getInstance().setScreen(screen);
@@ -240,9 +229,9 @@ public interface MCAccount {
             @Override
             public void serialize(JsonObject object) {
                 MCAccount.super.serialize(object);
-                object.addProperty("encrypted",isEncrypted());
-                getMCAccessToken(null).ifPresent(t-> object.addProperty(MC_ACCESS_TOKEN,t));
-                getMSARefreshToken(null).ifPresent(t-> object.addProperty(MSA_REFRESH_TOKEN,t));
+                object.addProperty("encrypted", isEncrypted());
+                getMCAccessToken(null).ifPresent(t -> object.addProperty(MC_ACCESS_TOKEN, t));
+                getMSARefreshToken(null).ifPresent(t -> object.addProperty(MSA_REFRESH_TOKEN, t));
             }
 
             @Override
@@ -260,34 +249,16 @@ public interface MCAccount {
                     System.arraycopy(decodedData, salt.length + iv.length, encrypted, 0, encrypted.length);
 
                     Cipher c = Cipher.getInstance(TRANSFORMATION);
-                    c.init(Cipher.DECRYPT_MODE,getKeyFromPassword(password, salt),new IvParameterSpec(iv));
+                    c.init(Cipher.DECRYPT_MODE, getKeyFromPassword(password, salt), new IvParameterSpec(iv));
                     return Optional.of(new String(c.doFinal(encrypted)));
-                } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException e) {
+                } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+                         IllegalBlockSizeException | BadPaddingException | InvalidAlgorithmParameterException e) {
                     FactoryAPIClient.getToasts().addToast(new LegacyTip(Component.translatable("legacy.menu.choose_user.failed", Component.translatable("legacy.menu.choose_user.failed.incorrect_password").withStyle(ChatFormatting.RED)), 140, 46).centered());
                     return Optional.empty();
                 }
             }
         };
     }
-
-    // A reusable Apache HTTP request config
-    // NB: We use Apache's HTTP implementation as the native HTTP client does
-    //     not appear to free its resources after use!
-    RequestConfig REQUEST_CONFIG = RequestConfig.custom().setConnectionRequestTimeout(30_000).setConnectTimeout(30_000).setSocketTimeout(30_000).build();
-
-
-    // Default URLs used in the configuration.
-    String CLIENT_ID = "2f63b52c-2aeb-4f21-a753-12adfd4ef9fc";
-    String AUTHORIZE_URL = "https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize";
-    String TOKEN_URL = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token";
-    String XBOX_AUTH_URL = "https://user.auth.xboxlive.com/user/authenticate";
-    String XBOX_XSTS_URL = "https://xsts.auth.xboxlive.com/xsts/authorize";
-    String MC_AUTH_URL = "https://api.minecraftservices.com/authentication/login_with_xbox";
-    String MC_PROFILE_URL = "https://api.minecraftservices.com/minecraft/profile";
-
-    Stocker<Long> lastSessionCheckTime = Stocker.of(0L);
-    Stocker<Boolean> lastSessionCheck = Stocker.of(null);
-
 
     /**
      * Navigates to the Microsoft login, and listens for a successful login
@@ -400,13 +371,13 @@ public interface MCAccount {
 
                 // Build a Microsoft login url
                 final URIBuilder uriBuilder = new URIBuilder(AUTHORIZE_URL)
-                    .addParameter("client_id", CLIENT_ID)
-                    .addParameter("response_type", "code")
-                    .addParameter(
-                        "redirect_uri", String.format("http://localhost:%d/callback", server.getAddress().getPort())
-                    )
-                    .addParameter("scope", "XboxLive.signin offline_access")
-                    .addParameter("state", state);
+                        .addParameter("client_id", CLIENT_ID)
+                        .addParameter("response_type", "code")
+                        .addParameter(
+                                "redirect_uri", String.format("http://localhost:%d/callback", server.getAddress().getPort())
+                        )
+                        .addParameter("scope", "XboxLive.signin offline_access")
+                        .addParameter("state", state);
                 if (prompt != null) uriBuilder.addParameter("prompt", prompt.toString());
 
                 final URI uri = uriBuilder.build();
@@ -424,18 +395,18 @@ public interface MCAccount {
                     latch.await();
 
                     return Optional.ofNullable(authCode.get())
-                                   .filter(code -> !code.isBlank())
-                                   // If present, log success and return
-                                   .map(code -> {
-                                       LOGGER.info("Acquired Microsoft auth code! ({})",
-                                           StringUtils.abbreviateMiddle(code, "...", 32));
-                                       return code;
-                                   })
-                                   // Otherwise, throw an exception with the error description if present
-                                   .orElseThrow(() -> new Exception(
-                                       Optional.ofNullable(errorMsg.get())
-                                               .orElse("There was no auth code or error description present.")
-                                   ));
+                            .filter(code -> !code.isBlank())
+                            // If present, log success and return
+                            .map(code -> {
+                                LOGGER.info("Acquired Microsoft auth code! ({})",
+                                        StringUtils.abbreviateMiddle(code, "...", 32));
+                                return code;
+                            })
+                            // Otherwise, throw an exception with the error description if present
+                            .orElseThrow(() -> new Exception(
+                                    Optional.ofNullable(errorMsg.get())
+                                            .orElse("There was no auth code or error description present.")
+                            ));
                 } finally {
                     // Always release the server!
                     server.stop(2);
@@ -449,30 +420,32 @@ public interface MCAccount {
             }
         }, executor);
     }
+
     /**
      * Exchanges a Microsoft auth code for an access token.
      *
      * <p>NB: You must manually interrupt the executor thread if the
      * completable future is cancelled!
      *
-     * @param code Microsoft auth code
+     * @param code     Microsoft auth code
      * @param executor executor to run the login task on
      * @return completable future for the Microsoft access token
      */
-    static CompletableFuture<Pair<String,String>> acquireMSAccessToken(final String code, final Executor executor) {
-        return acquireMSAccessToken(code,false,executor);
+    static CompletableFuture<Pair<String, String>> acquireMSAccessToken(final String code, final Executor executor) {
+        return acquireMSAccessToken(code, false, executor);
     }
+
     /**
      * Exchanges a Microsoft auth code or a refresh token for an access token.
      *
      * <p>NB: You must manually interrupt the executor thread if the
      * completable future is cancelled!
      *
-     * @param code Microsoft auth code or a refresh token
+     * @param code     Microsoft auth code or a refresh token
      * @param executor executor to run the login task on
      * @return completable future for the Microsoft access token
      */
-    static CompletableFuture<Pair<String,String>> acquireMSAccessToken(final String code, boolean isRefreshToken, final Executor executor) {
+    static CompletableFuture<Pair<String, String>> acquireMSAccessToken(final String code, boolean isRefreshToken, final Executor executor) {
         return CompletableFuture.supplyAsync(() -> {
             LOGGER.info("Exchanging Microsoft auth code for an access token...");
             try (CloseableHttpClient client = HttpClients.createMinimal()) {
@@ -486,8 +459,8 @@ public interface MCAccount {
                         new BasicNameValuePair(isRefreshToken ? "refresh_token" : "code", code),
                         // We must provide the exact redirect URI that was used to obtain the auth code
                         new BasicNameValuePair("redirect_uri", String.format("http://localhost:%d/callback", 25585))
-                    ),
-                    "UTF-8"
+                ),
+                        "UTF-8"
                 ));
 
                 // Send the request on the HTTP client
@@ -497,22 +470,22 @@ public interface MCAccount {
                 // Attempt to parse the response body as JSON and extract the access token
                 final JsonObject json = GsonHelper.parse(EntityUtils.toString(res.getEntity()));
                 return Pair.of(Optional.ofNullable(json.get("access_token"))
-                               .map(JsonElement::getAsString)
-                               .filter(token -> !token.isBlank())
-                               // If present, log success and return
-                               .map(token -> {
-                                   LOGGER.info("Acquired Microsoft access token! ({})",
-                                       StringUtils.abbreviateMiddle(token, "...", 32));
-                                   return token;
-                               })
-                               // Otherwise, throw an exception with the error description if present
-                               .orElseThrow(() -> new Exception(
-                                   json.has("error") ? String.format(
-                                       "%s: %s",
-                                       json.get("error").getAsString(),
-                                       json.get("error_description").getAsString()
-                                   ) : "There was no access token or error description present."
-                               )),json.get("refresh_token").getAsString());
+                        .map(JsonElement::getAsString)
+                        .filter(token -> !token.isBlank())
+                        // If present, log success and return
+                        .map(token -> {
+                            LOGGER.info("Acquired Microsoft access token! ({})",
+                                    StringUtils.abbreviateMiddle(token, "...", 32));
+                            return token;
+                        })
+                        // Otherwise, throw an exception with the error description if present
+                        .orElseThrow(() -> new Exception(
+                                json.has("error") ? String.format(
+                                        "%s: %s",
+                                        json.get("error").getAsString(),
+                                        json.get("error_description").getAsString()
+                                ) : "There was no access token or error description present."
+                        )), json.get("refresh_token").getAsString());
             } catch (InterruptedException e) {
                 LOGGER.warn("Microsoft access token acquisition was cancelled!");
                 throw new CancellationException("Interrupted");
@@ -542,43 +515,43 @@ public interface MCAccount {
                 request.setConfig(REQUEST_CONFIG);
                 request.setHeader("Content-Type", "application/json");
                 request.setEntity(new StringEntity(
-                    String.format("""
-                        {
-                          "Properties": {
-                            "AuthMethod": "RPS",
-                            "SiteName": "user.auth.xboxlive.com",
-                            "RpsTicket": "d=%s"
-                          },
-                          "RelyingParty": "http://auth.xboxlive.com",
-                          "TokenType": "JWT"
-                        }""", accessToken)
+                        String.format("""
+                                {
+                                  "Properties": {
+                                    "AuthMethod": "RPS",
+                                    "SiteName": "user.auth.xboxlive.com",
+                                    "RpsTicket": "d=%s"
+                                  },
+                                  "RelyingParty": "http://auth.xboxlive.com",
+                                  "TokenType": "JWT"
+                                }""", accessToken)
                 ));
 
                 // Send the request on the HTTP client
                 LOGGER.info("[{}] {} (timeout={}s)",
-                    request.getMethod(), request.getURI().toString(), request.getConfig().getConnectTimeout() / 1000);
+                        request.getMethod(), request.getURI().toString(), request.getConfig().getConnectTimeout() / 1000);
                 final org.apache.http.HttpResponse res = client.execute(request);
 
                 // Attempt to parse the response body as JSON and extract the access token
                 // NB: No response body is sent if the response is not ok
                 final JsonObject json = res.getStatusLine().getStatusCode() == 200
-                                        ? GsonHelper.parse(EntityUtils.toString(res.getEntity()))
-                                        : new JsonObject();
+                        ? GsonHelper.parse(EntityUtils.toString(res.getEntity()))
+                        : new JsonObject();
                 return Optional.ofNullable(json.get("Token"))
-                               .map(JsonElement::getAsString)
-                               .filter(token -> !token.isBlank())
-                               // If present, log success and return
-                               .map(token -> {
-                                   LOGGER.info("Acquired Xbox Live access token! ({})",
-                                       StringUtils.abbreviateMiddle(token, "...", 32));
-                                   return token;
-                               })
-                               // Otherwise, throw an exception with the error description if present
-                               .orElseThrow(() -> new Exception(
-                                   json.has("XErr") ? String.format(
-                                       "%s: %s", json.get("XErr").getAsString(), json.get("Message").getAsString()
-                                   ) : "There was no access token or error description present."
-                               ));
+                        .map(JsonElement::getAsString)
+                        .filter(token -> !token.isBlank())
+                        // If present, log success and return
+                        .map(token -> {
+                            LOGGER.info("Acquired Xbox Live access token! ({})",
+                                    StringUtils.abbreviateMiddle(token, "...", 32));
+                            return token;
+                        })
+                        // Otherwise, throw an exception with the error description if present
+                        .orElseThrow(() -> new Exception(
+                                json.has("XErr") ? String.format(
+                                        "%s: %s", json.get("XErr").getAsString(), json.get("Message").getAsString()
+                                ) : "There was no access token or error description present."
+                        ));
             } catch (InterruptedException e) {
                 LOGGER.warn("Xbox Live access token acquisition was cancelled!");
                 throw new CancellationException("Interrupted");
@@ -609,48 +582,48 @@ public interface MCAccount {
                 request.setConfig(REQUEST_CONFIG);
                 request.setHeader("Content-Type", "application/json");
                 request.setEntity(new StringEntity(
-                    String.format("""
-                        {
-                          "Properties": {
-                            "SandboxId": "RETAIL",
-                            "UserTokens": ["%s"]
-                          },
-                          "RelyingParty": "rp://api.minecraftservices.com/",
-                          "TokenType": "JWT"
-                        }""", accessToken)
+                        String.format("""
+                                {
+                                  "Properties": {
+                                    "SandboxId": "RETAIL",
+                                    "UserTokens": ["%s"]
+                                  },
+                                  "RelyingParty": "rp://api.minecraftservices.com/",
+                                  "TokenType": "JWT"
+                                }""", accessToken)
                 ));
 
                 // Send the request on the HTTP client
                 LOGGER.info("[{}] {} (timeout={}s)",
-                    request.getMethod(), request.getURI().toString(), request.getConfig().getConnectTimeout() / 1000);
+                        request.getMethod(), request.getURI().toString(), request.getConfig().getConnectTimeout() / 1000);
                 final org.apache.http.HttpResponse res = client.execute(request);
 
                 // Attempt to parse the response body as JSON and extract the access token and user hash
                 // NB: No response body is sent if the response is not ok
                 final JsonObject json = res.getStatusLine().getStatusCode() == 200
-                                        ? GsonHelper.parse(EntityUtils.toString(res.getEntity()))
-                                        : new JsonObject();
+                        ? GsonHelper.parse(EntityUtils.toString(res.getEntity()))
+                        : new JsonObject();
                 return Optional.ofNullable(json.get("Token"))
-                               .map(JsonElement::getAsString)
-                               .filter(token -> !token.isBlank())
-                               // If present, extract the user hash, log success and return
-                               .map(token -> {
-                                   // Extract the user hash
-                                   final String uhs = json.get("DisplayClaims").getAsJsonObject()
-                                                          .get("xui").getAsJsonArray()
-                                                          .get(0).getAsJsonObject()
-                                                          .get("uhs").getAsString();
-                                   // Return an immutable mapping of the token and user hash
-                                   LOGGER.info("Acquired Xbox Live XSTS token! (token={}, uhs={})",
-                                       StringUtils.abbreviateMiddle(token, "...", 32), uhs);
-                                   return Map.of("Token", token, "uhs", uhs);
-                               })
-                               // Otherwise, throw an exception with the error description if present
-                               .orElseThrow(() -> new Exception(
-                                   json.has("XErr") ? String.format(
-                                       "%s: %s", json.get("XErr").getAsString(), json.get("Message").getAsString()
-                                   ) : "There was no access token or error description present."
-                               ));
+                        .map(JsonElement::getAsString)
+                        .filter(token -> !token.isBlank())
+                        // If present, extract the user hash, log success and return
+                        .map(token -> {
+                            // Extract the user hash
+                            final String uhs = json.get("DisplayClaims").getAsJsonObject()
+                                    .get("xui").getAsJsonArray()
+                                    .get(0).getAsJsonObject()
+                                    .get("uhs").getAsString();
+                            // Return an immutable mapping of the token and user hash
+                            LOGGER.info("Acquired Xbox Live XSTS token! (token={}, uhs={})",
+                                    StringUtils.abbreviateMiddle(token, "...", 32), uhs);
+                            return Map.of("Token", token, "uhs", uhs);
+                        })
+                        // Otherwise, throw an exception with the error description if present
+                        .orElseThrow(() -> new Exception(
+                                json.has("XErr") ? String.format(
+                                        "%s: %s", json.get("XErr").getAsString(), json.get("Message").getAsString()
+                                ) : "There was no access token or error description present."
+                        ));
             } catch (InterruptedException e) {
                 LOGGER.warn("Xbox Live XSTS token acquisition was cancelled!");
                 throw new CancellationException("Interrupted");
@@ -681,31 +654,31 @@ public interface MCAccount {
                 request.setConfig(REQUEST_CONFIG);
                 request.setHeader("Content-Type", "application/json");
                 request.setEntity(new StringEntity(
-                    String.format("{\"identityToken\": \"XBL3.0 x=%s;%s\"}", userHash, xstsToken)
+                        String.format("{\"identityToken\": \"XBL3.0 x=%s;%s\"}", userHash, xstsToken)
                 ));
 
                 // Send the request on the HTTP client
                 LOGGER.info("[{}] {} (timeout={}s)",
-                    request.getMethod(), request.getURI().toString(), request.getConfig().getConnectTimeout() / 1000);
+                        request.getMethod(), request.getURI().toString(), request.getConfig().getConnectTimeout() / 1000);
                 final org.apache.http.HttpResponse res = client.execute(request);
 
                 // Attempt to parse the response body as JSON and extract the access token
                 final JsonObject json = GsonHelper.parse(EntityUtils.toString(res.getEntity()));
                 return Optional.ofNullable(json.get("access_token"))
-                               .map(JsonElement::getAsString)
-                               .filter(token -> !token.isBlank())
-                               // If present, log success and return
-                               .map(token -> {
-                                   LOGGER.info("Acquired Minecraft access token! ({})",
-                                       StringUtils.abbreviateMiddle(token, "...", 32));
-                                   return token;
-                               })
-                               // Otherwise, throw an exception with the error description if present
-                               .orElseThrow(() -> new Exception(
-                                   json.has("error") ? String.format(
-                                       "%s: %s", json.get("error").getAsString(), json.get("errorMessage").getAsString()
-                                   ) : "There was no access token or error description present."
-                               ));
+                        .map(JsonElement::getAsString)
+                        .filter(token -> !token.isBlank())
+                        // If present, log success and return
+                        .map(token -> {
+                            LOGGER.info("Acquired Minecraft access token! ({})",
+                                    StringUtils.abbreviateMiddle(token, "...", 32));
+                            return token;
+                        })
+                        // Otherwise, throw an exception with the error description if present
+                        .orElseThrow(() -> new Exception(
+                                json.has("error") ? String.format(
+                                        "%s: %s", json.get("error").getAsString(), json.get("errorMessage").getAsString()
+                                ) : "There was no access token or error description present."
+                        ));
             } catch (InterruptedException e) {
                 LOGGER.warn("Minecraft access token acquisition was cancelled!");
                 throw new CancellationException("Interrupted");
@@ -716,40 +689,42 @@ public interface MCAccount {
         }, executor);
     }
 
-    static LegacyLoadingScreen prepareLoginInScreen(Runnable onClose, ExecutorService executor){
+    static LegacyLoadingScreen prepareLoginInScreen(Runnable onClose, ExecutorService executor) {
         return LegacyLoadingScreen.createWithExecutor(LOGIN_IN, onClose, executor);
     }
 
-    static CompletableFuture<User> login(LegacyLoadingScreen screen, String code, String password, Stocker<String> refresh, Executor executor){
-        CompletableFuture<User> login = updateStage(MCAccount.acquireMSAccessToken(code,refresh.get() != null,executor), screen,ACQUIRING_MSACCESS_TOKEN,20).
-                thenComposeAsync(s-> {
-                    refresh.set(encryptToken(password,s.getSecond()));
-                    return updateStage(MCAccount.acquireXboxAccessToken(s.getFirst(), executor), screen, ACQUIRING_XBOX_ACCESS_TOKEN, 40);
+    static CompletableFuture<User> login(LegacyLoadingScreen screen, String code, String password, Stocker<String> refresh, Executor executor) {
+        CompletableFuture<User> login = updateStage(MCAccount.acquireMSAccessToken(code, refresh.get() != null, executor), screen, ACQUIRING_MSACCESS_TOKEN, 0.2f).
+                thenComposeAsync(s -> {
+                    refresh.set(encryptToken(password, s.getSecond()));
+                    return updateStage(MCAccount.acquireXboxAccessToken(s.getFirst(), executor), screen, ACQUIRING_XBOX_ACCESS_TOKEN, 0.4f);
                 }).
-                thenComposeAsync(s-> updateStage(MCAccount.acquireXboxXstsToken(s,executor),screen,ACQUIRING_XBOX_XSTS_TOKEN,60)).
-                thenComposeAsync(s-> updateStage(MCAccount.acquireMCAccessToken(s.get("Token"),s.get("uhs"),executor),screen,ACQUIRING_MC_ACCESS_TOKEN,80)).
-                thenComposeAsync(s-> updateStage(MCAccount.login(s,executor),screen,FINALIZING,100));
+                thenComposeAsync(s -> updateStage(MCAccount.acquireXboxXstsToken(s, executor), screen, ACQUIRING_XBOX_XSTS_TOKEN, 0.6f)).
+                thenComposeAsync(s -> updateStage(MCAccount.acquireMCAccessToken(s.get("Token"), s.get("uhs"), executor), screen, ACQUIRING_MC_ACCESS_TOKEN, 0.8f)).
+                thenComposeAsync(s -> updateStage(MCAccount.login(s, executor), screen, FINALIZING, 1.0f));
 
         login.exceptionally(throwable -> {
-            FactoryAPIClient.getToasts().addToast(new LegacyTip(Component.translatable("legacy.menu.choose_user.failed",Component.translatable("legacy.menu.choose_user.failed." + (throwable instanceof ConnectTimeoutException ? "timeout" : (throwable != null && throwable.getCause().getMessage().equals("NOT_FOUND: Not Found") ? "notPurchased" : "unauthorized"))).withStyle(ChatFormatting.RED)),140,46).centered());
+            FactoryAPIClient.getToasts().addToast(new LegacyTip(Component.translatable("legacy.menu.choose_user.failed", Component.translatable("legacy.menu.choose_user.failed." + (throwable instanceof ConnectTimeoutException ? "timeout" : (throwable != null && throwable.getCause().getMessage().equals("NOT_FOUND: Not Found") ? "notPurchased" : "unauthorized"))).withStyle(ChatFormatting.RED)), 140, 46).centered());
             if (throwable != null) Legacy4J.LOGGER.error(throwable.getMessage());
             Minecraft.getInstance().executeBlocking(screen::onClose);
             return null;
         });
         return login;
     }
+
     static User loginFail(LegacyLoadingScreen screen, Throwable throwable) {
         FactoryAPIClient.getToasts().addToast(new LegacyTip(Component.translatable("legacy.menu.choose_user.failed", Component.translatable("legacy.menu.choose_user.failed." + (throwable instanceof ConnectTimeoutException ? "timeout" : (throwable != null && throwable.getCause().getMessage().equals("NOT_FOUND: Not Found") ? "notPurchased" : "unauthorized"))).withStyle(ChatFormatting.RED)), 140, 46).centered());
         if (throwable != null) Legacy4J.LOGGER.error(throwable.getMessage());
         Minecraft.getInstance().executeBlocking(screen::onClose);
         return null;
     }
-    static CompletableFuture<MCAccount> create(Runnable onClose, String password){
+
+    static CompletableFuture<MCAccount> create(Runnable onClose, String password) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        LegacyLoadingScreen screen = MCAccount.prepareLoginInScreen(onClose,executor);
+        LegacyLoadingScreen screen = MCAccount.prepareLoginInScreen(onClose, executor);
         Minecraft.getInstance().setScreen(screen);
         Stocker<String> refresh = Stocker.of(null);
-        return updateStage(MCAccount.acquireMSAuthCode(bol-> I18n.get(bol ? "legacy.menu.choose_user.login_successful" : "legacy.menu.choose_user.failed_login"),executor),screen,ACQUIRING_MSAUTH_TOKEN,0).thenComposeAsync(s-> login(screen,s,password,refresh,executor)).thenApplyAsync(user -> create(new GameProfile(user.getProfileId(),user.getName()),password != null,encryptToken(password,user.getAccessToken()),refresh.get()),executor);
+        return updateStage(MCAccount.acquireMSAuthCode(bol -> I18n.get(bol ? "legacy.menu.choose_user.login_successful" : "legacy.menu.choose_user.failed_login"), executor), screen, ACQUIRING_MSAUTH_TOKEN, 0).thenComposeAsync(s -> login(screen, s, password, refresh, executor)).thenApplyAsync(user -> create(new GameProfile(user.getProfileId(), user.getName()), password != null, encryptToken(password, user.getAccessToken()), refresh.get()), executor);
     }
 
     /**
@@ -775,39 +750,39 @@ public interface MCAccount {
 
                 // Send the request on the HTTP client
                 LOGGER.info("[{}] {} (timeout={}s)",
-                    request.getMethod(), request.getURI().toString(), request.getConfig().getConnectTimeout() / 1000);
+                        request.getMethod(), request.getURI().toString(), request.getConfig().getConnectTimeout() / 1000);
                 final org.apache.http.HttpResponse res = client.execute(request);
 
                 // Attempt to parse the response body as JSON and extract the profile
                 final JsonObject json = GsonHelper.parse(EntityUtils.toString(res.getEntity()));
                 return Optional.ofNullable(json.get("id"))
-                               .map(JsonElement::getAsString)
-                               .filter(uuid -> !uuid.isBlank())
-                               // Parse the UUID (without hyphens)
-                               .map(uuid -> UUID.fromString(
-                                   uuid.replaceFirst(
-                                       "([0-9a-fA-F]{8})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]+)",
-                                       "$1-$2-$3-$4-$5"
-                                   )
-                               ))
-                               // If present, log success, build a new session and return
-                               .map(uuid -> {
-                                   LOGGER.info("Fetched Minecraft profile! (name={}, uuid={})",
-                                       json.get("name").getAsString(), uuid);
-                                   return new User(
-                                       json.get("name").getAsString(),
-                                       uuid/*? if <=1.20.2 {*//*.toString()*//*?}*/,
-                                       mcToken,
-                                       Optional.empty(),
-                                       Optional.empty()
-                                   );
-                               })
-                               // Otherwise, throw an exception with the error description if present
-                               .orElseThrow(() -> new Exception(
-                                   json.has("error") ? String.format(
-                                       "%s: %s", json.get("error").getAsString(), json.get("errorMessage").getAsString()
-                                   ) : "There was no profile or error description present."
-                               ));
+                        .map(JsonElement::getAsString)
+                        .filter(uuid -> !uuid.isBlank())
+                        // Parse the UUID (without hyphens)
+                        .map(uuid -> UUID.fromString(
+                                uuid.replaceFirst(
+                                        "([0-9a-fA-F]{8})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]+)",
+                                        "$1-$2-$3-$4-$5"
+                                )
+                        ))
+                        // If present, log success, build a new session and return
+                        .map(uuid -> {
+                            LOGGER.info("Fetched Minecraft profile! (name={}, uuid={})",
+                                    json.get("name").getAsString(), uuid);
+                            return new User(
+                                    json.get("name").getAsString(),
+                                    uuid/*? if <=1.20.2 {*//*.toString()*//*?}*/,
+                                    mcToken,
+                                    Optional.empty(),
+                                    Optional.empty()
+                            );
+                        })
+                        // Otherwise, throw an exception with the error description if present
+                        .orElseThrow(() -> new Exception(
+                                json.has("error") ? String.format(
+                                        "%s: %s", json.get("error").getAsString(), json.get("errorMessage").getAsString()
+                                ) : "There was no profile or error description present."
+                        ));
             } catch (InterruptedException e) {
                 LOGGER.warn("Minecraft profile fetching was cancelled!");
                 throw new CancellationException("Interrupted");
@@ -823,7 +798,7 @@ public interface MCAccount {
      *
      * @param user New Minecraft User
      */
-    static void setUser(User user){
+    static void setUser(User user) {
         if (MinecraftAccessor.getInstance().setUser(user)) {
             Component success = Component.translatable("legacy.menu.choose_user.success", user.getName());
             FactoryAPIClient.getToasts().addToast(new LegacyTip(success, Minecraft.getInstance().font.width(success) + 110, 46) {
@@ -831,9 +806,9 @@ public interface MCAccount {
                 public void renderTip(GuiGraphics guiGraphics, int i, int j, float f, float l) {
                     super.renderTip(guiGraphics, i, j, f, l);
                     GameProfile profile = /*? if >1.20.2 {*/Minecraft.getInstance().getGameProfile()/*?} else {*//*user.getGameProfile()*//*?}*/;
-                    PlayerFaceRenderer.draw(guiGraphics, Minecraft.getInstance().getSkinManager().createLookup(profile,true).get(), 7, (height() - 32) / 2, 32);
+                    PlayerFaceRenderer.draw(guiGraphics, Minecraft.getInstance().getSkinManager().createLookup(profile, true).get(), 7, (height() - 32) / 2, 32);
                 }
-            }.centered().disappearTime(2400).canRemove(()->user != Minecraft.getInstance().getUser()));
+            }.centered().disappearTime(2400).canRemove(() -> user != Minecraft.getInstance().getUser()));
             lastSessionCheck.set(null);
         }
     }
@@ -843,15 +818,16 @@ public interface MCAccount {
      *
      * <p>Note: Because of this interval, each User change requires setting the lastSessionCheckTime value to null so that there is no erroneous check
      */
-    static boolean isOfflineUser(){
-        if (lastSessionCheck.get() != null && Util.getMillis() - lastSessionCheckTime.get() <= 180000) return lastSessionCheck.get();
+    static boolean isOfflineUser() {
+        if (lastSessionCheck.get() != null && Util.getMillis() - lastSessionCheckTime.get() <= 180000)
+            return lastSessionCheck.get();
         lastSessionCheckTime.set(Util.getMillis());
         lastSessionCheck.set(true);
-        CompletableFuture.runAsync(()->{
+        CompletableFuture.runAsync(() -> {
             try {
                 String server = UUID.randomUUID().toString();
-                Minecraft.getInstance().services().sessionService().joinServer(Minecraft.getInstance().getUser().getProfileId(),Minecraft.getInstance().getUser().getAccessToken(),server);
-                lastSessionCheck.set(Minecraft.getInstance().services().sessionService().hasJoinedServer(Minecraft.getInstance().getUser().getName(),server,null) == null);
+                Minecraft.getInstance().services().sessionService().joinServer(Minecraft.getInstance().getUser().getProfileId(), Minecraft.getInstance().getUser().getAccessToken(), server);
+                lastSessionCheck.set(Minecraft.getInstance().services().sessionService().hasJoinedServer(Minecraft.getInstance().getUser().getName(), server, null) == null);
             } catch (AuthenticationException e) {
                 lastSessionCheck.set(true);
             }
@@ -859,11 +835,44 @@ public interface MCAccount {
         return false;
     }
 
-
-    static <T> CompletableFuture<T> updateStage(CompletableFuture<T> future, LegacyLoadingScreen screen, Component stage, int percentage){
+    static <T> CompletableFuture<T> updateStage(CompletableFuture<T> future, LegacyLoadingScreen screen, Component stage, float percentage) {
         screen.setLoadingStage(stage);
         screen.setProgress(percentage);
         return future;
+    }
+
+    GameProfile getProfile();
+
+    default boolean isEncrypted() {
+        return false;
+    }
+
+    default Optional<String> getToken(@Nullable String password, String tokenEntry) {
+        return Optional.empty();
+    }
+
+    default Optional<String> getMCAccessToken(@Nullable String password) {
+        return getToken(password, MC_ACCESS_TOKEN);
+    }
+
+    default Optional<String> getMSARefreshToken(@Nullable String password) {
+        return getToken(password, MSA_REFRESH_TOKEN);
+    }
+
+    default void serialize(JsonObject object) {
+        serializeProfile(getProfile(), object);
+    }
+
+    default void login(ChooseUserScreen screen, @Nullable String password) {
+        login(() -> {
+            screen.reloadAccountButtons();
+            Minecraft.getInstance().setScreen(screen);
+        }, password);
+    }
+
+    default void login(Runnable onClose, @Nullable String password) {
+        MCAccount.setUser(new User(getProfile().name(), getProfile().id(), "invalidtoken", Optional.empty(), Optional.empty()));
+        onClose.run();
     }
 
 
@@ -871,8 +880,7 @@ public interface MCAccount {
      * Indicates the sync of user interaction that is required when requesting
      * Microsoft authorization codes.
      */
-    enum MicrosoftPrompt
-    {
+    enum MicrosoftPrompt {
         /**
          * Will use the default prompt, equivalent of not sending a prompt.
          */
@@ -912,14 +920,12 @@ public interface MCAccount {
          *
          * @param prompt prompt query value
          */
-        MicrosoftPrompt(final String prompt)
-        {
+        MicrosoftPrompt(final String prompt) {
             this.prompt = prompt;
         }
 
         @Override
-        public String toString()
-        {
+        public String toString() {
             return prompt;
         }
     }

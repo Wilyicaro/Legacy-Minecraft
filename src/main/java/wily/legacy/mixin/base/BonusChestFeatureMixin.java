@@ -20,7 +20,7 @@ import wily.legacy.block.entity.BaseContainerBlockEntityAccessor;
 
 @Mixin(BonusChestFeature.class)
 public class BonusChestFeatureMixin {
-    @WrapOperation(method = "place", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/WorldGenLevel;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z",ordinal = 0))
+    @WrapOperation(method = "place", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/WorldGenLevel;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z", ordinal = 0))
     public boolean place(WorldGenLevel instance, BlockPos blockPos, BlockState blockState, int i, Operation<Boolean> original) {
         boolean b = original.call(instance, blockPos, blockState, i);
         instance.getBlockEntity(blockPos, BlockEntityType.CHEST).ifPresent(e -> BaseContainerBlockEntityAccessor.of(e).setTempName(Component.translatable("selectWorld.bonusItems")));

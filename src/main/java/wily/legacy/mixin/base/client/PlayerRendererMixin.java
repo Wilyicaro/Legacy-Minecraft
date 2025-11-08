@@ -26,7 +26,8 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
         super(context, entityModel, f);
     }
 
-    @Shadow public abstract AvatarRenderState createRenderState();
+    @Shadow
+    public abstract AvatarRenderState createRenderState();
 
     @Inject(method = "renderHand", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModelPart(Lnet/minecraft/client/model/geom/ModelPart;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/RenderType;IILnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V"))
     private void renderHand(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int i, ResourceLocation resourceLocation, ModelPart modelPart, boolean bl, CallbackInfo ci) {

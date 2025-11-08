@@ -52,14 +52,17 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable {
         guiGraphics.pose().translate(this.getX() + (float) offset.x, getY() + (float) offset.y);
         Stocker.Sizeable scroll = getScroll();
         if (scroll.max > 0) {
+            guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().translate((getWidth() - 13) / 2f, 0);
             if (scroll.get() != scroll.max)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN,0, getHeight() + 4);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, 0, getHeight() + 4);
             if (scroll.get() > 0)
-                scrollRenderer.renderScroll(guiGraphics,ScreenDirection.UP, 0, -11);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, 0, -11);
+            guiGraphics.pose().popMatrix();
         } else FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 0.5f);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, 0, 0, width, height);
         guiGraphics.pose().translate(-2f, -1f + (scroll.max > 0 ? scroll.get() * getScrollerHeight() / scroll.max : 0));
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL,0,0, 16,16);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL, 0, 0, 16, 16);
         FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
         guiGraphics.pose().popMatrix();
     }
@@ -74,7 +77,7 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable {
         Stocker.Sizeable scroll = getScroll();
         if (scroll.max > 0 || scroll.get() > 0) {
             int lastScrolled = scroll.get();
-            scroll.set(Math.max(0,Math.min(scroll.get() + i,scroll.max)));
+            scroll.set(Math.max(0, Math.min(scroll.get() + i, scroll.max)));
             if (lastScrolled != scroll.get()) {
                 scrollRenderer.updateScroll(i > 0 ? ScreenDirection.DOWN : ScreenDirection.UP);
                 return true;
@@ -84,7 +87,7 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable {
     }
 
     public boolean mouseClicked(MouseButtonEvent event) {
-        if(isHovered(event.x(), event.y())) {
+        if (isHovered(event.x(), event.y())) {
             dragged = true;
             return mouseDragged(event.y());
         }

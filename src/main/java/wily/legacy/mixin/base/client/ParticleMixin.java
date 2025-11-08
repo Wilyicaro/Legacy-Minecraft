@@ -11,10 +11,11 @@ import wily.legacy.client.LegacyOptions;
 
 @Mixin(Particle.class)
 public class ParticleMixin {
-    @Shadow protected boolean hasPhysics;
+    @Shadow
+    protected boolean hasPhysics;
 
     @Inject(method = "<init>(Lnet/minecraft/client/multiplayer/ClientLevel;DDD)V", at = @At("RETURN"))
-    private void init(ClientLevel clientLevel, double d, double e, double f, CallbackInfo ci){
+    private void init(ClientLevel clientLevel, double d, double e, double f, CallbackInfo ci) {
         if (!LegacyOptions.defaultParticlePhysics.get()) hasPhysics = false;
     }
 }

@@ -21,7 +21,7 @@ import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.config.LegacyCommonOptions;
 //? if <1.20.5 {
 /*import wily.legacy.util.ItemAccessor;
-*///?}
+ *///?}
 
 @Mixin(Item.class)
 public class ItemMixin /*? if <1.20.5 {*//*implements ItemAccessor*//*?}*/ {
@@ -39,13 +39,14 @@ public class ItemMixin /*? if <1.20.5 {*//*implements ItemAccessor*//*?}*/ {
     *///?}
 
     @Unique
-    private boolean isSword(){
-        return ((Item)(Object)this).builtInRegistryHolder().is(ItemTags.SWORDS);
+    private boolean isSword() {
+        return ((Item) (Object) this).builtInRegistryHolder().is(ItemTags.SWORDS);
     }
 
     @Inject(method = "getUseDuration", at = @At("HEAD"), cancellable = true)
     public void getUseDuration(CallbackInfoReturnable<Integer> cir) {
-        if (isSword() && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking)) cir.setReturnValue(7200);
+        if (isSword() && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking))
+            cir.setReturnValue(7200);
     }
 
     //? <1.21.2 {
@@ -68,6 +69,7 @@ public class ItemMixin /*? if <1.20.5 {*//*implements ItemAccessor*//*?}*/ {
 
     @Inject(method = "getUseAnimation", at = @At("HEAD"), cancellable = true)
     public void getUseAnimation(ItemStack itemStack, CallbackInfoReturnable</*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/> cir) {
-        if (isSword() && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking)) cir.setReturnValue(/*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.BLOCK);
+        if (isSword() && FactoryConfig.hasCommonConfigEnabled(LegacyCommonOptions.legacySwordBlocking))
+            cir.setReturnValue(/*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.BLOCK);
     }
 }

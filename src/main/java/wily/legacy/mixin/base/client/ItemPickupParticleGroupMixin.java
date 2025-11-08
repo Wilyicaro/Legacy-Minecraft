@@ -15,6 +15,6 @@ public class ItemPickupParticleGroupMixin {
 
     @ModifyVariable(method = "fromParticle", at = @At("STORE"), index = 3)
     private static float render(float original, ItemPickupParticle itemPickupParticle, Camera camera, float partialTick) {
-        return LegacyOptions.legacyItemPickup.get() ? ((float) ((LegacyItemPickupParticle)itemPickupParticle).getPickupLife() + partialTick) / ((LegacyItemPickupParticle)itemPickupParticle).getPickupLifetime() : original;
+        return LegacyOptions.legacyItemPickup.get() ? ((float) ((LegacyItemPickupParticle) itemPickupParticle).getPickupLife() + partialTick) / ((LegacyItemPickupParticle) itemPickupParticle).getPickupLifetime() : original;
     }
 }

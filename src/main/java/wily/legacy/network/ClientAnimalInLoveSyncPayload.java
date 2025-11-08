@@ -13,20 +13,24 @@ import java.util.function.Supplier;
 public record ClientAnimalInLoveSyncPayload(int entityID, int inLove, int age) implements CommonNetwork.Payload {
     public static final CommonNetwork.Identifier<ClientAnimalInLoveSyncPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("client_in_love"), ClientAnimalInLoveSyncPayload::new);
 
-    public static ClientAnimalInLoveSyncPayload of(Animal animal){
-        return new ClientAnimalInLoveSyncPayload(animal.getId(),animal.getInLoveTime(),animal.getAge());
+    public ClientAnimalInLoveSyncPayload(CommonNetwork.PlayBuf buf) {
+        this(buf.get().readVarInt(), buf.get().readVarInt(), buf.get().readVarInt());
     }
-    public static void sync(Animal entity){
+
+    public static ClientAnimalInLoveSyncPayload of(Animal animal) {
+        return new ClientAnimalInLoveSyncPayload(animal.getId(), animal.getInLoveTime(), animal.getAge());
+    }
+
+    public static void sync(Animal entity) {
         if (entity.level() instanceof ServerLevel l) {
             ClientAnimalInLoveSyncPayload packet = null;
             for (ServerPlayer player : l.getServer().getPlayerList().getPlayers()) {
-                if (player.level() == entity.level() && player.distanceTo(entity) < l.getServer().getPlayerList().getViewDistance() * 16) CommonNetwork.sendToPlayer(player,packet == null ? (packet = ClientAnimalInLoveSyncPayload.of(entity)) : packet);
+                if (player.level() == entity.level() && player.distanceTo(entity) < l.getServer().getPlayerList().getViewDistance() * 16)
+                    CommonNetwork.sendToPlayer(player, packet == null ? (packet = ClientAnimalInLoveSyncPayload.of(entity)) : packet);
             }
         }
     }
-    public ClientAnimalInLoveSyncPayload(CommonNetwork.PlayBuf buf){
-        this(buf.get().readVarInt(),buf.get().readVarInt(),buf.get().readVarInt());
-    }
+
     @Override
     public void encode(CommonNetwork.PlayBuf buf) {
         buf.get().writeVarInt(entityID());

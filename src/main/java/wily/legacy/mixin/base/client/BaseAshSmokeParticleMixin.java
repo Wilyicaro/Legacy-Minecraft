@@ -14,7 +14,9 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(BaseAshSmokeParticle.class)
 public abstract class BaseAshSmokeParticleMixin extends SingleQuadParticle {
 
-    @Shadow @Final private SpriteSet sprites;
+    @Shadow
+    @Final
+    private SpriteSet sprites;
 
     protected BaseAshSmokeParticleMixin(ClientLevel clientLevel, double d, double e, double f, TextureAtlasSprite textureAtlasSprite) {
         super(clientLevel, d, e, f, textureAtlasSprite);

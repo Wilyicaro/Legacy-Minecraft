@@ -7,12 +7,15 @@ import net.minecraft.world.level.saveddata.maps.MapDecoration;
 import net.minecraft.world.level.saveddata.maps.MapDecorationType;
 
 public interface LegacyMapDecorationRenderState {
-    Holder<MapDecorationType> getType();
-    void setType(Holder<MapDecorationType> type);
-    static LegacyMapDecorationRenderState of(MapRenderState.MapDecorationRenderState renderState){
+    static LegacyMapDecorationRenderState of(MapRenderState.MapDecorationRenderState renderState) {
         return ((LegacyMapDecorationRenderState) renderState);
     }
-    default void extractRenderState(MapDecoration decoration){
+
+    Holder<MapDecorationType> getType();
+
+    void setType(Holder<MapDecorationType> type);
+
+    default void extractRenderState(MapDecoration decoration) {
         setType(decoration.type());
     }
 }

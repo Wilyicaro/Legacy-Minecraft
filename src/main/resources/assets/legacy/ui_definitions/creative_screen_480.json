@@ -1,0 +1,82 @@
+{
+  "targetUI": "wily.legacy.client.screen.CreativeModeScreen",
+  "targetType": "class",
+  "applyCondition": { "reference": "uiMode.sd" },
+  "elements": {
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "tabList.sprites": {
+      "type": "put_toggleable_tab_sprites",
+      "value": {
+        "high": {
+          "left": "legacy:tiles/big_high_tab_left",
+          "middle": "legacy:tiles/big_high_tab_middle",
+          "right": "legacy:tiles/big_high_tab_right"
+        },
+        "down": "legacy:tiles/big_low_tab"
+      }
+    },
+    "panel.y": {
+      "type": "put_number",
+      "value": "(${height}-${panel.height}+21)/2"
+    },
+    "scroller.x": {
+      "type": "put_number",
+      "value": "${panel.x}+185"
+    },
+    "scroller.y": {
+      "type": "put_number",
+      "value": "${panel.y}+14"
+    },
+    "scroller.width": {
+      "type": "put_number",
+      "value": 12
+    },
+    "scroller.height": {
+      "type": "put_number",
+      "value": 80
+    },
+    "tabList.buttonWidth": {
+      "type": "put_number",
+      "value": 27
+    },
+    "tabList.height": {
+      "type": "put_number",
+      "value": 27
+    },
+    "tabList.y": {
+      "type": "put_number",
+      "value": "${panel.y}-21"
+    },
+    "panel.width": {
+      "type": "put_number",
+      "value": 209
+    },
+    "panel.height": {
+      "type": "put_number",
+      "value": 123
+    },
+    "title.y": {
+      "type": "put_number",
+      "value": 6
+    },
+    "creative_menu": {
+      "type":"put_legacy_slot",
+      "range":"[0,49]",
+      "x":"17+(${creative_menu.index}%10)*16",
+      "y":"15+(${creative_menu.index}/10)*16",
+      "width":16,
+      "height":16
+    },
+    "quick_select": {
+      "type":"put_legacy_slot",
+      "range":"[50,59]",
+      "x":"25+(${quick_select.index}%9)*16",
+      "y":"100",
+      "width":16,
+      "height":16
+    }
+  }
+}

@@ -18,8 +18,9 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public class LegacyTipBuilder {
-    public static final Codec<LegacyTipBuilder> COMPLETE_CODEC = RecordCodecBuilder.create(i-> i.group(DynamicUtil.getComponentCodec().optionalFieldOf("title").forGetter(LegacyTipBuilder::getTitle),DynamicUtil.getComponentCodec().optionalFieldOf("tip").forGetter(LegacyTipBuilder::getTip), DynamicUtil.ITEM_CODEC.fieldOf("itemIcon").orElse(ItemStack.EMPTY).forGetter(LegacyTipBuilder::getItem), Codec.INT.fieldOf("time").orElse(-1).forGetter(LegacyTipBuilder::getTime)).apply(i, LegacyTipBuilder::create));
-    public static final Codec<LegacyTipBuilder> CODEC = Codec.either(DynamicUtil.getComponentCodec().xmap(c-> new LegacyTipBuilder().tip(c), b-> b.tip), COMPLETE_CODEC).xmap(e-> e.right().orElseGet(e.left()::get), Either::right);
+    public static final Codec<LegacyTipBuilder> COMPLETE_CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.getComponentCodec().optionalFieldOf("title").forGetter(LegacyTipBuilder::getTitle), DynamicUtil.getComponentCodec().optionalFieldOf("tip").forGetter(LegacyTipBuilder::getTip), DynamicUtil.ITEM_CODEC.fieldOf("itemIcon").orElse(ItemStack.EMPTY).forGetter(LegacyTipBuilder::getItem), Codec.INT.fieldOf("time").orElse(-1).forGetter(LegacyTipBuilder::getTime)).apply(i, LegacyTipBuilder::create));
+    public static final Codec<LegacyTipBuilder> SIMPLE_CODEC = DynamicUtil.getComponentCodec().xmap(c -> new LegacyTipBuilder().tip(c), b -> b.tip);
+    public static final Codec<LegacyTipBuilder> CODEC = new IOUtil.FallbackCodec<>(COMPLETE_CODEC, SIMPLE_CODEC, COMPLETE_CODEC);
     public static final Codec<Map<String, LegacyTipBuilder>> MAP_CODEC = Codec.unboundedMap(Codec.STRING, CODEC).xmap(HashMap::new, Function.identity());
     public static final Codec<List<LegacyTipBuilder>> LIST_CODEC = CODEC.listOf();
 
@@ -36,54 +37,57 @@ public class LegacyTipBuilder {
         return new LegacyTipBuilder().title(title).tip(tip).itemIcon(itemIcon).disappearTime(time);
     }
 
-    public static String getTipId(Item item){
+    public static String getTipId(Item item) {
         return item.getDescriptionId() + ".tip";
     }
 
-    public static Component getTip(ItemStack stack){
-        if (stack.getHoverName().getContents() instanceof TranslatableContents contents){
+    public static Component getTip(ItemStack stack) {
+        if (stack.getHoverName().getContents() instanceof TranslatableContents contents) {
             return Component.translatable(contents.getKey() + ".tip");
         }
         return Component.translatable(getTipId(stack.getItem()));
     }
 
-    public static String getTipId(EntityType<?> item){
+    public static String getTipId(EntityType<?> item) {
         return item.getDescriptionId() + ".tip";
     }
 
+    public static LegacyTipBuilder decode(CommonNetwork.PlayBuf buf) {
+        return LegacyTipBuilder.create(buf.get().readOptional(b -> CommonNetwork.decodeComponent(buf)), buf.get().readOptional(b -> CommonNetwork.decodeComponent(buf)), CommonNetwork.decodeItemStack(buf), buf.get().readInt());
+    }
 
-    public LegacyTipBuilder title(Component title){
+    public LegacyTipBuilder title(Component title) {
         this.title = title;
         return this;
     }
 
-    public LegacyTipBuilder tip(Component tip){
+    public LegacyTipBuilder tip(Component tip) {
         this.tip = tip;
         return this;
     }
 
-    public LegacyTipBuilder itemIcon(ItemStack itemIcon){
+    public LegacyTipBuilder itemIcon(ItemStack itemIcon) {
         this.itemIcon = itemIcon;
         return this;
     }
 
-    public LegacyTipBuilder item(ItemStack itemIcon){
+    public LegacyTipBuilder item(ItemStack itemIcon) {
         if (!itemIcon.isEmpty()) {
             return itemIcon(itemIcon).title(itemIcon.getHoverName()).tip(getTip(itemIcon));
         }
         return this;
     }
 
-    public LegacyTipBuilder disappearTime(int time){
+    public LegacyTipBuilder disappearTime(int time) {
         this.time = time;
         return this;
     }
 
-    public LegacyTipBuilder copyFrom(LegacyTipBuilder builder){
+    public LegacyTipBuilder copyFrom(LegacyTipBuilder builder) {
         return copyFrom(builder, false);
     }
 
-    public LegacyTipBuilder copyFrom(LegacyTipBuilder builder, boolean modifier){
+    public LegacyTipBuilder copyFrom(LegacyTipBuilder builder, boolean modifier) {
         if (!builder.getItem().isEmpty()) {
             if (modifier) itemIcon(builder.getItem());
             else item(builder.getItem());
@@ -94,30 +98,26 @@ public class LegacyTipBuilder {
         return this;
     }
 
-    public Optional<Component> getTitle(){
+    public Optional<Component> getTitle() {
         return Optional.ofNullable(title);
     }
 
-    public Optional<Component> getTip(){
+    public Optional<Component> getTip() {
         return Optional.ofNullable(tip);
     }
 
-    public ItemStack getItem(){
+    public ItemStack getItem() {
         return itemIcon;
     }
 
-    public int getTime(){
+    public int getTime() {
         return time;
     }
 
-    public static LegacyTipBuilder decode(CommonNetwork.PlayBuf buf){
-        return LegacyTipBuilder.create(buf.get().readOptional(b->CommonNetwork.decodeComponent(buf)),buf.get().readOptional(b->CommonNetwork.decodeComponent(buf)),CommonNetwork.decodeItemStack(buf),buf.get().readInt());
-    }
-
     public void encode(CommonNetwork.PlayBuf buf) {
-        buf.get().writeOptional(getTitle(), (b, t)-> CommonNetwork.encodeComponent(buf,t));
-        buf.get().writeOptional(getTip(), (b, t)-> CommonNetwork.encodeComponent(buf,t));
-        CommonNetwork.encodeItemStack(buf,itemIcon);
+        buf.get().writeOptional(getTitle(), (b, t) -> CommonNetwork.encodeComponent(buf, t));
+        buf.get().writeOptional(getTip(), (b, t) -> CommonNetwork.encodeComponent(buf, t));
+        CommonNetwork.encodeItemStack(buf, itemIcon);
         buf.get().writeInt(time);
     }
 }

@@ -14,9 +14,11 @@ import wily.legacy.inventory.RenameItemMenu;
 
 @Mixin(ServerGamePacketListenerImpl.class)
 public class ServerGamePacketListenerImplMixin {
-    @Shadow public ServerPlayer player;
-
-    @Shadow @Final private static Logger LOGGER;
+    @Shadow
+    @Final
+    private static Logger LOGGER;
+    @Shadow
+    public ServerPlayer player;
 
     @Inject(method = "handleRenameItem", at = @At("RETURN"))
     public void handleRenameItem(ServerboundRenameItemPacket serverboundRenameItemPacket, CallbackInfo ci) {

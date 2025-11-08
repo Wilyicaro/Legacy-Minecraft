@@ -24,7 +24,7 @@ public class KeyboardControllerInputMixin extends ClientInput {
     @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/KeyboardInput;calculateImpulse(ZZ)F", ordinal = 1))
     private float calculateLeftImpulse(float original) {
         BindingState.Axis leftStick = Legacy4JClient.controllerManager.getButtonState(ControllerBinding.LEFT_STICK);
-        return leftStick.pressed && (keyPresses.left() || keyPresses.right()) ? LegacyOptions.smoothMovement.get() && (LegacyOptions.forceSmoothMovement.get() || Legacy4JClient.hasModOnServer()) ?  -leftStick.getSmoothX() : (leftStick.x > 0 ? -1 : 1) : original;
+        return leftStick.pressed && (keyPresses.left() || keyPresses.right()) ? LegacyOptions.smoothMovement.get() && (LegacyOptions.forceSmoothMovement.get() || Legacy4JClient.hasModOnServer()) ? -leftStick.getSmoothX() : (leftStick.x > 0 ? -1 : 1) : original;
     }
 
     @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/Vec2;normalized()Lnet/minecraft/world/phys/Vec2;"))

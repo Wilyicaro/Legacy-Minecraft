@@ -1,0 +1,33 @@
+{
+  "targetUI": "wily.legacy.client.screen.LoadSaveScreen",
+  "targetType": "class",
+  "applyCondition": { "reference": "uiMode.sd" },
+  "elements": {
+    "hasTitle": {
+      "type": "put_boolean",
+      "value": false
+    },
+    "panel.width": 170,
+    "panel.height": 193,
+    "panel.y": "(${height}-${panel.height})/2",
+    "saveIcon.size": 19,
+    "layout.width": 152,
+    "layout.x": "${panel.x}+9",
+    "gameTypeSlider.y": "${panel.y}+43",
+    "difficultySlider.y": "${panel.y}+64",
+    "resourceAlbumSelector.y": "${panel.y}+86",
+    "onlineTickBox.y": "${panel.y}+135",
+    "moreOptionsButton.y": "${panel.y}+147",
+    "moreOptionsButton.height": 18,
+    "loadButton.y": "${panel.y}+167",
+    "loadButton.height": 18,
+    "nameText.x": "${panel.x}+32",
+    "nameText.y": "${panel.y}+8",
+    "creationText.x": "${panel.x}+32",
+    "creationText.y": "${panel.y}+20",
+    "seedText.x": "${panel.x}+9",
+    "seedText.y": "${panel.y}+33",
+    "saveIcon.x": "${panel.x}+10",
+    "saveIcon.y": "${panel.y}+9"
+  }
+}

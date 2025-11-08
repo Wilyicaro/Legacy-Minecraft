@@ -13,7 +13,9 @@ import wily.legacy.entity.LegacyPlayerInfo;
 
 @Mixin(ServerPlayerGameMode.class)
 public class ServerPlayerGameModeMixin {
-    @Shadow @Final protected ServerPlayer player;
+    @Shadow
+    @Final
+    protected ServerPlayer player;
 
     @Inject(method = "setGameModeForPlayer", at = @At("RETURN"))
     protected void setGameModeForPlayer(GameType gameType, GameType gameType2, CallbackInfo ci) {

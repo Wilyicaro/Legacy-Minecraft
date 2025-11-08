@@ -17,7 +17,7 @@ import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.util.JsonUtil;
+import wily.legacy.util.IOUtil;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacySoundUtil;
 
@@ -47,14 +47,14 @@ public class HowToPlayScreen extends LegacyScreen {
         return uiDefinitionID.toString();
     }
 
-    public ScrollableRenderer getScrollableRenderer(){
+    public ScrollableRenderer getScrollableRenderer() {
         return accessor.getElementValue("scrollable_renderer", scrollableRenderer, ScrollableRenderer.class);
     }
 
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
         super.addControlTooltips(renderer);
-        renderer.replace(1, i->i, a-> hasNextPage() ? LegacyComponents.NEXT_PAGE : null).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), ()-> hasPreviousPage() ? LegacyComponents.PREVIOUS_PAGE : null );
+        renderer.replace(1, i -> i, a -> hasNextPage() ? LegacyComponents.NEXT_PAGE : null).add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> hasPreviousPage() ? LegacyComponents.PREVIOUS_PAGE : null);
     }
 
     @Override
@@ -63,11 +63,11 @@ public class HowToPlayScreen extends LegacyScreen {
         accessor.putStaticElement("scrollable_renderer", scrollableRenderer);
     }
 
-    protected boolean hasNextPage(){
+    protected boolean hasNextPage() {
         return sectionIndex < Section.list.size() - 1;
     }
 
-    protected boolean hasPreviousPage(){
+    protected boolean hasPreviousPage() {
         return sectionIndex > 0;
     }
 
@@ -96,9 +96,9 @@ public class HowToPlayScreen extends LegacyScreen {
         @Override
         public void onResourceManagerReload(ResourceManager resourceManager) {
             Section.list.clear();
-            JsonUtil.getOrderedNamespaces(resourceManager).forEach(name->resourceManager.getResource(FactoryAPI.createLocation(name, HOW_TO_PLAY_SECTIONS)).ifPresent(((r) -> {
+            IOUtil.getOrderedNamespaces(resourceManager).forEach(name -> resourceManager.getResource(FactoryAPI.createLocation(name, HOW_TO_PLAY_SECTIONS)).ifPresent(((r) -> {
                 try (BufferedReader bufferedReader = r.openAsReader()) {
-                    Section.LIST_CODEC.parse(JsonOps.INSTANCE, JsonParser.parseReader(bufferedReader)).result().ifPresent(l-> l.forEach(s-> Section.list.add(s.index < 0 ? Section.list.size() : Math.min(s.index,Section.list.size()), s)));
+                    Section.LIST_CODEC.parse(JsonOps.INSTANCE, JsonParser.parseReader(bufferedReader)).result().ifPresent(l -> l.forEach(s -> Section.list.add(s.index < 0 ? Section.list.size() : Math.min(s.index, Section.list.size()), s)));
                 } catch (IOException exception) {
                     Legacy4J.LOGGER.warn(exception.getMessage());
                 }
@@ -111,12 +111,13 @@ public class HowToPlayScreen extends LegacyScreen {
         }
     }
 
-    public record Section(Component title, ResourceLocation uiDefinitionLocation, boolean hasButton, int index) implements ScreenSection<HowToPlayScreen>{
-        public static final Codec<Section> CODEC = RecordCodecBuilder.create(i-> i.group(DynamicUtil.getComponentCodec().fieldOf("title").forGetter(Section::title), ResourceLocation.CODEC.fieldOf("ui_definition").forGetter(Section::uiDefinitionLocation), Codec.BOOL.fieldOf("hasButton").orElse(true).forGetter(Section::hasButton), Codec.INT.fieldOf("index").orElse(-1).forGetter(Section::index)).apply(i,Section::new));
+    public record Section(Component title, ResourceLocation uiDefinitionLocation, boolean hasButton,
+                          int index) implements ScreenSection<HowToPlayScreen> {
+        public static final Codec<Section> CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.getComponentCodec().fieldOf("title").forGetter(Section::title), ResourceLocation.CODEC.fieldOf("ui_definition").forGetter(Section::uiDefinitionLocation), Codec.BOOL.fieldOf("hasButton").orElse(true).forGetter(Section::hasButton), Codec.INT.fieldOf("index").orElse(-1).forGetter(Section::index)).apply(i, Section::new));
         public static final Codec<List<Section>> LIST_CODEC = CODEC.listOf();
         public static final List<Section> list = new ArrayList<>();
 
-        public static Stream<Section> getWithButton(){
+        public static Stream<Section> getWithButton() {
             return list.stream().filter(Section::hasButton);
         }
 

@@ -9,8 +9,8 @@ public interface BaseContainerBlockEntityAccessor {
         return (BaseContainerBlockEntityAccessor) be;
     }
 
-    void setTempName(Component component);
-
     Component getTempName();
+
+    void setTempName(Component component);
 
 }

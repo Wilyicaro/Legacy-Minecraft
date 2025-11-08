@@ -3,7 +3,6 @@ package wily.legacy.mixin.base.client.gui;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import net.minecraft.client.AttackIndicatorStatus;
@@ -16,21 +15,18 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 //? if >1.20.2 {
 import net.minecraft.network.chat.numbers.NumberFormat;
 import net.minecraft.network.chat.numbers.StyledFormat;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerScoreEntry;
 //?} else {
 /*import net.minecraft.world.scores.Score;
-*///?}
+ *///?}
 //? if <1.21.5 {
 /*import com.mojang.blaze3d.platform.GlStateManager;
-*///?}
+ *///?}
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.PlayerTeam;
@@ -44,12 +40,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
-import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.config.FactoryConfig;
-import wily.factoryapi.util.FactoryGuiElement;
-import wily.factoryapi.util.FactoryScreenUtil;
+import wily.legacy.client.LegacyGuiItemRenderer;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacySprites;
@@ -57,22 +50,21 @@ import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.*;
-import java.util.function.Function;
 
 
 @Mixin(Gui.class)
 public abstract class GuiMixin implements ControlTooltip.Event {
-    @Shadow @Final
-    private Minecraft minecraft;
-
     @Final
     @Shadow
     private static Comparator<? super PlayerScoreEntry> SCORE_DISPLAY_ORDER;
+    @Shadow
+    @Final
+    private Minecraft minecraft;
+    @Shadow
+    private long healthBlinkTime;
 
-    @Shadow public abstract Font getFont();
-
-    @Shadow private long healthBlinkTime;
-
+    @Shadow
+    public abstract Font getFont();
 
     @Redirect(method = "renderSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getPopTime()I"))
     public int renderSlot(ItemStack instance) {
@@ -107,12 +99,12 @@ public abstract class GuiMixin implements ControlTooltip.Event {
 
     @Inject(method = "renderItemHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIII)V", ordinal = 1))
     private void renderHotbarSelection(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HOTBAR_SELECTION,24,24,0,23,guiGraphics.guiWidth() / 2 - 91 - 1 + minecraft.player.getInventory()./*? if <1.21.5 {*//*selected*//*?} else {*/getSelectedSlot()/*?}*/ * 20, guiGraphics.guiHeight(), 0,24, 1);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HOTBAR_SELECTION, 24, 24, 0, 23, guiGraphics.guiWidth() / 2 - 91 - 1 + minecraft.player.getInventory()./*? if <1.21.5 {*//*selected*//*?} else {*/getSelectedSlot()/*?}*/ * 20, guiGraphics.guiHeight(), 0, 24, 1);
     }
 
     @WrapMethod(method = "renderSlot")
     void renderSlotWithTransparency(GuiGraphics graphics, int i, int j, DeltaTracker deltaTracker, Player player, ItemStack itemStack, int k, Operation<Void> original) {
-        LegacyRenderUtil.secureTranslucentRender(graphics, true, LegacyRenderUtil.getHUDOpacity(), b -> {
+        LegacyGuiItemRenderer.secureTranslucentRender(true, LegacyRenderUtil.getHUDOpacity(), b -> {
             original.call(graphics, i, j, deltaTracker, player, itemStack, k);
         });
     }
@@ -127,7 +119,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         Component component = objective.getDisplayName();
         int i = this.getFont().width(component);
         int k = this.getFont().width(": ");
-        int j = Math.max(i,scores.stream().mapToInt(lv-> {
+        int j = Math.max(i, scores.stream().mapToInt(lv -> {
             int w = getFont().width(lv.formatValue(numberFormat));
             return this.getFont().width(PlayerTeam.formatNameForTeam(scoreboard.getPlayersTeam(lv.owner()), lv.ownerName())) + (w > 0 ? k + w : 0);
         }).max().orElse(0));
@@ -141,13 +133,13 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         Objects.requireNonNull(this.getFont());
         int s = m - scores.size() * 9;
         Objects.requireNonNull(this.getFont());
-        LegacyRenderUtil.renderPointerPanel(guiGraphics, o - 6,s - 16,j + 12, scores.size() * 9 + 22);
+        LegacyRenderUtil.renderPointerPanel(guiGraphics, o - 6, s - 16, j + 12, scores.size() * 9 + 22);
         Font var18 = this.getFont();
         int var10003 = o + j / 2 - i / 2;
         Objects.requireNonNull(this.getFont());
         guiGraphics.drawString(var18, component, var10003, s - 9, -1, false);
 
-        for(int t = 0; t < scores.size(); ++t) {
+        for (int t = 0; t < scores.size(); ++t) {
             PlayerScoreEntry lv = scores.get(t);
             x = scores.size() - t;
             Objects.requireNonNull(this.getFont());
@@ -179,7 +171,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         LegacyRenderUtil.renderHUDTooltip(guiGraphics, /*? if forge || neoforge {*/ /*shift *//*?} else {*/0/*?}*/);
     }
 
-    @Redirect(method= /*? if neoforge {*//*"renderHealthLevel"*//*?} else {*/"renderPlayerHealth"/*?}*/, at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD))
+    @Redirect(method = /*? if neoforge {*//*"renderHealthLevel"*//*?} else {*/"renderPlayerHealth"/*?}*/, at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;healthBlinkTime:J", opcode = Opcodes.PUTFIELD))
     private void renderPlayerHealth(Gui instance, long value) {
         healthBlinkTime = value - (LegacyOptions.legacyHearts.get() ? 6 : 0);
     }

@@ -72,18 +72,18 @@
       "sprite": "legacy:container/lit",
       "x": "${panel.x}+14+3*21",
       "y": "${panel.y}+23+25",
-      "width": 19,
-      "height": 19
+      "width": 21,
+      "height": 21
     },
     "lit_progress": {
       "type":"blit",
       "texture": "legacy:textures/gui/sprites/container/lit_progress.png",
       "x": "${panel.x}+14+3*21",
       "y": "${panel.y}+23+25+9",
-      "width": 19,
-      "height": 10,
-      "imageWidth": 19,
-      "imageHeight": 19,
+      "width": 21,
+      "height": 12,
+      "imageWidth": 21,
+      "imageHeight": 21,
       "uvY": 9
     },
     "arrow": {

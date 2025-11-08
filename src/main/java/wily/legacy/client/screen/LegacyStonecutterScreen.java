@@ -14,7 +14,7 @@ import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.crafting.StonecutterRecipe;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.Vec2;
 import org.spongepowered.asm.mixin.Unique;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -40,10 +40,13 @@ import static wily.legacy.util.LegacySprites.ARROW;
 import static wily.legacy.client.screen.ControlTooltip.*;
 
 
-public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraftingMenu> implements Controller.Event,ControlTooltip.Event {
-    public static final Vec3 DISPLAY_OFFSET = new Vec3(0.5, 0, 0);
-    public static final Vec3 ALT_DISPLAY_OFFSET = new Vec3(0.4, 0, 0);
-    protected List<RecipeIconHolder<StonecutterRecipe>>  craftingButtons = new ArrayList<>();;
+public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraftingMenu> implements Controller.Event, ControlTooltip.Event {
+    public static final Vec2 DISPLAY_OFFSET = new Vec2(0.5f, 0);
+    public static final Vec2 ALT_DISPLAY_OFFSET = new Vec2(0.4f, 0);
+    protected final List<ItemStack> compactInventoryList = new ArrayList<>();
+    protected final UIAccessor accessor = UIAccessor.of(this);
+    private final ContainerListener listener;
+    protected List<RecipeIconHolder<StonecutterRecipe>> craftingButtons = new ArrayList<>();
     protected List<List<RecipeInfo<StonecutterRecipe>>> recipesByGroup = new ArrayList<>();
     protected List<List<RecipeInfo<StonecutterRecipe>>> filteredRecipesByGroup = Collections.emptyList();
     protected Stocker.Sizeable craftingButtonsOffset = new Stocker.Sizeable(0);
@@ -51,41 +54,39 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
     protected List<Optional<Ingredient>> ingredientSlot = Collections.singletonList(Optional.empty());
     protected int selectedCraftingButton = 0;
     private boolean onlyCraftableRecipes;
-    protected final List<ItemStack> compactInventoryList = new ArrayList<>();
-    private final ContainerListener listener;
-    protected final UIAccessor accessor = UIAccessor.of(this);
 
     public LegacyStonecutterScreen(LegacyCraftingMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
-        List<RecipeInfo<StonecutterRecipe>> allRecipes = CommonRecipeManager.byType(RecipeType.STONECUTTING).stream().map(h-> RecipeInfo.create(h./*? if >1.20.1 {*/id()/*?} else {*//*getId()*//*?}*/, h/*? if >1.20.1 {*/.value()/*?}*/, LegacyCraftingMenu.getRecipeOptionalIngredients(h/*? if >1.20.1 {*/.value()/*?}*/),h/*? if >1.20.1 {*/.value()/*?}*/.assemble(null,Minecraft.getInstance().level.registryAccess()))).toList();
-        StoneCuttingGroupManager.listing.values().forEach(l->{
+        List<RecipeInfo<StonecutterRecipe>> allRecipes = CommonRecipeManager.byType(RecipeType.STONECUTTING).stream().map(h -> RecipeInfo.create(h./*? if >1.20.1 {*/id()/*?} else {*//*getId()*//*?}*/, h/*? if >1.20.1 {*/.value()/*?}*/, LegacyCraftingMenu.getRecipeOptionalIngredients(h/*? if >1.20.1 {*/.value()/*?}*/), h/*? if >1.20.1 {*/.value()/*?}*/.assemble(null, Minecraft.getInstance().level.registryAccess()))).toList();
+        StoneCuttingGroupManager.listing.values().forEach(l -> {
             List<RecipeInfo<StonecutterRecipe>> group = new ArrayList<>();
-            l.forEach(v->v.addRecipes(allRecipes.stream().filter(h->recipesByGroup.stream().noneMatch(r->r.contains(h)))::iterator,group::add));
+            l.forEach(v -> v.addRecipes(allRecipes.stream().filter(h -> recipesByGroup.stream().noneMatch(r -> r.contains(h)))::iterator, group::add));
             if (!group.isEmpty()) recipesByGroup.add(group);
         });
-        allRecipes.stream().filter(h->recipesByGroup.stream().noneMatch(r->r.contains(h))).forEach(h->recipesByGroup.add(Collections.singletonList(h)));
+        allRecipes.stream().filter(h -> recipesByGroup.stream().noneMatch(r -> r.contains(h))).forEach(h -> recipesByGroup.add(Collections.singletonList(h)));
         addCraftingButtons();
         onlyCraftableRecipes = true;
         listener = new ContainerListener() {
             public void slotChanged(AbstractContainerMenu abstractContainerMenu, int i, ItemStack itemStack) {
-                if(onlyCraftableRecipes){
-                    filteredRecipesByGroup = recipesByGroup.stream().map(l->l.stream().filter(r-> RecipeMenu.canCraft(r.getOptionalIngredients(),inventory, abstractContainerMenu.getCarried())).toList()).filter(l-> !l.isEmpty()).toList();
+                if (onlyCraftableRecipes) {
+                    filteredRecipesByGroup = recipesByGroup.stream().map(l -> l.stream().filter(r -> RecipeMenu.canCraft(r.getOptionalIngredients(), inventory, abstractContainerMenu.getCarried())).toList()).filter(l -> !l.isEmpty()).toList();
                     craftingButtons.get(selectedCraftingButton).updateRecipeDisplay();
                 }
             }
+
             public void dataChanged(AbstractContainerMenu abstractContainerMenu, int i, int j) {
 
             }
         };
-        listener.slotChanged(menu,0,ItemStack.EMPTY);
+        listener.slotChanged(menu, 0, ItemStack.EMPTY);
         onlyCraftableRecipes = false;
     }
 
     @Override
     public void addControlTooltips(Renderer renderer) {
-        ControlTooltip.setupDefaultButtons(renderer,this);
+        ControlTooltip.setupDefaultButtons(renderer, this);
         Event.super.addControlTooltips(renderer);
-        renderer.add(OPTION::get, ()-> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES);
+        renderer.add(OPTION::get, () -> onlyCraftableRecipes ? LegacyComponents.ALL_RECIPES : LegacyComponents.SHOW_CRAFTABLE_RECIPES);
     }
 
     @Override
@@ -105,11 +106,11 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
         super.init();
         menu.addSlotListener(listener);
         if (selectedCraftingButton < craftingButtons.size()) setFocused(craftingButtons.get(selectedCraftingButton));
-        craftingButtons.forEach(b->{
-            b.setPos(leftPos + 13 + craftingButtons.indexOf(b) * 27,topPos + 38);
+        craftingButtons.forEach(b -> {
+            b.setPos(leftPos + 13 + craftingButtons.indexOf(b) * 27, topPos + 38);
             addRenderableWidget(b);
         });
-        craftingButtonsOffset.max = Math.max(0,recipesByGroup.size() - 12);
+        craftingButtonsOffset.max = Math.max(0, recipesByGroup.size() - 12);
     }
 
     @Override
@@ -118,41 +119,45 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
     }
 
     public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        guiGraphics.drawString(this.font, title,(imageWidth - font.width(title)) / 2, 17, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        guiGraphics.drawString(this.font, this.playerInventoryTitle, (355 + 160 - font.width(playerInventoryTitle))/ 2, 109, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        guiGraphics.drawString(this.font, title, (imageWidth - font.width(title)) / 2, 17, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, (355 + 160 - font.width(playerInventoryTitle)) / 2, 109, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
     }
 
     @Override
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getElementValue("imageSprite",LegacySprites.SMALL_PANEL, ResourceLocation.class),leftPos,topPos,imageWidth,imageHeight);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 9,topPos + 103,163,105);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL,leftPos + 176,topPos + 103,163,105);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW,leftPos + 79,topPos + 158,22,15);
-        if (craftingButtonsOffset.get() > 0) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + 5, topPos + 45);
-        if (craftingButtonsOffset.max > 0 && craftingButtonsOffset.get() < craftingButtonsOffset.max) scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + 337, topPos + 45);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 9, topPos + 103, 163, 105);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 176, topPos + 103, 163, 105);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW, leftPos + 79, topPos + 158, 22, 15);
+        if (craftingButtonsOffset.get() > 0)
+            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + 5, topPos + 45);
+        if (craftingButtonsOffset.max > 0 && craftingButtonsOffset.get() < craftingButtonsOffset.max)
+            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + 337, topPos + 45);
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
-        craftingButtons.get(selectedCraftingButton).renderSelection(guiGraphics,i,j,f);
-        craftingButtons.forEach(h-> h.renderTooltip(minecraft,guiGraphics,i,j));
+        craftingButtons.get(selectedCraftingButton).renderSelection(guiGraphics, i, j, f);
+        craftingButtons.forEach(h -> h.renderTooltip(minecraft, guiGraphics, i, j));
         renderTooltip(guiGraphics, i, j);
     }
 
     @Override
     public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
         //? if >=1.21.2 {
-        if (this.getChildAt(d, e).filter((guiEventListener) -> guiEventListener.mouseScrolled(d, e, f, g)).isPresent()) return true;
+        if (this.getChildAt(d, e).filter((guiEventListener) -> guiEventListener.mouseScrolled(d, e, f, g)).isPresent())
+            return true;
         //?}
         if (super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g)) return true;
-        int scroll = (int)Math.signum(g);
-        if (((craftingButtonsOffset.get() > 0 && scroll < 0) || (scroll > 0 && craftingButtonsOffset.max > 0)) && craftingButtonsOffset.add(scroll,false) != 0){
+        int scroll = (int) Math.signum(g);
+        if (((craftingButtonsOffset.get() > 0 && scroll < 0) || (scroll > 0 && craftingButtonsOffset.max > 0)) && craftingButtonsOffset.add(scroll, false) != 0) {
             repositionElements();
             return true;
         }
         return false;
     }
+
     @Override
     public void removed() {
         super.removed();
@@ -160,7 +165,7 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
     }
 
     @Unique
-    protected void addCraftingButtons(){
+    protected void addCraftingButtons() {
         for (int i = 0; i < 12; i++) {
             int index = i;
 
@@ -173,19 +178,23 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                     super.render(graphics, i, j, f);
                 }
 
-
                 @Override
                 protected boolean canCraft(RecipeInfo<StonecutterRecipe> rcp) {
                     if (rcp == null || onlyCraftableRecipes) return true;
                     compactInventoryList.clear();
-                    RecipeMenu.handleCompactInventoryList(compactInventoryList,Minecraft.getInstance().player.getInventory(),menu.getCarried());
+                    RecipeMenu.handleCompactInventoryList(compactInventoryList, Minecraft.getInstance().player.getInventory(), menu.getCarried());
                     return LegacyCraftingScreen.canCraft(compactInventoryList, isFocused() && getFocusedRecipe() == rcp ? ingredientSlot : rcp.getOptionalIngredients(), null);
                 }
 
-
+                @Override
                 protected List<RecipeInfo<StonecutterRecipe>> getRecipes() {
                     List<List<RecipeInfo<StonecutterRecipe>>> list = onlyCraftableRecipes ? filteredRecipesByGroup : recipesByGroup;
                     return list.size() <= craftingButtonsOffset.get() + index ? Collections.emptyList() : list.get(craftingButtonsOffset.get() + index);
+                }
+
+                @Override
+                public LegacyScrollRenderer getScrollRenderer() {
+                    return scrollRenderer;
                 }
 
                 @Override
@@ -210,9 +219,9 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                 public void renderTooltip(Minecraft minecraft, GuiGraphics graphics, int i, int j) {
                     super.renderTooltip(minecraft, graphics, i, j);
                     if (isFocused()) {
-                        if (!ingredientSlot.isEmpty() && LegacyRenderUtil.isMouseOver(i,j, leftPos + 38, topPos + 149, 36,36))
+                        if (!ingredientSlot.isEmpty() && LegacyRenderUtil.isMouseOver(i, j, leftPos + 38, topPos + 149, 36, 36))
                             renderTooltip(minecraft, graphics, getActualItem(ingredientSlot.get(0)), i, j);
-                        if (LegacyRenderUtil.isMouseOver(i,j, leftPos + 110, topPos + 149, 36,36))
+                        if (LegacyRenderUtil.isMouseOver(i, j, leftPos + 110, topPos + 149, 36, 36))
                             renderTooltip(minecraft, graphics, getFocusedResult(), i, j);
                     }
                 }
@@ -220,8 +229,8 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                 @Override
                 public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
                     boolean warning = !canCraft(getFocusedRecipe());
-                    LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos + 38,topPos + 149,36,36, getActualItem(ingredientSlot.get(0)), !onlyCraftableRecipes && !ingredientSlot.get(0).isEmpty() && warning, LegacyRenderUtil.hasHorizontalArtifacts() ? ALT_DISPLAY_OFFSET : DISPLAY_OFFSET).render(graphics, i, j, f);
-                    LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos + 110,topPos + 149,36,36,getFocusedResult(), warning, LegacyRenderUtil.hasHorizontalArtifacts() ? ALT_DISPLAY_OFFSET : DISPLAY_OFFSET).render(graphics, i, j, f);
+                    LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos + 38, topPos + 149, 36, 36, getActualItem(ingredientSlot.get(0)), !onlyCraftableRecipes && !ingredientSlot.get(0).isEmpty() && warning, LegacyRenderUtil.hasHorizontalArtifacts() ? ALT_DISPLAY_OFFSET : DISPLAY_OFFSET).render(graphics, i, j, f);
+                    LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos + 110, topPos + 149, 36, 36, getFocusedResult(), warning, LegacyRenderUtil.hasHorizontalArtifacts() ? ALT_DISPLAY_OFFSET : DISPLAY_OFFSET).render(graphics, i, j, f);
 
                     if (getFocusedRecipe() != null) {
                         Component resultName = getFocusedRecipe().getName();

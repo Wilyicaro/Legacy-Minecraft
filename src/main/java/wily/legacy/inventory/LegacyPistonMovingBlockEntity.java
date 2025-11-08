@@ -9,11 +9,17 @@ import net.minecraft.world.level.storage.TagValueInput;
 
 public interface LegacyPistonMovingBlockEntity {
     CompoundTag getMovedBlockEntityTag();
+
     void setMovedBlockEntityTag(CompoundTag tag);
+
     BlockEntity getRenderingBlockEntity();
+
     void setRenderingBlockEntity(BlockEntity entity);
+
     BlockEntityType<?> getMovingBlockEntityType();
+
     void setMovingBlockEntityType(BlockEntityType<?> type);
+
     void createRenderingBlockEntity(Level level);
 
     default void load() {
@@ -24,6 +30,7 @@ public interface LegacyPistonMovingBlockEntity {
 
     default void load(BlockEntity blockEntity) {
         if (getMovedBlockEntityTag() == null) return;
-        if (blockEntity != null) blockEntity.loadCustomOnly(TagValueInput.create(ProblemReporter.DISCARDING, blockEntity.getLevel().registryAccess(), getMovedBlockEntityTag()));
+        if (blockEntity != null)
+            blockEntity.loadCustomOnly(TagValueInput.create(ProblemReporter.DISCARDING, blockEntity.getLevel().registryAccess(), getMovedBlockEntityTag()));
     }
 }

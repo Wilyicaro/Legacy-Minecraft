@@ -11,12 +11,12 @@ public class MovingBlockRenderStateMixin implements LegacyMovingBlockRenderState
     private Submit submit;
 
     @Override
-    public void setEnhancedSubmit(Submit submit) {
-        this.submit = submit;
+    public Submit getEnhancedSubmit() {
+        return submit;
     }
 
     @Override
-    public Submit getEnhancedSubmit() {
-        return submit;
+    public void setEnhancedSubmit(Submit submit) {
+        this.submit = submit;
     }
 }

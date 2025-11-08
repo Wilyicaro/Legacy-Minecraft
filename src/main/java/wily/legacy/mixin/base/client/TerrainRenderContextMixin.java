@@ -7,7 +7,7 @@ import net.fabricmc.fabric.impl.client.indigo.renderer.render.TerrainRenderConte
 import net.minecraft.client.Minecraft;
 //? if <1.21.5 {
 /*import net.minecraft.client.resources.model.BakedModel;
-*///?} else {
+ *///?} else {
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 //?}
 import net.minecraft.core.BlockPos;

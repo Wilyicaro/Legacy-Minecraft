@@ -1,0 +1,31 @@
+{
+  "targetUI": "wily.legacy.client.screen.ModsScreen",
+  "targetType": "class",
+  "applyCondition": { "reference": "uiMode.sd" },
+  "elements": {
+    "panel.width": {
+      "type": "put_number",
+      "value": 201
+    },
+    "panel.height": {
+      "type": "put_number",
+      "value": 180
+    },
+    "buttonsHeight": {
+      "type": "put_number",
+      "value": 17
+    },
+    "renderableVList.buttonIcon.size": {
+      "type": "put_number",
+      "value": 11
+    },
+    "renderableVList.buttonMessage.xOffset": {
+      "type": "put_number",
+      "value": 2
+    },
+    "panelRecess.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/square_recessed_panel"
+    }
+  }
+}

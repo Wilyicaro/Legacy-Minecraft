@@ -8,7 +8,7 @@ import net.minecraft.client.gui.components.toasts.AdvancementToast;
 import net.minecraft.client.gui.components.toasts.Toast;
 //? if <1.21.2 {
 /*import net.minecraft.client.gui.components.toasts.ToastComponent;
-*///?}
+ *///?}
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -33,28 +33,33 @@ public abstract class AdvancementToastMixin implements Toast, AdvancementToastAc
     int width = 82;
     //? if <1.21.5 {
     /*@Shadow private boolean playedSound;
-    *///?}
+     *///?}
 
-    @Shadow @Final private /*? if >1.20.1 {*/AdvancementHolder/*?} else {*//*Advancement*//*?}*/ advancement;
+    @Shadow
+    @Final
+    private /*? if >1.20.1 {*/ AdvancementHolder/*?} else {*//*Advancement*//*?}*/ advancement;
+
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, /*? if <1.21.2 {*//*ToastComponent toastComponent*//*?} else {*/Font font/*?}*/, long l, /*? if <1.21.2 {*/ /*CallbackInfoReturnable<Visibility> cir*//*?} else {*/CallbackInfo ci /*?}*/) {
         //? if <1.21.2 {
         /*Font font = Minecraft.getInstance().font;
-        *///?} else {
+         *///?} else {
         ci.cancel();
         //?}
-        Component holdToView = Component.translatable("legacy.menu.advancements.toast",(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_I) : ControllerBinding.UP_BUTTON.getIcon()).getComponent());
+        Component holdToView = Component.translatable("legacy.menu.advancements.toast", (ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_I) : ControllerBinding.UP_BUTTON.getIcon()).getComponent());
         DisplayInfo displayInfo = this.advancement./*? if >1.20.1 {*/value().display().orElse(null)/*?} else {*//*getDisplay()*//*?}*/;
-        width = 82 + (displayInfo == null ? 0 : Math.max(font.width(holdToView), Math.max(font.width(displayInfo.getTitle()) * 3/2,font.width(displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName()))));
-        LegacyRenderUtil.renderPointerPanel(guiGraphics,0,0,width(),height());
+        width = 82 + (displayInfo == null ? 0 : Math.max(font.width(holdToView), Math.max(font.width(displayInfo.getTitle()) * 3 / 2, font.width(displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName()))));
+        LegacyRenderUtil.renderPointerPanel(guiGraphics, 0, 0, width(), height());
         if (displayInfo != null) {
             int i = displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/() == /*? if >1.20.1 {*/AdvancementType/*?} else {*//*FrameType*//*?}*/.CHALLENGE ? 0xFF88FF : 0xFFFF00;
 
-            if (l < 1500L) guiGraphics.drawString(font, displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName(),(width() - font.width(displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName())) / 2, height() - 18, i | Mth.floor(Mth.clamp((float)(1500L - l) / 300.0f, 0.0f, 1.0f) * 255.0f) << 24 | 0x4000000);
-            else guiGraphics.drawString(font, holdToView,(width() - font.width(holdToView)) / 2, height() - 18, 0xFFFFFFFF | Mth.floor(Mth.clamp((float)(l - 1500L) / 300.0f, 0.0f, 1.0f) * 252.0f) << 24 | 0x4000000);
+            if (l < 1500L)
+                guiGraphics.drawString(font, displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName(), (width() - font.width(displayInfo./*? if >1.20.1 {*/getType/*?} else {*//*getFrame*//*?}*/().getDisplayName())) / 2, height() - 18, i | Mth.floor(Mth.clamp((float) (1500L - l) / 300.0f, 0.0f, 1.0f) * 255.0f) << 24 | 0x4000000);
+            else
+                guiGraphics.drawString(font, holdToView, (width() - font.width(holdToView)) / 2, height() - 18, 0xFFFFFFFF | Mth.floor(Mth.clamp((float) (l - 1500L) / 300.0f, 0.0f, 1.0f) * 252.0f) << 24 | 0x4000000);
             guiGraphics.pose().pushMatrix();
-            guiGraphics.pose().translate((width() - font.width(displayInfo.getTitle()) * 1.5f) / 2,10);
-            guiGraphics.pose().scale(1.5f,1.5f);
+            guiGraphics.pose().translate((width() - font.width(displayInfo.getTitle()) * 1.5f) / 2, 10);
+            guiGraphics.pose().scale(1.5f, 1.5f);
             guiGraphics.drawString(font, displayInfo.getTitle(), 0, 0, -1);
             guiGraphics.pose().popMatrix();
             //? if <1.21.5 {
@@ -65,17 +70,16 @@ public abstract class AdvancementToastMixin implements Toast, AdvancementToastAc
                 }
             }
             *///?}
-            LegacyRenderUtil.renderLocalPlayerHead(guiGraphics,7, (height() - 32) / 2, 32);
-            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,width() - 38,(height() - 28) / 2,28,28);
+            LegacyRenderUtil.renderLocalPlayerHead(guiGraphics, 7, (height() - 32) / 2, 32);
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL, width() - 38, (height() - 28) / 2, 28, 28);
             guiGraphics.renderItem(displayInfo.getIcon(), width() - 32, (height() - 16) / 2);
             //? if <1.21.2 {
             /*cir.setReturnValue((double)l >= 5000.0 * toastComponent.getNotificationDisplayTimeMultiplier() ? Toast.Visibility.HIDE : Toast.Visibility.SHOW);
-            *///?}
-            return;
+             *///?}
         }
         //? if <1.21.2 {
         /*cir.setReturnValue(Toast.Visibility.HIDE);
-        *///?}
+         *///?}
     }
 
     @Override

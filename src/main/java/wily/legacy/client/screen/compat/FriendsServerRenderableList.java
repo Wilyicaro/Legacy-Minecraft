@@ -19,6 +19,7 @@ import net.minecraft.server.players.NameAndId;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
+import wily.legacy.client.screen.CreationList;
 import wily.legacy.client.screen.JoinGameScreen;
 import wily.legacy.client.screen.ServerRenderableList;
 import wily.legacy.util.LegacySprites;
@@ -27,8 +28,8 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import java.util.*;
 
 public class FriendsServerRenderableList extends ServerRenderableList {
-    boolean ping = false;
     protected final FriendsListUpdate friendsListUpdate = friends -> updateServers();
+    boolean ping = false;
 
     public FriendsServerRenderableList(UIAccessor accessor) {
         super(accessor);
@@ -44,7 +45,7 @@ public class FriendsServerRenderableList extends ServerRenderableList {
         WorldHost.ONLINE_FRIEND_UPDATES.remove(friendsListUpdate);
     }
 
-    public boolean hasOnlineFriends(){
+    public boolean hasOnlineFriends() {
         return !WorldHost.ONLINE_FRIENDS.isEmpty();
     }
 
@@ -55,11 +56,11 @@ public class FriendsServerRenderableList extends ServerRenderableList {
             ping = true;
         }
         super.updateLANServers();
-        Util.backgroundExecutor().execute(()-> {
+        Util.backgroundExecutor().execute(() -> {
             WorldHost.ONLINE_FRIENDS.forEach(((uuid, id) -> {
                 AbstractButton onlineButton;
                 GameProfile profile = WorldHost.fetchProfile(minecraft.services().sessionService(), uuid);
-                addRenderable(onlineButton = new AbstractButton(0, 0, 270, 30, Component.literal(profile.name())) {
+                addRenderable(onlineButton = new CreationList.ContentButton(this, 0, 0, 270, 30, Component.literal(profile.name())) {
                     final ServerData serverData = new ServerData("", "", /*? if >1.20.2 {*/ServerData.Type.OTHER/*?} else {*//*false*//*?}*/);
                     final FaviconTexture icon = FaviconTexture.forServer(minecraft.getTextureManager(), serverData.ip);
                     private byte @Nullable [] lastIconBytes;
@@ -79,33 +80,31 @@ public class FriendsServerRenderableList extends ServerRenderableList {
                     }
 
                     @Override
-                    protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                        LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 35, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
-                    }
-
-                    @Override
-                    protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float f) {
-                        super.renderWidget(guiGraphics, mouseX, mouseY, f);
+                    public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+                        super.renderIcon(guiGraphics, x, y, width, height, mouseX, mouseY);
                         updateServerInfo();
                         byte[] bs = serverData.getIconBytes();
                         if (!Arrays.equals(bs, this.lastIconBytes)) {
                             if (this.uploadServerIcon(bs)) this.lastIconBytes = bs;
                             else serverData.setIconBytes(null);
                         }
-                        if (serverData.getIconBytes() == null) PlayerFaceRenderer.draw(guiGraphics, minecraft.getSkinManager().createLookup(profile, true).get(),getX() + 5, getY() + 5, 20);
-                        else drawIcon(guiGraphics, getX(), getY(),icon.textureLocation());
-                        if (minecraft.options.touchscreen().get().booleanValue() || isHovered) {
-                            guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
-                            int u = mouseX - getX();
-                            FactoryGuiGraphics.of(guiGraphics).blitSprite(u < 30 && u > 5 ? LegacySprites.JOIN_HIGHLIGHTED : LegacySprites.JOIN, getX(), getY(), 32, 32);
-                        }
+                        if (serverData.getIconBytes() == null)
+                            PlayerFaceRenderer.draw(guiGraphics, minecraft.getSkinManager().createLookup(profile, true).get(), getX() + x, getY() + y, width);
+                        else drawIcon(guiGraphics, getX() + x, getY() + y, width, height, icon.textureLocation());
                     }
 
+                    @Override
+                    public void renderIconHighlight(GuiGraphics guiGraphics, int x, int y, int width, int height, int mouseX, int mouseY) {
+                        super.renderIconHighlight(guiGraphics, x, y, width, height, mouseX, mouseY);
+                        FactoryGuiGraphics.of(guiGraphics).blitSprite(
+                                LegacyRenderUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y, width, height) ? LegacySprites.JOIN_HIGHLIGHTED : LegacySprites.JOIN,
+                                getX(), getY(), 32, 32);
+                    }
 
                     @Override
                     public void onPress(InputWithModifiers input) {
                         if (isFocused()) {
-                            minecraft.setScreen(new JoinGameScreen(getScreen(), serverData,b-> {
+                            minecraft.setScreen(new JoinGameScreen(getScreen(), serverData, b -> {
                                 WorldHost.LOGGER.info("Requesting to join {}", profile.id());
                                 if (WorldHost.protoClient != null) id.joinWorld(getScreen());
                             }));
@@ -130,7 +129,7 @@ public class FriendsServerRenderableList extends ServerRenderableList {
                             serverData.protocol = 0;
                         });
                         metadata.players().ifPresentOrElse(players -> {
-                            serverData.status = Component.translatable("multiplayer.status.player_count", Component.literal(players.online()+"").withStyle(ChatFormatting.GRAY), Component.literal(players.max()+"").withStyle(ChatFormatting.GRAY)).withStyle(ChatFormatting.DARK_GRAY);
+                            serverData.status = Component.translatable("multiplayer.status.player_count", Component.literal(players.online() + "").withStyle(ChatFormatting.GRAY), Component.literal(players.max() + "").withStyle(ChatFormatting.GRAY)).withStyle(ChatFormatting.DARK_GRAY);
                             serverData.players = players;
                             if (!players.sample().isEmpty()) {
                                 final List<Component> playerList = new ArrayList<>(players.sample().size());
@@ -156,11 +155,6 @@ public class FriendsServerRenderableList extends ServerRenderableList {
                                 serverData.setIconBytes(favicon.iconBytes());
                             }
                         });
-                    }
-
-                    @Override
-                    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
-                        defaultButtonNarrationText(narrationElementOutput);
                     }
                 });
                 if (accessor.getChildren().contains(onlineButton))

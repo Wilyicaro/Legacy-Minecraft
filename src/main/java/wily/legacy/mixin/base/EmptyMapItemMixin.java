@@ -30,16 +30,17 @@ public class EmptyMapItemMixin {
         return MapItem.create(level, arg, i, newScale > 0 ? newScale : (byte) level.getGameRules().getInt(LegacyGameRules.DEFAULT_MAP_SIZE), b, bl);
     }
     *///?} else {
-    @Redirect(method = "use", at = @At(value = "INVOKE",target = "Lnet/minecraft/world/item/ItemStack;consume(ILnet/minecraft/world/entity/LivingEntity;)V"))
+    @Redirect(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;consume(ILnet/minecraft/world/entity/LivingEntity;)V"))
     public void useConsume(ItemStack instance, int i, LivingEntity arg) {
 
     }
-    @WrapOperation(method = "use", at = @At(value = "INVOKE",target = /*? if <1.21.5 {*//*"Lnet/minecraft/world/item/MapItem;create(Lnet/minecraft/world/level/Level;IIBZZ)Lnet/minecraft/world/item/ItemStack;"*//*?} else {*/"Lnet/minecraft/world/item/MapItem;create(Lnet/minecraft/server/level/ServerLevel;IIBZZ)Lnet/minecraft/world/item/ItemStack;"/*?}*/))
+
+    @WrapOperation(method = "use", at = @At(value = "INVOKE", target = /*? if <1.21.5 {*//*"Lnet/minecraft/world/item/MapItem;create(Lnet/minecraft/world/level/Level;IIBZZ)Lnet/minecraft/world/item/ItemStack;"*//*?} else {*/"Lnet/minecraft/world/item/MapItem;create(Lnet/minecraft/server/level/ServerLevel;IIBZZ)Lnet/minecraft/world/item/ItemStack;"/*?}*/))
     public ItemStack use(/*? if <1.21.5 {*//*Level*//*?} else {*/ServerLevel/*?}*/ level, int arg, int i, byte j, boolean b, boolean bl, Operation<ItemStack> original, Level level1, Player player, InteractionHand interactionHand) {
         ItemStack map = player.getItemInHand(interactionHand);
         CompoundTag custom = map.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
-        map.consume(1,player);
-        return MapItem.create(level, arg, i, custom.contains("map_scale") ? custom.getByte("map_scale")/*? if >=1.21.5 {*/.orElse((byte) 0)/*?}*/ : (byte) ((ServerLevel)level).getGameRules().getInt(LegacyGameRules.DEFAULT_MAP_SIZE), b, bl);
+        map.consume(1, player);
+        return MapItem.create(level, arg, i, custom.contains("map_scale") ? custom.getByte("map_scale")/*? if >=1.21.5 {*/.orElse((byte) 0)/*?}*/ : (byte) level.getGameRules().getInt(LegacyGameRules.DEFAULT_MAP_SIZE), b, bl);
     }
     //?}
 }

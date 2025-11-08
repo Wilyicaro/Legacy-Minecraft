@@ -9,7 +9,7 @@ import net.minecraft.world.entity.*;
 //? if >=1.21.2 {
 //?} else {
 /*import net.minecraft.world.entity.MobSpawnType;
-*///?}
+ *///?}
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -24,6 +24,7 @@ import wily.legacy.util.LegacyComponents;
 public abstract class EntityTypeMixin {
     @Unique
     boolean wasLastEnemySpawnFailed = false;
+
     @Inject(method = "create(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/EntitySpawnReason;)Lnet/minecraft/world/entity/Entity;", at = @At("RETURN"), cancellable = true)
     public void create(Level level, EntitySpawnReason entitySpawnReason, CallbackInfoReturnable<Entity> cir) {
         Entity entity = cir.getReturnValue();

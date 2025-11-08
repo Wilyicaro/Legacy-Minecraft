@@ -7,7 +7,7 @@ import net.caffeinemc.mods.sodium.client.world.LevelSlice;
 import net.caffeinemc.mods.sodium.fabric.render.FluidRendererImpl;
 //?} else if forge || neoforge {
 /*import net.caffeinemc.mods.sodium.neoforge.render.FluidRendererImpl;
-*///?}
+ *///?}
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.core.BlockPos;
@@ -25,16 +25,17 @@ public class FluidRendererFactoryMixin {
         cir.setReturnValue(new BlendedColorProvider<>() {
             @Override
             protected int getColor(LevelSlice levelSlice, FluidState fluidState, BlockPos blockPos) {
-                return LegacyBiomeOverride.getOrDefault(Minecraft.getInstance().level.getBiome(blockPos).unwrapKey()).getWaterARGBOrDefault(BiomeColors.getAverageWaterColor(levelSlice,blockPos));
+                return LegacyBiomeOverride.getOrDefault(Minecraft.getInstance().level.getBiome(blockPos).unwrapKey()).getWaterARGBOrDefault(BiomeColors.getAverageWaterColor(levelSlice, blockPos));
             }
         });
     }
+
     @Inject(method = "getWaterBlockColorProvider", at = @At("HEAD"), cancellable = true)
     public void getWaterBlockColorProvider(CallbackInfoReturnable<BlendedColorProvider<FluidState>> cir) {
         cir.setReturnValue(new BlendedColorProvider<>() {
             @Override
             protected int getColor(LevelSlice levelSlice, FluidState fluidState, BlockPos blockPos) {
-                return LegacyBiomeOverride.getOrDefault(Minecraft.getInstance().level.getBiome(blockPos).unwrapKey()).getWaterARGBOrDefault(BiomeColors.getAverageWaterColor(levelSlice,blockPos));
+                return LegacyBiomeOverride.getOrDefault(Minecraft.getInstance().level.getBiome(blockPos).unwrapKey()).getWaterARGBOrDefault(BiomeColors.getAverageWaterColor(levelSlice, blockPos));
             }
         });
     }

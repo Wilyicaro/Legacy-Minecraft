@@ -31,14 +31,16 @@ import wily.legacy.inventory.LegacyPistonMovingBlockEntity;
 
 @Mixin(PistonMovingBlockEntity.class)
 public class PistonMovingBlockEntityMixin extends BlockEntity implements LegacyPistonMovingBlockEntity {
-    @Shadow private boolean isSourcePiston;
-    @Shadow private BlockState movedState;
     @Unique
     CompoundTag movedBeTag;
     @Unique
     BlockEntity movingRendererBlockEntity;
     @Unique
     BlockEntityType<?> movingBlockEntityType;
+    @Shadow
+    private boolean isSourcePiston;
+    @Shadow
+    private BlockState movedState;
 
     public PistonMovingBlockEntityMixin(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) {
         super(blockEntityType, blockPos, blockState);
@@ -48,24 +50,30 @@ public class PistonMovingBlockEntityMixin extends BlockEntity implements LegacyP
     private static void tick(Level level, BlockPos blockPos, BlockState blockState, PistonMovingBlockEntity pistonMovingBlockEntity, CallbackInfo ci) {
         if (pistonMovingBlockEntity instanceof LegacyPistonMovingBlockEntity be) be.load();
     }
+
     @Inject(method = "finalTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z", shift = At.Shift.AFTER))
     private void tick(CallbackInfo ci) {
         if (!isSourcePiston) load();
     }
+
     @Inject(method = /*? if <1.20.5 {*//*"load"*//*?} else {*/"loadAdditional"/*?}*/, at = @At("RETURN"))
     protected void load(ValueInput input, CallbackInfo ci) {
         CompoundTag newMovedBeTag = input.read("movedBlockEntityTag", CompoundTag.CODEC).orElseGet(CompoundTag::new);
         input.getString("movedBlockEntityType").map(FactoryAPI::createLocation).ifPresent(beTypeId -> movingBlockEntityType = FactoryAPIPlatform.getRegistryValue(beTypeId, BuiltInRegistries.BLOCK_ENTITY_TYPE));
         if (!newMovedBeTag.isEmpty()) {
             movedBeTag = newMovedBeTag;
-            if (hasLevel() && getLevel().isClientSide() && movingBlockEntityType != null) createRenderingBlockEntity(getLevel());
+            if (hasLevel() && getLevel().isClientSide() && movingBlockEntityType != null)
+                createRenderingBlockEntity(getLevel());
         }
     }
+
     @Inject(method = "saveAdditional", at = @At("RETURN"))
     protected void saveAdditional(ValueOutput output, CallbackInfo ci) {
         if (movedBeTag != null) output.store("movedBlockEntityTag", CompoundTag.CODEC, movedBeTag);
-        if (movingBlockEntityType != null) output.putString("movedBlockEntityType", BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(movingBlockEntityType).toString());
+        if (movingBlockEntityType != null)
+            output.putString("movedBlockEntityType", BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(movingBlockEntityType).toString());
     }
+
     @Override
     public CompoundTag getMovedBlockEntityTag() {
         return movedBeTag;
@@ -98,7 +106,7 @@ public class PistonMovingBlockEntityMixin extends BlockEntity implements LegacyP
 
     @Override
     public void createRenderingBlockEntity(Level level) {
-        BlockEntity entity = movingBlockEntityType.create(getBlockPos(),movedState);
+        BlockEntity entity = movingBlockEntityType.create(getBlockPos(), movedState);
         entity.setLevel(level);
         setRenderingBlockEntity(entity);
     }

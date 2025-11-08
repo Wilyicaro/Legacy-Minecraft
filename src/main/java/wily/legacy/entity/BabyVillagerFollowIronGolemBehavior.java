@@ -14,7 +14,7 @@ public class BabyVillagerFollowIronGolemBehavior extends Behavior<Villager> {
     private int takeGolemRoseTick;
 
     public BabyVillagerFollowIronGolemBehavior() {
-        super(ImmutableMap.of(),60,160);
+        super(ImmutableMap.of(), 60, 160);
     }
 
     @Override
@@ -28,7 +28,7 @@ public class BabyVillagerFollowIronGolemBehavior extends Behavior<Villager> {
             if (list.isEmpty()) {
                 return false;
             } else {
-                for(IronGolem ironGolem : list) {
+                for (IronGolem ironGolem : list) {
                     if (ironGolem.getOfferFlowerTick() > 0) {
                         this.ironGolem = ironGolem;
                         break;

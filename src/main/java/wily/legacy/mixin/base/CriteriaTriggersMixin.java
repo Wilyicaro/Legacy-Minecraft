@@ -17,16 +17,18 @@ import wily.legacy.network.ClientEffectActivationPayload;
 @Mixin(CriteriaTriggers.class)
 public class CriteriaTriggersMixin {
     @Redirect(method = "<clinit>", at = @At(value = "NEW", target = /*? if >1.20.1 {*/"()Lnet/minecraft/advancements/critereon/PlayerTrigger;"/*?} else {*//*"(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/advancements/critereon/PlayerTrigger;"*//*?}*/, ordinal = 3))
-    private static PlayerTrigger heroOfTheVillagerTrigger(/*? if <=1.20.1 {*//*ResourceLocation location*//*?}*/){
+    private static PlayerTrigger heroOfTheVillagerTrigger(/*? if <=1.20.1 {*//*ResourceLocation location*//*?}*/) {
         return effectTrigger(/*? if <=1.20.1 {*//*location, *//*?}*/MobEffects.HERO_OF_THE_VILLAGE);
     }
+
     @Redirect(method = "<clinit>", at = @At(value = "NEW", target = /*? if >1.20.1 {*/"()Lnet/minecraft/advancements/critereon/PlayerTrigger;"/*?} else {*//*"(Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/advancements/critereon/PlayerTrigger;"*//*?}*/, ordinal = 4))
-    private static PlayerTrigger badOmenTrigger(/*? if <=1.20.1 {*//*ResourceLocation location*//*?}*/){
+    private static PlayerTrigger badOmenTrigger(/*? if <=1.20.1 {*//*ResourceLocation location*//*?}*/) {
         return effectTrigger(/*? if <=1.20.1 {*//*location, *//*?}*/MobEffects./*? if <1.20.5 {*//*BAD_OMEN*//*?} else {*/RAID_OMEN/*?}*/);
     }
+
     @Unique
-    private static PlayerTrigger effectTrigger(/*? if <=1.20.1 {*//*ResourceLocation location, *//*?}*//*? if <1.20.5 {*//*MobEffect*//*?} else {*/Holder<MobEffect>/*?}*/ mobEffect){
-        return new PlayerTrigger(/*? if <=1.20.1 {*//*location*//*?}*/){
+    private static PlayerTrigger effectTrigger(/*? if <=1.20.1 {*//*ResourceLocation location, *//*?}*//*? if <1.20.5 {*//*MobEffect*//*?} else {*/Holder<MobEffect>/*?}*/ mobEffect) {
+        return new PlayerTrigger(/*? if <=1.20.1 {*//*location*//*?}*/) {
             @Override
             public void trigger(ServerPlayer serverPlayer) {
                 super.trigger(serverPlayer);

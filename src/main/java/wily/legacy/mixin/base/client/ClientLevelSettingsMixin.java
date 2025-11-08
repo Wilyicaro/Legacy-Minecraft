@@ -15,13 +15,15 @@ import wily.legacy.client.PackAlbum;
 
 @Mixin(LevelSettings.class)
 public class ClientLevelSettingsMixin implements LegacyClientWorldSettings {
-    @Mutable
-    @Shadow @Final private boolean allowCommands;
     long seed;
     boolean difficultyLocked = false;
     boolean trustPlayers = true;
-
     String selectedResourceAssort = PackAlbum.MINECRAFT.id();
+    @Mutable
+    @Shadow
+    @Final
+    private boolean allowCommands;
+
     @Inject(method = "parse", at = @At("RETURN"))
     private static void parse(Dynamic<?> dynamic, WorldDataConfiguration worldDataConfiguration, CallbackInfoReturnable<LevelSettings> cir) {
         LegacyClientWorldSettings.of(cir.getReturnValue()).setDifficultyLocked(dynamic.get("DifficultyLocked").asBoolean(false));
@@ -29,6 +31,7 @@ public class ClientLevelSettingsMixin implements LegacyClientWorldSettings {
         LegacyClientWorldSettings.of(cir.getReturnValue()).setDisplaySeed(dynamic.get("WorldGenSettings").orElseEmptyMap().get("seed").asLong(0));
         LegacyClientWorldSettings.of(cir.getReturnValue()).setSelectedResourceAlbum(PackAlbum.resourceById(dynamic.get("SelectedResourceAssort").asString(PackAlbum.MINECRAFT.id())));
     }
+
     @Inject(method = "copy", at = @At("RETURN"))
     private void copy(CallbackInfoReturnable<LevelSettings> cir) {
         LegacyClientWorldSettings settings = LegacyClientWorldSettings.of(cir.getReturnValue());
@@ -66,18 +69,19 @@ public class ClientLevelSettingsMixin implements LegacyClientWorldSettings {
         difficultyLocked = locked;
 
     }
+
     @Override
     public void setAllowCommands(boolean allow) {
         allowCommands = allow;
     }
 
     @Override
-    public void setSelectedResourceAlbum(PackAlbum album) {
-        selectedResourceAssort = album.id();
+    public PackAlbum getSelectedResourceAlbum() {
+        return PackAlbum.resourceById(selectedResourceAssort);
     }
 
     @Override
-    public PackAlbum getSelectedResourceAlbum() {
-        return PackAlbum.resourceById(selectedResourceAssort);
+    public void setSelectedResourceAlbum(PackAlbum album) {
+        selectedResourceAssort = album.id();
     }
 }

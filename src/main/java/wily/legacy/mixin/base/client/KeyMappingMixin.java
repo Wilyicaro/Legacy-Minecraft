@@ -13,7 +13,8 @@ import wily.legacy.client.controller.LegacyKeyMapping;
 @Mixin(KeyMapping.class)
 public abstract class KeyMappingMixin implements LegacyKeyMapping {
 
-    @Shadow private InputConstants.Key key;
+    @Shadow
+    private InputConstants.Key key;
     @Unique
     private ControllerBinding<?> defaultBinding;
     @Unique
@@ -22,6 +23,11 @@ public abstract class KeyMappingMixin implements LegacyKeyMapping {
     @Override
     public ControllerBinding<?> getDefaultBinding() {
         return defaultBinding;
+    }
+
+    @Override
+    public <T extends BindingState> void setDefaultBinding(ControllerBinding<T> binding) {
+        this.defaultBinding = binding;
     }
 
     @Override
@@ -35,15 +41,9 @@ public abstract class KeyMappingMixin implements LegacyKeyMapping {
     }
 
     @Override
-    public <T extends BindingState> void setDefaultBinding(ControllerBinding<T> binding) {
-        this.defaultBinding = binding;
-    }
-
-    @Override
     public InputConstants.Key getKey() {
         return key;
     }
-
 
 
     public Component getDisplayName() {

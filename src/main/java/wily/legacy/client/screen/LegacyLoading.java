@@ -9,12 +9,10 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public interface LegacyLoading {
-    List<Supplier<LegacyTip>> usingLoadingTips = new ArrayList<>(LegacyTipManager.loadingTips);
 
+    float getProgress();
 
-    int getProgress();
-
-    void setProgress(int progress);
+    void setProgress(float progress);
 
     Component getLoadingHeader();
 

@@ -28,12 +28,12 @@ public abstract class AbstractButtonMixin extends AbstractWidget {
     }
 
     @Inject(method = "onClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractButton;onPress(Lnet/minecraft/client/input/InputWithModifiers;)V"))
-    private void onPress(MouseButtonEvent mouseButtonEvent, boolean bl, CallbackInfo ci){
+    private void onPress(MouseButtonEvent mouseButtonEvent, boolean bl, CallbackInfo ci) {
         lastTimePressed = Util.getMillis();
     }
 
     @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractButton;onPress(Lnet/minecraft/client/input/InputWithModifiers;)V"))
-    private void onPress(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir){
+    private void onPress(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
         lastTimePressed = Util.getMillis();
     }
 

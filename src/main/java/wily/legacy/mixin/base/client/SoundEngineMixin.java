@@ -25,21 +25,35 @@ import java.util.function.Predicate;
 
 @Mixin(SoundEngine.class)
 public abstract class SoundEngineMixin implements SoundEngineAccessor {
-    @Shadow private boolean loaded;
+    @Shadow
+    private boolean loaded;
 
-    @Shadow @Final private Map<SoundInstance, ChannelAccess.ChannelHandle> instanceToChannel;
+    @Shadow
+    @Final
+    private Map<SoundInstance, ChannelAccess.ChannelHandle> instanceToChannel;
 
-    @Shadow @Final private Map<SoundInstance, Integer> queuedSounds;
+    @Shadow
+    @Final
+    private Map<SoundInstance, Integer> queuedSounds;
 
-    @Shadow @Final private List<TickableSoundInstance> tickingSounds;
+    @Shadow
+    @Final
+    private List<TickableSoundInstance> tickingSounds;
 
-    @Shadow @Final private Multimap<SoundSource, SoundInstance> instanceBySource;
+    @Shadow
+    @Final
+    private Multimap<SoundSource, SoundInstance> instanceBySource;
 
-    @Shadow @Final private Map<SoundInstance, Integer> soundDeleteTime;
+    @Shadow
+    @Final
+    private Map<SoundInstance, Integer> soundDeleteTime;
 
-    @Shadow @Final private List<TickableSoundInstance> queuedTickableSounds;
+    @Shadow
+    @Final
+    private List<TickableSoundInstance> queuedTickableSounds;
 
-    @Shadow protected abstract float calculateVolume(SoundInstance arg);
+    @Shadow
+    protected abstract float calculateVolume(SoundInstance arg);
 
     @Override
     public void stopAllSound() {
@@ -60,7 +74,8 @@ public abstract class SoundEngineMixin implements SoundEngineAccessor {
     @Override
     public void setVolume(SoundInstance soundInstance, float volume) {
         ChannelAccess.ChannelHandle channelHandle = this.instanceToChannel.get(soundInstance);
-        if (channelHandle != null) channelHandle.execute((channel) -> channel.setVolume(volume * this.calculateVolume(soundInstance)));
+        if (channelHandle != null)
+            channelHandle.execute((channel) -> channel.setVolume(volume * this.calculateVolume(soundInstance)));
     }
 
     @Override

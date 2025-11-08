@@ -2,8 +2,10 @@ package wily.legacy.mixin.base.client;
 
 //? if <1.20.5 {
 /*import com.mojang.blaze3d.vertex.BufferBuilder;
-*///?} else {
+ *///?} else {
+
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
+
 import java.util.SequencedMap;
 //?}
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -14,7 +16,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(MultiBufferSource.BufferSource.class)
 public interface BufferSourceAccessor {
     @Accessor(/*? if <1.20.5 {*//*"builder"*//*?} else {*/"sharedBuffer"/*?}*/)
-    /*? if <1.20.5 {*//*BufferBuilder*//*?} else {*/ByteBufferBuilder/*?}*/ buffer();
+        /*? if <1.20.5 {*//*BufferBuilder*//*?} else {*/ByteBufferBuilder/*?}*/ buffer();
+
     @Accessor("fixedBuffers")
-    /*? if <1.20.5 {*//*Map<RenderType, BufferBuilder>*//*?} else {*/SequencedMap<RenderType, ByteBufferBuilder>/*?}*/ fixedBuffers();
+        /*? if <1.20.5 {*//*Map<RenderType, BufferBuilder>*//*?} else {*/SequencedMap<RenderType, ByteBufferBuilder>/*?}*/ fixedBuffers();
 }

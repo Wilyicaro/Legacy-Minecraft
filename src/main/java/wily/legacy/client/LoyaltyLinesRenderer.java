@@ -24,17 +24,17 @@ public class LoyaltyLinesRenderer {
             double d14 = Math.sqrt(renderState.x * renderState.x + renderState.y * renderState.y + renderState.z * renderState.z);
             double d15 = renderState.uniqueAge * -0.1D;
             double d16 = Math.min(0.5F, d14 / 30.0F);
-            int k = 7 - ((int)renderState.uniqueAge) % 7;
+            int k = 7 - ((int) renderState.uniqueAge) % 7;
 
-            renderLoyaltyLine(renderState, matrix4f,multiBufferSource.getBuffer(RenderType.leash()),k,d6,d7,d15,d16,0.02D,light);
-            renderLoyaltyLine(renderState, matrix4f,multiBufferSource.getBuffer(RenderType.leash()),k,d6,d7,d15,d16,0.01D,light);
+            renderLoyaltyLine(renderState, matrix4f, multiBufferSource.getBuffer(RenderType.leash()), k, d6, d7, d15, d16, 0.02D, light);
+            renderLoyaltyLine(renderState, matrix4f, multiBufferSource.getBuffer(RenderType.leash()), k, d6, d7, d15, d16, 0.01D, light);
         }
     }
 
-    public static void renderLoyaltyLine(LoyaltyLinesRenderState renderState, Matrix4f matrix4f, VertexConsumer consumer, int k, double d6, double d7, double d15, double d16, double lineYD, int light){
-        for(int l = 0; l <= 37; ++l) {
+    public static void renderLoyaltyLine(LoyaltyLinesRenderState renderState, Matrix4f matrix4f, VertexConsumer consumer, int k, double d6, double d7, double d15, double d16, double lineYD, int light) {
+        for (int l = 0; l <= 37; ++l) {
             float d18 = l / 37.0F;
-            float f = 1.0F - (float)((l + k) % 7) / 7.0F;
+            float f = 1.0F - (float) ((l + k) % 7) / 7.0F;
             double d19 = d18 * 2.0D - 1.0D;
             d19 = (float) ((1.0F - d19 * d19) * d16);
             double d20 = renderState.x * d18 + Math.sin(d18 * Math.PI * 8.0D + d15) * d6 * d19;

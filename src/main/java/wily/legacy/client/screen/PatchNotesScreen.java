@@ -11,20 +11,21 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.util.LegacyComponents;
 
 public class PatchNotesScreen extends PanelBackgroundScreen {
-    protected final ScrollableRenderer scrollableRenderer = new ScrollableRenderer();
-    private final ResourceLocation uiDefinitionID;
     public static final ResourceLocation NEWER_VERSION = Legacy4J.createModLocation("ui_definitions/newer_version_notes.json");
     public static final ResourceLocation NEWER_MINECRAFT_VERSION = FactoryAPI.createVanillaLocation("ui_definitions/newer_version_notes.json");
+    protected final ScrollableRenderer scrollableRenderer = new ScrollableRenderer();
+    private final ResourceLocation uiDefinitionID;
 
     public PatchNotesScreen(Screen parent, ResourceLocation uiDefinitionID) {
-        super(parent, s-> Panel.centered(s, 370, 237, 0, 24), CommonComponents.EMPTY);
+        super(parent, s -> Panel.centered(s, 370, 237, 0, 24), CommonComponents.EMPTY);
         this.uiDefinitionID = uiDefinitionID;
     }
 
-    public static PanelBackgroundScreen createNewerVersion(Screen parent){
+    public static PanelBackgroundScreen createNewerVersion(Screen parent) {
         return new PatchNotesScreen(parent, NEWER_VERSION);
     }
-    public static PanelBackgroundScreen createNewerMinecraftVersion(Screen parent){
+
+    public static PanelBackgroundScreen createNewerMinecraftVersion(Screen parent) {
         return new PatchNotesScreen(parent, NEWER_MINECRAFT_VERSION);
     }
 
@@ -33,7 +34,7 @@ public class PatchNotesScreen extends PanelBackgroundScreen {
         return uiDefinitionID.toString();
     }
 
-    public ScrollableRenderer getScrollableRenderer(){
+    public ScrollableRenderer getScrollableRenderer() {
         return accessor.getElementValue("scrollable_renderer", scrollableRenderer, ScrollableRenderer.class);
     }
 
@@ -57,8 +58,8 @@ public class PatchNotesScreen extends PanelBackgroundScreen {
 
     @Override
     protected void init() {
-        accessor.putStaticElement("scrollable_renderer",scrollableRenderer);
+        accessor.putStaticElement("scrollable_renderer", scrollableRenderer);
         super.init();
-        addRenderableWidget(Button.builder(LegacyComponents.ACCEPT, b-> onClose()).bounds(panel.getX() + (panel.getWidth() - 200) / 2, panel.getY() + panel.getHeight() - 30, 200, 20).build());
+        addRenderableWidget(Button.builder(LegacyComponents.ACCEPT, b -> onClose()).bounds(panel.getX() + (panel.getWidth() - 200) / 2, panel.getY() + panel.getHeight() - 30, 200, 20).build());
     }
 }

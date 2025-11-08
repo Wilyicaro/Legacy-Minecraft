@@ -44,34 +44,40 @@ import static wily.legacy.util.LegacySprites.UNSELECT_HIGHLIGHTED;
 import static wily.legacy.util.LegacySprites.UNSELECT;
 
 @Mixin(PackSelectionScreen.class)
-public abstract class PackSelectionScreenMixin extends Screen implements ControlTooltip.Event,RenderableVList.Access {
+public abstract class PackSelectionScreenMixin extends Screen implements ControlTooltip.Event, RenderableVList.Access {
     private static final Component INCOMPATIBLE_TITLE = Component.translatable("pack.incompatible").withStyle(ChatFormatting.RED);
     private static final Component INCOMPATIBLE_CONFIRM_TITLE = Component.translatable("pack.incompatible.confirm.title");
     private static final Component AVAILABLE_PACK = Component.translatable("pack.selected.title");
     private static final Component SELECTED_PACK = Component.translatable("pack.available.title");
-    @Shadow @Final private PackSelectionModel model;
-    @Shadow protected abstract void reload();
+    @Shadow
+    @Final
+    private PackSelectionModel model;
+    @Shadow
+    private Button doneButton;
+    @Shadow
+    @Final
+    private Path packDir;
+    @Unique
+    private final Panel panel = Panel.centered(this, 410, 240);
+    @Unique
+    private final RenderableVList selectedPacksList = new RenderableVList(this).layoutSpacing(l -> 0);
+    @Unique
+    private final RenderableVList unselectedPacksList = new RenderableVList(this).layoutSpacing(l -> 0);
+    @Unique
+    private final List<RenderableVList> renderableVLists = List.of(unselectedPacksList, selectedPacksList);
 
-    @Shadow private Button doneButton;
-
-    @Shadow @Final private Path packDir;
-    @Unique
-    private Panel panel = Panel.centered(this,410,240);
-    @Unique
-    private RenderableVList selectedPacksList = new RenderableVList(this).layoutSpacing(l->0);
-    @Unique
-    private RenderableVList unselectedPacksList = new RenderableVList(this).layoutSpacing(l->0);
     protected PackSelectionScreenMixin(Component component) {
         super(component);
     }
-    private PackSelectionScreen self(){
-        return(PackSelectionScreen)(Object) this;
+
+    @Shadow
+    protected abstract void reload();
+
+    private PackSelectionScreen self() {
+        return (PackSelectionScreen) (Object) this;
     }
 
-    @Unique
-    private final List<RenderableVList> renderableVLists = List.of(unselectedPacksList,selectedPacksList);
-
-    @Inject(method = "init",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
         ci.cancel();
         super.init();
@@ -81,7 +87,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
         this.doneButton = Button.builder(CommonComponents.GUI_DONE, (button) -> this.onClose()).build();
     }
 
-    @Inject(method = "repositionElements",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "repositionElements", at = @At("HEAD"), cancellable = true)
     public void repositionElements(CallbackInfo ci) {
         super.repositionElements();
         ci.cancel();
@@ -90,7 +96,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     @Override
     public void added() {
         super.added();
-        ControlTooltip.Renderer.of(this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), ()-> LegacyComponents.OPEN_DIRECTORY);
+        ControlTooltip.Renderer.of(this).add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), () -> LegacyComponents.OPEN_DIRECTORY);
     }
 
     @Override
@@ -98,31 +104,33 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    public void initConstruct(CallbackInfo info){
+    public void initConstruct(CallbackInfo info) {
         reload();
     }
 
     @Inject(method = "populateLists", at = @At("HEAD"), cancellable = true)
     private void populateLists(CallbackInfo ci) {
         ci.cancel();
-        addPacks(unselectedPacksList,model.getUnselected());
-        addPacks(selectedPacksList,model.getSelected());
+        addPacks(unselectedPacksList, model.getUnselected());
+        addPacks(selectedPacksList, model.getSelected());
         repositionElements();
     }
+
     @Inject(method = "onClose", at = @At("RETURN"))
-    public void onClose(CallbackInfo info){
+    public void onClose(CallbackInfo info) {
         LegacySoundUtil.playBackSound();
     }
-    private void addPacks(RenderableVList list,Stream<PackSelectionModel.Entry> stream){
+
+    private void addPacks(RenderableVList list, Stream<PackSelectionModel.Entry> stream) {
         list.renderables.clear();
-        stream.forEach(e-> {
+        stream.forEach(e -> {
             List<Component> description = new ArrayList<>();
-            if (!e.getCompatibility().isCompatible()){
+            if (!e.getCompatibility().isCompatible()) {
                 description.add(INCOMPATIBLE_TITLE);
                 description.add(e.getCompatibility().getDescription());
             }
             if (!e.getExtendedDescription().getString().isEmpty()) description.add(e.getExtendedDescription());
-            AbstractButton button = new AbstractButton(0,0,180,30,e.getTitle()) {
+            AbstractButton button = new AbstractButton(0, 0, 180, 30, e.getTitle()) {
                 @Override
                 protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
                     super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
@@ -164,8 +172,9 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                         }
                     }
                 }
+
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-                    LegacyRenderUtil.renderScrollingString(guiGraphics,font,getMessage(),getX() + 30,getY(),getX() + width - 2,getY() + height,e.getCompatibility().isCompatible() ? LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()): 0xFF0000FF,true);
+                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, getMessage(), getX() + 30, getY(), getX() + width - 2, getY() + height, e.getCompatibility().isCompatible() ? LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()) : 0xFF0000FF, true);
                 }
 
                 @Override
@@ -199,16 +208,17 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
 
                 @Override
                 public void onPress(InputWithModifiers input) {
-                    if (e.isSelected() && e.canUnselect()){
+                    if (e.isSelected() && e.canUnselect()) {
                         e.unselect();
                         return;
                     }
                     if (e.getCompatibility().isCompatible()) {
                         e.select();
-                    } else minecraft.setScreen(new ConfirmationScreen(self(),INCOMPATIBLE_CONFIRM_TITLE, e.getCompatibility().getConfirmation(), (b) -> {
-                        e.select();
-                        if (minecraft.screen != null) minecraft.screen.onClose();
-                    }));
+                    } else
+                        minecraft.setScreen(new ConfirmationScreen(self(), INCOMPATIBLE_CONFIRM_TITLE, e.getCompatibility().getConfirmation(), (b) -> {
+                            e.select();
+                            if (minecraft.screen != null) minecraft.screen.onClose();
+                        }));
                 }
 
                 @Override
@@ -218,25 +228,28 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                             case 265 -> {
                                 int oldFocused = getFocused() == null ? -1 : children().indexOf(getFocused());
                                 if (e.canMoveUp()) e.moveUp();
-                                if (oldFocused >= 0 && oldFocused < children.size()) PackSelectionScreenMixin.this.setFocused(children().get(oldFocused));
+                                if (oldFocused >= 0 && oldFocused < children.size())
+                                    PackSelectionScreenMixin.this.setFocused(children().get(oldFocused));
                                 return false;
                             }
                             case 264 -> {
                                 int oldFocused = getFocused() == null ? -1 : children().indexOf(getFocused());
                                 if (e.canMoveDown()) e.moveDown();
-                                if (oldFocused >= 0 && oldFocused < children.size()) PackSelectionScreenMixin.this.setFocused(children().get(oldFocused));
+                                if (oldFocused >= 0 && oldFocused < children.size())
+                                    PackSelectionScreenMixin.this.setFocused(children().get(oldFocused));
                                 return false;
                             }
                         }
                     }
                     return super.keyPressed(keyEvent);
                 }
+
                 @Override
                 protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
                     defaultButtonNarrationText(narrationElementOutput);
                 }
             };
-            if (!description.isEmpty()) button.setTooltip(new MultilineTooltip(description,161));
+            if (!description.isEmpty()) button.setTooltip(new MultilineTooltip(description, 161));
             list.addRenderable(button);
         });
     }
@@ -254,7 +267,7 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
 
     @Override
     public boolean mouseScrolled(double d, double e/*? if >1.20.1 {*/, double f/*?}*/, double g) {
-        RenderableVList vList = getRenderableVListAt(d,e);
+        RenderableVList vList = getRenderableVListAt(d, e);
         if (vList != null) vList.mouseScrolled(g);
         return super.mouseScrolled(d, e/*? if >1.20.1 {*/, f/*?}*/, g);
     }
@@ -264,10 +277,10 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
         for (RenderableVList renderableVList : getRenderableVLists()) {
             if (renderableVList.keyPressed(keyEvent.key())) return true;
         }
-        if (keyEvent.key() == InputConstants.KEY_O){
+        if (keyEvent.key() == InputConstants.KEY_O) {
             //? if <1.20.5 {
             /*Util.getPlatform().openUri(this.packDir.toUri());
-            *///?} else {
+             *///?} else {
             Util.getPlatform().openPath(this.packDir);
             //?}
             return true;
@@ -277,21 +290,21 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
 
     //? if <=1.20.1 {
     /*@Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    *///?} else {
+     *///?} else {
     @Override
-    //?}
+            //?}
     public void render(GuiGraphics guiGraphics, int i, int j, float f/*? if <=1.20.1 {*//*, CallbackInfo ci*//*?}*/) {
         //? if <=1.20.1
         /*ci.cancel();*/
         LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
         panel.render(guiGraphics, i, j, f);
         FactoryScreenUtil.enableBlend();
-        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f,1.0f,1.0f,0.6f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 10, panel.y + 10, 190, 220);
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 0.6f);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 10, panel.y + 10, 190, 220);
         FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
         FactoryScreenUtil.disableBlend();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 210, panel.y + 10, 190, 220);
-        guiGraphics.drawString(this.font, SELECTED_PACK, panel.x + 10 + (190 - font.width(SELECTED_PACK)) / 2, panel.y + 18, CommonColor.INVENTORY_GRAY_TEXT.get(),false);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 210, panel.y + 10, 190, 220);
+        guiGraphics.drawString(this.font, SELECTED_PACK, panel.x + 10 + (190 - font.width(SELECTED_PACK)) / 2, panel.y + 18, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         guiGraphics.drawString(this.font, AVAILABLE_PACK, panel.x + 210 + (190 - font.width(AVAILABLE_PACK)) / 2, panel.y + 18, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         super.render(guiGraphics, i, j, f);
     }

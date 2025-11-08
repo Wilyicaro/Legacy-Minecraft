@@ -36,7 +36,7 @@ public class SnowLayerBlockMixin extends Block implements Fallable {
     }
 
     @Inject(method = "updateShape", at = @At("HEAD"), cancellable = true)
-    //? if >=1.21.2 {
+            //? if >=1.21.2 {
     private void updateShape(BlockState blockState, LevelReader levelReader, ScheduledTickAccess scheduledTickAccess, BlockPos blockPos, Direction direction, BlockPos blockPos2, BlockState blockState2, RandomSource randomSource, CallbackInfoReturnable<BlockState> cir) {
         scheduledTickAccess.scheduleTick(blockPos, this, this.getDelayAfterPlace());
         cir.setReturnValue(super.updateShape(blockState, levelReader, scheduledTickAccess, blockPos, direction, blockPos2, blockState2, randomSource));

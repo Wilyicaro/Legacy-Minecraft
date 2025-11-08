@@ -19,23 +19,27 @@ import wily.legacy.network.ClientAnimalInLoveSyncPayload;
 public abstract class AnimalMixin extends AgeableMob {
     @Unique
     int lastInlove = 0;
-
-    @Shadow public abstract void setInLoveTime(int i);
-
-    @Shadow private int inLove;
+    @Shadow
+    private int inLove;
 
     protected AnimalMixin(EntityType<? extends AgeableMob> entityType, Level level) {
         super(entityType, level);
     }
+
+    @Shadow
+    public abstract void setInLoveTime(int i);
+
     @Redirect(method = "aiStep", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/animal/Animal;inLove:I", opcode = Opcodes.PUTFIELD))
     public void aiStep(Animal instance, int value) {
         if (!level().isClientSide()) setInLoveTime(value);
     }
+
     @Inject(method = "aiStep", at = @At("HEAD"))
     public void aiStep(CallbackInfo ci) {
-        if (lastInlove != inLove) ClientAnimalInLoveSyncPayload.sync((Animal)(Object) this);
+        if (lastInlove != inLove) ClientAnimalInLoveSyncPayload.sync((Animal) (Object) this);
         lastInlove = inLove;
     }
+
     @Inject(method = "canFallInLove", at = @At("HEAD"), cancellable = true)
     public void aiStep(CallbackInfoReturnable<Boolean> cir) {
         if (age != 0) cir.setReturnValue(false);

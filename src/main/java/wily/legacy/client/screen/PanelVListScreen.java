@@ -14,13 +14,14 @@ import java.util.function.Function;
 public class PanelVListScreen extends PanelBackgroundScreen implements RenderableVList.Access {
     protected final RenderableVList renderableVList = new RenderableVList(accessor);
     public final List<RenderableVList> renderableVLists = new ArrayList<>(Collections.singleton(renderableVList));
-    public Consumer<PanelVListScreen> onClose = s->{};
+    public Consumer<PanelVListScreen> onClose = s -> {
+    };
 
-    public PanelVListScreen(Function<Screen,Panel> panelConstructor, Component component) {
+    public PanelVListScreen(Function<Screen, Panel> panelConstructor, Component component) {
         super(panelConstructor, component);
     }
 
-    public PanelVListScreen(Screen parent, Function<Screen,Panel> panelConstructor, Component component) {
+    public PanelVListScreen(Screen parent, Function<Screen, Panel> panelConstructor, Component component) {
         super(parent, panelConstructor, component);
     }
 
@@ -33,9 +34,11 @@ public class PanelVListScreen extends PanelBackgroundScreen implements Renderabl
         super.init();
         if (!getRenderableVLists().isEmpty()) renderableVListInit();
     }
-    public void renderableVListInit(){
-        getRenderableVList().init(panel.x + 10,panel.y + 10,panel.width - 20,panel.height-20);
+
+    public void renderableVListInit() {
+        getRenderableVList().init(panel.x + 10, panel.y + 10, panel.width - 20, panel.height - 20);
     }
+
     @Override
     public void onClose() {
         super.onClose();
@@ -50,7 +53,7 @@ public class PanelVListScreen extends PanelBackgroundScreen implements Renderabl
     @Override
     public boolean mouseScrolled(double d, double e, double f, double g) {
         if (super.mouseScrolled(d, e, f, g)) return true;
-        RenderableVList vList = getRenderableVListAt(d,e);
+        RenderableVList vList = getRenderableVListAt(d, e);
         if (vList != null && vList.renderables.stream().anyMatch(children::contains)) vList.mouseScrolled(g);
         return false;
     }

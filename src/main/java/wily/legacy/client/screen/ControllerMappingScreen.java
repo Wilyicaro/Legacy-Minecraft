@@ -27,7 +27,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public class ControllerMappingScreen extends LegacyKeyMappingScreen {
-    private Set<ControllerBinding<?>> recordedBindings = new ObjectOpenHashSet<>();
+    private final Set<ControllerBinding<?>> recordedBindings = new ObjectOpenHashSet<>();
 
     public ControllerMappingScreen(Screen parent) {
         super(parent, Component.translatable("legacy.options.selectedController"));
@@ -38,12 +38,12 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
         KeyMapping[] keyMappings = ArrayUtils.clone(Minecraft.getInstance().options.keyMappings);
         Arrays.sort(keyMappings);
         KeyMapping.Category lastCategory = null;
-        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.reset_defaults"),button -> minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.reset_controls"),Component.translatable("legacy.menu.reset_controls_message"), b-> {
+        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.reset_defaults"), button -> minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.reset_controls"), Component.translatable("legacy.menu.reset_controls_message"), b -> {
             for (KeyMapping keyMapping : keyMappings)
                 LegacyKeyMapping.of(keyMapping).setBinding(LegacyKeyMapping.of(keyMapping).getDefaultBinding());
             LegacyOptions.CLIENT_STORAGE.save();
             minecraft.setScreen(this);
-        }))).size(240,20).build());
+        }))).size(240, 20).build());
         renderableVList.addOptions(
                 LegacyOptions.unbindConflictingButtons,
                 LegacyOptions.controllerToasts,
@@ -78,7 +78,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
                             LegacyOptions.linearCameraMovement);
             }
             lastCategory = keyMapping.getCategory();
-            renderableVList.addRenderable(new MappingButton(0,0,240,20, LegacyKeyMapping.of(keyMapping)) {
+            renderableVList.addRenderable(new MappingButton(0, 0, 240, 20, LegacyKeyMapping.of(keyMapping)) {
                 @Override
                 public ControlTooltip.ComponentIcon getIcon() {
                     return mapping.getBinding().getIcon();
@@ -91,7 +91,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
 
                 @Override
                 public void onPress(InputWithModifiers input) {
-                    if (input.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed){
+                    if (input.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed) {
                         mapping.setBinding(mapping.getDefaultBinding());
                         LegacyOptions.CLIENT_STORAGE.save();
                         setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
@@ -105,16 +105,16 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
     }
 
     @Override
-    protected boolean areConflicting(LegacyKeyMapping keyMapping, LegacyKeyMapping comparison){
+    protected boolean areConflicting(LegacyKeyMapping keyMapping, LegacyKeyMapping comparison) {
         return keyMapping.getBinding() == comparison.getBinding();
     }
 
-    protected void setNone(LegacyKeyMapping keyMapping){
+    protected void setNone(LegacyKeyMapping keyMapping) {
         keyMapping.setBinding(null);
         LegacyOptions.CLIENT_STORAGE.save();
     }
 
-    public boolean unbindConflictingBindings(){
+    public boolean unbindConflictingBindings() {
         return LegacyOptions.unbindConflictingButtons.get();
     }
 
@@ -140,7 +140,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
     }
 
     @Override
-    public Component getConflictingTooltip(){
+    public Component getConflictingTooltip() {
         return LegacyComponents.CONFLICTING_BUTTONS;
     }
 
@@ -172,10 +172,11 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
     public void controllerTick(Controller controller) {
         if (selectedMapping != null) {
             for (ControllerBinding<?> binding : ControllerBinding.map.values()) {
-                if (binding.state().justPressed && binding.isBindable && !binding.state().isBlocked() && !binding.equals(ControllerBinding.BACK) && !binding.isSpecial()) recordedBindings.add(binding);
+                if (binding.state().justPressed && binding.isBindable && !binding.state().isBlocked() && !binding.equals(ControllerBinding.BACK) && !binding.isSpecial())
+                    recordedBindings.add(binding);
             }
 
-            if (!recordedBindings.isEmpty() && recordedBindings.stream().noneMatch(binding-> binding.state().pressed)) {
+            if (!recordedBindings.isEmpty() && recordedBindings.stream().noneMatch(binding -> binding.state().pressed)) {
                 BindingState state = CompoundControllerBinding.getOrCreateAndUpdate(controller, recordedBindings.toArray(ControllerBinding[]::new)).state();
                 applyBinding(state.binding);
                 recordedBindings.clear();

@@ -27,7 +27,7 @@ public class LegacySprites {
     public static final ResourceLocation CRAFTING_2_SLOTS_SELECTION = Legacy4J.createModLocation("container/crafting_2_slots_selection");
     public static final ResourceLocation CRAFTING_SELECTION = Legacy4J.createModLocation("container/crafting_selection");
     public static final ResourceLocation PACK_HIGHLIGHTED = Legacy4J.createModLocation("widget/pack_highlighted");
-    public static final ResourceLocation PACK_SELECTED = Legacy4J.createModLocation( "widget/pack_selected");
+    public static final ResourceLocation PACK_SELECTED = Legacy4J.createModLocation("widget/pack_selected");
     public static final ResourceLocation MAP_PLAYER = Legacy4J.createModLocation("icon/map/player");
     public static final ResourceLocation BACK = Legacy4J.createModLocation("widget/back");
     public static final ResourceLocation SHIFT = Legacy4J.createModLocation("widget/shift");
@@ -35,6 +35,8 @@ public class LegacySprites {
     public static final ResourceLocation SCROLL_UP = Legacy4J.createModLocation("widget/scroll_up");
     public static final ResourceLocation SCROLL_RIGHT = Legacy4J.createModLocation("widget/scroll_right");
     public static final ResourceLocation SCROLL_LEFT = Legacy4J.createModLocation("widget/scroll_left");
+    public static final ResourceLocation SCROLL_DOWN_SMALL = Legacy4J.createModLocation("widget/scroll_down_small");
+    public static final ResourceLocation SCROLL_UP_SMALL = Legacy4J.createModLocation("widget/scroll_up_small");
     public static final ResourceLocation LOADING_BACKGROUND = Legacy4J.createModLocation("widget/loading_background");
     public static final ResourceLocation LOADING_BAR = Legacy4J.createModLocation("widget/loading_bar");
     public static final ResourceLocation SADDLE_SLOT = Legacy4J.createModLocation("container/saddle_slot");
@@ -57,6 +59,7 @@ public class LegacySprites {
     public static final ResourceLocation SHIELD_SLOT = Legacy4J.createModLocation("container/shield_slot");
     public static final ResourceLocation FULL_ARROW = Legacy4J.createModLocation("container/full_arrow");
     public static final ResourceLocation FULL_ARROW_1080 = Legacy4J.createModLocation("container/full_arrow_1080");
+    public static final ResourceLocation FULL_SMALL_ARROW = Legacy4J.createModLocation("container/full_small_arrow");
     public static final ResourceLocation SMALL_ARROW = Legacy4J.createModLocation("container/small_arrow");
     public static final ResourceLocation LIT = Legacy4J.createModLocation("container/lit");
     public static final ResourceLocation LIT_PROGRESS = Legacy4J.createModLocation("container/lit_progress");
@@ -71,6 +74,9 @@ public class LegacySprites {
     public static final ResourceLocation ENCHANTMENT_BUTTON_EMPTY = Legacy4J.createModLocation("container/enchantment_button_empty");
     public static final ResourceLocation ENCHANTMENT_BUTTON_ACTIVE = Legacy4J.createModLocation("container/enchantment_button_active");
     public static final ResourceLocation ENCHANTMENT_BUTTON_SELECTED = Legacy4J.createModLocation("container/enchantment_button_selected");
+    public static final ResourceLocation SMALL_ENCHANTMENT_BUTTON_EMPTY = Legacy4J.createModLocation("container/small_enchantment_button_empty");
+    public static final ResourceLocation SMALL_ENCHANTMENT_BUTTON_ACTIVE = Legacy4J.createModLocation("container/small_enchantment_button_active");
+    public static final ResourceLocation SMALL_ENCHANTMENT_BUTTON_SELECTED = Legacy4J.createModLocation("container/small_enchantment_button_selected");
     public static final ResourceLocation CARTOGRAPHY_TABLE = Legacy4J.createModLocation("container/cartography_table_empty");
     public static final ResourceLocation CARTOGRAPHY_TABLE_MAP = Legacy4J.createModLocation("container/cartography_table_map");
     public static final ResourceLocation CARTOGRAPHY_TABLE_COPY = Legacy4J.createModLocation("container/cartography_table_copy");
@@ -88,12 +94,16 @@ public class LegacySprites {
     public static final ResourceLocation TRANSFER_MOVE_DOWN = FactoryAPI.createVanillaLocation("transferable_list/move_down");
     public static final ResourceLocation TEXT_FIELD = FactoryAPI.createVanillaLocation("widget/text_field");
     public static final ResourceLocation HIGHLIGHTED_TEXT_FIELD = FactoryAPI.createVanillaLocation("widget/text_field_highlighted");
-    public static final ResourceLocation HIGHLIGHTED_SLIDER = FactoryAPI.createVanillaLocation("widget/slider_highlighted");;
+    public static final ResourceLocation HIGHLIGHTED_SLIDER = FactoryAPI.createVanillaLocation("widget/slider_highlighted");
     public static final ResourceLocation SLIDER = FactoryAPI.createVanillaLocation("widget/slider");
     public static final ResourceLocation SLIDER_HANDLE_HIGHLIGHTED = FactoryAPI.createVanillaLocation("widget/slider_handle_highlighted");
     public static final ResourceLocation SLIDER_HANDLE = FactoryAPI.createVanillaLocation("widget/slider_handle");
     public static final ResourceLocation BUTTON = FactoryAPI.createVanillaLocation("widget/button");
     public static final ResourceLocation BUTTON_HIGHLIGHTED = FactoryAPI.createVanillaLocation("widget/button_highlighted");
+    public static final ResourceLocation TICKBOX = Legacy4J.createModLocation("widget/tickbox");
+    public static final ResourceLocation TICKBOX_HOVERED = Legacy4J.createModLocation("widget/tickbox_hovered");
+    public static final ResourceLocation TICK = Legacy4J.createModLocation("widget/tick");
+    public static final ResourceLocation SMALL_TICK = Legacy4J.createModLocation("widget/small_tick");
     public static final ResourceLocation LOOM_ERROR = FactoryAPI.createVanillaLocation("container/loom/error");
     public static final ResourceLocation FUEL_LENGTH_SPRITE = FactoryAPI.createVanillaLocation("container/brewing_stand/fuel_length");
     public static final ResourceLocation BREW_PROGRESS_SPRITE = FactoryAPI.createVanillaLocation("container/brewing_stand/brew_progress");
@@ -106,6 +116,7 @@ public class LegacySprites {
     public static final ResourceLocation TOOLS = Legacy4J.createModLocation("icon/tools");
     public static final ResourceLocation MISC = Legacy4J.createModLocation("icon/misc");
     public static final ResourceLocation SEARCH = Legacy4J.createModLocation("icon/search");
+    public static final ResourceLocation SEARCH_SMALL = Legacy4J.createModLocation("icon/search");
 
     public static final ResourceLocation SAVE_CHEST = Legacy4J.createModLocation("hud/save_chest");
     public static final ResourceLocation SAVE_ARROW = Legacy4J.createModLocation("hud/save_arrow");
@@ -127,4 +138,12 @@ public class LegacySprites {
     public static final ResourceLocation HIGH_VERT_TAB_MIDDLE = Legacy4J.createModLocation("tiles/high_vert_tab_middle");
     public static final ResourceLocation HIGH_VERT_TAB_UP = Legacy4J.createModLocation("tiles/high_vert_tab_up");
     public static final ResourceLocation LOW_VERT_TAB = Legacy4J.createModLocation("tiles/low_vert_tab");
+    public static final ResourceLocation ICON_HOLDER = Legacy4J.createModLocation("container/icon_holder");
+    public static final ResourceLocation SIZEABLE_ICON_HOLDER = Legacy4J.createModLocation("container/sizeable_icon_holder");
+    public static final ResourceLocation SELECT_ICON_HIGHLIGHT = Legacy4J.createModLocation("container/select_icon_highlight");
+    public static final ResourceLocation SELECT_ICON_HIGHLIGHT_SMALL = Legacy4J.createModLocation("container/select_icon_highlight_small");
+    public static final ResourceLocation RED_ICON_HOLDER = Legacy4J.createModLocation("container/red_icon_holder");
+    public static final ResourceLocation GRAY_ICON_HOLDER = Legacy4J.createModLocation("container/gray_icon_holder");
+    public static final ResourceLocation WARNING_ICON = Legacy4J.createModLocation("container/icon_warning");
+    public static final ResourceLocation SLOT_HIGHLIGHT = Legacy4J.createModLocation("container/slot_highlight");
 }

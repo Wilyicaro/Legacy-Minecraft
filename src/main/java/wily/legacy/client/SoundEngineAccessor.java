@@ -10,6 +10,8 @@ public interface SoundEngineAccessor {
     }
 
     void setVolume(SoundInstance soundInstance, float volume);
+
     void fadeAllMusic();
+
     void stopAllSound();
 }

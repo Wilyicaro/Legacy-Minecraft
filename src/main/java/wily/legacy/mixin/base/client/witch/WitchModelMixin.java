@@ -15,6 +15,7 @@ public class WitchModelMixin {
     private static PartDefinition createBodyLayer(PartDefinition instance, String partDefinition, CubeListBuilder partDefinition2, PartPose string) {
         return instance.getChild("head");
     }
+
     @ModifyArg(method = "createBodyLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/geom/builders/PartDefinition;addOrReplaceChild(Ljava/lang/String;Lnet/minecraft/client/model/geom/builders/CubeListBuilder;Lnet/minecraft/client/model/geom/PartPose;)Lnet/minecraft/client/model/geom/builders/PartDefinition;", ordinal = 1))
     private static String createBodyLayer(String string) {
         return "hat1";

@@ -13,7 +13,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potions;
@@ -23,48 +22,31 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 //?}
 //? if >=1.20.5 {
-import net.minecraft.core.component.DataComponents;
 //?}
 import net.minecraft.world.level.block.Block;
 //? if <1.21.2 {
 /*import net.minecraft.world.level.block.SuspiciousEffectHolder;
-*///?}
+ *///?}
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.RegisterListing;
 import wily.factoryapi.base.StackIngredient;
 import wily.factoryapi.util.ListMap;
-import wily.legacy.Legacy4J;import wily.legacy.util.LegacyItemUtil;
+import wily.legacy.util.IOUtil;
+import wily.legacy.util.LegacyItemUtil;
 
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
-    default boolean isInvalid() {
-        return get() instanceof Recipe<?> r && r.isSpecial() || getOptionalIngredients().isEmpty() || getResultItem().isEmpty();
-    }
-
-    default boolean isOverride() {
-        return get() == null;
-    }
-
-    List<Optional<Ingredient>> getOptionalIngredients();
-
-    ItemStack getResultItem();
-
-    Component getName();
-
-    Component getDescription();
-
     static <T> RecipeInfo<T> create(ResourceKey<Recipe<?>> id, T value, List<Optional<Ingredient>> ings, ItemStack result) {
-        return create(id.location(), value, ings, result, ()-> null);
+        return create(id.location(), value, ings, result, () -> null);
     }
 
     static <T> RecipeInfo<T> create(ResourceLocation id, T value, List<Optional<Ingredient>> ings, ItemStack result) {
-        return create(id, value, ings, result, ()-> null);
+        return create(id, value, ings, result, () -> null);
     }
 
     static <T> RecipeInfo<T> create(ResourceLocation id, T value, List<Optional<Ingredient>> ings, ItemStack result, Supplier<Component> description) {
@@ -105,68 +87,70 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
 
             @Override
             public boolean equals(Object obj) {
-                return super.equals(obj) || obj instanceof /*? if >1.20.1 {*/RecipeHolder<?>/*?} else {*//*Recipe<?>*//*?}*/ h && h./*? if >1.20.1 {*/id()/*?} else {*//*getId()*//*?}*/.equals(getId()) || obj instanceof RecipeInfo<?> h1 && h1.getId().equals(getId());
+                return super.equals(obj) || obj instanceof RecipeHolder<?> h && h.id().equals(getId()) || obj instanceof RecipeInfo<?> h1 && h1.getId().equals(getId());
             }
         };
     }
 
+    default boolean isInvalid() {
+        return get() instanceof Recipe<?> r && r.isSpecial() || getOptionalIngredients().isEmpty() || getResultItem().isEmpty();
+    }
+
+    default boolean isOverride() {
+        return get() == null;
+    }
+
+    List<Optional<Ingredient>> getOptionalIngredients();
+
+    ItemStack getResultItem();
+
+    Component getName();
+
+    Component getDescription();
+
     interface Filter extends Predicate<RecipeInfo<?>> {
-        ListMap<ResourceLocation, Codec<? extends Filter>> map = ListMap.<String, Codec<? extends Filter>>builder().put("id",Id.CODEC).put("item_tag",Id.CODEC).put("block_tag",BlockTag.CODEC).put("item_id",ItemId.CODEC).mapKeys(FactoryAPI::createVanillaLocation).build();
+        ListMap<ResourceLocation, Codec<? extends Filter>> map = ListMap.<String, Codec<? extends Filter>>builder().put("id", Id.CODEC).put("item_tag", Id.CODEC).put("block_tag", BlockTag.CODEC).put("item_id", ItemId.CODEC).mapKeys(FactoryAPI::createVanillaLocation).build();
         Codec<Filter> BY_TYPE_CODEC = new Codec<>() {
             @Override
             public <T> DataResult<T> encode(Filter input, DynamicOps<T> ops, T prefix) {
-                ResourceLocation.CODEC.fieldOf("type").codec().encode(map.getKey(input.codec()),ops,prefix);
-                return ((Codec<Filter>)input.codec()).fieldOf("value").codec().encode(input, ops, prefix);
+                return ResourceLocation.CODEC.fieldOf("type").codec().encode(map.getKey(input.codec()), ops, prefix).flatMap(r -> ((Codec<Filter>) input.codec()).fieldOf("value").codec().encode(input, ops, r));
             }
 
             @Override
             public <T> DataResult<Pair<Filter, T>> decode(DynamicOps<T> ops, T input) {
-                Dynamic<T> dynamic = new Dynamic<>(ops,input);
-                return dynamic.get("type").flatMap(ResourceLocation.CODEC::parse).flatMap(r-> dynamic.get("value").flatMap(d-> map.get(r).parse(d)).map(f->Pair.of(f, input)));
+                Dynamic<T> dynamic = new Dynamic<>(ops, input);
+                return dynamic.get("type").flatMap(ResourceLocation.CODEC::parse).flatMap(r -> dynamic.get("value").flatMap(d -> map.get(r).parse(d)).map(f -> Pair.of(f, input)));
             }
         };
-        Codec<Filter> CODEC = Codec.either(Codec.STRING.xmap(Filter::parse,Filter::toString), BY_TYPE_CODEC).xmap(e->e.right().orElseGet(e.left()::get), Either::right);
+        Codec<Filter> CODEC = IOUtil.createFallbackCodec(BY_TYPE_CODEC, Codec.STRING.xmap(Filter::parse, Filter::toString));
         Codec<List<Filter>> LIST_CODEC = CODEC.listOf().xmap(ArrayList::new, Function.identity());
-        Codec<Map<String,List<Filter>>> LISTING_CODEC = createListingCodec(Codec.either(CODEC,LIST_CODEC).xmap(e->e.right().orElseGet(()->new ArrayList<>(Collections.singleton(e.left().get()))),Either::right),"group","recipes", l->l.get(0).toString());
-
-        static <E> Codec<Map<String,E>> createListingCodec(Codec<E> codec, String keyField, String valueField, Function<E,String> fallBackKey) {
-            return new Codec<>() {
-                @Override
-                public <T> DataResult<Pair<Map<String, E>, T>> decode(DynamicOps<T> ops, T input) {
-                    Dynamic<T> dynamic = new Dynamic<>(ops,input);
-                    DataResult<Map<String, E>> defaultMap = dynamic.asMapOpt().map(s->s.collect(Collectors.toMap(p->p.getFirst().asString().result().orElseThrow(), p->codec.parse(p.getSecond()).result().orElseThrow(),(a,b)->b,LinkedHashMap::new)));
-                    return (defaultMap.result().isPresent() ? defaultMap : dynamic.asListOpt(d-> {
-                        E element = codec.parse(d).result().orElseGet(()->d.get(valueField).flatMap(codec::parse).resultOrPartial(Legacy4J.LOGGER::error).get());
-                        return Pair.of(d.get(keyField).asString().result().orElse(fallBackKey.apply(element)),element);
-                    }).map(l->l.stream().collect(Collectors.toMap(Pair::getFirst,Pair::getSecond,(a,b)->b,LinkedHashMap::new)))).map(m->Pair.of(m,input));
-                }
-
-                @Override
-                public <T> DataResult<T> encode(Map<String, E> input, DynamicOps<T> ops, T prefix) {
-                    Dynamic<T> dynamic = new Dynamic<>(ops,prefix);
-                    input.forEach((s,e)-> codec.encodeStart(ops,e).result().ifPresent(r->dynamic.set(s,new Dynamic<>(ops,r))));
-                    return DataResult.success(prefix);
-                }
-            };
-        }
+        Codec<Map<String, List<Filter>>> LISTING_CODEC = IOUtil.createListingCodec(IOUtil.createFallbackCodec(LIST_CODEC, CODEC.xmap(f -> new ArrayList<>(Collections.singleton(f)), list -> list.get(0))), "group", "recipes", l -> l.get(0).toString());
 
         ResourceLocation TIPPED_ARROW = FactoryAPI.createVanillaLocation("tipped_arrow");
 
         Map<ResourceLocation, IdOverride> ID_RECIPE_INFO_OVERRIDES = new HashMap<>(Map.of(TIPPED_ARROW, (validRecipes, recipeAdder) -> BuiltInRegistries.POTION.asHolderIdMap().forEach(p -> {
-            if (p.value().getEffects().isEmpty() && !p./*? if <1.20.5 {*//*value().*//*?}*/equals(Potions.WATER)) return;
-            ItemStack potion = LegacyItemUtil.setItemStackPotion(Items.LINGERING_POTION.getDefaultInstance(),p);
-            ItemStack result = LegacyItemUtil.setItemStackPotion(new ItemStack(Items.TIPPED_ARROW,8),p);
+            if (p.value().getEffects().isEmpty() && !p.equals(Potions.WATER)) return;
+            ItemStack potion = LegacyItemUtil.setItemStackPotion(Items.LINGERING_POTION.getDefaultInstance(), p);
+            ItemStack result = LegacyItemUtil.setItemStackPotion(new ItemStack(Items.TIPPED_ARROW, 8), p);
             List<Optional<Ingredient>> ings = new ArrayList<>();
             Optional<Ingredient> arrowOptional = Optional.of(Ingredient.of(Items.ARROW));
             for (int i = 0; i < 8; i++) ings.add(arrowOptional);
             ings.add(4, Optional.of(StackIngredient.of(true, potion)));
             List<Component> description = new ArrayList<>();
-            recipeAdder.accept(RecipeInfo.create(TIPPED_ARROW, null, ings, result, ()-> {
+            recipeAdder.accept(RecipeInfo.create(TIPPED_ARROW, null, ings, result, () -> {
                 description.clear();
                 LegacyItemUtil.addPotionTooltip(p, description, 0.125F/*? if >=1.20.3 {*/, Minecraft.getInstance().level.tickRateManager().tickrate()/*?}*/);
                 return description.get(0);
             }));
         })));
+
+        static Filter parse(String s) {
+            if (s.startsWith("#"))
+                return new ItemTag(TagKey.create(Registries.ITEM, FactoryAPI.createLocation(s.replaceFirst("#", ""))));
+            else if (s.startsWith("result_item/"))
+                return new ItemId(FactoryAPI.createLocation(s.replaceFirst("result_item/", "")));
+            return new Id(FactoryAPI.createLocation(s));
+        }
 
         default <T> void addRecipes(Iterable<RecipeInfo<T>> validRecipes, Consumer<RecipeInfo<T>> recipeAdder) {
             for (RecipeInfo<T> validRecipe : validRecipes) {
@@ -177,41 +161,38 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
             }
         }
 
-        default boolean onlyFirstMatch(){
+        default boolean onlyFirstMatch() {
             return false;
         }
 
         Codec<? extends Filter> codec();
-
-        static Filter parse(String s) {
-            if (s.startsWith("#")) return new ItemTag(TagKey.create(Registries.ITEM, FactoryAPI.createLocation(s.replaceFirst("#", ""))));
-            else if (s.startsWith("result_item/")) return new ItemId(FactoryAPI.createLocation(s.replaceFirst("result_item/", "")));
-            return new Id(FactoryAPI.createLocation(s));
-        }
 
         interface IdOverride<T> {
             void addRecipes(Iterable<RecipeInfo<T>> validRecipes, Consumer<RecipeInfo<T>> recipeAdder);
         }
 
         record BlockTag(TagKey<Block> tag) implements Filter {
-            public static final Codec<BlockTag> CODEC = TagKey.codec(Registries.BLOCK).xmap(BlockTag::new,BlockTag::tag);
+            public static final Codec<BlockTag> CODEC = TagKey.codec(Registries.BLOCK).xmap(BlockTag::new, BlockTag::tag);
+
             @Override
             public boolean test(RecipeInfo<?> h) {
                 return h.getResultItem().getItem() instanceof BlockItem i && i.getBlock().builtInRegistryHolder().is(tag);
             }
 
             @Override
-            public Codec<Filter> codec() {
-                return null;
+            public Codec<BlockTag> codec() {
+                return CODEC;
             }
+
             @Override
             public String toString() {
-                return "#block_tag/"+tag.location();
+                return "#block_tag/" + tag.location();
             }
         }
 
         record ItemTag(TagKey<Item> tag) implements Filter {
-            public static final Codec<ItemTag> CODEC = TagKey.codec(Registries.ITEM).xmap(ItemTag::new,ItemTag::tag);
+            public static final Codec<ItemTag> CODEC = TagKey.codec(Registries.ITEM).xmap(ItemTag::new, ItemTag::tag);
+
             @Override
             public boolean test(RecipeInfo<?> h) {
                 return h.getResultItem().is(tag);
@@ -224,15 +205,16 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
 
             @Override
             public String toString() {
-                return "#"+tag.location();
+                return "#" + tag.location();
             }
         }
 
         record Id(ResourceLocation id) implements Filter {
-            public static final Codec<Id> CODEC = ResourceLocation.CODEC.xmap(Id::new,Id::id);
+            public static final Codec<Id> CODEC = ResourceLocation.CODEC.xmap(Id::new, Id::id);
+
             @Override
             public <T> void addRecipes(Iterable<RecipeInfo<T>> validRecipes, Consumer<RecipeInfo<T>> recipeAdder) {
-                Filter.super.addRecipes(validRecipes,recipeAdder);
+                Filter.super.addRecipes(validRecipes, recipeAdder);
                 IdOverride<T> value = ID_RECIPE_INFO_OVERRIDES.get(id);
                 if (value != null) value.addRecipes(validRecipes, recipeAdder);
             }
@@ -259,12 +241,13 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
         }
 
         record ItemId(ResourceLocation id, boolean onlyFirstMatch) implements Filter {
-            public static final Codec<ItemId> EXTENDED_CODEC = RecordCodecBuilder.create(i->i.group(ResourceLocation.CODEC.fieldOf("id").forGetter(ItemId::id),Codec.BOOL.fieldOf("onlyFirstMatch").forGetter(ItemId::onlyFirstMatch)).apply(i,ItemId::new));
-            public static final Codec<ItemId> CODEC = Codec.either(ResourceLocation.CODEC.xmap(ItemId::new,ItemId::id),EXTENDED_CODEC).xmap(e->e.right().orElseGet(e.left()::get), Either::right);
+            public static final Codec<ItemId> EXTENDED_CODEC = RecordCodecBuilder.create(i -> i.group(ResourceLocation.CODEC.fieldOf("id").forGetter(ItemId::id), Codec.BOOL.fieldOf("onlyFirstMatch").forGetter(ItemId::onlyFirstMatch)).apply(i, ItemId::new));
+            public static final Codec<ItemId> CODEC = IOUtil.createFallbackCodec(EXTENDED_CODEC, ResourceLocation.CODEC.xmap(ItemId::new, ItemId::id));
 
-            public ItemId(ResourceLocation id){
-                this(id,true);
+            public ItemId(ResourceLocation id) {
+                this(id, true);
             }
+
             @Override
             public boolean test(RecipeInfo<?> h) {
                 return BuiltInRegistries.ITEM.getKey(h.getResultItem().getItem()).equals(id);
@@ -277,7 +260,7 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
 
             @Override
             public String toString() {
-                return "result_item/"+id;
+                return "result_item/" + id;
             }
         }
 

@@ -17,8 +17,8 @@ public class BufferSourceWrapper extends MultiBufferSource.BufferSource {
     private RenderType overrideRenderType;
     private Function<VertexConsumer, VertexConsumer> vertexConsumerFunction = Function.identity();
 
-    public BufferSourceWrapper(MultiBufferSource.BufferSource source){
-        super(((BufferSourceAccessor)source).buffer(), ((BufferSourceAccessor)source).fixedBuffers());
+    public BufferSourceWrapper(MultiBufferSource.BufferSource source) {
+        super(((BufferSourceAccessor) source).buffer(), ((BufferSourceAccessor) source).fixedBuffers());
         this.source = source;
     }
 
@@ -27,13 +27,14 @@ public class BufferSourceWrapper extends MultiBufferSource.BufferSource {
             @Override
             public VertexConsumer getBuffer(RenderType renderType) {
                 if (renderType == Sheets.cutoutBlockSheet()) return super.getBuffer(Sheets.translucentItemSheet());
-                else if (renderType.format() == DefaultVertexFormat.NEW_ENTITY && renderType instanceof RenderType.CompositeRenderType r && ((CompositeRenderTypeAccessor)(Object)r).getState().textureState instanceof RenderStateShard.TextureStateShard s && s.texture.isPresent()) return super.getBuffer(RenderType.itemEntityTranslucentCull(s.texture.get()));
+                else if (renderType.format() == DefaultVertexFormat.NEW_ENTITY && renderType instanceof RenderType.CompositeRenderType r && ((CompositeRenderTypeAccessor) (Object) r).getState().textureState instanceof RenderStateShard.TextureStateShard s && s.texture.isPresent())
+                    return super.getBuffer(RenderType.itemEntityTranslucentCull(s.texture.get()));
                 return super.getBuffer(renderType);
             }
         }.setVertexConsumerFunction(consumer -> new VertexConsumerWrapper(consumer).setColorMultiplier(ColorUtil.withAlpha(0xFFFFFF, opacity)));
     }
 
-    public static BufferSourceWrapper of(BufferSource source, RenderType overrideType){
+    public static BufferSourceWrapper of(BufferSource source, RenderType overrideType) {
         BufferSourceWrapper wrapper = new BufferSourceWrapper(source);
         wrapper.setOverrideRenderType(overrideType);
         return wrapper;

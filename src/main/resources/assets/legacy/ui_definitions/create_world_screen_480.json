@@ -1,0 +1,22 @@
+{
+  "targetUI": "create_world_screen",
+  "applyCondition": { "reference": "uiMode.sd" },
+  "elements": {
+    "panel.width": 180,
+    "panel.height": 184,
+    "layout.width": 162,
+    "layout.x": "${panel.x}+9",
+    "nameEditBox.y": "${panel.y}+14",
+    "nameEditBox.height": 16,
+    "gameTypeSlider.y": "${panel.y}+34",
+    "difficultySlider.y": "${panel.y}+55",
+    "resourceAlbumSelector.y": "${panel.y}+79",
+    "onlineTickBox.y": "${panel.y}+127",
+    "moreOptionsButton.y": "${panel.y}+138",
+    "moreOptionsButton.height": 18,
+    "createButton.y": "${panel.y}+158",
+    "createButton.height": 18,
+    "nameLabel.x": "${layout.x}+1",
+    "nameLabel.y": "${panel.y}+8"
+  }
+}

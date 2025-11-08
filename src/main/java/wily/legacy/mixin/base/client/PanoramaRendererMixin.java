@@ -14,7 +14,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 public class PanoramaRendererMixin {
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, boolean bl, CallbackInfo ci) {
-        if (LegacyOptions.legacyPanorama.get()){
+        if (LegacyOptions.legacyPanorama.get()) {
             LegacyRenderUtil.renderLegacyPanorama(guiGraphics);
             ci.cancel();
         }

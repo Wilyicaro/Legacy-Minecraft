@@ -29,8 +29,6 @@ import java.util.function.Function;
 @Mixin(MerchantOffer.class)
 public abstract class MerchantOfferMixin implements LegacyMerchantOffer {
 
-    @Shadow public abstract ItemStack getResult();
-
     private int requiredLevel;
 
     //? if <1.20.5 {
@@ -45,17 +43,18 @@ public abstract class MerchantOfferMixin implements LegacyMerchantOffer {
     }
     *///?} else {
     @Redirect(method = "<clinit>", at = @At(value = "INVOKE", target = "Lcom/mojang/serialization/codecs/RecordCodecBuilder;create(Ljava/util/function/Function;)Lcom/mojang/serialization/Codec;", remap = false))
-    private static Codec<MerchantOffer> init(Function<RecordCodecBuilder.Instance<MerchantOffer>, ? extends App<RecordCodecBuilder.Mu<MerchantOffer>,MerchantOffer>> builder){
-        return RecordCodecBuilder.create(instance -> instance.group(ItemCost.CODEC.fieldOf("buy").forGetter(MerchantOffer::getItemCostA), ItemCost.CODEC.lenientOptionalFieldOf("buyB").forGetter(MerchantOffer::getItemCostB), ItemStack.CODEC.fieldOf("sell").forGetter(MerchantOffer::getResult), Codec.INT.lenientOptionalFieldOf("uses", 0).forGetter(MerchantOffer::getUses), Codec.INT.lenientOptionalFieldOf("maxUses", 4).forGetter(MerchantOffer::getMaxUses), Codec.BOOL.lenientOptionalFieldOf("rewardExp", true).forGetter(MerchantOffer::shouldRewardExp), Codec.INT.lenientOptionalFieldOf("specialPrice", 0).forGetter(MerchantOffer::getSpecialPriceDiff), Codec.INT.lenientOptionalFieldOf("demand", 0).forGetter(MerchantOffer::getDemand), Codec.FLOAT.lenientOptionalFieldOf("priceMultiplier", 0.0f).forGetter(MerchantOffer::getPriceMultiplier), Codec.INT.lenientOptionalFieldOf("xp", 1).forGetter(MerchantOffer::getXp),Codec.INT.lenientOptionalFieldOf("requiredLevel", 0).forGetter(o->((LegacyMerchantOffer)o).getRequiredLevel())).apply(instance, (a, b, c, d, e, f, g, h, i, j, k)-> {
-            MerchantOffer offer = new MerchantOffer(a,b,c,d,e,j,i,h);
-            ((LegacyMerchantOffer)offer).setRequiredLevel(k);
+    private static Codec<MerchantOffer> init(Function<RecordCodecBuilder.Instance<MerchantOffer>, ? extends App<RecordCodecBuilder.Mu<MerchantOffer>, MerchantOffer>> builder) {
+        return RecordCodecBuilder.create(instance -> instance.group(ItemCost.CODEC.fieldOf("buy").forGetter(MerchantOffer::getItemCostA), ItemCost.CODEC.lenientOptionalFieldOf("buyB").forGetter(MerchantOffer::getItemCostB), ItemStack.CODEC.fieldOf("sell").forGetter(MerchantOffer::getResult), Codec.INT.lenientOptionalFieldOf("uses", 0).forGetter(MerchantOffer::getUses), Codec.INT.lenientOptionalFieldOf("maxUses", 4).forGetter(MerchantOffer::getMaxUses), Codec.BOOL.lenientOptionalFieldOf("rewardExp", true).forGetter(MerchantOffer::shouldRewardExp), Codec.INT.lenientOptionalFieldOf("specialPrice", 0).forGetter(MerchantOffer::getSpecialPriceDiff), Codec.INT.lenientOptionalFieldOf("demand", 0).forGetter(MerchantOffer::getDemand), Codec.FLOAT.lenientOptionalFieldOf("priceMultiplier", 0.0f).forGetter(MerchantOffer::getPriceMultiplier), Codec.INT.lenientOptionalFieldOf("xp", 1).forGetter(MerchantOffer::getXp), Codec.INT.lenientOptionalFieldOf("requiredLevel", 0).forGetter(o -> ((LegacyMerchantOffer) o).getRequiredLevel())).apply(instance, (a, b, c, d, e, f, g, h, i, j, k) -> {
+            MerchantOffer offer = new MerchantOffer(a, b, c, d, e, j, i, h);
+            ((LegacyMerchantOffer) offer).setRequiredLevel(k);
             offer.rewardExp = f;
             offer.setSpecialPriceDiff(g);
             return offer;
         }));
     }
+
     @Inject(method = "createFromStream", at = @At("RETURN"))
-    private static void createFromStream(RegistryFriendlyByteBuf registryFriendlyByteBuf, CallbackInfoReturnable<MerchantOffer> cir){
+    private static void createFromStream(RegistryFriendlyByteBuf registryFriendlyByteBuf, CallbackInfoReturnable<MerchantOffer> cir) {
         MerchantOffer offer = cir.getReturnValue();
         int level = 0;
         CustomData data = offer.getResult().get(DataComponents.CUSTOM_DATA);
@@ -65,33 +64,39 @@ public abstract class MerchantOfferMixin implements LegacyMerchantOffer {
             if (requiredLevel.isPresent()) {
                 level = requiredLevel.get();
                 copy.remove("requiredLevel");
-                if (copy.isEmpty()) offer.getResult().set(DataComponents.CUSTOM_DATA,null);
+                if (copy.isEmpty()) offer.getResult().set(DataComponents.CUSTOM_DATA, null);
             }
         }
-        ((LegacyMerchantOffer)offer).setRequiredLevel(level);
+        ((LegacyMerchantOffer) offer).setRequiredLevel(level);
     }
+
     @Redirect(method = "writeToStream", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/codec/StreamCodec;encode(Ljava/lang/Object;Ljava/lang/Object;)V", ordinal = 1/*? if forge || neoforge {*//*, remap = false*//*?}*/))
-    private static void writeFromStream(StreamCodec<RegistryFriendlyByteBuf,ItemStack> instance, Object b, Object i,RegistryFriendlyByteBuf buf, MerchantOffer offer){
+    private static void writeFromStream(StreamCodec<RegistryFriendlyByteBuf, ItemStack> instance, Object b, Object i, RegistryFriendlyByteBuf buf, MerchantOffer offer) {
         ItemStack result = offer.getResult().copy();
         CompoundTag customData = result.has(DataComponents.CUSTOM_DATA) ? result.get(DataComponents.CUSTOM_DATA).copyTag() : new CompoundTag();
-        customData.putInt("requiredLevel",((LegacyMerchantOffer)offer).getRequiredLevel());
-        result.set(DataComponents.CUSTOM_DATA,CustomData.of(customData));
+        customData.putInt("requiredLevel", ((LegacyMerchantOffer) offer).getRequiredLevel());
+        result.set(DataComponents.CUSTOM_DATA, CustomData.of(customData));
         instance.encode(buf, result);
     }
+
+    @Shadow
+    public abstract ItemStack getResult();
+
     //?}
     //? if >1.20.1 {
     @Inject(method = "copy", at = @At("RETURN"))
-    private void copy(CallbackInfoReturnable<MerchantOffer> cir){
-       ((LegacyMerchantOffer) cir.getReturnValue()).setRequiredLevel(requiredLevel);
-    }
-    //?}
-    @Override
-    public void setRequiredLevel(int requiredLevel) {
-        this.requiredLevel = requiredLevel;
+    private void copy(CallbackInfoReturnable<MerchantOffer> cir) {
+        ((LegacyMerchantOffer) cir.getReturnValue()).setRequiredLevel(requiredLevel);
     }
 
     @Override
     public int getRequiredLevel() {
         return requiredLevel;
+    }
+
+    //?}
+    @Override
+    public void setRequiredLevel(int requiredLevel) {
+        this.requiredLevel = requiredLevel;
     }
 }

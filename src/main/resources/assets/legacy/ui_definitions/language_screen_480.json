@@ -1,0 +1,19 @@
+{
+  "targetUI": "wily.legacy.client.screen.LegacyLanguageScreen",
+  "targetType": "class",
+  "applyCondition": { "reference": "uiMode.sd" },
+  "elements": {
+    "panel.y": {
+      "type": "put_number",
+      "value": "(${height}-${panel.height})/2+8"
+    },
+    "panel.height": {
+      "type": "put_number",
+      "value": 170
+    },
+    "panelRecess.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/square_recessed_panel"
+    }
+  }
+}

@@ -37,23 +37,56 @@ import java.util.stream.Collectors;
 
 
 public class SDLControllerHandler implements Controller.Handler {
+    public static final String SDL_VERSION = SdlVersionConst.SDL_MAJOR_VERSION + "." + SdlVersionConst.SDL_MINOR_VERSION + "." + SdlVersionConst.SDL_MICRO_VERSION + "." + SdlVersionConst.SDL_COMMIT;
+    public static final String nativesMainURLFormat = "https://maven.isxander.dev/releases/dev/isxander/libsdl4j-natives/%s/%s";
+    public static final Component TITLE = Component.literal("SDL3 (isXander's libsdl4j)");
+    private static final SDLControllerHandler INSTANCE = new SDLControllerHandler();
+    public NativesStatus natives;
     private SDL_JoystickID[] actualIds = new SDL_JoystickID[0];
     private boolean init = false;
 
-    private static final SDLControllerHandler INSTANCE = new SDLControllerHandler();
-    public static final String SDL_VERSION = SdlVersionConst.SDL_MAJOR_VERSION + "." + SdlVersionConst.SDL_MINOR_VERSION+ "." + SdlVersionConst.SDL_MICRO_VERSION + "." + SdlVersionConst.SDL_COMMIT;
+    public static SDLControllerHandler getInstance() {
+        return INSTANCE;
+    }
 
-    public static final String nativesMainURLFormat = "https://maven.isxander.dev/releases/dev/isxander/libsdl4j-natives/%s/%s";
-    public NativesStatus natives;
+    public static URI getNativesURI() throws URISyntaxException {
+        return new URI(nativesMainURLFormat.formatted(SDL_VERSION, getNativesFileName()));
+    }
 
-    public static final Component TITLE = Component.literal("SDL3 (isXander's libsdl4j)");
+    public static NativesStatus getNativesStatus(Minecraft minecraft) {
+        String fileName = getNativesFileName();
+        boolean pojav = false;
+
+        if (System.getenv("POJAV_NATIVEDIR") != null) {
+            Legacy4J.LOGGER.warn("Pojav-based Launcher Detected.");
+            pojav = true;
+        }
+
+        return new NativesStatus(fileName == null ? null : new File(minecraft.gameDirectory, "natives/" + fileName), pojav);
+    }
+
+    public static String getNativesFileName() {
+        try {
+            Class.forName("com.sun.jna.Native");
+        } catch (ClassNotFoundException e) {
+            Legacy4J.LOGGER.warn("JNA wasn't found.");
+            return null;
+        }
+        String arch = System.getProperty("os.arch");
+        String base = switch (Util.getPlatform()) {
+            case WINDOWS ->
+                    arch.contains("64") ? "libsdl4j-natives-%s-windows-x86_64.dll" : "libsdl4j-natives-%s-windows-x86.dll";
+            case OSX -> "libsdl4j-natives-%s-macos-universal.dylib";
+            case LINUX ->
+                    arch.contains("aarch") || arch.contains("arm") ? "libsdl4j-natives-%s-linux-aarch64.so" : "libsdl4j-natives-%s-linux-x86_64.so";
+            default -> null;
+        };
+        return base != null ? base.formatted(SDL_VERSION) : null;
+    }
+
     @Override
     public Component getName() {
         return TITLE;
-    }
-
-    public static SDLControllerHandler getInstance() {
-        return INSTANCE;
     }
 
     public void fallback() {
@@ -101,7 +134,7 @@ public class SDLControllerHandler implements Controller.Handler {
 
     public void openNativesScreen(Minecraft minecraft) {
         Screen s = minecraft.screen;
-        minecraft.setScreen(new ConfirmationScreen(s, Component.translatable("legacy.menu.download_natives",getName()), Controller.Handler.DOWNLOAD_MESSAGE, b -> {
+        minecraft.setScreen(new ConfirmationScreen(s, Component.translatable("legacy.menu.download_natives", getName()), Controller.Handler.DOWNLOAD_MESSAGE, b -> {
             Stocker<Long> fileSize = new Stocker<>(1L);
             ExecutorService executor = Executors.newSingleThreadExecutor();
             LegacyLoadingScreen screen = new LegacyLoadingScreen(Controller.Handler.DOWNLOADING_NATIVES, CommonComponents.EMPTY) {
@@ -113,7 +146,7 @@ public class SDLControllerHandler implements Controller.Handler {
                         onClose();
                         return;
                     }
-                    setProgress(natives.file().exists() ? Math.round(Math.min(1,FileUtils.sizeOf(natives.file()) / (float) fileSize.get()) * 80) : 0);
+                    setProgress(natives.file().exists() ? Math.min(1, FileUtils.sizeOf(natives.file()) / (float) fileSize.get()) : 0);
                     super.tick();
                 }
 
@@ -129,12 +162,12 @@ public class SDLControllerHandler implements Controller.Handler {
                 }
             };
             minecraft.setScreen(screen);
-            CompletableFuture.runAsync(()->{
+            CompletableFuture.runAsync(() -> {
                 try {
                     fileSize.set(getNativesURI().toURL().openConnection().getContentLengthLong());
                     FileUtils.copyURLToFile(getNativesURI().toURL(), natives.file());
                     screen.setLoadingHeader(Controller.Handler.LOADING_NATIVES);
-                    screen.setProgress(100);
+                    screen.setProgress(1);
                     init = false;
                 } catch (IOException | URISyntaxException e) {
                     throw new RuntimeException(e);
@@ -147,39 +180,6 @@ public class SDLControllerHandler implements Controller.Handler {
                 init = false;
             }
         });
-    }
-
-    public static URI getNativesURI() throws URISyntaxException {
-        return new URI(nativesMainURLFormat.formatted(SDL_VERSION, getNativesFileName()));
-    }
-
-    public static NativesStatus getNativesStatus(Minecraft minecraft) {
-        String fileName = getNativesFileName();
-        boolean pojav = false;
-
-        if (System.getenv("POJAV_NATIVEDIR") != null){
-            Legacy4J.LOGGER.warn("Pojav-based Launcher Detected.");
-            pojav = true;
-        }
-
-        return new NativesStatus(fileName == null ? null : new File(minecraft.gameDirectory, "natives/" + fileName), pojav);
-    }
-
-    public static String getNativesFileName(){
-        try {
-            Class.forName("com.sun.jna.Native");
-        } catch (ClassNotFoundException e) {
-            Legacy4J.LOGGER.warn("JNA wasn't found.");
-            return null;
-        }
-        String arch = System.getProperty("os.arch");
-        String base = switch (Util.getPlatform()){
-            case WINDOWS -> arch.contains("64") ? "libsdl4j-natives-%s-windows-x86_64.dll" : "libsdl4j-natives-%s-windows-x86.dll";
-            case OSX -> "libsdl4j-natives-%s-macos-universal.dylib";
-            case LINUX -> arch.contains("aarch") || arch.contains("arm") ? "libsdl4j-natives-%s-linux-aarch64.so" : "libsdl4j-natives-%s-linux-x86_64.so";
-            default -> null;
-        };
-        return base != null ? base.formatted(SDL_VERSION) : null;
     }
 
     @Override
@@ -197,6 +197,7 @@ public class SDLControllerHandler implements Controller.Handler {
         SDL_Gamepad controller = SdlGamepad.SDL_OpenGamepad(actualIds[jid]);
         return new Controller() {
             String name;
+
             @Override
             public String getName() {
                 if (name == null) name = SdlGamepad.SDL_GetGamepadName(controller);
@@ -207,24 +208,26 @@ public class SDLControllerHandler implements Controller.Handler {
             public ControlType getType() {
                 int type = SdlGamepad.SDL_GetGamepadType(controller);
                 return switch (type) {
-                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_PS3 -> ControlType.PS3;
-                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_PS4 -> ControlType.PS4;
-                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_PS5 -> ControlType.PS5;
-                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_XBOX360 -> ControlType.x360;
-                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_XBOXONE -> ControlType.xONE;
-                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_PRO,SDL_GamepadType.SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_PAIR -> ControlType.SWITCH;
-                    default -> ControlType.STEAM;
+                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_PS3 -> ControlType.get(ControlType.PS3);
+                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_PS4 -> ControlType.get(ControlType.PS4);
+                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_PS5 -> ControlType.get(ControlType.PS5);
+                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_XBOX360 -> ControlType.get(ControlType.x360);
+                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_XBOXONE -> ControlType.get(ControlType.xONE);
+                    case SDL_GamepadType.SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_PRO,
+                         SDL_GamepadType.SDL_GAMEPAD_TYPE_NINTENDO_SWITCH_JOYCON_PAIR ->
+                            ControlType.get(ControlType.SWITCH);
+                    default -> ControlType.get(ControlType.STEAM);
                 };
             }
 
             @Override
             public boolean buttonPressed(int i) {
-                return SdlGamepad.SDL_GetGamepadButton(controller,i);
+                return SdlGamepad.SDL_GetGamepadButton(controller, i);
             }
 
             @Override
             public float axisValue(int i) {
-                return SdlGamepad.SDL_GetGamepadAxis(controller,i) / (float) Short.MAX_VALUE;
+                return SdlGamepad.SDL_GetGamepadAxis(controller, i) / (float) Short.MAX_VALUE;
             }
 
             @Override
@@ -234,16 +237,17 @@ public class SDLControllerHandler implements Controller.Handler {
 
             @Override
             public void setLED(byte r, byte g, byte b) {
-                SdlGamepad.SDL_SetGamepadLED(controller,r,g,b);
+                SdlGamepad.SDL_SetGamepadLED(controller, r, g, b);
             }
 
             @Override
             public void rumble(char low_frequency_rumble, char high_frequency_rumble, int duration_ms) {
-                SdlGamepad.SDL_RumbleGamepad(controller,low_frequency_rumble,high_frequency_rumble,duration_ms);
+                SdlGamepad.SDL_RumbleGamepad(controller, low_frequency_rumble, high_frequency_rumble, duration_ms);
             }
+
             @Override
             public void rumbleTriggers(char left_rumble, char right_rumble, int duration_ms) {
-                SdlGamepad.SDL_RumbleGamepadTriggers(controller,left_rumble,right_rumble,duration_ms);
+                SdlGamepad.SDL_RumbleGamepadTriggers(controller, left_rumble, right_rumble, duration_ms);
             }
 
             @Override
@@ -253,12 +257,12 @@ public class SDLControllerHandler implements Controller.Handler {
 
             @Override
             public int getTouchpadFingersCount(int touchpad) {
-                return SdlGamepad.SDL_GetNumGamepadTouchpadFingers(controller,touchpad);
+                return SdlGamepad.SDL_GetNumGamepadTouchpadFingers(controller, touchpad);
             }
 
             @Override
             public boolean hasFingerInTouchpad(int touchpad, int finger, Byte state, Float x, Float y, Float pressure) {
-                return SdlGamepad.SDL_GetGamepadTouchpadFinger(controller,touchpad,finger,state == null ? null : new ByteByReference(state),x == null ? null : new FloatByReference(x),y == null ? null : new FloatByReference(y),pressure == null ? null : new FloatByReference(pressure));
+                return SdlGamepad.SDL_GetGamepadTouchpadFinger(controller, touchpad, finger, state == null ? null : new ByteByReference(state), x == null ? null : new FloatByReference(x), y == null ? null : new FloatByReference(y), pressure == null ? null : new FloatByReference(pressure));
             }
 
             @Override
@@ -295,14 +299,14 @@ public class SDLControllerHandler implements Controller.Handler {
     @Override
     public int getButtonIndex(ControllerBinding.Button button) {
         return switch (button) {
-            case DOWN-> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_SOUTH;
+            case DOWN -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_SOUTH;
             case RIGHT -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_EAST;
-            case LEFT-> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_WEST;
+            case LEFT -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_WEST;
             case UP -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_NORTH;
             case BACK -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_BACK;
             case GUIDE -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_GUIDE;
             case START -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_START;
-            case LEFT_STICK-> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_LEFT_STICK;
+            case LEFT_STICK -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_LEFT_STICK;
             case RIGHT_STICK -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_RIGHT_STICK;
             case LEFT_BUMPER -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_LEFT_SHOULDER;
             case RIGHT_BUMPER -> SDL_GamepadButton.SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER;

@@ -1,9 +1,11 @@
 package wily.legacy.mixin.base.client;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
 //? if >=1.21.2 {
 import net.minecraft.client.renderer.SkyRenderer;
 //?}
+import net.minecraft.server.packs.resources.ResourceManager;
 import org.spongepowered.asm.mixin.*;
 import wily.legacy.client.LevelRendererAccessor;
 
@@ -44,12 +46,22 @@ public abstract class LevelRendererMixin implements LevelRendererAccessor {
 
     *///?} else {
 
-    @Shadow @Final @Mutable
+    @Shadow
+    @Final
+    @Mutable
     private SkyRenderer skyRenderer;
+    @Shadow
+    @Final
+    private Minecraft minecraft;
+
+    @Shadow
+    public abstract void onResourceManagerReload(ResourceManager resourceManager);
+
     @Override
     public void updateSkyBuffers() {
         skyRenderer.close();
         this.skyRenderer = new SkyRenderer();
+        onResourceManagerReload(minecraft.getResourceManager());
     }
     //?}
 

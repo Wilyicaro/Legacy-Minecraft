@@ -5,7 +5,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.renderer.entity.DrownedRenderer;
 //? if >=1.21.2 {
 import net.minecraft.client.renderer.entity.state.ZombieRenderState;
- //?}
+        //?}
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.monster.Drowned;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +22,7 @@ public class DrownedRendererMixin {
         ci.cancel();
         float j = /*? if <1.21.2 {*//*drowned.getSwimAmount(h)*//*?} else {*/renderState.swimAmount/*?}*/;
         if (j <= 0) return;
-        float k = /*? if <1.21.2 {*//*drowned.getViewXRot(h)*//*?} else {*/renderState.xRot/*?}*/;;
+        float k = /*? if <1.21.2 {*//*drowned.getViewXRot(h)*//*?} else {*/renderState.xRot/*?}*/;
         float l = /*? if <1.21.2 {*//*drowned.isInWater()*//*?} else {*/renderState.isInWater/*?}*/ ? -90.0F - k : -90.0F;
         float m = Mth.lerp(j, 0.0F, l);
         poseStack.mulPose(Axis.XP.rotationDegrees(m));

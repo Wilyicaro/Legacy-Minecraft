@@ -16,34 +16,38 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public record ServerMenuCraftPayload(Optional<ResourceLocation> craftId, List<Optional<Ingredient>> customIngredients, int button, boolean max) implements CommonNetwork.Payload {
+public record ServerMenuCraftPayload(Optional<ResourceLocation> craftId, List<Optional<Ingredient>> customIngredients,
+                                     int button, boolean max) implements CommonNetwork.Payload {
     public static final CommonNetwork.Identifier<ServerMenuCraftPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("server_menu_craft"), ServerMenuCraftPayload::new);
 
-    public ServerMenuCraftPayload(CommonNetwork.PlayBuf buf){
-        this(buf.get().readOptional(FriendlyByteBuf::readResourceLocation), buf.get().readList(b-> buf.get().readOptional(b1->FactoryIngredient.decode(buf).toIngredient())),buf.get().readVarInt(), buf.get().readBoolean());
+    public ServerMenuCraftPayload(CommonNetwork.PlayBuf buf) {
+        this(buf.get().readOptional(FriendlyByteBuf::readResourceLocation), buf.get().readList(b -> buf.get().readOptional(b1 -> FactoryIngredient.decode(buf).toIngredient())), buf.get().readVarInt(), buf.get().readBoolean());
     }
 
-    public ServerMenuCraftPayload(List<Optional<Ingredient>> ingredients, int button, boolean max){
-        this(Optional.empty(),ingredients,button, max);
+    public ServerMenuCraftPayload(List<Optional<Ingredient>> ingredients, int button, boolean max) {
+        this(Optional.empty(), ingredients, button, max);
     }
-    public ServerMenuCraftPayload(RecipeInfo<?> rcp, int button, boolean max){
-        this(Optional.of(rcp.getId()),rcp.isOverride() ? rcp.getOptionalIngredients() : Collections.emptyList(),button, max);
+
+    public ServerMenuCraftPayload(RecipeInfo<?> rcp, int button, boolean max) {
+        this(Optional.of(rcp.getId()), rcp.isOverride() ? rcp.getOptionalIngredients() : Collections.emptyList(), button, max);
     }
-    public ServerMenuCraftPayload(RecipeInfo<?> rcp, boolean max){
-        this(rcp,-1,max);
+
+    public ServerMenuCraftPayload(RecipeInfo<?> rcp, boolean max) {
+        this(rcp, -1, max);
     }
 
     @Override
     public void encode(CommonNetwork.PlayBuf buf) {
-        buf.get().writeOptional(craftId,FriendlyByteBuf::writeResourceLocation);
-        buf.get().writeCollection(customIngredients,(r, o)->r.writeOptional(o, (b,i)-> FactoryIngredient.encode(buf, FactoryIngredient.of(i))));
+        buf.get().writeOptional(craftId, FriendlyByteBuf::writeResourceLocation);
+        buf.get().writeCollection(customIngredients, (r, o) -> r.writeOptional(o, (b, i) -> FactoryIngredient.encode(buf, FactoryIngredient.of(i))));
         buf.get().writeVarInt(button);
         buf.get().writeBoolean(max);
     }
 
     @Override
     public void apply(Context context) {
-        if (context.player() instanceof ServerPlayer sp && sp.containerMenu instanceof RecipeMenu m) context.executor().execute(()-> m.tryCraft(sp,this));
+        if (context.player() instanceof ServerPlayer sp && sp.containerMenu instanceof RecipeMenu m)
+            context.executor().execute(() -> m.tryCraft(sp, this));
     }
 
     @Override

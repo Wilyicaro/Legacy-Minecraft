@@ -20,9 +20,13 @@ import wily.legacy.util.client.LegacyRenderUtil;
 
 @Mixin(GhostSlots.class)
 public class GhostSlotsMixin {
-    @Shadow @Final private Reference2ObjectMap<Slot, GhostSlots.GhostSlot> ingredients;
+    @Shadow
+    @Final
+    private Reference2ObjectMap<Slot, GhostSlots.GhostSlot> ingredients;
 
-    @Shadow @Final private SlotSelectTime slotSelectTime;
+    @Shadow
+    @Final
+    private SlotSelectTime slotSelectTime;
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, Minecraft minecraft, boolean bl, CallbackInfo ci) {

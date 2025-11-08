@@ -33,11 +33,12 @@ import java.util.function.Function;
 public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMenuAccess<AbstractContainerMenu> {
     public static final Container layerSelectionGrid = new SimpleContainer(50);
     public final List<ItemStack> layerItems = new ArrayList<>();
+    public final List<LegacySlotWidget> slotWidgets = new ArrayList<>();
     protected final Stocker.Sizeable scrolledList = new Stocker.Sizeable(0);
 
     protected final AbstractContainerMenu menu;
+    protected final LegacyScroller scroller = LegacyScroller.create(135, () -> scrolledList);
     protected Slot hoveredSlot = null;
-    protected final LegacyScroller scroller = LegacyScroller.create(135, ()->scrolledList);
 
     public ItemViewerScreen(Screen parent, Function<Screen, Panel> panelConstructor, Component component) {
         super(parent, panelConstructor, component);
@@ -64,21 +65,23 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
                 }
             }));
         }
+        for (Slot slot : menu.slots) {
+            slotWidgets.add(new LegacySlotWidget(slot));
+        }
         addLayerItems();
         scrolledList.max = Math.max(0, (layerItems.size() - 1) / layerSelectionGrid.getContainerSize());
     }
 
     protected void addLayerItems() {
-        BuiltInRegistries.ITEM.forEach(i-> {
+        BuiltInRegistries.ITEM.forEach(i -> {
             if (i != Items.AIR) layerItems.add(i.getDefaultInstance());
         });
     }
 
     @Override
     public void addControlTooltips(ControlTooltip.Renderer renderer) {
-        ControlTooltip.setupDefaultScreen(renderer, this).add(()-> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_W) : ControllerBinding.RIGHT_TRIGGER.getIcon(),()->getHoveredSlot() != null && getHoveredSlot().hasItem() && LegacyTipManager.hasTip(getHoveredSlot().getItem()) ? LegacyComponents.WHATS_THIS : null);
+        ControlTooltip.setupDefaultScreen(renderer, this).add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_W) : ControllerBinding.RIGHT_TRIGGER.getIcon(), () -> getHoveredSlot() != null && getHoveredSlot().hasItem() && LegacyTipManager.hasTip(getHoveredSlot().getItem()) ? LegacyComponents.WHATS_THIS : null);
     }
-
 
     @Override
     protected void init() {
@@ -86,6 +89,9 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
         scroller.setPosition(panel.x + 299, panel.y + 23);
         scroller.offset(new Vec3(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.0f : 0.5f, 0, 0));
         fillLayerGrid();
+        for (LegacySlotWidget slotWidget : slotWidgets) {
+            addWidget(slotWidget);
+        }
     }
 
     public void fillLayerGrid() {
@@ -103,7 +109,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean bl) {
-        if (scroller.mouseClicked(event)) fillLayerGrid();;
+        if (scroller.mouseClicked(event)) fillLayerGrid();
         if (hoveredSlot != null) slotClicked(hoveredSlot);
         return super.mouseClicked(event, bl);
     }
@@ -117,7 +123,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     @Override
     public boolean keyPressed(KeyEvent keyEvent) {
         if (keyEvent.key() == InputConstants.KEY_W && hoveredSlot != null && hoveredSlot.hasItem() && LegacyTipManager.setTip(LegacyTipManager.getTip(hoveredSlot.getItem().copy()))) {
-            LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(),1.0f);
+            LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
             return true;
         }
         return super.keyPressed(keyEvent);
@@ -128,26 +134,21 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
 
     @Override
     public boolean mouseDragged(MouseButtonEvent event, double f, double g) {
-        if (scroller.mouseDragged(event.y())) fillLayerGrid();;
+        if (scroller.mouseDragged(event.y())) fillLayerGrid();
         return super.mouseDragged(event, f, g);
-    }
-
-    public void setHoveredSlot(Slot hoveredSlot) {
-        this.hoveredSlot = hoveredSlot;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
         setHoveredSlot(null);
-        menu.slots.forEach(s -> {
-            LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBoundsWithItem(panel.x, panel.y, s);
-            holder.render(guiGraphics, i, j, f);
-            if (holder.isHovered) {
-                if (s.isHighlightable()) holder.renderHighlight(guiGraphics);
-                setHoveredSlot(s);
-            }
-        });
+        for (LegacySlotWidget slotWidget : slotWidgets) {
+            slotWidget.isHovered = LegacyRenderUtil.isHovering(slotWidget.slot, panel.x, panel.y, i, j);
+            if (slotWidget.isHovered)
+                setHoveredSlot(slotWidget.slot);
+            slotWidget.slotBoundsWithItem(panel.x, panel.y, slotWidget.slot);
+            slotWidget.render(guiGraphics, i, j, f);
+        }
         if (hoveredSlot != null && !hoveredSlot.getItem().isEmpty())
             guiGraphics.setTooltipForNextFrame(font, hoveredSlot.getItem(), i, j);
     }
@@ -156,7 +157,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
         panel.render(guiGraphics, i, j, f);
-        renderScroll(guiGraphics,i,j,f);
+        renderScroll(guiGraphics, i, j, f);
     }
 
     protected void renderScroll(GuiGraphics guiGraphics, int i, int j, float f) {
@@ -174,6 +175,11 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     }
 
     @Override
+    public ScreenRectangle getMenuRectangleLimit() {
+        return new ScreenRectangle(panel.x + 23, panel.y + 24, 10 * 27 - 2, 5 * 27 - 2);
+    }
+
+    @Override
     public boolean isOutsideClick(int i) {
         return false;
     }
@@ -183,8 +189,17 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
         return hoveredSlot;
     }
 
+    public void setHoveredSlot(Slot hoveredSlot) {
+        this.hoveredSlot = hoveredSlot;
+    }
+
     @Override
     public int getTipXDiff() {
         return 0;
+    }
+
+    @Override
+    public boolean disableCursorOnWidgets() {
+        return true;
     }
 }

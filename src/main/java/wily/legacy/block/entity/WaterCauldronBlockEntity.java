@@ -31,9 +31,11 @@ public class WaterCauldronBlockEntity extends BlockEntity {
     public Holder<Potion> potion = getDefaultPotion();
     public Holder<Item> lastPotionItemUsed = Items.POTION.builtInRegistryHolder();
     public Integer waterColor;
+
     public WaterCauldronBlockEntity(BlockPos blockPos, BlockState blockState) {
-        super(LegacyRegistries.WATER_CAULDRON_BLOCK_ENTITY.get(),blockPos, blockState);
+        super(LegacyRegistries.WATER_CAULDRON_BLOCK_ENTITY.get(), blockPos, blockState);
     }
+
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
         TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, provider);
@@ -44,18 +46,18 @@ public class WaterCauldronBlockEntity extends BlockEntity {
     @Override
     public void setChanged() {
         super.setChanged();
-        if (level.isClientSide()){
-            level.sendBlockUpdated(getBlockPos(),getBlockState(),getBlockState(),2);
-        }else if (level instanceof ServerLevel l){
+        if (level.isClientSide()) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 2);
+        } else if (level instanceof ServerLevel l) {
             l.getChunkSource().blockChanged(getBlockPos());
         }
     }
 
-    public void convertToColored(){
+    public void convertToColored() {
         convertTo(LegacyRegistries.COLORED_WATER_CAULDRON.get());
     }
 
-    public void convertTo(LayeredCauldronBlock block){
+    public void convertTo(LayeredCauldronBlock block) {
         if (getBlockState().is(block)) return;
         BlockState coloredBlockState = block.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, getBlockState().getValue(LayeredCauldronBlock.LEVEL));
         level.setBlock(getBlockPos(), coloredBlockState, 3);
@@ -63,18 +65,18 @@ public class WaterCauldronBlockEntity extends BlockEntity {
         level.setBlockEntity(this);
     }
 
-    public void setWaterColor(Integer waterColor){
-        if (waterColor == null){
+    public void setWaterColor(Integer waterColor) {
+        if (waterColor == null) {
             convertTo((LayeredCauldronBlock) Blocks.WATER_CAULDRON);
         } else convertToColored();
         this.waterColor = waterColor;
     }
 
-    public Holder<Potion> getDefaultPotion(){
+    public Holder<Potion> getDefaultPotion() {
         return Potions.WATER;
     }
 
-    public boolean hasWater(){
+    public boolean hasWater() {
         return potion.value().equals(Potions.WATER.value());
     }
 
@@ -85,9 +87,9 @@ public class WaterCauldronBlockEntity extends BlockEntity {
     @Override
     public void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        input.getInt("dyeColor").ifPresent(i-> waterColor = i);
+        input.getInt("dyeColor").ifPresent(i -> waterColor = i);
         input.getString("potion").flatMap(id -> BuiltInRegistries.POTION.get(ResourceKey.create(Registries.POTION, ResourceLocation.tryParse(id)))).ifPresent(p -> potion = p);
-        input.getString("lastPotionItemUsed").flatMap(id ->BuiltInRegistries.ITEM.get(ResourceKey.create(Registries.ITEM, ResourceLocation.tryParse(id)))).ifPresent(p-> lastPotionItemUsed = p);
+        input.getString("lastPotionItemUsed").flatMap(id -> BuiltInRegistries.ITEM.get(ResourceKey.create(Registries.ITEM, ResourceLocation.tryParse(id)))).ifPresent(p -> lastPotionItemUsed = p);
     }
 
     @Override
@@ -97,7 +99,7 @@ public class WaterCauldronBlockEntity extends BlockEntity {
             output.putInt("dyeColor", waterColor);
             convertToColored();
         }
-        potion.unwrapKey().ifPresent(r-> output.putString("potion",r.location().toString()));
-        lastPotionItemUsed.unwrapKey().ifPresent(r-> output.putString("lastPotionItemUsed",r.location().toString()));
+        potion.unwrapKey().ifPresent(r -> output.putString("potion", r.location().toString()));
+        lastPotionItemUsed.unwrapKey().ifPresent(r -> output.putString("lastPotionItemUsed", r.location().toString()));
     }
 }

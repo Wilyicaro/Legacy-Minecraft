@@ -21,7 +21,7 @@ public class VillagerGoalPackagesMixin {
     @Inject(method = "getCorePackage", at = @At("RETURN"), cancellable = true)
     private static void getCorePackage(CallbackInfoReturnable<ImmutableList<Pair<Integer, ? extends BehaviorControl<? super Villager>>>> cir) {
         List<Pair<Integer, ? extends BehaviorControl<? super Villager>>> list = new ArrayList<>(cir.getReturnValue());
-        list.add(Pair.of(7,new BabyVillagerFollowIronGolemBehavior()));
+        list.add(Pair.of(7, new BabyVillagerFollowIronGolemBehavior()));
         cir.setReturnValue(ImmutableList.copyOf(list));
     }
 }

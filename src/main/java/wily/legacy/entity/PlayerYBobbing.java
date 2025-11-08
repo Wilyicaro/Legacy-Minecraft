@@ -13,6 +13,10 @@ public interface PlayerYBobbing {
         return (PlayerYBobbing) avatarState;
     }
 
+    static float getAngle(Minecraft minecraft, float partialTicks) {
+        return minecraft.getCameraEntity() instanceof ClientAvatarEntity player && !minecraft.player.getAbilities().flying ? of(player.avatarState()).getAngle(partialTicks) : 0;
+    }
+
     float yBob();
 
     float oYBob();
@@ -21,18 +25,14 @@ public interface PlayerYBobbing {
 
     void setOYBob(float bob);
 
-    default float getAngle(float partialTicks){
-        return Mth.lerp(partialTicks,oYBob(),yBob());
+    default float getAngle(float partialTicks) {
+        return Mth.lerp(partialTicks, oYBob(), yBob());
     }
 
     default void handleYBobbing() {
-        if (this instanceof Player p){
+        if (this instanceof Player p) {
             setOYBob(yBob());
             setYBob(yBob() + ((!p.onGround() && !p.isDeadOrDying() ? (float) Math.atan(-p.getDeltaMovement().y * 0.2D) * 15.0F : 0) - yBob()) * 0.8F);
         }
-    }
-
-    static float getAngle(Minecraft minecraft, float partialTicks){
-        return minecraft.getCameraEntity() instanceof ClientAvatarEntity player && !minecraft.player.getAbilities().flying ? of(player.avatarState()).getAngle(partialTicks) : 0;
     }
 }

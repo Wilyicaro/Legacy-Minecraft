@@ -7,8 +7,8 @@ import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.function.Function;
 
-public abstract class OverlayPanelScreen extends PanelBackgroundScreen{
-    protected boolean transparentBackground = true;
+public abstract class OverlayPanelScreen extends PanelBackgroundScreen {
+    protected boolean darkBackground = true;
 
     public OverlayPanelScreen(Screen parent, Function<Screen, Panel> panelConstructor, Component component) {
         super(parent, panelConstructor, component);
@@ -28,7 +28,7 @@ public abstract class OverlayPanelScreen extends PanelBackgroundScreen{
             guiGraphics.deferredTooltip = null;
         }
 
-        if (transparentBackground) {
+        if (darkBackground) {
             renderTransparentBackground(guiGraphics);
             LegacyRenderUtil.renderUsername(guiGraphics);
         }
@@ -37,7 +37,7 @@ public abstract class OverlayPanelScreen extends PanelBackgroundScreen{
     @Override
     protected void init() {
         super.init();
-        if (parent != null) parent.init(minecraft,width,height);
+        if (parent != null) parent.init(minecraft, width, height);
     }
 
     @Override

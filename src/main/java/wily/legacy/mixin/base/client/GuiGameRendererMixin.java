@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base.client;
 
 //? if >=1.20.5 {
+
 import net.minecraft.client.DeltaTracker;
 //?}
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
@@ -47,7 +48,7 @@ public class GuiGameRendererMixin {
     }
     *///?} else {
     @WrapWithCondition(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"))
-    private boolean render(Gui instance, GuiGraphics guiGraphics, DeltaTracker deltaTracker){
+    private boolean render(Gui instance, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         return LegacyOptions.displayHUD.get();
     }
     //?}

@@ -22,7 +22,7 @@ public abstract class ClientLivingEntityMixin extends Entity {
 
     @Inject(method = "onEquipItem", at = @At("HEAD"))
     public void onEquipItem(EquipmentSlot arg, ItemStack itemStack, ItemStack itemStack2, CallbackInfo ci) {
-        if (((Entity)this) == Minecraft.getInstance().player && !FactoryItemUtil.equalItems(itemStack, itemStack2) && !this.firstTick){
+        if (((Entity) this) == Minecraft.getInstance().player && !FactoryItemUtil.equalItems(itemStack, itemStack2) && !this.firstTick) {
             AnimatedCharacterRenderer.updateTime(1500);
         }
     }

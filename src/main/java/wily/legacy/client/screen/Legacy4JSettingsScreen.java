@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.legacy.client.CommonColor;
@@ -29,20 +30,20 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
 
 
     public Legacy4JSettingsScreen(Screen screen) {
-        super(screen,s-> Panel.centered(s,250,250, 50, 0), CommonComponents.EMPTY);
-        tabList.add(0,0,100, 25, LegacyTabButton.Type.MIDDLE, null, LegacyComponents.ALL,null, b->resetElements());
+        super(screen, s -> Panel.createPanel(s, p -> p.appearance(250, Math.min(250, s.height - 52)), p -> p.pos(p.centeredLeftPos(s) + 50, p.centeredTopPos(s))), CommonComponents.EMPTY);
+        tabList.add(100, 25, LegacyTabButton.Type.MIDDLE, LegacyComponents.ALL, b -> resetElements());
         renderablesByTab.add(new ArrayList<>());
         OptionsScreen.Section.list.forEach(this::addOptionSection);
         addActualRenderables();
     }
 
-    protected void addOptionSection(OptionsScreen.Section section){
-        tabList.add(0,0,100, 25, LegacyTabButton.Type.MIDDLE, null, section.title(),null, b->resetElements());
-        section.elements().forEach(c->c.accept(this));
+    protected void addOptionSection(OptionsScreen.Section section) {
+        tabList.add(100, 25, LegacyTabButton.Type.MIDDLE, section.title(), b -> resetElements());
+        section.elements().forEach(c -> c.accept(this));
         if (section == Section.GAME_OPTIONS)
-            getRenderableVList().addRenderables(Button.builder(Component.translatable("controls.keybinds.title"), button -> this.minecraft.setScreen(new LegacyKeyMappingScreen(this))).build(),Button.builder(Component.translatable("legacy.options.selectedController"), button -> this.minecraft.setScreen(new ControllerMappingScreen(this))).build());
-        section.advancedSection().ifPresent(s1-> {
-            getRenderableVList().addRenderable(SimpleLayoutRenderable.createDrawString(s1.title(),0,1,200,9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+            getRenderableVList().addRenderables(Button.builder(Component.translatable("controls.keybinds.title"), button -> this.minecraft.setScreen(new LegacyKeyMappingScreen(this))).build(), Button.builder(Component.translatable("legacy.options.selectedController"), button -> this.minecraft.setScreen(new ControllerMappingScreen(this))).build());
+        section.advancedSection().ifPresent(s1 -> {
+            getRenderableVList().addRenderable(SimpleLayoutRenderable.createDrawString(s1.title(), 0, 1, 200, 9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
             if (s1 == Section.ADVANCED_USER_INTERFACE)
                 getRenderableVList().addOptions(LegacyOptions.advancedOptionsMode);
             s1.elements().forEach(c -> c.accept(this));
@@ -53,20 +54,20 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
         renderablesByTab.add(renderables);
     }
 
-    protected void resetElements(){
+    protected void resetElements() {
         getRenderableVList().renderables.clear();
         addActualRenderables();
         getRenderableVList().scrolledList.set(0);
         repositionElements();
     }
 
-    protected void addActualRenderables(){
+    protected void addActualRenderables() {
         String value = editBox.getValue().toLowerCase(Locale.ROOT);
         if (value.isBlank()) {
             getRenderableVList().renderables.addAll(renderablesByTab.get(getTabList().getIndex()));
         } else {
             for (Renderable renderable : renderablesByTab.get(getTabList().getIndex())) {
-                if (renderable instanceof AbstractWidget w && w.getMessage().getString().toLowerCase(Locale.ROOT).contains(value)){
+                if (renderable instanceof AbstractWidget w && w.getMessage().getString().toLowerCase(Locale.ROOT).contains(value)) {
                     getRenderableVList().renderables.add(w);
                 }
             }
@@ -82,22 +83,22 @@ public class Legacy4JSettingsScreen extends OptionsScreen implements TabList.Acc
     protected void init() {
         addRenderableWidget(tabList);
         super.init();
-        panel.panelSprite = LegacySprites.SMALL_PANEL;
         addRenderableOnly(tabList::renderSelected);
         addRenderableWidget(editBox);
+        editBox.setWidth(panel.getWidth() - 50);
         editBox.setPosition(panel.getX() + (panel.width - editBox.getWidth()) / 2, panel.getY() + 10);
-        editBox.setResponder(s->resetElements());
-        tabList.init((b, i)-> {
-            b.spriteRender = LegacyTabButton.ToggleableTabSprites.VERTICAL;
+        editBox.setResponder(s -> resetElements());
+        tabList.init((b, i) -> {
+            b.spriteRender = accessor.getElementValue("tabList.sprites", LegacyTabButton.ToggleableTabSprites.VERTICAL, LegacyTabButton.Render.class);
             b.setX(panel.x - b.getWidth() + 6);
             b.setY(panel.y + i + 5);
-            b.offset = (t1) -> new Vec3(t1.selected ? 0 : 3.4, 0.4, 0);
-        },true);
+            b.offset = (t1) -> new Vec2(t1.selected ? 0 : 3.4f, 0.4f);
+        }, true);
     }
 
     @Override
     public void renderableVListInit() {
-        getRenderableVList().init(panel.x + 10,panel.y + 40,panel.width - 20,panel.height-50);
+        getRenderableVList().init(panel.x + 10, panel.y + 40, panel.width - 20, panel.height - 50);
     }
 
     @Override

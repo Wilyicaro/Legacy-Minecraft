@@ -23,31 +23,33 @@ public class LegacyMerchantMenu extends LegacyCraftingMenu {
     public final Merchant merchant;
     public int merchantLevel;
     public boolean showProgressBar;
+
     public LegacyMerchantMenu(int i, Inventory inventory) {
         this(i, inventory, new ClientSideMerchant(inventory.player));
     }
+
     public LegacyMerchantMenu(int i, Inventory inventory, Merchant merchant) {
-        super(LegacyRegistries.MERCHANT_MENU.get(), i, p->merchant.getTradingPlayer() == p);
-        addInventorySlotGrid(inventory, 9,133, 98,3);
-        addInventorySlotGrid(inventory, 0,133, 154,1);
+        super(LegacyRegistries.MERCHANT_MENU.get(), i, p -> merchant.getTradingPlayer() == p);
+        addInventorySlotGrid(inventory, 9, 133, 98, 3);
+        addInventorySlotGrid(inventory, 0, 133, 154, 1);
         this.merchant = merchant;
     }
 
-    public static List<Optional<Ingredient>> ingredientsFromStacks(ItemStack... s){
-        return Arrays.stream(s).map(i-> i.isEmpty() ? Optional.<Ingredient>empty() : Optional.of((Ingredient) StackIngredient.of(true,i))).toList();
+    public static List<Optional<Ingredient>> ingredientsFromStacks(ItemStack... s) {
+        return Arrays.stream(s).map(i -> i.isEmpty() ? Optional.<Ingredient>empty() : Optional.of((Ingredient) StackIngredient.of(true, i))).toList();
     }
 
 
     @Override
     public boolean canCraft(List<Optional<Ingredient>> ingredients, Player player, ServerMenuCraftPayload packet) {
-        return packet.button() >= 0 && packet.button() < merchant.getOffers().size() && !merchant.getOffers().isEmpty() && !merchant.getOffers().get(packet.button()).isOutOfStock() && super.canCraft(ingredients, player, packet) ;
+        return packet.button() >= 0 && packet.button() < merchant.getOffers().size() && !merchant.getOffers().isEmpty() && !merchant.getOffers().get(packet.button()).isOutOfStock() && super.canCraft(ingredients, player, packet);
     }
 
     @Override
     public void onCraft(Player player, ServerMenuCraftPayload packet, ItemStack result) {
         super.onCraft(player, packet, result);
         MerchantOffer offer = merchant.getOffers().get(packet.button());
-        offer.getResult().onCraftedBy(/*? if <1.21.5 {*//*player.level(),*//*?}*/player,offer.getResult().getCount());
+        offer.getResult().onCraftedBy(/*? if <1.21.5 {*//*player.level(),*//*?}*/player, offer.getResult().getCount());
         if (merchant instanceof LivingEntity e) e.playSound(merchant.getNotifyTradeSound(), 1.0f, e.getVoicePitch());
         merchant.notifyTrade(offer);
         player.awardStat(Stats.TRADED_WITH_VILLAGER);
@@ -71,7 +73,7 @@ public class LegacyMerchantMenu extends LegacyCraftingMenu {
     @Override
     public List<Optional<Ingredient>> getIngredients(Player player, ServerMenuCraftPayload packet) {
         if (player instanceof ServerPlayer && packet.button() >= 0 && packet.button() < merchant.getOffers().size() && !merchant.getOffers().isEmpty())
-            return ingredientsFromStacks(merchant.getOffers().get(packet.button()).getCostA(),merchant.getOffers().get(packet.button()).getCostB());
+            return ingredientsFromStacks(merchant.getOffers().get(packet.button()).getCostA(), merchant.getOffers().get(packet.button()).getCostB());
         return super.getIngredients(player, packet);
     }
 }

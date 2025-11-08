@@ -22,21 +22,30 @@ import wily.legacy.util.client.LegacySoundUtil;
 
 @Mixin(AbstractWidget.class)
 public abstract class AbstractWidgetMixin implements ControlTooltip.ActionHolder {
-    @Shadow public abstract boolean isFocused();
-
-    @Shadow protected boolean isHovered;
-
-
+    @Shadow
+    protected boolean isHovered;
     @Unique
     private long lastHovered = -1;
-
     @Unique
     private boolean playedFocusSound = false;
 
-    @Inject(method = "render",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractWidget;renderWidget(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"))
-    private void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci){
+    @Redirect(method = "renderScrollingString(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIIII)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V"))
+    private static void renderScrollingString(GuiGraphics instance, Font arg, Component arg2, int i, int j, int k) {
+        instance.drawString(arg, arg2, i, j, k, CommonValue.WIDGET_TEXT_SHADOW.get());
+    }
+
+    @Redirect(method = "renderScrollingString(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIIII)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V"))
+    private static void renderCenteredScrollingString(GuiGraphics instance, Font arg, Component arg2, int i, int j, int k) {
+        instance.drawString(arg, arg2, i - arg.width(arg2) / 2, j, k, CommonValue.WIDGET_TEXT_SHADOW.get());
+    }
+
+    @Shadow
+    public abstract boolean isFocused();
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractWidget;renderWidget(Lnet/minecraft/client/gui/GuiGraphics;IIF)V"))
+    private void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         if (isHovered) {
-            if (lastHovered == -1){
+            if (lastHovered == -1) {
                 lastHovered = Util.getMillis();
             }
             if (!playedFocusSound && Util.getMillis() - lastHovered >= 10 && LegacyOptions.hoverFocusSound.get()) {
@@ -51,21 +60,11 @@ public abstract class AbstractWidgetMixin implements ControlTooltip.ActionHolder
 
     @Redirect(method = "nextFocusPath", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/AbstractWidget;isActive()Z"))
     public boolean nextFocusPath(AbstractWidget instance) {
-        return true;
+        return instance.visible;
     }
 
     @Override
     public @Nullable Component getAction(Context context) {
-        return ControlTooltip.getSelectAction((GuiEventListener) this,context);
-    }
-
-    @Redirect(method = "renderScrollingString(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIIII)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V"))
-    private static void renderScrollingString(GuiGraphics instance, Font arg, Component arg2, int i, int j, int k) {
-        instance.drawString(arg, arg2, i, j, k, CommonValue.WIDGET_TEXT_SHADOW.get());
-    }
-
-    @Redirect(method = "renderScrollingString(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIIII)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawCenteredString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;III)V"))
-    private static void renderCenteredScrollingString(GuiGraphics instance, Font arg, Component arg2, int i, int j, int k) {
-        instance.drawString(arg, arg2, i - arg.width(arg2) / 2, j, k, CommonValue.WIDGET_TEXT_SHADOW.get());
+        return ControlTooltip.getSelectAction((GuiEventListener) this, context);
     }
 }

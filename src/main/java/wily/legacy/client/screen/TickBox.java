@@ -13,21 +13,21 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
+import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class TickBox extends AbstractButton {
-    public static final ResourceLocation[] SPRITES = new ResourceLocation[]{Legacy4J.createModLocation( "widget/tickbox"), Legacy4J.createModLocation( "widget/tickbox_hovered")};
-    public static final ResourceLocation TICK = Legacy4J.createModLocation( "widget/tick");
-    protected final Function<Boolean,Component> message;
-    protected Function<Boolean,Tooltip> tooltip;
+    protected final Function<Boolean, Component> message;
     private final Consumer<TickBox> onPress;
-
     public boolean selected;
+    protected Function<Boolean, Tooltip> tooltip;
 
-    public TickBox(int i, int j,int width, int height, boolean initialState,Function<Boolean, Component> message,Function<Boolean, Tooltip> tooltip, Consumer<TickBox> onPress) {
+    public TickBox(int i, int j, int width, int height, boolean initialState, Function<Boolean, Component> message, Function<Boolean, Tooltip> tooltip, Consumer<TickBox> onPress) {
         super(i, j, width, height, message.apply(false));
         this.selected = initialState;
         this.message = message;
@@ -35,17 +35,28 @@ public class TickBox extends AbstractButton {
         this.onPress = onPress;
         setTooltip(tooltip.apply(selected));
     }
-    public TickBox(int i, int j,int width, boolean initialState,Function<Boolean, Component> message,Function<Boolean, Tooltip> tooltip, Consumer<TickBox> onPress){
-        this(i,j,width,12,initialState,message,tooltip,onPress);
+
+    public TickBox(int i, int j, int width, boolean initialState, Function<Boolean, Component> message, Function<Boolean, Tooltip> tooltip, Consumer<TickBox> onPress) {
+        this(i, j, width, getDefaultHeight(), initialState, message, tooltip, onPress);
     }
-    public TickBox(int i, int j, boolean initialState,Function<Boolean, Component> message,Function<Boolean, Tooltip> tooltip, Consumer<TickBox> onPress){
-        this(i,j,200,initialState,message,tooltip,onPress);
+
+    public TickBox(int i, int j, boolean initialState, Function<Boolean, Component> message, Function<Boolean, Tooltip> tooltip, Consumer<TickBox> onPress) {
+        this(i, j, 200, initialState, message, tooltip, onPress);
     }
+
+    public static int getDefaultHeight() {
+        return LegacyOptions.getUIMode().isSD() ? 9 : 12;
+    }
+
     @Override
     public void onPress(InputWithModifiers input) {
         selected = !selected;
         onPress.accept(this);
         setTooltip(tooltip.apply(selected));
+    }
+
+    public void updateHeight() {
+        setHeight(getDefaultHeight());
     }
 
     @Override
@@ -55,11 +66,15 @@ public class TickBox extends AbstractButton {
         FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, this.alpha);
         FactoryScreenUtil.enableBlend();
         FactoryScreenUtil.enableDepthTest();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(SPRITES[isHoveredOrFocused() ? 1 : 0], this.getX(), this.getY(), 12, 12);
-        if (selected) FactoryGuiGraphics.of(guiGraphics).blitSprite(TICK, this.getX(), this.getY(), 14, 12);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.TICKBOX_HOVERED : LegacySprites.TICKBOX, this.getX(), this.getY(), getHeight(), getHeight());
+        if (selected) {
+            if (LegacyOptions.getUIMode().isSD())
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_TICK, this.getX(), this.getY(), 11, 9);
+            else FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TICK, this.getX(), this.getY(), 14, 12);
+        }
         FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 1.0F);
         guiGraphics.pose().pushMatrix();
-        if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.4f,0.4f);
+        if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.4f, 0.4f);
         this.renderString(guiGraphics, minecraft.font, isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get());
         guiGraphics.pose().popMatrix();
     }
@@ -85,6 +100,6 @@ public class TickBox extends AbstractButton {
 
     @Override
     public void renderString(GuiGraphics guiGraphics, Font font, int i) {
-        LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 13, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), i,isHoveredOrFocused());
+        LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + getHeight() + (LegacyOptions.getUIMode().isSD() ? 0 : 1), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), i, isHoveredOrFocused()));
     }
 }

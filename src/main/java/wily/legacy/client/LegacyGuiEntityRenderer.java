@@ -5,7 +5,7 @@ import net.minecraft.client.gui.render.pip.GuiEntityRenderer;
 public interface LegacyGuiEntityRenderer {
 
     static LegacyGuiEntityRenderer of(GuiEntityRenderer renderState) {
-        return (LegacyGuiEntityRenderer) (Object) renderState;
+        return (LegacyGuiEntityRenderer) renderState;
     }
 
     void available();

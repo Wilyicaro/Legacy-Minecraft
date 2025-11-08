@@ -14,21 +14,28 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4J;
+import wily.legacy.client.LegacyGlyphInfo;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 @Mixin(BitmapProvider.Definition.class)
 public abstract class BitmapProviderMixin {
-    @Shadow protected abstract int getActualGlyphWidth(NativeImage nativeImage, int i, int j, int k, int l);
+    @Shadow
+    @Final
+    private int[][] codepointGrid;
+    @Shadow
+    @Final
+    private int ascent;
+    @Shadow
+    @Final
+    private int height;
+    @Shadow
+    @Final
+    private ResourceLocation file;
 
-    @Shadow @Final private int[][] codepointGrid;
-
-    @Shadow @Final private int ascent;
-
-    @Shadow @Final private int height;
-
-    @Shadow @Final private ResourceLocation file;
+    @Shadow
+    protected abstract int getActualGlyphWidth(NativeImage nativeImage, int i, int j, int k, int l);
 
     @Inject(method = "load", at = @At("HEAD"), cancellable = true)
     private void load(ResourceManager resourceManager, CallbackInfoReturnable<GlyphProvider> cir) throws IOException {
@@ -42,11 +49,11 @@ public abstract class BitmapProviderMixin {
             int j = nativeImage.getHeight();
             int k = i / this.codepointGrid[0].length;
             int l = j / this.codepointGrid.length;
-            float f = (float)this.height / (float)l;
+            float f = (float) this.height / (float) l;
             CodepointMap<BitmapProvider.Glyph> codepointMap = new CodepointMap<>(BitmapProvider.Glyph[]::new, BitmapProvider.Glyph[][]::new);
             int m = 0;
 
-            while(true) {
+            while (true) {
                 if (m >= this.codepointGrid.length) {
                     var22 = new BitmapProvider(nativeImage, codepointMap);
                     break;
@@ -63,7 +70,7 @@ public abstract class BitmapProviderMixin {
 
                             @Override
                             public GlyphInfo info() {
-                                return GlyphInfo.simple((q + 1) * f);
+                                return new LegacyGlyphInfo((q + 1) * f, f);
                             }
                         });
                         if (glyph != null) {

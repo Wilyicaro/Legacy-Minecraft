@@ -9,6 +9,8 @@ public interface SoundManagerAccessor {
     }
 
     void setVolume(SoundInstance soundInstance, float volume);
+
     void fadeAllMusic();
+
     void stopAllSound();
 }

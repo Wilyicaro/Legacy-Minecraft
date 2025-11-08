@@ -16,11 +16,11 @@ import wily.legacy.client.LegacyBiomeOverride;
 
 @Mixin(WaterFogEnvironment.class)
 public abstract class WaterFogEnvironmentMixin {
-    @Inject(method = "setupFog",at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/fog/FogData;environmentalEnd:F", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
+    @Inject(method = "setupFog", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/fog/FogData;environmentalEnd:F", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
     private void setupWaterFogEnd(FogData fogData, Entity entity, BlockPos blockPos, ClientLevel clientLevel, float f, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (entity instanceof LocalPlayer localPlayer){
+        if (entity instanceof LocalPlayer localPlayer) {
             LegacyBiomeOverride o = LegacyBiomeOverride.getOrDefault(localPlayer.level().getBiome(entity.getOnPos()).unwrapKey());
-            if (o.waterFogDistance() != null) fogData.environmentalEnd = o.waterFogDistance();
+            o.waterFogDistance().ifPresent(fogDistance -> fogData.environmentalEnd = fogDistance);
         }
     }
 }

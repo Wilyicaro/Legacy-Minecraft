@@ -36,8 +36,7 @@ public class LegacyMixinOptions {
     public static final FactoryMixinToggle legacyDrowned = createAndRegisterMixin("legacy.mixin.base.client.drowned", "legacyDrowned");
 
 
-
-    public static FactoryMixinToggle createAndRegisterMixin(String key, String translationKey){
+    public static FactoryMixinToggle createAndRegisterMixin(String key, String translationKey) {
         return CLIENT_MIXIN_STORAGE.register(LegacyMixinToggles.createMixinOption(key, translationKey, true));
     }
 }

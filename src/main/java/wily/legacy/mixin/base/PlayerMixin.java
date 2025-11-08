@@ -27,12 +27,12 @@ import wily.legacy.util.LegacyItemUtil;
 @Mixin(Player.class)
 public abstract class PlayerMixin extends LivingEntity {
 
-    @Shadow public abstract Abilities getAbilities();
-
-
     protected PlayerMixin(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
     }
+
+    @Shadow
+    public abstract Abilities getAbilities();
 
     @Inject(method = "getFlyingSpeed", at = @At(value = "RETURN"), cancellable = true)
     protected void getFlyingSpeed(CallbackInfoReturnable<Float> cir) {

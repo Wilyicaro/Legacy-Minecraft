@@ -25,7 +25,8 @@ public class LegacyMixinPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (!LegacyMixinToggles.COMMON_STORAGE.getFormatted("wily.", mixinClassName)) return false;
-        if (FactoryAPI.isClient() && !LegacyMixinOptions.CLIENT_MIXIN_STORAGE.getFormatted("wily.", mixinClassName)) return false;
+        if (FactoryAPI.isClient() && !LegacyMixinOptions.CLIENT_MIXIN_STORAGE.getFormatted("wily.", mixinClassName))
+            return false;
         if (FactoryAPI.isLoadingMod("nostalgic_tweaks")) {
             if (mixinClassName.endsWith("ItemInHandRendererSwayMixin")) return false;
         } else if (mixinClassName.contains("compat.nostalgic.")) return false;
@@ -33,8 +34,7 @@ public class LegacyMixinPlugin implements IMixinConfigPlugin {
         if (!FactoryAPI.isLoadingMod("jei") && mixinClassName.contains("compat.jei.")) return false;
 
         boolean hasVivecraft = FactoryAPI.isLoadingMod("vivecraft");
-        if (hasVivecraft && mixinClassName.endsWith("GuiGameRendererMixin")) return false;
-        return true;
+        return !hasVivecraft || !mixinClassName.endsWith("GuiGameRendererMixin");
     }
 
 

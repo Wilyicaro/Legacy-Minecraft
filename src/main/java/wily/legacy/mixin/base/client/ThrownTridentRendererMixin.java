@@ -30,8 +30,9 @@ public abstract class ThrownTridentRendererMixin extends /*? if >=1.21.2 {*/Enti
         super(context);
     }
 
-    @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/ThrownTridentRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V",at = @At("RETURN"))
+    @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/ThrownTridentRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At("RETURN"))
     public void render(ThrownTridentRenderState renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
-        if (LegacyOptions.loyaltyLines.get()) ((LegacySubmitNodeCollector)submitNodeCollector).submitLoyaltyLines(poseStack, LoyaltyLinesRenderState.of(renderState));
+        if (LegacyOptions.loyaltyLines.get())
+            ((LegacySubmitNodeCollector) submitNodeCollector).submitLoyaltyLines(poseStack, LoyaltyLinesRenderState.of(renderState));
     }
 }

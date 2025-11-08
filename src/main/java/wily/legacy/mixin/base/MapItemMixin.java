@@ -14,6 +14,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class MapItemMixin {
     @Redirect(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/state/BlockState;getMapColor(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Lnet/minecraft/world/level/material/MapColor;", ordinal = 3))
     public MapColor update(BlockState instance, BlockGetter blockGetter, BlockPos blockPos) {
-        return blockGetter instanceof CollisionGetter c && !c.getWorldBorder().isWithinBounds(blockPos) ? MapColor.NONE : instance.getMapColor(blockGetter,blockPos);
+        return blockGetter instanceof CollisionGetter c && !c.getWorldBorder().isWithinBounds(blockPos) ? MapColor.NONE : instance.getMapColor(blockGetter, blockPos);
     }
 }

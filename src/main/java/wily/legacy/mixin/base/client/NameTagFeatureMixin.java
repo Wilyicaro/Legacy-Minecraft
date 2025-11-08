@@ -17,7 +17,7 @@ import wily.legacy.client.LegacyOptions;
 public abstract class NameTagFeatureMixin {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;drawInBatch(Lnet/minecraft/network/chat/Component;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/gui/Font$DisplayMode;II)V", shift = At.Shift.AFTER, ordinal = 0))
     protected void renderNameTagSeeThrough(SubmitNodeCollection submitNodeCollection, MultiBufferSource.BufferSource bufferSource, Font font, CallbackInfo ci, @Local SubmitNodeStorage.NameTagSubmit submit) {
-      LegacyNameTag.renderNameTagOutline(font, bufferSource, submit, true);
+        LegacyNameTag.renderNameTagOutline(font, bufferSource, submit, true);
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;drawInBatch(Lnet/minecraft/network/chat/Component;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/gui/Font$DisplayMode;II)V", shift = At.Shift.AFTER, ordinal = 0))
@@ -30,6 +30,6 @@ public abstract class NameTagFeatureMixin {
         float thickness = LegacyNameTag.getThickness(submit.distanceToCameraSq());
         float[] color = thickness < 1 || !LegacyOptions.displayNameTagBorder.get() ? null : LegacyNameTag.of(submit).getNameTagColor();
 
-        return color == null ? original : ColorUtil.colorFromFloat(color[0], color[1], color[2],1.0f);
+        return color == null ? original : ColorUtil.colorFromFloat(color[0], color[1], color[2], 1.0f);
     }
 }

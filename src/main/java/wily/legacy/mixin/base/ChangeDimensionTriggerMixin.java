@@ -16,11 +16,11 @@ import wily.legacy.util.LegacyComponents;
 public class ChangeDimensionTriggerMixin {
     @Inject(method = "trigger", at = @At("RETURN"))
     public void trigger(ServerPlayer serverPlayer, ResourceKey<Level> resourceKey, ResourceKey<Level> resourceKey2, CallbackInfo ci) {
-        if (resourceKey2.equals(Level.END)){
+        if (resourceKey2.equals(Level.END)) {
             serverPlayer.level().getServer().getPlayerList().broadcastSystemMessage(LegacyComponents.getEnteredDimensionMessage(serverPlayer.getDisplayName(), Level.END), false);
-            if (/*? if <1.21.1 {*//*((EntityAccessor)serverPlayer).getPortalEntrancePos()*//*?} else {*/serverPlayer.portalProcess/*?}*/ != null){
+            if (/*? if <1.21.1 {*//*((EntityAccessor)serverPlayer).getPortalEntrancePos()*//*?} else {*/serverPlayer.portalProcess/*?}*/ != null) {
                 BlockPos entryPos = /*? if <1.21.1 {*//*((EntityAccessor)serverPlayer).getPortalEntrancePos()*//*?} else {*/serverPlayer.portalProcess.getEntryPosition()/*?}*/;
-                if (LegacyWorldOptions.usedEndPortalPositions.get().stream().noneMatch(pos-> pos.inRange(entryPos))){
+                if (LegacyWorldOptions.usedEndPortalPositions.get().stream().noneMatch(pos -> pos.inRange(entryPos))) {
                     LegacyWorldOptions.usedEndPortalPositions.get().add(new LegacyWorldOptions.UsedEndPortalPos(entryPos, serverPlayer.getUUID()));
                     LegacyWorldOptions.usedEndPortalPositions.save();
                 }

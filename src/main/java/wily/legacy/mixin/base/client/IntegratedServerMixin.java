@@ -31,23 +31,27 @@ import java.util.function.BooleanSupplier;
 
 @Mixin(IntegratedServer.class)
 public abstract class IntegratedServerMixin extends MinecraftServer {
-    @Shadow @Final private Minecraft minecraft;
-
-    @Shadow @Final private static Logger LOGGER;
-
-    @Shadow private boolean paused;
+    @Shadow
+    @Final
+    private static Logger LOGGER;
+    @Shadow
+    @Final
+    private Minecraft minecraft;
+    @Shadow
+    private boolean paused;
 
     public IntegratedServerMixin(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, Services services, LevelLoadListener levelLoadListener) {
         super(thread, levelStorageAccess, packRepository, worldStem, proxy, dataFixer, services, levelLoadListener);
     }
 
 
-    public IntegratedServer self(){
+    public IntegratedServer self() {
         return (IntegratedServer) (Object) this;
     }
+
     @Inject(method = "tickServer", at = @At("HEAD"))
     public void tickServer(BooleanSupplier booleanSupplier, CallbackInfo ci) {
-        if (LegacySaveCache.manualSave){
+        if (LegacySaveCache.manualSave) {
             LegacySaveCache.manualSave = false;
             FactoryAPIClient.getProfiler().push("manualSave");
             LOGGER.info("Saving manually...");
@@ -63,7 +67,8 @@ public abstract class IntegratedServerMixin extends MinecraftServer {
 
     @Override
     public boolean isUnderSpawnProtection(ServerLevel serverLevel, BlockPos blockPos, Player player) {
-        if (!isSingleplayerOwner(player.nameAndId()) && !LegacyClientWorldSettings.of(worldData).trustPlayers()) return true;
+        if (!isSingleplayerOwner(player.nameAndId()) && !LegacyClientWorldSettings.of(worldData).trustPlayers())
+            return true;
         return super.isUnderSpawnProtection(serverLevel, blockPos, player);
     }
 }

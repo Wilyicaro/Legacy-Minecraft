@@ -1,9 +1,6 @@
 {
    "brands": [
 	"legacy:textures/gui/intro/background.png",
-	"legacy:textures/gui/intro/background.png",
-	"legacy:textures/gui/intro/background.png",
-	"legacy:textures/gui/intro/background.png",
 	"legacy:textures/gui/intro/mojang.png",
 	"legacy:textures/gui/intro/kyubion.png",
 	"legacy:textures/gui/intro/4j.png"

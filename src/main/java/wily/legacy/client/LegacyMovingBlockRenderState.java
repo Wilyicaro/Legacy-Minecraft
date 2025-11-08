@@ -10,10 +10,12 @@ public interface LegacyMovingBlockRenderState {
         return (LegacyMovingBlockRenderState) renderState;
     }
 
-    void setEnhancedSubmit(Submit renderState);
     Submit getEnhancedSubmit();
 
-    record Submit(BlockEntityRenderState renderState, BlockEntityRenderer<BlockEntity, BlockEntityRenderState> renderer) {
+    void setEnhancedSubmit(Submit renderState);
+
+    record Submit(BlockEntityRenderState renderState,
+                  BlockEntityRenderer<BlockEntity, BlockEntityRenderState> renderer) {
 
     }
 }

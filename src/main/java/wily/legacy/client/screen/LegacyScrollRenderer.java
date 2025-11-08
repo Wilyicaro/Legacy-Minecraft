@@ -15,20 +15,32 @@ public class LegacyScrollRenderer {
     public long lastScroll = 0;
     public ScreenDirection lastDirection;
 
-    public void updateScroll(ScreenDirection direction){
+    public void updateScroll(ScreenDirection direction) {
         lastDirection = direction;
         lastScroll = (lastScrolled[direction.ordinal()] = Util.getMillis());
     }
 
-    public void renderScroll(GuiGraphics graphics, ScreenDirection direction, int x, int y){
-        boolean h = direction.getAxis() == ScreenAxis.HORIZONTAL;
+    public void renderSmallScroll(GuiGraphics graphics, boolean up, int x, int y) {
+        renderScroll(graphics, up ? ScreenDirection.UP : ScreenDirection.DOWN, x, y, up ? LegacySprites.SCROLL_UP_SMALL : LegacySprites.SCROLL_DOWN_SMALL, 7, 4);
+    }
+
+    public void renderScroll(GuiGraphics graphics, ScreenDirection direction, int x, int y) {
+        if (direction.getAxis() == ScreenAxis.HORIZONTAL)
+            renderScroll(graphics, direction, x, y, SCROLLS[direction.ordinal()], 6, 11);
+        else
+            renderScroll(graphics, direction, x, y, SCROLLS[direction.ordinal()], 13, 7);
+    }
+
+    public float getAlpha(long last) {
+        float f = (Util.getMillis() - last) / 320f;
+        return Math.min(1.0f, f < 0.5f ? 1 - f * 2f : (f - 0.5f) * 2f);
+    }
+
+    public void renderScroll(GuiGraphics graphics, ScreenDirection direction, int x, int y, ResourceLocation sprite, int width, int height) {
         long l = lastScrolled[direction.ordinal()];
-        if (l > 0) {
-            float f = (Util.getMillis() - l) / 320f;
-            float fade = Math.min(1.0f,f < 0.5f ? 1 - f * 2f : (f - 0.5f) * 2f);
-            FactoryGuiGraphics.of(graphics).setBlitColor(1.0f,1.0f,1.0f, fade);
-        }
-        FactoryGuiGraphics.of(graphics).blitSprite(SCROLLS[direction.ordinal()], x, y, h ? 6 : 13, h ? 11 : 7);
+        if (l > 0)
+            FactoryGuiGraphics.of(graphics).setBlitColor(1.0f, 1.0f, 1.0f, getAlpha(l));
+        FactoryGuiGraphics.of(graphics).blitSprite(sprite, x, y, width, height);
         if (l > 0)
             FactoryGuiGraphics.of(graphics).clearBlitColor();
     }

@@ -23,59 +23,64 @@ import java.util.function.Function;
 
 public class LegacyWorldOptions {
     public static final FactoryConfig.StorageHandler WORLD_STORAGE = new FactoryConfig.StorageHandler();
-    public static final FactoryConfig<Map<String, LegacyTipBuilder>> customTips = WORLD_STORAGE.register(FactoryConfig.create("customTips", null, ()-> LegacyTipBuilder.MAP_CODEC, new HashMap<>(), v-> {}, WORLD_STORAGE));
-    public static final FactoryConfig<List<InitialItem>> initialItems = WORLD_STORAGE.register(FactoryConfig.create("initialItems", null, ()-> InitialItem.LIST_CODEC, List.of(new InitialItem(Items.MAP.getDefaultInstance(), LegacyGameRules.PLAYER_STARTING_MAP), new InitialItem(Items.BUNDLE.getDefaultInstance(), LegacyGameRules.PLAYER_STARTING_BUNDLE)), v-> {}, WORLD_STORAGE));
-    public static final FactoryConfig<List<UsedEndPortalPos>> usedEndPortalPositions = WORLD_STORAGE.register(FactoryConfig.create("usedEndPortalPositions", null, ()-> UsedEndPortalPos.LIST_CODEC, new ArrayList<>(), v-> {}, WORLD_STORAGE));
+    public static final FactoryConfig<Map<String, LegacyTipBuilder>> customTips = WORLD_STORAGE.register(FactoryConfig.create("customTips", null, () -> LegacyTipBuilder.MAP_CODEC, new HashMap<>(), v -> {
+    }, WORLD_STORAGE));
+    public static final FactoryConfig<List<InitialItem>> initialItems = WORLD_STORAGE.register(FactoryConfig.create("initialItems", null, () -> InitialItem.LIST_CODEC, List.of(new InitialItem(Items.MAP.getDefaultInstance(), LegacyGameRules.PLAYER_STARTING_MAP), new InitialItem(Items.BUNDLE.getDefaultInstance(), LegacyGameRules.PLAYER_STARTING_BUNDLE)), v -> {
+    }, WORLD_STORAGE));
+    public static final FactoryConfig<List<UsedEndPortalPos>> usedEndPortalPositions = WORLD_STORAGE.register(FactoryConfig.create("usedEndPortalPositions", null, () -> UsedEndPortalPos.LIST_CODEC, new ArrayList<>(), v -> {
+    }, WORLD_STORAGE));
 
-    public record InitialItem(ItemStack item, Optional<GameRules.Key<GameRules.BooleanValue>> dependentGamerule){
+    public record InitialItem(ItemStack item, Optional<GameRules.Key<GameRules.BooleanValue>> dependentGamerule) {
         public static final Codec<GameRules.Key<GameRules.BooleanValue>> BOOLEAN_GAMERULE_CODEC = Codec.STRING.xmap(InitialItem::getGameruleFromId, GameRules.Key::getId);
-        public static final Codec<InitialItem> CODEC = RecordCodecBuilder.create(i-> i.group(DynamicUtil.ITEM_CODEC.fieldOf("item").forGetter(InitialItem::item), BOOLEAN_GAMERULE_CODEC.optionalFieldOf("gamerule").forGetter(InitialItem::dependentGamerule)).apply(i, InitialItem::new));
+        public static final Codec<InitialItem> CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.ITEM_CODEC.fieldOf("item").forGetter(InitialItem::item), BOOLEAN_GAMERULE_CODEC.optionalFieldOf("gamerule").forGetter(InitialItem::dependentGamerule)).apply(i, InitialItem::new));
         public static final Codec<List<InitialItem>> LIST_CODEC = CODEC.listOf();
 
-        public InitialItem(ItemStack item, GameRules.Key<GameRules.BooleanValue> gamerule){
+        public InitialItem(ItemStack item, GameRules.Key<GameRules.BooleanValue> gamerule) {
             this(item, Optional.of(gamerule));
         }
 
-        public InitialItem(ItemStack item){
+        public InitialItem(ItemStack item) {
             this(item, Optional.empty());
         }
 
-        public boolean isEnabled(MinecraftServer server){
-            return dependentGamerule.isEmpty() || server.getGameRules().getBoolean(dependentGamerule.get());
-        }
-
-        public static GameRules.Key<GameRules.BooleanValue> getGameruleFromId(String id){
+        public static GameRules.Key<GameRules.BooleanValue> getGameruleFromId(String id) {
             Bearer<GameRules.Key<GameRules.BooleanValue>> keyBearer = Bearer.of(null);
             GameRules gameRules = FactoryAPI.currentServer.getGameRules();
             gameRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
                 @Override
                 public <T extends GameRules.Value<T>> void visit(GameRules.Key<T> key, GameRules.Type<T> type) {
-                    if (gameRules.getRule(key) instanceof GameRules.BooleanValue && key.getId().equals(id)) keyBearer.set((GameRules.Key<GameRules.BooleanValue>) key);
+                    if (gameRules.getRule(key) instanceof GameRules.BooleanValue && key.getId().equals(id))
+                        keyBearer.set((GameRules.Key<GameRules.BooleanValue>) key);
                 }
             });
             return keyBearer.get();
         }
+
+        public boolean isEnabled(MinecraftServer server) {
+            return dependentGamerule.isEmpty() || server.getGameRules().getBoolean(dependentGamerule.get());
+        }
     }
 
-    public record UsedEndPortalPos(BlockPos pos, UUID player, String identifier){
-        public static final Codec<UsedEndPortalPos> CODEC = RecordCodecBuilder.create(i-> i.group(BlockPos.CODEC.fieldOf("pos").forGetter(UsedEndPortalPos::pos), Codec.STRING.xmap(UUID::fromString, UUID::toString).fieldOf("player").forGetter(UsedEndPortalPos::player)).apply(i, UsedEndPortalPos::new));
+    public record UsedEndPortalPos(BlockPos pos, UUID player, String identifier) {
+        public static final Codec<UsedEndPortalPos> CODEC = RecordCodecBuilder.create(i -> i.group(BlockPos.CODEC.fieldOf("pos").forGetter(UsedEndPortalPos::pos), Codec.STRING.xmap(UUID::fromString, UUID::toString).fieldOf("player").forGetter(UsedEndPortalPos::player)).apply(i, UsedEndPortalPos::new));
         public static final Codec<List<UsedEndPortalPos>> LIST_CODEC = CODEC.listOf().xmap(ArrayList::new, Function.identity());
 
-        public UsedEndPortalPos(BlockPos pos, UUID player){
-            this(pos, player, "used_end_portal_pos:"+pos.toString());
+        public UsedEndPortalPos(BlockPos pos, UUID player) {
+            this(pos, player, "used_end_portal_pos:" + pos.toString());
         }
 
-        public boolean inRange(BlockPos otherPos){
+        public boolean inRange(BlockPos otherPos) {
             return Math.abs(pos.getX() - otherPos.getX()) <= 2 && Math.abs(pos.getZ() - otherPos.getZ()) <= 2;
         }
 
-        public boolean isValid(MinecraftServer server){
+        public boolean isValid(MinecraftServer server) {
             ServerPlayer serverPlayer = server.getPlayerList().getPlayer(player);
             return serverPlayer != null && serverPlayer.level().dimension() == Level.END;
         }
     }
 
-    public record NamedArea(BlockPos firstPos, BlockPos secondPos, boolean checkHeight, boolean isBarrier, List<UUID> players){
+    public record NamedArea(BlockPos firstPos, BlockPos secondPos, boolean checkHeight, boolean isBarrier,
+                            List<UUID> players) {
 
     }
 }

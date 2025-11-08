@@ -31,19 +31,20 @@ import wily.legacy.client.LegacyOptions;
 
 @Mixin(FireworkEntityRenderer.class)
 public abstract class FireworkEntityRendererMixin extends EntityRenderer<FireworkRocketEntity, FireworkRocketRenderState> {
-    private static final ResourceLocation FIREWORK_LOCATION = Legacy4J.createModLocation( "textures/entity/projectiles/firework.png");
-    protected FireworkEntityRendererMixin(EntityRendererProvider.Context context) {
-        super(context);
-    }
+    private static final ResourceLocation FIREWORK_LOCATION = Legacy4J.createModLocation("textures/entity/projectiles/firework.png");
     @Unique
     private ArrowModel model;
 
+    protected FireworkEntityRendererMixin(EntityRendererProvider.Context context) {
+        super(context);
+    }
+
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void init(EntityRendererProvider.Context context, CallbackInfo ci){
+    private void init(EntityRendererProvider.Context context, CallbackInfo ci) {
         this.model = new ArrowModel(context.bakeLayer(ModelLayers.ARROW));
     }
 
-    @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/FireworkRocketRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/FireworkRocketRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At("HEAD"), cancellable = true)
     public void submit(FireworkRocketRenderState fireworkRocketRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
         if (LegacyOptions.legacyFireworks.get()) {
             ci.cancel();

@@ -15,20 +15,20 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.players.NameAndId;
 import wily.legacy.util.client.LegacyRenderUtil;
 
-public class JoinGameScreen extends PanelVListScreen{
+public class JoinGameScreen extends PanelVListScreen {
     public static final Component JOIN_GAME = Component.translatable("legacy.menu.join_game");
-    protected ScrollableRenderer scrollableRenderer =  new ScrollableRenderer(new LegacyScrollRenderer());
     protected final MultiLineLabel label;
+    protected final Panel tooltipBox = Panel.tooltipBoxOf(panel, 186);
     private final Button.OnPress connect;
-    protected final Panel tooltipBox = Panel.tooltipBoxOf(panel,186);
+    protected ScrollableRenderer scrollableRenderer = new ScrollableRenderer(new LegacyScrollRenderer());
 
     public JoinGameScreen(Screen parent, ServerData data, Button.OnPress connect) {
-        super(parent, s-> Panel.centered(s,225, 177,0,34), JOIN_GAME);
-        label = MultiLineLabel.create(Minecraft.getInstance().font,data.motd,tooltipBox.getWidth() - 10);
+        super(parent, s -> Panel.centered(s, 225, 177, 0, 34), JOIN_GAME);
+        label = MultiLineLabel.create(Minecraft.getInstance().font, data.motd, tooltipBox.getWidth() - 10);
         this.connect = connect;
         if (data.players == null) return;
         for (NameAndId gameProfile : data.players.sample()) {
-            renderableVList.addRenderable(new AbstractButton(0,0,210,30,Component.literal(gameProfile.name())) {
+            renderableVList.addRenderable(new AbstractButton(0, 0, 210, 30, Component.literal(gameProfile.name())) {
                 @Override
                 public void onPress(InputWithModifiers input) {
                 }
@@ -49,7 +49,7 @@ public class JoinGameScreen extends PanelVListScreen{
     @Override
     protected void init() {
         super.init();
-        addRenderableWidget(Button.builder(JOIN_GAME,connect).bounds((width - 225) / 2, panel.getY() - 25,225,20).build());
+        addRenderableWidget(Button.builder(JOIN_GAME, connect).bounds((width - 225) / 2, panel.getY() - 25, 225, 20).build());
     }
 
     @Override
@@ -61,7 +61,7 @@ public class JoinGameScreen extends PanelVListScreen{
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         super.renderDefaultBackground(guiGraphics, i, j, f);
-        tooltipBox.render(guiGraphics,i,j,f);
-        scrollableRenderer.render(guiGraphics,panel.x + panel.width + 3, panel.y + 13,tooltipBox.width - 10, tooltipBox.getHeight() - 44, ()-> label.render(guiGraphics, MultiLineLabel.Align.LEFT, panel.x + panel.width + 3, panel.y + 13, 12, true, 0xFFFFFFFF));
+        tooltipBox.render(guiGraphics, i, j, f);
+        scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () -> label.render(guiGraphics, MultiLineLabel.Align.LEFT, panel.x + panel.width + 3, panel.y + 13, 12, true, 0xFFFFFFFF));
     }
 }

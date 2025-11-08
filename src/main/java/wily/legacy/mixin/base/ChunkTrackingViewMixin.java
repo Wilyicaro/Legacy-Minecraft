@@ -15,13 +15,18 @@ import wily.legacy.config.LegacyCommonOptions;
 @Mixin(ChunkTrackingView.Positioned.class)
 public class ChunkTrackingViewMixin {
 
-    @Shadow @Final private int viewDistance;
+    @Shadow
+    @Final
+    private int viewDistance;
 
-    @Shadow @Final private ChunkPos center;
+    @Shadow
+    @Final
+    private ChunkPos center;
 
     @Inject(method = "contains", at = @At("HEAD"), cancellable = true)
     private void isWithinDistance(int i, int j, boolean bl, CallbackInfoReturnable<Boolean> cir) {
-        if (LegacyCommonOptions.squaredViewDistance.get()) cir.setReturnValue(Legacy4J.isChunkPosVisibleInSquare(center.x, center.z, viewDistance, i, j, false));
+        if (LegacyCommonOptions.squaredViewDistance.get())
+            cir.setReturnValue(Legacy4J.isChunkPosVisibleInSquare(center.x, center.z, viewDistance, i, j, false));
     }
 }
 //?}

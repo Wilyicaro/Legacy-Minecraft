@@ -2,6 +2,8 @@ package wily.legacy.init;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
@@ -37,8 +39,8 @@ public class LegacyRegistries {
     public static final RegisterListing.Holder<MenuType<LegacyCraftingMenu>> PLAYER_CRAFTING_PANEL_MENU = MENU_REGISTER.add("player_crafting_panel_menu", ()->new MenuType<>(LegacyCraftingMenu::playerCraftingMenu, FeatureFlags.VANILLA_SET));
     public static final RegisterListing.Holder<MenuType<LegacyCraftingMenu>> CRAFTING_PANEL_MENU = MENU_REGISTER.add("crafting_panel_menu", ()->new MenuType<>(LegacyCraftingMenu::craftingMenu, FeatureFlags.VANILLA_SET));
 
-    public static final RegisterListing.Holder<Item> WATER = ITEM_REGISTER.add("water",id-> new BlockItem(Blocks.WATER, FactoryAPIPlatform.setupBlockItemProperties(new Item.Properties(),id)));
-    public static final RegisterListing.Holder<Item> LAVA = ITEM_REGISTER.add("lava",id-> new BlockItem(Blocks.LAVA, FactoryAPIPlatform.setupBlockItemProperties(new Item.Properties(),id)));
+    public static final RegisterListing.Holder<Item> WATER = ITEM_REGISTER.add("water",id -> new BlockItem(Blocks.WATER, new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)).overrideDescription(Blocks.WATER.getDescriptionId())));
+    public static final RegisterListing.Holder<Item> LAVA = ITEM_REGISTER.add("lava",id -> new BlockItem(Blocks.LAVA, new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)).overrideDescription(Blocks.LAVA.getDescriptionId())));
 
     public static final RegisterListing.Holder<ColoredWaterCauldronBlock> COLORED_WATER_CAULDRON = BLOCK_REGISTER.add("colored_water_cauldron", id-> new ColoredWaterCauldronBlock(FactoryAPIPlatform.setupBlockProperties(BlockBehaviour.Properties./*? if <1.20.2 {*//*copy*//*?} else {*/ofLegacyCopy/*?}*/(Blocks.CAULDRON),id)));
 

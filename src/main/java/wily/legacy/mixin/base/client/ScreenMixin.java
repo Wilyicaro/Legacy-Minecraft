@@ -20,80 +20,95 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
+import wily.legacy.client.NavigationElement;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.KeyboardScreen;
+import wily.legacy.client.screen.LegacyLoading;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
 @Mixin(Screen.class)
 public abstract class ScreenMixin extends AbstractContainerEventHandler {
-    @Shadow public int width;
+    @Shadow
+    public int width;
 
-    @Shadow public int height;
+    @Shadow
+    public int height;
 
-    @Shadow protected Minecraft minecraft;
+    @Shadow
+    protected Minecraft minecraft;
 
-    public Screen self(){
-        return (Screen) (Object)this;
+    public Screen self() {
+        return (Screen) (Object) this;
     }
 
-    @Inject(method = "renderWithTooltipAndSubtitles",at = @At("HEAD"))
-    private void renderWithTooltip(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci){
-        LegacyTipManager.tipDiffPercentage = Math.max(-0.5f,Math.min(LegacyTipManager.tipDiffPercentage + (LegacyTipManager.getActualTip() == null ? -0.1f : 0.08f) * f,1.5f));
+    @Inject(method = "renderWithTooltipAndSubtitles", at = @At("HEAD"))
+    private void renderWithTooltip(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        LegacyTipManager.tipDiffPercentage = Math.max(-0.5f, Math.min(LegacyTipManager.tipDiffPercentage + (LegacyTipManager.getActualTip() == null ? -0.1f : 0.08f) * f, 1.5f));
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(LegacyTipManager.getTipXDiff(),0);
+        guiGraphics.pose().translate(LegacyTipManager.getTipXDiff(), 0);
     }
 
-    @Inject(method = "renderWithTooltipAndSubtitles",at = @At("RETURN"))
-    private void renderWithTooltipReturn(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci){
-        guiGraphics.pose().translate(-LegacyTipManager.getTipXDiff(),0);
-        ControlTooltip.Renderer.of(this).render(guiGraphics,i,j,f);
+    @Inject(method = "renderWithTooltipAndSubtitles", at = @At("RETURN"))
+    private void renderWithTooltipReturn(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
+        guiGraphics.pose().translate(-LegacyTipManager.getTipXDiff(), 0);
+        ControlTooltip.Renderer.of(this).render(guiGraphics, i, j, f);
         guiGraphics.pose().popMatrix();
     }
 
-    @Inject(method = "changeFocus",at = @At("HEAD"))
-    private void changeFocus(ComponentPath componentPath, CallbackInfo ci){
-        LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(),true);
+    @Inject(method = "changeFocus", at = @At("HEAD"))
+    private void changeFocus(ComponentPath componentPath, CallbackInfo ci) {
+        if (componentPath instanceof ComponentPath.Path path)
+            NavigationElement.of(path.childPath().component()).playFocusSound(path);
     }
-    @Inject(method = "onClose",at = @At("HEAD"))
-    private void onClose(CallbackInfo ci){
-        LegacySoundUtil.playBackSound();
+
+    @Inject(method = "onClose", at = @At("HEAD"))
+    private void onClose(CallbackInfo ci) {
+        if (!(self() instanceof LegacyLoading))
+            LegacySoundUtil.playBackSound();
     }
+
     //? if >1.20.1 {
-    @Inject(method = "renderTransparentBackground",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderTransparentBackground", at = @At("HEAD"), cancellable = true)
     public void renderTransparentBackground(GuiGraphics graphics, CallbackInfo ci) {
         ci.cancel();
         if (self() instanceof AbstractContainerScreen<?> && !LegacyOptions.menusWithBackground.get()) return;
         LegacyRenderUtil.renderTransparentBackground(graphics);
     }
+
     //?}
-    @Inject(method = "renderBackground",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
     public void renderBackground(GuiGraphics guiGraphics, /*? if >1.20.1 {*/int i, int j, float f,/*?}*/ CallbackInfo ci) {
         ci.cancel();
         if (UIAccessor.of(self()).getBoolean("hasBackground", true) && (!(self() instanceof AbstractContainerScreen<?>) || LegacyOptions.menusWithBackground.get())) {
             LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(self()), guiGraphics, false);
         }
     }
+
     //? if >=1.20.5 {
-    @Inject(method = "renderPanorama",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderPanorama", at = @At("HEAD"), cancellable = true)
     public void renderPanorama(GuiGraphics guiGraphics, float f, CallbackInfo ci) {
         ci.cancel();
         LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(self()), guiGraphics, true, false, !(self() instanceof TitleScreen));
     }
+
     //?}
-    @Inject(method = "keyPressed",at = @At("HEAD"))
-    private void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir){
+    @Inject(method = "keyPressed", at = @At("HEAD"))
+    private void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
         if (Legacy4JClient.keyToggleCursor.matches(keyEvent)) Legacy4JClient.controllerManager.toggleCursor();
     }
-    @Redirect(method = "rebuildWidgets",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;clearFocus()V"))
+
+    @Redirect(method = "rebuildWidgets", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;clearFocus()V"))
     public void rebuildWidgets(Screen instance) {
     }
-    @Inject(method = "setInitialFocus(Lnet/minecraft/client/gui/components/events/GuiEventListener;)V",at = @At(value = "HEAD"), cancellable = true)
+
+    @Inject(method = "setInitialFocus(Lnet/minecraft/client/gui/components/events/GuiEventListener;)V", at = @At(value = "HEAD"), cancellable = true)
     public void setInitialFocus(GuiEventListener guiEventListener, CallbackInfo ci) {
         if (getFocused() == null) setFocused(guiEventListener);
         ci.cancel();
     }
+
     //? if <1.20.5 {
     /*@Inject(method = "rebuildWidgets",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;init()V",shift = At.Shift.AFTER))
     public void rebuildWidgetsInitialFocus(CallbackInfo ci) {
@@ -105,19 +120,20 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
         Legacy4JClient.postScreenInit((Screen) (Object)this);
     }
     *///?} else {
-    @Inject(method = "rebuildWidgets",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;setInitialFocus()V",shift = At.Shift.AFTER))
+    @Inject(method = "rebuildWidgets", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;setInitialFocus()V", shift = At.Shift.AFTER))
     public void rebuildWidgetsInitialFocus(CallbackInfo ci) {
-        Legacy4JClient.postScreenInit((Screen) (Object)this);
+        Legacy4JClient.postScreenInit((Screen) (Object) this);
     }
 
-    @Inject(method = "setInitialFocus()V",at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "setInitialFocus()V", at = @At(value = "HEAD"), cancellable = true)
     public void setInitialFocus(CallbackInfo ci) {
         ci.cancel();
-        Legacy4JClient.postScreenInit((Screen) (Object)this);
+        Legacy4JClient.postScreenInit((Screen) (Object) this);
     }
-    @Inject(method = "init(Lnet/minecraft/client/Minecraft;II)V",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;setInitialFocus()V", shift = At.Shift.AFTER))
+
+    @Inject(method = "init(Lnet/minecraft/client/Minecraft;II)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;setInitialFocus()V", shift = At.Shift.AFTER))
     public void init(Minecraft minecraft, int i, int j, CallbackInfo ci) {
-        Legacy4JClient.postScreenInit((Screen) (Object)this);
+        Legacy4JClient.postScreenInit((Screen) (Object) this);
     }
     //?}
 

@@ -12,7 +12,8 @@ import wily.legacy.util.client.LegacyFontUtil;
 @Mixin(Style.class)
 public class StyleMixin {
     @Inject(method = "getFont", at = @At("RETURN"), cancellable = true)
-    private void getFont(CallbackInfoReturnable<FontDescription> cir){
-        if(LegacyFontUtil.defaultFontOverride != null && cir.getReturnValue().equals(FontDescription.DEFAULT)) cir.setReturnValue(LegacyFontUtil.defaultFontOverride);
+    private void getFont(CallbackInfoReturnable<FontDescription> cir) {
+        if (LegacyFontUtil.defaultFontOverride != null && cir.getReturnValue().equals(FontDescription.DEFAULT))
+            cir.setReturnValue(LegacyFontUtil.defaultFontOverride);
     }
 }

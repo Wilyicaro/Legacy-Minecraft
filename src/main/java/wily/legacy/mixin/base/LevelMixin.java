@@ -23,10 +23,12 @@ import wily.legacy.init.LegacyGameRules;
 
 @Mixin(ServerLevel.class)
 public abstract class LevelMixin {
-    @Shadow public abstract GameRules getGameRules();
+    @Shadow
+    public abstract GameRules getGameRules();
 
     @Inject(method = "explode", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerExplosion;explode()I"), cancellable = true)
     public void explode(Entity entity, DamageSource damageSource, ExplosionDamageCalculator explosionDamageCalculator, double d, double e, double f, float g, boolean bl, Level.ExplosionInteraction explosionInteraction, ParticleOptions particleOptions, ParticleOptions particleOptions2, WeightedList<ExplosionParticleInfo> weightedList, Holder<SoundEvent> holder, CallbackInfo ci) {
-        if (explosionInteraction != Level.ExplosionInteraction.MOB && !getGameRules().getBoolean(LegacyGameRules.getTntExplodes())) ci.cancel();
+        if (explosionInteraction != Level.ExplosionInteraction.MOB && !getGameRules().getBoolean(LegacyGameRules.getTntExplodes()))
+            ci.cancel();
     }
 }

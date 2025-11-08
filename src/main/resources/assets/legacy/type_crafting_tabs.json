@@ -1,0 +1,74 @@
+[
+  {
+    "id": "legacy:crafting",
+    "icon": {
+      "type": "item",
+      "value": "minecraft:crafting_table"
+    }
+  },
+  {
+    "id": "legacy:banner",
+    "icon": {
+      "type": "item",
+      "value": "minecraft:white_banner"
+    },
+    "tabs": [
+      {
+        "type": "item",
+        "value": "minecraft:white_banner"
+      },
+      {
+        "type": "item",
+        "value": "minecraft:shield"
+      }
+    ]
+  },
+  {
+    "id": "legacy:firework",
+    "icon": {
+      "type": "item",
+      "value": "minecraft:firework_rocket"
+    },
+    "tabs": [
+      {
+        "type": "item",
+        "value": "minecraft:firework_star"
+      },
+      {
+        "type": "item",
+        "value": {
+          "item": "minecraft:firework_star",
+          "components": {"minecraft:firework_explosion": {"shape":  "small_ball", "colors": [11743532]}}
+        }
+      },
+      {
+        "type": "item",
+        "value": "minecraft:firework_rocket"
+      }
+    ]
+  },
+  {
+    "id": "legacy:dying",
+    "icon": {
+      "type": "item",
+      "value": "minecraft:cyan_dye"
+    },
+    "tabs": [
+      {
+        "type": "item",
+        "value": "minecraft:leather_chestplate"
+      },
+      {
+        "type": "item",
+        "value": "minecraft:cyan_dye"
+      },
+      {
+        "icon": {
+          "type": "item",
+          "value": "minecraft:decorated_pot"
+        },
+        "allows2x2Grid": false
+      }
+    ]
+  }
+]

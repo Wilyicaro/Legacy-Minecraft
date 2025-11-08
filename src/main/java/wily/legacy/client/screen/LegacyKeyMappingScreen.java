@@ -50,33 +50,40 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
     }
 
     public LegacyKeyMappingScreen(Screen parent, Component title) {
-        this(parent, s-> Panel.centered(s, LegacySprites.PANEL,255, 293), title);
+        this(parent, s -> Panel.centered(s, LegacySprites.PANEL, 255, 293), title);
     }
 
     public LegacyKeyMappingScreen(Screen parent, Function<Screen, Panel> panelFunction, Component title) {
         super(parent, panelFunction, title);
-        renderableVList.layoutSpacing(l->1);
+        renderableVList.layoutSpacing(l -> 1);
         addButtons();
     }
 
-    public void addButtons(){
+    public static void setAndUpdateKey(KeyMapping key, InputConstants.Key input) {
+        key.setKey(input);
+        Minecraft.getInstance().options.save();
+        KeyMapping.resetMapping();
+    }
+
+    public void addButtons() {
         KeyMapping[] keyMappings = ArrayUtils.clone(Minecraft.getInstance().options.keyMappings);
         Arrays.sort(keyMappings);
         KeyMapping.Category lastCategory = null;
-        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.reset_defaults"),button -> minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.reset_keyBinds"),Component.translatable("legacy.menu.reset_keyBinds_message"), b-> {
+        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.reset_defaults"), button -> minecraft.setScreen(new ConfirmationScreen(this, Component.translatable("legacy.menu.reset_keyBinds"), Component.translatable("legacy.menu.reset_keyBinds_message"), b -> {
             for (KeyMapping keyMapping : keyMappings)
                 keyMapping.setKey(keyMapping.getDefaultKey());
             KeyMapping.resetMapping();
             Minecraft.getInstance().options.save();
             minecraft.setScreen(this);
-        }))).size(240,20).build());
-        renderableVList.addOptions(LegacyOptions.unbindConflictingKeys,LegacyOptions.of(Minecraft.getInstance().options.toggleCrouch()),LegacyOptions.of(Minecraft.getInstance().options.toggleSprint()),LegacyOptions.of(Minecraft.getInstance().options.toggleUse()),LegacyOptions.of(Minecraft.getInstance().options.toggleAttack()));
+        }))).size(240, 20).build());
+        renderableVList.addOptions(LegacyOptions.unbindConflictingKeys, LegacyOptions.of(Minecraft.getInstance().options.toggleCrouch()), LegacyOptions.of(Minecraft.getInstance().options.toggleSprint()), LegacyOptions.of(Minecraft.getInstance().options.toggleUse()), LegacyOptions.of(Minecraft.getInstance().options.toggleAttack()));
         for (KeyMapping keyMapping : keyMappings) {
             KeyMapping.Category category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category))
-                renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> {}))), SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> graphics.drawString(font, category.label(), l.x + 1, l.y + 4, CommonColor.INVENTORY_GRAY_TEXT.get(), false)))));
+                renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> {
+                }))), SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> graphics.drawString(font, category.label(), l.x + 1, l.y + 4, CommonColor.INVENTORY_GRAY_TEXT.get(), false)))));
             lastCategory = keyMapping.getCategory();
-            renderableVList.addRenderable(new MappingButton(0,0,240,20, LegacyKeyMapping.of(keyMapping)) {
+            renderableVList.addRenderable(new MappingButton(0, 0, 240, 20, LegacyKeyMapping.of(keyMapping)) {
                 @Override
                 public ControlTooltip.ComponentIcon getIcon() {
                     return ControlTooltip.getKeyIcon(mapping.getKey().getValue());
@@ -101,6 +108,134 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
         }
     }
 
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean bl) {
+        if (selectedMapping != null && allowsKey()) {
+            setAndUpdateKey(selectedMapping.self(), InputConstants.Type.MOUSE.getOrCreate(event.button()));
+            setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
+            resolveConflictingMappings();
+            setSelectedMapping(null);
+            return true;
+        }
+        return super.mouseClicked(event, bl);
+    }
+
+    @Override
+    public boolean keyPressed(KeyEvent keyEvent) {
+        if (selectedMapping != null && allowsKey()) {
+            setAndUpdateKey(selectedMapping.self(), keyEvent.isEscape() ? InputConstants.UNKNOWN : InputConstants.getKey(keyEvent));
+            setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
+            resolveConflictingMappings();
+            setSelectedMapping(null);
+            return true;
+        }
+        return super.keyPressed(keyEvent);
+    }
+
+    public boolean allowsKey() {
+        return true;
+    }
+
+    @Override
+    public void setFocused(@Nullable GuiEventListener guiEventListener) {
+        super.setFocused(guiEventListener);
+        setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
+    }
+
+    @Override
+    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
+    }
+
+    public Component getCancelTooltip() {
+        return Component.translatable("legacy.options.keyMappingTooltip", ControlTooltip.CANCEL_BINDING.get().getComponent());
+    }
+
+    public Component getConflictingTooltip() {
+        return LegacyComponents.CONFLICTING_KEYS;
+    }
+
+    protected void setSelectedMapping(LegacyKeyMapping keyMapping) {
+        this.selectedMapping = keyMapping;
+    }
+
+    protected boolean areConflicting(LegacyKeyMapping keyMapping, LegacyKeyMapping comparison) {
+        return keyMapping.getKey() == comparison.getKey();
+    }
+
+    public boolean unbindConflictingBindings() {
+        return LegacyOptions.unbindConflictingKeys.get();
+    }
+
+    protected void setNone(LegacyKeyMapping keyMapping) {
+        setAndUpdateKey(keyMapping.self(), InputConstants.UNKNOWN);
+    }
+
+    protected void resolveConflictingMappings() {
+        for (Renderable renderable : getRenderableVList().renderables) {
+            if (renderable instanceof MappingButton b && selectedMapping != b.mapping && !b.isNone() && areConflicting(selectedMapping, b.mapping)) {
+                getRenderableVList().focusRenderable(b);
+                if (unbindConflictingBindings()) setNone(b.mapping);
+                setAndUpdateMappingTooltip(this::getConflictingTooltip);
+                break;
+            }
+        }
+    }
+
+    protected void setAndUpdateMappingTooltip(ArbitrarySupplier<Component> tooltip) {
+        mappingTooltip = tooltip;
+        updateMappingTooltip();
+    }
+
+    protected void updateMappingTooltip() {
+        mappingTooltipLines.withLines(Collections.emptyList());
+        mappingTooltip.ifPresent(c -> mappingTooltipLines.withLines(c, 120));
+    }
+
+    @Override
+    protected void init() {
+        updateMappingTooltip();
+        addRenderableOnly(((guiGraphics, i, j, f) -> {
+            if (getFocused() instanceof MappingButton b && !mappingTooltipLines.getLines().isEmpty()) {
+                int tooltipHeight = mappingTooltipLines.getHeight() + 18;
+                int tooltipX = panel.getX() + panel.getWidth() - 2;
+                int tooltipY = Math.max(panel.getY() + 2, Math.min(b.getY() + (b.getHeight() - tooltipHeight) / 2, panel.getY() + panel.getHeight() - tooltipHeight - 2));
+                LegacyRenderUtil.renderPointerPanel(guiGraphics, tooltipX, tooltipY, 129, tooltipHeight);
+                mappingTooltipLines.setPosition(tooltipX + 4, tooltipY + 9);
+                mappingTooltipLines.render(guiGraphics, i, j, f);
+            }
+        }));
+        super.init();
+        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, FactoryAPIPlatform.getModInfo("minecraft").getVersion() + " " + Legacy4J.VERSION.get(), panel.getX() + panel.getWidth() + 81, panel.getY() + panel.getHeight() - 7, CommonColor.INVENTORY_GRAY_TEXT.get(), false)));
+    }
+
+    @Override
+    public void renderableVListInit() {
+        getRenderableVList().init(panel.x + 7, panel.y + 6, panel.width - 14, panel.height - 20);
+    }
+
+    @Override
+    public void addControlTooltips(ControlTooltip.Renderer renderer) {
+        super.addControlTooltips(renderer);
+        renderer.replace(0, i -> i, c -> selectedMapping == null ? c : null);
+        renderer.replace(1, i -> i, c -> selectedMapping == null ? c : null);
+        renderer.replace(2, i -> i, c -> selectedMapping == null ? c : null);
+        renderer.replace(3, i -> i, c -> selectedMapping == null ? c : null);
+        renderer.add(ControlTooltip.CANCEL_BINDING::get, () -> selectedMapping == null ? null : LegacyComponents.CANCEL);
+    }
+
+    @Override
+    public void bindingStateTick(BindingState state) {
+        if (selectedMapping != null) {
+            state.block();
+            if (state.is(ControllerBinding.BACK) && state.pressed) {
+                setAndUpdateKey(selectedMapping.self(), InputConstants.UNKNOWN);
+                setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
+                setSelectedMapping(null);
+            }
+        }
+    }
+
     public abstract class MappingButton extends AbstractButton {
         public final LegacyKeyMapping mapping;
 
@@ -118,161 +253,28 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
             if (!isFocused() && isPressed()) setSelectedMapping(null);
             super.renderWidget(guiGraphics, i, j, f);
             Component c = isPressed() ? SELECTION : isNone() ? NONE : null;
-            if (c != null){
-                guiGraphics.drawString(font, c, getX() + width - 20 - Minecraft.getInstance().font.width(c) / 2, getY() + (height -  font.lineHeight) / 2 + 1, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+            if (c != null) {
+                guiGraphics.drawString(font, c, getX() + width - 20 - Minecraft.getInstance().font.width(c) / 2, getY() + (height - font.lineHeight) / 2 + 1, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
                 return;
             }
             ControlTooltip.Icon icon = getIcon();
             FactoryScreenUtil.enableBlend();
-            icon.render(guiGraphics, getX() + width - 20 - icon.getWidth() / 2, getY() + (height -  font.lineHeight) / 2 + 1,false);
+            icon.render(guiGraphics, getX() + width - 20 - icon.getWidth() / 2, getY() + (height - font.lineHeight) / 2 + 1, false);
             FactoryScreenUtil.disableBlend();
         }
 
-        private boolean isPressed(){
+        private boolean isPressed() {
             return selectedMapping != null && mapping == selectedMapping;
         }
 
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-            LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 8, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j,true);
+            LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 8, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j, true);
         }
+
         @Override
         protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
             defaultButtonNarrationText(narrationElementOutput);
-        }
-    }
-
-    @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean bl) {
-        if (selectedMapping != null && allowsKey()) {
-            setAndUpdateKey(selectedMapping.self(), InputConstants.Type.MOUSE.getOrCreate(event.button()));
-            setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
-            resolveConflictingMappings();
-            setSelectedMapping(null);
-            return true;
-        }
-        return super.mouseClicked(event, bl);
-    }
-
-    public static void setAndUpdateKey(KeyMapping key, InputConstants.Key input){
-        key.setKey(input);
-        Minecraft.getInstance().options.save();
-        KeyMapping.resetMapping();
-    }
-
-    @Override
-    public boolean keyPressed(KeyEvent keyEvent) {
-        if (selectedMapping != null && allowsKey()){
-            setAndUpdateKey(selectedMapping.self(), keyEvent.isEscape() ? InputConstants.UNKNOWN : InputConstants.getKey(keyEvent));
-            setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
-            resolveConflictingMappings();
-            setSelectedMapping(null);
-            return true;
-        }
-        return super.keyPressed(keyEvent);
-    }
-
-    public boolean allowsKey(){
-        return true;
-    }
-
-    @Override
-    public void setFocused(@Nullable GuiEventListener guiEventListener) {
-        super.setFocused(guiEventListener);
-        setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
-    }
-
-    @Override
-    public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
-    }
-
-    public Component getCancelTooltip(){
-        return Component.translatable("legacy.options.keyMappingTooltip", ControlTooltip.CANCEL_BINDING.get().getComponent());
-    }
-
-    public Component getConflictingTooltip(){
-        return LegacyComponents.CONFLICTING_KEYS;
-    }
-
-    protected void setSelectedMapping(LegacyKeyMapping keyMapping){
-        this.selectedMapping = keyMapping;
-    }
-
-    protected boolean areConflicting(LegacyKeyMapping keyMapping, LegacyKeyMapping comparison){
-        return keyMapping.getKey() == comparison.getKey();
-    }
-
-    public boolean unbindConflictingBindings(){
-        return LegacyOptions.unbindConflictingKeys.get();
-    }
-
-    protected void setNone(LegacyKeyMapping keyMapping){
-        setAndUpdateKey(keyMapping.self(), InputConstants.UNKNOWN);
-    }
-
-    protected void resolveConflictingMappings(){
-        for (Renderable renderable : getRenderableVList().renderables) {
-            if (renderable instanceof MappingButton b && selectedMapping != b.mapping && !b.isNone() && areConflicting(selectedMapping, b.mapping)){
-                getRenderableVList().focusRenderable(b);
-                if (unbindConflictingBindings()) setNone(b.mapping);
-                setAndUpdateMappingTooltip(this::getConflictingTooltip);
-                break;
-            }
-        }
-    }
-
-    protected void setAndUpdateMappingTooltip(ArbitrarySupplier<Component> tooltip){
-        mappingTooltip = tooltip;
-        updateMappingTooltip();
-    }
-
-    protected void updateMappingTooltip(){
-        mappingTooltipLines.withLines(Collections.emptyList());
-        mappingTooltip.ifPresent(c-> mappingTooltipLines.withLines(c, 120));
-    }
-
-    @Override
-    protected void init() {
-        updateMappingTooltip();
-        addRenderableOnly(((guiGraphics, i, j, f) -> {
-            if (getFocused() instanceof MappingButton b && !mappingTooltipLines.getLines().isEmpty()) {
-                int tooltipHeight = mappingTooltipLines.getHeight() + 18;
-                int tooltipX = panel.getX() + panel.getWidth() - 2;
-                int tooltipY = Math.max(panel.getY() + 2, Math.min(b.getY() + (b.getHeight() - tooltipHeight) / 2, panel.getY() + panel.getHeight() - tooltipHeight - 2));
-                LegacyRenderUtil.renderPointerPanel(guiGraphics, tooltipX, tooltipY, 129,  tooltipHeight);
-                mappingTooltipLines.setPosition(tooltipX + 4, tooltipY + 9);
-                mappingTooltipLines.render(guiGraphics, i, j, f);
-            }
-        }));
-        super.init();
-        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, FactoryAPIPlatform.getModInfo("minecraft").getVersion() + " " + Legacy4J.VERSION.get(),panel.getX() + panel.getWidth() + 81, panel.getY() + panel.getHeight() - 7,CommonColor.INVENTORY_GRAY_TEXT.get(),false)));
-    }
-
-    @Override
-    public void renderableVListInit() {
-        getRenderableVList().init(panel.x + 7,panel.y + 6,panel.width - 14,panel.height-20);
-    }
-
-    @Override
-    public void addControlTooltips(ControlTooltip.Renderer renderer) {
-        super.addControlTooltips(renderer);
-        renderer.replace(0, i-> i, c-> selectedMapping == null ? c : null);
-        renderer.replace(1, i-> i, c-> selectedMapping == null ? c : null);
-        renderer.replace(2, i-> i, c-> selectedMapping == null ? c : null);
-        renderer.replace(3, i-> i, c-> selectedMapping == null ? c : null);
-        renderer.add(ControlTooltip.CANCEL_BINDING::get, ()-> selectedMapping == null ? null : LegacyComponents.CANCEL);
-    }
-
-    @Override
-    public void bindingStateTick(BindingState state) {
-        if (selectedMapping != null) {
-            state.block();
-            if (state.is(ControllerBinding.BACK) && state.pressed){
-                setAndUpdateKey(selectedMapping.self(), InputConstants.UNKNOWN);
-                setAndUpdateMappingTooltip(ArbitrarySupplier.empty());
-                setSelectedMapping(null);
-            }
         }
     }
 }

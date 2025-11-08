@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface CompositeRenderTypeAccessor {
     //? if <1.21.5 {
     /*@Invoker("state")
-    *///?} else {
+     *///?} else {
     @Accessor("state")
     //?}
     RenderType.CompositeState getState();

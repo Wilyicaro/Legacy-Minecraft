@@ -14,14 +14,15 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(targets = /*? if <1.21.2 {*//*"net.minecraft.client.gui.components.toasts.ToastComponent$ToastInstance"*//*?} else {*/ "net.minecraft.client.gui.components.toasts.ToastManager$ToastInstance"/*?}*/)
 public abstract class ToastComponentMixin {
 
-    //? if <1.21.2 {
-    /*@Shadow protected abstract float getVisibility(long l);
-    *///?} else {
-    @Shadow private float visiblePortion;
-    //?}
+    @Shadow
+    @Final
+    int /*? if >=1.21.2 {*/firstSlotIndex/*?} else {*//*index*//*?}*/;
 
-    @Shadow @Final private Toast toast;
-    @Shadow @Final int /*? if >=1.21.2 {*/firstSlotIndex/*?} else {*//*index*//*?}*/;
+    @Shadow
+    private float visiblePortion;
+    @Shadow
+    @Final
+    private Toast toast;
 
     //? if <=1.20.1 {
     /*@Inject(method = "render", at = @At("HEAD"), cancellable = true)
@@ -30,8 +31,8 @@ public abstract class ToastComponentMixin {
     }
     *///?}
 
-    @Redirect(method = "render", at = @At(value = "INVOKE",target = "Lorg/joml/Matrix3x2fStack;translate(FF)Lorg/joml/Matrix3x2f;", remap = false))
-    private Matrix3x2f render(Matrix3x2fStack instance, float f, float g, /*? if >=1.21.2 {*/GuiGraphics guiGraphics, /*?}*/int i){
-        return instance.translate((i - this.toast.width()) / 2f,-toast.height() + (50 + toast.height() + this./*? if >=1.21.2 {*/firstSlotIndex/*?} else {*//*index*//*?}*/ * 32f) * /*? if <1.21.2 {*//*this.getVisibility(Util.getMillis())*//*?} else {*/visiblePortion/*?}*/);
+    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;translate(FF)Lorg/joml/Matrix3x2f;", remap = false))
+    private Matrix3x2f render(Matrix3x2fStack instance, float f, float g, /*? if >=1.21.2 {*/GuiGraphics guiGraphics, /*?}*/int i) {
+        return instance.translate((i - this.toast.width()) / 2f, -toast.height() + (50 + toast.height() + this./*? if >=1.21.2 {*/firstSlotIndex/*?} else {*//*index*//*?}*/ * 32f) * /*? if <1.21.2 {*//*this.getVisibility(Util.getMillis())*//*?} else {*/visiblePortion/*?}*/);
     }
 }

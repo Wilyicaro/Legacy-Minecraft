@@ -30,8 +30,8 @@ public abstract class PlayerListMixin {
 
     @Inject(method = "respawn", at = @At("RETURN"))
     public void respawn(ServerPlayer serverPlayer, boolean bl, /*? if >=1.20.5 {*/Entity.RemovalReason removalReason,/*?}*/ CallbackInfoReturnable<ServerPlayer> cir) {
-        ((LegacyPlayerInfo)cir.getReturnValue()).copyFrom(((LegacyPlayerInfo)serverPlayer));
-        ((LegacyPlayer)cir.getReturnValue()).copyFrom(((LegacyPlayer)serverPlayer));
+        ((LegacyPlayerInfo) cir.getReturnValue()).copyFrom(((LegacyPlayerInfo) serverPlayer));
+        ((LegacyPlayer) cir.getReturnValue()).copyFrom(((LegacyPlayer) serverPlayer));
         CriteriaTriggers.CHANGED_DIMENSION.trigger(cir.getReturnValue(), serverPlayer.level().dimension(), cir.getReturnValue().level().dimension());
     }
 }

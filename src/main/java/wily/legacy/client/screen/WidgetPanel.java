@@ -24,14 +24,15 @@ public class WidgetPanel extends Panel implements GuiEventListener, NarratableEn
     public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
         return !this.isFocused() ? ComponentPath.leaf(this) : null;
     }
-    @Override
-    public void setFocused(boolean bl) {
-        this.focused = bl;
-    }
 
     @Override
     public boolean isFocused() {
         return focused;
+    }
+
+    @Override
+    public void setFocused(boolean bl) {
+        this.focused = bl;
     }
 
     @Override

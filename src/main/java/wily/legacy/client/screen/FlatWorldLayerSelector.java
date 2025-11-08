@@ -20,37 +20,38 @@ import wily.legacy.util.LegacySprites;
 import java.util.function.Consumer;
 
 public class FlatWorldLayerSelector extends ItemViewerScreen {
+    protected final LegacySliderButton<Integer> layerSlider;
     private final Consumer<FlatWorldLayerSelector> applyLayer;
     protected Block selectedLayer = Blocks.AIR;
-    protected final LegacySliderButton<Integer> layerSlider;
-
     protected ItemStack displayLayer = ItemStack.EMPTY;
 
     public FlatWorldLayerSelector(Screen parent, Consumer<FlatWorldLayerSelector> applyLayer, int maxLayerHeight, Component component) {
-        super(parent,s-> Panel.centered(s,325,245), component);
+        super(parent, s -> Panel.centered(s, 325, 245), component);
         this.applyLayer = applyLayer;
-        layerSlider = LegacySliderButton.createFromIntRange(panel.x + 21, panel.y + 167, 271, 16, (b)-> Component.translatable("legacy.menu.create_flat_world.layer_height"),(b)-> null, 1, 1, maxLayerHeight, b-> {});
-    }
-
-    @Override
-    protected void addLayerItems() {
-        BuiltInRegistries.FLUID.stream().filter(f-> f.getBucket() != null && (f == Fluids.EMPTY || f.isSource(f.defaultFluidState()))).forEach(f-> {
-            Item i;
-            if ((i =f.defaultFluidState().createLegacyBlock().getBlock().asItem()) instanceof BlockItem) layerItems.add(i.getDefaultInstance());
-            else layerItems.add(f.getBucket().getDefaultInstance());
-        });
-        BuiltInRegistries.BLOCK.forEach(b->{
-            if (b instanceof LiquidBlock) return;
-            Item i = Item.BY_BLOCK.getOrDefault(b, null);
-            if (i != null) layerItems.add(i.getDefaultInstance());
+        layerSlider = LegacySliderButton.createFromIntRange(panel.x + 21, panel.y + 167, 271, 16, (b) -> Component.translatable("legacy.menu.create_flat_world.layer_height"), (b) -> null, 1, 1, maxLayerHeight, b -> {
         });
     }
 
     public FlatWorldLayerSelector(Screen parent, FlatLayerInfo editLayer, Consumer<FlatWorldLayerSelector> applyLayer, int maxLayerHeight, Component component) {
-        this(parent,applyLayer,maxLayerHeight,component);
+        this(parent, applyLayer, maxLayerHeight, component);
         selectedLayer = editLayer.getBlockState().getBlock();
         displayLayer = editLayer.getBlockState().getBlock().asItem().getDefaultInstance();
         layerSlider.setObjectValue(editLayer.getHeight());
+    }
+
+    @Override
+    protected void addLayerItems() {
+        BuiltInRegistries.FLUID.stream().filter(f -> f.getBucket() != null && (f == Fluids.EMPTY || f.isSource(f.defaultFluidState()))).forEach(f -> {
+            Item i;
+            if ((i = f.defaultFluidState().createLegacyBlock().getBlock().asItem()) instanceof BlockItem)
+                layerItems.add(i.getDefaultInstance());
+            else layerItems.add(f.getBucket().getDefaultInstance());
+        });
+        BuiltInRegistries.BLOCK.forEach(b -> {
+            if (b instanceof LiquidBlock) return;
+            Item i = Item.BY_BLOCK.getOrDefault(b, null);
+            if (i != null) layerItems.add(i.getDefaultInstance());
+        });
     }
 
     public FlatLayerInfo getFlatLayerInfo() {
@@ -62,10 +63,10 @@ public class FlatWorldLayerSelector extends ItemViewerScreen {
         super.init();
         layerSlider.setPosition(panel.x + 21, panel.y + 167);
         addRenderableWidget(layerSlider);
-        addRenderableWidget(Button.builder(Component.translatable("gui.ok"), b-> {
+        addRenderableWidget(Button.builder(Component.translatable("gui.ok"), b -> {
             applyLayer.accept(this);
             onClose();
-        }).bounds(panel.x + 57,panel.y + 216,200,20).build());
+        }).bounds(panel.x + 57, panel.y + 216, 200, 20).build());
     }
 
     @Override
@@ -77,12 +78,12 @@ public class FlatWorldLayerSelector extends ItemViewerScreen {
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         super.renderDefaultBackground(guiGraphics, i, j, f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS,panel.x + 20, panel. y + 187, 275, 27);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 20, panel.y + 187, 275, 27);
 
-        guiGraphics.drawString(this.font, this.title,panel.x + (panel.width - font.width(title)) / 2,panel. y + 8, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        guiGraphics.drawString(this.font, this.title, panel.x + (panel.width - font.width(title)) / 2, panel.y + 8, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
         Component layerCount = Component.translatable("legacy.menu.create_flat_world.layer_count", layerSlider.getObjectValue());
-        guiGraphics.drawString(this.font, layerCount,panel.x + 49 - font.width(layerCount),panel. y + 197, 0xFFFFFFFF, true);
-        guiGraphics.drawString(this.font, selectedLayer.getName(),panel.x + 70,panel. y + 197, 0xFFFFFFFF, true);
+        guiGraphics.drawString(this.font, layerCount, panel.x + 49 - font.width(layerCount), panel.y + 197, 0xFFFFFFFF, true);
+        guiGraphics.drawString(this.font, selectedLayer.getName(), panel.x + 70, panel.y + 197, 0xFFFFFFFF, true);
 
 
         guiGraphics.pose().pushMatrix();
@@ -91,5 +92,4 @@ public class FlatWorldLayerSelector extends ItemViewerScreen {
         guiGraphics.renderItem(displayLayer, 0, 0);
         guiGraphics.pose().popMatrix();
     }
-
 }

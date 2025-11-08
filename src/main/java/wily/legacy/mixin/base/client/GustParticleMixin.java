@@ -14,7 +14,9 @@ import org.spongepowered.asm.mixin.Shadow;
 @Mixin(GustParticle.class)
 public abstract class GustParticleMixin extends SingleQuadParticle {
 
-    @Shadow @Final private SpriteSet sprites;
+    @Shadow
+    @Final
+    private SpriteSet sprites;
 
     protected GustParticleMixin(ClientLevel clientLevel, double d, double e, double f, TextureAtlasSprite textureAtlasSprite) {
         super(clientLevel, d, e, f, textureAtlasSprite);

@@ -1,7 +1,7 @@
 {
   "targetUI": "wily.legacy.client.screen.WorldMoreOptionsScreen",
   "targetType": "class",
-  "applyCondition": "${windowHeight}>=1080",
+  "applyCondition": { "reference": "uiMode.fhd" },
   "elements": {
     "panel.sprite": {
       "type": "put_resource_location",

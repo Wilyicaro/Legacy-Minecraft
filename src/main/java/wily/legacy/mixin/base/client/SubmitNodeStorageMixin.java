@@ -17,20 +17,21 @@ import java.util.List;
 
 @Mixin(SubmitNodeStorage.class)
 public abstract class SubmitNodeStorageMixin implements LegacySubmitNodeCollector {
-    @Shadow public abstract SubmitNodeCollection order(int i);
+    @Shadow
+    public abstract SubmitNodeCollection order(int i);
 
     @Override
     public void submitLegacyNameTag(PoseStack poseStack, @Nullable Vec3 vec3, int i, Component component, boolean bl, int j, double d, CameraRenderState cameraRenderState, float[] color) {
-        ((LegacySubmitNodeCollector)order(0)).submitLegacyNameTag(poseStack, vec3, i, component, bl, j, d, cameraRenderState, color);
+        ((LegacySubmitNodeCollector) order(0)).submitLegacyNameTag(poseStack, vec3, i, component, bl, j, d, cameraRenderState, color);
     }
 
     @Override
     public void submitLoyaltyLines(PoseStack poseStack, LoyaltyLinesRenderState loyaltyLinesRenderState) {
-        ((LegacySubmitNodeCollector)order(0)).submitLoyaltyLines(poseStack, loyaltyLinesRenderState);
+        ((LegacySubmitNodeCollector) order(0)).submitLoyaltyLines(poseStack, loyaltyLinesRenderState);
     }
 
     @Override
     public List<LoyaltyLinesRenderer.Submit> getLoyaltyLinesSubmits() {
-        return ((LegacySubmitNodeCollector)order(0)).getLoyaltyLinesSubmits();
+        return ((LegacySubmitNodeCollector) order(0)).getLoyaltyLinesSubmits();
     }
 }

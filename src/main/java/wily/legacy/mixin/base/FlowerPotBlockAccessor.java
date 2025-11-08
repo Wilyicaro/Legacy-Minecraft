@@ -10,7 +10,7 @@ import java.util.Map;
 @Mixin(FlowerPotBlock.class)
 public interface FlowerPotBlockAccessor {
     @Accessor("POTTED_BY_CONTENT")
-    static Map<Block, Block> getPottedByContent(){
+    static Map<Block, Block> getPottedByContent() {
         return null;
     }
 }

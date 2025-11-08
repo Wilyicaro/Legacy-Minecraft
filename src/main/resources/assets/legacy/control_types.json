@@ -1,1 +1,19 @@
-["legacy:java","legacy:xbox_360","legacy:xbox_one","legacy:playstation_3","legacy:playstation_vita","legacy:playstation_4","legacy:playstation_5","legacy:wii_u","legacy:switch","legacy:steam","legacy:stadia"]
+[
+  {
+    "id": "legacy:java",
+    "name": {"translate": "legacy.options.controlType.java"},
+    "isKbm": true,
+    "font": "legacy:java",
+    "minecraftLogo": "legacy:textures/gui/title/minecraft/java.png"
+  },
+  "legacy:xbox_360",
+  "legacy:xbox_one",
+  "legacy:playstation_3",
+  "legacy:playstation_vita",
+  "legacy:playstation_4",
+  "legacy:playstation_5",
+  "legacy:wii_u",
+  "legacy:switch",
+  "legacy:steam",
+  "legacy:stadia"
+]

@@ -11,6 +11,7 @@ public interface FireworkRocketRecipeAccessor {
     static Ingredient getPaperIngredient() {
         return null;
     }
+
     @Accessor("GUNPOWDER_INGREDIENT")
     static Ingredient getGunpowderIngredient() {
         return null;

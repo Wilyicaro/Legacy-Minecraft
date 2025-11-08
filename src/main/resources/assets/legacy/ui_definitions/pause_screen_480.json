@@ -1,0 +1,22 @@
+{
+  "targetUI": "minecraft:pause_screen",
+  "applyCondition": { "reference": "uiMode.sd" },
+  "elements": {
+    "buttonsHeight": {
+      "type": "put_number",
+      "value": 18
+    },
+    "renderableVList.width": {
+      "type": "put_number",
+      "value": 135
+    },
+    "renderableVList.x": {
+      "type": "put_number",
+      "value": "(${width}-${renderableVList.width})/2"
+    },
+    "renderableVList.y": {
+      "type": "put_number",
+      "value": 55
+    }
+  }
+}

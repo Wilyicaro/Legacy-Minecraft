@@ -18,14 +18,17 @@ public interface FireworkStarRecipeAccessor {
     static Ingredient getTwinkleIngredient() {
         return null;
     }
+
     @Accessor("TRAIL_INGREDIENT")
     static Ingredient getTrailIngredient() {
         return null;
     }
+
     @Accessor("GUNPOWDER_INGREDIENT")
     static Ingredient getGunpowderIngredient() {
         return null;
     }
+
     @Accessor("SHAPE_BY_ITEM")
     static Map<Item, /*? if >=1.20.5 {*/FireworkExplosion.Shape/*?} else {*//*FireworkRocketItem.Shape*//*?}*/> getShapeByItem() {
         return null;

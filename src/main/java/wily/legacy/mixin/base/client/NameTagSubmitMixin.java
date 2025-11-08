@@ -9,12 +9,12 @@ public class NameTagSubmitMixin implements LegacyNameTag {
     float[] nameTagColor = null;
 
     @Override
-    public void setNameTagColor(float[] color) {
-        nameTagColor = color;
+    public float[] getNameTagColor() {
+        return nameTagColor;
     }
 
     @Override
-    public float[] getNameTagColor() {
-        return nameTagColor;
+    public void setNameTagColor(float[] color) {
+        nameTagColor = color;
     }
 }

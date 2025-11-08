@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 //?}
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.Vec2;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,23 +33,26 @@ import java.util.List;
 
 @Mixin(RecipeToast.class)
 public abstract class RecipeToastMixin implements Toast {
-    @Shadow @Final private static Component TITLE_TEXT;
+    @Shadow
+    @Final
+    private static Component TITLE_TEXT;
 
-    @Shadow @Final private static Component DESCRIPTION_TEXT;
+    @Shadow
+    @Final
+    private static Component DESCRIPTION_TEXT;
+    private final List<Pair<ItemStack, ItemStack>> displayItems = new ArrayList<>();
+    @Shadow
+    private int displayedRecipeIndex;
 
-    //? if <1.21.2 {
-    /*@Shadow private boolean changed;
-    @Shadow @Final private List</^? if >1.20.1 {^/RecipeHolder<?>/^?} else {^//^Recipe<?>^//^?}^/> recipes;
-    @Shadow private long lastChanged;
-    *///?} else {
-    @Shadow private int displayedRecipeIndex;
-    private final List<Pair<ItemStack,ItemStack>> displayItems = new ArrayList<>();
+    @Inject(method = "addOrUpdate", at = @At("HEAD"), cancellable = true)
+    private static void addOrUpdate(CallbackInfo ci) {
+        if (!LegacyOptions.hasClassicCrafting()) ci.cancel();
+    }
 
     @Inject(method = "addItem", at = @At("RETURN"))
-    private void addItem(ItemStack itemStack, ItemStack itemStack2, CallbackInfo ci){
-        displayItems.add(Pair.of(itemStack,itemStack2));
+    private void addItem(ItemStack itemStack, ItemStack itemStack2, CallbackInfo ci) {
+        displayItems.add(Pair.of(itemStack, itemStack2));
     }
-    //?}
 
     @Override
     public int width() {
@@ -61,41 +64,22 @@ public abstract class RecipeToastMixin implements Toast {
         return 40;
     }
 
-    @Inject(method = "addOrUpdate", at = @At("HEAD"), cancellable = true)
-    private static void addOrUpdate(CallbackInfo ci) {
-        if (!LegacyOptions.hasClassicCrafting()) ci.cancel();
-    }
     @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
-    public void render(GuiGraphics guiGraphics, /*? if <1.21.2 {*/ /*ToastComponent toastComponent*//*?} else {*/Font font /*?}*/, long l, /*? if <1.21.2 {*/ /*CallbackInfoReturnable<Visibility> cir*//*?} else {*/CallbackInfo ci/*?}*/) {
-        //? if <1.21.2 {
-        /*if (this.changed) {
-            this.lastChanged = l;
-            this.changed = false;
-        }
-        if (this.recipes.isEmpty() || !ScreenUtil.hasClassicCrafting()){
-            cir.setReturnValue(Toast.Visibility.HIDE);
-            return;
-        }
-        /^? if >1.20.1 {^/RecipeHolder<?>/^?} else {^//^Recipe<?>^//^?}^/ recipeHolder = this.recipes.get((int)((double)l / Math.max(1.0, 5000.0 * toastComponent.getNotificationDisplayTimeMultiplier() / (double)this.recipes.size()) % (double)this.recipes.size()));
-        *///?} else {
+    public void render(GuiGraphics guiGraphics, Font font, long l, CallbackInfo ci) {
         ci.cancel();
-        //?}
 
-        LegacyRenderUtil.renderPointerPanel(guiGraphics,0,0,width(),height());
+        LegacyRenderUtil.renderPointerPanel(guiGraphics, 0, 0, width(), height());
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate((width() - 1.5f * Minecraft.getInstance().font.width(TITLE_TEXT)) / 2, 10);
-        guiGraphics.pose().scale(1.5f,1.5f);
-        guiGraphics.drawString(Minecraft.getInstance().font, TITLE_TEXT, 0,0, 0xFFFFFFFF);
+        guiGraphics.pose().scale(1.5f, 1.5f);
+        guiGraphics.drawString(Minecraft.getInstance().font, TITLE_TEXT, 0, 0, 0xFFFFFFFF);
         guiGraphics.pose().popMatrix();
-        guiGraphics.drawString(Minecraft.getInstance().font, DESCRIPTION_TEXT, (width() - Minecraft.getInstance().font.width(DESCRIPTION_TEXT)) / 2 , 27, 0xFFFFFFFF);
-        ItemStack toastSymbol = /*? if <1.21.2 {*//*recipeHolder/^? if >1.20.1 {^/.value()/^?}^/.getToastSymbol()*//*?} else {*/ displayItems.get(displayedRecipeIndex).key()/*?}*/;
-        ItemStack resultItem = /*? if <1.21.2 {*//*recipeHolder/^? if >1.20.1 {^/.value()/^?}^/.getResultItem(Minecraft.getInstance().level.registryAccess())*//*?} else {*/ displayItems.get(displayedRecipeIndex).value()/*?}*/;
+        guiGraphics.drawString(Minecraft.getInstance().font, DESCRIPTION_TEXT, (width() - Minecraft.getInstance().font.width(DESCRIPTION_TEXT)) / 2, 27, 0xFFFFFFFF);
+        ItemStack toastSymbol = displayItems.get(displayedRecipeIndex).key();
+        ItemStack resultItem = displayItems.get(displayedRecipeIndex).value();
 
-        LegacyRenderUtil.iconHolderRenderer.itemHolder(8,(height() - 27) / 2,27,27,toastSymbol,false, Vec3.ZERO).renderItem(guiGraphics,0,0,0);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL,width() - 36,(height() - 28) / 2,28,28);
-        guiGraphics.renderItem(resultItem ,width() - 30, (height() - 16) / 2);
-        //? if <1.21.2 {
-        /*cir.setReturnValue((double)(l - this.lastChanged) >= 5000.0 * toastComponent.getNotificationDisplayTimeMultiplier() ? Toast.Visibility.HIDE : Toast.Visibility.SHOW);
-        *///?}
+        LegacyRenderUtil.iconHolderRenderer.itemHolder(8, (height() - 27) / 2, 27, 27, toastSymbol, false, Vec2.ZERO).renderItem(guiGraphics, 0, 0, 0);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_PANEL, width() - 36, (height() - 28) / 2, 28, 28);
+        guiGraphics.renderItem(resultItem, width() - 30, (height() - 16) / 2);
     }
 }

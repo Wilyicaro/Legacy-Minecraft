@@ -1,4 +1,3 @@
-
 package wily.legacy.mixin.base.client;
 
 import net.minecraft.Util;
@@ -29,28 +28,37 @@ import java.util.List;
 @Mixin(DeathScreen.class)
 public abstract class DeathScreenMixin extends Screen implements ControlTooltip.Event {
 
-    @Shadow @Final public boolean hardcore;
+    @Shadow
+    @Final
+    public boolean hardcore;
 
-    @Shadow @Final public Component causeOfDeath;
+    @Shadow
+    @Final
+    public Component causeOfDeath;
 
-    @Shadow @Nullable private Button exitToTitleButton;
-
-    @Shadow @Nullable protected abstract Style getClickedComponentStyleAt(int i);
-
-    @Shadow @Final private List<Button> exitButtons;
-
-
-    @Shadow protected abstract void handleExitToTitleScreen();
-
-    @Shadow protected abstract void setButtonsActive(boolean bl);
-
-    @Shadow private int delayTicker;
-
-    private long screenInit = Util.getMillis();
+    @Shadow
+    @Nullable
+    private Button exitToTitleButton;
+    @Shadow
+    @Final
+    private List<Button> exitButtons;
+    @Shadow
+    private int delayTicker;
+    private final long screenInit = Util.getMillis();
 
     protected DeathScreenMixin(Component component) {
         super(component);
     }
+
+    @Shadow
+    @Nullable
+    protected abstract Style getClickedComponentStyleAt(int i);
+
+    @Shadow
+    protected abstract void handleExitToTitleScreen();
+
+    @Shadow
+    protected abstract void setButtonsActive(boolean bl);
 
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     protected void init(CallbackInfo ci) {
@@ -67,28 +75,31 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
         }).bounds(this.width / 2 - 100, this.height / 2 + 45, 200, 20).build()));
         setButtonsActive(false);
     }
+
     @Inject(method = "handleExitToTitleScreen", at = @At("HEAD"), cancellable = true)
     private void handleExitToTitleScreen(CallbackInfo ci) {
         ci.cancel();
         if (this.hardcore) {
-            ExitConfirmationScreen.exit(minecraft,true);
+            ExitConfirmationScreen.exit(minecraft, true);
         } else {
             this.minecraft.setScreen(new ExitConfirmationScreen(this));
         }
     }
+
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
-        float alpha = Math.min((Util.getMillis() - screenInit) / 1200f,1.0f);
-        guiGraphics.fill(0, 0, guiGraphics.guiWidth(),guiGraphics.guiHeight(), 3672076 | Mth.ceil(alpha * 160.0F) << 24);
+        float alpha = Math.min((Util.getMillis() - screenInit) / 1200f, 1.0f);
+        guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 3672076 | Mth.ceil(alpha * 160.0F) << 24);
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate((this.width - font.width(title) * 2) / 2f, height / 4f + 20);
         guiGraphics.pose().scale(2.0F, 2.0F);
-        LegacyRenderUtil.drawOutlinedString(guiGraphics,this.font, this.title, 0,0, CommonColor.TITLE_TEXT.get(),CommonColor.TITLE_TEXT_OUTLINE.get(),0.5f);
+        LegacyRenderUtil.drawOutlinedString(guiGraphics, this.font, this.title, 0, 0, CommonColor.TITLE_TEXT.get(), CommonColor.TITLE_TEXT_OUTLINE.get(), 0.5f);
         guiGraphics.pose().popMatrix();
         if (this.causeOfDeath != null) {
             guiGraphics.drawCenteredString(this.font, this.causeOfDeath, this.width / 2, height / 2 - 24, 16777215);
-            if (j > height / 2 - 24 && j < height / 2 - 15) guiGraphics.renderComponentHoverEffect(this.font, this.getClickedComponentStyleAt(i), i, j);
+            if (j > height / 2 - 24 && j < height / 2 - 15)
+                guiGraphics.renderComponentHoverEffect(this.font, this.getClickedComponentStyleAt(i), i, j);
         }
 
         if (this.exitToTitleButton != null && this.minecraft.getReportingContext().hasDraftReport()) {

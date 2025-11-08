@@ -23,12 +23,11 @@ import java.util.function.Consumer;
 
 public record LegacyItemAttributeDisplay(ItemStack context) implements ItemAttributeModifiers.Display {
     public static final Codec<LegacyItemAttributeDisplay> CODEC = ItemStack.CODEC.xmap(LegacyItemAttributeDisplay::new, LegacyItemAttributeDisplay::context);
-    static final StreamCodec<RegistryFriendlyByteBuf, LegacyItemAttributeDisplay> STREAM_CODEC = ItemStack.STREAM_CODEC.map(LegacyItemAttributeDisplay::new, LegacyItemAttributeDisplay::context);
     public static final DecimalFormat ATTRIBUTE_MODIFIER_FORMAT = Util.make(new DecimalFormat("#.##"), (decimalFormat) -> {
         decimalFormat.setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Locale.ROOT));
         decimalFormat.setMinimumFractionDigits(1);
     });
-
+    static final StreamCodec<RegistryFriendlyByteBuf, LegacyItemAttributeDisplay> STREAM_CODEC = ItemStack.STREAM_CODEC.map(LegacyItemAttributeDisplay::new, LegacyItemAttributeDisplay::context);
 
     public Type type() {
         return ItemAttributeModifiers.Display.Type.DEFAULT;
@@ -42,12 +41,12 @@ public record LegacyItemAttributeDisplay(ItemStack context) implements ItemAttri
         double e;
         if (arg3.operation() != AttributeModifier.Operation.ADD_MULTIPLIED_BASE && arg3.operation() != AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL) {
             if (arg2.is(Attributes.KNOCKBACK_RESISTANCE)) {
-                e = d * (double)10.0F;
+                e = d * (double) 10.0F;
             } else {
                 e = d;
             }
         } else {
-            e = d * (double)100.0F;
+            e = d * (double) 100.0F;
         }
 
         if (d >= 0.0F) {

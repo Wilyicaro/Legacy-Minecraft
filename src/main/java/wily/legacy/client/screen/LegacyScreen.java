@@ -9,8 +9,8 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
 public class LegacyScreen extends Screen implements Controller.Event, ControlTooltip.Event {
-    public Screen parent;
     protected final UIAccessor accessor = UIAccessor.of(this);
+    public Screen parent;
 
     protected LegacyScreen(Component component) {
         super(component);
@@ -27,7 +27,7 @@ public class LegacyScreen extends Screen implements Controller.Event, ControlToo
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderDefaultBackground(guiGraphics,i,j,f);
+        renderDefaultBackground(guiGraphics, i, j, f);
     }
 
     @Override

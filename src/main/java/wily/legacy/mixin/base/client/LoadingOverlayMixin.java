@@ -30,14 +30,24 @@ public abstract class LoadingOverlayMixin extends Overlay {
     @Unique
     private static boolean loadIntroLocation = false;
 
-    @Shadow @Final private ReloadInstance reload;
+    @Shadow
+    @Final
+    private ReloadInstance reload;
 
-    @Shadow @Final private Consumer<Optional<Throwable>> onFinish;
+    @Shadow
+    @Final
+    private Consumer<Optional<Throwable>> onFinish;
 
-    @Shadow @Final private Minecraft minecraft;
-    @Shadow private long fadeOutStart;
-    @Shadow @Final private boolean fadeIn;
-    @Shadow private long fadeInStart;
+    @Shadow
+    @Final
+    private Minecraft minecraft;
+    @Shadow
+    private long fadeOutStart;
+    @Shadow
+    @Final
+    private boolean fadeIn;
+    @Shadow
+    private long fadeInStart;
     @Unique
     private long initTime;
 
@@ -52,7 +62,8 @@ public abstract class LoadingOverlayMixin extends Overlay {
                 LegacyResourceManager.loadIntroLocations(minecraft.getResourceManager());
             }
             float timer = LegacyIntro.getTimer(initTime, LegacyResourceManager.intro);
-            if (!finishedIntro && LegacyIntro.canSkip(timer, LegacyResourceManager.intro) && reload.isDone()) finishedIntro = true;
+            if (!finishedIntro && LegacyIntro.canSkip(timer, LegacyResourceManager.intro) && reload.isDone())
+                finishedIntro = true;
             if (!finishedIntro) {
                 LegacyIntro.render(guiGraphics, LegacyResourceManager.intro, timer);
             }
@@ -65,9 +76,11 @@ public abstract class LoadingOverlayMixin extends Overlay {
                 }
                 float g = this.fadeOutStart > -1L ? (float) (m - this.fadeOutStart) / 1000.0f : -1.0f;
                 h = this.fadeInStart > -1L ? (float) (m - this.fadeInStart) / 500.0f : -1.0f;
-                if ((MinecraftAccessor.getInstance().hasGameLoaded() && reload.isDone()) && minecraft.screen != null)
+                if ((MinecraftAccessor.getInstance().hasGameLoaded() && reload.isDone()) && minecraft.screen != null) {
                     this.minecraft.screen.renderWithTooltipAndSubtitles(guiGraphics, 0, 0, f);
-                else {
+                    this.minecraft.setOverlay(null);
+                    return;
+                } else {
                     FactoryGuiGraphics.of(guiGraphics).blit(LegacyRenderUtil.LOADING_BACKGROUND, 0, 0, 0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight());
                 }
                 if (g < 1.0f && !reload.isDone() && MinecraftAccessor.getInstance().hasGameLoaded())

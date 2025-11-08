@@ -15,11 +15,13 @@ import wily.legacy.client.LegacyOptions;
 
 @Mixin(VillagerModel.class)
 public class VillagerModelMixin {
-    @Shadow @Final private ModelPart head;
+    @Shadow
+    @Final
+    private ModelPart head;
 
     @Inject(method = "setupAnim*", at = @At("RETURN"))
     public void setupAnim(VillagerRenderState villager, CallbackInfo ci) {
-        if (LegacyOptions.legacyBabyVillagerHead.get()){
+        if (LegacyOptions.legacyBabyVillagerHead.get()) {
             head.xScale = head.yScale = head.zScale = (villager.isBaby ? 1.5f : 1);
         }
     }

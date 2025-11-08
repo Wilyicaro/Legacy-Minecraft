@@ -15,6 +15,7 @@ public interface GlyphInfoMixin extends GlyphInfo {
     default float getShadowOffset() {
         return LegacyFontUtil.legacyFont ? 0.4f : 1.0f;
     }
+
     /**
      * @author Wilyicaro
      * @reason Legacy Edition Accuracy

@@ -37,12 +37,12 @@ public class LegacyLoadingMessageScreenMixin extends Screen implements LegacyLoa
     //?}
 
     @Override
-    public int getProgress() {
+    public float getProgress() {
         return legacyLoadingScreen.getProgress();
     }
 
     @Override
-    public void setProgress(int progress) {
+    public void setProgress(float progress) {
         legacyLoadingScreen.setProgress(progress);
     }
 

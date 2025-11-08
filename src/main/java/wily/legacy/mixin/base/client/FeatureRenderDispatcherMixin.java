@@ -18,7 +18,9 @@ import wily.legacy.client.LoyaltyLinesRenderer;
 public class FeatureRenderDispatcherMixin implements LegacyFeatureRenderDispatcher {
 
     @Mutable
-    @Shadow @Final private MultiBufferSource.BufferSource bufferSource;
+    @Shadow
+    @Final
+    private MultiBufferSource.BufferSource bufferSource;
 
     @Inject(method = "renderAllFeatures", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/feature/FlameFeatureRenderer;render(Lnet/minecraft/client/renderer/SubmitNodeCollection;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/resources/model/AtlasManager;)V"))
     private void renderLoyaltyLinesFeatures(CallbackInfo ci, @Local SubmitNodeCollection submitNodeCollection) {
@@ -26,12 +28,12 @@ public class FeatureRenderDispatcherMixin implements LegacyFeatureRenderDispatch
     }
 
     @Override
-    public void setBufferSource(MultiBufferSource.BufferSource bufferSource) {
-        this.bufferSource = bufferSource;
+    public MultiBufferSource.BufferSource getBufferSource() {
+        return bufferSource;
     }
 
     @Override
-    public MultiBufferSource.BufferSource getBufferSource() {
-        return bufferSource;
+    public void setBufferSource(MultiBufferSource.BufferSource bufferSource) {
+        this.bufferSource = bufferSource;
     }
 }

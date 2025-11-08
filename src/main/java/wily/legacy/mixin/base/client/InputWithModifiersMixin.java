@@ -12,8 +12,9 @@ import wily.legacy.client.screen.KeyboardScreen;
 @Mixin(InputWithModifiers.class)
 public interface InputWithModifiersMixin {
     //TODO use @Overwrite if Forge still doesn't support mixin in interfaces...
-    @Inject(method = "hasShiftDown",at = @At("HEAD"), cancellable = true)
+    @Inject(method = "hasShiftDown", at = @At("HEAD"), cancellable = true)
     private void hasShiftDown(CallbackInfoReturnable<Boolean> cir) {
-        if (Legacy4JClient.controllerManager.simulateShift || Minecraft.getInstance().screen instanceof KeyboardScreen s && s.shift) cir.setReturnValue(true);
+        if (Legacy4JClient.controllerManager.simulateShift || Minecraft.getInstance().screen instanceof KeyboardScreen s && s.shift)
+            cir.setReturnValue(true);
     }
 }

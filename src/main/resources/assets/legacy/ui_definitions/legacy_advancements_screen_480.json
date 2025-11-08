@@ -1,0 +1,50 @@
+{
+  "targetUI": "wily.legacy.client.screen.LegacyAdvancementsScreen",
+  "targetType": "class",
+  "applyCondition": { "reference": "uiMode.sd" },
+  "elements": {
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "tabList.sprites": {
+      "type": "put_toggleable_tab_sprites",
+      "value": {
+        "high": {
+          "left": "legacy:tiles/big_high_tab_left",
+          "middle": "legacy:tiles/big_high_tab_middle",
+          "right": "legacy:tiles/big_high_tab_right"
+        },
+        "down": "legacy:tiles/big_low_tab"
+      }
+    },
+    "panel.y": {
+      "type": "put_number",
+      "value": "(${height}-${panel.height}+21)/2"
+    },
+    "tabList.buttonWidth": {
+      "type": "put_number",
+      "value": 24
+    },
+    "tabList.height": {
+      "type": "put_number",
+      "value": 27
+    },
+    "tabList.y": {
+      "type": "put_number",
+      "value": "${panel.y}-21"
+    },
+    "panel.width": {
+      "type": "put_number",
+      "value": 240
+    },
+    "panel.height": {
+      "type": "put_number",
+      "value": 170
+    },
+    "panelRecess.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/square_recessed_panel"
+    }
+  }
+}

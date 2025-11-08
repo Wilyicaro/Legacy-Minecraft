@@ -1,126 +1,89 @@
 package wily.legacy.client;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.Biome;
 import wily.factoryapi.FactoryAPI;
-import wily.legacy.Legacy4J;
-import wily.legacy.util.JsonUtil;
+import wily.factoryapi.util.DynamicUtil;
+import wily.legacy.Legacy4JClient;
+import wily.legacy.util.IOUtil;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 
-public class LegacyBiomeOverride {
-    public static final Map<ResourceLocation,LegacyBiomeOverride> map = new HashMap<>();
-    private static final String BIOME_OVERRIDES = "biome_overrides.json";
+public record LegacyBiomeOverride(ResourceLocation id, Optional<Component> name, Optional<ItemStack> item,
+                                  Optional<Integer> waterColor, Optional<Integer> waterFogColor,
+                                  Optional<Integer> fogColor, Optional<Integer> skyColor,
+                                  Optional<Float> waterTransparency,
+                                  Optional<Float> waterFogDistance) implements IdValueInfo<LegacyBiomeOverride> {
     public static final ResourceLocation DEFAULT_LOCATION = FactoryAPI.createVanillaLocation("default");
-    private ItemStack icon = ItemStack.EMPTY;
-    Integer waterColor;
-    Integer waterFogColor;
-    Integer fogColor;
-    Integer skyColor;
-    Float waterTransparency;
-    Float waterFogDistance;
+    public static final Codec<LegacyBiomeOverride> CODEC = RecordCodecBuilder.create(i -> i.group(ResourceLocation.CODEC.fieldOf("id").forGetter(LegacyBiomeOverride::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(LegacyBiomeOverride::name), DynamicUtil.ITEM_CODEC.optionalFieldOf("item").forGetter(LegacyBiomeOverride::item), CommonColor.INT_COLOR_CODEC.optionalFieldOf("water_color").forGetter(LegacyBiomeOverride::waterColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("water_fog_color").forGetter(LegacyBiomeOverride::waterFogColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("fog_color").forGetter(LegacyBiomeOverride::fogColor), CommonColor.INT_COLOR_CODEC.optionalFieldOf("sky_color").forGetter(LegacyBiomeOverride::skyColor), Codec.FLOAT.optionalFieldOf("water_transparency").forGetter(LegacyBiomeOverride::waterTransparency), Codec.FLOAT.optionalFieldOf("water_fog_distance").forGetter(LegacyBiomeOverride::waterFogDistance)).apply(i, LegacyBiomeOverride::new));
+    public static final Codec<List<LegacyBiomeOverride>> LIST_MAP_CODEC = IOUtil.createListIdMapCodec(CODEC, "id").fieldOf("overrides").codec();
 
-    public static LegacyBiomeOverride getDefault(){
-        return map.get(DEFAULT_LOCATION);
+    public LegacyBiomeOverride(ResourceLocation id) {
+        this(id, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 
-    public static LegacyBiomeOverride getOrDefault(Optional<ResourceKey<Biome>> optionalKey){
+    public static LegacyBiomeOverride getDefault() {
+        return Legacy4JClient.legacyBiomeOverrides.map().computeIfAbsent(DEFAULT_LOCATION, LegacyBiomeOverride::new);
+    }
+
+    public static LegacyBiomeOverride getOrDefault(Optional<ResourceKey<Biome>> optionalKey) {
         return optionalKey.isEmpty() ? getDefault() : getOrDefault(optionalKey.get().location());
     }
 
-    public static LegacyBiomeOverride getOrDefault(ResourceLocation location){
-        return map.getOrDefault(location, getDefault());
-    }
-
-    public LegacyBiomeOverride(){
+    public static LegacyBiomeOverride getOrDefault(ResourceLocation location) {
+        return Legacy4JClient.legacyBiomeOverrides.map().getOrDefault(location, getDefault());
     }
 
     public ItemStack icon() {
-        return icon;
+        return item.orElse(ItemStack.EMPTY);
     }
 
-    public float waterTransparency() {
-        return waterTransparency == null ? getDefault().waterTransparency() : waterTransparency;
+    @Override
+    public Optional<Float> waterTransparency() {
+        return waterTransparency.or(() -> getDefault().waterTransparency);
     }
 
-    public Integer waterColor() {
-        return waterColor == null ? getDefault().waterColor : waterColor;
+    public float getWaterTransparency() {
+        return waterTransparency().orElse(1.0f);
     }
 
-    public int getWaterARGBOrDefault(int defaultColor){
-        return (int) (waterTransparency()*255) << 24 | (waterColor() == null ? defaultColor : waterColor()) & 16777215;
+    public Optional<Integer> waterColor() {
+        return waterColor.or(() -> getDefault().waterColor);
     }
 
-    public Integer waterFogColor() {
-        return waterFogColor == null ? getDefault().waterFogColor : waterFogColor;
+    public int getWaterARGBOrDefault(int defaultColor) {
+        return (int) (getWaterTransparency() * 255) << 24 | (waterColor().orElse(defaultColor)) & 16777215;
     }
 
-    public Integer fogColor() {
-        return fogColor == null ? getDefault().fogColor : fogColor;
+    public Optional<Integer> waterFogColor() {
+        return waterFogColor.or(() -> getDefault().waterFogColor);
     }
 
-    public Integer skyColor() {
-        return skyColor == null ? getDefault().skyColor : skyColor;
+    public Optional<Integer> fogColor() {
+        return fogColor.or(() -> getDefault().fogColor);
     }
 
-    public Float waterFogDistance() {
-        return waterFogDistance == null ? getDefault().waterFogDistance : waterFogDistance;
+    public Optional<Integer> skyColor() {
+        return skyColor.or(() -> getDefault().skyColor);
     }
 
-    public static class Manager implements ResourceManagerReloadListener {
-        @Override
-        public void onResourceManagerReload(ResourceManager resourceManager) {
-            map.clear();
-            map.put(DEFAULT_LOCATION, new LegacyBiomeOverride(){
-                public float waterTransparency() {
-                    return this.waterTransparency == null ? 1.0f : waterTransparency;
-                }
-            });
-            JsonUtil.getOrderedNamespaces(resourceManager).forEach(name->resourceManager.getResource(FactoryAPI.createLocation(name,BIOME_OVERRIDES)).ifPresent(r->{
-                try {
-                    BufferedReader bufferedReader = r.openAsReader();
-                    JsonObject obj = GsonHelper.parse(bufferedReader);
-                    JsonElement ioElement = obj.get("overrides");
-                    if (ioElement instanceof JsonObject jsonObject)
-                        jsonObject.asMap().forEach((s,e)-> {
-                            if (e instanceof JsonObject o){
-                                LegacyBiomeOverride override = map.computeIfAbsent(FactoryAPI.createLocation(s), resourceLocation-> new LegacyBiomeOverride());
-                                JsonUtil.getItemFromJson(o,true).ifPresent(i->override.icon = i);
-                                Integer i;
-                                if ((i = JsonUtil.optionalJsonColor(o, "water_color", null)) != null) override.waterColor = i;
-                                if ((i = JsonUtil.optionalJsonColor(o, "water_fog_color", null)) != null) override.waterFogColor = i;
-                                if ((i = JsonUtil.optionalJsonColor(o, "fog_color", null)) != null) override.fogColor = i;
-                                if ((i = JsonUtil.optionalJsonColor(o, "sky_color", null)) != null) override.skyColor = i;
-                                if (o.get("water_fog_distance") instanceof JsonPrimitive p && p.isNumber()) override.waterFogDistance = p.getAsFloat();
-                                if (o.get("water_transparency") instanceof JsonPrimitive p && p.isNumber()) override.waterTransparency = p.getAsFloat();
-                            }
-                            });
-                    bufferedReader.close();
-                } catch (IOException exception) {
-                    Legacy4J.LOGGER.warn(exception.getMessage());
-                }
-            }));
-        }
+    public Optional<Float> waterFogDistance() {
+        return waterFogDistance.or(() -> getDefault().waterFogDistance);
+    }
 
-        @Override
-        public String getName() {
-            return "legacy:biome_overrides";
-        }
+    @Override
+    public LegacyBiomeOverride copyFrom(LegacyBiomeOverride other) {
+        return new LegacyBiomeOverride(id, other.name.or(this::name), other.item.or(this::item), other.waterColor.or(this::waterColor), other.waterFogColor.or(this::waterFogColor), other.fogColor.or(this::fogColor), other.skyColor.or(this::skyColor), other.waterTransparency.or(this::waterTransparency), other.waterFogDistance.or(this::waterFogDistance));
+    }
+
+    @Override
+    public boolean isValid() {
+        return true;
     }
 }

@@ -24,13 +24,15 @@ import wily.legacy.util.client.LegacyRenderUtil;
 public abstract class AbstractSliderButtonMixin extends AbstractWidget implements ControlTooltip.ActionHolder {
 
 
-    @Shadow protected double value;
-
-    @Shadow public boolean canChangeValue;
+    @Shadow
+    public boolean canChangeValue;
+    @Shadow
+    protected double value;
 
     public AbstractSliderButtonMixin(int i, int j, int k, int l, Component component) {
         super(i, j, k, l, component);
     }
+
     @Inject(method = "renderWidget", at = @At("HEAD"), cancellable = true)
     public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         ci.cancel();
@@ -40,8 +42,9 @@ public abstract class AbstractSliderButtonMixin extends AbstractWidget implement
         FactoryScreenUtil.enableBlend();
         FactoryScreenUtil.enableDepthTest();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SLIDER, this.getX(), this.getY(), this.getWidth(), this.getHeight());
-        if (isHoveredOrFocused()) FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HIGHLIGHTED_SLIDER, this.getX() - 1, this.getY() - 1, this.getWidth() + 2, this.getHeight() + 2);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(isHovered() ? LegacySprites.SLIDER_HANDLE_HIGHLIGHTED : LegacySprites.SLIDER_HANDLE, this.getX() + (int)(this.value * (double)(this.width - 8)), this.getY(), 8, this.getHeight());
+        if (isHoveredOrFocused())
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HIGHLIGHTED_SLIDER, this.getX() - 1, this.getY() - 1, this.getWidth() + 2, this.getHeight() + 2);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(isHovered() ? LegacySprites.SLIDER_HANDLE_HIGHLIGHTED : LegacySprites.SLIDER_HANDLE, this.getX() + (int) (this.value * (double) (this.width - 8)), this.getY(), 8, this.getHeight());
         FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 1.0f);
         int k = LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused());
         this.renderScrollingString(guiGraphics, minecraft.font, 2, k | Mth.ceil(this.alpha * 255.0f) << 24);
