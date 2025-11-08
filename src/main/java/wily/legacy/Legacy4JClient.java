@@ -241,12 +241,15 @@ public class Legacy4JClient {
     }
 
     public static void preTick(Minecraft minecraft) {
-        ControlType activeControlType = ControlType.getActiveType();
-        if (lastControlType != activeControlType) {
-            if (lastControlType != null)
-                ControlType.UpdateEvent.EVENT.invoker.change(lastControlType, activeControlType);
-            lastControlType = activeControlType;
+        if (minecraft.isGameLoadFinished()) {
+            ControlType activeControlType = ControlType.getActiveType();
+            if (lastControlType != activeControlType) {
+                if (lastControlType != null)
+                    ControlType.UpdateEvent.EVENT.invoker.change(lastControlType, activeControlType);
+                lastControlType = activeControlType;
+            }
         }
+
         if (minecraft.screen instanceof ReplaceableScreen r && r.canReplace()) minecraft.setScreen(r.getReplacement());
 
         if (LegacyOptions.unfocusedInputs.get()) minecraft.setWindowActive(true);

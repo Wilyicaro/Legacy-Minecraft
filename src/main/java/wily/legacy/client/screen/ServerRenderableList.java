@@ -239,8 +239,7 @@ public class ServerRenderableList extends RenderableVList {
         }
 
         @Override
-        public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
-            super.renderIcon(guiGraphics, x, y, width, height, mouseX, mouseY);
+        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             if (server.state() == ServerData.State.INITIAL) {
                 server.setState(ServerData.State.PINGING);
                 server.motd = CommonComponents.EMPTY;
@@ -262,6 +261,12 @@ public class ServerRenderableList extends RenderableVList {
                     }
                 });
             }
+            super.renderWidget(guiGraphics, i, j, f);
+        }
+
+        @Override
+        public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, int x, int y, int width, int height) {
+            super.renderIcon(guiGraphics, x, y, width, height, mouseX, mouseY);
             Component component = !this.isCompatible() ? server.version.copy().withStyle(ChatFormatting.RED) : server.status;
             LegacyFontUtil.applySDFont(b -> {
                 int q = minecraft.font.width(component);
@@ -398,15 +403,15 @@ public class ServerRenderableList extends RenderableVList {
 
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-            LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(minecraft.font, getMessage(), getX() + accessor.getInteger(name + ".buttonMessage.xOffset", 35), getY() + 3, 0xFFFFFFFF));
+            LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(font, getMessage(), getX() + accessor.getInteger(name + ".buttonMessage.xOffset", 35), getY() + 3, j));
 
             if (getHeight() >= 30) {
                 guiGraphics.pose().pushMatrix();
                 guiGraphics.pose().translate(getX() + 35, getY() + 10);
                 guiGraphics.pose().scale(2 / 3f, 2 / 3f);
-                List<FormattedCharSequence> list = minecraft.font.split(server.motd, Math.max(width - 36, minecraft.font.width(server.motd) / 2 + 20));
+                List<FormattedCharSequence> list = font.split(server.motd, Math.max(width - 36, font.width(server.motd) / 2 + 20));
                 for (int p = 0; p < Math.min(2, list.size()); ++p) {
-                    LegacyRenderUtil.renderScrollingString(guiGraphics, minecraft.font, list.get(p), 0, minecraft.font.lineHeight * p, width - 36, 11 + minecraft.font.lineHeight * p, -8355712, false, minecraft.font.width(list.get(p)) * 2 / 3);
+                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, list.get(p), 0, font.lineHeight * p, width - 36, 11 + font.lineHeight * p, -8355712, false, font.width(list.get(p)) * 2 / 3);
                 }
                 guiGraphics.pose().popMatrix();
             }
