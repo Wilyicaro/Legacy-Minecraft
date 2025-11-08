@@ -189,7 +189,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     @ModifyExpressionValue(method = "renderSlots", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isActive()Z"))
     private boolean renderSlots(boolean original, @Local Slot slot) {
-        return original && LegacySlotDisplay.of(slot).isVisible();
+        return slotWidgets.get(slot.index).isVisible = original && LegacySlotDisplay.of(slot).isVisible();
     }
 
     //?}
@@ -197,8 +197,6 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
     private void renderSlot(GuiGraphics guiGraphics, Slot slot, CallbackInfo ci) {
         ci.cancel();
         LegacySlotWidget widget = slotWidgets.get(slot.index);
-        widget.isVisible = slot.isActive() && LegacySlotDisplay.of(slot).isVisible();
-        if (!widget.isVisible) return;
         ItemStack itemStack = slot.getItem();
         boolean bl = false;
         boolean bl2 = slot == this.clickedSlot && !this.draggingItem.isEmpty() && !this.isSplittingStack;
