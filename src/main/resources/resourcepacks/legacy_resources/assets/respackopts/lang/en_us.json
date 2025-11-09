@@ -1,0 +1,11 @@
+{
+    "rpo.legacyResources": "Legacy Resources",
+    "rpo.legacyResources.oldHorsey": "Old Horse Isle Sound",
+    "rpo.legacyResources.oldHorsey.tooltip": "Adds an additional 'neigh' sound effect to the horse's idle sounds",
+    "rpo.legacyResources.oldSkelebone": "Old Skeleton Sounds",
+    "rpo.legacyResources.oldSkelebone.tooltip": "Replaces the Skeleton's hurt and death sounds with their LE counterparts",
+    "rpo.legacyResources.oldExp": "Old Level-Up Sound",
+    "rpo.legacyResources.oldExp.tooltip": "Replaces the Experience Level Up sound with the original, longer sound used in LE and before JE 1.4.2",
+    "rpo.legacyResources.dog": "Play Dog after Cat",
+    "rpo.legacyResources.dog.tooltip": "Extends the 'Cat' music disc to include the 'Dog' track"
+}
