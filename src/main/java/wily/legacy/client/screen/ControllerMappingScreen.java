@@ -70,7 +70,7 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
             KeyMapping.Category category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category)) {
                 renderableVList.addCategory(category.label());
-                if (category.equals("key.categories.movement"))
+                if (category.equals(KeyMapping.Category.MOVEMENT))
                     renderableVList.addOptions(
                             LegacyOptions.invertYController,
                             LegacyOptions.smoothMovement,

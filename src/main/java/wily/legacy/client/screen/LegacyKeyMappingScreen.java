@@ -80,8 +80,7 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
         for (KeyMapping keyMapping : keyMappings) {
             KeyMapping.Category category = keyMapping.getCategory();
             if (!Objects.equals(lastCategory, category))
-                renderableVList.addRenderables(SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> {
-                }))), SimpleLayoutRenderable.create(240, 13, (l -> ((graphics, i, j, f) -> graphics.drawString(font, category.label(), l.x + 1, l.y + 4, CommonColor.INVENTORY_GRAY_TEXT.get(), false)))));
+                renderableVList.addCategory(category.label());
             lastCategory = keyMapping.getCategory();
             renderableVList.addRenderable(new MappingButton(0, 0, 240, 20, LegacyKeyMapping.of(keyMapping)) {
                 @Override

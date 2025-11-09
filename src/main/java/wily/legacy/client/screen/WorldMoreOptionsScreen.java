@@ -223,6 +223,13 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     }
 
     @Override
+    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        super.render(guiGraphics, i, j, f);
+        if (LegacyRenderUtil.hasTooltipBoxes(accessor))
+            guiGraphics.deferredTooltip = null;
+    }
+
+    @Override
     public void renderableVListInit() {
         if (LegacyRenderUtil.hasTooltipBoxes(accessor)) tooltipBox.init();
         super.renderableVListInit();

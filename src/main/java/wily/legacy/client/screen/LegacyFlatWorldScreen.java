@@ -272,6 +272,13 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         generator.structureOverrides = Optional.of(HolderSet.direct(structuresOverrides));
     }
 
+    @Override
+    public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+        super.render(guiGraphics, i, j, f);
+        if (LegacyRenderUtil.hasTooltipBoxes(accessor))
+            guiGraphics.deferredTooltip = null;
+    }
+
     public class LayerButton extends AbstractButton implements ControlTooltip.ActionHolder {
         public final FlatLayerInfo flatLayerInfo;
 

@@ -7,10 +7,10 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.item.crafting.StonecutterRecipe;
@@ -21,14 +21,17 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.network.CommonRecipeManager;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.RecipeInfo;
 import wily.legacy.client.StoneCuttingGroupManager;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
 import wily.legacy.client.controller.ControllerBinding;
+import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.*;
 import wily.legacy.inventory.LegacyCraftingMenu;
 import wily.legacy.inventory.RecipeMenu;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.ArrayList;
@@ -36,7 +39,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static wily.legacy.util.LegacySprites.ARROW;
 import static wily.legacy.client.screen.ControlTooltip.*;
 
 
@@ -104,10 +106,38 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
         imageWidth = 348;
         imageHeight = 215;
         super.init();
+        LegacySlotDisplay display = new LegacySlotDisplay() {
+            @Override
+            public int getWidth() {
+                return 16;
+            }
+
+            @Override
+            public Vec2 getOffset() {
+                return menu.inventoryOffset;
+            }
+
+            @Override
+            public boolean isVisible() {
+                return menu.inventoryActive;
+            }
+        };
+        for (int i = 0; i < 36; i++) {
+            Slot s = menu.slots.get(i);
+            if (i < 27) {
+                LegacySlotDisplay.override(s, 186 + (s.getContainerSlot() - 9) % 9 * 16, 133 + (s.getContainerSlot() - 9) / 9 * 16, display);
+            } else {
+                LegacySlotDisplay.override(s, 186 + s.getContainerSlot() * 16, 186, display);
+            }
+        }
         menu.addSlotListener(listener);
         if (selectedCraftingButton < craftingButtons.size()) setFocused(craftingButtons.get(selectedCraftingButton));
+        int craftingButtonsX = accessor.getInteger("craftingButtons.x", 13);
+        int craftingButtonsY = accessor.getInteger("craftingButtons.y", 38);
+        int craftingButtonsSize = accessor.getInteger("craftingButtons.size", 27);
         craftingButtons.forEach(b -> {
-            b.setPos(leftPos + 13 + craftingButtons.indexOf(b) * 27, topPos + 38);
+            b.width = b.height = craftingButtonsSize;
+            b.setPos(leftPos + craftingButtonsX + craftingButtons.indexOf(b) * craftingButtonsSize, topPos + craftingButtonsY);
             addRenderableWidget(b);
         });
         craftingButtonsOffset.max = Math.max(0, recipesByGroup.size() - 12);
@@ -119,28 +149,44 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
     }
 
     public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        guiGraphics.drawString(this.font, title, (imageWidth - font.width(title)) / 2, 17, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        guiGraphics.drawString(this.font, this.playerInventoryTitle, (355 + 160 - font.width(playerInventoryTitle)) / 2, 109, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        LegacyFontUtil.applySDFont(b -> {
+            guiGraphics.drawString(this.font, title, (imageWidth - font.width(title)) / 2, accessor.getInteger("title.y", 17), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            int inventoryPanelX = accessor.getInteger("inventoryPanel.x", 176);
+            int bottomPanelY = accessor.getInteger("bottomPanel.y", 103);
+            int inventoryPanelWidth = accessor.getInteger("inventoryPanel.width", 163);
+            guiGraphics.drawString(this.font, this.playerInventoryTitle, inventoryPanelX + (inventoryPanelWidth - font.width(playerInventoryTitle)) / 2, bottomPanelY + accessor.getInteger("inventoryTitle.y", 11), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        });
     }
 
     @Override
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
+        boolean sd = LegacyOptions.getUIMode().isSD();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 9, topPos + 103, 163, 105);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 176, topPos + 103, 163, 105);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(ARROW, leftPos + 79, topPos + 158, 22, 15);
+        int bottomPanelHeight = accessor.getInteger("bottomPanel.height", 105);
+        int panelWidth = accessor.getInteger("craftingGridPanel.width", 163);
+        int bottomPanelY = accessor.getInteger("bottomPanel.y", 103);
+        int craftingGridPanelX = accessor.getInteger("craftingGridPanel.x", 9);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + craftingGridPanelX, topPos + bottomPanelY, panelWidth, bottomPanelHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + accessor.getInteger("inventoryPanel.x", 176), topPos + bottomPanelY, accessor.getInteger("inventoryPanel.width", 163), bottomPanelHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(sd ? LegacySprites.SMALL_ARROW : LegacySprites.ARROW, leftPos + craftingGridPanelX + accessor.getInteger("craftingArrow.x", 70), topPos + bottomPanelY + accessor.getInteger("craftingArrow.y", 55), sd ? 16 : 22, sd ? 14 : 15);
         if (craftingButtonsOffset.get() > 0)
-            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + 5, topPos + 45);
+            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, accessor.getInteger("horizontalScroll.x", leftPos + 5), topPos + 45);
         if (craftingButtonsOffset.max > 0 && craftingButtonsOffset.get() < craftingButtonsOffset.max)
-            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + 337, topPos + 45);
+            scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + imageWidth - 11, topPos + 45);
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         super.render(guiGraphics, i, j, f);
+        renderTooltip(guiGraphics, i, j);
+    }
+
+    @Override
+    public void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+        super.renderContents(guiGraphics, i, j, f);
+
         craftingButtons.get(selectedCraftingButton).renderSelection(guiGraphics, i, j, f);
         craftingButtons.forEach(h -> h.renderTooltip(minecraft, guiGraphics, i, j));
-        renderTooltip(guiGraphics, i, j);
     }
 
     @Override
@@ -216,25 +262,24 @@ public class LegacyStonecutterScreen extends AbstractContainerScreen<LegacyCraft
                 }
 
                 @Override
-                public void renderTooltip(Minecraft minecraft, GuiGraphics graphics, int i, int j) {
-                    super.renderTooltip(minecraft, graphics, i, j);
-                    if (isFocused()) {
-                        if (!ingredientSlot.isEmpty() && LegacyRenderUtil.isMouseOver(i, j, leftPos + 38, topPos + 149, 36, 36))
-                            renderTooltip(minecraft, graphics, getActualItem(ingredientSlot.get(0)), i, j);
-                        if (LegacyRenderUtil.isMouseOver(i, j, leftPos + 110, topPos + 149, 36, 36))
-                            renderTooltip(minecraft, graphics, getFocusedResult(), i, j);
-                    }
-                }
-
-                @Override
                 public void renderSelection(GuiGraphics graphics, int i, int j, float f) {
                     boolean warning = !canCraft(getFocusedRecipe());
-                    LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos + 38, topPos + 149, 36, 36, getActualItem(ingredientSlot.get(0)), !onlyCraftableRecipes && !ingredientSlot.get(0).isEmpty() && warning, LegacyRenderUtil.hasHorizontalArtifacts() ? ALT_DISPLAY_OFFSET : DISPLAY_OFFSET).render(graphics, i, j, f);
-                    LegacyRenderUtil.iconHolderRenderer.itemHolder(leftPos + 110, topPos + 149, 36, 36, getFocusedResult(), warning, LegacyRenderUtil.hasHorizontalArtifacts() ? ALT_DISPLAY_OFFSET : DISPLAY_OFFSET).render(graphics, i, j, f);
+                    int xDiff = leftPos + accessor.getInteger("craftingGridPanel.x", 9);
+                    int yDiff = topPos + accessor.getInteger("bottomPanel.y", 103);
+                    int panelWidth = accessor.getInteger("craftingGridPanel.width", 163);
+                    int stonecutterSlotSize = accessor.getInteger("stonecutterSlot.size", 36);
+
+                    LegacyIconHolder input = LegacyRenderUtil.iconHolderRenderer.itemHolder(xDiff + accessor.getInteger("inputSlot.x", 29), yDiff + accessor.getInteger("inputSlot.y",  43), stonecutterSlotSize, stonecutterSlotSize, getActualItem(ingredientSlot.get(0)), !onlyCraftableRecipes && !ingredientSlot.get(0).isEmpty() && warning, LegacyRenderUtil.hasHorizontalArtifacts() ? ALT_DISPLAY_OFFSET : DISPLAY_OFFSET);
+                    input.render(graphics, i, j, f);
+                    input.renderTooltip(minecraft, graphics, i, j);
+                    LegacyIconHolder output = LegacyRenderUtil.iconHolderRenderer.itemHolder(xDiff + accessor.getInteger("resultSlot.x", 101), yDiff + accessor.getInteger("resultSlot.y", 43), stonecutterSlotSize, stonecutterSlotSize, getFocusedResult(), warning, LegacyRenderUtil.hasHorizontalArtifacts() ? ALT_DISPLAY_OFFSET : DISPLAY_OFFSET);
+                    output.render(graphics, i, j, f);
+                    output.renderTooltip(minecraft, graphics, i, j);
 
                     if (getFocusedRecipe() != null) {
                         Component resultName = getFocusedRecipe().getName();
-                        LegacyRenderUtil.renderScrollingString(graphics, font, resultName, leftPos + 11 + Math.max(163 - font.width(resultName), 0) / 2, topPos + 114, leftPos + 170, topPos + 125, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                        int titleY = yDiff + accessor.getInteger("craftingTitle.y", 11);
+                        LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(graphics, font, resultName, xDiff + 2 + Math.max(panelWidth - font.width(resultName), 0) / 2, titleY, xDiff + panelWidth - 2, titleY + 11, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
                     }
                     super.renderSelection(graphics, i, j, f);
                 }

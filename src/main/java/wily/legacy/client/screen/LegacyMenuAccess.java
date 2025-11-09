@@ -112,9 +112,13 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
     }
 
     static ScreenRectangle createMenuRectangleLimit(LegacyMenuAccess<?> menu, int x, int y, int width, int height, int paddingH, int paddingV) {
-        int left = x - (menu instanceof TabList.Access tabList ? tabList.getTabXOffset() * 2 : 0);
-        int top = y - (menu instanceof TabList.Access tabList ? tabList.getTabYOffset() * 2 : 0);
-        return new ScreenRectangle(left - paddingH, top - paddingV, width + paddingH * 2, height + paddingV * 2);
+        if (menu instanceof TabList.Access tabList) {
+            x -= tabList.getTabXOffset();
+            width += tabList.getTabXOffset();
+            y -= tabList.getTabYOffset();
+            height += tabList.getTabYOffset();
+        }
+        return new ScreenRectangle(x - paddingH, y - paddingV, width + paddingH * 2, height + paddingV * 2);
     }
 
     boolean isOutsideClick(int i);

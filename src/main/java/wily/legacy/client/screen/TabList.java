@@ -1,6 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
@@ -12,13 +13,10 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FontDescription;
-import net.minecraft.network.chat.Style;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.UIAccessor;
-import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.NavigationElement;
 import wily.legacy.init.LegacyRegistries;
-import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.ArrayList;
@@ -28,7 +26,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class TabList implements Renderable, GuiEventListener, NarratableEntry {
+public class TabList implements Renderable, GuiEventListener, NarratableEntry, NavigationElement {
     public final List<LegacyTabButton> tabButtons;
     protected final UIAccessor accessor;
     public LegacyTabButton selected = null;
@@ -48,6 +46,10 @@ public class TabList implements Renderable, GuiEventListener, NarratableEntry {
         tabButtons.add(button);
         if (selected == null) selected = button;
         return button;
+    }
+
+    @Override
+    public void applyFocus(ComponentPath.Path path, boolean apply) {
     }
 
     public LegacyTabButton addTabButton(int x, int y, int width, int height, LegacyTabButton.Type type, LegacyTabButton.Render icon, Component message, Tooltip tooltip, Consumer<LegacyTabButton> onPress) {
