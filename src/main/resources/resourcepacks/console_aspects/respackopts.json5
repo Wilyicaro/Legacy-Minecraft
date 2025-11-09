@@ -1,0 +1,14 @@
+{
+    id: "consoleAspects",
+    version: 13,
+    capabilities: ["FileFilter", "DirFilter"],
+    conf: {
+        grassOverlay: true,
+        progArtGrass: true,
+        bedSprites: true,
+        waterOverrides: true,
+        waterMipmaps: true,
+        blackArmorIcons: true,
+        oldOres: true
+    }
+}

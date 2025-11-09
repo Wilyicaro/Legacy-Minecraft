@@ -1,0 +1,19 @@
+{
+    "rpo.consoleAspects": "Console Aspects",
+    "rpo.consoleAspects.grassOverlay": "Grass Overlay Offset",
+    "rpo.consoleAspects.grassOverlay.tooltip": "Adds a slight vertical offset to the Grass Block's biome color overlay to imitate a visual bug from PS4 Edition. May cause z-fighting at certain distances",
+    "rpo.consoleAspects.progArtGrass": "Programmer Art Grass Sides",
+    "rpo.consoleAspects.progArtGrass.tooltip": "Replaces the JAPPA Grass Block side textures with the Programmer Art equivalents, like in PS4 Edition",
+    "rpo.consoleAspects.bedSprites": "2D Bed Items",
+    "rpo.consoleAspects.bedSprites.tooltip": "Replaces the 3D bed item models with 2D item textures",
+    "rpo.consoleAspects.waterOverrides": "Water Overrides",
+    "rpo.consoleAspects.waterOverrides.tooltip": "Enables biome overrides affecting water color",
+    "rpo.consoleAspects.waterMipmaps": "Water Mipmaps",
+    "rpo.consoleAspects.waterMipmaps.tooltip": "Enables water mipmaps, making distant water opaque",
+    "rpo.consoleAspects.blackArmorIcons": "Black Armor Icons",
+    "rpo.consoleAspects.blackArmorIcons.tooltip": "Replaces the indented armor icons with black outlined icons",
+    "rpo.consoleAspects.oldOres": "Old Ore Textures",
+    "rpo.consoleAspects.oldOres.tooltip": "Replaces all stone ore textures with their pre-1.17/PS4 counterparts",
+    "rpo.consoleAspects.oldMusic": "Old Music",
+    "rpo.consoleAspects.oldMusic.tooltip": "Restricts background music to C418 tracks"
+}
