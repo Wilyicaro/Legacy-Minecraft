@@ -140,7 +140,7 @@ public class SDLControllerHandler implements Controller.Handler {
             LegacyLoadingScreen screen = new LegacyLoadingScreen(Controller.Handler.DOWNLOADING_NATIVES, CommonComponents.EMPTY) {
                 @Override
                 public void tick() {
-                    if (getProgress() == 100) {
+                    if (getProgress() >= 1) {
                         LegacyOptions.selectedControllerHandler.set(getInstance());
                         LegacyOptions.CLIENT_STORAGE.save();
                         onClose();
@@ -154,6 +154,8 @@ public class SDLControllerHandler implements Controller.Handler {
                 public void onClose() {
                     minecraft.setScreen(s);
                     LegacyLoadingScreen.closeExecutor(executor);
+                    if (getProgress() < 1 && natives.file().exists())
+                        natives.file().delete();
                 }
 
                 @Override

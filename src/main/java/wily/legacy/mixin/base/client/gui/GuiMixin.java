@@ -19,6 +19,7 @@ import net.minecraft.network.chat.Component;
 //? if >1.20.2 {
 import net.minecraft.network.chat.numbers.NumberFormat;
 import net.minecraft.network.chat.numbers.StyledFormat;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.scores.PlayerScoreEntry;
 //?} else {
@@ -102,17 +103,30 @@ public abstract class GuiMixin implements ControlTooltip.Event {
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.HOTBAR_SELECTION, 24, 24, 0, 23, guiGraphics.guiWidth() / 2 - 91 - 1 + minecraft.player.getInventory()./*? if <1.21.5 {*//*selected*//*?} else {*/getSelectedSlot()/*?}*/ * 20, guiGraphics.guiHeight(), 0, 24, 1);
     }
 
+    @WrapWithCondition(method = "renderCrosshair", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIII)V", ordinal = 0))
+    private boolean renderCrosshair(GuiGraphics instance, RenderPipeline renderPipeline, ResourceLocation arg, int i, int j, int k, int l) {
+        if (LegacyOptions.getUIMode().isFHD()) {
+            int size = 15 * minecraft.getWindow().getGuiScale() - 1;
+            instance.pose().pushMatrix();
+            instance.pose().translate(instance.guiWidth() / 2, instance.guiHeight() / 2);
+            instance.pose().scale(1f / minecraft.getWindow().getGuiScale());
+            instance.blitSprite(renderPipeline, arg, -size / 2, 0, size, size);
+            instance.pose().popMatrix();
+            return false;
+        }
+        return true;
+    }
+
+
     @WrapMethod(method = "renderSlot")
     void renderSlotWithTransparency(GuiGraphics graphics, int i, int j, DeltaTracker deltaTracker, Player player, ItemStack itemStack, int k, Operation<Void> original) {
-        LegacyGuiItemRenderer.secureTranslucentRender(true, LegacyRenderUtil.getHUDOpacity(), b -> {
-            original.call(graphics, i, j, deltaTracker, player, itemStack, k);
-        });
+        LegacyGuiItemRenderer.secureTranslucentRender(true, LegacyRenderUtil.getHUDOpacity(), b -> original.call(graphics, i, j, deltaTracker, player, itemStack, k));
     }
 
     @Inject(method = "displayScoreboardSidebar", at = @At("HEAD"), cancellable = true)
     private void displayScoreboardSidebar(GuiGraphics guiGraphics, Objective objective, CallbackInfo ci) {
         ci.cancel();
-        if (minecraft.screen != null) return;
+        if (!LegacyRenderUtil.canDisplayHUD()) return;
         Scoreboard scoreboard = objective.getScoreboard();
         NumberFormat numberFormat = objective.numberFormatOrDefault(StyledFormat.SIDEBAR_DEFAULT);
         List<PlayerScoreEntry> scores = scoreboard.listPlayerScores(objective).stream().filter((playerScoreEntry) -> !playerScoreEntry.isHidden()).sorted(SCORE_DISPLAY_ORDER).limit(15L).toList();

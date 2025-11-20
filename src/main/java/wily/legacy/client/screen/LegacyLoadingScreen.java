@@ -20,11 +20,14 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTip;
 import wily.legacy.client.LegacyTipManager;
+import wily.legacy.network.TopMessage;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
+import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -34,7 +37,7 @@ import java.util.function.BooleanSupplier;
 import static wily.legacy.util.LegacySprites.LOADING_BACKGROUND;
 import static wily.legacy.util.LegacySprites.LOADING_BAR;
 
-public class LegacyLoadingScreen extends Screen implements LegacyLoading {
+public class LegacyLoadingScreen extends Screen implements LegacyLoading, ControlTooltip.Event {
     private float progress;
     private Component loadingHeader;
     private Component loadingStage;
@@ -92,6 +95,41 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading {
         };
         screen.setGenericLoading(true);
         return screen;
+    }
+
+    public static void startFakeAutoSave() {
+        if (!LegacyOptions.fakeAutosaveScreen.get()) return;
+        Minecraft.getInstance().gui.autosaveIndicatorValue = 0.0f;
+        TopMessage.setMedium(null);
+        Minecraft.getInstance().setScreen(getFakeAutoSaveScreen());
+    }
+
+    public static LegacyLoadingScreen getFakeAutoSaveScreen() {
+        return new LegacyLoadingScreen(LegacyComponents.PREPARING_AUTOSAVE, LegacyComponents.PREPARING_CHUNKS) {
+            int finalizingTicks = -1;
+
+            @Override
+            public void tick() {
+                minecraft.gui.autosaveIndicatorValue = 0.0f;
+                super.tick();
+
+                if (finalizingTicks < 0) {
+                    setProgress(getProgress() + 0.02f);
+
+                    if (getProgress() >= 1.0) {
+                        finalizingTicks = 80;
+                        setProgress(0);
+                        setLoadingStage(LegacyComponents.FINALIZING);
+                    }
+                } else if (finalizingTicks > 0) {
+                    finalizingTicks--;
+                } else {
+                    onClose();
+                    LegacySoundUtil.playBackSound();
+                    minecraft.gui.autosaveIndicatorValue = 1.0f;
+                }
+            }
+        };
     }
 
     public static LegacyLoadingScreen createWithExecutor(Component header, Runnable onClose, ExecutorService executor) {

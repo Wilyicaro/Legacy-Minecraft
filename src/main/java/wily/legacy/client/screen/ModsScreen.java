@@ -43,16 +43,15 @@ import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.function.Function;
 
 public class ModsScreen extends PanelVListScreen {
     public static final Function<ModInfo, SizedLocation> modLogosCache = Util.memoize(mod -> {
         Optional<String> opt = mod.getLogoFile(100);
-        if (opt.isPresent() && mod.findResource(opt.get()).isPresent())
+        if (opt.isPresent() && mod.containsResource(opt.get()))
             try {
-                NativeImage image = NativeImage.read(Files.newInputStream(mod.findResource(opt.get()).get()));
+                NativeImage image = NativeImage.read(mod.openResource(opt.get()));
                 ResourceLocation location = FactoryAPI.createLocation(mod.getId(), opt.get().toLowerCase(Locale.ENGLISH));
                 Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(/*? if >=1.21.5 {*/location::toString, /*?}*/image));
                 if (location != null) return new SizedLocation(location, image.getWidth(), image.getHeight());
@@ -146,7 +145,10 @@ public class ModsScreen extends PanelVListScreen {
                 @Override
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                     SizedLocation logo = modLogosCache.apply(mod);
-                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + accessor.getInteger(getRenderableVList().name + ".buttonMessage.xOffset", 10) + (logo == null ? 20 : logo.getScaledWidth(20)), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
+                    int iconHeight = accessor.getInteger(getRenderableVList().name + ".buttonIcon.size", 20);
+                    int iconPos = (height - iconHeight) / 2;
+                    int x = this.getX() + iconPos + accessor.getInteger(getRenderableVList().name + ".buttonMessage.xOffset", 10) + (logo == null ? iconHeight : logo.getScaledWidth(iconHeight));
+                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), x, this.getY(), x + this.getWidth(), this.getY() + this.getHeight(), j, true);
                 }
 
                 @Override

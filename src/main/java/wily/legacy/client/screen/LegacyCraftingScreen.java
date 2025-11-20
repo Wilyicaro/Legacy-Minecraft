@@ -476,7 +476,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
-        Component title = getTabList() == craftingTabList ? getTabList().tabButtons.get(getTabList().getIndex()).getMessage() : getFocused() instanceof CustomCraftingIconHolder h ? h.getDisplayName() : CommonComponents.EMPTY;
+        Component title = getTabList() == craftingTabList ? getTabList().tabButtons.get(getTabList().getIndex()).getMessage() : getCraftingButtons().get(selectedCraftingButton) instanceof CustomCraftingIconHolder h ? h.getDisplayName() : CommonComponents.EMPTY;
         LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(this.font, title, ((typeTabList.getIndex() == 0 ? imageWidth : imageWidth / 2) - font.width(title)) / 2, accessor.getInteger("title.y", 17), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
         int inventoryPanelX = accessor.getInteger("inventoryPanel.x", 176);
         int bottomPanelY = accessor.getInteger("bottomPanel.y", 103);

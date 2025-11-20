@@ -12,6 +12,7 @@ import net.minecraft.client.gui.render.state.GuiRenderState;
 import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
@@ -30,6 +31,7 @@ import wily.legacy.client.LegacyGuiItemRenderer;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.MutablePIPRenderState;
 import wily.legacy.client.screen.LegacyMenuAccess;
+import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -107,5 +109,19 @@ public abstract class GuiGraphicsMixin {
         float opacity = LegacyGuiItemRenderer.OPACITY;
         if (opacity != 1f) k = ARGB.color((int) (ARGB.alpha(k) * opacity), ARGB.transparent(k));
         original.call(instance, arg, string, i, j, k, bl);
+    }
+
+    @Inject(method = "renderItemBar", at = @At("RETURN"))
+    private void drawString(ItemStack itemStack, int i, int j, CallbackInfo ci) {
+        if (!LegacyOptions.legacyPotionsBar.get()) return;
+        int potionLevel = LegacyItemUtil.getPotionLevel(itemStack);
+        if (potionLevel > 0) {
+            int x = i + 3;
+            int y = j + 13;
+            self().fill(RenderPipelines.GUI, x, y, x + 11, y + 2, -16777216);
+            for (int k = 0; k < potionLevel; k++) {
+                self().fill(RenderPipelines.GUI, x + k * 3, y, x + k * 3 + 2, y + 2, 0xFF00DDE5);
+            }
+        }
     }
 }

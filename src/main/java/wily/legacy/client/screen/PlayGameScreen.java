@@ -228,24 +228,10 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
         if (keyEvent.key() == InputConstants.KEY_X && tabList.getIndex() == 2) {
             EditBox serverBox = new EditBox(Minecraft.getInstance().font, 0, 0, 200, 20, DIRECT_CONNECTION);
             minecraft.setScreen(new ConfirmationScreen(this, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 92 : 120, serverBox.getMessage(), LegacyComponents.ENTER_IP, b1 -> ConnectScreen.startConnecting(this, minecraft, ServerAddress.parseString(serverBox.getValue()), new ServerData("", "",/*? if >1.20.2 {*/ ServerData.Type.OTHER/*?} else {*//*false*//*?}*/), false/*? if >=1.20.5 {*/, null/*?}*/)) {
-                boolean released = false;
-
                 @Override
                 protected void addButtons() {
                     super.addButtons();
                     okButton.active = false;
-                }
-
-                @Override
-                public boolean charTyped(CharacterEvent event) {
-                    if (!released) return false;
-                    return super.charTyped(event);
-                }
-
-                @Override
-                public boolean keyReleased(KeyEvent event) {
-                    if (keyEvent.key() == event.key()) released = true;
-                    return super.keyReleased(event);
                 }
 
                 @Override

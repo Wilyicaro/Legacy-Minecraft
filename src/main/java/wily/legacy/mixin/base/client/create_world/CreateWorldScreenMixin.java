@@ -31,7 +31,6 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.*;
-import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
@@ -115,11 +114,11 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         uiState.addListener(worldCreationUiState -> nameEdit.setTooltip(Tooltip.create(Component.translatable("selectWorld.targetFolder", Component.literal(worldCreationUiState.getTargetFolder()).withStyle(ChatFormatting.ITALIC)))));
         setInitialFocus(nameEdit);
         addRenderableWidget(accessor.putWidget("nameEditBox", nameEdit));
-        LegacySliderButton<WorldCreationUiState.SelectedGameMode> gameModeButton = addRenderableWidget(accessor.putWidget("gameTypeSlider", new LegacySliderButton<>(layoutX, panel.y + 51, layoutWidth, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().displayName), b -> Tooltip.create(uiState.getGameMode().getInfo()), uiState.getGameMode(), () -> List.of(WorldCreationUiState.SelectedGameMode.SURVIVAL, WorldCreationUiState.SelectedGameMode.HARDCORE, WorldCreationUiState.SelectedGameMode.CREATIVE), b -> uiState.setGameMode(b.getObjectValue()))));
+        LegacySliderButton<WorldCreationUiState.SelectedGameMode> gameModeButton = addRenderableWidget(accessor.putWidget("gameTypeSlider", new LegacySliderButton<>(layoutX, panel.y + 51, layoutWidth, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().displayName), b -> Tooltip.create(uiState.getGameMode().getInfo()), uiState.getGameMode(), () -> List.of(WorldCreationUiState.SelectedGameMode.SURVIVAL, WorldCreationUiState.SelectedGameMode.HARDCORE, WorldCreationUiState.SelectedGameMode.CREATIVE), b -> uiState.setGameMode(b.getObjectValue()), uiState::getGameMode)));
         uiState.addListener(worldCreationUiState -> gameModeButton.active = !worldCreationUiState.isDebug());
-        LegacySliderButton<Difficulty> difficultyButton = addRenderableWidget(accessor.putWidget("difficultySlider", new LegacySliderButton<>(layoutX, panel.y + 77, layoutWidth, 16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"), b.getObjectValue().getDisplayName()), b -> Tooltip.create(uiState.getDifficulty().getInfo()), uiState.getDifficulty(), () -> Arrays.asList(Difficulty.values()), b -> uiState.setDifficulty(b.getObjectValue()))));
+        LegacySliderButton<Difficulty> difficultyButton = addRenderableWidget(accessor.putWidget("difficultySlider", new LegacySliderButton<>(layoutX, panel.y + 77, layoutWidth, 16, b -> b.getDefaultMessage(Component.translatable("options.difficulty"), b.getObjectValue().getDisplayName()), b -> Tooltip.create(uiState.getDifficulty().getInfo()), uiState.getDifficulty(), () -> Arrays.asList(Difficulty.values()), b -> uiState.setDifficulty(b.getObjectValue()), uiState::getDifficulty)));
         uiState.addListener(worldCreationUiState -> {
-            difficultyButton.setObjectValue(uiState.getDifficulty());
+            difficultyButton.updateValue();
             difficultyButton.updateMessage();
             difficultyButton.active = !uiState.isHardcore();
         });

@@ -231,20 +231,15 @@ public class LegacyRenderUtil {
     }
 
     public static float getHUDScale() {
-        return Math.max(1.5f, 4 - LegacyOptions.hudScale.get());
-    }
-
-    public static float getTweakedHUDScale() {
-        float scale = 3 / LegacyRenderUtil.getHUDScale();
-        return LegacyOptions.getUIMode().isFHD() && LegacyOptions.hudScale.get() == 2 ? scale * 0.9825f : LegacyOptions.getUIMode().isSD() && LegacyOptions.hudScale.get() != 1 ? scale * 0.8f : scale;
-    }
-
-    public static float getTweakedCrosshairScale() {
-        return LegacyOptions.hudScale.get() == 1 && LegacyOptions.getUIMode().isFHD() ? 0.9f : 1f;
+        return switch (LegacyOptions.hudSize.get()) {
+            case 2 -> LegacyOptions.getUIMode().isFHD() ? 1.474f : LegacyOptions.getUIMode().isSD() ? 1.0f : 1.5f;
+            case 3 -> LegacyOptions.getUIMode().isSD() ? 1.324f : 2.0f;
+            default -> LegacyOptions.getUIMode().isSD() ? 0.8f : 1;
+        };
     }
 
     public static float getHUDSize() {
-        return 6 + 3f / LegacyRenderUtil.getHUDScale() * (35 + (mc.gameMode.canHurtPlayer() ? Math.max(2, Mth.ceil((Math.max(mc.player.getAttributeValue(Attributes.MAX_HEALTH), Math.max(mc.gui.displayHealth, mc.player.getHealth())) + mc.player.getAbsorptionAmount()) / 20f) + (mc.player.getArmorValue() > 0 ? 1 : 0)) * 10 : 0));
+        return 6 + LegacyRenderUtil.getHUDScale() * (35 + (mc.gameMode.canHurtPlayer() ? Math.max(2, Mth.ceil((Math.max(mc.player.getAttributeValue(Attributes.MAX_HEALTH), Math.max(mc.gui.displayHealth, mc.player.getHealth())) + mc.player.getAbsorptionAmount()) / 20f) + (mc.player.getArmorValue() > 0 ? 1 : 0)) * 10 : 0));
     }
 
     public static float getHUDDistance() {
@@ -389,7 +384,7 @@ public class LegacyRenderUtil {
     }
 
     public static float getAutoGuiScale() {
-        return getStandardHeight() / (LegacyOptions.uiMode.get().isSD() ? 240.0f : 360.0f);
+        return getStandardHeight() / (LegacyOptions.getUIMode().isSD() ? 240.0f : 360.0f);
     }
 
     public static int getStandardHeight() {
@@ -467,9 +462,7 @@ public class LegacyRenderUtil {
     public static Component getEffectName(MobEffectInstance mobEffectInstance) {
         MutableComponent mutableComponent = mobEffectInstance.getEffect()/*? if >=1.20.5 {*/.value()/*?}*/.getDisplayName().copy();
         if (mobEffectInstance.getAmplifier() >= 1 && mobEffectInstance.getAmplifier() <= 9) {
-            MutableComponent var10000 = mutableComponent.append(CommonComponents.SPACE);
-            int var10001 = mobEffectInstance.getAmplifier();
-            var10000.append(Component.translatable("enchantment.level." + (var10001 + 1)));
+            mutableComponent.append(CommonComponents.SPACE).append(Component.translatable("enchantment.level." + (mobEffectInstance.getAmplifier() + 1)));
         }
 
         return mutableComponent;
@@ -489,6 +482,7 @@ public class LegacyRenderUtil {
         LegacyRenderUtil.prepareHUDRender(guiGraphics);
         guiGraphics.pose().translate(0, guiGraphics.guiHeight() - Math.max(shift, LegacyRenderUtil.getHUDSize()));
         FactoryAPIClient.getProfiler().push("selectedItemName");
+        LegacyFontUtil.applySDFont(sd -> {
         if (GuiAccessor.getInstance().getToolHighlightTimer() > 0 && !GuiAccessor.getInstance().getLastToolHighlight().isEmpty()) {
             Font font = /*? if forge || neoforge {*//*Objects.requireNonNullElse(IClientItemExtensions.of(GuiAccessor.getInstance().getLastToolHighlight()).getFont(GuiAccessor.getInstance().getLastToolHighlight(), IClientItemExtensions.FontContext.SELECTED_ITEM_NAME), mc.font)*//*?} else {*/  mc.font/*?}*/;
             List<Component> tooltip = LegacyRenderUtil.getTooltip(GuiAccessor.getInstance().getLastToolHighlight());
@@ -512,7 +506,7 @@ public class LegacyRenderUtil {
                     guiGraphics.pose().translate(0, LegacyOptions.selectedItemTooltipSpacing.get());
                 });
             }
-        }
+        }});
         FactoryAPIClient.getProfiler().pop();
         LegacyRenderUtil.finalizeHUDRender(guiGraphics);
     }

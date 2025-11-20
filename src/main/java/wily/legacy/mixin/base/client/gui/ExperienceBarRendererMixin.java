@@ -27,7 +27,7 @@ public interface ExperienceBarRendererMixin {
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(guiGraphics.guiWidth() / 2f, guiGraphics.guiHeight());
         String exp = String.valueOf(i);
-        int hudScale = LegacyOptions.hudScale.get();
+        int hudScale = LegacyOptions.hudSize.get();
         boolean hd = LegacyOptions.getUIMode().isHDOrLower();
         guiGraphics.pose().translate(0, -36f);
         if (!hd && hudScale != 1) guiGraphics.pose().scale(7 / 8f, 7 / 8f);

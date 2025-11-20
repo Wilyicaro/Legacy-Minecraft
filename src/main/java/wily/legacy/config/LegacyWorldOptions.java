@@ -23,12 +23,9 @@ import java.util.function.Function;
 
 public class LegacyWorldOptions {
     public static final FactoryConfig.StorageHandler WORLD_STORAGE = new FactoryConfig.StorageHandler();
-    public static final FactoryConfig<Map<String, LegacyTipBuilder>> customTips = WORLD_STORAGE.register(FactoryConfig.create("customTips", null, () -> LegacyTipBuilder.MAP_CODEC, new HashMap<>(), v -> {
-    }, WORLD_STORAGE));
-    public static final FactoryConfig<List<InitialItem>> initialItems = WORLD_STORAGE.register(FactoryConfig.create("initialItems", null, () -> InitialItem.LIST_CODEC, List.of(new InitialItem(Items.MAP.getDefaultInstance(), LegacyGameRules.PLAYER_STARTING_MAP), new InitialItem(Items.BUNDLE.getDefaultInstance(), LegacyGameRules.PLAYER_STARTING_BUNDLE)), v -> {
-    }, WORLD_STORAGE));
-    public static final FactoryConfig<List<UsedEndPortalPos>> usedEndPortalPositions = WORLD_STORAGE.register(FactoryConfig.create("usedEndPortalPositions", null, () -> UsedEndPortalPos.LIST_CODEC, new ArrayList<>(), v -> {
-    }, WORLD_STORAGE));
+    public static final FactoryConfig<Map<String, LegacyTipBuilder>> customTips = WORLD_STORAGE.register(FactoryConfig.create("customTips", null, () -> LegacyTipBuilder.MAP_CODEC, new HashMap<>(), v -> {}, WORLD_STORAGE));
+    public static final FactoryConfig<List<InitialItem>> initialItems = WORLD_STORAGE.register(FactoryConfig.create("initialItems", null, () -> InitialItem.LIST_CODEC, List.of(new InitialItem(Items.MAP.getDefaultInstance(), LegacyGameRules.PLAYER_STARTING_MAP), new InitialItem(Items.BUNDLE.getDefaultInstance(), LegacyGameRules.PLAYER_STARTING_BUNDLE)), v -> {}, WORLD_STORAGE));
+    public static final FactoryConfig<List<UsedEndPortalPos>> usedEndPortalPositions = WORLD_STORAGE.register(FactoryConfig.create("usedEndPortalPositions", null, () -> UsedEndPortalPos.LIST_CODEC, new ArrayList<>(), v -> {}, WORLD_STORAGE));
 
     public record InitialItem(ItemStack item, Optional<GameRules.Key<GameRules.BooleanValue>> dependentGamerule) {
         public static final Codec<GameRules.Key<GameRules.BooleanValue>> BOOLEAN_GAMERULE_CODEC = Codec.STRING.xmap(InitialItem::getGameruleFromId, GameRules.Key::getId);

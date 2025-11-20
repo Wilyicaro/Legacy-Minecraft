@@ -140,7 +140,7 @@ public class IOUtil {
 
             @Override
             public <T> DataResult<T> encode(Map<String, E> input, DynamicOps<T> ops, T prefix) {
-                return DataResult.success(ops.createMap(input.entrySet().stream().map(e -> Pair.of(ops.createString(e.getKey()), codec.encodeStart(ops, e.getValue()).resultOrPartial(Legacy4J.LOGGER::error).get()))));
+                return DataResult.success(ops.createList(input.entrySet().stream().map(e -> ops.createMap(Map.of(ops.createString(keyField), ops.createString(e.getKey()), ops.createString(valueField), codec.encodeStart(ops, e.getValue()).resultOrPartial(Legacy4J.LOGGER::error).get())))));
             }
         };
     }

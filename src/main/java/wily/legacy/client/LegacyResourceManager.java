@@ -2,6 +2,7 @@ package wily.legacy.client;
 
 import com.google.gson.*;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
@@ -21,6 +22,7 @@ import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.KeyboardScreen;
 import wily.legacy.util.IOUtil;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,10 +59,14 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
         }
     }
 
-    public static void addIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, JsonObject> addIcon) {
+    public static <T extends ControlTooltip.CharsIcon> void addIcons(ResourceManager resourceManager, ResourceLocation location, Codec<List<T>> codec, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
         resourceManager.getResource(location).ifPresent(r -> {
-            try {
-                GsonHelper.parse(r.openAsReader()).asMap().forEach((s, o) -> addIcon.accept(s, o.getAsJsonObject()));
+            try (BufferedReader reader = r.openAsReader()) {
+                codec.parse(JsonOps.INSTANCE, JsonParser.parseReader(reader)).resultOrPartial(error -> Legacy4J.LOGGER.warn("Failed to parse {}: {}", location, error)).ifPresent(charsIcons -> {
+                    for (ControlTooltip.CharsIcon charsIcon : charsIcons) {
+                        addIcon.accept(charsIcon.name(), charsIcon);
+                    }
+                });
             } catch (IOException e) {
                 Legacy4J.LOGGER.warn(e.getMessage());
             }
@@ -68,19 +74,11 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
     }
 
     public static void addControllerIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
-        addIcons(resourceManager, location, (s, o) -> {
-            ControllerBinding<?> binding = ControllerBinding.map.get(s);
-            if (binding != null)
-                addIcon.accept(s, ControlTooltip.LegacyIcon.create(() -> binding.getMapped().state(), IOUtil.getJsonStringOrNull(o, "icon", String::toCharArray), IOUtil.getJsonStringOrNull(o, "iconOverlay", String::toCharArray), IOUtil.getJsonStringOrNull(o, "tipIcon", v -> v.charAt(0))));
-        });
+        addIcons(resourceManager, location, ControlTooltip.ControllerIcon.LIST_CODEC, addIcon);
     }
 
     public static void addKbmIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
-        addIcons(resourceManager, location, (s, o) -> {
-            InputConstants.Key key = InputConstants.getKey(s);
-            ControlTooltip.KeyIcon icon = ControlTooltip.KeyIcon.create(key, IOUtil.getJsonStringOrNull(o, "icon", String::toCharArray), IOUtil.getJsonStringOrNull(o, "iconOverlay", String::toCharArray), IOUtil.getJsonStringOrNull(o, "tipIcon", v -> v.charAt(0)));
-            addIcon.accept(key.getName(), icon);
-        });
+        addIcons(resourceManager, location, ControlTooltip.KeyIcon.LIST_CODEC, addIcon);
     }
 
     public static void loadIntroLocations(ResourceManager resourceManager) {

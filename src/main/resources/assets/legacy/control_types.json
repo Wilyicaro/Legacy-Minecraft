@@ -6,11 +6,46 @@
     "font": "legacy:java",
     "minecraftLogo": "legacy:textures/gui/title/minecraft/java.png"
   },
-  "legacy:xbox_360",
-  "legacy:xbox_one",
+  {
+    "id": "legacy:xbox_360",
+    "name": {"translate": "legacy.options.controlType.xbox_360"},
+    "font": {
+      "sd": {
+        "id": "legacy:xbox_360_sd",
+        "iconHeight": 9
+      },
+      "default": "legacy:xbox_360"
+    },
+    "minecraftLogo": "legacy:textures/gui/title/minecraft/xbox_360.png"
+  },
+  {
+    "id": "legacy:xbox_one",
+    "name": {"translate": "legacy.options.controlType.xbox_one"},
+    "font": {
+      "default": "legacy:xbox_one",
+      "hd": "legacy:xbox_one_hd"
+    },
+    "minecraftLogo": "legacy:textures/gui/title/minecraft/xbox_one.png"
+  },
   "legacy:playstation_3",
-  "legacy:playstation_vita",
-  "legacy:playstation_4",
+  {
+    "id": "legacy:playstation_vita",
+    "name": {"translate": "legacy.options.controlType.playstation_vita"},
+    "font": {
+      "id": "legacy:playstation_vita",
+      "iconHeight": 9
+    },
+    "minecraftLogo": "legacy:textures/gui/title/minecraft/playstation_vita.png"
+  },
+  {
+    "id": "legacy:playstation_4",
+    "name": {"translate": "legacy.options.controlType.playstation_4"},
+    "font": {
+      "default": "legacy:playstation_4",
+      "hd": "legacy:playstation_4_hd"
+    },
+    "minecraftLogo": "legacy:textures/gui/title/minecraft/playstation_4.png"
+  },
   "legacy:playstation_5",
   "legacy:wii_u",
   "legacy:switch",

@@ -19,6 +19,6 @@ public class ServerPlayerGameModeMixin {
 
     @Inject(method = "setGameModeForPlayer", at = @At("RETURN"))
     protected void setGameModeForPlayer(GameType gameType, GameType gameType2, CallbackInfo ci) {
-        LegacyPlayerInfo.updateMayFlySurvival(player, LegacyPlayerInfo.of(player).mayFlySurvival(), false);
+        LegacyPlayerInfo.setAndUpdateMayFlySurvival(player, LegacyPlayerInfo.of(player).mayFlySurvival(), false);
     }
 }

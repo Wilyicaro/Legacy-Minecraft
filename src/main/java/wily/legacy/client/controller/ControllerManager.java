@@ -28,7 +28,6 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.LegacyMenuAccess;
-import wily.legacy.client.screen.TabList;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.mixin.base.client.KeyboardHandlerAccessor;
 import wily.legacy.mixin.base.client.MouseHandlerAccessor;
@@ -55,6 +54,7 @@ public class ControllerManager {
     public boolean simulateShift = false;
     public boolean canChangeSlidersValue = true;
     public boolean isControllerSimulatingInput = false;
+    public boolean blockNextCharType = false;
     protected Minecraft minecraft;
     protected boolean isControllerTheLastInput = false;
     private KeyMapping[] orderedKeyMappings;
@@ -166,6 +166,7 @@ public class ControllerManager {
         for (ControllerBinding<?> binding : ControllerBinding.map.values()) {
             BindingState state = binding.state();
             state.update(controller);
+            BindingUpdate.EVENT.invoker.accept(state);
             if (LegacyTipManager.getActualTip() != null) LegacyTipManager.getActualTip().bindingStateTick(state);
 
             if (state.pressed) {
@@ -274,7 +275,7 @@ public class ControllerManager {
 
                 Predicate<Predicate<BindingState.Axis>> isStickAnd = s ->
                         state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && s.test(stick) &&
-                        (isCursorDisabled && (state.pressed && state.canClick() || state.released) || LegacyOptions.legacyCursor.get() && !isCursorDisabled && !stick.isBlocked() && stick.getSmoothMagnitude() < 0.2f && state.timePressed == state.getDefaultDelay() / 2 && isHoveringWidget());
+                        ((isCursorDisabled || LegacyOptions.interfaceSensitivity.get() == 0) && (state.pressed && state.canClick() || state.released) || LegacyOptions.interfaceSensitivity.get() > 0 && LegacyOptions.legacyCursor.get() && !isCursorDisabled && !stick.isBlocked() && stick.getSmoothMagnitude() >= 0.15f && stick.getSmoothMagnitude() < 0.3f && state.timePressed == state.getDefaultDelay() / 2 && isHoveringWidget());
                 if (isStickAnd.test(s -> s.y < 0 && -s.y > Math.abs(s.x)))
                     simulateKeyAction(InputConstants.KEY_UP, state, !state.released, false);
                 else if (isStickAnd.test(s -> s.y > 0 && s.y > Math.abs(s.x)))
@@ -490,5 +491,9 @@ public class ControllerManager {
 
     interface Setup extends Consumer<ControllerManager> {
         FactoryEvent<Setup> EVENT = new FactoryEvent<>(e -> m -> e.invokeAll(l -> l.accept(m)));
+    }
+
+    interface BindingUpdate extends Consumer<BindingState> {
+        FactoryEvent<BindingUpdate> EVENT = new FactoryEvent<>(e -> m -> e.invokeAll(l -> l.accept(m)));
     }
 }

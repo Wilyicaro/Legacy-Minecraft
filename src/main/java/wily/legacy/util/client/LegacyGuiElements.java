@@ -22,8 +22,7 @@ public class LegacyGuiElements {
 
     public static void setup(Minecraft minecraft) {
         FactoryGuiElement[] nonScaledElements = new FactoryGuiElement[]{FactoryGuiElement.SELECTED_ITEM_NAME, FactoryGuiElement.OVERLAY_MESSAGE, FactoryGuiElement.SPECTATOR_TOOLTIP};
-        ArbitrarySupplier<Float> hudScale = LegacyRenderUtil::getTweakedHUDScale;
-        ArbitrarySupplier<Float> crosshairScale = LegacyRenderUtil::getTweakedCrosshairScale;
+        ArbitrarySupplier<Float> hudScale = LegacyRenderUtil::getHUDScale;
 
         UIAccessor accessor = FactoryScreenUtil.getGuiAccessor();
         FactoryGuiElement.HOTBAR.pre().register(guiGraphics -> {
@@ -57,10 +56,6 @@ public class LegacyGuiElements {
             a.getElements().put("hud.scaledTranslateY", () -> -minecraft.getWindow().getGuiScaledHeight());
             a.getElements().put("hud.renderColor", () -> ColorUtil.colorFromFloat(1.0f, 1.0f, 1.0f, LegacyRenderUtil.getHUDOpacity()));
             a.getElements().put(FactoryGuiElement.BOSSHEALTH.name() + ".renderColor", () -> ColorUtil.colorFromFloat(1.0f, 1.0f, 1.0f, LegacyRenderUtil.getInterfaceOpacity()));
-
-            a.getElements().put(FactoryGuiElement.CROSSHAIR.name() + ".scaleX", crosshairScale);
-            a.getElements().put(FactoryGuiElement.CROSSHAIR.name() + ".scaleY", crosshairScale);
-            a.getElements().put(FactoryGuiElement.CROSSHAIR.name() + ".scaleZ", crosshairScale);
             a.putStaticElement(FactoryGuiElement.CROSSHAIR.name() + ".hud.translateY", false);
             a.putStaticElement(FactoryGuiElement.CROSSHAIR.name() + ".hud.scaledTranslateY", false);
             a.getElements().put(FactoryGuiElement.SPECTATOR_HOTBAR.name() + ".translateY", () -> (22 - LegacyRenderUtil.getHUDDistance()) * (1 - SpectatorGuiAccessor.getInstance().getVisibility()));

@@ -39,7 +39,7 @@ public class LegacySlotWidget extends LegacyIconHolder implements NavigationElem
     public void applyFocus(ComponentPath.Path path, boolean apply) {
         if (apply) {
             path.component().setFocused(null);
-            if (Legacy4JClient.controllerManager.isControllerTheLastInput())
+            if (Legacy4JClient.controllerManager.isControllerTheLastInput() && LegacyOptions.interfaceSensitivity.get() > 0)
                 ControllerBinding.LEFT_STICK.state().block();
             Legacy4JClient.controllerManager.enableCursor();
             Legacy4JClient.controllerManager.setPointerPos(getMiddleX(), getMiddleY());
@@ -55,6 +55,11 @@ public class LegacySlotWidget extends LegacyIconHolder implements NavigationElem
     @Override
     public boolean isHovered(double mouseX, double mouseY) {
         return isHovered;
+    }
+
+    @Override
+    public boolean isMouseOver(double d, double e) {
+        return false;
     }
 
     @Override

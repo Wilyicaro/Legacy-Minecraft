@@ -39,8 +39,7 @@ public class PublishScreen extends ConfirmationScreen {
             okAction.accept(this);
             s.onClose();
         };
-        gameTypeSlider = new LegacySliderButton<>(0, 0, 200, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().getLongDisplayName()), b -> Tooltip.create(Component.translatable("selectWorld.gameMode." + b.getObjectValue().getName() + ".info")), gameType, () -> GAME_TYPES, b -> {
-        });
+        gameTypeSlider = new LegacySliderButton<>(0, 0, 200, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().getLongDisplayName()), b -> Tooltip.create(Component.translatable("selectWorld.gameMode." + b.getObjectValue().getName() + ".info")), gameType, () -> GAME_TYPES, b -> {});
     }
 
     public PublishScreen(Screen parent, GameType gameType) {

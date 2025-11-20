@@ -7,6 +7,8 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceLinkedOpenHashMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -70,6 +72,7 @@ import org.lwjgl.glfw.GLFW;
 import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.ItemContainerPlatform;
 import wily.factoryapi.base.ArbitrarySupplier;
+import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.factoryapi.util.ColorUtil;
 import wily.factoryapi.util.FactoryItemUtil;
 import wily.legacy.Legacy4J;
@@ -282,17 +285,17 @@ public interface ControlTooltip {
         InputConstants.Type type = i >= 0 ? i <= 9 ? InputConstants.Type.MOUSE : InputConstants.Type.KEYSYM : null;
         if (type == null) return null;
         InputConstants.Key key = type.getOrCreate(i);
-        return ControlType.getKbmActiveType().icons().computeIfAbsent(key.getName(), i2 -> LegacyIcon.create(key, (k, b) -> new KeyIcon(k) {
+        return ControlType.getKbmActiveType().icons().computeIfAbsent(key.getName(), i2 -> new KeyIcon(key) {
             @Override
             public Component getComponent(boolean allowPressed) {
-                return getControlIcon(k.getType() == InputConstants.Type.MOUSE ? b.getAsBoolean() && allowPressed ? MOUSE_BASE_FOCUSED_CHAR : MOUSE_BASE_CHAR : b.getAsBoolean() && allowPressed ? KEY_PRESSED_CHAR : KEY_CHAR, ControlType.getKbmActiveType()).getComponent();
+                return getControlIcon(key.getType() == InputConstants.Type.MOUSE ? pressed() && allowPressed ? MOUSE_BASE_FOCUSED_CHAR : MOUSE_BASE_CHAR : pressed() && allowPressed ? KEY_PRESSED_CHAR : KEY_CHAR, ControlType.getKbmActiveType()).getComponent();
             }
 
             @Override
             public Component getOverlayComponent(boolean allowPressed) {
-                return k.getDisplayName();
+                return key.getDisplayName();
             }
-        }));
+        });
     }
 
     static Component getPickAction(Minecraft minecraft) {
@@ -696,47 +699,6 @@ public interface ControlTooltip {
         boolean lastPressed = false;
         long startPressTime = 0L;
 
-        public static LegacyIcon create(Supplier<BindingState> stateGetter, char[] iconChars, char[] iconOverlayChars, Character tipIcon) {
-            return new LegacyIcon() {
-
-                @Override
-                public Component getComponent(boolean allowPressed) {
-                    return getActualIcon(iconChars, allowPressed, ControlType.getActiveControllerType());
-                }
-
-                @Override
-                public Component getOverlayComponent(boolean allowPressed) {
-                    return getActualIcon(iconOverlayChars, allowPressed, ControlType.getActiveControllerType());
-                }
-
-                @Override
-                public Component getComponent() {
-                    return tipIcon == null ? super.getComponent() == null ? getOverlayComponent(false) : super.getComponent() : getControlIcon(String.valueOf(tipIcon), ControlType.getActiveControllerType()).getComponent();
-                }
-
-                @Override
-                public boolean pressed() {
-                    return stateGetter.get().pressed;
-                }
-
-                @Override
-                public boolean canLoop() {
-                    return !stateGetter.get().isBlocked();
-                }
-
-                @Override
-                public void click(MouseButtonEvent event) {
-                    super.click(event);
-                    stateGetter.get().nextUpdatePress();
-                }
-            };
-        }
-
-        public static LegacyIcon create(InputConstants.Key key, BiFunction<InputConstants.Key, BooleanSupplier, LegacyIcon> iconGetter) {
-            Window window = Minecraft.getInstance().getWindow();
-            return iconGetter.apply(key, () -> (key.getType() == InputConstants.Type.KEYSYM ? InputConstants.isKeyDown(window, key.getValue()) : GLFW.glfwGetMouseButton(window.handle(), key.getValue()) == 1));
-        }
-
         public abstract Component getComponent(boolean allowPressed);
 
         public abstract Component getOverlayComponent(boolean allowPressed);
@@ -792,31 +754,119 @@ public interface ControlTooltip {
         }
     }
 
-    abstract class KeyIcon extends LegacyIcon {
-        public final InputConstants.Key key;
+    abstract class CharsIcon extends LegacyIcon {
+        public static final Codec<char[]> CHARS_CODEC = Codec.STRING.xmap(String::toCharArray, String::new);
+        private final Optional<char[]> iconChars;
+        private final Optional<char[]> iconOverlayChars;
+        private final Optional<String> tipIcon;
 
-        public KeyIcon(InputConstants.Key key) {
+        protected CharsIcon(Optional<char[]> iconChars, Optional<char[]> iconOverlayChars, Optional<String> tipIcon) {
+            this.iconChars = iconChars;
+            this.iconOverlayChars = iconOverlayChars;
+            this.tipIcon = tipIcon;
+        }
+
+        @Override
+        public Component getComponent(boolean allowPressed) {
+            return iconChars.isPresent() ? getActualIcon(iconChars.get(), allowPressed, getControlType()) : null;
+        }
+
+        @Override
+        public Component getOverlayComponent(boolean allowPressed) {
+            return iconOverlayChars.isPresent() ? getActualIcon(iconOverlayChars.get(), allowPressed, getControlType()) : null;
+        }
+
+        @Override
+        public Component getComponent() {
+            return tipIcon.isEmpty() ? super.getComponent() == null ? getOverlayComponent(false) : super.getComponent() : getControlIcon(tipIcon.get(), ControlType.getActiveControllerType()).getComponent();
+        }
+
+        public abstract ControlType getControlType();
+
+        public Optional<char[]> iconChars() {
+            return iconChars;
+        }
+
+        public Optional<char[]> iconOverlayChars() {
+            return iconOverlayChars;
+        }
+
+        public Optional<String> tipIcon() {
+            return tipIcon;
+        }
+
+        public abstract String name();
+    }
+
+    class ControllerIcon extends CharsIcon {
+        public static final Codec<ControllerIcon> CODEC = RecordCodecBuilder.create(i -> i.group(ControllerBinding.CODEC.fieldOf("binding").forGetter(ControllerIcon::binding), CharsIcon.CHARS_CODEC.optionalFieldOf("icon").forGetter(ControllerIcon::iconChars), CharsIcon.CHARS_CODEC.optionalFieldOf("iconOverlay").forGetter(ControllerIcon::iconOverlayChars), Codec.STRING.optionalFieldOf("tipIcon").forGetter(ControllerIcon::tipIcon)).apply(i, ControllerIcon::new));
+        public static final Codec<List<ControllerIcon>> LIST_CODEC = IOUtil.createListIdMapCodec(CODEC, "binding");
+
+        private final ControllerBinding<?> binding;
+
+        public ControllerIcon(ControllerBinding<?> binding, Optional<char[]> iconChars, Optional<char[]> iconOverlayChars, Optional<String> tipIcon) {
+            super(iconChars, iconOverlayChars, tipIcon);
+            this.binding = binding;
+        }
+
+        @Override
+        public boolean pressed() {
+            return state().pressed;
+        }
+
+        @Override
+        public boolean canLoop() {
+            return !state().isBlocked();
+        }
+
+        @Override
+        public void click(MouseButtonEvent event) {
+            super.click(event);
+            state().nextUpdatePress();
+        }
+
+        @Override
+        public ControlType getControlType() {
+            return ControlType.getActiveControllerType();
+        }
+
+        public ControllerBinding<?> binding() {
+            return binding;
+        }
+
+        public BindingState state() {
+            return binding().getMapped().state();
+        }
+
+        @Override
+        public String name() {
+            return binding().getKey();
+        }
+    }
+
+    class KeyIcon extends CharsIcon {
+        public static final Codec<KeyIcon> CODEC = RecordCodecBuilder.create(i -> i.group(Codec.STRING.xmap(InputConstants::getKey, InputConstants.Key::getName).fieldOf("key").forGetter(KeyIcon::key), CharsIcon.CHARS_CODEC.optionalFieldOf("icon").forGetter(KeyIcon::iconChars), CharsIcon.CHARS_CODEC.optionalFieldOf("iconOverlay").forGetter(KeyIcon::iconOverlayChars), Codec.STRING.optionalFieldOf("tipIcon").forGetter(KeyIcon::tipIcon)).apply(i, KeyIcon::new));
+        public static final Codec<List<KeyIcon>> LIST_CODEC = IOUtil.createListIdMapCodec(CODEC, "key");
+
+        private final InputConstants.Key key;
+
+        public KeyIcon(InputConstants.Key key, Optional<char[]> iconChars, Optional<char[]> iconOverlayChars, Optional<String> tipIcon) {
+            super(iconChars, iconOverlayChars, tipIcon);
             this.key = key;
         }
 
-        public static KeyIcon create(InputConstants.Key key, char[] iconChars, char[] iconOverlayChars, Character tipIcon) {
-            return new KeyIcon(key) {
+        public KeyIcon(InputConstants.Key key) {
+            this(key, Optional.empty(), Optional.empty(), Optional.empty());
+        }
 
-                @Override
-                public Component getComponent(boolean allowPressed) {
-                    return getActualIcon(iconChars, allowPressed, ControlType.getKbmActiveType());
-                }
+        @Override
+        public ControlType getControlType() {
+            return ControlType.getKbmActiveType();
+        }
 
-                @Override
-                public Component getOverlayComponent(boolean allowPressed) {
-                    return getActualIcon(iconOverlayChars, allowPressed, ControlType.getKbmActiveType());
-                }
-
-                @Override
-                public Component getComponent() {
-                    return tipIcon == null ? super.getComponent() == null ? getOverlayComponent(false) : super.getComponent() : getControlIcon(String.valueOf(tipIcon), ControlType.getActiveControllerType()).getComponent();
-                }
-            };
+        @Override
+        public String name() {
+            return key.getName();
         }
 
         @Override
@@ -846,6 +896,10 @@ public interface ControlTooltip {
         @Override
         public boolean canLoop() {
             return key.getType() != InputConstants.Type.MOUSE;
+        }
+
+        public InputConstants.Key key() {
+            return key;
         }
     }
 
@@ -935,31 +989,33 @@ public interface ControlTooltip {
                 Component action;
                 Icon icon;
                 if ((action = tooltip.getAction()) == null || (icon = tooltip.getIcon()) == null) continue;
+
                 if (LegacyOptions.getUIMode().isSD())
                     action = action.copy().withStyle(action.getStyle().withFont(LegacyFontUtil.MOJANGLES_11_FONT));
                 renderTooltips.compute(action, (k, existingIcon) -> existingIcon == null ? icon : existingIcon.equals(icon) || !LegacyOptions.displayMultipleControlsFromAction.get() ? existingIcon : CompoundIcon.of(existingIcon, SPACE_ICON, icon));
             }
             guiGraphics.pose().pushMatrix();
             boolean left = LegacyOptions.controlTooltipDisplay.get().isLeft();
-            float hudDiff = (1 - LegacyOptions.hudDistance.get().floatValue()) * 60f;
-            float xDiff = -Math.min(hudDiff, 30);
-            guiGraphics.pose().translate(left ? xDiff : guiGraphics.guiWidth() - xDiff, Math.min(hudDiff, 16));
-            int baseHeight = guiGraphics.guiHeight() - 29;
+            float hudDistance = Math.max(0.0f, LegacyOptions.hudDistance.get().floatValue() - 0.5f) * 2;
+            float hudDiff = 1.0f - hudDistance;
+            float xDiff = 32 - 30 * hudDiff;
+            guiGraphics.pose().translate(left ? xDiff : guiGraphics.guiWidth() - xDiff, guiGraphics.guiHeight() - (29 - (15 - ControlType.getActiveType().iconHeight()) / 2 - 16 * hudDiff));
 
             renderTooltips.forEach((action, icon) -> {
                 if (left) {
-                    int controlWidth = icon.render(guiGraphics, 32, baseHeight, allowPressed(), ColorUtil.withAlpha(0xFFFFFF, getAlpha()), false);
+                    int controlWidth = icon.render(guiGraphics, 0, 0, allowPressed(), ColorUtil.withAlpha(0xFFFFFF, getAlpha()), false);
                     if (controlWidth > 0) {
                         guiGraphics.pose().translate(LegacyOptions.getUIMode().isSD() ? 0 : 2, 0.0f);
-                        guiGraphics.drawString(minecraft.font, action, 32 + controlWidth, baseHeight, ColorUtil.withAlpha(CommonColor.ACTION_TEXT.get(), getAlpha()));
+                        guiGraphics.drawString(minecraft.font, action, controlWidth, 0, ColorUtil.withAlpha(CommonColor.ACTION_TEXT.get(), getAlpha()));
                         guiGraphics.pose().translate(controlWidth + minecraft.font.width(action) + 10, 0);
                     }
                 } else {
                     int controlWidth = icon.getWidth();
                     if (controlWidth > 0) {
                         guiGraphics.pose().translate(-controlWidth - minecraft.font.width(action), 0);
-                        icon.render(guiGraphics, -32, baseHeight, allowPressed(), ColorUtil.withAlpha(0xFFFFFF, getAlpha()), false);
-                        guiGraphics.drawString(minecraft.font, action, -30 + controlWidth, baseHeight, ColorUtil.withAlpha(CommonColor.ACTION_TEXT.get(), getAlpha()));
+                        icon.render(guiGraphics, 0, 0, allowPressed(), ColorUtil.withAlpha(0xFFFFFF, getAlpha()), false);
+                        guiGraphics.pose().translate(LegacyOptions.getUIMode().isSD() ? 0 : 2, 0.0f);
+                        guiGraphics.drawString(minecraft.font, action, controlWidth, 0, ColorUtil.withAlpha(CommonColor.ACTION_TEXT.get(), getAlpha()));
                         guiGraphics.pose().translate(-12, 0);
                     }
                 }
@@ -970,14 +1026,15 @@ public interface ControlTooltip {
 
         public void press(MouseButtonEvent event, boolean clicked) {
             boolean left = LegacyOptions.controlTooltipDisplay.get().isLeft();
-            float hudDiff = (1 - LegacyOptions.hudDistance.get().floatValue()) * 60f;
-            float xDiff = -Math.min(hudDiff, 30);
-            float tooltipX = left ? xDiff + 32 : Minecraft.getInstance().getWindow().getGuiScaledWidth() - xDiff - 32;
-            float tooltipY = Minecraft.getInstance().getWindow().getGuiScaledHeight() - 29 + Math.min(hudDiff, 16);
+            float hudDistance = Math.max(0.0f, LegacyOptions.hudDistance.get().floatValue() - 0.5f) * 2;
+            float hudDiff = 1.0f - hudDistance;
+            float xDiff = 32 - 30 * hudDiff;
+            float tooltipX = left ? xDiff : minecraft.getWindow().getGuiScaledWidth() - xDiff;
+            float tooltipY = minecraft.getWindow().getGuiScaledHeight() - (29 - (15 - ControlType.getActiveType().iconHeight()) / 2 - 16 * hudDiff);
             for (Map.Entry<Component, Icon> e : renderTooltips.entrySet()) {
                 int tooltipWidth = e.getValue().getWidth() + minecraft.font.width(e.getKey());
                 if (!left) tooltipX -= tooltipWidth;
-                if (LegacyRenderUtil.isMouseOver(event.x(), event.y(), tooltipX, tooltipY, tooltipWidth, 7)) {
+                if (LegacyRenderUtil.isMouseOver(event.x(), event.y(), tooltipX, tooltipY - 1, tooltipWidth, 9)) {
                     if (clicked)
                         e.getValue().clickIfInside(tooltipX, event);
                     else

@@ -3,26 +3,11 @@
   "targetType": "class",
   "applyCondition": { "reference": "uiMode.sd" },
   "elements": {
-    "panel.width": {
-      "type": "put_number",
-      "value": 201
-    },
-    "panel.height": {
-      "type": "put_number",
-      "value": 180
-    },
-    "buttonsHeight": {
-      "type": "put_number",
-      "value": 17
-    },
-    "renderableVList.buttonIcon.size": {
-      "type": "put_number",
-      "value": 11
-    },
-    "renderableVList.buttonMessage.xOffset": {
-      "type": "put_number",
-      "value": 2
-    },
+    "panel.width": 180,
+    "panel.height": 180,
+    "buttonsHeight": 17,
+    "renderableVList.buttonIcon.size": 11,
+    "renderableVList.buttonMessage.xOffset": 8,
     "panelRecess.sprite": {
       "type": "put_resource_location",
       "value": "legacy:tiles/square_recessed_panel"

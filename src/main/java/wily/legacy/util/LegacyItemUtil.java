@@ -4,19 +4,19 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.config.LegacyCommonOptions;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class LegacyItemUtil {
@@ -101,6 +101,22 @@ public class LegacyItemUtil {
 
     public static int getDyeColor(DyeColor dyeColor) {
         return dyeColor.getTextureDiffuseColor();
+    }
+
+    public static int getPotionLevel(ItemStack stack) {
+        Holder<Potion> potion = getPotionContent(stack);
+        if (potion == null) return 0;
+        int level;
+        if (potion instanceof Holder.Reference<Potion> reference && reference.key().location().getPath().startsWith("strong_")) {
+            level = 2;
+        } else if (potion instanceof Holder.Reference<Potion> reference && reference.key().location().getPath().startsWith("long_")) {
+            level = 3;
+        } else if (potion.value().getEffects().isEmpty()) {
+            level = 0;
+        } else {
+            level = 1;
+        }
+        return level;
     }
 
     public static float getItemDamageModifier(ItemStack stack) {

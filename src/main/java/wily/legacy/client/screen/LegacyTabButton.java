@@ -26,6 +26,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.DynamicUtil;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.ListMap;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.SizeableAsset;
@@ -34,6 +35,7 @@ import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -81,24 +83,6 @@ public class LegacyTabButton extends AbstractButton {
 
     public static Render sizeableIconOf(SizeableAsset<IconHolder<?>> sizeable) {
         return (t, guiGraphics, i, j, f) -> sizeable.get().icon().render(t, guiGraphics, i, j, f);
-    }
-
-    public static Codec<IconHolder<?>> createIconHolderCodec(String typeField, String valueField) {
-        return new Codec<>() {
-            @Override
-            public <T> DataResult<Pair<IconHolder<?>, T>> decode(DynamicOps<T> ops, T input) {
-                Dynamic<T> dynamic = new Dynamic<>(ops, input);
-                DataResult<ResourceLocation> idResult = dynamic.get(typeField).flatMap(ResourceLocation.CODEC::parse);
-                if (idResult.result().isEmpty()) idResult = DataResult.success(DEFAULT_ICON_TYPE_ID);
-                return idResult.flatMap(f -> dynamic.get(valueField).flatMap(d -> ICON_TYPES.get(f).parse(f, d).map(c -> Pair.of(c, input))));
-            }
-
-            @Override
-            public <T> DataResult<T> encode(IconHolder<?> input, DynamicOps<T> ops, T prefix) {
-                Dynamic<T> dynamic = new Dynamic<>(ops, prefix);
-                return input.encodeContent(ops).map(r -> dynamic.set(typeField, dynamic.createString(input.type.toString())).set(typeField, r).getValue());
-            }
-        };
     }
 
     @Override
@@ -253,6 +237,24 @@ public class LegacyTabButton extends AbstractButton {
         }
     }
 
+    public static Codec<IconHolder<?>> createIconHolderCodec(String typeField, String valueField) {
+        Codec<ResourceLocation> typeCodec = ResourceLocation.CODEC.fieldOf(typeField).codec();
+        return new Codec<>() {
+            @Override
+            public <T> DataResult<Pair<IconHolder<?>, T>> decode(DynamicOps<T> ops, T input) {
+                Dynamic<T> dynamic = new Dynamic<>(ops, input);
+                DataResult<ResourceLocation> idResult = typeCodec.parse(dynamic);
+                if (idResult.result().isEmpty()) idResult = DataResult.success(DEFAULT_ICON_TYPE_ID);
+                return idResult.flatMap(f -> dynamic.get(valueField).flatMap(d -> ICON_TYPES.get(f).parse(f, d).map(c -> Pair.of(c, input))));
+            }
+
+            @Override
+            public <T> DataResult<T> encode(IconHolder<?> input, DynamicOps<T> ops, T prefix) {
+                return typeCodec.encode(ICON_TYPES.getKey(input.type), ops, prefix).flatMap(r -> input.encodeContent(ops, ops.empty()).map(value -> ops.set(r, valueField, value)));
+            }
+        };
+    }
+
     public static final Codec<IconHolder<?>> ICON_HOLDER_CODEC = IOUtil.createFallbackCodec(createIconHolderCodec("type", "value"), DEFAULT_ICON_CODEC.xmap(Function.identity(), h -> (IconHolder<ResourceLocation>) h));
 
     public record IconHolder<T>(ResourceLocation typeId, IconType<T> type, T content, Render icon) {
@@ -260,8 +262,8 @@ public class LegacyTabButton extends AbstractButton {
             this(typeId, type, content, type.createIcon.apply(content));
         }
 
-        public <C> DataResult<Dynamic<C>> encodeContent(DynamicOps<C> ops) {
-            return type.contentCodec.encodeStart(ops, content).map(c -> new Dynamic<>(ops, c));
+        public <C> DataResult<C> encodeContent(DynamicOps<C> ops, C prefix) {
+            return type.contentCodec.encode(content, ops, prefix);
         }
     }
 

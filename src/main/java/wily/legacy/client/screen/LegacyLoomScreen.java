@@ -250,7 +250,7 @@ public class LegacyLoomScreen extends AbstractContainerScreen<LegacyCraftingMenu
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         LegacyFontUtil.applySDFont(b -> {
-            Component title = !isSelectionTab() ? craftingTabList.tabButtons.get(craftingTabList.getIndex()).getMessage() : getFocused() instanceof CustomRecipeIconHolder h ? h.getDisplayName() : Component.empty();
+            Component title = !isSelectionTab() ? craftingTabList.tabButtons.get(craftingTabList.getIndex()).getMessage() : selectBannerButton.get(0).getDisplayName();
             guiGraphics.drawString(this.font, title, ((!isSelectionTab() ? imageWidth : imageWidth / 2) - font.width(title)) / 2, accessor.getInteger("title.y", 17), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
             int inventoryPanelX = accessor.getInteger("inventoryPanel.x", 176);
             int bottomPanelY = accessor.getInteger("bottomPanel.y", 103);

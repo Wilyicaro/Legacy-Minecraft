@@ -136,6 +136,8 @@ public class LegacyComponents {
     public static final Component SERVER_OPTIONS = Component.translatable("legacy.menu.server_options");
     public static final Component SERVER_OPTIONS_MESSAGE = Component.translatable("legacy.menu.server_options_message");
     public static final Component MISSING_WORLD_TEMPLATE = Component.translatable("legacy.menu.missing_world_template");
+    public static final Component DOWNLOADING_WORLD_TEMPLATE = Component.translatable("legacy.menu.downloading_world_template");
+    public static final Component OPTIONS_PRESET_MESSAGE = Component.translatable("legacy.menu.options_preset_message");
     public static final Component GAME_OPTIONS = Component.translatable("legacy.menu.game_options");
     public static final Component WORLD_OPTIONS = Component.translatable("createWorld.tab.world.title");
     public static final Component INGREDIENTS = Component.translatable("legacy.container.ingredients");
@@ -184,6 +186,9 @@ public class LegacyComponents {
     public static final Component ENTER_IP = Component.translatable("manageServer.enterIp");
     public static final Component INITIALIZING = Component.translatable("legacy.connect.initializing");
     public static final Component LOADING_SPAWN_AREA = Component.translatable("legacy.loading_spawn_area");
+    public static final Component PREPARING_AUTOSAVE = Component.translatable("legacy.menu.savingLevel.preparing");
+    public static final Component PREPARING_CHUNKS = Component.translatable("legacy.menu.savingLevel.preparing_chunks");
+    public static final Component FINALIZING = Component.translatable("legacy.menu.savingLevel.finalizing");
     public static final Component SPAWN_EGG_TIP = Component.translatable("item.minecraft.spawn_egg.tip");
     public static final Component MAP_NAME = Component.translatable("legacy.container.mapName");
     public static final Component RENAME_MAP = Component.translatable("legacy.container.renameMap");
