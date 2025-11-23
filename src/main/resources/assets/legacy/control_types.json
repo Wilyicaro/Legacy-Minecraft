@@ -51,7 +51,14 @@
     },
     "minecraftLogo": "legacy:textures/gui/title/minecraft/playstation_4.png"
   },
-  "legacy:playstation_5",
+  {
+    "id": "legacy:playstation_5",
+    "name": {"translate": "legacy.options.controlType.playstation_5"},
+    "font": {
+      "default": "legacy:playstation_5",
+      "hd": "legacy:playstation_5_hd"
+    },
+  },
   "legacy:wii_u",
   "legacy:switch",
   "legacy:steam",
