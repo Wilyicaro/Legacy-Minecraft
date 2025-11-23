@@ -62,5 +62,12 @@
   "legacy:wii_u",
   "legacy:switch",
   "legacy:steam",
-  "legacy:stadia"
+  {
+    "id": "legacy:stadia",
+    "name": {"translate": "legacy.options.controlType.playstation_5"},
+    "font": {
+      "default": "legacy:stadia",
+      "hd": "legacy:stadia_hd"
+    },
+  },
 ]
