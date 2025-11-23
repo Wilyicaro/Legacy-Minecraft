@@ -3,13 +3,18 @@
     "id": "legacy:java",
     "name": {"translate": "legacy.options.controlType.java"},
     "isKbm": true,
-    "font": "legacy:java",
+    "font": {
+      "default": "legacy:java",
+      "hd": "legacy:java_hd"
+  },
     "minecraftLogo": "legacy:textures/gui/title/minecraft/java.png"
   },
   {
     "id": "legacy:xbox_360",
     "name": {"translate": "legacy.options.controlType.xbox_360"},
     "font": {
+      "default": "legacy:xbox_360",
+      "hd": "legacy:xbox_360_hd",
       "sd": {
         "id": "legacy:xbox_360_sd",
         "iconHeight": 9
