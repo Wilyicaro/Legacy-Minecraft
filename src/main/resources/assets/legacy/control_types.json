@@ -60,11 +60,18 @@
     },
   },
   "legacy:wii_u",
-  "legacy:switch",
+  {
+    "id": "legacy:switch",
+    "name": {"translate": "legacy.options.controlType.switch"},
+    "font": {
+      "default": "legacy:switch",
+      "hd": "legacy:switch_hd"
+    },
+  },
   "legacy:steam",
   {
     "id": "legacy:stadia",
-    "name": {"translate": "legacy.options.controlType.playstation_5"},
+    "name": {"translate": "legacy.options.controlType.stadia"},
     "font": {
       "default": "legacy:stadia",
       "hd": "legacy:stadia_hd"
