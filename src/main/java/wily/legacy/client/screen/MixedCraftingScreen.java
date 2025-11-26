@@ -50,6 +50,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.util.PagedList;
+import wily.legacy.Legacy4J;
 import wily.legacy.client.*;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.Controller;
@@ -486,7 +487,7 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Abstrac
     }
 
     protected int getMaxTabCount() {
-        return accessor.getInteger("maxTabCount", 4);
+        return accessor.getInteger("maxTabCount", 5);
     }
 
     protected void addCraftingButtons() {
@@ -629,6 +630,9 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Abstrac
 
     @Override
     public boolean keyReleased(KeyEvent keyEvent) {
+        if (keyEvent.key() == InputConstants.KEY_O) {
+            Legacy4J.LOGGER.warn("RELEASED OOOO!");
+        }
         if (!searchBox.isFocused() && !searchMode && keyEvent.key() == InputConstants.KEY_O && (keyEvent.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed)) {
             enableSearchMode(false);
             return true;

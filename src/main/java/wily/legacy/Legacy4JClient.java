@@ -473,6 +473,11 @@ public class Legacy4JClient {
             knownBlocks.save();
             knownEntities.save();
         });
+        FactoryAPIClient.RESIZE_DISPLAY.register(minecraft -> {
+            LegacyTipManager.rebuildActual();
+            LegacyTipManager.rebuildActualLoading();
+            minecraft.gui.getChat().rescaleChat();
+        });
         FactoryEvent.registerBuiltInPacks(registry -> {
             registry.registerResourcePack(FactoryAPI.createLocation(MOD_ID, "legacy_resources"), true);
             registry.registerResourcePack(FactoryAPI.createLocation(MOD_ID, "legacy_waters"), true);

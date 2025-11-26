@@ -134,7 +134,9 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 graphics.disableScissor();
                 ResourceLocation background = PackAlbum.Selector.getPackBackground(selectedPack);
                 MultiLineLabel label = labelsCache.apply(selectedPack.getDescription(), 145);
-                scrollableRenderer.render(graphics, x + 8, y + 40, 146, 12 * (background == null ? 14 : 7), () -> label.render(graphics, MultiLineLabel.Align.LEFT, x + 8, y + 40, 12, true, 0xFFFFFFFF));
+                int visibleLines = (height - 50 - (background == null ? 0 : 78)) / 12;
+                scrollableRenderer.scrolled.max = org.joml.Math.max(0, label.getLineCount() - visibleLines);
+                scrollableRenderer.render(graphics, x + 8, y + 40, 146, visibleLines * 12, () -> label.render(graphics, MultiLineLabel.Align.LEFT, x + 8, y + 40, 12, true, 0xFFFFFFFF));
                 if (background != null)
                     FactoryGuiGraphics.of(graphics).blit(background, x + 8, y + height - 78, 0.0f, 0.0f, 145, 72, 145, 72);
             }
@@ -171,8 +173,6 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
             this.selectedIndex = Stocker.cyclic(0, index, displayPacks.size());
             selectedPack = displayPacks.get(selectedIndex);
             scrollableRenderer.resetScrolled();
-            ResourceLocation background = PackAlbum.Selector.getPackBackground(selectedPack);
-            scrollableRenderer.scrolled.max = Math.max(0, labelsCache.apply(selectedPack.getDescription(), 145).getLineCount() - (background == null ? 20 : 7));
             updateTooltip();
         }
 

@@ -606,8 +606,7 @@ public interface ControlTooltip {
     }
 
     interface Event {
-        Event EMPTY = new Event() {
-        };
+        Event EMPTY = new Event() {};
 
         static Event of(Object o) {
             return o instanceof Event e ? e : EMPTY;

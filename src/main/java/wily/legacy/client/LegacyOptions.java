@@ -290,7 +290,7 @@ public class LegacyOptions {
 
     public static UIMode getUIMode() {
         if (uiMode.get() == UIMode.AUTO) {
-            if (LegacyRenderUtil.getStandardHeight() >= 1080) return UIMode.FHD;
+            if (LegacyRenderUtil.getStandardHeight() == 1080) return UIMode.FHD;
             return LegacyRenderUtil.getStandardHeight() > 540 ? UIMode.HD : UIMode.SD;
         }
 

@@ -36,6 +36,7 @@ public record LegacyIntro(List<ResourceLocation> brands, ResourceLocation backgr
 
     public static void render(GuiGraphics guiGraphics, LegacyIntro intro, float timer) {
         guiGraphics.fill(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), 0xFFFFFFFF);
+        if (intro.brands.isEmpty()) return;
         int actual = (int) (timer % intro.brands().size());
         float last = (float) Math.ceil(timer) - timer;
         if (intro.crossFade() && last <= intro.fadeOut() && actual + 1 < intro.brands().size()) {

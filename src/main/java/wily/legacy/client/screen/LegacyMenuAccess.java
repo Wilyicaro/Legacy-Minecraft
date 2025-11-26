@@ -106,9 +106,10 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
 
     ScreenRectangle getMenuRectangle();
 
-    default ScreenRectangle getMenuRectangleLimit() {
-        ScreenRectangle rect = getMenuRectangle();
-        return createMenuRectangleLimit(this, rect.left(), rect.top(), rect.width(), rect.height(), 20, 10);
+    ScreenRectangle getMenuRectangleLimit();
+
+    static ScreenRectangle createMenuRectangleLimit(LegacyMenuAccess<?> menu, int x, int y, int width, int height) {
+        return createMenuRectangleLimit(menu, x, y, width, height, 20, 10);
     }
 
     static ScreenRectangle createMenuRectangleLimit(LegacyMenuAccess<?> menu, int x, int y, int width, int height, int paddingH, int paddingV) {

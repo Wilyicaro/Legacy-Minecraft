@@ -26,15 +26,15 @@ import java.util.Optional;
 
 public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon, String worldTemplate,
                                   String folderName, boolean directJoin, boolean isLocked, boolean isGamePath, boolean preDownload,
-                                  Optional<URI> downloadURI, Optional<String> checkSum) {
-    public static final Codec<LegacyWorldTemplate> CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.getComponentCodec().fieldOf("buttonMessage").forGetter(LegacyWorldTemplate::buttonMessage), ResourceLocation.CODEC.fieldOf("icon").forGetter(LegacyWorldTemplate::icon), Codec.STRING.fieldOf("templateLocation").forGetter(LegacyWorldTemplate::worldTemplate), Codec.STRING.fieldOf("folderName").forGetter(LegacyWorldTemplate::folderName), Codec.BOOL.optionalFieldOf("directJoin", false).forGetter(LegacyWorldTemplate::directJoin), Codec.BOOL.optionalFieldOf("isLocked", false).forGetter(LegacyWorldTemplate::isLocked), Codec.BOOL.optionalFieldOf("isGamePath", false).forGetter(LegacyWorldTemplate::isGamePath), Codec.BOOL.optionalFieldOf("preDownload", false).forGetter(LegacyWorldTemplate::preDownload), Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("downloadURI").forGetter(LegacyWorldTemplate::downloadURI)).apply(i, LegacyWorldTemplate::create));
+                                  Optional<String> albumId, Optional<URI> downloadURI, Optional<String> checkSum) {
+    public static final Codec<LegacyWorldTemplate> CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.getComponentCodec().fieldOf("buttonMessage").forGetter(LegacyWorldTemplate::buttonMessage), ResourceLocation.CODEC.fieldOf("icon").forGetter(LegacyWorldTemplate::icon), Codec.STRING.fieldOf("templateLocation").forGetter(LegacyWorldTemplate::worldTemplate), Codec.STRING.fieldOf("folderName").forGetter(LegacyWorldTemplate::folderName), Codec.BOOL.optionalFieldOf("directJoin", false).forGetter(LegacyWorldTemplate::directJoin), Codec.BOOL.optionalFieldOf("isLocked", false).forGetter(LegacyWorldTemplate::isLocked), Codec.BOOL.optionalFieldOf("isGamePath", false).forGetter(LegacyWorldTemplate::isGamePath), Codec.BOOL.optionalFieldOf("preDownload", false).forGetter(LegacyWorldTemplate::preDownload), Codec.STRING.optionalFieldOf("resourceAlbum").forGetter(LegacyWorldTemplate::albumId), Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("downloadURI").forGetter(LegacyWorldTemplate::downloadURI)).apply(i, LegacyWorldTemplate::create));
     public static final Codec<List<LegacyWorldTemplate>> LIST_CODEC = CODEC.listOf();
     public static final List<LegacyWorldTemplate> list = new ArrayList<>();
     private static final String TEMPLATES = "world_templates.json";
 
-    public static LegacyWorldTemplate create(Component buttonMessage, ResourceLocation icon, String worldTemplate, String folderName, boolean directJoin, boolean isLocked, boolean isGamePath, boolean delayDownload, Optional<URI> compoundDownloadURI) {
+    public static LegacyWorldTemplate create(Component buttonMessage, ResourceLocation icon, String worldTemplate, String folderName, boolean directJoin, boolean isLocked, boolean isGamePath, boolean delayDownload, Optional<String> albumId, Optional<URI> compoundDownloadURI) {
         Optional<String[]> splitURI = compoundDownloadURI.map(u -> u.toString().split("\\?checksum="));
-        return new LegacyWorldTemplate(buttonMessage, icon, worldTemplate, folderName, directJoin, isLocked, isGamePath, delayDownload, splitURI.map(s -> URI.create(s[0])), splitURI.map(s -> s.length < 2 ? null : s[1]));
+        return new LegacyWorldTemplate(buttonMessage, icon, worldTemplate, folderName, directJoin, isLocked, isGamePath, delayDownload, albumId, splitURI.map(s -> URI.create(s[0])), splitURI.map(s -> s.length < 2 ? null : s[1]));
     }
 
     public Path getPath() {

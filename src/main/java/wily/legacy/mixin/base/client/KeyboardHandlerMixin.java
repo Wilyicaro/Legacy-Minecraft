@@ -42,6 +42,7 @@ public class KeyboardHandlerMixin {
     *///?} else {
     @WrapOperation(method = "keyPress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;keyPressed(Lnet/minecraft/client/input/KeyEvent;)Z"))
     public boolean screenKeyPress(Screen instance, KeyEvent keyEvent, Operation<Boolean> original) {
+        Legacy4JClient.controllerManager.blockNextCharType = false;
         if (Minecraft.getInstance().getOverlay() == null && original.call(instance, keyEvent)) {
             Legacy4JClient.controllerManager.blockNextCharType = true;
             return true;

@@ -434,7 +434,9 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 graphics.disableScissor();
                 ResourceLocation background = getSelectedAlbum().backgroundSprite.orElse(p ? getPackBackground(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : null);
                 MultiLineLabel label = labelsCache.apply(getSelectedAlbum().description(), 145);
-                scrollableRenderer.render(graphics, x + 8, y + 40, 146, 12 * (background == null ? 14 : 7), () -> label.render(graphics, MultiLineLabel.Align.LEFT, x + 8, y + 40, 12, true, 0xFFFFFFFF));
+                int visibleLines = (height - 50 - (background == null ? 0 : 78)) / 12;
+                scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleLines);
+                scrollableRenderer.render(graphics, x + 8, y + 40, 146, visibleLines * 12, () -> label.render(graphics, MultiLineLabel.Align.LEFT, x + 8, y + 40, 12, true, 0xFFFFFFFF));
                 if (background != null) {
                     if (getSelectedAlbum().backgroundSprite().isPresent())
                         FactoryGuiGraphics.of(graphics).blitSprite(background, x + 8, y + height - 78, 145, 72);
@@ -518,7 +520,6 @@ public record PackAlbum(String id, int version, Component displayName, Component
             if (selectedIndex == index) return;
             this.selectedIndex = Stocker.cyclic(0, index, albums.size());
             scrollableRenderer.resetScrolled();
-            scrollableRenderer.scrolled.max = Math.max(0, labelsCache.apply(getSelectedAlbum().description(), 145).getLineCount() - (getSelectedAlbum().backgroundSprite.orElse(getSelectedAlbum().isValidPackDisplay(packRepository) ? getPackBackground(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : null) == null ? 20 : 7));
             updateTooltip();
         }
 

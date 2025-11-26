@@ -69,7 +69,7 @@ public class LegacySlotWidget extends LegacyIconHolder implements NavigationElem
 
     @Override
     public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
-        return isVisible && !isHovered ? super.nextFocusPath(focusNavigationEvent) : null;
+        return isVisible && !isHovered && (!Controller.Event.of(Minecraft.getInstance().screen).disableCursorOnInit() || !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.cursorMode.get().isAlways()) ? super.nextFocusPath(focusNavigationEvent) : null;
     }
 
     @Override

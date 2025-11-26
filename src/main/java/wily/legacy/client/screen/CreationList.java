@@ -20,9 +20,7 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.LegacySaveCache;
-import wily.legacy.client.LegacyWorldTemplate;
+import wily.legacy.client.*;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -94,6 +92,7 @@ public class CreationList extends RenderableVList {
     public static void loadTemplate(Screen parent, Minecraft minecraft, LegacyWorldTemplate template) {
         try (LevelStorageSource.LevelStorageAccess access = LegacySaveCache.getLevelStorageSource().createAccess(LegacySaveCache.importSaveFile(template.open(), minecraft.getLevelSource()::levelExists, LegacySaveCache.getLevelStorageSource(), template.folderName()))) {
             LevelSummary summary = access.getSummary(/*? if >1.20.2 {*/access.getDataTag()/*?}*/);
+            template.albumId().map(PackAlbum::resourceById).ifPresent(album -> LegacyClientWorldSettings.of(summary.getSettings()).setSelectedResourceAlbum(album));
             access.close();
             if (template.directJoin()) {
                 LoadSaveScreen.loadWorld(parent, minecraft, LegacySaveCache.getLevelStorageSource(), summary);

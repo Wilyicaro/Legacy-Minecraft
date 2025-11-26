@@ -341,7 +341,7 @@ public class ControllerManager {
 
     public void simulateKeyAction(Predicate<BindingState> canSimulate, int key, BindingState state, boolean onlyScreen) {
         boolean clicked = state.pressed && state.canClick();
-        if (canSimulate.test(state) && (!Controller.Event.of(minecraft.screen).onceClickBindings(state) || state.onceClick(true))) {
+        if (canSimulate.test(state) && (!Controller.Event.of(minecraft.screen).onceClickBindings(state) || state.released || state.onceClick(true))) {
             simulateKeyAction(key, state, clicked, onlyScreen);
         }
     }

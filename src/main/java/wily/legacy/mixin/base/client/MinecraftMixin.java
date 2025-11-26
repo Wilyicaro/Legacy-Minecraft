@@ -15,6 +15,7 @@ import net.minecraft.client.gui.components.toasts.AdvancementToast;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.screens.*;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.main.GameConfig;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -32,6 +33,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -136,6 +138,14 @@ public abstract class MinecraftMixin {
     @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetAttackStrengthTicker()V"))
     private void startAttack(CallbackInfoReturnable<Boolean> cir) {
         CommonNetwork.sendToServer(new ServerPlayerMissHitPayload());
+    }
+
+    @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;options:Lnet/minecraft/client/Options;", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
+    private void changeWindowDefaultWidth(GameConfig gameConfig, CallbackInfo ci){
+        if (options.overrideWidth == 0)
+            options.overrideWidth = 720;
+        if (options.overrideHeight == 0)
+            options.overrideHeight = 408;
     }
 
     @Inject(method = "startUseItem", at = @At("HEAD"), cancellable = true)
@@ -248,13 +258,6 @@ public abstract class MinecraftMixin {
             return false;
         }
         return true;
-    }
-
-    @Inject(method = "resizeDisplay", at = @At("RETURN"))
-    private void resizeDisplay(CallbackInfo ci) {
-        LegacyTipManager.rebuildActual();
-        LegacyTipManager.rebuildActualLoading();
-        gui.getChat().rescaleChat();
     }
 
     @ModifyArg(method = "disconnect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V"))
