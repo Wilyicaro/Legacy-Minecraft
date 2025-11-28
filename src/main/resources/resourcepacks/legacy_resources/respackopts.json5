@@ -1,0 +1,11 @@
+{
+    id: "legacyResources",
+    version: 13,
+    capabilities: ["FileFilter", "DirFilter"],
+    conf: {
+        oldHorsey: true,
+        oldSkelebone: true,
+        oldExp: true,
+        dog: true
+    }
+}
