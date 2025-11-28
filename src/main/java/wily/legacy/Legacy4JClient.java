@@ -2,6 +2,7 @@ package wily.legacy;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.serialization.DataResult;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.KeyMapping;
@@ -129,6 +130,7 @@ public class Legacy4JClient {
     public static final StoneCuttingGroupManager stoneCuttingGroupManager = new StoneCuttingGroupManager();
     public static final MapIdValueManager<LoomTabListing, ?> loomListingManager = MapIdValueManager.create(Legacy4J.createModLocation("loom_tab_listing"), LoomTabListing.CODEC);
     public static final MapIdValueManager<TypeCraftingTab, ?> typeCraftingTabs = MapIdValueManager.create(Legacy4J.createModLocation("type_crafting_tabs"), TypeCraftingTab.CODEC);
+    public static final MapIdValueManager<LegacyTabDisplay, ?> mixedCraftingTabs = MapIdValueManager.create(Legacy4J.createModLocation("mixed_crafting_tabs"), LegacyTabDisplay.CODEC.validate(display -> MixedCraftingScreen.isValidTab(display) ? DataResult.success(display) : DataResult.error(() -> display.id() + " is an invalid tab!")));
     public static final ControlTooltip.GuiManager controlTooltipGuiManager = new ControlTooltip.GuiManager();
     public static final LeaderboardsScreen.Manager leaderBoardListingManager = new LeaderboardsScreen.Manager();
     public static final HowToPlayScreen.Manager howToPlaySectionManager = new HowToPlayScreen.Manager();
@@ -393,6 +395,7 @@ public class Legacy4JClient {
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, stoneCuttingGroupManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, loomListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, typeCraftingTabs);
+        FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, mixedCraftingTabs);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, controlTooltipGuiManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, leaderBoardListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, howToPlaySectionManager);

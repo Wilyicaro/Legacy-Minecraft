@@ -140,14 +140,6 @@ public abstract class MinecraftMixin {
         CommonNetwork.sendToServer(new ServerPlayerMissHitPayload());
     }
 
-    @Inject(method = "<init>", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;options:Lnet/minecraft/client/Options;", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
-    private void changeWindowDefaultWidth(GameConfig gameConfig, CallbackInfo ci){
-        if (options.overrideWidth == 0)
-            options.overrideWidth = 720;
-        if (options.overrideHeight == 0)
-            options.overrideHeight = 408;
-    }
-
     @Inject(method = "startUseItem", at = @At("HEAD"), cancellable = true)
     private void startUseItem(CallbackInfo ci) {
         if (player != null && player.isSleeping()) {

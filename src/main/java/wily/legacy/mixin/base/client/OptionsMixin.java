@@ -15,6 +15,7 @@ import wily.legacy.client.GlobalPacks;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.PackAlbum;
 
+import java.io.File;
 import java.util.function.BooleanSupplier;
 
 @Mixin(Options.class)
@@ -22,6 +23,10 @@ public abstract class OptionsMixin {
 
     @Shadow
     protected Minecraft minecraft;
+
+    @Shadow public int overrideWidth;
+
+    @Shadow public int overrideHeight;
 
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;<init>(Ljava/lang/String;ILnet/minecraft/client/KeyMapping$Category;)V", ordinal = 5), index = 0)
     protected String initKeyCraftingName(String string) {
@@ -56,6 +61,14 @@ public abstract class OptionsMixin {
     @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/ToggleKeyMapping;<init>(Ljava/lang/String;Lcom/mojang/blaze3d/platform/InputConstants$Type;ILnet/minecraft/client/KeyMapping$Category;Ljava/util/function/BooleanSupplier;Z)V", ordinal = 1), index = 4)
     protected BooleanSupplier initKeyAttack(BooleanSupplier booleanSupplier) {
         return () -> booleanSupplier.getAsBoolean() && !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.controllerToggleAttack.get() && Legacy4JClient.controllerManager.isControllerTheLastInput();
+    }
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void init(Minecraft minecraft, File file, CallbackInfo ci) {
+        if (overrideWidth == 0)
+            overrideWidth = 720;
+        if (overrideHeight == 0)
+            overrideHeight = 408;
     }
 
     @Inject(method = "loadSelectedResourcePacks", at = @At("HEAD"), cancellable = true)

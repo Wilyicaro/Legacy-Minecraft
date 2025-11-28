@@ -97,11 +97,18 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
             packRepository.setSelected(packs);
             scrolledList = new Stocker.Sizeable(0);
             List<Pack> displayPacks = getDisplayPacks();
-            int s = displayPacks.size();
-            if (s > getMaxPacks())
+            if (displayPacks.size() > getMaxPacks())
                 scrolledList.max = displayPacks.size() - getMaxPacks();
             setSelectedPack(0);
             updateTooltip();
+        }
+
+        @Override
+        public void setWidth(int i) {
+            super.setWidth(i);
+            List<Pack> displayPacks = getDisplayPacks();
+            if (displayPacks.size() > getMaxPacks())
+                scrolledList.max = displayPacks.size() - getMaxPacks();
         }
 
         public static Selector resources(int i, int j, int k, int l, boolean hasTooltip) {

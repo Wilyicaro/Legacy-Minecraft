@@ -18,18 +18,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public record OptionsPreset(ResourceLocation id, Optional<Component> name, Map<String, Object> legacyOptions, Map<String, Object> vanillaOptions) implements IdValueInfo<OptionsPreset> {
+public record OptionsPreset(ResourceLocation id, Optional<Component> name, Optional<Component> tooltip, Map<String, Object> legacyOptions, Map<String, Object> vanillaOptions) implements IdValueInfo<OptionsPreset> {
     public static final Map<String, OptionInstance<?>> VANILLA_OPTIONS_MAP = new HashMap<>();
 
     public static final Codec<Map<String, Object>> LEGACY_OPTIONS_CODEC = Codec.dispatchedMap(Codec.STRING.validate(s -> LegacyOptions.CLIENT_STORAGE.configMap.containsKey(s) ? DataResult.success(s) : DataResult.error(() -> "Can't find legacy option named as " + s)), s -> LegacyOptions.CLIENT_STORAGE.configMap.get(s).control().codec());
     public static final Codec<Map<String, Object>> VANILLA_OPTIONS_CODEC = Codec.dispatchedMap(Codec.STRING.validate(s -> VANILLA_OPTIONS_MAP.containsKey(s) ? DataResult.success(s) : DataResult.error(() -> "Can't find vanilla option named as " + s)), s -> VANILLA_OPTIONS_MAP.get(s).codec());
 
-    public static final Codec<OptionsPreset> CODEC = RecordCodecBuilder.create(i -> i.group(ResourceLocation.CODEC.fieldOf("id").forGetter(OptionsPreset::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(OptionsPreset::name), LEGACY_OPTIONS_CODEC.optionalFieldOf("legacy", Collections.emptyMap()).forGetter(OptionsPreset::legacyOptions), VANILLA_OPTIONS_CODEC.optionalFieldOf("vanilla", Collections.emptyMap()).forGetter(OptionsPreset::vanillaOptions)).apply(i, OptionsPreset::new));
+    public static final Codec<OptionsPreset> CODEC = RecordCodecBuilder.create(i -> i.group(ResourceLocation.CODEC.fieldOf("id").forGetter(OptionsPreset::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(OptionsPreset::name), DynamicUtil.getComponentCodec().optionalFieldOf("tooltip").forGetter(OptionsPreset::tooltip), LEGACY_OPTIONS_CODEC.optionalFieldOf("legacy", Collections.emptyMap()).forGetter(OptionsPreset::legacyOptions), VANILLA_OPTIONS_CODEC.optionalFieldOf("vanilla", Collections.emptyMap()).forGetter(OptionsPreset::vanillaOptions)).apply(i, OptionsPreset::new));
     public static final Codec<OptionHolder<OptionsPreset>> OPTION_CODEC = OptionHolder.createCodec(r -> Legacy4JClient.optionPresetsManager.map().get(r));
 
     @Override
     public OptionsPreset copyFrom(OptionsPreset other) {
-        return new OptionsPreset(id, other.name().or(this::name), ImmutableMap.<String, Object>builder().putAll(legacyOptions).putAll(other.legacyOptions).build(), ImmutableMap.<String, Object>builder().putAll(vanillaOptions).putAll(other.vanillaOptions).build());
+        return new OptionsPreset(id, other.name().or(this::name), other.tooltip().or(this::tooltip), ImmutableMap.<String, Object>builder().putAll(legacyOptions).putAll(other.legacyOptions).build(), ImmutableMap.<String, Object>builder().putAll(vanillaOptions).putAll(other.vanillaOptions).build());
     }
 
     public void apply() {

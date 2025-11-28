@@ -5,6 +5,7 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.OptionHolder;
 import wily.legacy.client.OptionsPreset;
 import wily.legacy.util.LegacyComponents;
 
@@ -22,13 +23,13 @@ public class OptionsPresetScreen extends ConfirmationScreen {
 
     public OptionsPresetScreen(Screen parent, OptionsPreset preset) {
         super(parent, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 130 : 175, Component.translatable("legacy.menu.options_preset", preset.nameOrEmpty()), LegacyComponents.OPTIONS_PRESET_MESSAGE, screen -> {
-            screen.onClose();
             ((OptionsPresetScreen)screen).preset.applyAndSave();
+            screen.onClose();
         });
         renderableVLists.add(renderableVList);
         renderableVLists.add(showOptionsList);
         this.originalPreset = preset;
-        this.preset = new OptionsPreset(preset.id(), preset.name(), new HashMap<>(preset.legacyOptions()), new HashMap<>(preset.vanillaOptions()));
+        this.preset = new OptionsPreset(preset.id(), preset.name(), preset.tooltip(), new HashMap<>(preset.legacyOptions()), new HashMap<>(preset.vanillaOptions()));
 
         preset.legacyOptions().forEach((key, value) -> addSelectableOption(LegacyOptions.CLIENT_STORAGE.configMap.get(key), this.preset.legacyOptions(), value));
         preset.vanillaOptions().forEach((key, value) -> addSelectableOption(LegacyOptions.of(OptionsPreset.VANILLA_OPTIONS_MAP.get(key)), this.preset.vanillaOptions(), value));
@@ -40,6 +41,15 @@ public class OptionsPresetScreen extends ConfirmationScreen {
             if (b.selected) map.put(config.getKey(), presetValue);
             else map.remove(config.getKey());
         }));
+    }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+        if (!originalPreset.isApplied()) {
+            LegacyOptions.optionsPreset.set(OptionHolder.none());
+            LegacyOptions.optionsPreset.save();
+        }
     }
 
     @Override

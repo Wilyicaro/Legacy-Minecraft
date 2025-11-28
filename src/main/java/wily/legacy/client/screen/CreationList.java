@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -92,11 +93,12 @@ public class CreationList extends RenderableVList {
     public static void loadTemplate(Screen parent, Minecraft minecraft, LegacyWorldTemplate template) {
         try (LevelStorageSource.LevelStorageAccess access = LegacySaveCache.getLevelStorageSource().createAccess(LegacySaveCache.importSaveFile(template.open(), minecraft.getLevelSource()::levelExists, LegacySaveCache.getLevelStorageSource(), template.folderName()))) {
             LevelSummary summary = access.getSummary(/*? if >1.20.2 {*/access.getDataTag()/*?}*/);
-            template.albumId().map(PackAlbum::resourceById).ifPresent(album -> LegacyClientWorldSettings.of(summary.getSettings()).setSelectedResourceAlbum(album));
+            Optional<PackAlbum> album = template.albumId().map(PackAlbum::resourceById);
+            album.ifPresent(LegacyClientWorldSettings.of(summary.getSettings())::setSelectedResourceAlbum);
             access.close();
             if (template.directJoin()) {
                 LoadSaveScreen.loadWorld(parent, minecraft, LegacySaveCache.getLevelStorageSource(), summary);
-            } else minecraft.setScreen(new LoadSaveScreen(parent, summary, access, template.isLocked()) {
+            } else minecraft.setScreen(new LoadSaveScreen(parent, summary, access, (album.isPresent() || template.albumId().isEmpty()) && template.isLocked()) {
                 @Override
                 public void onClose() {
                     if (!LegacyOptions.saveCache.get())

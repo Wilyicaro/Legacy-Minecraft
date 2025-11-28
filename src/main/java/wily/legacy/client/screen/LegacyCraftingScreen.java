@@ -481,6 +481,7 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         int inventoryPanelX = accessor.getInteger("inventoryPanel.x", 176);
         int bottomPanelY = accessor.getInteger("bottomPanel.y", 103);
         int inventoryPanelWidth = accessor.getInteger("inventoryPanel.width", 163);
+        int bottomPanelHeight = accessor.getInteger("bottomPanel.height", 105);
         if (infoType.get() <= 0)
             LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(this.font, this.playerInventoryTitle, inventoryPanelX + (inventoryPanelWidth - font.width(playerInventoryTitle)) / 2, bottomPanelY + accessor.getInteger("inventoryTitle.y", 11), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
         else {
@@ -488,27 +489,37 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
                 if (infoType.get() == 1 && LegacyTipManager.hasTip(h.getFocusedResult())) {
                     LegacyFontUtil.applySDFont(b -> {
                         List<FormattedCharSequence> l = font.split(LegacyTipManager.getTipComponent(h.getFocusedResult()), inventoryPanelWidth - 11);
-                        scrollableRenderer.scrolled.max = Math.max(0, l.size() - 7);
-                        scrollableRenderer.render(guiGraphics, inventoryPanelX + 5, bottomPanelY + 2, inventoryPanelWidth - 11, 84, () -> {
+                        int lineSpacing = (b ? 8 : 12);
+                        scrollableRenderer.lineHeight = lineSpacing;
+                        int lineAmount = (bottomPanelHeight - 21) / lineSpacing;
+                        scrollableRenderer.scrolled.max = Math.max(0, l.size() - lineAmount);
+                        scrollableRenderer.render(guiGraphics, inventoryPanelX + 5, bottomPanelY + 2, inventoryPanelWidth - 11, lineAmount * lineSpacing + 2, () -> {
                             for (int i1 = 0; i1 < l.size(); i1++)
                                 guiGraphics.drawString(font, l.get(i1), inventoryPanelX + 5, bottomPanelY + 5 + i1 * (b ? 8 : 12), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
                         });
                     });
                 } else if (infoType.get() == 2) {
-                    LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(this.font, LegacyComponents.INGREDIENTS, inventoryPanelX + (inventoryPanelWidth - font.width(LegacyComponents.INGREDIENTS)) / 2, bottomPanelY + 5, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+                    LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(this.font, LegacyComponents.INGREDIENTS, inventoryPanelX + (inventoryPanelWidth - font.width(LegacyComponents.INGREDIENTS)) / 2, bottomPanelY + accessor.getInteger("ingredientsTitle.y", 5), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
                     if (h.getFocusedRecipe() != null) {
+                        int ingredientSize = accessor.getInteger("ingredientSlot.size", 14);
+                        int ingredientX = inventoryPanelX + accessor.getInteger("ingredientSlot.x", 4);
+                        int ingredientY = bottomPanelY + accessor.getInteger("ingredientSlot.y", 21);
+                        float textScale = LegacyOptions.getUIMode().isFHD() ? 2 / 3f : LegacyOptions.getUIMode().isSD() ? 1 / 2f : 1.0f;
+
                         compactItemStackList.clear();
                         RecipeMenu.handleCompactItemStackList(compactItemStackList, () -> h.getFocusedRecipe().getOptionalIngredients().stream().map(RecipeIconHolder::getActualItem).iterator());
                         scrollableRenderer.scrolled.max = Math.max(0, compactItemStackList.size() - 4);
-                        scrollableRenderer.render(guiGraphics, inventoryPanelX + 2, bottomPanelY + 19, 152, 60, () -> {
+                        scrollableRenderer.lineHeight = ingredientSize + 1;
+                        scrollableRenderer.render(guiGraphics, inventoryPanelX + 2, ingredientY - 2, inventoryPanelWidth - 11, (ingredientSize + 1) * 4 + 1, () -> {
                             for (int i1 = 0; i1 < compactItemStackList.size(); i1++) {
                                 ItemStack ing = compactItemStackList.get(i1);
-                                LegacyRenderUtil.iconHolderRenderer.itemHolder(inventoryPanelX + 4, bottomPanelY + 21 + 15 * i1, 14, 14, ing, false, Vec2.ZERO).render(guiGraphics, i, j, 0);
+                                LegacyRenderUtil.iconHolderRenderer.itemHolder(ingredientX, ingredientY + (ingredientSize + 1) * i1, ingredientSize, ingredientSize, ing, false, Vec2.ZERO).render(guiGraphics, i, j, 0);
                                 guiGraphics.pose().pushMatrix();
-                                guiGraphics.pose().translate(inventoryPanelX + 22, bottomPanelY + 25 + 15 * i1);
-                                LegacyFontUtil.applySmallerFont(LegacyFontUtil.MOJANGLES_11_FONT, b -> {
-                                    if (!b) guiGraphics.pose().scale(2 / 3f, 2 / 3f);
-                                    guiGraphics.drawString(font, ing.getHoverName(), 0, 0, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                                guiGraphics.pose().translate(ingredientX + ingredientSize + accessor.getInteger("ingredientText.x", 4), ingredientY + ingredientSize / 2 + (ingredientSize + 1) * i1);
+                                LegacyFontUtil.applyFontOverrideIf(LegacyOptions.getUIMode().isHD(), LegacyFontUtil.MOJANGLES_11_FONT, b -> {
+                                    guiGraphics.pose().scale(textScale);
+                                    guiGraphics.pose().translate(0, -3);
+                                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, ing.getHoverName(), 0,-2, Math.round((inventoryPanelWidth - 22 - 2) / textScale), 7, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
                                 });
                                 guiGraphics.pose().popMatrix();
                             }
@@ -581,7 +592,8 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         leftPos += getTabXOffset();
         topPos += getTabYOffset();
         menu.addSlotListener(listener);
-        menu.inventoryActive = accessor.putBearer("isInventoryActive", Bearer.of(infoType.get() <= 0));
+        menu.inventoryActive = infoType.get() <= 0;
+        accessor.putBearer("isInventoryActive", Bearer.of(() -> menu.inventoryActive, b -> menu.inventoryActive = b));
         menu.inventoryOffset = accessor.getElementValue("inventoryOffset", LegacyCraftingMenu.DEFAULT_INVENTORY_OFFSET, Vec2.class);
         if (hasTypeTabList()) addWidget(typeTabList);
         int count = getCraftingButtons().size();
@@ -753,9 +765,9 @@ public class LegacyCraftingScreen extends AbstractContainerScreen<LegacyCrafting
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_ARROW, xDiff + accessor.getInteger("craftingArrow.x", 77) + (is2x2 ? 0 : slotSize / 2), topPos + bottomPanelY + accessor.getInteger("craftingArrow.y", 57), 16, 14);
         if (typeTabList.getIndex() == 0 || !hasTypeTabList()) {
             if (craftingButtonsOffset.get() > 0)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, accessor.getInteger("horizontalScroll.x", leftPos + 5), topPos + 45);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.LEFT, leftPos + accessor.getInteger("horizontalScroll.x", 5), topPos + accessor.getInteger("horizontalScroll.y", 45));
             if (craftingButtonsOffset.max > 0 && craftingButtonsOffset.get() < craftingButtonsOffset.max)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + imageWidth - 11, topPos + 45);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.RIGHT, leftPos + imageWidth - 6 - accessor.getInteger("horizontalScroll.x", 5), topPos + accessor.getInteger("horizontalScroll.y", 45));
         }
 
         int resultSlotSize = accessor.getInteger("craftingResultSlot.size", 36);

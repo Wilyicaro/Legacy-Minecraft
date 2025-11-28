@@ -110,7 +110,7 @@ public abstract class GuiMixin implements ControlTooltip.Event {
             instance.pose().pushMatrix();
             instance.pose().translate(instance.guiWidth() / 2, instance.guiHeight() / 2);
             instance.pose().scale(1f / minecraft.getWindow().getGuiScale());
-            instance.blitSprite(renderPipeline, arg, -size / 2, 0, size, size);
+            instance.blitSprite(renderPipeline, arg, -size / 2, -size / 2, size, size);
             instance.pose().popMatrix();
             return false;
         }

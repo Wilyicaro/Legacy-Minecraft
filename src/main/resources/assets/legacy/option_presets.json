@@ -2,6 +2,7 @@
   {
     "id": "legacy:handheld",
     "name": {"translate": "legacy.options.optionsPreset.handheld"},
+    "tooltip": {"translate": "legacy.options.optionsPreset.handheld.tooltip"},
     "vanilla": {
       "options.renderDistance": 6,
       "options.graphics": 1
@@ -14,6 +15,7 @@
   {
     "id": "legacy:low",
     "name": {"translate": "legacy.options.optionsPreset.low"},
+    "tooltip": {"translate": "legacy.options.optionsPreset.low.tooltip"},
     "vanilla": {
       "options.renderDistance": 10,
       "options.graphics": 1
@@ -26,6 +28,7 @@
   {
     "id": "legacy:medium",
     "name": {"translate": "legacy.options.optionsPreset.medium"},
+    "tooltip": {"translate": "legacy.options.optionsPreset.medium.tooltip"},
     "vanilla": {
       "options.renderDistance": 18,
       "options.graphics": 1
@@ -38,6 +41,7 @@
   {
     "id": "legacy:high",
     "name": {"translate": "legacy.options.optionsPreset.high"},
+    "tooltip": {"translate": "legacy.options.optionsPreset.high.tooltip"},
     "vanilla": {
       "options.renderDistance": 24,
       "options.graphics": 2
@@ -50,6 +54,7 @@
   {
     "id": "legacy:ultra",
     "name": {"translate": "legacy.options.optionsPreset.ultra"},
+    "tooltip": {"translate": "legacy.options.optionsPreset.ultra.tooltip"},
     "vanilla": {
       "options.renderDistance": 32,
       "options.graphics": 2

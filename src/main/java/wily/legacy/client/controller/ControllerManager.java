@@ -397,11 +397,11 @@ public class ControllerManager {
     }
 
     public float getVisualPointerX() {
-        return Math.round(minecraft.mouseHandler.xpos()) / (float) Math.round((float) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth());
+        return (float) Math.round(minecraft.mouseHandler.xpos()) * minecraft.getWindow().getGuiScaledWidth() / minecraft.getWindow().getScreenWidth();
     }
 
     public float getVisualPointerY() {
-        return Math.round(minecraft.mouseHandler.ypos()) / (float) Math.round((float) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight());
+        return (float) Math.round(minecraft.mouseHandler.ypos()) * minecraft.getWindow().getGuiScaledHeight() / minecraft.getWindow().getScreenHeight();
     }
 
     public <T extends BindingState> T getButtonState(ControllerBinding<T> button) {

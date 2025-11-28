@@ -1,0 +1,70 @@
+{
+  "targetUI": "wily.legacy.client.screen.MixedCraftingScreen",
+  "targetType": "class",
+  "applyCondition": { "reference": "uiMode.sd" },
+  "elements": {
+    "imageSprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "tabList.sprites": {
+      "type": "put_toggleable_tab_sprites",
+      "value": {
+        "high": {
+          "left": "legacy:tiles/big_high_tab_left",
+          "middle": "legacy:tiles/big_high_tab_middle",
+          "right": "legacy:tiles/big_high_tab_right"
+        },
+        "down": "legacy:tiles/big_low_tab"
+      }
+    },
+    "imageHeight": 121,
+    "imageWidth": 251,
+    "tabYOffset": 11,
+    "tabList.buttonWidth": 37,
+    "tabList.selectedOffset.y": 2,
+    "tabList.buttonOffset.x": -1,
+    "tabList.height": 29,
+    "tabList.y": "${topPos}-23",
+    "bottomPanel.height": 71,
+    "craftingGridPanel.width": 117,
+    "inventoryPanel.width": 117,
+    "bottomPanel.y": 44,
+    "craftingGridSlot.size": 16,
+    "craftingGridPanel.x": 6,
+    "craftingResultSlot.size": 25,
+    "craftingButtons.size": 20,
+    "craftingButtons.y": 18,
+    "craftingButtons.x": "(${imageWidth}-${craftingButtons.size}*12)/2",
+    "craftingTitle.y": 7,
+    "craftingGridSlot.x": 10,
+    "craftingGridSlot.y": 20,
+    "craftingArrow.x": 56,
+    "craftingArrow.y": 37,
+    "descriptionPanel.x": 128,
+    "descriptionPanel.y":  4,
+    "descriptionPanel.width": 117,
+    "descriptionPanel.height": 39,
+    "descriptionText.x":  3,
+    "descriptionText.y": 3,
+    "inventoryPanel.x": 127,
+    "title.y": 6,
+    "inventoryTitle.y": 3,
+    "resultSlot.x": 80,
+    "resultSlot.y": 32,
+    "ingredientsTitle.y": 3,
+    "ingredientSlot.size": 10,
+    "ingredientSlot.y": 12,
+    "ingredientText.x": 2,
+    "horizontalScroll.x": -7,
+    "horizontalScroll.y": 23,
+    "inventorySlot.size": 11,
+    "inventory.x": "${inventoryPanel.x}+9",
+    "inventory.y": "${bottomPanel.y}+16",
+    "quickSelect.y": "${bottomPanel.y}+53",
+    "searchBox.x": "${leftPos}+(${imageWidth}-${searchBox.width})/2",
+    "searchBox.y": "${topPos}+5",
+    "searchBox.width": 70,
+    "searchBox.height": 10
+  }
+}

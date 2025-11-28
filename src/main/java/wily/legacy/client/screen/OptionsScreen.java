@@ -261,10 +261,7 @@ public class OptionsScreen extends PanelVListScreen {
                 Component.translatable("legacy.menu.graphics"),
                 s -> Panel.centered(s, 250, 222, 0, 24),
                 new ArrayList<>(List.of(
-                        o -> o.renderableVList.addOptions(LegacyOptions.of(mc.options.cloudStatus())),
-                        o -> o.renderableVList.addRenderables(LegacyConfigWidgets.createWidget(LegacyOptions.optionsPreset, v -> {
-                            if (!v.isNone() && !v.get().isApplied()) o.minecraft.setScreen(new OptionsPresetScreen(o, v.get()));
-                        })),
+                        o -> o.renderableVList.addOptions(LegacyOptions.of(mc.options.cloudStatus()), LegacyOptions.optionsPreset),
                         o -> o.renderableVList.addLinkedOptions(
                                 LegacyOptions.displayLegacyGamma, FactoryConfig::get,
                                 LegacyOptions.legacyGamma),
@@ -281,6 +278,7 @@ public class OptionsScreen extends PanelVListScreen {
                 @Override
                 public void onClose() {
                     super.onClose();
+                    if (!LegacyOptions.optionsPreset.get().isNone() && !LegacyOptions.optionsPreset.get().get().isApplied()) minecraft.setScreen(new OptionsPresetScreen(parent, LegacyOptions.optionsPreset.get().get()));
                     globalPackSelector.applyChanges();
                     selector.applyChanges(true);
                 }
@@ -323,11 +321,6 @@ public class OptionsScreen extends PanelVListScreen {
                         repositionElements();
                         if (selectorTooltipVisibility == 10) finishedAnimation = true;
                     }
-
-//                    if (!LegacyOptions.optionsPreset.get().isNone() && !LegacyOptions.optionsPreset.get().get().isApplied()) {
-//                        LegacyOptions.optionsPreset.set(OptionHolder.none());
-//                        updateWidgets();
-//                    }
                     super.tick();
                 }
             };

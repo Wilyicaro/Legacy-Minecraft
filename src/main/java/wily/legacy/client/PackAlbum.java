@@ -334,6 +334,13 @@ public record PackAlbum(String id, int version, Component displayName, Component
             updateTooltip();
         }
 
+        @Override
+        public void setWidth(int i) {
+            super.setWidth(i);
+            if (albums.size() > getMaxPacks())
+                scrolledList.max = albums.size() - getMaxPacks();
+        }
+
         public static Selector resources(int i, int j, int k, int l, boolean hasTooltip) {
             return new Selector(i, j, k, l, LegacyComponents.RESOURCE_ALBUMS, LegacyComponents.SHOW_RESOURCE_PACKS, resourceAlbums, Minecraft.getInstance().hasSingleplayerServer() ? LegacyClientWorldSettings.of(Minecraft.getInstance().getSingleplayerServer().getWorldData()).getSelectedResourceAlbum() : resourceById(defaultResourceAlbum.get()), Minecraft.getInstance().getResourcePackRepository(), Minecraft.getInstance().getResourcePackDirectory(), Selector::reloadResourcesChanges, GlobalPacks.globalResources, hasTooltip) {
 
