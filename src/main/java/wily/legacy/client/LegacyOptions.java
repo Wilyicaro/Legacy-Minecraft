@@ -6,7 +6,6 @@ import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
-import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -15,7 +14,6 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.vehicle./*? if <1.21.2 {*//*Boat*//*?} else {*/AbstractBoat/*?}*/;
 import wily.factoryapi.base.Bearer;
-import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.base.config.FactoryConfigControl;
 import wily.factoryapi.base.config.FactoryConfigDisplay;
@@ -23,7 +21,6 @@ import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.controller.*;
-import wily.legacy.client.screen.OptionsPresetScreen;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.util.IOUtil;
 import wily.legacy.util.LegacyComponents;
@@ -266,6 +263,7 @@ public class LegacyOptions {
     public static final FactoryConfig<OptionHolder<OptionsPreset>> optionsPreset = CLIENT_STORAGE.register(FactoryConfig.create("optionsPreset", FactoryConfigDisplay.<OptionHolder<OptionsPreset>>builder().valueToComponent(i -> i.isNone() ? LegacyComponents.NONE : i.get().isApplied() ? i.get().nameOrEmpty() : Component.translatable("legacy.options.not_applied_value", i.get().nameOrEmpty())).tooltip(holder -> holder.isNone() ? null : holder.get().tooltip().orElse(null)).build(optionName("optionsPreset")), new FactoryConfigControl.FromInt<>(OptionsPreset.OPTION_CODEC, i -> i == 0 || Legacy4JClient.optionPresetsManager.map().size() < i ? OptionHolder.none() : OptionHolder.of(Legacy4JClient.optionPresetsManager.map().getByIndex(i - 1)), s1 -> 1 + Legacy4JClient.optionPresetsManager.map().indexOf(s1.get()), () -> Legacy4JClient.optionPresetsManager.map().size() + 1), OptionHolder.none(), v -> {}, CLIENT_STORAGE));
     public static final FactoryConfig<Boolean> fakeAutosaveScreen = CLIENT_STORAGE.register(createBoolean("fakeAutosaveScreen", false));
     public static final FactoryConfig<Boolean> legacyPotionsBar = CLIENT_STORAGE.register(createBoolean("legacyPotionsBar", false));
+    public static final FactoryConfig<Boolean> defaultShowCraftableRecipes = CLIENT_STORAGE.register(createBoolean("defaultShowCraftableRecipes", false));
 
     public static int getTerrainFogStart() {
         return Math.min(terrainFogStart.get(), Minecraft.getInstance().options.renderDistance().get());

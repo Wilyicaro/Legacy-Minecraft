@@ -22,9 +22,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.NavigationElement;
 import wily.legacy.client.screen.ControlTooltip;
-import wily.legacy.client.screen.KeyboardScreen;
 import wily.legacy.client.screen.LegacyLoading;
-import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 

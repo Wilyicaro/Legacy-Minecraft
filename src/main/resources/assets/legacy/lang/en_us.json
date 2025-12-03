@@ -1628,6 +1628,7 @@
   "legacy.options.cursorMode.always": "Always",
   "legacy.options.cursorMode.auto": "Auto",
   "legacy.options.cursorMode.never": "Never",
+  "legacy.options.defaultShowCraftableRecipes": "Default Show Craftable Recipes",
   "legacy.options.defaultParticlePhysics": "Default Particle Physics",
   "legacy.options.directSaveLoad": "Load Save Directly",
   "legacy.options.displayControlTooltips": "Display Control Tooltips",

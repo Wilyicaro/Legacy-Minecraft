@@ -1511,6 +1511,7 @@
   "legacy.options.cursorMode.always": "Sempre",
   "legacy.options.cursorMode.auto": "Auto",
   "legacy.options.cursorMode.never": "Nunca",
+  "legacy.options.defaultShowCraftableRecipes": "Mostrar receitas fabricáveis por padrão",
   "legacy.options.defaultParticlePhysics": "Física Padrão da Partícula",
   "legacy.options.directSaveLoad": "Carregar Salvamento Diretamente",
   "legacy.options.displayControlTooltips": "Exibir Dicas de Controles",

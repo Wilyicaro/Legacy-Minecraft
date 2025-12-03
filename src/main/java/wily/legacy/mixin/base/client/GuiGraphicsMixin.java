@@ -63,11 +63,11 @@ public abstract class GuiGraphicsMixin {
         LegacyFontUtil.legacyFont = true;
     }
 
-    @Inject(method = /*? if neoforge {*/ /*"renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/world/item/ItemStack;)V", remap = false*//*?} else {*/"renderTooltip"/*?}*/, at = @At("HEAD"), cancellable = true)
-    private void renderTooltipInternal(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner, ResourceLocation location/*? if neoforge {*//*, ItemStack tooltipStack*//*?}*/, CallbackInfo ci) {
+    @Inject(method = /*? if forge || neoforge {*/ /*"renderTooltip(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/world/item/ItemStack;)V", remap = false*//*?} else {*/"renderTooltip"/*?}*/, at = @At("HEAD"), cancellable = true)
+    private void renderTooltipInternal(Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner, ResourceLocation location/*? if forge || neoforge {*//*, ItemStack tooltipStack*//*?}*/, CallbackInfo ci) {
         if (!LegacyOptions.legacyItemTooltips.get()) return;
         ci.cancel();
-        LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderTooltipInternal(self(), font, list, i, j, clientTooltipPositioner/*? if neoforge || forge {*//*, tooltipStack*//*?}*/));
+        LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderTooltipInternal(self(), font, list, i, j, clientTooltipPositioner/*? if forge || neoforge {*//*, tooltipStack*//*?}*/));
     }
 
     @WrapOperation(method = "renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;III)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiRenderState;submitItem(Lnet/minecraft/client/gui/render/state/GuiItemRenderState;)V"))
@@ -113,15 +113,6 @@ public abstract class GuiGraphicsMixin {
 
     @Inject(method = "renderItemBar", at = @At("RETURN"))
     private void drawString(ItemStack itemStack, int i, int j, CallbackInfo ci) {
-        if (!LegacyOptions.legacyPotionsBar.get()) return;
-        int potionLevel = LegacyItemUtil.getPotionLevel(itemStack);
-        if (potionLevel > 0) {
-            int x = i + 3;
-            int y = j + 13;
-            self().fill(RenderPipelines.GUI, x, y, x + 11, y + 2, -16777216);
-            for (int k = 0; k < potionLevel; k++) {
-                self().fill(RenderPipelines.GUI, x + k * 3, y, x + k * 3 + 2, y + 2, 0xFF00DDE5);
-            }
-        }
+        LegacyRenderUtil.renderPotionLevel(self(), i, j, itemStack);
     }
 }

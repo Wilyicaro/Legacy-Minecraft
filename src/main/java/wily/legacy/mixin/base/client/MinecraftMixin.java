@@ -252,6 +252,13 @@ public abstract class MinecraftMixin {
         return true;
     }
 
+    @Inject(method = "resizeDisplay", at = @At("RETURN"))
+    private void resizeDisplay(CallbackInfo ci) {
+        LegacyTipManager.rebuildActual();
+        LegacyTipManager.rebuildActualLoading();
+        gui.getChat().rescaleChat();
+    }
+
     @ModifyArg(method = "disconnect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V"))
     private Screen changeGenericScreen(Screen arg, @Local(argsOnly = true) Screen disconnectScreen) {
         return disconnectScreen instanceof LegacyLoadingScreen ? disconnectScreen : arg;

@@ -164,7 +164,6 @@ public class Legacy4JClient {
     public static ControlType lastControlType;
     public static boolean canSprint = false;
     public static int sprintTicksLeft = -1;
-    public static LegacyLoadingScreen legacyLoadingScreen = new LegacyLoadingScreen();
     public static KnownListing<Block> knownBlocks;
     public static KnownListing<EntityType<?>> knownEntities;
     public static GameType defaultServerGameType;
@@ -475,11 +474,6 @@ public class Legacy4JClient {
             LegacySaveCache.retakeWorldIcon = true;
             knownBlocks.save();
             knownEntities.save();
-        });
-        FactoryAPIClient.RESIZE_DISPLAY.register(minecraft -> {
-            LegacyTipManager.rebuildActual();
-            LegacyTipManager.rebuildActualLoading();
-            minecraft.gui.getChat().rescaleChat();
         });
         FactoryEvent.registerBuiltInPacks(registry -> {
             registry.registerResourcePack(FactoryAPI.createLocation(MOD_ID, "legacy_resources"), true);

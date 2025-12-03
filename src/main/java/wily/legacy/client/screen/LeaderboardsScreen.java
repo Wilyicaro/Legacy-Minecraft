@@ -161,23 +161,25 @@ public class LeaderboardsScreen extends PanelVListScreen {
                 protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                     int y = getY() + (getHeight() - font.lineHeight) / 2 + 1;
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.LEADERBOARD_BUTTON_HIGHLIGHTED : LegacySprites.LEADERBOARD_BUTTON, getX(), getY(), getWidth(), getHeight());
-                    guiGraphics.drawString(font, rank, getX() + 40 - font.width(rank) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
-                    guiGraphics.drawString(font, getMessage(), getX() + 120 - (font.width(getMessage())) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
-                    guiGraphics.drawString(font, getMessage(), getX() + 120 - (font.width(getMessage())) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
-                    int added = 0;
-                    Component hoveredValue = null;
-                    for (int index = page; index < statsBoards.get(selectedStatBoard).statsList.size(); index++) {
-                        if (added >= statsInScreen) break;
-                        Stat<?> stat = statsBoards.get(selectedStatBoard).statsList.get(index);
-                        Component value = ControlTooltip.CONTROL_ICON_FUNCTION.apply(stat.format((Legacy4JClient.hasModOnServer() ? info.getStatsMap() : minecraft.player.getStats().stats).getInt(stat)), Style.EMPTY).getComponent();
-                        SimpleLayoutRenderable renderable = statsBoards.get(selectedStatBoard).renderables.get(index);
-                        int w = font.width(value);
-                        LegacyRenderUtil.renderScrollingString(guiGraphics, font, value, renderable.getX() + Math.max(0, renderable.getWidth() - w) / 2, getY(), renderable.getX() + Math.min(renderable.getWidth(), (renderable.getWidth() - w) / 2 + getWidth()), getY() + getHeight(), LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
-                        if (LegacyRenderUtil.isMouseOver(i, j, renderable.getX() + Math.max(0, renderable.getWidth() - w) / 2, getY(), Math.min(renderable.getWidth(), w), getHeight()))
-                            hoveredValue = value;
-                        added++;
-                    }
-                    if (hoveredValue != null) guiGraphics.setTooltipForNextFrame(font, hoveredValue, i, j);
+                    LegacyFontUtil.applySDFont(b -> {
+                        guiGraphics.drawString(font, rank, getX() + accessor.getInteger(renderableVList.name + ".buttonRank.x", 40) - font.width(rank) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                        guiGraphics.drawString(font, getMessage(), getX() + accessor.getInteger(renderableVList.name + ".buttonUsername.x", 120)  - (font.width(getMessage())) / 2, y, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+
+                        int added = 0;
+                        Component hoveredValue = null;
+                        for (int index = page; index < statsBoards.get(selectedStatBoard).statsList.size(); index++) {
+                            if (added >= statsInScreen) break;
+                            Stat<?> stat = statsBoards.get(selectedStatBoard).statsList.get(index);
+                            Component value = ControlTooltip.CONTROL_ICON_FUNCTION.apply(stat.format((Legacy4JClient.hasModOnServer() ? info.getStatsMap() : minecraft.player.getStats().stats).getInt(stat)), Style.EMPTY).getComponent();
+                            SimpleLayoutRenderable renderable = statsBoards.get(selectedStatBoard).renderables.get(index);
+                            int w = font.width(value);
+                            LegacyRenderUtil.renderScrollingString(guiGraphics, font, value, renderable.getX() + Math.max(0, renderable.getWidth() - w) / 2, getY(), renderable.getX() + Math.min(renderable.getWidth(), (renderable.getWidth() - w) / 2 + getWidth()), getY() + getHeight(), LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()), true);
+                            if (LegacyRenderUtil.isMouseOver(i, j, renderable.getX() + Math.max(0, renderable.getWidth() - w) / 2, getY(), Math.min(renderable.getWidth(), w), getHeight()))
+                                hoveredValue = value;
+                            added++;
+                        }
+                        if (hoveredValue != null) guiGraphics.setTooltipForNextFrame(font, hoveredValue, i, j);
+                    });
                 }
 
                 @Override
@@ -204,27 +206,36 @@ public class LeaderboardsScreen extends PanelVListScreen {
     protected void panelInit() {
         super.panelInit();
         addRenderableOnly((guiGraphics, i, j, f) -> {
-            LegacyRenderUtil.renderPointerPanel(guiGraphics, panel.x + 8, panel.y - 18, 166, 18);
-            LegacyRenderUtil.renderPointerPanel(guiGraphics, panel.x + (panel.width - 211) / 2, panel.y - 18, 211, 18);
-            LegacyRenderUtil.renderPointerPanel(guiGraphics, panel.x + panel.width - 174, panel.y - 18, 166, 18);
+            int topTooltipHeight = accessor.getInteger("topTooltip.height", 18);
+            int topTooltipY = panel.y + accessor.getInteger("topTooltip.y", -topTooltipHeight);
+            int filterTooltipWidth = accessor.getInteger("filterTooltip.width", 166);
+            int filterTooltipX = panel.x + accessor.getInteger("filterTooltip.x", 8);
+            int boardTooltipWidth = accessor.getInteger("boardTooltip.width", 211);
+            int boardTooltipX = panel.x + accessor.getInteger("boardTooltip.x", (panel.width - boardTooltipWidth) / 2);
+            int entriesTooltipWidth = accessor.getInteger("entriesTooltip.width", 166);
+            int entriesTooltipX = panel.x + panel.width - entriesTooltipWidth + accessor.getInteger("entriesTooltip.x", -8);
+            LegacyRenderUtil.renderPointerPanel(guiGraphics, filterTooltipX, topTooltipY, filterTooltipWidth, topTooltipHeight);
+            LegacyRenderUtil.renderPointerPanel(guiGraphics, boardTooltipX, topTooltipY, boardTooltipWidth, topTooltipHeight);
+            LegacyRenderUtil.renderPointerPanel(guiGraphics, entriesTooltipX, topTooltipY, entriesTooltipWidth, topTooltipHeight);
             if (!statsBoards.isEmpty() && selectedStatBoard < statsBoards.size()) {
                 StatsBoard board = statsBoards.get(selectedStatBoard);
-                LegacyFontUtil.applySmallerFont(LegacyFontUtil.MOJANGLES_11_FONT, b -> {
+                LegacyFontUtil.applyFontOverrideIf(LegacyOptions.getUIMode().isHD(), LegacyFontUtil.MOJANGLES_11_FONT, b -> {
+                    float topTooltipScale = accessor.getFloat("topTooltip.scale", LegacyOptions.getUIMode().isHD() ? 2 / 3f : 1.0f);
                     guiGraphics.pose().pushMatrix();
                     Component filter = Component.translatable("legacy.menu.leaderboard.filter", this.filter.get() == 0 ? OVERALL : MY_SCORE);
-                    guiGraphics.pose().translate(panel.x + 91 - font.width(filter) / 3f, panel.y - 12);
-                    if (!b) guiGraphics.pose().scale(2 / 3f, 2 / 3f);
+                    guiGraphics.pose().translate(filterTooltipX + (filterTooltipWidth - font.width(filter) * topTooltipScale) / 2, topTooltipY + accessor.getInteger("filterText.y", 6));
+                    if (!b) guiGraphics.pose().scale(topTooltipScale);
                     guiGraphics.drawString(font, filter, 0, 0, 0xFFFFFFFF);
                     guiGraphics.pose().popMatrix();
                     guiGraphics.pose().pushMatrix();
-                    guiGraphics.pose().translate(panel.x + (panel.width - font.width(board.displayName) * 2 / 3f) / 2, panel.y - 12);
-                    if (!b) guiGraphics.pose().scale(2 / 3f, 2 / 3f);
+                    guiGraphics.pose().translate(boardTooltipX + (boardTooltipWidth - font.width(board.displayName) * topTooltipScale) / 2, topTooltipY + accessor.getInteger("boardText.y", 6));
+                    if (!b) guiGraphics.pose().scale(topTooltipScale);
                     guiGraphics.drawString(font, board.displayName, 0, 0, 0xFFFFFFFF);
                     guiGraphics.pose().popMatrix();
                     guiGraphics.pose().pushMatrix();
                     Component entries = Component.translatable("legacy.menu.leaderboard.entries", actualRankBoard.size());
-                    guiGraphics.pose().translate(panel.x + 477 - font.width(entries) / 3f, panel.y - 12);
-                    if (!b) guiGraphics.pose().scale(2 / 3f, 2 / 3f);
+                    guiGraphics.pose().translate(entriesTooltipX + (entriesTooltipWidth - font.width(entries) * topTooltipScale) / 2, topTooltipY + accessor.getInteger("entriesText.y", 6));
+                    if (!b) guiGraphics.pose().scale(topTooltipScale);
                     guiGraphics.drawString(font, entries, 0, 0, 0xFFFFFFFF);
                     guiGraphics.pose().popMatrix();
                 });
@@ -236,36 +247,48 @@ public class LeaderboardsScreen extends PanelVListScreen {
                     guiGraphics.pose().popMatrix();
                     return;
                 }
-                guiGraphics.drawString(font, RANK, panel.x + 40, panel.y + 20, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-                guiGraphics.drawString(font, USERNAME, panel.x + 108, panel.y + 20, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                LegacyFontUtil.applySDFont(b -> {
+                    guiGraphics.drawString(font, RANK, panel.x + accessor.getInteger("rankText.x", 40), panel.y + accessor.getInteger("rankText.y", 20), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                    guiGraphics.drawString(font, USERNAME, panel.x + accessor.getInteger("usernameText.x", 108), panel.y + accessor.getInteger("usernameText.y", 20), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                });
+
+                int statsBoardX = accessor.getInteger("statsBoard.x", 182);
+                int statsBoardY = accessor.getInteger("statsBoard.y", 22);
+                int totalStatsWidth = accessor.getInteger("statsBoard.width", 351);
+
                 int totalWidth = 0;
                 statsInScreen = 0;
                 for (int index = page; index < board.renderables.size(); index++) {
                     int newWidth = totalWidth + board.renderables.get(index).getWidth();
-                    if (newWidth > 351) break;
+                    if (newWidth > totalStatsWidth) break;
                     statsInScreen++;
                     totalWidth = newWidth;
                 }
-                FactoryScreenUtil.enableBlend();
+                int boardControlTooltipY = topTooltipY + accessor.getInteger("boardControlTooltip.y", 6);
                 guiGraphics.pose().pushMatrix();
-                guiGraphics.pose().translate(panel.x + (panel.width - 211) / 2f, panel.y - 12);
-                guiGraphics.pose().scale(0.5f, 0.5f);
+                guiGraphics.pose().translate(boardTooltipX + accessor.getInteger("boardControlTooltip.x", 2), boardControlTooltipY);
+                if (!LegacyOptions.getUIMode().isSD())
+                    guiGraphics.pose().scale(0.5f, 0.5f);
                 (ControlType.getActiveType().isKbm() ? ControlTooltip.CompoundComponentIcon.of(ControlTooltip.getKeyIcon(InputConstants.KEY_LEFT), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_RIGHT)) : ControllerBinding.LEFT_STICK.getIcon()).render(guiGraphics, 4, 0, false);
+                guiGraphics.pose().popMatrix();
                 if (statsInScreen < statsBoards.get(selectedStatBoard).renderables.size()) {
                     ControlTooltip.Icon pageControl = ControlTooltip.CompoundComponentIcon.of(ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_LBRACKET) : ControllerBinding.LEFT_BUMPER.getIcon(), ControlTooltip.SPACE_ICON, ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_RBRACKET) : ControllerBinding.RIGHT_BUMPER.getIcon());
-                    pageControl.render(guiGraphics, 422 - pageControl.getWidth() - 8, 0, false);
+                    guiGraphics.pose().pushMatrix();
+                    guiGraphics.pose().translate(boardTooltipX + boardTooltipWidth + accessor.getInteger("boardPageTooltip.x", -4), boardControlTooltipY);
+                    if (!LegacyOptions.getUIMode().isSD())
+                        guiGraphics.pose().scale(0.5f, 0.5f);
+                    pageControl.render(guiGraphics, -pageControl.getWidth(), 0, false);
+                    guiGraphics.pose().popMatrix();
                 }
-                guiGraphics.pose().popMatrix();
-                FactoryScreenUtil.disableBlend();
                 if (statsInScreen == 0) return;
-                int x = (351 - totalWidth) / (statsInScreen + 1);
+                int x = (totalStatsWidth - totalWidth) / (statsInScreen + 1);
                 Integer hovered = null;
                 for (int index = page; index < page + statsInScreen; index++) {
                     SimpleLayoutRenderable r = board.renderables.get(index);
-                    r.setPosition(panel.x + 182 + x, panel.y + 22 - r.height / 2);
+                    r.setPosition(panel.x + statsBoardX + x, panel.y + statsBoardY - r.height / 2);
                     r.render(guiGraphics, i, j, f);
                     if (r.isHovered(i, j)) hovered = index;
-                    x += r.getWidth() + (351 - totalWidth) / statsInScreen;
+                    x += r.getWidth() + (totalStatsWidth - totalWidth) / statsInScreen;
                 }
                 if (hovered != null)
                     guiGraphics.setTooltipForNextFrame(font, board.statsList.get(hovered).getValue() instanceof EntityType<?> e ? e.getDescription() : board.statsList.get(hovered).getValue() instanceof ItemLike item && item.asItem() != Items.AIR ? Component.translatable(item.asItem().getDescriptionId()) : ControlTooltip.getAction("stat." + board.statsList.get(hovered).getValue().toString().replace(':', '.')), i, j);
@@ -275,7 +298,8 @@ public class LeaderboardsScreen extends PanelVListScreen {
 
     @Override
     public void renderableVListInit() {
-        getRenderableVList().init(panel.x + 9, panel.y + 39, 551, 226);
+        initRenderableVListHeight(20);
+        getRenderableVList().init(panel.x + 9, panel.y + 39, panel.width - 17, panel.height - 49);
     }
 
     @Override

@@ -78,8 +78,8 @@ public class KeyboardScreen extends OverlayPanelScreen {
         this(s -> Panel.createPanel(s, p -> p.appearance(LegacySprites.PANEL, 385, 154), p -> p.pos(leftPosGetter.apply(s, p), topPosGetter.apply(s, p))), listener, parent);
     }
 
-    public KeyboardScreen(Function<Screen, Panel> panelConstructor, Supplier<GuiEventListener> listener, Screen parent) {
-        super(parent, panelConstructor, CommonComponents.EMPTY);
+    public KeyboardScreen(Panel.Constructor<KeyboardScreen> panelConstructor, Supplier<GuiEventListener> listener, Screen parent) {
+        super(parent, panelConstructor.cast(), CommonComponents.EMPTY);
         this.listenerSupplier = listener;
         renderableVList.forceWidth = false;
         darkBackground = false;

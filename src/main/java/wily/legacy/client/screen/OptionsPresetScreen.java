@@ -4,6 +4,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.config.FactoryConfig;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.OptionHolder;
 import wily.legacy.client.OptionsPreset;
@@ -46,10 +47,17 @@ public class OptionsPresetScreen extends ConfirmationScreen {
     @Override
     public void onClose() {
         super.onClose();
-        if (!originalPreset.isApplied()) {
-            LegacyOptions.optionsPreset.set(OptionHolder.none());
-            LegacyOptions.optionsPreset.save();
+        for (OptionsPreset preset : Legacy4JClient.optionPresetsManager.map().values()) {
+            if (preset.isApplied()) {
+                if (!preset.equals(originalPreset)) {
+                    LegacyOptions.optionsPreset.set(OptionHolder.of(preset));
+                    LegacyOptions.optionsPreset.save();
+                }
+                return;
+            }
         }
+        LegacyOptions.optionsPreset.set(OptionHolder.none());
+        LegacyOptions.optionsPreset.save();
     }
 
     @Override
