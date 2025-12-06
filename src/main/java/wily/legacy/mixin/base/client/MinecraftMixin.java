@@ -240,7 +240,7 @@ public abstract class MinecraftMixin {
     private void addedScreen(Screen screen, CallbackInfo ci) {
         ControlTooltip.Event.of(screen).setupControlTooltips();
         ControlTooltip.Renderer.SCREEN_EVENT.invoker.accept(screen, ControlTooltip.Event.of(screen).getControlTooltips());
-        LegacyTipManager.tipDiffPercentage = 0;
+        LegacyTipManager.resetTipOffset(true);
     }
 
     @WrapWithCondition(method = "setScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;init(Lnet/minecraft/client/Minecraft;II)V"))

@@ -33,17 +33,17 @@ public class LegacyLoadingRenderer implements Renderable {
         return INSTANCE;
     }
 
-    public void prepareRender(Minecraft minecraft, Component loadingHeader, Component loadingStage, float progress, boolean genericLoading) {
+    public void prepareRender(Minecraft minecraft, UIAccessor accessor, Component loadingHeader, Component loadingStage, float progress, boolean genericLoading) {
         this.minecraft = minecraft;
-        this.accessor = UIAccessor.of(minecraft.screen);
+        this.accessor = accessor;
         this.loadingHeader = accessor.getElementValue("loadingHeader.component", loadingHeader, Component.class);
         this.loadingStage = accessor.getElementValue("loadingStage.component", loadingStage, Component.class);
         this.progress = accessor.getFloat("progress", progress);
         this.genericLoading = accessor.getBoolean("genericLoading", genericLoading);
     }
 
-    public void prepareRender(Minecraft minecraft) {
-        prepareRender(minecraft, loadingHeader, loadingStage, progress, genericLoading);
+    public void prepareRender(Minecraft minecraft, UIAccessor accessor) {
+        prepareRender(minecraft, accessor, loadingHeader, loadingStage, progress, genericLoading);
     }
 
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {

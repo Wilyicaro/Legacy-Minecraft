@@ -28,6 +28,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
+import wily.factoryapi.FactoryAPI;
+import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.util.ColorUtil;
 
 import java.util.Map;
@@ -198,9 +200,14 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
         }
     }
 
-    private void submitBlitFromItemAtlas(GuiRenderState renderState, GuiItemRenderState guiItemRenderState, float f, float g, int i, int j) {
-        float h = f + (float) i / j;
-        float k = g + (float) (-i) / j;
+    private void submitBlitFromItemAtlas(GuiRenderState renderState, GuiItemRenderState guiItemRenderState, float u, float v, int size, int atlasSize) {
+        float h = u + (float) size / atlasSize;
+        float k = v + (float) (-size) / atlasSize;
+        //Compatibility with VulkanMod rendering
+        if (FactoryAPI.isModLoaded("vulkanmod")) {
+            v = 1 - v;
+            k = v + (float) (size) / atlasSize;
+        }
         float opacity = LegacyGuiItemRenderState.of(guiItemRenderState).opacity();
         renderState
                 .submitBlitToCurrentLayer(
@@ -212,9 +219,9 @@ public class LegacyGuiItemRenderer implements AutoCloseable {
                                 guiItemRenderState.y(),
                                 guiItemRenderState.x() + 16,
                                 guiItemRenderState.y() + 16,
-                                f,
+                                u,
                                 h,
-                                g,
+                                v,
                                 k,
                                 opacity == 1.0f || !LegacyOptions.enhancedItemTranslucency.get() ? 0xFFFFFFFF : ColorUtil.withAlpha(0xFFFFFF, opacity),
                                 guiItemRenderState.scissorArea(),

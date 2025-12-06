@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.LegacyComponents;
@@ -145,7 +146,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading, Contro
     //? if >1.20.1 {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-        renderer.prepareRender(minecraft);
+        renderer.prepareRender(minecraft, UIAccessor.of(this));
         renderer.renderBackground(guiGraphics, i, j, f);
     }
     //?}

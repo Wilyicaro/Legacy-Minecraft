@@ -194,7 +194,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     }
 
     @Override
-    public int getTipXDiff() {
+    public int getTipXOffset() {
         return 0;
     }
 

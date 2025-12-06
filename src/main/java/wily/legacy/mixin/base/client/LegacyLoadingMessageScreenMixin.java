@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyLoading;
 
@@ -20,7 +21,7 @@ public class LegacyLoadingMessageScreenMixin extends Screen implements LegacyLoa
     public void render(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         if (LegacyOptions.legacyLoadingAndConnecting.get()) {
             ci.cancel();
-            getLoadingRenderer().prepareRender(minecraft, getTitle(), null, 0, false);
+            getLoadingRenderer().prepareRender(minecraft, UIAccessor.of(this), getTitle(), null, 0, false);
             getLoadingRenderer().render(guiGraphics, i, j, f);
         }
     }

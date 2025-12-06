@@ -47,6 +47,7 @@ import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
@@ -71,8 +72,6 @@ public record PackAlbum(String id, int version, Component displayName, Component
     public static final List<PackAlbum> DEFAULT_RESOURCE_ALBUMS = new ArrayList<>();
     public static final String RESOURCE_ALBUMS = "resource_albums";
     public static final Path RESOURCE_ALBUMS_PATH = Minecraft.getInstance().gameDirectory.toPath().resolve(RESOURCE_ALBUMS);
-    @Deprecated
-    public static final Path RESOURCE_ASSORTS_PATH = Minecraft.getInstance().gameDirectory.toPath().resolve("resource_assorts");
     public static final Component ALBUM_OPTIONS = Component.translatable("legacy.menu.album_options");
     public static final Component ALBUM_OPTIONS_MESSAGE = Component.translatable("legacy.menu.album_options_message");
     public static final Component ADD_ALBUM = Component.translatable("legacy.menu.add_album");
@@ -98,11 +97,9 @@ public record PackAlbum(String id, int version, Component displayName, Component
     }
 
     public static void init() {
-        List<PackAlbum> albums = Files.exists(RESOURCE_ASSORTS_PATH) ? load(RESOURCE_ASSORTS_PATH, DEFAULT_RESOURCE_ALBUMS, defaultResourceAlbum, true) : Collections.emptyList();
-        albums.forEach(PackAlbum::registerResource);
-        if (!Files.exists(RESOURCE_ALBUMS_PATH) || !albums.isEmpty())
+        if (!Files.exists(RESOURCE_ALBUMS_PATH))
             save(RESOURCE_ALBUMS_PATH, DEFAULT_RESOURCE_ALBUMS, defaultResourceAlbum);
-        if (albums.isEmpty()) load();
+        load();
     }
 
     public static PackAlbum resourceById(String s) {
@@ -296,7 +293,8 @@ public record PackAlbum(String id, int version, Component displayName, Component
         private static final Map<String, ResourceLocation> packIcons = Maps.newHashMap();
         private static final Map<String, ResourceLocation> packBackgrounds = Maps.newHashMap();
         public final Stocker.Sizeable scrolledList;
-        public final BiFunction<Component, Integer, MultiLineLabel> labelsCache = Util.memoize((c, i) -> MultiLineLabel.create(Minecraft.getInstance().font, c, i));
+        public static final BiFunction<Component, Integer, MultiLineLabel> labelsCache = Util.memoize((c, i) -> MultiLineLabel.create(Minecraft.getInstance().font, c, i));
+        public static final BiFunction<Component, Integer, MultiLineLabel> sdLabelsCache = Util.memoize((c, i) -> MultiLineLabel.create(Minecraft.getInstance().font, c.copy().withStyle(c.getStyle().withFont(LegacyFontUtil.MOJANGLES_11_FONT)), i));
         protected final PackAlbum initialAlbum;
         protected final List<String> oldSelection;
         protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
@@ -419,12 +417,16 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 setTooltip(Tooltip.create(getSelectedAlbum().description(), getSelectedAlbum().displayName()));
         }
 
+        public static int getDefaultWidth() {
+            return LegacyOptions.getUIMode().isSD() ? 105 : 161;
+        }
+
         public void renderTooltipBox(GuiGraphics guiGraphics, LayoutElement panel) {
             renderTooltipBox(guiGraphics, panel, 0);
         }
 
         public void renderTooltipBox(GuiGraphics guiGraphics, LayoutElement panel, int xOffset) {
-            renderTooltipBox(guiGraphics, panel.getX() + panel.getWidth() - 2 + xOffset, panel.getY() + 5, 161, panel.getHeight() - 10);
+            renderTooltipBox(guiGraphics, panel.getX() + panel.getWidth() - 2 + xOffset, panel.getY() + 5, getDefaultWidth(), panel.getHeight() - 10);
         }
 
         public void renderTooltipBox(GuiGraphics graphics, int x, int y, int width, int height) {
@@ -436,19 +438,26 @@ public record PackAlbum(String id, int version, Component displayName, Component
                     FactoryGuiGraphics.of(graphics).blitSprite(getSelectedAlbum().iconSprite().get(), x + 7, y + 5, 32, 32);
                 else
                     FactoryGuiGraphics.of(graphics).blit(p ? getPackIcon(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : DEFAULT_ICON, x + 7, y + 5, 0.0f, 0.0f, 32, 32, 32, 32);
-                FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4, x + 148, y + 44);
-                labelsCache.apply(getSelectedAlbum().displayName(), 108).render(graphics, MultiLineLabel.Align.LEFT, x + 43, y + 8, 12, true, 0xFFFFFFFF);
+                boolean sd = LegacyOptions.getUIMode().isSD();
+                int nameWidth = width - 53;
+                int lineHeight = sd ? 8 : 12;
+                FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4, x + 40 + nameWidth, y + 44);
+                (sd ? sdLabelsCache : labelsCache).apply(getSelectedAlbum().displayName(), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
                 graphics.disableScissor();
                 ResourceLocation background = getSelectedAlbum().backgroundSprite.orElse(p ? getPackBackground(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : null);
-                MultiLineLabel label = labelsCache.apply(getSelectedAlbum().description(), 145);
-                int visibleLines = (height - 50 - (background == null ? 0 : 78)) / 12;
+                int descriptionWidth = width - 16;
+                MultiLineLabel label = (sd ? sdLabelsCache : labelsCache).apply(getSelectedAlbum().description(), descriptionWidth);
+                int descriptionFromBottom = sd ? 52 : 78;
+                int visibleLines = (height - 50 - (background == null ? 0 : descriptionFromBottom)) / lineHeight;
                 scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleLines);
-                scrollableRenderer.render(graphics, x + 8, y + 40, 146, visibleLines * 12, () -> label.render(graphics, MultiLineLabel.Align.LEFT, x + 8, y + 40, 12, true, 0xFFFFFFFF));
+                scrollableRenderer.lineHeight = lineHeight;
+                int left = x + (sd ? 5 : 8);
+                scrollableRenderer.render(graphics, left, y + 40, descriptionWidth, visibleLines * lineHeight, () -> label.render(graphics, MultiLineLabel.Align.LEFT, left, y + 40, lineHeight, true, 0xFFFFFFFF));
                 if (background != null) {
                     if (getSelectedAlbum().backgroundSprite().isPresent())
-                        FactoryGuiGraphics.of(graphics).blitSprite(background, x + 8, y + height - 78, 145, 72);
+                        FactoryGuiGraphics.of(graphics).blitSprite(background, left, y + height - descriptionFromBottom, sd ? 95 : 145, sd ? 47 : 72);
                     else
-                        FactoryGuiGraphics.of(graphics).blit(background, x + 8, y + height - 78, 0.0f, 0.0f, 145, 72, 145, 72);
+                        FactoryGuiGraphics.of(graphics).blit(background, left, y + height - descriptionFromBottom, 0.0f, 0.0f, sd ? 95 : 145, sd ? 47 : 72, sd ? 95 : 145, sd ? 47 : 72);
                 }
             }
         }
@@ -609,7 +618,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, getX() - 1, getY() + font.lineHeight - 1, width + 2, height + 2 - minecraft.font.lineHeight);
             int visibleCount = 0;
             for (int index = 0; index < albums.size(); index++) {
-                if (visibleCount >= getMaxPacks()) break;
+                if (visibleCount >= getMaxPacks() || scrolledList.get() + index >= albums.size()) break;
                 PackAlbum album = albums.getByIndex(Math.min(albums.size() - 1, scrolledList.get() + index));
                 if (album.iconSprite().isPresent())
                     FactoryGuiGraphics.of(guiGraphics).blitSprite(album.iconSprite().get(), getX() + 21 + 30 * index, getY() + font.lineHeight + 4, 28, 28);

@@ -311,6 +311,8 @@ public class Legacy4JClient {
         if (!Minecraft.getInstance().isPaused()) {
             TopMessage.tick();
         }
+
+        LegacyTipManager.updateTipTicks();
     }
 
     public static void postTick(Minecraft minecraft) {
