@@ -1309,7 +1309,7 @@
   "legacy.menu.create_flat_world.unsupported.incorrect_biome.shipwrecks": "You have Shipwrecks enabled, but they cannot be generated as the biome is not an Ocean or Beach.",
   "legacy.menu.create_flat_world.unsupported.incorrect_biome.villages": "You have Villages enabled, but they cannot be generated as the biome is not Plains, Desert, Savanna, Taiga, Snowy Plains, or Snowy Taiga.",
   "legacy.menu.create_flat_world.unsupported.incorrect_biome.woodland_mansions": "You have Woodland Mansions enabled, but they cannot be generated as the biome is not a Dark Forest.",
-  "legacy.menu.create_world": "Create World",
+  "legacy.menu.create_world": "Create New World",
   "legacy.menu.disable_autosave": "Disable Autosave",
   "legacy.menu.disable_autosave_title": "Disable autosave",
   "legacy.menu.disable_autosave_message": "Are you sure you want to disable the constant, automatic saving of the world?",
