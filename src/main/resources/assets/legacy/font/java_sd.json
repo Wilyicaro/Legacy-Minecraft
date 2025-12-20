@@ -1,0 +1,1229 @@
+{
+    "providers":[
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/key_base.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\uC000"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/key_base_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\uC001"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/mouse_base.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\uC002"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/mouse_base_focused.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\uC003"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/space_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0032"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/space_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1032"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/comma_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0044"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/minus_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1045"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/minus_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0045"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/comma_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1044"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/period_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0046"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/period_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1046"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/slash_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0047"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/slash_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1047"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/semicolon_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0059"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/semicolon_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1059"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/equals_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0061"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/equals_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1061"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/0_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0048"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/0_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1048"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/1_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0049"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/1_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1049"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/2_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0050"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/2_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1050"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/3_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0051"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/3_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1051"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/4_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0052"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/4_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1052"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/5_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0053"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/5_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1053"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/6_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0054"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/6_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1054"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/7_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0055"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/7_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1055"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/8_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0056"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/8_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1056"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/9_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0057"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/9_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1057"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/a_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0065"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/a_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1065"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/b_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0066"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/b_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1066"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/c_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0067"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/c_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1067"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/d_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0068"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/d_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1068"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/e_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0069"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/e_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1069"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0070"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1070"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/g_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0071"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/g_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1071"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/h_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0072"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/h_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1072"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/i_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0073"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/i_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1073"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/j_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0074"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/j_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1074"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/k_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0075"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/k_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1075"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/l_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0076"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/l_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1076"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/m_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0077"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/m_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1077"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/n_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0078"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/n_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1078"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/o_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0079"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/o_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1079"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/p_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0080"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/p_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1080"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/q_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0081"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/q_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1081"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/r_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0082"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/r_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1082"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/s_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0083"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/s_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1083"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/t_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0084"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/t_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1084"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/u_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0085"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/u_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1085"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/v_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0086"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/v_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1086"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/w_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0087"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/w_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1087"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/x_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0088"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/x_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1088"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/y_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0089"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/y_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1089"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/z_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0090"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/z_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1090"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/left_bracket_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0091"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/left_bracket_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1091"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/backslash_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0092"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/backslash_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1092"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/right_bracket_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0093"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/right_bracket_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1093"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/grave_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0096"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/grave_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1096"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/up_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0265"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/up_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1265"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/left_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0263"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/left_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1263"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/down_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0264"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/down_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1264"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/right_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0262"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/right_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1262"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/esc_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0256"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/esc_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1256"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/return_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0257"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/return_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1257"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/tab_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0258"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/tab_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1258"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/backspace_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0259"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/backspace_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1259"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/insert_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0260"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/insert_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1260"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/delete_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0261"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/delete_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1261"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f1_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0290"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f1_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1290"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f2_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0291"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f2_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1291"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f3_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0292"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f3_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1292"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f4_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0293"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f4_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1293"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f5_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0294"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f5_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1294"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f6_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0295"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f6_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1295"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f7_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0296"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f7_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1296"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f8_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0297"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f8_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1297"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f9_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0298"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f9_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1298"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f10_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0299"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f10_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1299"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f11_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0300"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f11_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1300"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f12_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0301"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/f12_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1301"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/left_mouse.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\uD000"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/left_mouse_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\uE000"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/right_mouse.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\uD001"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/right_mouse_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\uE001"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/mouse_scroll.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\uA000"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/mouse_scroll_up.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\uA001"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/mouse_scroll_up.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\uA002"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/mouse_scroll_button.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\uD002"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/mouse_scroll_button_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\uE002"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/enter_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0335"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/enter_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1335"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/left_shift_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0340"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/left_shift_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1340"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/right_shift_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0344"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/right_shift_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1344"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/left_control_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0341"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/left_control_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1341"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/right_control_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0345"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/right_control_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1345"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/left_alt_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0342"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/left_alt_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1342"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/right_alt_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0346"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/right_alt_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1346"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/pg_down_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0267"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/pg_down_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1267"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/pg_up_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0266"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/pg_up_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1266"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/home_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0268"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/home_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1268"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/end_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0269"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/end_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1269"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/caps_key.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u0280"]
+        },
+        {
+            "type": "bitmap",
+            "file": "legacy:component/kbm/sd/caps_key_pressed.png",
+            "ascent": 9,
+            "height": 10,
+            "chars": ["\u1280"]
+        }
+    ]    
+}
