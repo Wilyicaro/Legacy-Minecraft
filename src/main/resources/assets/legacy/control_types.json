@@ -6,7 +6,10 @@
     "font": {
       "default": "legacy:java_hd",
       "fhd": "legacy:java",
-      "sd": "legacy:java_sd"
+      "sd": {
+        "id": "legacy:java_sd",
+        "iconHeight": 9
+      }
   },
     "minecraftLogo": "legacy:textures/gui/title/minecraft/java.png"
   },
