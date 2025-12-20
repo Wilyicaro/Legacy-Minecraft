@@ -89,7 +89,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
     @Inject(method = "<init>", at = @At("RETURN"))
     public void initReturn(Minecraft minecraft, Runnable runnable, WorldCreationContext worldCreationContext, Optional optional, OptionalLong optionalLong, CreateWorldCallback createWorldCallback, CallbackInfo ci     /*? if >=1.21.2 {*/  /*?}*/) {
         uiState.setDifficulty(LegacyOptions.createWorldDifficulty.get());
-        panel = Panel.createPanel(this, p -> (width - (p.width + (LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(this)) ? 160 : 0))) / 2, p -> (height - p.height) / 2, 245, 228);
+        panel = Panel.createPanel(this, p -> (width - (p.width + (LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(this)) ? PackAlbum.Selector.getDefaultWidth() : 0))) / 2, p -> (height - p.height) / 2, 245, 228);
         resourceAlbumSelector = PackAlbum.Selector.resources(panel.x + 13, panel.y + 106, 220, 45, !LegacyRenderUtil.hasTooltipBoxes());
         publishScreen = new PublishScreen(this, uiState.getGameMode().gameType);
     }

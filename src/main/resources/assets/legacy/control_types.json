@@ -4,8 +4,8 @@
     "name": {"translate": "legacy.options.controlType.java"},
     "isKbm": true,
     "font": {
-      "default": "legacy:java",
-      "hd": "legacy:java_hd"
+      "default": "legacy:java_hd",
+      "fhd": "legacy:java"
   },
     "minecraftLogo": "legacy:textures/gui/title/minecraft/java.png"
   },
@@ -18,8 +18,7 @@
       "sd": {
         "id": "legacy:xbox_360_sd",
         "iconHeight": 9
-      },
-      "default": "legacy:xbox_360"
+      }
     },
     "minecraftLogo": "legacy:textures/gui/title/minecraft/xbox_360.png"
   },
@@ -32,7 +31,18 @@
     },
     "minecraftLogo": "legacy:textures/gui/title/minecraft/xbox_one.png"
   },
-  "legacy:playstation_3",
+  {
+    "id": "legacy:playstation_3",
+    "name": {"translate": "legacy.options.controlType.playstation_3"},
+    "font": {
+      "default": "legacy:playstation_3",
+      "sd": {
+        "id": "legacy:playstation_3_sd",
+        "iconHeight": 9
+      }
+    },
+    "minecraftLogo": "legacy:textures/gui/title/minecraft/playstation_3.png"
+  },
   {
     "id": "legacy:playstation_vita",
     "name": {"translate": "legacy.options.controlType.playstation_vita"},

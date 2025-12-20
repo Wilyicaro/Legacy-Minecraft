@@ -39,7 +39,7 @@ public abstract class AbstractRecipeBookScreenMixin extends AbstractContainerScr
 
     @Override
     public ScreenRectangle getMenuRectangleLimit() {
-        return recipeBookComponent.isVisible() ? LegacyMenuAccess.createMenuRectangleLimit(this, leftPos - 160, topPos + (imageHeight - 166) / 2, imageWidth + 160, Math.max(166, imageHeight), 20, 10) : LegacyMenuAccess.super.getMenuRectangleLimit();
+        return recipeBookComponent.isVisible() ? LegacyMenuAccess.createMenuRectangleLimit(this, leftPos - 160, topPos + (imageHeight - 166) / 2, imageWidth + 160, Math.max(166, imageHeight)) : LegacyMenuAccess.createMenuRectangleLimit(this, leftPos, topPos, imageWidth, imageHeight);
     }
 
 }

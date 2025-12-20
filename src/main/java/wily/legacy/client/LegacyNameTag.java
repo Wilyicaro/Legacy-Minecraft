@@ -14,6 +14,8 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 public interface LegacyNameTag {
+    LegacyNameTag NEXT_SUBMIT = new Instance();
+
     static LegacyNameTag of(SubmitNodeStorage.NameTagSubmit nameTagSubmit) {
         return (LegacyNameTag) (Object) nameTagSubmit;
     }
@@ -67,7 +69,21 @@ public interface LegacyNameTag {
         return getNameTagColor() != null;
     }
 
-    interface Storage {
-        void add(PoseStack poseStack, @Nullable Vec3 vec3, int i, Component component, boolean bl, int j, double d, CameraRenderState cameraRenderState, float[] color);
+    default void copyFrom(LegacyNameTag tag) {
+        setNameTagColor(tag.getNameTagColor());
+    }
+
+    class Instance implements LegacyNameTag {
+        float[] color;
+
+        @Override
+        public float[] getNameTagColor() {
+            return color;
+        }
+
+        @Override
+        public void setNameTagColor(float[] color) {
+            this.color = color;
+        }
     }
 }

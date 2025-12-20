@@ -1,0 +1,56 @@
+{
+  "targetUI": "wily.legacy.client.screen.LegacyMerchantScreen",
+  "targetType": "class",
+  "applyCondition": { "reference": "uiMode.sd" },
+  "elements": {
+    "imageSprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "imageHeight": 121,
+    "imageWidth": 213,
+    "bottomPanel.height": 71,
+    "tradingGridPanel.width": 90,
+    "inventoryPanel.width": 110,
+    "bottomPanel.y": 44,
+    "tradingGridPanel.x": 5,
+    "tradingSlot.size": 25,
+    "tradingButtons.size": 20,
+    "tradingButtons.y": 22,
+    "tradingButtons.x": "(${imageWidth}-${tradingButtons.size}*10)/2",
+    "tradingSlot.x": 8,
+    "tradingSlot.y": 30,
+    "firstTradingSlot.y": 16,
+    "secondTradingSlot.y": 44,
+    "resultSlot.x": 64,
+    "tradingArrow.x": 35,
+    "tradingArrow.y": 30,
+    "inventoryPanel.x": 98,
+    "levelTitle.y": 8,
+    "title.y": 6,
+    "inventoryTitle.y": 3,
+    "progressBar.width": 182,
+    "progressBar.height": 5,
+    "progressBar.y": 14,
+    "horizontalScroll.x": -7,
+    "horizontalScroll.y": 27,
+    "inventory": {
+      "type":"put_legacy_slot",
+      "range":"[0,26]",
+      "x":"${inventoryPanel.x}+6+(${inventory.index}%9)*11",
+      "y":"${bottomPanel.y}+16+(${inventory.index}/9)*11",
+      "width":11,
+      "height":11,
+      "isVisible": {"reference": "isInventoryActive"}
+    },
+    "quick_select": {
+      "type":"put_legacy_slot",
+      "range":"[27,36]",
+      "x":"${inventoryPanel.x}+6+(${quick_select.index}%9)*11",
+      "y":"${bottomPanel.y}+53",
+      "width":11,
+      "height":11,
+      "isVisible": {"reference": "isInventoryActive"}
+    }
+  }
+}

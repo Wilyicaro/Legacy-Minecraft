@@ -178,9 +178,12 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
             if (index + scrollOff >= this.menu.getOffers().size() || (hovered = LegacyRenderUtil.isMouseOver(event.x(), event.y(), leftPos + 8.5f, topPos + 22.5f + index * 18, 102, 18))) {
                 if (hovered) {
                     LegacySoundUtil.playSimpleUISound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0f);
-                    if (shopItem == index + scrollOff && ((LegacyMerchantOffer) menu.getOffers().get(index + scrollOff)).getRequiredLevel() <= menu.getTraderLevel())
+
+                    if (shopItem != index + scrollOff) {
+                        shopItem = index + scrollOff;
                         postButtonClick();
-                    else shopItem = index + scrollOff;
+                    }
+
                     cir.setReturnValue(true);
                     return;
                 }

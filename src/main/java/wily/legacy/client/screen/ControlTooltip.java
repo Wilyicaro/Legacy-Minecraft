@@ -73,6 +73,7 @@ import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.ItemContainerPlatform;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.AdvancedTextWidget;
+import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.factoryapi.util.ColorUtil;
 import wily.factoryapi.util.FactoryItemUtil;
 import wily.legacy.Legacy4J;
@@ -606,8 +607,7 @@ public interface ControlTooltip {
     }
 
     interface Event {
-        Event EMPTY = new Event() {
-        };
+        Event EMPTY = new Event() {};
 
         static Event of(Object o) {
             return o instanceof Event e ? e : EMPTY;
@@ -1025,6 +1025,7 @@ public interface ControlTooltip {
 
 
         public void press(MouseButtonEvent event, boolean clicked) {
+            if (!MinecraftAccessor.getInstance().hasGameLoaded()) return;
             boolean left = LegacyOptions.controlTooltipDisplay.get().isLeft();
             float hudDistance = Math.max(0.0f, LegacyOptions.hudDistance.get().floatValue() - 0.5f) * 2;
             float hudDiff = 1.0f - hudDistance;

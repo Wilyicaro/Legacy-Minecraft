@@ -69,6 +69,7 @@ import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.MultilineTooltip;
 import wily.legacy.network.TopMessage;
+import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.LegacySprites;
 
 import java.util.Collection;
@@ -89,6 +90,7 @@ public class LegacyRenderUtil {
     public static final ResourceLocation MENU_BACKGROUND = Legacy4J.createModLocation("textures/gui/menu_background.png");
     public static final ResourceLocation LOADING_BACKGROUND = Legacy4J.createModLocation("textures/gui/loading_background.png");
     protected static final LogoRenderer logoRenderer = new LogoRenderer(false);
+
     private static final Minecraft mc = Minecraft.getInstance();
 
     static {
@@ -243,7 +245,7 @@ public class LegacyRenderUtil {
     }
 
     public static float getHUDDistance() {
-        return -LegacyOptions.hudDistance.get().floatValue() * (22.5f + (LegacyOptions.inGameTooltips.get() ? 17.5f : 0));
+        return -LegacyOptions.hudDistance.get().floatValue() * (22.4f + (LegacyOptions.inGameTooltips.get() ? 17.6f : 0));
     }
 
     public static float getHUDOpacity() {
@@ -550,10 +552,10 @@ public class LegacyRenderUtil {
         FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 
-    public static void renderTooltipInternal(GuiGraphics graphics, Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner/*? if neoforge || forge {*//*, ItemStack tooltipStack*//*?}*/) {
+    public static void renderTooltipInternal(GuiGraphics graphics, Font font, List<ClientTooltipComponent> list, int i, int j, ClientTooltipPositioner clientTooltipPositioner/*? if forge || neoforge {*//*, ItemStack tooltipStack*//*?}*/) {
         if (list.isEmpty()) return;
         //? if forge {
-        /*RenderTooltipEvent.Pre preEvent = ForgeHooksClient.onRenderTooltipPre(tooltipStack, graphics, i, j, graphics.guiWidth(), graphics.guiHeight(), list, font, clientTooltipPositioner);
+        /*RenderTooltipEvent.Pre preEvent = ForgeHooksClient.onRenderTooltipPre(tooltipStack, graphics, i, j, graphics.guiWidth(), graphics.guiHeight(), list, font, clientTooltipPositioner, null);
         if (preEvent == null) return;
         *///?} else if neoforge {
         /*RenderTooltipEvent.Pre preEvent = ClientHooks.onRenderTooltipPre(tooltipStack, graphics, i, j, graphics.guiWidth(), graphics.guiHeight(), list, font, clientTooltipPositioner);
@@ -665,9 +667,22 @@ public class LegacyRenderUtil {
 
         if (GLFW.glfwGetInputMode(mc.getWindow().handle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_HIDDEN && !Legacy4JClient.controllerManager.isCursorDisabled && !LegacyOptions.hasSystemCursor()) {
             graphics.pose().pushMatrix();
-            graphics.pose().translate(Legacy4JClient.controllerManager.getVisualPointerX() + LegacyTipManager.getTipXDiff(), Legacy4JClient.controllerManager.getVisualPointerY());
+            graphics.pose().translate(Legacy4JClient.controllerManager.getVisualPointerX() + LegacyTipManager.getTipXOffset(), Legacy4JClient.controllerManager.getVisualPointerY());
             FactoryGuiGraphics.of(graphics).blitSprite(LegacyOptions.getUIMode().isFHD() ? LegacySprites.POINTER : LegacySprites.SMALL_POINTER, -8, -8, 16, 16);
             graphics.pose().popMatrix();
+        }
+    }
+
+    public static void renderPotionLevel(GuiGraphics graphics, int i, int j, ItemStack itemStack) {
+        if (!LegacyOptions.legacyPotionsBar.get()) return;
+        int potionLevel = LegacyItemUtil.getPotionLevel(itemStack);
+        if (potionLevel > 0) {
+            int x = i + 3;
+            int y = j + 13;
+            graphics.fill(x, y, x + 11, y + 2, -16777216);
+            for (int k = 0; k < potionLevel; k++) {
+                graphics.fill(x + k * 3, y, x + k * 3 + 2, y + 2, 0xFF00DDE5);
+            }
         }
     }
 

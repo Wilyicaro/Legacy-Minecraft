@@ -4,7 +4,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.SplashRenderer;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -18,7 +21,7 @@ public class SplashRendererMixin {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;scale(FF)Lorg/joml/Matrix3x2f;", shift = At.Shift.AFTER, remap = false))
     public void renderAfterScale(GuiGraphics guiGraphics, int i, Font font, float f, CallbackInfo ci) {
         if (LegacyOptions.getUIMode().isSD())
-            guiGraphics.pose().scale(0.8f, 0.8f);
+            guiGraphics.pose().scale(0.75f, 0.75f);
         else
             guiGraphics.pose().scale(1.5f, 1.5f);
         if (Minecraft.getInstance().getResourceManager().getResource(LegacyRenderUtil.MINECRAFT).isPresent())
@@ -28,7 +31,7 @@ public class SplashRendererMixin {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;translate(FF)Lorg/joml/Matrix3x2f;", shift = At.Shift.AFTER, remap = false))
     public void renderAfterTranslate(GuiGraphics guiGraphics, int i, Font font, float f, CallbackInfo ci) {
         if (LegacyOptions.getUIMode().isSD()) {
-            guiGraphics.pose().translate(-35, -25);
+            guiGraphics.pose().translate(-45, -30);
         }
     }
 

@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 
 public class IOUtil {
 
+    //TODO: Replace this with a Codec, like RecipeInfo.Filter
     public static <T> Predicate<T> registryMatches(Registry<T> registry, JsonObject o) {
         String name = registry.key().location().getPath();
         if (!o.has(name) && !o.has(name + "s")) return t -> false;
@@ -65,14 +66,6 @@ public class IOUtil {
         //?}
         Predicate<Item> p = registryMatches(BuiltInRegistries.ITEM, o);
         return (item, d) -> p.test(item) && (data == null || /*? if <1.20.5 {*//*NbtUtils.compareNbt(data,d,true)*//*?} else {*/Objects.equals(d, data)/*?}*/);
-    }
-
-    public static ArbitrarySupplier<ItemStack> getItemFromJson(JsonElement element, boolean allowData) {
-        return DynamicUtil.getItemFromDynamic(new Dynamic<>(JsonOps.INSTANCE, element), allowData);
-    }
-
-    public static <K, V> void addMapListEntry(Map<K, List<V>> map, K key, V entry) {
-        map.computeIfAbsent(key, k -> new ArrayList<>()).add(entry);
     }
 
     public static <T> T getJsonStringOrNull(JsonObject object, String element, Function<String, T> constructor) {

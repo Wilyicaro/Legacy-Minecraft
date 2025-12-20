@@ -52,7 +52,7 @@ public abstract class ClientMinecraftServerMixin {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void init(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, Services services, LevelLoadListener levelLoadListener, CallbackInfo ci) {
-        ticksUntilAutosave = 300;
+        ticksUntilAutosave *= Math.max(1, LegacyOptions.autoSaveInterval.get());
     }
 
     @ModifyReturnValue(method = "computeNextAutosaveInterval", at = @At("RETURN"))

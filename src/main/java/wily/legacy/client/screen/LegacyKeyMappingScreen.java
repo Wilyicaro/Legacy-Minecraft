@@ -53,8 +53,8 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
         this(parent, s -> Panel.centered(s, LegacySprites.PANEL, 255, 293), title);
     }
 
-    public LegacyKeyMappingScreen(Screen parent, Function<Screen, Panel> panelFunction, Component title) {
-        super(parent, panelFunction, title);
+    public LegacyKeyMappingScreen(Screen parent, Panel.Constructor<LegacyKeyMappingScreen> panelFunction, Component title) {
+        super(parent, panelFunction.cast(), title);
         renderableVList.layoutSpacing(l -> 1);
         addButtons();
     }

@@ -146,8 +146,6 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
 
     @Override
     public void setStatsMap(Object2IntMap<Stat<?>> statsMap) {
-        getStats().stats.clear();
-        getStats().stats.putAll(statsMap);
     }
 
     @Override

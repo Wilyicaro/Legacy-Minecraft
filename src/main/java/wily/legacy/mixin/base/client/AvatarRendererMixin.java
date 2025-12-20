@@ -13,8 +13,8 @@ import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyNameTag;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.LegacySubmitNodeCollector;
 import wily.legacy.entity.LegacyPlayerInfo;
 
 @Mixin(AvatarRenderer.class)
@@ -24,7 +24,9 @@ public class AvatarRendererMixin {
         if (LegacyOptions.displayNameTagBorder.get()) {
             Minecraft minecraft = Minecraft.getInstance();
             float[] nameTagColor = minecraft.getConnection() == null || !(minecraft.getConnection().getPlayerInfo(avatarRenderState.nameTag.getString()) instanceof LegacyPlayerInfo info) || info.getIdentifierIndex() == 0 ? new float[]{0, 0, 0} : Legacy4JClient.getVisualPlayerColor(info);
-            ((LegacySubmitNodeCollector) instance).submitLegacyNameTag(poseStack, vec3, color, component, b, i, v, cameraRenderState, nameTagColor);
+            LegacyNameTag.NEXT_SUBMIT.setNameTagColor(nameTagColor);
+            original.call(instance, poseStack, vec3, color, component, b, i, v, cameraRenderState);
+            LegacyNameTag.NEXT_SUBMIT.setNameTagColor(null);
         } else original.call(instance, poseStack, vec3, color, component, b, i, v, cameraRenderState);
     }
 }

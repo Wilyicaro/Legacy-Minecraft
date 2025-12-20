@@ -1,0 +1,36 @@
+{
+  "targetUI": "wily.legacy.client.screen.LeaderboardsScreen",
+  "targetType": "class",
+  "applyCondition": { "reference": "uiMode.sd" },
+  "elements": {
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "panel.width": 328,
+    "panel.height": 156,
+    "panel.y": "(${height}-${panel.height})/2+6",
+    "filterTooltip.width": 96,
+    "filterText.y": 10,
+    "boardTooltip.width": 110,
+    "boardText.y": 4,
+    "entriesTooltip.width": 96,
+    "entriesText.y": 10,
+    "topTooltip.scale": 0.5,
+    "topTooltip.height": 24,
+    "boardControlTooltip.y": 12,
+    "rankText.x": 10,
+    "rankText.y": 20,
+    "usernameText.x": 60,
+    "usernameText.y": 20,
+    "renderableVList.x": "${panel.x}+5",
+    "renderableVList.y": "${panel.y}+34",
+    "renderableVList.width": "${panel.width}-10",
+    "renderableVList.buttonRank.x": 25,
+    "renderableVList.buttonUsername.x": 65,
+    "statsBoard.x": 90,
+    "statsBoard.y": 18,
+    "statsBoard.width": 230,
+    "buttonsHeight": 18
+  }
+}

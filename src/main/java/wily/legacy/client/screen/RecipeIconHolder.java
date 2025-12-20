@@ -159,7 +159,7 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
                 LegacySoundUtil.playSimpleUISound(LegacyRegistries.FOCUS.get(), true);
                 if (oldSelection == selectionOffset && (compactMode || selectionOffset != 0))
                     Collections.rotate(getFocusedRecipes(), keyEvent.isUp() ? 1 : -1);
-                updateRecipeDisplay(getFocusedRecipe());
+                updateRecipeDisplay();
                 return true;
             }
         }
@@ -244,9 +244,9 @@ public abstract class RecipeIconHolder<R> extends LegacyIconHolder implements Co
     @Override
     public void onPress(InputWithModifiers input) {
         if (isFocused() && isValidIndex()) {
-            if (canCraft(getFocusedRecipe())) {
+            if (canCraft()) {
                 craft(input);
-                updateRecipeDisplay(getFocusedRecipe());
+                updateRecipeDisplay();
             } else {
                 if (minecraft.player.containerMenu instanceof LegacyCraftingMenu m && !m.showedNotEnoughIngredientsHint && LegacyOptions.hints.get()) {
                     m.showedNotEnoughIngredientsHint = true;

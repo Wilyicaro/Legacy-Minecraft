@@ -40,8 +40,8 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     protected final LegacyScroller scroller = LegacyScroller.create(135, () -> scrolledList);
     protected Slot hoveredSlot = null;
 
-    public ItemViewerScreen(Screen parent, Function<Screen, Panel> panelConstructor, Component component) {
-        super(parent, panelConstructor, component);
+    public ItemViewerScreen(Screen parent, Panel.Constructor<ItemViewerScreen> panelConstructor, Component component) {
+        super(parent, panelConstructor.cast(), component);
         menu = new AbstractContainerMenu(null, -1) {
 
             @Override
@@ -194,7 +194,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     }
 
     @Override
-    public int getTipXDiff() {
+    public int getTipXOffset() {
         return 0;
     }
 

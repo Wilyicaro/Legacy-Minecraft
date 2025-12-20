@@ -341,7 +341,7 @@ public class ControllerManager {
 
     public void simulateKeyAction(Predicate<BindingState> canSimulate, int key, BindingState state, boolean onlyScreen) {
         boolean clicked = state.pressed && state.canClick();
-        if (canSimulate.test(state) && (!Controller.Event.of(minecraft.screen).onceClickBindings(state) || state.onceClick(true))) {
+        if (canSimulate.test(state) && (!Controller.Event.of(minecraft.screen).onceClickBindings(state) || state.released || state.onceClick(true))) {
             simulateKeyAction(key, state, clicked, onlyScreen);
         }
     }
@@ -397,11 +397,11 @@ public class ControllerManager {
     }
 
     public float getVisualPointerX() {
-        return Math.round(minecraft.mouseHandler.xpos()) / (float) Math.round((float) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth());
+        return (float) Math.round(minecraft.mouseHandler.xpos()) * minecraft.getWindow().getGuiScaledWidth() / minecraft.getWindow().getScreenWidth();
     }
 
     public float getVisualPointerY() {
-        return Math.round(minecraft.mouseHandler.ypos()) / (float) Math.round((float) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight());
+        return (float) Math.round(minecraft.mouseHandler.ypos()) * minecraft.getWindow().getGuiScaledHeight() / minecraft.getWindow().getScreenHeight();
     }
 
     public <T extends BindingState> T getButtonState(ControllerBinding<T> button) {

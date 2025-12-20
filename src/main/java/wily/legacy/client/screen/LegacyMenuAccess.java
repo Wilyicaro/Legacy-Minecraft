@@ -5,7 +5,6 @@ import net.minecraft.client.gui.navigation.ScreenAxis;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
-import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import wily.legacy.Legacy4JClient;
@@ -106,9 +105,10 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
 
     ScreenRectangle getMenuRectangle();
 
-    default ScreenRectangle getMenuRectangleLimit() {
-        ScreenRectangle rect = getMenuRectangle();
-        return createMenuRectangleLimit(this, rect.left(), rect.top(), rect.width(), rect.height(), 20, 10);
+    ScreenRectangle getMenuRectangleLimit();
+
+    static ScreenRectangle createMenuRectangleLimit(LegacyMenuAccess<?> menu, int x, int y, int width, int height) {
+        return createMenuRectangleLimit(menu, x, y, width, height, 20, 10);
     }
 
     static ScreenRectangle createMenuRectangleLimit(LegacyMenuAccess<?> menu, int x, int y, int width, int height, int paddingH, int paddingV) {
@@ -136,7 +136,7 @@ public interface LegacyMenuAccess<T extends AbstractContainerMenu> extends MenuA
         return findSlotAt(Legacy4JClient.controllerManager.getPointerX(), Legacy4JClient.controllerManager.getPointerY());
     }
 
-    default int getTipXDiff() {
+    default int getTipXOffset() {
         return -132;
     }
 

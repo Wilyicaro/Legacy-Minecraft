@@ -25,7 +25,7 @@ public abstract class NameTagFeatureMixin {
         LegacyNameTag.renderNameTagOutline(font, bufferSource, submit, false);
     }
 
-    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;drawInBatch(Lnet/minecraft/network/chat/Component;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/gui/Font$DisplayMode;II)V", ordinal = 0), index = 9)
+    @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;drawInBatch(Lnet/minecraft/network/chat/Component;FFIZLorg/joml/Matrix4f;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/gui/Font$DisplayMode;II)V", ordinal = 0), index = 8)
     protected int renderNameTag(int original, @Local SubmitNodeStorage.NameTagSubmit submit) {
         float thickness = LegacyNameTag.getThickness(submit.distanceToCameraSq());
         float[] color = thickness < 1 || !LegacyOptions.displayNameTagBorder.get() ? null : LegacyNameTag.of(submit).getNameTagColor();
