@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
@@ -65,6 +66,24 @@ public class ControllerMappingScreen extends LegacyKeyMappingScreen {
                 LegacyOptions.rightStickDeadZone,
                 LegacyOptions.leftTriggerDeadZone,
                 LegacyOptions.rightTriggerDeadZone);
+		renderableVList.addMultSliderOption(LegacyOptions.controllerLedRed, 0);
+		renderableVList.addMultSliderOption(LegacyOptions.controllerLedGreen, 0);
+		renderableVList.addMultSliderOption(LegacyOptions.controllerLedBlue, 0);
+        renderableVList.addRenderable(new SimpleLayoutRenderable(241, 20) {
+            @Override
+            public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+                int rgb = (LegacyOptions.controllerLedRed.get() << 16) | 
+                          (LegacyOptions.controllerLedGreen.get() << 8) | 
+                          LegacyOptions.controllerLedBlue.get();
+                guiGraphics.fill(x, y, x + 241, y + 20, 0xA0808080);
+                guiGraphics.fill(x, y, x + 241, y + 1, 0xFF909090);
+                guiGraphics.fill(x, y + 19, x + 241, y + 20, 0xFF303030);
+                guiGraphics.fill(x + 2, y + 2, x + 239, y + 18, 0xFF000000 | rgb);
+                guiGraphics.drawCenteredString(minecraft.font, 
+                    Component.translatable("legacy.options.controllerLedPreview"), 
+                    x + 120, y + 6, 0xFFFFFFFF);
+            }
+        });
 
         for (KeyMapping keyMapping : keyMappings) {
             KeyMapping.Category category = keyMapping.getCategory();
