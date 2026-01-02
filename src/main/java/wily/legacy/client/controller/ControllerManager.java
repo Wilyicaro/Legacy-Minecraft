@@ -147,8 +147,15 @@ public class ControllerManager {
             if (controller != null) {
                 connectedController = controller;
                 controller.connect(this);
-            }
-        } else safeDisconnect();
+			    if (controller.hasLED()) {
+                    controller.setLED(
+                    (byte)LegacyOptions.controllerLedRed.get().intValue(),
+                    (byte)LegacyOptions.controllerLedGreen.get().intValue(),
+                    (byte)LegacyOptions.controllerLedBlue.get().intValue()
+                    );
+                }
+            } else safeDisconnect();
+        }
     }
 
     public void updateHandler(Controller.Handler handler) {
@@ -176,10 +183,12 @@ public class ControllerManager {
 
             if (getCursorMode().isAuto() && state.pressed && !isCursorDisabled) tryDisableCursor();
 
-            if (minecraft.player != null && minecraft.getConnection() != null && controller.hasLED() && minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID()) instanceof LegacyPlayerInfo i) {
-                float[] color = Legacy4JClient.getVisualPlayerColor(i);
-                controller.setLED((byte) (color[0] * 255), (byte) (color[1] * 255), (byte) (color[2] * 255));
-            }
+			if (controller.hasLED())
+                controller.setLED(
+                (byte)LegacyOptions.controllerLedRed.get().intValue(),
+                (byte)LegacyOptions.controllerLedGreen.get().intValue(),
+                (byte)LegacyOptions.controllerLedBlue.get().intValue()
+            );
 
             if (state.is(ControllerBinding.START) && state.justPressed)
                 if (minecraft.screen == null) minecraft.pauseGame(false);
