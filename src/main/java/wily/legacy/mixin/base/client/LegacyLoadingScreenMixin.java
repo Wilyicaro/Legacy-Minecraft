@@ -44,6 +44,7 @@ public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
                 if (minecraft.level != null && minecraft.level.dimension() != Level.OVERWORLD) {
                     genericLoading = true;
                 }
+                progress = p.progress / 100f;
             }
             if (self() instanceof ConnectScreen p) {
                 lastLoadingHeader = p.status;

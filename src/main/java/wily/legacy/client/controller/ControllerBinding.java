@@ -20,7 +20,7 @@ import java.util.function.Function;
 public class ControllerBinding<T extends BindingState> {
     public static final Map<String,ControllerBinding<?>> map = new Object2ObjectLinkedOpenHashMap<>();
     public static final Codec<ControllerBinding<?>> CODEC = Codec.STRING.xmap(ControllerBinding::getOrCreate, ControllerBinding::getKey);
-    public static final Codec<Optional<ControllerBinding<?>>> OPTIONAL_CODEC = Codec.STRING.xmap(s->s.equals("none") ? Optional.empty() : Optional.ofNullable(getOrCreate(s)), b-> b.map(ControllerBinding::getKey).orElse("none"));
+    public static final Codec<Optional<ControllerBinding<?>>> OPTIONAL_CODEC = Codec.STRING.xmap(s ->s .equals("none") ? Optional.empty() : Optional.ofNullable(getOrCreate(s)), b -> b.map(ControllerBinding::getKey).orElse("none"));
     private static final Map<ControllerBinding<?>, Function<Options, List<KeyMapping>>> defaultKeyMappingByBinding = new HashMap<>();
     public final Function<ControllerBinding<T>, T> stateConstructor;
     public final T bindingState;

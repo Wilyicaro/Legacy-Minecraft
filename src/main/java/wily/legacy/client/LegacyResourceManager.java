@@ -1,6 +1,8 @@
 package wily.legacy.client;
 
+import com.google.common.base.Charsets;
 import com.google.gson.*;
+import com.google.gson.stream.JsonWriter;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
@@ -23,12 +25,16 @@ import wily.legacy.client.screen.KeyboardScreen;
 import wily.legacy.util.IOUtil;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
 public class LegacyResourceManager implements ResourceManagerReloadListener {
+    public static final boolean DEBUG = false;
     public static final ResourceLocation GAMEPAD_MAPPINGS = Legacy4J.createModLocation("gamepad_mappings.txt");
     public static final ResourceLocation INTRO_LOCATION = Legacy4J.createModLocation("intro.json");
     public static final ResourceLocation GAMMA_LOCATION = Legacy4J.createModLocation(/*? if >=1.21.2 {*/"gamma" /*?} else {*//*"post_effect/gamma.json"*//*?}*/);
@@ -152,6 +158,28 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
                     Legacy4J.LOGGER.warn(e.getMessage());
                 }
             });
+            if (DEBUG) {
+                File gamePath = new File(Minecraft.getInstance().gameDirectory, "debug_resource_values");
+                gamePath.mkdirs();
+                try (JsonWriter w = new JsonWriter(Files.newBufferedWriter(Path.of(gamePath.getPath(), COMMON_COLORS), Charsets.UTF_8))) {
+                    w.setSerializeNulls(false);
+                    w.setIndent("  ");
+                    JsonObject obj = new JsonObject();
+                    CommonColor.COMMON_COLORS.forEach((id, value) -> obj.add(id.toString(), value.encode(JsonOps.INSTANCE)));
+                    GsonHelper.writeValue(w, obj, null);
+                } catch (IOException exception) {
+                    Legacy4J.LOGGER.warn(exception.getMessage());
+                }
+                try (JsonWriter w = new JsonWriter(Files.newBufferedWriter(Path.of(gamePath.getPath(), COMMON_VALUES), Charsets.UTF_8))) {
+                    w.setSerializeNulls(false);
+                    w.setIndent("  ");
+                    JsonObject obj = new JsonObject();
+                    CommonValue.COMMON_VALUES.forEach((id, value) -> obj.add(id.toString(), value.encode(JsonOps.INSTANCE)));
+                    GsonHelper.writeValue(w, obj, null);
+                } catch (IOException exception) {
+                    Legacy4J.LOGGER.warn(exception.getMessage());
+                }
+            }
             addKbmIcons(resourceManager, FactoryAPI.createLocation(name, DEFAULT_KBM_ICONS), (s, b) -> {
                 for (ControlType value : Legacy4JClient.controlTypesManager.map().values())
                     if (value.isKbm()) value.icons().put(s, b);

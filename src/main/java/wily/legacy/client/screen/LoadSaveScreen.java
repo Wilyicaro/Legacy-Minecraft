@@ -181,6 +181,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         resourceAlbumSelector.setY(panel.y + 112);
         resourceAlbumSelector.setWidth(getLayoutWidth());
         addRenderableWidget(accessor.putWidget("resourceAlbumSelector", resourceAlbumSelector));
+        resourceAlbumSelector.hasTooltip = !LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(this));
     }
 
     public void onLoad() {

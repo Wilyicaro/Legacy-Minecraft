@@ -220,7 +220,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
             if (!statsBoards.isEmpty() && selectedStatBoard < statsBoards.size()) {
                 StatsBoard board = statsBoards.get(selectedStatBoard);
                 LegacyFontUtil.applyFontOverrideIf(LegacyOptions.getUIMode().isHD(), LegacyFontUtil.MOJANGLES_11_FONT, b -> {
-                    float topTooltipScale = accessor.getFloat("topTooltip.scale", LegacyOptions.getUIMode().isHD() ? 2 / 3f : 1.0f);
+                    float topTooltipScale = accessor.getFloat("topTooltip.scale", LegacyOptions.getUIMode().isFHD() ? 2 / 3f : 1.0f);
                     guiGraphics.pose().pushMatrix();
                     Component filter = Component.translatable("legacy.menu.leaderboard.filter", this.filter.get() == 0 ? OVERALL : MY_SCORE);
                     guiGraphics.pose().translate(filterTooltipX + (filterTooltipWidth - font.width(filter) * topTooltipScale) / 2, topTooltipY + accessor.getInteger("filterText.y", 6));

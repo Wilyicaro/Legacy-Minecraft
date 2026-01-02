@@ -304,7 +304,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
         private final Path packPath;
         private final Consumer<Selector> reloadChanges;
         private final FactoryConfig<GlobalPacks> globalPacks;
-        private final boolean hasTooltip;
+        public boolean hasTooltip;
         private final PackRepository packRepository;
         private final Minecraft minecraft;
         public PackAlbum savedAlbum;

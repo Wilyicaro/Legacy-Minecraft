@@ -149,9 +149,9 @@ public class ControllerManager {
                 controller.connect(this);
 			    if (controller.hasLED()) {
                     controller.setLED(
-                    (byte)LegacyOptions.controllerLedRed.get().intValue(),
-                    (byte)LegacyOptions.controllerLedGreen.get().intValue(),
-                    (byte)LegacyOptions.controllerLedBlue.get().intValue()
+                            LegacyOptions.controllerLedRed.get().byteValue(),
+                            LegacyOptions.controllerLedGreen.get().byteValue(),
+                            LegacyOptions.controllerLedBlue.get().byteValue()
                     );
                 }
             } else safeDisconnect();
@@ -185,10 +185,10 @@ public class ControllerManager {
 
 			if (controller.hasLED())
                 controller.setLED(
-                (byte)LegacyOptions.controllerLedRed.get().intValue(),
-                (byte)LegacyOptions.controllerLedGreen.get().intValue(),
-                (byte)LegacyOptions.controllerLedBlue.get().intValue()
-            );
+                        LegacyOptions.controllerLedRed.get().byteValue(),
+                        LegacyOptions.controllerLedGreen.get().byteValue(),
+                        LegacyOptions.controllerLedBlue.get().byteValue()
+                );
 
             if (state.is(ControllerBinding.START) && state.justPressed)
                 if (minecraft.screen == null) minecraft.pauseGame(false);

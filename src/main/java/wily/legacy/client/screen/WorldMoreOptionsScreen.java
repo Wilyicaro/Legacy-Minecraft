@@ -62,32 +62,13 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         editBox.setValue(parent.getUiState().getSeed());
         editBox.setResponder(string -> parent.getUiState().setSeed(editBox.getValue()));
         renderableVList.addRenderable(editBox);
-        renderableVList.addRenderable(SimpleLayoutRenderable.create(0, 9, r -> ((guiGraphics, i, j, f) -> guiGraphics.drawString(Minecraft.getInstance().font, SEED_INFO, r.x + 1, r.y + 2, CommonColor.INVENTORY_GRAY_TEXT.get(), false))));
+        renderableVList.addRenderable(SimpleLayoutRenderable.createDrawString(SEED_INFO,1, 2, 0, 9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
         renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isGenerateStructures(), b -> Component.translatable("selectWorld.mapFeatures"), b -> Tooltip.create(Component.translatable("selectWorld.mapFeatures.info")), b -> parent.getUiState().setGenerateStructures(b.selected)));
         renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isBonusChest(), b -> Component.translatable("selectWorld.bonusItems"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.bonusItems.description")), b -> parent.getUiState().setBonusChest(b.selected)));
+        renderableVList.addRenderable(SimpleLayoutRenderable.createDrawString(Component.translatable("selectWorld.mapType"), 0, 2, 0, 9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
         renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 0, 16,
-                s -> s.getDefaultMessage(Component.translatable("selectWorld.mapType"),
-                        s.getObjectValue().describePreset()),
-                b -> {
-                    Holder<WorldPreset> holder = parent.getUiState().getWorldType().preset();
-                    if (holder == null)
-                        return null;
-                    String id = holder.unwrapKey().map(key -> key.location().toString()).orElse("minecraft:custom");
-                    if (id.equals("minecraft:amplified")) {
-                        return Tooltip.create(
-                                Component.translatable("legacy.menu.selectWorld.mapType.amplified.description"));
-                    } else if (id.equals("minecraft:flat")) {
-                        return Tooltip
-                                .create(Component.translatable("legacy.menu.selectWorld.mapType.flat.description"));
-                    } else if (id.equals("minecraft:large_biomes")) {
-                        return Tooltip.create(
-                                Component.translatable("legacy.menu.selectWorld.mapType.large_biomes.description"));
-                    } else if (id.equals("minecraft:single_biome_surface")) {
-                        return Tooltip.create(Component
-                                .translatable("legacy.menu.selectWorld.mapType.single_biome_surface.description"));
-                    }
-                    return Tooltip.create(Component.translatable("legacy.menu.selectWorld.mapType.description"));
-                },
+                s -> s.getObjectValue().describePreset(),
+                b -> Tooltip.create(LegacyComponents.getWorldTypeDescription(b.getObjectValue().preset())),
                 parent.getUiState().getWorldType(),
                 () -> CycleButton.DEFAULT_ALT_LIST_SELECTOR.getAsBoolean() ? parent.getUiState().getAltPresetList()
                         : parent.getUiState().getNormalPresetList(),
@@ -97,31 +78,12 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             if (presetEditor != null)
                 minecraft.setScreen(presetEditor.createEditScreen(parent, parent.getUiState().getSettings()));
         }).tooltip(Tooltip.create(Component.empty())).build();
-        parent.getUiState().addListener(s -> {customizeButton.active = !s.isDebug() && s.getPresetEditor() != null;
-            Holder<WorldPreset> holder = s.getWorldType().preset();
-            Component desc;
-            if (holder == null) {
-                desc = Component.translatable("legacy.menu.selectWorld.mapType.customize.description");
-            } else {
-                String id = holder.unwrapKey().map(key -> key.location().toString()).orElse("minecraft:custom");
-                if (id.equals("minecraft:flat")) {
-                    desc = Component.translatable("legacy.menu.selectWorld.mapType.flat.customize.description");
-                } else if (id.equals("minecraft:single_biome_surface")) {
-                    desc = Component
-                            .translatable("legacy.menu.selectWorld.mapType.single_biome_surface.customize.description");
-                } else {
-                    desc = Component.translatable("legacy.menu.selectWorld.mapType.customize.description");
-                }
-            }
-            customizeButton.setTooltip(Tooltip.create(desc));
+        parent.getUiState().addListener(s -> {
+            customizeButton.active = !s.isDebug() && s.getPresetEditor() != null;
+            customizeButton.setTooltip(Tooltip.create(LegacyComponents.getWorldPresetCustomizeDescription(s.getWorldType().preset())));
         });
         renderableVList.addRenderable(customizeButton);
         renderableVList.addRenderable(SimpleLayoutRenderable.create(0, 9, r -> ((guiGraphics, i, j, f) -> {
-            if (customizeButton.active) {
-                guiGraphics.drawString(Minecraft.getInstance().font,
-                        Component.translatable("legacy.menu.selectWorld.mapType.customize.current"), r.x + 1, r.y + 2,
-                        CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-            }
         })));
         TickBox hostPrivileges = new TickBox(0, 0, parent.getUiState()./*? if <1.20.5 {*//*isAllowCheats*//*?} else {*/isAllowCommands/*?}*/(), b -> LegacyComponents.HOST_PRIVILEGES, b -> Tooltip.create(LegacyComponents.HOST_PRIVILEGES_INFO), b -> parent.getUiState()./*? if <1.20.5 {*//*setAllowCheats*//*?} else {*/setAllowCommands/*?}*/(b.selected));
         parent.getUiState().addListener(s -> hostPrivileges.active = !s.isDebug() && !s.isHardcore());

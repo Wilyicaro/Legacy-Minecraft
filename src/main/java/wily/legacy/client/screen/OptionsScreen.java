@@ -48,21 +48,6 @@ public class OptionsScreen extends PanelVListScreen {
         });
     }
 
-    public OptionsScreen(Screen parent, Panel.Constructor<OptionsScreen> panelConstructor, Component component, Renderable... renderables) {
-        this(parent, panelConstructor, component);
-        renderableVList.addRenderables(renderables);
-    }
-
-    public OptionsScreen(Screen parent, Panel.Constructor<OptionsScreen> panelConstructor, Component component, FactoryConfig<?>... options) {
-        this(parent, panelConstructor, component);
-        renderableVList.addOptions(options);
-    }
-
-    public OptionsScreen(Screen parent, Panel.Constructor<OptionsScreen> panelConstructor, Component component, Stream<FactoryConfig<?>> options) {
-        this(parent, panelConstructor, component);
-        renderableVList.addOptions(options);
-    }
-
     public static void setupSelectorControlTooltips(ControlTooltip.Renderer renderer, Screen screen) {
         renderer.add(() -> ControlType.getActiveType().isKbm() ? CompoundComponentIcon.of(getKeyIcon(InputConstants.KEY_LSHIFT), PLUS_ICON, getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT)) : null, () -> ControlTooltip.getKeyMessage(InputConstants.MOUSE_BUTTON_LEFT, screen));
         renderer.add(ControlTooltip.EXTRA::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_X, screen));

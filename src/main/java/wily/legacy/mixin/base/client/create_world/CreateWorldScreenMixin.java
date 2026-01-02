@@ -133,6 +133,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         resourceAlbumSelector.setY(panel.y + 106);
         resourceAlbumSelector.setWidth(layoutWidth);
         addRenderableWidget(accessor.putWidget("resourceAlbumSelector", resourceAlbumSelector));
+        resourceAlbumSelector.hasTooltip = !LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(this));
         this.uiState.onChanged();
     }
 

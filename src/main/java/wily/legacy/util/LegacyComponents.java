@@ -1,8 +1,11 @@
 package wily.legacy.util;
 
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.presets.WorldPreset;
+import net.minecraft.world.level.levelgen.presets.WorldPresets;
 import wily.factoryapi.FactoryAPI;
 import wily.legacy.client.LegacyTipManager;
 
@@ -195,6 +198,46 @@ public class LegacyComponents {
     public static final Component ZOOM_MAP = Component.translatable("legacy.container.zoomMap");
     public static final Component COPY_MAP = Component.translatable("legacy.container.copyMap");
     public static final Component LOCK_MAP = Component.translatable("legacy.container.lockMap");
+    public static final Component WORLD_TYPE_DESCRIPTION = Component.translatable("legacy.menu.selectWorld.mapType.description");
+    public static final Component FLAT_DESCRIPTION = Component.translatable("legacy.menu.selectWorld.mapType.flat.description");
+    public static final Component AMPLIFIED_DESCRIPTION = Component.translatable("legacy.menu.selectWorld.mapType.amplified.description");
+    public static final Component LARGE_BIOMES_DESCRIPTION = Component.translatable("legacy.menu.selectWorld.mapType.large_biomes.description");
+    public static final Component SINGLE_BIOME_DESCRIPTION = Component.translatable("legacy.menu.selectWorld.mapType.single_biome_surface.description");
+    public static final Component FLAT_CUSTOMIZE_DESCRIPTION = Component.translatable("legacy.menu.selectWorld.mapType.flat.customize.description");
+    public static final Component SINGLE_BIOME_CUSTOMIZE_DESCRIPTION = Component.translatable("legacy.menu.selectWorld.mapType.single_biome_surface.customize.description");
+    public static final Component WORLD_TYPE_CUSTOMIZE_DESCRIPTION = Component.translatable("legacy.menu.selectWorld.mapType.customize.description");
+    public static final Component CONTROLLER_LED_PREVIEW = Component.translatable("legacy.options.controllerLedPreview");
+
+    public static Component getWorldTypeDescription(Holder<WorldPreset> preset) {
+        Component presetDescription = getWorldPresetDescription(preset);
+        return presetDescription == null ? WORLD_TYPE_DESCRIPTION : WORLD_TYPE_DESCRIPTION.copy().append("\n\n").append(presetDescription);
+    }
+
+    public static Component getWorldPresetDescription(Holder<WorldPreset> preset) {
+        if (preset == null)
+            return null;
+        else if (preset.is(WorldPresets.AMPLIFIED))
+            return AMPLIFIED_DESCRIPTION;
+        else if (preset.is(WorldPresets.FLAT))
+            return FLAT_DESCRIPTION;
+        else if (preset.is(WorldPresets.LARGE_BIOMES))
+            return LARGE_BIOMES_DESCRIPTION;
+        else if (preset.is(WorldPresets.SINGLE_BIOME_SURFACE))
+            return SINGLE_BIOME_DESCRIPTION;
+        else
+            return null;
+    }
+
+    public static Component getWorldPresetCustomizeDescription(Holder<WorldPreset> preset) {
+        if (preset == null)
+            return WORLD_TYPE_CUSTOMIZE_DESCRIPTION;
+        else if (preset.is(WorldPresets.FLAT))
+            return FLAT_CUSTOMIZE_DESCRIPTION;
+        else if (preset.is(WorldPresets.SINGLE_BIOME_SURFACE))
+            return SINGLE_BIOME_CUSTOMIZE_DESCRIPTION;
+        else
+            return WORLD_TYPE_CUSTOMIZE_DESCRIPTION;
+    }
 
     public static Component optionName(String key) {
         return Component.translatable("legacy.options." + key);

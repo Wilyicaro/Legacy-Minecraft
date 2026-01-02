@@ -28,7 +28,7 @@ WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
 
 <img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/modpage_official_projects.png?raw=true" width="600" >
 
-- [Alpha4J](https://modrinth.com/mod/alpha4j) | An Alternative For Alpha 1.2.6!
+- [AlphaJam](https://modrinth.com/mod/alphajam) | A Quality of Life mod for a1.2.6 with a bit of Legacy Console Edition flavor.
 - [Re-Console](https://modrinth.com/modpack/legacy-minecraft) | Better performance, all tutorial worlds, and more!
 - [Simply Legacy](https://modrinth.com/modpack/simply-legacy) | Designed to bring a more vanilla-focused, close-to-home Legacy Console Edition experience.
 
@@ -44,6 +44,7 @@ WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
 - Cjanator38 and NicSonic for making HD Control Icons for Xbox 360, Playstation 5, Switch and Stadia
 - Androser for contributing to the controller bindings
 - pizzart for contributing with some QOL and accuracy changes
+- Nabouna32 for contributing with option tooltips and controller LED RGB options
 
 <img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/modpage_related_projects.png?raw=true" width="600" >
 
