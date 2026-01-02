@@ -63,8 +63,6 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         editBox.setResponder(string -> parent.getUiState().setSeed(editBox.getValue()));
         renderableVList.addRenderable(editBox);
         renderableVList.addRenderable(SimpleLayoutRenderable.createDrawString(SEED_INFO,1, 2, 0, 9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
-        renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isGenerateStructures(), b -> Component.translatable("selectWorld.mapFeatures"), b -> Tooltip.create(Component.translatable("selectWorld.mapFeatures.info")), b -> parent.getUiState().setGenerateStructures(b.selected)));
-        renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isBonusChest(), b -> Component.translatable("selectWorld.bonusItems"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.bonusItems.description")), b -> parent.getUiState().setBonusChest(b.selected)));
         renderableVList.addRenderable(SimpleLayoutRenderable.createDrawString(Component.translatable("selectWorld.mapType"), 0, 2, 0, 9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
         renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 0, 16,
                 s -> s.getObjectValue().describePreset(),
@@ -83,6 +81,8 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             customizeButton.setTooltip(Tooltip.create(LegacyComponents.getWorldPresetCustomizeDescription(s.getWorldType().preset())));
         });
         renderableVList.addRenderable(customizeButton);
+        renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isGenerateStructures(), b -> Component.translatable("selectWorld.mapFeatures"), b -> Tooltip.create(Component.translatable("selectWorld.mapFeatures.info")), b -> parent.getUiState().setGenerateStructures(b.selected)));
+        renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isBonusChest(), b -> Component.translatable("selectWorld.bonusItems"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.bonusItems.description")), b -> parent.getUiState().setBonusChest(b.selected)));
         renderableVList.addRenderable(SimpleLayoutRenderable.create(0, 9, r -> ((guiGraphics, i, j, f) -> {
         })));
         TickBox hostPrivileges = new TickBox(0, 0, parent.getUiState()./*? if <1.20.5 {*//*isAllowCheats*//*?} else {*/isAllowCommands/*?}*/(), b -> LegacyComponents.HOST_PRIVILEGES, b -> Tooltip.create(LegacyComponents.HOST_PRIVILEGES_INFO), b -> parent.getUiState()./*? if <1.20.5 {*//*setAllowCheats*//*?} else {*/setAllowCommands/*?}*/(b.selected));
