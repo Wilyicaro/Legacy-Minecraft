@@ -522,7 +522,7 @@ public interface ControlTooltip {
     }
 
     static boolean canDyeEntity(Minecraft minecraft, ItemStack usedItem) {
-        return usedItem.getItem() instanceof DyeItem && minecraft.hitResult instanceof EntityHitResult result && (result.getEntity() instanceof Wolf w && w.isTame() || result.getEntity() instanceof Sheep || result.getEntity() instanceof Cat c && c.isTame());
+        return usedItem.getItem() instanceof DyeItem dye && minecraft.hitResult instanceof EntityHitResult result && minecraft.player != null && (result.getEntity() instanceof Sheep sheep && sheep.getColor() != dye.getDyeColor() || result.getEntity() instanceof Wolf w && w.isTame() && w.isOwnedBy(minecraft.player) && w.getCollarColor() != dye.getDyeColor() || result.getEntity() instanceof Cat c && c.isTame() && c.isOwnedBy(minecraft.player) && c.getCollarColor() != dye.getDyeColor());
     }
 
     Icon getIcon();
