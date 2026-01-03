@@ -329,7 +329,7 @@ public interface ControlTooltip {
         BlockState blockState = blockHit == null ? null : minecraft.level.getBlockState(blockHit.getBlockPos());
         Entity entity = minecraft.hitResult instanceof EntityHitResult r ? r.getEntity() : null;
         if (minecraft.player.isSleeping()) return LegacyComponents.WAKE_UP;
-        if ((blockState != null && (blockState.getBlock() instanceof ButtonBlock || blockState.getBlock() instanceof LeverBlock || blockState.getBlock() instanceof DoorBlock || blockState.getBlock() instanceof TrapDoorBlock || blockState.getBlock() instanceof FenceGateBlock || blockState.getBlock() instanceof BellBlock|| blockState.getBlock() instanceof EnderChestBlock || (blockState.getMenuProvider(minecraft.level, blockHit.getBlockPos()) != null || minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof MenuProvider))))
+        if ((blockState != null && (blockState.getBlock() instanceof ButtonBlock || blockState.getBlock() instanceof LeverBlock || blockState.getBlock() instanceof DoorBlock || blockState.getBlock() instanceof TrapDoorBlock || blockState.getBlock() instanceof FenceGateBlock || blockState.getBlock() instanceof EnderChestBlock || (blockState.getMenuProvider(minecraft.level, blockHit.getBlockPos()) != null || minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof MenuProvider))))
             return (blockState.getBlock() instanceof AbstractChestBlock<?> || blockState.getBlock() instanceof ShulkerBoxBlock || blockState.getBlock() instanceof BarrelBlock || blockState.getBlock() instanceof HopperBlock || blockState.getBlock() instanceof DropperBlock) ? LegacyComponents.OPEN : LegacyComponents.USE;
         if (minecraft.hitResult instanceof EntityHitResult r && (r.getEntity() instanceof AbstractVillager m && (!(m instanceof Villager v) || /*? if <1.21.5 {*//*v.getVillagerData().getProfession() != VillagerProfession.NONE*//*?} else {*/!v.getVillagerData().profession().is(VillagerProfession.NONE)/*?}*/) && !m.isTrading()))
             return LegacyComponents.TRADE;
@@ -345,6 +345,8 @@ public interface ControlTooltip {
             return LegacyComponents.INVERT;
         if (blockState != null && blockState.getBlock() instanceof SignBlock)
             return LegacyComponents.EDIT;
+        if (blockState != null && blockState.getBlock() instanceof BellBlock)
+            return LegacyComponents.RING;
 
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack actualItem = minecraft.player.getItemInHand(hand);
