@@ -207,6 +207,9 @@ public class LegacyComponents {
     public static final Component SINGLE_BIOME_CUSTOMIZE_DESCRIPTION = Component.translatable("legacy.menu.selectWorld.mapType.single_biome_surface.customize.description");
     public static final Component WORLD_TYPE_CUSTOMIZE_DESCRIPTION = Component.translatable("legacy.menu.selectWorld.mapType.customize.description");
     public static final Component CONTROLLER_LED_PREVIEW = Component.translatable("legacy.options.controllerLedPreview");
+    public static final Component EDIT = Component.translatable("legacy.action.edit");
+    public static final Component MILK = Component.translatable("legacy.action.milk");
+    public static final Component DOUSE = Component.translatable("legacy.action.douse");
 
     public static Component getWorldTypeDescription(Holder<WorldPreset> preset) {
         Component presetDescription = getWorldPresetDescription(preset);
