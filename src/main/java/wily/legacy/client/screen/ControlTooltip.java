@@ -39,6 +39,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.*;
+import net.minecraft.world.entity.animal.allay.Allay;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
@@ -376,6 +377,21 @@ public interface ControlTooltip {
                 } else if (holdingBook) {
                     return LegacyComponents.PLACE;
                 }
+            }
+        }
+        if (minecraft.hitResult instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof Allay allay) {
+            ItemStack allayItem = allay.getItemInHand(InteractionHand.MAIN_HAND);
+            if (minecraft.player.getMainHandItem().isEmpty() &&
+                    minecraft.player.getOffhandItem().isEmpty() &&
+                    !allayItem.isEmpty() &&
+                    !allayItem.is(Items.LEAD) && !allayItem.is(Items.NAME_TAG)) {
+                return LegacyComponents.TAKE;
+            }
+            boolean holdingValidItem = !minecraft.player.getMainHandItem().isEmpty() &&
+                    !minecraft.player.getMainHandItem().is(Items.LEAD) &&
+                    !minecraft.player.getMainHandItem().is(Items.NAME_TAG);
+            if (allayItem.isEmpty() && holdingValidItem) {
+                return LegacyComponents.GIVE;
             }
         }
 

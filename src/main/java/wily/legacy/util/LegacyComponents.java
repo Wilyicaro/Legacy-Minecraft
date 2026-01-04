@@ -212,6 +212,7 @@ public class LegacyComponents {
     public static final Component DOUSE = Component.translatable("legacy.action.douse");
     public static final Component RING = Component.translatable("legacy.action.ring");
     public static final Component MOISTEN = Component.translatable("legacy.action.moisten");
+    public static final Component GIVE = Component.translatable("legacy.action.give");
 
     public static Component getWorldTypeDescription(Holder<WorldPreset> preset) {
         Component presetDescription = getWorldPresetDescription(preset);
