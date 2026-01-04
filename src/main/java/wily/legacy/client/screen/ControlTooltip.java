@@ -33,6 +33,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.InteractionHand;
@@ -402,6 +403,22 @@ public interface ControlTooltip {
 
             if (actualItem.is(Items.GLASS_BOTTLE) && blockState != null && (blockState.getBlock() instanceof BeehiveBlock) && blockState.getValue(BeehiveBlock.HONEY_LEVEL) >= 5)
                 return LegacyComponents.COLLECT;
+            if (actualItem.is(Items.GLASS_BOTTLE) && blockHit != null) {
+                BlockState targetState = minecraft.level.getBlockState(blockHit.getBlockPos());
+                if (targetState.getBlock() instanceof AbstractCauldronBlock) {
+                    if (targetState.hasProperty(LayeredCauldronBlock.LEVEL)
+                            && targetState.getValue(LayeredCauldronBlock.LEVEL) > 0) {
+                        return LegacyComponents.COLLECT;
+                    }
+                }
+                BlockHitResult fluidHit = Item.getPlayerPOVHitResult(minecraft.level, minecraft.player,
+                        ClipContext.Fluid.SOURCE_ONLY);
+                if (fluidHit != null && fluidHit.getType() != HitResult.Type.MISS) {
+                    if (minecraft.level.getFluidState(fluidHit.getBlockPos()).is(FluidTags.WATER)) {
+                        return LegacyComponents.COLLECT;
+                    }
+                }
+            }
 
             if (blockHit != null && LegacyItemUtil.isDyeableItem(actualItem.getItemHolder()) && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof WaterCauldronBlockEntity be) {
                 if (be.waterColor == null && LegacyItemUtil.isDyedItem(actualItem)) return LegacyComponents.CLEAR;
