@@ -51,7 +51,10 @@ import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.entity.vehicle.ChestBoat;
+import net.minecraft.world.entity.vehicle.MinecartChest;
 import net.minecraft.world.entity.vehicle.MinecartFurnace;
+import net.minecraft.world.entity.vehicle.MinecartHopper; 
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.*;
@@ -459,6 +462,10 @@ public interface ControlTooltip {
             if (actualItem.getItem() instanceof SpyglassItem) return LegacyComponents.ZOOM;
         }
         if (entity instanceof AbstractHorse h && h.isTamed() && minecraft.player.isSecondaryUseActive())
+            return LegacyComponents.OPEN;
+        if (entity instanceof MinecartChest || entity instanceof MinecartHopper)
+            return LegacyComponents.OPEN;
+        if (entity instanceof ChestBoat && minecraft.player.isShiftKeyDown())
             return LegacyComponents.OPEN;
         if (entity != null && entity.canAddPassenger(minecraft.player) && minecraft.player.canRide(entity)) {
             if (entity instanceof Boat) return LegacyComponents.SAIL;
