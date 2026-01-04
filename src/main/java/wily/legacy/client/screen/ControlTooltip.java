@@ -65,8 +65,9 @@ import net.minecraft.world.item.crafting.RecipePropertySet;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.entity.CampfireBlockEntity;
+import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -351,6 +352,32 @@ public interface ControlTooltip {
             return LegacyComponents.EDIT;
         if (blockState != null && blockState.getBlock() instanceof BellBlock)
             return LegacyComponents.RING;
+        if (blockHit != null && blockState != null
+                && blockState.getBlock() instanceof ChiseledBookShelfBlock chiseledBlock) {
+            OptionalInt slotOpt = chiseledBlock.getHitSlot(blockHit, blockHit.getDirection());
+
+            if (slotOpt.isPresent()) {
+                int slot = slotOpt.getAsInt();
+                BooleanProperty slotProperty = ChiseledBookShelfBlock.SLOT_OCCUPIED_PROPERTIES.get(slot);
+                boolean slotHasBook = blockState.getValue(slotProperty);
+
+                boolean holdingBook = false;
+                for (InteractionHand hand : InteractionHand.values()) {
+                    ItemStack item = minecraft.player.getItemInHand(hand);
+                    if (!item.isEmpty() && (item.is(Items.BOOK) || item.is(Items.ENCHANTED_BOOK) ||
+                            item.is(Items.WRITABLE_BOOK) || item.is(Items.WRITTEN_BOOK))) {
+                        holdingBook = true;
+                        break;
+                    }
+                }
+
+                if (slotHasBook) {
+                    return LegacyComponents.REMOVE;
+                } else if (holdingBook) {
+                    return LegacyComponents.PLACE;
+                }
+            }
+        }
 
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack actualItem = minecraft.player.getItemInHand(hand);
