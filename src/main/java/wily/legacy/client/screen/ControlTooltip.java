@@ -462,7 +462,7 @@ public interface ControlTooltip {
             if (canDyeEntity(minecraft, actualItem)) return LegacyComponents.DYE;
             if (actualItem.is(Items.IRON_INGOT) && entity instanceof IronGolem g && g.getHealth() < g.getMaxHealth())
                 return LegacyComponents.REPAIR;
-            if (entity instanceof MinecartFurnace && actualItem.is(ItemTags.COALS)) return LegacyComponents.USE;
+            if (entity instanceof MinecartFurnace && actualItem.is(ItemTags.COALS)) return LegacyComponents.FUEL;
             if (entity instanceof TamableAnimal a && a.isTame() && a.isFood(actualItem) && a.getHealth() < a.getMaxHealth())
                 return LegacyComponents.HEAL;
             if (entity instanceof TamableAnimal a && a.isTame() && a.isOwnedBy(minecraft.player))
