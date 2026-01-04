@@ -423,6 +423,18 @@ public interface ControlTooltip {
 
             if (actualItem.is(Items.GLASS_BOTTLE) && blockState != null && (blockState.getBlock() instanceof BeehiveBlock) && blockState.getValue(BeehiveBlock.HONEY_LEVEL) >= 5)
                 return LegacyComponents.COLLECT;
+            if (blockState != null && blockState.getBlock() instanceof EndPortalFrameBlock) {
+                if (!blockState.getValue(EndPortalFrameBlock.HAS_EYE) &&
+                        actualItem.is(Items.ENDER_EYE)) {
+                    return LegacyComponents.INSERT;
+                }
+                return null;
+            }
+            if (actualItem.is(Items.GLOWSTONE) && blockState != null &&
+                    blockState.getBlock() instanceof RespawnAnchorBlock &&
+                    blockState.getValue(RespawnAnchorBlock.CHARGE) < 4) {
+                return LegacyComponents.CHARGE;
+            }
             if (actualItem.is(Items.GLASS_BOTTLE) && blockHit != null) {
                 BlockState targetState = minecraft.level.getBlockState(blockHit.getBlockPos());
                 if (targetState.getBlock() instanceof AbstractCauldronBlock) {
