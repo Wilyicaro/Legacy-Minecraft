@@ -45,6 +45,7 @@ import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.animal.horse.Llama;
 import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
@@ -462,6 +463,8 @@ public interface ControlTooltip {
             if (canTill(minecraft, hand, actualItem)) return LegacyComponents.TILL;
             if (actualItem.getItem() instanceof ShovelItem && blockState != null && blockState.getBlock() instanceof CampfireBlock && blockState.getValue(CampfireBlock.LIT))
                 return LegacyComponents.DOUSE;
+            if (entity instanceof Piglin && actualItem.is(Items.GOLD_INGOT))
+                return LegacyComponents.TRADE;
             if (actualItem.getItem() instanceof AxeItem && blockState != null && AxeItem.STRIPPABLES.get(blockState.getBlock()) != null && !(hand.equals(InteractionHand.MAIN_HAND) && minecraft.player.getOffhandItem().is(Items.SHIELD) && !minecraft.player.isSecondaryUseActive()))
                 return LegacyComponents.PEEL_BARK;
             if (actualItem.getItem() instanceof ShovelItem && blockState != null && minecraft.level.getBlockState(blockHit.getBlockPos().above()).isAir() && ShovelItem.FLATTENABLES.get(blockState.getBlock()) != null)
