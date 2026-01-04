@@ -450,6 +450,13 @@ public interface ControlTooltip {
             }
             if (/*? if <1.21.5 {*//*actualItem.getItem() instanceof SaddleItem && *//*?}*/minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof /*? if <1.21.5 {*//*Saddleable*//*?} else {*/ Mob/*?}*/ s &&/*? if <1.21.5 {*//*s.isSaddleable()*//*?} else {*/s.isEquippableInSlot(actualItem, EquipmentSlot.SADDLE)/*?}*/ && !s.isSaddled())
                 return LegacyComponents.SADDLE;
+            if (actualItem.is(Items.POTION) && LegacyItemUtil.getPotionContent(actualItem) != null && LegacyItemUtil.getPotionContent(actualItem).getRegisteredName().equals("minecraft:water") && blockState != null) {
+                if (blockState.is(Blocks.DIRT) || blockState.is(Blocks.COARSE_DIRT) || blockState.is(Blocks.ROOTED_DIRT)) {
+                    return LegacyComponents.MOISTEN;
+                } else if (blockState.is(Blocks.MUD)) {
+                    return LegacyComponents.DRINK;
+                }
+            }
             if ((isEdible(actualItem) && minecraft.player.canEat(false)) || actualItem.getItem() instanceof PotionItem || actualItem.is(Items.MILK_BUCKET))
                 return actualItem.getUseAnimation() == /*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.DRINK || actualItem.is(Items.MILK_BUCKET) ? LegacyComponents.DRINK : LegacyComponents.EAT;
             if (canTill(minecraft, hand, actualItem)) return LegacyComponents.TILL;
