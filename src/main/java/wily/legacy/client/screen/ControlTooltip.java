@@ -22,6 +22,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
@@ -331,6 +332,25 @@ public interface ControlTooltip {
     static Component getActualUse(Minecraft minecraft) {
         if (minecraft.hitResult != null && minecraft.hitResult.getType() != HitResult.Type.MISS && !minecraft.level.getWorldBorder().isWithinBounds(minecraft.hitResult.getLocation().x(), minecraft.hitResult.getLocation().z()))
             return null;
+        if (minecraft.hitResult instanceof BlockHitResult blockHitResult) {
+            BlockPos pos = blockHitResult.getBlockPos();
+            BlockState state = minecraft.level.getBlockState(pos);
+
+            if (state.getBlock() instanceof LecternBlock) {
+                boolean hasBook = state.getValue(LecternBlock.HAS_BOOK);
+
+                if (hasBook) {
+                    return LegacyComponents.READ;
+                }
+                for (InteractionHand hand : InteractionHand.values()) {
+                    ItemStack item = minecraft.player.getItemInHand(hand);
+                    if (item.is(Items.WRITABLE_BOOK) || item.is(Items.WRITTEN_BOOK)) {
+                        return LegacyComponents.PLACE;
+                    }
+                }
+                return null;
+            }
+        }
 
         BlockHitResult blockHit = minecraft.hitResult instanceof BlockHitResult r && r.getType() != HitResult.Type.MISS ? r : null;
         BlockState blockState = blockHit == null ? null : minecraft.level.getBlockState(blockHit.getBlockPos());
@@ -499,6 +519,12 @@ public interface ControlTooltip {
                 return LegacyComponents.MILK;
             if (actualItem.is(Items.WATER_BUCKET) && entity != null && (entity.getType() == EntityType.AXOLOTL || entity.getType() == EntityType.COD || entity.getType() == EntityType.SALMON || entity.getType() == EntityType.TROPICAL_FISH || entity.getType() == EntityType.PUFFERFISH || entity.getType() == EntityType.TADPOLE))
                 return LegacyComponents.COLLECT;
+            if (actualItem.is(Items.WRITABLE_BOOK) || actualItem.is(Items.WRITTEN_BOOK)) {
+                if (actualItem.is(Items.WRITABLE_BOOK)) {
+                    return LegacyComponents.OPEN;
+                }
+                return LegacyComponents.READ;
+            }
 
             BlockHitResult bucketHitResult;
             if (actualItem.getItem() instanceof BucketItem i && (bucketHitResult = mayInteractItemAt(minecraft, actualItem, Item.getPlayerPOVHitResult(minecraft.level, minecraft.player, ItemContainerPlatform.getBucketFluid(i) == Fluids.EMPTY ? ClipContext.Fluid.SOURCE_ONLY : ClipContext.Fluid.NONE))) != null) {
