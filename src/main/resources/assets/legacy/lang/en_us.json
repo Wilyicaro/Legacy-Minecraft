@@ -995,6 +995,7 @@
   "legacy.action.cook": "Cook",
   "legacy.action.create": "Create",
   "legacy.action.dig_path": "Dig Path",
+  "legacy.action.direct": "Direct",
   "legacy.action.dismount": "Dismount",
   "legacy.action.distribute": "Distribute",
   "legacy.action.douse": "Douse",

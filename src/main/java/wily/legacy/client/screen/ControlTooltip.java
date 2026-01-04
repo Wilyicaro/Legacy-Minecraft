@@ -451,6 +451,10 @@ public interface ControlTooltip {
                     }
                 }
             }
+            if (actualItem.is(Items.COMPASS) && blockState != null &&
+                    blockState.getBlock() == Blocks.LODESTONE) {
+                return LegacyComponents.DIRECT;
+            }
 
             if (blockHit != null && LegacyItemUtil.isDyeableItem(actualItem.getItemHolder()) && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof WaterCauldronBlockEntity be) {
                 if (be.waterColor == null && LegacyItemUtil.isDyedItem(actualItem)) return LegacyComponents.CLEAR;
