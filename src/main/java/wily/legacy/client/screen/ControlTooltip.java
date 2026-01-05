@@ -518,12 +518,13 @@ public interface ControlTooltip {
                         return LegacyComponents.COLLECT;
                     }
                 }
-                BlockHitResult fluidHit = Item.getPlayerPOVHitResult(minecraft.level, minecraft.player,
+            }
+            if (actualItem.is(Items.GLASS_BOTTLE)) {
+                BlockHitResult hit = Item.getPlayerPOVHitResult(minecraft.level, minecraft.player,
                         ClipContext.Fluid.SOURCE_ONLY);
-                if (fluidHit != null && fluidHit.getType() != HitResult.Type.MISS) {
-                    if (minecraft.level.getFluidState(fluidHit.getBlockPos()).is(FluidTags.WATER)) {
-                        return LegacyComponents.COLLECT;
-                    }
+                if (hit.getType() == HitResult.Type.BLOCK
+                        && minecraft.level.getFluidState(hit.getBlockPos()).is(FluidTags.WATER)) {
+                    return LegacyComponents.COLLECT;
                 }
             }
             if (actualItem.is(Items.COMPASS) && blockState != null &&
