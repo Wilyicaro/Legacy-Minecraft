@@ -474,7 +474,7 @@ public interface ControlTooltip {
         }
         if (blockHit != null) {
             BlockState cakeState = minecraft.level.getBlockState(blockHit.getBlockPos());
-            if (cakeState.is(Blocks.CAKE) && minecraft.player.getFoodData().getFoodLevel() < 20)
+            if (cakeState.is(Blocks.CAKE) && (minecraft.player.getAbilities().instabuild || minecraft.player.getFoodData().getFoodLevel() < 20))
                 return LegacyComponents.EAT;
         }
 
