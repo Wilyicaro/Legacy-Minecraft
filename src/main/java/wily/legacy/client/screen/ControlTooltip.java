@@ -655,6 +655,13 @@ public interface ControlTooltip {
                 if (!piglin.isBaby() && piglin.getOffhandItem().isEmpty())
                     return LegacyComponents.BARTER;
             }
+            if (actualItem.is(Items.LILY_PAD)) {
+                if (minecraft.hitResult instanceof BlockHitResult hit &&
+                        minecraft.level.getFluidState(hit.getBlockPos()).is(FluidTags.WATER)) {
+                    return LegacyComponents.PLACE;
+                }
+                return null;
+            }
             if (actualItem.getItem() instanceof AxeItem && blockState != null && AxeItem.STRIPPABLES.get(blockState.getBlock()) != null && !(hand.equals(InteractionHand.MAIN_HAND) && minecraft.player.getOffhandItem().is(Items.SHIELD) && !minecraft.player.isSecondaryUseActive()))
                 return LegacyComponents.PEEL_BARK;
             if (actualItem.getItem() instanceof ShovelItem && blockState != null && minecraft.level.getBlockState(blockHit.getBlockPos().above()).isAir() && ShovelItem.FLATTENABLES.get(blockState.getBlock()) != null)
