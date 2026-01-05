@@ -223,6 +223,7 @@ public class LegacyComponents {
     public static final Component REMOVE_GLOW = Component.translatable("legacy.action.remove_glow");
     public static final Component WAX = Component.translatable("legacy.action.wax");
     public static final Component SCRAPE = Component.translatable("legacy.action.scrape");
+    public static final Component BARTER = Component.translatable("legacy.action.barter");
 
     public static Component getWorldTypeDescription(Holder<WorldPreset> preset) {
         Component presetDescription = getWorldPresetDescription(preset);

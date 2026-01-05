@@ -637,7 +637,7 @@ public interface ControlTooltip {
             if (actualItem.getItem() instanceof ShovelItem && blockState != null && blockState.getBlock() instanceof CampfireBlock && blockState.getValue(CampfireBlock.LIT))
                 return LegacyComponents.DOUSE;
             if (entity instanceof Piglin && actualItem.is(Items.GOLD_INGOT))
-                return LegacyComponents.TRADE;
+                return LegacyComponents.BARTER;
             if (actualItem.getItem() instanceof AxeItem && blockState != null && AxeItem.STRIPPABLES.get(blockState.getBlock()) != null && !(hand.equals(InteractionHand.MAIN_HAND) && minecraft.player.getOffhandItem().is(Items.SHIELD) && !minecraft.player.isSecondaryUseActive()))
                 return LegacyComponents.PEEL_BARK;
             if (actualItem.getItem() instanceof ShovelItem && blockState != null && minecraft.level.getBlockState(blockHit.getBlockPos().above()).isAir() && ShovelItem.FLATTENABLES.get(blockState.getBlock()) != null)
