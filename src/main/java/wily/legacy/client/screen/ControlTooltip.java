@@ -483,12 +483,14 @@ public interface ControlTooltip {
 
             if (actualItem.isEmpty()) continue;
 
-            if (blockState.getBlock() instanceof CommandBlock)
-                return LegacyComponents.EDIT;
-            if (blockState.getBlock() instanceof StructureBlock)
-                return LegacyComponents.CONFIGURE;
-            if (blockState.getBlock() instanceof JigsawBlock)
-                return LegacyComponents.CONFIGURE;
+            if (blockHit != null && blockState != null) {
+                if (blockState.getBlock() instanceof CommandBlock)
+                    return LegacyComponents.EDIT;
+                if (blockState.getBlock() instanceof StructureBlock)
+                    return LegacyComponents.CONFIGURE;
+                if (blockState.getBlock() instanceof JigsawBlock)
+                    return LegacyComponents.CONFIGURE;
+            }
             if (blockState != null && blockState.getBlock() instanceof JukeboxBlock) {
                 if (BuiltInRegistries.ITEM.getKey(actualItem.getItem()).getPath().startsWith("music_disc_")) {
                     return LegacyComponents.PLAY;
