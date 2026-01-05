@@ -709,7 +709,7 @@ public interface ControlTooltip {
     }
 
     static boolean isPlant(Block block) {
-        return block instanceof BushBlock || block instanceof SugarCaneBlock || block instanceof GrowingPlantBlock || block instanceof BambooStalkBlock || block instanceof CactusBlock;
+        return block instanceof BushBlock || block instanceof SugarCaneBlock || block instanceof GrowingPlantBlock || block instanceof BambooStalkBlock || block instanceof CactusBlock || block instanceof SaplingBlock || block instanceof FlowerBlock || block instanceof DoublePlantBlock || block instanceof MushroomBlock || block instanceof CropBlock || block instanceof KelpPlantBlock || block instanceof SeagrassBlock || block instanceof StemBlock || block instanceof CocoaBlock;
     }
 
     static boolean isEdible(ItemStack stack) {
