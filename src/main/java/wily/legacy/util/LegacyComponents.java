@@ -224,6 +224,8 @@ public class LegacyComponents {
     public static final Component WAX = Component.translatable("legacy.action.wax");
     public static final Component SCRAPE = Component.translatable("legacy.action.scrape");
     public static final Component BARTER = Component.translatable("legacy.action.barter");
+    public static final Component ADJUST = Component.translatable("legacy.action.adjust");
+    public static final Component CONFIGURE = Component.translatable("legacy.action.configure");
 
     public static Component getWorldTypeDescription(Holder<WorldPreset> preset) {
         Component presetDescription = getWorldPresetDescription(preset);

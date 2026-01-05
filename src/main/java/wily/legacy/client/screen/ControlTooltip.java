@@ -483,6 +483,12 @@ public interface ControlTooltip {
 
             if (actualItem.isEmpty()) continue;
 
+            if (blockState.getBlock() instanceof CommandBlock)
+                return LegacyComponents.EDIT;
+            if (blockState.getBlock() instanceof StructureBlock)
+                return LegacyComponents.CONFIGURE;
+            if (blockState.getBlock() instanceof JigsawBlock)
+                return LegacyComponents.CONFIGURE;
             if (blockState != null && blockState.getBlock() instanceof JukeboxBlock) {
                 if (BuiltInRegistries.ITEM.getKey(actualItem.getItem()).getPath().startsWith("music_disc_")) {
                     return LegacyComponents.PLAY;
@@ -542,6 +548,11 @@ public interface ControlTooltip {
                 return LegacyComponents.FILL;
             if (actualItem.is(Items.WATER_BUCKET)) {
                 return LegacyComponents.EMPTY;
+            }
+            if (actualItem.is(Items.LIGHT) && blockHit != null) {
+                BlockState lightState = minecraft.level.getBlockState(blockHit.getBlockPos());
+                if (lightState.is(Blocks.LIGHT))
+                    return LegacyComponents.ADJUST;
             }
             if (blockState != null && blockState.getBlock() instanceof AbstractCauldronBlock c && (actualItem.is(Items.BUCKET) && c.isFull(blockState) || actualItem.is(Items.POTION) && LegacyItemUtil.getPotionContent(actualItem) == null))
                 return LegacyComponents.COLLECT;
