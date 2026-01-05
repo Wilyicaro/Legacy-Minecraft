@@ -455,6 +455,12 @@ public interface ControlTooltip {
                     blockState.getBlock() == Blocks.LODESTONE) {
                 return LegacyComponents.DIRECT;
             }
+            if (actualItem.is(Items.GOAT_HORN)) {
+                if (!minecraft.player.isUsingItem() && !minecraft.player.getCooldowns().isOnCooldown(actualItem)) {
+                    return LegacyComponents.BLOW;
+                }
+                return null;
+            }
 
             if (blockHit != null && LegacyItemUtil.isDyeableItem(actualItem.getItemHolder()) && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof WaterCauldronBlockEntity be) {
                 if (be.waterColor == null && LegacyItemUtil.isDyedItem(actualItem)) return LegacyComponents.CLEAR;
@@ -498,7 +504,7 @@ public interface ControlTooltip {
             if (/*? if <1.21.2 {*//*actualItem.getItem() instanceof Equipable e*//*?} else {*/actualItem.has(DataComponents.EQUIPPABLE)/*?}*/ && (!/*? if <1.20.5 {*//*(actualItem.getItem() instanceof HorseArmorItem)*//*?} else if <1.21.2 {*//*e.getEquipmentSlot().equals(EquipmentSlot.BODY)*//*?} else {*/actualItem.get(DataComponents.EQUIPPABLE).slot().equals(EquipmentSlot.BODY) /*?}*/ || minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Mob m && /*? if <1.20.5 {*//*m instanceof AbstractHorse h && h.isArmor(actualItem)*//*?} else if <1.21.2 {*//*m.isBodyArmorItem(actualItem)*//*?} else {*/ m.isEquippableInSlot(actualItem, EquipmentSlot.BODY)/*?}*/))
                 return LegacyComponents.EQUIP;
             if (actualItem.getItem() instanceof EmptyMapItem || actualItem.getItem() instanceof FishingRodItem)
-                return LegacyComponents.USE;
+                return LegacyComponents.CAST;
             if (actualItem.getItem() instanceof FireworkRocketItem && (minecraft.player.isFallFlying() || minecraft.hitResult instanceof BlockHitResult && minecraft.hitResult.getType() != HitResult.Type.MISS))
                 return LegacyComponents.LAUNCH;
             if (actualItem.getItem() instanceof ShearsItem) {

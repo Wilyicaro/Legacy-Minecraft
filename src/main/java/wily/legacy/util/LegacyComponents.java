@@ -217,6 +217,8 @@ public class LegacyComponents {
     public static final Component FUEL = Component.translatable("legacy.action.fuel");
     public static final Component INSERT = Component.translatable("legacy.action.insert");
     public static final Component DIRECT = Component.translatable("legacy.action.direct");
+    public static final Component CAST = Component.translatable("legacy.action.cast");
+    public static final Component BLOW = Component.translatable("legacy.action.blow");
 
     public static Component getWorldTypeDescription(Holder<WorldPreset> preset) {
         Component presetDescription = getWorldPresetDescription(preset);
