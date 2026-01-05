@@ -421,6 +421,11 @@ public interface ControlTooltip {
 
             if (actualItem.isEmpty()) continue;
 
+            if (blockState != null && blockState.getBlock() instanceof JukeboxBlock) {
+                if (BuiltInRegistries.ITEM.getKey(actualItem.getItem()).getPath().startsWith("music_disc_")) {
+                    return LegacyComponents.PLAY;
+                }
+            }
             if (actualItem.is(Items.GLASS_BOTTLE) && blockState != null && (blockState.getBlock() instanceof BeehiveBlock) && blockState.getValue(BeehiveBlock.HONEY_LEVEL) >= 5)
                 return LegacyComponents.COLLECT;
             if (blockState != null && blockState.getBlock() instanceof EndPortalFrameBlock) {
