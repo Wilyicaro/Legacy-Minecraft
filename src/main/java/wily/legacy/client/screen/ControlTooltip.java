@@ -546,11 +546,8 @@ public interface ControlTooltip {
                 return LegacyComponents.MIX;
 
 
-            if (blockState != null && blockState.getBlock() instanceof AbstractCauldronBlock c && (actualItem.is(Items.LAVA_BUCKET) || (actualItem.is(Items.POTION) || actualItem.is(Items.SPLASH_POTION) || actualItem.is(Items.LINGERING_POTION)) && (blockState.is(Blocks.CAULDRON) || blockState.is(Blocks.WATER_CAULDRON) && !c.isFull(blockState)) && LegacyItemUtil.getPotionContent(actualItem) != null))
+            if (blockState != null && blockState.getBlock() instanceof AbstractCauldronBlock c && (actualItem.is(Items.WATER_BUCKET) || actualItem.is(Items.LAVA_BUCKET) || (actualItem.is(Items.POTION) || actualItem.is(Items.SPLASH_POTION) || actualItem.is(Items.LINGERING_POTION)) && (blockState.is(Blocks.CAULDRON) || blockState.is(Blocks.WATER_CAULDRON) && !c.isFull(blockState)) && LegacyItemUtil.getPotionContent(actualItem) != null))
                 return LegacyComponents.FILL;
-            if (actualItem.is(Items.WATER_BUCKET)) {
-                return LegacyComponents.EMPTY;
-            }
             if (actualItem.is(Items.LIGHT) && blockHit != null) {
                 BlockState lightState = minecraft.level.getBlockState(blockHit.getBlockPos());
                 if (lightState.is(Blocks.LIGHT))
