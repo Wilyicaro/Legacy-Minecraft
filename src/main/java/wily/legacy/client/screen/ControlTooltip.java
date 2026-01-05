@@ -472,6 +472,11 @@ public interface ControlTooltip {
                 return LegacyComponents.GIVE;
             }
         }
+        if (blockHit != null) {
+            BlockState cakeState = minecraft.level.getBlockState(blockHit.getBlockPos());
+            if (cakeState.is(Blocks.CAKE) && minecraft.player.getFoodData().getFoodLevel() < 20)
+                return LegacyComponents.EAT;
+        }
 
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack actualItem = minecraft.player.getItemInHand(hand);
