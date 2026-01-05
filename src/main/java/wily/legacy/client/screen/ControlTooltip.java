@@ -370,8 +370,6 @@ public interface ControlTooltip {
             return LegacyComponents.EJECT;
         if (blockState != null && blockState.getBlock() instanceof DaylightDetectorBlock)
             return LegacyComponents.INVERT;
-        if (blockState != null && blockState.getBlock() instanceof SignBlock)
-            return LegacyComponents.EDIT;
         if (blockState != null && blockState.getBlock() instanceof BellBlock)
             return LegacyComponents.RING;
         if (blockHit != null && blockState != null
@@ -398,6 +396,47 @@ public interface ControlTooltip {
                 } else if (holdingBook) {
                     return LegacyComponents.PLACE;
                 }
+            }
+        }
+        if (minecraft.hitResult instanceof BlockHitResult r) {
+            BlockState signState = minecraft.level.getBlockState(r.getBlockPos());
+            if (signState.getBlock() instanceof SignBlock ||
+                    signState.getBlock() instanceof CeilingHangingSignBlock ||
+                    signState.getBlock() instanceof WallHangingSignBlock) {
+                if (minecraft.level.getBlockEntity(r.getBlockPos()) instanceof SignBlockEntity sign) {
+                    boolean isFrontText = sign.isFacingFrontText(minecraft.player);
+                    SignText signText = isFrontText ? sign.getFrontText() : sign.getBackText();
+                    boolean isEmpty = true;
+                    for (int i = 0; i < 4; i++) {
+                        if (!signText.getMessage(i, false).getString().isEmpty()) {
+                            isEmpty = false;
+                            break;
+                        }
+                    }
+                    if (isEmpty) {
+                        return LegacyComponents.EDIT;
+                    }
+                    for (InteractionHand hand : InteractionHand.values()) {
+                        ItemStack actualItem = minecraft.player.getItemInHand(hand);
+                        if (actualItem.is(Items.GLOW_INK_SAC)) {
+                            if (!signText.hasGlowingText()) {
+                                return LegacyComponents.GLOW;
+                            }
+                        }
+                        if (actualItem.is(Items.INK_SAC)) {
+                            if (signText.hasGlowingText()) {
+                                return LegacyComponents.REMOVE_GLOW;
+                            }
+                        }
+                        if (actualItem.getItem() instanceof DyeItem dyeItem) {
+                            DyeColor newColor = dyeItem.getDyeColor();
+                            if (signText.getColor() != newColor) {
+                                return LegacyComponents.DYE;
+                            }
+                        }
+                    }
+                }
+                return LegacyComponents.EDIT;
             }
         }
         if (minecraft.hitResult instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof Allay allay) {
