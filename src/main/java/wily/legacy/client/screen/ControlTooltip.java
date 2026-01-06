@@ -332,35 +332,17 @@ public interface ControlTooltip {
     static Component getActualUse(Minecraft minecraft) {
         if (minecraft.hitResult != null && minecraft.hitResult.getType() != HitResult.Type.MISS && !minecraft.level.getWorldBorder().isWithinBounds(minecraft.hitResult.getLocation().x(), minecraft.hitResult.getLocation().z()))
             return null;
-        if (minecraft.hitResult instanceof BlockHitResult blockHitResult) {
-            BlockPos pos = blockHitResult.getBlockPos();
-            BlockState state = minecraft.level.getBlockState(pos);
-
-            if (state.getBlock() instanceof LecternBlock) {
-                boolean hasBook = state.getValue(LecternBlock.HAS_BOOK);
-
-                if (hasBook) {
-                    return LegacyComponents.READ;
-                }
-                for (InteractionHand hand : InteractionHand.values()) {
-                    ItemStack item = minecraft.player.getItemInHand(hand);
-                    if (item.is(Items.WRITABLE_BOOK) || item.is(Items.WRITTEN_BOOK)) {
-                        return LegacyComponents.PLACE;
-                    }
-                }
-                return null;
-            }
-        }
 
         BlockHitResult blockHit = minecraft.hitResult instanceof BlockHitResult r && r.getType() != HitResult.Type.MISS ? r : null;
         BlockState blockState = blockHit == null ? null : minecraft.level.getBlockState(blockHit.getBlockPos());
         Entity entity = minecraft.hitResult instanceof EntityHitResult r ? r.getEntity() : null;
+
         if (minecraft.player.isSleeping()) return LegacyComponents.WAKE_UP;
-        if ((blockState != null && (blockState.getBlock() instanceof ButtonBlock || blockState.getBlock() instanceof LeverBlock || blockState.getBlock() instanceof DoorBlock || blockState.getBlock() instanceof TrapDoorBlock || blockState.getBlock() instanceof FenceGateBlock || blockState.getBlock() instanceof EnderChestBlock || (blockState.getMenuProvider(minecraft.level, blockHit.getBlockPos()) != null || minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof MenuProvider))))
-            return (blockState.getBlock() instanceof AbstractChestBlock<?> || blockState.getBlock() instanceof ShulkerBoxBlock || blockState.getBlock() instanceof BarrelBlock || blockState.getBlock() instanceof HopperBlock || blockState.getBlock() instanceof DropperBlock) ? LegacyComponents.OPEN : LegacyComponents.USE;
         if (minecraft.hitResult instanceof EntityHitResult r && (r.getEntity() instanceof AbstractVillager m && (!(m instanceof Villager v) || /*? if <1.21.5 {*//*v.getVillagerData().getProfession() != VillagerProfession.NONE*//*?} else {*/!v.getVillagerData().profession().is(VillagerProfession.NONE)/*?}*/) && !m.isTrading()))
             return LegacyComponents.TRADE;
         if (entity instanceof ItemFrame itemFrame && !itemFrame.getItem().isEmpty()) return LegacyComponents.ROTATE;
+        if (entity instanceof TamableAnimal a && a.isTame() && a.isOwnedBy(minecraft.player))
+            return a.isInSittingPose() ? LegacyComponents.FOLLOW_ME : LegacyComponents.SIT;
 
         if (blockState != null && blockState.getBlock() instanceof BedBlock) return LegacyComponents.SLEEP;
         if (blockState != null && blockState.getBlock() instanceof NoteBlock) return LegacyComponents.CHANGE_PITCH;
@@ -372,32 +354,30 @@ public interface ControlTooltip {
             return LegacyComponents.INVERT;
         if (blockState != null && blockState.getBlock() instanceof BellBlock)
             return LegacyComponents.RING;
-        if (blockHit != null && blockState != null
-                && blockState.getBlock() instanceof ChiseledBookShelfBlock chiseledBlock) {
-            OptionalInt slotOpt = chiseledBlock.getHitSlot(blockHit, blockHit.getDirection());
-
-            if (slotOpt.isPresent()) {
-                int slot = slotOpt.getAsInt();
-                BooleanProperty slotProperty = ChiseledBookShelfBlock.SLOT_OCCUPIED_PROPERTIES.get(slot);
-                boolean slotHasBook = blockState.getValue(slotProperty);
-
-                boolean holdingBook = false;
-                for (InteractionHand hand : InteractionHand.values()) {
-                    ItemStack item = minecraft.player.getItemInHand(hand);
-                    if (!item.isEmpty() && (item.is(Items.BOOK) || item.is(Items.ENCHANTED_BOOK) ||
-                            item.is(Items.WRITABLE_BOOK) || item.is(Items.WRITTEN_BOOK))) {
-                        holdingBook = true;
-                        break;
-                    }
-                }
-
-                if (slotHasBook) {
-                    return LegacyComponents.REMOVE;
-                } else if (holdingBook) {
+        if (blockState != null && blockState.getBlock() instanceof LecternBlock) {
+            if (blockState.getValue(LecternBlock.HAS_BOOK)) return LegacyComponents.READ;
+            for (InteractionHand h : InteractionHand.values())
+                if (minecraft.player.getItemInHand(h).is(Items.WRITABLE_BOOK) || minecraft.player.getItemInHand(h).is(Items.WRITTEN_BOOK))
                     return LegacyComponents.PLACE;
+            return null;
+        }
+        if (blockHit != null && blockState != null && blockState.getBlock() instanceof ChiseledBookShelfBlock shelf) {
+            OptionalInt slot = shelf.getHitSlot(blockHit, blockHit.getDirection());
+            if (slot.isPresent()) { int s = slot.getAsInt();
+                if (blockState.getValue(ChiseledBookShelfBlock.SLOT_OCCUPIED_PROPERTIES.get(s)))
+                    return LegacyComponents.REMOVE;
+                for (InteractionHand h : InteractionHand.values()) { ItemStack item = minecraft.player.getItemInHand(h);
+                    if (item.is(Items.BOOK) || item.is(Items.WRITABLE_BOOK) || item.is(Items.WRITTEN_BOOK) || item.is(Items.ENCHANTED_BOOK))
+                        return LegacyComponents.PLACE;
                 }
             }
         }
+
+
+
+
+
+        
         if (minecraft.hitResult instanceof BlockHitResult r) {
             BlockState copperState = minecraft.level.getBlockState(r.getBlockPos());
             Block copperBlock = copperState.getBlock();
@@ -574,8 +554,6 @@ public interface ControlTooltip {
             if (entity instanceof MinecartFurnace && actualItem.is(ItemTags.COALS)) return LegacyComponents.FUEL;
             if (entity instanceof TamableAnimal a && a.isTame() && a.isFood(actualItem) && a.getHealth() < a.getMaxHealth())
                 return LegacyComponents.HEAL;
-            if (entity instanceof TamableAnimal a && a.isTame() && a.isOwnedBy(minecraft.player))
-                return a.isInSittingPose() ? LegacyComponents.FOLLOW_ME : LegacyComponents.SIT;
             if (canTame(minecraft, hand, actualItem)) return LegacyComponents.TAME;
             if (canSetLoveMode(entity, actualItem)) return LegacyComponents.LOVE_MODE;
             if (blockHit != null && actualItem.getItem() instanceof BoneMealItem && blockState.getBlock() instanceof BonemealableBlock b && b.isValidBonemealTarget(minecraft.level, blockHit.getBlockPos(), blockState/*? if <=1.20.2 {*//*,true*//*?}*/))
@@ -693,6 +671,8 @@ public interface ControlTooltip {
             else if (entity instanceof /*? if <1.21.5 {*//*Saddleable*//*?} else {*/ Mob/*?}*/ s && !entity.isVehicle() && ((!(entity instanceof AbstractHorse) && s.isSaddled()) || entity instanceof AbstractHorse h && !minecraft.player.isSecondaryUseActive() && (h.isTamed() && !h.isFood(minecraft.player.getMainHandItem()) || minecraft.player.getMainHandItem().isEmpty())))
                 return LegacyComponents.MOUNT;
         }
+        if ((blockState != null && (blockState.getBlock() instanceof ButtonBlock || blockState.getBlock() instanceof LeverBlock || blockState.getBlock() instanceof DoorBlock || blockState.getBlock() instanceof TrapDoorBlock || blockState.getBlock() instanceof FenceGateBlock || blockState.getBlock() instanceof EnderChestBlock || (blockState.getMenuProvider(minecraft.level, blockHit.getBlockPos()) != null || minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof MenuProvider))))
+            return (blockState.getBlock() instanceof AbstractChestBlock<?> || blockState.getBlock() instanceof ShulkerBoxBlock || blockState.getBlock() instanceof BarrelBlock || blockState.getBlock() instanceof HopperBlock || blockState.getBlock() instanceof DropperBlock) ? LegacyComponents.OPEN : LegacyComponents.USE;
         return null;
     }
 
