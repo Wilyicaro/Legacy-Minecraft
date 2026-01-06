@@ -477,20 +477,20 @@ public interface ControlTooltip {
             if (cakeState.is(Blocks.CAKE) && (minecraft.player.getAbilities().instabuild || minecraft.player.getFoodData().getFoodLevel() < 20))
                 return LegacyComponents.EAT;
         }
+        if (blockHit != null && blockState != null) {
+            if (blockState.getBlock() instanceof CommandBlock)
+                return LegacyComponents.EDIT;
+            if (blockState.getBlock() instanceof StructureBlock)
+                return LegacyComponents.CONFIGURE;
+            if (blockState.getBlock() instanceof JigsawBlock)
+                return LegacyComponents.CONFIGURE;
+        } 
 
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack actualItem = minecraft.player.getItemInHand(hand);
 
             if (actualItem.isEmpty()) continue;
 
-            if (blockHit != null && blockState != null) {
-                if (blockState.getBlock() instanceof CommandBlock)
-                    return LegacyComponents.EDIT;
-                if (blockState.getBlock() instanceof StructureBlock)
-                    return LegacyComponents.CONFIGURE;
-                if (blockState.getBlock() instanceof JigsawBlock)
-                    return LegacyComponents.CONFIGURE;
-            }
             if (blockState != null && blockState.getBlock() instanceof JukeboxBlock) {
                 if (BuiltInRegistries.ITEM.getKey(actualItem.getItem()).getPath().startsWith("music_disc_")) {
                     return LegacyComponents.PLAY;
