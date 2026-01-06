@@ -477,14 +477,20 @@ public interface ControlTooltip {
             if (cakeState.is(Blocks.CAKE) && (minecraft.player.getAbilities().instabuild || minecraft.player.getFoodData().getFoodLevel() < 20))
                 return LegacyComponents.EAT;
         }
-        if (blockHit != null && blockState != null) {
+        if (blockHit != null && blockState != null && minecraft.player.canUseGameMasterBlocks()) {
             if (blockState.getBlock() instanceof CommandBlock)
                 return LegacyComponents.EDIT;
             if (blockState.getBlock() instanceof StructureBlock)
                 return LegacyComponents.CONFIGURE;
             if (blockState.getBlock() instanceof JigsawBlock)
                 return LegacyComponents.CONFIGURE;
-        } 
+        }
+        HitResult hitResult = minecraft.hitResult;
+        if (hitResult instanceof EntityHitResult entityHit && minecraft.player.canUseGameMasterBlocks()) {
+            if (entityHit.getEntity().getType() == EntityType.COMMAND_BLOCK_MINECART) {
+                return LegacyComponents.EDIT;
+            }
+        }
 
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack actualItem = minecraft.player.getItemInHand(hand);
@@ -587,10 +593,6 @@ public interface ControlTooltip {
             if (actualItem.getItem() instanceof FishingRodItem) {
                 FishingHook hook = minecraft.player.fishing;
                 if (hook != null) {
-                    if (hook.isInWater() && hook.getDeltaMovement().y < -0.12
-                            && !hook.onGround() && hook.tickCount > 50) {
-                        return LegacyComponents.HOOK_IT;
-                    }
                     return LegacyComponents.REEL;
                 }
                 return LegacyComponents.CAST;
