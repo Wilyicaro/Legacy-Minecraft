@@ -355,6 +355,19 @@ public interface ControlTooltip {
             if (minecraft.player.canUseGameMasterBlocks())
                 return LegacyComponents.EDIT;
         }
+        if (entity instanceof AbstractHorse h && h.isTamed() && minecraft.player.isSecondaryUseActive())
+            return LegacyComponents.OPEN;
+        if (entity instanceof MinecartChest || entity instanceof MinecartHopper)
+            return LegacyComponents.OPEN;
+        if (entity instanceof ChestBoat && minecraft.player.isShiftKeyDown())
+            return LegacyComponents.OPEN;
+        if (entity != null && entity.canAddPassenger(minecraft.player) && minecraft.player.canRide(entity)) {
+            if (entity instanceof Boat || entity instanceof ChestBoat) return LegacyComponents.SAIL;
+            else if (entity instanceof AbstractMinecart m && /*? if <1.21.2 {*//*m.getMinecartType() == AbstractMinecart.Type.RIDEABLE*//*?} else {*/m.isRideable()/*?}*/)
+                return LegacyComponents.RIDE;
+            else if (entity instanceof /*? if <1.21.5 {*//*Saddleable*//*?} else {*/ Mob/*?}*/ s && !entity.isVehicle() && ((!(entity instanceof AbstractHorse) && s.isSaddled()) || entity instanceof AbstractHorse h && !minecraft.player.isSecondaryUseActive() && (h.isTamed() && !h.isFood(minecraft.player.getMainHandItem()) || minecraft.player.getMainHandItem().isEmpty())))
+                return LegacyComponents.MOUNT;
+        }
 
         if (blockState != null && blockState.getBlock() instanceof BedBlock) return LegacyComponents.SLEEP;
         if (blockState != null && blockState.getBlock() instanceof NoteBlock) return LegacyComponents.CHANGE_PITCH;
@@ -425,6 +438,8 @@ public interface ControlTooltip {
             if (blockState.getBlock() instanceof JigsawBlock)
                 return LegacyComponents.CONFIGURE;
         }
+        if ((blockState != null && (blockState.getBlock() instanceof ButtonBlock || blockState.getBlock() instanceof LeverBlock || blockState.getBlock() instanceof DoorBlock || blockState.getBlock() instanceof TrapDoorBlock || blockState.getBlock() instanceof FenceGateBlock || blockState.getBlock() instanceof EnderChestBlock || (blockState.getMenuProvider(minecraft.level, blockHit.getBlockPos()) != null || minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof MenuProvider))))
+            return (blockState.getBlock() instanceof AbstractChestBlock<?> || blockState.getBlock() instanceof ShulkerBoxBlock || blockState.getBlock() instanceof BarrelBlock || blockState.getBlock() instanceof HopperBlock || blockState.getBlock() instanceof DropperBlock) ? LegacyComponents.OPEN : LegacyComponents.USE;
 
         for (InteractionHand hand : InteractionHand.values()) {
             ItemStack actualItem = minecraft.player.getItemInHand(hand);
@@ -523,8 +538,8 @@ public interface ControlTooltip {
             if (/*? if <1.21.2 {*//*actualItem.getItem() instanceof Equipable e*//*?} else {*/actualItem.has(DataComponents.EQUIPPABLE)/*?}*/ && (!/*? if <1.20.5 {*//*(actualItem.getItem() instanceof HorseArmorItem)*//*?} else if <1.21.2 {*//*e.getEquipmentSlot().equals(EquipmentSlot.BODY)*//*?} else {*/actualItem.get(DataComponents.EQUIPPABLE).slot().equals(EquipmentSlot.BODY) /*?}*/ || minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Mob m && /*? if <1.20.5 {*//*m instanceof AbstractHorse h && h.isArmor(actualItem)*//*?} else if <1.21.2 {*//*m.isBodyArmorItem(actualItem)*//*?} else {*/ m.isEquippableInSlot(actualItem, EquipmentSlot.BODY)/*?}*/))
                 return LegacyComponents.EQUIP;
             if (actualItem.getItem() instanceof FishingRodItem) {
-                FishingHook hook = minecraft.player.fishing;
-                if (hook != null) {
+                FishingHook Fishhook = minecraft.player.fishing;
+                if (Fishhook != null) {
                     return LegacyComponents.REEL;
                 }
                 return LegacyComponents.CAST;
@@ -612,22 +627,7 @@ public interface ControlTooltip {
                 return LegacyComponents.DIG_PATH;
             if (actualItem.getItem() instanceof SpyglassItem) return LegacyComponents.ZOOM;
         }
-        if (entity instanceof AbstractHorse h && h.isTamed() && minecraft.player.isSecondaryUseActive())
-            return LegacyComponents.OPEN;
-        if (entity instanceof MinecartChest || entity instanceof MinecartHopper)
-            return LegacyComponents.OPEN;
-        if (entity instanceof ChestBoat && minecraft.player.isShiftKeyDown())
-            return LegacyComponents.OPEN;
-        if (entity != null && entity.canAddPassenger(minecraft.player) && minecraft.player.canRide(entity)) {
-            if (entity instanceof Boat) return LegacyComponents.SAIL;
-            else if (entity instanceof AbstractMinecart m && /*? if <1.21.2 {*//*m.getMinecartType() == AbstractMinecart.Type.RIDEABLE*//*?} else {*/m.isRideable()/*?}*/)
-                return LegacyComponents.RIDE;
-            else if (entity instanceof /*? if <1.21.5 {*//*Saddleable*//*?} else {*/ Mob/*?}*/ s && !entity.isVehicle() && ((!(entity instanceof AbstractHorse) && s.isSaddled()) || entity instanceof AbstractHorse h && !minecraft.player.isSecondaryUseActive() && (h.isTamed() && !h.isFood(minecraft.player.getMainHandItem()) || minecraft.player.getMainHandItem().isEmpty())))
-                return LegacyComponents.MOUNT;
-        }
-        if ((blockState != null && (blockState.getBlock() instanceof ButtonBlock || blockState.getBlock() instanceof LeverBlock || blockState.getBlock() instanceof DoorBlock || blockState.getBlock() instanceof TrapDoorBlock || blockState.getBlock() instanceof FenceGateBlock || blockState.getBlock() instanceof EnderChestBlock || (blockState.getMenuProvider(minecraft.level, blockHit.getBlockPos()) != null || minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof MenuProvider))))
-            return (blockState.getBlock() instanceof AbstractChestBlock<?> || blockState.getBlock() instanceof ShulkerBoxBlock || blockState.getBlock() instanceof BarrelBlock || blockState.getBlock() instanceof HopperBlock || blockState.getBlock() instanceof DropperBlock) ? LegacyComponents.OPEN : LegacyComponents.USE;
-        return null;
+       return null;
     }
 
     static BlockHitResult mayInteractItemAt(Minecraft minecraft, ItemStack usedItem, HitResult result) {
