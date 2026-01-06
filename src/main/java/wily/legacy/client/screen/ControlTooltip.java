@@ -381,55 +381,36 @@ public interface ControlTooltip {
                     return LegacyComponents.SCRAPE;
             }
         }
-                 
-
-
-
-
-
-
-
-        if (minecraft.hitResult instanceof BlockHitResult r) {
-            BlockState signState = minecraft.level.getBlockState(r.getBlockPos());
-            if (signState.getBlock() instanceof SignBlock ||
-                    signState.getBlock() instanceof CeilingHangingSignBlock ||
-                    signState.getBlock() instanceof WallHangingSignBlock) {
-                if (minecraft.level.getBlockEntity(r.getBlockPos()) instanceof SignBlockEntity sign) {
-                    boolean isFrontText = sign.isFacingFrontText(minecraft.player);
-                    SignText signText = isFrontText ? sign.getFrontText() : sign.getBackText();
-                    boolean isEmpty = true;
-                    for (int i = 0; i < 4; i++) {
-                        if (!signText.getMessage(i, false).getString().isEmpty()) {
-                            isEmpty = false;
-                            break;
-                        }
+        if (blockHit != null && blockState != null && (blockState.getBlock() instanceof SignBlock || blockState.getBlock() instanceof CeilingHangingSignBlock || blockState.getBlock() instanceof WallHangingSignBlock)) {
+            if (minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof SignBlockEntity sign) {
+                SignText text = sign.isFacingFrontText(minecraft.player) ? sign.getFrontText() : sign.getBackText();
+                boolean empty = true;
+                for (int i = 0; i < 4; i++)
+                    if (!text.getMessage(i, false).getString().isEmpty()) {
+                        empty = false;
+                        break;
                     }
-                    if (isEmpty) {
-                        return LegacyComponents.EDIT;
-                    }
-                    for (InteractionHand hand : InteractionHand.values()) {
-                        ItemStack actualItem = minecraft.player.getItemInHand(hand);
-                        if (actualItem.is(Items.GLOW_INK_SAC)) {
-                            if (!signText.hasGlowingText()) {
-                                return LegacyComponents.GLOW;
-                            }
-                        }
-                        if (actualItem.is(Items.INK_SAC)) {
-                            if (signText.hasGlowingText()) {
-                                return LegacyComponents.REMOVE_GLOW;
-                            }
-                        }
-                        if (actualItem.getItem() instanceof DyeItem dyeItem) {
-                            DyeColor newColor = dyeItem.getDyeColor();
-                            if (signText.getColor() != newColor) {
-                                return LegacyComponents.DYE;
-                            }
-                        }
-                    }
+                if (empty)
+                    return LegacyComponents.EDIT;
+                for (InteractionHand hand : InteractionHand.values()) { ItemStack item = minecraft.player.getItemInHand(hand);
+                    if (item.is(Items.GLOW_INK_SAC) && !text.hasGlowingText())
+                        return LegacyComponents.GLOW;
+                    if (item.is(Items.INK_SAC) && text.hasGlowingText())
+                        return LegacyComponents.REMOVE_GLOW;
+                    if (item.getItem() instanceof DyeItem dye && text.getColor() != dye.getDyeColor())
+                        return LegacyComponents.DYE;
                 }
-                return LegacyComponents.EDIT;
             }
+            return LegacyComponents.EDIT;
         }
+
+
+
+
+        
+
+
+        
         if (minecraft.hitResult instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof Allay allay) {
             ItemStack allayItem = allay.getItemInHand(InteractionHand.MAIN_HAND);
             if (minecraft.player.getMainHandItem().isEmpty() &&
