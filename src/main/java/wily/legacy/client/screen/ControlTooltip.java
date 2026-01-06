@@ -372,30 +372,23 @@ public interface ControlTooltip {
                 }
             }
         }
-
-
-
-
-
-        
-        if (minecraft.hitResult instanceof BlockHitResult r) {
-            BlockState copperState = minecraft.level.getBlockState(r.getBlockPos());
-            Block copperBlock = copperState.getBlock();
+        if (blockState != null) {
             for (InteractionHand hand : InteractionHand.values()) {
-                ItemStack actualItem = minecraft.player.getItemInHand(hand);
-                if (actualItem.is(Items.HONEYCOMB)) {
-                    if (HoneycombItem.WAXABLES.get().containsKey(copperBlock)) {
-                        return LegacyComponents.WAX;
-                    }
-                }
-                if (actualItem.getItem() instanceof AxeItem) {
-                    if (HoneycombItem.WAX_OFF_BY_BLOCK.get().containsKey(copperBlock) ||
-                            WeatheringCopper.getPrevious(copperState).isPresent()) {
-                        return LegacyComponents.SCRAPE;
-                    }
-                }
+                ItemStack item = minecraft.player.getItemInHand(hand);
+                if (item.is(Items.HONEYCOMB) && HoneycombItem.WAXABLES.get().containsKey(blockState.getBlock()))
+                    return LegacyComponents.WAX;
+                if (item.getItem() instanceof AxeItem && (HoneycombItem.WAX_OFF_BY_BLOCK.get().containsKey(blockState.getBlock()) || WeatheringCopper.getPrevious(blockState).isPresent()))
+                    return LegacyComponents.SCRAPE;
             }
         }
+                 
+
+
+
+
+
+
+
         if (minecraft.hitResult instanceof BlockHitResult r) {
             BlockState signState = minecraft.level.getBlockState(r.getBlockPos());
             if (signState.getBlock() instanceof SignBlock ||
