@@ -351,6 +351,10 @@ public interface ControlTooltip {
             if (allayItem.isEmpty() && !main.isEmpty() && !main.is(Items.LEAD))
                 return LegacyComponents.GIVE;
         }
+        if (entity != null && entity.getType() == EntityType.COMMAND_BLOCK_MINECART) {
+            if (minecraft.player.canUseGameMasterBlocks())
+                return LegacyComponents.EDIT;
+        }
 
         if (blockState != null && blockState.getBlock() instanceof BedBlock) return LegacyComponents.SLEEP;
         if (blockState != null && blockState.getBlock() instanceof NoteBlock) return LegacyComponents.CHANGE_PITCH;
@@ -411,18 +415,8 @@ public interface ControlTooltip {
             }
             return LegacyComponents.EDIT;
         }
-
-
-
-
-
-        
-        
-        if (blockHit != null) {
-            BlockState cakeState = minecraft.level.getBlockState(blockHit.getBlockPos());
-            if (cakeState.is(Blocks.CAKE) && (minecraft.player.getAbilities().instabuild || minecraft.player.getFoodData().getFoodLevel() < 20))
-                return LegacyComponents.EAT;
-        }
+        if (blockHit != null && blockState != null && blockState.getBlock() instanceof CakeBlock && (minecraft.player.getAbilities().instabuild || minecraft.player.getFoodData().getFoodLevel() < 20))
+            return LegacyComponents.EAT;
         if (blockHit != null && blockState != null && minecraft.player.canUseGameMasterBlocks()) {
             if (blockState.getBlock() instanceof CommandBlock)
                 return LegacyComponents.EDIT;
@@ -430,12 +424,6 @@ public interface ControlTooltip {
                 return LegacyComponents.CONFIGURE;
             if (blockState.getBlock() instanceof JigsawBlock)
                 return LegacyComponents.CONFIGURE;
-        }
-        HitResult hitResult = minecraft.hitResult;
-        if (hitResult instanceof EntityHitResult entityHit && minecraft.player.canUseGameMasterBlocks()) {
-            if (entityHit.getEntity().getType() == EntityType.COMMAND_BLOCK_MINECART) {
-                return LegacyComponents.EDIT;
-            }
         }
 
         for (InteractionHand hand : InteractionHand.values()) {
