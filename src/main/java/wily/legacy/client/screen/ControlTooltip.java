@@ -343,6 +343,14 @@ public interface ControlTooltip {
         if (entity instanceof ItemFrame itemFrame && !itemFrame.getItem().isEmpty()) return LegacyComponents.ROTATE;
         if (entity instanceof TamableAnimal a && a.isTame() && a.isOwnedBy(minecraft.player))
             return a.isInSittingPose() ? LegacyComponents.FOLLOW_ME : LegacyComponents.SIT;
+        if (entity instanceof Allay allay) {
+            ItemStack allayItem = allay.getItemInHand(InteractionHand.MAIN_HAND);
+            ItemStack main = minecraft.player.getMainHandItem();
+            if (main.isEmpty() && !allayItem.isEmpty())
+                return LegacyComponents.TAKE;
+            if (allayItem.isEmpty() && !main.isEmpty() && !main.is(Items.LEAD))
+                return LegacyComponents.GIVE;
+        }
 
         if (blockState != null && blockState.getBlock() instanceof BedBlock) return LegacyComponents.SLEEP;
         if (blockState != null && blockState.getBlock() instanceof NoteBlock) return LegacyComponents.CHANGE_PITCH;
@@ -407,25 +415,9 @@ public interface ControlTooltip {
 
 
 
-        
-
 
         
-        if (minecraft.hitResult instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof Allay allay) {
-            ItemStack allayItem = allay.getItemInHand(InteractionHand.MAIN_HAND);
-            if (minecraft.player.getMainHandItem().isEmpty() &&
-                    minecraft.player.getOffhandItem().isEmpty() &&
-                    !allayItem.isEmpty() &&
-                    !allayItem.is(Items.LEAD) && !allayItem.is(Items.NAME_TAG)) {
-                return LegacyComponents.TAKE;
-            }
-            boolean holdingValidItem = !minecraft.player.getMainHandItem().isEmpty() &&
-                    !minecraft.player.getMainHandItem().is(Items.LEAD) &&
-                    !minecraft.player.getMainHandItem().is(Items.NAME_TAG);
-            if (allayItem.isEmpty() && holdingValidItem) {
-                return LegacyComponents.GIVE;
-            }
-        }
+        
         if (blockHit != null) {
             BlockState cakeState = minecraft.level.getBlockState(blockHit.getBlockPos());
             if (cakeState.is(Blocks.CAKE) && (minecraft.player.getAbilities().instabuild || minecraft.player.getFoodData().getFoodLevel() < 20))
