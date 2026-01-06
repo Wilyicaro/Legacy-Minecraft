@@ -53,6 +53,7 @@ import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.ChestBoat;
@@ -80,7 +81,6 @@ import org.lwjgl.glfw.GLFW;
 import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.ItemContainerPlatform;
 import wily.factoryapi.base.ArbitrarySupplier;
-import wily.factoryapi.base.client.AdvancedTextWidget;
 import wily.factoryapi.base.client.MinecraftAccessor;
 import wily.factoryapi.util.ColorUtil;
 import wily.factoryapi.util.FactoryItemUtil;
@@ -584,8 +584,17 @@ public interface ControlTooltip {
                 return LegacyComponents.BLOCK;
             if (/*? if <1.21.2 {*//*actualItem.getItem() instanceof Equipable e*//*?} else {*/actualItem.has(DataComponents.EQUIPPABLE)/*?}*/ && (!/*? if <1.20.5 {*//*(actualItem.getItem() instanceof HorseArmorItem)*//*?} else if <1.21.2 {*//*e.getEquipmentSlot().equals(EquipmentSlot.BODY)*//*?} else {*/actualItem.get(DataComponents.EQUIPPABLE).slot().equals(EquipmentSlot.BODY) /*?}*/ || minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Mob m && /*? if <1.20.5 {*//*m instanceof AbstractHorse h && h.isArmor(actualItem)*//*?} else if <1.21.2 {*//*m.isBodyArmorItem(actualItem)*//*?} else {*/ m.isEquippableInSlot(actualItem, EquipmentSlot.BODY)/*?}*/))
                 return LegacyComponents.EQUIP;
-            if (actualItem.getItem() instanceof EmptyMapItem || actualItem.getItem() instanceof FishingRodItem)
+            if (actualItem.getItem() instanceof FishingRodItem) {
+                FishingHook hook = minecraft.player.fishing;
+                if (hook != null) {
+                    if (hook.isInWater() && hook.getDeltaMovement().y < -0.12
+                            && !hook.onGround() && hook.tickCount > 50) {
+                        return LegacyComponents.HOOK_IT;
+                    }
+                    return LegacyComponents.REEL;
+                }
                 return LegacyComponents.CAST;
+            }
             if (actualItem.getItem() instanceof FireworkRocketItem && (minecraft.player.isFallFlying() || minecraft.hitResult instanceof BlockHitResult && minecraft.hitResult.getType() != HitResult.Type.MISS))
                 return LegacyComponents.LAUNCH;
             if (actualItem.getItem() instanceof ShearsItem) {
