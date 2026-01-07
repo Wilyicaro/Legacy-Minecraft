@@ -435,6 +435,10 @@ public interface ControlTooltip {
             if (blockState.getBlock() instanceof JigsawBlock)
                 return LegacyComponents.CONFIGURE;
         }
+        if (blockState != null && blockState.getBlock() instanceof FlowerPotBlock pot) { Block planted = /*? if <1.20.2 {*//*pot.getContent()*//*?} else {*/pot.getPotted()/*?}*/;
+            if (planted != Blocks.AIR && minecraft.player.getMainHandItem().isEmpty() && minecraft.player.getOffhandItem().isEmpty())
+            return LegacyComponents.COLLECT;
+        }
         if ((blockState != null && (blockState.getBlock() instanceof ButtonBlock || blockState.getBlock() instanceof LeverBlock || blockState.getBlock() instanceof DoorBlock || blockState.getBlock() instanceof TrapDoorBlock || blockState.getBlock() instanceof FenceGateBlock || blockState.getBlock() instanceof EnderChestBlock || (blockState.getMenuProvider(minecraft.level, blockHit.getBlockPos()) != null || minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof MenuProvider))))
             return (blockState.getBlock() instanceof AbstractChestBlock<?> || blockState.getBlock() instanceof ShulkerBoxBlock || blockState.getBlock() instanceof BarrelBlock || blockState.getBlock() instanceof HopperBlock || blockState.getBlock() instanceof DropperBlock) ? LegacyComponents.OPEN : LegacyComponents.USE;
 
@@ -452,8 +456,7 @@ public interface ControlTooltip {
             if (blockState != null && blockState.getBlock() instanceof RespawnAnchorBlock && actualItem.is(Items.GLOWSTONE) && blockState.getValue(RespawnAnchorBlock.CHARGE) < 4)
                 return LegacyComponents.CHARGE;
             // 2-Special block-item interactions (Jukebox, Beehive, Cauldron, Lodestone, Flower Pot)
-            if (blockState != null && blockState.getBlock() instanceof JukeboxBlock &&
-                    actualItem.has(DataComponents.JUKEBOX_PLAYABLE))
+            if (blockState != null && blockState.getBlock() instanceof JukeboxBlock && actualItem.has(DataComponents.JUKEBOX_PLAYABLE))
                 return LegacyComponents.PLAY;
             if (blockState != null && blockState.getBlock() instanceof BeehiveBlock && actualItem.is(Items.GLASS_BOTTLE) && blockState.getValue(BeehiveBlock.HONEY_LEVEL) >= 5)
                 return LegacyComponents.COLLECT;
@@ -500,8 +503,14 @@ public interface ControlTooltip {
                 return LegacyComponents.DIRECT;
             if (blockHit != null && actualItem.is(Items.LIGHT) && minecraft.level.getBlockState(blockHit.getBlockPos()).is(Blocks.LIGHT))
                 return LegacyComponents.ADJUST;
-            if (blockState != null && blockState.getBlock() instanceof FlowerPotBlock pot && pot./*? if <1.20.2 {*//*getContent*//*?} else {*/getPotted/*?}*/() == Blocks.AIR && actualItem.getItem() instanceof BlockItem b && FlowerPotBlockAccessor.getPottedByContent().containsKey(b.getBlock()))
-                return LegacyComponents.PLANT;
+            
+            if (blockState != null && blockState.getBlock() instanceof FlowerPotBlock pot) { Block planted = /*? if <1.20.2 {*//*pot.getContent()*//*?} else {*/pot.getPotted()/*?}*/;
+                if (planted == Blocks.AIR && actualItem.getItem() instanceof BlockItem b && FlowerPotBlockAccessor.getPottedByContent().containsKey(b.getBlock()))
+                    return LegacyComponents.PLANT;
+                if (planted != Blocks.AIR && actualItem.getItem() instanceof BlockItem b && !FlowerPotBlockAccessor.getPottedByContent().containsKey(b.getBlock()))
+                    return LegacyComponents.COLLECT;
+                return null;
+            }
             // 3-Interactions with specific entities (Piglin barter, bucket, bucketable mobs, cow for milk)
             if (entity instanceof Piglin piglin && actualItem.is(Items.GOLD_INGOT) && !piglin.isBaby() && piglin.getOffhandItem().isEmpty())
                 return LegacyComponents.BARTER;
