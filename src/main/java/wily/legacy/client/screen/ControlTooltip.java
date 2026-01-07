@@ -488,9 +488,9 @@ public interface ControlTooltip {
                 boolean dyedItem = LegacyItemUtil.isDyedItem(actualItem);
                 boolean isDyeable = LegacyItemUtil.isDyeableItem(actualItem.getItemHolder());
                 if (isDyeable) {
-                    if (be.waterColor == null && dyedItem)
+                    if (be.waterColor == null && !dyedItem)
                         return LegacyComponents.CLEAR;
-                    if (be.waterColor != null && !dyedItem)
+                    if (be.waterColor != null)
                         return LegacyComponents.DYE;
                 }
                 if (actualItem.getItem() instanceof DyeItem)
