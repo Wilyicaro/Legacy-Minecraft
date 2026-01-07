@@ -469,8 +469,6 @@ public interface ControlTooltip {
                    if (actualItem.is(Items.POTION) && blockState != null && LegacyItemUtil.getPotionContent(actualItem) != null && "minecraft:water".equals(LegacyItemUtil.getPotionContent(actualItem).getRegisteredName())) {
                 if (blockState.is(Blocks.DIRT) || blockState.is(Blocks.COARSE_DIRT) || blockState.is(Blocks.ROOTED_DIRT))
                     return LegacyComponents.MOISTEN;
-                if (blockState.is(Blocks.MUD))
-                    return LegacyComponents.DRINK;
             }
             if (blockState != null && blockState.getBlock() instanceof AbstractCauldronBlock c) {
                 boolean isGlassBottle = actualItem.is(Items.GLASS_BOTTLE);
