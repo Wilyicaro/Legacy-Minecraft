@@ -472,11 +472,16 @@ public interface ControlTooltip {
             }
             if (blockState != null && blockState.getBlock() instanceof AbstractCauldronBlock c) {
                 boolean isGlassBottle = actualItem.is(Items.GLASS_BOTTLE);
-                boolean isBucket = actualItem.is(Items.BUCKET);
+                boolean isEmptyBucket = actualItem.is(Items.BUCKET);
+                boolean isWaterBucket = actualItem.is(Items.WATER_BUCKET);
                 boolean isPotion = actualItem.is(Items.POTION) || actualItem.is(Items.SPLASH_POTION) || actualItem.is(Items.LINGERING_POTION);
-                if ((isGlassBottle && blockState.hasProperty(LayeredCauldronBlock.LEVEL) && blockState.getValue(LayeredCauldronBlock.LEVEL) > 0) || (isBucket && c.isFull(blockState)) || (isPotion && LegacyItemUtil.getPotionContent(actualItem) == null))
+                if (isGlassBottle && blockState.hasProperty(LayeredCauldronBlock.LEVEL) && blockState.getValue(LayeredCauldronBlock.LEVEL) > 0)
                     return LegacyComponents.COLLECT;
-                if ((isBucket || isPotion) && (blockState.is(Blocks.CAULDRON) || blockState.is(Blocks.WATER_CAULDRON) && !c.isFull(blockState)) && LegacyItemUtil.getPotionContent(actualItem) != null)
+                if (isWaterBucket && !c.isFull(blockState))
+                    return LegacyComponents.FILL;
+                if (isEmptyBucket && c.isFull(blockState))
+                    return LegacyComponents.COLLECT;
+                if (isPotion && LegacyItemUtil.getPotionContent(actualItem) != null && !c.isFull(blockState))
                     return LegacyComponents.FILL;
             }
             if (blockHit != null && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof WaterCauldronBlockEntity be) {
@@ -501,7 +506,7 @@ public interface ControlTooltip {
             if (entity instanceof Piglin piglin && actualItem.is(Items.GOLD_INGOT) && !piglin.isBaby() && piglin.getOffhandItem().isEmpty())
                 return LegacyComponents.BARTER;
             BlockHitResult bucketHitResult;
-            if (actualItem.getItem() instanceof BucketItem i && (bucketHitResult = mayInteractItemAt(minecraft, actualItem, Item.getPlayerPOVHitResult(minecraft.level, minecraft.player, ItemContainerPlatform.getBucketFluid(i) == Fluids.EMPTY ? ClipContext.Fluid.SOURCE_ONLY : ClipContext.Fluid.NONE))) != null) {
+            if (actualItem.getItem() instanceof BucketItem i  && !(blockState != null && blockState.getBlock() instanceof AbstractCauldronBlock)&& (bucketHitResult = mayInteractItemAt(minecraft, actualItem, Item.getPlayerPOVHitResult(minecraft.level, minecraft.player, ItemContainerPlatform.getBucketFluid(i) == Fluids.EMPTY ? ClipContext.Fluid.SOURCE_ONLY : ClipContext.Fluid.NONE))) != null) {
                 BlockState state = minecraft.level.getBlockState(bucketHitResult.getBlockPos());
                 if (ItemContainerPlatform.getBucketFluid(i) != Fluids.EMPTY) {
                     BlockState resultState = state.getBlock() instanceof LiquidBlockContainer && ItemContainerPlatform.getBucketFluid(i) == Fluids.WATER ? state : minecraft.level.getBlockState(bucketHitResult.getBlockPos().relative(bucketHitResult.getDirection()));
