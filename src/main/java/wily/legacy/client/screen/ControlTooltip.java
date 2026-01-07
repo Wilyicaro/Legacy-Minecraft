@@ -453,7 +453,7 @@ public interface ControlTooltip {
                 return LegacyComponents.CHARGE;
             // 2-Special block-item interactions (Jukebox, Beehive, Cauldron, Lodestone, Flower Pot)
             if (blockState != null && blockState.getBlock() instanceof JukeboxBlock &&
-                    BuiltInRegistries.ITEM.getKey(actualItem.getItem()).getPath().startsWith("music_disc_"))
+                    actualItem.has(DataComponents.JUKEBOX_PLAYABLE))
                 return LegacyComponents.PLAY;
             if (blockState != null && blockState.getBlock() instanceof BeehiveBlock && actualItem.is(Items.GLASS_BOTTLE) && blockState.getValue(BeehiveBlock.HONEY_LEVEL) >= 5)
                 return LegacyComponents.COLLECT;
