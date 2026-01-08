@@ -359,13 +359,15 @@ public interface ControlTooltip {
         if (entity instanceof ChestBoat && minecraft.player.isShiftKeyDown())
             return LegacyComponents.OPEN;
         if (entity != null && entity.canAddPassenger(minecraft.player) && minecraft.player.canRide(entity)) {
-            if (entity instanceof Boat || entity instanceof ChestBoat) return LegacyComponents.SAIL;
-            else if (entity instanceof AbstractMinecart m && /*? if <1.21.2 {*//*m.getMinecartType() == AbstractMinecart.Type.RIDEABLE*//*?} else {*/m.isRideable()/*?}*/)
-                return LegacyComponents.RIDE;
-            else if (entity instanceof /*? if <1.21.5 {*//*Saddleable*//*?} else {*/ Mob/*?}*/ s && !entity.isVehicle() && ((!(entity instanceof AbstractHorse) && s.isSaddled()) || entity instanceof AbstractHorse h && !minecraft.player.isSecondaryUseActive() && (h.isTamed() && !h.isFood(minecraft.player.getMainHandItem()) || minecraft.player.getMainHandItem().isEmpty())))
-                return LegacyComponents.MOUNT;
+            boolean holdingLead = minecraft.player.getMainHandItem().getItem() instanceof LeadItem;
+            if (!holdingLead) {
+                if (entity instanceof Boat || entity instanceof ChestBoat) return LegacyComponents.SAIL;
+                else if (entity instanceof AbstractMinecart m && /*? if <1.21.2 {*//*m.getMinecartType() == AbstractMinecart.Type.RIDEABLE*//*?} else {*/m.isRideable()/*?}*/)
+                    return LegacyComponents.RIDE;
+                else if (entity instanceof /*? if <1.21.5 {*//*Saddleable*//*?} else {*/ Mob/*?}*/ s && !entity.isVehicle() && ((!(entity instanceof AbstractHorse) && s.isSaddled()) || entity instanceof AbstractHorse h && !minecraft.player.isSecondaryUseActive() && (h.isTamed() && !h.isFood(minecraft.player.getMainHandItem()) || minecraft.player.getMainHandItem().isEmpty())))
+                    return LegacyComponents.MOUNT;
+            }
         }
-
         if (blockState != null && blockState.getBlock() instanceof BedBlock) return LegacyComponents.SLEEP;
         if (blockState != null && blockState.getBlock() instanceof NoteBlock) return LegacyComponents.CHANGE_PITCH;
         if (blockState != null && blockState.getBlock() instanceof ComposterBlock && blockState.getValue(ComposterBlock.LEVEL) == 8)
@@ -594,7 +596,7 @@ public interface ControlTooltip {
             if (actualItem.getItem() instanceof LeadItem) {
                 if (entity instanceof Mob m && m.canBeLeashed(/* ? if <1.20.5 { *//* minecraft.player *//* ?} */))
                     return LegacyComponents.LEASH;
-                if (entity instanceof AbstractHorse || entity instanceof Llama || entity instanceof Parrot)
+                if (entity instanceof AbstractHorse || entity instanceof Llama || entity instanceof Parrot || entity instanceof Boat || entity instanceof ChestBoat)
                     return LegacyComponents.LEASH;
                 if (blockState != null && blockState.is(BlockTags.FENCES)) return LegacyComponents.ATTACH;
             }
