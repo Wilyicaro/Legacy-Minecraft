@@ -473,18 +473,42 @@ public interface ControlTooltip {
                 if (blockState.is(Blocks.DIRT) || blockState.is(Blocks.COARSE_DIRT) || blockState.is(Blocks.ROOTED_DIRT))
                     return LegacyComponents.MOISTEN;
             }
-            if (blockState != null && blockState.getBlock() instanceof AbstractCauldronBlock c) {
-                boolean isGlassBottle = actualItem.is(Items.GLASS_BOTTLE);
+            if (blockState != null && blockState.getBlock() instanceof AbstractCauldronBlock) {
+                Block block = blockState.getBlock();
+                boolean isEmptyBottle = actualItem.is(Items.GLASS_BOTTLE);
+                boolean isWaterBottle = actualItem.is(Items.POTION) && LegacyItemUtil.getPotionContent(actualItem) != null && "minecraft:water".equals(LegacyItemUtil.getPotionContent(actualItem).getRegisteredName());
                 boolean isEmptyBucket = actualItem.is(Items.BUCKET);
                 boolean isWaterBucket = actualItem.is(Items.WATER_BUCKET);
-                boolean isPotion = actualItem.is(Items.POTION) || actualItem.is(Items.SPLASH_POTION) || actualItem.is(Items.LINGERING_POTION);
-                if (isGlassBottle && blockState.hasProperty(LayeredCauldronBlock.LEVEL) && blockState.getValue(LayeredCauldronBlock.LEVEL) > 0)
+                boolean isPowderBucket = actualItem.is(Items.POWDER_SNOW_BUCKET);
+                boolean isLavaBucket = actualItem.is(Items.LAVA_BUCKET);
+                boolean isOtherPotion = (actualItem.is(Items.POTION) || actualItem.is(Items.SPLASH_POTION) || actualItem.is(Items.LINGERING_POTION)) && !isWaterBottle;
+                WaterCauldronBlockEntity be = null;
+                if (blockHit != null && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof WaterCauldronBlockEntity wbe) be = wbe;
+                int level = blockState.hasProperty(LayeredCauldronBlock.LEVEL) ? blockState.getValue(LayeredCauldronBlock.LEVEL) : 0;
+                boolean isDyed = be != null && be.waterColor != null;
+                if (isEmptyBottle && block == Blocks.WATER_CAULDRON && !isDyed && level > 0)
                     return LegacyComponents.COLLECT;
-                if (isWaterBucket && !c.isFull(blockState))
+                if (isEmptyBucket) {
+                    if (block == Blocks.WATER_CAULDRON && level == 3)
+                        return LegacyComponents.COLLECT;
+                    if (block == Blocks.LAVA_CAULDRON || block == Blocks.POWDER_SNOW_CAULDRON)
+                        return LegacyComponents.COLLECT;
+                }
+                if (isWaterBottle && block == Blocks.CAULDRON)
                     return LegacyComponents.FILL;
-                if (isEmptyBucket && c.isFull(blockState))
-                    return LegacyComponents.COLLECT;
-                if (isPotion && LegacyItemUtil.getPotionContent(actualItem) != null && !c.isFull(blockState))
+                if (isWaterBottle && block == Blocks.WATER_CAULDRON && !isDyed && level < 3)
+                    return LegacyComponents.FILL;
+                if (isWaterBucket) {
+                    if (block == Blocks.CAULDRON || block == Blocks.LAVA_CAULDRON || block == Blocks.POWDER_SNOW_CAULDRON)
+                        return LegacyComponents.FILL;
+                    if (block == Blocks.WATER_CAULDRON && level < 3)
+                        return LegacyComponents.FILL;
+                }
+                if (isPowderBucket && (block == Blocks.CAULDRON || block == Blocks.WATER_CAULDRON || block == Blocks.LAVA_CAULDRON))
+                    return LegacyComponents.FILL;
+                if (isLavaBucket && (block == Blocks.CAULDRON || block == Blocks.WATER_CAULDRON || block == Blocks.POWDER_SNOW_CAULDRON))
+                    return LegacyComponents.FILL;
+                if (isOtherPotion && block == Blocks.CAULDRON)
                     return LegacyComponents.FILL;
             }
             if (blockHit != null && minecraft.level.getBlockEntity(blockHit.getBlockPos()) instanceof WaterCauldronBlockEntity be) {
