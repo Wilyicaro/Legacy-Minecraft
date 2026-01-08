@@ -538,6 +538,9 @@ public interface ControlTooltip {
             // 3-Interactions with specific entities (Piglin barter, bucket, bucketable mobs, cow for milk)
             if (entity instanceof Piglin piglin && actualItem.is(Items.GOLD_INGOT) && !piglin.isBaby() && piglin.getOffhandItem().isEmpty())
                 return LegacyComponents.BARTER;
+                        Set<EntityType<?>> bucketable = Set.of( EntityType.AXOLOTL, EntityType.COD, EntityType.SALMON, EntityType.TROPICAL_FISH, EntityType.PUFFERFISH, EntityType.TADPOLE);
+            if (actualItem.is(Items.WATER_BUCKET) && entity != null && bucketable.contains(entity.getType()))
+                return LegacyComponents.COLLECT;
             BlockHitResult bucketHitResult;
             if (actualItem.getItem() instanceof BucketItem i  && !(blockState != null && blockState.getBlock() instanceof AbstractCauldronBlock)&& (bucketHitResult = mayInteractItemAt(minecraft, actualItem, Item.getPlayerPOVHitResult(minecraft.level, minecraft.player, ItemContainerPlatform.getBucketFluid(i) == Fluids.EMPTY ? ClipContext.Fluid.SOURCE_ONLY : ClipContext.Fluid.NONE))) != null) {
                 BlockState state = minecraft.level.getBlockState(bucketHitResult.getBlockPos());
@@ -547,9 +550,6 @@ public interface ControlTooltip {
                         return LegacyComponents.EMPTY;
                 } else if (state.getBlock() instanceof BucketPickup) return LegacyComponents.COLLECT;
             }
-            Set<EntityType<?>> bucketable = Set.of( EntityType.AXOLOTL, EntityType.COD, EntityType.SALMON, EntityType.TROPICAL_FISH, EntityType.PUFFERFISH, EntityType.TADPOLE);
-            if (actualItem.is(Items.WATER_BUCKET) && entity != null && bucketable.contains(entity.getType()))
-                return LegacyComponents.COLLECT;
             if (actualItem.is(Items.BUCKET) && entity instanceof Cow)
                 return LegacyComponents.MILK;
             if (entity instanceof MinecartFurnace && actualItem.is(ItemTags.COALS)) return LegacyComponents.FUEL;
