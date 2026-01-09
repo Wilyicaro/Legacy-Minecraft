@@ -46,6 +46,7 @@ import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.animal.horse.Llama;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.npc.AbstractVillager;
@@ -333,6 +334,7 @@ public interface ControlTooltip {
         BlockHitResult blockHit = minecraft.hitResult instanceof BlockHitResult r && r.getType() != HitResult.Type.MISS ? r : null;
         BlockState blockState = blockHit == null ? null : minecraft.level.getBlockState(blockHit.getBlockPos());
         Entity entity = minecraft.hitResult instanceof EntityHitResult r ? r.getEntity() : null;
+        ItemStack MainHand = minecraft.player.getMainHandItem();
 
         if (minecraft.player.isSleeping()) return LegacyComponents.WAKE_UP;
         if (minecraft.hitResult instanceof EntityHitResult r && (r.getEntity() instanceof AbstractVillager m && (!(m instanceof Villager v) || /*? if <1.21.5 {*//*v.getVillagerData().getProfession() != VillagerProfession.NONE*//*?} else {*/!v.getVillagerData().profession().is(VillagerProfession.NONE)/*?}*/) && !m.isTrading()))
@@ -358,6 +360,16 @@ public interface ControlTooltip {
             return LegacyComponents.OPEN;
         if (entity instanceof ChestBoat && minecraft.player.isShiftKeyDown())
             return LegacyComponents.OPEN;
+        if (/*? if <1.21.5 {*//*MainHand.getItem() instanceof SaddleItem && *//*?}*/minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof /*? if <1.21.5 {*//*Saddleable*//*?} else {*/ Mob/*?}*/ s &&/*? if <1.21.5 {*//*s.isSaddleable()*//*?} else {*/s.isEquippableInSlot(MainHand, EquipmentSlot.SADDLE)/*?}*/ && !s.isSaddled() && (!(s instanceof AbstractHorse h) || h.isTamed())) {
+            return LegacyComponents.SADDLE;
+        }
+        if (minecraft.hitResult instanceof EntityHitResult r) {
+            Entity e = r.getEntity();
+            if (e instanceof AbstractHorse h && h.isTamed() && !MainHand.is(Items.SADDLE) && MainHand.has(DataComponents.EQUIPPABLE) && MainHand.get(DataComponents.EQUIPPABLE).slot().equals(EquipmentSlot.BODY) && h.isEquippableInSlot(MainHand, EquipmentSlot.BODY) && h.getItemBySlot(EquipmentSlot.BODY).isEmpty())
+                return LegacyComponents.EQUIP;
+            if (e instanceof Llama llama && llama.isTamed() && MainHand.is(ItemTags.WOOL_CARPETS) && llama.getItemBySlot(EquipmentSlot.BODY).isEmpty())
+                return LegacyComponents.EQUIP;
+        }
         if (entity != null && entity.canAddPassenger(minecraft.player) && minecraft.player.canRide(entity)) {
             boolean holdingLead = minecraft.player.getMainHandItem().getItem() instanceof LeadItem;
             if (!holdingLead) {
@@ -589,10 +601,20 @@ public interface ControlTooltip {
             // 7-Equipable items (armor, saddle, lead)
             if (actualItem.getUseAnimation().equals(/*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.BLOCK))
                 return LegacyComponents.BLOCK;
-            if (/*? if <1.21.5 {*//*actualItem.getItem() instanceof SaddleItem && *//*?}*/minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof /*? if <1.21.5 {*//*Saddleable*//*?} else {*/ Mob/*?}*/ s &&/*? if <1.21.5 {*//*s.isSaddleable()*//*?} else {*/s.isEquippableInSlot(actualItem, EquipmentSlot.SADDLE)/*?}*/ && !s.isSaddled())
-                return LegacyComponents.SADDLE;
-            if (/*? if <1.21.2 {*//*actualItem.getItem() instanceof Equipable e*//*?} else {*/actualItem.has(DataComponents.EQUIPPABLE)/*?}*/ && (!/*? if <1.20.5 {*//*(actualItem.getItem() instanceof HorseArmorItem)*//*?} else if <1.21.2 {*//*e.getEquipmentSlot().equals(EquipmentSlot.BODY)*//*?} else {*/actualItem.get(DataComponents.EQUIPPABLE).slot().equals(EquipmentSlot.BODY) /*?}*/ || minecraft.hitResult instanceof EntityHitResult r && r.getEntity() instanceof Mob m && /*? if <1.20.5 {*//*m instanceof AbstractHorse h && h.isArmor(actualItem)*//*?} else if <1.21.2 {*//*m.isBodyArmorItem(actualItem)*//*?} else {*/ m.isEquippableInSlot(actualItem, EquipmentSlot.BODY)/*?}*/))
-                return LegacyComponents.EQUIP;
+            boolean lookingAtEntity = minecraft.hitResult instanceof EntityHitResult;
+            if (!lookingAtEntity && /* ? if <1.21.2 { *//* actualItem.getItem() instanceof Equipable e *//* ?} else { */ actualItem.has(DataComponents.EQUIPPABLE)/* ?} */ && !actualItem.is(Items.SADDLE) && !actualItem.is(Items.LEATHER_HORSE_ARMOR) && !actualItem.is(Items.IRON_HORSE_ARMOR) && !actualItem.is(Items.GOLDEN_HORSE_ARMOR) && !actualItem.is(Items.COPPER_HORSE_ARMOR) && !actualItem.is(Items.DIAMOND_HORSE_ARMOR)) {
+                EquipmentSlot slot = /* ? if <1.21.2 { *//* e.getEquipmentSlot() *//* ?} else { */ actualItem.get(DataComponents.EQUIPPABLE).slot();/* ?} */
+                if (slot == EquipmentSlot.HEAD || slot == EquipmentSlot.CHEST || slot == EquipmentSlot.LEGS || slot == EquipmentSlot.FEET)
+                    return LegacyComponents.EQUIP;
+            }
+            if (minecraft.hitResult instanceof EntityHitResult r) {
+                Entity e = r.getEntity();
+                if (e instanceof ArmorStand stand && actualItem.has(DataComponents.EQUIPPABLE)) {
+                    EquipmentSlot slot = actualItem.get(DataComponents.EQUIPPABLE).slot();
+                    if ((slot == EquipmentSlot.HEAD || slot == EquipmentSlot.CHEST || slot == EquipmentSlot.LEGS || slot == EquipmentSlot.FEET) && stand.getItemBySlot(slot).isEmpty())
+                        return LegacyComponents.EQUIP;
+                }
+            }
             if (actualItem.getItem() instanceof LeadItem) {
                 if (entity instanceof Mob m && m.canBeLeashed(/* ? if <1.20.5 { *//* minecraft.player *//* ?} */))
                     return LegacyComponents.LEASH;
