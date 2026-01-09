@@ -640,8 +640,10 @@ public interface ControlTooltip {
                 return LegacyComponents.THROW;
             if (actualItem.getItem() instanceof FireworkRocketItem && (minecraft.player.isFallFlying() || minecraft.hitResult instanceof BlockHitResult && minecraft.hitResult.getType() != HitResult.Type.MISS))
                 return LegacyComponents.LAUNCH;
-            if (actualItem.getItem() instanceof ProjectileWeaponItem)
-                return !minecraft.player.getProjectile(actualItem).isEmpty() ? LegacyComponents.RELEASE : LegacyComponents.DRAW;
+            if (actualItem.getItem() instanceof BowItem)
+                return (minecraft.player.isUsingItem() && minecraft.player.getUseItem() == actualItem) ? LegacyComponents.RELEASE : (!minecraft.player.getProjectile(actualItem).isEmpty() ? LegacyComponents.DRAW : null);
+            if (actualItem.getItem() instanceof CrossbowItem)
+                return (CrossbowItem.isCharged(actualItem)) ? LegacyComponents.RELEASE : (!minecraft.player.getProjectile(actualItem).isEmpty() ? LegacyComponents.DRAW : null);
             // 9-Usable items (spyglass, fishing rod, goat horn)
             if (actualItem.getItem() instanceof SpyglassItem) return LegacyComponents.ZOOM;
             if ((actualItem.is(Items.WRITABLE_BOOK) || actualItem.is(Items.WRITTEN_BOOK)) && (blockState == null || !(blockState.getBlock() instanceof LecternBlock)))
