@@ -275,7 +275,7 @@
         },
         {
             "type": "bitmap",
-            "file": "legacy:component/ps4/touchpad.png",
+            "file": "legacy:component/ps4/hd/touchpad.png",
             "ascent": 11,
             "height": 15,
             "chars": ["\uE750"]
