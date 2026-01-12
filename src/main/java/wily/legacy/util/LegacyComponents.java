@@ -227,6 +227,8 @@ public class LegacyComponents {
     public static final Component ADJUST = Component.translatable("legacy.action.adjust");
     public static final Component CONFIGURE = Component.translatable("legacy.action.configure");
     public static final Component REEL = Component.translatable("legacy.action.reel");
+    public static final Component UNLEASH = Component.translatable("legacy.action.unleash");
+    public static final Component DETACH = Component.translatable("legacy.action.detach");
 
     public static Component getWorldTypeDescription(Holder<WorldPreset> preset) {
         Component presetDescription = getWorldPresetDescription(preset);

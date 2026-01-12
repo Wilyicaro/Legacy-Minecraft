@@ -22,6 +22,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
@@ -46,8 +47,7 @@ import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.animal.horse.Llama;
-import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.entity.decoration.*;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.npc.Villager;
@@ -71,6 +71,7 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -340,6 +341,25 @@ public interface ControlTooltip {
         if (minecraft.hitResult instanceof EntityHitResult r && (r.getEntity() instanceof AbstractVillager m && (!(m instanceof Villager v) || /*? if <1.21.5 {*//*v.getVillagerData().getProfession() != VillagerProfession.NONE*//*?} else {*/!v.getVillagerData().profession().is(VillagerProfession.NONE)/*?}*/) && !m.isTrading()))
             return LegacyComponents.TRADE;
         if (entity instanceof ItemFrame itemFrame && !itemFrame.getItem().isEmpty()) return LegacyComponents.ROTATE;
+        if (entity instanceof LeashFenceKnotEntity knot) {
+            BlockPos fencePos = knot.getPos();
+            if (!minecraft.level.getEntities((Entity) null, new AABB(fencePos).inflate(8.0D), e -> (e instanceof Mob mob && mob.getLeashHolder() == minecraft.player) || e instanceof Boat boat && boat.getLeashHolder() == minecraft.player || e instanceof ChestBoat chestBoat && chestBoat.getLeashHolder() == minecraft.player).isEmpty())
+                return LegacyComponents.ATTACH;
+            return LegacyComponents.DETACH;
+        }
+        boolean isLeashedToPlayer = (entity instanceof Mob m && m.getLeashHolder() == minecraft.player) || entity instanceof Boat b && b.getLeashHolder() == minecraft.player || entity instanceof ChestBoat cb && cb.getLeashHolder() == minecraft.player;
+        if (isLeashedToPlayer)
+            return LegacyComponents.UNLEASH;
+        if (blockState != null && blockState.is(BlockTags.FENCES) && blockHit != null)
+            if (!minecraft.level.getEntities((Entity) null, new AABB(blockHit.getBlockPos()).inflate(8.0D), e -> (e instanceof Mob mob && mob.getLeashHolder() == minecraft.player) || e instanceof Boat boat && boat.getLeashHolder() == minecraft.player || e instanceof ChestBoat chestBoat && chestBoat.getLeashHolder() == minecraft.player).isEmpty())
+                return LegacyComponents.ATTACH;
+        if (MainHand.getItem() instanceof LeadItem) {
+            boolean isLeashableEntity = (entity instanceof Mob m && m.canBeLeashed(/* ? if <1.20.5 { *//* minecraft.player *//* ?} */)) || entity instanceof AbstractHorse || entity instanceof Llama || entity instanceof Parrot || entity instanceof Boat || entity instanceof ChestBoat;
+            if (isLeashableEntity)
+                return LegacyComponents.LEASH;
+            if (entity != null)
+                return null;
+        }
         if (entity instanceof TamableAnimal a && a.isTame() && a.isOwnedBy(minecraft.player) && (!canDyeEntity(minecraft, minecraft.player.getMainHandItem()) && !canDyeEntity(minecraft, minecraft.player.getOffhandItem())) && (!(a instanceof Parrot p) || (p.onGround() && !minecraft.player.isPassenger())))
             return a.isInSittingPose() ? LegacyComponents.FOLLOW_ME : LegacyComponents.SIT;
         if (entity instanceof Allay allay) {
@@ -614,13 +634,6 @@ public interface ControlTooltip {
                     if ((slot == EquipmentSlot.HEAD || slot == EquipmentSlot.CHEST || slot == EquipmentSlot.LEGS || slot == EquipmentSlot.FEET) && stand.getItemBySlot(slot).isEmpty())
                         return LegacyComponents.EQUIP;
                 }
-            }
-            if (actualItem.getItem() instanceof LeadItem) {
-                if (entity instanceof Mob m && m.canBeLeashed(/* ? if <1.20.5 { *//* minecraft.player *//* ?} */))
-                    return LegacyComponents.LEASH;
-                if (entity instanceof AbstractHorse || entity instanceof Llama || entity instanceof Parrot || entity instanceof Boat || entity instanceof ChestBoat)
-                    return LegacyComponents.LEASH;
-                if (blockState != null && blockState.is(BlockTags.FENCES)) return LegacyComponents.ATTACH;
             }
             if (actualItem.getItem() instanceof FoodOnAStickItem<?> i && minecraft.player.getControlledVehicle() instanceof ItemSteerable && minecraft.player.getControlledVehicle().getType() == i.canInteractWith)
                 return LegacyComponents.BOOST;
