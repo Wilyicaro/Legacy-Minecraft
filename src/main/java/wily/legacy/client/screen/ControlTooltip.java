@@ -582,7 +582,7 @@ public interface ControlTooltip {
                     BlockState resultState = state.getBlock() instanceof LiquidBlockContainer && ItemContainerPlatform.getBucketFluid(i) == Fluids.WATER ? state : minecraft.level.getBlockState(bucketHitResult.getBlockPos().relative(bucketHitResult.getDirection()));
                     if (resultState.canBeReplaced(ItemContainerPlatform.getBucketFluid(i)) || resultState.isAir() || resultState.getBlock() instanceof LiquidBlockContainer container && container.canPlaceLiquid(/*? if >=1.20.2 {*/minecraft.player, /*?}*/minecraft.level, bucketHitResult.getBlockPos(), resultState, ItemContainerPlatform.getBucketFluid(i)))
                         return LegacyComponents.EMPTY;
-                } else if (state.getBlock() instanceof BucketPickup) return LegacyComponents.COLLECT;
+                } else if (state.getBlock() instanceof BucketPickup && !state.getFluidState().isEmpty()) return LegacyComponents.COLLECT;
             }
             if (actualItem.is(Items.BUCKET) && entity instanceof Cow)
                 return LegacyComponents.MILK;
