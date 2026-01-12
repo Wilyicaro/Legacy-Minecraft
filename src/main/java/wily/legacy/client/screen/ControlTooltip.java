@@ -1272,7 +1272,16 @@ public interface ControlTooltip {
         public static void applyGUIControlTooltips(Renderer renderer, Minecraft minecraft) {
             renderer.add(minecraft.options.keyJump, () -> minecraft.player.isUnderWater() ? LegacyComponents.SWIM_UP : null).add(minecraft.options.keyInventory, () -> !minecraft.gameMode.isServerControlledInventory() || !(minecraft.player.getVehicle() instanceof AbstractHorse h) || h.isTamed()).add(Legacy4JClient.keyCrafting).add(minecraft.options.keyUse, () -> getActualUse(minecraft)).add(minecraft.options.keyAttack, () -> getMainAction(minecraft));
             renderer.tooltips.addAll(controlTooltips);
-            renderer.add(minecraft.options.keyShift, () -> minecraft.player.isPassenger() ? minecraft.player.getVehicle() instanceof LivingEntity ? LegacyComponents.DISMOUNT : LegacyComponents.EXIT : minecraft.player./*? if >=1.21 {*/getInBlockState/*?} else {*//*getFeetBlockState*//*?}*/().is(Blocks.SCAFFOLDING) ? LegacyComponents.HOLD_TO_DESCEND : null).add(minecraft.options.keyPickItem, () -> getPickAction(minecraft));
+            renderer.add(minecraft.options.keyShift, () -> {
+                if (minecraft.player.isPassenger()) {
+                    return minecraft.player.getVehicle() instanceof LivingEntity ? LegacyComponents.DISMOUNT : LegacyComponents.EXIT;
+                }
+                BlockPos playerPos = minecraft.player.blockPosition();
+                boolean inOrOnScaffolding = minecraft.level.getBlockState(playerPos).is(Blocks.SCAFFOLDING) || minecraft.level.getBlockState(playerPos.below()).is(Blocks.SCAFFOLDING);
+                boolean scaffoldBelow = minecraft.level.getBlockState(playerPos.below()).is(Blocks.SCAFFOLDING);
+                boolean notOnGroundFloor = !minecraft.player.onGround() || scaffoldBelow;
+                    return (inOrOnScaffolding && notOnGroundFloor) ? LegacyComponents.HOLD_TO_DESCEND : null;
+                }).add(minecraft.options.keyPickItem, () -> getPickAction(minecraft));
         }
 
         public static <T> Predicate<T> staticPredicate(boolean b) {
