@@ -354,8 +354,7 @@ public interface ControlTooltip {
                 case 9, 10, 11, 12, 13, 14, 15 -> (!stand.getItemBySlot(EquipmentSlot.CHEST).isEmpty() || !stand.getItemBySlot(EquipmentSlot.MAINHAND).isEmpty() || !stand.getItemBySlot(EquipmentSlot.OFFHAND).isEmpty()) ? LegacyComponents.TAKE : null;
                 case 4, 5, 6, 7, 8 -> !stand.getItemBySlot(EquipmentSlot.LEGS).isEmpty() ? LegacyComponents.TAKE : null;
                 default -> !stand.getItemBySlot(EquipmentSlot.FEET).isEmpty() ? LegacyComponents.TAKE : null;
-            }
-                : mainHand.has(DataComponents.EQUIPPABLE) && mainHand.get(DataComponents.EQUIPPABLE).slot() != EquipmentSlot.BODY ? LegacyComponents.EQUIP : (mainHand.is(ItemTags.SWORDS) || mainHand.is(ItemTags.PICKAXES) || mainHand.is(ItemTags.AXES) || mainHand.is(ItemTags.SHOVELS) || mainHand.is(ItemTags.HOES) || mainHand.is(Items.TRIDENT) || mainHand.is(Items.SHIELD) || mainHand.is(Items.BOW) || mainHand.is(Items.CROSSBOW) ||mainHand.is(Items.SPYGLASS)) ? LegacyComponents.EQUIP : null; 
+            } : LegacyComponents.EQUIP;
         }
         boolean isLeashedToPlayer = (entity instanceof Mob m && m.getLeashHolder() == minecraft.player) || entity instanceof Boat b && b.getLeashHolder() == minecraft.player || entity instanceof ChestBoat cb && cb.getLeashHolder() == minecraft.player;
         if (isLeashedToPlayer)
