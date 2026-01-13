@@ -207,6 +207,29 @@ public class LegacyComponents {
     public static final Component SINGLE_BIOME_CUSTOMIZE_DESCRIPTION = Component.translatable("legacy.menu.selectWorld.mapType.single_biome_surface.customize.description");
     public static final Component WORLD_TYPE_CUSTOMIZE_DESCRIPTION = Component.translatable("legacy.menu.selectWorld.mapType.customize.description");
     public static final Component CONTROLLER_LED_PREVIEW = Component.translatable("legacy.options.controllerLedPreview");
+    public static final Component EDIT = Component.translatable("legacy.action.edit");
+    public static final Component MILK = Component.translatable("legacy.action.milk");
+    public static final Component DOUSE = Component.translatable("legacy.action.douse");
+    public static final Component RING = Component.translatable("legacy.action.ring");
+    public static final Component MOISTEN = Component.translatable("legacy.action.moisten");
+    public static final Component GIVE = Component.translatable("legacy.action.give");
+    public static final Component READ = Component.translatable("legacy.action.read");
+    public static final Component FUEL = Component.translatable("legacy.action.fuel");
+    public static final Component INSERT = Component.translatable("legacy.action.insert");
+    public static final Component DIRECT = Component.translatable("legacy.action.direct");
+    public static final Component CAST = Component.translatable("legacy.action.cast");
+    public static final Component BLOW = Component.translatable("legacy.action.blow");
+    public static final Component GLOW = Component.translatable("legacy.action.glow");
+    public static final Component REMOVE_GLOW = Component.translatable("legacy.action.remove_glow");
+    public static final Component WAX = Component.translatable("legacy.action.wax");
+    public static final Component SCRAPE = Component.translatable("legacy.action.scrape");
+    public static final Component BARTER = Component.translatable("legacy.action.barter");
+    public static final Component ADJUST = Component.translatable("legacy.action.adjust");
+    public static final Component CONFIGURE = Component.translatable("legacy.action.configure");
+    public static final Component REEL = Component.translatable("legacy.action.reel");
+    public static final Component UNLEASH = Component.translatable("legacy.action.unleash");
+    public static final Component DETACH = Component.translatable("legacy.action.detach");
+    public static final Component CLOSE = Component.translatable("legacy.action.close");
 
     public static Component getWorldTypeDescription(Holder<WorldPreset> preset) {
         Component presetDescription = getWorldPresetDescription(preset);
