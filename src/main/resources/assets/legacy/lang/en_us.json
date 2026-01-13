@@ -995,6 +995,7 @@
   "legacy.action.charge": "Charge",
   "legacy.action.clear": "Clear",
   "legacy.action.clear_quick_select": "Clear Quick Select",
+  "legacy.action.close": "Close",
   "legacy.action.collect": "Collect",
   "legacy.action.configure": "Configure",
   "legacy.action.cook": "Cook",
