@@ -7,10 +7,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Quaternionf;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 import wily.factoryapi.FactoryAPIClient;
-import wily.legacy.Legacy4J;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 public class AnimatedCharacterRenderer {
@@ -25,7 +23,7 @@ public class AnimatedCharacterRenderer {
                 updateTime(450);
             }
             if (Util.getMillis() - time <= remainingTime) {
-                float scale = LegacyRenderUtil.getTweakedHUDScale();
+                float scale = LegacyRenderUtil.getHUDScale();
                 float xRot = character.getXRot();
                 float xRotO = character.xRotO;
                 if (!character.isFallFlying()) character.setXRot(character.xRotO = -2.5f);

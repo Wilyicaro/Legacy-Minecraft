@@ -17,7 +17,7 @@
       {"group": "utility", "recipes": ["crafting_table","furnace","blast_furnace","smoker","campfire","soul_campfire","enchanting_table","anvil","brewing_stand","cartography_table","loom","fletching_table","smithing_table","stonecutter","grindstone"]},
       {"group": "chest", "recipes": ["chest","trapped_chest","ender_chest","copper_chest","barrel","shulker_box"]},
       {"group": "bed", "recipes": ["white_bed","orange_bed","magenta_bed","light_blue_bed","yellow_bed","lime_bed","pink_bed","gray_bed","light_gray_bed","cyan_bed","purple_bed","blue_bed","brown_bed","green_bed","red_bed","black_bed"]},
-      {"group": "barrier", "recipes": ["oak_fence","birch_fence","spruce_fence","jungle_fence","acacia_fence","dark_oak_fence","mangrove_fence","pale_oak_fence","bamboo_fence","cherry_fence","crimson_fence","warped_fence","cobblestone_wall","mossy_cobblestone_wall","cobbled_deepslate_wall","polished_deepslate_wall","deepslate_brick_wall","deepslate_tile_wall","blackstone_wall","polished_blackstone_wall","blackstone_brick_wall","granite_wall","diorite_wall","andesite_wall","brick_wall","stone_brick_wall","mossy_stone_brick_wall","nether_brick_wall","red_nether_brick_wall","sandstone_wall","red_sandstone_wall","mud_brick_wall","end_stone_brick_wall","prismarine_wall","tuff_wall","tuff_brick_wall","polished_tuff_wall","resin_brick_wall","nether_brick_fence","iron_bars"]},
+      {"group": "barrier", "recipes": ["oak_fence","birch_fence","spruce_fence","jungle_fence","acacia_fence","dark_oak_fence","mangrove_fence","pale_oak_fence","bamboo_fence","cherry_fence","crimson_fence","warped_fence","cobblestone_wall","mossy_cobblestone_wall","cobbled_deepslate_wall","polished_deepslate_wall","deepslate_brick_wall","deepslate_tile_wall","blackstone_wall","polished_blackstone_wall","blackstone_brick_wall","granite_wall","diorite_wall","andesite_wall","brick_wall","stone_brick_wall","mossy_stone_brick_wall","nether_brick_wall","red_nether_brick_wall","sandstone_wall","red_sandstone_wall","mud_brick_wall","end_stone_brick_wall","prismarine_wall","tuff_wall","tuff_brick_wall","polished_tuff_wall","resin_brick_wall","nether_brick_fence","iron_bars","copper_bars"]},
       {"group": "gate", "recipes": ["oak_fence_gate","birch_fence_gate","spruce_fence_gate","jungle_fence_gate","acacia_fence_gate","dark_oak_fence_gate","mangrove_fence_gate","pale_oak_fence_gate","bamboo_fence_gate","cherry_fence_gate","crimson_fence_gate","warped_fence_gate"]},
       {"group": "door", "recipes": ["oak_door","birch_door","spruce_door","jungle_door","acacia_door","dark_oak_door","mangrove_door","pale_oak_door","bamboo_door","cherry_door","crimson_door","warped_door","iron_door","copper_door","oak_trapdoor","birch_trapdoor","spruce_trapdoor","jungle_trapdoor","acacia_trapdoor","dark_oak_trapdoor","mangrove_trapdoor","pale_oak_trapdoor","bamboo_trapdoor","cherry_trapdoor","crimson_trapdoor","warped_trapdoor","iron_trapdoor","copper_trapdoor"]},
       {"group": "stairs", "recipes": ["oak_stairs","birch_stairs","spruce_stairs","jungle_stairs","acacia_stairs","dark_oak_stairs","mangrove_stairs","pale_oak_stairs","bamboo_stairs","bamboo_mosaic_stairs","cherry_stairs","crimson_stairs","warped_stairs","cobblestone_stairs","mossy_cobblestone_stairs","cobbled_deepslate_stairs","polished_deepslate_stairs","deepslate_brick_stairs","deepslate_tile_stairs","blackstone_stairs","polished_blackstone_stairs","polished_blackstone_brick_stairs","granite_stairs","polished_granite_stairs","diorite_stairs","polished_diorite_stairs","andesite_stairs","polished_andesite_stairs","brick_stairs","stone_stairs","stone_brick_stairs","mossy_stone_brick_stairs","mud_brick_stairs","nether_brick_stairs","red_nether_brick_stairs","sandstone_stairs","smooth_sandstone_stairs","red_sandstone_stairs","smooth_red_sandstone_stairs","quartz_stairs","smooth_quartz_stairs","purpur_stairs","end_stone_brick_stairs","prismarine_stairs","prismarine_brick_stairs","dark_prismarine_stairs","cut_copper_stairs","exposed_cut_copper_stairs","weathered_cut_copper_stairs","oxidized_cut_copper_stairs","waxed_cut_copper_stairs","waxed_exposed_cut_copper_stairs","waxed_weathered_cut_copper_stairs","waxed_oxidized_cut_copper_stairs","tuff_stairs","tuff_brick_stairs","polished_tuff_stairs","resin_brick_stairs"]},
@@ -45,7 +45,7 @@
       {"group": "sword", "recipes": ["wooden_sword","stone_sword","iron_sword","diamond_sword","golden_sword","copper_sword"]},
       "shield",
       {"group": "container", "recipes": ["bucket","bowl","glass_bottle","cauldron","composter"]},
-      {"group": "lighting", "recipes": ["torch","soul_torch","copper_torch","glowstone","sea_lantern","fire_charge","jack_o_lantern","end_rod","lantern","soul_lantern"]},
+      {"group": "lighting", "recipes": ["torch","soul_torch","copper_torch","glowstone","sea_lantern","fire_charge","jack_o_lantern","end_rod","lantern","soul_lantern","copper_lantern"]},
       {"group": "location", "recipes": ["clock","ender_eye","lead","saddle","white_harness","orange_harness","magenta_harness","light_blue_harness","yellow_harness","lime_harness","pink_harness","gray_harness","light_gray_harness","cyan_harness","purple_harness","blue_harness","brown_harness","green_harness","red_harness","black_harness","compass","recovery_compass","map","spyglass"]}
     ]
   },
@@ -107,7 +107,7 @@
       "redstone_torch",
       {"group": "utility", "recipes": ["repeater","comparator"]},
       {"group": "sensor", "recipes": ["daylight_detector","calibrated_sculk_sensor","target","lightning_rod"]},
-      "end_crystal",
+      {"group": "tear", "recipes": ["end_crystal", "dried_ghast"]},
       {"group": "item_transport", "recipes": ["hopper","dispenser","dropper","crafter"]},
       {"group": "button", "recipes": ["stone_button","polished_blackstone_button","oak_button","birch_button","spruce_button","jungle_button","acacia_button","dark_oak_button","mangrove_button","pale_oak_button","bamboo_button","cherry_button","crimson_button","warped_button"]},
       {"group": "pressure_plate", "recipes": ["oak_pressure_plate","birch_pressure_plate","spruce_pressure_plate","jungle_pressure_plate","acacia_pressure_plate","dark_oak_pressure_plate","mangrove_pressure_plate","pale_oak_pressure_plate","bamboo_pressure_plate","cherry_pressure_plate","crimson_pressure_plate","warped_pressure_plate","stone_pressure_plate","polished_blackstone_pressure_plate","heavy_weighted_pressure_plate","light_weighted_pressure_plate"]},
@@ -118,7 +118,13 @@
   {
     "id": "transport",
     "name": {"translate": "legacy.container.tab.transport"},
-    "icon": "legacy:icon/transport",
+    "icon": {
+      "type": "sizeable",
+      "value": {
+        "default": "legacy:icon/transport",
+        "sd": "legacy:icon/transport_small"
+      }
+    },
     "listing": [
       {"group": "rail", "recipes": ["rail","powered_rail","detector_rail","activator_rail"]},
       "minecart","chest_minecart","furnace_minecart","tnt_minecart","hopper_minecart",

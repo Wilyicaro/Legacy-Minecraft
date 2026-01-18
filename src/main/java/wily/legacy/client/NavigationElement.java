@@ -22,7 +22,7 @@ public interface NavigationElement {
     }
 
     default void applyFocus(ComponentPath.Path path, boolean apply) {
-        boolean disableCursor = Controller.Event.of(path.component()).disableCursorOnWidgets();
+        boolean disableCursor = Controller.Event.of(path.component()).disableCursorOnWidgets() && !Legacy4JClient.controllerManager.getCursorMode().isAlways();
         if (Legacy4JClient.controllerManager.isCursorDisabled || disableCursor) {
             if (!apply) {
                 path.component().setFocused(null);

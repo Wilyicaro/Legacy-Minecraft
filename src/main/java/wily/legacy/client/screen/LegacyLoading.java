@@ -1,28 +1,41 @@
 package wily.legacy.client.screen;
 
 import net.minecraft.network.chat.Component;
-import wily.legacy.client.LegacyTip;
-import wily.legacy.client.LegacyTipManager;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Supplier;
 
 public interface LegacyLoading {
+    default LegacyLoadingRenderer getLoadingRenderer() {
+        return LegacyLoadingRenderer.getInstance();
+    }
 
-    float getProgress();
+    default float getProgress() {
+        return getLoadingRenderer().progress;
+    }
 
-    void setProgress(float progress);
+    default void setProgress(float progress) {
+        getLoadingRenderer().progress = progress;
+    }
 
-    Component getLoadingHeader();
+    default Component getLoadingHeader() {
+        return getLoadingRenderer().loadingHeader;
+    }
 
-    void setLoadingHeader(Component loadingHeader);
+    default void setLoadingHeader(Component loadingHeader) {
+        getLoadingRenderer().loadingHeader = loadingHeader;
+    }
 
-    Component getLoadingStage();
+    default Component getLoadingStage() {
+        return getLoadingRenderer().loadingStage;
+    }
 
-    void setLoadingStage(Component loadingStage);
+    default void setLoadingStage(Component loadingStage) {
+        getLoadingRenderer().loadingStage = loadingStage;
+    }
 
-    boolean isGenericLoading();
+    default boolean isGenericLoading() {
+        return getLoadingRenderer().genericLoading;
+    }
 
-    void setGenericLoading(boolean genericLoading);
+    default void setGenericLoading(boolean genericLoading) {
+        getLoadingRenderer().genericLoading = genericLoading;
+    }
 }

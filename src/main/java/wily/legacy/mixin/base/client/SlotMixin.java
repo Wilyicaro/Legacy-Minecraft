@@ -1,7 +1,6 @@
 package wily.legacy.mixin.base.client;
 
-import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -9,7 +8,6 @@ import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.inventory.LegacySlot;
 
@@ -30,14 +28,9 @@ public abstract class SlotMixin implements LegacySlot {
     @Unique
     private int defaultY;
     private LegacySlotDisplay display = LegacySlotDisplay.VANILLA;
-    private ItemStack lastItemStack = ItemStack.EMPTY;
-    private long lastItemStackChange;
 
     @Shadow
     public abstract ItemStack getItem();
-
-    @Shadow
-    public abstract void setChanged();
 
     @Override
     public LegacySlotDisplay getDisplay() {
@@ -59,16 +52,10 @@ public abstract class SlotMixin implements LegacySlot {
         defaultY = y;
     }
 
-    @Inject(method = "getItem", at = @At("RETURN"), cancellable = true)
-    public void getItem(CallbackInfoReturnable<ItemStack> cir) {
-        ItemStack s = cir.getReturnValue();
-        if (Minecraft.getInstance().player != null && Minecraft.getInstance().player.containerMenu.slots.contains(this) && !ItemStack.matches(s, lastItemStack) && lastItemStackChange != Util.getMillis()) {
-            lastItemStackChange = Util.getMillis();
-            lastItemStack = s.copy();
-            setChanged();
-        }
-        ItemStack override = LegacySlotDisplay.of((Slot) (Object) this).getItemOverride();
-        if (override != null) cir.setReturnValue(override);
+    @ModifyReturnValue(method = "getItem", at = @At("RETURN"))
+    public ItemStack getItem(ItemStack original) {
+        ItemStack override = display.getItemOverride();
+        return override == null ? original : override;
     }
 
     @Override

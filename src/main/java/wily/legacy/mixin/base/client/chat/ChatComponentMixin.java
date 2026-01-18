@@ -1,16 +1,14 @@
 package wily.legacy.mixin.base.client.chat;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.network.chat.Style;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Final;
@@ -19,14 +17,13 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.OverlayPanelScreen;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
-
-import java.util.Objects;
 
 @Mixin(ChatComponent.class)
 public abstract class ChatComponentMixin {
@@ -69,6 +66,39 @@ public abstract class ChatComponentMixin {
                 }
             }
         };
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;forEachLine(IIZILnet/minecraft/client/gui/components/ChatComponent$LineConsumer;)I", ordinal = 1))
+    private void changeChatFont(GuiGraphics guiGraphics, int i, int j, int k, boolean bl, CallbackInfo ci) {
+        if (LegacyOptions.getUIMode().isSD())
+            LegacyFontUtil.defaultFontOverride = LegacyFontUtil.MOJANGLES_11_FONT;
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;forEachLine(IIZILnet/minecraft/client/gui/components/ChatComponent$LineConsumer;)I", ordinal = 1, shift = At.Shift.AFTER))
+    private void changeChatFontAfter(GuiGraphics guiGraphics, int i, int j, int k, boolean bl, CallbackInfo ci) {
+        LegacyFontUtil.defaultFontOverride = null;
+    }
+
+    @Inject(method = "getClickedComponentStyleAt", at = @At("HEAD"))
+    private void changeClickedChatFont(double d, double e, CallbackInfoReturnable<Style> cir) {
+        if (LegacyOptions.getUIMode().isSD())
+            LegacyFontUtil.defaultFontOverride = LegacyFontUtil.MOJANGLES_11_FONT;
+    }
+
+    @Inject(method = "getClickedComponentStyleAt", at = @At("RETURN"))
+    private void changeClickedChatFontAfter(double d, double e, CallbackInfoReturnable<Style> cir) {
+        LegacyFontUtil.defaultFontOverride = null;
+    }
+
+    @Inject(method = "addMessageToDisplayQueue", at = @At("HEAD"))
+    private void changeClickedChatFontWidth(GuiMessage guiMessage, CallbackInfo ci) {
+        if (LegacyOptions.getUIMode().isSD())
+            LegacyFontUtil.defaultFontOverride = LegacyFontUtil.MOJANGLES_11_FONT;
+    }
+
+    @Inject(method = "addMessageToDisplayQueue", at = @At("RETURN"))
+    private void changeClickedChatFontWidthAfter(GuiMessage guiMessage, CallbackInfo ci) {
+        LegacyFontUtil.defaultFontOverride = null;
     }
 
     @ModifyExpressionValue(method = "getMessageTagAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;screenToChatX(D)D"))

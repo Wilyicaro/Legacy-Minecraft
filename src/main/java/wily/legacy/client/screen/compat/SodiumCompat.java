@@ -34,13 +34,13 @@ import org.apache.logging.log4j.core.util.ReflectionUtil;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
-import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.screen.*;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.function.Supplier;
 
 public class SodiumCompat {
 
@@ -71,7 +71,7 @@ public class SodiumCompat {
                     option.applyChanges();
                     option.getStorage().save();
                 }
-            });
+            }, () -> (Integer) option.getValue());
         } else if (option.getControl() instanceof CyclingControl<?> c) {
             List<Enum<?>> values = List.of((Enum<?>[]) ReflectionUtil.getFieldValue(SODIUM_CYCLING_CONTROL_FIELDS.get("allowedValues"), c));
             Component[] components = (Component[]) ReflectionUtil.getFieldValue(SODIUM_CYCLING_CONTROL_FIELDS.get("names"), c);
@@ -81,7 +81,7 @@ public class SodiumCompat {
                     option.applyChanges();
                     option.getStorage().save();
                 }
-            });
+            }, c.getOption()::getValue);
         }
         return null;
     }

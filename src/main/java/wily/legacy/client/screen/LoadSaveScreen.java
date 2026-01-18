@@ -24,10 +24,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
-import wily.legacy.client.CommonColor;
-import wily.legacy.client.LegacyClientWorldSettings;
-import wily.legacy.client.LegacySaveCache;
-import wily.legacy.client.PackAlbum;
+import wily.legacy.client.*;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
@@ -63,14 +60,13 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
     public Difficulty difficulty;
 
     public LoadSaveScreen(Screen screen, LevelSummary summary, LevelStorageSource.LevelStorageAccess access, boolean isLocked) {
-        super(s -> Panel.createPanel(s, p -> (s.width - (p.width + (LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(s)) ? 160 : 0))) / 2, p -> (s.height - p.height) / 2 + 21, 245, 233), Component.translatable("legacy.menu.load_save.load"));
+        super(s -> Panel.createPanel(s, p -> (s.width - (p.width + (LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(s)) ? PackAlbum.Selector.getDefaultWidth() : 0))) / 2, p -> (s.height - p.height) / 2 + 21, 245, 233), Component.translatable("legacy.menu.load_save.load"));
         this.isLocked = isLocked;
         this.parent = screen;
         this.summary = summary;
         this.access = access;
         difficulty = summary.getSettings().difficulty();
-        gameTypeSlider = new LegacySliderButton<>(0, 0, 220, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().getShortDisplayName()), b -> Tooltip.create(Component.translatable("selectWorld.gameMode." + b.getObjectValue().getName() + ".info")), summary.getSettings().gameType(), () -> GAME_TYPES, b -> {
-        });
+        gameTypeSlider = new LegacySliderButton<>(0, 0, 220, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().getShortDisplayName()), b -> Tooltip.create(Component.translatable("selectWorld.gameMode." + b.getObjectValue().getName() + ".info")), summary.getSettings().gameType(), () -> GAME_TYPES, b -> {});
         gameTypeSlider.active = !summary.isHardcore();
         publishScreen = new PublishScreen(this, gameTypeSlider.getObjectValue());
         onlineTickBox = new TickBox(0, 0, 220, publishScreen.publish, b -> PublishScreen.PUBLISH, b -> null, button -> {
@@ -185,6 +181,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         resourceAlbumSelector.setY(panel.y + 112);
         resourceAlbumSelector.setWidth(getLayoutWidth());
         addRenderableWidget(accessor.putWidget("resourceAlbumSelector", resourceAlbumSelector));
+        resourceAlbumSelector.hasTooltip = !LegacyRenderUtil.hasTooltipBoxes(UIAccessor.of(this));
     }
 
     public void onLoad() {

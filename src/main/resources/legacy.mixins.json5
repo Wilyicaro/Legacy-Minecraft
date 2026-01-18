@@ -176,14 +176,12 @@
     "client.NameTagSubmitMixin",
     "client.EntityRendererMixin",
     "client.NameTagFeatureRendererStorageMixin",
-    "client.SubmitNodeCollectorMixin",
     "client.AvatarRendererMixin",
     "client.LevelLoadingScreenAccessor",
-    "client.FeatureRenderDispatcherMixin",
     "client.MovingBlockRenderStateMixin",
     "client.ClientAvatarStateMixin",
-    "client.SubmitNodeStorageMixin",
-    "client.ComponentPathMixin"
+    "client.ComponentPathMixin",
+    "client.FeatureRenderDispatcherMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",

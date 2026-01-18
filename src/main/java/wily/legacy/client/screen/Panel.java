@@ -141,4 +141,13 @@ public class Panel extends SimpleLayoutRenderable {
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         FactoryGuiGraphics.of(guiGraphics).blitSprite(panelSprite, x, y, width, height);
     }
+
+    //TODO: Replace this with some kind of builder
+    public interface Constructor<T extends Screen> {
+        Panel create(T screen);
+
+        default <X extends Screen> Constructor<X> cast() {
+            return (Constructor<X>) this;
+        }
+    }
 }

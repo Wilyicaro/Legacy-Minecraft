@@ -10,8 +10,8 @@ import java.util.function.Function;
 public abstract class OverlayPanelScreen extends PanelBackgroundScreen {
     protected boolean darkBackground = true;
 
-    public OverlayPanelScreen(Screen parent, Function<Screen, Panel> panelConstructor, Component component) {
-        super(parent, panelConstructor, component);
+    public OverlayPanelScreen(Screen parent, Panel.Constructor<OverlayPanelScreen> panelConstructor, Component component) {
+        super(parent, panelConstructor.cast(), component);
     }
 
     public OverlayPanelScreen(Screen parent, int imageWidth, int imageHeight, Component component) {

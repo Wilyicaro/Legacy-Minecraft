@@ -109,11 +109,11 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
     Component getDescription();
 
     interface Filter extends Predicate<RecipeInfo<?>> {
-        ListMap<ResourceLocation, Codec<? extends Filter>> map = ListMap.<String, Codec<? extends Filter>>builder().put("id", Id.CODEC).put("item_tag", Id.CODEC).put("block_tag", BlockTag.CODEC).put("item_id", ItemId.CODEC).mapKeys(FactoryAPI::createVanillaLocation).build();
+        ListMap<ResourceLocation, Codec<? extends Filter>> map = ListMap.<String, Codec<? extends Filter>>builder().put("id", Id.CODEC).put("item_tag", ItemTag.CODEC).put("block_tag", BlockTag.CODEC).put("item_id", ItemId.CODEC).mapKeys(FactoryAPI::createVanillaLocation).build();
         Codec<Filter> BY_TYPE_CODEC = new Codec<>() {
             @Override
             public <T> DataResult<T> encode(Filter input, DynamicOps<T> ops, T prefix) {
-                return ResourceLocation.CODEC.fieldOf("type").codec().encode(map.getKey(input.codec()), ops, prefix).flatMap(r -> ((Codec<Filter>) input.codec()).fieldOf("value").codec().encode(input, ops, r));
+                return ResourceLocation.CODEC.encodeStart(ops, map.getKey(input.codec())).map(type -> ops.set(prefix, "type", type)).flatMap(r ->  ((Codec<Filter>) input.codec()).encodeStart(ops, input).map(value -> ops.set(r, "value", value)));
             }
 
             @Override

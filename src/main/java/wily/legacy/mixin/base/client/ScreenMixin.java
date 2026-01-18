@@ -22,9 +22,7 @@ import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.NavigationElement;
 import wily.legacy.client.screen.ControlTooltip;
-import wily.legacy.client.screen.KeyboardScreen;
 import wily.legacy.client.screen.LegacyLoading;
-import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
@@ -45,14 +43,13 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
 
     @Inject(method = "renderWithTooltipAndSubtitles", at = @At("HEAD"))
     private void renderWithTooltip(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
-        LegacyTipManager.tipDiffPercentage = Math.max(-0.5f, Math.min(LegacyTipManager.tipDiffPercentage + (LegacyTipManager.getActualTip() == null ? -0.1f : 0.08f) * f, 1.5f));
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(LegacyTipManager.getTipXDiff(), 0);
+        guiGraphics.pose().translate(LegacyTipManager.getTipXOffset(), 0);
     }
 
     @Inject(method = "renderWithTooltipAndSubtitles", at = @At("RETURN"))
     private void renderWithTooltipReturn(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
-        guiGraphics.pose().translate(-LegacyTipManager.getTipXDiff(), 0);
+        guiGraphics.pose().translate(-LegacyTipManager.getTipXOffset(), 0);
         ControlTooltip.Renderer.of(this).render(guiGraphics, i, j, f);
         guiGraphics.pose().popMatrix();
     }

@@ -65,6 +65,12 @@
     "inventoryTitle.y": 3,
     "resultSlot.x": 80,
     "resultSlot.y": 32,
+    "ingredientsTitle.y": 2,
+    "ingredientSlot.size": 10,
+    "ingredientSlot.y": 12,
+    "ingredientText.x": 2,
+    "horizontalScroll.x": -7,
+    "horizontalScroll.y": 23,
     "customCraftingButtons": {
       "type": "children",
       "elements": [

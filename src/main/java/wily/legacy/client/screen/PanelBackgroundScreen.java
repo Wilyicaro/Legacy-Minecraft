@@ -8,14 +8,14 @@ import java.util.function.Function;
 public class PanelBackgroundScreen extends LegacyScreen {
     protected final Panel panel;
 
-    public PanelBackgroundScreen(Screen parent, Function<Screen, Panel> panelConstructor, Component component) {
+    public PanelBackgroundScreen(Screen parent, Panel.Constructor<PanelBackgroundScreen> panelConstructor, Component component) {
         super(parent, component);
-        panel = panelConstructor.apply(this);
+        panel = panelConstructor.create(this);
     }
 
-    public PanelBackgroundScreen(Function<Screen, Panel> panelConstructor, Component component) {
+    public PanelBackgroundScreen(Panel.Constructor<PanelBackgroundScreen> panelConstructor, Component component) {
         super(component);
-        panel = panelConstructor.apply(this);
+        panel = panelConstructor.create(this);
     }
 
     public PanelBackgroundScreen(Screen parent, int imageWidth, int imageHeight, Component component) {

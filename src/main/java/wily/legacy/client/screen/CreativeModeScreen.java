@@ -205,7 +205,7 @@ public class CreativeModeScreen extends AbstractContainerScreen<CreativeModeScre
             searchBox.setWidth(sd ? 70 : 200);
             searchBox.setHeight(sd ? 10 : 20);
             searchBox.setPosition(panel.getX() + (panel.getWidth() - searchBox.getWidth()) / 2 - 6, panel.getY() + (sd ? 3 : 7));
-            addRenderableWidget(searchBox);
+            addRenderableWidget(accessor.putWidget("searchBox", searchBox));
         }
         this.minecraft.player.inventoryMenu.removeSlotListener(this.listener);
         this.listener = new CreativeInventoryListener(this.minecraft);

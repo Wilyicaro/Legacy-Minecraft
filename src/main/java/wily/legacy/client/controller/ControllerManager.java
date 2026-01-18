@@ -28,7 +28,6 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.screen.LegacyMenuAccess;
-import wily.legacy.client.screen.TabList;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.mixin.base.client.KeyboardHandlerAccessor;
 import wily.legacy.mixin.base.client.MouseHandlerAccessor;
@@ -55,6 +54,7 @@ public class ControllerManager {
     public boolean simulateShift = false;
     public boolean canChangeSlidersValue = true;
     public boolean isControllerSimulatingInput = false;
+    public boolean blockNextCharType = false;
     protected Minecraft minecraft;
     protected boolean isControllerTheLastInput = false;
     private KeyMapping[] orderedKeyMappings;
@@ -147,8 +147,15 @@ public class ControllerManager {
             if (controller != null) {
                 connectedController = controller;
                 controller.connect(this);
-            }
-        } else safeDisconnect();
+			    if (controller.hasLED()) {
+                    controller.setLED(
+                            LegacyOptions.controllerLedRed.get().byteValue(),
+                            LegacyOptions.controllerLedGreen.get().byteValue(),
+                            LegacyOptions.controllerLedBlue.get().byteValue()
+                    );
+                }
+            } else safeDisconnect();
+        }
     }
 
     public void updateHandler(Controller.Handler handler) {
@@ -166,6 +173,7 @@ public class ControllerManager {
         for (ControllerBinding<?> binding : ControllerBinding.map.values()) {
             BindingState state = binding.state();
             state.update(controller);
+            BindingUpdate.EVENT.invoker.accept(state);
             if (LegacyTipManager.getActualTip() != null) LegacyTipManager.getActualTip().bindingStateTick(state);
 
             if (state.pressed) {
@@ -175,10 +183,12 @@ public class ControllerManager {
 
             if (getCursorMode().isAuto() && state.pressed && !isCursorDisabled) tryDisableCursor();
 
-            if (minecraft.player != null && minecraft.getConnection() != null && controller.hasLED() && minecraft.getConnection().getPlayerInfo(minecraft.player.getUUID()) instanceof LegacyPlayerInfo i) {
-                float[] color = Legacy4JClient.getVisualPlayerColor(i);
-                controller.setLED((byte) (color[0] * 255), (byte) (color[1] * 255), (byte) (color[2] * 255));
-            }
+			if (controller.hasLED())
+                controller.setLED(
+                        LegacyOptions.controllerLedRed.get().byteValue(),
+                        LegacyOptions.controllerLedGreen.get().byteValue(),
+                        LegacyOptions.controllerLedBlue.get().byteValue()
+                );
 
             if (state.is(ControllerBinding.START) && state.justPressed)
                 if (minecraft.screen == null) minecraft.pauseGame(false);
@@ -274,7 +284,7 @@ public class ControllerManager {
 
                 Predicate<Predicate<BindingState.Axis>> isStickAnd = s ->
                         state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick && s.test(stick) &&
-                        (isCursorDisabled && (state.pressed && state.canClick() || state.released) || LegacyOptions.legacyCursor.get() && !isCursorDisabled && !stick.isBlocked() && stick.getSmoothMagnitude() < 0.2f && state.timePressed == state.getDefaultDelay() / 2 && isHoveringWidget());
+                        ((isCursorDisabled || LegacyOptions.interfaceSensitivity.get() == 0) && (state.pressed && state.canClick() || state.released) || LegacyOptions.interfaceSensitivity.get() > 0 && LegacyOptions.legacyCursor.get() && !isCursorDisabled && !stick.isBlocked() && stick.getSmoothMagnitude() >= 0.15f && stick.getSmoothMagnitude() < 0.3f && state.timePressed == state.getDefaultDelay() / 2 && isHoveringWidget());
                 if (isStickAnd.test(s -> s.y < 0 && -s.y > Math.abs(s.x)))
                     simulateKeyAction(InputConstants.KEY_UP, state, !state.released, false);
                 else if (isStickAnd.test(s -> s.y > 0 && s.y > Math.abs(s.x)))
@@ -340,7 +350,7 @@ public class ControllerManager {
 
     public void simulateKeyAction(Predicate<BindingState> canSimulate, int key, BindingState state, boolean onlyScreen) {
         boolean clicked = state.pressed && state.canClick();
-        if (canSimulate.test(state) && (!Controller.Event.of(minecraft.screen).onceClickBindings(state) || state.onceClick(true))) {
+        if (canSimulate.test(state) && (!Controller.Event.of(minecraft.screen).onceClickBindings(state) || state.released || state.onceClick(true))) {
             simulateKeyAction(key, state, clicked, onlyScreen);
         }
     }
@@ -396,11 +406,11 @@ public class ControllerManager {
     }
 
     public float getVisualPointerX() {
-        return Math.round(minecraft.mouseHandler.xpos()) / (float) Math.round((float) minecraft.getWindow().getScreenWidth() / minecraft.getWindow().getGuiScaledWidth());
+        return (float) Math.round(minecraft.mouseHandler.xpos()) * minecraft.getWindow().getGuiScaledWidth() / minecraft.getWindow().getScreenWidth();
     }
 
     public float getVisualPointerY() {
-        return Math.round(minecraft.mouseHandler.ypos()) / (float) Math.round((float) minecraft.getWindow().getScreenHeight() / minecraft.getWindow().getGuiScaledHeight());
+        return (float) Math.round(minecraft.mouseHandler.ypos()) * minecraft.getWindow().getGuiScaledHeight() / minecraft.getWindow().getScreenHeight();
     }
 
     public <T extends BindingState> T getButtonState(ControllerBinding<T> button) {
@@ -490,5 +500,9 @@ public class ControllerManager {
 
     interface Setup extends Consumer<ControllerManager> {
         FactoryEvent<Setup> EVENT = new FactoryEvent<>(e -> m -> e.invokeAll(l -> l.accept(m)));
+    }
+
+    interface BindingUpdate extends Consumer<BindingState> {
+        FactoryEvent<BindingUpdate> EVENT = new FactoryEvent<>(e -> m -> e.invokeAll(l -> l.accept(m)));
     }
 }

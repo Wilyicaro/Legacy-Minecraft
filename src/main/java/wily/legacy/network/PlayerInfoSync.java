@@ -7,7 +7,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.GameType;
-import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
@@ -17,7 +16,6 @@ import wily.legacy.entity.LegacyPlayer;
 import wily.legacy.entity.LegacyPlayerInfo;
 
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Payload {
@@ -107,7 +105,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
                     case DISABLE_EXHAUSTION, ENABLE_EXHAUSTION ->
                             ((LegacyPlayerInfo) affectPlayer).setDisableExhaustion(sync == Sync.DISABLE_EXHAUSTION);
                     case ENABLE_MAY_FLY_SURVIVAL, DISABLE_MAY_FLY_SURVIVAL ->
-                            LegacyPlayerInfo.updateMayFlySurvival(affectPlayer, sync == Sync.ENABLE_MAY_FLY_SURVIVAL, true);
+                            LegacyPlayerInfo.setAndUpdateMayFlySurvival(affectPlayer, sync == Sync.ENABLE_MAY_FLY_SURVIVAL, true);
                 }
             }
         }
@@ -124,10 +122,13 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
 
     public record All(Map<UUID, LegacyPlayerInfo> players, Map<String, Object> gameRules, GameType defaultGameType,
                       CommonNetwork.Identifier<All> identifier) implements CommonNetwork.Payload {
-        public static final List<GameRules.Key<GameRules.BooleanValue>> NON_OP_GAMERULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK, LegacyGameRules.getTntExplodes(), GameRules.RULE_DOMOBLOOT, GameRules.RULE_DOBLOCKDROPS, GameRules.RULE_NATURAL_REGENERATION, LegacyGameRules.GLOBAL_MAP_PLAYER_ICON, LegacyGameRules.LEGACY_SWIMMING, GameRules.RULE_DO_IMMEDIATE_RESPAWN));        public static final CommonNetwork.Identifier<All> ID_C2S = CommonNetwork.Identifier.create(Legacy4J.createModLocation("player_info_sync_all_c2s"), b -> new All(b, All.ID_C2S));
+        public static final List<GameRules.Key<GameRules.BooleanValue>> NON_OP_GAMERULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK, LegacyGameRules.getTntExplodes(), GameRules.RULE_DOMOBLOOT, GameRules.RULE_DOBLOCKDROPS, GameRules.RULE_NATURAL_REGENERATION, LegacyGameRules.GLOBAL_MAP_PLAYER_ICON, LegacyGameRules.LEGACY_SWIMMING, GameRules.RULE_DO_IMMEDIATE_RESPAWN));
+        public static final CommonNetwork.Identifier<All> ID_C2S = CommonNetwork.Identifier.create(Legacy4J.createModLocation("player_info_sync_all_c2s"), b -> new All(b, All.ID_C2S));
+        public static final CommonNetwork.Identifier<All> ID_S2C = CommonNetwork.Identifier.create(Legacy4J.createModLocation("player_info_sync_all_s2c"), b -> new All(b, All.ID_S2C));
+
         public All(Map<String, Object> gameRules, CommonNetwork.Identifier<All> identifier) {
             this(Collections.emptyMap(), gameRules, GameType.SURVIVAL, identifier);
-        }        public static final CommonNetwork.Identifier<All> ID_S2C = CommonNetwork.Identifier.create(Legacy4J.createModLocation("player_info_sync_all_s2c"), b -> new All(b, All.ID_S2C));
+        }
 
         public All(CommonNetwork.PlayBuf buf, CommonNetwork.Identifier<All> identifier) {
             this(buf.get().readMap(HashMap::new, b -> b.readUUID(), b -> LegacyPlayerInfo.decode(buf)), buf.get().readMap(HashMap::new, FriendlyByteBuf::readUtf, b -> {
@@ -185,9 +186,5 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
                 });
             });
         }
-
-
-
-
     }
 }

@@ -10,6 +10,7 @@ import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.core.Holder;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -18,6 +19,7 @@ import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.WorldDataConfiguration;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.DatapackRepositoryAccessor;
@@ -36,6 +38,7 @@ import java.util.function.Predicate;
 public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlTooltip.Event, DatapackRepositoryAccessor {
     public static final Component ENTER_SEED = Component.translatable("selectWorld.enterSeed");
     public static final Component SEED_INFO = Component.translatable("selectWorld.seedInfo");
+    public static final Component ENTER_SEED_DESCRIPTION = Component.translatable("legacy.menu.selectWorld.enterSeed.description");
     protected final TabList tabList = new TabList(accessor).add(LegacyTabButton.Type.LEFT, Component.translatable("createWorld.tab.world.title"), t -> rebuildWidgets()).add(LegacyTabButton.Type.RIGHT, Component.translatable("legacy.menu.game_options"), t -> rebuildWidgets());
 
     protected final RenderableVList gameRenderables = new RenderableVList(accessor);
@@ -55,19 +58,30 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 return super.createNarrationMessage().append(CommonComponents.NARRATION_SEPARATOR).append(SEED_INFO);
             }
         };
+        editBox.setTooltip(new MultilineTooltip(tooltipBox.getWidth() - 10, ENTER_SEED_DESCRIPTION));
         editBox.setValue(parent.getUiState().getSeed());
         editBox.setResponder(string -> parent.getUiState().setSeed(editBox.getValue()));
         renderableVList.addRenderable(editBox);
-        renderableVList.addRenderable(SimpleLayoutRenderable.create(0, 9, r -> ((guiGraphics, i, j, f) -> guiGraphics.drawString(Minecraft.getInstance().font, SEED_INFO, r.x + 1, r.y + 2, CommonColor.INVENTORY_GRAY_TEXT.get(), false))));
+        renderableVList.addRenderable(SimpleLayoutRenderable.createDrawString(SEED_INFO,1, 2, 0, 9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
         renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isGenerateStructures(), b -> Component.translatable("selectWorld.mapFeatures"), b -> Tooltip.create(Component.translatable("selectWorld.mapFeatures.info")), b -> parent.getUiState().setGenerateStructures(b.selected)));
-        renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isBonusChest(), b -> Component.translatable("selectWorld.bonusItems"), b -> null, b -> parent.getUiState().setBonusChest(b.selected)));
-        renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 0, 16, s -> s.getDefaultMessage(Component.translatable("selectWorld.mapType"), parent.getUiState().getWorldType().describePreset()), b -> parent.getUiState().getWorldType().isAmplified() ? Tooltip.create(Component.translatable("generator.minecraft.amplified.info")) : null, parent.getUiState().getWorldType(), () -> CycleButton.DEFAULT_ALT_LIST_SELECTOR.getAsBoolean() ? parent.getUiState().getAltPresetList() : parent.getUiState().getNormalPresetList(), b -> parent.getUiState().setWorldType(b.objectValue)));
+        renderableVList.addRenderable(new TickBox(0, 0, parent.getUiState().isBonusChest(), b -> Component.translatable("selectWorld.bonusItems"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.bonusItems.description")), b -> parent.getUiState().setBonusChest(b.selected)));
+        renderableVList.addRenderable(SimpleLayoutRenderable.createDrawString(Component.translatable("selectWorld.mapType"), 0, 2, 0, 9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 0, 16,
+                s -> s.getObjectValue().describePreset(),
+                b -> Tooltip.create(LegacyComponents.getWorldTypeDescription(b.getObjectValue().preset())),
+                parent.getUiState().getWorldType(),
+                () -> CycleButton.DEFAULT_ALT_LIST_SELECTOR.getAsBoolean() ? parent.getUiState().getAltPresetList()
+                        : parent.getUiState().getNormalPresetList(),
+                b -> parent.getUiState().setWorldType(b.objectValue)));
         Button customizeButton = Button.builder(Component.translatable("selectWorld.customizeType"), button -> {
             PresetEditor presetEditor = parent.getUiState().getPresetEditor();
             if (presetEditor != null)
                 minecraft.setScreen(presetEditor.createEditScreen(parent, parent.getUiState().getSettings()));
-        }).build();
-        parent.getUiState().addListener(s -> customizeButton.active = !s.isDebug() && s.getPresetEditor() != null);
+        }).tooltip(Tooltip.create(Component.empty())).build();
+        parent.getUiState().addListener(s -> {
+            customizeButton.active = !s.isDebug() && s.getPresetEditor() != null;
+            customizeButton.setTooltip(Tooltip.create(LegacyComponents.getWorldPresetCustomizeDescription(s.getWorldType().preset())));
+        });
         renderableVList.addRenderable(customizeButton);
         renderableVList.addRenderable(SimpleLayoutRenderable.create(0, 9, r -> ((guiGraphics, i, j, f) -> {
         })));
@@ -93,8 +107,8 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 parent.tryApplyNewDataPacks(dataRepository, false, w -> minecraft.setScreen(this));
             };
         }
-        renderableVList.addRenderable(Button.builder(Component.translatable("selectWorld.dataPacks"), button -> openDataPackSelectionScreen(parent, parent.getUiState().getSettings().dataConfiguration())).build());
-        renderableVList.addRenderable(new TickBox(0, 0, trustPlayers.get(), b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> null, t -> trustPlayers.set(t.selected)));
+        renderableVList.addRenderable(Button.builder(Component.translatable("selectWorld.dataPacks"), button -> openDataPackSelectionScreen(parent, parent.getUiState().getSettings().dataConfiguration())).tooltip(Tooltip.create(Component.translatable("legacy.menu.selectWorld.dataPacks.description"))).build());
+        renderableVList.addRenderable(new TickBox(0, 0, trustPlayers.get(), b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.trust_players.description")), t -> trustPlayers.set(t.selected)));
         addGameRulesOptions(renderableVList, gameRules, k -> k.getCategory() == GameRules.Category.UPDATES);
         gameRenderables.addRenderable(hostPrivileges);
         for (GameRules.Category value : GameRules.Category.values()) {
@@ -188,7 +202,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             if (getFocused() instanceof AbstractWidgetAccessor widget && widget.getTooltip() != null && widget.getTooltip().get() != null)
                 tooltipBoxLabel = widget.getTooltip().get().toCharSequence(minecraft);
             else if ((listener = getChildAt(i, j)).isPresent() && listener.get() instanceof AbstractWidgetAccessor widget && widget.getTooltip() != null && widget.getTooltip().get() != null)
-                widget.getTooltip().get().toCharSequence(minecraft);
+                tooltipBoxLabel = widget.getTooltip().get().toCharSequence(minecraft);
             else tooltipBoxLabel = null;
 
             if (tooltipBoxLabel == null)

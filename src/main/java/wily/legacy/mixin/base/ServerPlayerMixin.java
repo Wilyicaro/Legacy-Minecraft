@@ -4,7 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Either;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
@@ -43,6 +43,7 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     boolean classicLoom = true;
     boolean disableExhaustion = false;
     boolean mayFlySurvival = false;
+
     public ServerPlayerMixin(Level level, GameProfile gameProfile) {
         super(level, gameProfile);
     }
@@ -55,6 +56,8 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
 
     @Shadow
     public abstract ServerLevel level();
+
+    @Shadow @Final private MinecraftServer server;
 
     @Override
     public GameProfile legacyMinecraft$getProfile() {
@@ -143,8 +146,6 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
 
     @Override
     public void setStatsMap(Object2IntMap<Stat<?>> statsMap) {
-        getStats().stats.clear();
-        getStats().stats.putAll(statsMap);
     }
 
     @Override
@@ -156,10 +157,9 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     public void addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo ci) {
         valueOutput.putBoolean("DisableExhaustion", isExhaustionDisabled());
         valueOutput.putBoolean("MayFlySurvival", mayFlySurvival());
-
     }
 
-    @Inject(method = "readAdditionalSaveData", at = @At("RETURN"))
+    @Inject(method = "readAdditionalSaveData", at = @At("HEAD"))
     public void readAdditionalSaveData(ValueInput input, CallbackInfo ci) {
         setDisableExhaustion(input.getBooleanOr("DisableExhaustion", false));
         setMayFlySurvival(input.getBooleanOr("MayFlySurvival", false));

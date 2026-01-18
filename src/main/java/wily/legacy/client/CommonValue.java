@@ -2,6 +2,7 @@ package wily.legacy.client;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.DynamicOps;
 import net.minecraft.resources.ResourceLocation;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.Stocker;
@@ -39,5 +40,9 @@ public class CommonValue<T> extends Stocker<T> {
 
     public void parse(Dynamic<?> dynamic) {
         codec.parse(dynamic).result().ifPresent(this::set);
+    }
+
+    public <V> V encode(DynamicOps<V> ops) {
+        return codec.encodeStart(ops, get()).result().get();
     }
 }

@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stat;
+import net.minecraft.world.entity.player.Player;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.mixin.base.ClientBoundAwardStatsPacketAccessor;
 
@@ -12,13 +13,17 @@ public interface LegacyPlayerInfo {
         return (LegacyPlayerInfo) obj;
     }
 
-    static void updateMayFlySurvival(ServerPlayer player, boolean mayFlySurvival, boolean updateAbilities) {
-        LegacyPlayerInfo.of(player).setMayFlySurvival(mayFlySurvival);
-        if (player.getAbilities().mayfly != mayFlySurvival && player.gameMode.isSurvival()) {
+    static void updateMayFlySurvival(Player player, boolean mayFlySurvival, boolean updateAbilities) {
+        if (player.getAbilities().mayfly != mayFlySurvival && player.gameMode().isSurvival()) {
             player.getAbilities().mayfly = mayFlySurvival;
             if (!player.getAbilities().mayfly && player.getAbilities().flying) player.getAbilities().flying = false;
             if (updateAbilities) player.onUpdateAbilities();
         }
+    }
+
+    static void setAndUpdateMayFlySurvival(ServerPlayer player, boolean mayFlySurvival, boolean updateAbilities) {
+        LegacyPlayerInfo.of(player).setMayFlySurvival(mayFlySurvival);
+        updateMayFlySurvival(player, mayFlySurvival, updateAbilities);
     }
 
     static LegacyPlayerInfo decode(CommonNetwork.PlayBuf buf) {

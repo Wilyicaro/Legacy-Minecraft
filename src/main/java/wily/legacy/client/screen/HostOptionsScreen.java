@@ -117,38 +117,12 @@ public class HostOptionsScreen extends PanelVListScreen {
             return true;
         }
         if (keyEvent.key() == InputConstants.KEY_O) {
-            minecraft.setScreen(new ChatScreen("", false) {
-                boolean released = false;
-
-                public boolean charTyped(CharacterEvent characterEvent) {
-                    if (!released) return false;
-                    return super.charTyped(characterEvent);
-                }
-
-                @Override
-                public boolean keyReleased(KeyEvent keyEvent1) {
-                    if (keyEvent.key() == keyEvent1.key()) released = true;
-                    return super.keyReleased(keyEvent1);
-                }
-            });
+            minecraft.setScreen(new ChatScreen("", false));
             return true;
         }
         if (keyEvent.key() == InputConstants.KEY_X && minecraft.hasSingleplayerServer()) {
             if (!minecraft.getSingleplayerServer().isPublished())
-                minecraft.setScreen(new PublishScreen(this, minecraft.getSingleplayerServer().getDefaultGameType(), s -> s.publish(minecraft.getSingleplayerServer())) {
-                    boolean released = false;
-
-                    public boolean charTyped(CharacterEvent characterEvent) {
-                        if (!released) return false;
-                        return super.charTyped(characterEvent);
-                    }
-
-                    @Override
-                    public boolean keyReleased(KeyEvent keyEvent1) {
-                        if (keyEvent.key() == keyEvent1.key()) released = true;
-                        return super.keyReleased(keyEvent1);
-                    }
-                });
+                minecraft.setScreen(new PublishScreen(this, minecraft.getSingleplayerServer().getDefaultGameType(), s -> s.publish(minecraft.getSingleplayerServer())));
             else if (PublishScreen.hasWorldHost()) minecraft.setScreen(new WorldHostFriendsScreen(this));
             return true;
         }

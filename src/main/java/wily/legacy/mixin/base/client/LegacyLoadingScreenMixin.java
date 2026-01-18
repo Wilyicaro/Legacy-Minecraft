@@ -9,11 +9,10 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.screen.LegacyLoading;
 import wily.legacy.util.LegacyComponents;
-
-import static wily.legacy.Legacy4JClient.legacyLoadingScreen;
 
 @Mixin({LevelLoadingScreen.class, ProgressScreen.class, ConnectScreen.class})
 public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
@@ -45,52 +44,13 @@ public class LegacyLoadingScreenMixin extends Screen implements LegacyLoading {
                 if (minecraft.level != null && minecraft.level.dimension() != Level.OVERWORLD) {
                     genericLoading = true;
                 }
+                progress = p.progress / 100f;
             }
             if (self() instanceof ConnectScreen p) {
                 lastLoadingHeader = p.status;
             }
-            legacyLoadingScreen.prepareRender(minecraft, width, height, lastLoadingHeader, lastLoadingStage, progress, genericLoading);
-            legacyLoadingScreen.render(guiGraphics, i, j, f);
+            getLoadingRenderer().prepareRender(minecraft, UIAccessor.of(this), lastLoadingHeader, lastLoadingStage, progress, genericLoading);
+            getLoadingRenderer().render(guiGraphics, i, j, f);
         }
-    }
-
-    @Override
-    public float getProgress() {
-        return legacyLoadingScreen.getProgress();
-    }
-
-    @Override
-    public void setProgress(float progress) {
-        legacyLoadingScreen.setProgress(progress);
-    }
-
-    @Override
-    public Component getLoadingHeader() {
-        return legacyLoadingScreen.getLoadingHeader();
-    }
-
-    @Override
-    public void setLoadingHeader(Component loadingHeader) {
-        legacyLoadingScreen.setLoadingHeader(loadingHeader);
-    }
-
-    @Override
-    public Component getLoadingStage() {
-        return legacyLoadingScreen.getLoadingStage();
-    }
-
-    @Override
-    public void setLoadingStage(Component loadingStage) {
-        legacyLoadingScreen.setLoadingStage(loadingStage);
-    }
-
-    @Override
-    public boolean isGenericLoading() {
-        return legacyLoadingScreen.isGenericLoading();
-    }
-
-    @Override
-    public void setGenericLoading(boolean genericLoading) {
-        legacyLoadingScreen.setGenericLoading(genericLoading);
     }
 }

@@ -17,12 +17,12 @@ public class PanelVListScreen extends PanelBackgroundScreen implements Renderabl
     public Consumer<PanelVListScreen> onClose = s -> {
     };
 
-    public PanelVListScreen(Function<Screen, Panel> panelConstructor, Component component) {
-        super(panelConstructor, component);
+    public PanelVListScreen(Panel.Constructor<PanelVListScreen> panelConstructor, Component component) {
+        super(panelConstructor.cast(), component);
     }
 
-    public PanelVListScreen(Screen parent, Function<Screen, Panel> panelConstructor, Component component) {
-        super(parent, panelConstructor, component);
+    public PanelVListScreen(Screen parent, Panel.Constructor<PanelVListScreen> panelConstructor, Component component) {
+        super(parent, panelConstructor.cast(), component);
     }
 
     public PanelVListScreen(Screen parent, int imageWidth, int imageHeight, Component component) {

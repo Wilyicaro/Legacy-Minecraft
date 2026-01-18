@@ -95,6 +95,8 @@ public class SubtitleOverlayMixin {
                     }
                 }
 
+                if (list.isEmpty()) return;
+
                 j += 36;
                 int lineHeight = 12;
                 guiGraphics.pose().pushMatrix();
@@ -127,7 +129,7 @@ public class SubtitleOverlayMixin {
                         FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
                     }
                     guiGraphics.drawString(this.minecraft.font, component, -o / 2, -n, r);
-                    guiGraphics.pose().translate(0, -(lineHeight + 1));
+                    guiGraphics.pose().translate(0, -lineHeight);
                 }
                 guiGraphics.pose().popMatrix();
             }

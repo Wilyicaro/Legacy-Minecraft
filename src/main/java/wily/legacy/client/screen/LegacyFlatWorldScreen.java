@@ -204,8 +204,8 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
                 Optional<GuiEventListener> listener;
                 if (getFocused() instanceof AbstractWidgetAccessor widget && widget.getTooltip() != null && widget.getTooltip().get() != null)
                     tooltipBoxLabel = widget.getTooltip().get().toCharSequence(minecraft);
-                else if ((listener = getChildAt(i, j)).isPresent() && listener.get() instanceof AbstractWidgetAccessor widget && widget.getTooltip() != null)
-                    widget.getTooltip().get().toCharSequence(minecraft);
+                else if ((listener = getChildAt(i, j)).isPresent() && listener.get() instanceof AbstractWidgetAccessor widget && widget.getTooltip() != null && widget.getTooltip().get() != null)
+                    tooltipBoxLabel = widget.getTooltip().get().toCharSequence(minecraft);
                 else tooltipBoxLabel = null;
 
                 LegacyRenderUtil.renderPointerPanel(guiGraphics, panel.x + panel.width - 2, panel.y + 5, 194, panel.height - 10);

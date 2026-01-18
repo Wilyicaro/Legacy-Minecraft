@@ -2,6 +2,7 @@ package wily.legacy;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.serialization.DataResult;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.GraphicsStatus;
 import net.minecraft.client.KeyMapping;
@@ -129,9 +130,11 @@ public class Legacy4JClient {
     public static final StoneCuttingGroupManager stoneCuttingGroupManager = new StoneCuttingGroupManager();
     public static final MapIdValueManager<LoomTabListing, ?> loomListingManager = MapIdValueManager.create(Legacy4J.createModLocation("loom_tab_listing"), LoomTabListing.CODEC);
     public static final MapIdValueManager<TypeCraftingTab, ?> typeCraftingTabs = MapIdValueManager.create(Legacy4J.createModLocation("type_crafting_tabs"), TypeCraftingTab.CODEC);
+    public static final MapIdValueManager<LegacyTabDisplay, ?> mixedCraftingTabs = MapIdValueManager.create(Legacy4J.createModLocation("mixed_crafting_tabs"), LegacyTabDisplay.CODEC.validate(display -> MixedCraftingScreen.isValidTab(display) ? DataResult.success(display) : DataResult.error(() -> display.id() + " is an invalid tab!")));
     public static final ControlTooltip.GuiManager controlTooltipGuiManager = new ControlTooltip.GuiManager();
     public static final LeaderboardsScreen.Manager leaderBoardListingManager = new LeaderboardsScreen.Manager();
     public static final HowToPlayScreen.Manager howToPlaySectionManager = new HowToPlayScreen.Manager();
+    public static final MapIdValueManager<OptionsPreset, ListMap<ResourceLocation, OptionsPreset>> optionPresetsManager = MapIdValueManager.createListMap(Legacy4J.createModLocation("option_presets"), OptionsPreset.CODEC);
     public static final MapIdValueManager<ControlType, ListMap<ResourceLocation, ControlType>> controlTypesManager = MapIdValueManager.createListMap(Legacy4J.createModLocation("control_types"), ControlType.CODEC);
     public static final ControllerManager controllerManager = new ControllerManager();
     public static final Map<Block, ResourceLocation> fastLeavesModels = new HashMap<>();
@@ -161,7 +164,6 @@ public class Legacy4JClient {
     public static ControlType lastControlType;
     public static boolean canSprint = false;
     public static int sprintTicksLeft = -1;
-    public static LegacyLoadingScreen legacyLoadingScreen = new LegacyLoadingScreen();
     public static KnownListing<Block> knownBlocks;
     public static KnownListing<EntityType<?>> knownEntities;
     public static GameType defaultServerGameType;
@@ -309,6 +311,8 @@ public class Legacy4JClient {
         if (!Minecraft.getInstance().isPaused()) {
             TopMessage.tick();
         }
+
+        LegacyTipManager.updateTipTicks();
     }
 
     public static void postTick(Minecraft minecraft) {
@@ -386,11 +390,13 @@ public class Legacy4JClient {
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyWorldTemplateManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyTipOverridesManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyBiomeOverrides);
+        FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, optionPresetsManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, controlTypesManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyResourceManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, stoneCuttingGroupManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, loomListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, typeCraftingTabs);
+        FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, mixedCraftingTabs);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, controlTooltipGuiManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, leaderBoardListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, howToPlaySectionManager);
@@ -516,7 +522,11 @@ public class Legacy4JClient {
         //? if forge {
         /*RegisterPresetEditorsEvent.getBus(FactoryAPIPlatform.getModEventBus()).addListener(e-> Legacy4JClient.VANILLA_PRESET_EDITORS.forEach(((o, presetEditor) -> o.ifPresent(worldPresetResourceKey -> e.register(worldPresetResourceKey, presetEditor)))));
          *///?}
-        FactoryAPIClient.PlayerEvent.DISCONNECTED_EVENT.register(p -> PackAlbum.applyDefaultResourceAlbum());
+        FactoryAPIClient.PlayerEvent.DISCONNECTED_EVENT.register(p -> {
+            PackAlbum.applyDefaultResourceAlbum();
+            TopMessage.setSmall(null);
+            TopMessage.setMedium(null);
+        });
         FactoryAPIClient.registerConfigScreen(FactoryAPIPlatform.getModInfo(MOD_ID), Legacy4JSettingsScreen::new);
         FactoryAPIClient.registerDefaultConfigScreen("minecraft", s -> new OptionsScreen(s, Minecraft.getInstance().options));
     }

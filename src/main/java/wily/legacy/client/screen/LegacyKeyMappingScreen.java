@@ -20,7 +20,6 @@ import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.AdvancedTextWidget;
-import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
@@ -35,12 +34,11 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.function.Function;
 
 import static wily.legacy.util.LegacyComponents.NONE;
 import static wily.legacy.util.LegacyComponents.SELECTION;
 
-public class LegacyKeyMappingScreen extends PanelVListScreen {
+public class LegacyKeyMappingScreen extends OptionsScreen {
     protected AdvancedTextWidget mappingTooltipLines = new AdvancedTextWidget(accessor).withShadow(false);
     protected LegacyKeyMapping selectedMapping = null;
     protected ArbitrarySupplier<Component> mappingTooltip = ArbitrarySupplier.empty();
@@ -53,8 +51,8 @@ public class LegacyKeyMappingScreen extends PanelVListScreen {
         this(parent, s -> Panel.centered(s, LegacySprites.PANEL, 255, 293), title);
     }
 
-    public LegacyKeyMappingScreen(Screen parent, Function<Screen, Panel> panelFunction, Component title) {
-        super(parent, panelFunction, title);
+    public LegacyKeyMappingScreen(Screen parent, Panel.Constructor<LegacyKeyMappingScreen> panelFunction, Component title) {
+        super(parent, panelFunction.cast(), title);
         renderableVList.layoutSpacing(l -> 1);
         addButtons();
     }

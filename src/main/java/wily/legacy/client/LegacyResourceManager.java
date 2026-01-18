@@ -1,7 +1,10 @@
 package wily.legacy.client;
 
+import com.google.common.base.Charsets;
 import com.google.gson.*;
+import com.google.gson.stream.JsonWriter;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
@@ -21,12 +24,17 @@ import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.KeyboardScreen;
 import wily.legacy.util.IOUtil;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
 public class LegacyResourceManager implements ResourceManagerReloadListener {
+    public static final boolean DEBUG = false;
     public static final ResourceLocation GAMEPAD_MAPPINGS = Legacy4J.createModLocation("gamepad_mappings.txt");
     public static final ResourceLocation INTRO_LOCATION = Legacy4J.createModLocation("intro.json");
     public static final ResourceLocation GAMMA_LOCATION = Legacy4J.createModLocation(/*? if >=1.21.2 {*/"gamma" /*?} else {*//*"post_effect/gamma.json"*//*?}*/);
@@ -57,10 +65,14 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
         }
     }
 
-    public static void addIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, JsonObject> addIcon) {
+    public static <T extends ControlTooltip.CharsIcon> void addIcons(ResourceManager resourceManager, ResourceLocation location, Codec<List<T>> codec, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
         resourceManager.getResource(location).ifPresent(r -> {
-            try {
-                GsonHelper.parse(r.openAsReader()).asMap().forEach((s, o) -> addIcon.accept(s, o.getAsJsonObject()));
+            try (BufferedReader reader = r.openAsReader()) {
+                codec.parse(JsonOps.INSTANCE, JsonParser.parseReader(reader)).resultOrPartial(error -> Legacy4J.LOGGER.warn("Failed to parse {}: {}", location, error)).ifPresent(charsIcons -> {
+                    for (ControlTooltip.CharsIcon charsIcon : charsIcons) {
+                        addIcon.accept(charsIcon.name(), charsIcon);
+                    }
+                });
             } catch (IOException e) {
                 Legacy4J.LOGGER.warn(e.getMessage());
             }
@@ -68,19 +80,11 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
     }
 
     public static void addControllerIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
-        addIcons(resourceManager, location, (s, o) -> {
-            ControllerBinding<?> binding = ControllerBinding.map.get(s);
-            if (binding != null)
-                addIcon.accept(s, ControlTooltip.LegacyIcon.create(() -> binding.getMapped().state(), IOUtil.getJsonStringOrNull(o, "icon", String::toCharArray), IOUtil.getJsonStringOrNull(o, "iconOverlay", String::toCharArray), IOUtil.getJsonStringOrNull(o, "tipIcon", v -> v.charAt(0))));
-        });
+        addIcons(resourceManager, location, ControlTooltip.ControllerIcon.LIST_CODEC, addIcon);
     }
 
     public static void addKbmIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
-        addIcons(resourceManager, location, (s, o) -> {
-            InputConstants.Key key = InputConstants.getKey(s);
-            ControlTooltip.KeyIcon icon = ControlTooltip.KeyIcon.create(key, IOUtil.getJsonStringOrNull(o, "icon", String::toCharArray), IOUtil.getJsonStringOrNull(o, "iconOverlay", String::toCharArray), IOUtil.getJsonStringOrNull(o, "tipIcon", v -> v.charAt(0)));
-            addIcon.accept(key.getName(), icon);
-        });
+        addIcons(resourceManager, location, ControlTooltip.KeyIcon.LIST_CODEC, addIcon);
     }
 
     public static void loadIntroLocations(ResourceManager resourceManager) {
@@ -154,6 +158,28 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
                     Legacy4J.LOGGER.warn(e.getMessage());
                 }
             });
+            if (DEBUG) {
+                File gamePath = new File(Minecraft.getInstance().gameDirectory, "debug_resource_values");
+                gamePath.mkdirs();
+                try (JsonWriter w = new JsonWriter(Files.newBufferedWriter(Path.of(gamePath.getPath(), COMMON_COLORS), Charsets.UTF_8))) {
+                    w.setSerializeNulls(false);
+                    w.setIndent("  ");
+                    JsonObject obj = new JsonObject();
+                    CommonColor.COMMON_COLORS.forEach((id, value) -> obj.add(id.toString(), value.encode(JsonOps.INSTANCE)));
+                    GsonHelper.writeValue(w, obj, null);
+                } catch (IOException exception) {
+                    Legacy4J.LOGGER.warn(exception.getMessage());
+                }
+                try (JsonWriter w = new JsonWriter(Files.newBufferedWriter(Path.of(gamePath.getPath(), COMMON_VALUES), Charsets.UTF_8))) {
+                    w.setSerializeNulls(false);
+                    w.setIndent("  ");
+                    JsonObject obj = new JsonObject();
+                    CommonValue.COMMON_VALUES.forEach((id, value) -> obj.add(id.toString(), value.encode(JsonOps.INSTANCE)));
+                    GsonHelper.writeValue(w, obj, null);
+                } catch (IOException exception) {
+                    Legacy4J.LOGGER.warn(exception.getMessage());
+                }
+            }
             addKbmIcons(resourceManager, FactoryAPI.createLocation(name, DEFAULT_KBM_ICONS), (s, b) -> {
                 for (ControlType value : Legacy4JClient.controlTypesManager.map().values())
                     if (value.isKbm()) value.icons().put(s, b);

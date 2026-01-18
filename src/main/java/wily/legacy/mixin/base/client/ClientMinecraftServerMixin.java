@@ -1,9 +1,15 @@
 package wily.legacy.mixin.base.client;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.mojang.datafixers.DataFixer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.Services;
+import net.minecraft.server.WorldStem;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.progress.LevelLoadListener;
+import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
@@ -17,8 +23,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.LegacySaveCache;
+import wily.legacy.client.screen.LegacyLoadingScreen;
 import wily.legacy.network.TopMessage;
 
+import java.net.Proxy;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BooleanSupplier;
@@ -42,16 +50,33 @@ public abstract class ClientMinecraftServerMixin {
     @Shadow
     public abstract Iterable<ServerLevel> getAllLevels();
 
-    @Inject(method = "computeNextAutosaveInterval", at = @At("RETURN"), cancellable = true)
-    private void tickServer(CallbackInfoReturnable<Integer> cir) {
-        cir.setReturnValue(LegacyOptions.autoSaveInterval.get() > 0 ? LegacyOptions.autoSaveInterval.get() * cir.getReturnValue() : 1);
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void init(Thread thread, LevelStorageSource.LevelStorageAccess levelStorageAccess, PackRepository packRepository, WorldStem worldStem, Proxy proxy, DataFixer dataFixer, Services services, LevelLoadListener levelLoadListener, CallbackInfo ci) {
+        ticksUntilAutosave *= Math.max(1, LegacyOptions.autoSaveInterval.get());
+    }
+
+    @ModifyReturnValue(method = "computeNextAutosaveInterval", at = @At("RETURN"))
+    private int tickServer(int original) {
+        return original * Math.max(1, LegacyOptions.autoSaveInterval.get());
     }
 
     @Inject(method = "tickServer", at = @At(value = "FIELD", target = "Lnet/minecraft/server/MinecraftServer;ticksUntilAutosave:I", opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER))
     private void tickServer(BooleanSupplier booleanSupplier, CallbackInfo ci) {
-        if (LegacyOptions.autoSaveCountdown.get() && LegacyOptions.autoSaveInterval.get() > 0 && ticksUntilAutosave >= 0 && ticksUntilAutosave <= 100) {
+        if (LegacyOptions.autoSaveInterval.get() == 0 || Minecraft.getInstance().isDemo()) {
+            ticksUntilAutosave++;
+            return;
+        }
+        if (!LegacyOptions.autoSaveCountdown.get()) return;
+
+        if (ticksUntilAutosave >= 20 && ticksUntilAutosave <= 120) {
             if (ticksUntilAutosave % 20 == 0)
-                TopMessage.setMedium(new TopMessage(Component.translatable("legacy.menu.autoSave_countdown", ticksUntilAutosave / 20), CommonColor.INVENTORY_GRAY_TEXT.get(), 21, false, false, false));
+                TopMessage.setMedium(new TopMessage(Component.translatable("legacy.menu.autoSave_countdown", ticksUntilAutosave / 20 - 1), CommonColor.INVENTORY_GRAY_TEXT.get(), 21, false, false, false));
+        }
+
+        if (ticksUntilAutosave <= 0) {
+            Minecraft minecraft = Minecraft.getInstance();
+            if (minecraft.screen == null) minecraft.execute(LegacyLoadingScreen::startFakeAutoSave);
+            else ticksUntilAutosave++;
         }
     }
 

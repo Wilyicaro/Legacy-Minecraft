@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.OptionInstanceAccessor;
+import wily.legacy.client.OptionsPreset;
 
 import java.util.function.Consumer;
 
@@ -30,6 +31,7 @@ public abstract class OptionInstanceMixin implements OptionInstanceAccessor {
     @Inject(method = "<init>(Ljava/lang/String;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Lnet/minecraft/client/OptionInstance$CaptionBasedToString;Lnet/minecraft/client/OptionInstance$ValueSet;Lcom/mojang/serialization/Codec;Ljava/lang/Object;Ljava/util/function/Consumer;)V", at = @At("RETURN"))
     public void init(String string, OptionInstance.TooltipSupplier tooltipSupplier, OptionInstance.CaptionBasedToString captionBasedToString, OptionInstance.ValueSet valueSet, Codec codec, Object object, Consumer consumer, CallbackInfo ci) {
         Legacy4JClient.whenResetOptions.add(() -> set(object));
+        OptionsPreset.VANILLA_OPTIONS_MAP.put(string, (OptionInstance<?>) (Object) this);
         defaultValue = object;
         key = string;
     }

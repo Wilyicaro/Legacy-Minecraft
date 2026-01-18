@@ -26,6 +26,11 @@ WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
 *You can also join our [Discord](https://discord.com/invite/CVas58uPyb) to talk to the developers, other members and suggest features for the mod!*  
 *Also, you can follow the mod's development in detail and see how it's progressing on the [Kyubion Studios server](https://discord.gg/cdZg5aYfMM).*
 
+<img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/modpage_official_projects.png?raw=true" width="600" >
+
+- [AlphaJam](https://modrinth.com/mod/alphajam) | A Quality of Life mod for a1.2.6 with a bit of Legacy Console Edition flavor.
+- [Re-Console](https://modrinth.com/modpack/legacy-minecraft) | Better performance, all tutorial worlds, and more!
+- [Simply Legacy](https://modrinth.com/modpack/simply-legacy) | Designed to bring a more vanilla-focused, close-to-home Legacy Console Edition experience.
 
 <img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/modpage_special_thanks.png?raw=true" width="600" >
 
@@ -36,8 +41,10 @@ WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
 - Permdog99 and ItzJustAPlayer for helping with the PlayStation® 5 Control Icons
 - NicSonic-_- for providing the Stadia Control Icons
 - Cjnator38 for providing the LE default font converted to JE, and the 1.21.x credits background, and helping with the 1.21.6 port
+- Cjanator38 and NicSonic for making HD Control Icons for Xbox 360, Playstation 5, Switch and Stadia
 - Androser for contributing to the controller bindings
 - pizzart for contributing with some QOL and accuracy changes
+- Nabouna32 for contributing with option tooltips and controller LED RGB options
 
 <img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/modpage_related_projects.png?raw=true" width="600" >
 
@@ -45,7 +52,6 @@ WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
 - [Legacy Skins](https://modrinth.com/modpack/legacy-skins) | a compatibility mod for Legacy4J and Customizable Player Models, improving the `Change Skin` interface to be accurate and functional!
 - [Minimega](https://modrinth.com/modpack/minimega) | a mod that aims to recreate the minigames from the discontinued Legacy Console Editions.
 - [Project4J](https://modrinth.com/modpack/project-4j) | Experience a timeline where Legacy Console Edition had mods!
-- [Re-Console](https://modrinth.com/modpack/legacy-minecraft) | Better performance, all tutorial worlds, and more!
 
 # 📝 Planned and Implemented Features
 | Feature                                                                    | Implemented | Planned |

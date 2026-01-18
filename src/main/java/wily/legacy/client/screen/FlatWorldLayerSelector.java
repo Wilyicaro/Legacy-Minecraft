@@ -28,8 +28,7 @@ public class FlatWorldLayerSelector extends ItemViewerScreen {
     public FlatWorldLayerSelector(Screen parent, Consumer<FlatWorldLayerSelector> applyLayer, int maxLayerHeight, Component component) {
         super(parent, s -> Panel.centered(s, 325, 245), component);
         this.applyLayer = applyLayer;
-        layerSlider = LegacySliderButton.createFromIntRange(panel.x + 21, panel.y + 167, 271, 16, (b) -> Component.translatable("legacy.menu.create_flat_world.layer_height"), (b) -> null, 1, 1, maxLayerHeight, b -> {
-        });
+        layerSlider = LegacySliderButton.createFromIntRange(panel.x + 21, panel.y + 167, 271, 16, (b) -> Component.translatable("legacy.menu.create_flat_world.layer_height"), (b) -> null, 1, 1, maxLayerHeight, b -> {}, null);
     }
 
     public FlatWorldLayerSelector(Screen parent, FlatLayerInfo editLayer, Consumer<FlatWorldLayerSelector> applyLayer, int maxLayerHeight, Component component) {

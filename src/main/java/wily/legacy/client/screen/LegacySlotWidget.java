@@ -39,7 +39,7 @@ public class LegacySlotWidget extends LegacyIconHolder implements NavigationElem
     public void applyFocus(ComponentPath.Path path, boolean apply) {
         if (apply) {
             path.component().setFocused(null);
-            if (Legacy4JClient.controllerManager.isControllerTheLastInput())
+            if (Legacy4JClient.controllerManager.isControllerTheLastInput() && LegacyOptions.interfaceSensitivity.get() > 0)
                 ControllerBinding.LEFT_STICK.state().block();
             Legacy4JClient.controllerManager.enableCursor();
             Legacy4JClient.controllerManager.setPointerPos(getMiddleX(), getMiddleY());
@@ -58,13 +58,18 @@ public class LegacySlotWidget extends LegacyIconHolder implements NavigationElem
     }
 
     @Override
+    public boolean isMouseOver(double d, double e) {
+        return false;
+    }
+
+    @Override
     public boolean shouldTakeFocusAfterInteraction() {
         return false;
     }
 
     @Override
     public ComponentPath nextFocusPath(FocusNavigationEvent focusNavigationEvent) {
-        return isVisible && !isHovered ? super.nextFocusPath(focusNavigationEvent) : null;
+        return isVisible && !isHovered && (!Controller.Event.of(Minecraft.getInstance().screen).disableCursorOnInit() || !Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.cursorMode.get().isAlways()) ? super.nextFocusPath(focusNavigationEvent) : null;
     }
 
     @Override

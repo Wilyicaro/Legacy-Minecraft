@@ -12,6 +12,7 @@ import net.minecraft.server.commands.PublishCommand;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.GameType;
 import wily.factoryapi.FactoryAPI;
+import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.client.LegacyClientWorldSettings;
 import wily.legacy.client.LegacyOptions;
 
@@ -32,20 +33,17 @@ public class PublishScreen extends ConfirmationScreen {
     private int port = HttpUtil.getAvailablePort();
 
     public PublishScreen(Screen parent, GameType gameType, Consumer<PublishScreen> okAction) {
-        super(parent, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 108 : 145, LAN_SERVER, Component.translatable("lanServer.port"), b -> {
-        });
+        super(parent, ConfirmationScreen::getPanelWidth, () -> LegacyOptions.getUIMode().isSD() ? 108 : 145, LAN_SERVER, Component.translatable("lanServer.port"), b -> {});
         this.okAction = s -> {
             publish = true;
             okAction.accept(this);
             s.onClose();
         };
-        gameTypeSlider = new LegacySliderButton<>(0, 0, 200, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().getLongDisplayName()), b -> Tooltip.create(Component.translatable("selectWorld.gameMode." + b.getObjectValue().getName() + ".info")), gameType, () -> GAME_TYPES, b -> {
-        });
+        gameTypeSlider = new LegacySliderButton<>(0, 0, 200, 16, b -> b.getDefaultMessage(GAME_MODEL_LABEL, b.getObjectValue().getLongDisplayName()), b -> Tooltip.create(Component.translatable("selectWorld.gameMode." + b.getObjectValue().getName() + ".info")), gameType, () -> GAME_TYPES, b -> {});
     }
 
     public PublishScreen(Screen parent, GameType gameType) {
-        this(parent, gameType, s -> {
-        });
+        this(parent, gameType, s -> {});
     }
 
     public static boolean hasWorldHost() {
@@ -106,8 +104,6 @@ public class PublishScreen extends ConfirmationScreen {
 
     public void publish(IntegratedServer server) {
         if (!publish) return;
-        FactoryAPI.SECURE_EXECUTOR.executeNowIfPossible(() -> this.minecraft.gui.getChat().addMessage(server.publishServer(gameTypeSlider.getObjectValue(), server.getWorldData()./*? if <1.20.5 {*//*getAllowCommands*//*?} else {*/isAllowCommands/*?}*/() && LegacyClientWorldSettings.of(server.getWorldData()).trustPlayers(), this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed")), () -> Minecraft.getInstance().player != null);
+        FactoryAPIClient.SECURE_EXECUTOR.executeNowIfPossible(() -> this.minecraft.gui.getChat().addMessage(server.publishServer(gameTypeSlider.getObjectValue(), server.getWorldData()./*? if <1.20.5 {*//*getAllowCommands*//*?} else {*/isAllowCommands/*?}*/() && LegacyClientWorldSettings.of(server.getWorldData()).trustPlayers(), this.port) ? PublishCommand.getSuccessMessage(this.port) : Component.translatable("commands.publish.failed")), () -> Minecraft.getInstance().player != null);
     }
-
-
 }

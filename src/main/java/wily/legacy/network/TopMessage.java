@@ -1,11 +1,8 @@
 package wily.legacy.network;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Player;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.Legacy4J;
-
-import java.util.function.Supplier;
 
 public record TopMessage(Component message, int baseColor, int ticksOnScreen, boolean shadow, boolean fade,
                          boolean pulse) {

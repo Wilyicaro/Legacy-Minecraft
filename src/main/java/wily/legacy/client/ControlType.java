@@ -6,9 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
-import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryEvent;
-import wily.factoryapi.base.RegisterListing;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
@@ -18,12 +16,13 @@ import wily.legacy.util.IOUtil;
 import java.util.*;
 
 public record ControlType(ResourceLocation id, Optional<Component> name, boolean isKbm,
-                          Optional<SizeableAsset<FontDescription>> font, Optional<ResourceLocation> minecraftLogo,
+                          Optional<SizeableAsset<ControlFont>> font, Optional<ResourceLocation> minecraftLogo,
                           Optional<SizeableAsset<Style>> style,
                           Map<String, ControlTooltip.LegacyIcon> icons) implements IdValueInfo<ControlType> {
     public static final SizeableAsset<Style> EMPTY_STYLE_ASSET = new SizeableAsset<>(Style.EMPTY);
-    public static final Codec<ControlType> EXTENDED_CODEC = RecordCodecBuilder.create(i -> i.group(ResourceLocation.CODEC.fieldOf("id").forGetter(ControlType::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(ControlType::name), Codec.BOOL.fieldOf("isKbm").orElse(false).forGetter(ControlType::isKbm), SizeableAsset.createWithFallback(FontDescription.CODEC).optionalFieldOf("font").forGetter(ControlType::font), ResourceLocation.CODEC.optionalFieldOf("minecraftLogo").forGetter(ControlType::minecraftLogo)).apply(i, ControlType::new));
+    public static final Codec<ControlType> EXTENDED_CODEC = RecordCodecBuilder.create(i -> i.group(ResourceLocation.CODEC.fieldOf("id").forGetter(ControlType::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(ControlType::name), Codec.BOOL.optionalFieldOf("isKbm", false).forGetter(ControlType::isKbm), SizeableAsset.createWithFallback(ControlFont.CODEC).optionalFieldOf("font").forGetter(ControlType::font), ResourceLocation.CODEC.optionalFieldOf("minecraftLogo").forGetter(ControlType::minecraftLogo)).apply(i, ControlType::new));
     public static final Codec<ControlType> CODEC = IOUtil.createFallbackCodec(EXTENDED_CODEC, ResourceLocation.CODEC.xmap(ControlType::new, ControlType::id));
+    public static final Codec<OptionHolder<ControlType>> OPTION_CODEC = OptionHolder.createCodecWithAuto(ControlType::get);
     public static final ResourceLocation KBM = Legacy4J.createModLocation("java");
     public static final ResourceLocation x360 = Legacy4J.createModLocation("xbox_360");
     public static final ResourceLocation xONE = Legacy4J.createModLocation("xbox_one");
@@ -35,11 +34,11 @@ public record ControlType(ResourceLocation id, Optional<Component> name, boolean
     public static final ResourceLocation STADIA = Legacy4J.createModLocation("stadia");
     public static final ResourceLocation PSVITA = Legacy4J.createModLocation("playstation_vita");
     public static final ResourceLocation PS5 = Legacy4J.createModLocation("playstation_5");
-    public ControlType(ResourceLocation id, Optional<Component> name, boolean isKbm, Optional<SizeableAsset<FontDescription>> font, Optional<ResourceLocation> minecraftLogo) {
-        this(id, name, isKbm, font, minecraftLogo, font.map(asset -> asset.map(Style.EMPTY::withFont)), new HashMap<>());
+    public ControlType(ResourceLocation id, Optional<Component> name, boolean isKbm, Optional<SizeableAsset<ControlFont>> font, Optional<ResourceLocation> minecraftLogo) {
+        this(id, name, isKbm, font, minecraftLogo, font.map(asset -> asset.map(f -> Style.EMPTY.withFont(f.font()))), new HashMap<>());
     }
     public ControlType(ResourceLocation id) {
-        this(id, Optional.of(Component.translatable("legacy.options.controlType." + id.getPath())), false, Optional.of(new SizeableAsset<>(new FontDescription.Resource(id))), Optional.of(id.withPath("textures/gui/title/minecraft/%s.png".formatted(id.getPath()))));
+        this(id, Optional.of(Component.translatable("legacy.options.controlType." + id.getPath())), false, Optional.of(new SizeableAsset<>(new ControlFont(new FontDescription.Resource(id)))), Optional.of(id.withPath("textures/gui/title/minecraft/%s.png".formatted(id.getPath()))));
     }
 
     public static ControlType getActiveControllerType() {
@@ -65,12 +64,24 @@ public record ControlType(ResourceLocation id, Optional<Component> name, boolean
         }
     }
 
+    public record ControlFont(FontDescription font, int iconHeight) {
+        public static final Codec<ControlFont> CODEC = IOUtil.createFallbackCodec(RecordCodecBuilder.create(i -> i.group(FontDescription.CODEC.fieldOf("id").forGetter(ControlType.ControlFont::font), Codec.INT.fieldOf("iconHeight").forGetter(ControlType.ControlFont::iconHeight)).apply(i, ControlFont::new)), FontDescription.CODEC.xmap(ControlFont::new, ControlFont::font));
+
+        public ControlFont(FontDescription font) {
+            this(font, 15);
+        }
+    }
+
     public static ControlType get(ResourceLocation id) {
         return Legacy4JClient.controlTypesManager.map().get(id);
     }
 
     public Style styleOrEmpty() {
         return style.orElse(EMPTY_STYLE_ASSET).get();
+    }
+
+    public int iconHeight() {
+        return font.isPresent() ? font.get().get().iconHeight() : 0;
     }
 
     @Override
@@ -89,68 +100,4 @@ public record ControlType(ResourceLocation id, Optional<Component> name, boolean
         void change(ControlType last, ControlType actual);
     }
 
-    public static class Holder implements RegisterListing.Holder<ControlType> {
-        public static final Holder AUTO = new Holder(null) {
-            @Override
-            public ControlType get() {
-                return null;
-            }
-
-            @Override
-            public String toString() {
-                return "auto";
-            }
-        };
-        public static final Codec<Holder> CODEC = Codec.STRING.xmap(Holder::parse, Holder::toString);
-        private final ResourceLocation id;
-        private ControlType controlType;
-
-        public Holder(ResourceLocation id) {
-            this.id = id;
-        }
-
-        public static Holder parse(String stringId) {
-            if (stringId.equals("auto")) return AUTO;
-            ResourceLocation id = FactoryAPI.createLocation(stringId);
-            return id == null ? AUTO : new Holder(id);
-        }
-
-        public static Holder of(ControlType controlType) {
-            return new Holder(controlType.id()) {
-                @Override
-                public ControlType get() {
-                    return controlType;
-                }
-            };
-        }
-
-        public boolean isAuto() {
-            return get() == null;
-        }
-
-        public ControlType orElse(ControlType alternative) {
-            ControlType controlType = get();
-            return controlType == null ? alternative : controlType;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return obj instanceof Holder h && h.get() == get();
-        }
-
-        @Override
-        public ResourceLocation getId() {
-            return id;
-        }
-
-        @Override
-        public String toString() {
-            return id.toString();
-        }
-
-        @Override
-        public ControlType get() {
-            return controlType == null ? controlType = ControlType.get(id) : controlType;
-        }
-    }
 }

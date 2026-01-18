@@ -314,6 +314,11 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
     }
 
     @Override
+    public boolean isMouseOver(double d, double e) {
+        return isHovered(d, e);
+    }
+
+    @Override
     public boolean keyPressed(KeyEvent keyEvent) {
         if (keyEvent.isSelection()) {
             onPress(keyEvent);

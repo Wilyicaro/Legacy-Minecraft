@@ -76,7 +76,8 @@ public class SDLControllerHandler implements Controller.Handler {
         String base = switch (Util.getPlatform()) {
             case WINDOWS ->
                     arch.contains("64") ? "libsdl4j-natives-%s-windows-x86_64.dll" : "libsdl4j-natives-%s-windows-x86.dll";
-            case OSX -> "libsdl4j-natives-%s-macos-universal.dylib";
+            case OSX ->
+                    arch.contains("aarch") || arch.contains("arm") ? "libsdl4j-natives-%s-macos-aarch64.dylib" : "libsdl4j-natives-%s-macos-x86_64.dylib";
             case LINUX ->
                     arch.contains("aarch") || arch.contains("arm") ? "libsdl4j-natives-%s-linux-aarch64.so" : "libsdl4j-natives-%s-linux-x86_64.so";
             default -> null;
@@ -140,7 +141,7 @@ public class SDLControllerHandler implements Controller.Handler {
             LegacyLoadingScreen screen = new LegacyLoadingScreen(Controller.Handler.DOWNLOADING_NATIVES, CommonComponents.EMPTY) {
                 @Override
                 public void tick() {
-                    if (getProgress() == 100) {
+                    if (getProgress() >= 1) {
                         LegacyOptions.selectedControllerHandler.set(getInstance());
                         LegacyOptions.CLIENT_STORAGE.save();
                         onClose();
@@ -154,6 +155,8 @@ public class SDLControllerHandler implements Controller.Handler {
                 public void onClose() {
                     minecraft.setScreen(s);
                     LegacyLoadingScreen.closeExecutor(executor);
+                    if (getProgress() < 1 && natives.file().exists())
+                        natives.file().delete();
                 }
 
                 @Override

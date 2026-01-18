@@ -18,8 +18,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SpawnEggItem;
 import wily.factoryapi.FactoryAPI;
+import wily.factoryapi.FactoryAPIClient;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.screen.LegacyLoadingScreen;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.util.LegacyTipBuilder;
 
@@ -31,11 +31,16 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public class LegacyTipManager implements ResourceManagerReloadListener {
+    public static final int MOVEMENT_TIP_TICKS = 15;
+    public static final int PAUSE_TIP_TICKS = 10;
+    public static final int MAX_TIP_TICKS = MOVEMENT_TIP_TICKS * 2 + PAUSE_TIP_TICKS;
     public static final List<Supplier<LegacyTip>> tips = new ArrayList<>();
     public static final List<Supplier<LegacyTip>> loadingTips = new ArrayList<>();
     private static final String TIPS = "texts/tips.json";
     private static final List<Supplier<LegacyTip>> usingLoadingTips = new ArrayList<>();
-    public static float tipDiffPercentage;
+    public static int tipTicks;
+    public static boolean startTipOffset = false;
+    public static boolean returningTip = false;
     private static LegacyTip actualTip;
     private static Supplier<LegacyTip> actualTipSupplier;
     private static LegacyTip lastTip;
@@ -72,14 +77,45 @@ public class LegacyTipManager implements ResourceManagerReloadListener {
         lastTip = actualTip;
         actualTip = tip;
         actualTipSupplier = null;
+        if (actualTip != null) {
+            startTipOffset = true;
+        } else
+            returningTip = true;
     }
 
     public static LegacyTip getLastTip() {
         return lastTip;
     }
 
-    public static float getTipXDiff() {
-        return LegacyOptions.hints.get() && Minecraft.getInstance().screen instanceof LegacyMenuAccess<?> a && a.getTipXDiff() != 0 ? Math.min(0, Math.max(a.getTipXDiff(), 50 - a.getMenuRectangle().left()) * Math.max(0, Math.min(tipDiffPercentage, 1))) : 0;
+    public static void updateTipTicks() {
+        if (startTipOffset) {
+            if (tipTicks < MAX_TIP_TICKS) {
+                if (tipTicks < MOVEMENT_TIP_TICKS || returningTip)
+                    tipTicks++;
+            } else {
+                resetTipOffset(actualTip == null);
+            }
+        }
+    }
+
+    public static void resetTipOffset(boolean resetStart) {
+        if (resetStart)
+            startTipOffset = false;
+        returningTip = false;
+        tipTicks = 0;
+    }
+
+    public static float getTipOffsetPercentage() {
+        if (startTipOffset) {
+            float ticks = tipTicks + FactoryAPIClient.getGamePartialTick(false);
+            return Math.clamp(returningTip ? MAX_TIP_TICKS - ticks : ticks, 0, MOVEMENT_TIP_TICKS) / MOVEMENT_TIP_TICKS;
+        }
+
+        return 0;
+    }
+
+    public static float getTipXOffset() {
+        return LegacyOptions.hints.get() && Minecraft.getInstance().screen instanceof LegacyMenuAccess<?> a && a.getTipXOffset() != 0 ? Math.min(0, Math.max(a.getTipXOffset(), 50 - a.getMenuRectangle().left()) * getTipOffsetPercentage()) : 0;
     }
 
     public static LegacyTip updateTip() {

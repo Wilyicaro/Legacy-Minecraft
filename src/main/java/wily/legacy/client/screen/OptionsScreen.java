@@ -1,6 +1,5 @@
 package wily.legacy.client.screen;
 
-import com.google.common.collect.Streams;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Monitor;
 import com.mojang.blaze3d.platform.VideoMode;
@@ -19,7 +18,6 @@ import wily.factoryapi.base.client.FactoryOptions;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
-import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.util.LegacyComponents;
 
@@ -35,8 +33,8 @@ import static wily.legacy.client.screen.ControlTooltip.getKeyIcon;
 public class OptionsScreen extends PanelVListScreen {
     public Screen advancedOptionsScreen;
 
-    public OptionsScreen(Screen parent, Function<Screen, Panel> panelConstructor, Component component) {
-        super(parent, panelConstructor, component);
+    public OptionsScreen(Screen parent, Panel.Constructor<OptionsScreen> panelConstructor, Component component) {
+        super(parent, panelConstructor.cast(), component);
     }
 
     public OptionsScreen(Screen parent, Section section) {
@@ -50,25 +48,10 @@ public class OptionsScreen extends PanelVListScreen {
         });
     }
 
-    public OptionsScreen(Screen parent, Function<Screen, Panel> panelConstructor, Component component, Renderable... renderables) {
-        this(parent, panelConstructor, component);
-        renderableVList.addRenderables(renderables);
-    }
-
-    public OptionsScreen(Screen parent, Function<Screen, Panel> panelConstructor, Component component, FactoryConfig<?>... options) {
-        this(parent, panelConstructor, component);
-        renderableVList.addOptions(options);
-    }
-
-    public OptionsScreen(Screen parent, Function<Screen, Panel> panelConstructor, Component component, Stream<FactoryConfig<?>> options) {
-        this(parent, panelConstructor, component);
-        renderableVList.addOptions(options);
-    }
-
     public static void setupSelectorControlTooltips(ControlTooltip.Renderer renderer, Screen screen) {
         renderer.add(() -> ControlType.getActiveType().isKbm() ? CompoundComponentIcon.of(getKeyIcon(InputConstants.KEY_LSHIFT), PLUS_ICON, getKeyIcon(InputConstants.MOUSE_BUTTON_LEFT)) : null, () -> ControlTooltip.getKeyMessage(InputConstants.MOUSE_BUTTON_LEFT, screen));
         renderer.add(ControlTooltip.EXTRA::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_X, screen));
-        renderer.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_O) : ControllerBinding.UP_BUTTON.getIcon(), () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, screen));
+        renderer.add(ControlTooltip.OPTION::get, () -> ControlTooltip.getKeyMessage(InputConstants.KEY_O, screen));
     }
 
     public OptionsScreen withAdvancedOptions(Function<OptionsScreen, Screen> advancedOptionsFunction) {
@@ -97,25 +80,43 @@ public class OptionsScreen extends PanelVListScreen {
         renderer.replace(6, i -> i, c -> c == null ? advancedOptionsScreen == null ? null : LegacyComponents.SHOW_ADVANCED_OPTIONS : c);
     }
 
-    public record Section(Component title, Function<Screen, Panel> panelConstructor,
+    public void updateWidgets(boolean forceMessageUpdate) {
+        for (Renderable renderable : getRenderableVList().renderables) {
+            if (renderable instanceof LegacySliderButton<?> slider && !slider.updateValue() && forceMessageUpdate) slider.updateMessage();
+            else if (renderable instanceof TickBox tickBox && !tickBox.updateValue() && forceMessageUpdate) tickBox.updateMessage();
+        }
+        if (advancedOptionsScreen instanceof OptionsScreen optionsScreen)
+            optionsScreen.updateWidgets(forceMessageUpdate);
+    }
+
+    public void updateWidgetMessages() {
+        for (Renderable renderable : getRenderableVList().renderables) {
+            if (renderable instanceof LegacySliderButton<?> slider) slider.updateMessage();
+            else if (renderable instanceof TickBox tickBox) tickBox.updateMessage();
+        }
+        if (advancedOptionsScreen instanceof OptionsScreen optionsScreen)
+            optionsScreen.updateWidgetMessages();
+    }
+
+    public record Section(Component title, Panel.Constructor<OptionsScreen> panelConstructor,
                           List<Consumer<OptionsScreen>> elements, ArbitrarySupplier<Section> advancedSection,
                           BiFunction<Screen, Section, OptionsScreen> sectionBuilder) implements ScreenSection<OptionsScreen> {
         public static final List<Section> list = new ArrayList<>();
         private static final Minecraft mc = Minecraft.getInstance();
 
-        public Section(Component title, Function<Screen, Panel> panelConstructor, List<Consumer<OptionsScreen>> elements, ArbitrarySupplier<Section> advancedSection) {
+        public Section(Component title, Panel.Constructor<OptionsScreen> panelConstructor, List<Consumer<OptionsScreen>> elements, ArbitrarySupplier<Section> advancedSection) {
             this(title, panelConstructor, elements, advancedSection, OptionsScreen::new);
         }
 
-        public Section(Component title, Function<Screen, Panel> panelConstructor, List<Consumer<OptionsScreen>> elements) {
+        public Section(Component title, Panel.Constructor<OptionsScreen> panelConstructor, List<Consumer<OptionsScreen>> elements) {
             this(title, panelConstructor, elements, ArbitrarySupplier.empty());
         }
 
-        public Section(Component title, Function<Screen, Panel> panelConstructor, ArbitrarySupplier<Section> advancedSection, FactoryConfig<?>... options) {
+        public Section(Component title, Panel.Constructor<OptionsScreen> panelConstructor, ArbitrarySupplier<Section> advancedSection, FactoryConfig<?>... options) {
             this(title, panelConstructor, new ArrayList<>(List.of(o -> o.renderableVList.addOptions(options))), advancedSection);
         }
 
-        public Section(Component title, Function<Screen, Panel> panelConstructor, FactoryConfig<?>... optionInstances) {
+        public Section(Component title, Panel.Constructor<OptionsScreen> panelConstructor, FactoryConfig<?>... optionInstances) {
             this(title, panelConstructor, ArbitrarySupplier.empty(), optionInstances);
         }
 
@@ -189,7 +190,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.skipInitialSaveWarning,
                                 LegacyOptions.lockControlTypeChange,
                                 LegacyOptions.selectedControlType,
-                                LegacyOptions.cursorMode),
+                                LegacyOptions.cursorMode,
+                                LegacyOptions.defaultShowCraftableRecipes),
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("options.accessibility.title"),
                                 LegacyOptions.of(mc.options.notificationDisplayTime()),
@@ -244,9 +246,7 @@ public class OptionsScreen extends PanelVListScreen {
                 Component.translatable("legacy.menu.graphics"),
                 s -> Panel.centered(s, 250, 222, 0, 24),
                 new ArrayList<>(List.of(
-                        o -> o.renderableVList.addOptions(
-                                LegacyOptions.of(mc.options.cloudStatus()),
-                                LegacyOptions.of(mc.options.graphicsMode())),
+                        o -> o.renderableVList.addOptions(LegacyOptions.of(mc.options.cloudStatus()), LegacyOptions.optionsPreset),
                         o -> o.renderableVList.addLinkedOptions(
                                 LegacyOptions.displayLegacyGamma, FactoryConfig::get,
                                 LegacyOptions.legacyGamma),
@@ -263,6 +263,7 @@ public class OptionsScreen extends PanelVListScreen {
                 @Override
                 public void onClose() {
                     super.onClose();
+                    if (!LegacyOptions.optionsPreset.get().isNone() && !LegacyOptions.optionsPreset.get().get().isApplied()) minecraft.setScreen(new OptionsPresetScreen(parent, LegacyOptions.optionsPreset.get().get()));
                     globalPackSelector.applyChanges();
                     selector.applyChanges(true);
                 }
@@ -275,7 +276,7 @@ public class OptionsScreen extends PanelVListScreen {
                 @Override
                 protected void panelInit() {
                     super.panelInit();
-                    panel.x -= Math.round(Math.min(10, getSelectorTooltipVisibility()) / 10f * 80);
+                    panel.x -= Math.round(Math.min(10, getSelectorTooltipVisibility()) / 20f * PackAlbum.Selector.getDefaultWidth());
                 }
 
                 private float getSelectorTooltipVisibility() {
@@ -287,9 +288,9 @@ public class OptionsScreen extends PanelVListScreen {
                     super.renderDefaultBackground(guiGraphics, i, j, f);
                     if (selectorTooltipVisibility > 0) {
                         if (getFocused() != globalPackSelector)
-                            selector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -161));
+                            selector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -PackAlbum.Selector.getDefaultWidth()));
                         else
-                            globalPackSelector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -161));
+                            globalPackSelector.renderTooltipBox(guiGraphics, panel, Math.round((1 - (Math.min(10, getSelectorTooltipVisibility())) / 10f) * -PackAlbum.Selector.getDefaultWidth()));
                         guiGraphics.nextStratum();
                     }
                 }
@@ -317,8 +318,9 @@ public class OptionsScreen extends PanelVListScreen {
                 new ArrayList<>(List.of(
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("options.videoTitle"),
-                                LegacyOptions.of(mc.options.fullscreen()),
                                 LegacyOptions.of(createResolutionOptionInstance(o)),
+                                LegacyOptions.of(mc.options.fullscreen()),
+                                LegacyOptions.of(mc.options.graphicsMode()),
                                 LegacyOptions.of(mc.options.enableVsync()),
                                 LegacyOptions.of(mc.options.framerateLimit()),
                                 LegacyOptions.of(mc.options.fov()),
@@ -355,6 +357,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyEntityFireTint,
                                 LegacyOptions.legacyItemPickup,
                                 LegacyOptions.enhancedPistonMovingRenderer,
+                                LegacyOptions.legacyPotionsBar,
                                 FactoryOptions.RANDOM_BLOCK_ROTATIONS,
                                 LegacyOptions.defaultParticlePhysics,
                                 LegacyOptions.of(mc.options.particles()),
@@ -376,7 +379,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.showVanillaRecipeBook,
                                 LegacyOptions.tooltipBoxes,
                                 LegacyOptions.of(mc.options.attackIndicator()),
-                                LegacyOptions.hudScale,
+                                LegacyOptions.hudSize,
                                 LegacyOptions.hudOpacity,
                                 LegacyOptions.hudDistance,
                                 LegacyOptions.of(mc.options.guiScale()),
@@ -421,7 +424,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.advancedHeldItemTooltip,
                                 LegacyOptions.itemTooltipEllipsis,
                                 LegacyOptions.selectedItemTooltipLines,
-                                LegacyOptions.selectedItemTooltipSpacing
+                                LegacyOptions.selectedItemTooltipSpacing,
+                                LegacyOptions.controlTooltipDisplay
                         ),
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("legacy.menu.menu_settings"),
@@ -430,7 +434,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.menusWithBackground,
                                 LegacyOptions.legacyIntroAndReloading,
                                 LegacyOptions.legacyLoadingAndConnecting,
-                                LegacyOptions.legacyPanorama),
+                                LegacyOptions.legacyPanorama,
+                                LegacyOptions.fakeAutosaveScreen),
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("options.chat.title"),
                                 LegacyOptions.of(mc.options.reducedDebugInfo()),
