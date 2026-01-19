@@ -5,11 +5,11 @@
     "isKbm": true,
     "font": {
       "default": "legacy:java_hd",
-      "fhd": "legacy:java",
       "sd": {
         "id": "legacy:java_sd",
-        "iconHeight": 9
-      }
+        "iconHeight": 9,
+      "fhd": "legacy:java"
+    }
   },
     "minecraftLogo": "legacy:textures/gui/title/minecraft/java.png"
   },
@@ -31,7 +31,11 @@
     "name": {"translate": "legacy.options.controlType.xbox_one"},
     "font": {
       "default": "legacy:xbox_one",
-      "hd": "legacy:xbox_one_hd"
+      "hd": "legacy:xbox_one_hd",
+      "sd": {
+        "id": "legacy:xbox_one_sd",
+        "iconHeight": 9
+      }
     },
     "minecraftLogo": "legacy:textures/gui/title/minecraft/xbox_one.png"
   },
@@ -61,7 +65,11 @@
     "name": {"translate": "legacy.options.controlType.playstation_4"},
     "font": {
       "default": "legacy:playstation_4",
-      "hd": "legacy:playstation_4_hd"
+      "hd": "legacy:playstation_4_hd",
+      "sd": {
+        "id": "legacy:playstation_4_sd",
+        "iconHeight": 9
+      }
     },
     "minecraftLogo": "legacy:textures/gui/title/minecraft/playstation_4.png"
   },
@@ -70,7 +78,11 @@
     "name": {"translate": "legacy.options.controlType.playstation_5"},
     "font": {
       "default": "legacy:playstation_5",
-      "hd": "legacy:playstation_5_hd"
+      "hd": "legacy:playstation_5_hd",
+      "sd": {
+        "id": "legacy:playstation_5_sd",
+        "iconHeight": 9
+      }
     },
     "minecraftLogo": "legacy:textures/gui/title/minecraft/playstation_5.png"
   },
@@ -84,7 +96,18 @@
     },
     "minecraftLogo": "legacy:textures/gui/title/minecraft/switch.png"
   },
-  "legacy:steam",
+  {
+    "id": "legacy:steam",
+    "name": {"translate": "legacy.options.controlType.steam"},
+    "font": {
+      "default": "legacy:steam",
+      "sd": {
+        "id": "legacy:steam_sd",
+        "iconHeight": 9
+      }
+    },
+    "minecraftLogo": "legacy:textures/gui/title/minecraft/steam.png"
+  },
   {
     "id": "legacy:stadia",
     "name": {"translate": "legacy.options.controlType.stadia"},
