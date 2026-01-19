@@ -120,11 +120,14 @@ public class LegacyBlockBehaviors {
                 if (!be.potion.equals(p) && !level.isClientSide())
                     level.playSound(null, blockPos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 1.0f, 1.0f);
             } else {
-                level.setBlockAndUpdate(blockPos, blockState.cycle(LayeredCauldronBlock.LEVEL));
                 if (be.waterColor != null) {
                     be.setWaterColor(null);
-                    level.setBlockAndUpdate(blockPos, blockState.setValue(LayeredCauldronBlock.LEVEL, 1));
-                    be.setRemoved();
+                }
+                BlockState currentState = level.getBlockState(blockPos);
+                if (currentState.hasProperty(LayeredCauldronBlock.LEVEL)) {
+                    int currentLevel = currentState.getValue(LayeredCauldronBlock.LEVEL);
+                    int nextLevel = Math.min(3, currentLevel + 1);
+                    level.setBlock(blockPos, currentState.setValue(LayeredCauldronBlock.LEVEL, nextLevel), 3);
                 }
                 be.lastPotionItemUsed = itemStack.getItemHolder();
                 if (!level.isClientSide())
@@ -223,6 +226,7 @@ public class LegacyBlockBehaviors {
                 else
                     be.setWaterColor(be.waterColor = LegacyItemUtil.mixColors(List.of(be.waterColor, dyeColor).iterator()));
                 be.setChanged();
+                level.sendBlockUpdated(blockPos, blockState, blockState, 3);
 
                 if (!level.isClientSide()) {
                     level.playSound(null, blockPos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.25f, 1.0f);
@@ -268,6 +272,8 @@ public class LegacyBlockBehaviors {
                         sendCauldronSplashParticles(level, blockPos);
                     }
                     ColoredWaterCauldronBlock.lowerFillLevel(be);
+                    be.setChanged();
+                    level.sendBlockUpdated(blockPos, level.getBlockState(blockPos), level.getBlockState(blockPos), 3);
                 }
                 return successInteraction();
             });

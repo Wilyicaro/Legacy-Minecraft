@@ -245,7 +245,9 @@
     "HangingEntityItemAccessor",
     "ClientBoundAwardStatsPacketAccessor",
     "BaseContainerBlockEntityMixin",
-    "PrepareSpawnTaskMixin"
+    "PrepareSpawnTaskMixin",
+    "PigAccessor",
+    "ItemBasedSteeringAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
