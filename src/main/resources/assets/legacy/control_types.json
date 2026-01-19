@@ -5,10 +5,10 @@
     "isKbm": true,
     "font": {
       "default": "legacy:java_hd",
+      "fhd": "legacy:java",
       "sd": {
         "id": "legacy:java_sd",
-        "iconHeight": 9,
-      "fhd": "legacy:java"
+        "iconHeight": 9
     }
   },
     "minecraftLogo": "legacy:textures/gui/title/minecraft/java.png"
