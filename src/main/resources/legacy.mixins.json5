@@ -247,7 +247,9 @@
     "BaseContainerBlockEntityMixin",
     "PrepareSpawnTaskMixin",
     "PigAccessor",
-    "ItemBasedSteeringAccessor"
+    "ItemBasedSteeringAccessor",
+    "SpawnEggItemMixin",
+    "ArmorStandItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1
