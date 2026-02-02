@@ -249,7 +249,8 @@
     "PigAccessor",
     "ItemBasedSteeringAccessor",
     "SpawnEggItemMixin",
-    "ArmorStandItemMixin"
+    "ArmorStandItemMixin",
+    "BannerBlockItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1
