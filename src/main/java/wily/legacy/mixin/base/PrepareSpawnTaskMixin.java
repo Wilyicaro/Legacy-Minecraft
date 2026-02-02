@@ -1,5 +1,8 @@
 package wily.legacy.mixin.base;
 
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
@@ -28,7 +31,21 @@ public class PrepareSpawnTaskMixin {
             for (int j = 0; j < 27; j++) {
                 if (itemsToAdd.isEmpty()) break;
                 for (int i = 0; i < itemsToAdd.size(); i++) {
-                    if (serverPlayer.getInventory().add(9 + j, itemsToAdd.get(i).copy())) {
+                    ItemStack stack = itemsToAdd.get(i).copy();
+
+if (stack.is(net.minecraft.world.item.Items.MAP)) {
+    CompoundTag custom = stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA)
+        ? stack.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA).copyTag()
+        : new CompoundTag();
+    custom.putByte("map_scale", (byte) 3);
+    stack.set(
+        net.minecraft.core.component.DataComponents.CUSTOM_DATA,
+        net.minecraft.world.item.component.CustomData.of(custom)
+    );
+}
+
+if (serverPlayer.getInventory().add(9 + j, stack)) {
+
                         itemsToAdd.remove(i);
                         break;
                     }
