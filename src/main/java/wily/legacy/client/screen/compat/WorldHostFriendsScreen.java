@@ -9,8 +9,11 @@ import io.github.gaming32.worldhost.gui.widget.UserListWidget;
 import io.github.gaming32.worldhost.plugin.FriendAdder;
 import io.github.gaming32.worldhost.plugin.FriendListFriend;
 import io.github.gaming32.worldhost.plugin.ProfileInfo;
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.client.Minecraft;
+//? >=1.21.11 {
+import net.minecraft.client.gui.ActiveTextCollector;
+//?}
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -108,6 +111,8 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
 
             private void addFriendButton(FriendListFriend friend) {
                 renderableVList.addRenderable(new FriendButton(0, 0, 230, 30, friend) {
+                    //? <1.21.11 {
+                    /*
                     @Override
                     protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                         super.renderWidget(guiGraphics, i, j, f);
@@ -122,6 +127,23 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
                     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                         LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 45, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
                     }
+                    *///?} else {
+                    @Override
+                    protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+                        super.renderContents(guiGraphics, i, j, f);
+                        FactoryScreenUtil.enableBlend();
+                        FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.TICKBOX_HOVERED : LegacySprites.TICKBOX, this.getX() + 30, this.getY() + (height - 12) / 2, 12, 12);
+                        if (friendsToAdd.contains(friend))
+                            FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TICK, this.getX() + 30, this.getY() + (height - 12) / 2, 14, 12);
+                        FactoryScreenUtil.disableBlend();
+                    }
+
+                    @Override
+                    protected void renderDefaultLabel(ActiveTextCollector textCollector) {
+                        int xOffset = 45;
+                        renderScrollingStringOverContents(textCollector, this.getMessage(), xOffset / 2);
+                    }
+                    //?}
 
                     @Override
                     public void onPress(InputWithModifiers input) {
@@ -222,6 +244,8 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
             return UserListWidget.getNameWithTag(friend, profileInfo);
         }
 
+        //? <1.21.11 {
+        /*
         @Override
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             super.renderWidget(guiGraphics, i, j, f);
@@ -232,6 +256,21 @@ public class WorldHostFriendsScreen extends PanelVListScreen {
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
             LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 30, this.getY(), getX() + getWidth() - 2, this.getY() + this.getHeight(), j, true);
         }
+        *///?} else {
+        @Override
+        protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+            renderDefaultSprite(guiGraphics);
+            profileInfo.iconRenderer().draw(guiGraphics, getX() + 5, getY() + 5, 20, 20);
+            ActiveTextCollector textCollector = guiGraphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE);
+            renderDefaultLabel(textCollector);
+        }
+
+        @Override
+        protected void renderDefaultLabel(ActiveTextCollector textCollector) {
+            int xOffset = 30;
+            renderScrollingStringOverContents(textCollector, this.getMessage(), xOffset / 2);
+        }
+        //?}
 
         @Override
         public boolean keyPressed(KeyEvent keyEvent) {

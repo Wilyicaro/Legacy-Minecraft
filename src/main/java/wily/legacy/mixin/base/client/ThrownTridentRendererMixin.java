@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer./*? if <1.21.11 {*//*RenderType*//*?} else {*/rendertype.RenderTypes/*?}*/;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.entity.ThrownTridentRenderer;
 import net.minecraft.client.renderer.entity.state.ThrownTridentRenderState;
 //?}
 import net.minecraft.client.renderer.state.CameraRenderState;
-import net.minecraft.world.entity.projectile.ThrownTrident;
+import net.minecraft.world.entity.projectile./*? if <1.21.11 {*//**//*?} else {*/arrow./*?}*/ThrownTrident;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -34,7 +34,7 @@ public abstract class ThrownTridentRendererMixin extends /*? if >=1.21.2 {*/Enti
     @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/ThrownTridentRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V", at = @At("RETURN"))
     public void render(ThrownTridentRenderState renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
         if (LegacyOptions.loyaltyLines.get()) {
-            submitNodeCollector.submitCustomGeometry(poseStack, RenderType.leash(), new LoyaltyLinesRenderer.Submit(LoyaltyLinesRenderState.of(renderState)));
+            submitNodeCollector.submitCustomGeometry(poseStack, /*? if <1.21.11 {*//*RenderType*//*?} else {*/RenderTypes/*?}*/.leash(), new LoyaltyLinesRenderer.Submit(LoyaltyLinesRenderState.of(renderState)));
         }
     }
 }

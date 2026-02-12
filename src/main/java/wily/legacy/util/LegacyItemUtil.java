@@ -107,9 +107,9 @@ public class LegacyItemUtil {
         Holder<Potion> potion = getPotionContent(stack);
         if (potion == null) return 0;
         int level;
-        if (potion instanceof Holder.Reference<Potion> reference && reference.key().location().getPath().startsWith("strong_")) {
+        if (potion instanceof Holder.Reference<Potion> reference && reference.key()./*? if <1.21.11 {*//*location*//*?} else {*/identifier/*?}*/().getPath().startsWith("strong_")) {
             level = 2;
-        } else if (potion instanceof Holder.Reference<Potion> reference && reference.key().location().getPath().startsWith("long_")) {
+        } else if (potion instanceof Holder.Reference<Potion> reference && reference.key()./*? if <1.21.11 {*//*location*//*?} else {*/identifier/*?}*/().getPath().startsWith("long_")) {
             level = 3;
         } else if (potion.value().getEffects().isEmpty()) {
             level = 0;

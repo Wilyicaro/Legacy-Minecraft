@@ -1,6 +1,9 @@
 package wily.legacy.client.screen;
 
 import net.minecraft.client.Minecraft;
+//? >=1.21.11 {
+import net.minecraft.client.gui.Font;
+//?}
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -11,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.Locale;
 
@@ -23,11 +27,23 @@ public class LegacyLanguageScreen extends PanelVListScreen {
         super(parent, s -> Panel.centered(s, 255, 240, 0, 24), Component.translatable("controls.keybinds.title"));
         String autoCode = getSystemLanguageCode();
         renderableVList.addRenderable(new AbstractButton(0, 0, 260, 20, Component.translatable("legacy.menu.system_language")) {
+            //? <1.21.11 {
+            /*
             @Override
             protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                 super.renderWidget(guiGraphics, i, j, f);
                 if (manager.getSelected().equals(autoCode)) setFocused(true);
             }
+            *///?} else {
+            @Override
+            protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+                if (manager.getSelected().equals(autoCode)) setFocused(true);
+                renderDefaultSprite(guiGraphics);
+                Font font = Minecraft.getInstance().font;
+                int color = LegacyRenderUtil.getTextColorForState(this, 0xFFFFFF, 0xFFFFA0, 0xA0A0A0);
+                LegacyRenderUtil.renderWidgetMessageCentered(guiGraphics, this, font, getMessage(), 0, color, true);
+            }
+            //?}
 
             @Override
             public void onPress(InputWithModifiers input) {
@@ -40,11 +56,23 @@ public class LegacyLanguageScreen extends PanelVListScreen {
             }
         });
         manager.getLanguages().forEach(((s, languageInfo) -> renderableVList.addRenderable(new AbstractButton(0, 0, 260, 20, languageInfo.toComponent()) {
+            //? <1.21.11 {
+            /*
             @Override
             protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                 super.renderWidget(guiGraphics, i, j, f);
                 if (manager.getSelected().equals(s)) setFocused(true);
             }
+            *///?} else {
+            @Override
+            protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+                if (manager.getSelected().equals(s)) setFocused(true);
+                renderDefaultSprite(guiGraphics);
+                Font font = Minecraft.getInstance().font;
+                int color = LegacyRenderUtil.getTextColorForState(this, 0xFFFFFF, 0xFFFFA0, 0xA0A0A0);
+                LegacyRenderUtil.renderWidgetMessageCentered(guiGraphics, this, font, getMessage(), 0, color, true);
+            }
+            //?}
 
             @Override
             public void onPress(InputWithModifiers input) {

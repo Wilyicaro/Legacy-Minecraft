@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base.client;
 
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -37,19 +37,25 @@ public abstract class AbstractButtonMixin extends AbstractWidget {
         lastTimePressed = Util.getMillis();
     }
 
+    //? <1.21.11 {
+    /*
     @ModifyVariable(method = "renderWidget", at = @At(value = "STORE"), ordinal = 2)
     protected int renderWidget(int k) {
         return LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused() || Util.getMillis() - lastTimePressed <= 150);
     }
+    *///?}
 
     @Inject(method = "renderWidget", at = @At("HEAD"))
     protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f, CallbackInfo ci) {
         alpha = active ? 1 : 0.8f;
     }
 
+    //? <1.21.11 {
+    /*
     @Redirect(method = "renderWidget", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/components/AbstractButton;active:Z", opcode = Opcodes.GETFIELD))
     protected boolean renderWidget(AbstractButton instance) {
         return true;
     }
+    *///?}
 
 }

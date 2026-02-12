@@ -3,11 +3,14 @@ package wily.legacy.util.client;
 import com.google.common.collect.Ordering;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
+//? >=1.21.11 {
+import net.minecraft.client.gui.components.AbstractWidget;
+//?}
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.toasts.Toast;
@@ -25,7 +28,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
@@ -84,11 +87,11 @@ import static wily.legacy.client.screen.ControlTooltip.MORE;
 public class LegacyRenderUtil {
     public static final boolean isNvidia;
     public static final LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
-    public static final ResourceLocation MINECRAFT = Legacy4J.createModLocation("textures/gui/title/minecraft.png");
-    public static final ResourceLocation PANORAMA_DAY = Legacy4J.createModLocation("textures/gui/title/panorama_day.png");
-    public static final ResourceLocation PANORAMA_NIGHT = Legacy4J.createModLocation("textures/gui/title/panorama_night.png");
-    public static final ResourceLocation MENU_BACKGROUND = Legacy4J.createModLocation("textures/gui/menu_background.png");
-    public static final ResourceLocation LOADING_BACKGROUND = Legacy4J.createModLocation("textures/gui/loading_background.png");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ MINECRAFT = Legacy4J.createModLocation("textures/gui/title/minecraft.png");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PANORAMA_DAY = Legacy4J.createModLocation("textures/gui/title/panorama_day.png");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PANORAMA_NIGHT = Legacy4J.createModLocation("textures/gui/title/panorama_night.png");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ MENU_BACKGROUND = Legacy4J.createModLocation("textures/gui/menu_background.png");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ LOADING_BACKGROUND = Legacy4J.createModLocation("textures/gui/loading_background.png");
     protected static final LogoRenderer logoRenderer = new LogoRenderer(false);
 
     private static final Minecraft mc = Minecraft.getInstance();
@@ -101,11 +104,11 @@ public class LegacyRenderUtil {
         blitTranslucentOverlaySprite(graphics, LegacySprites.POINTER_PANEL, x, y, width, height);
     }
 
-    public static void blitTranslucentOverlaySprite(GuiGraphics graphics, ResourceLocation sprite, int x, int y, int width, int height) {
+    public static void blitTranslucentOverlaySprite(GuiGraphics graphics, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ sprite, int x, int y, int width, int height) {
         blitTranslucentSprite(graphics, sprite, x, y, width, height);
     }
 
-    public static void blitTranslucentSprite(GuiGraphics graphics, ResourceLocation sprite, int x, int y, int width, int height) {
+    public static void blitTranslucentSprite(GuiGraphics graphics, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ sprite, int x, int y, int width, int height) {
         FactoryGuiGraphics.of(graphics).blitSprite(sprite, x, y, width, height);
     }
 
@@ -321,6 +324,43 @@ public class LegacyRenderUtil {
         }
     }
 
+    //? >=1.21.11 {
+    public static int getTextColorForState(AbstractWidget w, int normalRgb, int hoverRgb, int disabledRgb) {
+        int alpha = Mth.ceil(w.getAlpha() * 255.0F);
+        int rgb = !w.active ? disabledRgb : (w.isHoveredOrFocused() ? hoverRgb : normalRgb);
+        return (alpha << 24) | (rgb & 0xFFFFFF);
+    }
+
+    public static void renderWidgetMessageScrollingLeft(
+            GuiGraphics guiGraphics,
+            AbstractWidget w,
+            Font font,
+            Component message,
+            int xOffset,
+            int rightPadding,
+            int color,
+            boolean shadow) {
+        int left = w.getX() + xOffset;
+        int top = w.getY();
+        int right = w.getX() + w.getWidth() - rightPadding;
+        int bottom = w.getY() + w.getHeight();
+        renderScrollingString(guiGraphics, font, message, left, top, right, bottom, color, shadow);
+    }
+
+    public static void renderWidgetMessageCentered(
+            GuiGraphics guiGraphics,
+            AbstractWidget w,
+            Font font,
+            Component message,
+            int yOffset,
+            int color,
+            boolean shadow) {
+        int centerX = w.getX() + w.getWidth() / 2;
+        int centerY = w.getY() + (w.getHeight() - font.lineHeight) / 2 + yOffset;
+        guiGraphics.drawCenteredString(font, message, centerX, centerY, color);
+    }
+    //?}
+
     public static boolean isHovering(Slot slot, int leftPos, int topPos, double d, double e) {
         LegacyIconHolder holder = LegacyRenderUtil.iconHolderRenderer.slotBounds(slot);
         int width = holder.getWidth();
@@ -352,7 +392,12 @@ public class LegacyRenderUtil {
         float w = livingEntity.getScale();
         Vector3f vector3f = new Vector3f(0.0F, livingEntity.getBbHeight() / 2.0F + f * w, 0.0F);
         float x = m / w;
+        //? <1.21.11 {
+        /*
         InventoryScreen.renderEntityInInventory(guiGraphics, i - guiGraphics.guiWidth(), j - guiGraphics.guiHeight(), k + guiGraphics.guiWidth(), l + guiGraphics.guiHeight(), x, vector3f, quaternionf, quaternionf2, livingEntity);
+        *///?} else {
+        InventoryScreen.renderEntityInInventoryFollowsMouse( guiGraphics, i - guiGraphics.guiWidth(), j - guiGraphics.guiHeight(), k + guiGraphics.guiWidth(), l + guiGraphics.guiHeight(), (int) x, f, g, h, livingEntity);
+        //?}
         livingEntity.yBodyRot = r;
         livingEntity.setYRot(s);
         livingEntity.setXRot(t);
@@ -374,7 +419,7 @@ public class LegacyRenderUtil {
         EntityRenderer<? super Entity, ?> entityRenderer = entityRenderDispatcher.getRenderer(entity);
         EntityRenderState entityRenderState = entityRenderer.createRenderState(entity, 1.0F);
         entityRenderState.lightCoords = 15728880;
-        entityRenderState.hitboxesRenderState = null;
+        /*? if <1.21.11 {*//*entityRenderState.hitboxesRenderState = null;*//*?}*/
         entityRenderState.shadowPieces.clear();
         entityRenderState.outlineColor = 0;
         guiGraphics.submitEntityRenderState(entityRenderState, h, vector3f, quaternionf, quaternionf2, x, y, x0, y0);

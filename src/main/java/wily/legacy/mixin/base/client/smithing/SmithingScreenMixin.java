@@ -5,8 +5,11 @@ import net.minecraft.client.gui.screens.inventory.CyclingSlotBackground;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.inventory.ItemCombinerScreen;
 import net.minecraft.client.gui.screens.inventory.SmithingScreen;
+//? <1.21.11 {
+import net.minecraft.client.renderer.entity.state.ArmorStandRenderState;
+//?}
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -47,7 +50,7 @@ public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMen
     @Final
     private static Quaternionf ARMOR_STAND_ANGLE;
     @Shadow
-    private ArmorStand armorStandPreview;
+    private /*? if <1.21.11 {*//*ArmorStand*//*?} else {*/ArmorStandRenderState/*?}*/ armorStandPreview;
     @Shadow
     @Final
     private CyclingSlotBackground templateIcon;
@@ -58,7 +61,7 @@ public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMen
     @Final
     private CyclingSlotBackground additionalIcon;
 
-    public SmithingScreenMixin(SmithingMenu itemCombinerMenu, Inventory inventory, Component component, ResourceLocation resourceLocation) {
+    public SmithingScreenMixin(SmithingMenu itemCombinerMenu, Inventory inventory, Component component, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ resourceLocation) {
         super(itemCombinerMenu, inventory, component, resourceLocation);
     }
 
@@ -120,7 +123,7 @@ public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMen
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this)./*? if <1.21.11 {*//*getResourceLocation*//*?} else {*/getIdentifier/*?}*/("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + (sd ? 6.5f : 13.5f), topPos + (sd ? 3.5f : 9.5f));
         guiGraphics.pose().scale(sd ? 2.0f : 2.5f, sd ? 2.0f : 2.5f);
@@ -133,7 +136,12 @@ public abstract class SmithingScreenMixin extends ItemCombinerScreen<SmithingMen
         if (hasRecipeError())
             FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.ERROR_CROSS, 4, 0, 15, 15);
         guiGraphics.pose().popMatrix();
+        //? <1.21.11 {
+        /*
         InventoryScreen.renderEntityInInventory(guiGraphics, this.leftPos, this.topPos, this.leftPos + (sd ? 228 : 364), this.topPos + (sd ? 100 : 150), sd ? 20 : 35, ARMOR_STAND_TRANSLATION, ARMOR_STAND_ANGLE, null, this.armorStandPreview);
+        *///?} else {
+        guiGraphics.submitEntityRenderState(this.armorStandPreview, sd ? 20.0F : 35.0F, ARMOR_STAND_TRANSLATION, ARMOR_STAND_ANGLE, null, this.leftPos, this.topPos, this.leftPos + (sd ? 228 : 364), this.topPos + (sd ? 100 : 150));
+        //?}
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/ItemCombinerScreen;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))

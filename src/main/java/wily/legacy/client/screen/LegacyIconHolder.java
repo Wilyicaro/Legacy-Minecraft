@@ -13,7 +13,7 @@ import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -38,8 +38,8 @@ import wily.legacy.util.client.LegacySoundUtil;
 
 public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEventListener, NarratableEntry, ControlTooltip.ActionHolder {
     public Vec2 offset = Vec2.ZERO;
-    public ResourceLocation iconSprite = null;
-    public ArbitrarySupplier<ResourceLocation> iconHolderOverride = null;
+    public /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ iconSprite = null;
+    public ArbitrarySupplier</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/> iconHolderOverride = null;
     @NotNull
     public ItemStack itemIcon = ItemStack.EMPTY;
 
@@ -129,7 +129,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         return itemHolder(x, y, width, height, itemIcon, isWarning, null, offset, null);
     }
 
-    public LegacyIconHolder itemHolder(int x, int y, int width, int height, ItemStack itemIcon, boolean isWarning, ResourceLocation iconSprite, Vec2 offset, ArbitrarySupplier<ResourceLocation> override) {
+    public LegacyIconHolder itemHolder(int x, int y, int width, int height, ItemStack itemIcon, boolean isWarning, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ iconSprite, Vec2 offset, ArbitrarySupplier</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/> override) {
         setPos(x, y);
         setBounds(width, height);
         this.iconSprite = iconSprite;
@@ -193,14 +193,14 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         this.isWarning = warning;
     }
 
-    public ResourceLocation getIconHolderSprite() {
+    public /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ getIconHolderSprite() {
         return iconHolderOverride == null ? isWarning() ? LegacySprites.RED_ICON_HOLDER : isSizeable() ? LegacySprites.SIZEABLE_ICON_HOLDER : LegacySprites.ICON_HOLDER : iconHolderOverride.get();
     }
 
     @Override
     public void render(GuiGraphics graphics, int i, int j, float f) {
         isHovered = isHovered(i, j);
-        ResourceLocation sprite = getIconHolderSprite();
+        /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ sprite = getIconHolderSprite();
         if (sprite != null)
             renderChild(graphics, getXCorner(), getYCorner(), () -> FactoryGuiGraphics.of(graphics).blitSprite(sprite, 0, 0, getWidth(), getHeight()));
         if (iconSprite != null) {
@@ -209,7 +209,7 @@ public class LegacyIconHolder extends SimpleLayoutRenderable implements GuiEvent
         renderItem(graphics, i, j, f);
     }
 
-    public void renderIcon(ResourceLocation location, GuiGraphics graphics, boolean scaled, int width, int height) {
+    public void renderIcon(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ location, GuiGraphics graphics, boolean scaled, int width, int height) {
         renderChild(graphics, getX(), getY(), () -> {
             if (scaled) {
                 graphics.pose().scale(getSelectableWidth() / width, getSelectableHeight() / height);

@@ -32,6 +32,8 @@ public class ClientBiomeMixin {
         biomeOverride().waterColor().ifPresent(cir::setReturnValue);
     }
 
+    //? <1.21.11 {
+    /*
     @Inject(method = "getWaterFogColor", at = @At("HEAD"), cancellable = true)
     private void getWaterFogColor(CallbackInfoReturnable<Integer> cir) {
         LegacyBiomeOverride o = biomeOverride();
@@ -48,4 +50,5 @@ public class ClientBiomeMixin {
     private void getSkyColor(CallbackInfoReturnable<Integer> cir) {
         biomeOverride().skyColor().ifPresent(cir::setReturnValue);
     }
+    *///?}
 }

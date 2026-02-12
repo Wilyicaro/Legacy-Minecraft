@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base;
 
-import net.minecraft.advancements.critereon.ChangeDimensionTrigger;
+import net.minecraft.advancements./*? if <1.21.11 {*//*critereon*//*?} else {*/criterion/*?}*/.ChangeDimensionTrigger;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;

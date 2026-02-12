@@ -12,7 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level./*? if <1.21.11 {*//*GameRules*//*?} else {*/gamerules.*/*?}*/;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.end.EndDragonFight;
@@ -232,7 +232,7 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
                 server.getLevel(Level.END).setDragonFight(new EndDragonFight(minecraft.getSingleplayerServer().getLevel(Level.END), minecraft.getSingleplayerServer().getWorldData().worldGenOptions().seed(), EndDragonFight.Data.DEFAULT));
             server.setDefaultGameType(gameTypeSlider.getObjectValue());
             server.setDifficulty(difficulty, false);
-            applyGameRules.accept(server.getGameRules(), minecraft.getSingleplayerServer());
+            applyGameRules.accept(server./*? if <1.21.11 {*//**//*?} else {*/getWorldData()./*?}*/getGameRules(), minecraft.getSingleplayerServer());
             publishScreen.publish((IntegratedServer) server);
             LegacyClientWorldSettings.of(server.getWorldData()).setAllowCommands(hostPrivileges);
             server.getPlayerList().sendPlayerPermissionLevel(s);

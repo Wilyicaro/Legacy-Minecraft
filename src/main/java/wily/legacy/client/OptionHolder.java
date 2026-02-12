@@ -1,7 +1,7 @@
 package wily.legacy.client;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.RegisterListing;
 
@@ -20,31 +20,31 @@ public class OptionHolder<T> implements RegisterListing.Holder<T> {
             return "none";
         }
     };
-    private final ResourceLocation id;
-    private final Function<ResourceLocation, T> valueGetter;
+    private final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ id;
+    private final Function</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/, T> valueGetter;
 
-    public OptionHolder(ResourceLocation id, Function<ResourceLocation, T> valueGetter) {
+    public OptionHolder(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ id, Function</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/, T> valueGetter) {
         this.id = id;
         this.valueGetter = valueGetter;
     }
 
-    public static <T> Codec<OptionHolder<T>> createCodecWithAuto(Function<ResourceLocation, T> valueGetter) {
+    public static <T> Codec<OptionHolder<T>> createCodecWithAuto(Function</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/, T> valueGetter) {
         return Codec.STRING.xmap(value -> parseWithAuto(value, valueGetter), OptionHolder::toString);
     }
 
-    public static <T> Codec<OptionHolder<T>> createCodec(Function<ResourceLocation, T> valueGetter) {
+    public static <T> Codec<OptionHolder<T>> createCodec(Function</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/, T> valueGetter) {
         return Codec.STRING.xmap(value -> parse(value, valueGetter), OptionHolder::toString);
     }
 
-    public static <T> OptionHolder<T> parseWithAuto(String stringId, Function<ResourceLocation, T> valueGetter) {
+    public static <T> OptionHolder<T> parseWithAuto(String stringId, Function</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/, T> valueGetter) {
         if (stringId.equals("auto")) return auto();
-        ResourceLocation id = FactoryAPI.createLocation(stringId);
+        /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ id = FactoryAPI.createLocation(stringId);
         return id == null ? auto() : new OptionHolder<>(id, valueGetter);
     }
 
-    public static <T> OptionHolder<T> parse(String stringId, Function<ResourceLocation, T> valueGetter) {
+    public static <T> OptionHolder<T> parse(String stringId, Function</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/, T> valueGetter) {
         if (stringId.equals("none")) return none();
-        ResourceLocation id = FactoryAPI.createLocation(stringId);
+        /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ id = FactoryAPI.createLocation(stringId);
         return id == null ? none() : new OptionHolder<>(id, valueGetter);
     }
 
@@ -79,7 +79,7 @@ public class OptionHolder<T> implements RegisterListing.Holder<T> {
     }
 
     @Override
-    public ResourceLocation getId() {
+    public /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ getId() {
         return id;
     }
 

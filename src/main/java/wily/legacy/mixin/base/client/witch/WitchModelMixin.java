@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base.client.witch;
 
-import net.minecraft.client.model.WitchModel;
+import net.minecraft.client.model./*? if <1.21.11 {*//**//*?} else {*/monster.witch./*?}*/WitchModel;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.PartDefinition;

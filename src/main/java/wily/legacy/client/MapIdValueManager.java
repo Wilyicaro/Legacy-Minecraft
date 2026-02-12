@@ -6,7 +6,7 @@ import com.google.gson.stream.JsonWriter;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
@@ -23,21 +23,21 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public record MapIdValueManager<T extends IdValueInfo<T>, M extends Map<ResourceLocation, T>>(ResourceLocation name,
+public record MapIdValueManager<T extends IdValueInfo<T>, M extends Map</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/, T>>(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ name,
                                                                                               Codec<List<T>> codec,
                                                                                               M map,
                                                                                               boolean removeInvalid) implements ResourceManagerReloadListener {
     public static boolean DEBUG = false;
 
-    public static <T extends IdValueInfo<T>> MapIdValueManager<T, LinkedHashMap<ResourceLocation, T>> createWithListCodec(ResourceLocation name, Codec<List<T>> codec) {
+    public static <T extends IdValueInfo<T>> MapIdValueManager<T, LinkedHashMap</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/, T>> createWithListCodec(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ name, Codec<List<T>> codec) {
         return new MapIdValueManager<>(name, codec, new LinkedHashMap<>(), false);
     }
 
-    public static <T extends IdValueInfo<T>> MapIdValueManager<T, LinkedHashMap<ResourceLocation, T>> create(ResourceLocation name, Codec<T> codec) {
+    public static <T extends IdValueInfo<T>> MapIdValueManager<T, LinkedHashMap</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/, T>> create(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ name, Codec<T> codec) {
         return createWithListCodec(name, codec.listOf());
     }
 
-    public static <T extends IdValueInfo<T>> MapIdValueManager<T, ListMap<ResourceLocation, T>> createListMap(ResourceLocation name, Codec<T> codec) {
+    public static <T extends IdValueInfo<T>> MapIdValueManager<T, ListMap</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/, T>> createListMap(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ name, Codec<T> codec) {
         return new MapIdValueManager<>(name, codec.listOf(), new ListMap<>(), true);
     }
 

@@ -3,6 +3,9 @@ package wily.legacy.client.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+//? >=1.21.11 {
+import net.minecraft.client.gui.ActiveTextCollector;
+//?}
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -245,6 +248,8 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
 
         public abstract boolean isNone();
 
+        //? <1.21.11 {
+        /*
         @Override
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             if (!isFocused() && isPressed()) setSelectedMapping(null);
@@ -259,15 +264,42 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
             icon.render(guiGraphics, getX() + width - 20 - icon.getWidth() / 2, getY() + (height - font.lineHeight) / 2 + 1, false);
             FactoryScreenUtil.disableBlend();
         }
+        *///?} else {
+        @Override
+        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+            if (!isFocused() && isPressed()) setSelectedMapping(null);
+            renderDefaultSprite(guiGraphics);
+            ActiveTextCollector textCollector = guiGraphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE);
+            renderDefaultLabel(textCollector);
+            Component c = isPressed() ? SELECTION : isNone() ? NONE : null;
+            if (c != null) {
+                guiGraphics.drawString(font, c, getX() + width - 20 - Minecraft.getInstance().font.width(c) / 2, getY() + (height - font.lineHeight) / 2 + 1, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+                return;
+            }
+            ControlTooltip.Icon icon = getIcon();
+            FactoryScreenUtil.enableBlend();
+            icon.render(guiGraphics, getX() + width - 20 - icon.getWidth() / 2, getY() + (height - font.lineHeight) / 2 + 1, false);
+            FactoryScreenUtil.disableBlend();
+        }
+        //?}
 
         private boolean isPressed() {
             return selectedMapping != null && mapping == selectedMapping;
         }
 
+        //? <1.21.11 {
+        /*
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
             LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 8, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j, true);
         }
+        *///?} else {
+        @Override
+        protected void renderDefaultLabel(ActiveTextCollector textCollector) {
+            int xOffset = 8;
+            renderScrollingStringOverContents(textCollector, this.getMessage(), xOffset / 2);
+        }
+        //?}
 
         @Override
         protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {

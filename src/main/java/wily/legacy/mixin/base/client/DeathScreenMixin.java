@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base.client;
 
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Renderable;
@@ -50,9 +50,12 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
         super(component);
     }
 
+    //? <1.21.11 {
+    /*
     @Shadow
     @Nullable
     protected abstract Style getClickedComponentStyleAt(int i);
+    *///?}
 
     @Shadow
     protected abstract void handleExitToTitleScreen();
@@ -98,8 +101,11 @@ public abstract class DeathScreenMixin extends Screen implements ControlTooltip.
         guiGraphics.pose().popMatrix();
         if (this.causeOfDeath != null) {
             guiGraphics.drawCenteredString(this.font, this.causeOfDeath, this.width / 2, height / 2 - 24, 16777215);
+            //? <1.21.11 {
+            /*
             if (j > height / 2 - 24 && j < height / 2 - 15)
                 guiGraphics.renderComponentHoverEffect(this.font, this.getClickedComponentStyleAt(i), i, j);
+            *///?}
         }
 
         if (this.exitToTitleButton != null && this.minecraft.getReportingContext().hasDraftReport()) {

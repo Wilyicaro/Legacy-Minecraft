@@ -27,6 +27,26 @@ public class VertexConsumerWrapper implements VertexConsumer {
         return colorMultiplier == null ? consumer.setColor(i, j, k, l) : consumer.setColor((ColorUtil.getR(colorMultiplier) * i) / 255, (ColorUtil.getG(colorMultiplier) * j) / 255, (ColorUtil.getB(colorMultiplier) * k) / 255, (ColorUtil.getA(colorMultiplier) * l) / 255);
     }
 
+    //? >=1.21.11 {
+    @Override
+    public VertexConsumer setColor(int i) {
+        if (colorMultiplier == null) {
+            return consumer.setColor(i);
+        } else {
+            int a = (i >> 24) & 0xFF;
+            int r = (i >> 16) & 0xFF;
+            int g = (i >> 8) & 0xFF;
+            int b = i & 0xFF;
+            return consumer.setColor(
+                (ColorUtil.getR(colorMultiplier) * r) / 255,
+                (ColorUtil.getG(colorMultiplier) * g) / 255,
+                (ColorUtil.getB(colorMultiplier) * b) / 255,
+                (ColorUtil.getA(colorMultiplier) * a) / 255
+            );
+        }
+    }
+    //?}
+
     @Override
     public VertexConsumer setUv(float f, float g) {
         return consumer.setUv(f, g);
@@ -46,4 +66,11 @@ public class VertexConsumerWrapper implements VertexConsumer {
     public VertexConsumer setNormal(float f, float g, float h) {
         return consumer.setNormal(f, g, h);
     }
+
+    //? >=1.21.11 {
+    @Override
+    public VertexConsumer setLineWidth(float f) {
+        return consumer.setLineWidth(f);
+    }
+    //?}
 }

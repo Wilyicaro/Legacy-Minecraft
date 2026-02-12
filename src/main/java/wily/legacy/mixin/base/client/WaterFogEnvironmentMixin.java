@@ -1,5 +1,8 @@
 package wily.legacy.mixin.base.client;
 
+//? >=1.21.11 {
+import net.minecraft.client.Camera;
+//?}
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
@@ -16,6 +19,8 @@ import wily.legacy.client.LegacyBiomeOverride;
 
 @Mixin(WaterFogEnvironment.class)
 public abstract class WaterFogEnvironmentMixin {
+    //? <1.21.11 {
+    /*
     @Inject(method = "setupFog", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/fog/FogData;environmentalEnd:F", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
     private void setupWaterFogEnd(FogData fogData, Entity entity, BlockPos blockPos, ClientLevel clientLevel, float f, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (entity instanceof LocalPlayer localPlayer) {
@@ -23,4 +28,14 @@ public abstract class WaterFogEnvironmentMixin {
             o.waterFogDistance().ifPresent(fogDistance -> fogData.environmentalEnd = fogDistance);
         }
     }
+    *///?} else {
+    @Inject(method = "setupFog", at = @At(value = "FIELD", target = "Lnet/minecraft/client/renderer/fog/FogData;environmentalEnd:F", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
+    private void setupWaterFogEnd(FogData fogData, Camera camera, ClientLevel clientLevel, float f, DeltaTracker deltaTracker, CallbackInfo ci) {
+        Entity entity = camera.entity();
+        if (entity instanceof LocalPlayer localPlayer) {
+            LegacyBiomeOverride o = LegacyBiomeOverride.getOrDefault(localPlayer.level().getBiome(entity.getOnPos()).unwrapKey());
+            o.waterFogDistance().ifPresent(fogDistance -> fogData.environmentalEnd = fogDistance);
+        }
+    }
+    //?}
 }

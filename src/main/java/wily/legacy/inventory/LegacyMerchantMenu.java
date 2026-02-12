@@ -4,7 +4,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.npc.ClientSideMerchant;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc./*? if <1.21.11 {*//**//*?} else {*/villager./*?}*/Villager;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;

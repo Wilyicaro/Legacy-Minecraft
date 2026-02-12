@@ -8,7 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.BundleItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level./*? if <1.21.11 {*//*GameRules*//*?} else {*/gamerules.*/*?}*/;
 import net.minecraft.world.level.Level;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.Bearer;
@@ -27,12 +27,18 @@ public class LegacyWorldOptions {
     public static final FactoryConfig<List<InitialItem>> initialItems = WORLD_STORAGE.register(FactoryConfig.create("initialItems", null, () -> InitialItem.LIST_CODEC, List.of(new InitialItem(Items.MAP.getDefaultInstance(), LegacyGameRules.PLAYER_STARTING_MAP), new InitialItem(Items.BUNDLE.getDefaultInstance(), LegacyGameRules.PLAYER_STARTING_BUNDLE)), v -> {}, WORLD_STORAGE));
     public static final FactoryConfig<List<UsedEndPortalPos>> usedEndPortalPositions = WORLD_STORAGE.register(FactoryConfig.create("usedEndPortalPositions", null, () -> UsedEndPortalPos.LIST_CODEC, new ArrayList<>(), v -> {}, WORLD_STORAGE));
 
+    //? <1.21.11 {
+    /*
     public record InitialItem(ItemStack item, Optional<GameRules.Key<GameRules.BooleanValue>> dependentGamerule) {
         public static final Codec<GameRules.Key<GameRules.BooleanValue>> BOOLEAN_GAMERULE_CODEC = Codec.STRING.xmap(InitialItem::getGameruleFromId, GameRules.Key::getId);
+    *///?} else {
+    public record InitialItem(ItemStack item, Optional<GameRule<Boolean>> dependentGamerule) {
+        public static final Codec<GameRule<Boolean>> BOOLEAN_GAMERULE_CODEC = Codec.STRING.xmap(InitialItem::getGameruleFromId, GameRule::id);
+    //?}
         public static final Codec<InitialItem> CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.ITEM_CODEC.fieldOf("item").forGetter(InitialItem::item), BOOLEAN_GAMERULE_CODEC.optionalFieldOf("gamerule").forGetter(InitialItem::dependentGamerule)).apply(i, InitialItem::new));
         public static final Codec<List<InitialItem>> LIST_CODEC = CODEC.listOf();
 
-        public InitialItem(ItemStack item, GameRules.Key<GameRules.BooleanValue> gamerule) {
+        public InitialItem(ItemStack item, /*? if <1.21.11 {*//*GameRules.Key<GameRules.BooleanValue>*//*?} else {*/GameRule<Boolean>/*?}*/ gamerule) {
             this(item, Optional.of(gamerule));
         }
 
@@ -40,6 +46,8 @@ public class LegacyWorldOptions {
             this(item, Optional.empty());
         }
 
+        //? <1.21.11 {
+        /*
         public static GameRules.Key<GameRules.BooleanValue> getGameruleFromId(String id) {
             Bearer<GameRules.Key<GameRules.BooleanValue>> keyBearer = Bearer.of(null);
             GameRules gameRules = FactoryAPI.currentServer.getGameRules();
@@ -52,9 +60,26 @@ public class LegacyWorldOptions {
             });
             return keyBearer.get();
         }
+        *///?} else {
+        public static GameRule<Boolean> getGameruleFromId(String id) {
+            Bearer<GameRule<Boolean>> keyBearer = Bearer.of(null);
+            GameRules gameRules = FactoryAPI.currentServer.getWorldData().getGameRules();
+
+            gameRules.visitGameRuleTypes(new GameRuleTypeVisitor() {
+                @Override
+                public <T> void visit(GameRule<T> gameRule) {
+                    // Vérifier si c'est un GameRule<Boolean> et si l'ID correspond
+                    if (gameRule.valueClass() == Boolean.class && gameRule.id().equals(id)) {
+                        keyBearer.set((GameRule<Boolean>) gameRule);
+                    }
+                }
+            });
+            return keyBearer.get();
+        }
+        //?}
 
         public boolean isEnabled(MinecraftServer server) {
-            return dependentGamerule.isEmpty() || server.getGameRules().getBoolean(dependentGamerule.get());
+            return dependentGamerule.isEmpty() || server./*? if <1.21.11 {*//*getGameRules().getBoolean*//*?} else {*/getWorldData().getGameRules().get/*?}*/(dependentGamerule.get());
         }
     }
 

@@ -14,6 +14,7 @@ group = rootProject.maven_group
 def loader = property("loom.platform")
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven { url "https://maven.neoforged.net/releases/" }
 
@@ -72,6 +73,9 @@ configurations.configureEach {
 }
 
 dependencies {
+    implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+    include 'org.apache.httpcomponents:httpclient:4.5.14'
+    include 'org.apache.httpcomponents:httpcore:4.4.16'
     minecraft "com.mojang:minecraft:${stonecutter.current.version}"
     mappings loom.officialMojangMappings()
     api(include(sdl_dependency))
@@ -120,7 +124,7 @@ dependencies {
 
 }
 
-def aw = "${mod_id}.accesswidener"
+def aw = stonecutter.eval(stonecutter.current.version, ">=1.21.11") ? "${mod_id}.accesswidener" : "${mod_id}-1.21.10.accesswidener"
 
 loom {
     accessWidenerPath.set(getRootProject().file("src/main/resources/${aw}"))

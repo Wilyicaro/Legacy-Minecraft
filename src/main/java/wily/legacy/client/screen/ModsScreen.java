@@ -5,7 +5,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -22,7 +22,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.util.Mth;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIClient;
@@ -52,12 +52,12 @@ public class ModsScreen extends PanelVListScreen {
         if (opt.isPresent() && mod.containsResource(opt.get()))
             try {
                 NativeImage image = NativeImage.read(mod.openResource(opt.get()));
-                ResourceLocation location = FactoryAPI.createLocation(mod.getId(), opt.get().toLowerCase(Locale.ENGLISH));
+                /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ location = FactoryAPI.createLocation(mod.getId(), opt.get().toLowerCase(Locale.ENGLISH));
                 Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(/*? if >=1.21.5 {*/location::toString, /*?}*/image));
                 if (location != null) return new SizedLocation(location, image.getWidth(), image.getHeight());
             } catch (IOException e) {
             }
-        ResourceLocation defaultLogo = PackAlbum.Selector.DEFAULT_ICON;
+        /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ defaultLogo = PackAlbum.Selector.DEFAULT_ICON;
         if (mod.getId().equals("minecraft"))
             defaultLogo = PackAlbum.Selector.getPackIcon(Minecraft.getInstance().getResourcePackRepository().getPack("vanilla"));
         return new SizedLocation(defaultLogo, 1, 1);
@@ -127,6 +127,8 @@ public class ModsScreen extends PanelVListScreen {
                     }
                 }
 
+                //? <1.21.11 {
+                /*
                 @Override
                 protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                     super.renderWidget(guiGraphics, i, j, f);
@@ -150,6 +152,31 @@ public class ModsScreen extends PanelVListScreen {
                     int x = this.getX() + iconPos + accessor.getInteger(getRenderableVList().name + ".buttonMessage.xOffset", 10) + (logo == null ? iconHeight : logo.getScaledWidth(iconHeight));
                     LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), x, this.getY(), x + this.getWidth(), this.getY() + this.getHeight(), j, true);
                 }
+                *///?} else {
+                @Override
+                protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+                    if (isFocused()) focusedMod = mod;
+                    renderDefaultSprite(guiGraphics);
+                    FactoryScreenUtil.enableBlend();
+                    SizedLocation logo = modLogosCache.apply(mod);
+                    if (logo != null) {
+                        int iconHeight = accessor.getInteger(getRenderableVList().name + ".buttonIcon.size", 20);
+                        int iconPos = (height - iconHeight) / 2;
+                        FactoryGuiGraphics.of(guiGraphics).blit(logo.location, getX() + iconPos, getY() + iconPos, 0, 0, logo.getScaledWidth(iconHeight), iconHeight, logo.getScaledWidth(iconHeight), iconHeight);
+                    }
+                    FactoryScreenUtil.disableBlend();
+                    renderModLabel(guiGraphics, logo);
+                }
+
+                protected void renderModLabel(GuiGraphics guiGraphics, SizedLocation logo) {
+                    int color = LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused());
+                    Font font = Minecraft.getInstance().font;
+                    int iconHeight = accessor.getInteger(getRenderableVList().name + ".buttonIcon.size", 20);
+                    int iconPos = (height - iconHeight) / 2;
+                    int x = this.getX() + iconPos + accessor.getInteger(getRenderableVList().name + ".buttonMessage.xOffset", 10) + (logo == null ? iconHeight : logo.getScaledWidth(iconHeight));
+                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), x, this.getY(), x + this.getWidth(), this.getY() + this.getHeight(), color, true);
+                }
+                //?}
 
                 @Override
                 protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -232,7 +259,7 @@ public class ModsScreen extends PanelVListScreen {
         renderer.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> Component.translatable("legacy.menu.sorting", this.sorting.get() == 0 ? LegacyComponents.NONE : LegacyComponents.ALPHABETICAL));
     }
 
-    public record SizedLocation(ResourceLocation location, int width, int height) {
+    public record SizedLocation(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ location, int width, int height) {
         public int getScaledWidth(int height) {
             return (int) (height * ((float) width() / height()));
         }

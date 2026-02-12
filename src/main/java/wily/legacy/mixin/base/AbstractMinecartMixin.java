@@ -6,9 +6,14 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.animal.IronGolem;
+//? <1.21.11 {
+/*
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.vehicle.AbstractMinecart;
+*///?} else {
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
+//?}
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseRailBlock;
 import net.minecraft.world.level.block.Blocks;
@@ -124,8 +129,12 @@ public abstract class AbstractMinecartMixin extends Entity {
     public AbstractMinecartMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
-
+    //? <1.21.11 {
+    /*
     @Redirect(method = "applyNaturalSlowdown", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/AbstractMinecart;isInWater()Z"))
+    *///?} else {
+    @Redirect(method = "applyNaturalSlowdown", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/minecart/AbstractMinecart;isInWater()Z"))
+    //?}
     public boolean applyNaturalSlowdown(AbstractMinecart instance) {
         return false;
     }

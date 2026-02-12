@@ -8,7 +8,7 @@ import net.minecraft.client.gui.screens.inventory.StonecutterScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -133,7 +133,7 @@ public abstract class StonecutterScreenMixin extends AbstractContainerScreen<Sto
     @Inject(method = "renderBg", at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this)./*? if <1.21.11 {*//*getResourceLocation*//*?} else {*/getIdentifier/*?}*/("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 70, topPos + 18, 75, 75);
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 148.5f, topPos + 18);

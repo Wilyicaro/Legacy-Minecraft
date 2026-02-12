@@ -2,7 +2,7 @@ package wily.legacy.mixin.base.client.packselection;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -131,6 +131,8 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
             }
             if (!e.getExtendedDescription().getString().isEmpty()) description.add(e.getExtendedDescription());
             AbstractButton button = new AbstractButton(0, 0, 180, 30, e.getTitle()) {
+                //? <1.21.11 {
+                /*
                 @Override
                 protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
                     super.renderWidget(guiGraphics, mouseX, mouseY, partialTicks);
@@ -176,6 +178,56 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                     LegacyRenderUtil.renderScrollingString(guiGraphics, font, getMessage(), getX() + 30, getY(), getX() + width - 2, getY() + height, e.getCompatibility().isCompatible() ? LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()) : 0xFF0000FF, true);
                 }
+                *///?} else {
+                @Override
+                protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+                    renderDefaultSprite(guiGraphics);
+                    FactoryScreenUtil.enableBlend();
+                    FactoryGuiGraphics.of(guiGraphics).blit(e.getIconTexture(), getX() + 5, getY() + 5, 0.0f, 0.0f, 20, 20, 20, 20);
+                    FactoryScreenUtil.disableBlend();
+                    if ((minecraft.options.touchscreen().get().booleanValue() || isHovered) && showHoverOverlay()) {
+                        guiGraphics.fill(getX() + 5, getY() + 5, getX() + 25, getY() + 25, -1601138544);
+                        int p = i - getX();
+                        int q = j - getY();
+                        if (e.canSelect()) {
+                            if (p < 32) {
+                                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.JOIN_HIGHLIGHTED, getX() + 5, getY() + 5, 20, 20);
+                            } else {
+                                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.JOIN, getX() + 5, getY() + 5, 20, 20);
+                            }
+                        } else {
+                            if (e.canUnselect()) {
+                                if (p < 16) {
+                                    FactoryGuiGraphics.of(guiGraphics).blitSprite(UNSELECT_HIGHLIGHTED, getX() + 5, getY() + 5, 20, 20);
+                                } else {
+                                    FactoryGuiGraphics.of(guiGraphics).blitSprite(UNSELECT, getX() + 5, getY() + 5, 20, 20);
+                                }
+                            }
+                            if (e.canMoveUp()) {
+                                if (p < 32 && p > 16 && q < 16) {
+                                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TRANSFER_MOVE_UP_HIGHLIGHTED, getX(), getY(), 32, 32);
+                                } else {
+                                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TRANSFER_MOVE_UP, getX(), getY(), 32, 32);
+                                }
+                            }
+                            if (e.canMoveDown()) {
+                                if (p < 32 && p > 16 && q > 16) {
+                                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TRANSFER_MOVE_DOWN_HIGHLIGHTED, getX(), getY(), 32, 32);
+                                } else {
+                                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TRANSFER_MOVE_DOWN, getX(), getY(), 32, 32);
+                                }
+                            }
+                        }
+                    }
+                    renderPackLabel(guiGraphics);
+                }
+
+                protected void renderPackLabel(GuiGraphics guiGraphics) {
+                    Font font = minecraft.font;
+                    int color = e.getCompatibility().isCompatible() ? LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()) : 0xFF0000FF;
+                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, getMessage(), getX() + 30, getY(), getX() + width - 2, getY() + height, color, true);
+                }
+                //?}
 
                 @Override
                 public void onClick(MouseButtonEvent event, boolean bl) {

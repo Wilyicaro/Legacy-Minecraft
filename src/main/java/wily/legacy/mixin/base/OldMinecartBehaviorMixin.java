@@ -2,9 +2,9 @@
 package wily.legacy.mixin.base;
 
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
-import net.minecraft.world.entity.vehicle.MinecartBehavior;
-import net.minecraft.world.entity.vehicle.OldMinecartBehavior;
+import net.minecraft.world.entity.vehicle./*? if <1.21.11 {*//**//*?} else {*/minecart./*?}*/AbstractMinecart;
+import net.minecraft.world.entity.vehicle./*? if <1.21.11 {*//**//*?} else {*/minecart./*?}*/MinecartBehavior;
+import net.minecraft.world.entity.vehicle./*? if <1.21.11 {*//**//*?} else {*/minecart./*?}*/OldMinecartBehavior;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -49,7 +49,12 @@ public abstract class OldMinecartBehaviorMixin extends MinecartBehavior {
         return instance.add(movement.x * 0.1f, e, movement.z * 0.1f);
     }
 
+    //? <1.21.11 {
+    /*
     @Redirect(method = "moveAlongTrack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/AbstractMinecart;isInWater()Z"))
+    *///?} else {
+    @Redirect(method = "moveAlongTrack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/vehicle/minecart/AbstractMinecart;isInWater()Z"))
+    //?}
     public boolean moveAlongTrack(AbstractMinecart instance) {
         return false;
     }

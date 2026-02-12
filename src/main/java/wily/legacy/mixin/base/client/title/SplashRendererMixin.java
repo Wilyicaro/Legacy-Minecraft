@@ -18,6 +18,8 @@ import wily.legacy.util.client.LegacyRenderUtil;
 @Mixin(SplashRenderer.class)
 public class SplashRendererMixin {
 
+    //? <1.21.11 {
+    /*
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;scale(FF)Lorg/joml/Matrix3x2f;", shift = At.Shift.AFTER, remap = false))
     public void renderAfterScale(GuiGraphics guiGraphics, int i, Font font, float f, CallbackInfo ci) {
         if (LegacyOptions.getUIMode().isSD())
@@ -34,6 +36,7 @@ public class SplashRendererMixin {
             guiGraphics.pose().translate(-45, -30);
         }
     }
+    *///?}
 
     @Inject(method = "render", at = @At("HEAD"))
     public void render(GuiGraphics guiGraphics, int i, Font font, float f, CallbackInfo ci) {

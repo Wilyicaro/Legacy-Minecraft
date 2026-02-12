@@ -5,6 +5,9 @@ import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.GuiMessage;
 import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
+//? >=1.21.11 {
+import net.minecraft.client.gui.Font;
+//?}
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.screens.ChatScreen;
@@ -46,6 +49,8 @@ public abstract class ChatComponentMixin {
     @Shadow
     public abstract boolean isChatFocused();
 
+    //? <1.21.11 {
+    /*
     @Shadow
     protected abstract void drawTagIcon(GuiGraphics guiGraphics, int i, int j, GuiMessageTag.Icon icon);
 
@@ -89,6 +94,7 @@ public abstract class ChatComponentMixin {
     private void changeClickedChatFontAfter(double d, double e, CallbackInfoReturnable<Style> cir) {
         LegacyFontUtil.defaultFontOverride = null;
     }
+    *///?}
 
     @Inject(method = "addMessageToDisplayQueue", at = @At("HEAD"))
     private void changeClickedChatFontWidth(GuiMessage guiMessage, CallbackInfo ci) {
@@ -101,16 +107,26 @@ public abstract class ChatComponentMixin {
         LegacyFontUtil.defaultFontOverride = null;
     }
 
+    //? <1.21.11 {
+    /*
     @ModifyExpressionValue(method = "getMessageTagAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;screenToChatX(D)D"))
     private double changeMessageTagXPos(double original) {
         return original + Math.round(LegacyRenderUtil.getChatSafeZone());
     }
+    *///?}
 
     @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
+    //? <1.21.11 {
+    /*
     private void stopRender(GuiGraphics guiGraphics, int i, int j, int k, boolean bl, CallbackInfo ci) {
+    *///?} else {
+    private void stopRender(GuiGraphics guiGraphics, Font font, int i, int j, int k, boolean bl, boolean bl2,CallbackInfo ci) {
+    //?}
         if (minecraft.screen != null && !isChatFocused()) ci.cancel();
     }
 
+    //? <1.21.11 {
+    /*
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;pushMatrix()Lorg/joml/Matrix3x2fStack;", shift = At.Shift.AFTER, ordinal = 0, remap = false))
     private void changeRenderTranslation(GuiGraphics guiGraphics, int i, int j, int k, boolean bl, CallbackInfo ci) {
         guiGraphics.pose().translate(LegacyRenderUtil.getChatSafeZone(), LegacyRenderUtil.getHUDDistance() - 42);
@@ -126,6 +142,7 @@ public abstract class ChatComponentMixin {
         double e = (double) this.minecraft.getWindow().getGuiScaledHeight() - d - 40 + LegacyRenderUtil.getHUDDistance() - 42;
         cir.setReturnValue(e / (this.getScale() * (double) this.getLineHeight()));
     }
+    *///?}
 
     @Inject(method = "isChatFocused", at = @At(value = "HEAD"), cancellable = true)
     private void isChatFocused(CallbackInfoReturnable<Boolean> cir) {

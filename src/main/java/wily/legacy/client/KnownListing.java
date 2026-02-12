@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.util.GsonHelper;
 import org.slf4j.Logger;
 import wily.factoryapi.FactoryAPI;
@@ -26,14 +26,14 @@ import wily.factoryapi.FactoryAPI;
 
 public class KnownListing<T> {
     private static final Logger LOGGER = LogUtils.getLogger();
-    public final List<ResourceLocation> list = new ArrayList<>();
+    public final List</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/> list = new ArrayList<>();
     private final Path path;
     private final Registry<T> registry;
     private final String listingFile;
 
     public KnownListing(Registry<T> registry, Path path) {
         this.registry = registry;
-        listingFile = "known_" + this.registry.key().location().getPath() + ".json";
+        listingFile = "known_" + this.registry.key()./*? if <1.21.11 {*//*location*//*?} else {*/identifier/*?}*/().getPath() + ".json";
         this.path = path.resolve(listingFile);
         if (Files.exists(this.path)) {
             try (BufferedReader bufferedReader = Files.newBufferedReader(this.path, Charsets.UTF_8)) {
@@ -43,7 +43,7 @@ public class KnownListing<T> {
                         list.add(FactoryAPI.createLocation(p.getAsString()));
                 });
             } catch (Exception exception) {
-                LOGGER.error("Failed to read {}, known {} will be reset", listingFile, this.registry.key().location().getPath(), exception);
+                LOGGER.error("Failed to read {}, known {} will be reset", listingFile, this.registry.key()./*? if <1.21.11 {*//*location*//*?} else {*/identifier/*?}*/().getPath(), exception);
             }
         }
     }
@@ -63,7 +63,7 @@ public class KnownListing<T> {
             list.forEach(l -> a.add(l.toString()));
             GsonHelper.writeValue(new JsonWriter(bufferedWriter), a, String::compareTo);
         } catch (IOException iOException) {
-            LOGGER.error("Failed to write {}, new known {} won't be present", listingFile, registry.key().location().getPath(), iOException);
+            LOGGER.error("Failed to write {}, new known {} won't be present", listingFile, registry.key()./*? if <1.21.11 {*//*location*//*?} else {*/identifier/*?}*/().getPath(), iOException);
         }
     }
 }

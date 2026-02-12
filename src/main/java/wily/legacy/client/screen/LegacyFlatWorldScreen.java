@@ -90,7 +90,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
 
     public void addStructure(Holder.Reference<StructureSet> structure) {
         List<Component> descr = new ArrayList<>();
-        String nameKey = "structure." + structure.key().location().toLanguageKey();
+        String nameKey = "structure." + structure.key()./*? if <1.21.11 {*//*location*//*?} else {*/identifier/*?}*/().toLanguageKey();
         String descriptionKey = nameKey + ".description";
         if (LegacyTipManager.hasTip(nameKey)) descr.add(Component.translatable(nameKey));
         if (LegacyTipManager.hasTip(descriptionKey)) {
@@ -106,12 +106,14 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
 
     public void addBiome(Holder.Reference<Biome> biome) {
         AbstractButton b;
-        displayBiomes.addRenderable(b = new AbstractButton(0, 0, 260, 30, Component.translatable("biome." + biome.key().location().toLanguageKey())) {
+        displayBiomes.addRenderable(b = new AbstractButton(0, 0, 260, 30, Component.translatable("biome." + biome.key()./*? if <1.21.11 {*//*location*//*?} else {*/identifier/*?}*/().toLanguageKey())) {
             @Override
             public void onPress(InputWithModifiers input) {
                 generator.biome = biome;
             }
 
+            //? <1.21.11 {
+            /*
             @Override
             protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                 super.renderWidget(guiGraphics, i, j, f);
@@ -136,6 +138,34 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
                 int l = this.getX() + this.getWidth();
                 LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j, true);
             }
+            *///?} else {
+            @Override
+            protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+                renderDefaultSprite(guiGraphics);
+                ItemStack s = LegacyBiomeOverride.getOrDefault(biome.unwrapKey()).icon();
+                if (!s.isEmpty()) {
+                    guiGraphics.pose().pushMatrix();
+                    guiGraphics.pose().translate(getX() + 26, getY() + 5);
+                    guiGraphics.pose().scale(1.25f, 1.25f);
+                    guiGraphics.renderItem(s, 0, 0);
+                    guiGraphics.pose().popMatrix();
+                }
+                FactoryScreenUtil.enableBlend();
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.TICKBOX_HOVERED : LegacySprites.TICKBOX, this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);
+                if (generator.biome == biome)
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TICK, this.getX() + 6, this.getY() + (height - 12) / 2, 14, 12);
+                FactoryScreenUtil.disableBlend();
+                renderBiomeLabel(guiGraphics);
+            }
+
+            protected void renderBiomeLabel(GuiGraphics guiGraphics) {
+                int color = LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused());
+                Font font = Minecraft.getInstance().font;
+                int k = this.getX() + 54;
+                int l = this.getX() + this.getWidth();
+                LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), color, true);
+            }
+            //?}
 
             @Override
             protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -144,7 +174,7 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
         });
         List<Component> descr = new ArrayList<>();
         descr.add(b.getMessage());
-        String descriptionKey = "biome." + biome.key().location().toLanguageKey() + ".description";
+        String descriptionKey = "biome." + biome.key()./*? if <1.21.11 {*//*location*//*?} else {*/identifier/*?}*/().toLanguageKey() + ".description";
         if (LegacyTipManager.hasTip(descriptionKey)) {
             descr.add(ControlTooltip.SPACE);
             descr.add(Component.translatable(descriptionKey));
@@ -295,6 +325,8 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
             setTooltip(new MultilineTooltip(descr, 182));
         }
 
+        //? <1.21.11 {
+        /*
         @Override
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             super.renderWidget(guiGraphics, i, j, f);
@@ -312,6 +344,27 @@ public class LegacyFlatWorldScreen extends PanelVListScreen implements ControlTo
             int l = this.getX() + this.getWidth();
             LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j, true);
         }
+        *///?} else {
+        @Override
+        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+            renderDefaultSprite(guiGraphics);
+            guiGraphics.drawString(font, Component.translatable("legacy.menu.create_flat_world.layer_count", flatLayerInfo.getHeight()), getX() + 12, getY() + 1 + (height - font.lineHeight) / 2, 0xFFFFFFFF);
+            guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().translate(getX() + 39, getY() + 5);
+            guiGraphics.pose().scale(1.25f, 1.25f);
+            guiGraphics.renderItem(flatLayerInfo.getBlockState().getBlock().asItem().getDefaultInstance(), 0, 0);
+            guiGraphics.pose().popMatrix();
+            renderLayerLabel(guiGraphics);
+        }
+
+        protected void renderLayerLabel(GuiGraphics guiGraphics) {
+            int color = LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused());
+            Font font = Minecraft.getInstance().font;
+            int k = this.getX() + 67;
+            int l = this.getX() + this.getWidth();
+            LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), color, true);
+        }
+        //?}
 
         @Override
         public void setFocused(boolean bl) {

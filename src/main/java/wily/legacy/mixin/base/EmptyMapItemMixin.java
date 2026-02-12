@@ -40,7 +40,7 @@ public class EmptyMapItemMixin {
         ItemStack map = player.getItemInHand(interactionHand);
         CompoundTag custom = map.getOrDefault(DataComponents.CUSTOM_DATA, CustomData.EMPTY).copyTag();
         map.consume(1, player);
-        return MapItem.create(level, arg, i, custom.contains("map_scale") ? custom.getByte("map_scale")/*? if >=1.21.5 {*/.orElse((byte) 0)/*?}*/ : (byte) level.getGameRules().getInt(LegacyGameRules.DEFAULT_MAP_SIZE), b, bl);
+        return MapItem.create(level, arg, i, custom.contains("map_scale") ? custom.getByte("map_scale")/*? if >=1.21.5 {*/.orElse((byte) 0)/*?}*/ : (byte) /*? if <1.21.11 {*//*level.getGameRules().getInt*//*?} else {*/(int) level.getGameRules().get/*?}*/(LegacyGameRules.DEFAULT_MAP_SIZE), b, bl);
     }
     //?}
 }

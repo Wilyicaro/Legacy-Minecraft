@@ -3,7 +3,7 @@ package wily.legacy.mixin.base.client.gui;
 //? if >=1.21.1 {
 //?}
 
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.SubtitleOverlay;

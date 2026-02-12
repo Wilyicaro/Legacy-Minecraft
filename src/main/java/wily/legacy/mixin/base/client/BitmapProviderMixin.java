@@ -5,7 +5,7 @@ import com.mojang.blaze3d.font.GlyphProvider;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.gui.font.CodepointMap;
 import net.minecraft.client.gui.font.providers.BitmapProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -32,14 +32,14 @@ public abstract class BitmapProviderMixin {
     private int height;
     @Shadow
     @Final
-    private ResourceLocation file;
+    private /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ file;
 
     @Shadow
     protected abstract int getActualGlyphWidth(NativeImage nativeImage, int i, int j, int k, int l);
 
     @Inject(method = "load", at = @At("HEAD"), cancellable = true)
     private void load(ResourceManager resourceManager, CallbackInfoReturnable<GlyphProvider> cir) throws IOException {
-        ResourceLocation resourceLocation = this.file.withPrefix("textures/");
+        /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ resourceLocation = this.file.withPrefix("textures/");
         InputStream inputStream = resourceManager.open(resourceLocation);
 
         BitmapProvider var22;

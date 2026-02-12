@@ -1,5 +1,8 @@
 package wily.legacy.client.screen;
 
+//? >=1.21.11 {
+import net.minecraft.client.Minecraft;
+//?}
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -29,10 +32,12 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen {
         presetGetter.listElements().forEach(holder -> {
             Set<Block> set = (holder.value()).settings().getLayersInfo().stream().map((flatLayerInfo) -> flatLayerInfo.getBlockState().getBlock()).filter((block) -> !block.isEnabled(enabledFeatures)).collect(Collectors.toSet());
             if (!set.isEmpty()) {
-                Legacy4J.LOGGER.info("Discarding flat world preset {} since it contains experimental blocks {}", holder.unwrapKey().map((resourceKey) -> resourceKey.location().toString()).orElse("<unknown>"), set);
+                Legacy4J.LOGGER.info("Discarding flat world preset {} since it contains experimental blocks {}", holder.unwrapKey().map((resourceKey) -> resourceKey./*? if <1.21.11 {*//*location*//*?} else {*/identifier/*?}*/().toString()).orElse("<unknown>"), set);
             } else {
                 FlatLevelGeneratorPreset preset = holder.value();
-                renderableVList.addRenderable(new AbstractButton(0, 0, 263, 30, Component.translatable(holder.key().location().toLanguageKey("flat_world_preset"))) {
+                renderableVList.addRenderable(new AbstractButton(0, 0, 263, 30, Component.translatable(holder.key()./*? if <1.21.11 {*//*location*//*?} else {*/identifier/*?}*/().toLanguageKey("flat_world_preset"))) {
+                    //? <1.21.11 {
+                    /*
                     @Override
                     protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                         super.renderWidget(guiGraphics, i, j, f);
@@ -49,6 +54,26 @@ public class LegacyFlatPresetsScreen extends PanelVListScreen {
                         int l = this.getX() + this.getWidth();
                         LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j, true);
                     }
+                    *///?} else {
+                    @Override
+                    protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+                        renderDefaultSprite(guiGraphics);
+                        guiGraphics.pose().pushMatrix();
+                        guiGraphics.pose().translate(getX() + 5, getY() + 5);
+                        guiGraphics.pose().scale(1.25f, 1.25f);
+                        guiGraphics.renderItem(preset.displayItem().value().getDefaultInstance(), 0, 0);
+                        guiGraphics.pose().popMatrix();
+                        renderPresetLabel(guiGraphics);
+                    }
+
+                    protected void renderPresetLabel(GuiGraphics guiGraphics) {
+                        int color = LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused());
+                        Font font = Minecraft.getInstance().font;
+                        int k = this.getX() + 33;
+                        int l = this.getX() + this.getWidth();
+                        LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), color, true);
+                    }
+                    //?}
 
                     @Override
                     public void onPress(InputWithModifiers input) {

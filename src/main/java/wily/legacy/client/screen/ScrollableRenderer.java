@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.util.Mth;

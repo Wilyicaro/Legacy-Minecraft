@@ -5,10 +5,18 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.HorseInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
+//? if <1.21.11 {
+/*
 import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.animal.horse.Llama;
+*///?} else {
+import net.minecraft.client.gui.screens.inventory.AbstractMountInventoryScreen;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.equine.AbstractHorse;
+import net.minecraft.world.entity.animal.equine.Llama;
+//?}
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.HorseInventoryMenu;
 import net.minecraft.world.inventory.Slot;
@@ -24,6 +32,8 @@ import wily.legacy.inventory.LegacySlotDisplay;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
+//? <1.21.11 {
+/*
 @Mixin(HorseInventoryScreen.class)
 public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<HorseInventoryMenu> {
     @Shadow
@@ -85,3 +95,58 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
         renderBg(guiGraphics, f, i, j);
     }
 }
+*///?} else {
+@Mixin(HorseInventoryScreen.class)
+public abstract class HorseInventoryScreenMixin extends AbstractMountInventoryScreen<HorseInventoryMenu> {
+
+    public HorseInventoryScreenMixin(HorseInventoryMenu horseInventoryMenu, Inventory inventory, Component component, int i, LivingEntity livingEntity) {
+        super(horseInventoryMenu, inventory, component, i, livingEntity);
+    }
+
+    @Override
+    public void init() {
+        imageWidth = 215;
+        imageHeight = 203;
+        inventoryLabelX = 14;
+        inventoryLabelY = 91;
+        titleLabelX = 14;
+        titleLabelY = 8;
+        super.init();
+        AbstractHorse theHorse = (AbstractHorse) this.mount;
+        for (int i = 0; i < menu.slots.size(); i++) {
+            Slot s = menu.slots.get(i);
+            if (i == 0) {
+                LegacySlotDisplay.override(s, 14, 21, new LegacySlotDisplay() {
+                    @Override
+                    public Identifier getIconSprite() {
+                        return s.getItem().isEmpty() ? LegacySprites.SADDLE_SLOT : null;
+                    }
+                });
+            } else if (i == 1) {
+                LegacySlotDisplay.override(s, 14, 42, new LegacySlotDisplay() {
+                    @Override
+                    public Identifier getIconSprite() {
+                        return s.getItem().isEmpty() ? theHorse instanceof Llama ? LegacySprites.LLAMA_ARMOR_SLOT : LegacySprites.ARMOR_SLOT : null;
+                    }
+                });
+            } else if (i < menu.slots.size() - 36) {
+                int slotOffset = s.getContainerSlot();
+                LegacySlotDisplay.override(s, 98 + slotOffset % theHorse.getInventoryColumns() * 21, 21 + slotOffset / theHorse.getInventoryColumns() * 21);
+            } else if (i < menu.slots.size() - 9) {
+                LegacySlotDisplay.override(s, 14 + (s.getContainerSlot() - 9) % 9 * 21, 104 + (s.getContainerSlot() - 9) / 9 * 21);
+            } else {
+                LegacySlotDisplay.override(s, 14 + s.getContainerSlot() * 21, 174);
+            }
+        }
+    }
+
+    @Override
+    protected void renderBg(GuiGraphics graphics, float f, int i, int j) {
+        LivingEntity theMount = this.mount;
+        FactoryGuiGraphics.of(graphics).blitSprite(UIAccessor.of(this).getIdentifier("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_ENTITY_PANEL, leftPos + 34, topPos + 20, 63, 63);
+        FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 97, topPos + 20, 105, 63);
+        LegacyRenderUtil.renderEntityInInventoryFollowsMouse(graphics, leftPos + 35, topPos + 21, leftPos + 95, topPos + 81, 25, 0.0625f, i, j, /*? if <1.21.11 {*//*horse*//*?} else {*/theMount/*?}*/);
+    }
+}
+//?}

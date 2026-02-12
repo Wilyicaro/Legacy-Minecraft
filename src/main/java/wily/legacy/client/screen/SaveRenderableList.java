@@ -24,7 +24,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.world.level.storage.LevelStorageException;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
@@ -58,14 +58,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public class SaveRenderableList extends RenderableVList {
-    static final ResourceLocation ERROR_HIGHLIGHTED = FactoryAPI.createVanillaLocation("world_list/error_highlighted");
-    static final ResourceLocation ERROR = FactoryAPI.createVanillaLocation("world_list/error");
-    static final ResourceLocation MARKED_JOIN_HIGHLIGHTED = FactoryAPI.createVanillaLocation("world_list/marked_join_highlighted");
-    static final ResourceLocation MARKED_JOIN = FactoryAPI.createVanillaLocation("world_list/marked_join");
-    static final ResourceLocation WARNING_HIGHLIGHTED = FactoryAPI.createVanillaLocation("world_list/warning_highlighted");
-    static final ResourceLocation WARNING = FactoryAPI.createVanillaLocation("world_list/warning");
-    static final ResourceLocation JOIN_HIGHLIGHTED = FactoryAPI.createVanillaLocation("world_list/join_highlighted");
-    static final ResourceLocation JOIN = FactoryAPI.createVanillaLocation("world_list/join");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ ERROR_HIGHLIGHTED = FactoryAPI.createVanillaLocation("world_list/error_highlighted");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ ERROR = FactoryAPI.createVanillaLocation("world_list/error");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ MARKED_JOIN_HIGHLIGHTED = FactoryAPI.createVanillaLocation("world_list/marked_join_highlighted");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ MARKED_JOIN = FactoryAPI.createVanillaLocation("world_list/marked_join");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ WARNING_HIGHLIGHTED = FactoryAPI.createVanillaLocation("world_list/warning_highlighted");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ WARNING = FactoryAPI.createVanillaLocation("world_list/warning");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ JOIN_HIGHLIGHTED = FactoryAPI.createVanillaLocation("world_list/join_highlighted");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ JOIN = FactoryAPI.createVanillaLocation("world_list/join");
     static final Logger LOGGER = LogUtils.getLogger();
     static final Component FROM_NEWER_TOOLTIP_1 = Component.translatable("selectWorld.tooltip.fromNewerVersion1").withStyle(ChatFormatting.RED);
     static final Component FROM_NEWER_TOOLTIP_2 = Component.translatable("selectWorld.tooltip.fromNewerVersion2").withStyle(ChatFormatting.RED);
@@ -326,10 +326,10 @@ public class SaveRenderableList extends RenderableVList {
             super.renderIconHighlight(guiGraphics, mouseX, mouseY, x, y, width, height);
 
             boolean hoverIcon = LegacyRenderUtil.isMouseOver(mouseX, mouseY, getX() + x, getY() + y, width, height);
-            ResourceLocation resourceLocation = hoverIcon ? JOIN_HIGHLIGHTED : JOIN;
-            ResourceLocation resourceLocation2 = hoverIcon ? WARNING_HIGHLIGHTED : WARNING;
-            ResourceLocation resourceLocation3 = hoverIcon ? ERROR_HIGHLIGHTED : ERROR;
-            ResourceLocation resourceLocation4 = hoverIcon ? MARKED_JOIN_HIGHLIGHTED : MARKED_JOIN;
+            /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ resourceLocation = hoverIcon ? JOIN_HIGHLIGHTED : JOIN;
+            /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ resourceLocation2 = hoverIcon ? WARNING_HIGHLIGHTED : WARNING;
+            /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ resourceLocation3 = hoverIcon ? ERROR_HIGHLIGHTED : ERROR;
+            /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ resourceLocation4 = hoverIcon ? MARKED_JOIN_HIGHLIGHTED : MARKED_JOIN;
             if (summary instanceof LevelSummary.SymlinkLevelSummary/*? if >=1.20.3 {*/ || summary instanceof LevelSummary.CorruptedLevelSummary/*?}*/) {
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation3, getX() + x, getY() + y, width, height);
                 FactoryGuiGraphics.of(guiGraphics).blitSprite(resourceLocation4, getX() + x, getY() + y, width, height);

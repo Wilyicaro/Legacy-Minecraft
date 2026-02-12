@@ -1,12 +1,12 @@
 package wily.legacy.client;
 
 import net.minecraft.client.gui.components.toasts.AdvancementToast;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 
 public interface AdvancementToastAccessor {
     static AdvancementToastAccessor of(AdvancementToast toast) {
         return (AdvancementToastAccessor) toast;
     }
 
-    ResourceLocation getAdvancementId();
+    /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ getAdvancementId();
 }

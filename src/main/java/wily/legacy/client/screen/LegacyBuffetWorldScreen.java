@@ -33,12 +33,14 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
     }
 
     public void addBiome(Holder.Reference<Biome> biome) {
-        renderableVList.addRenderable(new AbstractButton(0, 0, 260, 30, Component.translatable("biome." + biome.key().location().toLanguageKey())) {
+        renderableVList.addRenderable(new AbstractButton(0, 0, 260, 30, Component.translatable("biome." + biome.key()./*? if <1.21.11 {*//*location*//*?} else {*/identifier/*?}*/().toLanguageKey())) {
             @Override
             public void onPress(InputWithModifiers input) {
                 selectedBiome = biome;
             }
 
+            //? <1.21.11 {
+            /*
             @Override
             protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
                 super.renderWidget(guiGraphics, i, j, f);
@@ -63,6 +65,34 @@ public class LegacyBuffetWorldScreen extends PanelVListScreen {
                 int l = this.getX() + this.getWidth();
                 LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), j, true);
             }
+            *///?} else {
+            @Override
+            protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+                renderDefaultSprite(guiGraphics);
+                ItemStack s = LegacyBiomeOverride.getOrDefault(biome.unwrapKey()).icon();
+                if (!s.isEmpty()) {
+                    guiGraphics.pose().pushMatrix();
+                    guiGraphics.pose().translate(getX() + 26, getY() + 5);
+                    guiGraphics.pose().scale(1.25f, 1.25f);
+                    guiGraphics.renderItem(s, 0, 0);
+                    guiGraphics.pose().popMatrix();
+                }
+                FactoryScreenUtil.enableBlend();
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.TICKBOX_HOVERED : LegacySprites.TICKBOX, this.getX() + 6, this.getY() + (height - 12) / 2, 12, 12);
+                if (selectedBiome == biome)
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TICK, this.getX() + 6, this.getY() + (height - 12) / 2, 14, 12);
+                FactoryScreenUtil.disableBlend();
+                renderBiomeLabel(guiGraphics);
+            }
+
+            protected void renderBiomeLabel(GuiGraphics guiGraphics) {
+                int color = LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused());
+                Font font = Minecraft.getInstance().font;
+                int k = this.getX() + 54;
+                int l = this.getX() + this.getWidth();
+                LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), k, this.getY(), l, this.getY() + this.getHeight(), color, true);
+            }
+            //?}
 
             @Override
             protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {

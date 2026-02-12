@@ -9,7 +9,7 @@ import com.mojang.realmsclient.RealmsMainScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.DefaultUncaughtExceptionHandler;
 import net.minecraft.SharedConstants;
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -33,7 +33,10 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
+//? >= 1.21.11 {
+import net.minecraft.server.network.EventLoopGroupHolder;
+//?}
 import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -57,18 +60,18 @@ import static wily.legacy.client.screen.CreationList.addIconButton;
 
 public class ServerRenderableList extends RenderableVList {
     protected static final Logger LOGGER = LogUtils.getLogger();
-    static final ResourceLocation INCOMPATIBLE = FactoryAPI.createVanillaLocation("server_list/incompatible");
-    static final ResourceLocation UNREACHABLE = FactoryAPI.createVanillaLocation("server_list/unreachable");
-    static final ResourceLocation PING_1 = FactoryAPI.createVanillaLocation("server_list/ping_1");
-    static final ResourceLocation PING_2 = FactoryAPI.createVanillaLocation("server_list/ping_2");
-    static final ResourceLocation PING_3 = FactoryAPI.createVanillaLocation("server_list/ping_3");
-    static final ResourceLocation PING_4 = FactoryAPI.createVanillaLocation("server_list/ping_4");
-    static final ResourceLocation PING_5 = FactoryAPI.createVanillaLocation("server_list/ping_5");
-    static final ResourceLocation PINGING_1 = FactoryAPI.createVanillaLocation("server_list/pinging_1");
-    static final ResourceLocation PINGING_2 = FactoryAPI.createVanillaLocation("server_list/pinging_2");
-    static final ResourceLocation PINGING_3 = FactoryAPI.createVanillaLocation("server_list/pinging_3");
-    static final ResourceLocation PINGING_4 = FactoryAPI.createVanillaLocation("server_list/pinging_4");
-    static final ResourceLocation PINGING_5 = FactoryAPI.createVanillaLocation("server_list/pinging_5");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ INCOMPATIBLE = FactoryAPI.createVanillaLocation("server_list/incompatible");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ UNREACHABLE = FactoryAPI.createVanillaLocation("server_list/unreachable");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PING_1 = FactoryAPI.createVanillaLocation("server_list/ping_1");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PING_2 = FactoryAPI.createVanillaLocation("server_list/ping_2");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PING_3 = FactoryAPI.createVanillaLocation("server_list/ping_3");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PING_4 = FactoryAPI.createVanillaLocation("server_list/ping_4");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PING_5 = FactoryAPI.createVanillaLocation("server_list/ping_5");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PINGING_1 = FactoryAPI.createVanillaLocation("server_list/pinging_1");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PINGING_2 = FactoryAPI.createVanillaLocation("server_list/pinging_2");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PINGING_3 = FactoryAPI.createVanillaLocation("server_list/pinging_3");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PINGING_4 = FactoryAPI.createVanillaLocation("server_list/pinging_4");
+    static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PINGING_5 = FactoryAPI.createVanillaLocation("server_list/pinging_5");
     static final ThreadPoolExecutor THREAD_POOL = new ScheduledThreadPoolExecutor(5, new ThreadFactoryBuilder().setNameFormat("Server Pinger #%d").setDaemon(true).setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(LOGGER)).build());
     static final Component SCANNING_LABEL = Component.translatable("lanServer.scanning");
     static final Component CANT_RESOLVE_TEXT = Component.translatable("multiplayer.status.cannot_resolve").withStyle(style -> style.withColor(-65536));
@@ -77,7 +80,7 @@ public class ServerRenderableList extends RenderableVList {
     static final Component NO_CONNECTION_STATUS = Component.translatable("multiplayer.status.no_connection");
     static final Component PINGING_STATUS = Component.translatable("multiplayer.status.pinging");
     static final Component ONLINE_STATUS = Component.translatable("multiplayer.status.online");
-    private static final ResourceLocation ICON_MISSING = FactoryAPI.createVanillaLocation("textures/misc/unknown_server.png");
+    private static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ ICON_MISSING = FactoryAPI.createVanillaLocation("textures/misc/unknown_server.png");
     private static final Component LAN_SERVER_HEADER = Component.translatable("lanServer.title");
     private static final Component HIDDEN_ADDRESS_TEXT = Component.translatable("selectServer.hiddenAddress");
     public final ServerList servers;
@@ -97,7 +100,7 @@ public class ServerRenderableList extends RenderableVList {
         updateServers();
     }
 
-    public static void drawIcon(GuiGraphics guiGraphics, int x, int y, int width, int height, ResourceLocation resourceLocation) {
+    public static void drawIcon(GuiGraphics guiGraphics, int x, int y, int width, int height, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ resourceLocation) {
         FactoryScreenUtil.enableBlend();
         FactoryGuiGraphics.of(guiGraphics).blit(resourceLocation, x, y, 0.0f, 0.0f, width, height, width, height);
         FactoryScreenUtil.disableBlend();
@@ -161,7 +164,7 @@ public class ServerRenderableList extends RenderableVList {
             for (LanServer lanServer : lanServers) {
                 AbstractButton lanButton;
                 addRenderable(lanButton = new CreationList.ContentButton(this, 0, 0, 0, 30, Component.literal(lanServer.getMotd())) {
-                    @Override
+                    /*? if <1.21.11 {*//*@Override*//*?}*/
                     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                         int messageX = accessor.getInteger(name + ".buttonMessage.xOffset", 35);
                         guiGraphics.drawString(minecraft.font, LAN_SERVER_HEADER, messageX, getY() + 1, 0xFFFFFFFF, false);
@@ -227,7 +230,7 @@ public class ServerRenderableList extends RenderableVList {
         private byte @Nullable [] lastIconBytes;
         private boolean showOnlinePlayersTooltip;
         @Nullable
-        private ResourceLocation statusIcon;
+        private /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ statusIcon;
         @Nullable
         private Component statusIconTooltip;
 
@@ -239,17 +242,17 @@ public class ServerRenderableList extends RenderableVList {
         }
 
         @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+        protected void /*? if <1.21.11 {*//*renderWidget*//*?} else {*/renderContents/*?}*/(GuiGraphics guiGraphics, int i, int j, float f) {
             if (server.state() == ServerData.State.INITIAL) {
                 server.setState(ServerData.State.PINGING);
                 server.motd = CommonComponents.EMPTY;
                 server.status = CommonComponents.EMPTY;
-                THREAD_POOL.submit(() -> {
+                THREAD_POOL.submit(/*? if <1.21.11 {*//**//*?} else {*/(Runnable)/*?}*/ () -> {
                     try {
                         getScreen(PlayGameScreen.class).getPinger().pingServer(server, () -> minecraft.execute(this::updateServerList), () -> {
                             server.setState(server.protocol == SharedConstants.getCurrentVersion().protocolVersion() ? ServerData.State.SUCCESSFUL : ServerData.State.INCOMPATIBLE);
                             minecraft.execute(this::refreshStatus);
-                        });
+                        }/*? if <1.21.11 {*//**//*?} else {*/, EventLoopGroupHolder.remote(true)/*?}*/);
                     } catch (UnknownHostException unknownHostException) {
                         server.setState(ServerData.State.UNREACHABLE);
                         server.motd = CANT_RESOLVE_TEXT;
@@ -401,7 +404,7 @@ public class ServerRenderableList extends RenderableVList {
             return true;
         }
 
-        @Override
+        /*? if <1.21.11 {*//*@Override*//*?}*/
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
             LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(font, getMessage(), getX() + accessor.getInteger(name + ".buttonMessage.xOffset", 35), getY() + 3, j));
 

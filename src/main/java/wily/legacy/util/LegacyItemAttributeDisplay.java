@@ -2,7 +2,7 @@ package wily.legacy.util;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;

@@ -4,16 +4,16 @@ package wily.legacy.client.screen.compat;
 //? if >=1.21 {
 
 import net.caffeinemc.mods.sodium.client.SodiumClientMod;
-import net.caffeinemc.mods.sodium.client.gui.SodiumGameOptionPages;
-import net.caffeinemc.mods.sodium.client.gui.SodiumGameOptions;
-import net.caffeinemc.mods.sodium.client.gui.options.Option;
-import net.caffeinemc.mods.sodium.client.gui.options.OptionPage;
-import net.caffeinemc.mods.sodium.client.gui.options.control.ControlValueFormatter;
+/*? if <1.21.11 {*//*import net.caffeinemc.mods.sodium.client.gui.SodiumGameOptionPages;*//*?}*/
+/*? if <1.21.11 {*//*import net.caffeinemc.mods.sodium.client.gui.SodiumGameOptions;*//*?}*/
+/*? if <1.21.11 {*//*import net.caffeinemc.mods.sodium.client.gui.options.Option;*//*?}*/
+/*? if <1.21.11 {*//*import net.caffeinemc.mods.sodium.client.gui.options.OptionPage;*//*?}*/
+/*? if <1.21.11 {*//*import net.caffeinemc.mods.sodium.client.gui.options.control.ControlValueFormatter;*//*?}*/
 import net.caffeinemc.mods.sodium.client.gui.options.control.CyclingControl;
 import net.caffeinemc.mods.sodium.client.gui.options.control.SliderControl;
 import net.caffeinemc.mods.sodium.client.gui.options.control.TickBoxControl;
-import net.caffeinemc.mods.sodium.client.gui.options.storage.MinecraftOptionsStorage;
-import net.caffeinemc.mods.sodium.client.gui.options.storage.SodiumOptionsStorage;
+/*? if <1.21.11 {*//*import net.caffeinemc.mods.sodium.client.gui.options.storage.MinecraftOptionsStorage;*//*?}*/
+/*? if <1.21.11 {*//*import net.caffeinemc.mods.sodium.client.gui.options.storage.SodiumOptionsStorage;*//*?}*/
 //?} else {
 /*import me.jellysquid.mods.sodium.client.SodiumClientMod;
 import me.jellysquid.mods.sodium.client.gui.SodiumGameOptionPages;
@@ -42,6 +42,8 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.Supplier;
 
+//? <1.21.11 {
+/*
 public class SodiumCompat {
 
     public static final Map<String, Field> SODIUM_SLIDER_CONTROL_FIELDS = FactoryAPI.getAccessibleFieldsMap(SliderControl.class, "min", "max", "mode");
@@ -103,4 +105,4 @@ public class SodiumCompat {
         });
     }
 }
-//?}
+*///?}

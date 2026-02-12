@@ -18,7 +18,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level./*? if <1.21.11 {*//*GameRules*//*?} else {*/gamerules.*/*?}*/;
 import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.WorldDataConfiguration;
 import wily.factoryapi.base.Bearer;
@@ -107,6 +107,8 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 parent.tryApplyNewDataPacks(dataRepository, false, w -> minecraft.setScreen(this));
             };
         }
+        //? <1.21.11 {
+        /*
         renderableVList.addRenderable(Button.builder(Component.translatable("selectWorld.dataPacks"), button -> openDataPackSelectionScreen(parent, parent.getUiState().getSettings().dataConfiguration())).tooltip(Tooltip.create(Component.translatable("legacy.menu.selectWorld.dataPacks.description"))).build());
         renderableVList.addRenderable(new TickBox(0, 0, trustPlayers.get(), b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.trust_players.description")), t -> trustPlayers.set(t.selected)));
         addGameRulesOptions(renderableVList, gameRules, k -> k.getCategory() == GameRules.Category.UPDATES);
@@ -117,7 +119,23 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         }
         parent.getUiState().onChanged();
     }
+        *///?} else {
+        renderableVList.addRenderable(Button.builder(Component.translatable("selectWorld.dataPacks"), button -> openDataPackSelectionScreen(parent, parent.getUiState().getSettings().dataConfiguration())).tooltip(Tooltip.create(Component.translatable("legacy.menu.selectWorld.dataPacks.description"))).build());
+        renderableVList.addRenderable(new TickBox(0, 0, trustPlayers.get(), b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.trust_players.description")), t -> trustPlayers.set(t.selected)));
+        addGameRulesOptions(renderableVList, gameRules, k -> k.category() == GameRuleCategory.UPDATES);
+        gameRenderables.addRenderable(hostPrivileges);
+        addGameRulesOptions(gameRenderables, gameRules, k -> k.category() == GameRuleCategory.PLAYER);
+        addGameRulesOptions(gameRenderables, gameRules, k -> k.category() == GameRuleCategory.MOBS);
+        addGameRulesOptions(gameRenderables, gameRules, k -> k.category() == GameRuleCategory.SPAWNING);
+        addGameRulesOptions(gameRenderables, gameRules, k -> k.category() == GameRuleCategory.DROPS);
+        addGameRulesOptions(gameRenderables, gameRules, k -> k.category() == GameRuleCategory.CHAT);
+        addGameRulesOptions(gameRenderables, gameRules, k -> k.category() == GameRuleCategory.MISC);
+        parent.getUiState().onChanged();
+    }
+        //?}
 
+    //? <1.21.11 {
+    /*
     public WorldMoreOptionsScreen(LoadSaveScreen parent) {
         super(parent, 244, 199, Component.translatable("createWorld.tab.more.title"));
         renderableVLists.add(gameRenderables);
@@ -181,6 +199,72 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
             }
         });
     }
+    *///?} else {
+    public WorldMoreOptionsScreen(LoadSaveScreen parent) {
+        super(parent, 244, 199, Component.translatable("createWorld.tab.more.title"));
+        renderableVLists.add(gameRenderables);
+        tabList.setSelected(1);
+        GameRules gameRules = parent.summary.getSettings().gameRules();
+        LoadSaveScreen.RESETTABLE_DIMENSIONS.forEach(d -> renderableVList.addRenderable(new TickBox(0, 0, parent.dimensionsToReset.contains(d), b -> Component.translatable("legacy.menu.load_save.reset", LegacyComponents.getDimensionName(d)), b -> null, t -> {
+            if (t.selected) parent.dimensionsToReset.add(d);
+            else parent.dimensionsToReset.remove(d);
+        })));
+        renderableVList.addRenderable(new TickBox(0, 0, parent.trustPlayers, b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> null, t -> parent.trustPlayers = t.selected));
+        addGameRulesOptions(renderableVList, gameRules, k -> k.category() == GameRuleCategory.UPDATES);
+        gameRenderables.addRenderable(new TickBox(0, 0, parent.hostPrivileges, b -> LegacyComponents.HOST_PRIVILEGES, b -> Tooltip.create(LegacyComponents.HOST_PRIVILEGES_INFO), b -> parent.hostPrivileges = b.selected));
+        List<GameRuleCategory> categories = List.of(GameRuleCategory.PLAYER, GameRuleCategory.MOBS, GameRuleCategory.SPAWNING, GameRuleCategory.DROPS, GameRuleCategory.CHAT, GameRuleCategory.MISC);
+        for (GameRuleCategory value : categories) {
+            if (value == GameRuleCategory.UPDATES) continue;
+            addGameRulesOptions(gameRenderables, gameRules, k -> k.category() == value);
+        }
+        parent.applyGameRules = (g, s) -> {
+            if (!g.equals(gameRules)) g.setAll(gameRules, s);
+        };
+    }
+
+    @Override
+    public void addControlTooltips(ControlTooltip.Renderer renderer) {
+        super.addControlTooltips(renderer);
+        renderer.add(ControlTooltip.CONTROL_TAB::get, () -> tabList.getIndex() == 0 ? LegacyComponents.GAME_OPTIONS : LegacyComponents.WORLD_OPTIONS);
+    }
+
+    public void addGameRulesOptions(RenderableVList list, GameRules gameRules, Predicate<GameRule<?>> allowGamerule) {
+        gameRules.visitGameRuleTypes(new GameRuleTypeVisitor() {
+
+            @Override
+            public void visitBoolean(GameRule<Boolean> gameRule) {
+                if (!allowGamerule.test(gameRule)) return;
+                Boolean currentValue = gameRules.get(gameRule);
+                Boolean defaultValue = gameRule.defaultValue();
+                Component tooltip = Component.translatable(gameRule.getDescriptionId() + ".description");
+                Component valueTooltip = Component.translatable("editGamerule.default", gameRule.serialize(defaultValue)).withStyle(ChatFormatting.GRAY);
+                list.addRenderable(new TickBox(0, 0, currentValue, b -> Component.translatable(gameRule.getDescriptionId()), b -> new MultilineTooltip(tooltipBox.width - 10, tooltip, valueTooltip), b -> gameRules.set(gameRule, b.selected, null)));
+            }
+
+            @Override
+            public void visitInteger(GameRule<Integer> gameRule) {
+                if (!allowGamerule.test(gameRule)) return;
+                Integer currentValue = gameRules.get(gameRule);
+                Integer defaultValue = gameRule.defaultValue();
+                Component tooltip = Component.translatable(gameRule.getDescriptionId() + ".description");
+                Component valueTooltip = Component.translatable("editGamerule.default", gameRule.serialize(defaultValue)).withStyle(ChatFormatting.GRAY);
+                EditBox integerEdit = new EditBox(Minecraft.getInstance().font, 0, 0, 220, 20, Component.translatable(gameRule.getDescriptionId()));
+                integerEdit.setTooltip(new MultilineTooltip(tooltipBox.width - 10, tooltip, valueTooltip));
+                integerEdit.setValue(Integer.toString(currentValue));
+                integerEdit.setResponder(string -> {
+                    if (gameRule.deserialize(string).result().isPresent()) {
+                        integerEdit.setTextColor(0xFFE0E0E0);
+                        gameRules.set(gameRule, Integer.parseInt(string), null);
+                    } else {
+                        integerEdit.setTextColor(0xFFFF0000);
+                    }
+                });
+                list.addRenderable(SimpleLayoutRenderable.create(0, 9, r -> ((guiGraphics, i, j, f) -> guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable(gameRule.getDescriptionId()), r.x + 1, r.y + 2, CommonColor.INVENTORY_GRAY_TEXT.get(), false))));
+                list.addRenderable(integerEdit);
+            }
+        });
+    }
+    //?}
 
     @Override
     public void onClose() {

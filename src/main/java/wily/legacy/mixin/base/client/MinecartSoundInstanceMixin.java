@@ -12,8 +12,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.LegacyOptions;
 
+//? <1.21.11 {
+/*
 @Mixin(value = {MinecartSoundInstance.class, RidingMinecartSoundInstance.class})
 public abstract class MinecartSoundInstanceMixin extends AbstractTickableSoundInstance {
+*///?} else {
+@Mixin(MinecartSoundInstance.class)
+public abstract class MinecartSoundInstanceMixin extends AbstractTickableSoundInstance {
+//?}
     protected MinecartSoundInstanceMixin(SoundEvent soundEvent, SoundSource soundSource, RandomSource randomSource) {
         super(soundEvent, soundSource, randomSource);
     }

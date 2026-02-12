@@ -3,16 +3,16 @@ package wily.legacy.client;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.client.screen.LegacyTabButton;
 
 import java.util.*;
 
-public record LegacyCraftingTabListing(ResourceLocation id, Optional<Component> name,
+public record LegacyCraftingTabListing(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ id, Optional<Component> name,
                                        Optional<LegacyTabButton.IconHolder<?>> iconHolder,
                                        Map<String, List<RecipeInfo.Filter>> craftings) implements LegacyTabInfo<LegacyCraftingTabListing> {
-    public static final Codec<LegacyCraftingTabListing> CODEC = RecordCodecBuilder.create(i -> i.group(ResourceLocation.CODEC.fieldOf("id").forGetter(LegacyCraftingTabListing::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(LegacyCraftingTabListing::name), LegacyTabButton.ICON_HOLDER_CODEC.optionalFieldOf("icon").forGetter(LegacyCraftingTabListing::iconHolder), RecipeInfo.Filter.LISTING_CODEC.fieldOf("listing").orElseGet(LinkedHashMap::new).forGetter(LegacyCraftingTabListing::craftings)).apply(i, LegacyCraftingTabListing::new));
+    public static final Codec<LegacyCraftingTabListing> CODEC = RecordCodecBuilder.create(i -> i.group(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/.CODEC.fieldOf("id").forGetter(LegacyCraftingTabListing::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(LegacyCraftingTabListing::name), LegacyTabButton.ICON_HOLDER_CODEC.optionalFieldOf("icon").forGetter(LegacyCraftingTabListing::iconHolder), RecipeInfo.Filter.LISTING_CODEC.fieldOf("listing").orElseGet(LinkedHashMap::new).forGetter(LegacyCraftingTabListing::craftings)).apply(i, LegacyCraftingTabListing::new));
 
     @Override
     public boolean isValid() {

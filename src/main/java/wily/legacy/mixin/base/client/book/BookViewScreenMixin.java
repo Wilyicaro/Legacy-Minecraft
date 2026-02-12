@@ -1,6 +1,10 @@
 package wily.legacy.mixin.base.client.book;
 
 import com.mojang.blaze3d.platform.InputConstants;
+
+//? >=1.21.11 {
+import net.minecraft.client.gui.ActiveTextCollector;
+//?}
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.BookViewScreen;
@@ -63,8 +67,37 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
     @Shadow
     protected abstract int getNumPages();
 
+    //? <1.21.11 {
+    /*
     @Shadow
     public abstract @Nullable Style getClickedComponentStyleAt(double d, double e);
+    *///?} else {
+    @Unique
+    private @Nullable Style legacy$getClickedComponentStyleAt(double d, double e) {
+        if (this.cachedPageComponents.isEmpty()) {
+            return null;
+        }
+        int i = (int) Math.floor(d - panel.x - 20);
+        int j = (int) Math.floor(e - panel.y - 37);
+        if (i < 0 || j < 0) {
+            return null;
+        }
+        int k = Math.min(176 / this.font.lineHeight, this.cachedPageComponents.size());
+        if (i <= 159 && j < this.minecraft.font.lineHeight * k + k) {
+            int l = j / this.minecraft.font.lineHeight;
+            if (l < this.cachedPageComponents.size()) {
+                FormattedCharSequence formattedCharSequence = this.cachedPageComponents.get(l);
+                int absoluteX = panel.x + 20;
+                int absoluteY = panel.y + 37 + l * this.minecraft.font.lineHeight;
+                ActiveTextCollector.ClickableStyleFinder finder = new ActiveTextCollector.ClickableStyleFinder(
+                        this.minecraft.font, absoluteX + i, absoluteY);
+                finder.accept(absoluteX, absoluteY, formattedCharSequence);
+                return finder.result();
+            }
+        }
+        return null;
+    }
+    //?}
 
     @Override
     public void added() {
@@ -110,7 +143,7 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
             FormattedCharSequence formattedCharSequence = this.cachedPageComponents.get(o);
             guiGraphics.drawString(this.font, formattedCharSequence, panel.x + 20, panel.y + 37 + o * this.font.lineHeight, 0xFF000000, false);
         }
-        Style style = this.getClickedComponentStyleAt(i, j);
+       Style style = this./*? if <1.21.11 {*//*getClickedComponentStyleAt*//*?} else {*/legacy$getClickedComponentStyleAt/*?}*/(i, j);
         if (style != null) {
             guiGraphics.renderComponentHoverEffect(this.font, style, i, j);
         }
@@ -133,6 +166,8 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         cir.setReturnValue(super.keyPressed(keyEvent));
     }
 
+    //? <1.21.11 {
+    /*
     @Inject(method = "getClickedComponentStyleAt", at = @At("HEAD"), cancellable = true)
     public void getClickedComponentStyleAt(double d, double e, CallbackInfoReturnable<Style> cir) {
         if (this.cachedPageComponents.isEmpty()) {
@@ -156,6 +191,7 @@ public abstract class BookViewScreenMixin extends Screen implements Controller.E
         }
         cir.setReturnValue(null);
     }
+    *///?}
 
     @Override
     public boolean isPauseScreen() {

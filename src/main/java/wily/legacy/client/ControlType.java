@@ -5,7 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
@@ -15,29 +15,29 @@ import wily.legacy.util.IOUtil;
 
 import java.util.*;
 
-public record ControlType(ResourceLocation id, Optional<Component> name, boolean isKbm,
-                          Optional<SizeableAsset<ControlFont>> font, Optional<ResourceLocation> minecraftLogo,
+public record ControlType(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ id, Optional<Component> name, boolean isKbm,
+                          Optional<SizeableAsset<ControlFont>> font, Optional</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/> minecraftLogo,
                           Optional<SizeableAsset<Style>> style,
                           Map<String, ControlTooltip.LegacyIcon> icons) implements IdValueInfo<ControlType> {
     public static final SizeableAsset<Style> EMPTY_STYLE_ASSET = new SizeableAsset<>(Style.EMPTY);
-    public static final Codec<ControlType> EXTENDED_CODEC = RecordCodecBuilder.create(i -> i.group(ResourceLocation.CODEC.fieldOf("id").forGetter(ControlType::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(ControlType::name), Codec.BOOL.optionalFieldOf("isKbm", false).forGetter(ControlType::isKbm), SizeableAsset.createWithFallback(ControlFont.CODEC).optionalFieldOf("font").forGetter(ControlType::font), ResourceLocation.CODEC.optionalFieldOf("minecraftLogo").forGetter(ControlType::minecraftLogo)).apply(i, ControlType::new));
-    public static final Codec<ControlType> CODEC = IOUtil.createFallbackCodec(EXTENDED_CODEC, ResourceLocation.CODEC.xmap(ControlType::new, ControlType::id));
+    public static final Codec<ControlType> EXTENDED_CODEC = RecordCodecBuilder.create(i -> i.group(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/.CODEC.fieldOf("id").forGetter(ControlType::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(ControlType::name), Codec.BOOL.optionalFieldOf("isKbm", false).forGetter(ControlType::isKbm), SizeableAsset.createWithFallback(ControlFont.CODEC).optionalFieldOf("font").forGetter(ControlType::font), /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/.CODEC.optionalFieldOf("minecraftLogo").forGetter(ControlType::minecraftLogo)).apply(i, ControlType::new));
+    public static final Codec<ControlType> CODEC = IOUtil.createFallbackCodec(EXTENDED_CODEC, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/.CODEC.xmap(ControlType::new, ControlType::id));
     public static final Codec<OptionHolder<ControlType>> OPTION_CODEC = OptionHolder.createCodecWithAuto(ControlType::get);
-    public static final ResourceLocation KBM = Legacy4J.createModLocation("java");
-    public static final ResourceLocation x360 = Legacy4J.createModLocation("xbox_360");
-    public static final ResourceLocation xONE = Legacy4J.createModLocation("xbox_one");
-    public static final ResourceLocation PS3 = Legacy4J.createModLocation("playstation_3");
-    public static final ResourceLocation PS4 = Legacy4J.createModLocation("playstation_4");
-    public static final ResourceLocation WII_U = Legacy4J.createModLocation("wii_u");
-    public static final ResourceLocation SWITCH = Legacy4J.createModLocation("switch");
-    public static final ResourceLocation STEAM = Legacy4J.createModLocation("steam");
-    public static final ResourceLocation STADIA = Legacy4J.createModLocation("stadia");
-    public static final ResourceLocation PSVITA = Legacy4J.createModLocation("playstation_vita");
-    public static final ResourceLocation PS5 = Legacy4J.createModLocation("playstation_5");
-    public ControlType(ResourceLocation id, Optional<Component> name, boolean isKbm, Optional<SizeableAsset<ControlFont>> font, Optional<ResourceLocation> minecraftLogo) {
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ KBM = Legacy4J.createModLocation("java");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ x360 = Legacy4J.createModLocation("xbox_360");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ xONE = Legacy4J.createModLocation("xbox_one");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PS3 = Legacy4J.createModLocation("playstation_3");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PS4 = Legacy4J.createModLocation("playstation_4");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ WII_U = Legacy4J.createModLocation("wii_u");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ SWITCH = Legacy4J.createModLocation("switch");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ STEAM = Legacy4J.createModLocation("steam");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ STADIA = Legacy4J.createModLocation("stadia");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PSVITA = Legacy4J.createModLocation("playstation_vita");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PS5 = Legacy4J.createModLocation("playstation_5");
+    public ControlType(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ id, Optional<Component> name, boolean isKbm, Optional<SizeableAsset<ControlFont>> font, Optional</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/> minecraftLogo) {
         this(id, name, isKbm, font, minecraftLogo, font.map(asset -> asset.map(f -> Style.EMPTY.withFont(f.font()))), new HashMap<>());
     }
-    public ControlType(ResourceLocation id) {
+    public ControlType(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ id) {
         this(id, Optional.of(Component.translatable("legacy.options.controlType." + id.getPath())), false, Optional.of(new SizeableAsset<>(new ControlFont(new FontDescription.Resource(id)))), Optional.of(id.withPath("textures/gui/title/minecraft/%s.png".formatted(id.getPath()))));
     }
 
@@ -72,7 +72,7 @@ public record ControlType(ResourceLocation id, Optional<Component> name, boolean
         }
     }
 
-    public static ControlType get(ResourceLocation id) {
+    public static ControlType get(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ id) {
         return Legacy4JClient.controlTypesManager.map().get(id);
     }
 

@@ -47,10 +47,13 @@ public abstract class GameRendererMixin {
         LegacyRenderUtil.renderGameOverlay(graphics);
     }
 
+    //? if <1.21.11 {
+    /*
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;render(Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", shift = At.Shift.AFTER))
     private void render(DeltaTracker deltaTracker, boolean bl, CallbackInfo ci) {
         if (minecraft.isGameLoadFinished() && LegacyOptions.displayLegacyGamma.get()) LegacyGamma.INSTANCE.render();
     }
+    *///?}
 
     @Inject(method = "bobView", at = @At("RETURN"))
     private void bobView(PoseStack poseStack, float f, CallbackInfo ci) {

@@ -2,6 +2,11 @@ package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
+//? >=1.21.11 {
+import net.minecraft.client.gui.ActiveTextCollector;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
+//?}
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -18,7 +23,7 @@ import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level./*? if <1.21.11 {*//*GameRules*//*?} else {*/gamerules.*/*?}*/;
 import net.minecraft.world.level.GameType;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
@@ -50,8 +55,14 @@ import static wily.legacy.client.screen.LoadSaveScreen.GAME_MODEL_LABEL;
 public class HostOptionsScreen extends PanelVListScreen {
     public static final Component HOST_OPTIONS = Component.translatable("legacy.menu.host_options");
     public static final Component PLAYERS_INVITE = Component.translatable("legacy.menu.players_invite");
+    //? <1.21.11 {
+    /*
     public static final List<GameRules.Key<GameRules.BooleanValue>> WORLD_RULES = new ArrayList<>(List.of(GameRules.RULE_DOFIRETICK, LegacyGameRules.getTntExplodes(), GameRules.RULE_DAYLIGHT, GameRules.RULE_KEEPINVENTORY, GameRules.RULE_DOMOBSPAWNING, GameRules.RULE_MOBGRIEFING, LegacyGameRules.GLOBAL_MAP_PLAYER_ICON, LegacyGameRules.LEGACY_SWIMMING, LegacyGameRules.LEGACY_FLIGHT));
     public static final List<GameRules.Key<GameRules.BooleanValue>> OTHER_RULES = new ArrayList<>(List.of(GameRules.RULE_WEATHER_CYCLE, GameRules.RULE_DOMOBLOOT, GameRules.RULE_DOBLOCKDROPS, GameRules.RULE_NATURAL_REGENERATION, GameRules.RULE_DO_IMMEDIATE_RESPAWN));
+    *///?} else {
+    public static final List<GameRule<Boolean>> WORLD_RULES = new ArrayList<>(List.of(LegacyGameRules.getTntExplodes(), GameRules.ADVANCE_TIME, GameRules.KEEP_INVENTORY, GameRules.SPAWN_MOBS, GameRules.MOB_GRIEFING, LegacyGameRules.GLOBAL_MAP_PLAYER_ICON, LegacyGameRules.LEGACY_SWIMMING, LegacyGameRules.LEGACY_FLIGHT));
+    public static final List<GameRule<Boolean>> OTHER_RULES = new ArrayList<>(List.of(GameRules.ADVANCE_WEATHER, GameRules.MOB_DROPS, GameRules.BLOCK_DROPS, GameRules.NATURAL_HEALTH_REGENERATION, GameRules.IMMEDIATE_RESPAWN));
+    //?}
     protected final Component title;
     protected float oldAlpha = getDefaultOpacity();
     protected float alpha = getDefaultOpacity();
@@ -131,7 +142,7 @@ public class HostOptionsScreen extends PanelVListScreen {
 
     protected void addPlayerButtons() {
         addPlayerButtons(true, (playerInfo, b) -> {
-            if (!minecraft.player.hasPermissions(2)) return;
+            if (!minecraft.player./*? if <1.21.11 {*//*hasPermissions(2)*//*?} else {*/permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS))/*?}*/) return;
             Map<AbstractWidget, Runnable> COMMAND_MAP = new HashMap<>();
             boolean initialVisibility = !((LegacyPlayerInfo) playerInfo).isVisible();
             PanelVListScreen screen = new PanelVListScreen(this, s -> Panel.centered(s, LegacySprites.PANEL, 280, playerInfo.getGameMode().isSurvival() ? 120 : 88), HOST_OPTIONS) {
@@ -218,7 +229,7 @@ public class HostOptionsScreen extends PanelVListScreen {
     }
 
     protected void addHostOptionsButton() {
-        if (!minecraft.player.hasPermissions(2) && !minecraft.hasSingleplayerServer()) return;
+        if (!minecraft.player./*? if <1.21.11 {*//*hasPermissions(2)*//*?} else {*/permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS))/*?}*/ && !minecraft.hasSingleplayerServer()) return;
         addRenderableWidget(Button.builder(HOST_OPTIONS, this::pressHostOptionsButton).bounds(panel.x, panel.y - 36, 250, 20).build());
     }
 
@@ -226,7 +237,7 @@ public class HostOptionsScreen extends PanelVListScreen {
         Map<String, Object> nonOpGamerules = new HashMap<>();
         Map<AbstractWidget, Runnable> COMMAND_MAP = new HashMap<>();
 
-        PanelVListScreen screen = new PanelVListScreen(this, s -> Panel.centered(s, LegacySprites.PANEL, 265, minecraft.player.hasPermissions(2) ? 200 : 130), HOST_OPTIONS) {
+        PanelVListScreen screen = new PanelVListScreen(this, s -> Panel.centered(s, LegacySprites.PANEL, 265, minecraft.player./*? if <1.21.11 {*//*hasPermissions(2)*//*?} else {*/permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS))/*?}*/ ? 200 : 130), HOST_OPTIONS) {
             @Override
             public void renderableVListInit() {
                 getRenderableVList().init(panel.x + 8, panel.y + 8, panel.width - 16, panel.height - 16);
@@ -253,9 +264,15 @@ public class HostOptionsScreen extends PanelVListScreen {
                 panel.render(guiGraphics, i, j, f);
             }
         };
-        if (!minecraft.player.hasPermissions(2)) {
+        if (!minecraft.player./*? if <1.21.11 {*//*hasPermissions(2)*//*?} else {*/permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS))/*?}*/) {
+            //? <1.21.11 {
+            /*
             for (GameRules.Key<GameRules.BooleanValue> key : PlayerInfoSync.All.NON_OP_GAMERULES)
                 screen.renderableVList.addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.getRule(key).get(), b1 -> Component.translatable(key.getDescriptionId()), b1 -> null, b1 -> nonOpGamerules.put(key.getId(), b1.selected)));
+            *///?} else {
+            for (GameRule<Boolean> key : PlayerInfoSync.All.NON_OP_GAMERULES)
+                screen.renderableVList.addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.get(key), b1 -> Component.translatable(key.getDescriptionId()), b1 -> null, b1 -> nonOpGamerules.put(key.id(), b1.selected)));
+            //?}
             LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c -> screen.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
             Legacy4J.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c -> screen.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
             minecraft.setScreen(screen);
@@ -265,8 +282,14 @@ public class HostOptionsScreen extends PanelVListScreen {
         int initialWeather = minecraft.level.isThundering() ? 2 : minecraft.level.isRaining() ? 1 : 0;
         screen.renderableVList.layoutSpacing(l -> 2);
 
+        //? <1.21.11 {
+        /*
         for (GameRules.Key<GameRules.BooleanValue> key : WORLD_RULES)
             screen.renderableVList.addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.getRule(key).get(), b1 -> Component.translatable(key.getDescriptionId()), b1 -> null, b1 -> COMMAND_MAP.put(b1, () -> minecraft.player.connection.sendCommand("gamerule %s %s".formatted(key.getId(), b1.selected)))));
+        *///?} else {
+        for (GameRule<Boolean> key : WORLD_RULES)
+            screen.renderableVList.addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.get(key), b1 -> Component.translatable(key.getDescriptionId()), b1 -> null, b1 -> COMMAND_MAP.put(b1, () -> minecraft.player.connection.sendCommand("gamerule %s %s".formatted(key.id(), b1.selected)))));
+        //?}
         screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_day"), b1 -> minecraft.player.connection.sendCommand("time set day")).bounds(0, 0, 215, 20).build());
         screen.renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.host_options.set_night"), b1 -> minecraft.player.connection.sendCommand("time set 14000")).bounds(0, 0, 215, 20).build());
         screen.renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b1 -> b1.getDefaultMessage(Component.translatable("options.difficulty"), b1.getObjectValue().getDisplayName()), b1 -> Tooltip.create(minecraft.level.getDifficulty().getInfo()), minecraft.level.getDifficulty(), () -> Arrays.asList(Difficulty.values()), b1 -> COMMAND_MAP.put(b1, () -> minecraft.getConnection().sendCommand("difficulty " + b1.getObjectValue().getKey()))));
@@ -280,8 +303,14 @@ public class HostOptionsScreen extends PanelVListScreen {
             if (!Objects.equals(b1.getObjectValue(), weathers.get(initialWeather)))
                 COMMAND_MAP.put(b1, () -> minecraft.getConnection().sendCommand("weather " + b1.getObjectValue()));
         }));
+        //? <1.21.11 {
+        /*
         for (GameRules.Key<GameRules.BooleanValue> key : OTHER_RULES)
             screen.renderableVList.addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.getRule(key).get(), b1 -> Component.translatable(key.getDescriptionId()), b1 -> null, b1 -> COMMAND_MAP.put(b1, () -> minecraft.player.connection.sendCommand("gamerule %s %s".formatted(key.getId(), b1.selected)))));
+        *///?} else {
+        for (GameRule<Boolean> key : OTHER_RULES)
+            screen.renderableVList.addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.get(key), b1 -> Component.translatable(key.getDescriptionId()), b1 -> null, b1 -> COMMAND_MAP.put(b1, () -> minecraft.player.connection.sendCommand("gamerule %s %s".formatted(key.id(), b1.selected)))));
+        //?}
         LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c -> screen.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
         Legacy4J.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c -> screen.getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
         minecraft.setScreen(screen);
@@ -333,6 +362,8 @@ public class HostOptionsScreen extends PanelVListScreen {
             this.playerInfo = playerInfo;
         }
 
+        //? <1.21.11 {
+        /*
         @Override
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             if (isHoveredOrFocused()) shouldFade = true;
@@ -344,6 +375,22 @@ public class HostOptionsScreen extends PanelVListScreen {
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
             LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), getX() + 68, this.getY(), getX() + getWidth(), this.getY() + this.getHeight(), j, true);
         }
+        *///?} else {
+        @Override
+        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+            if (isHoveredOrFocused()) shouldFade = true;
+            renderDefaultSprite(guiGraphics);
+            drawPlayerIcon((LegacyPlayerInfo) playerInfo, guiGraphics, getX() + 6, getY() + 5);
+            ActiveTextCollector textCollector = guiGraphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE);
+            renderDefaultLabel(textCollector);
+        }
+
+        @Override
+        protected void renderDefaultLabel(ActiveTextCollector textCollector) {
+            int xOffset = 68;
+            renderScrollingStringOverContents(textCollector, this.getMessage(), xOffset / 2);
+        }
+        //?}
 
         @Override
         protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {

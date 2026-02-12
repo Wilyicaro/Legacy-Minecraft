@@ -11,7 +11,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceLinkedOpenHashMap;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -44,16 +44,40 @@ import net.minecraft.world.entity.animal.*;
 import net.minecraft.world.entity.animal.allay.Allay;
 import net.minecraft.world.entity.animal.sheep.Sheep;
 import net.minecraft.world.entity.animal.wolf.Wolf;
+//? <1.21.11 {
+/*
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.animal.horse.Horse;
 import net.minecraft.world.entity.animal.horse.Llama;
+*///?} else {
+import net.minecraft.world.entity.animal.cow.Cow;
+import net.minecraft.world.entity.animal.cow.MushroomCow;
+import net.minecraft.world.entity.animal.equine.AbstractHorse;
+import net.minecraft.world.entity.animal.equine.Horse;
+import net.minecraft.world.entity.animal.equine.Llama;
+import net.minecraft.world.entity.animal.feline.Cat;
+import net.minecraft.world.entity.animal.golem.IronGolem;
+import net.minecraft.world.entity.animal.golem.SnowGolem;
+import net.minecraft.world.entity.animal.panda.Panda;
+import net.minecraft.world.entity.animal.parrot.Parrot;
+import net.minecraft.world.entity.animal.pig.Pig;
+//?}
 import net.minecraft.world.entity.decoration.*;
 import net.minecraft.world.entity.monster.piglin.Piglin;
-import net.minecraft.world.entity.npc.AbstractVillager;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc./*? if <1.21.11 {*//**//*?} else {*/villager./*?}*/AbstractVillager;
+import net.minecraft.world.entity.npc./*? if <1.21.11 {*//**//*?} else {*/villager./*?}*/Villager;
+import net.minecraft.world.entity.npc./*? if <1.21.11 {*//**//*?} else {*/villager./*?}*/VillagerProfession;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.*;
+//? <1.21.11 {
+/*import net.minecraft.world.entity.vehicle.*;
+*///?} else {
+import net.minecraft.world.entity.vehicle.boat.Boat;
+import net.minecraft.world.entity.vehicle.boat.ChestBoat;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.MinecartChest;
+import net.minecraft.world.entity.vehicle.minecart.MinecartFurnace;
+import net.minecraft.world.entity.vehicle.minecart.MinecartHopper;
+//?}
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.*;

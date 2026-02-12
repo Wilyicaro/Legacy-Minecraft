@@ -5,7 +5,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CrafterScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.CrafterMenu;
 import net.minecraft.world.inventory.CrafterSlot;
@@ -32,11 +32,11 @@ public abstract class CrafterScreenMixin extends AbstractContainerScreen<Crafter
 
     @Shadow
     @Final
-    private static ResourceLocation POWERED_REDSTONE_LOCATION_SPRITE;
+    private static /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ POWERED_REDSTONE_LOCATION_SPRITE;
 
     @Shadow
     @Final
-    private static ResourceLocation UNPOWERED_REDSTONE_LOCATION_SPRITE;
+    private static /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ UNPOWERED_REDSTONE_LOCATION_SPRITE;
 
     public CrafterScreenMixin(CrafterMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
@@ -48,11 +48,20 @@ public abstract class CrafterScreenMixin extends AbstractContainerScreen<Crafter
         renderBg(guiGraphics, f, i, j);
     }
 
+    //? <1.21.11 {
+    /*
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
     public void renderSlot(GuiGraphics guiGraphics, Slot slot, CallbackInfo ci) {
         ci.cancel();
         super.renderSlot(guiGraphics, slot);
     }
+    *///?} else {
+    @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
+    public void renderSlot(GuiGraphics guiGraphics, Slot slot, int i, int j, CallbackInfo ci) {
+        ci.cancel();
+        super.renderSlot(guiGraphics, slot, i, j);
+    }
+    //?}
 
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
     public void init(CallbackInfo ci) {
@@ -68,7 +77,7 @@ public abstract class CrafterScreenMixin extends AbstractContainerScreen<Crafter
             Slot s = menu.slots.get(i);
             if (i < 9) {
                 LegacySlotDisplay.override(s, 34 + s.getContainerSlot() % 3 * 21, 23 + s.getContainerSlot() / 3 * 21, new LegacySlotDisplay() {
-                    public ArbitrarySupplier<ResourceLocation> getIconHolderOverride() {
+                    public ArbitrarySupplier</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/> getIconHolderOverride() {
                         return () -> (menu.isSlotDisabled(s.index) ? LegacySprites.DISABLED_CRAFTER_SLOT : LegacySprites.CRAFTER_SLOT);
                     }
                 });
@@ -78,7 +87,7 @@ public abstract class CrafterScreenMixin extends AbstractContainerScreen<Crafter
                 LegacySlotDisplay.override(s, 14 + s.getContainerSlot() * 21, 171);
             } else {
                 LegacySlotDisplay.override(s, 150, 39, new LegacySlotDisplay() {
-                    public ArbitrarySupplier<ResourceLocation> getIconHolderOverride() {
+                    public ArbitrarySupplier</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/> getIconHolderOverride() {
                         return () -> LegacySprites.NON_INTERACTIVE_RESULT_SLOT;
                     }
 
@@ -102,7 +111,7 @@ public abstract class CrafterScreenMixin extends AbstractContainerScreen<Crafter
     @Inject(method = "renderBg", at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this)./*? if <1.21.11 {*//*getResourceLocation*//*?} else {*/getIdentifier/*?}*/("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(menu.isPowered() ? POWERED_REDSTONE_LOCATION_SPRITE : UNPOWERED_REDSTONE_LOCATION_SPRITE, leftPos + 105, topPos + 43, 24, 24);
     }
 

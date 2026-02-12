@@ -128,10 +128,18 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
         return false;
     }
 
+    //? <1.21.11 {
+    /*
     @Override
     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
         LegacyFontUtil.applySDFont(b -> super.renderScrollingString(guiGraphics, font, i, j));
     }
+    *///?} else {
+    @Override
+    public void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+        LegacyFontUtil.applySDFont(b -> super.renderWidget(guiGraphics, i, j, f));
+    }
+    //?}
 
     @Override
     public boolean keyReleased(KeyEvent keyEvent) {

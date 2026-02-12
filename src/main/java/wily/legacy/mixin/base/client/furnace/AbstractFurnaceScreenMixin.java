@@ -10,7 +10,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractFurnaceScreen;
  *///?}
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractFurnaceMenu;
@@ -118,7 +118,7 @@ public abstract class AbstractFurnaceScreenMixin<T extends AbstractFurnaceMenu> 
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
         int guiScale = minecraft.getWindow().getGuiScale();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this)./*? if <1.21.11 {*//*getResourceLocation*//*?} else {*/getIdentifier/*?}*/("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + (sd ? 63 : LegacyRenderUtil.hasHorizontalArtifacts() ? 75.4f : 75.5f), topPos + (sd ? 34 : 46.4f));
         int flameSize = sd ? 14 : 21;

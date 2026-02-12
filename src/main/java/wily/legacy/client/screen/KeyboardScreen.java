@@ -1,8 +1,11 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.client.Minecraft;
+//? >=1.21.11 {
+import net.minecraft.client.gui.ActiveTextCollector;
+//?}
 import net.minecraft.client.gui.ComponentPath;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -23,7 +26,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.sounds.SoundEvent;
 import org.jetbrains.annotations.Nullable;
 import wily.factoryapi.base.Stocker;
@@ -114,7 +117,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
             }
 
             @Override
-            public ResourceLocation getSprite() {
+            public /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ getSprite() {
                 return shiftLock ? LegacySprites.BUTTON_SLOT_SELECTED : super.getSprite();
             }
 
@@ -159,7 +162,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     @Override
-    public void resize(Minecraft minecraft, int i, int j) {
+    public void resize(/*? if <1.21.11 {*//*Minecraft minecraft, *//*?}*/int i, int j) {
         onClose();
     }
 
@@ -246,7 +249,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
     }
 
     public record CharButtonBuilder(int width, String chars, String shiftChars, ControllerBinding binding,
-                                    ResourceLocation iconSprite, SoundEvent downSound) {
+                                    /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ iconSprite, SoundEvent downSound) {
         public CharButton build(KeyboardScreen screen) {
             return screen.new CharButton(width, chars, shiftChars, binding, iconSprite, downSound);
         }
@@ -258,11 +261,11 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
         private final Supplier<GuiEventListener> keyListener;
 
-        public KeyButton(int key, Supplier<GuiEventListener> keyListener, ControllerBinding binding, ResourceLocation iconSprite) {
+        public KeyButton(int key, Supplier<GuiEventListener> keyListener, ControllerBinding binding, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ iconSprite) {
             this(key, 40, keyListener, binding, iconSprite);
         }
 
-        public KeyButton(int key, int height, Supplier<GuiEventListener> keyListener, ControllerBinding binding, ResourceLocation iconSprite) {
+        public KeyButton(int key, int height, Supplier<GuiEventListener> keyListener, ControllerBinding binding, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ iconSprite) {
             super(50, height, CommonComponents.EMPTY, binding, iconSprite);
             this.key = key;
             this.keyListener = keyListener;
@@ -272,6 +275,8 @@ public class KeyboardScreen extends OverlayPanelScreen {
             return true;
         }
 
+        //? <1.21.11 {
+        /*
         @Override
         protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
             FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(), getX(), getY(), getWidth(), getHeight());
@@ -279,8 +284,22 @@ public class KeyboardScreen extends OverlayPanelScreen {
             renderString(guiGraphics, Minecraft.getInstance().font, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
             FactoryScreenUtil.disableBlend();
         }
+        *///?} else {
+        @Override
+        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+            FactoryGuiGraphics.of(guiGraphics).blitSprite(getSprite(), getX(), getY(), getWidth(), getHeight());
+            FactoryScreenUtil.enableBlend();
+            ActiveTextCollector textCollector = guiGraphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE);
+            renderCustomLabel(textCollector, LegacyRenderUtil.getDefaultTextColor(!isHoveredOrFocused()));
+            FactoryScreenUtil.disableBlend();
+        }
 
-        public ResourceLocation getSprite() {
+        protected void renderCustomLabel(ActiveTextCollector textCollector, int color) {
+            renderScrollingStringOverContents(textCollector, getMessage(), 2);
+        }
+        //?}
+
+        public /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ getSprite() {
             return isHoveredOrFocused() ? LegacySprites.BUTTON_SLOT_HIGHLIGHTED : LegacySprites.BUTTON_SLOT;
         }
 
@@ -297,10 +316,10 @@ public class KeyboardScreen extends OverlayPanelScreen {
 
     public static abstract class ActionButton extends AbstractButton {
         public final ControllerBinding binding;
-        private final ResourceLocation iconSprite;
+        private final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ iconSprite;
         public int pressTime = 0;
 
-        public ActionButton(int k, int l, Component component, ControllerBinding binding, ResourceLocation iconSprite) {
+        public ActionButton(int k, int l, Component component, ControllerBinding binding, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ iconSprite) {
             super(0, 0, k, l, component);
             this.binding = binding;
             this.iconSprite = iconSprite;
@@ -349,6 +368,8 @@ public class KeyboardScreen extends OverlayPanelScreen {
             }
         }
 
+        //? <1.21.11 {
+        /*
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
             int bindingOffset = 0;
 
@@ -367,6 +388,31 @@ public class KeyboardScreen extends OverlayPanelScreen {
                 }
             }
         }
+        *///?} else {
+        @Override
+        protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+            renderDefaultSprite(guiGraphics);
+            int bindingOffset = 0;
+
+            if (binding != null && Legacy4JClient.controllerManager.connectedController != null) {
+                bindingOffset = binding.getIcon().render(guiGraphics, getX() + 2, getY() + (getHeight() - 9) / 2 + 1, true);
+            }
+
+            if (iconSprite == null) {
+                ActiveTextCollector textCollector = guiGraphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE);
+                renderScrollingStringOverContents(textCollector, getMessage(), (2 + bindingOffset) / 2);
+            } else {
+                TextureAtlasSprite sprite = FactoryGuiGraphics.getSprites().texturesByName.getOrDefault(iconSprite, null);
+                if (sprite != null) {
+                try (SpriteContents contents = sprite.contents()) {
+                    FactoryScreenUtil.enableBlend();
+                    FactoryGuiGraphics.of(guiGraphics).blitSprite(iconSprite, getX() + (getWidth() - contents.width()) / 2 + Math.max(0, 2 + bindingOffset - (getWidth() - contents.width()) / 2), getY() + (getHeight() - contents.height()) / 2, contents.width(), contents.height());
+                    FactoryScreenUtil.disableBlend();
+                    }
+                }
+            }
+        }
+        //?}
 
         @Override
         protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -381,7 +427,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
         private int selectedChar = 0;
 
 
-        public CharButton(int width, String chars, String shiftChars, ControllerBinding binding, ResourceLocation iconSprite, SoundEvent downSound) {
+        public CharButton(int width, String chars, String shiftChars, ControllerBinding binding, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ iconSprite, SoundEvent downSound) {
             super(width, 20, CommonComponents.EMPTY, binding, iconSprite);
             this.chars = chars;
             this.shiftChars = shiftChars;

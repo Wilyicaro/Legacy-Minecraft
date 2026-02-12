@@ -68,6 +68,8 @@ public class TickBox extends AbstractButton {
         setHeight(getDefaultHeight());
     }
 
+    //? <1.21.11 {
+    /*
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
         setAlpha(active ? 1.0F : 0.5F);
@@ -87,7 +89,28 @@ public class TickBox extends AbstractButton {
         this.renderString(guiGraphics, minecraft.font, isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get());
         guiGraphics.pose().popMatrix();
     }
-
+    *///?} else {
+    @Override
+    protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+        setAlpha(active ? 1.0F : 0.5F);
+        Minecraft minecraft = Minecraft.getInstance();
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, this.alpha);
+        FactoryScreenUtil.enableBlend();
+        FactoryScreenUtil.enableDepthTest();
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(isHoveredOrFocused() ? LegacySprites.TICKBOX_HOVERED : LegacySprites.TICKBOX, this.getX(), this.getY(), getHeight(), getHeight());
+        if (selected) {
+            if (LegacyOptions.getUIMode().isSD())
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SMALL_TICK, this.getX(), this.getY(), 11, 9);
+            else
+                FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.TICK, this.getX(), this.getY(), 14, 12);
+        }
+        FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 1.0F);
+        guiGraphics.pose().pushMatrix();
+        if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.4f, 0.4f);
+        renderText(guiGraphics, minecraft.font, isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get());
+        guiGraphics.pose().popMatrix();
+    }
+    //?}
 
     @Override
     public Component getMessage() {
@@ -107,10 +130,17 @@ public class TickBox extends AbstractButton {
         }
     }
 
+    //? <1.21.11 {
+    /*
     @Override
     public void renderString(GuiGraphics guiGraphics, Font font, int i) {
         LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + getHeight() + (LegacyOptions.getUIMode().isSD() ? 0 : 1), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), i, isHoveredOrFocused()));
     }
+    *///?} else {
+    public void renderText(GuiGraphics guiGraphics, Font font, int color) {
+        LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + getHeight() + (LegacyOptions.getUIMode().isSD() ? 0 : 1), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), color, isHoveredOrFocused()));
+    }
+    //?}
 
     public boolean updateValue() {
         if (selectedGetter != null) {

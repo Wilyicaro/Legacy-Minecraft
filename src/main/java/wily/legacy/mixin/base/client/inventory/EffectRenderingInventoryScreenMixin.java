@@ -17,29 +17,54 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.client.screen.LegacyMenuAccess;
 import wily.legacy.util.client.LegacyRenderUtil;
 
-@Mixin(/*? if <1.21.2 {*//*EffectRenderingInventoryScreen*//*?} else {*/EffectsInInventory/*?}*/.class)
-public abstract class EffectRenderingInventoryScreenMixin /*? if <1.21.2 {*//*extends AbstractContainerScreen*//*?}*/ {
-    //? if <1.21.2 {
-    /*public EffectRenderingInventoryScreenMixin(AbstractContainerMenu abstractContainerMenu, Inventory inventory, Component component) {
+
+//? <1.21.2 {
+/*
+@Mixin(EffectRenderingInventoryScreen.class)
+public abstract class EffectRenderingInventoryScreenMixin extends AbstractContainerScreen {
+    public EffectRenderingInventoryScreenMixin(AbstractContainerMenu abstractContainerMenu, Inventory inventory, Component component) {
         super(abstractContainerMenu, inventory, component);
     }
-    *///?} else {
+    
+    @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+        ci.cancel();
+        super.render(guiGraphics, i, j, f);
+        ScreenUtil.renderContainerEffects(guiGraphics, leftPos, topPos, imageWidth, imageHeight, i, j);
+    }
+}
+*///?} else if <1.21.11 {
+/*
+@Mixin(EffectsInInventory.class)
+public abstract class EffectRenderingInventoryScreenMixin {
     @Shadow
     @Final
     private AbstractContainerScreen<?> screen;
 
-    //?}
     @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
     public void render(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        //? if <1.21.2 {
-        /*super.render(guiGraphics, i, j, f);
-        ScreenUtil.renderContainerEffects(guiGraphics, leftPos, topPos, imageWidth, imageHeight, i, j);
-        *///?} else {
         if (screen instanceof LegacyMenuAccess<?> a) {
             ScreenRectangle rec = a.getMenuRectangle();
             LegacyRenderUtil.renderContainerEffects(guiGraphics, rec.left(), rec.top(), rec.width(), rec.height(), i, j);
         }
-        //?}
     }
 }
+*///?} else {
+@Mixin(EffectsInInventory.class)
+public abstract class EffectRenderingInventoryScreenMixin {
+    
+    @Shadow
+    @Final
+    private AbstractContainerScreen<?> screen;
+
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    public void render(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
+        ci.cancel();
+        if (screen instanceof LegacyMenuAccess<?> a) {
+            ScreenRectangle rec = a.getMenuRectangle();
+            LegacyRenderUtil.renderContainerEffects(guiGraphics, rec.left(), rec.top(), rec.width(), rec.height(), i, j);
+        }
+    }
+}
+//?}

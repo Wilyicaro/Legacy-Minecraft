@@ -4,8 +4,14 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.model.geom.ModelLayers;
+//? <1.21.11 {
+/*
+import net.minecraft.client.model.ArrowModel;
+*///?} else {
+import net.minecraft.client.model.object.projectile.ArrowModel;
+//?}
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer./*? if <1.21.11 {*//*RenderType*//*?} else {*/rendertype.RenderTypes/*?}*/;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -15,11 +21,10 @@ import net.minecraft.client.renderer.entity.state.ArrowRenderState;
 import net.minecraft.client.renderer.entity.state.FireworkRocketRenderState;
 import net.minecraft.client.renderer.state.CameraRenderState;
 import wily.factoryapi.base.client.FactoryRenderStateExtension;
-import net.minecraft.client.model.ArrowModel;
 import wily.legacy.client.LegacyFireworkRenderState;
 //?}
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -31,7 +36,7 @@ import wily.legacy.client.LegacyOptions;
 
 @Mixin(FireworkEntityRenderer.class)
 public abstract class FireworkEntityRendererMixin extends EntityRenderer<FireworkRocketEntity, FireworkRocketRenderState> {
-    private static final ResourceLocation FIREWORK_LOCATION = Legacy4J.createModLocation("textures/entity/projectiles/firework.png");
+    private static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ FIREWORK_LOCATION = Legacy4J.createModLocation("textures/entity/projectiles/firework.png");
     @Unique
     private ArrowModel model;
 
@@ -52,7 +57,7 @@ public abstract class FireworkEntityRendererMixin extends EntityRenderer<Firewor
             poseStack.pushPose();
             poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0F));
             poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot));
-            submitNodeCollector.submitModel(model, new ArrowRenderState(), poseStack, RenderType.entityCutout(FIREWORK_LOCATION), fireworkRocketRenderState.lightCoords, OverlayTexture.NO_OVERLAY, fireworkRocketRenderState.outlineColor, null);
+            submitNodeCollector.submitModel(model, new ArrowRenderState(), poseStack, /*? if <1.21.11 {*//*RenderType*//*?} else {*/RenderTypes/*?}*/.entityCutout(FIREWORK_LOCATION), fireworkRocketRenderState.lightCoords, OverlayTexture.NO_OVERLAY, fireworkRocketRenderState.outlineColor, null);
             poseStack.popPose();
             super.submit(fireworkRocketRenderState, poseStack, submitNodeCollector, cameraRenderState);
         }

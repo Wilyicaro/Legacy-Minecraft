@@ -6,7 +6,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
@@ -194,7 +194,12 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     //?}
     @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
+    //? <1.21.11 {
+    /*
     private void renderSlot(GuiGraphics guiGraphics, Slot slot, CallbackInfo ci) {
+    *///?} else {
+    private void renderSlot(GuiGraphics guiGraphics, Slot slot, int x, int y, CallbackInfo ci) {
+    //?}
         ci.cancel();
         LegacySlotWidget widget = slotWidgets.get(slot.index);
         ItemStack itemStack = slot.getItem();

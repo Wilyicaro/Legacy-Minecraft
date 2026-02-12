@@ -1,6 +1,6 @@
 package wily.legacy.client.controller;
 
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import wily.legacy.client.screen.ControlTooltip;
 
 import java.util.Arrays;

@@ -11,7 +11,7 @@ import net.minecraft.data.AtlasIds;
 import net.minecraft.network.chat.Component;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyMapDecorationRenderState;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer./*? if <1.21.11 {*//*RenderType*//*?} else {*/rendertype.RenderTypes/*?}*/;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.saveddata.maps.*;
@@ -84,7 +84,7 @@ public abstract class MapRendererMixin {
                 float m = textureAtlasSprite.getU1();
                 float n = textureAtlasSprite.getV1();
                 float z = l * -0.001f;
-                submitNodeCollector.submitCustomGeometry(poseStack, RenderType.text(textureAtlasSprite.atlasLocation()), (pose, vertexConsumer) -> {
+                submitNodeCollector.submitCustomGeometry(poseStack, /*? if <1.21.11 {*//*RenderType*//*?} else {*/RenderTypes/*?}*/.text(textureAtlasSprite.atlasLocation()), (pose, vertexConsumer) -> {
                     vertexConsumer.addVertex(pose, -1.0f, 1.0f, z).setColor(color[0], color[1], color[2], 1.0f).setUv(g, h).setLight(i);
                     vertexConsumer.addVertex(pose, 1.0f, 1.0f, z).setColor(color[0], color[1], color[2], 1.0f).setUv(m, h).setLight(i);
                     vertexConsumer.addVertex(pose, 1.0f, -1.0f, z).setColor(color[0], color[1], color[2], 1.0f).setUv(m, n).setLight(i);

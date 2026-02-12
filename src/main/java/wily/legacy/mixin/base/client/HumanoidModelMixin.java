@@ -41,7 +41,7 @@ public abstract class HumanoidModelMixin {
     private void setupAnim(/*? if <1.21.2 {*/ /*LivingEntity livingEntity, float f, float g, float h, float i, float j*//*?} else {*/ HumanoidRenderState humanoidRenderState/*?}*/, CallbackInfo info) {
         HumanoidArm mainArm = /*? if <1.21.2 {*//*livingEntity.getMainArm()*//*?} else {*/ humanoidRenderState.mainArm/*?}*/;
         float ageInTicks = /*? if <1.21.2 {*//*h*//*?} else {*/humanoidRenderState.ageInTicks/*?}*/;
-        if (/*? if <1.21.2 {*//*!livingEntity.hasItemInSlot(EquipmentSlot.MAINHAND)*//*?} else {*/ humanoidRenderState.getMainHandItem().isEmpty()/*?}*/ && /*? if <1.21.2 {*//*livingEntity.isShiftKeyDown()*//*?} else {*/humanoidRenderState.isDiscrete/*?}*/ && /*? if <1.21.2 {*//*livingEntity.isFallFlying()*//*?} else {*/humanoidRenderState.isFallFlying/*?}*/) {
+        if (/*? if <1.21.2 {*//*!livingEntity.hasItemInSlot(EquipmentSlot.MAINHAND)*//*?} else {*/ humanoidRenderState./*? if <1.21.11 {*//*getMainHandItem*//*?} else {*/getMainHandItemStack/*?}*/().isEmpty()/*?}*/ && /*? if <1.21.2 {*//*livingEntity.isShiftKeyDown()*//*?} else {*/humanoidRenderState.isDiscrete/*?}*/ && /*? if <1.21.2 {*//*livingEntity.isFallFlying()*//*?} else {*/humanoidRenderState.isFallFlying/*?}*/) {
             (mainArm == HumanoidArm.RIGHT ? this.rightArm : leftArm).xRot = (float) (Math.PI) + (mainArm == HumanoidArm.RIGHT ? 1.0f : -1.0f) * Mth.sin(ageInTicks * 0.067F) * 0.05F;
         }
         HumanoidArm useArm = /*? if <1.21.2 {*//*livingEntity.getUsedItemHand()*//*?} else {*/ humanoidRenderState.useItemHand/*?}*/ == InteractionHand.MAIN_HAND ? mainArm : mainArm.getOpposite();

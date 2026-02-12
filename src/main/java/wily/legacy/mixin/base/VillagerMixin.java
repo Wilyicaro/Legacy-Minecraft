@@ -4,6 +4,9 @@ import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.*;
+//? >=1.21.11 {
+import net.minecraft.world.entity.npc.villager.*;
+//?}
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.item.trading.MerchantOffers;
@@ -29,8 +32,8 @@ public abstract class VillagerMixin extends AbstractVillager {
     @Shadow
     public abstract VillagerData getVillagerData();
 
-    @Redirect(method = "increaseMerchantCareer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/npc/Villager;updateTrades()V"))
-    private void increaseMerchantCareer(Villager instance) {
+    @Redirect(method = "increaseMerchantCareer", at = @At(value = "INVOKE", target = /*? if <1.21.11 {*//*"Lnet/minecraft/world/entity/npc/Villager;updateTrades()V"*//*?} else {*/"Lnet/minecraft/world/entity/npc/villager/Villager;updateTrades(Lnet/minecraft/server/level/ServerLevel;)V"/*?}*/))
+    private void increaseMerchantCareer(Villager instance/*? if <1.21.11 {*//**//*?} else {*/, net.minecraft.server.level.ServerLevel serverLevel/*?}*/) {
         if (getLevel() < 5) {
             updateTrades(getLevel() + 1);
         }
@@ -49,7 +52,7 @@ public abstract class VillagerMixin extends AbstractVillager {
     public MerchantOffers getOffers() {
         if (this.offers == null) {
             this.offers = new MerchantOffers();
-            this.updateTrades();
+            /*? if <1.21.11 {*//*this.updateTrades();*//*?} else {*/updateTrades(getLevel());/*?}*/
             updateTrades(getLevel() + 1);
         }
         return this.offers;
@@ -73,7 +76,7 @@ public abstract class VillagerMixin extends AbstractVillager {
         ArrayList<VillagerTrades.ItemListing> arrayList = Lists.newArrayList(itemListings);
         int j = 0;
         while (j < 2 && !arrayList.isEmpty()) {
-            MerchantOffer merchantOffer = arrayList.remove(self().getRandom().nextInt(arrayList.size())).getOffer(self(), self().getRandom());
+            MerchantOffer merchantOffer = arrayList.remove(self().getRandom().nextInt(arrayList.size())).getOffer(/*? if <1.21.11 {*//**//*?} else {*/(net.minecraft.server.level.ServerLevel) level(), /*?}*/self(), self().getRandom());
             if (merchantOffer == null) continue;
             ((LegacyMerchantOffer) merchantOffer).setRequiredLevel(level);
             self().getOffers().add(merchantOffer);

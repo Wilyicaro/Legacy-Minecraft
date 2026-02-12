@@ -114,7 +114,7 @@
     "client.PresetEditorMixin",
     "client.RecipeBookComponentMixin",
     "client.RecipeToastMixin",
-    "client.RenderTypeMixin",
+    //"client.RenderTypeMixin",
     "client.ScreenEffectRendererMixin",
     "client.ScreenMixin",
     "client.sign.SignEditScreenMixin",
@@ -181,6 +181,9 @@
     "client.MovingBlockRenderStateMixin",
     "client.ClientAvatarStateMixin",
     "client.ComponentPathMixin",
+    //? >=1.21.11 {
+    "client.RidingMinecartSoundInstanceMixin",
+    //?}
     "client.FeatureRenderDispatcherMixin"
   ],
   "mixins": [
@@ -247,6 +250,11 @@
     "BaseContainerBlockEntityMixin",
     "PrepareSpawnTaskMixin",
     "PigAccessor",
+    //? >=1.21.11 {
+    "ServerMinecraftServerMixin",
+    "RenderSetupAccessor",
+    "TextureBindingAccessor",
+    //?}
     "ItemBasedSteeringAccessor"
   ],
   "injectors": {

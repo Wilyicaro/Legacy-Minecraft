@@ -11,8 +11,15 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
+//? <1.21.11 {
+/*
 import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.animal.SnowGolem;
+*///?} else {
+import net.minecraft.world.entity.animal.golem.IronGolem;
+import net.minecraft.world.entity.animal.golem.SnowGolem;
+import net.minecraft.world.level.gamerules.GameRules;
+//?}
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -54,7 +61,7 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Inject(method = "hurtServer", at = @At("HEAD"), cancellable = true)
     public void hurt(ServerLevel level, DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> cir) {
-        if (!level().isClientSide() && !level().getServer().isPvpAllowed() && damageSource.getDirectEntity() instanceof Player && (this instanceof OwnableEntity o && damageSource.getDirectEntity().equals(o.getOwner()) || ((Object) this) instanceof IronGolem i && i.isPlayerCreated() || ((Object) this) instanceof SnowGolem)) {
+        if (!level().isClientSide() && !level/*? if <1.21.11 {*//*().getServer().isPvpAllowed()*//*?} else {*/.getGameRules().get(GameRules.PVP)/*?}*/ && damageSource.getDirectEntity() instanceof Player && (this instanceof OwnableEntity o && damageSource.getDirectEntity().equals(o.getOwner()) || ((Object) this) instanceof IronGolem i && i.isPlayerCreated() || ((Object) this) instanceof SnowGolem)) {
             cir.setReturnValue(false);
         }
     }

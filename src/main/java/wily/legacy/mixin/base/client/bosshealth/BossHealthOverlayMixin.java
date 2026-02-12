@@ -6,7 +6,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.BossHealthOverlay;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import org.spongepowered.asm.mixin.Final;
@@ -45,7 +45,7 @@ public abstract class BossHealthOverlayMixin {
 
     //? if >1.20.1 {
     @Shadow
-    protected abstract void drawBar(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, int k, ResourceLocation[] resourceLocations, ResourceLocation[] resourceLocations2);
+    protected abstract void drawBar(GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, int k, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/[] resourceLocations, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/[] resourceLocations2);
 
     //?}
     @ModifyVariable(method = "render", at = @At(value = "STORE", ordinal = 0), ordinal = 1)
@@ -68,19 +68,19 @@ public abstract class BossHealthOverlayMixin {
     }
 
     //? if >1.20.1 {
-    @Redirect(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/BossHealthOverlay;drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/ResourceLocation;[Lnet/minecraft/resources/ResourceLocation;)V", ordinal = 0))
-    private void drawBar(BossHealthOverlay instance, GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, int k, ResourceLocation[] resourceLocations, ResourceLocation[] resourceLocations2) {
+    @Redirect(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At(value = "INVOKE", target = /*? if <1.21.11 {*//*"Lnet/minecraft/client/gui/components/BossHealthOverlay;drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/ResourceLocation;[Lnet/minecraft/resources/ResourceLocation;)V"*//*?} else {*/"Lnet/minecraft/client/gui/components/BossHealthOverlay;drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/Identifier;[Lnet/minecraft/resources/Identifier;)V"/*?}*/, ordinal = 0))
+    private void drawBar(BossHealthOverlay instance, GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, int k, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/[] resourceLocations, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/[] resourceLocations2) {
         drawBar(guiGraphics, 0, 0, bossEvent, 406, resourceLocations, resourceLocations2);
     }
 
-    @Redirect(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/BossHealthOverlay;drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/ResourceLocation;[Lnet/minecraft/resources/ResourceLocation;)V", ordinal = 1))
-    private void drawBarProgress(BossHealthOverlay instance, GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, int k, ResourceLocation[] resourceLocations, ResourceLocation[] resourceLocations2) {
+    @Redirect(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;)V", at = @At(value = "INVOKE", target = /*? if <1.21.11 {*//*"Lnet/minecraft/client/gui/components/BossHealthOverlay;drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/ResourceLocation;[Lnet/minecraft/resources/ResourceLocation;)V"*//*?} else {*/"Lnet/minecraft/client/gui/components/BossHealthOverlay;drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/Identifier;[Lnet/minecraft/resources/Identifier;)V"/*?}*/, ordinal = 1))
+    private void drawBarProgress(BossHealthOverlay instance, GuiGraphics guiGraphics, int i, int j, BossEvent bossEvent, int k, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/[] resourceLocations, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/[] resourceLocations2) {
         guiGraphics.pose().translate(3f, 0);
         drawBar(guiGraphics, 0, 0, bossEvent, Mth.lerpDiscrete(bossEvent.getProgress(), 0, 400), resourceLocations, resourceLocations2);
     }
 
-    @Redirect(method = "drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/ResourceLocation;[Lnet/minecraft/resources/ResourceLocation;)V", at = @At(value = "INVOKE", target = /*? if <1.21.2 {*//*"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIIIIIII)V"*//*?} else {*/"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIIIIIII)V"/*?}*/))
-    private void drawBar(GuiGraphics instance, RenderPipeline renderPipeline, ResourceLocation arg, int i, int j, int k, int l, int m, int n, int o, int p  /*? if >=1.21.2 {*/ /*?}*/) {
+    @Redirect(method = /*? if <1.21.11 {*//*"drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/ResourceLocation;[Lnet/minecraft/resources/ResourceLocation;)V"*//*?} else {*/"drawBar(Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/world/BossEvent;I[Lnet/minecraft/resources/Identifier;[Lnet/minecraft/resources/Identifier;)V"/*?}*/, at = @At(value = "INVOKE", target = /*? if <1.21.2 {*//*"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIIIIIII)V"*//*?} else if <1.21.11 {*//*"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/ResourceLocation;IIIIIIII)V"*//*?} else {*/"Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIIIIIII)V"/*?}*/))
+    private void drawBar(GuiGraphics instance, RenderPipeline renderPipeline, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ arg, int i, int j, int k, int l, int m, int n, int o, int p  /*? if >=1.21.2 {*/ /*?}*/) {
         FactoryGuiGraphics.of(instance).blitSprite(arg, o <= 400 ? 400 : 406, j * 3, k, l, m, n, 0, o, p * 3);
     }
     //?} else {

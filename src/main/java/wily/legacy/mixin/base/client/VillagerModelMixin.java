@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base.client;
 
-import net.minecraft.client.model.VillagerModel;
+import net.minecraft.client.model./*? if <1.21.11 {*//**//*?} else {*/npc./*?}*/VillagerModel;
 import net.minecraft.client.model.geom.ModelPart;
 //? if >=1.21.2 {
 import net.minecraft.client.renderer.entity.state.VillagerRenderState;

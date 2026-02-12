@@ -8,7 +8,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.sounds.SoundEvents;
@@ -31,7 +31,7 @@ public class HowToPlayScreen extends LegacyScreen {
 
     protected final Section section;
     protected final int sectionIndex;
-    protected final ResourceLocation uiDefinitionID;
+    protected final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ uiDefinitionID;
 
     protected final ScrollableRenderer scrollableRenderer = new ScrollableRenderer();
 
@@ -111,9 +111,9 @@ public class HowToPlayScreen extends LegacyScreen {
         }
     }
 
-    public record Section(Component title, ResourceLocation uiDefinitionLocation, boolean hasButton,
+    public record Section(Component title, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ uiDefinitionLocation, boolean hasButton,
                           int index) implements ScreenSection<HowToPlayScreen> {
-        public static final Codec<Section> CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.getComponentCodec().fieldOf("title").forGetter(Section::title), ResourceLocation.CODEC.fieldOf("ui_definition").forGetter(Section::uiDefinitionLocation), Codec.BOOL.fieldOf("hasButton").orElse(true).forGetter(Section::hasButton), Codec.INT.fieldOf("index").orElse(-1).forGetter(Section::index)).apply(i, Section::new));
+        public static final Codec<Section> CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.getComponentCodec().fieldOf("title").forGetter(Section::title), /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/.CODEC.fieldOf("ui_definition").forGetter(Section::uiDefinitionLocation), Codec.BOOL.fieldOf("hasButton").orElse(true).forGetter(Section::hasButton), Codec.INT.fieldOf("index").orElse(-1).forGetter(Section::index)).apply(i, Section::new));
         public static final Codec<List<Section>> LIST_CODEC = CODEC.listOf();
         public static final List<Section> list = new ArrayList<>();
 

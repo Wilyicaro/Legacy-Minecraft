@@ -2,7 +2,7 @@ package wily.legacy.client.screen;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.client.UIAccessor;
@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 
 public class Panel extends SimpleLayoutRenderable {
     protected final UIAccessor accessor;
-    public ResourceLocation panelSprite = LegacySprites.SMALL_PANEL;
+    public /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ panelSprite = LegacySprites.SMALL_PANEL;
     public String name;
 
     public Panel(Screen screen) {
@@ -73,11 +73,11 @@ public class Panel extends SimpleLayoutRenderable {
         return Panel.createPanel(screen, p -> p.centeredLeftPos(screen) + xOffset.get(), p -> p.centeredTopPos(screen) + yOffset.get(), imageWidth, imageHeight);
     }
 
-    public static Panel centered(Screen screen, ResourceLocation panelSprite, int imageWidth, int imageHeight, int xOffset, int yOffset) {
+    public static Panel centered(Screen screen, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ panelSprite, int imageWidth, int imageHeight, int xOffset, int yOffset) {
         return Panel.createPanel(screen, p -> p.appearance(panelSprite, imageWidth, imageHeight), p -> p.pos(p.centeredLeftPos(screen) + xOffset, p.centeredTopPos(screen) + yOffset));
     }
 
-    public static Panel centered(Screen screen, ResourceLocation panelSprite, int imageWidth, int imageHeight) {
+    public static Panel centered(Screen screen, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ panelSprite, int imageWidth, int imageHeight) {
         return Panel.createPanel(screen, p -> p.appearance(panelSprite, imageWidth, imageHeight), p -> p.pos(p.centeredLeftPos(screen), p.centeredTopPos(screen)));
     }
 
@@ -117,8 +117,8 @@ public class Panel extends SimpleLayoutRenderable {
         appearance(LegacySprites.SMALL_PANEL, width, height);
     }
 
-    public void appearance(ResourceLocation sprite, int width, int height) {
-        panelSprite = accessor.getElementValue(name + ".sprite", sprite, ResourceLocation.class);
+    public void appearance(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ sprite, int width, int height) {
+        panelSprite = accessor.getElementValue(name + ".sprite", sprite, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/.class);
         size(accessor.putStaticElement(name + ".width", accessor.getInteger(name + ".width", width)), accessor.putStaticElement(name + ".height", accessor.getInteger(name + ".height", height)));
     }
 

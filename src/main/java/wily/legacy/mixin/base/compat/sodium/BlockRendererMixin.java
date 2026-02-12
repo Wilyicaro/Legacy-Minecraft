@@ -4,7 +4,7 @@ package wily.legacy.mixin.base.compat.sodium;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline.BlockRenderer;
-import net.caffeinemc.mods.sodium.client.render.frapi.render.AbstractBlockRenderContext;
+import net.caffeinemc.mods.sodium.client.render./*? if <1.21.11 {*//*frapi.render*//*?} else {*/model/*?}*/.AbstractBlockRenderContext;
 //? if <1.21.5 {
 /*import net.minecraft.client.resources.model.BakedModel;
  *///?} else {

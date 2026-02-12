@@ -157,6 +157,8 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
         cir.setReturnValue(super.keyPressed(keyEvent));
     }
 
+    //? <1.21.11 {
+    /*
     @ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 2)
     public int pageX(int x, @Local(ordinal = 4) int pageWidth) {
         return panel.x + panel.width - 24 - pageWidth;
@@ -166,7 +168,17 @@ public abstract class BookEditScreenMixin extends Screen implements Controller.E
     public int pageY(int x) {
         return panel.y + 22;
     }
+    *///?} else {
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V"), index = 1)
+    public int pageX(int x) {
+        return panel.x + panel.width - 24 - font.width(numberOfPages);
+    }
 
+    @ModifyArg(method = "visitText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/ActiveTextCollector;accept(Lnet/minecraft/client/gui/TextAlignment;IILnet/minecraft/network/chat/Component;)V"), index = 2)
+    public int pageY(int y) {
+        return panel.y + 22;
+    }
+    //?}
 
     @Override
     public boolean isPauseScreen() {

@@ -3,8 +3,8 @@ package wily.legacy.entity;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.behavior.Behavior;
-import net.minecraft.world.entity.animal.IronGolem;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.animal./*? if <1.21.11 {*//**//*?} else {*/golem./*?}*/IronGolem;
+import net.minecraft.world.entity.npc./*? if <1.21.11 {*//**//*?} else {*/villager./*?}*/Villager;
 
 import java.util.List;
 

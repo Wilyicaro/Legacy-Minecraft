@@ -3,7 +3,11 @@ package wily.legacy.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
+//? >=1.21.11 {
+import net.minecraft.client.gui.ActiveTextCollector;
+import net.minecraft.client.gui.TextAlignment;
+//?}
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -19,7 +23,7 @@ import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
 import org.jetbrains.annotations.Nullable;
@@ -139,9 +143,16 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 int nameWidth = width - 53;
                 int lineHeight = sd ? 8 : 12;
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4, x + 40 + nameWidth, y + 44);
+                //? <1.21.11 {
+                /*
                 (sd ? PackAlbum.Selector.sdLabelsCache : PackAlbum.Selector.labelsCache).apply(selectedPack.getTitle(), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
+                *///?} else {
+                MultiLineLabel nameLabel = (sd ? PackAlbum.Selector.sdLabelsCache : PackAlbum.Selector.labelsCache).apply(selectedPack.getTitle(), nameWidth);
+                ActiveTextCollector textCollector = graphics.textRenderer();
+                nameLabel.visitLines(TextAlignment.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, textCollector);
+                //?}
                 graphics.disableScissor();
-                ResourceLocation background = PackAlbum.Selector.getPackBackground(selectedPack);
+                /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ background = PackAlbum.Selector.getPackBackground(selectedPack);
                 int descriptionWidth = width - 16;
                 MultiLineLabel label = (sd ? PackAlbum.Selector.sdLabelsCache : PackAlbum.Selector.labelsCache).apply(selectedPack.getDescription(), descriptionWidth);
                 int descriptionFromBottom = sd ? 52 : 78;
@@ -149,7 +160,12 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 scrollableRenderer.scrolled.max = org.joml.Math.max(0, label.getLineCount() - visibleLines);
                 scrollableRenderer.lineHeight = lineHeight;
                 int left = x + (sd ? 5 : 8);
+                //? <1.21.11 {
+                /*
                 scrollableRenderer.render(graphics, left, y + 40, descriptionWidth, visibleLines * lineHeight, () -> label.render(graphics, MultiLineLabel.Align.LEFT, left, y + 40, lineHeight, true, 0xFFFFFFFF));
+                *///?} else {
+                scrollableRenderer.render(graphics, left, y + 40, descriptionWidth, visibleLines * lineHeight, () -> {ActiveTextCollector collector = graphics.textRenderer(); label.visitLines(TextAlignment.LEFT, left, y + 40, lineHeight, collector);});
+                //?}
                 if (background != null)
                     FactoryGuiGraphics.of(graphics).blit(background, left, y + height - descriptionFromBottom, 0.0f, 0.0f, descriptionWidth, sd ? 47 : 72, descriptionWidth, sd ? 47 : 72);
             }

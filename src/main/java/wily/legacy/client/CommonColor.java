@@ -2,7 +2,7 @@ package wily.legacy.client;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.util.ListMap;
 import wily.legacy.util.IOUtil;
@@ -24,7 +24,7 @@ public class CommonColor extends CommonValue<Integer> {
     }, i -> String.format(Locale.ROOT, "#%08X", i));
     public static final Codec<Integer> INT_COLOR_CODEC = IOUtil.createFallbackCodec(RGBA_INT_COLOR_CODEC, Codec.INT);
 
-    public static final ListMap<ResourceLocation, CommonColor> COMMON_COLORS = new ListMap<>();
+    public static final ListMap</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/, CommonColor> COMMON_COLORS = new ListMap<>();
 
     public static final CommonColor CHAT_BACKGROUND = registerCommonColor("chat_background", 0xFF323232);
     public static final CommonColor INVENTORY_GRAY_TEXT = registerCommonColor("inventory_gray_text", 0xFF323232);
@@ -69,7 +69,7 @@ public class CommonColor extends CommonValue<Integer> {
         return registerCommonColor(FactoryAPI.createVanillaLocation(path), defaultValue);
     }
 
-    public static CommonColor registerCommonColor(ResourceLocation id, int defaultValue) {
+    public static CommonColor registerCommonColor(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ id, int defaultValue) {
         CommonColor color = new CommonColor(defaultValue);
         COMMON_COLORS.put(id, color);
         return color;

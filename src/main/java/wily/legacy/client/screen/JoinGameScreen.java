@@ -2,6 +2,10 @@ package wily.legacy.client.screen;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
+//? >=1.21.11 {
+import net.minecraft.client.gui.ActiveTextCollector;
+import net.minecraft.client.gui.TextAlignment;
+//?}
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -33,10 +37,26 @@ public class JoinGameScreen extends PanelVListScreen {
                 public void onPress(InputWithModifiers input) {
                 }
 
+                //? <1.21.11 {
+                /*
                 @Override
                 protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
                     LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + 5, this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), j, true);
                 }
+                *///?} else {
+                @Override
+                protected void renderContents(GuiGraphics guiGraphics, int i, int j, float f) {
+                    renderDefaultSprite(guiGraphics);
+                    ActiveTextCollector textCollector = guiGraphics.textRendererForWidget(this, GuiGraphics.HoveredTextEffects.NONE);
+                    renderDefaultLabel(textCollector);
+                }
+                
+                @Override
+                protected void renderDefaultLabel(ActiveTextCollector textCollector) {
+                    int xOffset = 5;
+                    renderScrollingStringOverContents(textCollector, this.getMessage(), xOffset / 2);
+                }
+                //?}
 
                 @Override
                 protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
@@ -62,6 +82,14 @@ public class JoinGameScreen extends PanelVListScreen {
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         super.renderDefaultBackground(guiGraphics, i, j, f);
         tooltipBox.render(guiGraphics, i, j, f);
+        //? <1.21.11 {
+        /*
         scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () -> label.render(guiGraphics, MultiLineLabel.Align.LEFT, panel.x + panel.width + 3, panel.y + 13, 12, true, 0xFFFFFFFF));
+        *///?} else {
+        scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () -> {
+        ActiveTextCollector textCollector = guiGraphics.textRenderer();
+        label.visitLines(TextAlignment.LEFT, panel.x + panel.width + 3, panel.y + 13, 12, textCollector);
+        });
+        //?}
     }
 }

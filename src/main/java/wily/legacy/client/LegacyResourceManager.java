@@ -9,7 +9,7 @@ import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -35,11 +35,11 @@ import java.util.function.BiConsumer;
 
 public class LegacyResourceManager implements ResourceManagerReloadListener {
     public static final boolean DEBUG = false;
-    public static final ResourceLocation GAMEPAD_MAPPINGS = Legacy4J.createModLocation("gamepad_mappings.txt");
-    public static final ResourceLocation INTRO_LOCATION = Legacy4J.createModLocation("intro.json");
-    public static final ResourceLocation GAMMA_LOCATION = Legacy4J.createModLocation(/*? if >=1.21.2 {*/"gamma" /*?} else {*//*"post_effect/gamma.json"*//*?}*/);
-    public static final ResourceLocation DEFAULT_KEYBOARD_LAYOUT_LOCATION = Legacy4J.createModLocation("keyboard_layout/en_us.json");
-    public static final ResourceLocation PLAYER_IDENTIFIERS_LOCATION = Legacy4J.createModLocation("player_identifiers.json");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ GAMEPAD_MAPPINGS = Legacy4J.createModLocation("gamepad_mappings.txt");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ INTRO_LOCATION = Legacy4J.createModLocation("intro.json");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ GAMMA_LOCATION = Legacy4J.createModLocation(/*? if >=1.21.2 {*/"gamma" /*?} else {*//*"post_effect/gamma.json"*//*?}*/);
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ DEFAULT_KEYBOARD_LAYOUT_LOCATION = Legacy4J.createModLocation("keyboard_layout/en_us.json");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ PLAYER_IDENTIFIERS_LOCATION = Legacy4J.createModLocation("player_identifiers.json");
 
     public static final String COMMON_COLORS = "common_colors.json";
     public static final String COMMON_VALUES = "common_values.json";
@@ -65,7 +65,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
         }
     }
 
-    public static <T extends ControlTooltip.CharsIcon> void addIcons(ResourceManager resourceManager, ResourceLocation location, Codec<List<T>> codec, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
+    public static <T extends ControlTooltip.CharsIcon> void addIcons(ResourceManager resourceManager, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ location, Codec<List<T>> codec, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
         resourceManager.getResource(location).ifPresent(r -> {
             try (BufferedReader reader = r.openAsReader()) {
                 codec.parse(JsonOps.INSTANCE, JsonParser.parseReader(reader)).resultOrPartial(error -> Legacy4J.LOGGER.warn("Failed to parse {}: {}", location, error)).ifPresent(charsIcons -> {
@@ -79,11 +79,11 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
         });
     }
 
-    public static void addControllerIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
+    public static void addControllerIcons(ResourceManager resourceManager, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
         addIcons(resourceManager, location, ControlTooltip.ControllerIcon.LIST_CODEC, addIcon);
     }
 
-    public static void addKbmIcons(ResourceManager resourceManager, ResourceLocation location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
+    public static void addKbmIcons(ResourceManager resourceManager, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ location, BiConsumer<String, ControlTooltip.LegacyIcon> addIcon) {
         addIcons(resourceManager, location, ControlTooltip.KeyIcon.LIST_CODEC, addIcon);
     }
 
@@ -138,7 +138,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
                 try {
                     JsonObject obj = GsonHelper.parse(r.openAsReader());
                     obj.asMap().forEach((s, e) -> {
-                        ResourceLocation id = FactoryAPI.createLocation(s);
+                        /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ id = FactoryAPI.createLocation(s);
                         if (CommonColor.COMMON_COLORS.containsKey(id))
                             CommonColor.COMMON_COLORS.get(id).parse(new Dynamic<>(JsonOps.INSTANCE, e));
                     });
@@ -150,7 +150,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
                 try {
                     JsonObject obj = GsonHelper.parse(r.openAsReader());
                     obj.asMap().forEach((s, e) -> {
-                        ResourceLocation id = FactoryAPI.createLocation(s);
+                        /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ id = FactoryAPI.createLocation(s);
                         if (CommonColor.COMMON_VALUES.containsKey(id))
                             CommonColor.COMMON_VALUES.get(id).parse(new Dynamic<>(JsonOps.INSTANCE, e));
                     });
@@ -189,7 +189,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
                     if (!value.isKbm()) value.icons().put(s, b);
             });
             for (ControlType value : Legacy4JClient.controlTypesManager.map().values()) {
-                ResourceLocation location = FactoryAPI.createLocation(value.id().getNamespace(), "control_tooltips/icons/%s.json".formatted(value.id().getPath()));
+                /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ location = FactoryAPI.createLocation(value.id().getNamespace(), "control_tooltips/icons/%s.json".formatted(value.id().getPath()));
                 if (value.isKbm()) addKbmIcons(resourceManager, location, value.icons()::put);
                 else addControllerIcons(resourceManager, location, value.icons()::put);
             }

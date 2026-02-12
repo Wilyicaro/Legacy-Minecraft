@@ -7,7 +7,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.OptionInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4JClient;
@@ -18,13 +18,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public record OptionsPreset(ResourceLocation id, Optional<Component> name, Optional<Component> tooltip, Map<String, Object> legacyOptions, Map<String, Object> vanillaOptions) implements IdValueInfo<OptionsPreset> {
+public record OptionsPreset(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ id, Optional<Component> name, Optional<Component> tooltip, Map<String, Object> legacyOptions, Map<String, Object> vanillaOptions) implements IdValueInfo<OptionsPreset> {
     public static final Map<String, OptionInstance<?>> VANILLA_OPTIONS_MAP = new HashMap<>();
 
     public static final Codec<Map<String, Object>> LEGACY_OPTIONS_CODEC = Codec.dispatchedMap(Codec.STRING.validate(s -> LegacyOptions.CLIENT_STORAGE.configMap.containsKey(s) ? DataResult.success(s) : DataResult.error(() -> "Can't find legacy option named as " + s)), s -> LegacyOptions.CLIENT_STORAGE.configMap.get(s).control().codec());
     public static final Codec<Map<String, Object>> VANILLA_OPTIONS_CODEC = Codec.dispatchedMap(Codec.STRING.validate(s -> VANILLA_OPTIONS_MAP.containsKey(s) ? DataResult.success(s) : DataResult.error(() -> "Can't find vanilla option named as " + s)), s -> VANILLA_OPTIONS_MAP.get(s).codec());
 
-    public static final Codec<OptionsPreset> CODEC = RecordCodecBuilder.create(i -> i.group(ResourceLocation.CODEC.fieldOf("id").forGetter(OptionsPreset::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(OptionsPreset::name), DynamicUtil.getComponentCodec().optionalFieldOf("tooltip").forGetter(OptionsPreset::tooltip), LEGACY_OPTIONS_CODEC.optionalFieldOf("legacy", Collections.emptyMap()).forGetter(OptionsPreset::legacyOptions), VANILLA_OPTIONS_CODEC.optionalFieldOf("vanilla", Collections.emptyMap()).forGetter(OptionsPreset::vanillaOptions)).apply(i, OptionsPreset::new));
+    public static final Codec<OptionsPreset> CODEC = RecordCodecBuilder.create(i -> i.group(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/.CODEC.fieldOf("id").forGetter(OptionsPreset::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(OptionsPreset::name), DynamicUtil.getComponentCodec().optionalFieldOf("tooltip").forGetter(OptionsPreset::tooltip), LEGACY_OPTIONS_CODEC.optionalFieldOf("legacy", Collections.emptyMap()).forGetter(OptionsPreset::legacyOptions), VANILLA_OPTIONS_CODEC.optionalFieldOf("vanilla", Collections.emptyMap()).forGetter(OptionsPreset::vanillaOptions)).apply(i, OptionsPreset::new));
     public static final Codec<OptionHolder<OptionsPreset>> OPTION_CODEC = OptionHolder.createCodec(r -> Legacy4JClient.optionPresetsManager.map().get(r));
 
     @Override

@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
@@ -111,11 +111,11 @@ public class CreationList extends RenderableVList {
         }
     }
 
-    public static void addIconButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress) {
+    public static void addIconButton(RenderableVList list, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ iconSprite, Component message, Consumer<AbstractButton> onPress) {
         addIconButton(list, iconSprite, message, onPress, null);
     }
 
-    public static void addIconButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress, Tooltip tooltip) {
+    public static void addIconButton(RenderableVList list, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ iconSprite, Component message, Consumer<AbstractButton> onPress, Tooltip tooltip) {
         AbstractButton button;
         list.addRenderable(button = new ContentButton(list, 0, 0, 270, 30, message) {
             @Override
@@ -141,13 +141,6 @@ public class CreationList extends RenderableVList {
             this.list = list;
         }
 
-        @Override
-        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
-            super.renderWidget(guiGraphics, i, j, f);
-            if (list.accessor.getBoolean(list.name + ".buttonIcon.isVisible", true))
-                renderIcon(guiGraphics, i, j, f);
-        }
-
         public void renderIcon(GuiGraphics guiGraphics, int mouseX, int mouseY, float f) {
             int iconWidth = list.accessor.getInteger(list.name + ".buttonIcon.width", 20);
             int iconHeight = list.accessor.getInteger(list.name + ".buttonIcon.height", 20);
@@ -165,11 +158,33 @@ public class CreationList extends RenderableVList {
             guiGraphics.fill(getX() + x, getY() + y, getX() + x + width, getY() + y + height, -1601138544);
         }
 
+        //? <1.21.11 {
+        /*
+        @Override
+        protected void renderWidget(GuiGraphics guiGraphics, int i, int j, float f) {
+            super.renderWidget(guiGraphics, i, j, f);
+            if (list.accessor.getBoolean(list.name + ".buttonIcon.isVisible", true))
+                renderIcon(guiGraphics, i, j, f);
+        }
+
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
             int x = this.getX() + list.accessor.getInteger(list.name + ".buttonMessage.xOffset", 35);
             LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), x, this.getY(), x + this.getWidth(), this.getY() + this.getHeight(), j, true));
         }
+        *///?} else {
+        @Override
+        protected void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+            renderDefaultSprite(guiGraphics);
+            if (list.accessor.getBoolean(list.name + ".buttonIcon.isVisible", true)) {
+                renderIcon(guiGraphics, mouseX, mouseY, partialTick);
+            }
+            int xOffset = list.accessor.getInteger(list.name + ".buttonMessage.xOffset", 35);
+            Font font = Minecraft.getInstance().font;
+            int color = LegacyRenderUtil.getTextColorForState(this, 0xFFFFFF, 0xFFFFA0, 0xA0A0A0);
+            LegacyFontUtil.applySDFont(sd -> LegacyRenderUtil.renderWidgetMessageScrollingLeft(guiGraphics, this, font, getMessage(), xOffset, 2, color, true));
+        }
+        //?}
 
         @Override
         protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {

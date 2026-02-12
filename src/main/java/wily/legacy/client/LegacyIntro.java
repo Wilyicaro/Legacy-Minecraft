@@ -3,10 +3,10 @@ package wily.legacy.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import org.lwjgl.glfw.GLFW;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.legacy.Legacy4J;
@@ -16,13 +16,13 @@ import wily.legacy.util.IOUtil;
 import java.util.Collections;
 import java.util.List;
 
-public record LegacyIntro(List<ResourceLocation> brands, ResourceLocation background, float brandDuration, float fadeIn,
+public record LegacyIntro(List</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/> brands, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ background, float brandDuration, float fadeIn,
                           float fadeOut, boolean crossFade) {
-    public static final ResourceLocation DEFAULT_BACKGROUND = Legacy4J.createModLocation("textures/gui/intro/background.png");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ DEFAULT_BACKGROUND = Legacy4J.createModLocation("textures/gui/intro/background.png");
     public static final LegacyIntro EMPTY = new LegacyIntro(Collections.emptyList());
-    public static final Codec<LegacyIntro> COMPLETE_CODEC = RecordCodecBuilder.create(i -> i.group(ResourceLocation.CODEC.listOf().fieldOf("brands").forGetter(LegacyIntro::brands), ResourceLocation.CODEC.fieldOf("background").orElse(DEFAULT_BACKGROUND).forGetter(LegacyIntro::background), Codec.FLOAT.fieldOf("brandDuration").forGetter(LegacyIntro::brandDuration), Codec.FLOAT.fieldOf("fadeIn").orElse(0.4f).forGetter(LegacyIntro::fadeIn), Codec.FLOAT.fieldOf("fadeOut").orElse(0.4f).forGetter(LegacyIntro::fadeOut), Codec.BOOL.fieldOf("crossFade").orElse(false).forGetter(LegacyIntro::crossFade)).apply(i, LegacyIntro::new));
-    public static final Codec<LegacyIntro> CODEC = IOUtil.createFallbackCodec(COMPLETE_CODEC, ResourceLocation.CODEC.listOf().xmap(LegacyIntro::new, LegacyIntro::brands));
-    public LegacyIntro(List<ResourceLocation> brands) {
+    public static final Codec<LegacyIntro> COMPLETE_CODEC = RecordCodecBuilder.create(i -> i.group(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/.CODEC.listOf().fieldOf("brands").forGetter(LegacyIntro::brands), /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/.CODEC.fieldOf("background").orElse(DEFAULT_BACKGROUND).forGetter(LegacyIntro::background), Codec.FLOAT.fieldOf("brandDuration").forGetter(LegacyIntro::brandDuration), Codec.FLOAT.fieldOf("fadeIn").orElse(0.4f).forGetter(LegacyIntro::fadeIn), Codec.FLOAT.fieldOf("fadeOut").orElse(0.4f).forGetter(LegacyIntro::fadeOut), Codec.BOOL.fieldOf("crossFade").orElse(false).forGetter(LegacyIntro::crossFade)).apply(i, LegacyIntro::new));
+    public static final Codec<LegacyIntro> CODEC = IOUtil.createFallbackCodec(COMPLETE_CODEC, /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/.CODEC.listOf().xmap(LegacyIntro::new, LegacyIntro::brands));
+    public LegacyIntro(List</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/> brands) {
         this(brands, DEFAULT_BACKGROUND, 3200, 0.4f, 0.4f, false);
     }
 

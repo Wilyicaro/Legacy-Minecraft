@@ -3,7 +3,7 @@ package wily.legacy.client;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.screen.LegacyTabButton;
@@ -14,15 +14,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-public record TypeCraftingTab(ResourceLocation id, Optional<Component> name,
+public record TypeCraftingTab(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ id, Optional<Component> name,
                               Optional<LegacyTabButton.IconHolder<?>> iconHolder,
                               List<CustomTab> tabs) implements LegacyTabInfo<TypeCraftingTab> {
-    public static final Codec<TypeCraftingTab> CODEC = RecordCodecBuilder.create(i -> i.group(ResourceLocation.CODEC.fieldOf("id").forGetter(TypeCraftingTab::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(TypeCraftingTab::name), LegacyTabButton.ICON_HOLDER_CODEC.optionalFieldOf("icon").forGetter(TypeCraftingTab::iconHolder), CustomTab.LIST_CODEC.fieldOf("tabs").orElseGet(ArrayList::new).forGetter(TypeCraftingTab::tabs)).apply(i, TypeCraftingTab::new));
+    public static final Codec<TypeCraftingTab> CODEC = RecordCodecBuilder.create(i -> i.group(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/.CODEC.fieldOf("id").forGetter(TypeCraftingTab::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(TypeCraftingTab::name), LegacyTabButton.ICON_HOLDER_CODEC.optionalFieldOf("icon").forGetter(TypeCraftingTab::iconHolder), CustomTab.LIST_CODEC.fieldOf("tabs").orElseGet(ArrayList::new).forGetter(TypeCraftingTab::tabs)).apply(i, TypeCraftingTab::new));
 
-    public static final ResourceLocation CRAFTING = Legacy4J.createModLocation("crafting");
-    public static final ResourceLocation BANNER = Legacy4J.createModLocation("banner");
-    public static final ResourceLocation FIREWORK = Legacy4J.createModLocation("firework");
-    public static final ResourceLocation DYING = Legacy4J.createModLocation("dying");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ CRAFTING = Legacy4J.createModLocation("crafting");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ BANNER = Legacy4J.createModLocation("banner");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ FIREWORK = Legacy4J.createModLocation("firework");
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ DYING = Legacy4J.createModLocation("dying");
 
     @Override
     public boolean isValid() {

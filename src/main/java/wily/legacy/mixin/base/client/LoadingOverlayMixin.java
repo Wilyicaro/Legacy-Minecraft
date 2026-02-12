@@ -1,6 +1,6 @@
 package wily.legacy.mixin.base.client;
 
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.LoadingOverlay;
@@ -102,7 +102,7 @@ public abstract class LoadingOverlayMixin extends Overlay {
                 }
                 this.fadeOutStart = Util.getMillis();
                 if (this.minecraft.screen != null) {
-                    this.minecraft.screen.init(this.minecraft, guiGraphics.guiWidth(), guiGraphics.guiHeight());
+                    this.minecraft.screen.init(/*? if <1.21.11 {*//*this.minecraft, *//*?}*/guiGraphics.guiWidth(), guiGraphics.guiHeight());
                 }
             }
         }

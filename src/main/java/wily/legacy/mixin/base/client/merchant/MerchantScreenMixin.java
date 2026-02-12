@@ -7,10 +7,10 @@ import net.minecraft.client.gui.screens.inventory.MerchantScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.npc.VillagerData;
+import net.minecraft.world.entity.npc./*? if <1.21.11 {*//**//*?} else {*/villager./*?}*/VillagerData;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MerchantMenu;
 import net.minecraft.world.inventory.Slot;
@@ -241,7 +241,7 @@ public abstract class MerchantScreenMixin extends AbstractContainerScreen<Mercha
     @Inject(method = "renderBg", at = @At("HEAD"), cancellable = true)
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this)./*? if <1.21.11 {*//*getResourceLocation*//*?} else {*/getIdentifier/*?}*/("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + 7, topPos + 21, 105, 165);
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(leftPos + 219.5f, topPos + 42.4f);

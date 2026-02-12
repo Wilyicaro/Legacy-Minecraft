@@ -1,9 +1,8 @@
-accessWidener   v2  named
+accessWidener v2 named
 accessible class net/minecraft/client/OptionInstance$SliderableValueSet
 accessible class net/minecraft/client/OptionInstance$CycleableValueSet
 accessible field net/minecraft/client/OptionInstance toString Ljava/util/function/Function;
 accessible field net/minecraft/client/OptionInstance caption Lnet/minecraft/network/chat/Component;
-accessible method net/minecraft/client/gui/components/CycleButton <init> (IIIILnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/Component;ILjava/lang/Object;Lnet/minecraft/client/gui/components/CycleButton$ValueListSupplier;Ljava/util/function/Function;Ljava/util/function/Function;Lnet/minecraft/client/gui/components/CycleButton$OnValueChange;Lnet/minecraft/client/OptionInstance$TooltipSupplier;Z)V
 mutable field net/minecraft/client/Minecraft options Lnet/minecraft/client/Options;
 accessible field net/minecraft/client/gui/screens/Screen renderables Ljava/util/List;
 accessible field net/minecraft/client/gui/components/AbstractSliderButton canChangeValue Z
@@ -58,14 +57,10 @@ accessible method net/minecraft/client/gui/screens/worldselection/CreateWorldScr
 accessible method net/minecraft/client/gui/screens/worldselection/CreateWorldScreen tryApplyNewDataPacks (Lnet/minecraft/server/packs/repository/PackRepository;ZLjava/util/function/Consumer;)V
 accessible method net/minecraft/client/gui/screens/worldselection/PresetEditor flatWorldConfigurator (Lnet/minecraft/world/level/levelgen/flat/FlatLevelGeneratorSettings;)Lnet/minecraft/client/gui/screens/worldselection/WorldCreationContext$DimensionsUpdater;
 accessible method net/minecraft/client/gui/screens/worldselection/PresetEditor fixedBiomeConfigurator (Lnet/minecraft/core/Holder;)Lnet/minecraft/client/gui/screens/worldselection/WorldCreationContext$DimensionsUpdater;
-accessible method net/minecraft/world/level/GameRules register (Ljava/lang/String;Lnet/minecraft/world/level/GameRules$Category;Lnet/minecraft/world/level/GameRules$Type;)Lnet/minecraft/world/level/GameRules$Key;
-accessible method net/minecraft/world/level/GameRules$BooleanValue create (Z)Lnet/minecraft/world/level/GameRules$Type;
 accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData$HoldingPlayer <init> (Lnet/minecraft/world/level/saveddata/maps/MapItemSavedData;Lnet/minecraft/world/entity/player/Player;)V
 accessible field net/minecraft/client/gui/screens/ConnectScreen status Lnet/minecraft/network/chat/Component;
 accessible field net/minecraft/client/gui/components/Tooltip message Lnet/minecraft/network/chat/Component;
 accessible method net/minecraft/client/gui/components/Tooltip <init> (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/Component;)V
-accessible field net/minecraft/client/renderer/RenderStateShard$TextureStateShard texture Ljava/util/Optional;
-accessible field net/minecraft/client/renderer/RenderType$CompositeState textureState Lnet/minecraft/client/renderer/RenderStateShard$EmptyTextureStateShard;
 accessible field net/minecraft/client/KeyMapping ALL Ljava/util/Map;
 accessible field net/minecraft/client/MouseHandler xpos D
 accessible field net/minecraft/client/MouseHandler ypos D
@@ -104,18 +99,14 @@ accessible class net/minecraft/world/inventory/MenuType$MenuSupplier
 accessible method net/minecraft/world/inventory/MenuType <init> (Lnet/minecraft/world/inventory/MenuType$MenuSupplier;Lnet/minecraft/world/flag/FeatureFlagSet;)V
 accessible field net/minecraft/world/item/CreativeModeTabs OP_BLOCKS Lnet/minecraft/resources/ResourceKey;
 accessible field net/minecraft/client/gui/components/CommandSuggestions suggestions Lnet/minecraft/client/gui/components/CommandSuggestions$SuggestionsList;
-transitive-accessible class net/minecraft/client/renderer/RenderType$CompositeRenderType
 accessible method net/minecraft/client/Minecraft startUseItem ()V
 accessible field net/minecraft/client/gui/Gui displayHealth I
 accessible method net/minecraft/client/gui/components/events/ContainerEventHandler nextFocusPathInDirection (Lnet/minecraft/client/gui/navigation/ScreenRectangle;Lnet/minecraft/client/gui/navigation/ScreenDirection;Lnet/minecraft/client/gui/components/events/GuiEventListener;Lnet/minecraft/client/gui/navigation/FocusNavigationEvent;)Lnet/minecraft/client/gui/ComponentPath;
 accessible method net/minecraft/world/level/saveddata/maps/MapItemSavedData <init> (IIBZZZLnet/minecraft/resources/ResourceKey;)V
 accessible method net/minecraft/client/gui/font/providers/BitmapProvider <init> (Lcom/mojang/blaze3d/platform/NativeImage;Lnet/minecraft/client/gui/font/CodepointMap;)V
-accessible method net/minecraft/world/level/GameRules$IntegerValue create (I)Lnet/minecraft/world/level/GameRules$Type;
 accessible class net/minecraft/client/gui/font/providers/BitmapProvider$Glyph
 extendable class net/minecraft/client/gui/font/providers/BitmapProvider$Glyph
 accessible method net/minecraft/client/gui/font/providers/BitmapProvider$Glyph <init> (FLcom/mojang/blaze3d/platform/NativeImage;IIIIII)V
-accessible method net/minecraft/world/level/GameRules$IntegerValue create (IIILnet/minecraft/world/flag/FeatureFlagSet;Ljava/util/function/BiConsumer;)Lnet/minecraft/world/level/GameRules$Type;
-accessible class net/minecraft/world/level/GameRules$VisitorCaller
 accessible method net/minecraft/world/inventory/AbstractFurnaceMenu canSmelt (Lnet/minecraft/world/item/ItemStack;)Z
 accessible method net/minecraft/client/multiplayer/ClientPacketListener setKeyPair (Lnet/minecraft/world/entity/player/ProfileKeyPair;)V
 accessible class net/minecraft/client/gui/screens/recipebook/GhostSlots$GhostSlot
@@ -124,7 +115,6 @@ extendable class net/minecraft/world/item/crafting/Ingredient
 accessible method net/minecraft/world/item/crafting/Ingredient <init> (Lnet/minecraft/core/HolderSet;)V
 accessible method net/minecraft/client/gui/screens/Screen changeFocus (Lnet/minecraft/client/gui/ComponentPath;)V
 accessible field net/minecraft/client/renderer/GameRenderer resourcePool Lcom/mojang/blaze3d/resource/CrossFrameResourcePool;
-accessible method net/minecraft/world/level/GameRules$BooleanValue create (ZLjava/util/function/BiConsumer;)Lnet/minecraft/world/level/GameRules$Type;
 accessible class net/minecraft/client/gui/components/SubtitleOverlay$Subtitle
 accessible class net/minecraft/client/gui/components/SubtitleOverlay$SoundPlayedAt
 accessible class net/minecraft/client/gui/Gui$HeartType

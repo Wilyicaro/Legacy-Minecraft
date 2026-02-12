@@ -1,6 +1,6 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.client.GameNarrator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;

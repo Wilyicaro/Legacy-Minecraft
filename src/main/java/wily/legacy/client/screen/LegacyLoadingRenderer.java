@@ -6,7 +6,7 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FontDescription;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
@@ -53,7 +53,7 @@ public class LegacyLoadingRenderer implements Renderable {
     public void renderForeground(GuiGraphics guiGraphics, int i, int j, float f) {
         int width = guiGraphics.guiWidth();
         int height = guiGraphics.guiHeight();
-        ArbitrarySupplier<ResourceLocation> fontOverride = accessor.getElement("fontOverride", ResourceLocation.class);
+        ArbitrarySupplier</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/> fontOverride = accessor.getElement("fontOverride", /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/.class);
 
         if (!genericLoading) {
             if (progress != -1) {

@@ -1,6 +1,6 @@
 package wily.legacy.util.client;
 
-import net.minecraft.Util;
+import net.minecraft./*? if <1.21.11 {*//**//*?} else {*/util./*?}*/Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import wily.factoryapi.FactoryAPIClient;

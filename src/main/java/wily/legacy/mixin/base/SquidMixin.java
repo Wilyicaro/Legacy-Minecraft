@@ -3,7 +3,7 @@ package wily.legacy.mixin.base;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.animal.Squid;
+import net.minecraft.world.entity.animal./*? if <1.21.11 {*//**//*?} else {*/squid./*?}*/Squid;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;

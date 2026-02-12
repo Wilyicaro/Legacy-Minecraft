@@ -5,7 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 import wily.factoryapi.base.ArbitrarySupplier;
@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public record LegacyCreativeTabListing(ResourceLocation id, Optional<Component> name,
+public record LegacyCreativeTabListing(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ id, Optional<Component> name,
                                        Optional<LegacyTabButton.IconHolder<?>> iconHolder,
                                        List<ArbitrarySupplier<ItemStack>> displayItems) implements LegacyTabInfo<LegacyCreativeTabListing> {
-    public static final Codec<LegacyCreativeTabListing> CODEC = RecordCodecBuilder.create(i -> i.group(ResourceLocation.CODEC.fieldOf("id").forGetter(LegacyCreativeTabListing::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(LegacyCreativeTabListing::name), LegacyTabButton.ICON_HOLDER_CODEC.optionalFieldOf("icon").forGetter(LegacyCreativeTabListing::iconHolder), DynamicUtil.ITEM_SUPPLIER_CODEC.listOf().fieldOf("listing").orElseGet(ArrayList::new).forGetter(LegacyCreativeTabListing::displayItems)).apply(i, LegacyCreativeTabListing::new));
-    public static final ResourceLocation SEARCH = Legacy4J.createModLocation("search");
+    public static final Codec<LegacyCreativeTabListing> CODEC = RecordCodecBuilder.create(i -> i.group(/*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/.CODEC.fieldOf("id").forGetter(LegacyCreativeTabListing::id), DynamicUtil.getComponentCodec().optionalFieldOf("name").forGetter(LegacyCreativeTabListing::name), LegacyTabButton.ICON_HOLDER_CODEC.optionalFieldOf("icon").forGetter(LegacyCreativeTabListing::iconHolder), DynamicUtil.ITEM_SUPPLIER_CODEC.listOf().fieldOf("listing").orElseGet(ArrayList::new).forGetter(LegacyCreativeTabListing::displayItems)).apply(i, LegacyCreativeTabListing::new));
+    public static final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ SEARCH = Legacy4J.createModLocation("search");
 
     public static void rebuildVanillaCreativeTabsItems(Minecraft minecraft) {
         if (minecraft.getConnection() != null && CreativeModeTabs.tryRebuildTabContents(minecraft.getConnection().enabledFeatures(), minecraft.options.operatorItemsTab().get(), minecraft.getConnection().registryAccess())) {

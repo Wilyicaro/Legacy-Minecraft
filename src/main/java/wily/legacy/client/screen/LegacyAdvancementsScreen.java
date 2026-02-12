@@ -12,7 +12,7 @@ import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.ClientAdvancements;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.*;
 import net.minecraft.world.phys.Vec2;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.Stocker;
@@ -37,7 +37,7 @@ import static wily.legacy.client.screen.ControlTooltip.*;
 
 public class LegacyAdvancementsScreen extends PanelVListScreen implements TabList.Access {
     public static final Component TITLE = Component.translatable("gui.advancements");
-    public static final List<ResourceLocation> vanillaOrder = List.of(FactoryAPI.createVanillaLocation("story/root"), FactoryAPI.createVanillaLocation("adventure/root"), FactoryAPI.createVanillaLocation("husbandry/root"), FactoryAPI.createVanillaLocation("nether/root"), FactoryAPI.createVanillaLocation("end/root"));
+    public static final List</*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/> vanillaOrder = List.of(FactoryAPI.createVanillaLocation("story/root"), FactoryAPI.createVanillaLocation("adventure/root"), FactoryAPI.createVanillaLocation("husbandry/root"), FactoryAPI.createVanillaLocation("nether/root"), FactoryAPI.createVanillaLocation("end/root"));
     protected final Stocker.Sizeable page = new Stocker.Sizeable(0);
     protected final TabList tabList = new TabList(accessor, new PagedList<>(page, this::getMaxTabCount));
     protected final List<DisplayInfo> displayInfos = new ArrayList<>();
@@ -123,7 +123,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         addRenderableOnly(((guiGraphics, i, j, f) -> {
             LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(font, showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.getIndex()).getMessage() : getTitle(), panel.x + (panel.width - font.width(showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.getIndex()).getMessage() : getTitle())) / 2, panel.y + 10, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
             if (!displayInfos.isEmpty()) {
-                ResourceLocation background = displayInfos.get(tabList.getIndex()).getBackground().orElse(null).texturePath();
+                /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ background = displayInfos.get(tabList.getIndex()).getBackground().orElse(null).texturePath();
                 if (background != null)
                     FactoryGuiGraphics.of(guiGraphics).blit(background, panel.x + 14, panel.y + 24, 0, 0, panelRecess.width - 4, 23, 16, 16);
             }
@@ -198,7 +198,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
     }
 
     public static class AdvancementButton extends AbstractWidget {
-        public final ResourceLocation id;
+        public final /*? if <1.21.11 {*//*ResourceLocation*//*?} else {*/Identifier/*?}*/ id;
         public final Advancement advancement;
         public final DisplayInfo info;
         protected boolean lastUnlocked;
