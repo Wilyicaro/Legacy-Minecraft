@@ -9,7 +9,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 
 public final class LegacyBlockCaps {
 
-    private static final int BANNER_CAP = 16;
+    private static final int BANNER_CAP = 24;
     private static final int CHUNK_RADIUS = 8;
 
     private LegacyBlockCaps() {

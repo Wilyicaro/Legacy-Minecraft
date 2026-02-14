@@ -19,29 +19,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(SpawnEggItem.class)
 public abstract class SpawnEggItemMixin {
 
-    private static final String ANIMALS_CAP_REACHED =
-            "Can't use Spawn Egg at the moment. The maximum number of animals, excluding Wolves, Bats, Chickens and Mooshrooms, has been reached.";
-
-    private static final String ENEMIES_CAP_REACHED =
-            "Can't use Spawn Egg at the moment. The maximum number of enemies in a world has been reached.";
-
-    private static final String MOOSHROOMS_CAP_REACHED =
-            "Can't use Spawn Egg at the moment. The maximum number of Mooshrooms has been reached.";
-
-    private static final String CHICKENS_CAP_REACHED =
-            "Can't use Spawn Egg at the moment. The maximum number of Chickens in a world has been reached.";
-
-    private static final String WOLVES_CAP_REACHED =
-            "Can't use Spawn Egg at the moment. The maximum number of Wolves in a world has been reached.";
-
-    private static final String BATS_CAP_REACHED =
-            "Can't use Spawn Egg at the moment. The maximum number of Bats in a world has been reached.";
-
-    private static final String FISH_SQUID_CAP_REACHED =
-            "The maximum number of Fish and Squid in a world has been reached.";
-
-    private static final String GENERIC_CAP_REACHED =
-            "Can't use Spawn Egg at the moment. The maximum number of mobs in a world has been reached.";
+    private static final String KEY_ANIMALS_CAP_REACHED   = "legacy.spawn_egg.cap_reached.animals";
+    private static final String KEY_ENEMIES_CAP_REACHED   = "legacy.spawn_egg.cap_reached.enemies";
+    private static final String KEY_MOOSHROOMS_CAP_REACHED= "legacy.spawn_egg.cap_reached.mooshrooms";
+    private static final String KEY_CHICKENS_CAP_REACHED  = "legacy.spawn_egg.cap_reached.chickens";
+    private static final String KEY_WOLVES_CAP_REACHED    = "legacy.spawn_egg.cap_reached.wolves";
+    private static final String KEY_BATS_CAP_REACHED      = "legacy.spawn_egg.cap_reached.bats";
+    private static final String KEY_FISH_SQUID_CAP_REACHED= "legacy.spawn_egg.cap_reached.fish_squid";
+    private static final String KEY_GENERIC_CAP_REACHED   = "legacy.spawn_egg.cap_reached.generic";
 
     @Shadow
     public abstract EntityType<?> getType(ItemStack stack);
@@ -56,18 +41,19 @@ public abstract class SpawnEggItemMixin {
         if (!LegacyMobCaps.isCapped(serverLevel, player, type)) return;
 
         LegacyMobCaps.LegacyBucket bucket = LegacyMobCaps.bucketFor(type);
-        String msg = switch (bucket) {
-            case PASSIVE -> ANIMALS_CAP_REACHED;
-            case HOSTILE -> ENEMIES_CAP_REACHED;
-            case MOOSHROOM -> MOOSHROOMS_CAP_REACHED;
-            case CHICKEN -> CHICKENS_CAP_REACHED;
-            case WOLF -> WOLVES_CAP_REACHED;
-            case BAT -> BATS_CAP_REACHED;
-            case FISH, SQUID -> FISH_SQUID_CAP_REACHED;
-            default -> GENERIC_CAP_REACHED;
+
+        String key = switch (bucket) {
+            case PASSIVE -> KEY_ANIMALS_CAP_REACHED;
+            case HOSTILE -> KEY_ENEMIES_CAP_REACHED;
+            case MOOSHROOM -> KEY_MOOSHROOMS_CAP_REACHED;
+            case CHICKEN -> KEY_CHICKENS_CAP_REACHED;
+            case WOLF -> KEY_WOLVES_CAP_REACHED;
+            case BAT -> KEY_BATS_CAP_REACHED;
+            case FISH, SQUID -> KEY_FISH_SQUID_CAP_REACHED;
+            default -> KEY_GENERIC_CAP_REACHED;
         };
 
-        player.displayClientMessage(Component.literal(msg), false);
+        player.displayClientMessage(Component.translatable(key), false);
         cir.setReturnValue(InteractionResult.FAIL);
         cir.cancel();
     }

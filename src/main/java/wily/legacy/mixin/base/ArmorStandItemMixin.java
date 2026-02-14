@@ -35,7 +35,7 @@ public abstract class ArmorStandItemMixin {
 
         if (LegacyMobCaps.isCapped(level, player, net.minecraft.world.entity.EntityType.ARMOR_STAND)) {
             player.displayClientMessage(
-                    Component.literal("The maximum number of Armor Stands in a world has been reached."),
+                    Component.translatable("legacy.armor_stand.cap_reached"),
                     false
             );
             stack.setCount(originalCount);

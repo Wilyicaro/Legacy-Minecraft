@@ -36,7 +36,7 @@ public abstract class BannerBlockItemMixin {
         int originalCount = stack.getCount();
         if (LegacyBlockCaps.isBannerCapped(level, player)) {
             player.displayClientMessage(
-                    Component.literal("The maximum number of Banners in a world has been reached."),
+                    Component.translatable("legacy.banner.cap_reached"),
                     false
             );
             stack.setCount(originalCount);

@@ -1,5 +1,6 @@
 package wily.legacy.mixin.base;
 
+import wily.legacy.init.LegacyGameRules;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
@@ -37,7 +38,8 @@ if (stack.is(net.minecraft.world.item.Items.MAP)) {
     CompoundTag custom = stack.has(net.minecraft.core.component.DataComponents.CUSTOM_DATA)
         ? stack.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA).copyTag()
         : new CompoundTag();
-    custom.putByte("map_scale", (byte) 3);
+    byte scale = (byte) serverPlayer.level().getGameRules().getInt(LegacyGameRules.STARTING_MAP_SIZE);
+custom.putByte("map_scale", scale);
     stack.set(
         net.minecraft.core.component.DataComponents.CUSTOM_DATA,
         net.minecraft.world.item.component.CustomData.of(custom)
