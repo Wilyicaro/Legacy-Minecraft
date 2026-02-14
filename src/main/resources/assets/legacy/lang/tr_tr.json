@@ -1658,6 +1658,14 @@
   "structure.minecraft.villages.description": "Settlements situated in Plains, Savanna, Desert, Taiga or Snowy Plains biomes. Guarded by Iron Golems and home to Farmers, Librarians, Clerics, Blacksmiths and Butchers.",
   "structure.minecraft.woodland_mansions": "Woodland Mansions",
   "structure.minecraft.woodland_mansions.description": "Masions found in Dark Oak Forests. Home to Vexes and Illagers.",
+  "legacy.spawn_egg.cap_reached.animals": "Can't use Spawn Egg at the moment. The maximum number of animals, excluding Wolves, Bats, Chickens and Mooshrooms, has been reached.",
+  "legacy.spawn_egg.cap_reached.enemies": "Can't use Spawn Egg at the moment. The maximum number of enemies in a world has been reached.",
+  "legacy.spawn_egg.cap_reached.mooshrooms": "Can't use Spawn Egg at the moment. The maximum number of Mooshrooms has been reached.",
+  "legacy.spawn_egg.cap_reached.chickens": "Can't use Spawn Egg at the moment. The maximum number of Chickens in a world has been reached.",
+  "legacy.spawn_egg.cap_reached.wolves": "Can't use Spawn Egg at the moment. The maximum number of Wolves in a world has been reached.",
+  "legacy.spawn_egg.cap_reached.bats": "Can't use Spawn Egg at the moment. The maximum number of Bats in a world has been reached.",
+  "legacy.spawn_egg.cap_reached.fish_squid": "The maximum number of Fish and Squid in a world has been reached.",
+  "legacy.spawn_egg.cap_reached.generic": "Can't use Spawn Egg at the moment. The maximum number of mobs in a world has been reached.",
   "legacy.armor_stand.cap_reached": "The maximum number of Armor Stands in a world has been reached.",
   "legacy.banner.cap_reached": "The maximum number of Banners in a world has been reached."
 }
