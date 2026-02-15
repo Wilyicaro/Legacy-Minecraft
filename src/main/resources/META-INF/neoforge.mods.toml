@@ -15,6 +15,18 @@ credits="${mod_credits}"
 [[mixins]]
 config="${mod_id}.mixins.json"
 
+[[mixins]]
+config="consoleskins.mixins.json"
+
+[[mixins]]
+config="consoleskins.client.mixins.json"
+
+[[mixins]]
+config="cpm.mixins.json"
+
+[[mixins]]
+config="cpm.mixins.shared.json"
+
 [[dependencies.${mod_id}]]
 modId = "minecraft"
 type="required"

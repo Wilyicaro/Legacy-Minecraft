@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "package": "wily.legacy.Skins.mixin.client",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "AbstractClientPlayerMixin",
+    "AvatarRenderStateSkinIdMixin",
+    "AvatarRendererSkinMixin",
+    "MinecraftSkinSyncTickMixin",
+    "PlayerModelMenuDollMixin",
+    "TextureManagerDefaultAtlasRecoverMixin",
+    "HelpAndOptionsScreenSkinsOptionsMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "legacy.refmap.json"
+}

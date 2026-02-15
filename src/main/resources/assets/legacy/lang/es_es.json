@@ -1143,6 +1143,8 @@
   "legacy.menu.autoSave_countdown": "Autosave in %s...",
   "legacy.menu.autoSave_message": "Este juego utiliza la función de autoguardado. Si ves este icono, el juego está guardando los datos.\n\nNo apagues tu dispositivo cuando aparezca este icono en pantalla.",
   "legacy.menu.change_skin": "Cambiar aspecto",
+  "legacy.menu.change_skin.skin_animations": "Skin Animations",
+  "legacy.menu.change_skin.smooth_preview_scroll": "Smooth Preview Scroll",
   "legacy.menu.choose_user": "Choose User",
   "legacy.menu.choose_user.account_options": "Account Options",
   "legacy.menu.choose_user.account_options.delete": "Delete Account",

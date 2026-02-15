@@ -1143,6 +1143,8 @@
   "legacy.menu.autoSave_countdown": "Autosave in %s...",
   "legacy.menu.autoSave_message": "Коли ви бачите цей значок, це означає, що гра зберігає ваші дані.\n\nБудь ласка, не вимикайте пристрій, поки на екрані відображається цей значок.",
   "legacy.menu.change_skin": "Змінити скін",
+  "legacy.menu.change_skin.skin_animations": "Skin Animations",
+  "legacy.menu.change_skin.smooth_preview_scroll": "Smooth Preview Scroll",
   "legacy.menu.choose_user": "Choose User",
   "legacy.menu.choose_user.account_options": "Account Options",
   "legacy.menu.choose_user.account_options.delete": "Delete Account",

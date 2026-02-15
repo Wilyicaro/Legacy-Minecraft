@@ -28,8 +28,16 @@
   },
   "accessWidener": "${aw}",
   "mixins": [
-    "${mod_id}.mixins.json"
+    "${mod_id}.mixins.json",
+    "consoleskins.mixins.json",
+    "consoleskins.client.mixins.json",
+    "cpm.mixins.json",
+    "cpm.mixins.shared.json"
   ],
+  "breaks": {
+    "cpm": "*",
+    "customplayermodels": "*"
+  },
   "depends": {
     "fabric-api": "*",
     "factory_api": ">=${factory_api_version}",

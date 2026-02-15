@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "wily.legacy.Skins.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "PlayerListSkinsJoinMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  },
+  "refmap": "legacy.refmap.json"
+}

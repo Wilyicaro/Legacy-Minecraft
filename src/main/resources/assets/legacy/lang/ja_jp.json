@@ -1143,6 +1143,8 @@
   "legacy.menu.autoSave_countdown": "Autosave in %s...",
   "legacy.menu.autoSave_message": "このゲームではオートセーブ機能を利用できます。オートセーブの実行中は上のオートセーブ アイコンが表示されます。\n\nオートセーブ アイコンの表示中にデバイスの電源を切らないでください。",
   "legacy.menu.change_skin": "スキンを変更",
+  "legacy.menu.change_skin.skin_animations": "Skin Animations",
+  "legacy.menu.change_skin.smooth_preview_scroll": "Smooth Preview Scroll",
   "legacy.menu.choose_user": "Choose User",
   "legacy.menu.choose_user.account_options": "Account Options",
   "legacy.menu.choose_user.account_options.delete": "Delete Account",

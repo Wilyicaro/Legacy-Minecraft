@@ -30,6 +30,8 @@ import wily.legacy.config.LegacyMixinToggles;
 import wily.legacy.config.LegacyWorldOptions;
 import wily.legacy.init.*;
 import wily.legacy.network.*;
+import wily.legacy.Skins.SkinsBootstrap;
+import wily.legacy.Skins.skin.SkinSync;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.ArmorStandPose;
 
@@ -64,9 +66,18 @@ public class Legacy4J {
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     public static final FactoryConfig.StorageHandler MIXIN_CONFIGS_STORAGE = FactoryConfig.StorageHandler.fromMixin(LegacyMixinToggles.COMMON_STORAGE, true);
 
-    private static Collection<CommonNetwork.Payload> playerInitialPayloads = Collections.emptySet();
+
+    private static void checkIncompatibleMods() {
+
+        if (FactoryAPI.isModLoaded("cpm") || FactoryAPI.isModLoaded("customplayermodels")) {
+            throw new IllegalStateException("Legacy4J is incompatible with Customizable Player Models (CPM). Please remove CPM (modid: cpm) from your mods folder.");
+        }
+    }
+
+private static Collection<CommonNetwork.Payload> playerInitialPayloads = Collections.emptySet();
 
     public Legacy4J() {
+        checkIncompatibleMods();
         init();
         //? if forge || neoforge {
         /*if (FactoryAPI.isClient())
@@ -104,7 +115,8 @@ public class Legacy4J {
     }
 
     public static void init() {
-        FactoryConfig.registerCommonStorage(createModLocation("common"), LegacyCommonOptions.COMMON_STORAGE);
+        checkIncompatibleMods();
+FactoryConfig.registerCommonStorage(createModLocation("common"), LegacyCommonOptions.COMMON_STORAGE);
         FactoryConfig.registerCommonStorage(createModLocation("mixin_common"), MIXIN_CONFIGS_STORAGE);
         LegacyRegistries.register();
         LegacyGameRules.init();
@@ -123,7 +135,20 @@ public class Legacy4J {
             r.register(false, TipCommand.Payload.ID);
             r.register(false, TipCommand.EntityPayload.ID);
             r.register(false, TopMessage.Payload.ID);
+
+            // Skins / CPM sync
+            r.register(true, SkinSync.SetSkinC2S.ID);
+            r.register(true, SkinSync.SetCpmModelC2S.ID);
+	            r.register(true, SkinSync.SetCpmModelChunkC2S.ID);
+	            r.register(true, SkinSync.RequestSnapshotC2S.ID);
+            r.register(false, SkinSync.SyncSkinS2C.ID);
+            r.register(false, SkinSync.SyncCpmModelS2C.ID);
+	            r.register(false, SkinSync.SyncCpmModelChunkS2C.ID);
+            r.register(false, SkinSync.RequestCpmModelS2C.ID);
+            r.register(false, SkinSync.RequestSkinS2C.ID);
         });
+
+        SkinsBootstrap.initCommon();
         ArmorStandPose.init();
         FactoryEvent.setItemComponent(Items.CAKE, DataComponents.MAX_STACK_SIZE, 64);
         FactoryEvent.registerCommands(TipCommand::register);

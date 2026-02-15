@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "compatibilityLevel": "JAVA_21",
+  "package": "wily.legacy.CustomModelSkins.cpm.mixin",
+  "mixins": [],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 0,
+    "maxShiftBy": 3
+  },
+  "refmap": "legacy.refmap.json"
+}

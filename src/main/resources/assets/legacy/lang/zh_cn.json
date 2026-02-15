@@ -1143,6 +1143,8 @@
   "legacy.menu.autoSave_countdown": "自动保存倒计时 %s...",
   "legacy.menu.autoSave_message": "当你看到上方显示的图标时，游戏正在保存你的数据。\n\n请在图标显示时不要关闭设备。",
   "legacy.menu.change_skin": "更改皮肤",
+  "legacy.menu.change_skin.skin_animations": "Skin Animations",
+  "legacy.menu.change_skin.smooth_preview_scroll": "Smooth Preview Scroll",
   "legacy.menu.choose_user": "选择用户",
   "legacy.menu.choose_user.account_options": "账户选项",
   "legacy.menu.choose_user.account_options.delete": "删除账户",

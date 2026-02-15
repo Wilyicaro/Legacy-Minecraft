@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "package": "wily.legacy.CustomModelSkins.cpm.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [],
+  "client": [
+    "access.NativeImageAccessor",
+    "access.HumanoidModelAccessor",
+    "access.PlayerModelAccessor",
+    "access.ModelAccessor",
+    "access.LivingEntityRendererAccessor",
+    "AvatarRenderStateMixin",
+    "render.AvatarRendererMixin",
+    "render.ItemInHandRendererCPMMixin",
+    "render.LivingEntityRendererMixin",
+    "render.ModelPartHookMixin",
+    "render.HumanoidArmorLayerMixin",
+    "render.EquipmentLayerRendererMixin",
+    "render.PlayerModelMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "legacy.refmap.json"
+}
