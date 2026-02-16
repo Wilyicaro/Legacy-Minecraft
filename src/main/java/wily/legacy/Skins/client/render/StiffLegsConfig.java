@@ -36,7 +36,7 @@ public final class StiffLegsConfig {
     public static boolean isStiffLegsSkin(String skinId) {
         if (skinId == null || skinId.isBlank()) return false;
         reloadIfNeeded();
-        return ids.contains(skinId);
+        return ids.contains(skinId) || SkinPoseRegistry.has(SkinPoseRegistry.PoseTag.STIFF_LEGS, skinId);
     }
 
     public static void reloadNow() {

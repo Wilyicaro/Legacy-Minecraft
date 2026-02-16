@@ -2,6 +2,7 @@ package wily.legacy.Skins.client.render;
 
 import net.minecraft.client.Minecraft;
 
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -73,7 +74,7 @@ public final class ZombieArmsConfig {
     public static boolean isZombieArmsSkin(String skinId) {
         if (skinId == null || skinId.isBlank()) return false;
         reloadIfNeeded();
-        return ids.contains(skinId);
+        return ids.contains(skinId) || SkinPoseRegistry.has(SkinPoseRegistry.PoseTag.ZOMBIE_ARMS, skinId);
     }
 
     public static void reloadNow() {

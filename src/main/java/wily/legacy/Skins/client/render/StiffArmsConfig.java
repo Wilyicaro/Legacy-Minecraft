@@ -28,7 +28,7 @@ public final class StiffArmsConfig {
     public static boolean isStiffArmsSkin(String id) {
         if (id == null || id.isBlank()) return false;
         reloadIfNeeded();
-        return ids.contains(id);
+        return ids.contains(id) || SkinPoseRegistry.has(SkinPoseRegistry.PoseTag.STIFF_ARMS, id);
     }
 
     public static void reloadNow() {

@@ -30,11 +30,11 @@ public final class BadSantaSitConfig {
 
     public static boolean isIdleSitSkin(String skinId) {
         if (skinId == null || skinId.isBlank()) return false;
-        if (DEFAULTS.contains(skinId)) return true;
+        if (DEFAULTS.contains(skinId) || SkinPoseRegistry.has(SkinPoseRegistry.PoseTag.IDLE_SIT, skinId)) return true;
         Set<String> f = fileSet;
         if (f == null || (System.currentTimeMillis() - lastLoadMs) > 3_000L) reloadQuiet();
         f = fileSet;
-        return f != null && f.contains(skinId);
+        return (f != null && f.contains(skinId)) || SkinPoseRegistry.has(SkinPoseRegistry.PoseTag.IDLE_SIT, skinId);
     }
 
     public static void reloadQuiet() {

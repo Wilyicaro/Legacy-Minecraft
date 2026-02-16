@@ -2,6 +2,7 @@ package wily.legacy.Skins.client.cpm;
 
 import wily.legacy.Skins.skin.ClientSkinCache;
 import wily.legacy.Skins.skin.SkinSync;
+import wily.legacy.Skins.client.render.SkinPoseRegistry;
 import com.mojang.authlib.GameProfile;
 import wily.legacy.CustomModelSkins.cpm.shared.MinecraftClientAccess;
 import wily.legacy.CustomModelSkins.cpm.client.CustomPlayerModelsClient;
@@ -204,7 +205,19 @@ public final class CpmModelManager {
 
     private static boolean isLegacyUpsideDownModel(String key) {
         if (key == null) return false;
-        return "legacy_skinpacks:skinpacks/birthday_3/nathan.cpmmodel".equals(key) || "legacy_skinpacks:skinpacks/birthday_3/erik.cpmmodel".equals(key);
+
+        
+        if ("legacy_skinpacks:skinpacks/birthday_3/nathan.cpmmodel".equals(key) ||
+            "legacy_skinpacks:skinpacks/birthday_3/erik.cpmmodel".equals(key)) {
+            return true;
+        }
+
+        
+        try {
+            return SkinPoseRegistry.has(SkinPoseRegistry.PoseTag.UPSIDE_DOWN, "cpm:" + key);
+        } catch (Throwable t) {
+            return false;
+        }
     }
 
     private static boolean applyModel(GameProfile profile, String selectionId, UUID uuid) {

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import wily.legacy.Skins.util.DebugLog;
+import wily.legacy.Skins.client.render.SkinPoseRegistry;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
@@ -129,6 +130,9 @@ public final class SkinPackLoader {
 
     public static void loadPacks(ResourceManager rm) {
 
+        
+        SkinPoseRegistry.beginReload();
+
         if (LAST_USED_CUSTOM_PACK_ID == null) {
             LAST_USED_CUSTOM_PACK_ID = ConsoleSkinsClientSettings.getLastUsedCustomPackId();
         }
@@ -160,6 +164,8 @@ public final class SkinPackLoader {
             loadLegacySkinPacksIndex(rm, packs, skinsById, packBySkin);
         } catch (Throwable ex) {
             DebugLog.warn("ResourceManager skinpack scan failed: {}", ex.toString());
+        } finally {
+            SkinPoseRegistry.endReload();
         }
 
         LinkedHashMap<String, SkinPack> ordered = withFavourites(packs, skinsById);
@@ -245,6 +251,9 @@ public final class SkinPackLoader {
                     if (PackExclusions.isExcluded(packId) || SkinIdUtil.containsMinecon(packLoc.getPath())) continue;
 
                     JsonObject obj = pe.getValue().getAsJsonObject();
+
+                    
+                    collectPoseTagsFromPackJson(ns, obj);
                     String name = obj.has("name") ? obj.get("name").getAsString() : tr("skin_pack." + packLoc.getNamespace() + "." + packLoc.getPath(), packLoc.getPath());
                     String author = obj.has("author") ? obj.get("author").getAsString() : "";
 
@@ -296,6 +305,9 @@ public final class SkinPackLoader {
                             }
                             String modelKey = modelLoc.toString();
                             String id = SkinIds.CPM_PREFIX + modelKey;
+
+                            
+                            collectPoseTagsFromSkinJson(ns, so, id);
                             String skinName = so.has("name") ? so.get("name").getAsString() : tr("skin_pack." + packLoc.getNamespace() + "." + packLoc.getPath() + "." + i, modelKey);
                             SkinEntry entry = new SkinEntry(id, skinName, DEFAULT_CPM_PREVIEW_SKIN, i + 1);
                             entries.add(entry);
@@ -316,6 +328,8 @@ public final class SkinPackLoader {
                                        Map<String, SkinPack> packsOut,
                                        Map<String, SkinEntry> skinsByIdOut,
                                        Map<String, String> packBySkinOut) {
+        
+        collectPoseTagsFromPackJson(namespace, json);
         String name = json.has("name") ? json.get("name").getAsString() : packId;
         String author = json.has("author") ? json.get("author").getAsString() : "";
         if (name.startsWith("key:")) name = tr(name.substring(4), packId);
@@ -334,6 +348,9 @@ public final class SkinPackLoader {
                 String skinName = o.has("name") ? o.get("name").getAsString() : skinId;
                 int order = o.has("order") ? o.get("order").getAsInt() : (i + 1);
                 String texPath = o.get("texture").getAsString();
+
+                
+                collectPoseTagsFromSkinJson(namespace, o, skinId);
 
                 ResourceLocation texture;
                 if (SkinIds.PACK_DEFAULT.equals(packId) && SkinSync.MODID.equals(namespace)) {
@@ -361,6 +378,63 @@ public final class SkinPackLoader {
         if (rm.getResource(icon).isEmpty()) icon = DEFAULT_PACK_ICON;
 
         packsOut.put(packId, new SkinPack(packId, name, author, icon, entries));
+    }
+
+    
+    private static void collectPoseTagsFromPackJson(String namespace, JsonObject packObj) {
+        if (packObj == null) return;
+        JsonObject poses = null;
+        if (packObj.has("poses") && packObj.get("poses").isJsonObject()) poses = packObj.getAsJsonObject("poses");
+        else if (packObj.has("animations") && packObj.get("animations").isJsonObject()) poses = packObj.getAsJsonObject("animations");
+        if (poses == null) return;
+
+        for (Map.Entry<String, JsonElement> e : poses.entrySet()) {
+            SkinPoseRegistry.PoseTag tag = SkinPoseRegistry.PoseTag.fromKey(e.getKey());
+            if (tag == null) continue;
+            JsonElement v = e.getValue();
+            if (v == null) continue;
+
+            if (v.isJsonArray()) {
+                JsonArray arr = v.getAsJsonArray();
+                for (int i = 0; i < arr.size(); i++) {
+                    JsonElement el = arr.get(i);
+                    if (el != null && el.isJsonPrimitive()) {
+                        try {
+                            SkinPoseRegistry.addSelector(tag, el.getAsString(), namespace);
+                        } catch (Throwable ignored) {
+                        }
+                    }
+                }
+            } else if (v.isJsonPrimitive()) {
+                try {
+                    SkinPoseRegistry.addSelector(tag, v.getAsString(), namespace);
+                } catch (Throwable ignored) {
+                }
+            }
+        }
+    }
+
+    
+    private static void collectPoseTagsFromSkinJson(String namespace, JsonObject skinObj, String skinId) {
+        if (skinObj == null || skinId == null || skinId.isBlank()) return;
+        JsonElement poses = null;
+        if (skinObj.has("poses")) poses = skinObj.get("poses");
+        else if (skinObj.has("animations")) poses = skinObj.get("animations");
+        if (poses == null) return;
+
+        if (poses.isJsonArray()) {
+            JsonArray arr = poses.getAsJsonArray();
+            for (int i = 0; i < arr.size(); i++) {
+                JsonElement el = arr.get(i);
+                if (el != null && el.isJsonPrimitive()) {
+                    SkinPoseRegistry.PoseTag tag = SkinPoseRegistry.PoseTag.fromKey(el.getAsString());
+                    if (tag != null) SkinPoseRegistry.addSelector(tag, skinId, namespace);
+                }
+            }
+        } else if (poses.isJsonPrimitive()) {
+            SkinPoseRegistry.PoseTag tag = SkinPoseRegistry.PoseTag.fromKey(poses.getAsString());
+            if (tag != null) SkinPoseRegistry.addSelector(tag, skinId, namespace);
+        }
     }
 
     private static JsonObject readObj(Resource res) {
