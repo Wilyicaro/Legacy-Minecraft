@@ -1659,5 +1659,7 @@
   "structure.minecraft.villages": "Aldeas",
   "structure.minecraft.villages.description": "Asentamientos situados en biomas de Llanuras, Sabana, Desierto, Taiga o Llanuras Nevadas. Custodiados por Gólems de Hierro y hogar de Agricultores, Bibliotecarios, Clérigos, Herreros y Carniceros.",
   "structure.minecraft.woodland_mansions": "Mansiones del Bosque",
-  "structure.minecraft.woodland_mansions.description": "Mansiones encontradas en Bosques de Roble Oscuro. Hogar de Vexes e Illagers."
+  "structure.minecraft.woodland_mansions.description": "Mansiones encontradas en Bosques de Roble Oscuro. Hogar de Vexes e Illagers.",
+  "legacy.skinpack.type.skin": "Skin Pack",
+  "legacy.skinpack.type.mashup": "Mash-up Pack"
 }

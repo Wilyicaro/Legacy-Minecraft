@@ -1659,5 +1659,7 @@
   "structure.minecraft.villages": "Села",
   "structure.minecraft.villages.description": "Поселення, розташовані в біомах Рівнини, Савани, Пустелі, Тайги або Снігових рівнин. Охороняються залізними ґолемами і є домом для фермерів, бібліотекарів, священників, ковалів та м'ясників.",
   "structure.minecraft.woodland_mansions": "Лісові маєтки",
-  "structure.minecraft.woodland_mansions.description": "Маєтки, знайдені в Темнодубових лісах. Домівка для Бісиків та Розбійників."
+  "structure.minecraft.woodland_mansions.description": "Маєтки, знайдені в Темнодубових лісах. Домівка для Бісиків та Розбійників.",
+  "legacy.skinpack.type.skin": "Skin Pack",
+  "legacy.skinpack.type.mashup": "Mash-up Pack"
 }

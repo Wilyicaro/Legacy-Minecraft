@@ -1864,5 +1864,7 @@
   "structure.minecraft.villages": "Villages",
   "structure.minecraft.villages.description": "Établissements situés dans les biomes de plaines, savane, désert, taïga ou plaines enneigées. Gardés par des golems de fer et domicile de fermiers, bibliothécaires, clercs, forgerons et bouchers.",
   "structure.minecraft.woodland_mansions": "Manoirs des bois",
-  "structure.minecraft.woodland_mansions.description": "Manoirs trouvés dans les forêts de chêne noir. Domicile des vex et des illageois."
+  "structure.minecraft.woodland_mansions.description": "Manoirs trouvés dans les forêts de chêne noir. Domicile des vex et des illageois.",
+  "legacy.skinpack.type.skin": "Skin Pack",
+  "legacy.skinpack.type.mashup": "Mash-up Pack"
 }

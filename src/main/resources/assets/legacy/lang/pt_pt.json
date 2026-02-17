@@ -1718,5 +1718,7 @@
   "structure.minecraft.villages": "Vilas",
   "structure.minecraft.villages.description": "Assentamentos encontrados nas Planícies, na Savana, no Deserto, na Taiga ou nas Planícies nevadas. Guardado por Golens de Ferro e casa para Agricultores, Bibliotecários, Clérigos, Ferreiros e Açougueiros.",
   "structure.minecraft.woodland_mansions": "Mansões da Mata",
-  "structure.minecraft.woodland_mansions.description": "Mansões encontradas em Florestas escuras. Lar dos Vexes e Illagers."
+  "structure.minecraft.woodland_mansions.description": "Mansões encontradas em Florestas escuras. Lar dos Vexes e Illagers.",
+  "legacy.skinpack.type.skin": "Skin Pack",
+  "legacy.skinpack.type.mashup": "Mash-up Pack"
 }

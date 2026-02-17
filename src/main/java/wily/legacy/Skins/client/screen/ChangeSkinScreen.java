@@ -1,6 +1,7 @@
 package wily.legacy.Skins.client.screen;
 
 import java.lang.reflect.Method;
+import java.util.Locale;
 import java.util.UUID;
 
 import com.mojang.blaze3d.platform.InputConstants;
@@ -897,12 +898,33 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         SkinPack pack = getFocusedPack();
         if (pack != null) {
             int mid = tooltipBox.x - 5 + (tooltipBox.getWidth() - 18) / 2;
-            drawBigCentered(g, Component.literal(pack.name()), mid, panel.y + 27, 0xFFFFFFFF);
+            drawBigCentered(g, Component.literal(pack.name()), mid, panel.y + 27, 0xFFFFFFFF);            String t = pack.type();
+            if (t != null && !t.isBlank()) {
+                String k = t.toLowerCase(Locale.ROOT);
+                Component label = null;
+                if (k.equals("skin")) label = Component.translatable("legacy.skinpack.type.skin");
+                else if (k.equals("mashup")) label = Component.translatable("legacy.skinpack.type.mashup");
+
+                if (label != null) {
+                    drawSmallCentered(g, label, mid, panel.y + 27 + (int) (minecraft.font.lineHeight * 1.55f) + 8, 0xCCFFFFFF);
+                }
+            }
         }
     }
 
     private void drawBigCentered(GuiGraphics g, Component text, int centerX, int y, int color) {
         float scale = 1.35f;
+        int yAdj = y - (int) ((scale - 1f) * minecraft.font.lineHeight / 2f);
+        var pose = g.pose();
+        pose.pushMatrix();
+        pose.translate((float) centerX, (float) yAdj);
+        pose.scale(scale, scale);
+        g.drawCenteredString(minecraft.font, text, 0, 0, color);
+        pose.popMatrix();
+    }
+
+    private void drawSmallCentered(GuiGraphics g, Component text, int centerX, int y, int color) {
+        float scale = 0.95f;
         int yAdj = y - (int) ((scale - 1f) * minecraft.font.lineHeight / 2f);
         var pose = g.pose();
         pose.pushMatrix();

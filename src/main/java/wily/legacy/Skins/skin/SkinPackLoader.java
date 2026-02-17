@@ -201,7 +201,7 @@ public final class SkinPackLoader {
             if (e != null) fav.add(e);
         }
 
-        SkinPack favPack = new SkinPack(SkinIds.PACK_FAVOURITES, "Favourites", "", DEFAULT_PACK_ICON, fav);
+        SkinPack favPack = new SkinPack(SkinIds.PACK_FAVOURITES, "Favourites", "", "", DEFAULT_PACK_ICON, fav);
 
         LinkedHashMap<String, SkinPack> out = new LinkedHashMap<>();
         SkinPack def = base.get(SkinIds.PACK_DEFAULT);
@@ -256,6 +256,7 @@ public final class SkinPackLoader {
                     collectPoseTagsFromPackJson(ns, obj);
                     String name = obj.has("name") ? obj.get("name").getAsString() : tr("skin_pack." + packLoc.getNamespace() + "." + packLoc.getPath(), packLoc.getPath());
                     String author = obj.has("author") ? obj.get("author").getAsString() : "";
+                    String type = obj.has("type") ? obj.get("type").getAsString() : "";
 
                     ResourceLocation icon = DEFAULT_PACK_ICON;
                     if (obj.has("icon")) {
@@ -316,7 +317,7 @@ public final class SkinPackLoader {
                         }
                     }
 
-                    packsOut.put(packId, new SkinPack(packId, name, author, icon, entries));
+                    packsOut.put(packId, new SkinPack(packId, name, author, type, icon, entries));
                 }
             } catch (Throwable ex) {
                 DebugLog.warn("Failed to read legacy skin_packs.json from {}: {}", rl, ex.toString());
@@ -332,6 +333,7 @@ public final class SkinPackLoader {
         collectPoseTagsFromPackJson(namespace, json);
         String name = json.has("name") ? json.get("name").getAsString() : packId;
         String author = json.has("author") ? json.get("author").getAsString() : "";
+        String type = json.has("type") ? json.get("type").getAsString() : "";
         if (name.startsWith("key:")) name = tr(name.substring(4), packId);
 
         JsonArray skins = json.getAsJsonArray("skins");
@@ -377,7 +379,7 @@ public final class SkinPackLoader {
         ResourceLocation icon = ResourceLocation.fromNamespaceAndPath(namespace, SKINPACKS_PREFIX + packId + "/pack.png");
         if (rm.getResource(icon).isEmpty()) icon = DEFAULT_PACK_ICON;
 
-        packsOut.put(packId, new SkinPack(packId, name, author, icon, entries));
+        packsOut.put(packId, new SkinPack(packId, name, author, type, icon, entries));
     }
 
     

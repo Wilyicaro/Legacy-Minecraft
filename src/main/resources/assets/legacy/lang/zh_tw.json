@@ -1659,5 +1659,7 @@
   "structure.minecraft.villages": "村莊",
   "structure.minecraft.villages.description": "Settlements situated in Plains, Savanna, Desert, Taiga or Snowy Plains biomes. Guarded by Iron Golems and home to Farmers, Librarians, Clerics, Blacksmiths and Butchers.",
   "structure.minecraft.woodland_mansions": "林地府邸",
-  "structure.minecraft.woodland_mansions.description": "林地府邸可以在黑橡木森林找到，是惱鬼和衛道士的巢穴。"
+  "structure.minecraft.woodland_mansions.description": "林地府邸可以在黑橡木森林找到，是惱鬼和衛道士的巢穴。",
+  "legacy.skinpack.type.skin": "Skin Pack",
+  "legacy.skinpack.type.mashup": "Mash-up Pack"
 }

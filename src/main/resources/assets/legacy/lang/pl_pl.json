@@ -1659,5 +1659,7 @@
   "structure.minecraft.villages": "Wioski",
   "structure.minecraft.villages.description": "Osady położone w biomach równin, sawanny, pustyni, tajgi lub śnieżnych równin. Są strzeżone przez żelazne golemy i zamieszkiwane przez rolników, bibliotekarzy, duchownych, kowali i rzeźników.",
   "structure.minecraft.woodland_mansions": "Leśne dwory",
-  "structure.minecraft.woodland_mansions.description": "Posiadłości znalezione w Lasach Ciiemnego dębu. Dom Vexów i Illagerów."
+  "structure.minecraft.woodland_mansions.description": "Posiadłości znalezione w Lasach Ciiemnego dębu. Dom Vexów i Illagerów.",
+  "legacy.skinpack.type.skin": "Skin Pack",
+  "legacy.skinpack.type.mashup": "Mash-up Pack"
 }

@@ -1659,5 +1659,7 @@
   "structure.minecraft.villages": "村庄",
   "structure.minecraft.villages.description": "位于平原、稀树草原、沙漠、针叶林或雪原生物群系的定居点。由铁傀儡守护，居住着农民、图书管理员、牧师、铁匠和屠夫。",
   "structure.minecraft.woodland_mansions": "林地府邸",
-  "structure.minecraft.woodland_mansions.description": "位于深色橡树林的府邸，居住着恼鬼和恶魂。"
+  "structure.minecraft.woodland_mansions.description": "位于深色橡树林的府邸，居住着恼鬼和恶魂。",
+  "legacy.skinpack.type.skin": "Skin Pack",
+  "legacy.skinpack.type.mashup": "Mash-up Pack"
 }

@@ -1659,5 +1659,7 @@
   "structure.minecraft.villages": "Villages",
   "structure.minecraft.villages.description": "Settlements situated in Plains, Savanna, Desert, Taiga or Snowy Plains biomes. Guarded by Iron Golems and home to Farmers, Librarians, Clerics, Blacksmiths and Butchers.",
   "structure.minecraft.woodland_mansions": "Woodland Mansions",
-  "structure.minecraft.woodland_mansions.description": "Masions found in Dark Oak Forests. Home to Vexes and Illagers."
+  "structure.minecraft.woodland_mansions.description": "Masions found in Dark Oak Forests. Home to Vexes and Illagers.",
+  "legacy.skinpack.type.skin": "Skin Pack",
+  "legacy.skinpack.type.mashup": "Mash-up Pack"
 }
