@@ -672,10 +672,6 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         if (pack != null) {
             int mid = tooltipBox.x - 5 + (tooltipBox.getWidth() - 18) / 2;
             drawBigCentered(g, Component.literal(pack.name()), mid, panel.y + 27, 0xFFFFFFFF);
-
-            if (SkinIdUtil.isFavouritesPack(pack.id()) && (pack.skins() == null || pack.skins().isEmpty())) {
-                g.drawCenteredString(minecraft.font, Component.literal("No favourites yet"), x + w / 2, y + h / 2 - 4, 0xFFCCCCCC);
-            }
         }
     }
 
