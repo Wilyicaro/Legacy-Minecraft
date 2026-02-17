@@ -47,7 +47,8 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
 
     private final Minecraft minecraft;
     private final Panel tooltipBox;
-    private int tooltipWidth = 400;
+    private static final int DESIRED_TOOLTIP_WIDTH = 400;
+    private int tooltipWidth = DESIRED_TOOLTIP_WIDTH;
     private final ChangeSkinPackList packList;
     private final ChangeSkinActions actions;
 
@@ -67,6 +68,33 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
 
     private static boolean inside(double mx, double my, int x, int y, int w, int h) {
         return mx >= x && mx < x + w && my >= y && my < y + h;
+    }
+
+    private int previewBoxSize() {
+        int min = 24;
+        int size = 112;
+        int max = panel.width - 20;
+        if (max < size) size = Math.max(min, max);
+        return Math.max(1, size);
+    }
+
+    private int previewBoxX() {
+        int s = previewBoxSize();
+        int x = panel.x + 34;
+        int right = panel.x + panel.width - 7;
+        if (x + s > right) x = panel.x + Math.max(7, (panel.width - s) / 2);
+        return x;
+    }
+
+    private int previewBoxY() {
+        int s = previewBoxSize();
+        int y = panel.y + 10;
+        int top = panel.y + 5;
+        int bottom = panel.y + panel.height - s - 5;
+        if (bottom < top) bottom = top;
+        if (y > bottom) y = bottom;
+        if (y < top) y = top;
+        return y;
     }
 
     private void skinPack(int i) {
@@ -171,11 +199,21 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
     @Override
     public void renderableVListInit() {
         addRenderableOnly((g, i, j, f) -> blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL, panel.x + 7, panel.y + 129, panel.width - 14, panel.height - 140));
-        addRenderableOnly((g, i, j, f) -> blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL, panel.x + 34, panel.y + 10, 112, 112));
+        addRenderableOnly((g, i, j, f) -> {
+            int x = previewBoxX();
+            int y = previewBoxY();
+            int s = previewBoxSize();
+            blitSprite(g, LegacySprites.SQUARE_RECESSED_PANEL, x, y, s, s);
+        });
         addRenderableOnly((g, i, j, f) -> {
             ResourceLocation icon = getFocusedPackIcon();
-            if (icon != null)
-                g.blit(RenderPipelines.GUI_TEXTURED, icon, (int) Math.floor(panel.x + 35.3), (int) Math.floor(panel.y + 11.3), 0, 0, 109, 109, 128, 128);
+            if (icon != null) {
+                int x = previewBoxX();
+                int y = previewBoxY();
+                int s = previewBoxSize();
+                int inner = Math.max(1, s - 2);
+                g.blit(RenderPipelines.GUI_TEXTURED, icon, x + 1, y + 1, 0, 0, inner, inner, 128, 128);
+            }
         });
 
         packList.refreshPackIdsIfNeeded();
@@ -199,23 +237,44 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
     }
 
     private void layoutPanels() {
+        int margin = 8;
+
+        int availW = Math.max(1, this.width - margin * 2);
+        int availH = Math.max(1, this.height - margin * 2);
+
+        int baseW = 180;
+        int baseH = 290;
+
+        int minW = 150;
+        int minH = 200;
+
+        panel.width = Math.max(1, Math.min(Math.max(minW, baseW), availW));
+        panel.height = Math.max(1, Math.min(Math.max(minH, baseH), availH));
+
+        int tooltipMax = availW - (panel.width - 2);
+        int tip = tooltipMax >= 220 ? Math.min(DESIRED_TOOLTIP_WIDTH, tooltipMax) : 0;
+        tooltipWidth = Math.max(0, tip);
 
         int totalW = panel.width - 2 + tooltipWidth;
-        int margin = 6;
-
-        int maxTooltip = Math.max(220, this.width - (panel.width - 2) - margin * 2);
-        tooltipWidth = Math.min(tooltipWidth, maxTooltip);
-
-        totalW = panel.width - 2 + tooltipWidth;
 
         int px = (this.width - totalW) / 2;
-        px = Math.max(margin, Math.min(px, this.width - totalW - margin));
+        int minX = margin;
+        int maxX = this.width - totalW - margin;
+        if (maxX < minX) maxX = minX;
+        if (px < minX) px = minX;
+        if (px > maxX) px = maxX;
         panel.x = px;
 
-        panel.y = Math.max(margin, Math.min(panel.y, this.height - panel.height - margin));
+        int py = (this.height - panel.height) / 2 - 10;
+        int minY = margin;
+        int maxY = this.height - panel.height - margin;
+        if (maxY < minY) maxY = minY;
+        if (py < minY) py = minY;
+        if (py > maxY) py = maxY;
+        panel.y = py;
 
         tooltipBox.pos(panel.x + panel.width - 2, panel.y + 5);
-        tooltipBox.appearance(LegacySprites.POINTER_PANEL, tooltipWidth, panel.height - 10);
+        tooltipBox.appearance(LegacySprites.POINTER_PANEL, tooltipWidth, tooltipWidth == 0 ? 0 : Math.max(1, panel.height - 10));
     }
 
     @Override
