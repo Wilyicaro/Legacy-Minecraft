@@ -104,6 +104,10 @@ public final class ChangeSkinActions {
         }
     }
 
+    public boolean isPendingSwap() {
+        return pending != null;
+    }
+
 
     public void tick() {
         if (pending == null) return;

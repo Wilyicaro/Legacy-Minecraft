@@ -3,6 +3,8 @@ package wily.legacy.Skins.client.screen;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import wily.legacy.Skins.client.screen.changeskin.ChangeSkinActions;
 import wily.legacy.Skins.client.screen.changeskin.ChangeSkinPackList;
 import wily.legacy.Skins.client.screen.widget.PlayerSkinWidget;
@@ -12,7 +14,6 @@ import wily.legacy.Skins.skin.SkinEntry;
 import wily.legacy.Skins.skin.SkinPack;
 import wily.legacy.Skins.skin.SkinPackLoader;
 import wily.legacy.Skins.skin.SkinSync;
-import com.mojang.blaze3d.platform.InputConstants;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -32,6 +33,7 @@ import wily.legacy.Skins.skin.SkinIdUtil;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.Panel;
 import wily.legacy.client.screen.PanelVListScreen;
+import wily.legacy.client.screen.RenderableVList;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -59,6 +61,15 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
     private boolean centerDragMoved;
     private double centerDragStartX;
     private double centerDragStartY;
+
+    private int queuedCarouselSteps;
+    private int queuedCarouselDir;
+    private boolean queuedCarouselSound;
+
+    private boolean holdingOuterCarousel;
+    private int holdingOuterDir;
+    private long holdingOuterStartAt;
+    private long holdingOuterNextAt;
 
     private PlayerSkinWidgetList playerSkinWidgetList;
 
@@ -468,38 +479,141 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         return true;
     }
 
+
+    private boolean carouselAnimating() {
+        if (playerSkinWidgetList == null || playerSkinWidgetList.widgets == null) return false;
+        for (PlayerSkinWidget w : playerSkinWidgetList.widgets) {
+            if (w != null && w.visible && w.progress <= 1f) return true;
+        }
+        return false;
+    }
+
+    private PlayerSkinWidget pickCarouselWidget(double mx, double my) {
+        if (playerSkinWidgetList == null || playerSkinWidgetList.widgets == null) return null;
+        PlayerSkinWidget best = null;
+        double bestD = Double.MAX_VALUE;
+        for (PlayerSkinWidget w : playerSkinWidgetList.widgets) {
+            if (w == null || !w.visible) continue;
+            int x = w.getX();
+            int y = w.getY();
+            int ww = w.getWidth();
+            int hh = w.getHeight();
+            if (!inside(mx, my, x, y, ww, hh)) continue;
+            double cx = x + ww * 0.5;
+            double cy = y + hh * 0.5;
+            double dx = mx - cx;
+            double dy = my - cy;
+            double d = dx * dx + dy * dy;
+            if (d < bestD) {
+                bestD = d;
+                best = w;
+            }
+        }
+        return best;
+    }
+
+    private void cancelQueuedCarousel() {
+        queuedCarouselSteps = 0;
+        queuedCarouselDir = 0;
+        queuedCarouselSound = false;
+    }
+
+    private void pumpQueuedCarousel() {
+        if (queuedCarouselSteps <= 0) return;
+        if (actions != null && actions.isPendingSwap()) return;
+        if (carouselAnimating()) return;
+        if (playerSkinWidgetList == null) {
+            cancelQueuedCarousel();
+            return;
+        }
+        if (queuedCarouselSound) {
+            queuedCarouselSound = false;
+            playClick();
+        }
+        playerSkinWidgetList.sortForIndex(playerSkinWidgetList.index + queuedCarouselDir);
+        queuedCarouselSteps--;
+        if (queuedCarouselSteps <= 0) cancelQueuedCarousel();
+    }
+
+    private void startQueuedCarousel(int offset) {
+        if (playerSkinWidgetList == null) return;
+        if (actions != null && actions.isPendingSwap()) return;
+        if (carouselAnimating()) return;
+        int abs = Math.abs(offset);
+        if (abs == 0) return;
+        if (abs == 1) {
+            playerSkinWidgetList.sortForIndex(playerSkinWidgetList.index + offset);
+            playClick();
+            return;
+        }
+        queuedCarouselDir = offset > 0 ? 1 : -1;
+        queuedCarouselSteps = abs;
+        queuedCarouselSound = true;
+        pumpQueuedCarousel();
+    }
+
+    private void startHoldingOuterCarousel(int dir) {
+        holdingOuterCarousel = true;
+        holdingOuterDir = dir < 0 ? -1 : 1;
+        long now = net.minecraft.Util.getMillis();
+        holdingOuterStartAt = now;
+        holdingOuterNextAt = now + 220L;
+    }
+
+    private void stopHoldingOuterCarousel() {
+        holdingOuterCarousel = false;
+        holdingOuterDir = 0;
+        holdingOuterStartAt = 0L;
+        holdingOuterNextAt = 0L;
+    }
+
+    private void pumpHoldingOuterCarousel() {
+        if (!holdingOuterCarousel) return;
+        if (actions != null && actions.isPendingSwap()) return;
+        if (queuedCarouselSteps > 0) return;
+        if (carouselAnimating()) return;
+        long now = net.minecraft.Util.getMillis();
+        if (now < holdingOuterNextAt) return;
+        startQueuedCarousel(holdingOuterDir);
+        long held = now - holdingOuterStartAt;
+        long delay = held < 700L ? 120L : 80L;
+        holdingOuterNextAt = now + delay;
+    }
     @Override
     public boolean mouseClicked(MouseButtonEvent e, boolean bl) {
         double mx = e.x(), my = e.y();
 
-        if (super.mouseClicked(e, bl)) return true;
+        PlayerSkinWidget hit = pickCarouselWidget(mx, my);
+        if (hit != null) {
+            if (actions != null && actions.isPendingSwap()) return true;
+            if (carouselAnimating()) return true;
 
-        if (playerSkinWidgetList != null && playerSkinWidgetList.widgets != null) {
-            boolean anim = playerSkinWidgetList.widgets.stream().anyMatch(w -> w != null && w.visible && w.progress <= 1f);
-
-            for (PlayerSkinWidget w : playerSkinWidgetList.widgets) {
-                if (w == null || !w.visible) continue;
-                if (!inside(mx, my, w.getX(), w.getY(), w.getWidth(), w.getHeight())) continue;
-
-                if (anim) return true;
-
-                int off = w.slotOffset;
-                if (off == 0) {
-
-                    if (e.button() == InputConstants.MOUSE_BUTTON_LEFT) {
-                        draggingCenterDoll = true;
-                        centerDragMoved = false;
-                        centerDragStartX = mx;
-                        centerDragStartY = my;
-                        return true;
+            if (e.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
+                if (playerSkinWidgetList != null && playerSkinWidgetList.element3 != null) {
+                    PlayerSkinWidget center = playerSkinWidgetList.element3;
+                    if (!center.isInterpolating()) {
+                        center.recenterView();
+                        playClick();
                     }
-                    selectSkin();
-                } else {
-                    playerSkinWidgetList.sortForIndex(playerSkinWidgetList.index + off);
-                    playClick();
                 }
                 return true;
             }
+
+            if (e.button() != InputConstants.MOUSE_BUTTON_LEFT) return true;
+
+            int off = hit.slotOffset;
+            if (off == 0) {
+                stopHoldingOuterCarousel();
+                draggingCenterDoll = true;
+                centerDragMoved = false;
+                centerDragStartX = mx;
+                centerDragStartY = my;
+                return true;
+            }
+            stopHoldingOuterCarousel();
+            startQueuedCarousel(off);
+            if (Math.abs(off) == 2) startHoldingOuterCarousel(off);
+            return true;
         }
 
         int iconX = tooltipBox.x + tooltipBox.getWidth() - 50;
@@ -515,7 +629,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
             return true;
         }
 
-        return false;
+        return super.mouseClicked(e, bl);
     }
 
     @Override
@@ -530,7 +644,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
                 }
 
 
-                if (centerDragMoved) center.applyDrag(dragX, 0);
+                if (centerDragMoved) center.applyDrag(-dragX, 0);
                 return true;
             }
         }
@@ -540,6 +654,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
 
     @Override
     public boolean mouseReleased(MouseButtonEvent event) {
+        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && holdingOuterCarousel) stopHoldingOuterCarousel();
         if (draggingCenterDoll && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
             draggingCenterDoll = false;
             if (!centerDragMoved) {
@@ -550,6 +665,29 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         }
 
         return super.mouseReleased(event);
+    }
+
+    @Override
+    public boolean mouseScrolled(double d, double e, double f, double g) {
+        if (g == 0) return false;
+
+        RenderableVList vList = getRenderableVListAt(d, e);
+        if (vList != null) {
+            vList.mouseScrolled(g);
+            return true;
+        }
+
+        if (playerSkinWidgetList == null) return false;
+        if (!inside(d, e, tooltipBox.x, tooltipBox.y, tooltipBox.getWidth(), tooltipBox.getHeight()) && pickCarouselWidget(d, e) == null)
+            return false;
+
+        if (actions != null && actions.isPendingSwap()) return true;
+        if (draggingCenterDoll) return true;
+        if (carouselAnimating()) return true;
+
+        int dir = g > 0 ? -1 : 1;
+        startQueuedCarousel(dir);
+        return true;
     }
 
     @Override
@@ -665,33 +803,39 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         super.tick();
         syncPackFocus();
 
-
         try {
             actions.tick();
         } catch (Throwable ignored) {
         }
 
-        if (!packList.consumeQueuedChangePack()) return;
+        if (packList.consumeQueuedChangePack()) {
+            stopHoldingOuterCarousel();
+            cancelQueuedCarousel();
 
-        int idx = 0;
-        UUID self = minecraft.player != null ? minecraft.player.getUUID() : minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
-        String selectedId = self != null ? ClientSkinCache.get(self) : null;
+            int idx = 0;
+            UUID self = minecraft.player != null ? minecraft.player.getUUID() : minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
+            String selectedId = self != null ? ClientSkinCache.get(self) : null;
 
-        if (selectedId != null && !selectedId.isBlank()) {
-            SkinPack focused = actions.getFocusedPack();
-            if (focused != null && focused.skins() != null) {
-                int limit = Math.min(100, focused.skins().size());
-                for (int i = 0; i < limit; i++) {
-                    SkinEntry se = focused.skins().get(i);
-                    if (se != null && selectedId.equals(se.id())) {
-                        idx = i;
-                        break;
+            if (selectedId != null && !selectedId.isBlank()) {
+                SkinPack focused = actions.getFocusedPack();
+                if (focused != null && focused.skins() != null) {
+                    int limit = Math.min(100, focused.skins().size());
+                    for (int i = 0; i < limit; i++) {
+                        SkinEntry se = focused.skins().get(i);
+                        if (se != null && selectedId.equals(se.id())) {
+                            idx = i;
+                            break;
+                        }
                     }
                 }
             }
+
+            actions.skinPack(idx);
+            return;
         }
 
-        actions.skinPack(idx);
+        pumpQueuedCarousel();
+        pumpHoldingOuterCarousel();
     }
 
     @Override
