@@ -151,6 +151,13 @@ public final class ChangeSkinPackList {
         onFocusChange.onFocusedPackChanged();
     }
 
+    public void focusPackId(String packId, boolean playSound) {
+        if (packId == null || packIds.isEmpty()) return;
+        int idx = packIds.indexOf(packId);
+        if (idx >= 0) setFocusedPackIndex(idx, playSound);
+    }
+
+
     private void refreshPackIds() {
         basePackIds.clear();
         basePackIds.addAll(SkinPackLoader.getPacks().keySet());

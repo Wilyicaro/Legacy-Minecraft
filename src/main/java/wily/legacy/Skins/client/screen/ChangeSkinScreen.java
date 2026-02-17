@@ -121,6 +121,22 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         actions.openLegacyChangeSkinScreen();
     }
 
+    private int resolveSelectedSkinIndex() {
+        UUID self = minecraft.player != null ? minecraft.player.getUUID() : minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
+        String selectedId = self != null ? ClientSkinCache.get(self) : null;
+        if (selectedId == null || selectedId.isBlank()) return 0;
+
+        SkinPack focused = actions.getFocusedPack();
+        if (focused != null && focused.skins() != null) {
+            int limit = Math.min(100, focused.skins().size());
+            for (int i = 0; i < limit; i++) {
+                SkinEntry se = focused.skins().get(i);
+                if (se != null && selectedId.equals(se.id())) return i;
+            }
+        }
+        return 0;
+    }
+
     private ResourceLocation getFocusedPackIcon() {
         return actions.getFocusedPackIcon();
     }
@@ -233,6 +249,12 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         addRenderableOnly(panel);
         panel.init();
         layoutPanels();
+
+        if (firstOpen) {
+            String openId = SkinPackLoader.getLastUsedCustomPackId();
+            if (openId != null) packList.focusPackId(openId, false);
+        }
+
         tooltipBox.init("tooltipBox");
     }
 
@@ -295,7 +317,8 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
 
         if (firstOpen) {
             firstOpen = false;
-            skinPack(0);
+            packList.consumeQueuedChangePack();
+            skinPack(resolveSelectedSkinIndex());
             actions.warmupFavouritesPack();
         } else if (playerSkinWidgetList != null) {
             skinPack(playerSkinWidgetList.index);

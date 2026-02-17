@@ -10,29 +10,29 @@ import net.minecraft.world.entity.player.PlayerModelPart;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.Skins.client.screen.ChangeSkinScreen;
+import wily.legacy.Skins.SkinsClientBootstrap;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HelpAndOptionsScreen extends RenderableVListScreen {
 
-    public static final OptionsScreen.Section HOW_TO_PLAY = new OptionsScreen.Section(Component.translatable("legacy.menu.how_to_play"), s -> Panel.centered(s, LegacySprites.PANEL, Math.min(240, Math.max(1, s.width - 16)), Math.min(Math.min(7, (int) HowToPlayScreen.Section.getWithButton().count()) * 25 + 24, Math.max(1, s.height - 16)), 0, 20), new ArrayList<>(List.of(o -> HowToPlayScreen.Section.getWithButton().forEach(s -> o.getRenderableVList().addRenderable(s.createButtonBuilder(o).build())))), ArbitrarySupplier.empty(), ((screen, section) -> new OptionsScreen(screen, section) {
+    public static final OptionsScreen.Section HOW_TO_PLAY = new OptionsScreen.Section(Component.translatable("legacy.menu.how_to_play"), s -> Panel.centered(s, LegacySprites.PANEL, 240, Math.min(7, (int) HowToPlayScreen.Section.getWithButton().count()) * 25 + 24, 0, 20), new ArrayList<>(List.of(o -> HowToPlayScreen.Section.getWithButton().forEach(s -> o.getRenderableVList().addRenderable(s.createButtonBuilder(o).build())))), ArbitrarySupplier.empty(), ((screen, section) -> new OptionsScreen(screen, section) {
         @Override
         public void renderableVListInit() {
             getRenderableVList().cyclic(false).layoutSpacing(l -> 5).init(panel.x + 12, panel.getY() + 8, panel.getWidth() - 25, panel.getHeight() - 16);
         }
     }));
-    public static ScreenSection<?> CHANGE_SKIN = new OptionsScreen.Section(Component.translatable("legacy.menu.change_skin"), s -> Panel.centered(s, Math.min(250, Math.max(1, s.width - 16)), Math.min(150, Math.max(1, s.height - 16))), new ArrayList<>(List.of(o -> o.renderableVList.renderables.addAll(createPlayerSkinWidgets()))));
+    public static ScreenSection<?> CHANGE_SKIN = new OptionsScreen.Section(Component.translatable("legacy.menu.change_skin"), s -> Panel.centered(s, 250, 150), new ArrayList<>(List.of(o -> o.renderableVList.renderables.addAll(createPlayerSkinWidgets()))));
     public HelpAndOptionsScreen(Screen parent) {
         super(parent, Component.translatable("options.title"), r -> {
         });
-        renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.change_skin"), () -> new ChangeSkinScreen(this)).build());
+        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.change_skin"), b -> SkinsClientBootstrap.requestOpenChangeSkinScreen(Minecraft.getInstance(), this)).build());
         renderableVList.addRenderable(HOW_TO_PLAY.createButtonBuilder(this).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("controls.title"), () -> new RenderableVListScreen(this, Component.translatable("controls.title"), r -> r.addRenderables(Button.builder(Component.translatable("options.mouse_settings.title"), button -> this.minecraft.setScreen(
                 new OptionsScreen(r.getScreen(), new OptionsScreen.Section(
                         Component.translatable("options.mouse_settings.title"),
-                        s -> Panel.centered(s, Math.min(250, Math.max(1, s.width - 16)), Math.min(130, Math.max(1, s.height - 16))),
+                        s -> Panel.centered(s, 250, 130),
                         new ArrayList<>(List.of(
                                 o -> o.renderableVList.addMultSliderOption(LegacyOptions.of(Minecraft.getInstance().options.sensitivity()), 2),
                                 o -> o.renderableVList.addMultSliderOption(LegacyOptions.of(Minecraft.getInstance().options.mouseWheelSensitivity()), 2),
@@ -46,11 +46,6 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
                                 ))))))).build(), Button.builder(Component.translatable("controls.keybinds.title"), button -> this.minecraft.setScreen(new LegacyKeyMappingScreen(r.getScreen()))).build(), Button.builder(Component.translatable("legacy.options.selectedController"), button -> this.minecraft.setScreen(new ControllerMappingScreen(r.getScreen()))).build()))).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("legacy.menu.settings"), () -> new SettingsScreen(this)).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> new RenderableVListScreen(this, Component.translatable("credits_and_attribution.screen.title"), r -> r.addRenderables(openScreenButton(Component.translatable("credits_and_attribution.button.credits"), () -> new WinScreen(false, () -> this.minecraft.setScreen(r.getScreen()))).build(), Button.builder(Component.translatable("credits_and_attribution.button.attribution"), b -> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaAttribution"))).build(), Button.builder(Component.translatable("credits_and_attribution.button.licenses"), b -> Minecraft.getInstance().setScreen(ConfirmationScreen.createLinkScreen(r.getScreen(), "https://aka.ms/MinecraftJavaLicenses"))).build()))).build());
-    }
-
-    @Override
-    public void resize(Minecraft minecraft, int i, int j) {
-        super.resize(minecraft, i, j);
     }
 
     public static List<AbstractWidget> createPlayerSkinWidgets() {

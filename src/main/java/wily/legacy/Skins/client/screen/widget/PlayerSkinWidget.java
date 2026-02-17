@@ -303,12 +303,14 @@ public class PlayerSkinWidget extends AbstractWidget {
                 if (isCpm) {
                     GuiCpmPreviewCache.prewarmMenuPreview(id, tex);
                     boolean resolved = GuiCpmPreviewCache.isResolved(id, tex);
-                    if (!resolved && lastStableId != null && lastStableTexture != null) {
-                        renderId = lastStableId;
-                        renderTex = lastStableTexture;
-                    } else if (resolved) {
+                    if (resolved) {
                         lastStableId = id;
                         lastStableTexture = tex;
+                    } else {
+                        if (id.equals(lastStableId) && tex.equals(lastStableTexture)) {
+                            GuiDollRender.renderDollInRect(guiGraphics, id, tex, yawOffset, crouchPose, attackTime, partialTick, left, top, right, bottom, sizeCap);
+                        }
+                        return;
                     }
                 } else {
                     if (tex != null) {
