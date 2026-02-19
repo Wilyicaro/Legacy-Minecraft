@@ -1114,6 +1114,7 @@
   "legacy.builtin.high_contrast": "Alto Contraste Legacy",
   "legacy.builtin.legacy_resources": "Recursos Legacy",
   "legacy.builtin.legacy_waters": "Águas Legacy",
+  "legacy.builtin.rosenfeld_patch": "Rosenfeld Patch",
   "legacy.chat.entered_dimension": "%s entrou em %s",
   "legacy.chat.left_dimension": "%s saiu de %s",
   "legacy.commands.legacyTip.incorrectName": "Não há dicas personalizadas com o nome \"%s\".",
