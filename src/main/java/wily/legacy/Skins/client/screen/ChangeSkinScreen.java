@@ -103,6 +103,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         float sw = (w - 20f) / (BASE_PANEL_WIDTH + BASE_TOOLTIP_WIDTH - 2f);
         float sh = (h - 20f) / BASE_PANEL_HEIGHT;
         float sc = Math.min(1f, Math.min(sw, sh));
+        if (sc > 0.8f) sc *= 0.93f;
         if (sc <= 0f) sc = 1f;
         return sc;
     }
@@ -351,9 +352,10 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         int ps = previewBoxSize();
         int minY = py + ps + sc(2);
         if (desiredY < minY) desiredY = minY;
-        int bottom = panel.y + panel.height - sc(12);
+        int bottom = panel.y + panel.height - sc(8);
         int y = desiredY;
         int h = Math.max(1, bottom - y);
+        getRenderableVList().scrollArrowYOffset(-8 - sc(6));
         getRenderableVList().init("consoleskins.packList", x, y, w, h);
     }
 
@@ -803,7 +805,11 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
                     if (sy <= -triggerY) {
                         if (!stickUpHeld) {
                             stickUpHeld = true;
-                            center.togglePunch();
+                            if (center.isPunchLoop()) {
+                                center.setPoseMode(1, false, false);
+                            } else {
+                                center.togglePunch();
+                            }
                             keptCenterPoseMode = center.getPoseMode();
                             keptCenterPunchLoop = center.isPunchLoop();
                             playerSkinWidgetList.setCenterPose(keptCenterPoseMode, keptCenterPunchLoop);
@@ -815,7 +821,11 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
                     if (sy >= triggerY) {
                         if (!stickDownHeld) {
                             stickDownHeld = true;
-                            center.togglePose();
+                            if (center.getPoseMode() == 1) {
+                                center.setPoseMode(0, true, false);
+                            } else {
+                                center.togglePose();
+                            }
                             keptCenterPoseMode = center.getPoseMode();
                             keptCenterPunchLoop = center.isPunchLoop();
                             playerSkinWidgetList.setCenterPose(keptCenterPoseMode, keptCenterPunchLoop);

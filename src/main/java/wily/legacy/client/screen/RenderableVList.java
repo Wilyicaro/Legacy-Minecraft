@@ -42,6 +42,7 @@ public class RenderableVList {
     public int listHeight;
     protected int renderablesCount;
     protected LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
+    protected int scrollArrowYOffset = -8;
     protected Function<LayoutElement, Integer> layoutSeparation = w -> LegacyOptions.getUIMode().isSD() ? 2 : 3;
 
     public RenderableVList(UIAccessor accessor) {
@@ -153,6 +154,11 @@ public class RenderableVList {
         return this;
     }
 
+    public RenderableVList scrollArrowYOffset(int scrollArrowYOffset) {
+        this.scrollArrowYOffset = scrollArrowYOffset;
+        return this;
+    }
+
     public void focusRenderable(Renderable renderable) {
         if (renderables.isEmpty()) return;
         if (renderable instanceof GuiEventListener l && getScreen().children().contains(l)) {
@@ -200,9 +206,9 @@ public class RenderableVList {
         boolean allowScroll = this.listHeight > 0;
         if (allowScroll) accessor.getChildrenRenderables().add(((guiGraphics, i, j, f) -> {
             if (scrolledList.get() > 0)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, this.leftPos + this.listWidth - 29, this.topPos + this.listHeight - 8);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.UP, this.leftPos + this.listWidth - 29, this.topPos + this.listHeight + scrollArrowYOffset);
             if (canScrollDown)
-                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, this.leftPos + this.listWidth - 13, this.topPos + this.listHeight - 8);
+                scrollRenderer.renderScroll(guiGraphics, ScreenDirection.DOWN, this.leftPos + this.listWidth - 13, this.topPos + this.listHeight + scrollArrowYOffset);
         }));
         canScrollDown = false;
         int yDiff = 0;

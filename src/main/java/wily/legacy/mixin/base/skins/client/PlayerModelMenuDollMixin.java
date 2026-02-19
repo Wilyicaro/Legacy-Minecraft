@@ -60,11 +60,10 @@ public abstract class PlayerModelMenuDollMixin {
             hat.yRot = 0.0F;
             hat.zRot = 0.0F;
 
-            if (state.pose == Pose.CROUCHING) {
+            if (state.isCrouching) {
                 head.yRot = 0.15F;
                 hat.yRot = head.yRot;
             }
-
             float t = (System.currentTimeMillis() % 1_000_000L) / 1000.0F;
             float speed = 4.8F;
             float swing = (float) Math.sin(t * speed) * 0.28F;
@@ -133,7 +132,7 @@ public abstract class PlayerModelMenuDollMixin {
 
                 if (ConsoleSkinsClientSettings.isSkinAnimations() && StiffLegsConfig.isStiffLegsSkin(id)) {
 
-                    if (state.pose == Pose.STANDING) {
+                    if (state.pose == Pose.STANDING || state.pose == Pose.CROUCHING) {
                         self.rightLeg.xRot = 0.0F;
                         self.leftLeg.xRot = 0.0F;
                         self.rightLeg.yRot = 0.0F;

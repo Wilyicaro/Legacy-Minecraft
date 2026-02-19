@@ -15,13 +15,49 @@ public final class GuiSessionSkin {
 
     public static PlayerSkin getSessionPlayerSkin() {
         Minecraft mc = Minecraft.getInstance();
-        if (mc != null && mc.player != null) {
+        if (mc == null) return null;
+        if (mc.player != null) {
             ClientSkinCache.pushBypassSkinOverride();
             try {
                 return mc.player.getSkin();
             } finally {
                 ClientSkinCache.popBypassSkinOverride();
             }
+        }
+        GameProfile profile = null;
+        try {
+            profile = mc.getGameProfile();
+        } catch (Throwable ignored) {
+        }
+        if (profile == null) {
+            try {
+                Object user = mc.getUser();
+                if (user != null) {
+                    try {
+                        java.util.UUID id = null;
+                        try {
+                            Object o = user.getClass().getMethod("getProfileId").invoke(user);
+                            if (o instanceof java.util.UUID) id = (java.util.UUID) o;
+                        } catch (Throwable ignored2) {
+                        }
+                        String name = null;
+                        try {
+                            Object o = user.getClass().getMethod("getName").invoke(user);
+                            if (o != null) name = String.valueOf(o);
+                        } catch (Throwable ignored2) {
+                        }
+                        if (id != null || (name != null && !name.isBlank())) profile = new GameProfile(id, name);
+                    } catch (Throwable ignored2) {
+                    }
+                }
+            } catch (Throwable ignored) {
+            }
+        }
+        if (profile == null) return null;
+        ensureSessionTexturesFetch(profile);
+        try {
+            return mc.getSkinManager().createLookup(profile, true).get();
+        } catch (Throwable ignored) {
         }
         return null;
     }

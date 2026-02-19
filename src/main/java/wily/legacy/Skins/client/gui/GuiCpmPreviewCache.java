@@ -58,6 +58,29 @@ public final class GuiCpmPreviewCache {
         CPM_PREWARM_TASKS.put(key, fut);
     }
 
+    public static void resolveMenuPreviewNow(String selectionId, ResourceLocation skinTexture) {
+        if (selectionId == null || skinTexture == null) return;
+        if (!selectionId.startsWith("cpm:")) return;
+        if (CustomPlayerModelsClient.mc == null) return;
+        String key = selectionId + "|" + skinTexture;
+        GameProfile gp = getOrCreateCpmProfile(selectionId, skinTexture);
+        try {
+            ensureTexturesProperty(gp, skinTexture);
+        } catch (Throwable ignored) {
+        }
+        try {
+            CpmModelManager.applyToProfile(gp, selectionId);
+        } catch (Throwable ignored) {
+        }
+        try {
+            Player<?> pl = CustomPlayerModelsClient.mc.getDefinitionLoader().loadPlayer(gp, ModelDefinitionLoader.PLAYER_UNIQUE);
+            if (pl != null && pl.getModelDefinition() != null) {
+                CPM_READY.put(key, Boolean.TRUE);
+            }
+        } catch (Throwable ignored) {
+        }
+    }
+
     static GameProfile getOrCreateCpmProfile(String selectionId, ResourceLocation skinTexture) {
         String key = (selectionId == null ? "" : selectionId) + "|" + skinTexture;
         GameProfile gp = CPM_PROFILE_CACHE.get(key);
