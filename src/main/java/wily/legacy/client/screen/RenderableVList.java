@@ -241,7 +241,8 @@ public class RenderableVList {
         if (forceWidth) return scroll;
         int xDiff = 0;
         int rowAmount = 0;
-        for (int i = scrolledList.get(); i < scrolledList.get() + renderablesCount; i++) {
+        int end = Math.min(renderables.size(), scrolledList.get() + renderablesCount);
+        for (int i = scrolledList.get(); i < end; i++) {
             if (renderables.get(i) instanceof LayoutElement e)
                 xDiff += (xDiff == 0 ? 0 : layoutSeparation.apply(e)) + e.getWidth();
             rowAmount += scroll;

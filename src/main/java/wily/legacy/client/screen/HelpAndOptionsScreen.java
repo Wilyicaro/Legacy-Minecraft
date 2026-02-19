@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.PlayerModelPart;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.Skins.SkinsClientBootstrap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
     public HelpAndOptionsScreen(Screen parent) {
         super(parent, Component.translatable("options.title"), r -> {
         });
-        renderableVList.addRenderable(CHANGE_SKIN.createButtonBuilder(this).build());
+        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.change_skin"), b -> SkinsClientBootstrap.requestOpenChangeSkinScreen(Minecraft.getInstance(), this)).build());
         renderableVList.addRenderable(HOW_TO_PLAY.createButtonBuilder(this).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("controls.title"), () -> new RenderableVListScreen(this, Component.translatable("controls.title"), r -> r.addRenderables(Button.builder(Component.translatable("options.mouse_settings.title"), button -> this.minecraft.setScreen(
                 new OptionsScreen(r.getScreen(), new OptionsScreen.Section(

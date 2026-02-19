@@ -1,0 +1,120 @@
+{
+  "name": "No Pack: Default Skins",
+  "author": "Mojang",
+  "skins": [
+    {
+      "id": "steve",
+      "name": "Steve",
+      "texture": "skins/steve.png",
+      "order": 1
+    },
+    {
+      "id": "steve2",
+      "name": "Tennis Steve",
+      "texture": "skins/tennis_steve.png",
+      "order": 2
+    },
+    {
+      "id": "steve3",
+      "name": "Tuxedo Steve",
+      "texture": "skins/tux_steve.png",
+      "order": 3
+    },
+    {
+      "id": "steve4",
+      "name": "Athlete Steve",
+      "texture": "skins/athlete_steve.png",
+      "order": 4
+    },
+    {
+      "id": "steve5",
+      "name": "Scottish Steve",
+      "texture": "skins/scottish_steve.png",
+      "order": 5
+    },
+    {
+      "id": "steve6",
+      "name": "Prisoner Steve",
+      "texture": "skins/jail_steve.png",
+      "order": 6
+    },
+    {
+      "id": "steve7",
+      "name": "Cyclist Steve",
+      "texture": "skins/cyclist_steve.png",
+      "order": 7
+    },
+    {
+      "id": "steve8",
+      "name": "Boxer Steve",
+      "texture": "skins/boxer_steve.png",
+      "order": 8
+    },
+    {
+      "id": "alex",
+      "name": "Alex",
+      "texture": "skins/alex.png",
+      "order": 9
+    },
+    {
+      "id": "alex2",
+      "name": "Tennis Alex",
+      "texture": "skins/tennis_alex.png",
+      "order": 10
+    },
+    {
+      "id": "alex3",
+      "name": "Tuxedo Alex",
+      "texture": "skins/tux_alex.png",
+      "order": 11
+    },
+    {
+      "id": "alex4",
+      "name": "Athlete Alex",
+      "texture": "skins/athlete_alex.png",
+      "order": 12
+    },
+    {
+      "id": "alex5",
+      "name": "Swedish Alex",
+      "texture": "skins/swedish_alex.png",
+      "order": 13
+    },
+    {
+      "id": "alex6",
+      "name": "Prisoner Alex",
+      "texture": "skins/prisoner_alex.png",
+      "order": 14
+    },
+    {
+      "id": "alex7",
+      "name": "Cyclist Alex",
+      "texture": "skins/cyclist_alex.png",
+      "order": 15
+    },
+    {
+      "id": "alex8",
+      "name": "Boxer Alex",
+      "texture": "skins/boxer_alex.png",
+      "order": 16
+    },
+    {
+      "id": "dev_steve",
+      "name": "Dev Steve",
+      "texture": "skins/dev_steve.png",
+      "order": 17
+    },
+    {
+      "id": "dev_alex",
+      "name": "Dev Alex",
+      "texture": "skins/dev_alex.png",
+      "order": 18
+    },
+    {
+      "id": "auto_select",
+      "name": "Auto Selected",
+      "texture": "skins/steve.png",
+      "order": 19
+    }
+  ]
+}

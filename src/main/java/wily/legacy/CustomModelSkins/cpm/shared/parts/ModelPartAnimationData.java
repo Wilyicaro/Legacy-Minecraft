@@ -1,0 +1,25 @@
+package wily.legacy.CustomModelSkins.cpm.shared.parts;
+
+import wily.legacy.CustomModelSkins.cpm.shared.io.IOHelper;
+
+import java.io.IOException;
+
+@Deprecated
+public class ModelPartAnimationData implements IModelPart {
+    public ModelPartAnimationData(IOHelper in) throws IOException {
+    }
+
+    @Override
+    public IResolvedModelPart resolve() {
+        return IResolvedModelPart.EMPTY;
+    }
+
+    @Override
+    public void write(IOHelper dout) throws IOException {
+    }
+
+    @Override
+    public ModelPartType getType() {
+        return ModelPartType.ANIMATION_DATA;
+    }
+}

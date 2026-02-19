@@ -1222,7 +1222,7 @@ public interface ControlTooltip {
             float hudDistance = Math.max(0.0f, LegacyOptions.hudDistance.get().floatValue() - 0.5f) * 2;
             float hudDiff = 1.0f - hudDistance;
             float xDiff = 32 - 30 * hudDiff;
-            guiGraphics.pose().translate(left ? xDiff : guiGraphics.guiWidth() - xDiff, guiGraphics.guiHeight() - (29 - (15 - ControlType.getActiveType().iconHeight()) / 2 - 16 * hudDiff));
+            guiGraphics.pose().translate(left ? xDiff : guiGraphics.guiWidth() - xDiff, guiGraphics.guiHeight() - (29 - (15 - ControlType.getActiveType().iconHeight()) / 2 - 16 * hudDiff) + 4);
 
             renderTooltips.forEach((action, icon) -> {
                 if (left) {
