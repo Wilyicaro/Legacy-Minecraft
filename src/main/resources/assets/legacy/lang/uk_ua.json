@@ -1114,6 +1114,7 @@
   "legacy.builtin.high_contrast": "Legacy High Contrast",
   "legacy.builtin.legacy_resources": "Legacy Resources",
   "legacy.builtin.legacy_waters": "Старі води",
+  "legacy.builtin.rosenfeld_patch": "Rosenfeld Patch",
   "legacy.chat.entered_dimension": "%s увійшов до %s",
   "legacy.chat.left_dimension": "%s залишив %s",
   "legacy.commands.legacyTip.incorrectName": "There are no custom tips with the name \"%s\".",
