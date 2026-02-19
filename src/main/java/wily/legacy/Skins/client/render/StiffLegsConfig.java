@@ -24,7 +24,7 @@ public final class StiffLegsConfig {
         d.add("cpm:legacy_skinpacks:skinpacks/halloween_charity/ghost4jstudios.cpmmodel");
         d.add("cpm:legacy_skinpacks:skinpacks/halloween_mashup/ghost.cpmmodel");
         d.add("cpm:legacy_skinpacks:skinpacks/festive_mashup/skier.cpmmodel");
-        d.add("legacy_skinpacks:skinpacks/festive_mashup/skier.cpmmodel");
+	d.add("cpm:legacy_skinpacks:skinpacks/festive_mashup/treefairy.cpmmodel");
         DEFAULT_IDS = Collections.unmodifiableSet(d);
     }
 

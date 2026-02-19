@@ -23,8 +23,8 @@ public final class SkiingPose {
             if (s > 0.020F) speed = 34.0F;
             else if (s > 0.004F) speed = 26.0F;
         }
-        speed *= 0.2F;
-        float swing = (float) Math.sin(t * speed) * 0.55F;
+        speed *= 0.1F;
+        float swing = (float) Math.sin(t * speed) * 0.35F;
         float base = -0.32F;
 
         model.rightArm.xRot = base + swing;

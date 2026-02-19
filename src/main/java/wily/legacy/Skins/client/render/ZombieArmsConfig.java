@@ -29,7 +29,6 @@ public final class ZombieArmsConfig {
         d.add("cpm:legacy_skinpacks:skinpacks/sp5/femalezombie.cpmmodel");
         d.add("cpm:legacy_skinpacks:skinpacks/sp5/malezombie.cpmmodel");
         d.add("cpm:legacy_skinpacks:skinpacks/sp6/villagerzombie.cpmmodel");
-        d.add("cpm:legacy_skinpacks:skinpacks/battle_beasts_1/suitzombie.cpmmodel");
         d.add("cpm:legacy_skinpacks:skinpacks/birthday_2/partyzombievillager.cpmmodel");
         d.add("cpm:legacy_skinpacks:skinpacks/birthday_2/partywitherskeleton.cpmmodel");
         d.add("cpm:legacy_skinpacks:skinpacks/birthday_1/cakezombie.cpmmodel");
