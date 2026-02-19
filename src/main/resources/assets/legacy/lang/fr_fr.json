@@ -1114,6 +1114,7 @@
   "legacy.builtin.high_contrast": "Contraste élevé hérité",
   "legacy.builtin.legacy_resources": "Ressources héritées",
   "legacy.builtin.legacy_waters": "Eaux héritées",
+  "legacy.builtin.rosenfeld_patch": "Rosenfeld Patch",
   "legacy.chat.entered_dimension": "%s est entré dans %s",
   "legacy.chat.left_dimension": "%s a quitté %s",
   "legacy.commands.legacyTip.incorrectName": "Il n'y a pas d'astuce personnalisée avec le nom \"%s\".",
