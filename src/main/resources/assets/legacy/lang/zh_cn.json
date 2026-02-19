@@ -1114,6 +1114,7 @@
   "legacy.builtin.high_contrast": "高对比度（旧版）",
   "legacy.builtin.legacy_resources": "Legacy Resources",
   "legacy.builtin.legacy_waters": "旧版水流",
+  "legacy.builtin.rosenfeld_patch": "Rosenfeld Patch",
   "legacy.chat.entered_dimension": "%s 已输入 %s",
   "legacy.chat.left_dimension": "%s 甚于 %s",
   "legacy.commands.legacyTip.incorrectName": "没有名为 \"%s\" 的自定义提示。",
