@@ -391,6 +391,13 @@ public class PlayerSkinWidget extends AbstractWidget {
         pendingPoseMode = -1;
     }
 
+    public void resetPoseState() {
+        crouchPose = false;
+        punchLoop = false;
+        punchCooldown = 0;
+        pendingPoseMode = -1;
+    }
+
     public int getPoseMode() {
         return crouchPose ? 1 : 0;
     }

@@ -1,6 +1,7 @@
 package wily.legacy.Skins.client.gui;
 
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
+import wily.legacy.Skins.client.render.SkiingConfig;
 import wily.legacy.Skins.client.render.ZombieArmsConfig;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
 import com.mojang.authlib.GameProfile;
@@ -84,6 +85,10 @@ public final class GuiDollRender {
         }
         if (state instanceof RenderStateSkinIdAccess a) a.consoleskins$setSkinId(selectionId);
         if (ConsoleSkinsClientSettings.isSkinAnimations() && ZombieArmsConfig.isZombieArmsSkin(selectionId)) {
+            state.leftArmPose = HumanoidModel.ArmPose.EMPTY;
+            state.rightArmPose = HumanoidModel.ArmPose.EMPTY;
+        }
+        if (ConsoleSkinsClientSettings.isSkinAnimations() && SkiingConfig.isSkiingSkin(selectionId)) {
             state.leftArmPose = HumanoidModel.ArmPose.EMPTY;
             state.rightArmPose = HumanoidModel.ArmPose.EMPTY;
         }

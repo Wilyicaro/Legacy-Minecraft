@@ -17,6 +17,7 @@ public final class SkinPoseRegistry {
     public enum PoseTag {
         ZOMBIE_ARMS("zombie_arms"),
         IDLE_SIT("idle_sit"),
+        SKIING("skiing"),
         STIFF_ARMS("stiff_arms"),
         STIFF_LEGS("stiff_legs"),
         UPSIDE_DOWN("upside_down"),

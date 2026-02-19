@@ -169,7 +169,7 @@ public class PlayerSkinWidgetList {
             PlayerSkinWidget w = getWrappedNonVirtual(this.index + offset);
             if (w == null || used.contains(w)) continue;
             used.add(w);
-            if (offset != 0) w.resetPose();
+            if (offset != 0) w.resetPoseState();
             setupSlot(w, offset);
             w.prewarm();
             if (offset == 0) element3 = w;
@@ -220,7 +220,7 @@ public class PlayerSkinWidgetList {
             PlayerSkinWidget w = ring.get(pos);
             int skinIndex = mod(this.index + offset, n);
             w.setSkinId(skinIds.get(skinIndex));
-            if (offset != 0) w.resetPose();
+            if (offset != 0) w.resetPoseState();
             setupSlot(w, offset);
             w.prewarm();
             if (offset == 0) element3 = w;

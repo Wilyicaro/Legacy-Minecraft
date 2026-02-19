@@ -71,12 +71,17 @@ public abstract class AvatarRendererSkinMixin {
                 }
                 try {
                     boolean moving = false;
+                    float speedSq = 0.0F;
                     try {
                         var v = avatar.getDeltaMovement();
-                        moving = v != null && (v.x * v.x + v.z * v.z) > 1.0E-4;
+                        if (v != null) {
+                            speedSq = (float) (v.x * v.x + v.z * v.z);
+                            moving = speedSq > 1.0E-4;
+                        }
                     } catch (Throwable ignored2) {
                     }
                     a.consoleskins$setMoving(moving);
+                    a.consoleskins$setMoveSpeedSq(speedSq);
                 } catch (Throwable ignored) {
                 }
             }

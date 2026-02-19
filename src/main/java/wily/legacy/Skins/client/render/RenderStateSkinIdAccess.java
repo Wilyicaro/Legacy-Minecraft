@@ -14,4 +14,8 @@ public interface RenderStateSkinIdAccess {
     boolean consoleskins$isMoving();
 
     void consoleskins$setMoving(boolean moving);
+
+    float consoleskins$getMoveSpeedSq();
+
+    void consoleskins$setMoveSpeedSq(float speedSq);
 }

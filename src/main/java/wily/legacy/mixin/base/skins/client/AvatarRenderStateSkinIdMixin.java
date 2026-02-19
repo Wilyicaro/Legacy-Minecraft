@@ -17,6 +17,8 @@ public abstract class AvatarRenderStateSkinIdMixin implements RenderStateSkinIdA
     private UUID consoleskins$uuid;
     @Unique
     private boolean consoleskins$moving;
+    @Unique
+    private float consoleskins$moveSpeedSq;
 
     @Override
     public String consoleskins$getSkinId() {
@@ -46,5 +48,15 @@ public abstract class AvatarRenderStateSkinIdMixin implements RenderStateSkinIdA
     @Override
     public void consoleskins$setMoving(boolean moving) {
         this.consoleskins$moving = moving;
+    }
+
+    @Override
+    public float consoleskins$getMoveSpeedSq() {
+        return consoleskins$moveSpeedSq;
+    }
+
+    @Override
+    public void consoleskins$setMoveSpeedSq(float speedSq) {
+        this.consoleskins$moveSpeedSq = speedSq;
     }
 }

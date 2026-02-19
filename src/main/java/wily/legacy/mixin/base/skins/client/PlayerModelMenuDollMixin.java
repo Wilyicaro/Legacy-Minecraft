@@ -9,6 +9,7 @@ import wily.legacy.Skins.client.render.StiffLegsConfig;
 import wily.legacy.Skins.client.render.StiffArmsConfig;
 import wily.legacy.Skins.client.render.StiffArmsPose;
 import wily.legacy.Skins.client.render.ZombieArmsPose;
+import wily.legacy.Skins.client.render.SkiingPose;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
 
 import java.util.UUID;
@@ -101,6 +102,11 @@ public abstract class PlayerModelMenuDollMixin {
 
         if (ConsoleSkinsClientSettings.isSkinAnimations() && ZombieArmsPose.shouldApply(state)) {
             ZombieArmsPose.apply(self);
+        }
+
+        if (ConsoleSkinsClientSettings.isSkinAnimations() && SkiingPose.shouldApply(state)) {
+            float t = state.id == DollRenderIds.MENU_DOLL_ID ? (System.currentTimeMillis() % 1_000_000L) / 1000.0F : StiffArmsPose.getAgeInTicks(state);
+            SkiingPose.apply(self, state, t);
         }
 
         if (ConsoleSkinsClientSettings.isSkinAnimations() && state instanceof RenderStateSkinIdAccess a2) {
