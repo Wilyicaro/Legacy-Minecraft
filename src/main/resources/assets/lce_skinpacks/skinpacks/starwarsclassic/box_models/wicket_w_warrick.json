@@ -1,0 +1,223 @@
+{
+  "meta": {
+    "displayName": "Wicket W. Warrick",
+    "displayNameId": "IDS_DLCSKIN00001253_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00001253_THEMENAME"
+  },
+  "offsets": {
+    "head":         { "x": 0, "y": 17, "z": 0 },
+    "hat":          { "x": 0, "y": 15, "z": 0 },
+    "body":         { "x": 0, "y": 15, "z": 0 },
+    "right_arm":    { "x": 0, "y": 15, "z": 0 },
+    "left_arm":     { "x": 0, "y": 15, "z": 0 },
+    "right_leg":    { "x": 0, "y": 7, "z": 0 },
+    "left_leg":     { "x": 0, "y": 7, "z": 0 }
+  },
+  "hide": [all],
+  "hidearmour": ["helmet", "chestpiece", "leggings", "boots"],
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            5.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_leg_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            5.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            14
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -1.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            6.0,
+            2.0
+          ],
+          "uv": [
+            30,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_leg_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            5.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            23
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -1.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            6.0,
+            2.0
+          ],
+          "uv": [
+            38,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -7.0,
+            -3.0
+          ],
+          "size": [
+            6.0,
+            6.0,
+            6.0
+          ],
+          "uv": [
+            2,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -8.0,
+            0.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -8.0,
+            0.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -4.0,
+            -3.5
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

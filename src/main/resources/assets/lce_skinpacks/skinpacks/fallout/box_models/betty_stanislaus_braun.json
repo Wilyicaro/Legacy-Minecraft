@@ -1,0 +1,201 @@
+{
+  "meta": {
+    "displayName": "Betty (Stanislaus Braun)",
+    "displayNameId": "IDS_SKINS_DLCSKIN00004818_DISPLAYNAME",
+    "themeName": "Fallout 3",
+    "themeNameId": "IDS_SKINS_DLCSKIN00004818_THEMENAME"
+  },
+  "armorOffsets": {
+    "LEG0": {
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    "LEG1": {
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    "HEAD": {
+      "x": 0.0,
+      "y": 2.0,
+      "z": 0.0
+    },
+    "BODY": {
+      "x": 0.0,
+      "y": 2.0,
+      "z": 0.0
+    },
+    "ARM0": {
+      "x": 0.0,
+      "y": 2.0,
+      "z": 0.0
+    },
+    "ARM1": {
+      "x": 0.0,
+      "y": 2.0,
+      "z": 0.0
+    },
+    "TOOL0": {
+      "x": 0.0,
+      "y": -1.0,
+      "z": 0.0
+    },
+    "TOOL1": {
+      "x": 0.0,
+      "y": -1.0,
+      "z": 0.0
+    },
+    "WAIST": {
+      "x": 0.0,
+      "y": -1.0,
+      "z": 0.0
+    },
+    "PANTS0": {
+      "x": 0.0,
+      "y": -1.0,
+      "z": 0.0
+    },
+    "PANTS1": {
+      "x": 0.0,
+      "y": -1.0,
+      "z": 0.0
+    },
+    "BOOT0": {
+      "x": 0.0,
+      "y": -1.0,
+      "z": 0.0
+    },
+    "BOOT1": {
+      "x": 0.0,
+      "y": -1.0,
+      "z": 0.0
+    }
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            11.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_leg_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            11.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_leg_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            11.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            11.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            11.0,
+            4.0
+          ],
+          "uv": [
+            32,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

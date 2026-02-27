@@ -1,0 +1,270 @@
+{
+  "name": "Classic Skin Pack 1",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "creeper",
+      "name": "Creeper",
+      "texture": "skins/creeper.png",
+      "order": 1
+    },
+    {
+      "id": "squid",
+      "name": "Squid",
+      "texture": "skins/squid.png",
+      "order": 2
+    },
+    {
+      "id": "zombie",
+      "name": "Zombie",
+      "texture": "skins/zombie.png",
+      "order": 3
+    },
+    {
+      "id": "jack_of_blades",
+      "name": "Jack of Blades",
+      "texture": "skins/jack_of_blades.png",
+      "order": 4
+    },
+    {
+      "id": "hero",
+      "name": "Hero",
+      "texture": "skins/hero.png",
+      "order": 5
+    },
+    {
+      "id": "garth",
+      "name": "Garth",
+      "texture": "skins/garth.png",
+      "order": 6
+    },
+    {
+      "id": "reaver",
+      "name": "Reaver",
+      "texture": "skins/reaver.png",
+      "order": 7
+    },
+    {
+      "id": "hammer",
+      "name": "Hammer",
+      "texture": "skins/hammer.png",
+      "order": 8
+    },
+    {
+      "id": "locust_drone",
+      "name": "Locust Drone",
+      "texture": "skins/locust_drone.png",
+      "order": 9
+    },
+    {
+      "id": "cole_train",
+      "name": "Cole Train",
+      "texture": "skins/cole_train.png",
+      "order": 10
+    },
+    {
+      "id": "clayton_carmine",
+      "name": "Clayton Carmine",
+      "texture": "skins/clayton_carmine.png",
+      "order": 45
+    },
+    {
+      "id": "master_chief",
+      "name": "Master Chief",
+      "texture": "skins/master_chief.png",
+      "order": 0.5
+    },
+    {
+      "id": "covenant_grunt",
+      "name": "Covenant Grunt",
+      "texture": "skins/covenant_grunt.png",
+      "order": 13
+    },
+    {
+      "id": "covenant_brute",
+      "name": "Covenant Brute",
+      "texture": "skins/covenant_brute.png",
+      "order": 14
+    },
+    {
+      "id": "banjo",
+      "name": "Banjo",
+      "texture": "skins/banjo.png",
+      "order": 0.6
+    },
+    {
+      "id": "grunty",
+      "name": "Grunty",
+      "texture": "skins/grunty.png",
+      "order": 16
+    },
+    {
+      "id": "bottles",
+      "name": "Bottles",
+      "texture": "skins/bottles.png",
+      "order": 17
+    },
+    {
+      "id": "tooty",
+      "name": "Tooty",
+      "texture": "skins/tooty.png",
+      "order": 18
+    },
+    {
+      "id": "mumbo_jumbo",
+      "name": "Mumbo Jumbo",
+      "texture": "skins/mumbo_jumbo.png",
+      "order": 19
+    },
+    {
+      "id": "klungo",
+      "name": "Klungo",
+      "texture": "skins/klungo.png",
+      "order": 20
+    },
+    {
+      "id": "trials_rider",
+      "name": "Trials Rider",
+      "texture": "skins/trials_rider.png",
+      "order": 0.7
+    },
+    {
+      "id": "freestyle",
+      "name": "Freestyle",
+      "texture": "skins/freestyle.png",
+      "order": 22
+    },
+    {
+      "id": "old_school",
+      "name": "Old-School",
+      "texture": "skins/old_school.png",
+      "order": 23
+    },
+    {
+      "id": "biker",
+      "name": "Biker",
+      "texture": "skins/biker.png",
+      "order": 24
+    },
+    {
+      "id": "combat",
+      "name": "Combat",
+      "texture": "skins/combat.png",
+      "order": 25
+    },
+    {
+      "id": "splosion_man",
+      "name": "'Splosion Man",
+      "texture": "skins/splosion_man.png",
+      "order": 44
+    },
+    {
+      "id": "scientist_wilson",
+      "name": "Scientist Wilson",
+      "texture": "skins/scientist_wilson.png",
+      "order": 27
+    },
+    {
+      "id": "scientist_danklef",
+      "name": "Scientist Danklef",
+      "texture": "skins/scientist_danklef.png",
+      "order": 28
+    },
+    {
+      "id": "ms_splosion_man",
+      "name": "Ms. 'Splosion Man",
+      "texture": "skins/ms_splosion_man.png",
+      "order": 29
+    },
+    {
+      "id": "mandy_elite",
+      "name": "Mandy Elite",
+      "texture": "skins/mandy_elite.png",
+      "order": 30
+    },
+    {
+      "id": "racing_driver_1",
+      "name": "Racing Driver 1",
+      "texture": "skins/racing_driver_1.png",
+      "order": 31
+    },
+    {
+      "id": "racing_driver_2",
+      "name": "Racing Driver 2",
+      "texture": "skins/racing_driver_2.png",
+      "order": 32
+    },
+    {
+      "id": "racing_driver_3",
+      "name": "Racing Driver 3",
+      "texture": "skins/racing_driver_3.png",
+      "order": 33
+    },
+    {
+      "id": "racing_driver_4",
+      "name": "Racing Driver 4",
+      "texture": "skins/racing_driver_4.png",
+      "order": 34
+    },
+    {
+      "id": "nurse",
+      "name": "Nurse",
+      "texture": "skins/nurse.png",
+      "order": 35
+    },
+    {
+      "id": "prisoner",
+      "name": "Prisoner",
+      "texture": "skins/prisoner.png",
+      "order": 36
+    },
+    {
+      "id": "victorian_swimmer",
+      "name": "Victorian Swimmer",
+      "texture": "skins/victorian_swimmer.png",
+      "order": 37
+    },
+    {
+      "id": "deep_sea_diver",
+      "name": "Deep Sea Diver",
+      "texture": "skins/deep_sea_diver.png",
+      "order": 38
+    },
+    {
+      "id": "king",
+      "name": "King",
+      "texture": "skins/king.png",
+      "order": 39
+    },
+    {
+      "id": "queen",
+      "name": "Queen",
+      "texture": "skins/queen.png",
+      "order": 40
+    },
+    {
+      "id": "jester",
+      "name": "Jester",
+      "texture": "skins/jester.png",
+      "order": 41
+    },
+    {
+      "id": "knight_templar",
+      "name": "Knight Templar",
+      "texture": "skins/knight_templar.png",
+      "order": 0.71
+    },
+    {
+      "id": "black_knight",
+      "name": "Black Knight",
+      "texture": "skins/black_knight.png",
+      "order": 0.72
+    },
+    {
+      "id": "wizard",
+      "name": "Wizard",
+      "texture": "skins/wizard.png",
+      "order": 0.73
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "The Ninth Doctor",
+    "displayNameId": "IDS_DLCSKIN00002001_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

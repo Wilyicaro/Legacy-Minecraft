@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "The End Creature",
+    "displayNameId": "IDS_DLCSKIN00003016_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

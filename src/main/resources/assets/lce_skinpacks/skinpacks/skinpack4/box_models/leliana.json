@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Leliana",
+    "displayNameId": "IDS_dlcskin17565763_DISPLAYNAME",
+    "themeName": "Dragon Age",
+    "themeNameId": "IDS_dlcskin17565763_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

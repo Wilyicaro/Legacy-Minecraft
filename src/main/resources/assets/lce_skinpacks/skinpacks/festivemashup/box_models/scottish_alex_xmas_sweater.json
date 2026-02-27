@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Scottish Alex Xmas Sweater",
+    "displayNameId": "IDS_SKINS_DLCSKIN00002740_DISPLAYNAME",
+    "themeName": "Festive Mash-up",
+    "themeNameId": "IDS_SKINS_DLCSKIN00002740_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

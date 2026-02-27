@@ -1,0 +1,80 @@
+{
+  "meta": {
+    "displayName": "Rancor Keeper",
+    "displayNameId": "IDS_DLCSKIN00001238_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00001238_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            5.0,
+            -2.9
+          ],
+          "size": [
+            6.0,
+            6.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            4.0,
+            -2.9
+          ],
+          "size": [
+            4.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_leg_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -2.1
+          ],
+          "size": [
+            4.0,
+            6.0,
+            0.0
+          ],
+          "uv": [
+            0,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

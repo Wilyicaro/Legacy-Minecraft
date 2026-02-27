@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Sensei",
+    "displayNameId": "IDS_dlcskin80934533_DISPLAYNAME",
+    "themeName": "Fruit Ninja",
+    "themeNameId": "IDS_dlcskin80934533_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

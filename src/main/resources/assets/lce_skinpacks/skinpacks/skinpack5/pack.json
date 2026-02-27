@@ -1,0 +1,270 @@
+{
+  "name": "Skin Pack 5",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "german_soldier",
+      "name": "German Soldier",
+      "texture": "skins/german_soldier.png",
+      "order": 42
+    },
+    {
+      "id": "john_carver",
+      "name": "John Carver",
+      "texture": "skins/john_carver.png",
+      "order": 4
+    },
+    {
+      "id": "male_zombie",
+      "name": "Male Zombie",
+      "texture": "skins/male_zombie.png",
+      "order": 11
+    },
+    {
+      "id": "salvador",
+      "name": "Salvador",
+      "texture": "skins/salvador.png",
+      "order": 27
+    },
+    {
+      "id": "sam_fisher",
+      "name": "Sam Fisher",
+      "texture": "skins/sam_fisher.png",
+      "order": 15
+    },
+    {
+      "id": "roland",
+      "name": "Roland",
+      "texture": "skins/roland.png",
+      "order": 23
+    },
+    {
+      "id": "black_cat_man",
+      "name": "Black Cat Man",
+      "texture": "skins/black_cat_man.png",
+      "order": 46
+    },
+    {
+      "id": "nikolai_orelov",
+      "name": "Nikolai Orelov",
+      "texture": "skins/nikolai_orelov.png",
+      "order": 18
+    },
+    {
+      "id": "grass_man",
+      "name": "Grass Man",
+      "texture": "skins/grass_man.png",
+      "order": 50
+    },
+    {
+      "id": "ocelot_man",
+      "name": "Ocelot Man",
+      "texture": "skins/ocelot_man.png",
+      "order": 48
+    },
+    {
+      "id": "barbera",
+      "name": "Barbera",
+      "texture": "skins/barbera.png",
+      "order": 14
+    },
+    {
+      "id": "rock_man",
+      "name": "Rock Man",
+      "texture": "skins/rock_man.png",
+      "order": 49
+    },
+    {
+      "id": "us_airbone_soldier",
+      "name": "US Airbone Soldier",
+      "texture": "skins/us_airbone_soldier.png",
+      "order": 35
+    },
+    {
+      "id": "maya",
+      "name": "Maya",
+      "texture": "skins/maya.png",
+      "order": 26
+    },
+    {
+      "id": "kenny",
+      "name": "Kenny",
+      "texture": "skins/kenny.png",
+      "order": 6
+    },
+    {
+      "id": "aveline_de_grandpre",
+      "name": "Aveline de Grandpré",
+      "texture": "skins/aveline_de_grandpre.png",
+      "order": 17
+    },
+    {
+      "id": "russian_soldier",
+      "name": "Russian Soldier",
+      "texture": "skins/russian_soldier.png",
+      "order": 37
+    },
+    {
+      "id": "cat_eared_girl",
+      "name": "Cat-Eared Girl",
+      "texture": "skins/cat_eared_girl.png",
+      "order": 34
+    },
+    {
+      "id": "imperial_japanese_soldier",
+      "name": "Imperial Japanese Soldier",
+      "texture": "skins/imperial_japanese_soldier.png",
+      "order": 39
+    },
+    {
+      "id": "isaac_clarke",
+      "name": "Isaac Clarke",
+      "texture": "skins/isaac_clarke.png",
+      "order": 1
+    },
+    {
+      "id": "mooshroom_suit",
+      "name": "Mooshroom Suit",
+      "texture": "skins/mooshroom_suit.png",
+      "order": 43
+    },
+    {
+      "id": "molly",
+      "name": "Molly",
+      "texture": "skins/molly.png",
+      "order": 7
+    },
+    {
+      "id": "sergeant_rex_power_colt",
+      "name": "Sergeant Rex \"Power\" Colt",
+      "texture": "skins/sergeant_rex_power_colt.png",
+      "order": 20
+    },
+    {
+      "id": "globox",
+      "name": "Globox",
+      "texture": "skins/globox.png",
+      "order": 13
+    },
+    {
+      "id": "german_sergeant",
+      "name": "German Sergeant",
+      "texture": "skins/german_sergeant.png",
+      "order": 41
+    },
+    {
+      "id": "axton",
+      "name": "Axton",
+      "texture": "skins/axton.png",
+      "order": 24
+    },
+    {
+      "id": "pig_suit",
+      "name": "Pig Suit",
+      "texture": "skins/pig_suit.png",
+      "order": 44
+    },
+    {
+      "id": "female_zombie",
+      "name": "Female Zombie",
+      "texture": "skins/female_zombie.png",
+      "order": 10
+    },
+    {
+      "id": "german_captain",
+      "name": "German Captain",
+      "texture": "skins/german_captain.png",
+      "order": 40
+    },
+    {
+      "id": "flower_girl",
+      "name": "Flower Girl",
+      "texture": "skins/flower_girl.png",
+      "order": 33
+    },
+    {
+      "id": "puker",
+      "name": "Puker",
+      "texture": "skins/puker.png",
+      "order": 2
+    },
+    {
+      "id": "rayman",
+      "name": "Rayman",
+      "texture": "skins/rayman.png",
+      "order": 12
+    },
+    {
+      "id": "vaas_montenegro",
+      "name": "Vaas Montenegro",
+      "texture": "skins/vaas_montenegro.png",
+      "order": 22
+    },
+    {
+      "id": "handsome_jack",
+      "name": "Handsome Jack",
+      "texture": "skins/handsome_jack.png",
+      "order": 25
+    },
+    {
+      "id": "ginger_cat_man",
+      "name": "Ginger Cat Man",
+      "texture": "skins/ginger_cat_man.png",
+      "order": 47
+    },
+    {
+      "id": "lee_everett",
+      "name": "Lee Everett",
+      "texture": "skins/lee_everett.png",
+      "order": 5
+    },
+    {
+      "id": "jason_brody",
+      "name": "Jason Brody",
+      "texture": "skins/jason_brody.png",
+      "order": 21
+    },
+    {
+      "id": "ender_dragon_suit",
+      "name": "Ender Dragon Suit",
+      "texture": "skins/ender_dragon_suit.png",
+      "order": 45
+    },
+    {
+      "id": "ellie_langford",
+      "name": "Ellie Langford",
+      "texture": "skins/ellie_langford.png",
+      "order": 3
+    },
+    {
+      "id": "sam_fisher_2",
+      "name": "Sam Fisher",
+      "texture": "skins/sam_fisher_2.png",
+      "order": 16
+    },
+    {
+      "id": "omid",
+      "name": "Omid",
+      "texture": "skins/omid.png",
+      "order": 9
+    },
+    {
+      "id": "british_soldier",
+      "name": "British Soldier",
+      "texture": "skins/british_soldier.png",
+      "order": 36
+    },
+    {
+      "id": "christa",
+      "name": "Christa",
+      "texture": "skins/christa.png",
+      "order": 8
+    },
+    {
+      "id": "edward_kenway",
+      "name": "Edward Kenway",
+      "texture": "skins/edward_kenway.png",
+      "order": 19
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Albert Cole",
+    "displayNameId": "IDS_SKINS_DLCSKIN00004802_DISPLAYNAME",
+    "themeName": "Fallout 1",
+    "themeNameId": "IDS_SKINS_DLCSKIN00004802_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

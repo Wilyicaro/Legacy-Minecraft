@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Frost Troll",
+    "displayNameId": "IDS_SKINS_DLCSKIN00001428_DISPLAYNAME",
+    "themeName": "Skyrim",
+    "themeNameId": "IDS_SKINS_DLCSKIN00001428_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

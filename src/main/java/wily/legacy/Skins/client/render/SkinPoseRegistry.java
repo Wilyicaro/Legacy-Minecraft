@@ -1,14 +1,14 @@
 package wily.legacy.Skins.client.render;
 
+import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Pattern;
-
 
 public final class SkinPoseRegistry {
 
@@ -21,7 +21,9 @@ public final class SkinPoseRegistry {
         STIFF_ARMS("stiff_arms"),
         STIFF_LEGS("stiff_legs"),
         UPSIDE_DOWN("upside_down"),
-        DISABLE_VIEW_BOBBING("disable_view_bobbing");
+        WEEPING_STATUE("weeping_statue"),
+        DISABLE_VIEW_BOBBING("disable_view_bobbing"),
+        HIDE_HAND("hide_hand");
 
         private final String key;
         PoseTag(String key) { this.key = key; }
@@ -30,8 +32,10 @@ public final class SkinPoseRegistry {
         public static PoseTag fromKey(String key) {
             if (key == null) return null;
             String k = key.trim().toLowerCase(Locale.ROOT);
+            String nk = k.replace("_", "");
             for (PoseTag t : values()) {
                 if (t.key.equals(k)) return t;
+                if (t.key.replace("_", "").equals(nk)) return t;
             }
             return null;
         }
@@ -47,6 +51,7 @@ public final class SkinPoseRegistry {
     private static final Object LOCK = new Object();
 
     private static Map<PoseTag, List<Selector>> ACTIVE = empty();
+    private static Map<PoseTag, List<Selector>> RUNTIME = empty();
     private static Map<PoseTag, List<Selector>> STAGING = empty();
 
     private static Map<PoseTag, List<Selector>> empty() {
@@ -95,23 +100,62 @@ public final class SkinPoseRegistry {
         }
     }
 
+    public static void addRuntimeSelector(PoseTag tag, String selector) {
+        if (tag == null || selector == null) return;
+        String s = normalize(selector, null);
+        if (s == null || s.isBlank()) return;
+
+        Selector compiled = compileSelector(s);
+
+        synchronized (LOCK) {
+            List<Selector> list = RUNTIME.get(tag);
+            if (list instanceof ArrayList<Selector> al) {
+                al.add(compiled);
+            } else if (list == null || list.isEmpty()) {
+                ArrayList<Selector> al2 = new ArrayList<>();
+                al2.add(compiled);
+                RUNTIME.put(tag, al2);
+            } else {
+                ArrayList<Selector> al2 = new ArrayList<>(list);
+                al2.add(compiled);
+                RUNTIME.put(tag, al2);
+            }
+        }
+    }
+
+    public static void clearRuntimeSelectors() {
+        synchronized (LOCK) {
+            RUNTIME = empty();
+        }
+    }
+
     public static boolean hasPose(PoseTag tag, String skinId) {
         if (tag == null || skinId == null) return false;
         List<Selector> sels;
+        List<Selector> rt;
         synchronized (LOCK) {
             sels = ACTIVE.get(tag);
+            rt = RUNTIME.get(tag);
         }
-        if (sels == null || sels.isEmpty()) return false;
-
 
         String id = normalize(skinId, null);
-        for (Selector s : sels) {
-            if (s.matches(id)) return true;
+        if (id == null || id.isBlank()) return false;
+
+        if (sels != null && !sels.isEmpty()) {
+            for (Selector s : sels) {
+                if (s.matches(id)) return true;
+            }
         }
-        return false;
+
+        if (rt != null && !rt.isEmpty()) {
+            for (Selector s : rt) {
+                if (s.matches(id)) return true;
+            }
+        }
+
+        return BoxModelManager.hasPoseTag(id, tag);
     }
 
-  
     public static boolean has(PoseTag tag, String skinId) {
         return hasPose(tag, skinId);
     }
@@ -120,18 +164,8 @@ public final class SkinPoseRegistry {
         String s = in.trim();
         if (s.isEmpty()) return null;
 
-
-        if (s.endsWith(".cpmmodel") && !s.startsWith("cpm:")) {
-  
-            if (!s.contains(":") && defaultNamespace != null && !defaultNamespace.isBlank()) {
-                s = defaultNamespace + ":" + s;
-            }
-            s = "cpm:" + s;
-        } else {
-
-            if (!s.contains(":") && defaultNamespace != null && !defaultNamespace.isBlank()) {
-                s = defaultNamespace + ":" + s;
-            }
+        if (!s.contains(":") && defaultNamespace != null && !defaultNamespace.isBlank()) {
+            s = defaultNamespace + ":" + s;
         }
         return s;
     }

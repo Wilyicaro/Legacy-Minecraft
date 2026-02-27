@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Raider",
+    "displayNameId": "IDS_SKINS_DLCSKIN00004836_DISPLAYNAME",
+    "themeName": "Fallout",
+    "themeNameId": "IDS_SKINS_DLCSKIN00004836_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

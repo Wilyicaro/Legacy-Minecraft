@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Creeper",
+    "displayNameId": "IDS_DLCSKIN20000000_DISPLAYNAME",
+    "themeName": "Minecraft",
+    "themeNameId": "IDS_DLCSKIN20000000_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

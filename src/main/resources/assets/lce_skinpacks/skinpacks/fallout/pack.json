@@ -1,0 +1,283 @@
+{
+  "name": "Fallout",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "vault_boy",
+      "name": "Vault Boy",
+      "texture": "skins/vault_boy.png",
+      "order": 1
+    },
+    {
+      "id": "vault_girl",
+      "name": "Vault Girl",
+      "texture": "skins/vault_girl.png",
+      "model": "slim",
+      "order": 2
+    },
+    {
+      "id": "albert_cole",
+      "name": "Albert Cole",
+      "texture": "skins/albert_cole.png",
+      "order": 3
+    },
+    {
+      "id": "natalia_dubrovhsky",
+      "name": "Natalia Dubrovhsky",
+      "texture": "skins/natalia_dubrovhsky.png",
+      "model": "slim",
+      "order": 4
+    },
+    {
+      "id": "max_stone",
+      "name": "Max Stone",
+      "texture": "skins/max_stone.png",
+      "order": 5
+    },
+    {
+      "id": "chitsa",
+      "name": "Chitsa",
+      "texture": "skins/chitsa.png",
+      "model": "slim",
+      "order": 6
+    },
+    {
+      "id": "mingan",
+      "name": "Mingan",
+      "texture": "skins/mingan.png",
+      "order": 7
+    },
+    {
+      "id": "narg",
+      "name": "Narg",
+      "texture": "skins/narg.png",
+      "order": 8
+    },
+    {
+      "id": "hakunin",
+      "name": "Hakunin",
+      "texture": "skins/hakunin.png",
+      "order": 9
+    },
+    {
+      "id": "lone_wanderer",
+      "name": "Lone Wanderer",
+      "texture": "skins/lone_wanderer.png",
+      "model": "slim",
+      "order": 10
+    },
+    {
+      "id": "lone_wanderer_2",
+      "name": "Lone Wanderer",
+      "texture": "skins/lone_wanderer_2.png",
+      "order": 11
+    },
+    {
+      "id": "three_dog",
+      "name": "Three Dog",
+      "texture": "skins/three_dog.png",
+      "order": 12
+    },
+    {
+      "id": "butch_deloria",
+      "name": "Butch DeLoria",
+      "texture": "skins/butch_deloria.png",
+      "order": 13
+    },
+    {
+      "id": "fawkes",
+      "name": "Fawkes",
+      "texture": "skins/fawkes.png",
+      "order": 14
+    },
+    {
+      "id": "moira_brown",
+      "name": "Moira Brown",
+      "texture": "skins/moira_brown.png",
+      "model": "slim",
+      "order": 15
+    },
+    {
+      "id": "jamesfallout",
+      "name": "James",
+      "texture": "skins/james.png",
+      "order": 16
+    },
+    {
+      "id": "brotherhood_of_steel_paladin",
+      "name": "Brotherhood of Steel Paladin",
+      "texture": "skins/brotherhood_of_steel_paladin.png",
+      "order": 17
+    },
+    {
+      "id": "colonel_autumn",
+      "name": "Colonel Autumn",
+      "texture": "skins/colonel_autumn.png",
+      "order": 18
+    },
+    {
+      "id": "betty_stanislaus_braun",
+      "name": "Betty (Stanislaus Braun)",
+      "texture": "skins/betty_stanislaus_braun.png",
+      "model": "slim",
+      "order": 19
+    },
+    {
+      "id": "clover",
+      "name": "Clover",
+      "texture": "skins/clover.png",
+      "model": "slim",
+      "order": 20
+    },
+    {
+      "id": "star_paladin_cross",
+      "name": "Star Paladin Cross",
+      "texture": "skins/star_paladin_cross.png",
+      "order": 21
+    },
+    {
+      "id": "harold",
+      "name": "Harold",
+      "texture": "skins/harold.png",
+      "order": 22
+    },
+    {
+      "id": "sole_survivor",
+      "name": "Sole Survivor",
+      "texture": "skins/sole_survivor.png",
+   "model": "slim",
+      "order": 23
+    },
+    {
+      "id": "sole_survivor_2",
+      "name": "Sole Survivor",
+      "texture": "skins/sole_survivor_2.png",
+      "order": 24
+    },
+    {
+      "id": "nick_valentine",
+      "name": "Nick Valentine",
+      "texture": "skins/nick_valentine.png",
+      "order": 25
+    },
+    {
+      "id": "preston_garvey",
+      "name": "Preston Garvey",
+      "texture": "skins/preston_garvey.png",
+      "order": 26
+    },
+    {
+      "id": "silver_shroud",
+      "name": "Silver Shroud",
+      "texture": "skins/silver_shroud.png",
+      "order": 27
+    },
+    {
+      "id": "hancock",
+      "name": "Hancock",
+      "texture": "skins/hancock.png",
+      "order": 28
+    },
+    {
+      "id": "piper",
+      "name": "Piper",
+      "texture": "skins/piper.png",
+      "model": "slim",
+      "order": 29
+    },
+    {
+      "id": "cait",
+      "name": "Cait",
+      "texture": "skins/cait.png",
+      "model": "slim",
+      "order": 30
+    },
+    {
+      "id": "paladin_danse",
+      "name": "Paladin Danse",
+      "texture": "skins/paladin_danse.png",
+      "order": 31
+    },
+    {
+      "id": "the_mechanist",
+      "name": "The Mechanist",
+      "texture": "skins/the_mechanist.png",
+      "order": 32
+    },
+    {
+      "id": "super_mutant",
+      "name": "Super Mutant",
+      "texture": "skins/super_mutant.png",
+      "order": 33
+    },
+    {
+      "id": "raider",
+      "name": "Raider",
+      "texture": "skins/raider.png",
+      "model": "slim",
+      "order": 34
+    },
+    {
+      "id": "raider_2",
+      "name": "Raider",
+      "texture": "skins/raider_2.png",
+      "order": 35
+    },
+    {
+      "id": "jangles_the_moon_monkey",
+      "name": "Jangles the Moon Monkey",
+      "texture": "skins/jangles_the_moon_monkey.png",
+      "order": 36
+    },
+    {
+      "id": "kellogg",
+      "name": "Kellogg",
+      "texture": "skins/kellogg.png",
+      "order": 37
+    },
+    {
+      "id": "tinker_tom",
+      "name": "Tinker Tom",
+      "texture": "skins/tinker_tom.png",
+      "order": 38
+    },
+    {
+      "id": "grognak_the_barbarian",
+      "name": "Grognak the Barbarian",
+      "texture": "skins/grognak_the_barbarian.png",
+      "order": 39
+    },
+    {
+      "id": "grognak_the_barbarian_2",
+      "name": "Grognak the Barbarian",
+      "texture": "skins/grognak_the_barbarian_2.png",
+      "model": "slim",
+      "order": 40
+    },
+    {
+      "id": "bosco",
+      "name": "Bosco",
+      "texture": "skins/bosco.png",
+      "order": 41
+    },
+    {
+      "id": "albert_cole_2",
+      "name": "Albert Cole",
+      "texture": "skins/albert_cole_2.png",
+      "order": 42
+    },
+    {
+      "id": "natalia_dubrovhsky_2",
+      "name": "Natalia Dubrovhsky",
+      "texture": "skins/natalia_dubrovhsky_2.png",
+      "model": "slim",
+      "order": 43
+    },
+    {
+      "id": "max_stone_2",
+      "name": "Max Stone",
+      "texture": "skins/max_stone_2.png",
+      "order": 44
+    }
+  ]
+}

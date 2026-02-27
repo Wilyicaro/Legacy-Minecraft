@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "German Soldier",
+    "displayNameId": "IDS_dlcskin02415359_DISPLAYNAME",
+    "themeName": "World War 2",
+    "themeNameId": "IDS_dlcskin02415359_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

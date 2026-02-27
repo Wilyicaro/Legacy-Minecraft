@@ -1,0 +1,278 @@
+{
+  "name": "Battle and the Beasts 2",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "baby_ghast",
+      "name": "Baby Ghast",
+      "texture": "skins/baby_ghast.png",
+      "order": 1
+    },
+    {
+      "id": "siamese_cat",
+      "name": "Siamese Cat",
+      "texture": "skins/siamese_cat.png",
+      "order": 2
+    },
+    {
+      "id": "fungi_creature",
+      "name": "Fungi Creature",
+      "texture": "skins/fungi_creature.png",
+      "order": 3
+    },
+    {
+      "id": "nether_creature",
+      "name": "Nether Creature",
+      "texture": "skins/nether_creature.png",
+      "order": 4
+    },
+    {
+      "id": "tiger",
+      "name": "Tiger",
+      "texture": "skins/tiger.png",
+      "order": 5
+    },
+    {
+      "id": "snow_leopard",
+      "name": "Snow Leopard",
+      "texture": "skins/snow_leopard.png",
+      "order": 6
+    },
+    {
+      "id": "giant_panda",
+      "name": "Giant Panda",
+      "texture": "skins/giant_panda.png",
+      "order": 7
+    },
+    {
+      "id": "red_panda",
+      "name": "Red Panda",
+      "texture": "skins/red_panda.png",
+      "order": 8
+    },
+    {
+      "id": "lemur",
+      "name": "Lemur",
+      "texture": "skins/lemur.png",
+      "order": 9
+    },
+    {
+      "id": "shark",
+      "name": "Shark",
+      "texture": "skins/shark.png",
+      "order": 10
+    },
+    {
+      "id": "gecko",
+      "name": "Gecko",
+      "texture": "skins/gecko.png",
+      "order": 11
+    },
+    {
+      "id": "fox",
+      "name": "Fox",
+      "texture": "skins/fox.png",
+      "order": 12
+    },
+    {
+      "id": "toad",
+      "name": "Toad",
+      "texture": "skins/toad.png",
+      "order": 13
+    },
+    {
+      "id": "sloth",
+      "name": "Sloth",
+      "texture": "skins/sloth.png",
+      "order": 14
+    },
+    {
+      "id": "walrus",
+      "name": "Walrus",
+      "texture": "skins/walrus.png",
+      "order": 15
+    },
+    {
+      "id": "badger",
+      "name": "Badger",
+      "texture": "skins/badger.png",
+      "order": 16
+    },
+    {
+      "id": "rabbit",
+      "name": "Rabbit",
+      "texture": "skins/rabbit.png",
+      "order": 17
+    },
+    {
+      "id": "star_nosed_mole",
+      "name": "Star Nosed Mole",
+      "texture": "skins/star_nosed_mole.png",
+      "order": 18
+    },
+    {
+      "id": "capybara",
+      "name": "Capybara",
+      "texture": "skins/capybara.png",
+      "order": 19
+    },
+    {
+      "id": "hedgehog",
+      "name": "Hedgehog",
+      "texture": "skins/hedgehog.png",
+      "order": 20
+    },
+    {
+      "id": "dolphin",
+      "name": "Dolphin",
+      "texture": "skins/dolphin.png",
+      "order": 21
+    },
+    {
+      "id": "narwhal",
+      "name": "Narwhal",
+      "texture": "skins/narwhal.png",
+      "order": 22
+    },
+    {
+      "id": "masai",
+      "name": "Masai",
+      "texture": "skins/masai.png",
+      "order": 23
+    },
+    {
+      "id": "masai_2",
+      "name": "Masai",
+      "texture": "skins/masai_2.png",
+      "order": 24
+    },
+    {
+      "id": "musketeer",
+      "name": "Musketeer",
+      "texture": "skins/musketeer.png",
+      "order": 25
+    },
+    {
+      "id": "musketeer_2",
+      "name": "Musketeer",
+      "texture": "skins/musketeer_2.png",
+      "order": 26
+    },
+    {
+      "id": "incan",
+      "name": "Incan",
+      "texture": "skins/incan.png",
+      "order": 27
+    },
+    {
+      "id": "incan_2",
+      "name": "Incan",
+      "texture": "skins/incan_2.png",
+      "order": 28
+    },
+    {
+      "id": "egyptian",
+      "name": "Egyptian",
+      "texture": "skins/egyptian.png",
+      "order": 29
+    },
+    {
+      "id": "egyptian_2",
+      "name": "Egyptian",
+      "texture": "skins/egyptian_2.png",
+      "order": 30
+    },
+    {
+      "id": "highland",
+      "name": "Highland",
+      "texture": "skins/highland.png",
+      "order": 31
+    },
+    {
+      "id": "highland_2",
+      "name": "Highland",
+      "texture": "skins/highland_2.png",
+      "order": 32
+    },
+    {
+      "id": "maori",
+      "name": "Maori",
+      "texture": "skins/maori.png",
+      "cape": "capes/maroi.png",
+      "order": 33
+    },
+    {
+      "id": "maori_2",
+      "name": "Maori",
+      "texture": "skins/maori_2.png",
+      "order": 34
+    },
+    {
+      "id": "arabian",
+      "name": "Arabian",
+      "texture": "skins/arabian.png",
+      "cape": "capes/arabian.png",
+      "order": 35
+    },
+    {
+      "id": "arabian_2",
+      "name": "Arabian",
+      "texture": "skins/arabian_2.png",
+      "order": 36
+    },
+    {
+      "id": "cossack",
+      "name": "Cossack",
+      "texture": "skins/cossack.png",
+      "order": 37
+    },
+    {
+      "id": "cossack_2",
+      "name": "Cossack",
+      "texture": "skins/cossack_2.png",
+      "order": 38
+    },
+    {
+      "id": "conquistador",
+      "name": "Conquistador",
+      "texture": "skins/conquistador.png",
+      "order": 39
+    },
+    {
+      "id": "conquistador_2",
+      "name": "Conquistador",
+      "texture": "skins/conquistador_2.png",
+      "order": 40
+    },
+    {
+      "id": "octopus",
+      "name": "Octopus",
+      "texture": "skins/octopus.png",
+      "order": 41
+    },
+    {
+      "id": "barbarian",
+      "name": "Barbarian",
+      "texture": "skins/barbarian.png",
+      "order": 42
+    },
+    {
+      "id": "barbarian_2",
+      "name": "Barbarian",
+      "texture": "skins/barbarian_2.png",
+      "order": 43
+    },
+    {
+      "id": "mole_rat",
+      "name": "Mole Rat",
+      "texture": "skins/mole_rat.png",
+      "order": 44
+    },
+    {
+      "id": "orca",
+      "name": "Orca",
+      "texture": "skins/orca.png",
+      "order": 45
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Garth",
+    "displayNameId": "IDS_DLCSKIN00000006_DISPLAYNAME",
+    "themeName": "Fable Heroes",
+    "themeNameId": "IDS_DLCSKIN00000006_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

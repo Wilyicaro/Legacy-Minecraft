@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Sole Survivor",
+    "displayNameId": "IDS_SKINS_DLCSKIN00004825_DISPLAYNAME",
+    "themeName": "Fallout 4",
+    "themeNameId": "IDS_SKINS_DLCSKIN00004825_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

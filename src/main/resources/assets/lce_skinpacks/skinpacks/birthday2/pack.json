@@ -1,0 +1,156 @@
+{
+  "name": "2nd Birthday Skin Pack",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "party_plastic_steve",
+      "name": "Party Plastic Steve",
+      "texture": "skins/party_plastic_steve.png",
+      "order": 1
+    },
+    {
+      "id": "party_plastic_creeper",
+      "name": "Party Plastic Creeper",
+      "texture": "skins/party_plastic_creeper.png",
+      "order": 2
+    },
+    {
+      "id": "party_zombie_villager",
+      "name": "Party Zombie Villager",
+      "texture": "skins/party_zombie_villager.png",
+      "order": 3,
+      "poses": ["zombie_arms"]
+    },
+    {
+      "id": "witchbirthday2",
+      "name": "Witch",
+      "texture": "skins/witchbirthday2.png",
+      "order": 4
+    },
+    {
+      "id": "party_wither_skeleton",
+      "name": "Party Wither Skeleton",
+      "texture": "skins/party_wither_skeleton.png",
+      "order": 5,
+      "poses": ["zombie_arms"]
+    },
+    {
+      "id": "wither",
+      "name": "Wither",
+      "texture": "skins/wither.png",
+      "order": 6
+    },
+    {
+      "id": "party_red_cat",
+      "name": "Party Red Cat",
+      "texture": "skins/party_red_cat.png",
+      "order": 7
+    },
+    {
+      "id": "party_black_cat",
+      "name": "Party Black Cat",
+      "texture": "skins/party_black_cat.png",
+      "order": 8
+    },
+    {
+      "id": "party_siamese_cat",
+      "name": "Party Siamese Cat",
+      "texture": "skins/party_siamese_cat.png",
+      "order": 9
+    },
+    {
+      "id": "party_ocelot",
+      "name": "Party Ocelot",
+      "texture": "skins/party_ocelot.png",
+      "order": 10
+    },
+    {
+      "id": "party_fidget",
+      "name": "Party Fidget",
+      "texture": "skins/party_fidget.png",
+      "order": 11
+    },
+    {
+      "id": "party_dust",
+      "name": "Party Dust",
+      "texture": "skins/party_dust.png",
+      "order": 12
+    },
+    {
+      "id": "party_ratchet",
+      "name": "Party Ratchet",
+      "texture": "skins/party_ratchet.png",
+      "order": 13
+    },
+    {
+      "id": "party_clank",
+      "name": "Party Clank",
+      "texture": "skins/party_clank.png",
+      "model": "slim",
+      "order": 14
+    },
+    {
+      "id": "party_sackboy",
+      "name": "Party Sackboy",
+      "texture": "skins/party_sackboy.png",
+      "order": 15
+    },
+    {
+      "id": "party_sackgirl",
+      "name": "Party Sackgirl",
+      "texture": "skins/party_sackgirl.png",
+      "order": 16
+    },
+    {
+      "id": "party_sly_cooper",
+      "name": "Party Sly Cooper",
+      "texture": "skins/party_sly_cooper.png",
+      "order": 17
+    },
+    {
+      "id": "party_carmelita_montoya_fox",
+      "name": "Party Carmelita Montoya Fox",
+      "texture": "skins/party_carmelita_montoya_fox.png",
+      "model": "slim",
+      "order": 18
+    },
+    {
+      "id": "party_bentley",
+      "name": "Party Bentley",
+      "texture": "skins/party_bentley.png",
+      "order": 19
+    },
+    {
+      "id": "party_kratos",
+      "name": "Party Kratos",
+      "texture": "skins/party_kratos.png",
+      "order": 20
+    },
+    {
+      "id": "party_zeus",
+      "name": "Party Zeus",
+      "texture": "skins/party_zeus.png",
+      "order": 21
+    },
+    {
+      "id": "party_gaia",
+      "name": "Party Gaia",
+      "texture": "skins/party_gaia.png",
+      "order": 22
+    },
+    {
+      "id": "party_robed_figure_red",
+      "name": "Party Robed Figure - Red",
+      "texture": "skins/party_robed_figure_red.png",
+      "cape": "capes/robed_red.png",
+      "order": 23
+    },
+    {
+      "id": "party_robed_figure_white",
+      "name": "Party Robed Figure - White",
+      "texture": "skins/party_robed_figure_white.png",
+      "cape": "capes/robed_white.png",
+      "order": 24
+    }
+  ]
+}

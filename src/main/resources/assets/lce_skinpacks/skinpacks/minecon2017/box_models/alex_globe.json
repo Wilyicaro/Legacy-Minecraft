@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Alex Globe",
+    "displayNameId": "IDS_DLCSKIN00006501_DISPLAYNAME",
+    "themeName": "Head in the Clouds",
+    "themeNameId": "IDS_DLCSKIN00006501_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

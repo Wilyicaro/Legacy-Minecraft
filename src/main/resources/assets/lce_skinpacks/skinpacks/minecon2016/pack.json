@@ -1,0 +1,106 @@
+{
+  "name": "Minecon 2016",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "steve_11",
+      "name": "Steve",
+      "texture": "skins/steve.png",
+      "cape": "capes/2011.png",
+      "order": 1
+    },
+    {
+      "id": "steve_2",
+      "name": "Steve",
+      "texture": "skins/steve_2.png",
+      "cape": "capes/2012.png",
+      "order": 2
+    },
+    {
+      "id": "steve_3",
+      "name": "Steve",
+      "texture": "skins/steve_3.png",
+      "cape": "capes/2013.png",
+      "order": 3
+    },
+    {
+      "id": "steve_4",
+      "name": "Steve",
+      "texture": "skins/steve_4.png",
+      "cape": "capes/2015.png",
+      "order": 4
+    },
+    {
+      "id": "steve_5",
+      "name": "Steve",
+      "texture": "skins/steve_4.png",
+      "cape": "capes/2016.png",
+      "order": 4
+    },
+
+    {
+      "id": "alex_11",
+      "name": "Alex",
+      "texture": "skins/alex.png",
+      "cape": "capes/2011.png",
+      "model": "slim",
+      "order": 5
+    },
+    {
+      "id": "alex_2",
+      "name": "Alex",
+      "texture": "skins/alex_2.png",
+      "cape": "capes/2012.png",
+      "model": "slim",
+      "order": 6
+    },
+    {
+      "id": "alex_3",
+      "name": "Alex",
+      "texture": "skins/alex_3.png",
+      "cape": "capes/2013.png",
+      "model": "slim",
+      "order": 7
+    },
+    {
+      "id": "alex_4",
+      "name": "Alex",
+      "texture": "skins/alex_4.png",
+      "cape": "capes/2015.png",
+      "model": "slim",
+      "order": 8
+    },
+    {
+      "id": "alex_4",
+      "name": "Alex",
+      "texture": "skins/alex_4.png",
+      "cape": "capes/2016.png",
+      "model": "slim",
+      "order": 8
+    },
+    {
+      "id": "forest_fighter",
+      "name": "Forest Fighter",
+      "texture": "skins/forest_fighter.png",
+      "order": 9
+    },
+    {
+      "id": "ice_pioneer",
+      "name": "Ice Pioneer",
+      "texture": "skins/ice_pioneer.png",
+      "order": 10
+    },
+    {
+      "id": "mesa_artisan",
+      "name": "Mesa Artisan",
+      "texture": "skins/mesa_artisan.png",
+      "order": 11
+    },
+    {
+      "id": "ocean_engineer",
+      "name": "Ocean Engineer",
+      "texture": "skins/ocean_engineer.png",
+      "order": 12
+    }
+  ]
+}

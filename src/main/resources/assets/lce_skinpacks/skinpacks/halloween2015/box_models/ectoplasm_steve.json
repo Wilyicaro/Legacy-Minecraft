@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Ectoplasm Steve",
+    "displayNameId": "IDS_SKINS_DLCSKIN00003231_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

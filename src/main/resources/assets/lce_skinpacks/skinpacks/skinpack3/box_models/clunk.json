@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Clunk",
+    "displayNameId": "IDS_DLCSKIN20000206_DISPLAYNAME",
+    "themeName": "Awesomenauts",
+    "themeNameId": "IDS_DLCSKIN20000206_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

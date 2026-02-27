@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Coach",
+    "displayNameId": "IDS_DLCSKIN20000213_DISPLAYNAME",
+    "themeName": "Left 4 Dead 2",
+    "themeNameId": "IDS_DLCSKIN20000213_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Orange Knight",
+    "displayNameId": "IDS_DLCSKIN20000129_DISPLAYNAME",
+    "themeName": "Castle Crashers",
+    "themeNameId": "IDS_DLCSKIN20000129_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

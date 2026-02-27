@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Nikolai Orelov",
+    "displayNameId": "IDS_dlcskin17347335_DISPLAYNAME",
+    "themeName": "Assassin's Creed The Fall",
+    "themeNameId": "IDS_dlcskin17347335_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

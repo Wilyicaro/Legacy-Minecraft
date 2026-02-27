@@ -1,0 +1,357 @@
+{
+  "meta": {
+    "displayName": "Emperor's Royal Guard",
+    "displayNameId": "IDS_DLCSKIN00001246_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00001246_THEMENAME"
+  },
+"hide":["hat"],
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -10.0,
+            -4.0
+          ],
+          "size": [
+            8.0,
+            8.0,
+            8.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -8.1,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            16.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -11.0,
+            -3.0
+          ],
+          "size": [
+            6.0,
+            1.0,
+            6.0
+          ],
+          "uv": [
+            32,
+            9
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -6.0,
+            -3.0,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            50,
+            10
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            -4.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            50,
+            10
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -4.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            50,
+            10
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -3.0,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            50,
+            10
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            1.9
+          ],
+          "size": [
+            8.0,
+            12.0,
+            1.0
+          ],
+          "uv": [
+            22,
+            19
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_leg_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            1.9
+          ],
+          "size": [
+            4.0,
+            12.0,
+            1.0
+          ],
+          "uv": [
+            7,
+            19
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            9.0,
+            3.9
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            51,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            6.0,
+            2.9
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            9.0,
+            3.9
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.9,
+            9.0,
+            1.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            52,
+            9
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_leg_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            1.9
+          ],
+          "size": [
+            4.0,
+            12.0,
+            1.0
+          ],
+          "uv": [
+            7,
+            19
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            9.0,
+            2.9
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            6.0,
+            2.9
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            9.0,
+            3.9
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.9,
+            9.0,
+            1.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            52,
+            9
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

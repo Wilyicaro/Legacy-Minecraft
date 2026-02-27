@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Butcher",
+    "displayNameId": "IDS_dlcskin89142404_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

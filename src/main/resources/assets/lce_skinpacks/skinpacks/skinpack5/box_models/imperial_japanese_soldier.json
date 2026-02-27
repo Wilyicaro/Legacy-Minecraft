@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Imperial Japanese Soldier",
+    "displayNameId": "IDS_dlcskin39442390_DISPLAYNAME",
+    "themeName": "World War 2",
+    "themeNameId": "IDS_dlcskin39442390_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

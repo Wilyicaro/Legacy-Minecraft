@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Patchkin",
+    "displayNameId": "IDS_DLCSKIN00005609_DISPLAYNAME",
+    "themeName": "Villains",
+    "themeNameId": "IDS_DLCSKIN00005609_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

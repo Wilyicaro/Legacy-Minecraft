@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Ms. 'Splosion Man",
+    "displayNameId": "IDS_DLCSKIN00000029_DISPLAYNAME",
+    "themeName": "Ms. 'Splosion Man",
+    "themeNameId": "IDS_DLCSKIN00000029_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

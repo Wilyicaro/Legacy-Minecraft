@@ -1,10 +1,5 @@
 package wily.legacy.mixin.base.skins.client;
 
-
-/**
- * Mixin: console skins / CPM rendering glue.
- */
-
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;

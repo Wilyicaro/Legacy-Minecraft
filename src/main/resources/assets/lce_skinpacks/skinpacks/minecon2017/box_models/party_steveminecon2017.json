@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Party Steve",
+    "displayNameId": "IDS_DLCSKIN00006505_DISPLAYNAME",
+    "themeName": "Fancy-Pants Steve",
+    "themeNameId": "IDS_DLCSKIN00006505_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

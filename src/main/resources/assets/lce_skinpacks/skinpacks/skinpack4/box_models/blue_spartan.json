@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Blue Spartan",
+    "displayNameId": "IDS_dlcskin74908399_DISPLAYNAME",
+    "themeName": "Halo",
+    "themeNameId": "IDS_dlcskin74908399_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

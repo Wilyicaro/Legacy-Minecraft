@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Racing Driver 4",
+    "displayNameId": "IDS_DLCSKIN00000034_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

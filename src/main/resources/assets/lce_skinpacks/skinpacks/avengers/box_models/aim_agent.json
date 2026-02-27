@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "AIM Agent",
+    "displayNameId": "IDS_dlcskin40284308_DISPLAYNAME",
+    "themeName": "Marvel Avengers",
+    "themeNameId": "IDS_dlcskin40284308_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

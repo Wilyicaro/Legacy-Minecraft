@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Baker's Wife",
+    "displayNameId": "IDS_dlcskin05148215_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

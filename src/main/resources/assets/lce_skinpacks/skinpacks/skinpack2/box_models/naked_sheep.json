@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Naked Sheep",
+    "displayNameId": "IDS_DLCSKIN20000103_DISPLAYNAME",
+    "themeName": "Minecraft",
+    "themeNameId": "IDS_DLCSKIN20000103_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,272 @@
+{
+  "name": "Skin Pack 2",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "enderman",
+      "name": "Enderman",
+      "texture": "skins/enderman.png",
+      "order": 17.1
+    },
+    {
+      "id": "pig",
+      "name": "Pig",
+      "texture": "skins/pig.png",
+      "order": 17.2
+    },
+    {
+      "id": "sheep",
+      "name": "Sheep",
+      "texture": "skins/sheep.png",
+      "order": 17.3
+    },
+    {
+      "id": "naked_sheep",
+      "name": "Naked Sheep",
+      "texture": "skins/naked_sheep.png",
+      "order": 17.4
+    },
+    {
+      "id": "spider",
+      "name": "Spider",
+      "texture": "skins/spider.png",
+      "order": 17.5
+    },
+    {
+      "id": "general_akamoto",
+      "name": "General Akamoto",
+      "texture": "skins/general_akamoto.png",
+      "order": 6
+    },
+    {
+      "id": "otus",
+      "name": "Otus",
+      "texture": "skins/otus.png",
+      "order": 7
+    },
+    {
+      "id": "agent_cobalt",
+      "name": "Agent Cobalt",
+      "texture": "skins/agent_cobalt.png",
+      "order": 8
+    },
+    {
+      "id": "zap",
+      "name": "Zap",
+      "texture": "skins/zap.png",
+      "order": 9
+    },
+    {
+      "id": "buzz",
+      "name": "Buzz",
+      "texture": "skins/buzz.png",
+      "order": 10
+    },
+    {
+      "id": "glorg",
+      "name": "Glorg",
+      "texture": "skins/glorg.png",
+      "order": 11
+    },
+    {
+      "id": "the_player",
+      "name": "The Player",
+      "texture": "skins/the_player.png",
+      "order": 12
+    },
+    {
+      "id": "spelunky_guy",
+      "name": "Spelunky Guy",
+      "texture": "skins/spelunky_guy.png",
+      "order": 13
+    },
+    {
+      "id": "green_knight",
+      "name": "Green Knight",
+      "texture": "skins/green_knight.png",
+      "order": 60
+    },
+    {
+      "id": "pirate",
+      "name": "Pirate",
+      "texture": "skins/pirate.png",
+      "order": 15
+    },
+    {
+      "id": "ninja",
+      "name": "Ninja",
+      "texture": "skins/ninja.png",
+      "order": 16
+    },
+    {
+      "id": "elf",
+      "name": "Elf",
+      "texture": "skins/elf.png",
+      "order": 17
+    },
+    {
+      "id": "ratchet",
+      "name": "Ratchet",
+      "texture": "skins/ratchet.png",
+      "order": 18
+    },
+    {
+      "id": "clank",
+      "name": "Clank",
+      "texture": "skins/clank.png",
+      "order": 19
+    },
+    {
+      "id": "captain_qwark",
+      "name": "Captain Qwark",
+      "texture": "skins/captain_qwark.png",
+      "order": 20
+    },
+    {
+      "id": "dr_nefarious",
+      "name": "Dr Nefarious",
+      "texture": "skins/dr_nefarious.png",
+      "order": 21
+    },
+    {
+      "id": "cole",
+      "name": "Cole",
+      "texture": "skins/cole.png",
+      "order": 22
+    },
+    {
+      "id": "kessler",
+      "name": "Kessler",
+      "texture": "skins/kessler.png",
+      "order": 23
+    },
+    {
+      "id": "kuo",
+      "name": "Kuo",
+      "texture": "skins/kuo.png",
+      "order": 24
+    },
+    {
+      "id": "nix",
+      "name": "Nix",
+      "texture": "skins/nix.png",
+      "order": 25
+    },
+    {
+      "id": "the_beast",
+      "name": "The Beast",
+      "texture": "skins/the_beast.png",
+      "order": 26
+    },
+    {
+      "id": "robed_figure_red",
+      "name": "Robed Figure - Red",
+      "texture": "skins/robed_figure_red.png",
+      "cape": "capes/journeyred.png",
+      "order": 27
+    },
+    {
+      "id": "robed_figure_white",
+      "name": "Robed Figure - White",
+      "texture": "skins/robed_figure_white.png",
+      "cape": "capes/journeywhite.png",
+      "order": 28
+    },
+    {
+      "id": "orange_knight",
+      "name": "Orange Knight",
+      "texture": "skins/orange_knight.png",
+      "order": 0.1
+    },
+    {
+      "id": "ellie",
+      "name": "Ellie",
+      "texture": "skins/ellie.png",
+      "order": 30
+    },
+    {
+      "id": "joel",
+      "name": "Joel",
+      "texture": "skins/joel.png",
+      "order": 31
+    },
+    {
+      "id": "tess",
+      "name": "Tess",
+      "texture": "skins/tess.png",
+      "order": 32
+    },
+    {
+      "id": "bill",
+      "name": "Bill",
+      "texture": "skins/bill.png",
+      "order": 33
+    },
+    {
+      "id": "bloater",
+      "name": "Bloater",
+      "texture": "skins/bloater.png",
+      "order": 34
+    },
+    {
+      "id": "clicker",
+      "name": "Clicker",
+      "texture": "skins/clicker.png",
+      "order": 35
+    },
+    {
+      "id": "kratos",
+      "name": "Kratos",
+      "texture": "skins/kratos.png",
+      "order": 36
+    },
+    {
+      "id": "zeus",
+      "name": "Zeus",
+      "texture": "skins/zeus.png",
+      "order": 37
+    },
+    {
+      "id": "hades",
+      "name": "Hades",
+      "texture": "skins/hades.png",
+      "order": 38
+    },
+    {
+      "id": "athena",
+      "name": "Athena",
+      "texture": "skins/athena.png",
+      "order": 39
+    },
+    {
+      "id": "gaia",
+      "name": "Gaia",
+      "texture": "skins/gaia.png",
+      "order": 40
+    },
+    {
+      "id": "pilot",
+      "name": "Pilot",
+      "texture": "skins/pilot.png",
+      "order": 41
+    },
+    {
+      "id": "sailor",
+      "name": "Sailor",
+      "texture": "skins/sailor.png",
+      "order": 42
+    },
+    {
+      "id": "red_knight",
+      "name": "Red Knight",
+      "texture": "skins/red_knight.png",
+      "order": 43
+    },
+    {
+      "id": "blue_knight",
+      "name": "Blue Knight",
+      "texture": "skins/blue_knight.png",
+      "order": 44
+    }
+  ]
+}

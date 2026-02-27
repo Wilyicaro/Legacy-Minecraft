@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Sergeant Rex \"Power\" Colt",
+    "displayNameId": "IDS_dlcskin45006439_DISPLAYNAME",
+    "themeName": "Far Cry 3: Blood Dragon",
+    "themeNameId": "IDS_dlcskin45006439_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

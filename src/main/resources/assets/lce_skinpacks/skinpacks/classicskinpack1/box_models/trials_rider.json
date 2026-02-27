@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Trials Rider",
+    "displayNameId": "IDS_DLCSKIN00000021_DISPLAYNAME",
+    "themeName": "Trials HD",
+    "themeNameId": "IDS_DLCSKIN00000021_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Zombie Herobrine",
+    "displayNameId": "IDS_DLCSKIN20000201_DISPLAYNAME",
+    "themeName": "Minecraft",
+    "themeNameId": "IDS_DLCSKIN20000201_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

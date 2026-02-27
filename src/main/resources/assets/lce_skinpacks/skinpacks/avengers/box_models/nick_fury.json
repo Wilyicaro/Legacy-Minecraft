@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Nick Fury",
+    "displayNameId": "IDS_dlcskin45075025_DISPLAYNAME",
+    "themeName": "Marvel Avengers",
+    "themeNameId": "IDS_dlcskin45075025_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

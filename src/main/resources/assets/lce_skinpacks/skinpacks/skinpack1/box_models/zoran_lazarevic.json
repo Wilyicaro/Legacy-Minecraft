@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "displayName": "Zoran Lazarevic",
+    "displayNameId": "IDS_DLCSKIN20000026_DISPLAYNAME",
+    "themeName": "Uncharted",
+    "themeNameId": "IDS_DLCSKIN20000026_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            5.0,
+            -2.99
+          ],
+          "size": [
+            3.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

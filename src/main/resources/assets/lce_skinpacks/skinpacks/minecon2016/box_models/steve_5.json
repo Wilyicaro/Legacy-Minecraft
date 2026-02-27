@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Steve",
+    "displayNameId": "IDS_DLCSKIN00003109_DISPLAYNAME",
+    "themeName": "Minecon 2016 Cape",
+    "themeNameId": "IDS_DLCSKIN00003109_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

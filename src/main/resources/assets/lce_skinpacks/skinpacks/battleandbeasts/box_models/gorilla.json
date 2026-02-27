@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Gorilla",
+    "displayNameId": "IDS_DLCSKIN00000818_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

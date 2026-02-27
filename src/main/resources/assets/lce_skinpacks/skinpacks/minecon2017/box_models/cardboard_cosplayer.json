@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Cardboard Cosplayer",
+    "displayNameId": "IDS_DLCSKIN00006503_DISPLAYNAME",
+    "themeName": "Homemade Minecon costume!",
+    "themeNameId": "IDS_DLCSKIN00006503_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

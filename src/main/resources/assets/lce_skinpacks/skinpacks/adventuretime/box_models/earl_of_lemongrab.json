@@ -1,0 +1,90 @@
+{
+  "meta": {
+    "displayName": "Earl of Lemongrab",
+    "displayNameId": "IDS_SKINS_DLCSKIN00004418_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -0.5,
+            -5.0,
+            -6.9
+          ],
+          "size": [
+            1.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            9,
+            9
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -0.5,
+            -5.0,
+            -4.9
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            10,
+            10
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -9.9,
+            -3.0
+          ],
+          "size": [
+            6.0,
+            2.0,
+            6.0
+          ],
+          "uv": [
+            2,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -10.9,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            24,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Lydia",
+    "displayNameId": "IDS_SKINS_DLCSKIN00001417_DISPLAYNAME",
+    "themeName": "Skyrim",
+    "themeNameId": "IDS_SKINS_DLCSKIN00001417_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Otus",
+    "displayNameId": "IDS_DLCSKIN20000106_DISPLAYNAME",
+    "themeName": "Owlboy",
+    "themeNameId": "IDS_DLCSKIN20000106_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

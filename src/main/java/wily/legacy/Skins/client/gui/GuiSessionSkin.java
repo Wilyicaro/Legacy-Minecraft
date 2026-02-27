@@ -80,7 +80,6 @@ public final class GuiSessionSkin {
             Thread t = new Thread(() -> {
                 try {
 
-
                     try {
                         skinManager.getClass().getMethod("getInsecureSkinInformation", GameProfile.class).invoke(skinManager, profile);
                     } catch (Throwable ignored) {

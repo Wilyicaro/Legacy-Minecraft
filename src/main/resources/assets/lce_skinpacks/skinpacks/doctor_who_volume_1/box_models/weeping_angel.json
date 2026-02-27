@@ -1,0 +1,235 @@
+{
+  "meta": {
+    "displayName": "Weeping Angel",
+    "displayNameId": "IDS_DLCSKIN00002022_DISPLAYNAME"
+  },
+  "hide": "HAT",
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            4.0,
+            0.0,
+            2.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            59,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            0.0,
+            2.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            59,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -6.0,
+            6.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            59,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            -6.0,
+            6.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            59,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -4.0,
+            10.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            59,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            -4.0,
+            10.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            59,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            14.0,
+            6.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            59,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            14.0,
+            6.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            59,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            6.0,
+            6.0
+          ],
+          "size": [
+            1.0,
+            8.0,
+            8.0
+          ],
+          "uv": [
+            32,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            6.0,
+            6.0
+          ],
+          "size": [
+            1.0,
+            8.0,
+            8.0
+          ],
+          "uv": [
+            32,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            -2.0,
+            6.0
+          ],
+          "size": [
+            1.0,
+            8.0,
+            8.0
+          ],
+          "uv": [
+            32,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -2.0,
+            6.0
+          ],
+          "size": [
+            1.0,
+            8.0,
+            8.0
+          ],
+          "uv": [
+            32,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

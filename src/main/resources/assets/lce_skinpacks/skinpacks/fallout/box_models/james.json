@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "James",
+    "displayNameId": "IDS_SKINS_DLCSKIN00004815_DISPLAYNAME",
+    "themeName": "Fallout 3",
+    "themeNameId": "IDS_SKINS_DLCSKIN00004815_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

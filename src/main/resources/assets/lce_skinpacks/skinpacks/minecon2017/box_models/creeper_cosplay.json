@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Creeper Cosplay",
+    "displayNameId": "IDS_DLCSKIN00006507_DISPLAYNAME",
+    "themeName": "Explosive personality",
+    "themeNameId": "IDS_DLCSKIN00006507_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

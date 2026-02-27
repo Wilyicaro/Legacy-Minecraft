@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Maya",
+    "displayNameId": "IDS_dlcskin31132464_DISPLAYNAME",
+    "themeName": "Borderlands 2",
+    "themeNameId": "IDS_dlcskin31132464_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

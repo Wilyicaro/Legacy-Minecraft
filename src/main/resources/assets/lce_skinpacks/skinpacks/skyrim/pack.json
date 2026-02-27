@@ -1,0 +1,248 @@
+{
+  "name": "The Elder Scrolls V: Skyrim",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "dragonborn_male",
+      "name": "Dragonborn Male",
+      "texture": "skins/dragonborn_male.png",
+      "order": 1
+    },
+    {
+      "id": "dragonborn_female",
+      "name": "Dragonborn Female",
+      "texture": "skins/dragonborn_female.png",
+      "order": 2
+    },
+    {
+      "id": "ancano",
+      "name": "Ancano",
+      "texture": "skins/ancano.png",
+      "order": 3
+    },
+    {
+      "id": "elenwen",
+      "name": "Elenwen",
+      "texture": "skins/elenwen.png",
+      "order": 4
+    },
+    {
+      "id": "argonian_fighter",
+      "name": "Argonian Fighter",
+      "texture": "skins/argonian_fighter.png",
+      "order": 5
+    },
+    {
+      "id": "argonian_mage",
+      "name": "Argonian Mage",
+      "texture": "skins/argonian_mage.png",
+      "order": 6
+    },
+    {
+      "id": "wood_elf_archer",
+      "name": "Wood Elf Archer",
+      "texture": "skins/wood_elf_archer.png",
+      "order": 7
+    },
+    {
+      "id": "wood_elf_mage",
+      "name": "Wood Elf Mage",
+      "texture": "skins/wood_elf_mage.png",
+      "order": 8
+    },
+    {
+      "id": "breton_mage",
+      "name": "Breton Mage",
+      "texture": "skins/breton_mage.png",
+      "order": 9
+    },
+    {
+      "id": "forsworn_shaman",
+      "name": "Forsworn Shaman",
+      "texture": "skins/forsworn_shaman.png",
+      "order": 10
+    },
+    {
+      "id": "dark_elf_mage",
+      "name": "Dark Elf Mage",
+      "texture": "skins/dark_elf_mage.png",
+      "order": 11
+    },
+    {
+      "id": "dark_elf_assassin",
+      "name": "Dark Elf Assassin",
+      "texture": "skins/dark_elf_assassin.png",
+      "order": 12
+    },
+    {
+      "id": "imperial_soldier",
+      "name": "Imperial Soldier",
+      "texture": "skins/imperial_soldier.png",
+      "order": 13
+    },
+    {
+      "id": "vex",
+      "name": "Vex",
+      "texture": "skins/vex.png",
+      "order": 14
+    },
+    {
+      "id": "khajiit_merchant",
+      "name": "Khajiit Merchant",
+      "texture": "skins/khajiit_merchant.png",
+      "order": 15
+    },
+    {
+      "id": "stormcloak_soldier",
+      "name": "Stormcloak Soldier",
+      "texture": "skins/stormcloak_soldier.png",
+      "order": 16
+    },
+    {
+      "id": "lydiawife",
+      "name": "Lydia",
+      "texture": "skins/lydia.png",
+      "order": 17
+    },
+    {
+      "id": "orc_blacksmith",
+      "name": "Orc Blacksmith",
+      "texture": "skins/orc_blacksmith.png",
+      "order": 18
+    },
+    {
+      "id": "orc_warrior_female",
+      "name": "Orc Warrior Female",
+      "texture": "skins/orc_warrior_female.png",
+      "order": 19
+    },
+    {
+      "id": "nazir",
+      "name": "Nazir",
+      "texture": "skins/nazir.png",
+      "cape": "capes/nazir.png",
+      "order": 20
+    },
+    {
+      "id": "saadia",
+      "name": "Saadia",
+      "texture": "skins/saadia.png",
+      "order": 21
+    },
+    {
+      "id": "vampire_lord",
+      "name": "Vampire Lord",
+      "texture": "skins/vampire_lord.png",
+      "cape": "capes/vampirelord.png",
+      "order": 22
+    },
+    {
+      "id": "isran",
+      "name": "Isran",
+      "texture": "skins/isran.png",
+      "order": 23
+    },
+    {
+      "id": "astrid",
+      "name": "Astrid",
+      "texture": "skins/astrid.png",
+      "order": 24
+    },
+    {
+      "id": "aela_the_huntress",
+      "name": "Aela the Huntress",
+      "texture": "skins/aela_the_huntress.png",
+      "order": 25
+    },
+    {
+      "id": "maiq_the_liar",
+      "name": "M'aiq the Liar",
+      "texture": "skins/maiq_the_liar.png",
+      "order": 26
+    },
+    {
+      "id": "greybeard",
+      "name": "Greybeard",
+      "texture": "skins/greybeard.png",
+      "order": 27
+    },
+    {
+      "id": "frost_troll",
+      "name": "Frost Troll",
+      "texture": "skins/frost_troll.png",
+      "order": 28
+    },
+    {
+      "id": "flame_atronach",
+      "name": "Flame Atronach",
+      "texture": "skins/flame_atronach.png",
+      "order": 29
+    },
+    {
+      "id": "dragon_priest",
+      "name": "Dragon Priest",
+      "texture": "skins/dragon_priest.png",
+      "order": 30
+    },
+    {
+      "id": "hagraven",
+      "name": "Hagraven",
+      "texture": "skins/hagraven.png",
+      "order": 31
+    },
+    {
+      "id": "draugr_deathlord",
+      "name": "Draugr Deathlord",
+      "texture": "skins/draugr_deathlord.png",
+      "order": 32
+    },
+    {
+      "id": "sheogorath",
+      "name": "Sheogorath",
+      "texture": "skins/sheogorath.png",
+      "order": 33
+    },
+    {
+      "id": "spriggan",
+      "name": "Spriggan",
+      "texture": "skins/spriggan.png",
+      "order": 34
+    },
+    {
+      "id": "dwarven_centurion",
+      "name": "Dwarven Centurion",
+      "texture": "skins/dwarven_centurion.png",
+      "order": 35
+    },
+    {
+      "id": "wispmother",
+      "name": "Wispmother",
+      "texture": "skins/wispmother.png",
+      "order": 36
+    },
+    {
+      "id": "dremora_lord",
+      "name": "Dremora Lord",
+      "texture": "skins/dremora_lord.png",
+      "order": 37
+    },
+    {
+      "id": "master_necromancer",
+      "name": "Master Necromancer",
+      "texture": "skins/master_necromancer.png",
+      "order": 38
+    },
+    {
+      "id": "vilkas",
+      "name": "Vilkas",
+      "texture": "skins/vilkas.png",
+      "order": 39
+    },
+    {
+      "id": "orc_warrior_male",
+      "name": "Orc Warrior Male",
+      "texture": "skins/orc_warrior_male.png",
+      "order": 40
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Nether Tamer",
+    "displayNameId": "IDS_DLCSKIN00005323_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

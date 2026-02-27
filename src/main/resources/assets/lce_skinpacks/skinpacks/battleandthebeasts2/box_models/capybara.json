@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Capybara",
+    "displayNameId": "IDS_DLCSKIN00001018_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

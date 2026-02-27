@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Hercules",
+    "displayNameId": "IDS_dlcskin73281745_DISPLAYNAME",
+    "themeName": "Marvel Avengers",
+    "themeNameId": "IDS_dlcskin73281745_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

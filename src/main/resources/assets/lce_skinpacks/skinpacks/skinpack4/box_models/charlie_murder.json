@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Charlie Murder",
+    "displayNameId": "IDS_dlcskin76218837_DISPLAYNAME",
+    "themeName": "Charlie Murder",
+    "themeNameId": "IDS_dlcskin76218837_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

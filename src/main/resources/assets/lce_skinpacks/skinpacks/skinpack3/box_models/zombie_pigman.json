@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Zombie Pigman",
+    "displayNameId": "IDS_DLCSKIN20000200_DISPLAYNAME",
+    "themeName": "Minecraft",
+    "themeNameId": "IDS_DLCSKIN20000200_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Winter Steve",
+    "displayNameId": "IDS_DLCSKIN00000611_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

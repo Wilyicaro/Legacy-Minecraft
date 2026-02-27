@@ -1,0 +1,379 @@
+{
+  "meta": {
+    "displayName": "Bigfoot",
+    "displayNameId": "IDS_SKINS_DLCSKIN00002717_DISPLAYNAME",
+    "themeName": "Festive Mash-up",
+    "themeNameId": "IDS_SKINS_DLCSKIN00002717_THEMENAME"
+  },
+  "armorOffsets": {
+    "HELMET": {
+      "x": 0.0,
+      "y": -3.0,
+      "z": 0.0
+    },
+    "SHOULDER0": {
+      "x": 0.0,
+      "y": -2.0,
+      "z": 0.0
+    },
+    "SHOULDER1": {
+      "x": 0.0,
+      "y": -2.0,
+      "z": 0.0
+    },
+    "CHEST": {
+      "x": 0.0,
+      "y": -2.0,
+      "z": 0.0
+    }
+  },
+"hide": ["head", "hat"],
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -4.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            3.0,
+            4.0
+          ],
+          "uv": [
+            44,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -4.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            3.0,
+            4.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -9.9,
+            -3.9
+          ],
+          "size": [
+            8.0,
+            8.0,
+            8.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -3.9,
+            -4.9
+          ],
+          "size": [
+            6.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -10.9,
+            -2.9
+          ],
+          "size": [
+            4.0,
+            1.0,
+            5.0
+          ],
+          "uv": [
+            41,
+            10
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -3.9,
+            -3.9
+          ],
+          "size": [
+            6.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            10
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -8.9,
+            -4.9
+          ],
+          "size": [
+            6.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -6.9,
+            -4.9
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            29
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -5.9,
+            -4.9
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            27
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -5.9,
+            -4.9
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            27
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_leg_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            10.0,
+            -3.0
+          ],
+          "size": [
+            3.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            12,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            10.0,
+            -4.0
+          ],
+          "size": [
+            3.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            12,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            11.0,
+            -5.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_leg_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            10.0,
+            -3.0
+          ],
+          "size": [
+            3.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            12,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            10.0,
+            -4.0
+          ],
+          "size": [
+            3.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            12,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            11.0,
+            -5.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

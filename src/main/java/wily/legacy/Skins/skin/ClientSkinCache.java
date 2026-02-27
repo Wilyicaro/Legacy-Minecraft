@@ -22,7 +22,6 @@ public final class ClientSkinCache {
             SKINS_BY_UUID.put(uuid, skinId);
         }
 
-
         try {
             var mc = Minecraft.getInstance();
             if (mc != null) {
@@ -37,7 +36,6 @@ public final class ClientSkinCache {
                 if (conn != null) {
                     var info = conn.getPlayerInfo(uuid);
                     if (info != null && info.getProfile() != null) {
-
 
                         setName(info.getProfile().name(), skinId);
                     }
@@ -63,7 +61,6 @@ public final class ClientSkinCache {
     public static String getByName(String scoreboardName) {
         return scoreboardName == null ? null : SKINS_BY_NAME.get(scoreboardName);
     }
-
 
     public static String get(UUID uuid, String scoreboardName) {
         String v = get(uuid);

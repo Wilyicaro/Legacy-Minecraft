@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Tundra Brewer",
+    "displayNameId": "IDS_DLCSKIN00004518_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00004518_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Richard",
+    "displayNameId": "IDS_DLCSKIN00006103_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

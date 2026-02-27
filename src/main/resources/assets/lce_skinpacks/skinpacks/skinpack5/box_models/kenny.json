@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "displayName": "Kenny",
+    "displayNameId": "IDS_dlcskin33352839_DISPLAYNAME",
+    "themeName": "The Walking Dead",
+    "themeNameId": "IDS_dlcskin33352839_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -7.0,
+            -7.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -7.0,
+            -7.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

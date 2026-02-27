@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Daniel Kaplan",
+    "displayNameId": "IDS_DLCSKIN00003001_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

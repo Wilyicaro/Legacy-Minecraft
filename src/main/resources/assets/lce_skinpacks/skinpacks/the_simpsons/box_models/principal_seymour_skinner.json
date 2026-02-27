@@ -1,0 +1,266 @@
+{
+  "meta": {
+    "displayName": "Principal Seymour Skinner",
+    "displayNameId": "IDS_DLCSKIN00002105_DISPLAYNAME"
+  },
+  "hide": "head",
+  "armorOffsets": {
+    "HELMET": {
+      "x": 0.0,
+      "y": -2.1,
+      "z": 0.0
+    }
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -3.0,
+            -5.8
+          ],
+          "size": [
+            6.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -10.9,
+            -4.9
+          ],
+          "size": [
+            2.0,
+            1.0,
+            3.0
+          ],
+          "uv": [
+            25,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.9,
+            -10.9,
+            -5.8
+          ],
+          "size": [
+            4.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -10.9,
+            -4.9
+          ],
+          "size": [
+            3.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.9,
+            -6.0,
+            0.1
+          ],
+          "size": [
+            1.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            23
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.9,
+            -6.0,
+            0.1
+          ],
+          "size": [
+            1.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            23
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -6.0,
+            -5.8
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            20
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -10.0,
+            -4.8
+          ],
+          "size": [
+            8.0,
+            8.0,
+            8.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -10.0,
+            -5.4
+          ],
+          "size": [
+            5.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -10.5,
+            2.4
+          ],
+          "size": [
+            3.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -2.5,
+            -2.0,
+            -2.9
+          ],
+          "size": [
+            5.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.5,
+            -2.0,
+            -3.9
+          ],
+          "size": [
+            5.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            6.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            32,
+            7
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

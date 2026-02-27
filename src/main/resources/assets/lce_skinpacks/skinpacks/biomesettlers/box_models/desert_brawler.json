@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Desert Brawler",
+    "displayNameId": "IDS_DLCSKIN00004501_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00004501_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

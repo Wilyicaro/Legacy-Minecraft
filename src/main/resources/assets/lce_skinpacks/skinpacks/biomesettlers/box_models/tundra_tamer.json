@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Tundra Tamer",
+    "displayNameId": "IDS_DLCSKIN00004523_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00004523_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

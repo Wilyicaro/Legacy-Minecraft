@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Black Widow",
+    "displayNameId": "IDS_dlcskin80585139_DISPLAYNAME",
+    "themeName": "Marvel Avengers",
+    "themeNameId": "IDS_dlcskin80585139_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

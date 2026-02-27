@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Oswin Oswald",
+    "displayNameId": "IDS_DLCSKIN00002010_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

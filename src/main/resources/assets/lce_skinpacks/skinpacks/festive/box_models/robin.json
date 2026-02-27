@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "displayName": "Robin",
+    "displayNameId": "IDS_DLCSKIN00000618_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -5.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            30
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

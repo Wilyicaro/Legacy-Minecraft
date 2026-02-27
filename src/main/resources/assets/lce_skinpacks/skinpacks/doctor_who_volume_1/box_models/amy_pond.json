@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Amy Pond",
+    "displayNameId": "IDS_DLCSKIN00002006_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

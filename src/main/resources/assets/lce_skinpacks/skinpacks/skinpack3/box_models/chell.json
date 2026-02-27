@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Chell",
+    "displayNameId": "IDS_DLCSKIN20000221_DISPLAYNAME",
+    "themeName": "Portal",
+    "themeNameId": "IDS_DLCSKIN20000221_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

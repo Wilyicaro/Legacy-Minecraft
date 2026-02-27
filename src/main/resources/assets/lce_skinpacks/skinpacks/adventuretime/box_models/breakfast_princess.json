@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "displayName": "Breakfast Princess",
+    "displayNameId": "IDS_SKINS_DLCSKIN00004427_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            2.3,
+            -11.5,
+            0.2
+          ],
+          "size": [
+            0.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

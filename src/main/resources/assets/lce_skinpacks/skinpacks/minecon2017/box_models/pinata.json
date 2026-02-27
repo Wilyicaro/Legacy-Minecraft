@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Pinata",
+    "displayNameId": "IDS_DLCSKIN00006506_DISPLAYNAME",
+    "themeName": "Pi\u00f1-attaboy!",
+    "themeNameId": "IDS_DLCSKIN00006506_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

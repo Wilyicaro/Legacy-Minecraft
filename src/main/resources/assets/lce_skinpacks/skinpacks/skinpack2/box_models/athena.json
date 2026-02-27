@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "displayName": "Athena",
+    "displayNameId": "IDS_DLCSKIN20000139_DISPLAYNAME",
+    "themeName": "God of War",
+    "themeNameId": "IDS_DLCSKIN20000139_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            -8.99,
+            1.99
+          ],
+          "size": [
+            4.0,
+            1.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -8.99,
+            3.99
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            26,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

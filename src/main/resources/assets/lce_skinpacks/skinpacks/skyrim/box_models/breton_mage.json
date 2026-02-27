@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Breton Mage",
+    "displayNameId": "IDS_SKINS_DLCSKIN00001408_DISPLAYNAME",
+    "themeName": "Skyrim",
+    "themeNameId": "IDS_SKINS_DLCSKIN00001408_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

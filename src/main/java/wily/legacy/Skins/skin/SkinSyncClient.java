@@ -1,15 +1,15 @@
 package wily.legacy.Skins.skin;
 
-import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.base.network.CommonNetwork;
-import wily.legacy.Legacy4J;
-import wily.legacy.Skins.client.cpm.CpmModelManager;
-import wily.legacy.Skins.client.gui.GuiCpmPreviewCache;
-import wily.legacy.Skins.client.gui.PreviewPlayer;
 
 import java.util.Objects;
+import wily.legacy.Skins.skin.ClientSkinAssets;
+import wily.legacy.Skins.skin.SkinEntry;
+import wily.legacy.Skins.skin.SkinPackLoader;
 import java.util.UUID;
 
 public final class SkinSyncClient {
@@ -20,26 +20,17 @@ public final class SkinSyncClient {
     private static volatile int snapshotRequestDelayTicks = -1;
     private static volatile boolean receivedAnySyncSinceJoin;
 
+    private static final java.util.concurrent.ConcurrentHashMap<String, Boolean> SENT_ASSETS = new java.util.concurrent.ConcurrentHashMap<>();
+
+    private static final java.util.concurrent.ConcurrentHashMap<String, ChunkAccumulator> ASSET_CHUNKS = new java.util.concurrent.ConcurrentHashMap<>();
 
     private static final java.util.concurrent.ConcurrentHashMap<UUID, String> LAST_APPLIED =
             new java.util.concurrent.ConcurrentHashMap<>();
 
-    private static volatile long lastAnnounceMs = 0L;
-
-    private static final java.util.concurrent.ConcurrentHashMap<String, CpmChunkAssembly> IN_CPM_CHUNKS =
-            new java.util.concurrent.ConcurrentHashMap<>();
-
-    private record CpmChunkAssembly(String skinId, int transferId, int totalChunks, byte[][] chunks,
-                                    java.util.concurrent.atomic.AtomicInteger received,
-                                    java.util.concurrent.atomic.AtomicLong lastMs) {
-    }
-
     private SkinSyncClient() {
     }
 
-
     public static void initClient() {
-
         try {
             Minecraft mc = Minecraft.getInstance();
             if (mc != null && mc.getUser() != null) {
@@ -53,7 +44,6 @@ public final class SkinSyncClient {
         }
     }
 
-
     public static void ensureInitialSkinLoaded(Minecraft mc) {
         if (mc == null || mc.getUser() == null) return;
         UUID uid = mc.getUser().getProfileId();
@@ -64,9 +54,7 @@ public final class SkinSyncClient {
         }
     }
 
-
     public static void postTick(Minecraft client) {
-
         try {
             if (client != null && client.player != null && client.getUser() != null) {
                 UUID playerId = client.player.getUUID();
@@ -83,6 +71,7 @@ public final class SkinSyncClient {
             if (client != null && client.level != null) {
                 for (var p : client.level.players()) {
                     if (p == null) continue;
+
                     String s = ClientSkinCache.get(p.getUUID());
                     if (s != null && !s.isBlank()) ClientSkinCache.setName(p.getScoreboardName(), s);
 
@@ -90,10 +79,6 @@ public final class SkinSyncClient {
                         String last = LAST_APPLIED.get(p.getUUID());
                         if (!Objects.equals(last, s)) {
                             LAST_APPLIED.put(p.getUUID(), s);
-                            try {
-                                if (Legacy4J.INTERNAL_CPM_ENABLED) CpmModelManager.applyToProfile(p.getGameProfile(), s);
-                            } catch (Throwable ignored) {
-                            }
                         }
                     }
                 }
@@ -109,11 +94,7 @@ public final class SkinSyncClient {
             }
         }
 
-        if (snapshotRequestDelayTicks >= 0) {
-            if (FactoryAPI.getLoader().isForgeLike() && receivedAnySyncSinceJoin) {
-
-                snapshotRequestDelayTicks = -1;
-            } else if (client != null && client.player != null && client.getConnection() != null) {
+        if (snapshotRequestDelayTicks >= 0) {        if (client != null && client.player != null && client.getConnection() != null) {
                 snapshotRequestDelayTicks--;
                 if (snapshotRequestDelayTicks <= 0) {
                     snapshotRequestDelayTicks = -1;
@@ -138,16 +119,14 @@ public final class SkinSyncClient {
             pendingSkinId = null;
             requestSetSkin(client, skinId);
         }
-
     }
-
 
     public static void onClientJoin() {
         Minecraft client = Minecraft.getInstance();
         if (client == null) return;
 
         receivedAnySyncSinceJoin = false;
-        snapshotRequestDelayTicks = 40;
+        snapshotRequestDelayTicks = 1;
 
         if (pendingSkinId != null) {
             String skinId = pendingSkinId;
@@ -165,12 +144,7 @@ public final class SkinSyncClient {
                     if (persisted != null && !persisted.isBlank()) ClientSkinCache.set(uid, persisted);
                 }
                 if (persisted != null && !persisted.isBlank()) {
-
                     ClientSkinCache.set(client.player.getUUID(), persisted);
-                    try {
-                        if (Legacy4J.INTERNAL_CPM_ENABLED) CpmModelManager.applyToProfile(client.player.getGameProfile(), persisted);
-                    } catch (Throwable ignored2) {
-                    }
 
                     if (client.getConnection() != null) {
                         announcedThisSession = true;
@@ -184,16 +158,13 @@ public final class SkinSyncClient {
         }
     }
 
-
     public static void onClientDisconnect() {
         pendingSkinId = null;
         pendingUploadRequest = false;
         announcedThisSession = false;
         snapshotRequestDelayTicks = -1;
         receivedAnySyncSinceJoin = false;
-        lastAnnounceMs = 0L;
         LAST_APPLIED.clear();
-        IN_CPM_CHUNKS.clear();
 
         String keepVal = null;
         UUID keep = null;
@@ -207,106 +178,55 @@ public final class SkinSyncClient {
         }
 
         ClientSkinCache.clear();
+        ClientSkinAssets.clear();
+        SENT_ASSETS.clear();
+        ASSET_CHUNKS.clear();
         if (keep != null && keepVal != null && !keepVal.isBlank()) {
             ClientSkinCache.set(keep, keepVal);
         }
-        GuiCpmPreviewCache.clearCaches();
-        PreviewPlayer.clear();
-        if (Legacy4J.INTERNAL_CPM_ENABLED) CpmModelManager.invalidateAll();
     }
 
-
-    public static void requestSetSkin(Minecraft minecraft, String skinId) {
-        if (minecraft != null && minecraft.getConnection() != null && minecraft.player != null) {
-            try {
-                UUID uid = minecraft.getUser() != null ? minecraft.getUser().getProfileId() : minecraft.player.getUUID();
-                ClientSkinPersistence.save(uid, skinId);
-                if (uid != null) ClientSkinCache.set(uid, skinId);
-            } catch (Throwable ignored) {
-            }
-
-            try {
-                if (Legacy4J.INTERNAL_CPM_ENABLED) CpmModelManager.applyToProfile(minecraft.player.getGameProfile(), skinId == null ? "" : skinId);
-            } catch (Throwable ignored) {
-            }
-
-            if (SkinIdUtil.isCpm(skinId) && skinId.length() > SkinIds.CPM_PREFIX.length()) {
-                try {
-                    ClientSkinCache.set(minecraft.player.getUUID(), skinId);
-                } catch (Throwable ignored) {
-                }
-
-                byte[] modelFile = CpmModelManager.readModelFileBytesForSelection(skinId);
-                if (modelFile != null && modelFile.length > 0) {
-                    try {
-                        CpmModelManager.cacheNetworkModelFile(minecraft.player.getUUID(), skinId, modelFile);
-                    } catch (Throwable ignored) {
-                    }
-
-                    if (modelFile.length <= SkinSync.MAX_CPM_MODEL_FILE_BYTES) {
-                        CommonNetwork.sendToServer(new SkinSync.SetCpmModelC2S(skinId, modelFile));
-                        return;
-                    }
-
-                    if (modelFile.length <= SkinSync.MAX_CPM_MODEL_TOTAL_BYTES) {
-                        CommonNetwork.sendToServer(new SkinSync.SetSkinC2S(skinId));
-                        sendCpmChunksToServer(skinId, modelFile);
-                        return;
-                    }
-                }
-                CommonNetwork.sendToServer(new SkinSync.SetSkinC2S(skinId));
-                return;
-            }
-
-            CommonNetwork.sendToServer(new SkinSync.SetSkinC2S(skinId));
-        } else {
-
-            try {
-                Minecraft mc = Minecraft.getInstance();
-                if (mc != null && mc.getUser() != null) {
-                    UUID uid = mc.getUser().getProfileId();
-                    ClientSkinPersistence.save(uid, skinId);
-                    ClientSkinCache.set(uid, skinId);
-                }
-            } catch (Throwable ignored) {
-            }
-            pendingSkinId = skinId;
-        }
-    }
-
-    public static void onSyncSkin(UUID uuid, String skinId) {
-        receivedAnySyncSinceJoin = true;
-        ClientSkinCache.set(uuid, skinId);
-        applyToAnyKnownProfile(uuid, skinId);
-    }
-
-    public static void onSyncCpmModel(UUID uuid, String skinId, byte[] modelFileBytes) {
-        if (!Legacy4J.INTERNAL_CPM_ENABLED) return;
-
-        receivedAnySyncSinceJoin = true;
-        ClientSkinCache.set(uuid, skinId);
-        CpmModelManager.cacheNetworkModelFile(uuid, skinId, modelFileBytes);
-        applyToAnyKnownProfile(uuid, skinId);
-    }
-
-    public static void onRequestCpmUpload(String requestedSkinId) {
-        if (!Legacy4J.INTERNAL_CPM_ENABLED) return;
+    public static void requestSetSkin(Minecraft client, String skinId) {
+        if (client == null) return;
+        String id = skinId == null ? "" : skinId;
 
         try {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc == null || mc.player == null) return;
-            if (!SkinIdUtil.isCpm(requestedSkinId)) return;
+            UUID uid = client.getUser() != null ? client.getUser().getProfileId() : null;
+            if (uid != null) ClientSkinPersistence.save(uid, id);
+        } catch (Throwable ignored) {
+        }
 
-            String current = ClientSkinCache.get(mc.player.getUUID());
-            if (current == null || !current.equals(requestedSkinId)) return;
+        try {
+            if (client.player != null) ClientSkinCache.set(client.player.getUUID(), id);
+            if (client.getUser() != null) ClientSkinCache.set(client.getUser().getProfileId(), id);
+        } catch (Throwable ignored) {
+        }
 
-            byte[] modelFile = CpmModelManager.readModelFileBytesForSelection(requestedSkinId);
-            if (modelFile == null || modelFile.length == 0) return;
+        if (client.getConnection() == null || client.player == null) {
+            pendingSkinId = id;
+            return;
+        }
 
-            if (modelFile.length <= SkinSync.MAX_CPM_MODEL_FILE_BYTES) {
-                CommonNetwork.sendToServer(new SkinSync.SetCpmModelC2S(requestedSkinId, modelFile));
-            } else if (modelFile.length <= SkinSync.MAX_CPM_MODEL_TOTAL_BYTES) {
-                sendCpmChunksToServer(requestedSkinId, modelFile);
+        try {
+            CommonNetwork.sendToServer(new SkinSync.SetSkinC2S(id));
+
+            try {
+                if (!id.isBlank() && SENT_ASSETS.putIfAbsent(id, true) == null) {
+                    ResourceLocation texRl = null;
+                    SkinEntry e = null;
+                    try {
+                        e = SkinPackLoader.getSkin(id);
+                        if (e != null) texRl = e.texture();
+                    } catch (Throwable ignored) {
+                    }
+                    if (texRl == null) texRl = ResourceLocation.fromNamespaceAndPath("legacy", "textures/entity/" + id + ".png");
+                    ResourceLocation modelRl = resolveModelLocation(client, id, e);
+                    byte[] texBytes = loadBytes(client, texRl);
+                    byte[] modelBytes = loadBytes(client, modelRl);
+                    sendChunks(id, 0, texBytes);
+                    sendChunks(id, 1, modelBytes);
+                }
+            } catch (Throwable ignored) {
             }
         } catch (Throwable ignored) {
         }
@@ -333,7 +253,6 @@ public final class SkinSyncClient {
                     String persisted = ClientSkinPersistence.load(uid);
                     if (persisted != null && !persisted.isBlank()) {
                         skinId = persisted;
-
                         ClientSkinCache.set(uid, persisted);
                         ClientSkinCache.set(pid, persisted);
                     }
@@ -342,100 +261,171 @@ public final class SkinSyncClient {
             if (skinId == null) skinId = "";
 
             CommonNetwork.sendToServer(new SkinSync.SetSkinC2S(skinId));
-        } catch (Throwable ignored) {
-        }
-    }
 
-
-    public static void onSyncCpmModelChunk(UUID uuid, String skinId, int transferId, int totalChunks, int chunkIndex, byte[] chunkBytes) {
-        if (!Legacy4J.INTERNAL_CPM_ENABLED) return;
-
-        if (uuid == null || skinId == null) return;
-        if (totalChunks <= 0 || totalChunks > 10_000) return;
-        if (chunkIndex < 0 || chunkIndex >= totalChunks) return;
-
-        String key = uuid + "|" + transferId;
-        long now = System.currentTimeMillis();
-
-        CpmChunkAssembly asm = IN_CPM_CHUNKS.compute(key, (k, existing) -> {
-            if (existing == null || existing.totalChunks != totalChunks || existing.transferId != transferId || !Objects.equals(existing.skinId, skinId)) {
-                return new CpmChunkAssembly(skinId, transferId, totalChunks, new byte[totalChunks][], new java.util.concurrent.atomic.AtomicInteger(0), new java.util.concurrent.atomic.AtomicLong(now));
-            }
-            existing.lastMs.set(now);
-            return existing;
-        });
-
-        if (now - asm.lastMs.get() > 20_000L) {
-            IN_CPM_CHUNKS.remove(key);
-            return;
-        }
-
-        if (asm.chunks[chunkIndex] == null) {
-            asm.chunks[chunkIndex] = chunkBytes == null ? new byte[0] : chunkBytes;
-            asm.received.incrementAndGet();
-        }
-
-        if (asm.received.get() >= totalChunks) {
             try {
-                int total = 0;
-                for (byte[] c : asm.chunks) total += (c == null ? 0 : c.length);
-                if (total <= 0 || total > SkinSync.MAX_CPM_MODEL_TOTAL_BYTES) {
-                    IN_CPM_CHUNKS.remove(key);
-                    return;
+                if (!skinId.isBlank() && SENT_ASSETS.putIfAbsent(skinId, true) == null) {
+                    ResourceLocation texRl = null;
+                    SkinEntry e = null;
+                    try {
+                        e = SkinPackLoader.getSkin(skinId);
+                        if (e != null) texRl = e.texture();
+                    } catch (Throwable ignored) {
+                    }
+                    if (texRl == null) texRl = ResourceLocation.fromNamespaceAndPath("legacy", "textures/entity/" + skinId + ".png");
+                    ResourceLocation modelRl = resolveModelLocation(mc, skinId, e);
+                    byte[] texBytes = loadBytes(mc, texRl);
+                    byte[] modelBytes = loadBytes(mc, modelRl);
+                    sendChunks(skinId, 0, texBytes);
+                    sendChunks(skinId, 1, modelBytes);
                 }
-                byte[] full = new byte[total];
-                int pos = 0;
-                for (byte[] c : asm.chunks) {
-                    if (c == null || c.length == 0) continue;
-                    System.arraycopy(c, 0, full, pos, c.length);
-                    pos += c.length;
-                }
-                IN_CPM_CHUNKS.remove(key);
-                onSyncCpmModel(uuid, skinId, full);
             } catch (Throwable ignored) {
-                IN_CPM_CHUNKS.remove(key);
-            }
-        }
-    }
-
-    private static void sendCpmChunksToServer(String skinId, byte[] modelFile) {
-        try {
-            if (skinId == null || modelFile == null) return;
-            int chunkSize = SkinSync.MAX_CPM_CHUNK_BYTES;
-            if (chunkSize <= 0) return;
-            int totalChunks = (modelFile.length + chunkSize - 1) / chunkSize;
-            int transferId = java.util.concurrent.ThreadLocalRandom.current().nextInt();
-
-            for (int i = 0; i < totalChunks; i++) {
-                int off = i * chunkSize;
-                int len = Math.min(chunkSize, modelFile.length - off);
-                byte[] chunk = new byte[len];
-                System.arraycopy(modelFile, off, chunk, 0, len);
-                CommonNetwork.sendToServer(new SkinSync.SetCpmModelChunkC2S(skinId, transferId, totalChunks, i, chunk));
             }
         } catch (Throwable ignored) {
         }
     }
 
-    private static void applyToAnyKnownProfile(UUID uuid, String skinId) {
-        try {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc == null) return;
-            GameProfile gp = null;
-            if (mc.player != null && mc.player.getUUID().equals(uuid)) {
-                gp = mc.player.getGameProfile();
-            } else if (mc.level != null) {
-                var p = mc.level.getPlayerByUUID(uuid);
-                if (p != null) gp = p.getGameProfile();
-            }
-            if (gp == null && SkinIdUtil.isCpm(skinId)) {
+    private static ResourceLocation resolveModelLocation(Minecraft mc, String skinId, SkinEntry entry) {
+        if (mc == null || skinId == null || skinId.isBlank()) return null;
 
-                gp = new GameProfile(uuid, "synced");
-            }
-            if (gp != null) {
-                if (Legacy4J.INTERNAL_CPM_ENABLED) CpmModelManager.applyToProfile(gp, skinId == null ? "" : skinId);
+        try {
+            if (entry != null && entry.texture() != null) {
+                ResourceLocation tex = entry.texture();
+                String tp = tex.getPath();
+                int idx = tp.indexOf("skinpacks/");
+                if (idx >= 0) {
+                    String after = tp.substring(idx + "skinpacks/".length());
+                    int slash = after.indexOf('/');
+                    if (slash > 0) {
+                        String folder = after.substring(0, slash);
+                        ResourceLocation cand = ResourceLocation.fromNamespaceAndPath(tex.getNamespace(), "skinpacks/" + folder + "/box_models/" + skinId + ".json");
+                        if (mc.getResourceManager().getResource(cand).isPresent()) return cand;
+                    }
+                }
+
+                ResourceLocation cand2 = ResourceLocation.fromNamespaceAndPath(tex.getNamespace(), "box_models/" + skinId + ".json");
+                if (mc.getResourceManager().getResource(cand2).isPresent()) return cand2;
             }
         } catch (Throwable ignored) {
         }
+
+        try {
+            ResourceLocation cand3 = ResourceLocation.fromNamespaceAndPath("legacy", "box_models/" + skinId + ".json");
+            if (mc.getResourceManager().getResource(cand3).isPresent()) return cand3;
+        } catch (Throwable ignored) {
+        }
+
+        return ResourceLocation.fromNamespaceAndPath("legacy", "box_models/" + skinId + ".json");
+    }
+
+private static void sendChunks(String skinId, int type, byte[] bytes) {
+        if (skinId == null || skinId.isBlank()) return;
+        if (bytes == null) bytes = new byte[0];
+        int max = SkinSync.UploadAssetChunkC2S.MAX_CHUNK;
+        int total = bytes.length == 0 ? 1 : (bytes.length + max - 1) / max;
+
+        for (int i = 0; i < total; i++) {
+            int start = i * max;
+            int end = Math.min(bytes.length, start + max);
+            byte[] chunk;
+            if (bytes.length == 0) {
+                chunk = new byte[0];
+            } else {
+                int len = end - start;
+                chunk = new byte[len];
+                System.arraycopy(bytes, start, chunk, 0, len);
+            }
+            try {
+                CommonNetwork.sendToServer(new SkinSync.UploadAssetChunkC2S(skinId, type, i, total, chunk));
+            } catch (Throwable ignored) {
+            }
+        }
+    }
+
+private static byte[] loadBytes(Minecraft mc, ResourceLocation rl) {
+        try {
+            if (mc == null || rl == null) return new byte[0];
+            Resource res = mc.getResourceManager().getResource(rl).orElse(null);
+            if (res == null) return new byte[0];
+            try (var in = res.open()) {
+                return in.readAllBytes();
+            }
+        } catch (Throwable ignored) {
+        }
+        return new byte[0];
+    }
+
+    public static void onSyncAssets(UUID uuid, String skinId, byte[] texturePng, byte[] modelJson) {
+        if (skinId == null || skinId.isBlank()) return;
+        ClientSkinAssets.put(skinId, texturePng, modelJson);
+        ClientSkinCache.set(uuid, skinId);
+    }
+
+    private static final class ChunkAccumulator {
+        private final int total;
+        private final byte[][] parts;
+        private int received;
+
+        private ChunkAccumulator(int total) {
+            this.total = total;
+            this.parts = new byte[total][];
+            this.received = 0;
+        }
+
+        private void put(int index, byte[] data) {
+            if (index < 0 || index >= total) return;
+            if (parts[index] != null) return;
+            parts[index] = data == null ? new byte[0] : data;
+            received++;
+        }
+
+        private boolean complete() {
+            return received >= total;
+        }
+
+        private byte[] assemble() {
+            int len = 0;
+            for (int i = 0; i < total; i++) {
+                byte[] b = parts[i];
+                if (b != null) len += b.length;
+            }
+            byte[] out = new byte[len];
+            int off = 0;
+            for (int i = 0; i < total; i++) {
+                byte[] b = parts[i];
+                if (b == null) continue;
+                System.arraycopy(b, 0, out, off, b.length);
+                off += b.length;
+            }
+            return out;
+        }
+    }
+
+    public static void onSyncAssetChunk(UUID uuid, String skinId, int assetType, int index, int total, byte[] data) {
+        if (skinId == null || skinId.isBlank()) return;
+        if (total <= 0) return;
+
+        String key = uuid + "|" + skinId + "|" + assetType;
+
+        ChunkAccumulator acc = ASSET_CHUNKS.computeIfAbsent(key, k -> new ChunkAccumulator(total));
+        acc.put(index, data);
+
+        if (!acc.complete()) return;
+
+        ASSET_CHUNKS.remove(key);
+
+        byte[] full = acc.assemble();
+
+        if (assetType == 0) {
+            ClientSkinAssets.put(skinId, full, null);
+        } else if (assetType == 1) {
+            ClientSkinAssets.put(skinId, null, full);
+        }
+
+        ClientSkinCache.set(uuid, skinId);
+    }
+
+public static void onSyncSkin(UUID uuid, String skinId) {
+        receivedAnySyncSinceJoin = true;
+        ClientSkinCache.set(uuid, skinId);
     }
 }

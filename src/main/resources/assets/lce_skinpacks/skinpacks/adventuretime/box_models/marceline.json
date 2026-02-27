@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Marceline",
+    "displayNameId": "IDS_SKINS_DLCSKIN00004412_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

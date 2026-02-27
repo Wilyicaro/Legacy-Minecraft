@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Conquistador",
+    "displayNameId": "IDS_DLCSKIN00001038_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

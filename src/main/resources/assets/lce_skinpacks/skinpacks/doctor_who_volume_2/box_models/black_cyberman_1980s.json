@@ -1,0 +1,168 @@
+{
+  "meta": {
+    "displayName": "Black Cyberman 1980's",
+    "displayNameId": "IDS_DLCSKIN00002548_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            3.99,
+            -6.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.99,
+            -6.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -6.0,
+            -10.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            7.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            -10.0,
+            -1.0
+          ],
+          "size": [
+            4.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            29,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            5.0,
+            -10.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            7.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -10.0,
+            -1.0
+          ],
+          "size": [
+            4.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            29,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -11.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            3.0,
+            2.0
+          ],
+          "uv": [
+            32,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -2.8
+          ],
+          "size": [
+            8.0,
+            7.0,
+            1.0
+          ],
+          "uv": [
+            19,
+            19
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

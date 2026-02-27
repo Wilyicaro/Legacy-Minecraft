@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "displayName": "Nether Miner",
+    "displayNameId": "IDS_DLCSKIN00005322_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -7.0,
+            -5.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            5
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

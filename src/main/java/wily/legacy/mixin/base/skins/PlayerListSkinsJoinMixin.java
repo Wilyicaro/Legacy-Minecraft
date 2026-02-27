@@ -1,10 +1,5 @@
 package wily.legacy.mixin.base.skins;
 
-
-/**
- * Mixin: console skins / CPM rendering glue.
- */
-
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;

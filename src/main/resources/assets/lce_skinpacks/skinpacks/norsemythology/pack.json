@@ -1,0 +1,288 @@
+{
+  "name": "Norse Mythology",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "odin",
+      "name": "Odin",
+      "texture": "skins/odin.png",
+      "order": 1
+    },
+    {
+      "id": "frigg",
+      "name": "Frigg",
+      "texture": "skins/frigg.png",
+      "order": 2
+    },
+    {
+      "id": "thor",
+      "name": "Thor",
+      "texture": "skins/thor.png",
+      "order": 3
+    },
+    {
+      "id": "loki",
+      "name": "Loki",
+      "texture": "skins/loki.png",
+      "order": 4
+    },
+    {
+      "id": "baldur",
+      "name": "Baldur",
+      "texture": "skins/baldur.png",
+      "order": 5
+    },
+    {
+      "id": "heimdallr",
+      "name": "Heimdallr",
+      "texture": "skins/heimdallr.png",
+      "order": 6
+    },
+    {
+      "id": "tyr",
+      "name": "Tyr",
+      "texture": "skins/tyr.png",
+      "order": 7
+    },
+    {
+      "id": "eir",
+      "name": "Eir",
+      "texture": "skins/eir.png",
+      "order": 8
+    },
+    {
+      "id": "hildr",
+      "name": "Hildr",
+      "texture": "skins/hildr.png",
+      "order": 9
+    },
+    {
+      "id": "brynhildr",
+      "name": "Brynhildr",
+      "texture": "skins/brynhildr.png",
+      "order": 10
+    },
+    {
+      "id": "ratatoskr",
+      "name": "Ratatoskr",
+      "texture": "skins/ratatoskr.png",
+      "order": 11
+    },
+    {
+      "id": "austri",
+      "name": "Austri",
+      "texture": "skins/austri.png",
+      "order": 12
+    },
+    {
+      "id": "nordri",
+      "name": "Nordri",
+      "texture": "skins/nordri.png",
+      "order": 13
+    },
+    {
+      "id": "sudri",
+      "name": "Sudri",
+      "texture": "skins/sudri.png",
+      "order": 14
+    },
+    {
+      "id": "vestri",
+      "name": "Vestri",
+      "texture": "skins/vestri.png",
+      "order": 15
+    },
+    {
+      "id": "njord",
+      "name": "Njord",
+      "texture": "skins/njord.png",
+      "order": 16
+    },
+    {
+      "id": "ran",
+      "name": "Ran",
+      "texture": "skins/ran.png",
+      "order": 17
+    },
+    {
+      "id": "skadi",
+      "name": "Skadi",
+      "texture": "skins/skadi.png",
+      "order": 18
+    },
+    {
+      "id": "frost_jotunn",
+      "name": "Frost Jotunn",
+      "texture": "skins/frost_jotunn.png",
+      "order": 19
+    },
+    {
+      "id": "surtr",
+      "name": "Surtr",
+      "texture": "skins/surtr.png",
+      "order": 20
+    },
+    {
+      "id": "sinmara",
+      "name": "Sinmara",
+      "texture": "skins/sinmara.png",
+      "order": 21
+    },
+    {
+      "id": "draugr",
+      "name": "Draugr",
+      "texture": "skins/draugr.png",
+      "order": 22
+    },
+    {
+      "id": "einherjar",
+      "name": "Einherjar",
+      "texture": "skins/einherjar.png",
+      "order": 23
+    },
+    {
+      "id": "hel",
+      "name": "Hel",
+      "texture": "skins/hel.png",
+      "order": 24
+    },
+    {
+      "id": "sol",
+      "name": "Sol",
+      "texture": "skins/sol.png",
+      "order": 25
+    },
+    {
+      "id": "mani",
+      "name": "Mani",
+      "texture": "skins/mani.png",
+      "order": 26
+    },
+    {
+      "id": "landvaettir",
+      "name": "Landvættir",
+      "texture": "skins/landvaettir.png",
+      "order": 27
+    },
+    {
+      "id": "freyja",
+      "name": "Freyja",
+      "texture": "skins/freyja.png",
+      "order": 28
+    },
+    {
+      "id": "freyr",
+      "name": "Freyr",
+      "texture": "skins/freyr.png",
+      "order": 29
+    },
+    {
+      "id": "ragnar_lothbrok",
+      "name": "Ragnar Lothbrok",
+      "texture": "skins/ragnar_lothbrok.png",
+      "order": 30
+    },
+    {
+      "id": "thora_town_hart",
+      "name": "Thora Town-Hart",
+      "texture": "skins/thora_town_hart.png",
+      "order": 31
+    },
+    {
+      "id": "aslaug",
+      "name": "Aslaug",
+      "texture": "skins/aslaug.png",
+      "order": 32
+    },
+    {
+      "id": "sigurd",
+      "name": "Sigurd",
+      "texture": "skins/sigurd.png",
+      "order": 33
+    },
+    {
+      "id": "floki_vilgerdarson",
+      "name": "Floki Vilgerdarson",
+      "texture": "skins/floki_vilgerdarson.png",
+      "order": 34
+    },
+    {
+      "id": "bjorn_ironside",
+      "name": "Bjorn Ironside",
+      "texture": "skins/bjorn_ironside.png",
+      "order": 35
+    },
+    {
+      "id": "lagertha",
+      "name": "Lagertha",
+      "texture": "skins/lagertha.png",
+      "order": 36
+    },
+    {
+      "id": "rollo",
+      "name": "Rollo",
+      "texture": "skins/rollo.png",
+      "order": 37
+    },
+    {
+      "id": "bear_berserker",
+      "name": "Bear Berserker",
+      "texture": "skins/bear_berserker.png",
+      "order": 38
+    },
+    {
+      "id": "wolf_berserker",
+      "name": "Wolf Berserker",
+      "texture": "skins/wolf_berserker.png",
+      "order": 39
+    },
+    {
+      "id": "boar_berserker",
+      "name": "Boar Berserker",
+      "texture": "skins/boar_berserker.png",
+      "order": 40
+    },
+    {
+      "id": "grendel",
+      "name": "Grendel",
+      "texture": "skins/grendel.png",
+      "order": 41
+    },
+    {
+      "id": "fafnir",
+      "name": "Fafnir",
+      "texture": "skins/fafnir.png",
+      "order": 42
+    },
+    {
+      "id": "fenrir",
+      "name": "Fenrir",
+      "texture": "skins/fenrir.png",
+      "order": 43
+    },
+    {
+      "id": "jormungand",
+      "name": "Jormungand",
+      "texture": "skins/jormungand.png",
+      "order": 44
+    },
+    {
+      "id": "gullinbursti",
+      "name": "Gullinbursti",
+      "texture": "skins/gullinbursti.png",
+      "order": 45
+    },
+    {
+      "id": "troll",
+      "name": "Troll",
+      "texture": "skins/troll.png",
+      "order": 46
+    },
+    {
+      "id": "ymir",
+      "name": "Ymir",
+      "texture": "skins/ymir.png",
+      "order": 47
+    }
+  ]
+}

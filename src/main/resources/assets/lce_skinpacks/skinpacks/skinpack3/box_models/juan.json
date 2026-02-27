@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Juan",
+    "displayNameId": "IDS_DLCSKIN20000211_DISPLAYNAME",
+    "themeName": "Guacamelee!",
+    "themeNameId": "IDS_DLCSKIN20000211_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

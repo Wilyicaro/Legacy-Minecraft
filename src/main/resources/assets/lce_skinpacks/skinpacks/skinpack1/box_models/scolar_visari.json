@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Scolar Visari",
+    "displayNameId": "IDS_DLCSKIN20000007_DISPLAYNAME",
+    "themeName": "Killzone",
+    "themeNameId": "IDS_DLCSKIN20000007_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

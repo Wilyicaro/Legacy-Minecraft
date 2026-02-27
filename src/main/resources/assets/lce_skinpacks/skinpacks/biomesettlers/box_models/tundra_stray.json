@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Tundra Stray",
+    "displayNameId": "IDS_DLCSKIN00004522_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00004522_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

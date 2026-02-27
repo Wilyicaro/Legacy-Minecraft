@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Scottish Steve Xmas Sweater",
+    "displayNameId": "IDS_SKINS_DLCSKIN00002724_DISPLAYNAME",
+    "themeName": "Festive Mash-up",
+    "themeNameId": "IDS_SKINS_DLCSKIN00002724_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

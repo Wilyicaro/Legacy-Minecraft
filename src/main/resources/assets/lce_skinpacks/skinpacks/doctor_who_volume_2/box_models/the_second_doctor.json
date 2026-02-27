@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "The Second Doctor",
+    "displayNameId": "IDS_DLCSKIN00002505_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

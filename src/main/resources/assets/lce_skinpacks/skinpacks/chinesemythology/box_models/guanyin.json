@@ -1,0 +1,194 @@
+{
+  "meta": {
+    "displayName": "Guanyin",
+    "displayNameId": "IDS_SKINS_DLCSKIN00005105_DISPLAYNAME",
+    "themeName": "Goddess of Mercy",
+    "themeNameId": "IDS_SKINS_DLCSKIN00005105_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -11.0,
+            -4.0
+          ],
+          "size": [
+            6.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            50,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -12.0,
+            -2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            38
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -12.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            54,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -12.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            54,
+            24
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -14.0,
+            -1.0
+          ],
+          "size": [
+            4.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -12.0,
+            3.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            43
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            12.0,
+            4.0
+          ],
+          "uv": [
+            40,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            2.0
+          ],
+          "size": [
+            8.0,
+            14.0,
+            2.0
+          ],
+          "uv": [
+            44,
+            48
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

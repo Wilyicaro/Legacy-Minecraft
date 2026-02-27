@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Forsworn Shaman",
+    "displayNameId": "IDS_SKINS_DLCSKIN00001409_DISPLAYNAME",
+    "themeName": "Skyrim",
+    "themeNameId": "IDS_SKINS_DLCSKIN00001409_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

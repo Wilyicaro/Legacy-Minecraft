@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Forest Griefer",
+    "displayNameId": "IDS_DLCSKIN00004512_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00004512_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

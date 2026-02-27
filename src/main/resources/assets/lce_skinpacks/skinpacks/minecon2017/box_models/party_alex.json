@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Party Alex",
+    "displayNameId": "IDS_DLCSKIN00006504_DISPLAYNAME",
+    "themeName": "Dressed to impress Alex",
+    "themeNameId": "IDS_DLCSKIN00006504_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -364,7 +364,7 @@ public class Legacy4JClient {
     }
 
     public static void init() {
-        // Skins + CPM client bootstrap (must be early so hooks register correctly).
+
         SkinsClientBootstrap.initClient();
 
         ControlType.UpdateEvent.EVENT.register((last, actual) -> {

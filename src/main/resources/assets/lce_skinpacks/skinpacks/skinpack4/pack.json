@@ -1,0 +1,280 @@
+{
+  "name": "Skin Pack 4",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "grizzly_bear",
+      "name": "Grizzly Bear",
+      "texture": "skins/grizzly_bear.png",
+      "order": 45
+    },
+    {
+      "id": "iron_golem",
+      "name": "Iron Golem",
+      "texture": "skins/iron_golem.png",
+      "order": 38
+    },
+    {
+      "id": "bakers_wife",
+      "name": "Baker's Wife",
+      "texture": "skins/bakers_wife.png",
+      "order": 32
+    },
+    {
+      "id": "wolf",
+      "name": "Wolf",
+      "texture": "skins/wolf.png",
+      "order": 47
+    },
+    {
+      "id": "knight_3",
+      "name": "Knight 3",
+      "texture": "skins/knight_3.png",
+"cape": "capes/knight3.png",
+      "order": 27
+    },
+    {
+      "id": "samantha_byrne",
+      "name": "Samantha Byrne",
+      "texture": "skins/samantha_byrne.png",
+      "order": 14
+    },
+    {
+      "id": "mordecai",
+      "name": "Mordecai",
+      "texture": "skins/mordecai.png",
+      "order": 15
+    },
+    {
+      "id": "alistar",
+      "name": "Alistar",
+      "texture": "skins/alistar.png",
+      "order": 8
+    },
+    {
+      "id": "ezio",
+      "name": "Ezio",
+      "texture": "skins/ezio.png",
+      "order": 4
+    },
+    {
+      "id": "leliana",
+      "name": "Leliana",
+      "texture": "skins/leliana.png",
+      "order": 10
+    },
+    {
+      "id": "ninja",
+      "name": "Ninja",
+      "texture": "skins/ninja.png",
+      "order": 24
+    },
+    {
+      "id": "baker",
+      "name": "Baker",
+      "texture": "skins/baker.png",
+      "order": 12
+    },
+    {
+      "id": "brick",
+      "name": "Brick",
+      "texture": "skins/brick.png",
+      "order": 17
+    },
+    {
+      "id": "connor",
+      "name": "Connor",
+      "texture": "skins/connor.png",
+      "order": 6
+    },
+    {
+      "id": "highway_woman",
+      "name": "Highway Woman",
+      "texture": "skins/highway_woman.png",
+      "order": 37
+    },
+    {
+      "id": "barry_steakfries",
+      "name": "Barry Steakfries",
+      "texture": "skins/barry_steakfries.png",
+      "order": 21
+    },
+    {
+      "id": "red_spartan",
+      "name": "Red Spartan",
+      "texture": "skins/red_spartan.png",
+      "order": 2
+    },
+    {
+      "id": "knight_2",
+      "name": "Knight 2",
+      "texture": "skins/knight_2.png",
+"cape": "capes/knight2.png",
+      "order": 26
+    },
+    {
+      "id": "miner",
+      "name": "Miner",
+      "texture": "skins/miner.png",
+      "order": 31
+    },
+    {
+      "id": "lilith",
+      "name": "Lilith",
+      "texture": "skins/lilith.png",
+      "order": 16
+    },
+    {
+      "id": "mermaid",
+      "name": "Mermaid",
+      "texture": "skins/mermaid.png",
+      "order": 34
+    },
+    {
+      "id": "claptrap",
+      "name": "Claptrap",
+      "texture": "skins/claptrap.png",
+      "order": 18
+    },
+    {
+      "id": "altair",
+      "name": "Altair",
+      "texture": "skins/altair.png",
+      "order": 7
+    },
+    {
+      "id": "baroness",
+      "name": "Baroness",
+      "texture": "skins/baroness.png",
+      "order": 33
+    },
+    {
+      "id": "morrigan",
+      "name": "Morrigan",
+      "texture": "skins/morrigan.png",
+      "order": 8
+    },
+    {
+      "id": "skelekitten",
+      "name": "Skelekitten",
+      "texture": "skins/skelekitten.png",
+      "order": 23
+    },
+    {
+      "id": "black_smith",
+      "name": "Black Smith",
+      "texture": "skins/black_smith.png",
+      "order": 12
+    },
+    {
+      "id": "priest",
+      "name": "Priest",
+      "texture": "skins/priest.png",
+      "order": 29
+    },
+    {
+      "id": "creeper_suit",
+      "name": "Creeper Suit",
+      "texture": "skins/creeper_suit.png",
+      "order": 1
+    },
+    {
+      "id": "augustus_cole",
+      "name": "Augustus Cole",
+      "texture": "skins/augustus_cole.png",
+      "order": 13
+    },
+    {
+      "id": "blue_spartan",
+      "name": "Blue Spartan",
+      "texture": "skins/blue_spartan.png",
+      "order": 3
+    },
+    {
+      "id": "charlie_murder",
+      "name": "Charlie Murder",
+      "texture": "skins/charlie_murder.png",
+      "order": 22
+    },
+    {
+      "id": "moose",
+      "name": "Moose",
+      "texture": "skins/moose.png",
+      "order": 41
+    },
+    {
+      "id": "polar_bear",
+      "name": "Polar Bear",
+      "texture": "skins/polar_bear.png",
+      "order": 46
+    },
+    {
+      "id": "beaver",
+      "name": "Beaver",
+      "texture": "skins/beaver.png",
+      "order": 39.5
+    },
+    {
+      "id": "tree_man",
+      "name": "Tree Man",
+      "texture": "skins/tree_man.png",
+      "order": 39
+    },
+    {
+      "id": "sensei",
+      "name": "Sensei",
+      "texture": "skins/sensei.png",
+      "order": 19
+    },
+    {
+      "id": "knight_1",
+      "name": "Knight 1",
+      "texture": "skins/knight_1.png",
+"cape": "capes/knight1.png",
+      "order": 25
+    },
+    {
+      "id": "barbarian",
+      "name": "Barbarian",
+      "texture": "skins/barbarian.png",
+      "order": 11
+    },
+    {
+      "id": "knight_4",
+      "name": "Knight 4",
+      "texture": "skins/knight_4.png",
+"cape": "capes/knight4.png",
+      "order": 28
+    },
+    {
+      "id": "valkyrie_warrior",
+      "name": "Valkyrie Warrior",
+      "texture": "skins/valkyrie_warrior.png",
+      "order": 36
+    },
+    {
+      "id": "victorian_woman",
+      "name": "Victorian Woman",
+      "texture": "skins/victorian_woman.png",
+      "order": 35
+    },
+    {
+      "id": "butcher",
+      "name": "Butcher",
+      "texture": "skins/butcher.png",
+      "order": 30
+    },
+    {
+      "id": "sten",
+      "name": "Sten",
+      "texture": "skins/sten.png",
+      "order": 9
+    },
+    {
+      "id": "penguin",
+      "name": "Penguin",
+      "texture": "skins/penguin.png",
+      "order": 40
+    }
+  ]
+}

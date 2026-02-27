@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Omid",
+    "displayNameId": "IDS_dlcskin90416536_DISPLAYNAME",
+    "themeName": "The Walking Dead",
+    "themeNameId": "IDS_dlcskin90416536_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

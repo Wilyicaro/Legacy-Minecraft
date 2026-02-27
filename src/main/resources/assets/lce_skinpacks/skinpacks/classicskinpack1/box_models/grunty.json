@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Grunty",
+    "displayNameId": "IDS_DLCSKIN00000016_DISPLAYNAME",
+    "themeName": "Banjo-Kazooie",
+    "themeNameId": "IDS_DLCSKIN00000016_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

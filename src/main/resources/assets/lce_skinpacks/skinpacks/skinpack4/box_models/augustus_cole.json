@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Augustus Cole",
+    "displayNameId": "IDS_dlcskin70591448_DISPLAYNAME",
+    "themeName": "Gears of War 3",
+    "themeNameId": "IDS_dlcskin70591448_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

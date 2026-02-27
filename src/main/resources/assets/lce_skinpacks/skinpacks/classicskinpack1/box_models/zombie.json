@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Zombie",
+    "displayNameId": "IDS_DLCSKIN00000002_DISPLAYNAME",
+    "themeName": "Minecraft",
+    "themeNameId": "IDS_DLCSKIN00000002_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

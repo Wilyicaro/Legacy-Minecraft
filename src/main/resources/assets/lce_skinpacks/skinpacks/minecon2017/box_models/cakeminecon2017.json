@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Cake",
+    "displayNameId": "IDS_DLCSKIN00006500_DISPLAYNAME",
+    "themeName": "The Cake is a guy!",
+    "themeNameId": "IDS_DLCSKIN00006500_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

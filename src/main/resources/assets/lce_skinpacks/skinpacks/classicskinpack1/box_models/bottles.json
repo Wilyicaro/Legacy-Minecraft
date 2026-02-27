@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Bottles",
+    "displayNameId": "IDS_DLCSKIN00000017_DISPLAYNAME",
+    "themeName": "Banjo-Kazooie",
+    "themeNameId": "IDS_DLCSKIN00000017_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

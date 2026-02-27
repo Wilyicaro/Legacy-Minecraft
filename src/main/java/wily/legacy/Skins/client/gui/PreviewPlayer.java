@@ -1,7 +1,6 @@
 package wily.legacy.Skins.client.gui;
 
 import com.mojang.authlib.GameProfile;
-import wily.legacy.CustomModelSkins.cpm.shared.config.Player;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.RemotePlayer;
 
@@ -23,12 +22,10 @@ public class PreviewPlayer extends RemotePlayer {
     }
 
     public static void remove(UUID id) {
-        Player.removeClientPlayerOverride(id);
         POOL.remove(id);
     }
 
     public static void clear() {
-        POOL.keySet().forEach(Player::removeClientPlayerOverride);
         POOL.clear();
     }
 }

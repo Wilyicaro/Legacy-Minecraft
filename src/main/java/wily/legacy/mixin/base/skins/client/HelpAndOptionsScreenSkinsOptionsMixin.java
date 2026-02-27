@@ -1,10 +1,5 @@
 package wily.legacy.mixin.base.skins.client;
 
-
-/**
- * Mixin: console skins / CPM rendering glue.
- */
-
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,19 +23,38 @@ public class HelpAndOptionsScreenSkinsOptionsMixin {
         list.add(0, new TickBox(
                 0,
                 0,
+                ConsoleSkinsClientSettings.isTu3ChangeSkinScreen(),
+                b -> Component.translatable("legacy.menu.change_skin.tu3_change_skin_screen"),
+                b -> null,
+                t -> ConsoleSkinsClientSettings.setTu3ChangeSkinScreen(t.selected)
+        ));
+
+        list.add(1, new TickBox(
+                0,
+                0,
                 ConsoleSkinsClientSettings.isSmoothPreviewScroll(),
                 b -> Component.translatable("legacy.menu.change_skin.smooth_preview_scroll"),
                 b -> null,
                 t -> ConsoleSkinsClientSettings.setSmoothPreviewScroll(t.selected)
         ));
 
-        list.add(1, new TickBox(
+        list.add(2, new TickBox(
                 0,
                 0,
                 ConsoleSkinsClientSettings.isSkinAnimations(),
                 b -> Component.translatable("legacy.menu.change_skin.skin_animations"),
                 b -> null,
                 t -> ConsoleSkinsClientSettings.setSkinAnimations(t.selected)
+        ));
+
+        int idx = Math.min(3, list.size());
+        list.add(idx, new TickBox(
+                0,
+                0,
+                ConsoleSkinsClientSettings.isHideArmorOnAllBoxSkins(),
+                b -> Component.translatable("legacy.menu.change_skin.hide_armor"),
+                b -> null,
+                t -> ConsoleSkinsClientSettings.setHideArmorOnAllBoxSkins(t.selected)
         ));
     }
 }

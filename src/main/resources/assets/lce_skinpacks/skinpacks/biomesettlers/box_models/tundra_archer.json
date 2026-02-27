@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Tundra Archer",
+    "displayNameId": "IDS_DLCSKIN00004516_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00004516_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

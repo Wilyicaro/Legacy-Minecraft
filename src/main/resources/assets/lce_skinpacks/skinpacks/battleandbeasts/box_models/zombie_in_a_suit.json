@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Zombie in a Suit",
+    "displayNameId": "IDS_DLCSKIN00000801_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

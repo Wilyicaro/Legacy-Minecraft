@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Skelekitten",
+    "displayNameId": "IDS_dlcskin60905082_DISPLAYNAME",
+    "themeName": "Charlie Murder",
+    "themeNameId": "IDS_dlcskin60905082_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "displayName": "Roman Rory Williams",
+    "displayNameId": "IDS_DLCSKIN00002009_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "left_leg_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            1.99,
+            0.0,
+            -0.01
+          ],
+          "size": [
+            1.0,
+            8.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

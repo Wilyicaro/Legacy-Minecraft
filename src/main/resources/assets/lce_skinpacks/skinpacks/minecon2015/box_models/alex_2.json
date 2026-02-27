@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Alex",
+    "displayNameId": "IDS_DLCSKIN00003105_DISPLAYNAME",
+    "themeName": "Minecon 2012 Cape",
+    "themeNameId": "IDS_DLCSKIN00003105_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

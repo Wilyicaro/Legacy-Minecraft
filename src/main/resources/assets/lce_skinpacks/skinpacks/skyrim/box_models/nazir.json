@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Nazir",
+    "displayNameId": "IDS_SKINS_DLCSKIN00001420_DISPLAYNAME",
+    "themeName": "Skyrim",
+    "themeNameId": "IDS_SKINS_DLCSKIN00001420_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,266 @@
+{
+  "name": "Chinese Mythology",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "sun_wukong",
+      "name": "Sun Wukong",
+      "texture": "skins/sun_wukong.png",
+      "order": 1
+    },
+    {
+      "id": "xuanzang",
+      "name": "Xuanzang",
+      "texture": "skins/xuanzang.png",
+      "order": 2
+    },
+    {
+      "id": "monk_pig",
+      "name": "Monk Pig",
+      "texture": "skins/monk_pig.png",
+      "order": 3
+    },
+    {
+      "id": "friar_sand",
+      "name": "Friar Sand",
+      "texture": "skins/friar_sand.png",
+      "order": 4
+    },
+    {
+      "id": "jade_emperor",
+      "name": "Jade Emperor",
+      "texture": "skins/jade_emperor.png",
+      "order": 5
+    },
+    {
+      "id": "guanyin",
+      "name": "Guanyin",
+      "texture": "skins/guanyin.png",
+      "model": "slim",
+      "order": 6
+    },
+    {
+      "id": "red_boy",
+      "name": "Red Boy",
+      "texture": "skins/red_boy.png",
+      "order": 7
+    },
+    {
+      "id": "bull_demon_king",
+      "name": "Bull Demon King",
+      "texture": "skins/bull_demon_king.png",
+      "order": 8
+    },
+    {
+      "id": "princess_iron_fan",
+      "name": "Princess Iron Fan",
+      "texture": "skins/princess_iron_fan.png",
+      "model": "slim",
+      "order": 9
+    },
+    {
+      "id": "pale_bone_demon",
+      "name": "Pale Bone Demon",
+      "texture": "skins/pale_bone_demon.png",
+      "model": "slim",
+      "order": 10
+    },
+    {
+      "id": "lord_hundred_eyes",
+      "name": "Lord Hundred Eyes",
+      "texture": "skins/lord_hundred_eyes.png",
+      "order": 11
+    },
+    {
+      "id": "spider_demon",
+      "name": "Spider Demon",
+      "texture": "skins/spider_demon.png",
+      "model": "slim",
+      "order": 12
+    },
+    {
+      "id": "scorpion_demon",
+      "name": "Scorpion Demon",
+      "texture": "skins/scorpion_demon.png",
+      "model": "slim",
+      "order": 13
+    },
+    {
+      "id": "lady_earth_flow",
+      "name": "Lady Earth Flow",
+      "texture": "skins/lady_earth_flow.png",
+      "model": "slim",
+      "order": 14
+    },
+    {
+      "id": "black_wind_demon",
+      "name": "Black Wind Demon",
+      "texture": "skins/black_wind_demon.png",
+      "order": 15
+    },
+    {
+      "id": "change",
+      "name": "Chang'e",
+      "texture": "skins/change.png",
+      "model": "slim",
+      "order": 16
+    },
+    {
+      "id": "emperor_taizong",
+      "name": "Emperor Taizong",
+      "texture": "skins/emperor_taizong.png",
+      "order": 17
+    },
+    {
+      "id": "elder_subhuti",
+      "name": "Elder Subhuti",
+      "texture": "skins/elder_subhuti.png",
+      "order": 18
+    },
+    {
+      "id": "heavenly_king_li_jing",
+      "name": "Heavenly King Li Jing",
+      "texture": "skins/heavenly_king_li_jing.png",
+      "order": 19
+    },
+    {
+      "id": "prince_nezha",
+      "name": "Prince Nezha",
+      "texture": "skins/prince_nezha.png",
+      "order": 20
+    },
+    {
+      "id": "golden_horn",
+      "name": "Golden Horn",
+      "texture": "skins/golden_horn.png",
+      "order": 21
+    },
+    {
+      "id": "silver_horn",
+      "name": "Silver Horn",
+      "texture": "skins/silver_horn.png",
+      "order": 22
+    },
+    {
+      "id": "rhinoceros_king",
+      "name": "Rhinoceros King",
+      "texture": "skins/rhinoceros_king.png",
+      "order": 23
+    },
+    {
+      "id": "jade_rabbit",
+      "name": "Jade Rabbit",
+      "texture": "skins/jade_rabbit.png",
+      "model": "slim",
+      "order": 24
+    },
+    {
+      "id": "yan_wang",
+      "name": "Yan Wang",
+      "texture": "skins/yan_wang.png",
+      "order": 25
+    },
+    {
+      "id": "river_demon",
+      "name": "River Demon",
+      "texture": "skins/river_demon.png",
+      "order": 26
+    },
+    {
+      "id": "goddess_nuwa",
+      "name": "Goddess Nuwa",
+      "texture": "skins/goddess_nuwa.png",
+      "model": "slim",
+      "order": 27
+    },
+    {
+      "id": "empress_wu_zetian",
+      "name": "Empress Wu Zetian",
+      "texture": "skins/empress_wu_zetian.png",
+      "model": "slim",
+      "order": 28
+    },
+    {
+      "id": "princess_zhao_of_pingyang",
+      "name": "Princess Zhao of Pingyang",
+      "texture": "skins/princess_zhao_of_pingyang.png",
+      "model": "slim",
+      "order": 29
+    },
+    {
+      "id": "fox_spirit_daji",
+      "name": "Fox Spirit Daji",
+      "texture": "skins/fox_spirit_daji.png",
+      "order": 30
+    },
+    {
+      "id": "guardian_lion",
+      "name": "Guardian Lion",
+      "texture": "skins/guardian_lion.png",
+      "order": 31
+    },
+    {
+      "id": "terracotta_warrior",
+      "name": "Terracotta Warrior",
+      "texture": "skins/terracotta_warrior.png",
+      "order": 32
+    },
+    {
+      "id": "chinese_dragon_head",
+      "name": "Chinese Dragon Head",
+      "texture": "skins/chinese_dragon_head.png",
+      "order": 33
+    },
+    {
+      "id": "chinese_dragon_tail",
+      "name": "Chinese Dragon Tail",
+      "texture": "skins/chinese_dragon_tail.png",
+      "order": 34
+    },
+    {
+      "id": "tan",
+      "name": "Tan",
+      "texture": "skins/tan.png",
+      "model": "slim",
+      "order": 35
+    },
+    {
+      "id": "white_tiger",
+      "name": "White Tiger",
+      "texture": "skins/white_tiger.png",
+      "order": 36
+    },
+    {
+      "id": "vermillion_bird",
+      "name": "Vermillion Bird",
+      "texture": "skins/vermillion_bird.png",
+      "model": "slim",
+      "order": 37
+    },
+    {
+      "id": "azure_dragon",
+      "name": "Azure Dragon",
+      "texture": "skins/azure_dragon.png",
+      "order": 38
+    },
+    {
+      "id": "black_turtle",
+      "name": "Black Turtle",
+      "texture": "skins/black_turtle.png",
+      "order": 39
+    },
+    {
+      "id": "ching",
+      "name": "Ching",
+      "texture": "skins/ching.png",
+      "order": 40
+    },
+    {
+      "id": "goddess_longmu",
+      "name": "Goddess Longmu",
+      "texture": "skins/goddess_longmu.png",
+      "model": "slim",
+      "order": 41
+    }
+  ]
+}

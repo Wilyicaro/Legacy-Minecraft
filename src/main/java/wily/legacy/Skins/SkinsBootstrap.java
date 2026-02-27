@@ -15,17 +15,14 @@ public final class SkinsBootstrap {
     private SkinsBootstrap() {
     }
 
-
     private static final java.util.concurrent.ConcurrentHashMap<UUID, Long> LAST_JOIN_SYNC_MS =
             new java.util.concurrent.ConcurrentHashMap<>();
-
 
     public static void initCommon() {
 
         FactoryEvent.PlayerEvent.JOIN_EVENT.register(SkinsBootstrap::onServerPlayerJoin);
 
     }
-
 
     private static void runLater(MinecraftServer server, int ticks, Runnable task) {
         if (server == null || task == null) return;
@@ -39,7 +36,6 @@ public final class SkinsBootstrap {
     private static void onServerPlayerJoin(ServerPlayer joining) {
         handleServerPlayerJoin(joining);
     }
-
 
     public static void handleServerPlayerJoin(ServerPlayer joining) {
         MinecraftServer server = FactoryAPIPlatform.getEntityServer(joining);
@@ -58,14 +54,13 @@ public final class SkinsBootstrap {
                 String skinId = e.getValue();
 
                 CommonNetwork.sendToPlayer(joining, new SkinSync.SyncSkinS2C(who, skinId));
+                SkinSync.sendCachedAssetsTo(joining, who, skinId);
 
-                byte[] cpmFile = SkinSync.getServerCpmModelFile(who, skinId);
-                if (cpmFile != null && cpmFile.length > 0) {
-                    SkinSync.sendCpmModelToPlayer(joining, who, skinId, cpmFile);
-                } else if (SkinSync.isCpm(skinId)) {
-
-                    ServerPlayer owner = server.getPlayerList().getPlayer(who);
-                    if (owner != null) SkinSync.requestCpmModelFrom(owner, skinId);
+                if (skinId != null && !skinId.isBlank()) {
+                    if (!SkinSync.hasServerAsset(skinId, 0) || !SkinSync.hasServerAsset(skinId, 1)) {
+                        ServerPlayer p2 = server.getPlayerList().getPlayer(who);
+                        if (p2 != null) CommonNetwork.sendToPlayer(p2, new SkinSync.RequestSkinS2C());
+                    }
                 }
             }
 

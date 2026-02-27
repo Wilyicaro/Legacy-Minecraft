@@ -13,9 +13,13 @@ public final class ConsoleSkinsClientSettings {
 
     private static final boolean DEFAULT_SMOOTH_PREVIEW_SCROLL = false;
     private static final boolean DEFAULT_SKIN_ANIMATIONS = true;
+    private static final boolean DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS = false;
+    private static final boolean DEFAULT_TU3_CHANGE_SKIN_SCREEN = false;
     private static volatile boolean loaded;
     private static volatile boolean smoothPreviewScroll;
     private static volatile boolean skinAnimations = DEFAULT_SKIN_ANIMATIONS;
+    private static volatile boolean hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
+    private static volatile boolean tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
     private static volatile String lastUsedCustomPackId;
 
     private ConsoleSkinsClientSettings() {
@@ -41,11 +45,28 @@ public final class ConsoleSkinsClientSettings {
         ensureLoaded();
         skinAnimations = enabled;
         saveQuiet();
+    }
 
-        try {
-            wily.legacy.Skins.client.cpm.CpmModelManager.refreshUpsideDownFlags();
-        } catch (Throwable ignored) {
-        }
+    public static boolean isHideArmorOnAllBoxSkins() {
+        ensureLoaded();
+        return hideArmorOnAllBoxSkins;
+    }
+
+    public static void setHideArmorOnAllBoxSkins(boolean enabled) {
+        ensureLoaded();
+        hideArmorOnAllBoxSkins = enabled;
+        saveQuiet();
+    }
+
+    public static boolean isTu3ChangeSkinScreen() {
+        ensureLoaded();
+        return tu3ChangeSkinScreen;
+    }
+
+    public static void setTu3ChangeSkinScreen(boolean enabled) {
+        ensureLoaded();
+        tu3ChangeSkinScreen = enabled;
+        saveQuiet();
     }
 
     public static String getLastUsedCustomPackId() {
@@ -59,11 +80,12 @@ public final class ConsoleSkinsClientSettings {
         saveQuiet();
     }
 
-
     public static void resetToDefaults() {
         ensureLoaded();
         smoothPreviewScroll = DEFAULT_SMOOTH_PREVIEW_SCROLL;
         skinAnimations = DEFAULT_SKIN_ANIMATIONS;
+        hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
+        tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
         lastUsedCustomPackId = null;
         saveQuiet();
     }
@@ -79,6 +101,8 @@ public final class ConsoleSkinsClientSettings {
 
             smoothPreviewScroll = DEFAULT_SMOOTH_PREVIEW_SCROLL;
             skinAnimations = DEFAULT_SKIN_ANIMATIONS;
+            hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
+            tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
             lastUsedCustomPackId = null;
 
             Path cfg = resolveConfigFile();
@@ -101,6 +125,19 @@ public final class ConsoleSkinsClientSettings {
 
                     if (k.equalsIgnoreCase("skin_animations") || k.equalsIgnoreCase("skinAnimations") || k.equalsIgnoreCase("enable_skin_animations")) {
                         skinAnimations = parseBool(v, DEFAULT_SKIN_ANIMATIONS);
+                        continue;
+                    }
+
+                    if (k.equalsIgnoreCase("hide_armor_on_all_box_skins") || k.equalsIgnoreCase("hideArmorOnAllBoxSkins")
+                            || k.equalsIgnoreCase("force_hide_armor_on_all_box_skins") || k.equalsIgnoreCase("forceHideArmorOnAllBoxSkins")
+                            || k.equalsIgnoreCase("hide_armor_all_box_skins") || k.equalsIgnoreCase("hideArmorAllBoxSkins")) {
+                        hideArmorOnAllBoxSkins = parseBool(v, DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS);
+                        continue;
+                    }
+
+                    if (k.equalsIgnoreCase("tu3_change_skin_screen") || k.equalsIgnoreCase("tu3ChangeSkinScreen")
+                            || k.equalsIgnoreCase("tu3_change_skin") || k.equalsIgnoreCase("tu3ChangeSkin")) {
+                        tu3ChangeSkinScreen = parseBool(v, DEFAULT_TU3_CHANGE_SKIN_SCREEN);
                         continue;
                     }
 
@@ -130,6 +167,8 @@ public final class ConsoleSkinsClientSettings {
             String out = "# ConsoleSkins client options (dont mind the typos)\n"
                     + "smooth_preview_scroll=" + smoothPreviewScroll + "\n"
                     + "skin_animations=" + skinAnimations + "\n"
+                    + "hide_armor_on_all_box_skins=" + hideArmorOnAllBoxSkins + "\n"
+                    + "tu3_change_skin_screen=" + tu3ChangeSkinScreen + "\n"
                     + "last_used_custom_pack=" + (lastUsedCustomPackId == null ? "" : lastUsedCustomPackId) + "\n";
             Files.writeString(cfg, out, StandardCharsets.UTF_8);
         } catch (Throwable ignored) {

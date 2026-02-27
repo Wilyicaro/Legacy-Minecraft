@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Nether Archer",
+    "displayNameId": "IDS_DLCSKIN00005312_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

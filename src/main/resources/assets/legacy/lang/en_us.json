@@ -1272,6 +1272,7 @@
   "legacy.menu.change_skin": "Change Skin",
   "legacy.menu.change_skin.skin_animations": "Skin Animations",
   "legacy.menu.change_skin.smooth_preview_scroll": "Smooth Preview Scroll",
+  "legacy.menu.change_skin.tu3_change_skin_screen": "TU3 Change Skin Screen",
   "legacy.menu.choose_user": "Choose User",
   "legacy.menu.choose_user.account_options": "Account Options",
   "legacy.menu.choose_user.account_options.delete": "Delete Account",
@@ -1865,7 +1866,7 @@
   "structure.minecraft.villages.description": "Settlements situated in Plains, Savanna, Desert, Taiga or Snowy Plains biomes. Guarded by Iron Golems and home to Farmers, Librarians, Clerics, Blacksmiths and Butchers.",
   "structure.minecraft.woodland_mansions": "Woodland Mansions",
   "structure.minecraft.woodland_mansions.description": "Masions found in Dark Oak Forests. Home to Vexes and Illagers.",
-  "legacy.menu.change_skin.hide_armour": "Hide Armour",
   "legacy.skinpack.type.skin": "Skin Pack",
-  "legacy.skinpack.type.mashup": "Mash-up Pack"
+  "legacy.skinpack.type.mashup": "Mash-up Pack",
+  "legacy.menu.change_skin.hide_armor": "Hide Armor"
 }

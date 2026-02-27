@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Lilith",
+    "displayNameId": "IDS_dlcskin40418935_DISPLAYNAME",
+    "themeName": "Borderlands",
+    "themeNameId": "IDS_dlcskin40418935_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

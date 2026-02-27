@@ -1,0 +1,278 @@
+{
+  "name": "Battle and the Beasts",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "enderman_in_a_suit",
+      "name": "Enderman in a Suit",
+      "texture": "skins/enderman_in_a_suit.png",
+      "order": 1
+    },
+    {
+      "id": "zombie_in_a_suit",
+      "name": "Zombie in a Suit",
+      "texture": "skins/zombie_in_a_suit.png",
+      "order": 2
+    },
+    {
+      "id": "cave_spider_in_a_suit",
+      "name": "Cave Spider in a Suit",
+      "texture": "skins/cave_spider_in_a_suit.png",
+      "order": 3
+    },
+    {
+      "id": "chicken_in_a_suit",
+      "name": "Chicken in a Suit",
+      "texture": "skins/chicken_in_a_suit.png",
+      "order": 4
+    },
+    {
+      "id": "zebra",
+      "name": "Zebra",
+      "texture": "skins/zebra.png",
+      "order": 5
+    },
+    {
+      "id": "panther",
+      "name": "Panther",
+      "texture": "skins/panther.png",
+      "order": 6
+    },
+    {
+      "id": "warthog",
+      "name": "Warthog",
+      "texture": "skins/warthog.png",
+      "order": 7
+    },
+    {
+      "id": "mandrill_baboon",
+      "name": "Mandrill Baboon",
+      "texture": "skins/mandrill_baboon.png",
+      "order": 8
+    },
+    {
+      "id": "meerkat",
+      "name": "Meerkat",
+      "texture": "skins/meerkat.png",
+      "order": 9
+    },
+    {
+      "id": "rhinoceros",
+      "name": "Rhinoceros",
+      "texture": "skins/rhinoceros.png",
+      "order": 10
+    },
+    {
+      "id": "hippopotamus",
+      "name": "Hippopotamus",
+      "texture": "skins/hippopotamus.png",
+      "order": 11
+    },
+    {
+      "id": "elephant",
+      "name": "Elephant",
+      "texture": "skins/elephant.png",
+      "order": 12
+    },
+    {
+      "id": "lion",
+      "name": "Lion",
+      "texture": "skins/lion.png",
+      "order": 13
+    },
+    {
+      "id": "aardvark",
+      "name": "Aardvark",
+      "texture": "skins/aardvark.png",
+      "order": 14
+    },
+    {
+      "id": "leopard",
+      "name": "Leopard",
+      "texture": "skins/leopard.png",
+      "order": 15
+    },
+    {
+      "id": "gnu",
+      "name": "Gnu",
+      "texture": "skins/gnu.png",
+      "order": 16
+    },
+    {
+      "id": "hyena",
+      "name": "Hyena",
+      "texture": "skins/hyena.png",
+      "order": 17
+    },
+    {
+      "id": "antelope",
+      "name": "Antelope",
+      "texture": "skins/antelope.png",
+      "order": 18
+    },
+    {
+      "id": "gorilla",
+      "name": "Gorilla",
+      "texture": "skins/gorilla.png",
+      "order": 19
+    },
+    {
+      "id": "bush_baby",
+      "name": "Bush Baby",
+      "texture": "skins/bush_baby.png",
+      "order": 20
+    },
+    {
+      "id": "crocodile",
+      "name": "Crocodile",
+      "texture": "skins/crocodile.png",
+      "order": 21
+    },
+    {
+      "id": "spartan",
+      "name": "Spartan",
+      "texture": "skins/spartan.png",
+      "cape": "capes/spartan.png",
+      "order": 22
+    },
+    {
+      "id": "roman",
+      "name": "Roman",
+      "texture": "skins/roman.png",
+      "order": 23
+    },
+    {
+      "id": "norse_raider",
+      "name": "Norse Raider",
+      "texture": "skins/norse_raider.png",
+      "order": 24
+    },
+    {
+      "id": "medieval_knight",
+      "name": "Medieval Knight",
+      "texture": "skins/medieval_knight.png",
+      "order": 25
+    },
+    {
+      "id": "samurai_warrior",
+      "name": "Samurai Warrior",
+      "texture": "skins/samurai_warrior.png",
+      "order": 26
+    },
+    {
+      "id": "steppes_warrior",
+      "name": "Steppes Warrior",
+      "texture": "skins/steppes_warrior.png",
+      "order": 27
+    },
+    {
+      "id": "native_american",
+      "name": "Native American",
+      "texture": "skins/native_american.png",
+      "order": 28
+    },
+    {
+      "id": "cowhand",
+      "name": "Cowhand",
+      "texture": "skins/cowhand.png",
+      "order": 29
+    },
+    {
+      "id": "southern_african_warrior",
+      "name": "Southern African Warrior",
+      "texture": "skins/southern_african_warrior.png",
+      "order": 30
+    },
+    {
+      "id": "imperial_british_soldier",
+      "name": "Imperial British Soldier",
+      "texture": "skins/imperial_british_soldier.png",
+      "order": 31
+    },
+    {
+      "id": "african_warrior",
+      "name": "African Warrior",
+      "texture": "skins/african_warrior.png",
+      "order": 32
+    },
+    {
+      "id": "imperial_french_soldier",
+      "name": "Imperial French Soldier",
+      "texture": "skins/imperial_french_soldier.png",
+      "order": 33
+    },
+    {
+      "id": "spartan_2",
+      "name": "Spartan",
+      "texture": "skins/spartan_2.png",
+      "cape": "capes/mommyspartan.png",
+      "order": 34
+    },
+    {
+      "id": "roman_2",
+      "name": "Roman",
+      "texture": "skins/roman_2.png",
+      "order": 35
+    },
+    {
+      "id": "norse_raider_2",
+      "name": "Norse Raider",
+      "texture": "skins/norse_raider_2.png",
+      "order": 36
+    },
+    {
+      "id": "medieval_knight_2",
+      "name": "Medieval Knight",
+      "texture": "skins/medieval_knight_2.png",
+      "order": 37
+    },
+    {
+      "id": "samurai_warrior_2",
+      "name": "Samurai Warrior",
+      "texture": "skins/samurai_warrior_2.png",
+      "order": 38
+    },
+    {
+      "id": "steppes_warrior_2",
+      "name": "Steppes Warrior",
+      "texture": "skins/steppes_warrior_2.png",
+      "order": 39
+    },
+    {
+      "id": "native_american_2",
+      "name": "Native American",
+      "texture": "skins/native_american_2.png",
+      "order": 40
+    },
+    {
+      "id": "cowhand_2",
+      "name": "Cowhand",
+      "texture": "skins/cowhand_2.png",
+      "order": 41
+    },
+    {
+      "id": "southern_african_warrior_2",
+      "name": "Southern African Warrior",
+      "texture": "skins/southern_african_warrior_2.png",
+      "order": 42
+    },
+    {
+      "id": "imperial_british_soldier_2",
+      "name": "Imperial British Soldier",
+      "texture": "skins/imperial_british_soldier_2.png",
+      "order": 43
+    },
+    {
+      "id": "african_warrior_2",
+      "name": "African Warrior",
+      "texture": "skins/african_warrior_2.png",
+      "order": 44
+    },
+    {
+      "id": "imperial_french_soldier_2",
+      "name": "Imperial French Soldier",
+      "texture": "skins/imperial_french_soldier_2.png",
+      "order": 45
+    }
+  ]
+}

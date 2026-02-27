@@ -128,10 +128,6 @@ loom {
     if (loader == "forge") forge {
         convertAccessWideners.set(true)
         mixinConfigs("${mod_id}.mixins.json")
-        mixinConfigs("consoleskins.mixins.json")
-        mixinConfigs("consoleskins.client.mixins.json")
-        mixinConfigs("cpm.mixins.json")
-        mixinConfigs("cpm.mixins.shared.json")
     }
     mixin {
         useLegacyMixinAp = true

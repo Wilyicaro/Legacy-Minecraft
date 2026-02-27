@@ -1,0 +1,144 @@
+{
+  "meta": {
+    "displayName": "Nether Engineer",
+    "displayNameId": "IDS_DLCSKIN00005316_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            1.0,
+            -8.0,
+            -6.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -8.0,
+            -6.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -8.0,
+            -5.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -8.0,
+            -5.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -6.0,
+            4.0
+          ],
+          "size": [
+            6.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            24,
+            5
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -4.0,
+            5.0
+          ],
+          "size": [
+            2.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -4.0,
+            4.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            34,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

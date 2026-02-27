@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Blue Santa",
+    "displayNameId": "IDS_SKINS_DLCSKIN00002704_DISPLAYNAME",
+    "themeName": "Festive Mash-up",
+    "themeNameId": "IDS_SKINS_DLCSKIN00002704_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

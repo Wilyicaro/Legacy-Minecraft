@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Grim",
+    "displayNameId": "IDS_DLCSKIN20000029_DISPLAYNAME",
+    "themeName": "Resistance",
+    "themeNameId": "IDS_DLCSKIN20000029_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

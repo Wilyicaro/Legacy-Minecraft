@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "The First Doctor",
+    "displayNameId": "IDS_DLCSKIN00002004_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

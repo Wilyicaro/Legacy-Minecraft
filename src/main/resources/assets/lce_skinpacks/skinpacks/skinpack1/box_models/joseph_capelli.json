@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Joseph Capelli",
+    "displayNameId": "IDS_DLCSKIN20000027_DISPLAYNAME",
+    "themeName": "Resistance",
+    "themeNameId": "IDS_DLCSKIN20000027_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

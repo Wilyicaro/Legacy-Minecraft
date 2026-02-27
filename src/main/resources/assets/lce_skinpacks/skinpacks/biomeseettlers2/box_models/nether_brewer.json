@@ -1,0 +1,324 @@
+{
+  "meta": {
+    "displayName": "Nether Brewer",
+    "displayNameId": "IDS_DLCSKIN00005315_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            0.0,
+            0.0,
+            3.0
+          ],
+          "size": [
+            1.0,
+            6.0,
+            1.0
+          ],
+          "uv": [
+            60,
+            22
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            3.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            32
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            0.0,
+            3.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            0.0,
+            3.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            0.0,
+            3.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            22
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -5.0
+          ],
+          "size": [
+            1.0,
+            6.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            0.0,
+            -5.0
+          ],
+          "size": [
+            1.0,
+            6.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            0.0,
+            3.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            60,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            0.0,
+            3.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            28
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            3.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            60,
+            29
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            0.0,
+            -4.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            28,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            0.0,
+            -4.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            0.0,
+            -4.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            60,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -4.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            0.0,
+            -5.0
+          ],
+          "size": [
+            1.0,
+            6.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            39
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            0.0,
+            -5.0
+          ],
+          "size": [
+            1.0,
+            6.0,
+            1.0
+          ],
+          "uv": [
+            60,
+            42
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -7.0,
+            -5.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            4,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

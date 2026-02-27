@@ -1,7 +1,5 @@
 package wily.legacy.Skins.client.screen.changeskin;
 
-import wily.legacy.Skins.client.cpm.CpmModelManager;
-import wily.legacy.Skins.client.gui.GuiCpmPreviewCache;
 import wily.legacy.Skins.client.screen.widget.PlayerSkinWidget;
 import wily.legacy.Skins.client.screen.widget.PlayerSkinWidgetList;
 import wily.legacy.Skins.skin.ClientSkinCache;
@@ -28,6 +26,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import wily.legacy.client.screen.HelpAndOptionsScreen;
 import wily.legacy.client.screen.Panel;
+
+import wily.legacy.Skins.SkinsClientBootstrap;
+import wily.legacy.Skins.client.screen.TU3ChangeSkinScreen;
+import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
+import wily.legacy.client.screen.LegacyScreen;
+import wily.legacy.client.screen.OptionsScreen;
 import wily.legacy.Skins.client.compat.minecraft.TextureCompat;
 
 public final class ChangeSkinActions {
@@ -54,7 +58,6 @@ public final class ChangeSkinActions {
     private static final int BASE_W = 106;
     private static final int BASE_H = 150;
 
-
     private static final int FAV_REQUIRED_READY = 14;
 
     private static final int FAV_WARM_PER_TICK = 14;
@@ -66,7 +69,6 @@ public final class ChangeSkinActions {
     private final Host host;
 
     private final List<PlayerSkinWidget> widgetPool = new ArrayList<>(WIDGET_POOL_SIZE);
-
 
     private PendingSwap pending;
 
@@ -111,10 +113,8 @@ public final class ChangeSkinActions {
         return pending != null;
     }
 
-
     public void tick() {
         if (pending == null) return;
-
 
         SkinPack focused = getFocusedPack();
         if (focused == null || !SkinIdUtil.isFavouritesPack(focused.id())) {
@@ -167,21 +167,17 @@ public final class ChangeSkinActions {
             if (ids.size() >= MAX_SKINS_PER_PACK) break;
         }
 
-
         if (pack != null && SkinIdUtil.isFavouritesPack(pack.id())) {
 
             pending = new PendingSwap(ids, index);
-
 
             int pre = Math.min(24, Math.min(FAV_REQUIRED_READY, ids.size()));
             for (int i = 0; i < pre; i++) warmOne(ids.get(i));
 
             pending.warmCursor = pre;
 
-
             return;
         }
-
 
         pending = null;
         applySkinIds(ids, index, true);
@@ -244,7 +240,6 @@ public final class ChangeSkinActions {
 
         int startX = x + width / 2 - centerW / 2 - padX;
         int startY = y + height / 2 - centerH / 2 - padY;
-
 
         final int OFFSET = Math.max(1, Math.round(80 * uiScale));
         int marginX = Math.max(2, Math.round(6 * uiScale));
@@ -333,14 +328,6 @@ public final class ChangeSkinActions {
             }
         }
 
-
-        if (SkinIdUtil.isCpm(id)) {
-            ResourceLocation skinTex = tex != null ? tex : ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "skinpacks/default/skins/steve.png");
-            try {
-                GuiCpmPreviewCache.prewarmMenuPreview(id, skinTex);
-            } catch (Throwable ignored) {
-            }
-        }
     }
 
     private void touchTextureForId(PlayerSkinWidget w) {
@@ -367,15 +354,8 @@ public final class ChangeSkinActions {
 
             ResourceLocation tex = entry.texture();
 
-            if (SkinIdUtil.isCpm(id)) {
-
-                if (tex == null) return false;
-                if (!GuiCpmPreviewCache.isResolved(id, tex)) return false;
-            } else {
-
-                if (tex == null) return false;
-                if (TextureCompat.isMissingTexture(tex)) return false;
-            }
+            if (tex == null) return false;
+            if (TextureCompat.isMissingTexture(tex)) return false;
         }
         return true;
     }
@@ -390,26 +370,23 @@ public final class ChangeSkinActions {
         String selectedId = getSelectedSkinId();
         if (selectedId == null) return;
 
-        try {
-            SkinPack focused = getFocusedPack();
-            String packId = focused != null ? focused.id() : null;
-            if (packId != null && SkinIdUtil.isFavouritesPack(packId)) {
-
-                packId = SkinPackLoader.getSourcePackId(selectedId);
-            }
-            SkinPackLoader.setLastUsedCustomPackId(packId);
-        } catch (Throwable ignored) {
-        }
-
         String skinId = SkinIdUtil.isAutoSelect(selectedId) ? "" : selectedId;
-        SkinSyncClient.requestSetSkin(minecraft, skinId);
 
         try {
-            if (minecraft.player != null && SkinIdUtil.isCpm(skinId)) {
-                CpmModelManager.applyToProfile(minecraft.player.getGameProfile(), skinId);
+            if (skinId == null || skinId.isBlank()) {
+                SkinPackLoader.setLastUsedCustomPackId(null);
+            } else {
+                SkinPack focused = getFocusedPack();
+                String packId = focused != null ? focused.id() : null;
+                if (packId != null && SkinIdUtil.isFavouritesPack(packId)) {
+                    packId = SkinPackLoader.getSourcePackId(selectedId);
+                }
+                SkinPackLoader.setLastUsedCustomPackId(packId);
             }
         } catch (Throwable ignored) {
         }
+
+        SkinSyncClient.requestSetSkin(minecraft, skinId);
 
         UUID self = minecraft.player != null ? minecraft.player.getUUID()
                 : (minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null);
@@ -463,7 +440,22 @@ public final class ChangeSkinActions {
 
     public void openLegacyChangeSkinScreen() {
         try {
-            minecraft.setScreen(HelpAndOptionsScreen.CHANGE_SKIN.build(host.getScreen()));
+            final Screen skinScreen = host.getScreen();
+            final Screen rootParent = skinScreen instanceof LegacyScreen ls && ls.parent != null ? ls.parent : skinScreen;
+            Screen built = HelpAndOptionsScreen.CHANGE_SKIN.build(skinScreen);
+            if (built instanceof OptionsScreen opt) {
+                opt.onClose = s -> {
+                    try {
+                        boolean wantTu3 = ConsoleSkinsClientSettings.isTu3ChangeSkinScreen();
+                        boolean isTu3 = skinScreen instanceof TU3ChangeSkinScreen;
+                        if (wantTu3 != isTu3) {
+                            SkinsClientBootstrap.requestOpenChangeSkinScreen(minecraft, rootParent);
+                        }
+                    } catch (Throwable ignored) {
+                    }
+                };
+            }
+            minecraft.setScreen(built);
             playClick();
         } catch (Throwable t) {
             try {

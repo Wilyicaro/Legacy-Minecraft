@@ -1,0 +1,225 @@
+{
+  "name": "Marvel's Avengers Skin Pack",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "iron_man_mark_42",
+      "name": "Iron Man Mark 42",
+      "texture": "skins/iron_man_mark_42.png",
+      "order": 18
+    },
+    {
+      "id": "red_skull",
+      "name": "Red Skull",
+      "texture": "skins/red_skull.png",
+      "order": 25
+    },
+    {
+      "id": "kang",
+      "name": "Kang",
+      "texture": "skins/kang.png",
+      "order": 21
+    },
+    {
+      "id": "hydra_agent",
+      "name": "Hydra Agent",
+      "texture": "skins/hydra_agent.png",
+      "order": 14
+    },
+    {
+      "id": "iron_man_mark_41",
+      "name": "Iron Man Mark 41",
+      "texture": "skins/iron_man_mark_41.png",
+      "order": 17
+    },
+    {
+      "id": "arnim_zola",
+      "name": "Arnim Zola",
+      "texture": "skins/arnim_zola.png",
+      "order": 9
+    },
+    {
+      "id": "ant_man",
+      "name": "Ant-Man",
+      "texture": "skins/ant_man.png",
+      "order": 8
+    },
+    {
+      "id": "red_hulk",
+      "name": "Red Hulk",
+      "texture": "skins/red_hulk.png",
+      "order": 24
+    },
+    {
+      "id": "hulk",
+      "name": "Hulk",
+      "texture": "skins/hulk.png",
+      "order": 2
+    },
+    {
+      "id": "agent_coulson",
+      "name": "Agent Coulson",
+      "texture": "skins/agent_coulson.png",
+      "order": 30
+    },
+    {
+      "id": "moon_knight",
+      "name": "Moon Knight",
+      "texture": "skins/moon_knight.png",
+      "cape": "capes/moonknight.png",
+      "order": 23
+    },
+    {
+      "id": "iron_patriot",
+      "name": "Iron Patriot",
+      "texture": "skins/iron_patriot.png",
+      "order": 19
+    },
+    {
+      "id": "thor",
+      "name": "Thor",
+      "texture": "skins/thor.png",
+      "cape": "capes/thor.png",
+      "order": 3
+    },
+    {
+      "id": "captain_america_bucky_barnes",
+      "name": "Captain America (Bucky Barnes)",
+      "texture": "skins/captain_america_bucky_barnes.png",
+      "cape": "capes/cap.png",
+      "order": 11
+    },
+    {
+      "id": "aim_agent",
+      "name": "AIM Agent",
+      "texture": "skins/aim_agent.png",
+      "order": 7
+    },
+    {
+      "id": "abomination",
+      "name": "Abomination",
+      "texture": "skins/abomination.png",
+      "order": 6
+    },
+    {
+      "id": "falcon",
+      "name": "Falcon",
+      "texture": "skins/falcon.png",
+      "cape": "capes/wings.png",
+      "order": 12
+    },
+    {
+      "id": "nick_fury",
+      "name": "Nick Fury",
+      "texture": "skins/nick_fury.png",
+      "order": 4
+    },
+    {
+      "id": "wasp",
+      "name": "Wasp",
+      "texture": "skins/wasp.png",
+      "cape": "capes/wasp.png",
+      "order": 20
+    },
+    {
+      "id": "iron_man_mark_1",
+      "name": "Iron Man Mark 1",
+      "texture": "skins/iron_man_mark_1.png",
+      "order": 15
+    },
+    {
+      "id": "leader",
+      "name": "Leader",
+      "texture": "skins/leader.png",
+      "order": 31
+    },
+    {
+      "id": "iron_man_mark_16",
+      "name": "Iron Man Mark 16",
+      "texture": "skins/iron_man_mark_16.png",
+      "order": 16
+    },
+    {
+      "id": "loki",
+      "name": "Loki",
+      "texture": "skins/loki.png",
+      "order": 22
+    },
+    {
+      "id": "black_panther",
+      "name": "Black Panther",
+      "texture": "skins/black_panther.png",
+      "cape": "capes/blackpanther.png",
+      "order": 10
+    },
+    {
+      "id": "maria_hill",
+      "name": "Maria Hill",
+      "texture": "skins/maria_hill.png",
+      "order": 29
+    },
+    {
+      "id": "vision",
+      "name": "Vision",
+      "texture": "skins/vision.png",
+      "cape": "capes/vision.png",
+      "order": 28
+    },
+    {
+      "id": "taskmaster",
+      "name": "Taskmaster",
+      "texture": "skins/taskmaster.png",
+      "cape": "capes/taskmaster.png",
+      "order": 27
+    },
+    {
+      "id": "hercules",
+      "name": "Hercules",
+      "texture": "skins/hercules.png",
+      "order": 32
+    },
+    {
+      "id": "a_bomb",
+      "name": "A-Bomb",
+      "texture": "skins/a_bomb.png",
+      "order": 5
+    },
+    {
+      "id": "black_widow",
+      "name": "Black Widow",
+      "texture": "skins/black_widow.png",
+      "order": 34
+    },
+    {
+      "id": "spider_woman",
+      "name": "Spider Woman",
+      "texture": "skins/spider_woman.png",
+      "order": 26
+    },
+    {
+      "id": "captain_america",
+      "name": "Captain America",
+      "texture": "skins/captain_america.png",
+      "cape": "capes/cap.png",
+      "order": 1
+    },
+    {
+      "id": "hawkeye",
+      "name": "Hawkeye",
+      "texture": "skins/hawkeye.png",
+      "order": 33
+    },
+    {
+      "id": "iron_man_mark_7",
+      "name": "Iron Man Mark 7",
+      "texture": "skins/iron_man_mark_7.png",
+      "order": 35
+    },
+    {
+      "id": "giant_man",
+      "name": "Giant-Man",
+      "texture": "skins/giant_man.png",
+      "order": 13
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "displayName": "Slymime",
+    "displayNameId": "IDS_DLCSKIN00005612_DISPLAYNAME",
+    "themeName": "Villains",
+    "themeNameId": "IDS_DLCSKIN00005612_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            0.0,
+            -9.0,
+            0.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            4,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Biker",
+    "displayNameId": "IDS_DLCSKIN00000024_DISPLAYNAME",
+    "themeName": "Trials Evolution",
+    "themeNameId": "IDS_DLCSKIN00000024_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

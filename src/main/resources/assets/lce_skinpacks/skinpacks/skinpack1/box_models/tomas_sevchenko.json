@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Tomas Sevchenko",
+    "displayNameId": "IDS_DLCSKIN20000004_DISPLAYNAME",
+    "themeName": "Killzone",
+    "themeNameId": "IDS_DLCSKIN20000004_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

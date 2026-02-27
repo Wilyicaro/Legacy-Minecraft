@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Desert Tamer",
+    "displayNameId": "IDS_DLCSKIN00004507_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00004507_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

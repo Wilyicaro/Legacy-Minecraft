@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Altair",
+    "displayNameId": "IDS_dlcskin54065109_DISPLAYNAME",
+    "themeName": "Assassins Creed",
+    "themeNameId": "IDS_dlcskin54065109_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

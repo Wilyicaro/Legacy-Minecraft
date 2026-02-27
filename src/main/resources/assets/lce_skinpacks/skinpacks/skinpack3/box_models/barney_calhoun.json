@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Barney Calhoun",
+    "displayNameId": "IDS_DLCSKIN20000219_DISPLAYNAME",
+    "themeName": "Half Life",
+    "themeNameId": "IDS_DLCSKIN20000219_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "The Beast",
+    "displayNameId": "IDS_DLCSKIN20000126_DISPLAYNAME",
+    "themeName": "inFAMOUS",
+    "themeNameId": "IDS_DLCSKIN20000126_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

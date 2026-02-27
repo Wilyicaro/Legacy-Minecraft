@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Iron Patriot",
+    "displayNameId": "IDS_dlcskin33391757_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

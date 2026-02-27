@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Baby Ghast",
+    "displayNameId": "IDS_DLCSKIN00001000_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

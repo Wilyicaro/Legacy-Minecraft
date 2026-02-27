@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Ezio",
+    "displayNameId": "IDS_dlcskin13832854_DISPLAYNAME",
+    "themeName": "Assassins Creed",
+    "themeNameId": "IDS_dlcskin13832854_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

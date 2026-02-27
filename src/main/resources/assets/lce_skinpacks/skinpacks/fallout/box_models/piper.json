@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "displayName": "Piper",
+    "displayNameId": "IDS_SKINS_DLCSKIN00004831_DISPLAYNAME",
+    "themeName": "Fallout 4",
+    "themeNameId": "IDS_SKINS_DLCSKIN00004831_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            -6.0,
+            -6.0
+          ],
+          "size": [
+            6.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

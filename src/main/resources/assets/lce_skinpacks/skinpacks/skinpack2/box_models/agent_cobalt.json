@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Agent Cobalt",
+    "displayNameId": "IDS_DLCSKIN20000108_DISPLAYNAME",
+    "themeName": "Cobalt",
+    "themeNameId": "IDS_DLCSKIN20000108_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

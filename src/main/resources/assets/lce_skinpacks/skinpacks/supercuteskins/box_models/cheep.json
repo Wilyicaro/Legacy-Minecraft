@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Cheep",
+    "displayNameId": "IDS_SKINS_DLCSKIN00007402_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_SKINS_DLCSKIN00007402_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

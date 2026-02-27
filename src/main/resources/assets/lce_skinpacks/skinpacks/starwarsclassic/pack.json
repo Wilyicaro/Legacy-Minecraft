@@ -1,0 +1,338 @@
+{
+  "name": "Star Wars Classic",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "luke_skywalker",
+      "name": "Luke Skywalker",
+      "texture": "skins/luke_skywalker.png",
+      "order": 1
+    },
+    {
+      "id": "luke_skywalker_2",
+      "name": "Luke Skywalker",
+      "texture": "skins/luke_skywalker_2.png",
+      "order": 2
+    },
+    {
+      "id": "luke_skywalker_3",
+      "name": "Luke Skywalker",
+      "texture": "skins/luke_skywalker_3.png",
+      "order": 3
+    },
+    {
+      "id": "luke_skywalker_4",
+      "name": "Luke Skywalker",
+      "texture": "skins/luke_skywalker_4.png",
+      "order": 4
+    },
+    {
+      "id": "luke_skywalker_5",
+      "name": "Luke Skywalker",
+      "texture": "skins/luke_skywalker_5.png",
+      "order": 5
+    },
+    {
+      "id": "luke_skywalker_6",
+      "name": "Luke Skywalker",
+      "texture": "skins/luke_skywalker_6.png",
+      "order": 6
+    },
+    {
+      "id": "luke_skywalker_7",
+      "name": "Luke Skywalker",
+      "texture": "skins/luke_skywalker_7.png",
+      "order": 7
+    },
+    {
+      "id": "han_solo",
+      "name": "Han Solo",
+      "texture": "skins/han_solo.png",
+      "order": 8
+    },
+    {
+      "id": "han_solo_2",
+      "name": "Han Solo",
+      "texture": "skins/han_solo_2.png",
+      "order": 9
+    },
+    {
+      "id": "han_solo_3",
+      "name": "Han Solo",
+      "texture": "skins/han_solo_3.png",
+      "order": 10
+    },
+    {
+      "id": "chewbacca",
+      "name": "Chewbacca",
+      "texture": "skins/chewbacca.png",
+      "order": 11
+    },
+    {
+      "id": "princess_leia_organa",
+      "name": "Princess Leia Organa",
+      "texture": "skins/princess_leia_organa.png",
+      "order": 12
+    },
+    {
+      "id": "princess_leia_organa_2",
+      "name": "Princess Leia Organa",
+      "texture": "skins/princess_leia_organa_2.png",
+      "order": 13
+    },
+    {
+      "id": "princess_leia_organa_3",
+      "name": "Princess Leia Organa",
+      "texture": "skins/princess_leia_organa_3.png",
+      "order": 14
+    },
+    {
+      "id": "princess_leia_organa_4",
+      "name": "Princess Leia Organa",
+      "texture": "skins/princess_leia_organa_4.png",
+      "order": 15
+    },
+    {
+      "id": "princess_leia_organa_5",
+      "name": "Princess Leia Organa",
+      "texture": "skins/princess_leia_organa_5.png",
+      "order": 16
+    },
+    {
+      "id": "princess_leia_organa_6",
+      "name": "Princess Leia Organa",
+      "texture": "skins/princess_leia_organa_6.png",
+      "order": 17
+    },
+    {
+      "id": "tusken_raider",
+      "name": "Tusken Raider",
+      "texture": "skins/tusken_raider.png",
+      "order": 18
+    },
+    {
+      "id": "stormtrooper",
+      "name": "Stormtrooper",
+      "texture": "skins/stormtrooper.png",
+      "order": 19
+    },
+    {
+      "id": "darth_vader",
+      "name": "Darth Vader",
+      "texture": "skins/darth_vader.png",
+      "order": 20
+    },
+    {
+      "id": "blockade_runner_soldier",
+      "name": "Blockade Runner Soldier",
+      "texture": "skins/blockade_runner_soldier.png",
+      "order": 21
+    },
+    {
+      "id": "c_3po",
+      "name": "C-3PO",
+      "texture": "skins/c_3po.png",
+      "order": 22
+    },
+    {
+      "id": "ben_kenobi",
+      "name": "Ben Kenobi",
+      "texture": "skins/ben_kenobi.png",
+      "order": 23
+    },
+    {
+      "id": "cantina_band_member",
+      "name": "Cantina Band Member",
+      "texture": "skins/cantina_band_member.png",
+      "order": 24
+    },
+    {
+      "id": "tie_fighter_pilot",
+      "name": "TIE Fighter Pilot",
+      "texture": "skins/tie_fighter_pilot.png",
+      "order": 25
+    },
+    {
+      "id": "walrus_man_ponda_baba",
+      "name": "Walrus Man (Ponda Baba)",
+      "texture": "skins/walrus_man_ponda_baba.png",
+      "order": 26
+    },
+    {
+      "id": "hammerhead_momaw_nadon",
+      "name": "Hammerhead (Momaw Nadon)",
+      "texture": "skins/hammerhead_momaw_nadon.png",
+      "order": 27
+    },
+    {
+      "id": "greedo",
+      "name": "Greedo",
+      "texture": "skins/greedo.png",
+      "order": 28
+    },
+    {
+      "id": "governor_tarkin",
+      "name": "Governor Tarkin",
+      "texture": "skins/governor_tarkin.png",
+      "order": 29
+    },
+    {
+      "id": "lando_calrissian",
+      "name": "Lando Calrissian",
+      "texture": "skins/lando_calrissian.png",
+      "order": 30
+    },
+    {
+      "id": "boba_fett",
+      "name": "Boba Fett",
+      "texture": "skins/boba_fett.png",
+      "order": 31
+    },
+    {
+      "id": "bossk",
+      "name": "Bossk",
+      "texture": "skins/bossk.png",
+      "order": 32
+    },
+    {
+      "id": "dengar",
+      "name": "Dengar",
+      "texture": "skins/dengar.png",
+      "order": 33
+    },
+    {
+      "id": "zuckuss",
+      "name": "Zuckuss",
+      "texture": "skins/zuckuss.png",
+      "order": 34
+    },
+    {
+      "id": "ig_88",
+      "name": "IG-88",
+      "texture": "skins/ig_88.png",
+      "order": 35
+    },
+    {
+      "id": "emperor",
+      "name": "Emperor",
+      "texture": "skins/emperor.png",
+      "order": 36
+    },
+    {
+      "id": "at_at_pilot",
+      "name": "AT-AT Pilot",
+      "texture": "skins/at_at_pilot.png",
+      "order": 37
+    },
+    {
+      "id": "lobot",
+      "name": "Lobot",
+      "texture": "skins/lobot.png",
+      "order": 38
+    },
+    {
+      "id": "rancor_keeper",
+      "name": "Rancor Keeper",
+      "texture": "skins/rancor_keeper.png",
+      "order": 39
+    },
+    {
+      "id": "gamorrean_guard",
+      "name": "Gamorrean Guard",
+      "texture": "skins/gamorrean_guard.png",
+      "order": 40
+    },
+    {
+      "id": "lando_calrissian_2",
+      "name": "Lando Calrissian",
+      "texture": "skins/lando_calrissian_2.png",
+      "cape": "capes/lando.png",
+      "order": 41
+    },
+    {
+      "id": "princess_leia_organa_7",
+      "name": "Princess Leia Organa",
+      "texture": "skins/princess_leia_organa_7.png",
+      "order": 42
+    },
+    {
+      "id": "oola",
+      "name": "Oola",
+      "texture": "skins/oola.png",
+      "order": 43
+    },
+    {
+      "id": "nien_nunb",
+      "name": "Nien Nunb",
+      "texture": "skins/nien_nunb.png",
+      "order": 44
+    },
+    {
+      "id": "bib_fortuna",
+      "name": "Bib Fortuna",
+      "texture": "skins/bib_fortuna.png",
+      "order": 45
+    },
+    {
+      "id": "scout_trooper",
+      "name": "Scout Trooper",
+      "texture": "skins/scout_trooper.png",
+      "order": 46
+    },
+    {
+      "id": "emperors_royal_guard",
+      "name": "Emperor's Royal Guard",
+      "texture": "skins/emperors_royal_guard.png",
+      "order": 47
+    },
+    {
+      "id": "admiral_ackbar",
+      "name": "Admiral Ackbar",
+      "texture": "skins/admiral_ackbar.png",
+      "order": 48
+    },
+    {
+      "id": "r2_d2",
+      "name": "R2-D2",
+      "texture": "skins/r2_d2.png",
+      "order": 49
+    },
+    {
+      "id": "yoda",
+      "name": "Yoda",
+      "texture": "skins/yoda.png",
+      "cape": "capes/unusedinlceyodacape.png",
+      "order": 50
+    },
+    {
+      "id": "jawa",
+      "name": "Jawa",
+      "texture": "skins/jawa.png",
+      "order": 51
+    },
+    {
+      "id": "wampa_ice_creature",
+      "name": "Wampa Ice Creature",
+      "texture": "skins/wampa_ice_creature.png",
+      "order": 52
+    },
+    {
+      "id": "wicket_w_warrick",
+      "name": "Wicket W. Warrick",
+      "texture": "skins/wicket_w_warrick.png",
+      "order": 53
+    },
+    {
+      "id": "rancor",
+      "name": "Rancor",
+      "texture": "skins/rancor.png",
+      "order": 54
+    },
+    {
+      "id": "4_lom",
+      "name": "4-LOM",
+      "texture": "skins/4_lom.png",
+      "order": 55
+    }
+  ]
+}

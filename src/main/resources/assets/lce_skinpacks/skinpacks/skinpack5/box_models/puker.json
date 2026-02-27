@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Puker",
+    "displayNameId": "IDS_dlcskin66467189_DISPLAYNAME",
+    "themeName": "Dead Space 3",
+    "themeNameId": "IDS_dlcskin66467189_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

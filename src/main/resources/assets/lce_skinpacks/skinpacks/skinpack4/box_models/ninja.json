@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Ninja",
+    "displayNameId": "IDS_dlcskin18248253_DISPLAYNAME",
+    "themeName": "Mark of the Ninja",
+    "themeNameId": "IDS_dlcskin18248253_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

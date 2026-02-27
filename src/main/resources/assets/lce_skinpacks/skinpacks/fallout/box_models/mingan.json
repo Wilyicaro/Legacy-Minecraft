@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Mingan",
+    "displayNameId": "IDS_SKINS_DLCSKIN00004806_DISPLAYNAME",
+    "themeName": "Fallout 2",
+    "themeNameId": "IDS_SKINS_DLCSKIN00004806_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

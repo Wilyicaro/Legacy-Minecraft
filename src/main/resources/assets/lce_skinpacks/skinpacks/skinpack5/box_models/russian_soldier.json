@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Russian Soldier",
+    "displayNameId": "IDS_dlcskin36748310_DISPLAYNAME",
+    "themeName": "World War 2",
+    "themeNameId": "IDS_dlcskin36748310_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

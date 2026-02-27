@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Evil Wizard",
+    "displayNameId": "IDS_SKINS_DLCSKIN00003208_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

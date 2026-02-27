@@ -1,0 +1,294 @@
+{
+  "format_version": 1,
+  "packs": [
+    {
+      "id": "birthday2",
+      "name": "2nd Birthday Skin Pack",
+      "author": "Me",
+      "path": "skinpacks/birthday2/pack.json",
+      "type": "skin",
+      "sort_index": 300
+    },
+    {
+      "id": "avengers",
+      "name": "Marvel's Avengers Skin Pack",
+      "author": "Me",
+      "type": "skin",
+      "path": "skinpacks/avengers/pack.json",
+      "sort_index": 3975
+    },
+    {
+      "id": "skinpack5",
+      "name": "Skin Pack 5",
+      "author": "Me",
+      "type": "skin",
+      "path": "skinpacks/skinpack5/pack.json",
+      "sort_index": 3950
+    },
+    {
+      "id": "skinpack4",
+      "name": "Skin Pack 4",
+      "author": "Me",
+      "type": "skin",
+      "path": "skinpacks/skinpack4/pack.json",
+      "sort_index": 3925
+    },
+    {
+      "id": "campfiretales",
+      "name": "Campfire Tales",
+      "author": "Me",
+      "type": "skin",
+      "path": "skinpacks/campfiretales/pack.json",
+      "sort_index": 1200
+    },
+    {
+      "id": "chinesemythology",
+      "name": "Chinese Mythology",
+      "author": "Me",
+      "type": "mashup",
+      "path": "skinpacks/chinesemythology/pack.json",
+      "sort_index": 1300
+    },
+    {
+      "id": "minecon2017",
+      "name": "MINECON Earth 2017",
+      "author": "Me",
+      "type": "skin",
+      "path": "skinpacks/minecon2017/pack.json",
+      "sort_index": 2300
+    },
+    {
+      "id": "supercuteskins",
+      "name": "Super Cute Texture Pack",
+      "author": "Me",
+      "type": "skin",
+      "path": "skinpacks/supercuteskins/pack.json",
+      "sort_index": 5000
+    },
+    {
+      "id": "starwarsclassic",
+      "name": "Star Wars Classic",
+      "author": "Me",
+      "type": "skin",
+      "path": "skinpacks/starwarsclassic/pack.json",
+      "sort_index": 4100
+    },
+    {
+      "id": "minecon2015",
+      "name": "Minecon 2015 Skin Pack",
+      "author": "Me",
+      "path": "skinpacks/minecon2015/pack.json",
+      "type": "skin",
+      "sort_index": 2800
+    },
+    {
+      "id": "minecon2016",
+      "name": "Minecon 2016 Skin Pack",
+      "author": "Me",
+      "path": "skinpacks/minecon2016/pack.json",
+      "type": "skin",
+      "sort_index": 2900
+    },
+    {
+      "id": "battleandbeasts",
+      "name": "Battle and the Beasts",
+      "author": "Me",
+      "path": "skinpacks/battleandbeasts/pack.json",
+      "type": "skin",
+      "sort_index": 800
+    },
+    {
+      "id": "classicskinpack1",
+      "name": "Classic Skin Pack 1",
+      "author": "Me",
+      "path": "skinpacks/classicskinpack1/pack.json",
+      "type": "skin",
+      "sort_index": 1400
+    },
+    {
+      "id": "battleandthebeasts2",
+      "name": "Battle and the Beasts 2",
+      "author": "Me",
+      "path": "skinpacks/battleandthebeasts2/pack.json",
+      "type": "skin",
+      "sort_index": 900
+    },
+    {
+      "id": "villians",
+      "name": "Villians",
+      "author": "Me",
+      "path": "skinpacks/villians/pack.json",
+      "type": "skin",
+      "sort_index": 5300
+    },
+    {
+      "id": "festivemashup",
+      "name": "Festive",
+      "author": "Me",
+      "path": "skinpacks/festivemashup/pack.json",
+      "sort_index": 2000,
+      "type": "mashup"
+    },
+    {
+      "id": "adventuretime",
+      "name": "Adventure Time",
+      "author": "Me",
+      "path": "skinpacks/adventuretime/pack.json",
+      "sort_index": 1000,
+      "type": "mashup"
+    },
+    {
+      "id": "biomesettlers",
+      "name": "Biome Settlers",
+      "author": "Me",
+      "path": "skinpacks/biomesettlers/pack.json",
+      "type": "skin",
+      "sort_index": 1000
+    },
+    {
+      "id": "norsemythology",
+      "name": "Norse Mythology",
+      "author": "Me",
+      "path": "skinpacks/norsemythology/pack.json",
+      "sort_index": 3300,
+      "type": "mashup"
+    },
+    {
+      "id": "moanna",
+      "name": "Moanna",
+      "author": "Me",
+      "path": "skinpacks/moanna/pack.json",
+      "type": "skin",
+      "sort_index": 3200
+    },
+    {
+      "id": "skinpack2",
+      "name": "Skin Pack 2",
+      "author": "Me",
+      "path": "skinpacks/skinpack2/pack.json",
+      "type": "skin",
+      "sort_index": 3800
+    },
+    {
+      "id": "birthday",
+      "name": "Birthday Skin Pack",
+      "author": "Me",
+      "path": "skinpacks/birthday/pack.json",
+      "type": "skin",
+      "sort_index": 400
+    },
+    {
+      "id": "skinpack3",
+      "name": "Skin Pack 3",
+      "author": "Me",
+      "path": "skinpacks/skinpack3/pack.json",
+      "type": "skin",
+      "sort_index": 3900
+    },
+    {
+      "id": "halloween2015",
+      "name": "Halloween 2015",
+      "author": "Me",
+      "path": "skinpacks/halloween2015/pack.json",
+      "sort_index": 2400,
+      "type": "mashup"
+    },
+    {
+      "id": "biomeseettlers2",
+      "name": "Biome Settlers 2",
+      "author": "Me",
+      "path": "skinpacks/biomeseettlers2/pack.json",
+      "type": "skin",
+      "sort_index": 1100
+    },
+    {
+      "id": "thegoatstorymode",
+      "name": "Story Mode",
+      "author": "Me",
+      "type": "skin",
+      "path": "skinpacks/thegoatstorymode/pack.json",
+      "sort_index": 4500
+    },
+    {
+      "id": "skyrim",
+      "name": "The Elder Scrolls V: Skyrim",
+      "author": "Me",
+      "path": "skinpacks/skyrim/pack.json",
+      "type": "mashup",
+      "sort_index": 4900
+    },
+    {
+      "id": "fallout",
+      "name": "Fallout",
+      "author": "Me",
+      "path": "skinpacks/fallout/pack.json",
+      "type": "mashup",
+      "sort_index": 1900
+    },
+    {
+      "id": "doctor_who_volume_1",
+      "name": "Doctor Who Skins Volume I",
+      "author": "Me",
+      "path": "skinpacks/doctor_who_volume_1/pack.json",
+      "type": "skin",
+      "sort_index": 1500
+    },
+    {
+      "id": "doctor_who_volume_2",
+      "name": "Doctor Who Skins Volume II",
+      "author": "Me",
+      "path": "skinpacks/doctor_who_volume_2/pack.json",
+      "type": "skin",
+      "sort_index": 1600
+    },
+    {
+      "id": "skinpack1",
+      "name": "Skin Pack 1",
+      "author": "Me",
+      "path": "skinpacks/skinpack1/pack.json",
+      "type": "skin",
+      "sort_index": 3700
+    },
+    {
+      "id": "festive",
+      "name": "Festive",
+      "author": "Me",
+      "path": "skinpacks/festive/pack.json",
+      "type": "skin",
+      "sort_index": 2100
+    },
+    {
+      "id": "birthday5",
+      "name": "5th Birthday Skin Pack",
+      "author": "Me",
+      "path": "skinpacks/birthday5/pack.json",
+      "type": "skin",
+      "sort_index": 100
+    },
+    {
+      "id": "birthday3",
+      "name": "3rd Birthday Skin Pack",
+      "author": "Me",
+      "path": "skinpacks/birthday3/pack.json",
+      "type": "skin",
+      "sort_index": 200
+    },
+    {
+      "id": "birthday4",
+      "name": "4th Birthday Skin Pack",
+      "author": "Me",
+      "path": "skinpacks/birthday4/pack.json",
+      "type": "skin",
+      "sort_index": 150
+    },
+    {
+      "id": "the_simpsons",
+      "name": "The Simpsons",
+      "author": "Me",
+      "path": "skinpacks/the_simpsons/pack.json",
+      "type": "skin",
+      "sort_index": 5200
+    }
+  ],
+  "order_mode": "sort_index"
+}

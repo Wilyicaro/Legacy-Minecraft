@@ -1,0 +1,54 @@
+{
+  "name": "MINECON Earth 2017",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "cakeminecon2017",
+      "name": "Cake",
+      "texture": "skins/cakeminecon2017.png",
+      "order": 1
+    },
+    {
+      "id": "alex_globe",
+      "name": "Alex Globe",
+      "texture": "skins/alex_globe.png",
+      "order": 2
+    },
+    {
+      "id": "blue_sheep",
+      "name": "Blue Sheep",
+      "texture": "skins/blue_sheep.png",
+      "order": 3
+    },
+    {
+      "id": "cardboard_cosplayer",
+      "name": "Cardboard Cosplayer",
+      "texture": "skins/cardboard_cosplayer.png",
+      "order": 4
+    },
+    {
+      "id": "party_alex",
+      "name": "Party Alex",
+      "texture": "skins/party_alex.png",
+      "order": 5
+    },
+    {
+      "id": "party_steveminecon2017",
+      "name": "Party Steve",
+      "texture": "skins/party_steveminecon2017.png",
+      "order": 6
+    },
+    {
+      "id": "pinata",
+      "name": "Pinata",
+      "texture": "skins/pinata.png",
+      "order": 7
+    },
+    {
+      "id": "creeper_cosplay",
+      "name": "Creeper Cosplay",
+      "texture": "skins/creeper_cosplay.png",
+      "order": 8
+    }
+  ]
+}

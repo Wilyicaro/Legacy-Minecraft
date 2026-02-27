@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Birthday Present",
+    "displayNameId": "IDS_DLCSKIN00000720_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

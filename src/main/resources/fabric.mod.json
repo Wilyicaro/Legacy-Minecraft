@@ -33,7 +33,9 @@
   "depends": {
     "fabric-api": "*",
     "factory_api": ">=${factory_api_version}",
-    "minecraft": ["${mc_version_range}"]
+    "minecraft": [
+      "${mc_version_range}"
+    ]
   },
   "suggests": {
     "factocrafty": ">=0.0.0.6"

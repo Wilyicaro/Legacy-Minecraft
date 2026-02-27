@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Tuxedo Alex Xmas",
+    "displayNameId": "IDS_SKINS_DLCSKIN00002738_DISPLAYNAME",
+    "themeName": "Festive Mash-up",
+    "themeNameId": "IDS_SKINS_DLCSKIN00002738_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

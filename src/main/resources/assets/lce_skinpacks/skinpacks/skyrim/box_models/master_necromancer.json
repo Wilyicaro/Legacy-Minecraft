@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Master Necromancer",
+    "displayNameId": "IDS_SKINS_DLCSKIN00001438_DISPLAYNAME",
+    "themeName": "Skyrim",
+    "themeNameId": "IDS_SKINS_DLCSKIN00001438_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

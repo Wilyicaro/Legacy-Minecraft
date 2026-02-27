@@ -1,0 +1,146 @@
+{
+  "name": "Birthday Skin Pack",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "party_steve",
+      "name": "Party Steve",
+      "texture": "skins/party_steve.png",
+      "order": 1
+    },
+    {
+      "id": "party_creeper",
+      "name": "Party Creeper",
+      "texture": "skins/party_creeper.png",
+      "order": 2
+    },
+    {
+      "id": "cake_zombie",
+      "name": "Cake Zombie",
+      "texture": "skins/cake_zombie.png",
+      "poses": ["zombie_arms"],
+      "order": 3
+    },
+    {
+      "id": "party_pig_zombie",
+      "name": "Party Pig Zombie",
+      "texture": "skins/party_pig_zombie.png",
+      "order": 4
+    },
+    {
+      "id": "party_herobrine",
+      "name": "Party Herobrine",
+      "texture": "skins/party_herobrine.png",
+      "order": 5
+    },
+    {
+      "id": "party_skeleton",
+      "name": "Party Skeleton",
+      "texture": "skins/party_skeleton.png",
+      "order": 6
+    },
+    {
+      "id": "party_enderman",
+      "name": "Party Enderman",
+      "texture": "skins/party_enderman.png",
+      "order": 7
+    },
+    {
+      "id": "party_pig",
+      "name": "Party Pig",
+      "texture": "skins/party_pig.png",
+      "order": 8
+    },
+    {
+      "id": "party_cow",
+      "name": "Party Cow",
+      "texture": "skins/party_cow.png",
+      "order": 9
+    },
+    {
+      "id": "mooshroom",
+      "name": "Mooshroom",
+      "texture": "skins/mooshroom.png",
+      "order": 10
+    },
+    {
+      "id": "top_hat_sheep",
+      "name": "Top Hat Sheep",
+      "texture": "skins/top_hat_sheep.png",
+      "order": 11
+    },
+    {
+      "id": "party_squid",
+      "name": "Party Squid",
+      "texture": "skins/party_squid.png",
+      "order": 12
+    },
+    {
+      "id": "party_iron_golem",
+      "name": "Party Iron Golem",
+      "texture": "skins/party_iron_golem.png",
+      "order": 13
+    },
+    {
+      "id": "wolf_with_collar",
+      "name": "Wolf With Collar",
+      "texture": "skins/wolf_with_collar.png",
+      "order": 14
+    },
+    {
+      "id": "party_snow_golem",
+      "name": "Party Snow Golem",
+      "texture": "skins/party_snow_golem.png",
+      "order": 15
+    },
+    {
+      "id": "steve_creeper_boxhead",
+      "name": "Steve Creeper Boxhead",
+      "texture": "skins/steve_creeper_boxhead.png",
+      "order": 16
+    },
+    {
+      "id": "creeper_steve_boxhead",
+      "name": "Creeper Steve Boxhead",
+      "texture": "skins/creeper_steve_boxhead.png",
+      "order": 17
+    },
+    {
+      "id": "enderdragon",
+      "name": "EnderDragon",
+      "texture": "skins/enderdragon.png",
+      "cape": "capes/enderdragon.png",
+      "order": 18
+    },
+    {
+      "id": "blaze",
+      "name": "Blaze",
+      "texture": "skins/blaze.png",
+      "order": 19
+    },
+    {
+      "id": "farmer_villager",
+      "name": "Farmer Villager",
+      "texture": "skins/farmer_villager.png",
+      "order": 20
+    },
+    {
+      "id": "birthday_present",
+      "name": "Birthday Present",
+      "texture": "skins/birthday_present.png",
+      "order": 21
+    },
+    {
+      "id": "birthday_cake",
+      "name": "Birthday Cake",
+      "texture": "skins/birthday_cake.png",
+      "order": 22
+    },
+    {
+      "id": "slime",
+      "name": "Slime",
+      "texture": "skins/slime.png",
+      "order": 23
+    }
+  ]
+}

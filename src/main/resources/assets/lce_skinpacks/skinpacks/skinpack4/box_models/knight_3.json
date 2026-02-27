@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Knight 3",
+    "displayNameId": "IDS_dlcskin07765597_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Desert Hunter",
+    "displayNameId": "IDS_DLCSKIN00004505_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00004505_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

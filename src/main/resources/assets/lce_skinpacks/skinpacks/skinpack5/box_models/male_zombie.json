@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Male Zombie",
+    "displayNameId": "IDS_dlcskin10198573_DISPLAYNAME",
+    "themeName": "The Walking Dead",
+    "themeNameId": "IDS_dlcskin10198573_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

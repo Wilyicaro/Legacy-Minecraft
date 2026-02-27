@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "displayName": "The Empty Child",
+    "displayNameId": "IDS_DLCSKIN00002027_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            -2.0,
+            -6.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

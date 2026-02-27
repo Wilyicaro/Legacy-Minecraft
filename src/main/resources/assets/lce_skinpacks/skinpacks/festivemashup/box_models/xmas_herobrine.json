@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Xmas Herobrine",
+    "displayNameId": "IDS_SKINS_DLCSKIN00002700_DISPLAYNAME",
+    "themeName": "Festive Mash-up",
+    "themeNameId": "IDS_SKINS_DLCSKIN00002700_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

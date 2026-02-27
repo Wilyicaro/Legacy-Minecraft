@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Victorian Woman",
+    "displayNameId": "IDS_dlcskin86615661_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

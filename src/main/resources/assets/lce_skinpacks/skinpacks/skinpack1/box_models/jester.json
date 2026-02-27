@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Jester",
+    "displayNameId": "IDS_DLCSKIN20000041_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

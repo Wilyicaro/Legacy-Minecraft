@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Liz 10",
+    "displayNameId": "IDS_DLCSKIN00002038_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

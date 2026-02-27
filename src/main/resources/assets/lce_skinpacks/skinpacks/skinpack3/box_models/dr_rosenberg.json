@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Dr Rosenberg",
+    "displayNameId": "IDS_DLCSKIN20000220_DISPLAYNAME",
+    "themeName": "Half Life",
+    "themeNameId": "IDS_DLCSKIN20000220_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

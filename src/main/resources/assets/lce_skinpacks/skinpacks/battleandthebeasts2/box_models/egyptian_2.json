@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Egyptian",
+    "displayNameId": "IDS_DLCSKIN00001029_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

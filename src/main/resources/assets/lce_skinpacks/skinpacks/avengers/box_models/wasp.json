@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Wasp",
+    "displayNameId": "IDS_dlcskin47802838_DISPLAYNAME",
+    "themeName": "Marvel Avengers",
+    "themeNameId": "IDS_dlcskin47802838_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

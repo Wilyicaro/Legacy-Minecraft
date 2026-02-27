@@ -1,0 +1,136 @@
+{
+  "name": "4th Birthday Skin Pack",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "wolf_tshirt_steve",
+      "name": "Wolf T-Shirt",
+      "texture": "skins/wolf_tshirt_steve.png",
+      "order": 1
+    },
+    {
+      "id": "wolf_tshirt_alex",
+      "name": "Wolf T-Shirt",
+      "texture": "skins/wolf_tshirt_alex.png",
+      "order": 2,
+      "model": "slim"
+    },
+    {
+      "id": "chicken_tshirt_steve",
+      "name": "Chicken T-Shirt",
+      "texture": "skins/chicken_tshirt_steve.png",
+      "order": 3
+    },
+    {
+      "id": "chicken_tshirt_alex",
+      "name": "Chicken T-Shirt",
+      "texture": "skins/chicken_tshirt_alex.png",
+      "order": 4,
+      "model": "slim"
+    },
+    {
+      "id": "creeper_tshirt_steve",
+      "name": "Creeper T-Shirt",
+      "texture": "skins/creeper_tshirt_steve.png",
+      "order": 5
+    },
+    {
+      "id": "creeper_tshirt_alex",
+      "name": "Creeper T-Shirt",
+      "texture": "skins/creeper_tshirt_alex.png",
+      "order": 6,
+      "model": "slim"
+    },
+    {
+      "id": "guardian_tshirt_steve",
+      "name": "Guardian T-Shirt",
+      "texture": "skins/guardian_tshirt_steve.png",
+      "order": 7
+    },
+    {
+      "id": "guardian_tshirt_alex",
+      "name": "Guardian T-Shirt",
+      "texture": "skins/guardian_tshirt_alex.png",
+      "order": 8,
+      "model": "slim"
+    },
+    {
+      "id": "slime_tshirt_steve",
+      "name": "Slime T-Shirt",
+      "texture": "skins/slime_tshirt_steve.png",
+      "order": 9
+    },
+    {
+      "id": "slime_tshirt_alex",
+      "name": "Slime T-Shirt",
+      "texture": "skins/slime_tshirt_alex.png",
+      "order": 10,
+      "model": "slim"
+    },
+    {
+      "id": "ghast_tshirt_steve",
+      "name": "Ghast T-Shirt",
+      "texture": "skins/ghast_tshirt_steve.png",
+      "order": 11
+    },
+    {
+      "id": "ghast_tshirt_alex",
+      "name": "Ghast T-Shirt",
+      "texture": "skins/ghast_tshirt_alex.png",
+      "order": 12,
+      "model": "slim"
+    },
+    {
+      "id": "sheep_tshirt_steve",
+      "name": "Sheep T-Shirt",
+      "texture": "skins/sheep_tshirt_steve.png",
+      "order": 13
+    },
+    {
+      "id": "sheep_tshirt_alex",
+      "name": "Sheep T-Shirt",
+      "texture": "skins/sheep_tshirt_alex.png",
+      "order": 14,
+      "model": "slim"
+    },
+    {
+      "id": "ocelot_tshirt_steve",
+      "name": "Ocelot T-Shirt",
+      "texture": "skins/ocelot_tshirt_steve.png",
+      "order": 15
+    },
+    {
+      "id": "ocelot_tshirt_alex",
+      "name": "Ocelot T-Shirt",
+      "texture": "skins/ocelot_tshirt_alex.png",
+      "order": 16,
+      "model": "slim"
+    },
+    {
+      "id": "wither_tshirt_steve",
+      "name": "Wither T-Shirt",
+      "texture": "skins/wither_tshirt_steve.png",
+      "order": 17
+    },
+    {
+      "id": "wither_tshirt_alex",
+      "name": "Wither T-Shirt",
+      "texture": "skins/wither_tshirt_alex.png",
+      "order": 18,
+      "model": "slim"
+    },
+    {
+      "id": "skeleton_tshirt_steve",
+      "name": "Skeleton T-Shirt",
+      "texture": "skins/skeleton_tshirt_steve.png",
+      "order": 19
+    },
+    {
+      "id": "skeleton_tshirt_alex",
+      "name": "Skeleton T-Shirt",
+      "texture": "skins/skeleton_tshirt_alex.png",
+      "order": 20,
+      "model": "slim"
+    }
+  ]
+}

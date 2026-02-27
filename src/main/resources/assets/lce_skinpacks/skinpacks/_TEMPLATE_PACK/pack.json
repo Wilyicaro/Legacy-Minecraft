@@ -1,0 +1,13 @@
+{
+  "name": "Pack Name",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "skinid", // make this unique or it will steal from the orignal
+      "name": "Skin Name",
+      "texture": "skins/skinid.png",
+      "order": 1,
+      "cape": "capes/capename.png"
+    }
+  ]
+}

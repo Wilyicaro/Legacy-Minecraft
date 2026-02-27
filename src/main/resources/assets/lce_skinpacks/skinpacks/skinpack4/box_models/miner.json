@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Miner",
+    "displayNameId": "IDS_dlcskin36919430_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

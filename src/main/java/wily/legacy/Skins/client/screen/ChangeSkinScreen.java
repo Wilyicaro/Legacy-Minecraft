@@ -13,6 +13,7 @@ import wily.legacy.Skins.client.screen.changeskin.ChangeSkinActions;
 import wily.legacy.Skins.client.screen.changeskin.ChangeSkinPackList;
 import wily.legacy.Skins.client.screen.widget.PlayerSkinWidget;
 import wily.legacy.Skins.client.screen.widget.PlayerSkinWidgetList;
+import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.Skins.skin.ClientSkinCache;
 import wily.legacy.Skins.skin.SkinEntry;
 import wily.legacy.Skins.skin.SkinPack;
@@ -49,8 +50,8 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
             SKIN_BOX = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/skin_box"),
             SIZEABLE_ICON_HOLDER = ResourceLocation.fromNamespaceAndPath("legacy", "textures/gui/sprites/container/sizeable_icon_holder.png"),
             BEACON_CHECK = ResourceLocation.fromNamespaceAndPath("legacy", "textures/gui/sprites/container/beacon_check.png"),
-            HEART_CONTAINER = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/gui/sprites/hud/heart/container.png"),
-            HEART_FULL = ResourceLocation.fromNamespaceAndPath("minecraft", "textures/gui/sprites/hud/heart/full.png");
+            HEART_CONTAINER = ResourceLocation.fromNamespaceAndPath("minecraft", "hud/heart/container"),
+            HEART_FULL = ResourceLocation.fromNamespaceAndPath("minecraft", "hud/heart/full");
 
     private final Minecraft minecraft;
     private final Panel tooltipBox;
@@ -63,8 +64,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
     private final ChangeSkinPackList packList;
     private final ChangeSkinActions actions;
 
-    private boolean stickUpHeld, stickDownHeld, shiftHeld, pHeld, enterHeld, firstOpen = true;
-
+    private boolean stickUpHeld, stickDownHeld, leftStickUpHeld, leftStickDownHeld, shiftHeld, pHeld, enterHeld, firstOpen = true;
 
     private boolean draggingCenterDoll;
     private boolean centerDragMoved;
@@ -104,6 +104,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         float sh = (h - 20f) / BASE_PANEL_HEIGHT;
         float sc = Math.min(1f, Math.min(sw, sh));
         if (sc > 0.8f) sc *= 0.93f;
+        sc *= 0.95f;
         if (sc <= 0f) sc = 1f;
         return sc;
     }
@@ -302,7 +303,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         });
 
         try {
-            SkinPackLoader.loadPacks(minecraft.getResourceManager());
+            SkinPackLoader.ensureLoaded();
         } catch (Throwable ignored) {
         }
         packList.initFromLoader();
@@ -355,7 +356,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         int bottom = panel.y + panel.height - sc(8);
         int y = desiredY;
         int h = Math.max(1, bottom - y);
-        getRenderableVList().scrollArrowYOffset(-8 - sc(6));
+        getRenderableVList().scrollArrowYOffset(-8 - sc(8));
         getRenderableVList().init("consoleskins.packList", x, y, w, h);
     }
 
@@ -363,7 +364,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
     protected void panelInit() {
         uiScale = computeScale(width, height);
         tooltipWidth = Math.max(1, Math.round(BASE_TOOLTIP_WIDTH * uiScale));
-        renderableVList.layoutSpacing(l -> Math.max(1, sc(2)));
+        renderableVList.layoutSpacing(l -> 0);
         packList.applyUiScale(uiScale);
         addRenderableOnly(panel);
         panel.init();
@@ -402,7 +403,6 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
     @Override
     public boolean keyPressed(KeyEvent e) {
         int key = InputConstants.getKey(e).getValue();
-
 
         if (key == InputConstants.KEY_RETURN) {
             if (!enterHeld) enterHeld = true;
@@ -483,8 +483,9 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
     }
 
     private boolean handlePackListStepNavigation(int key) {
-        boolean up = key == InputConstants.KEY_W || key == InputConstants.KEY_UP;
-        boolean down = key == InputConstants.KEY_S || key == InputConstants.KEY_DOWN;
+        boolean kbm = ControlType.getActiveType().isKbm();
+        boolean up = (kbm && key == InputConstants.KEY_W) || key == InputConstants.KEY_UP;
+        boolean down = (kbm && key == InputConstants.KEY_S) || key == InputConstants.KEY_DOWN;
         if (!(up || down)) return false;
 
         if (key == InputConstants.KEY_UP || key == InputConstants.KEY_DOWN) {
@@ -548,7 +549,6 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         return true;
     }
 
-
     private boolean carouselAnimating() {
         if (playerSkinWidgetList == null || playerSkinWidgetList.widgets == null) return false;
         for (PlayerSkinWidget w : playerSkinWidgetList.widgets) {
@@ -557,8 +557,22 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         return false;
     }
 
+    private boolean insideCarouselPlane(double mx, double my) {
+        if (tooltipBox == null || panel == null) return false;
+        int x = tooltipBox.x;
+        int y = panel.y + sc(45);
+        int w = tooltipBox.getWidth() - sc(23);
+        int h = tooltipBox.getHeight() - sc(90);
+        int x1 = x + sc(2);
+        int y1 = y;
+        int x2 = x + w;
+        int y2 = y + h - sc(24);
+        return inside(mx, my, x1, y1, Math.max(1, x2 - x1), Math.max(1, y2 - y1));
+    }
+
     private PlayerSkinWidget pickCarouselWidget(double mx, double my) {
         if (playerSkinWidgetList == null || playerSkinWidgetList.widgets == null) return null;
+        if (!insideCarouselPlane(mx, my)) return null;
         PlayerSkinWidget best = null;
         double bestD = Double.MAX_VALUE;
         for (PlayerSkinWidget w : playerSkinWidgetList.widgets) {
@@ -717,7 +731,6 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
                     }
                 }
 
-
                 if (centerDragMoved) center.applyDrag(-dragX, 0);
                 if (centerDragMoved) {
                     keptCenterRotX = center.getRotationX();
@@ -855,7 +868,52 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
             }
         }
 
+        if (!ControlType.getActiveType().isKbm() && state != null && state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick) {
+            final double triggerY = 0.65d, sideLimit = 0.45d;
+            double sx = stick.x, sy = stick.y;
+
+            if (Math.abs(sx) <= sideLimit) {
+                if (sy <= -triggerY) {
+                    if (!leftStickUpHeld) {
+                        leftStickUpHeld = true;
+                        stepPack(true);
+                    }
+                    state.block();
+                    return;
+                }
+                if (sy >= triggerY) {
+                    if (!leftStickDownHeld) {
+                        leftStickDownHeld = true;
+                        stepPack(false);
+                    }
+                    state.block();
+                    return;
+                }
+            }
+
+            if (Math.abs(sy) < 0.25d) {
+                leftStickUpHeld = false;
+                leftStickDownHeld = false;
+            }
+        }
+
         super.bindingStateTick(state);
+    }
+
+    private void stepPack(boolean up) {
+        int count = packList != null ? packList.getPackCount() : 0;
+        if (count <= 1) return;
+
+        int target = packList.getFocusedPackIndex() + (up ? -1 : 1);
+        if (target < 0) target = count - 1;
+        else if (target >= count) target = 0;
+
+        ChangeSkinPackList.PackButton btn = packList.getButtonForIndex(target);
+        if (btn == null) return;
+
+        packList.setFocusedPackIndex(target, true);
+        setFocused(btn);
+        focusPackListItem(btn);
     }
 
     @Override
@@ -869,7 +927,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         r.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_F)
                 : ControllerBinding.LEFT_BUTTON.bindingState.getIcon(), () -> {
             String id = playerSkinWidgetList != null && playerSkinWidgetList.element3 != null ? playerSkinWidgetList.element3.skinId.get() : null;
-            return id != null && wily.legacy.Skins.skin.FavoritesStore.isFavorite(id) ? Component.literal("Unfavourite") : Component.literal("Favourite");
+            return id != null && wily.legacy.Skins.skin.FavoritesStore.isFavorite(id) ? Component.literal("Remove Favorite") : Component.literal("Add Favorite");
         });
 
         r.add(() -> ControlType.getActiveType().isKbm()
@@ -994,9 +1052,11 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
             }
 
             if (selected != null && wily.legacy.Skins.skin.FavoritesStore.isFavorite(selected)) {
-                int hs = Math.max(1, sc(16));
-                g.blit(RenderPipelines.GUI_TEXTURED, HEART_CONTAINER, iconX + sc(4), iconBaseY + sc(34), 0, 0, hs, hs, 16, 16);
-                g.blit(RenderPipelines.GUI_TEXTURED, HEART_FULL, iconX + sc(4), iconBaseY + sc(34), 0, 0, hs, hs, 16, 16);
+                int hs = Math.max(1, sc(14));
+                int hx = iconX + (holder - hs) / 2;
+                int hy = iconBaseY + sc(30) + (holder - hs) / 2;
+                blitSprite(g, HEART_CONTAINER, hx, hy, hs, hs);
+                blitSprite(g, HEART_FULL, hx, hy, hs, hs);
             }
         }
 
@@ -1014,7 +1074,35 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
             String name = entry == null ? String.valueOf(skinId) : entry.name();
 
             int mid = tooltipBox.x - sc(5) + (tooltipBox.getWidth() - sc(18)) / 2;
-            drawBigCentered(g, Component.literal(name), mid, panel.y + tooltipBox.getHeight() - sc(49), 0xFFFFFFFF);
+            int skinNameY = panel.y + tooltipBox.getHeight() - sc(49);
+            drawBigCentered(g, Component.literal(name), mid, skinNameY, 0xFFFFFFFF);
+
+            ResourceLocation modelId = null;
+            try {
+                String ns = entry != null && entry.texture() != null ? entry.texture().getNamespace() : SkinSync.ASSET_NS;
+                modelId = ResourceLocation.fromNamespaceAndPath(ns, skinId);
+            } catch (Throwable ignored) {
+            }
+
+            String theme = modelId == null ? null : BoxModelManager.getThemeText(modelId);
+            if (theme != null && !theme.isBlank() && !theme.equals(name)) {
+                float scale = 1.485f * uiScale;
+                if (scale < 0.65f) scale = 0.65f;
+
+                int maxPx = Math.max(1, tooltipBox.getWidth() - sc(26));
+                int maxUnscaled = (int) (maxPx / scale);
+                String show = theme;
+                if (minecraft.font.width(show) > maxUnscaled) {
+                    int ellW = minecraft.font.width("…");
+                    show = minecraft.font.plainSubstrByWidth(show, Math.max(0, maxUnscaled - ellW)) + "…";
+                }
+
+                int themeY = skinNameY + (int) (minecraft.font.lineHeight * scale) + sc(6);
+                int bottom = panel.y + tooltipBox.getHeight() - sc(12);
+                if (themeY > bottom) themeY = bottom;
+                drawBigCentered(g, Component.literal(show), mid, themeY, 0xFFFFFFFF);
+            }
+
         }
 
         SkinPack pack = getFocusedPack();
@@ -1061,7 +1149,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
 
     @Override
     public void removed() {
-        stickUpHeld = stickDownHeld = shiftHeld = pHeld = enterHeld = false;
+        stickUpHeld = stickDownHeld = leftStickUpHeld = leftStickDownHeld = shiftHeld = pHeld = enterHeld = false;
         draggingCenterDoll = false;
         centerDragMoved = false;
         PlayerSkinWidget.clearCarouselClip();

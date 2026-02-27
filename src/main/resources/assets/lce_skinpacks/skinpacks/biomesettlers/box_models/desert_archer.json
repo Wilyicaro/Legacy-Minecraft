@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Desert Archer",
+    "displayNameId": "IDS_DLCSKIN00004500_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00004500_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

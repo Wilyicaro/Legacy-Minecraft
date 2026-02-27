@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Blue Sheep",
+    "displayNameId": "IDS_DLCSKIN00006502_DISPLAYNAME",
+    "themeName": "Sheepish Steve",
+    "themeNameId": "IDS_DLCSKIN00006502_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

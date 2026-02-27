@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Tree Man",
+    "displayNameId": "IDS_dlcskin79506170_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

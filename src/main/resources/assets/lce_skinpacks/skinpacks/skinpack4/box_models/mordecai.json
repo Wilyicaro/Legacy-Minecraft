@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Mordecai",
+    "displayNameId": "IDS_dlcskin10973835_DISPLAYNAME",
+    "themeName": "Borderlands",
+    "themeNameId": "IDS_dlcskin10973835_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

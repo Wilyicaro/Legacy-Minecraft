@@ -1,0 +1,153 @@
+{
+  "name": "The Simpsons",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "homer_simpson",
+      "name": "Homer Simpson",
+      "texture": "skins/homer_simpson.png",
+      "order": 1
+    },
+    {
+      "id": "marge_simpson",
+      "name": "Marge Simpson",
+      "texture": "skins/marge_simpson.png",
+      "order": 2
+    },
+    {
+      "id": "bart_simpson",
+      "name": "Bart Simpson",
+      "texture": "skins/bart_simpson.png",
+      "order": 3
+    },
+    {
+      "id": "lisa_simpson",
+      "name": "Lisa Simpson",
+      "texture": "skins/lisa_simpson.png",
+      "order": 4
+    },
+    {
+      "id": "maggie_simpson",
+      "name": "Maggie Simpson",
+      "texture": "skins/maggie_simpson.png",
+      "order": 5,
+      "poses": ["hide_hand"]
+    },
+    {
+      "id": "principal_seymour_skinner",
+      "name": "Principal Seymour Skinner",
+      "texture": "skins/principal_seymour_skinner.png",
+      "order": 6
+    },
+    {
+      "id": "mrs_edna_krabappel",
+      "name": "Mrs. Edna Krabappel",
+      "texture": "skins/mrs_edna_krabappel.png",
+      "order": 7
+    },
+    {
+      "id": "groundskeeper_willie",
+      "name": "Groundskeeper Willie",
+      "texture": "skins/groundskeeper_willie.png",
+      "order": 8
+    },
+    {
+      "id": "otto_mann",
+      "name": "Otto Mann",
+      "texture": "skins/otto_mann.png",
+      "order": 9
+    },
+    {
+      "id": "milhouse_van_houten",
+      "name": "Milhouse Van Houten",
+      "texture": "skins/milhouse_van_houten.png",
+      "order": 10
+    },
+    {
+      "id": "nelson_muntz",
+      "name": "Nelson Muntz",
+      "texture": "skins/nelson_muntz.png",
+      "order": 11
+    },
+    {
+      "id": "jimbo_jones",
+      "name": "Jimbo Jones",
+      "texture": "skins/jimbo_jones.png",
+      "order": 12
+    },
+    {
+      "id": "ralph_wiggum",
+      "name": "Ralph Wiggum",
+      "texture": "skins/ralph_wiggum.png",
+      "order": 13
+    },
+    {
+      "id": "martin_prince",
+      "name": "Martin Prince",
+      "texture": "skins/martin_prince.png",
+      "order": 14
+    },
+    {
+      "id": "kearney",
+      "name": "Kearney",
+      "texture": "skins/kearney.png",
+      "order": 15
+    },
+    {
+      "id": "dolph",
+      "name": "Dolph",
+      "texture": "skins/dolph.png",
+      "order": 16
+    },
+    {
+      "id": "wendell",
+      "name": "Wendell",
+      "texture": "skins/wendell.png",
+      "order": 17
+    },
+    {
+      "id": "database",
+      "name": "Database",
+      "texture": "skins/database.png",
+      "order": 18
+    },
+    {
+      "id": "uter",
+      "name": "Üter",
+      "texture": "skins/uter.png",
+      "order": 19
+    },
+    {
+      "id": "janey_powell",
+      "name": "Janey Powell",
+      "texture": "skins/janey_powell.png",
+      "order": 20
+    },
+    {
+      "id": "superintendent_gary_chalmers",
+      "name": "Superintendent Gary Chalmers",
+      "texture": "skins/superintendent_gary_chalmers.png",
+      "order": 21
+    },
+    {
+      "id": "mr_dewey_largo",
+      "name": "Mr. Dewey Largo",
+      "texture": "skins/mr_dewey_largo.png",
+      "order": 22
+    },
+    {
+      "id": "sherri",
+      "name": "Sherri",
+      "texture": "skins/sherri.png",
+      "cape": "capes/sherri.png",
+      "order": 23
+    },
+    {
+      "id": "terri",
+      "name": "Terri",
+      "texture": "skins/terri.png",
+      "cape": "capes/terri.png",
+      "order": 24
+    }
+  ]
+}

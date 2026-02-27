@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Lonestar",
+    "displayNameId": "IDS_DLCSKIN20000205_DISPLAYNAME",
+    "themeName": "Awesomenauts",
+    "themeNameId": "IDS_DLCSKIN20000205_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

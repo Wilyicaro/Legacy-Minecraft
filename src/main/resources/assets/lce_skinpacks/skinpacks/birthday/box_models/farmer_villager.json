@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Farmer Villager",
+    "displayNameId": "IDS_DLCSKIN00000719_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

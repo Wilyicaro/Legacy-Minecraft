@@ -1,0 +1,163 @@
+{
+  "name": "Biome Settlers",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "desert_archer",
+      "name": "Desert Archer",
+      "texture": "skins/desert_archer.png",
+      "model": "slim",
+      "order": 1
+    },
+    {
+      "id": "desert_brawler",
+      "name": "Desert Brawler",
+      "texture": "skins/desert_brawler.png",
+      "model": "slim",
+      "order": 2
+    },
+    {
+      "id": "desert_brewer",
+      "name": "Desert Brewer",
+      "texture": "skins/desert_brewer.png",
+      "order": 3
+    },
+    {
+      "id": "desert_engineer",
+      "name": "Desert Engineer",
+      "texture": "skins/desert_engineer.png",
+      "order": 4
+    },
+    {
+      "id": "desert_griefer",
+      "name": "Desert Griefer",
+      "texture": "skins/desert_griefer.png",
+      "order": 5
+    },
+    {
+      "id": "desert_hunter",
+      "name": "Desert Hunter",
+      "texture": "skins/desert_hunter.png",
+      "order": 6
+    },
+    {
+      "id": "desert_husk",
+      "name": "Desert Husk",
+      "texture": "skins/desert_husk.png",
+      "model": "slim",ff
+      "order": 7
+    },
+    {
+      "id": "desert_tamer",
+      "name": "Desert Tamer",
+      "texture": "skins/desert_tamer.png",
+      "model": "slim",
+      "order": 8
+    },
+    {
+      "id": "forest_archer",
+      "name": "Forest Archer",
+      "texture": "skins/forest_archer.png",
+      "order": 9
+    },
+    {
+      "id": "forest_brawler",
+      "name": "Forest Brawler",
+      "texture": "skins/forest_brawler.png",
+      "order": 10
+    },
+    {
+      "id": "forest_brewer",
+      "name": "Forest Brewer",
+      "texture": "skins/forest_brewer.png",
+      "order": 11
+    },
+    {
+      "id": "forest_engineer",
+      "name": "Forest Engineer",
+      "texture": "skins/forest_engineer.png",
+      "model": "slim",
+      "order": 12
+    },
+    {
+      "id": "forest_griefer",
+      "name": "Forest Griefer",
+      "texture": "skins/forest_griefer.png",
+      "model": "slim",
+      "order": 13
+    },
+    {
+      "id": "forest_hunter",
+      "name": "Forest Hunter",
+      "texture": "skins/forest_hunter.png",
+      "model": "slim",
+      "order": 14
+    },
+    {
+      "id": "forest_tamer",
+      "name": "Forest Tamer",
+      "texture": "skins/forest_tamer.png",
+      "model": "slim",
+      "order": 15
+    },
+    {
+      "id": "forest_woodbeast",
+      "name": "Forest Woodbeast",
+      "texture": "skins/forest_woodbeast.png",
+      "model": "slim",
+      "order": 16
+    },
+    {
+      "id": "tundra_archer",
+      "name": "Tundra Archer",
+      "texture": "skins/tundra_archer.png",
+      "order": 17
+    },
+    {
+      "id": "tundra_brawler",
+      "name": "Tundra Brawler",
+      "texture": "skins/tundra_brawler.png",
+      "order": 18
+    },
+    {
+      "id": "tundra_brewer",
+      "name": "Tundra Brewer",
+      "texture": "skins/tundra_brewer.png",
+      "model": "slim",
+      "order": 19
+    },
+    {
+      "id": "tundra_engineer",
+      "name": "Tundra Engineer",
+      "texture": "skins/tundra_engineer.png",
+      "order": 20
+    },
+    {
+      "id": "tundra_griefer",
+      "name": "Tundra Griefer",
+      "texture": "skins/tundra_griefer.png",
+      "model": "slim",
+      "order": 21
+    },
+    {
+      "id": "tundra_hunter",
+      "name": "Tundra Hunter",
+      "texture": "skins/tundra_hunter.png",
+      "order": 22
+    },
+    {
+      "id": "tundra_stray",
+      "name": "Tundra Stray",
+      "texture": "skins/tundra_stray.png",
+      "model": "slim",
+      "order": 23
+    },
+    {
+      "id": "tundra_tamer",
+      "name": "Tundra Tamer",
+      "texture": "skins/tundra_tamer.png",
+      "model": "slim",
+      "order": 24
+    }
+  ]
+}

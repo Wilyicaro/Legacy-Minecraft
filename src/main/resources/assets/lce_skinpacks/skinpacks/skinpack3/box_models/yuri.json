@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Yuri",
+    "displayNameId": "IDS_DLCSKIN20000207_DISPLAYNAME",
+    "themeName": "Awesomenauts",
+    "themeNameId": "IDS_DLCSKIN20000207_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

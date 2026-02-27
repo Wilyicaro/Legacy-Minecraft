@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Eli Vance",
+    "displayNameId": "IDS_DLCSKIN20000226_DISPLAYNAME",
+    "themeName": "Half Life",
+    "themeNameId": "IDS_DLCSKIN20000226_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

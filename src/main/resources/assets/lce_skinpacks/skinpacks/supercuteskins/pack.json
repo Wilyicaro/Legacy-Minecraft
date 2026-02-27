@@ -1,0 +1,103 @@
+{
+  "name": "Super Cute Texture Pack",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "woof",
+      "name": "Woof",
+      "texture": "skins/woof.png",
+      "model": "slim",
+      "order": 1
+    },
+    {
+      "id": "mew",
+      "name": "Mew",
+      "texture": "skins/mew.png",
+      "model": "slim",
+      "order": 2
+    },
+    {
+      "id": "cheep",
+      "name": "Cheep",
+      "texture": "skins/cheep.png",
+      "order": 3
+    },
+    {
+      "id": "rawr",
+      "name": "Rawr",
+      "texture": "skins/rawr.png",
+      "order": 4
+    },
+    {
+      "id": "whinny",
+      "name": "Whinny",
+      "texture": "skins/whinny.png",
+      "model": "slim",
+      "order": 5
+    },
+    {
+      "id": "spotty",
+      "name": "Spotty",
+      "texture": "skins/spotty.png",
+      "model": "slim",
+      "order": 6
+    },
+    {
+      "id": "sniff",
+      "name": "Sniff",
+      "texture": "skins/sniff.png",
+      "order": 7
+    },
+    {
+      "id": "spit",
+      "name": "Spit",
+      "texture": "skins/spit.png",
+      "order": 8
+    },
+    {
+      "id": "squirt",
+      "name": "Squirt",
+      "texture": "skins/squirt.png",
+      "order": 9
+    },
+    {
+      "id": "patty",
+      "name": "Patty",
+      "texture": "skins/patty.png",
+      "model": "slim",
+      "order": 10
+    },
+    {
+      "id": "ringo",
+      "name": "Ringo",
+      "texture": "skins/ringo.png",
+      "order": 11
+    },
+    {
+      "id": "scoop",
+      "name": "Scoop",
+      "texture": "skins/scoop.png",
+      "model": "slim",
+      "order": 12
+    },
+    {
+      "id": "pop",
+      "name": "Pop",
+      "texture": "skins/pop.png",
+      "order": 13
+    },
+    {
+      "id": "beep",
+      "name": "Beep",
+      "texture": "skins/beep.png",
+      "order": 14
+    },
+    {
+      "id": "root",
+      "name": "Root",
+      "texture": "skins/root.png",
+      "model": "slim",
+      "order": 15
+    }
+  ]
+}

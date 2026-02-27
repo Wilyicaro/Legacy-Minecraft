@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Astrid",
+    "displayNameId": "IDS_SKINS_DLCSKIN00001424_DISPLAYNAME",
+    "themeName": "Skyrim",
+    "themeNameId": "IDS_SKINS_DLCSKIN00001424_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

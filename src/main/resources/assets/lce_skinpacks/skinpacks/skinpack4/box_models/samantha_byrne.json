@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Samantha Byrne",
+    "displayNameId": "IDS_dlcskin08975783_DISPLAYNAME",
+    "themeName": "Gears of War 3",
+    "themeNameId": "IDS_dlcskin08975783_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

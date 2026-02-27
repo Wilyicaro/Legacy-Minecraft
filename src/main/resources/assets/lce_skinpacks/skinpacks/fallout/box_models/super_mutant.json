@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "displayName": "Super Mutant",
+    "displayNameId": "IDS_SKINS_DLCSKIN00004835_DISPLAYNAME",
+    "themeName": "Fallout",
+    "themeNameId": "IDS_SKINS_DLCSKIN00004835_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            -4.0,
+            -3.0
+          ],
+          "size": [
+            5.0,
+            4.0,
+            6.0
+          ],
+          "uv": [
+            32,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

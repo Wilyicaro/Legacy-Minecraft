@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Grognak the Barbarian",
+    "displayNameId": "IDS_SKINS_DLCSKIN00004841_DISPLAYNAME",
+    "themeName": "Fallout",
+    "themeNameId": "IDS_SKINS_DLCSKIN00004841_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

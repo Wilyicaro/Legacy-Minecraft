@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Morrigan",
+    "displayNameId": "IDS_dlcskin59827857_DISPLAYNAME",
+    "themeName": "Dragon Age",
+    "themeNameId": "IDS_dlcskin59827857_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

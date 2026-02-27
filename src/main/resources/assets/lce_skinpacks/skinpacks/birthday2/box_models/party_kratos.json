@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Party Kratos",
+    "displayNameId": "IDS_DLCSKIN20000419_DISPLAYNAME",
+    "themeName": "God of War",
+    "themeNameId": "IDS_DLCSKIN20000419_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Forest Woodbeast",
+    "displayNameId": "IDS_DLCSKIN00004515_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00004515_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Romana",
+    "displayNameId": "IDS_DLCSKIN00002017_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

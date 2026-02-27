@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Moon Knight",
+    "displayNameId": "IDS_dlcskin32655210_DISPLAYNAME",
+    "themeName": "Marvel Avengers",
+    "themeNameId": "IDS_dlcskin32655210_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

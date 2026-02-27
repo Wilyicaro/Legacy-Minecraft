@@ -1,0 +1,469 @@
+{
+  "meta": {
+    "displayName": "Wampa Ice Creature",
+    "displayNameId": "IDS_DLCSKIN00001251_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00001251_THEMENAME"
+  },
+  "armorOffsets": {
+    "HELMET": {
+      "x": 0.0,
+      "y": -1.1,
+      "z": 0.0
+    },
+    "SHOULDER0": {
+      "x": 0.0,
+      "y": -1.1,
+      "z": 0.0
+    },
+    "SHOULDER1": {
+      "x": 0.0,
+      "y": -1.1,
+      "z": 0.0
+    },
+    "chestpiece": {
+      "x": 0.0,
+      "y": -1.1,
+      "z": 0.0
+    }
+  },
+"hide":["hat", "head"],
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -4.9,
+            -8.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.9,
+            -8.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.9,
+            -7.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            24,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.9,
+            -7.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            24,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.9,
+            -6.0,
+            -4.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            3.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.9,
+            -6.0,
+            -4.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            3.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.9,
+            -5.0,
+            -6.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            57,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.9,
+            -5.0,
+            -6.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            57,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            -5.0,
+            -7.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            28,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -5.0,
+            -7.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            28,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -10.0,
+            -4.9
+          ],
+          "size": [
+            8.0,
+            8.0,
+            8.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.9,
+            -4.0,
+            -2.9
+          ],
+          "size": [
+            5.0,
+            4.0,
+            6.0
+          ],
+          "uv": [
+            32,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.9,
+            5.0,
+            -2.5
+          ],
+          "size": [
+            2.0,
+            4.0,
+            5.0
+          ],
+          "uv": [
+            42,
+            5
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -0.9,
+            -4.0,
+            -2.9
+          ],
+          "size": [
+            5.0,
+            4.0,
+            6.0
+          ],
+          "uv": [
+            32,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.9,
+            5.0,
+            -2.5
+          ],
+          "size": [
+            2.0,
+            4.0,
+            5.0
+          ],
+          "uv": [
+            32,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -2.0,
+            -1.9
+          ],
+          "size": [
+            8.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_leg_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.9,
+            7.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            4.0
+          ],
+          "uv": [
+            32,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            7.0,
+            -2.9
+          ],
+          "size": [
+            4.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            55,
+            14
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            7.0,
+            1.9
+          ],
+          "size": [
+            4.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            46,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_leg_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            1.9,
+            7.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            4.0
+          ],
+          "uv": [
+            32,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            7.0,
+            -2.9
+          ],
+          "size": [
+            4.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            14
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            7.0,
+            1.9
+          ],
+          "size": [
+            4.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            46,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Ancient Mummy",
+    "displayNameId": "IDS_SKINS_DLCSKIN00003215_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

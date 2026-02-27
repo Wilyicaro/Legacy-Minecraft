@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Vilkas",
+    "displayNameId": "IDS_SKINS_DLCSKIN00001439_DISPLAYNAME",
+    "themeName": "Skyrim",
+    "themeNameId": "IDS_SKINS_DLCSKIN00001439_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

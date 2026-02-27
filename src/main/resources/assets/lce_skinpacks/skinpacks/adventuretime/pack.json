@@ -1,0 +1,314 @@
+{
+  "name": "Adventure Time",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "finn",
+      "name": "Finn",
+      "texture": "skins/finn.png",
+      "order": 1
+    },
+    {
+      "id": "finn_jammies",
+      "name": "Finn Jammies",
+      "texture": "skins/finn_jammies.png",
+      "order": 2
+    },
+    {
+      "id": "fionna",
+      "name": "Fionna",
+      "texture": "skins/fionna.png",
+      "order": 3
+    },
+    {
+      "id": "fionna_dress",
+      "name": "Fionna Dress",
+      "texture": "skins/fionna_dress.png",
+      "order": 4
+    },
+    {
+      "id": "jake",
+      "name": "Jake",
+      "texture": "skins/jake.png",
+      "order": 5
+    },
+    {
+      "id": "cake",
+      "name": "Cake",
+      "texture": "skins/cake.png",
+      "order": 6
+    },
+    {
+      "id": "princess_bubblegum",
+      "name": "Princess Bubblegum",
+      "texture": "skins/princess_bubblegum.png",
+      "order": 7
+    },
+    {
+      "id": "prince_gumball",
+      "name": "Prince Gumball",
+      "texture": "skins/prince_gumball.png",
+      "order": 8
+    },
+    {
+      "id": "lady_rainicorn",
+      "name": "Lady Rainicorn",
+      "texture": "skins/lady_rainicorn.png",
+      "order": 9
+    },
+    {
+      "id": "ice_king",
+      "name": "Ice King",
+      "texture": "skins/ice_king.png",
+      "order": 9.1
+    },
+    {
+      "id": "simon_petrikov",
+      "name": "Simon Petrikov",
+      "texture": "skins/simon_petrikov.png",
+      "order": 9.3
+    },
+    {
+      "id": "ice_queen",
+      "name": "Ice Queen",
+      "texture": "skins/ice_queen.png",
+      "order": 9.2,
+      "poses": ["stiff_legs"]
+    },
+    {
+      "id": "marceline",
+      "name": "Marceline",
+      "texture": "skins/marceline.png",
+      "order": 9.4
+    },
+    {
+      "id": "marshall_lee",
+      "name": "Marshall Lee",
+      "texture": "skins/marshall_lee.png",
+      "order": 9.6
+    },
+    {
+      "id": "king_of_ooo",
+      "name": "King of Ooo",
+      "texture": "skins/king_of_ooo.png",
+      "order": 10
+    },
+    {
+      "id": "bmo",
+      "name": "BMO",
+      "texture": "skins/bmo.png",
+      "order": 11
+    },
+    {
+      "id": "flame_princess",
+      "name": "Flame Princess",
+      "texture": "skins/flame_princess.png",
+      "model": "slim",
+      "order": 12
+    },
+    {
+      "id": "flame_prince",
+      "name": "Flame Prince",
+      "texture": "skins/flame_prince.png",
+      "order": 13
+    },
+    {
+      "id": "earl_of_lemongrab",
+      "name": "Earl of Lemongrab",
+      "texture": "skins/earl_of_lemongrab.png",
+      "order": 14
+    },
+    {
+      "id": "magic_man",
+      "name": "Magic Man",
+      "texture": "skins/magic_man.png",
+      "order": 15
+    },
+    {
+      "id": "ricardio",
+      "name": "Ricardio",
+      "texture": "skins/ricardio.png",
+      "order": 16
+    },
+    {
+      "id": "gunter",
+      "name": "Gunter",
+      "texture": "skins/gunter.png",
+      "order": 17
+    },
+    {
+      "id": "billy",
+      "name": "Billy",
+      "texture": "skins/billy.png",
+      "order": 18
+    },
+    {
+      "id": "billy_young",
+      "name": "Billy Young",
+      "texture": "skins/billy_young.png",
+      "order": 19
+    },
+    {
+      "id": "raggedy_princess",
+      "name": "Raggedy Princess",
+      "texture": "skins/raggedy_princess.png",
+      "order": 20
+    },
+    {
+      "id": "emerald_princess",
+      "name": "Emerald Princess",
+      "texture": "skins/emerald_princess.png",
+      "order": 21
+    },
+    {
+      "id": "dr_princess",
+      "name": "Dr Princess",
+      "texture": "skins/dr_princess.png",
+      "order": 22
+    },
+    {
+      "id": "breakfast_princess",
+      "name": "Breakfast Princess",
+      "texture": "skins/breakfast_princess.png",
+      "model": "slim",
+      "order": 23
+    },
+    {
+      "id": "sir_slicer",
+      "name": "Sir Slicer",
+      "texture": "skins/sir_slicer.png",
+      "order": 24
+    },
+    {
+      "id": "death",
+      "name": "Death",
+      "texture": "skins/death.png",
+      "order": 25
+    },
+    {
+      "id": "the_lich",
+      "name": "The Lich",
+      "texture": "skins/the_lich.png",
+      "cape": "capes/unusedinlce.png",
+      "order": 26
+    },
+    {
+      "id": "huntress_wizard",
+      "name": "Huntress Wizard",
+      "texture": "skins/huntress_wizard.png",
+      "cape": "capes/huntresswizard.png",
+      "model": "slim",
+      "order": 27
+    },
+    {
+      "id": "charlie",
+      "name": "Charlie",
+      "texture": "skins/charlie.png",
+      "model": "slim",
+      "order": 28
+    },
+    {
+      "id": "jake_jr",
+      "name": "Jake Jr.",
+      "texture": "skins/jake_jr.png",
+      "order": 29
+    },
+    {
+      "id": "viola",
+      "name": "Viola",
+      "texture": "skins/viola.png",
+      "order": 30
+    },
+    {
+      "id": "head_marauder",
+      "name": "Head Marauder",
+      "texture": "skins/head_marauder.png",
+      "order": 31
+    },
+    {
+      "id": "witchadventuretime",
+      "name": "Witch",
+      "texture": "skins/witch.png",
+      "order": 32
+    },
+    {
+      "id": "hunson_abadeer",
+      "name": "Hunson Abadeer",
+      "texture": "skins/hunson_abadeer.png",
+      "order": 33
+    },
+    {
+      "id": "grob_gob_glob_grod",
+      "name": "Grob Gob Glob Grod",
+      "texture": "skins/grob_gob_glob_grod.png",
+      "order": 34
+    },
+    {
+      "id": "frozen_yogurt_princess",
+      "name": "Frozen Yogurt Princess",
+      "texture": "skins/frozen_yogurt_princess.png",
+      "order": 35
+    },
+    {
+      "id": "gary_the_mermaid_queen",
+      "name": "Gary The Mermaid Queen",
+      "texture": "skins/gary_the_mermaid_queen.png",
+      "order": 36
+    },
+    {
+      "id": "susan_strong",
+      "name": "Susan Strong",
+      "texture": "skins/susan_strong.png",
+      "order": 37
+    },
+    {
+      "id": "grass_finn",
+      "name": "Grass Finn",
+      "texture": "skins/grass_finn.png",
+      "order": 38
+    },
+    {
+      "id": "frieda",
+      "name": "Frieda",
+      "texture": "skins/frieda.png",
+      "order": 39
+    },
+    {
+      "id": "dr_gross",
+      "name": "Dr Gross",
+      "texture": "skins/dr_gross.png",
+      "order": 40
+    },
+    {
+      "id": "minerva",
+      "name": "Minerva",
+      "texture": "skins/minerva.png",
+      "order": 41
+    },
+    {
+      "id": "betty_grof",
+      "name": "Betty Grof",
+      "texture": "skins/betty_grof.png",
+      "order": 42
+    },
+    {
+      "id": "banana_guard",
+      "name": "Banana Guard",
+      "texture": "skins/banana_guard.png",
+      "model": "slim",
+      "order": 43
+    },
+    {
+      "id": "lumpy_space_princess",
+      "name": "Lumpy Space Princess",
+      "texture": "skins/lumpy_space_princess.png",
+      "order": 44
+    },
+    {
+      "id": "martin_mertens",
+      "name": "Martin Mertens",
+      "texture": "skins/martin_mertens.png",
+      "order": 31.5
+    }
+  ]
+}

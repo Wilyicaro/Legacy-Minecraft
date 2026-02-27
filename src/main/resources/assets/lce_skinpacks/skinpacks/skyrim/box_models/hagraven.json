@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Hagraven",
+    "displayNameId": "IDS_SKINS_DLCSKIN00001431_DISPLAYNAME",
+    "themeName": "Skyrim",
+    "themeNameId": "IDS_SKINS_DLCSKIN00001431_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

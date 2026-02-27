@@ -1,0 +1,109 @@
+{
+  "name": "Campfire Tales",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "the_sham",
+      "name": "The Sham",
+      "texture": "skins/the_sham.png",
+      "model": "slim",
+      "order": 1
+    },
+    {
+      "id": "crisp",
+      "name": "Crisp",
+      "texture": "skins/crisp.png",
+      "order": 2
+    },
+    {
+      "id": "the_enderall",
+      "name": "The Enderall",
+      "texture": "skins/the_enderall.png",
+      "order": 3
+    },
+    {
+      "id": "farlander",
+      "name": "Farlander",
+      "texture": "skins/farlander.png",
+      "model": "slim",
+      "order": 4
+    },
+    {
+      "id": "the_headless_haunter",
+      "name": "The Headless Haunter",
+      "texture": "skins/the_headless_haunter.png",
+      "order": 5
+    },
+    {
+      "id": "the_lapis_lady",
+      "name": "The Lapis Lady",
+      "texture": "skins/the_lapis_lady.png",
+      "model": "slim",
+      "order": 6
+    },
+    {
+      "id": "lumbering_jack",
+      "name": "Lumbering Jack",
+      "texture": "skins/lumbering_jack.png",
+      "order": 7
+    },
+    {
+      "id": "rancid_anne",
+      "name": "Rancid Anne",
+      "texture": "skins/rancid_anne.png",
+      "model": "slim",
+      "order": 8
+    },
+    {
+      "id": "ol_diggy",
+      "name": "Ol' Diggy",
+      "texture": "skins/ol_diggy.png",
+      "order": 9
+    },
+    {
+      "id": "the_arisen_rose",
+      "name": "The Arisen Rose",
+      "texture": "skins/the_arisen_rose.png",
+      "model": "slim",
+      "order": 10
+    },
+    {
+      "id": "the_sea_swallowed_captain",
+      "name": "The Sea-Swallowed Captain",
+      "texture": "skins/the_sea_swallowed_captain.png",
+      "order": 11
+    },
+    {
+      "id": "the_blocksquatch",
+      "name": "The Blocksquatch",
+      "texture": "skins/the_blocksquatch.png",
+      "order": 12
+    },
+    {
+      "id": "the_unshorn",
+      "name": "The Unshorn",
+      "texture": "skins/the_unshorn.png",
+      "order": 13
+    },
+    {
+      "id": "silksnatcher",
+      "name": "Silksnatcher",
+      "texture": "skins/silksnatcher.png",
+      "model": "slim",
+      "order": 14
+    },
+    {
+      "id": "cropsy",
+      "name": "Cropsy",
+      "texture": "skins/cropsy.png",
+      "order": 15
+    },
+    {
+      "id": "the_well_wisher",
+      "name": "The Well Wisher",
+      "texture": "skins/the_well_wisher.png",
+      "model": "slim",
+      "order": 16
+    }
+  ]
+}

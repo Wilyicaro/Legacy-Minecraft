@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Kratos",
+    "displayNameId": "IDS_DLCSKIN20000136_DISPLAYNAME",
+    "themeName": "God of War",
+    "themeNameId": "IDS_DLCSKIN20000136_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

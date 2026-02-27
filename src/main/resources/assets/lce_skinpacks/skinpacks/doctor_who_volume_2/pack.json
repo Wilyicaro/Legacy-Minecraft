@@ -1,0 +1,314 @@
+{
+  "name": "Doctor Who Skins Volume II",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "the_tenth_doctor",
+      "name": "The Tenth Doctor",
+      "texture": "skins/the_tenth_doctor.png",
+      "order": 1
+    },
+    {
+      "id": "the_eighth_doctor",
+      "name": "The Eighth Doctor",
+      "texture": "skins/the_eighth_doctor.png",
+      "order": 2
+    },
+    {
+      "id": "the_seventh_doctor",
+      "name": "The Seventh Doctor",
+      "texture": "skins/the_seventh_doctor.png",
+      "order": 3
+    },
+    {
+      "id": "the_fifth_doctor",
+      "name": "The Fifth Doctor",
+      "texture": "skins/the_fifth_doctor.png",
+      "order": 4
+    },
+    {
+      "id": "the_third_doctor",
+      "name": "The Third Doctor",
+      "texture": "skins/the_third_doctor.png",
+      "cape": "capes/the_third_doctor.png",
+      "order": 5
+    },
+    {
+      "id": "the_second_doctor",
+      "name": "The Second Doctor",
+      "texture": "skins/the_second_doctor.png",
+      "order": 6
+    },
+    {
+      "id": "donna_noble",
+      "name": "Donna Noble",
+      "texture": "skins/donna_noble.png",
+      "order": 7
+    },
+    {
+      "id": "martha_jones",
+      "name": "Martha Jones",
+      "texture": "skins/martha_jones.png",
+      "order": 8
+    },
+    {
+      "id": "captain_jack_harkness",
+      "name": "Captain Jack Harkness",
+      "texture": "skins/captain_jack_harkness.png",
+      "order": 9
+    },
+    {
+      "id": "liz_shaw",
+      "name": "Liz Shaw",
+      "texture": "skins/liz_shaw.png",
+      "order": 10
+    },
+    {
+      "id": "ace",
+      "name": "Ace",
+      "texture": "skins/ace.png",
+      "order": 11
+    },
+    {
+      "id": "jo_grant",
+      "name": "Jo Grant",
+      "texture": "skins/jo_grant.png",
+      "order": 12
+    },
+    {
+      "id": "tegan_jovanka",
+      "name": "Tegan Jovanka",
+      "texture": "skins/tegan_jovanka.png",
+      "order": 13
+    },
+    {
+      "id": "wilfred_mott",
+      "name": "Wilfred Mott",
+      "texture": "skins/wilfred_mott.png",
+      "order": 14
+    },
+    {
+      "id": "mickey_smith",
+      "name": "Mickey Smith",
+      "texture": "skins/mickey_smith.png",
+      "order": 15
+    },
+    {
+      "id": "the_master_2007",
+      "name": "The Master 2007",
+      "texture": "skins/the_master_2007.png",
+      "order": 16
+    },
+    {
+      "id": "sontaran_2010",
+      "name": "Sontaran 2010",
+      "texture": "skins/sontaran_2010.png",
+      "order": 17
+    },
+    {
+      "id": "k9",
+      "name": "K9",
+      "texture": "skins/k9.png",
+      "order": 18,
+      "poses": [
+	"stiff_legs" ]
+    },
+    {
+      "id": "brigadier_lethbridge_stewart",
+      "name": "Brigadier Lethbridge-Stewart",
+      "texture": "skins/brigadier_lethbridge_stewart.png",
+      "order": 19
+    },
+    {
+      "id": "bannakaffalatta",
+      "name": "Bannakaffalatta",
+      "texture": "skins/bannakaffalatta.png",
+      "order": 20
+    },
+    {
+      "id": "judoon",
+      "name": "Judoon",
+      "texture": "skins/judoon.png",
+      "order": 21
+    },
+    {
+      "id": "sycorax",
+      "name": "Sycorax",
+      "texture": "skins/sycorax.png",
+      "cape": "capes/sycorax.png",
+      "order": 22
+    },
+    {
+      "id": "cyberking_miss_hartigan",
+      "name": "CyberKing / Miss Hartigan",
+      "texture": "skins/cyberking_miss_hartigan.png",
+      "order": 23
+    },
+    {
+      "id": "racnoss",
+      "name": "Racnoss",
+      "texture": "skins/racnoss.png",
+      "order": 24
+    },
+    {
+      "id": "slitheen",
+      "name": "Slitheen",
+      "texture": "skins/slitheen.png",
+      "order": 25
+    },
+    {
+      "id": "the_beast_drwho",
+      "name": "The Beast",
+      "texture": "skins/the_beast_drwho.png",
+      "order": 26
+    },
+    {
+      "id": "rassilon",
+      "name": "Rassilon",
+      "texture": "skins/rassilon.png",
+      "order": 27
+    },
+    {
+      "id": "heavenly_host",
+      "name": "Heavenly Host",
+      "texture": "skins/heavenly_host.png",
+      "order": 28
+    },
+    {
+      "id": "scarecrow",
+      "name": "Scarecrow",
+      "texture": "skins/scarecrow.png",
+      "order": 29
+    },
+    {
+      "id": "cybershade",
+      "name": "Cybershade",
+      "texture": "skins/cybershade.png",
+      "order": 30
+    },
+    {
+      "id": "azal_the_daemon",
+      "name": "Azal (the Daemon)",
+      "texture": "skins/azal_the_daemon.png",
+      "order": 31
+    },
+    {
+      "id": "axon_monster",
+      "name": "Axon Monster",
+      "texture": "skins/axon_monster.png",
+      "order": 32
+    },
+    {
+      "id": "omega",
+      "name": "Omega",
+      "texture": "skins/omega.png",
+      "order": 33
+    },
+    {
+      "id": "alpha_centauri",
+      "name": "Alpha Centauri",
+      "texture": "skins/alpha_centauri.png",
+      "poses": "zombie_arms",
+      "order": 34
+    },
+    {
+      "id": "gel_guard_plasma_creature",
+      "name": "Gel Guard (Plasma Creature)",
+      "texture": "skins/gel_guard_plasma_creature.png",
+      "order": 35
+    },
+    {
+      "id": "the_nimon",
+      "name": "The Nimon",
+      "texture": "skins/the_nimon.png",
+      "order": 36
+    },
+    {
+      "id": "sutekh",
+      "name": "Sutekh",
+      "texture": "skins/sutekh.png",
+      "order": 37
+    },
+    {
+      "id": "sea_devil",
+      "name": "Sea Devil",
+      "texture": "skins/sea_devil.png",
+      "order": 38
+    },
+    {
+      "id": "cyberman_2012_non_cybus",
+      "name": "Cyberman 2012 (Non-Cybus)",
+      "texture": "skins/cyberman_2012_non_cybus.png",
+      "order": 39
+    },
+    {
+      "id": "cyberman_2013",
+      "name": "Cyberman 2013",
+      "texture": "skins/cyberman_2013.png",
+      "order": 40
+    },
+    {
+      "id": "cyber_lord",
+      "name": "Cyber-Lord",
+      "texture": "skins/cyber_lord.png",
+      "order": 41
+    },
+    {
+      "id": "cyberman_2006_cybus",
+      "name": "Cyberman 2006 (Cybus)",
+      "texture": "skins/cyberman_2006_cybus.png",
+      "order": 42
+    },
+    {
+      "id": "black_cyberman_1980s",
+      "name": "Black Cyberman 1980's",
+      "texture": "skins/black_cyberman_1980s.png",
+      "order": 43
+    },
+    {
+      "id": "cyberman_1980s",
+      "name": "Cyberman 1980's",
+      "texture": "skins/cyberman_1980s.png",
+      "order": 44
+    },
+    {
+      "id": "cybermen_1970s",
+      "name": "Cybermen 1970's",
+      "texture": "skins/cybermen_1970s.png",
+      "order": 45
+    },
+    {
+      "id": "cyberman_1960s",
+      "name": "Cyberman 1960's",
+      "texture": "skins/cyberman_1960s.png",
+      "order": 46
+    },
+    {
+      "id": "cyberman_1960s_2",
+      "name": "Cyberman 1960's",
+      "texture": "skins/cyberman_1960s_2.png",
+      "order": 47
+    },
+    {
+      "id": "ood",
+      "name": "Ood",
+      "texture": "skins/ood.png",
+      "order": 38.5
+    },
+    {
+      "id": "saturnynian",
+      "name": "Saturnynian",
+      "texture": "skins/saturnynian.png",
+      "order": 38.75,
+      "poses": [
+	"zombie_arms" ]
+
+    },
+    {
+      "id": "the_tenth_doctor_suit",
+      "name": "The Tenth Doctor - Suit",
+      "texture": "skins/the_tenth_doctor_suit.png",
+      "order": 50
+    }
+  ]
+}

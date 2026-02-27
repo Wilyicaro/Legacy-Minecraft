@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Mooshroom Tamer",
+    "displayNameId": "IDS_DLCSKIN00005311_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

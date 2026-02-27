@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Lee Everett",
+    "displayNameId": "IDS_dlcskin81504816_DISPLAYNAME",
+    "themeName": "The Walking Dead",
+    "themeNameId": "IDS_dlcskin81504816_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

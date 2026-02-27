@@ -1,0 +1,168 @@
+{
+  "name": "Story Mode",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "jesse",
+      "name": "Jesse",
+      "texture": "skins/jesse.png",
+      "order": 1
+    },
+    {
+      "id": "olivia",
+      "name": "Olivia",
+      "texture": "skins/olivia.png",
+      "order": 2
+    },
+    {
+      "id": "olivia_armored",
+      "name": "Olivia Armored",
+      "texture": "skins/olivia_armored.png",
+      "order": 3
+    },
+    {
+      "id": "axel",
+      "name": "Axel",
+      "texture": "skins/axel.png",
+      "order": 4
+    },
+    {
+      "id": "axel_armored",
+      "name": "Axel Armored",
+      "texture": "skins/axel_armored.png",
+      "order": 5
+    },
+    {
+      "id": "petra",
+      "name": "Petra",
+      "texture": "skins/petra.png",
+      "order": 6
+    },
+    {
+      "id": "petra_armored",
+      "name": "Petra Armored",
+      "texture": "skins/petra_armored.png",
+      "order": 7
+    },
+    {
+      "id": "lukas",
+      "name": "Lukas",
+      "texture": "skins/lukas.png",
+      "order": 8
+    },
+    {
+      "id": "gabriel",
+      "name": "Gabriel",
+      "texture": "skins/gabriel.png",
+      "order": 9
+    },
+    {
+      "id": "ellegaard",
+      "name": "Ellegaard",
+      "texture": "skins/ellegaard.png",
+      "order": 10
+    },
+    {
+      "id": "ellegaard_armored",
+      "name": "Ellegaard Armored",
+      "texture": "skins/ellegaard_armored.png",
+      "order": 11
+    },
+    {
+      "id": "magnus",
+      "name": "Magnus",
+      "texture": "skins/magnus.png",
+      "order": 12
+    },
+    {
+      "id": "magnus_armored",
+      "name": "Magnus Armored",
+      "texture": "skins/magnus_armored.png",
+      "order": 13
+    },
+    {
+      "id": "soren",
+      "name": "Soren",
+      "texture": "skins/soren.png",
+      "order": 14
+    },
+    {
+      "id": "soren_armored",
+      "name": "Soren Armored",
+      "texture": "skins/soren_armored.png",
+      "order": 15
+    },
+    {
+      "id": "ivor",
+      "name": "Ivor",
+      "texture": "skins/ivor.png",
+      "order": 16
+    },
+    {
+      "id": "jesse_armored",
+      "name": "Jesse Armored",
+      "texture": "skins/jesse_armored.png",
+      "order": 17
+    },
+    {
+      "id": "jesse_armored_2",
+      "name": "Jesse Armored",
+      "texture": "skins/jesse_armored_2.png",
+      "order": 18
+    },
+    {
+      "id": "jesse_armored_3",
+      "name": "Jesse Armored",
+      "texture": "skins/jesse_armored_3.png",
+      "order": 19
+    },
+    {
+      "id": "jesse_armored_4",
+      "name": "Jesse Armored",
+      "texture": "skins/jesse_armored_4.png",
+      "order": 20
+    },
+    {
+      "id": "jesse_armored_5",
+      "name": "Jesse Armored",
+      "texture": "skins/jesse_armored_5.png",
+      "order": 21
+    },
+    {
+      "id": "jesse_armored_6",
+      "name": "Jesse Armored",
+      "texture": "skins/jesse_armored_6.png",
+      "order": 22
+    },
+    {
+      "id": "jesse_2",
+      "name": "Jesse",
+      "texture": "skins/jesse_2.png",
+      "order": 23
+    },
+    {
+      "id": "jesse_3",
+      "name": "Jesse",
+      "texture": "skins/jesse_3.png",
+      "order": 24
+    },
+    {
+      "id": "jesse_4",
+      "name": "Jesse",
+      "texture": "skins/jesse_4.png",
+      "order": 25
+    },
+    {
+      "id": "jesse_5",
+      "name": "Jesse",
+      "texture": "skins/jesse_5.png",
+      "order": 26
+    },
+    {
+      "id": "jesse_6",
+      "name": "Jesse",
+      "texture": "skins/jesse_6.png",
+      "order": 27
+    }
+  ]
+}

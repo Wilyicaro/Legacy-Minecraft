@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Ellis",
+    "displayNameId": "IDS_DLCSKIN20000216_DISPLAYNAME",
+    "themeName": "Left 4 Dead 2",
+    "themeNameId": "IDS_DLCSKIN20000216_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

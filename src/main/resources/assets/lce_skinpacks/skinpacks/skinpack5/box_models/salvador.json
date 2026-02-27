@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Salvador",
+    "displayNameId": "IDS_dlcskin10582245_DISPLAYNAME",
+    "themeName": "Borderlands 2",
+    "themeNameId": "IDS_dlcskin10582245_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

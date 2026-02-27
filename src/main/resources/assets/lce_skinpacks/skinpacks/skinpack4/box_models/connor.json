@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Connor",
+    "displayNameId": "IDS_dlcskin25888844_DISPLAYNAME",
+    "themeName": "Assassins Creed",
+    "themeNameId": "IDS_dlcskin25888844_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

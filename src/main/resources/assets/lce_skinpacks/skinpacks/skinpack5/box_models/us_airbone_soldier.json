@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "US Airbone Soldier",
+    "displayNameId": "IDS_dlcskin31093749_DISPLAYNAME",
+    "themeName": "World War 2",
+    "themeNameId": "IDS_dlcskin31093749_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

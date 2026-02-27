@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "displayName": "Red Panda",
+    "displayNameId": "IDS_DLCSKIN00001007_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            10.0,
+            2.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            6.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

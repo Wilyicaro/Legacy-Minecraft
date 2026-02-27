@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Cyclist Steve Xmas Sweater",
+    "displayNameId": "IDS_SKINS_DLCSKIN00002726_DISPLAYNAME",
+    "themeName": "Festive Mash-up",
+    "themeNameId": "IDS_SKINS_DLCSKIN00002726_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

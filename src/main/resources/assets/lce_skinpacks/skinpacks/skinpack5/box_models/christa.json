@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Christa",
+    "displayNameId": "IDS_dlcskin94179428_DISPLAYNAME",
+    "themeName": "The Walking Dead",
+    "themeNameId": "IDS_dlcskin94179428_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

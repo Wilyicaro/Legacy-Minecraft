@@ -64,14 +64,11 @@ public class Legacy4J {
     public static final String MOD_ID = "legacy";
     public static final Supplier<String> VERSION = () -> FactoryAPIPlatform.getModInfo(MOD_ID).getVersion();
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
-    public static final boolean INTERNAL_CPM_ENABLED = !(FactoryAPI.isModLoaded("cpm") || FactoryAPI.isModLoaded("customplayermodels"));
     public static final FactoryConfig.StorageHandler MIXIN_CONFIGS_STORAGE = FactoryConfig.StorageHandler.fromMixin(LegacyMixinToggles.COMMON_STORAGE, true);
 
 
     private static void checkIncompatibleMods() {
-        if (!INTERNAL_CPM_ENABLED) {
-            LOGGER.warn("Customizable Player Models (CPM) detected. Legacy4J internal CPM loaders are disabled for compatibility.");
-        }
+
     }
 
 private static Collection<CommonNetwork.Payload> playerInitialPayloads = Collections.emptySet();
@@ -136,21 +133,13 @@ FactoryConfig.registerCommonStorage(createModLocation("common"), LegacyCommonOpt
             r.register(false, TipCommand.EntityPayload.ID);
             r.register(false, TopMessage.Payload.ID);
 
-            // Skins / CPM sync
-            r.register(true, SkinSync.SetSkinC2S.ID);
-            if (INTERNAL_CPM_ENABLED) {
-                r.register(true, SkinSync.SetCpmModelC2S.ID);
-                r.register(true, SkinSync.SetCpmModelChunkC2S.ID);
-                r.register(true, SkinSync.RequestSnapshotC2S.ID);
-            }
-            r.register(false, SkinSync.SyncSkinS2C.ID);
-            if (INTERNAL_CPM_ENABLED) {
-                r.register(false, SkinSync.SyncCpmModelS2C.ID);
-                r.register(false, SkinSync.SyncCpmModelChunkS2C.ID);
-                r.register(false, SkinSync.RequestCpmModelS2C.ID);
-            }
 
+            r.register(true, SkinSync.SetSkinC2S.ID);
+            r.register(false, SkinSync.SyncSkinS2C.ID);
             r.register(false, SkinSync.RequestSkinS2C.ID);
+            r.register(true, SkinSync.RequestSnapshotC2S.ID);
+            r.register(true, SkinSync.UploadAssetChunkC2S.ID);
+            r.register(false, SkinSync.SyncAssetChunkS2C.ID);
         });
 
         SkinsBootstrap.initCommon();

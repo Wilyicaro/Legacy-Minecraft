@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Cow",
+    "displayNameId": "IDS_DLCSKIN20000202_DISPLAYNAME",
+    "themeName": "Minecraft",
+    "themeNameId": "IDS_DLCSKIN20000202_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

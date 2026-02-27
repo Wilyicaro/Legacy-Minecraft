@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Captain Jack Harkness",
+    "displayNameId": "IDS_DLCSKIN00002508_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

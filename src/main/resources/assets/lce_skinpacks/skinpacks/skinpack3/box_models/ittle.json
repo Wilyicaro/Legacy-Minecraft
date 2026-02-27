@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Ittle",
+    "displayNameId": "IDS_DLCSKIN20000204_DISPLAYNAME",
+    "themeName": "Ittle Dew",
+    "themeNameId": "IDS_DLCSKIN20000204_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

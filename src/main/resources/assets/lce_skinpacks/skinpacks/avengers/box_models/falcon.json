@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Falcon",
+    "displayNameId": "IDS_dlcskin41533274_DISPLAYNAME",
+    "themeName": "Marvel Avengers",
+    "themeNameId": "IDS_dlcskin41533274_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

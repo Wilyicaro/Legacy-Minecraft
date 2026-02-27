@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "African Warrior",
+    "displayNameId": "IDS_DLCSKIN00000843_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Ninja",
+    "displayNameId": "IDS_DLCSKIN20000116_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

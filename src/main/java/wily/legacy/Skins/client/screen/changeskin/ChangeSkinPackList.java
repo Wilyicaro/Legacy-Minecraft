@@ -20,7 +20,6 @@ public final class ChangeSkinPackList {
     private final Runnable clickSound;
     private final FocusChange onFocusChange;
 
-
     private final List<String> basePackIds = new ArrayList<>();
 
     private final List<String> packIds = new ArrayList<>();
@@ -30,7 +29,6 @@ public final class ChangeSkinPackList {
 
     private int focusedPackIndex;
     private boolean queuedChangePack;
-
 
     private String lastUsedCustomPackId;
 
@@ -79,7 +77,6 @@ public final class ChangeSkinPackList {
         queuedChangePack = true;
         ensureButtons();
     }
-
 
     public void bumpMostRecentCustomPack(String packId) {
 
@@ -164,7 +161,6 @@ public final class ChangeSkinPackList {
         int idx = packIds.indexOf(packId);
         if (idx >= 0) setFocusedPackIndex(idx, playSound);
     }
-
 
     private void refreshPackIds() {
         basePackIds.clear();

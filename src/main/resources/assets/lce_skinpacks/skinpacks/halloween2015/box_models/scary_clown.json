@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Scary Clown",
+    "displayNameId": "IDS_SKINS_DLCSKIN00003212_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

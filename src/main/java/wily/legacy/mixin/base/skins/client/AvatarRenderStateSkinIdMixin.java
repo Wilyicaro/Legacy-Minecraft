@@ -1,7 +1,5 @@
 package wily.legacy.mixin.base.skins.client;
 
-
-
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import org.spongepowered.asm.mixin.Mixin;

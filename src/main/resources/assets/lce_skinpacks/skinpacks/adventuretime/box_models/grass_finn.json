@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "displayName": "Grass Finn",
+    "displayNameId": "IDS_SKINS_DLCSKIN00004443_DISPLAYNAME"
+  },
+"hide": ["right_sleeve", "left_sleeve"],
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            1.0,
+            -10.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -10.0,
+            -2.0
+          ],
+          "size": [
+            3.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            1.0,
+            2.0
+          ],
+          "size": [
+            8.0,
+            8.0,
+            3.0
+          ],
+          "uv": [
+            42,
+            37
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

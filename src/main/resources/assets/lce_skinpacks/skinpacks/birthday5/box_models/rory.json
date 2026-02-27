@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Rory",
+    "displayNameId": "IDS_DLCSKIN00006115_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

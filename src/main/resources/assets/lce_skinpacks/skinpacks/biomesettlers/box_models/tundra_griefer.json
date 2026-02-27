@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Tundra Griefer",
+    "displayNameId": "IDS_DLCSKIN00004520_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00004520_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

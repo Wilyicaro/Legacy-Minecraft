@@ -1,10 +1,5 @@
 package wily.legacy.mixin.base.skins.client;
 
-
-/**
- * Mixin: console skins / CPM rendering glue.
- */
-
 import wily.legacy.Skins.skin.DefaultAtlasSkins;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AbstractTexture;

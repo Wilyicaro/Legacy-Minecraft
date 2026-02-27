@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Tundra Hunter",
+    "displayNameId": "IDS_DLCSKIN00004521_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00004521_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

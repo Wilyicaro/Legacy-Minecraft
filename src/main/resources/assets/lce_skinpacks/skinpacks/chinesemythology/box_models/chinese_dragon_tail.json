@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Chinese Dragon Tail",
+    "displayNameId": "IDS_SKINS_DLCSKIN00005135_DISPLAYNAME",
+    "themeName": "Dragon Dancer Suit",
+    "themeNameId": "IDS_SKINS_DLCSKIN00005135_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

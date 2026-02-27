@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Handsome Jack",
+    "displayNameId": "IDS_dlcskin77714110_DISPLAYNAME",
+    "themeName": "Borderlands 2",
+    "themeNameId": "IDS_dlcskin77714110_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

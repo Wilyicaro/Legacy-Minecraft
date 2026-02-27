@@ -1,22 +1,20 @@
 package wily.legacy.mixin.base.skins.client;
 
-
-/**
- * Mixin: console skins / CPM rendering glue.
- */
-
-import wily.legacy.Skins.client.cpm.CpmModelManager;
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
-import wily.legacy.Skins.skin.SkinIdUtil;
 import wily.legacy.Skins.skin.ClientSkinCache;
 import wily.legacy.Skins.skin.SkinEntry;
+import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinPackLoader;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.core.ClientAsset;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Avatar;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.entity.player.PlayerSkin;
+import net.minecraft.world.item.Items;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -24,12 +22,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Mixin(AvatarRenderer.class)
 public abstract class AvatarRendererSkinMixin {
-
 
     @Inject(method = "extractRenderState", at = @At("RETURN"), require = 0)
     private void consoleskins$patchStateSkin(Avatar avatar, AvatarRenderState state, float partialTick, CallbackInfo ci) {
@@ -52,7 +48,6 @@ public abstract class AvatarRendererSkinMixin {
                 skinId = ClientSkinCache.getByName(name);
             }
 
-
             if (skinId == null || skinId.isBlank()) {
                 try {
                     skinId = ClientSkinCache.get(avatar.getUUID());
@@ -60,10 +55,10 @@ public abstract class AvatarRendererSkinMixin {
                 }
             }
 
-            if (skinId == null || skinId.isBlank()) return;
+                        if (skinId == null || skinId.isBlank()) return;
             if ("auto_select".equals(skinId)) return;
 
-            if (state instanceof RenderStateSkinIdAccess a) {
+if (state instanceof RenderStateSkinIdAccess a) {
                 a.consoleskins$setSkinId(skinId);
                 try {
                     a.consoleskins$setEntityUuid(avatar.getUUID());
@@ -86,35 +81,41 @@ public abstract class AvatarRendererSkinMixin {
                 }
             }
 
-
-            try {
-                UUID uuid = avatar.getUUID();
-                if (uuid != null && SkinIdUtil.isCpm(skinId) && CpmModelManager.isModelLoaded(uuid)) {
-                    return;
-                }
-            } catch (Throwable ignored) {
-            }
-
             SkinEntry entry = SkinPackLoader.getSkin(skinId);
-            if (entry == null) return;
-            ResourceLocation tex = entry.texture();
+            ResourceLocation tex = entry != null ? entry.texture() : null;
+            if (tex == null) tex = ClientSkinAssets.getTexture(skinId);
             if (tex == null) return;
+                        if (tex == null) return;
 
             PlayerSkin original = state.skin;
             if (original == null) return;
 
             ClientAsset.ResourceTexture body = new ClientAsset.ResourceTexture(tex, tex);
-            PlayerSkin.Patch patch = PlayerSkin.Patch.create(
-                    Optional.of(body),
-                    Optional.empty(),
-                    Optional.empty(),
-                    Optional.empty()
-            );
-            state.skin = original.with(patch);
+
+            ClientAsset.ResourceTexture capeTex = null;
+            if (entry != null && entry.cape() != null) {
+                ResourceLocation capePath = entry.cape();
+                try {
+                    Minecraft.getInstance().getTextureManager().getTexture(capePath);
+                } catch (Throwable ignored) {
+                }
+                capeTex = new ClientAsset.ResourceTexture(capePath, capePath);
+            }
+
+            try {
+                if (avatar.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA)) capeTex = null;
+            } catch (Throwable ignored) {
+            }
+
+            state.showCape = capeTex != null;
+
+            PlayerModelType model = (entry != null && entry.slimArms()) ? PlayerModelType.SLIM : PlayerModelType.WIDE;
+
+            ClientAsset.Texture capeFinal = capeTex;
+            state.skin = PlayerSkin.insecure(body, capeFinal, null, model);
         } catch (Throwable ignored) {
         }
     }
-
 
     @Inject(
             method = "getTextureLocation(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)Lnet/minecraft/resources/ResourceLocation;",

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Iron Man Mark 1",
+    "displayNameId": "IDS_dlcskin48841475_DISPLAYNAME",
+    "themeName": "Marvel Avengers",
+    "themeNameId": "IDS_dlcskin48841475_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

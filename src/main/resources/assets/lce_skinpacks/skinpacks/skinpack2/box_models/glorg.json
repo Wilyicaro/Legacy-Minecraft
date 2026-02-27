@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Glorg",
+    "displayNameId": "IDS_DLCSKIN20000111_DISPLAYNAME",
+    "themeName": "Glorg",
+    "themeNameId": "IDS_DLCSKIN20000111_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Spelunky Guy",
+    "displayNameId": "IDS_DLCSKIN20000113_DISPLAYNAME",
+    "themeName": "Spelunky",
+    "themeNameId": "IDS_DLCSKIN20000113_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

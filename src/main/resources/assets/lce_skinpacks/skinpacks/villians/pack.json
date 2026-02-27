@@ -1,0 +1,114 @@
+{
+  "name": "Villians",
+  "author": "Me",
+  "skins": [
+    {
+      "id": "bisector",
+      "name": "Bisector",
+      "texture": "skins/bisector.png",
+      "order": 1
+    },
+    {
+      "id": "cake_maniac",
+      "name": "Cake Maniac",
+      "texture": "skins/cake_maniac.png",
+      "order": 2
+    },
+    {
+      "id": "doorman",
+      "name": "Doorman",
+      "texture": "skins/doorman.png",
+      "order": 3
+    },
+    {
+      "id": "dungeon_spectre",
+      "name": "Dungeon Spectre",
+      "texture": "skins/dungeon_spectre.png",
+      "model": "slim",
+      "order": 4
+    },
+    {
+      "id": "enchantro",
+      "name": "Enchantro",
+      "texture": "skins/enchantro.png",
+      "order": 5
+    },
+    {
+      "id": "endergaunt",
+      "name": "Endergaunt",
+      "texture": "skins/endergaunt.png",
+      "order": 6
+    },
+    {
+      "id": "eyece",
+      "name": "Eyece",
+      "texture": "skins/eyece.png",
+      "order": 7
+    },
+    {
+      "id": "frankencrafter",
+      "name": "Frankencrafter",
+      "texture": "skins/frankencrafter.png",
+      "order": 8
+    },
+    {
+      "id": "lava_fiend",
+      "name": "Lava Fiend",
+      "texture": "skins/lava_fiend.png",
+      "model": "slim",
+      "order": 9
+    },
+    {
+      "id": "patchkin",
+      "name": "Patchkin",
+      "texture": "skins/patchkin.png",
+      "order": 10
+    },
+    {
+      "id": "redstone_zealot",
+      "name": "Redstone Zealot",
+      "texture": "skins/redstone_zealot.png",
+      "order": 11
+    },
+    {
+      "id": "silverfish_monger",
+      "name": "Silverfish Monger",
+      "texture": "skins/silverfish_monger.png",
+      "order": 12
+    },
+    {
+      "id": "slymime",
+      "name": "Slymime",
+      "texture": "skins/slymime.png",
+      "model": "slim",
+      "order": 13
+    },
+    {
+      "id": "stronghold_monarch",
+      "name": "Stronghold Monarch",
+      "texture": "skins/stronghold_monarch.png",
+      "order": 14
+    },
+    {
+      "id": "stronghold_seer",
+      "name": "Stronghold Seer",
+      "texture": "skins/stronghold_seer.png",
+      "model": "slim",
+      "order": 15
+    },
+    {
+      "id": "swindler",
+      "name": "Swindler",
+      "texture": "skins/swindler.png",
+      "model": "slim",
+      "order": 16
+    },
+    {
+      "id": "terror_spawner",
+      "name": "Terror Spawner",
+      "texture": "skins/terror_spawner.png",
+      "model": "slim",
+      "order": 17
+    }
+  ]
+}

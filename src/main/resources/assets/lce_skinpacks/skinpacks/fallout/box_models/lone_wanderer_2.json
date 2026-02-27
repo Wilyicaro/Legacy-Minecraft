@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "displayName": "Lone Wanderer",
+    "displayNameId": "IDS_SKINS_DLCSKIN00004810_DISPLAYNAME",
+    "themeName": "Fallout 3",
+    "themeNameId": "IDS_SKINS_DLCSKIN00004810_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            0.0,
+            -3.0,
+            -3.0
+          ],
+          "size": [
+            4.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -3.0,
+            0.0
+          ],
+          "size": [
+            4.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -2.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            24,
+            5
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -2.0,
+            0.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            30,
+            5
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

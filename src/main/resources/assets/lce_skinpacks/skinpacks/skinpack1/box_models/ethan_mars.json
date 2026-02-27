@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "displayName": "Ethan Mars",
+    "displayNameId": "IDS_DLCSKIN20000019_DISPLAYNAME",
+    "themeName": "Heavy Rain",
+    "themeNameId": "IDS_DLCSKIN20000019_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            0.01,
+            1.99
+          ],
+          "size": [
+            6.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            3.0,
+            1.99
+          ],
+          "size": [
+            4.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

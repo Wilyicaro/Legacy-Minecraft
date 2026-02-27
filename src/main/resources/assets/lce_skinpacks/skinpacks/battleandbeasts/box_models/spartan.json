@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Spartan",
+    "displayNameId": "IDS_DLCSKIN00000821_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

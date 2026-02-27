@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Forest Brawler",
+    "displayNameId": "IDS_DLCSKIN00004509_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00004509_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

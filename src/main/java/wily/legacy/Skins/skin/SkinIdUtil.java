@@ -7,10 +7,6 @@ public final class SkinIdUtil {
     private SkinIdUtil() {
     }
 
-    public static boolean isCpm(String skinId) {
-        return skinId != null && skinId.startsWith(SkinIds.CPM_PREFIX);
-    }
-
     public static boolean isAutoSelect(String skinId) {
         return SkinIds.AUTO_SELECT.equals(skinId);
     }
@@ -24,6 +20,6 @@ public final class SkinIdUtil {
     }
 
     public static SkinType typeOf(String skinId) {
-        return isCpm(skinId) ? SkinType.CPM : SkinType.JSON;
+        return SkinType.JSON;
     }
 }

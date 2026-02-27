@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Dr Gross",
+    "displayNameId": "IDS_SKINS_DLCSKIN00004445_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

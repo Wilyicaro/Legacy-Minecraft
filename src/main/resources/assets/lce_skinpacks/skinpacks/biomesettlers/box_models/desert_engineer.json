@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Desert Engineer",
+    "displayNameId": "IDS_DLCSKIN00004503_DISPLAYNAME",
+    "themeName": "",
+    "themeNameId": "IDS_DLCSKIN00004503_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Prince Gumball",
+    "displayNameId": "IDS_SKINS_DLCSKIN00004407_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

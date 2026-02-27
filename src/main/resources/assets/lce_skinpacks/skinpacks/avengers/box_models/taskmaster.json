@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Taskmaster",
+    "displayNameId": "IDS_dlcskin71824670_DISPLAYNAME",
+    "themeName": "Marvel Avengers",
+    "themeNameId": "IDS_dlcskin71824670_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

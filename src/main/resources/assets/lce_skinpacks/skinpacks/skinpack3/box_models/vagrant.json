@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Vagrant",
+    "displayNameId": "IDS_DLCSKIN20000237_DISPLAYNAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

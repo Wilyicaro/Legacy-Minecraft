@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "German Sergeant",
+    "displayNameId": "IDS_dlcskin46397171_DISPLAYNAME",
+    "themeName": "World War 2",
+    "themeNameId": "IDS_dlcskin46397171_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Black Smith",
+    "displayNameId": "IDS_dlcskin62382971_DISPLAYNAME",
+    "themeName": "Castle Crashers",
+    "themeNameId": "IDS_dlcskin62382971_THEMENAME"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}
