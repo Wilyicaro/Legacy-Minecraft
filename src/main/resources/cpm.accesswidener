@@ -1,5 +1,0 @@
-accessWidener v2 named
-
-# CPM needs to be able to wrap/replace model parts. In modern Minecraft versions ModelPart is final.
-# Make it extendable so CPM can provide ModelPart subclasses implementing SelfRenderer.
-extendable class net/minecraft/client/model/geom/ModelPart
