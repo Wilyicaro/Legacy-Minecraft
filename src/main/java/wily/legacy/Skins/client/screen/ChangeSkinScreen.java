@@ -16,6 +16,7 @@ import wily.legacy.Skins.client.screen.widget.PlayerSkinWidgetList;
 import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.Skins.skin.ClientSkinCache;
 import wily.legacy.Skins.skin.SkinEntry;
+import wily.legacy.Skins.skin.SkinIds;
 import wily.legacy.Skins.skin.SkinPack;
 import wily.legacy.Skins.skin.SkinPackLoader;
 import wily.legacy.Skins.skin.SkinSync;
@@ -64,7 +65,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
     private final ChangeSkinPackList packList;
     private final ChangeSkinActions actions;
 
-    private boolean stickUpHeld, stickDownHeld, leftStickUpHeld, leftStickDownHeld, shiftHeld, pHeld, enterHeld, firstOpen = true;
+    private boolean stickUpHeld, stickDownHeld, shiftHeld, pHeld, enterHeld, firstOpen = true;
 
     private boolean draggingCenterDoll;
     private boolean centerDragMoved;
@@ -198,10 +199,28 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         actions.openLegacyChangeSkinScreen();
     }
 
+    private boolean isUsingAutoSelectedSkin() {
+        UUID self = minecraft.player != null ? minecraft.player.getUUID() : minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
+        if (self == null) return true;
+        String selectedId = ClientSkinCache.get(self);
+        if (selectedId == null) selectedId = SkinSync.getServerSkinId(self);
+        return selectedId == null || selectedId.isBlank();
+    }
+
     private int resolveSelectedSkinIndex() {
         UUID self = minecraft.player != null ? minecraft.player.getUUID() : minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
         String selectedId = self != null ? ClientSkinCache.get(self) : null;
-        if (selectedId == null || selectedId.isBlank()) return 0;
+        if (selectedId == null || selectedId.isBlank()) {
+            SkinPack focused = actions.getFocusedPack();
+            if (focused != null && focused.skins() != null) {
+                int limit = Math.min(100, focused.skins().size());
+                for (int i = 0; i < limit; i++) {
+                    SkinEntry se = focused.skins().get(i);
+                    if (se != null && SkinIds.AUTO_SELECT.equals(se.id())) return i;
+                }
+            }
+            return 0;
+        }
 
         SkinPack focused = actions.getFocusedPack();
         if (focused != null && focused.skins() != null) {
@@ -372,7 +391,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
 
         if (firstOpen) {
             String openId = SkinPackLoader.getLastUsedCustomPackId();
-            if (openId != null) packList.focusPackId(openId, false);
+            if (openId != null && !isUsingAutoSelectedSkin()) packList.focusPackId(openId, false);
         }
     }
 
@@ -483,9 +502,8 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
     }
 
     private boolean handlePackListStepNavigation(int key) {
-        boolean kbm = ControlType.getActiveType().isKbm();
-        boolean up = (kbm && key == InputConstants.KEY_W) || key == InputConstants.KEY_UP;
-        boolean down = (kbm && key == InputConstants.KEY_S) || key == InputConstants.KEY_DOWN;
+        boolean up = key == InputConstants.KEY_W || key == InputConstants.KEY_UP;
+        boolean down = key == InputConstants.KEY_S || key == InputConstants.KEY_DOWN;
         if (!(up || down)) return false;
 
         if (key == InputConstants.KEY_UP || key == InputConstants.KEY_DOWN) {
@@ -868,52 +886,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
             }
         }
 
-        if (!ControlType.getActiveType().isKbm() && state != null && state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick) {
-            final double triggerY = 0.65d, sideLimit = 0.45d;
-            double sx = stick.x, sy = stick.y;
-
-            if (Math.abs(sx) <= sideLimit) {
-                if (sy <= -triggerY) {
-                    if (!leftStickUpHeld) {
-                        leftStickUpHeld = true;
-                        stepPack(true);
-                    }
-                    state.block();
-                    return;
-                }
-                if (sy >= triggerY) {
-                    if (!leftStickDownHeld) {
-                        leftStickDownHeld = true;
-                        stepPack(false);
-                    }
-                    state.block();
-                    return;
-                }
-            }
-
-            if (Math.abs(sy) < 0.25d) {
-                leftStickUpHeld = false;
-                leftStickDownHeld = false;
-            }
-        }
-
         super.bindingStateTick(state);
-    }
-
-    private void stepPack(boolean up) {
-        int count = packList != null ? packList.getPackCount() : 0;
-        if (count <= 1) return;
-
-        int target = packList.getFocusedPackIndex() + (up ? -1 : 1);
-        if (target < 0) target = count - 1;
-        else if (target >= count) target = 0;
-
-        ChangeSkinPackList.PackButton btn = packList.getButtonForIndex(target);
-        if (btn == null) return;
-
-        packList.setFocusedPackIndex(target, true);
-        setFocused(btn);
-        focusPackListItem(btn);
     }
 
     @Override
@@ -1149,7 +1122,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
 
     @Override
     public void removed() {
-        stickUpHeld = stickDownHeld = leftStickUpHeld = leftStickDownHeld = shiftHeld = pHeld = enterHeld = false;
+        stickUpHeld = stickDownHeld = shiftHeld = pHeld = enterHeld = false;
         draggingCenterDoll = false;
         centerDragMoved = false;
         PlayerSkinWidget.clearCarouselClip();
