@@ -202,11 +202,11 @@
       "sort_index": 1100
     },
     {
-      "id": "thegoatstorymode",
+      "id": "storymode",
       "name": "Story Mode",
       "author": "Me",
       "type": "skin",
-      "path": "skinpacks/thegoatstorymode/pack.json",
+      "path": "skinpacks/storymode/pack.json",
       "sort_index": 4500
     },
     {

@@ -76,9 +76,9 @@
       "order": 19
     },
     {
-      "id": "thor",
+      "id": "thor1",
       "name": "Thor",
-      "texture": "skins/thor.png",
+      "texture": "skins/thor1.png",
       "cape": "capes/thor.png",
       "order": 3
     },

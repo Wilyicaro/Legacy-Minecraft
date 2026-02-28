@@ -373,9 +373,23 @@ public class PlayerSkinWidget extends AbstractWidget {
         if (isUpsideDownFacingFlip(id)) yawOffset = -yawOffset;
         float attackTime = 0.0F;
         if (punchLoop) {
+
             long ms = System.currentTimeMillis();
-            float t = (ms % 600L) / 600.0F;
-            attackTime = (Mth.sin(t * ((float) Math.PI * 2.0F) - ((float) Math.PI * 0.5F)) + 1.0F) * 0.5F;
+
+            long swing = 300L;
+
+            long phase = ms % (swing + 5L);
+
+            if (phase < swing) {
+
+                attackTime = phase / (float) swing;
+
+            } else {
+
+                attackTime = 0.0F;
+
+            }
+
         }
         int sizeCap = 165;
         if (CLIP_ENABLED) {
