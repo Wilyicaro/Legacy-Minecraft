@@ -11,7 +11,7 @@
   "bones": [
     {
       "name": "body_addon",
-      "attach": "BODY",
+      "attach": "//",
       "cubes": [
         {
           "origin": [

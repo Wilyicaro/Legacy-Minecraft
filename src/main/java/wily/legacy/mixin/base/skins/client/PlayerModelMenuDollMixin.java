@@ -29,9 +29,14 @@ public abstract class PlayerModelMenuDollMixin {
         PlayerModel self = (PlayerModel) (Object) this;
 
         String skinId = null;
+        boolean moving = false;
         if (state instanceof RenderStateSkinIdAccess a) {
             try {
                 skinId = a.consoleskins$getSkinId();
+            } catch (Throwable ignored) {
+            }
+            try {
+                moving = a.consoleskins$isMoving();
             } catch (Throwable ignored) {
             }
         }
@@ -49,7 +54,6 @@ public abstract class PlayerModelMenuDollMixin {
 
             if (state.isCrouching) {
                 head.yRot = 0.15F;
-                hat.yRot = head.yRot;
             }
             float t = (System.currentTimeMillis() % 1_000_000L) / 1000.0F;
             float speed = 3.0F;
@@ -86,11 +90,8 @@ public abstract class PlayerModelMenuDollMixin {
 
         if (!ConsoleSkinsClientSettings.isSkinAnimations()) return;
 
-        boolean zombie = ZombieArmsPose.shouldApply(state);
-        if (zombie) {
+        if (ZombieArmsPose.shouldApply(state)) {
             ZombieArmsPose.apply(self, state);
-        } else if (StiffArmsPose.shouldApply(state)) {
-            StiffArmsPose.apply(self, state);
         }
 
         if (IdleSitPose.shouldApply(state)) {
@@ -106,7 +107,7 @@ public abstract class PlayerModelMenuDollMixin {
         }
 
         if (skinId != null && StiffLegsConfig.isStiffLegsSkin(skinId)) {
-            if (state.pose == Pose.STANDING || state.pose == Pose.CROUCHING || state.pose == Pose.SWIMMING || state.pose == Pose.FALL_FLYING) {
+            if (state.pose == Pose.STANDING || state.pose == Pose.CROUCHING) {
                 self.rightLeg.xRot = 0.0F;
                 self.leftLeg.xRot = 0.0F;
                 self.rightLeg.yRot = 0.0F;
@@ -123,6 +124,11 @@ public abstract class PlayerModelMenuDollMixin {
             }
         }
 
+        if (skinId != null && StiffArmsConfig.isStiffArmsSkin(skinId)) {
+            if (state.pose == Pose.STANDING) {
+                StiffArmsPose.removeIdleSway(self, StiffArmsPose.getAgeInTicks(state), moving);
+            }
+        }
         if (WeepingStatuePose.shouldApply(state)) {
             WeepingStatuePose.apply(self);
         }

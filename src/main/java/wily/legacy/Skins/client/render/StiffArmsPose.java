@@ -50,6 +50,21 @@ public final class StiffArmsPose {
 
         float attackTime = state == null ? 0.0F : state.attackTime;
 
+        float t = getAgeInTicks(state);
+        float idleScale = 1.0F - attackTime;
+        if (idleScale < 0.0F) idleScale = 0.0F;
+        if (idleScale > 0.0F) {
+            float cos = Mth.cos(t * 0.45F) * 0.06F * idleScale;
+            float sin = Mth.sin(t * 0.37F) * 0.04F * idleScale;
+            float yaw = Mth.sin(t * 0.28F) * 0.02F * idleScale;
+            model.rightArm.zRot += cos;
+            model.leftArm.zRot -= cos;
+            model.rightArm.xRot += sin;
+            model.leftArm.xRot -= sin;
+            model.rightArm.yRot += yaw;
+            model.leftArm.yRot -= yaw;
+        }
+
         if (attackTime > 0.0F) {
             HumanoidArm arm = state.attackArm;
             if (arm == null) arm = HumanoidArm.RIGHT;

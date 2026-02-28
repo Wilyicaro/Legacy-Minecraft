@@ -3,7 +3,7 @@
     "displayName": "Death",
     "displayNameId": "IDS_SKINS_DLCSKIN00004429_DISPLAYNAME"
   },
-  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants", "hat"],
+  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants", "hat" , "head"],
   "texture": {
     "width": 64,
     "height": 64

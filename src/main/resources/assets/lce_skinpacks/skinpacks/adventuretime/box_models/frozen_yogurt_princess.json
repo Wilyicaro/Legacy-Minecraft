@@ -3,6 +3,7 @@
     "displayName": "Frozen Yogurt Princess",
     "displayNameId": "IDS_SKINS_DLCSKIN00004439_DISPLAYNAME"
   },
+"hide": ["right_sleeve", "left_sleeve"],
   "texture": {
     "width": 64,
     "height": 64

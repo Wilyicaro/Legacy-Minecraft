@@ -3,6 +3,7 @@
     "displayName": "Head Marauder",
     "displayNameId": "IDS_SKINS_DLCSKIN00004435_DISPLAYNAME"
   },
+"hide": "arms",
   "texture": {
     "width": 64,
     "height": 64
