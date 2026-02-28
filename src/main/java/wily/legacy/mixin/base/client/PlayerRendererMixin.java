@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import wily.legacy.Skins.client.render.boxloader.AttachSlot;
 import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.Skins.client.render.boxloader.BuiltBoxModel;
+import wily.legacy.Skins.client.render.SkinPoseRegistry;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.ClientSkinCache;
 import wily.legacy.Skins.skin.SkinEntry;
@@ -50,6 +51,11 @@ public abstract class PlayerRendererMixin extends LivingEntityRenderer {
 
         String skinId = ClientSkinCache.get(mc.player.getUUID());
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
+
+        if (SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.HIDE_HAND, skinId)) {
+            ci.cancel();
+            return;
+        }
 
         SkinEntry entry = SkinPackLoader.getSkin(skinId);
         ResourceLocation texture = entry != null ? entry.texture() : null;

@@ -92,7 +92,7 @@ public abstract class PlayerModelMenuDollMixin {
         if (!ConsoleSkinsClientSettings.isSkinAnimations()) return;
 
         if (ZombieArmsPose.shouldApply(state)) {
-            ZombieArmsPose.apply(self);
+            ZombieArmsPose.apply(self, state);
         }
 
         if (IdleSitPose.shouldApply(state)) {

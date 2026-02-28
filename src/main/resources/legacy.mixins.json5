@@ -85,7 +85,6 @@
     "client.inventory.InventoryScreenMixin",
     "client.ItemInHandRendererMixin",
     "client.ItemInHandRendererSwayMixin",
-    "client.ItemInHandRendererHideHandMixin",
     "client.KeyboardControllerInputMixin",
     "client.KeyboardHandlerMixin",
     "client.KeyMappingMixin",

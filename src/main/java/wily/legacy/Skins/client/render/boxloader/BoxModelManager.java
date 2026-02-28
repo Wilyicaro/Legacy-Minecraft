@@ -264,44 +264,58 @@ public final class BoxModelManager {
     }
 
     private static EnumSet<SkinPoseRegistry.PoseTag> parsePoseTags(JsonObject root) {
-        if (root == null) return EnumSet.noneOf(SkinPoseRegistry.PoseTag.class);
+        EnumSet<SkinPoseRegistry.PoseTag> out = EnumSet.noneOf(SkinPoseRegistry.PoseTag.class);
+        if (root == null) return out;
+
         JsonElement poses = null;
         if (root.has("poses")) poses = root.get("poses");
         else if (root.has("animations")) poses = root.get("animations");
-        if (poses == null || poses.isJsonNull()) return EnumSet.noneOf(SkinPoseRegistry.PoseTag.class);
-        EnumSet<SkinPoseRegistry.PoseTag> out = EnumSet.noneOf(SkinPoseRegistry.PoseTag.class);
-        if (poses.isJsonArray()) {
-            JsonArray arr = poses.getAsJsonArray();
-            for (int i = 0; i < arr.size(); i++) {
-                JsonElement el = arr.get(i);
-                if (el != null && el.isJsonPrimitive()) {
-                    JsonPrimitive p = el.getAsJsonPrimitive();
-                    if (p.isString()) {
-                        SkinPoseRegistry.PoseTag tag = SkinPoseRegistry.PoseTag.fromKey(p.getAsString());
-                        if (tag != null) out.add(tag);
-                    }
-                }
-            }
-        } else if (poses.isJsonPrimitive()) {
-            JsonPrimitive p = poses.getAsJsonPrimitive();
+        collectPoseTags(out, poses);
+
+        JsonElement hide = root.has("hide") ? root.get("hide") : null;
+        collectPoseTags(out, hide);
+
+        return out;
+    }
+
+    private static void collectPoseTags(EnumSet<SkinPoseRegistry.PoseTag> out, JsonElement el) {
+        if (out == null || el == null || el.isJsonNull()) return;
+
+        if (el.isJsonPrimitive()) {
+            JsonPrimitive p = el.getAsJsonPrimitive();
             if (p.isString()) {
                 SkinPoseRegistry.PoseTag tag = SkinPoseRegistry.PoseTag.fromKey(p.getAsString());
                 if (tag != null) out.add(tag);
             }
-        } else if (poses.isJsonObject()) {
-            JsonObject obj = poses.getAsJsonObject();
+            return;
+        }
+
+        if (el.isJsonArray()) {
+            JsonArray arr = el.getAsJsonArray();
+            for (int i = 0; i < arr.size(); i++) {
+                collectPoseTags(out, arr.get(i));
+            }
+            return;
+        }
+
+        if (el.isJsonObject()) {
+            JsonObject obj = el.getAsJsonObject();
             for (Map.Entry<String, JsonElement> e : obj.entrySet()) {
                 SkinPoseRegistry.PoseTag tag = SkinPoseRegistry.PoseTag.fromKey(e.getKey());
-                if (tag == null) continue;
-                JsonElement v = e.getValue();
-                if (v != null && v.isJsonPrimitive()) {
-                    JsonPrimitive p = v.getAsJsonPrimitive();
-                    if (p.isBoolean() && !p.getAsBoolean()) continue;
+                if (tag != null) {
+                    JsonElement v = e.getValue();
+                    if (v != null && v.isJsonPrimitive()) {
+                        JsonPrimitive pv = v.getAsJsonPrimitive();
+                        if (pv.isBoolean() && !pv.getAsBoolean()) {
+                            collectPoseTags(out, v);
+                            continue;
+                        }
+                    }
+                    out.add(tag);
                 }
-                out.add(tag);
+                collectPoseTags(out, e.getValue());
             }
         }
-        return out;
     }
 
     private static void putPoseTags(Map<String, EnumSet<SkinPoseRegistry.PoseTag>> map, String key, EnumSet<SkinPoseRegistry.PoseTag> tags) {
