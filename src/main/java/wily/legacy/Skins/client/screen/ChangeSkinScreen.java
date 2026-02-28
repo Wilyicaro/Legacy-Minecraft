@@ -207,6 +207,32 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         return selectedId == null || selectedId.isBlank();
     }
 
+
+private String getCurrentSelectedSkinId() {
+    UUID self = minecraft.player != null ? minecraft.player.getUUID()
+            : (minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null);
+    if (self == null) return null;
+    String selectedId = ClientSkinCache.get(self);
+    if (selectedId == null) selectedId = SkinSync.getServerSkinId(self);
+    return selectedId;
+}
+
+private String resolvePackIdToOpenOnFirstOpen() {
+    String selectedId = getCurrentSelectedSkinId();
+    if (selectedId != null && !selectedId.isBlank()) {
+        try {
+            String src = SkinPackLoader.getSourcePackId(selectedId);
+            if (src != null && !src.isBlank()) return src;
+        } catch (Throwable ignored) {
+        }
+    }
+    try {
+        return SkinPackLoader.getLastUsedCustomPackId();
+    } catch (Throwable ignored) {
+        return null;
+    }
+}
+
     private int resolveSelectedSkinIndex() {
         UUID self = minecraft.player != null ? minecraft.player.getUUID() : minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
         String selectedId = self != null ? ClientSkinCache.get(self) : null;
@@ -390,8 +416,8 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         tooltipBox.init("tooltipBox");
 
         if (firstOpen) {
-            String openId = SkinPackLoader.getLastUsedCustomPackId();
-            if (openId != null && !isUsingAutoSelectedSkin()) packList.focusPackId(openId, false);
+            String openId = resolvePackIdToOpenOnFirstOpen();
+            if (openId != null) packList.focusPackId(openId, false);
         }
     }
 
@@ -411,6 +437,8 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
 
         if (firstOpen) {
             firstOpen = false;
+            String openId = resolvePackIdToOpenOnFirstOpen();
+            if (openId != null) packList.focusPackId(openId, false);
             packList.consumeQueuedChangePack();
             skinPack(resolveSelectedSkinIndex());
             actions.warmupFavouritesPack();
