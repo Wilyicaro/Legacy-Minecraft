@@ -183,6 +183,7 @@
       "id": "alex_anatomy",
       "name": "Alex Anatomy",
       "texture": "skins/alex_anatomy.png",
+      "model": "slim",
       "order": 29
     },
     {
@@ -207,6 +208,7 @@
       "id": "ectoplasm_alex",
       "name": "Ectoplasm Alex",
       "texture": "skins/ectoplasm_alex.png",
+      "model": "slim",
       "order": 33
     },
     {

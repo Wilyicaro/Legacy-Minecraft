@@ -3,6 +3,7 @@
     "displayName": "Alex Anatomy",
     "displayNameId": "IDS_SKINS_DLCSKIN00003228_DISPLAYNAME"
   },
+  "hide": ["left_arm" , "left_leg"],
   "texture": {
     "width": 64,
     "height": 64
