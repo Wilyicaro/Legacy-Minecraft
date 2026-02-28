@@ -194,10 +194,10 @@
       "type": "mashup"
     },
     {
-      "id": "biomeseettlers2",
+      "id": "biomesettlers2",
       "name": "Biome Settlers 2",
       "author": "Me",
-      "path": "skinpacks/biomeseettlers2/pack.json",
+      "path": "skinpacks/biomesettlers2/pack.json",
       "type": "skin",
       "sort_index": 1100
     },
