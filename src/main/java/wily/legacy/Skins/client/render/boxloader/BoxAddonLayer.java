@@ -15,8 +15,8 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
-import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinEntry;
+import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinPackLoader;
 
 import java.lang.reflect.Field;
@@ -32,34 +32,17 @@ public class BoxAddonLayer extends RenderLayer {
     @Override
     public void submit(PoseStack poseStack, SubmitNodeCollector collector, int packedLight, EntityRenderState state, float partialTick, float ageInTicks) {
         if (!(state instanceof AvatarRenderState ars)) return;
+        if (!(ars instanceof RenderStateSkinIdAccess a)) return;
 
-        String skinId = null;
-        UUID uuid = null;
-        if (ars instanceof RenderStateSkinIdAccess a) {
-            try {
-                skinId = a.consoleskins$getSkinId();
-            } catch (Throwable ignored) {
-            }
-            try {
-                uuid = a.consoleskins$getEntityUuid();
-            } catch (Throwable ignored) {
-            }
-        }
+        if (consoleskins$isInvisible(ars, a)) return;
 
-        boolean spectator = consoleskins$isSpectator(ars, uuid);
+        String skinId = a.consoleskins$getSkinId();
+        if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
 
-        ResourceLocation texture = null;
-        if (skinId != null && !skinId.isBlank() && !"auto_select".equals(skinId)) {
-            SkinEntry entry = SkinPackLoader.getSkin(skinId);
-            texture = entry != null ? entry.texture() : null;
-            if (texture == null) texture = ClientSkinAssets.getTexture(skinId);
-        }
-
-        if (texture == null) {
-            texture = consoleskins$getPlayerSkinTexture(ars);
-        }
-
-if (texture == null) return;
+        SkinEntry entry = SkinPackLoader.getSkin(skinId);
+        ResourceLocation texture = entry != null ? entry.texture() : null;
+        if (texture == null) texture = ClientSkinAssets.getTexture(skinId);
+        if (texture == null) return;
 
         String p = texture.getPath();
         int slash = p.lastIndexOf('/');
@@ -69,16 +52,15 @@ if (texture == null) return;
         ResourceLocation modelId = ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), p);
 
         BuiltBoxModel built = BoxModelManager.get(modelId);
-        if (built == null && skinId != null && !skinId.isBlank() && !"auto_select".equals(skinId)) {
+        if (built == null) {
             var mj = ClientSkinAssets.getModelJson(skinId);
             if (mj != null) BoxModelManager.registerRuntime(modelId, mj);
             built = BoxModelManager.get(modelId);
+            if (built == null) return;
         }
-        if (built == null) return;
 
         final BuiltBoxModel baked = built;
         final ResourceLocation texFinal = texture;
-        final boolean spectatorFinal = spectator;
 
         collector.submitCustomGeometry(
                 poseStack,
@@ -89,12 +71,6 @@ if (texture == null) return;
 
                     PoseStack ps = new PoseStack();
                     ps.last().set(pose);
-
-                    if (spectatorFinal) {
-                        renderSlot(pm.head, baked.get(AttachSlot.HEAD), ps, vc, packedLight);
-                        renderHat(pm, baked.get(AttachSlot.HAT), ps, vc, packedLight);
-                        return;
-                    }
 
                     renderSlot(pm.head, baked.get(AttachSlot.HEAD), ps, vc, packedLight);
                     renderHat(pm, baked.get(AttachSlot.HAT), ps, vc, packedLight);
@@ -111,77 +87,31 @@ if (texture == null) return;
                 }
         );
     }
-private static ResourceLocation consoleskins$getPlayerSkinTexture(AvatarRenderState ars) {
-    if (ars == null) return null;
-    Object skin;
-    try {
-        skin = ars.skin;
-    } catch (Throwable ignored) {
-        return null;
-    }
-    return consoleskins$extractTextureFromSkin(skin);
-}
 
-private static ResourceLocation consoleskins$extractTextureFromSkin(Object skin) {
-    if (skin == null) return null;
-    try {
-        var m = skin.getClass().getMethod("texture");
-        Object r = m.invoke(skin);
-        if (r instanceof ResourceLocation rl) return rl;
-    } catch (Throwable ignored) {
-    }
-    try {
-        var m = skin.getClass().getMethod("textureLocation");
-        Object r = m.invoke(skin);
-        if (r instanceof ResourceLocation rl) return rl;
-    } catch (Throwable ignored) {
-    }
-    try {
-        var m = skin.getClass().getMethod("textureId");
-        Object r = m.invoke(skin);
-        if (r instanceof ResourceLocation rl) return rl;
-    } catch (Throwable ignored) {
-    }
-    try {
-        var f = skin.getClass().getField("texture");
-        Object r = f.get(skin);
-        if (r instanceof ResourceLocation rl) return rl;
-    } catch (Throwable ignored) {
-    }
-    try {
-        var f = skin.getClass().getDeclaredField("texture");
-        f.setAccessible(true);
-        Object r = f.get(skin);
-        if (r instanceof ResourceLocation rl) return rl;
-    } catch (Throwable ignored) {
-    }
-    return null;
-}
-
-
-    private static boolean consoleskins$isSpectator(AvatarRenderState ars, UUID uuid) {
+    private static boolean consoleskins$isInvisible(AvatarRenderState ars, RenderStateSkinIdAccess a) {
         if (ars != null) {
             try {
-                Field f = ars.getClass().getField("isSpectator");
+                Field f = ars.getClass().getField("isInvisible");
                 if (f.getType() == boolean.class) return f.getBoolean(ars);
             } catch (Throwable ignored) {
             }
             try {
-                Method m = ars.getClass().getMethod("isSpectator");
+                Method m = ars.getClass().getMethod("isInvisible");
                 if (m.getReturnType() == boolean.class) return (boolean) m.invoke(ars);
             } catch (Throwable ignored) {
             }
         }
 
-        if (uuid != null) {
-            try {
+        try {
+            UUID u = a.consoleskins$getEntityUuid();
+            if (u != null) {
                 Minecraft mc = Minecraft.getInstance();
                 if (mc.level != null) {
-                    Player p = mc.level.getPlayerByUUID(uuid);
-                    if (p != null) return p.isSpectator();
+                    Player p = mc.level.getPlayerByUUID(u);
+                    if (p != null) return p.isInvisible();
                 }
-            } catch (Throwable ignored) {
             }
+        } catch (Throwable ignored) {
         }
 
         return false;
