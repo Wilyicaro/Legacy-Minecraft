@@ -3,7 +3,7 @@
     "displayName": "Terri",
     "displayNameId": "IDS_DLCSKIN00002123_DISPLAYNAME"
   },
-  "hide": ["HEAD", "HAT", "LEFT_ARM", "RIGHT_ARM"],
+  "hide": ["HEAD", "HAT", "LEFT_ARM", "RIGHT_ARM", "body"],
   "texture": {
     "width": 64,
     "height": 64

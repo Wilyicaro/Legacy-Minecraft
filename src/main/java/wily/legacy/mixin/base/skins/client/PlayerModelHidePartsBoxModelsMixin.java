@@ -1,11 +1,14 @@
 package wily.legacy.mixin.base.skins.client;
 
 import com.google.gson.JsonObject;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -16,42 +19,39 @@ import wily.legacy.Skins.client.render.boxloader.BuiltBoxModel;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinEntry;
 import wily.legacy.Skins.skin.SkinPackLoader;
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.player.Player;
+
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Mixin(PlayerModel.class)
 public abstract class PlayerModelHidePartsBoxModelsMixin {
-private static void consoleskins$resetSkipDraw(ModelPart part) {
-    if (part == null) return;
-    ((ModelPartSkipDrawAccessorMixin) (Object) part).consoleskins$setSkipDraw(false);
-}
 
-private static boolean consoleskins$isSpectator(AvatarRenderState state) {
-    if (state == null) return false;
-    try {
-        Field f = state.getClass().getField("isSpectator");
-        if (f.getType() == boolean.class) return f.getBoolean(state);
-    } catch (Throwable ignored) {
-    }
-    if (state instanceof RenderStateSkinIdAccess a) {
-        UUID u = null;
-        try {
-            u = a.consoleskins$getEntityUuid();
-        } catch (Throwable ignored) {
-        }
-        if (u != null) {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.level != null) {
-                Player p = mc.level.getPlayerByUUID(u);
-                if (p != null) return p.isSpectator();
-            }
-        }
-    }
-    return false;
-}
+    @Unique
+    private boolean consoleskins$specBoxHeadInstalled;
+    @Unique
+    private String consoleskins$specBoxHeadSkinId;
 
+    @Unique
+    private Field consoleskins$specHeadCubesField;
+    @Unique
+    private Field consoleskins$specHatCubesField;
+    @Unique
+    private Field consoleskins$specHeadChildrenField;
+    @Unique
+    private Field consoleskins$specHatChildrenField;
+
+    @Unique
+    private Object consoleskins$specHeadCubesBackup;
+    @Unique
+    private Object consoleskins$specHatCubesBackup;
+    @Unique
+    private Object consoleskins$specHeadChildrenBackup;
+    @Unique
+    private Object consoleskins$specHatChildrenBackup;
 
     private static void consoleskins$resetPart(ModelPart part) {
         if (part == null) return;
@@ -65,25 +65,38 @@ private static boolean consoleskins$isSpectator(AvatarRenderState state) {
         ((ModelPartSkipDrawAccessorMixin) (Object) part).consoleskins$setSkipDraw(true);
     }
 
+    private static void consoleskins$setSkipDraw(ModelPart part, boolean skip) {
+        if (part == null) return;
+        ((ModelPartSkipDrawAccessorMixin) (Object) part).consoleskins$setSkipDraw(skip);
+    }
+
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("TAIL"), require = 0)
     private void consoleskins$hidePartsForBoxModels(AvatarRenderState state, CallbackInfo ci) {
         PlayerModel self = (PlayerModel) (Object) this;
-if (consoleskins$isSpectator(state)) {
-    consoleskins$resetSkipDraw(self.head);
-    consoleskins$resetSkipDraw(self.hat);
-    consoleskins$resetSkipDraw(self.body);
-    consoleskins$resetSkipDraw(self.rightArm);
-    consoleskins$resetSkipDraw(self.leftArm);
-    consoleskins$resetSkipDraw(self.rightLeg);
-    consoleskins$resetSkipDraw(self.leftLeg);
-    consoleskins$resetSkipDraw(self.jacket);
-    consoleskins$resetSkipDraw(self.rightSleeve);
-    consoleskins$resetSkipDraw(self.leftSleeve);
-    consoleskins$resetSkipDraw(self.rightPants);
-    consoleskins$resetSkipDraw(self.leftPants);
-    return;
-}
 
+        UUID uuid = null;
+        String skinId = null;
+        if (state instanceof RenderStateSkinIdAccess a) {
+            try {
+                uuid = a.consoleskins$getEntityUuid();
+            } catch (Throwable ignored) {
+            }
+            try {
+                skinId = a.consoleskins$getSkinId();
+            } catch (Throwable ignored) {
+            }
+        }
+
+        boolean spectator = consoleskins$isSpectator(state, uuid);
+
+        if (!spectator) {
+            consoleskins$uninstallSpectatorBoxHead(self);
+        }
+
+        if (spectator) {
+            consoleskins$applySpectatorBoxHeadIfNeeded(self, skinId);
+            return;
+        }
 
         consoleskins$resetPart(self.head);
         consoleskins$resetPart(self.hat);
@@ -99,8 +112,6 @@ if (consoleskins$isSpectator(state)) {
         consoleskins$resetPart(self.rightPants);
         consoleskins$resetPart(self.leftPants);
 
-        if (!(state instanceof RenderStateSkinIdAccess a)) return;
-        String skinId = a.consoleskins$getSkinId();
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
 
         SkinEntry entry = SkinPackLoader.getSkin(skinId);
@@ -108,12 +119,7 @@ if (consoleskins$isSpectator(state)) {
         if (tex == null) tex = ClientSkinAssets.getTexture(skinId);
         if (tex == null) return;
 
-        String p = tex.getPath();
-        int slash = p.lastIndexOf('/');
-        if (slash != -1) p = p.substring(slash + 1);
-        if (p.endsWith(".png")) p = p.substring(0, p.length() - 4);
-
-        ResourceLocation modelId = ResourceLocation.fromNamespaceAndPath(tex.getNamespace(), p);
+        ResourceLocation modelId = consoleskins$modelIdFromTexture(tex);
         BuiltBoxModel model = BoxModelManager.get(modelId);
         if (model == null) {
             JsonObject mj = ClientSkinAssets.getModelJson(skinId);
@@ -157,5 +163,240 @@ if (consoleskins$isSpectator(state)) {
             consoleskins$hidePart(self.leftPants);
         }
         if (model.hides(AttachSlot.LEFT_PANTS)) consoleskins$hidePart(self.leftPants);
+    }
+
+    @Unique
+    private void consoleskins$applySpectatorBoxHeadIfNeeded(PlayerModel self, String skinId) {
+        if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) {
+            consoleskins$uninstallSpectatorBoxHead(self);
+            return;
+        }
+
+        SkinEntry entry = SkinPackLoader.getSkin(skinId);
+        ResourceLocation tex = entry != null ? entry.texture() : null;
+        if (tex == null) tex = ClientSkinAssets.getTexture(skinId);
+        if (tex == null) {
+            consoleskins$uninstallSpectatorBoxHead(self);
+            return;
+        }
+
+        ResourceLocation modelId = consoleskins$modelIdFromTexture(tex);
+        BuiltBoxModel model = BoxModelManager.get(modelId);
+        if (model == null) {
+            JsonObject mj = ClientSkinAssets.getModelJson(skinId);
+            if (mj != null) BoxModelManager.registerRuntime(modelId, mj);
+            model = BoxModelManager.get(modelId);
+        }
+        if (model == null) {
+            consoleskins$uninstallSpectatorBoxHead(self);
+            return;
+        }
+
+        boolean hasHeadParts = model.get(AttachSlot.HEAD) != null && !model.get(AttachSlot.HEAD).isEmpty();
+        boolean hasHatParts = model.get(AttachSlot.HAT) != null && !model.get(AttachSlot.HAT).isEmpty();
+        boolean wantsHideHead = model.hides(AttachSlot.HEAD);
+
+        if (!(wantsHideHead && (hasHeadParts || hasHatParts))) {
+            consoleskins$uninstallSpectatorBoxHead(self);
+            return;
+        }
+
+        if (consoleskins$specBoxHeadInstalled && skinId.equals(consoleskins$specBoxHeadSkinId)) {
+            consoleskins$setSkipDraw(self.head, false);
+            consoleskins$setSkipDraw(self.hat, false);
+            return;
+        }
+
+        consoleskins$uninstallSpectatorBoxHead(self);
+
+        consoleskins$setSkipDraw(self.head, false);
+        consoleskins$setSkipDraw(self.hat, false);
+
+        consoleskins$specHeadCubesField = consoleskins$findListField(self.head, "cube");
+        consoleskins$specHatCubesField = consoleskins$findListField(self.hat, "cube");
+        consoleskins$specHeadChildrenField = consoleskins$findMapField(self.head, "child");
+        consoleskins$specHatChildrenField = consoleskins$findMapField(self.hat, "child");
+
+        consoleskins$specHeadCubesBackup = consoleskins$getFieldValue(consoleskins$specHeadCubesField, self.head);
+        consoleskins$specHatCubesBackup = consoleskins$getFieldValue(consoleskins$specHatCubesField, self.hat);
+        consoleskins$specHeadChildrenBackup = consoleskins$getFieldValue(consoleskins$specHeadChildrenField, self.head);
+        consoleskins$specHatChildrenBackup = consoleskins$getFieldValue(consoleskins$specHatChildrenField, self.hat);
+
+        if (consoleskins$specHeadCubesField != null) consoleskins$setFieldValue(consoleskins$specHeadCubesField, self.head, List.of());
+        if (consoleskins$specHatCubesField != null) consoleskins$setFieldValue(consoleskins$specHatCubesField, self.hat, List.of());
+
+        Map headChildren = consoleskins$copyChildrenMap(consoleskins$specHeadChildrenBackup);
+        Map hatChildren = consoleskins$copyChildrenMap(consoleskins$specHatChildrenBackup);
+
+        consoleskins$removeChildrenWithPrefix(headChildren, "consoleskins$spec_head_");
+        consoleskins$removeChildrenWithPrefix(hatChildren, "consoleskins$spec_hat_");
+
+        if (hasHeadParts) {
+            int i = 0;
+            for (Object p : model.get(AttachSlot.HEAD)) {
+                if (p instanceof ModelPart mp) headChildren.put("consoleskins$spec_head_" + (i++), mp);
+            }
+        }
+
+        if (hasHatParts) {
+            int i = 0;
+            for (Object p : model.get(AttachSlot.HAT)) {
+                if (p instanceof ModelPart mp) hatChildren.put("consoleskins$spec_hat_" + (i++), mp);
+            }
+        }
+
+        if (consoleskins$specHeadChildrenField != null) consoleskins$setFieldValue(consoleskins$specHeadChildrenField, self.head, headChildren);
+        if (consoleskins$specHatChildrenField != null) consoleskins$setFieldValue(consoleskins$specHatChildrenField, self.hat, hatChildren);
+
+        consoleskins$specBoxHeadInstalled = true;
+        consoleskins$specBoxHeadSkinId = skinId;
+    }
+
+    @Unique
+    private void consoleskins$uninstallSpectatorBoxHead(PlayerModel self) {
+        if (!consoleskins$specBoxHeadInstalled) return;
+
+        if (consoleskins$specHeadCubesField != null) consoleskins$setFieldValue(consoleskins$specHeadCubesField, self.head, consoleskins$specHeadCubesBackup);
+        if (consoleskins$specHatCubesField != null) consoleskins$setFieldValue(consoleskins$specHatCubesField, self.hat, consoleskins$specHatCubesBackup);
+        if (consoleskins$specHeadChildrenField != null) consoleskins$setFieldValue(consoleskins$specHeadChildrenField, self.head, consoleskins$specHeadChildrenBackup);
+        if (consoleskins$specHatChildrenField != null) consoleskins$setFieldValue(consoleskins$specHatChildrenField, self.hat, consoleskins$specHatChildrenBackup);
+
+        consoleskins$specHeadCubesField = null;
+        consoleskins$specHatCubesField = null;
+        consoleskins$specHeadChildrenField = null;
+        consoleskins$specHatChildrenField = null;
+        consoleskins$specHeadCubesBackup = null;
+        consoleskins$specHatCubesBackup = null;
+        consoleskins$specHeadChildrenBackup = null;
+        consoleskins$specHatChildrenBackup = null;
+
+        consoleskins$specBoxHeadInstalled = false;
+        consoleskins$specBoxHeadSkinId = null;
+    }
+
+    private static Object consoleskins$getFieldValue(Field f, Object obj) {
+        if (f == null || obj == null) return null;
+        try {
+            return f.get(obj);
+        } catch (Throwable ignored) {
+        }
+        return null;
+    }
+
+    private static void consoleskins$setFieldValue(Field f, Object obj, Object value) {
+        if (f == null || obj == null) return;
+        try {
+            f.set(obj, value);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private static Field consoleskins$findListField(ModelPart part, String hint) {
+        if (part == null) return null;
+        try {
+            Class<?> c = part.getClass();
+            while (c != null && c != Object.class) {
+                for (Field f : c.getDeclaredFields()) {
+                    if (!List.class.isAssignableFrom(f.getType())) continue;
+                    String n = f.getName().toLowerCase();
+                    if (hint != null && !hint.isBlank() && !n.contains(hint)) continue;
+                    f.setAccessible(true);
+                    return f;
+                }
+                c = c.getSuperclass();
+            }
+        } catch (Throwable ignored) {
+        }
+        try {
+            Class<?> c = part.getClass();
+            while (c != null && c != Object.class) {
+                for (Field f : c.getDeclaredFields()) {
+                    if (!List.class.isAssignableFrom(f.getType())) continue;
+                    f.setAccessible(true);
+                    return f;
+                }
+                c = c.getSuperclass();
+            }
+        } catch (Throwable ignored) {
+        }
+        return null;
+    }
+
+    private static Field consoleskins$findMapField(ModelPart part, String hint) {
+        if (part == null) return null;
+        try {
+            Class<?> c = part.getClass();
+            while (c != null && c != Object.class) {
+                for (Field f : c.getDeclaredFields()) {
+                    if (!Map.class.isAssignableFrom(f.getType())) continue;
+                    String n = f.getName().toLowerCase();
+                    if (hint != null && !hint.isBlank() && !n.contains(hint)) continue;
+                    f.setAccessible(true);
+                    return f;
+                }
+                c = c.getSuperclass();
+            }
+        } catch (Throwable ignored) {
+        }
+        try {
+            Class<?> c = part.getClass();
+            while (c != null && c != Object.class) {
+                for (Field f : c.getDeclaredFields()) {
+                    if (!Map.class.isAssignableFrom(f.getType())) continue;
+                    f.setAccessible(true);
+                    return f;
+                }
+                c = c.getSuperclass();
+            }
+        } catch (Throwable ignored) {
+        }
+        return null;
+    }
+
+    private static Map consoleskins$copyChildrenMap(Object mapObj) {
+        if (mapObj instanceof Map m) return new HashMap(m);
+        return new HashMap();
+    }
+
+    private static void consoleskins$removeChildrenWithPrefix(Map map, String prefix) {
+        if (map == null || prefix == null) return;
+        try {
+            map.keySet().removeIf(k -> k != null && k.toString().startsWith(prefix));
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private static ResourceLocation consoleskins$modelIdFromTexture(ResourceLocation texture) {
+        String p = texture.getPath();
+        int slash = p.lastIndexOf('/');
+        if (slash != -1) p = p.substring(slash + 1);
+        if (p.endsWith(".png")) p = p.substring(0, p.length() - 4);
+        return ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), p);
+    }
+
+    private static boolean consoleskins$isSpectator(AvatarRenderState state, UUID uuid) {
+        if (state != null) {
+            try {
+                Field f = state.getClass().getField("isSpectator");
+                if (f.getType() == boolean.class) return f.getBoolean(state);
+            } catch (Throwable ignored) {
+            }
+            try {
+                Method m = state.getClass().getMethod("isSpectator");
+                if (m.getReturnType() == boolean.class) return (boolean) m.invoke(state);
+            } catch (Throwable ignored) {
+            }
+        }
+        if (uuid != null) {
+            try {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.level != null) {
+                    Player p = mc.level.getPlayerByUUID(uuid);
+                    if (p != null) return p.isSpectator();
+                }
+            } catch (Throwable ignored) {
+            }
+        }
+        return false;
     }
 }
