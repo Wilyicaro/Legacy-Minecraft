@@ -5,7 +5,9 @@
     "themeName": "Festive Mash-up",
     "themeNameId": "IDS_SKINS_DLCSKIN00002733_THEMENAME"
   },
-"hide": ["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64
@@ -233,7 +235,7 @@
       "cubes": [
         {
           "origin": [
-            -2.0,
+            1.0,
             8.0,
             2.0
           ],
@@ -251,7 +253,7 @@
         },
         {
           "origin": [
-            -2.0,
+            1.0,
             8.0,
             10.0
           ],
@@ -269,7 +271,7 @@
         },
         {
           "origin": [
-            -3.0,
+            0.0,
             7.0,
             11.0
           ],

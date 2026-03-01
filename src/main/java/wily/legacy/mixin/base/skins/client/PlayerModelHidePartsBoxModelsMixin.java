@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import wily.legacy.Skins.client.render.SkinPoseRegistry;
 
 @Mixin(PlayerModel.class)
 public abstract class PlayerModelHidePartsBoxModelsMixin {

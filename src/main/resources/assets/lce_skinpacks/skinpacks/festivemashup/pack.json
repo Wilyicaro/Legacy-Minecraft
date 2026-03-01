@@ -205,7 +205,7 @@
       "id": "skier",
       "name": "Skier",
       "texture": "skins/skier.png",
-      "poses": ["skiing", "stiff_legs"],
+      "poses": ["stiff_legs", "sync_arms"],
       "order": 34
     },
     {

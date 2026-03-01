@@ -194,8 +194,9 @@
     "skins.client.HelpAndOptionsScreenSkinsOptionsMixin",
     "skins.client.ModelPartSkipDrawAccessorMixin",
     "skins.client.PlayerModelHidePartsBoxModelsMixin",
-    "skins.client.PlayerModelOffsetsBoxModelsMixin"
-    ,"skins.client.HumanoidArmorLayerPieceOffsetsMixin"
+    "skins.client.PlayerModelOffsetsBoxModelsMixin",
+    "skins.client.HumanoidArmorLayerPieceOffsetsMixin",
+    "skins.client.PlayerModelSyncArmsPoseMixin"
 ],
   "mixins": [
     "ChunkTrackingViewMixin",

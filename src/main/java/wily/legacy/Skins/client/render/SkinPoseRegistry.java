@@ -20,6 +20,7 @@ public final class SkinPoseRegistry {
         SKIING("skiing"),
         STIFF_ARMS("stiff_arms"),
         STIFF_LEGS("stiff_legs"),
+        SYNC_ARMS("sync_arms"),
         UPSIDE_DOWN("upside_down"),
         WEEPING_STATUE("weeping_statue"),
         DISABLE_VIEW_BOBBING("disable_view_bobbing"),
