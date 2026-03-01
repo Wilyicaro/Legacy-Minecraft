@@ -96,7 +96,7 @@ public abstract class PlayerModelMenuDollMixin {
 
         if (IdleSitPose.shouldApply(state)) {
 
-            if (state.pose == Pose.STANDING || state.pose == Pose.CROUCHING) {
+            if (state.pose == Pose.STANDING || state.pose == Pose.CROUCHING || state.pose == Pose.SWIMMING || state.pose == Pose.FALL_FLYING) {
                 IdleSitPose.apply(self);
             }
         }
@@ -107,8 +107,7 @@ public abstract class PlayerModelMenuDollMixin {
         }
 
         if (skinId != null && StiffLegsConfig.isStiffLegsSkin(skinId)) {
-            if (state.pose == Pose.STANDING || state.pose == Pose.CROUCHING) {
-                self.rightLeg.xRot = 0.0F;
+self.rightLeg.xRot = 0.0F;
                 self.leftLeg.xRot = 0.0F;
                 self.rightLeg.yRot = 0.0F;
                 self.leftLeg.yRot = 0.0F;
@@ -121,13 +120,9 @@ public abstract class PlayerModelMenuDollMixin {
                 self.leftPants.xRot = self.leftLeg.xRot;
                 self.leftPants.yRot = self.leftLeg.yRot;
                 self.leftPants.zRot = self.leftLeg.zRot;
-            }
         }
-
-        if (skinId != null && StiffArmsConfig.isStiffArmsSkin(skinId)) {
-            if (state.pose == Pose.STANDING) {
-                StiffArmsPose.removeIdleSway(self, StiffArmsPose.getAgeInTicks(state), moving);
-            }
+if (!ZombieArmsPose.shouldApply(state) && StiffArmsPose.shouldApply(state)) {
+            StiffArmsPose.apply(self, state);
         }
         if (WeepingStatuePose.shouldApply(state)) {
             WeepingStatuePose.apply(self);
