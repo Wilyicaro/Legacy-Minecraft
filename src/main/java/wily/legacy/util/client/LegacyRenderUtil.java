@@ -80,6 +80,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static wily.legacy.client.screen.ControlTooltip.MORE;
+import com.google.gson.JsonObject;
+import wily.legacy.Skins.client.render.boxloader.AttachSlot;
+import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
+import wily.legacy.Skins.client.render.boxloader.BuiltBoxModel;
+import wily.legacy.Skins.skin.ClientSkinAssets;
+import wily.legacy.Skins.skin.ClientSkinCache;
+import wily.legacy.Skins.skin.SkinEntry;
+import wily.legacy.Skins.skin.SkinPackLoader;
 
 public class LegacyRenderUtil {
     public static final boolean isNvidia;
@@ -381,9 +389,62 @@ public class LegacyRenderUtil {
     }
 
     public static void renderLocalPlayerHead(GuiGraphics guiGraphics, int x, int y, int size) {
-        if (mc.player == null) return;
-        PlayerFaceRenderer.draw(guiGraphics, mc.player.getSkin(), x, y, size);
+    if (mc.player == null) return;
+
+    String skinId;
+    try {
+        skinId = ClientSkinCache.get(mc.player.getUUID(), mc.player.getScoreboardName());
+    } catch (Throwable ignored) {
+        skinId = null;
     }
+
+    if (consoleskins$shouldRenderToastWithBoxHead(skinId)) {
+        int x0 = x;
+        int y0 = y;
+        int x1 = x + size;
+        int y1 = y + size;
+        float cx = (x0 + x1) / 2.0F;
+        float cy = (y0 + y1) / 2.0F;
+        int scale = size * 1;
+        float yOffset = 0.75F;
+        renderEntityInInventoryFollowsMouse(guiGraphics, x0, y0, x1, y1, scale, yOffset, cx, cy, mc.player);
+        return;
+    }
+
+    PlayerFaceRenderer.draw(guiGraphics, mc.player.getSkin(), x, y, size);
+}
+private static boolean consoleskins$shouldRenderToastWithBoxHead(String skinId) {
+    if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return false;
+
+    SkinEntry entry = SkinPackLoader.getSkin(skinId);
+    ResourceLocation texture = entry != null ? entry.texture() : null;
+    if (texture == null) texture = ClientSkinAssets.getTexture(skinId);
+    if (texture == null) return false;
+
+    ResourceLocation modelId = consoleskins$modelIdFromTexture(texture);
+
+    BuiltBoxModel model = BoxModelManager.get(modelId);
+    if (model == null) {
+        JsonObject mj = ClientSkinAssets.getModelJson(skinId);
+        if (mj != null) BoxModelManager.registerRuntime(modelId, mj);
+        model = BoxModelManager.get(modelId);
+    }
+    if (model == null) return false;
+
+    boolean hasHead = model.get(AttachSlot.HEAD) != null && !model.get(AttachSlot.HEAD).isEmpty();
+    boolean hasHat = model.get(AttachSlot.HAT) != null && !model.get(AttachSlot.HAT).isEmpty();
+
+    return model.hides(AttachSlot.HEAD) && (hasHead || hasHat);
+}
+
+private static ResourceLocation consoleskins$modelIdFromTexture(ResourceLocation texture) {
+    String p = texture.getPath();
+    int slash = p.lastIndexOf('/');
+    if (slash != -1) p = p.substring(slash + 1);
+    if (p.endsWith(".png")) p = p.substring(0, p.length() - 4);
+    return ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), p);
+}
+
 
     public static float getAutoGuiScale() {
         return getStandardHeight() / (LegacyOptions.getUIMode().isSD() ? 240.0f : 360.0f);
