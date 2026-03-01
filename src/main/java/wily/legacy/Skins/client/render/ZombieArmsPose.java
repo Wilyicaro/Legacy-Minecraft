@@ -7,6 +7,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.Items;
 
 import java.util.UUID;
 
@@ -38,16 +40,64 @@ public final class ZombieArmsPose {
     public static void apply(PlayerModel model, AvatarRenderState state) {
         Player player = getPlayer(state);
         if (player != null && player.getPose() == Pose.SWIMMING) return;
+float rArmX0 = model.rightArm.x;
+float rArmY0 = model.rightArm.y;
+float rArmZ0 = model.rightArm.z;
+float rArmXRot0 = model.rightArm.xRot;
+float rArmYRot0 = model.rightArm.yRot;
+float rArmZRot0 = model.rightArm.zRot;
+
+float lArmX0 = model.leftArm.x;
+float lArmY0 = model.leftArm.y;
+float lArmZ0 = model.leftArm.z;
+float lArmXRot0 = model.leftArm.xRot;
+float lArmYRot0 = model.leftArm.yRot;
+float lArmZRot0 = model.leftArm.zRot;
+
+float rSleeveX0 = model.rightSleeve.x;
+float rSleeveY0 = model.rightSleeve.y;
+float rSleeveZ0 = model.rightSleeve.z;
+float rSleeveXRot0 = model.rightSleeve.xRot;
+float rSleeveYRot0 = model.rightSleeve.yRot;
+float rSleeveZRot0 = model.rightSleeve.zRot;
+
+float lSleeveX0 = model.leftSleeve.x;
+float lSleeveY0 = model.leftSleeve.y;
+float lSleeveZ0 = model.leftSleeve.z;
+float lSleeveXRot0 = model.leftSleeve.xRot;
+float lSleeveYRot0 = model.leftSleeve.yRot;
+float lSleeveZRot0 = model.leftSleeve.zRot;
+
+boolean rightBlocking = false;
+boolean leftBlocking = false;
+if (player != null) {
+    try {
+        if (player.isUsingItem() && player.getUseItem().is(Items.SHIELD)) {
+            InteractionHand used = player.getUsedItemHand();
+            HumanoidArm main = player.getMainArm();
+            HumanoidArm arm = used == InteractionHand.MAIN_HAND ? main : (main == HumanoidArm.RIGHT ? HumanoidArm.LEFT : HumanoidArm.RIGHT);
+            rightBlocking = arm == HumanoidArm.RIGHT;
+            leftBlocking = arm == HumanoidArm.LEFT;
+        }
+    } catch (Throwable ignored) {
+    }
+}
+
 
         float baseX = -1.55F;
         if (state != null && state.isCrouching) baseX = -1.2F;
 
-        model.rightArm.xRot = baseX;
-        model.leftArm.xRot = baseX;
-        model.rightArm.yRot = -0.15F;
-        model.leftArm.yRot = 0.15F;
-        model.rightArm.zRot = 0.0F;
-        model.leftArm.zRot = 0.0F;
+if (!rightBlocking) {
+    model.rightArm.xRot = baseX;
+    model.rightArm.yRot = -0.15F;
+    model.rightArm.zRot = 0.0F;
+}
+if (!leftBlocking) {
+    model.leftArm.xRot = baseX;
+    model.leftArm.yRot = 0.15F;
+    model.leftArm.zRot = 0.0F;
+}
+
 
         float attackTime = state == null ? 0.0F : state.attackTime;
 
@@ -72,8 +122,8 @@ public final class ZombieArmsPose {
         if (holdScale > 0.0F && (rightHolding || leftHolding)) {
             float target = Math.max(baseX, -1.3F);
             float d = (target - baseX) * holdScale;
-            if (rightHolding) model.rightArm.xRot += d;
-            if (leftHolding) model.leftArm.xRot += d;
+            if (rightHolding && !rightBlocking) model.rightArm.xRot += d;
+            if (leftHolding && !leftBlocking) model.leftArm.xRot += d;
         }
 
         float t = StiffArmsPose.getAgeInTicks(state);
@@ -83,12 +133,16 @@ public final class ZombieArmsPose {
             float cos = Mth.cos(t * 0.95F) * 0.02F * idleScale;
             float sin = Mth.sin(t * 0.85F) * 0.015F * idleScale;
             float yaw = Mth.sin(t * 0.75F) * 0.012F * idleScale;
-            model.rightArm.zRot += cos;
-            model.leftArm.zRot -= cos;
-            model.rightArm.xRot += sin;
-            model.leftArm.xRot -= sin;
-            model.rightArm.yRot += yaw;
-            model.leftArm.yRot -= yaw;
+if (!rightBlocking) {
+    model.rightArm.zRot += cos;
+    model.rightArm.xRot += sin;
+    model.rightArm.yRot += yaw;
+}
+if (!leftBlocking) {
+    model.leftArm.zRot -= cos;
+    model.leftArm.xRot -= sin;
+    model.leftArm.yRot -= yaw;
+}
         }
         if (attackTime > 0.0F) {
             HumanoidArm arm = state.attackArm;
@@ -128,18 +182,50 @@ public final class ZombieArmsPose {
             }
         }
 
-        model.rightSleeve.x = model.rightArm.x;
-        model.rightSleeve.y = model.rightArm.y;
-        model.rightSleeve.z = model.rightArm.z;
-        model.leftSleeve.x = model.leftArm.x;
-        model.leftSleeve.y = model.leftArm.y;
-        model.leftSleeve.z = model.leftArm.z;
+if (rightBlocking) {
+    model.rightArm.x = rArmX0;
+    model.rightArm.y = rArmY0;
+    model.rightArm.z = rArmZ0;
+    model.rightArm.xRot = rArmXRot0;
+    model.rightArm.yRot = rArmYRot0;
+    model.rightArm.zRot = rArmZRot0;
 
-        model.rightSleeve.xRot = model.rightArm.xRot;
-        model.rightSleeve.yRot = model.rightArm.yRot;
-        model.rightSleeve.zRot = model.rightArm.zRot;
-        model.leftSleeve.xRot = model.leftArm.xRot;
-        model.leftSleeve.yRot = model.leftArm.yRot;
-        model.leftSleeve.zRot = model.leftArm.zRot;
+    model.rightSleeve.x = rSleeveX0;
+    model.rightSleeve.y = rSleeveY0;
+    model.rightSleeve.z = rSleeveZ0;
+    model.rightSleeve.xRot = rSleeveXRot0;
+    model.rightSleeve.yRot = rSleeveYRot0;
+    model.rightSleeve.zRot = rSleeveZRot0;
+} else {
+    model.rightSleeve.x = model.rightArm.x;
+    model.rightSleeve.y = model.rightArm.y;
+    model.rightSleeve.z = model.rightArm.z;
+    model.rightSleeve.xRot = model.rightArm.xRot;
+    model.rightSleeve.yRot = model.rightArm.yRot;
+    model.rightSleeve.zRot = model.rightArm.zRot;
+}
+
+if (leftBlocking) {
+    model.leftArm.x = lArmX0;
+    model.leftArm.y = lArmY0;
+    model.leftArm.z = lArmZ0;
+    model.leftArm.xRot = lArmXRot0;
+    model.leftArm.yRot = lArmYRot0;
+    model.leftArm.zRot = lArmZRot0;
+
+    model.leftSleeve.x = lSleeveX0;
+    model.leftSleeve.y = lSleeveY0;
+    model.leftSleeve.z = lSleeveZ0;
+    model.leftSleeve.xRot = lSleeveXRot0;
+    model.leftSleeve.yRot = lSleeveYRot0;
+    model.leftSleeve.zRot = lSleeveZRot0;
+} else {
+    model.leftSleeve.x = model.leftArm.x;
+    model.leftSleeve.y = model.leftArm.y;
+    model.leftSleeve.z = model.leftArm.z;
+    model.leftSleeve.xRot = model.leftArm.xRot;
+    model.leftSleeve.yRot = model.leftArm.yRot;
+    model.leftSleeve.zRot = model.leftArm.zRot;
+}
     }
 }
