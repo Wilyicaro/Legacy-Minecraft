@@ -18,4 +18,8 @@ public interface RenderStateSkinIdAccess {
     float consoleskins$getMoveSpeedSq();
 
     void consoleskins$setMoveSpeedSq(float speedSq);
+
+    boolean consoleskins$isSitting();
+
+    void consoleskins$setSitting(boolean sitting);
 }

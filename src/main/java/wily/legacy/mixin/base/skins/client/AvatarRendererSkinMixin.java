@@ -12,6 +12,7 @@ import net.minecraft.core.ClientAsset;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.world.item.Items;
@@ -21,8 +22,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.UUID;
 
 @Mixin(AvatarRenderer.class)
 public abstract class AvatarRendererSkinMixin {
@@ -36,7 +35,6 @@ public abstract class AvatarRendererSkinMixin {
     @Unique
     private static void consoleskins$applySkinToState(Avatar avatar, AvatarRenderState state) {
         try {
-
             String name = null;
             try {
                 name = avatar.getScoreboardName();
@@ -55,10 +53,10 @@ public abstract class AvatarRendererSkinMixin {
                 }
             }
 
-                        if (skinId == null || skinId.isBlank()) return;
+            if (skinId == null || skinId.isBlank()) return;
             if ("auto_select".equals(skinId)) return;
 
-if (state instanceof RenderStateSkinIdAccess a) {
+            if (state instanceof RenderStateSkinIdAccess a) {
                 a.consoleskins$setSkinId(skinId);
                 try {
                     a.consoleskins$setEntityUuid(avatar.getUUID());
@@ -79,13 +77,26 @@ if (state instanceof RenderStateSkinIdAccess a) {
                     a.consoleskins$setMoveSpeedSq(speedSq);
                 } catch (Throwable ignored) {
                 }
+                try {
+                    boolean sitting = false;
+                    try {
+                        sitting = avatar.isPassenger();
+                    } catch (Throwable ignored2) {
+                    }
+                    try {
+                        sitting = sitting || avatar.getPose() == Pose.SITTING;
+                    } catch (Throwable ignored2) {
+                    }
+                    a.consoleskins$setSitting(sitting);
+                } catch (Throwable ignored) {
+                }
             }
 
             SkinEntry entry = SkinPackLoader.getSkin(skinId);
             ResourceLocation tex = entry != null ? entry.texture() : null;
             if (tex == null) tex = ClientSkinAssets.getTexture(skinId);
             if (tex == null) return;
-                        if (tex == null) return;
+            if (tex == null) return;
 
             PlayerSkin original = state.skin;
             if (original == null) return;
