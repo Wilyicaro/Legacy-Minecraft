@@ -77,12 +77,12 @@ public final class ZombieArmsPose {
         }
 
         float t = StiffArmsPose.getAgeInTicks(state);
-        float idleScale = 1.1F - attackTime;
+        float idleScale = 1.0F - attackTime;
         if (idleScale < 0.0F) idleScale = 0.0F;
         if (idleScale > 0.0F) {
-            float cos = Mth.cos(t * 0.25F) * 0.08F * idleScale;
-            float sin = Mth.sin(t * 0.25F) * 0.08F * idleScale;
-            float yaw = Mth.sin(t * 0.25F) * 0.08F * idleScale;
+            float cos = Mth.cos(t * 0.95F) * 0.02F * idleScale;
+            float sin = Mth.sin(t * 0.85F) * 0.015F * idleScale;
+            float yaw = Mth.sin(t * 0.75F) * 0.012F * idleScale;
             model.rightArm.zRot += cos;
             model.leftArm.zRot -= cos;
             model.rightArm.xRot += sin;
