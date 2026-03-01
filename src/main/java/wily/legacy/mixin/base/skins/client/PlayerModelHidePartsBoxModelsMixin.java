@@ -16,9 +16,42 @@ import wily.legacy.Skins.client.render.boxloader.BuiltBoxModel;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinEntry;
 import wily.legacy.Skins.skin.SkinPackLoader;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.player.Player;
+import java.lang.reflect.Field;
+import java.util.UUID;
 
 @Mixin(PlayerModel.class)
 public abstract class PlayerModelHidePartsBoxModelsMixin {
+private static void consoleskins$resetSkipDraw(ModelPart part) {
+    if (part == null) return;
+    ((ModelPartSkipDrawAccessorMixin) (Object) part).consoleskins$setSkipDraw(false);
+}
+
+private static boolean consoleskins$isSpectator(AvatarRenderState state) {
+    if (state == null) return false;
+    try {
+        Field f = state.getClass().getField("isSpectator");
+        if (f.getType() == boolean.class) return f.getBoolean(state);
+    } catch (Throwable ignored) {
+    }
+    if (state instanceof RenderStateSkinIdAccess a) {
+        UUID u = null;
+        try {
+            u = a.consoleskins$getEntityUuid();
+        } catch (Throwable ignored) {
+        }
+        if (u != null) {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.level != null) {
+                Player p = mc.level.getPlayerByUUID(u);
+                if (p != null) return p.isSpectator();
+            }
+        }
+    }
+    return false;
+}
+
 
     private static void consoleskins$resetPart(ModelPart part) {
         if (part == null) return;
@@ -35,6 +68,22 @@ public abstract class PlayerModelHidePartsBoxModelsMixin {
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("TAIL"), require = 0)
     private void consoleskins$hidePartsForBoxModels(AvatarRenderState state, CallbackInfo ci) {
         PlayerModel self = (PlayerModel) (Object) this;
+if (consoleskins$isSpectator(state)) {
+    consoleskins$resetSkipDraw(self.head);
+    consoleskins$resetSkipDraw(self.hat);
+    consoleskins$resetSkipDraw(self.body);
+    consoleskins$resetSkipDraw(self.rightArm);
+    consoleskins$resetSkipDraw(self.leftArm);
+    consoleskins$resetSkipDraw(self.rightLeg);
+    consoleskins$resetSkipDraw(self.leftLeg);
+    consoleskins$resetSkipDraw(self.jacket);
+    consoleskins$resetSkipDraw(self.rightSleeve);
+    consoleskins$resetSkipDraw(self.leftSleeve);
+    consoleskins$resetSkipDraw(self.rightPants);
+    consoleskins$resetSkipDraw(self.leftPants);
+    return;
+}
+
 
         consoleskins$resetPart(self.head);
         consoleskins$resetPart(self.hat);
