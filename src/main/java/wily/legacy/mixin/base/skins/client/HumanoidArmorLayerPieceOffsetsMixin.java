@@ -144,14 +144,14 @@ public abstract class HumanoidArmorLayerPieceOffsetsMixin {
         EnumSet<ArmorSlot> armorHide = BoxModelManager.getArmorHide(modelId);
         EnumMap<ArmorSlot, float[]> armorOffsets = BoxModelManager.getArmorOffsets(modelId);
 
-        boolean hasBoxModel = BoxModelManager.get(modelId) != null;
+        boolean hasBoxModel = BoxModelManager.isAvailable(modelId);
 
         if (!hasBoxModel || ((armorHide == null || armorHide.isEmpty()) && (armorOffsets == null || armorOffsets.isEmpty()))) {
             JsonObject mj = ClientSkinAssets.getModelJson(skinId);
             if (mj != null) BoxModelManager.registerRuntime(modelId, mj);
             armorHide = BoxModelManager.getArmorHide(modelId);
             armorOffsets = BoxModelManager.getArmorOffsets(modelId);
-            hasBoxModel = BoxModelManager.get(modelId) != null;
+            hasBoxModel = BoxModelManager.isAvailable(modelId);
         }
 
         boolean hideArmor = false;

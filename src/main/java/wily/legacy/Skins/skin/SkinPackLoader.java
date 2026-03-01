@@ -177,7 +177,7 @@ public final class SkinPackLoader {
             }
 
             try {
-                Map<ResourceLocation, Resource> jsons = rm.listResources("skinpacks", rl -> rl.getPath().endsWith(".json"));
+                Map<ResourceLocation, Resource> jsons = rm.listResources("skinpacks", rl -> rl.getPath().endsWith(".json") && !rl.getPath().contains("/box_models/"));
                 ArrayList<ResourceLocation> keys = new ArrayList<>(jsons.keySet());
                 keys.sort(Comparator.comparing(ResourceLocation::getNamespace).thenComparing(ResourceLocation::getPath));
 

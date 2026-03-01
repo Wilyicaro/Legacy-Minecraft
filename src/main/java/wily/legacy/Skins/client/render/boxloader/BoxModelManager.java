@@ -42,6 +42,12 @@ public final class BoxModelManager {
     private static final Map<ResourceLocation, EnumSet<ArmorSlot>> ARMOR_HIDE_RUNTIME = new java.util.concurrent.ConcurrentHashMap<>();
     private static final Map<String, EnumSet<SkinPoseRegistry.PoseTag>> POSE_TAGS_CACHE = new java.util.concurrent.ConcurrentHashMap<>();
     private static final Map<String, EnumSet<SkinPoseRegistry.PoseTag>> POSE_TAGS_RUNTIME = new java.util.concurrent.ConcurrentHashMap<>();
+
+    private static final Map<ResourceLocation, ResourceLocation> JSON_INDEX = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final Map<ResourceLocation, Boolean> JSON_INDEX_SKINPACK = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final Map<String, ResourceLocation> KEY_INDEX = new java.util.concurrent.ConcurrentHashMap<>();
+    private static final java.util.Set<ResourceLocation> META_LOADED = java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private static final Map<ResourceLocation, Object> LOAD_LOCKS = new java.util.concurrent.ConcurrentHashMap<>();
     private static volatile boolean initialized = false;
 
     private BoxModelManager() {
@@ -61,101 +67,214 @@ public final class BoxModelManager {
         ARMOR_OFFSETS_CACHE.clear();
         ARMOR_HIDE_CACHE.clear();
         POSE_TAGS_CACHE.clear();
+        JSON_INDEX.clear();
+        JSON_INDEX_SKINPACK.clear();
+        KEY_INDEX.clear();
+        META_LOADED.clear();
+        LOAD_LOCKS.clear();
 
         loadFromBase(manager, "box_models", false);
-
         loadFromBase(manager, "skinpacks", true);
     }
 
     private static void loadFromBase(ResourceManager manager, String base, boolean skinpacksMode) {
+        if (manager == null) return;
         try {
-            for (var entry : manager.listResources(base, p -> {
+            for (ResourceLocation rl : manager.listResources(base, p -> {
                 String path = p.getPath();
                 if (!path.endsWith(".json")) return false;
                 if (!skinpacksMode) return true;
                 return path.contains("/box_models/");
-            }).entrySet()) {
-                ResourceLocation rl = entry.getKey();
+            }).keySet()) {
                 try {
-                    Resource res = entry.getValue();
-                    if (res == null) continue;
-                    try (Reader reader = res.openAsReader()) {
-                        JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
-                        if (root == null) continue;
-
-                        JsonObject texObj = root.has("texture") && root.get("texture").isJsonObject() ? root.getAsJsonObject("texture") : null;
-                        int texW = texObj != null && texObj.has("width") ? texObj.get("width").getAsInt() : 64;
-                        int texH = texObj != null && texObj.has("height") ? texObj.get("height").getAsInt() : 64;
-                        BoneDef[] bonesArr = root.has("bones") && root.get("bones").isJsonArray() ? GSON.fromJson(root.get("bones"), BoneDef[].class) : null;
-                        if (bonesArr == null) continue;
-                        java.util.List<BoneDef> bonesList = expandMirrors(root, bonesArr);
-                        EnumSet<AttachSlot> hide = parseHideSlots(root.get("hide"));
-
-                        ResourceLocation modelId;
-                        if (skinpacksMode) {
-
-                            String path = rl.getPath();
-                            int slash = path.lastIndexOf('/');
-                            String file = slash >= 0 ? path.substring(slash + 1) : path;
-                            if (file.endsWith(".json")) file = file.substring(0, file.length() - 5);
-                            modelId = ResourceLocation.fromNamespaceAndPath(rl.getNamespace(), file);
-                        } else {
-
-                            String path = rl.getPath();
-                            String idPath = path.substring(base.length() + 1, path.length() - 5);
-                            modelId = ResourceLocation.fromNamespaceAndPath(rl.getNamespace(), idPath);
-                        }
-
-                        EnumSet<SkinPoseRegistry.PoseTag> poseTags = parsePoseTags(root);
-                        if (poseTags != null && !poseTags.isEmpty()) {
-                            String ns = rl.getNamespace();
-                            if (skinpacksMode) {
-                                String key = modelId.getPath();
-                                putPoseTags(POSE_TAGS_CACHE, key, poseTags);
-                                putPoseTags(POSE_TAGS_CACHE, ns + ":" + key, poseTags);
-                            } else {
-                                String key = modelId.getPath();
-                                putPoseTags(POSE_TAGS_CACHE, key, poseTags);
-                                putPoseTags(POSE_TAGS_CACHE, ns + ":" + key, poseTags);
-                                int s2 = key.lastIndexOf('/');
-                                if (s2 >= 0 && s2 + 1 < key.length()) {
-                                    String last = key.substring(s2 + 1);
-                                    putPoseTags(POSE_TAGS_CACHE, last, poseTags);
-                                    putPoseTags(POSE_TAGS_CACHE, ns + ":" + last, poseTags);
-                                }
-                            }
-                        }
-                        JsonObject metaObj = root.has("meta") && root.get("meta").isJsonObject() ? root.getAsJsonObject("meta") : null;
-                        if (metaObj != null) {
-                            String themeName = metaObj.has("themeName") && metaObj.get("themeName").isJsonPrimitive() ? metaObj.get("themeName").getAsString() : null;
-                            String themeNameId = metaObj.has("themeNameId") && metaObj.get("themeNameId").isJsonPrimitive() ? metaObj.get("themeNameId").getAsString() : null;
-                            if ((themeName != null && !themeName.isBlank()) || (themeNameId != null && !themeNameId.isBlank())) {
-                                META_CACHE.put(modelId, new BoxMeta(themeName, themeNameId));
-                            }
-                        }
-
-                        if (root.has("offsets")) {
-                            EnumMap<AttachSlot, float[]> off = parseOffsets(root.get("offsets"));
-                            if (off != null && !off.isEmpty()) OFFSETS_CACHE.put(modelId, off);
-                        }
-
-                        JsonElement armorOffsetsEl = root.has("armor_offsets") ? root.get("armor_offsets") : (root.has("armorOffsets") ? root.get("armorOffsets") : null);
-                        if (armorOffsetsEl != null) {
-                            EnumMap<ArmorSlot, float[]> off = parseArmorOffsets(armorOffsetsEl);
-                            if (off != null && !off.isEmpty()) ARMOR_OFFSETS_CACHE.put(modelId, off);
-                        }
-                        JsonElement armorHideEl = root.has("hidearmour") ? root.get("hidearmour") : (root.has("hideArmour") ? root.get("hideArmour") : (root.has("hide_armor") ? root.get("hide_armor") : null));
-                        if (armorHideEl != null) {
-                            EnumSet<ArmorSlot> hs = parseArmorHideSlots(armorHideEl);
-                            if (hs != null && !hs.isEmpty()) ARMOR_HIDE_CACHE.put(modelId, hs);
-                        }
-
-                        CACHE.put(modelId, bake(texW, texH, bonesList, hide));
+                    ResourceLocation modelId;
+                    if (skinpacksMode) {
+                        String path = rl.getPath();
+                        int slash = path.lastIndexOf('/');
+                        String file = slash >= 0 ? path.substring(slash + 1) : path;
+                        if (file.endsWith(".json")) file = file.substring(0, file.length() - 5);
+                        modelId = ResourceLocation.fromNamespaceAndPath(rl.getNamespace(), file);
+                    } else {
+                        String path = rl.getPath();
+                        if (!path.startsWith(base + "/")) continue;
+                        String idPath = path.substring(base.length() + 1, path.length() - 5);
+                        modelId = ResourceLocation.fromNamespaceAndPath(rl.getNamespace(), idPath);
                     }
-                } catch (Exception ignored) {
+                    JSON_INDEX.put(modelId, rl);
+                    JSON_INDEX_SKINPACK.put(modelId, skinpacksMode);
+                    indexKeys(rl, modelId, skinpacksMode);
+                } catch (Throwable ignored) {
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private static void indexKeys(ResourceLocation jsonRl, ResourceLocation modelId, boolean skinpacksMode) {
+        if (jsonRl == null || modelId == null) return;
+        String ns = jsonRl.getNamespace();
+        String key = modelId.getPath();
+        KEY_INDEX.put(key, modelId);
+        KEY_INDEX.put(ns + ":" + key, modelId);
+        if (!skinpacksMode) {
+            int s2 = key.lastIndexOf('/');
+            if (s2 >= 0 && s2 + 1 < key.length()) {
+                String last = key.substring(s2 + 1);
+                KEY_INDEX.put(last, modelId);
+                KEY_INDEX.put(ns + ":" + last, modelId);
+            }
+        }
+    }
+
+    public static boolean isAvailable(ResourceLocation id) {
+        if (id == null) return false;
+        ResourceManager rm = null;
+        try {
+            rm = Minecraft.getInstance().getResourceManager();
+        } catch (Throwable ignored) {
+        }
+        if (rm != null) ensureReloaded(rm);
+        if (RUNTIME.containsKey(id) || CACHE.containsKey(id)) return true;
+        return JSON_INDEX.containsKey(id);
+    }
+
+    private static Object loadLock(ResourceLocation id) {
+        return LOAD_LOCKS.computeIfAbsent(id, k -> new Object());
+    }
+
+    private static void ensureMetaLoaded(ResourceLocation id) {
+        if (id == null) return;
+        if (META_LOADED.contains(id)) return;
+        if (META_RUNTIME.containsKey(id) || OFFSETS_RUNTIME.containsKey(id) || ARMOR_OFFSETS_RUNTIME.containsKey(id) || ARMOR_HIDE_RUNTIME.containsKey(id)) {
+            META_LOADED.add(id);
+            return;
+        }
+        ResourceLocation jsonRl = JSON_INDEX.get(id);
+        if (jsonRl == null) {
+            META_LOADED.add(id);
+            return;
+        }
+        Object lock = loadLock(id);
+        synchronized (lock) {
+            if (META_LOADED.contains(id)) return;
+            ResourceManager rm;
+            try {
+                rm = Minecraft.getInstance().getResourceManager();
+            } catch (Throwable ignored) {
+                return;
+            }
+            if (rm == null) return;
+            Resource res = rm.getResource(jsonRl).orElse(null);
+            if (res == null) {
+                META_LOADED.add(id);
+                return;
+            }
+            try (Reader reader = res.openAsReader()) {
+                JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
+                if (root != null) {
+                    boolean skinpacksMode = Boolean.TRUE.equals(JSON_INDEX_SKINPACK.get(id));
+                    storeMetaFromRoot(id, jsonRl, skinpacksMode, root);
+                }
+            } catch (Throwable ignored) {
+            }
+            META_LOADED.add(id);
+        }
+    }
+
+    private static void ensureBaked(ResourceLocation id) {
+        if (id == null) return;
+        if (RUNTIME.containsKey(id) || CACHE.containsKey(id)) return;
+        ResourceLocation jsonRl = JSON_INDEX.get(id);
+        if (jsonRl == null) return;
+        Object lock = loadLock(id);
+        synchronized (lock) {
+            if (RUNTIME.containsKey(id) || CACHE.containsKey(id)) return;
+            ResourceManager rm;
+            try {
+                rm = Minecraft.getInstance().getResourceManager();
+            } catch (Throwable ignored) {
+                return;
+            }
+            if (rm == null) return;
+            Resource res = rm.getResource(jsonRl).orElse(null);
+            if (res == null) return;
+            try (Reader reader = res.openAsReader()) {
+                JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
+                if (root == null) return;
+
+                boolean skinpacksMode = Boolean.TRUE.equals(JSON_INDEX_SKINPACK.get(id));
+                storeMetaFromRoot(id, jsonRl, skinpacksMode, root);
+
+                JsonObject texObj = root.has("texture") && root.get("texture").isJsonObject() ? root.getAsJsonObject("texture") : null;
+                int texW = texObj != null && texObj.has("width") ? texObj.get("width").getAsInt() : 64;
+                int texH = texObj != null && texObj.has("height") ? texObj.get("height").getAsInt() : 64;
+                BoneDef[] bonesArr = root.has("bones") && root.get("bones").isJsonArray() ? GSON.fromJson(root.get("bones"), BoneDef[].class) : null;
+                if (bonesArr == null) return;
+                List<BoneDef> bonesList = expandMirrors(root, bonesArr);
+                EnumSet<AttachSlot> hide = parseHideSlots(root.get("hide"));
+                CACHE.put(id, bake(texW, texH, bonesList, hide));
+                META_LOADED.add(id);
+            } catch (Throwable ignored) {
+            }
+        }
+    }
+
+    private static void storeMetaFromRoot(ResourceLocation modelId, ResourceLocation jsonRl, boolean skinpacksMode, JsonObject root) {
+        if (modelId == null || jsonRl == null || root == null) return;
+
+        EnumSet<SkinPoseRegistry.PoseTag> poseTags = parsePoseTags(root);
+        if (poseTags != null && !poseTags.isEmpty()) {
+            String ns = jsonRl.getNamespace();
+            String key = modelId.getPath();
+            putPoseTags(POSE_TAGS_CACHE, key, poseTags);
+            putPoseTags(POSE_TAGS_CACHE, ns + ":" + key, poseTags);
+            if (!skinpacksMode) {
+                int s2 = key.lastIndexOf('/');
+                if (s2 >= 0 && s2 + 1 < key.length()) {
+                    String last = key.substring(s2 + 1);
+                    putPoseTags(POSE_TAGS_CACHE, last, poseTags);
+                    putPoseTags(POSE_TAGS_CACHE, ns + ":" + last, poseTags);
+                }
+            }
+        }
+
+        JsonObject metaObj = root.has("meta") && root.get("meta").isJsonObject() ? root.getAsJsonObject("meta") : null;
+        if (metaObj != null) {
+            String themeName = metaObj.has("themeName") && metaObj.get("themeName").isJsonPrimitive() ? metaObj.get("themeName").getAsString() : null;
+            String themeNameId = metaObj.has("themeNameId") && metaObj.get("themeNameId").isJsonPrimitive() ? metaObj.get("themeNameId").getAsString() : null;
+            if ((themeName != null && !themeName.isBlank()) || (themeNameId != null && !themeNameId.isBlank())) {
+                META_CACHE.put(modelId, new BoxMeta(themeName, themeNameId));
+            } else {
+                META_CACHE.remove(modelId);
+            }
+        } else {
+            META_CACHE.remove(modelId);
+        }
+
+        if (root.has("offsets")) {
+            EnumMap<AttachSlot, float[]> off = parseOffsets(root.get("offsets"));
+            if (off != null && !off.isEmpty()) OFFSETS_CACHE.put(modelId, off);
+            else OFFSETS_CACHE.remove(modelId);
+        } else {
+            OFFSETS_CACHE.remove(modelId);
+        }
+
+        JsonElement armorOffsetsEl = root.has("armor_offsets") ? root.get("armor_offsets") : (root.has("armorOffsets") ? root.get("armorOffsets") : null);
+        if (armorOffsetsEl != null) {
+            EnumMap<ArmorSlot, float[]> off = parseArmorOffsets(armorOffsetsEl);
+            if (off != null && !off.isEmpty()) ARMOR_OFFSETS_CACHE.put(modelId, off);
+            else ARMOR_OFFSETS_CACHE.remove(modelId);
+        } else {
+            ARMOR_OFFSETS_CACHE.remove(modelId);
+        }
+
+        JsonElement armorHideEl = root.has("hidearmour") ? root.get("hidearmour") : (root.has("hideArmour") ? root.get("hideArmour") : (root.has("hide_armor") ? root.get("hide_armor") : null));
+        if (armorHideEl != null) {
+            EnumSet<ArmorSlot> hs = parseArmorHideSlots(armorHideEl);
+            if (hs != null && !hs.isEmpty()) ARMOR_HIDE_CACHE.put(modelId, hs);
+            else ARMOR_HIDE_CACHE.remove(modelId);
+        } else {
+            ARMOR_HIDE_CACHE.remove(modelId);
         }
     }
 
@@ -171,6 +290,10 @@ public final class BoxModelManager {
         BuiltBoxModel rt = RUNTIME.get(id);
         if (rt != null) return rt;
 
+        BuiltBoxModel ct = CACHE.get(id);
+        if (ct != null) return ct;
+
+        ensureBaked(id);
         return CACHE.get(id);
     }
 
@@ -185,6 +308,11 @@ public final class BoxModelManager {
 
         EnumMap<AttachSlot, float[]> rt = OFFSETS_RUNTIME.get(id);
         if (rt != null) return rt;
+
+        EnumMap<AttachSlot, float[]> ct = OFFSETS_CACHE.get(id);
+        if (ct != null) return ct;
+
+        ensureMetaLoaded(id);
         return OFFSETS_CACHE.get(id);
     }
 
@@ -199,6 +327,11 @@ public final class BoxModelManager {
 
         EnumMap<ArmorSlot, float[]> rt = ARMOR_OFFSETS_RUNTIME.get(id);
         if (rt != null) return rt;
+
+        EnumMap<ArmorSlot, float[]> ct = ARMOR_OFFSETS_CACHE.get(id);
+        if (ct != null) return ct;
+
+        ensureMetaLoaded(id);
         return ARMOR_OFFSETS_CACHE.get(id);
     }
     public static EnumSet<ArmorSlot> getArmorHide(ResourceLocation id) {
@@ -209,8 +342,14 @@ public final class BoxModelManager {
         } catch (Throwable ignored) {
         }
         if (rm != null) ensureReloaded(rm);
+
         EnumSet<ArmorSlot> rt = ARMOR_HIDE_RUNTIME.get(id);
         if (rt != null) return rt;
+
+        EnumSet<ArmorSlot> ct = ARMOR_HIDE_CACHE.get(id);
+        if (ct != null) return ct;
+
+        ensureMetaLoaded(id);
         return ARMOR_HIDE_CACHE.get(id);
     }
 
@@ -222,10 +361,36 @@ public final class BoxModelManager {
         } catch (Throwable ignored) {
         }
         if (rm != null) ensureReloaded(rm);
+
         EnumSet<SkinPoseRegistry.PoseTag> rt = POSE_TAGS_RUNTIME.get(id);
         if (rt != null && rt.contains(tag)) return true;
+
         EnumSet<SkinPoseRegistry.PoseTag> ct = POSE_TAGS_CACHE.get(id);
-        return ct != null && ct.contains(tag);
+        if (ct != null && ct.contains(tag)) return true;
+
+        ResourceLocation modelId = KEY_INDEX.get(id);
+        if (modelId == null) {
+            try {
+                modelId = ResourceLocation.parse(id);
+            } catch (Throwable ignored) {
+                modelId = null;
+            }
+        }
+        if (modelId != null) {
+            ensureMetaLoaded(modelId);
+
+            ct = POSE_TAGS_CACHE.get(id);
+            if (ct != null && ct.contains(tag)) return true;
+
+            String key = modelId.getPath();
+            ct = POSE_TAGS_CACHE.get(key);
+            if (ct != null && ct.contains(tag)) return true;
+
+            ct = POSE_TAGS_CACHE.get(modelId.toString());
+            return ct != null && ct.contains(tag);
+        }
+
+        return false;
     }
 
     public static void clearRuntime() {
@@ -255,6 +420,11 @@ public final class BoxModelManager {
         if (id == null) return null;
         BoxMeta meta = META_RUNTIME.get(id);
         if (meta == null) meta = META_CACHE.get(id);
+        if (meta == null) {
+            ensureMetaLoaded(id);
+            meta = META_RUNTIME.get(id);
+            if (meta == null) meta = META_CACHE.get(id);
+        }
         if (meta == null) return null;
         String out = trMaybe(meta.themeNameId);
         if (out == null || out.isBlank()) out = meta.themeName;
