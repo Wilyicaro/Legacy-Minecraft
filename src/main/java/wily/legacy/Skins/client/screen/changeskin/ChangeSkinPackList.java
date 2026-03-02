@@ -47,7 +47,7 @@ public final class ChangeSkinPackList {
         refreshPackIds();
         String preferred = SkinPackLoader.getPreferredDefaultPackId();
         int prefIdx = preferred == null ? -1 : packIds.indexOf(preferred);
-        focusedPackIndex = prefIdx >= 0 ? prefIdx : 0;
+        focusedPackIndex = prefIdx >= 0 ? prefIdx : defaultPackIndex();
         queuedChangePack = false;
         ensureButtons();
     }
@@ -116,6 +116,12 @@ public final class ChangeSkinPackList {
         return r;
     }
 
+    private int defaultPackIndex() {
+        if (packIds.isEmpty()) return 0;
+        int idx = packIds.indexOf(SkinIds.PACK_DEFAULT);
+        return idx >= 0 ? idx : 0;
+    }
+
     private String getFocusedPackId() {
         if (packIds.isEmpty()) return null;
         int idx = wrapIndex(focusedPackIndex);
@@ -157,16 +163,20 @@ public final class ChangeSkinPackList {
     }
 
     public void focusPackId(String packId, boolean playSound) {
-        if (packId == null || packIds.isEmpty()) return;
-        int idx = packIds.indexOf(packId);
-        if (idx >= 0) setFocusedPackIndex(idx, playSound);
+        if (packIds.isEmpty()) return;
+        int idx = packId == null ? -1 : packIds.indexOf(packId);
+        if (idx >= 0) {
+            setFocusedPackIndex(idx, playSound);
+            return;
+        }
+        setFocusedPackIndex(defaultPackIndex(), playSound);
     }
 
     private void refreshPackIds() {
         basePackIds.clear();
         basePackIds.addAll(SkinPackLoader.getPacks().keySet());
         rebuildDisplayOrder(null);
-        if (focusedPackIndex >= packIds.size()) focusedPackIndex = 0;
+        if (focusedPackIndex >= packIds.size()) focusedPackIndex = defaultPackIndex();
     }
 
     private void rebuildDisplayOrder(String preserveFocusedId) {
@@ -189,9 +199,9 @@ public final class ChangeSkinPackList {
 
         if (preserveFocusedId != null) {
             int idx = packIds.indexOf(preserveFocusedId);
-            focusedPackIndex = idx >= 0 ? idx : 0;
+            focusedPackIndex = idx >= 0 ? idx : defaultPackIndex();
         } else {
-            if (focusedPackIndex >= packIds.size()) focusedPackIndex = 0;
+            if (focusedPackIndex >= packIds.size()) focusedPackIndex = defaultPackIndex();
         }
     }
 

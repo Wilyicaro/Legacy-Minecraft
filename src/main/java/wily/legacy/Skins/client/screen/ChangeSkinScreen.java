@@ -218,18 +218,33 @@ private String getCurrentSelectedSkinId() {
 }
 
 private String resolvePackIdToOpenOnFirstOpen() {
-    String selectedId = getCurrentSelectedSkinId();
-    if (selectedId != null && !selectedId.isBlank()) {
-        try {
-            String src = SkinPackLoader.getSourcePackId(selectedId);
-            if (src != null && !src.isBlank()) return src;
-        } catch (Throwable ignored) {
-        }
-    }
     try {
-        return SkinPackLoader.getLastUsedCustomPackId();
+        String def = SkinPackLoader.getPreferredDefaultPackId();
+        var packs = SkinPackLoader.getPacks();
+
+        String selectedId = getCurrentSelectedSkinId();
+        String candidate = null;
+
+        if (selectedId != null && !selectedId.isBlank()) {
+            String last = SkinPackLoader.getLastUsedCustomPackId();
+            if (last != null && packs.containsKey(last) && SkinPackLoader.packContainsSkinId(last, selectedId)) candidate = last;
+
+            if (candidate == null) {
+                String src = SkinPackLoader.getSourcePackId(selectedId);
+                if (src != null && !src.isBlank() && packs.containsKey(src)) candidate = src;
+            }
+        }
+
+        if (candidate == null) {
+            String last = SkinPackLoader.getLastUsedCustomPackId();
+            if (last != null && packs.containsKey(last)) candidate = last;
+        }
+
+        if (candidate != null && packs.containsKey(candidate)) return candidate;
+        if (def != null && packs.containsKey(def)) return def;
+        return SkinIds.PACK_DEFAULT;
     } catch (Throwable ignored) {
-        return null;
+        return SkinIds.PACK_DEFAULT;
     }
 }
 

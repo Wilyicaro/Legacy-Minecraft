@@ -103,6 +103,26 @@ public final class SkinPackLoader {
         return PACK_BY_SKIN.get(mapped);
     }
 
+    public static boolean packContainsSkinId(String packId, String skinId) {
+        ensureLoaded();
+        if (packId == null || packId.isBlank() || skinId == null || skinId.isBlank()) return false;
+        SkinPack p = PACKS.get(packId);
+        if (p == null || p.skins() == null || p.skins().isEmpty()) return false;
+
+        for (SkinEntry e : p.skins()) {
+            if (e != null && skinId.equals(e.id())) return true;
+        }
+
+        String mapped = mapLegacyDefaultSkinId(skinId);
+        if (mapped != null) {
+            for (SkinEntry e : p.skins()) {
+                if (e != null && mapped.equals(e.id())) return true;
+            }
+        }
+
+        return false;
+    }
+
     public static String getLastUsedCustomPackId() {
         return LAST_USED_CUSTOM_PACK_ID;
     }
@@ -254,6 +274,12 @@ public final class SkinPackLoader {
             SKINS_BY_ID = Collections.unmodifiableMap(skinsById);
             PACK_BY_SKIN = Collections.unmodifiableMap(packBySkin);
             loaded = true;
+        }
+
+        try {
+            String last = LAST_USED_CUSTOM_PACK_ID;
+            if (last != null && !PACKS.containsKey(last)) setLastUsedCustomPackId(null);
+        } catch (Throwable ignored) {
         }
     }
 
