@@ -58,6 +58,7 @@ public final class WeepingStatuePose {
         if (!(state instanceof RenderStateSkinIdAccess a)) return false;
         String id = a.consoleskins$getSkinId();
         if (!WeepingStatueConfig.isWeepingStatueSkin(id)) return false;
+        if (state != null && state.attackTime > 0.0F) return false;
         Player p = getPlayer(state);
         if (p != null && isArmHolding(p, HumanoidArm.RIGHT)) return false;
         return true;
