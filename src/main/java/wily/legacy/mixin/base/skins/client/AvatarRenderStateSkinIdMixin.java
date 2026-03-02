@@ -19,6 +19,10 @@ public abstract class AvatarRenderStateSkinIdMixin implements RenderStateSkinIdA
     private float consoleskins$moveSpeedSq;
     @Unique
     private boolean consoleskins$sitting;
+    @Unique
+    private boolean consoleskins$usingItem;
+    @Unique
+    private boolean consoleskins$blocking;
 
     @Override
     public String consoleskins$getSkinId() {
@@ -68,5 +72,25 @@ public abstract class AvatarRenderStateSkinIdMixin implements RenderStateSkinIdA
     @Override
     public void consoleskins$setSitting(boolean sitting) {
         this.consoleskins$sitting = sitting;
+    }
+
+    @Override
+    public boolean consoleskins$isUsingItem() {
+        return consoleskins$usingItem;
+    }
+
+    @Override
+    public void consoleskins$setUsingItem(boolean usingItem) {
+        this.consoleskins$usingItem = usingItem;
+    }
+
+    @Override
+    public boolean consoleskins$isBlocking() {
+        return consoleskins$blocking;
+    }
+
+    @Override
+    public void consoleskins$setBlocking(boolean blocking) {
+        this.consoleskins$blocking = blocking;
     }
 }

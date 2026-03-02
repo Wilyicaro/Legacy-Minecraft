@@ -90,6 +90,22 @@ public abstract class AvatarRendererSkinMixin {
                     a.consoleskins$setSitting(sitting);
                 } catch (Throwable ignored) {
                 }
+
+                try {
+                    boolean using = false;
+                    boolean blocking = false;
+                    try {
+                        using = avatar.isUsingItem();
+                    } catch (Throwable ignored2) {
+                    }
+                    try {
+                        blocking = avatar.isBlocking();
+                    } catch (Throwable ignored2) {
+                    }
+                    a.consoleskins$setUsingItem(using);
+                    a.consoleskins$setBlocking(blocking);
+                } catch (Throwable ignored) {
+                }
             }
 
             SkinEntry entry = SkinPackLoader.getSkin(skinId);

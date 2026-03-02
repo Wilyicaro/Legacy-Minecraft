@@ -2,6 +2,8 @@ package wily.legacy.mixin.base.skins.client;
 
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Pose;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,8 +22,19 @@ public abstract class PlayerModelSyncArmsPoseMixin {
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
         if (!SkinPoseRegistry.hasPose(SkinPoseRegistry.PoseTag.SYNC_ARMS, skinId)) return;
 
+        if (state.pose != Pose.STANDING && state.pose != Pose.CROUCHING) return;
+        if (state.attackTime > 0.0F) return;
+        if (a.consoleskins$isUsingItem() || a.consoleskins$isBlocking()) return;
+
+        float speedSq = a.consoleskins$getMoveSpeedSq();
+        if (!a.consoleskins$isMoving() && speedSq <= 1.0E-4F) return;
+
+        float factor = a.consoleskins$isMoving() ? 1.0F : Mth.clamp(speedSq * 120.0F, 0.0F, 1.0F);
+        if (factor <= 0.01F) return;
+
         PlayerModel self = (PlayerModel) (Object) this;
-        self.rightArm.xRot = self.leftArm.xRot;
+        float diff = self.leftArm.xRot - self.rightArm.xRot;
+        self.rightArm.xRot += diff * factor;
         self.rightSleeve.xRot = self.rightArm.xRot;
     }
 }

@@ -22,4 +22,12 @@ public interface RenderStateSkinIdAccess {
     boolean consoleskins$isSitting();
 
     void consoleskins$setSitting(boolean sitting);
+
+    boolean consoleskins$isUsingItem();
+
+    void consoleskins$setUsingItem(boolean usingItem);
+
+    boolean consoleskins$isBlocking();
+
+    void consoleskins$setBlocking(boolean blocking);
 }
