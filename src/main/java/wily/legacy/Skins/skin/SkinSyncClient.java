@@ -212,17 +212,27 @@ public final class SkinSyncClient {
 
             try {
                 if (!id.isBlank() && SENT_ASSETS.putIfAbsent(id, true) == null) {
-                    ResourceLocation texRl = null;
+                    byte[] texBytes = ClientSkinAssets.getTextureBytes(id);
+                    byte[] modelBytes = ClientSkinAssets.getModelBytes(id);
+
                     SkinEntry e = null;
-                    try {
-                        e = SkinPackLoader.getSkin(id);
-                        if (e != null) texRl = e.texture();
-                    } catch (Throwable ignored) {
+                    if (texBytes == null || modelBytes == null) {
+                        try {
+                            e = SkinPackLoader.getSkin(id);
+                        } catch (Throwable ignored) {
+                        }
+
+                        if (texBytes == null) {
+                            ResourceLocation texRl = e != null ? e.texture() : null;
+                            if (texRl != null) texBytes = loadBytes(client, texRl);
+                        }
+
+                        if (modelBytes == null) {
+                            ResourceLocation modelRl = resolveModelLocation(client, id, e);
+                            modelBytes = loadBytes(client, modelRl);
+                        }
                     }
-                    if (texRl == null) texRl = ResourceLocation.fromNamespaceAndPath("legacy", "textures/entity/" + id + ".png");
-                    ResourceLocation modelRl = resolveModelLocation(client, id, e);
-                    byte[] texBytes = loadBytes(client, texRl);
-                    byte[] modelBytes = loadBytes(client, modelRl);
+
                     sendChunks(id, 0, texBytes);
                     sendChunks(id, 1, modelBytes);
                 }
@@ -264,17 +274,27 @@ public final class SkinSyncClient {
 
             try {
                 if (!skinId.isBlank() && SENT_ASSETS.putIfAbsent(skinId, true) == null) {
-                    ResourceLocation texRl = null;
+                    byte[] texBytes = ClientSkinAssets.getTextureBytes(skinId);
+                    byte[] modelBytes = ClientSkinAssets.getModelBytes(skinId);
+
                     SkinEntry e = null;
-                    try {
-                        e = SkinPackLoader.getSkin(skinId);
-                        if (e != null) texRl = e.texture();
-                    } catch (Throwable ignored) {
+                    if (texBytes == null || modelBytes == null) {
+                        try {
+                            e = SkinPackLoader.getSkin(skinId);
+                        } catch (Throwable ignored) {
+                        }
+
+                        if (texBytes == null) {
+                            ResourceLocation texRl = e != null ? e.texture() : null;
+                            if (texRl != null) texBytes = loadBytes(mc, texRl);
+                        }
+
+                        if (modelBytes == null) {
+                            ResourceLocation modelRl = resolveModelLocation(mc, skinId, e);
+                            modelBytes = loadBytes(mc, modelRl);
+                        }
                     }
-                    if (texRl == null) texRl = ResourceLocation.fromNamespaceAndPath("legacy", "textures/entity/" + skinId + ".png");
-                    ResourceLocation modelRl = resolveModelLocation(mc, skinId, e);
-                    byte[] texBytes = loadBytes(mc, texRl);
-                    byte[] modelBytes = loadBytes(mc, modelRl);
+
                     sendChunks(skinId, 0, texBytes);
                     sendChunks(skinId, 1, modelBytes);
                 }

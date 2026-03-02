@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -36,7 +37,7 @@ public final class SkinPackLoader {
 
     private static volatile String LAST_USED_CUSTOM_PACK_ID;
 
-    private static final ResourceLocation DEFAULT_PACK_ICON = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "skinpacks/default/pack.png");
+    private static final ResourceLocation DEFAULT_PACK_ICON = ResourceLocation.fromNamespaceAndPath("lce_skinpacks", "skinpacks/default/pack.png");
 
     private static final String BUILTIN_PACK_NAMESPACE = "lce_skinpacks";
     private static final ResourceLocation BUILTIN_PACK_MANIFEST = ResourceLocation.fromNamespaceAndPath(BUILTIN_PACK_NAMESPACE, "skinpacks/manifest.json");
@@ -44,7 +45,29 @@ public final class SkinPackLoader {
     private static final String SKINPACKS_PREFIX = "skinpacks/";
     private static final String PACK_JSON_SUFFIX = "/pack.json";
 
+    private static final String NAME_KEY_PREFIX = "key:";
+
     private SkinPackLoader() {
+    }
+
+    public static Component nameComponent(String raw, String fallback) {
+        if (raw == null || raw.isBlank()) return Component.literal(String.valueOf(fallback));
+        if (raw.startsWith(NAME_KEY_PREFIX) && raw.length() > NAME_KEY_PREFIX.length()) {
+            return Component.translatable(raw.substring(NAME_KEY_PREFIX.length()));
+        }
+        return Component.literal(raw);
+    }
+
+    public static String nameString(String raw, String fallback) {
+        if (raw == null || raw.isBlank()) return String.valueOf(fallback);
+        if (raw.startsWith(NAME_KEY_PREFIX) && raw.length() > NAME_KEY_PREFIX.length()) {
+            try {
+                return I18n.get(raw.substring(NAME_KEY_PREFIX.length()));
+            } catch (Throwable ignored) {
+                return String.valueOf(fallback);
+            }
+        }
+        return raw;
     }
 
     public static Map<String, SkinPack> getPacks() {
@@ -54,12 +77,30 @@ public final class SkinPackLoader {
 
     public static SkinEntry getSkin(String id) {
         ensureLoaded();
-        return SKINS_BY_ID.get(id);
+        if (id == null || id.isBlank()) return null;
+
+        SkinEntry e = SKINS_BY_ID.get(id);
+        if (e != null) return e;
+
+        if (ClientSkinAssets.getTexture(id) != null || ClientSkinAssets.getModelJson(id) != null) return null;
+
+        String mapped = mapLegacyDefaultSkinId(id);
+        if (mapped == null) return null;
+        return SKINS_BY_ID.get(mapped);
     }
 
     public static String getSourcePackId(String skinId) {
         ensureLoaded();
-        return PACK_BY_SKIN.get(skinId);
+        if (skinId == null || skinId.isBlank()) return null;
+
+        String p = PACK_BY_SKIN.get(skinId);
+        if (p != null) return p;
+
+        if (ClientSkinAssets.getTexture(skinId) != null || ClientSkinAssets.getModelJson(skinId) != null) return null;
+
+        String mapped = mapLegacyDefaultSkinId(skinId);
+        if (mapped == null) return null;
+        return PACK_BY_SKIN.get(mapped);
     }
 
     public static String getLastUsedCustomPackId() {
@@ -187,6 +228,7 @@ public final class SkinPackLoader {
 
                     String packId = parsePackId(path);
                     if (packId == null || packId.isEmpty()) continue;
+                    if (SkinIds.PACK_DEFAULT.equals(packId) && !BUILTIN_PACK_NAMESPACE.equals(ns)) continue;
                     if (packs.containsKey(packId)) continue;
                     if (PackExclusions.isExcluded(packId)) continue;
 
@@ -203,6 +245,7 @@ public final class SkinPackLoader {
         } finally {
             SkinPoseRegistry.endReload();
         }
+
 
         LinkedHashMap<String, SkinPack> ordered = withFavourites(packs, skinsById);
         applyBuiltinAutoSelection(rm, ordered);
@@ -267,6 +310,7 @@ public final class SkinPackLoader {
 
         for (ManifestPack mp : list) {
             String packId = mp.id();
+            if (SkinIds.PACK_DEFAULT.equals(packId) && !BUILTIN_PACK_NAMESPACE.equals(namespace)) continue;
             if (packsOut.containsKey(packId)) continue;
 
             String resolved = resolvePackJsonPath(mp.path(), packId);
@@ -346,11 +390,56 @@ public final class SkinPackLoader {
         return null;
     }
 
+    private static String mapLegacyDefaultSkinId(String id) {
+        if (id == null) return null;
+        return switch (id) {
+            case "steve2" -> "tennis_steve";
+            case "steve3" -> "tux_steve";
+            case "steve4" -> "athlete_steve";
+            case "steve5" -> "scottish_steve";
+            case "steve6" -> "jail_steve";
+            case "steve7" -> "cyclist_steve";
+            case "steve8" -> "boxer_steve";
+
+            case "alex2" -> "tennis_alex";
+            case "alex3" -> "tux_alex";
+            case "alex4" -> "athlete_alex";
+            case "alex5" -> "swedish_alex";
+            case "alex6" -> "prisoner_alex";
+            case "alex7" -> "cyclist_alex";
+            case "alex8" -> "boxer_alex";
+            default -> null;
+        };
+    }
+
+    private static SkinEntry runtimeEntry(String id) {
+        ResourceLocation tex = ClientSkinAssets.getTexture(id);
+        if (tex == null) return null;
+        Boolean slim = ClientSkinAssets.getSlimFlag(id);
+        return new SkinEntry(id, id, tex, null, Boolean.TRUE.equals(slim), 0);
+    }
+
+
     private static LinkedHashMap<String, SkinPack> withFavourites(Map<String, SkinPack> base, Map<String, SkinEntry> skinsById) {
         ArrayList<SkinEntry> fav = new ArrayList<>();
         for (String id : FavoritesStore.getFavorites()) {
             SkinEntry e = skinsById.get(id);
-            if (e != null) fav.add(e);
+            if (e != null) {
+                fav.add(e);
+                continue;
+            }
+
+            SkinEntry rt = runtimeEntry(id);
+            if (rt != null) {
+                fav.add(rt);
+                continue;
+            }
+
+            String mapped = mapLegacyDefaultSkinId(id);
+            if (mapped != null) {
+                SkinEntry m = skinsById.get(mapped);
+                if (m != null) fav.add(m);
+            }
         }
 
         SkinPack favPack = new SkinPack(SkinIds.PACK_FAVOURITES, "Favourites", "", "", DEFAULT_PACK_ICON, fav);
@@ -464,7 +553,6 @@ public final class SkinPackLoader {
         String name = json.has("name") ? json.get("name").getAsString() : packId;
         String author = json.has("author") ? json.get("author").getAsString() : "";
         String type = json.has("type") ? json.get("type").getAsString() : "";
-        if (name.startsWith("key:")) name = tr(name.substring(4), packId);
 
         JsonArray skins = json.getAsJsonArray("skins");
         ArrayList<SkinEntryWithIndex> tmp = new ArrayList<>();
@@ -501,21 +589,11 @@ public final class SkinPackLoader {
                     if (m.equals("wide") || m.equals("default") || m.equals("steve")) slimArms = false;
                 }
 
-                if (!modelExplicit && SkinIds.PACK_DEFAULT.equals(packId)) {
-                    String sidLower = skinId.toLowerCase(java.util.Locale.ROOT);
-                    String tpLower = texPath.toLowerCase(java.util.Locale.ROOT);
-                    if (sidLower.contains("alex") || tpLower.contains("alex")) slimArms = true;
-                }
-
                 collectPoseTagsFromSkinJson(o, skinId);
 
                 ResourceLocation texture;
                 ResourceLocation cape = null;
-                if (SkinIds.PACK_DEFAULT.equals(packId) && SkinSync.ASSET_NS.equals(namespace)) {
-                    texture = DefaultAtlasSkins.getTexture(rm, texPath);
-                } else {
-                    texture = ResourceLocation.fromNamespaceAndPath(namespace, SKINPACKS_PREFIX + packFolder + "/" + texPath);
-                }
+                texture = ResourceLocation.fromNamespaceAndPath(namespace, SKINPACKS_PREFIX + packFolder + "/" + texPath);
                 if (capePath != null && !capePath.isBlank()) {
                     cape = ResourceLocation.fromNamespaceAndPath(namespace, SKINPACKS_PREFIX + packFolder + "/" + capePath);
                 }

@@ -21,6 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class ClientSkinAssets {
     private static final Map<String, ResourceLocation> TEXTURES = new ConcurrentHashMap<>();
     private static final Map<String, JsonObject> MODELS = new ConcurrentHashMap<>();
+    private static final Map<String, byte[]> TEXTURE_BYTES = new ConcurrentHashMap<>();
+    private static final Map<String, byte[]> MODEL_BYTES = new ConcurrentHashMap<>();
     private static volatile java.lang.reflect.Method cachedTextureRelease;
     private static volatile boolean triedResolveTextureRelease;
 
@@ -33,6 +35,54 @@ public final class ClientSkinAssets {
 
     public static JsonObject getModelJson(String skinId) {
         return skinId == null ? null : MODELS.get(skinId);
+    }
+
+    public static byte[] getTextureBytes(String skinId) {
+        return skinId == null ? null : TEXTURE_BYTES.get(skinId);
+    }
+
+    public static byte[] getModelBytes(String skinId) {
+        return skinId == null ? null : MODEL_BYTES.get(skinId);
+    }
+
+    public static Boolean getSlimFlag(String skinId) {
+        if (skinId == null || skinId.isBlank()) return null;
+        JsonObject obj = MODELS.get(skinId);
+        if (obj == null) return null;
+
+        Boolean b = getSlimFlagFrom(obj);
+        if (b != null) return b;
+
+        if (obj.has("meta") && obj.get("meta").isJsonObject()) {
+            JsonObject meta = obj.getAsJsonObject("meta");
+            b = getSlimFlagFrom(meta);
+            if (b != null) return b;
+        }
+
+        return null;
+    }
+
+    private static Boolean getSlimFlagFrom(JsonObject obj) {
+        if (obj == null) return null;
+
+        if (obj.has("slim") && obj.get("slim").isJsonPrimitive()) {
+            try { return obj.get("slim").getAsBoolean(); } catch (Throwable ignored) {}
+        }
+
+        String modelStr = null;
+        if (obj.has("model") && obj.get("model").isJsonPrimitive()) {
+            try { modelStr = obj.get("model").getAsString(); } catch (Throwable ignored) {}
+        } else if (obj.has("arms") && obj.get("arms").isJsonPrimitive()) {
+            try { modelStr = obj.get("arms").getAsString(); } catch (Throwable ignored) {}
+        }
+
+        if (modelStr != null) {
+            String m = modelStr.trim().toLowerCase(java.util.Locale.ROOT);
+            if (m.equals("slim") || m.equals("alex")) return true;
+            if (m.equals("wide") || m.equals("default") || m.equals("steve")) return false;
+        }
+
+        return null;
     }
 
     private static void registerRuntimePoses(String skinId, JsonObject obj) {
@@ -73,6 +123,7 @@ public final class ClientSkinAssets {
 
         if (texturePng != null && texturePng.length > 0) {
             try {
+                TEXTURE_BYTES.put(skinId, texturePng.clone());
                 NativeImage img = NativeImage.read(new ByteArrayInputStream(texturePng));
                 DynamicTexture dt = new DynamicTexture(() -> "legacy_runtime_skin_" + skinId, img);
                 TextureManager tm = mc.getTextureManager();
@@ -83,16 +134,21 @@ public final class ClientSkinAssets {
                 TEXTURES.put(skinId, rl);
             } catch (Throwable ignored) {
             }
+        } else {
+            TEXTURE_BYTES.remove(skinId);
         }
 
         if (modelJson != null && modelJson.length > 0) {
             try {
+                MODEL_BYTES.put(skinId, modelJson.clone());
                 String s = new String(modelJson, java.nio.charset.StandardCharsets.UTF_8);
                 JsonObject obj = JsonParser.parseString(s).getAsJsonObject();
                 MODELS.put(skinId, obj);
                 registerRuntimePoses(skinId, obj);
             } catch (Throwable ignored) {
             }
+        } else {
+            MODEL_BYTES.remove(skinId);
         }
     }
 
@@ -144,6 +200,8 @@ public final class ClientSkinAssets {
         }
         TEXTURES.clear();
         MODELS.clear();
+        TEXTURE_BYTES.clear();
+        MODEL_BYTES.clear();
         BoxModelManager.clearRuntime();
         SkinPoseRegistry.clearRuntimeSelectors();
     }

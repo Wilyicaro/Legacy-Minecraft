@@ -1,6 +1,7 @@
 package wily.legacy.mixin.base.skins.client;
 
 import wily.legacy.Skins.skin.ClientSkinCache;
+import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinEntry;
 import wily.legacy.Skins.skin.SkinPackLoader;
 import net.minecraft.client.Minecraft;
@@ -33,9 +34,9 @@ PlayerSkin original = cir.getReturnValue();
         if (original == null) return;
 
         SkinEntry entry = SkinPackLoader.getSkin(skinId);
-        if (entry == null) return;
 
-        ResourceLocation texturePath = entry.texture();
+        ResourceLocation texturePath = ClientSkinAssets.getTexture(skinId);
+        if (texturePath == null && entry != null) texturePath = entry.texture();
         if (texturePath == null) return;
 
         try {
@@ -46,7 +47,7 @@ PlayerSkin original = cir.getReturnValue();
         ClientAsset.ResourceTexture body = new ClientAsset.ResourceTexture(texturePath, texturePath);
 
         ClientAsset.ResourceTexture capeTex = null;
-        if (entry.cape() != null) {
+        if (entry != null && entry.cape() != null) {
             ResourceLocation capePath = entry.cape();
             try {
                 Minecraft.getInstance().getTextureManager().getTexture(capePath);
@@ -60,7 +61,8 @@ PlayerSkin original = cir.getReturnValue();
         } catch (Throwable ignored) {
         }
 
-        PlayerModelType model = entry.slimArms() ? PlayerModelType.SLIM : PlayerModelType.WIDE;
+        Boolean slim = ClientSkinAssets.getSlimFlag(skinId);
+        PlayerModelType model = slim != null ? (slim ? PlayerModelType.SLIM : PlayerModelType.WIDE) : ((entry != null && entry.slimArms()) ? PlayerModelType.SLIM : PlayerModelType.WIDE);
 
         ClientAsset.Texture capeFinal = capeTex;
         PlayerSkin skin = PlayerSkin.insecure(body, capeFinal, null, model);

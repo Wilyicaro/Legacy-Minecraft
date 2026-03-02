@@ -93,9 +93,8 @@ public abstract class AvatarRendererSkinMixin {
             }
 
             SkinEntry entry = SkinPackLoader.getSkin(skinId);
-            ResourceLocation tex = entry != null ? entry.texture() : null;
-            if (tex == null) tex = ClientSkinAssets.getTexture(skinId);
-            if (tex == null) return;
+            ResourceLocation tex = ClientSkinAssets.getTexture(skinId);
+            if (tex == null && entry != null) tex = entry.texture();
             if (tex == null) return;
 
             PlayerSkin original = state.skin;
@@ -120,7 +119,8 @@ public abstract class AvatarRendererSkinMixin {
 
             state.showCape = capeTex != null;
 
-            PlayerModelType model = (entry != null && entry.slimArms()) ? PlayerModelType.SLIM : PlayerModelType.WIDE;
+            Boolean slim = ClientSkinAssets.getSlimFlag(skinId);
+            PlayerModelType model = slim != null ? (slim ? PlayerModelType.SLIM : PlayerModelType.WIDE) : ((entry != null && entry.slimArms()) ? PlayerModelType.SLIM : PlayerModelType.WIDE);
 
             ClientAsset.Texture capeFinal = capeTex;
             state.skin = PlayerSkin.insecure(body, capeFinal, null, model);

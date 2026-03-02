@@ -225,7 +225,7 @@ public final class ChangeSkinPackList {
         if (i < 0 || i >= packIds.size()) return Component.empty();
         String id = packIds.get(i);
         SkinPack pack = SkinPackLoader.getPacks().get(id);
-        return Component.literal(pack != null ? pack.name() : id);
+        return pack != null ? SkinPackLoader.nameComponent(pack.name(), id) : Component.literal(id);
     }
 
     public final class PackButton extends Button {

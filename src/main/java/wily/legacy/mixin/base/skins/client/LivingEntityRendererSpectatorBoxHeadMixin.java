@@ -159,9 +159,11 @@ public abstract class LivingEntityRendererSpectatorBoxHeadMixin {
     private static ResourceLocation consoleskins$resolveTexture(AvatarRenderState state, String skinId) {
         ResourceLocation tex = null;
         if (skinId != null && !skinId.isBlank() && !"auto_select".equals(skinId)) {
-            SkinEntry entry = SkinPackLoader.getSkin(skinId);
-            tex = entry != null ? entry.texture() : null;
-            if (tex == null) tex = ClientSkinAssets.getTexture(skinId);
+            tex = ClientSkinAssets.getTexture(skinId);
+            if (tex == null) {
+                SkinEntry entry = SkinPackLoader.getSkin(skinId);
+                if (entry != null) tex = entry.texture();
+            }
         }
         if (tex != null) return tex;
 

@@ -417,8 +417,8 @@ private static boolean consoleskins$shouldRenderToastWithBoxHead(String skinId) 
     if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return false;
 
     SkinEntry entry = SkinPackLoader.getSkin(skinId);
-    ResourceLocation texture = entry != null ? entry.texture() : null;
-    if (texture == null) texture = ClientSkinAssets.getTexture(skinId);
+    ResourceLocation texture = ClientSkinAssets.getTexture(skinId);
+    if (texture == null && entry != null) texture = entry.texture();
     if (texture == null) return false;
 
     ResourceLocation modelId = consoleskins$modelIdFromTexture(texture);

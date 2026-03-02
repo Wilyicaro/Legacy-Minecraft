@@ -1072,11 +1072,11 @@ private String resolvePackIdToOpenOnFirstOpen() {
         if (playerSkinWidgetList != null && playerSkinWidgetList.element3 != null) {
             String skinId = playerSkinWidgetList.element3.skinId.get();
             SkinEntry entry = skinId == null ? null : SkinPackLoader.getSkin(skinId);
-            String name = entry == null ? String.valueOf(skinId) : entry.name();
+            String name = SkinPackLoader.nameString(entry == null ? null : entry.name(), String.valueOf(skinId));
 
             int mid = tooltipBox.x - sc(5) + (tooltipBox.getWidth() - sc(18)) / 2;
             int skinNameY = panel.y + tooltipBox.getHeight() - sc(49);
-            drawBigCentered(g, Component.literal(name), mid, skinNameY, 0xFFFFFFFF);
+            drawBigCentered(g, SkinPackLoader.nameComponent(entry == null ? null : entry.name(), String.valueOf(skinId)), mid, skinNameY, 0xFFFFFFFF);
 
             ResourceLocation modelId = null;
             try {
@@ -1109,7 +1109,7 @@ private String resolvePackIdToOpenOnFirstOpen() {
         SkinPack pack = getFocusedPack();
         if (pack != null) {
             int mid = tooltipBox.x - sc(5) + (tooltipBox.getWidth() - sc(18)) / 2;
-            drawBigCentered(g, Component.literal(pack.name()), mid, panel.y + sc(27), 0xFFFFFFFF);
+            drawBigCentered(g, SkinPackLoader.nameComponent(pack.name(), pack.id()), mid, panel.y + sc(27), 0xFFFFFFFF);
             String t = pack.type();
             if (t != null && !t.isBlank()) {
                 String k = t.toLowerCase(Locale.ROOT);

@@ -116,8 +116,8 @@ public abstract class PlayerModelHidePartsBoxModelsMixin {
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
 
         SkinEntry entry = SkinPackLoader.getSkin(skinId);
-        ResourceLocation tex = entry != null ? entry.texture() : null;
-        if (tex == null) tex = ClientSkinAssets.getTexture(skinId);
+        ResourceLocation tex = ClientSkinAssets.getTexture(skinId);
+        if (tex == null && entry != null) tex = entry.texture();
         if (tex == null) return;
 
         ResourceLocation modelId = consoleskins$modelIdFromTexture(tex);
@@ -174,8 +174,8 @@ public abstract class PlayerModelHidePartsBoxModelsMixin {
         }
 
         SkinEntry entry = SkinPackLoader.getSkin(skinId);
-        ResourceLocation tex = entry != null ? entry.texture() : null;
-        if (tex == null) tex = ClientSkinAssets.getTexture(skinId);
+        ResourceLocation tex = ClientSkinAssets.getTexture(skinId);
+        if (tex == null && entry != null) tex = entry.texture();
         if (tex == null) {
             consoleskins$uninstallSpectatorBoxHead(self);
             return;

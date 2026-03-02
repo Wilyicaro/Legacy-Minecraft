@@ -425,7 +425,9 @@ public class PlayerSkinWidget extends AbstractWidget {
             String label = null;
             if (!"auto_select".equals(id)) {
                 SkinEntry e = SkinPackLoader.getSkin(id);
-                if (e != null) label = e.name();
+                if (e != null) {
+                    label = SkinPackLoader.nameString(e.name(), id);
+                }
             } else {
                 label = "Current Skin";
             }
@@ -457,7 +459,7 @@ public class PlayerSkinWidget extends AbstractWidget {
                     theme = BoxModelManager.getThemeText(modelId);
                 } catch (Throwable ignored) {
                 }
-                if (theme != null && (theme.isBlank() || theme.equals(label))) theme = null;
+            if (theme != null && (theme.isBlank() || theme.equals(label))) theme = null;
             }
 
             String showName = label;

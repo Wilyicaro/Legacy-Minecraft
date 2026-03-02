@@ -190,7 +190,6 @@
     "skins.client.LivingEntityRendererUpsideDownMixin",
     "skins.client.AvatarRendererUpsideDownMixin",
     "skins.client.MinecraftSkinSyncTickMixin",
-    "skins.client.TextureManagerDefaultAtlasRecoverMixin",
     "skins.client.HelpAndOptionsScreenSkinsOptionsMixin",
     "skins.client.ModelPartSkipDrawAccessorMixin",
     "skins.client.PlayerModelHidePartsBoxModelsMixin",

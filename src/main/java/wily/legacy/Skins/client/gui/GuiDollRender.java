@@ -168,10 +168,15 @@ public final class GuiDollRender {
         boolean slim = false;
         try {
             SkinEntry entry = selectionId != null ? SkinPackLoader.getSkin(selectionId) : null;
-            if (entry != null) slim = entry.slimArms();
-            else slim = isAlexLike(selectionId, skinTexture);
+            if (entry != null) {
+                slim = entry.slimArms();
+            } else {
+                Boolean b = ClientSkinAssets.getSlimFlag(selectionId);
+                if (b != null) slim = b;
+            }
         } catch (Throwable ignored) {
-            slim = isAlexLike(selectionId, skinTexture);
+            Boolean b = ClientSkinAssets.getSlimFlag(selectionId);
+            if (b != null) slim = b;
         }
         PlayerModelType model = slim ? PlayerModelType.SLIM : PlayerModelType.WIDE;
         PlayerSkin skin = PlayerSkin.insecure(body, cape, body, model);
@@ -194,12 +199,6 @@ public final class GuiDollRender {
         resetPreviewLighting(gui);
     }
 
-    private static boolean isAlexLike(String selectionId, ResourceLocation skinTexture) {
-        String sid = selectionId == null ? "" : selectionId.toLowerCase(java.util.Locale.ROOT);
-        if (sid.contains("alex")) return true;
-        String path = skinTexture == null ? "" : skinTexture.getPath().toLowerCase(java.util.Locale.ROOT);
-        return path.contains("alex");
-    }
 
     private static void applyPreviewLighting(GuiGraphics gui, float brightnessMul) {
         setupInventoryEntityLighting();

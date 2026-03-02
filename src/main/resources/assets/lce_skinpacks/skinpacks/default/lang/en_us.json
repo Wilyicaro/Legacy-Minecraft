@@ -1,0 +1,22 @@
+{
+  "legacy.default.pack": "No Pack: Default Skins",
+  "legacy.default.steve": "Steve",
+  "legacy.default.tennissteve": "Tennis Steve",
+  "legacy.default.tuxsteve": "Tuxedo Steve",
+  "legacy.default.athletesteve": "Athlete Steve",
+  "legacy.default.scottishsteve": "Scottish Steve",
+  "legacy.default.jailsteve": "Prisoner Steve",
+  "legacy.default.cycliststeve": "Cyclist Steve",
+  "legacy.default.boxersteve": "Boxer Steve",
+  "legacy.default.alex": "Alex",
+  "legacy.default.tennisalex": "Tennis Alex",
+  "legacy.default.tuxalex": "Tuxedo Alex",
+  "legacy.default.athletealex": "Athlete Alex",
+  "legacy.default.swedishalex": "Swedish Alex",
+  "legacy.default.prisoneralex": "Prisoner Alex",
+  "legacy.default.cyclistalex": "Cyclist Alex",
+  "legacy.default.boxeralex": "Boxer Alex",
+  "legacy.default.devsteve": "Dev Steve",
+  "legacy.default.devalex": "Dev Alex",
+  "legacy.default.autoselect": "Auto Selected"
+}

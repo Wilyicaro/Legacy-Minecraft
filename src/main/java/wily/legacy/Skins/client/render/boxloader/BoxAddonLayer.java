@@ -40,8 +40,8 @@ public class BoxAddonLayer extends RenderLayer {
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
 
         SkinEntry entry = SkinPackLoader.getSkin(skinId);
-        ResourceLocation texture = entry != null ? entry.texture() : null;
-        if (texture == null) texture = ClientSkinAssets.getTexture(skinId);
+        ResourceLocation texture = ClientSkinAssets.getTexture(skinId);
+        if (texture == null && entry != null) texture = entry.texture();
         if (texture == null) return;
 
         String p = texture.getPath();
