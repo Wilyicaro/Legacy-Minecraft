@@ -111,7 +111,7 @@ public abstract class PlayerModelMenuDollMixin {
         }
 
         if (WeepingStatuePose.shouldApply(state)) {
-            WeepingStatuePose.apply(self);
+            WeepingStatuePose.apply(self, state);
         }
     }
 
