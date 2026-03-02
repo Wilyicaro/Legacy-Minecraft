@@ -384,9 +384,9 @@ private String resolvePackIdToOpenOnFirstOpen() {
                 int x = previewBoxX();
                 int y = previewBoxY();
                 int s = previewBoxSize();
-                int ix = x + 1;
-                int iy = y + 1;
-                int inner = Math.max(1, s - 2);
+                int ix = x + 2;
+                int iy = y + 2;
+                int inner = Math.max(1, s - 4);
                 int[] d = packIconDims(icon);
                 int tw = d[0];
                 int th = d[1];
