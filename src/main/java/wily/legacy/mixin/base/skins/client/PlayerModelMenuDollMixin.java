@@ -119,6 +119,7 @@ public abstract class PlayerModelMenuDollMixin {
         if (model == null) return;
 
         boolean sitting = false;
+        boolean crouching = false;
         if (state != null) {
             try {
                 sitting = state.pose == Pose.SITTING;
@@ -126,6 +127,18 @@ public abstract class PlayerModelMenuDollMixin {
             }
             try {
                 sitting = sitting || state.hasPose(Pose.SITTING);
+            } catch (Throwable ignored) {
+            }
+            try {
+                crouching = state.pose == Pose.CROUCHING;
+            } catch (Throwable ignored) {
+            }
+            try {
+                crouching = crouching || state.hasPose(Pose.CROUCHING);
+            } catch (Throwable ignored) {
+            }
+            try {
+                crouching = crouching || state.isCrouching;
             } catch (Throwable ignored) {
             }
             if (!sitting && state instanceof RenderStateSkinIdAccess a) {
@@ -140,8 +153,6 @@ public abstract class PlayerModelMenuDollMixin {
         model.leftLeg.yRot = 0.0F;
         model.rightLeg.zRot = 0.0F;
         model.leftLeg.zRot = 0.0F;
-        model.rightLeg.z = 0.0F;
-        model.leftLeg.z = 0.0F;
 
         if (sitting) {
             float rot = -((float) Math.PI) / 2.0F + 0.2F;
@@ -149,11 +160,18 @@ public abstract class PlayerModelMenuDollMixin {
             model.leftLeg.xRot = rot;
             model.rightLeg.x = -2.0F;
             model.leftLeg.x = 2.0F;
+            model.rightLeg.z = 0.0F;
+            model.leftLeg.z = 0.0F;
+        } else if (crouching) {
+            model.rightLeg.xRot = 0.0F;
+            model.leftLeg.xRot = 0.0F;
         } else {
             model.rightLeg.xRot = 0.0F;
             model.leftLeg.xRot = 0.0F;
             model.rightLeg.x = -1.9F;
             model.leftLeg.x = 1.9F;
+            model.rightLeg.z = 0.0F;
+            model.leftLeg.z = 0.0F;
         }
 
         model.rightPants.xRot = model.rightLeg.xRot;

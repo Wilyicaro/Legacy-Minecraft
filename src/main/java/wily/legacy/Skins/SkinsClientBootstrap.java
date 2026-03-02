@@ -17,11 +17,22 @@ public final class SkinsClientBootstrap {
     private static final SkinPackReloadListener SKIN_PACK_RELOAD_LISTENER = new SkinPackReloadListener();
     private static volatile boolean reloadListenerRegistered = false;
     private static volatile boolean packPreloadStarted = false;
+    private static volatile boolean defaultSelectionChecked = false;
 
     public static void initClient() {
         SkinSyncClient.initClient();
 
         Legacy4JClient.whenResetOptions.add(ConsoleSkinsClientSettings::resetToDefaults);
+
+        Legacy4JClient.whenResetOptions.add(() -> {
+            try {
+                Minecraft mc = Minecraft.getInstance();
+                SkinPackLoader.setLastUsedCustomPackId(null);
+                SkinSyncClient.requestSetSkin(mc, "");
+                ConsoleSkinsClientSettings.setSkinSelectionInitialized(true);
+            } catch (Throwable ignored) {
+            }
+        });
 
         FactoryAPIClient.setup(m -> {
             try {
@@ -66,6 +77,34 @@ public final class SkinsClientBootstrap {
 
         SkinSyncClient.postTick(minecraft);
         ViewBobbingSkinOverride.tick(minecraft);
+
+        if (!defaultSelectionChecked) {
+            try {
+                if (minecraft != null && minecraft.getUser() != null) {
+                    if (!ConsoleSkinsClientSettings.isSkinSelectionInitialized()) {
+                        java.util.UUID uid = minecraft.getUser().getProfileId();
+                        String existing = null;
+                        try {
+                            existing = wily.legacy.Skins.skin.ClientSkinCache.get(uid);
+                        } catch (Throwable ignored) {
+                        }
+                        if (existing == null || existing.isBlank()) {
+                            try {
+                                existing = wily.legacy.Skins.skin.ClientSkinPersistence.load(uid);
+                            } catch (Throwable ignored) {
+                            }
+                        }
+                        if (existing == null || existing.isBlank()) {
+                            SkinPackLoader.setLastUsedCustomPackId(null);
+                            SkinSyncClient.requestSetSkin(minecraft, "");
+                        }
+                        ConsoleSkinsClientSettings.setSkinSelectionInitialized(true);
+                    }
+                    defaultSelectionChecked = true;
+                }
+            } catch (Throwable ignored) {
+            }
+        }
 
         if (!packPreloadStarted) {
             try {

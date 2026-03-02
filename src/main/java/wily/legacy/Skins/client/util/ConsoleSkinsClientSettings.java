@@ -15,11 +15,13 @@ public final class ConsoleSkinsClientSettings {
     private static final boolean DEFAULT_SKIN_ANIMATIONS = true;
     private static final boolean DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS = false;
     private static final boolean DEFAULT_TU3_CHANGE_SKIN_SCREEN = false;
+    private static final boolean DEFAULT_SKIN_SELECTION_INITIALIZED = false;
     private static volatile boolean loaded;
     private static volatile boolean smoothPreviewScroll;
     private static volatile boolean skinAnimations = DEFAULT_SKIN_ANIMATIONS;
     private static volatile boolean hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
     private static volatile boolean tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
+    private static volatile boolean skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
     private static volatile String lastUsedCustomPackId;
 
     private ConsoleSkinsClientSettings() {
@@ -69,6 +71,17 @@ public final class ConsoleSkinsClientSettings {
         saveQuiet();
     }
 
+    public static boolean isSkinSelectionInitialized() {
+        ensureLoaded();
+        return skinSelectionInitialized;
+    }
+
+    public static void setSkinSelectionInitialized(boolean initialized) {
+        ensureLoaded();
+        skinSelectionInitialized = initialized;
+        saveQuiet();
+    }
+
     public static String getLastUsedCustomPackId() {
         ensureLoaded();
         return lastUsedCustomPackId;
@@ -86,6 +99,7 @@ public final class ConsoleSkinsClientSettings {
         skinAnimations = DEFAULT_SKIN_ANIMATIONS;
         hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
         tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
+        skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
         lastUsedCustomPackId = null;
         saveQuiet();
     }
@@ -103,6 +117,7 @@ public final class ConsoleSkinsClientSettings {
             skinAnimations = DEFAULT_SKIN_ANIMATIONS;
             hideArmorOnAllBoxSkins = DEFAULT_HIDE_ARMOR_ON_ALL_BOX_SKINS;
             tu3ChangeSkinScreen = DEFAULT_TU3_CHANGE_SKIN_SCREEN;
+            skinSelectionInitialized = DEFAULT_SKIN_SELECTION_INITIALIZED;
             lastUsedCustomPackId = null;
 
             Path cfg = resolveConfigFile();
@@ -141,6 +156,12 @@ public final class ConsoleSkinsClientSettings {
                         continue;
                     }
 
+                    if (k.equalsIgnoreCase("skin_selection_initialized") || k.equalsIgnoreCase("skinSelectionInitialized")
+                            || k.equalsIgnoreCase("initialized_skin_selection") || k.equalsIgnoreCase("initializedSkinSelection")) {
+                        skinSelectionInitialized = parseBool(v, DEFAULT_SKIN_SELECTION_INITIALIZED);
+                        continue;
+                    }
+
                     if (k.equalsIgnoreCase("last_used_custom_pack") || k.equalsIgnoreCase("lastUsedCustomPack") || k.equalsIgnoreCase("last_used_custom_pack_id")) {
                         lastUsedCustomPackId = v == null || v.isBlank() ? null : v.trim();
                     }
@@ -169,6 +190,7 @@ public final class ConsoleSkinsClientSettings {
                     + "skin_animations=" + skinAnimations + "\n"
                     + "hide_armor_on_all_box_skins=" + hideArmorOnAllBoxSkins + "\n"
                     + "tu3_change_skin_screen=" + tu3ChangeSkinScreen + "\n"
+                    + "skin_selection_initialized=" + skinSelectionInitialized + "\n"
                     + "last_used_custom_pack=" + (lastUsedCustomPackId == null ? "" : lastUsedCustomPackId) + "\n";
             Files.writeString(cfg, out, StandardCharsets.UTF_8);
         } catch (Throwable ignored) {
