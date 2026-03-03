@@ -1,12 +1,8 @@
 package wily.legacy.Skins.client.screen;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
-
-import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import wily.legacy.Skins.client.screen.changeskin.ChangeSkinActions;
@@ -16,7 +12,6 @@ import wily.legacy.Skins.client.screen.widget.PlayerSkinWidgetList;
 import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.Skins.skin.ClientSkinCache;
 import wily.legacy.Skins.skin.SkinEntry;
-import wily.legacy.Skins.skin.SkinIds;
 import wily.legacy.Skins.skin.SkinPack;
 import wily.legacy.Skins.skin.SkinPackLoader;
 import wily.legacy.Skins.skin.SkinSync;
@@ -29,7 +24,6 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.Resource;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.BindingState;
@@ -67,11 +61,10 @@ public class TU3ChangeSkinScreen extends PanelVListScreen implements wily.legacy
     private static final int BASE_PANEL_HEIGHT = 290;
     private float uiScale = 1f;
     private int tooltipWidth = BASE_TOOLTIP_WIDTH;
-    private final Map<ResourceLocation, int[]> packIconDims = new HashMap<>();
     private final ChangeSkinPackList packList;
     private final ChangeSkinActions actions;
 
-    private boolean stickUpHeld, stickDownHeld, shiftHeld, pHeld, enterHeld, firstOpen = true;
+    private boolean stickUpHeld, stickDownHeld, leftStickUpHeld, leftStickDownHeld, shiftHeld, pHeld, enterHeld, firstOpen = true;
 
     private boolean draggingCenterDoll;
     private boolean centerDragMoved;
@@ -178,9 +171,10 @@ public class TU3ChangeSkinScreen extends PanelVListScreen implements wily.legacy
     private void renderTu3Tabs(GuiGraphics g) {
         computeTu3Tabs();
         int midExtra = tu3MidExtra();
-        int midY = tu3TabY - midExtra;
-        if (midY < tu3StripY) midY = tu3StripY;
-        int midH = tu3TabH + (tu3TabY - midY);
+        int shiftUpPx = 2;
+        int baseY = tu3TabY - shiftUpPx;
+        int midY = baseY - midExtra;
+        int midH = tu3TabH + midExtra;
 
         blitSprite(g, TU3_TAB_PLATE, tu3TabMidX, midY, Math.max(1, tu3TabMidW), midH);
 
@@ -226,29 +220,6 @@ public class TU3ChangeSkinScreen extends PanelVListScreen implements wily.legacy
         if (max < size) size = Math.max(min, max);
         return Math.max(1, size);
     }
-
-    private int[] packIconDims(ResourceLocation icon) {
-        int[] d = packIconDims.get(icon);
-        if (d != null) return d;
-        int w = 128;
-        int h = 128;
-        try {
-            Resource r = minecraft.getResourceManager().getResource(icon).orElse(null);
-            if (r != null) {
-                try (var in = r.open()) {
-                    NativeImage img = NativeImage.read(in);
-                    w = img.getWidth();
-                    h = img.getHeight();
-                    img.close();
-                }
-            }
-        } catch (Throwable ignored) {
-        }
-        int[] out = new int[]{Math.max(1, w), Math.max(1, h)};
-        packIconDims.put(icon, out);
-        return out;
-    }
-
     private int previewBoxX() {
         int s = previewBoxSize();
         int x = panel.x + sc(34);
@@ -369,69 +340,10 @@ public class TU3ChangeSkinScreen extends PanelVListScreen implements wily.legacy
         actions.openLegacyChangeSkinScreen();
     }
 
-    private boolean isUsingAutoSelectedSkin() {
-        UUID self = minecraft.player != null ? minecraft.player.getUUID() : minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
-        if (self == null) return true;
-        String selectedId = ClientSkinCache.get(self);
-        if (selectedId == null) selectedId = SkinSync.getServerSkinId(self);
-        return selectedId == null || selectedId.isBlank();
-    }
-
-
-private String getCurrentSelectedSkinId() {
-    UUID self = minecraft.player != null ? minecraft.player.getUUID()
-            : (minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null);
-    if (self == null) return null;
-    String selectedId = ClientSkinCache.get(self);
-    if (selectedId == null) selectedId = SkinSync.getServerSkinId(self);
-    return selectedId;
-}
-
-private String resolvePackIdToOpenOnFirstOpen() {
-    try {
-        String def = SkinPackLoader.getPreferredDefaultPackId();
-        var packs = SkinPackLoader.getPacks();
-
-        String selectedId = getCurrentSelectedSkinId();
-        String candidate = null;
-
-        if (selectedId != null && !selectedId.isBlank()) {
-            String last = SkinPackLoader.getLastUsedCustomPackId();
-            if (last != null && packs.containsKey(last) && SkinPackLoader.packContainsSkinId(last, selectedId)) candidate = last;
-
-            if (candidate == null) {
-                String src = SkinPackLoader.getSourcePackId(selectedId);
-                if (src != null && !src.isBlank() && packs.containsKey(src)) candidate = src;
-            }
-        }
-
-        if (candidate == null) {
-            String last = SkinPackLoader.getLastUsedCustomPackId();
-            if (last != null && packs.containsKey(last)) candidate = last;
-        }
-
-        if (candidate != null && packs.containsKey(candidate)) return candidate;
-        if (def != null && packs.containsKey(def)) return def;
-        return SkinIds.PACK_DEFAULT;
-    } catch (Throwable ignored) {
-        return SkinIds.PACK_DEFAULT;
-    }
-}
-
     private int resolveSelectedSkinIndex() {
         UUID self = minecraft.player != null ? minecraft.player.getUUID() : minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
         String selectedId = self != null ? ClientSkinCache.get(self) : null;
-        if (selectedId == null || selectedId.isBlank()) {
-            SkinPack focused = actions.getFocusedPack();
-            if (focused != null && focused.skins() != null) {
-                int limit = Math.min(100, focused.skins().size());
-                for (int i = 0; i < limit; i++) {
-                    SkinEntry se = focused.skins().get(i);
-                    if (se != null && SkinIds.AUTO_SELECT.equals(se.id())) return i;
-                }
-            }
-            return 0;
-        }
+        if (selectedId == null || selectedId.isBlank()) return 0;
 
         SkinPack focused = actions.getFocusedPack();
         if (focused != null && focused.skins() != null) {
@@ -581,7 +493,7 @@ private String resolvePackIdToOpenOnFirstOpen() {
         tooltipBox.size(layoutW + off23, layoutH + off90);
 
         if (firstOpen) {
-            String openId = resolvePackIdToOpenOnFirstOpen();
+            String openId = SkinPackLoader.getLastUsedCustomPackId();
             if (openId != null) packList.focusPackId(openId, false);
         }
     }
@@ -602,8 +514,6 @@ private String resolvePackIdToOpenOnFirstOpen() {
 
         if (firstOpen) {
             firstOpen = false;
-            String openId = resolvePackIdToOpenOnFirstOpen();
-            if (openId != null) packList.focusPackId(openId, false);
             packList.consumeQueuedChangePack();
             skinPack(resolveSelectedSkinIndex());
             actions.warmupFavouritesPack();
@@ -616,25 +526,7 @@ private String resolvePackIdToOpenOnFirstOpen() {
     public boolean keyPressed(KeyEvent e) {
         int key = InputConstants.getKey(e).getValue();
 
-        if (key == InputConstants.KEY_W || key == InputConstants.KEY_S) {
-            int dir = key == InputConstants.KEY_S ? 1 : -1;
-            int count = packList.getPackCount();
-            if (count > 1) {
-                int target = wrapPackIndex(packList.getFocusedPackIndex() + dir);
-                ChangeSkinPackList.PackButton btn = packList.getButtonForIndex(target);
-                packList.setFocusedPackIndex(target, true);
-                if (btn != null) {
-                    setFocused(btn);
-                    focusPackListItem(btn);
-                }
-                if (packList.consumeQueuedChangePack()) {
-                    stopHoldingOuterCarousel();
-                    cancelQueuedCarousel();
-                    skinPack(resolveSelectedSkinIndex());
-                }
-            }
-            return true;
-        }
+        if (ControlType.getActiveType().isKbm() && (key == InputConstants.KEY_W || key == InputConstants.KEY_S)) return true;
 
         if (key == InputConstants.KEY_RETURN) {
             if (!enterHeld) enterHeld = true;
@@ -715,9 +607,15 @@ private String resolvePackIdToOpenOnFirstOpen() {
     }
 
     private boolean handlePackListStepNavigation(int key) {
-        boolean up = key == InputConstants.KEY_W || key == InputConstants.KEY_UP;
-        boolean down = key == InputConstants.KEY_S || key == InputConstants.KEY_DOWN;
+        boolean kbm = ControlType.getActiveType().isKbm();
+        boolean up = key == InputConstants.KEY_UP;
+        boolean down = key == InputConstants.KEY_DOWN;
         if (!(up || down)) return false;
+
+        // TU3 controller: Up/Down should do nothing (L1/R1 already switch packs).
+        if (!kbm && (key == InputConstants.KEY_UP || key == InputConstants.KEY_DOWN)) {
+            return true;
+        }
 
         if (key == InputConstants.KEY_UP || key == InputConstants.KEY_DOWN) {
             var f = getFocused();
@@ -894,9 +792,10 @@ private String resolvePackIdToOpenOnFirstOpen() {
         if (e.button() == InputConstants.MOUSE_BUTTON_LEFT) {
             computeTu3Tabs();
             int midExtra = tu3MidExtra();
-            int midY = tu3TabY - midExtra;
-            if (midY < tu3StripY) midY = tu3StripY;
-            int midH = tu3TabH + (tu3TabY - midY);
+            int shiftUpPx = 2;
+            int baseY = tu3TabY - shiftUpPx;
+            int midY = baseY - midExtra;
+            int midH = tu3TabH + midExtra;
             if (inside(mx, my, tu3TabLeftX, tu3TabY, Math.max(1, tu3TabLeftW), tu3TabH)) {
                 packList.setFocusedPackIndex(packList.getFocusedPackIndex() - 1, true);
                 return true;
@@ -1116,7 +1015,56 @@ private String resolvePackIdToOpenOnFirstOpen() {
             }
         }
 
+        if (!ControlType.getActiveType().isKbm() && state != null && state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick) {
+            final double triggerY = 0.65d, sideLimit = 0.45d;
+            double sx = stick.x, sy = stick.y;
+
+            if (Math.abs(sx) <= sideLimit) {
+                if (sy <= -triggerY) {
+                    if (!leftStickUpHeld) {
+                        leftStickUpHeld = true;
+                    }
+                    state.block();
+                    return;
+                }
+                if (sy >= triggerY) {
+                    if (!leftStickDownHeld) {
+                        leftStickDownHeld = true;
+                    }
+                    state.block();
+                    return;
+                }
+            }
+
+            if (Math.abs(sy) < 0.25d) {
+                leftStickUpHeld = false;
+                leftStickDownHeld = false;
+            }
+        }
+
         super.bindingStateTick(state);
+    }
+
+    private void stepPack(boolean up) {
+        int count = packList != null ? packList.getPackCount() : 0;
+        if (count <= 1) return;
+
+        int target = packList.getFocusedPackIndex() + (up ? -1 : 1);
+        if (target < 0) target = count - 1;
+        else if (target >= count) target = 0;
+
+        ChangeSkinPackList.PackButton btn = packList.getButtonForIndex(target);
+        if (btn == null) return;
+
+        packList.setFocusedPackIndex(target, true);
+        setFocused(btn);
+        focusPackListItem(btn);
+
+        if (packList.consumeQueuedChangePack()) {
+            stopHoldingOuterCarousel();
+            cancelQueuedCarousel();
+            skinPack(resolveSelectedSkinIndex());
+        }
     }
 
     @Override
@@ -1149,8 +1097,7 @@ private String resolvePackIdToOpenOnFirstOpen() {
         });
 
         r.add(() -> ControlType.getActiveType().isKbm()
-                ? ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_W), ControlTooltip.SPACE_ICON,
-                ControlTooltip.getKeyIcon(InputConstants.KEY_A), ControlTooltip.SPACE_ICON, ControlTooltip.getKeyIcon(InputConstants.KEY_S), ControlTooltip.SPACE_ICON,
+                ? ControlTooltip.COMPOUND_ICON_FUNCTION.apply(new ControlTooltip.Icon[]{ControlTooltip.getKeyIcon(InputConstants.KEY_A), ControlTooltip.SPACE_ICON,
                 ControlTooltip.getKeyIcon(InputConstants.KEY_D)})
                 : ControllerBinding.LEFT_STICK.bindingState.getIcon(), () -> Component.literal("Navigate"));
 
@@ -1308,7 +1255,7 @@ private String resolvePackIdToOpenOnFirstOpen() {
 
     @Override
     public void removed() {
-        stickUpHeld = stickDownHeld = shiftHeld = pHeld = enterHeld = false;
+        stickUpHeld = stickDownHeld = leftStickUpHeld = leftStickDownHeld = shiftHeld = pHeld = enterHeld = false;
         draggingCenterDoll = false;
         centerDragMoved = false;
         PlayerSkinWidget.clearCarouselClip();
