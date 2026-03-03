@@ -85,6 +85,11 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
     private long holdingOuterStartAt;
     private long holdingOuterNextAt;
 
+    private boolean holdingPackStick;
+    private int holdingPackDir;
+    private long holdingPackStartAt;
+    private long holdingPackNextAt;
+
     private PlayerSkinWidgetList playerSkinWidgetList;
 
     private static void blitSprite(GuiGraphics g, ResourceLocation id, int x, int y, int w, int h) {
@@ -519,15 +524,54 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         if (btn == null) return true;
 
         packList.setFocusedPackIndex(target, true);
-        setFocused(btn);
         focusPackListItem(btn);
         return true;
     }
 
     private void focusPackListItem(Object item) {
-        Object v = getRenderableVList();
-        if (v == null || item == null) return;
-
+        RenderableVList vList = getRenderableVList();
+        if (vList == null || item == null) return;
+    
+        if (item instanceof ChangeSkinPackList.PackButton btn) {
+            if (btn.getPackIndex() < 0) return;
+    
+            if (children().contains(btn)) {
+                setFocused(btn);
+                return;
+            }
+    
+            int target = btn.getPackIndex();
+            int min = Integer.MAX_VALUE;
+            int max = Integer.MIN_VALUE;
+            for (var c : children()) {
+                if (c instanceof ChangeSkinPackList.PackButton pb && pb.getPackIndex() >= 0) {
+                    int idx = pb.getPackIndex();
+                    if (idx < min) min = idx;
+                    if (idx > max) max = idx;
+                }
+            }
+    
+            boolean down;
+            if (min == Integer.MAX_VALUE) {
+                down = true;
+            } else if (target < min) {
+                down = false;
+            } else if (target > max) {
+                down = true;
+            } else {
+                setFocused(btn);
+                return;
+            }
+    
+            int guard = Math.max(8, packList.getPackCount() + 4);
+            for (int t = 0; t < guard && !children().contains(btn); t++) {
+                vList.mouseScrolled(down);
+            }
+            if (children().contains(btn)) setFocused(btn);
+            return;
+        }
+    
+        Object v = vList;
         try {
             String[] names = {"setFocused", "focus", "focusRenderable", "setFocusedRenderable", "ensureVisible", "ensureRenderableVisible", "scrollTo", "scrollToIndex"};
             for (String n : names)
@@ -539,7 +583,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
                         return;
                     }
                 }
-
+    
             int idx = item instanceof ChangeSkinPackList.PackButton pb ? pb.getPackIndex() : packList.getFocusedPackIndex();
             String[] idxNames = {"scrollToIndex", "setScrollToIndex", "focusIndex", "setFocusedIndex", "setIndex", "scrollTo"};
             for (String n : idxNames)
@@ -554,6 +598,8 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         } catch (Throwable ignored) {
         }
     }
+
+
 
     private boolean control(boolean left, boolean right) {
         if (!(left || right) || playerSkinWidgetList == null) return false;
@@ -679,6 +725,33 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         long delay = held < 700L ? 120L : 80L;
         holdingOuterNextAt = now + delay;
     }
+
+    private void startHoldingPackStick(int dir) {
+        holdingPackStick = true;
+        holdingPackDir = dir < 0 ? -1 : 1;
+        long now = net.minecraft.Util.getMillis();
+        holdingPackStartAt = now;
+        holdingPackNextAt = now + 220L;
+        stepPack(holdingPackDir < 0);
+    }
+
+    private void stopHoldingPackStick() {
+        holdingPackStick = false;
+        holdingPackDir = 0;
+        holdingPackStartAt = 0L;
+        holdingPackNextAt = 0L;
+    }
+
+    private void pumpHoldingPackStick() {
+        if (!holdingPackStick) return;
+        long now = net.minecraft.Util.getMillis();
+        if (now < holdingPackNextAt) return;
+        stepPack(holdingPackDir < 0);
+        long held = now - holdingPackStartAt;
+        long delay = held < 700L ? 120L : 80L;
+        holdingPackNextAt = now + delay;
+    }
+
     @Override
     public boolean mouseClicked(MouseButtonEvent e, boolean bl) {
         double mx = e.x(), my = e.y();
@@ -883,32 +956,24 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
             }
         }
 
-        if (!ControlType.getActiveType().isKbm() && state != null && state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick) {
-            final double triggerY = 0.65d, sideLimit = 0.45d;
-            double sx = stick.x, sy = stick.y;
 
-            if (Math.abs(sx) <= sideLimit) {
-                if (sy <= -triggerY) {
-                    if (!leftStickUpHeld) {
-                        leftStickUpHeld = true;
-                        stepPack(true);
-                    }
-                    state.block();
-                    return;
-                }
-                if (sy >= triggerY) {
-                    if (!leftStickDownHeld) {
-                        leftStickDownHeld = true;
-                        stepPack(false);
-                    }
-                    state.block();
-                    return;
-                }
+        if (!ControlType.getActiveType().isKbm() && state != null && state.is(ControllerBinding.LEFT_STICK) && state instanceof BindingState.Axis stick) {
+            final double triggerY = 0.65d, releaseY = 0.3d, sideLimit = 0.45d;
+            double sx = stick.x, sy = stick.y;
+            double ay = Math.abs(sy);
+
+            if (Math.abs(sx) > sideLimit || ay < releaseY) {
+                stopHoldingPackStick();
+            } else if (ay >= triggerY) {
+                int dir = sy < 0 ? -1 : 1;
+                if (!holdingPackStick || holdingPackDir != dir) startHoldingPackStick(dir);
             }
 
-            if (Math.abs(sy) < 0.25d) {
-                leftStickUpHeld = false;
-                leftStickDownHeld = false;
+            pumpHoldingPackStick();
+
+            if (Math.abs(sx) <= sideLimit && ay >= releaseY) {
+                state.block();
+                return;
             }
         }
 
@@ -927,7 +992,6 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         if (btn == null) return;
 
         packList.setFocusedPackIndex(target, true);
-        setFocused(btn);
         focusPackListItem(btn);
     }
 
@@ -962,7 +1026,6 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         var f = getFocused();
         if (f == null || f == getRenderableVList() || f instanceof ChangeSkinPackList.PackButton)
             if (f != target) {
-                setFocused(target);
                 focusPackListItem(target);
             }
     }
@@ -1028,6 +1091,7 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
 
         pumpQueuedCarousel();
         pumpHoldingOuterCarousel();
+        pumpHoldingPackStick();
     }
 
     @Override
@@ -1165,6 +1229,8 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
     @Override
     public void removed() {
         stickUpHeld = stickDownHeld = leftStickUpHeld = leftStickDownHeld = shiftHeld = pHeld = enterHeld = false;
+        stopHoldingPackStick();
+        stopHoldingOuterCarousel();
         draggingCenterDoll = false;
         centerDragMoved = false;
         PlayerSkinWidget.clearCarouselClip();

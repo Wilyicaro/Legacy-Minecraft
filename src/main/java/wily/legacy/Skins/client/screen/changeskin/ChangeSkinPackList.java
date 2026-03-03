@@ -1,19 +1,21 @@
 package wily.legacy.Skins.client.screen.changeskin;
 
 import wily.legacy.Skins.skin.SkinIds;
-import wily.legacy.Skins.skin.SkinIdUtil;
 import wily.legacy.Skins.skin.SkinPack;
 import wily.legacy.Skins.skin.SkinPackLoader;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.screen.RenderableVList;
+import wily.legacy.util.LegacySprites;
 
 public final class ChangeSkinPackList {
 
@@ -26,11 +28,10 @@ public final class ChangeSkinPackList {
     private final List<PackButton> packButtons = new ArrayList<>();
 
     private int buttonHeight = 20;
+    private float textScale = 1f;
 
     private int focusedPackIndex;
     private boolean queuedChangePack;
-
-    private String lastUsedCustomPackId;
 
     public interface FocusChange {
         void onFocusedPackChanged();
@@ -55,6 +56,10 @@ public final class ChangeSkinPackList {
     public void applyUiScale(float uiScale) {
         int h = Math.max(1, Math.round(20f * uiScale));
         buttonHeight = Math.max(10, h);
+        float s = uiScale * 1.15f;
+        if (s < 0.90f) s = 0.90f;
+        if (s > 1.30f) s = 1.30f;
+        textScale = s;
         for (PackButton b : packButtons) b.applyHeight(buttonHeight);
     }
 
@@ -63,7 +68,6 @@ public final class ChangeSkinPackList {
         List<String> currentBase = new ArrayList<>(SkinPackLoader.getPacks().keySet());
 
         if (currentBase.equals(basePackIds)) {
-
             refreshButtonLabels();
             return;
         }
@@ -79,7 +83,6 @@ public final class ChangeSkinPackList {
     }
 
     public void bumpMostRecentCustomPack(String packId) {
-
         SkinPackLoader.setLastUsedCustomPackId(packId);
     }
 
@@ -175,7 +178,6 @@ public final class ChangeSkinPackList {
 
         String bump = SkinPackLoader.getLastUsedCustomPackId();
         if (bump != null && packIds.contains(bump)) {
-
             packIds.remove(bump);
 
             int insertAt = 1;
@@ -272,7 +274,72 @@ public final class ChangeSkinPackList {
 
         @Override
         protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-            super.renderWidget(graphics, mouseX, mouseY, partialTick);
+            if (!this.visible) return;
+
+            boolean selected = packIndex >= 0 && packIndex == focusedPackIndex;
+            boolean hot = selected || this.isHoveredOrFocused();
+            ResourceLocation sprite = hot ? LegacySprites.BUTTON_HIGHLIGHTED : LegacySprites.BUTTON;
+            int bw = Math.max(1, width);
+            int bh = Math.max(1, height);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, getX(), getY(), bw, bh);
+
+                        var font = Minecraft.getInstance().font;
+            String label = getMessage() == null ? "" : getMessage().getString();
+
+            float s = ChangeSkinPackList.this.textScale;
+            int maxPx = Math.max(1, bw - 10);
+            int maxUnscaled = (int) (maxPx / s);
+
+            int color;
+            if (!active) color = 0xFFAAAAAA;
+            else if (selected) color = 0xFFFFFFFF;
+            else color = 0xDDFFFFFF;
+
+            var pose = graphics.pose();
+
+            if (font.width(label) <= maxUnscaled) {
+                int cx = getX() + bw / 2;
+                int cy = getY() + (bh - Math.round(font.lineHeight * s)) / 2;
+                pose.pushMatrix();
+                pose.translate((float) cx, (float) cy);
+                pose.scale(s, s);
+                graphics.drawCenteredString(font, Component.literal(label), 0, 0, color);
+                pose.popMatrix();
+            } else {
+                String ell = "...";
+                float sEll = s * 1.2f;
+                if (sEll > s * 1.35f) sEll = s * 1.35f;
+
+                int ellWUn = font.width(ell);
+                float availPx = maxPx - ellWUn * sEll;
+                if (availPx < 0) availPx = 0;
+
+                int baseMaxUn = (int) (availPx / s);
+                String base = font.plainSubstrByWidth(label, Math.max(0, baseMaxUn));
+
+                while (!base.isEmpty() && Character.isWhitespace(base.charAt(base.length() - 1))) {
+                    base = base.substring(0, base.length() - 1);
+                }
+
+int baseWUn = font.width(base);
+                float totalPx = baseWUn * s + ellWUn * sEll;
+
+                float startX = getX() + (bw - totalPx) / 2f;
+                float yBase = getY() + (bh - font.lineHeight * s) / 2f;
+                float yEll = getY() + (bh - font.lineHeight * sEll) / 2f;
+
+                pose.pushMatrix();
+                pose.translate(startX, yBase);
+                pose.scale(s, s);
+                graphics.drawString(font, base, 0, 0, color, false);
+                pose.popMatrix();
+
+                pose.pushMatrix();
+                pose.translate(startX + baseWUn * s, yEll);
+                pose.scale(sEll, sEll);
+                graphics.drawString(font, ell, 0, 0, color, false);
+                pose.popMatrix();
+            }
             if (!ControlType.getActiveType().isKbm() && this.isFocused() && packIndex >= 0 && focusedPackIndex != packIndex) {
                 setFocusedPackIndex(packIndex, false);
             }

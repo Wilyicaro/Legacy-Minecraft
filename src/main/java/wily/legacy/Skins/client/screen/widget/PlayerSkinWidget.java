@@ -27,10 +27,11 @@ import net.minecraft.util.Mth;
 public class PlayerSkinWidget extends AbstractWidget {
     private static final float ROTATION_SENSITIVITY = 2.5F;
     private static final float ROTATION_X_LIMIT = 50.0F;
-    private static final float CAROUSEL_INTERP_MS = 320.0F;
-    private static final float CAROUSEL_INTERP_SMOOTH_MS = 220.0F;
-    private static final long CAROUSEL_FPS_FRAME_MS = 33L;
-    private static volatile boolean CLIP_ENABLED;
+    private static final float CAROUSEL_INTERP_MS = 250.0F;
+    private static final float CAROUSEL_INTERP_SMOOTH_MS = 190.0F;
+    private static final long CAROUSEL_FPS_FRAME_MS = 16L;
+    private static final int CAROUSEL_KEYFRAMES = 15;
+private static volatile boolean CLIP_ENABLED;
     private static volatile int CLIP_X1;
     private static volatile int CLIP_Y1;
     private static volatile int CLIP_X2;
@@ -140,6 +141,7 @@ public class PlayerSkinWidget extends AbstractWidget {
     private boolean wasHidden = true;
     private long start;
     private long lastAnimUpdate;
+    private int lastStep = -1;
     private Integer snapX;
     private Integer snapY;
     private Float snapRotX;
@@ -206,11 +208,11 @@ public class PlayerSkinWidget extends AbstractWidget {
         if (!this.visible || this.wasHidden) {
             this.rotationX = targetRotationX;
             this.rotationY = targetRotationY;
-            this.setX((int) targetPosX);
-            this.setY((int) targetPosY);
+            this.setX(Math.round(targetPosX));
+            this.setY(Math.round(targetPosY));
             this.scale = targetScale;
-            setWidth((int) (this.originalWidth * scale));
-            setHeight((int) (this.originalHeight * scale));
+            setWidth(Math.round(this.originalWidth * scale));
+            setHeight(Math.round(this.originalHeight * scale));
             if (this.visible) this.wasHidden = false;
             this.targetRotationX = Float.NEGATIVE_INFINITY;
             this.targetRotationY = Float.NEGATIVE_INFINITY;
@@ -224,12 +226,14 @@ public class PlayerSkinWidget extends AbstractWidget {
             this.snapScale = null;
             this.start = 0L;
             this.lastAnimUpdate = 0L;
+            this.lastStep = -1;
             this.progress = 2;
             return;
         }
         this.progress = 0;
         this.start = System.currentTimeMillis();
         this.lastAnimUpdate = 0L;
+        this.lastStep = -1;
         this.prevRotationX = rotationX;
         this.prevRotationY = rotationY;
         this.targetRotationX = targetRotationX;
@@ -294,24 +298,25 @@ public class PlayerSkinWidget extends AbstractWidget {
             }
             if (snapScale != null) {
                 this.scale = snapScale;
-                setWidth((int) (this.originalWidth * scale));
-                setHeight((int) (this.originalHeight * scale));
+                setWidth(Math.round(this.originalWidth * scale));
+                setHeight(Math.round(this.originalHeight * scale));
             }
             snapRotX = null;
             snapRotY = null;
             snapScale = null;
         } else if (this.targetPosX != Float.NEGATIVE_INFINITY) {
-            this.setX((int) this.targetPosX);
-            this.setY((int) targetPosY);
+            this.setX(Math.round(this.targetPosX));
+            this.setY(Math.round(targetPosY));
         }
         this.targetPosX = Float.NEGATIVE_INFINITY;
         this.targetPosY = Float.NEGATIVE_INFINITY;
         if (!snapped && this.targetScale != Float.NEGATIVE_INFINITY) {
             this.scale = targetScale;
-            setWidth((int) (this.originalWidth * scale));
-            setHeight((int) (this.originalHeight * scale));
+            setWidth(Math.round(this.originalWidth * scale));
+            setHeight(Math.round(this.originalHeight * scale));
         }
         this.targetScale = Float.NEGATIVE_INFINITY;
+        this.lastStep = -1;
 
         if (pendingPoseMode != -1) {
             setPoseModeInternal(pendingPoseMode, pendingPunchLoop);
@@ -333,28 +338,36 @@ public class PlayerSkinWidget extends AbstractWidget {
         float nScale = prevScale * (1 - delta) + targetScale * delta;
         this.rotationX = nRotX;
         this.rotationY = nRotY;
-        this.setX((int) nPosX);
-        this.setY((int) nPosY);
+        this.setX(Math.round(nPosX));
+        this.setY(Math.round(nPosY));
         this.scale = nScale;
-        setWidth((int) (this.originalWidth * scale));
-        setHeight((int) (this.originalHeight * scale));
+        setWidth(Math.round(this.originalWidth * scale));
+        setHeight(Math.round(this.originalHeight * scale));
     }
 
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (!visible) return;
         long now = System.currentTimeMillis();
-        final float interpMs = ConsoleSkinsClientSettings.isSmoothPreviewScroll() ? CAROUSEL_INTERP_SMOOTH_MS : CAROUSEL_INTERP_MS;
-        if (ConsoleSkinsClientSettings.isSmoothPreviewScroll()) {
+        final boolean smoothScroll = ConsoleSkinsClientSettings.isSmoothPreviewScroll();
+        final float interpMs = smoothScroll ? CAROUSEL_INTERP_SMOOTH_MS : CAROUSEL_INTERP_MS;
+        if (smoothScroll) {
             lastAnimUpdate = now;
             if (start == 0L) start = now;
             progress = (now - start) / interpMs;
             interpolate(progress);
-        } else if (now - lastAnimUpdate >= CAROUSEL_FPS_FRAME_MS) {
-            lastAnimUpdate = now;
-            if (start == 0L) start = now;
-            progress = (now - start) / interpMs;
-            interpolate(progress);
+        } else {
+            if (start == 0L) {
+                start = now;
+                lastStep = -1;
+            }
+            float stepMs = interpMs / (float) CAROUSEL_KEYFRAMES;
+            int step = (int) ((now - start) / stepMs);
+            if (step != lastStep) {
+                lastStep = step;
+                progress = step / (float) CAROUSEL_KEYFRAMES;
+                interpolate(progress);
+            }
         }
         int left = this.getX();
         int top = this.getY();
@@ -370,7 +383,7 @@ public class PlayerSkinWidget extends AbstractWidget {
         String id = skinId.get();
         if (id == null) return;
         float yawOffset = this.rotationY;
-        if (isUpsideDownFacingFlip(id)) yawOffset = -yawOffset;
+if (isUpsideDownFacingFlip(id)) yawOffset = -yawOffset;
         float attackTime = 0.0F;
         if (punchLoop) {
 
