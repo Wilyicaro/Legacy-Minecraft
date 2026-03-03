@@ -47,6 +47,7 @@ public final class SkinPackLoader {
     private static final ResourceLocation BUILTIN_PACK_MANIFEST = ResourceLocation.fromNamespaceAndPath(BUILTIN_PACK_NAMESPACE, "skinpacks/manifest.json");
 
     private static final String SKINPACKS_PREFIX = "skinpacks/";
+    private static final String DEFAULT_SKINPACKS_PREFIX = "default_skinpacks/";
     private static final String PACK_JSON_SUFFIX = "/pack.json";
 
     private SkinPackLoader() {
@@ -188,7 +189,9 @@ public final class SkinPackLoader {
             }
 
             try {
-                Map<ResourceLocation, Resource> jsons = rm.listResources("skinpacks", rl -> rl.getPath().endsWith(".json"));
+                Map<ResourceLocation, Resource> jsons = new java.util.HashMap<>();
+                try { jsons.putAll(rm.listResources("skinpacks", rl -> rl.getPath().endsWith(".json"))); } catch (Throwable ignored) {}
+                try { jsons.putAll(rm.listResources("default_skinpacks", rl -> rl.getPath().endsWith(".json"))); } catch (Throwable ignored) {}
                 ArrayList<ResourceLocation> keys = new ArrayList<>(jsons.keySet());
                 keys.sort(Comparator.comparing(ResourceLocation::getNamespace).thenComparing(ResourceLocation::getPath));
 
@@ -204,7 +207,10 @@ public final class SkinPackLoader {
                     if (anyManifest && packId.startsWith("_")) continue;
 
                     JsonObject json = readObj(jsons.get(rl));
-                    if (json != null) loadSinglePack(ns, packId, packId, json, rm, packs, skinsById, packBySkin, packSortIndex, packHasSort, packInsertIndex, insertCounter);
+                    if (json != null) {
+                        String prefix = path.startsWith(DEFAULT_SKINPACKS_PREFIX) ? DEFAULT_SKINPACKS_PREFIX : SKINPACKS_PREFIX;
+                        loadSinglePack(ns, packId, packId, prefix, json, rm, packs, skinsById, packBySkin, packSortIndex, packHasSort, packInsertIndex, insertCounter);
+                    }
                 }
             } catch (Throwable ex) {
                 DebugLog.warn("ResourceManager skinpack scan failed: {}", ex.toString());
@@ -357,7 +363,8 @@ public final class SkinPackLoader {
         }
 
         String folder = inferPackFolderFromPackPath(resolved, packId);
-        loadSinglePack(namespace, packId, folder, packObj, rm, packsOut, skinsByIdOut, packBySkinOut, packSortIndex, packHasSort, packInsertIndex, insertCounter);
+        String prefix = resolved.startsWith(DEFAULT_SKINPACKS_PREFIX) ? DEFAULT_SKINPACKS_PREFIX : SKINPACKS_PREFIX;
+        loadSinglePack(namespace, packId, folder, prefix, packObj, rm, packsOut, skinsByIdOut, packBySkinOut, packSortIndex, packHasSort, packInsertIndex, insertCounter);
     }
 
     return true;
@@ -367,7 +374,7 @@ public final class SkinPackLoader {
         if (manifestPath != null && !manifestPath.isBlank()) {
             String p = manifestPath.trim();
             if (p.startsWith("/")) p = p.substring(1);
-            if (p.startsWith(SKINPACKS_PREFIX)) return p;
+            if (p.startsWith(SKINPACKS_PREFIX) || p.startsWith(DEFAULT_SKINPACKS_PREFIX)) return p;
             return SKINPACKS_PREFIX + p;
         }
         String id = packId;
@@ -380,10 +387,16 @@ public final class SkinPackLoader {
         if (packJsonPath != null) {
             String p = packJsonPath;
             if (p.startsWith("/")) p = p.substring(1);
-            if (p.startsWith(SKINPACKS_PREFIX) && p.endsWith(PACK_JSON_SUFFIX)) {
-                String mid = p.substring(SKINPACKS_PREFIX.length(), p.length() - PACK_JSON_SUFFIX.length());
-                if (!mid.isBlank()) return mid;
-            }
+            if (p.endsWith(PACK_JSON_SUFFIX)) {
+    if (p.startsWith(SKINPACKS_PREFIX)) {
+        String mid = p.substring(SKINPACKS_PREFIX.length(), p.length() - PACK_JSON_SUFFIX.length());
+        if (!mid.isBlank()) return mid;
+    }
+    if (p.startsWith(DEFAULT_SKINPACKS_PREFIX)) {
+        String mid = p.substring(DEFAULT_SKINPACKS_PREFIX.length(), p.length() - PACK_JSON_SUFFIX.length());
+        if (!mid.isBlank()) return mid;
+    }
+}
         }
         String id = packId;
         int colon = id != null ? id.indexOf(':') : -1;
@@ -392,28 +405,37 @@ public final class SkinPackLoader {
     }
 
     private static String parsePackId(String path) {
-        if (path == null) return null;
+    if (path == null) return null;
 
-        if ((SKINPACKS_PREFIX + "manifest.json").equals(path)) return null;
+    String id = parsePackIdForPrefix(path, SKINPACKS_PREFIX);
+    if (id != null) return id;
+    return parsePackIdForPrefix(path, DEFAULT_SKINPACKS_PREFIX);
+}
 
-        if (path.startsWith(SKINPACKS_PREFIX) && path.endsWith(PACK_JSON_SUFFIX)) {
-            String p = path.substring(SKINPACKS_PREFIX.length(), path.length() - PACK_JSON_SUFFIX.length());
-            if (p.indexOf('/') >= 0) return null;
-            if (p.startsWith("_")) return null;
-            return p;
-        }
+private static String parsePackIdForPrefix(String path, String prefix) {
+    if (path == null || prefix == null) return null;
 
-        if (path.startsWith(SKINPACKS_PREFIX) && path.endsWith(".json")) {
-            String file = path.substring(SKINPACKS_PREFIX.length());
-            if (file.indexOf('/') >= 0) return null;
-            if ("pack.json".equals(file)) return null;
-            if ("manifest.json".equals(file)) return null;
-            if (file.startsWith("_")) return null;
-            return file.substring(0, file.length() - 5);
-        }
+    if ((prefix + "manifest.json").equals(path)) return null;
 
-        return null;
+    if (path.startsWith(prefix) && path.endsWith(PACK_JSON_SUFFIX)) {
+        String p = path.substring(prefix.length(), path.length() - PACK_JSON_SUFFIX.length());
+        if (p.indexOf('/') >= 0) return null;
+        if (p.startsWith("_")) return null;
+        return p;
     }
+
+    if (path.startsWith(prefix) && path.endsWith(".json")) {
+        String file = path.substring(prefix.length());
+        if (file.indexOf('/') >= 0) return null;
+        if ("pack.json".equals(file)) return null;
+        if ("manifest.json".equals(file)) return null;
+        if (file.startsWith("_")) return null;
+        return file.substring(0, file.length() - 5);
+    }
+
+    return null;
+}
+
 
     private static LinkedHashMap<String, SkinPack> withFavourites(Map<String, SkinPack> base, Map<String, SkinEntry> skinsById) {
         ArrayList<SkinEntry> fav = new ArrayList<>();
@@ -493,9 +515,7 @@ public final class SkinPackLoader {
                             icon = DEFAULT_PACK_ICON;
                         }
                     }
-                    if (rm.getResource(icon).isEmpty()) icon = DEFAULT_PACK_ICON;
-
-                    JsonArray skinsArr = obj.has("skins") && obj.get("skins").isJsonArray() ? obj.getAsJsonArray("skins") : null;
+JsonArray skinsArr = obj.has("skins") && obj.get("skins").isJsonArray() ? obj.getAsJsonArray("skins") : null;
                     if (skinsArr == null) continue;
 
                     String packFolder = packLoc.getPath();
@@ -532,7 +552,7 @@ public final class SkinPackLoader {
         }
     }
 
-    private static void loadSinglePack(String namespace, String packId, String packFolder, JsonObject json, ResourceManager rm,
+    private static void loadSinglePack(String namespace, String packId, String packFolder, String packPrefix, JsonObject json, ResourceManager rm,
                                        Map<String, SkinPack> packsOut,
                                        Map<String, SkinEntry> skinsByIdOut,
                                        Map<String, String> packBySkinOut,
@@ -590,10 +610,16 @@ public final class SkinPackLoader {
                 }
 
                 collectPoseTagsFromSkinJson(o, skinId);
-                ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(namespace, SKINPACKS_PREFIX + packFolder + "/" + texPath);
+                  ResourceLocation texture;
+if (texPath.startsWith(SKINPACKS_PREFIX) || texPath.startsWith(DEFAULT_SKINPACKS_PREFIX)) {
+    texture = ResourceLocation.fromNamespaceAndPath(namespace, texPath);
+} else {
+    texture = ResourceLocation.fromNamespaceAndPath(namespace, packPrefix + packFolder + "/" + texPath);
+}
                 ResourceLocation cape = null;
 if (capePath != null && !capePath.isBlank()) {
-                    cape = ResourceLocation.fromNamespaceAndPath(namespace, SKINPACKS_PREFIX + packFolder + "/" + capePath);
+                    if (capePath.startsWith(SKINPACKS_PREFIX) || capePath.startsWith(DEFAULT_SKINPACKS_PREFIX)) cape = ResourceLocation.fromNamespaceAndPath(namespace, capePath);
+                    else cape = ResourceLocation.fromNamespaceAndPath(namespace, packPrefix + packFolder + "/" + capePath);
                 }
                 tmp.add(new SkinEntryWithIndex(new SkinEntry(skinId, skinName, texture, cape, slimArms, order), i));
             }
@@ -611,8 +637,12 @@ if (capePath != null && !capePath.isBlank()) {
 
         if (entries.isEmpty()) return;
 
-        ResourceLocation icon = ResourceLocation.fromNamespaceAndPath(namespace, SKINPACKS_PREFIX + packFolder + "/pack.png");
-        if (rm.getResource(icon).isEmpty()) icon = DEFAULT_PACK_ICON;
+        ResourceLocation icon = ResourceLocation.fromNamespaceAndPath(namespace, packPrefix + packFolder + "/pack.png");
+                  if (rm.getResource(icon).isEmpty()) {
+    ResourceLocation alt = ResourceLocation.fromNamespaceAndPath(namespace, DEFAULT_SKINPACKS_PREFIX + packFolder + "/pack.png");
+    if (!DEFAULT_SKINPACKS_PREFIX.equals(packPrefix) && rm.getResource(alt).isPresent()) icon = alt;
+    else icon = DEFAULT_PACK_ICON;
+}
 
         packsOut.put(packId, new SkinPack(packId, name, author, type, icon, entries));
 

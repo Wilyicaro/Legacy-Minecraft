@@ -120,27 +120,21 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
     private int[] packIconDims(ResourceLocation icon) {
         int[] d = packIconDims.get(icon);
         if (d != null) return d;
-        int tw = 128;
-        int th = 128;
+        int w = 128;
+        int h = 128;
         try {
             Resource r = minecraft.getResourceManager().getResource(icon).orElse(null);
             if (r != null) {
                 try (var in = r.open()) {
                     NativeImage img = NativeImage.read(in);
-                    tw = img.getWidth();
-                    th = img.getHeight();
+                    w = img.getWidth();
+                    h = img.getHeight();
                     img.close();
                 }
             }
         } catch (Throwable ignored) {
         }
-
-        int fw = tw;
-        int fh = th;
-        if (th > tw && tw > 0 && th % tw == 0) fh = tw;
-        else if (tw > th && th > 0 && tw % th == 0) fw = th;
-
-        int[] out = new int[]{Math.max(1, tw), Math.max(1, th), Math.max(1, fw), Math.max(1, fh)};
+        int[] out = new int[]{Math.max(1, w), Math.max(1, h)};
         packIconDims.put(icon, out);
         return out;
     }
@@ -336,17 +330,15 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
                 int[] d = packIconDims(icon);
                 int tw = d[0];
                 int th = d[1];
-                int fw = d[2];
-                int fh = d[3];
-                float scale = Math.min(inner / (float) fw, inner / (float) fh);
+                float scale = Math.min(inner / (float) tw, inner / (float) th);
                 float cx = ix + inner / 2f;
                 float cy = iy + inner / 2f;
                 var pose = g.pose();
                 pose.pushMatrix();
                 pose.translate(cx, cy);
                 pose.scale(scale, scale);
-                pose.translate(-fw / 2f, -fh / 2f);
-                g.blit(RenderPipelines.GUI_TEXTURED, icon, 0, 0, 0, 0, fw, fh, tw, th);
+                pose.translate(-tw / 2f, -th / 2f);
+                g.blit(RenderPipelines.GUI_TEXTURED, icon, 0, 0, 0, 0, tw, th, tw, th);
                 pose.popMatrix();
             }
         });
@@ -379,8 +371,23 @@ public class ChangeSkinScreen extends PanelVListScreen implements wily.legacy.cl
         tooltipBox.init("tooltipBox");
 
         if (firstOpen) {
-            String openId = SkinPackLoader.getLastUsedCustomPackId();
-            if (openId != null) packList.focusPackId(openId, false);
+            UUID self = minecraft.player != null ? minecraft.player.getUUID() : minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
+            String selectedId = self != null ? ClientSkinCache.get(self) : null;
+
+            String focusId;
+            if (selectedId == null || selectedId.isBlank()) {
+                focusId = SkinPackLoader.getPreferredDefaultPackId();
+            } else {
+                String src = SkinPackLoader.getSourcePackId(selectedId);
+                focusId = src != null ? src : SkinPackLoader.getPreferredDefaultPackId();
+            }
+
+            if (focusId == null) {
+                String openId = SkinPackLoader.getLastUsedCustomPackId();
+                if (openId != null) focusId = openId;
+            }
+
+            if (focusId != null) packList.focusPackId(focusId, false);
         }
     }
 

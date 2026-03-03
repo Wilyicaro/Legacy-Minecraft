@@ -110,13 +110,13 @@
       "id": "dev_steve",
       "name": "key:legacy.default.devsteve",
       "texture": "skins/dev_steve.png",
-      "order": 17
+      "order": 18
     },
     {
       "id": "dev_alex",
       "name": "key:legacy.default.devalex",
       "texture": "skins/dev_alex.png",
-      "order": 18,
+      "order": 17,
       "model": "slim"
     },
     {

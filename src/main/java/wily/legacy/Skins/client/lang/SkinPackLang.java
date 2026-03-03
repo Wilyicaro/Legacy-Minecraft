@@ -86,10 +86,21 @@ public final class SkinPackLang {
 
     private static void loadLocale(ResourceManager rm, String locale, Map<String, String> out) {
         try {
-            Map<ResourceLocation, Resource> res = rm.listResources("skinpacks", rl -> {
-                String p = rl.getPath();
-                return p.contains("/lang/") && p.endsWith(locale + ".json");
-            });
+             Map<ResourceLocation, Resource> res = new java.util.HashMap<>();
+try {
+    res.putAll(rm.listResources("skinpacks", rl -> {
+        String p = rl.getPath();
+        return p.contains("/lang/") && p.endsWith(".json");
+    }));
+} catch (Throwable ignored) {
+}
+try {
+    res.putAll(rm.listResources("default_skinpacks", rl -> {
+        String p = rl.getPath();
+        return p.contains("/lang/") && p.endsWith(".json");
+    }));
+} catch (Throwable ignored) {
+}
 
             Map<ResourceLocation, Resource> vanilla = rm.listResources("lang", rl -> rl.getPath().equals("lang/" + locale + ".json"));
 

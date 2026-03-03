@@ -1,8 +1,12 @@
 package wily.legacy.Skins.client.screen;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
+
+import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import wily.legacy.Skins.client.screen.changeskin.ChangeSkinActions;
@@ -24,6 +28,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.BindingState;
@@ -61,6 +66,7 @@ public class TU3ChangeSkinScreen extends PanelVListScreen implements wily.legacy
     private static final int BASE_PANEL_HEIGHT = 290;
     private float uiScale = 1f;
     private int tooltipWidth = BASE_TOOLTIP_WIDTH;
+    private final Map<ResourceLocation, int[]> packIconDims = new HashMap<>();
     private final ChangeSkinPackList packList;
     private final ChangeSkinActions actions;
 
@@ -220,6 +226,29 @@ public class TU3ChangeSkinScreen extends PanelVListScreen implements wily.legacy
         if (max < size) size = Math.max(min, max);
         return Math.max(1, size);
     }
+
+    private int[] packIconDims(ResourceLocation icon) {
+        int[] d = packIconDims.get(icon);
+        if (d != null) return d;
+        int w = 128;
+        int h = 128;
+        try {
+            Resource r = minecraft.getResourceManager().getResource(icon).orElse(null);
+            if (r != null) {
+                try (var in = r.open()) {
+                    NativeImage img = NativeImage.read(in);
+                    w = img.getWidth();
+                    h = img.getHeight();
+                    img.close();
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+        int[] out = new int[]{Math.max(1, w), Math.max(1, h)};
+        packIconDims.put(icon, out);
+        return out;
+    }
+
     private int previewBoxX() {
         int s = previewBoxSize();
         int x = panel.x + sc(34);
@@ -493,8 +522,23 @@ public class TU3ChangeSkinScreen extends PanelVListScreen implements wily.legacy
         tooltipBox.size(layoutW + off23, layoutH + off90);
 
         if (firstOpen) {
-            String openId = SkinPackLoader.getLastUsedCustomPackId();
-            if (openId != null) packList.focusPackId(openId, false);
+            UUID self = minecraft.player != null ? minecraft.player.getUUID() : minecraft.getUser() != null ? minecraft.getUser().getProfileId() : null;
+            String selectedId = self != null ? ClientSkinCache.get(self) : null;
+
+            String focusId;
+            if (selectedId == null || selectedId.isBlank()) {
+                focusId = SkinPackLoader.getPreferredDefaultPackId();
+            } else {
+                String src = SkinPackLoader.getSourcePackId(selectedId);
+                focusId = src != null ? src : SkinPackLoader.getPreferredDefaultPackId();
+            }
+
+            if (focusId == null) {
+                String openId = SkinPackLoader.getLastUsedCustomPackId();
+                if (openId != null) focusId = openId;
+            }
+
+            if (focusId != null) packList.focusPackId(focusId, false);
         }
     }
 
