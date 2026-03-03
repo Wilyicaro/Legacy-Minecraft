@@ -26,6 +26,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Set;
 
 public final class SkinPackLoader {
 
@@ -168,6 +171,10 @@ public final class SkinPackLoader {
         PackExclusions.reload();
 
         LinkedHashMap<String, SkinPack> packs = new LinkedHashMap<>();
+        HashMap<String, Integer> packSortIndex = new HashMap<>();
+        HashSet<String> packHasSort = new HashSet<>();
+        HashMap<String, Integer> packInsertIndex = new HashMap<>();
+        final int[] insertCounter = new int[]{0};
         LinkedHashMap<String, SkinEntry> skinsById = new LinkedHashMap<>();
         LinkedHashMap<String, String> packBySkin = new LinkedHashMap<>();
 
@@ -177,7 +184,7 @@ public final class SkinPackLoader {
 
             boolean anyManifest = false;
             for (String ns : namespaces) {
-                if (loadFromManifest(rm, ns, packs, skinsById, packBySkin)) anyManifest = true;
+                if (loadFromManifest(rm, ns, packs, skinsById, packBySkin, packSortIndex, packHasSort, packInsertIndex, insertCounter)) anyManifest = true;
             }
 
             try {
@@ -197,7 +204,7 @@ public final class SkinPackLoader {
                     if (anyManifest && packId.startsWith("_")) continue;
 
                     JsonObject json = readObj(jsons.get(rl));
-                    if (json != null) loadSinglePack(ns, packId, packId, json, rm, packs, skinsById, packBySkin);
+                    if (json != null) loadSinglePack(ns, packId, packId, json, rm, packs, skinsById, packBySkin, packSortIndex, packHasSort, packInsertIndex, insertCounter);
                 }
             } catch (Throwable ex) {
                 DebugLog.warn("ResourceManager skinpack scan failed: {}", ex.toString());
@@ -207,6 +214,8 @@ public final class SkinPackLoader {
         } finally {
             SkinPoseRegistry.endReload();
         }
+
+        packs = sortPacks(packs, packSortIndex, packHasSort, packInsertIndex);
 
         LinkedHashMap<String, SkinPack> ordered = withFavourites(packs, skinsById);
         applyBuiltinAutoSelection(rm, ordered);
@@ -218,25 +227,73 @@ public final class SkinPackLoader {
         }
     }
 
+    private static LinkedHashMap<String, SkinPack> sortPacks(LinkedHashMap<String, SkinPack> in,
+                                                            Map<String, Integer> sortIndex,
+                                                            Set<String> hasSort,
+                                                            Map<String, Integer> insertIndex) {
+        if (in == null || in.isEmpty()) return in;
+        boolean any = false;
+        for (String k : in.keySet()) {
+            if (hasSort.contains(k)) {
+                any = true;
+                break;
+            }
+        }
+        if (!any) return in;
+
+        ArrayList<Map.Entry<String, SkinPack>> list = new ArrayList<>(in.entrySet());
+        list.sort((a, b) -> {
+            String ka = a.getKey();
+            String kb = b.getKey();
+            boolean ha = hasSort.contains(ka);
+            boolean hb = hasSort.contains(kb);
+            if (ha != hb) return ha ? -1 : 1;
+            int sa = sortIndex.getOrDefault(ka, 0);
+            int sb = sortIndex.getOrDefault(kb, 0);
+            if (sa != sb) return Integer.compare(sa, sb);
+            int ia = insertIndex.getOrDefault(ka, 0);
+            int ib = insertIndex.getOrDefault(kb, 0);
+            return Integer.compare(ia, ib);
+        });
+
+        LinkedHashMap<String, SkinPack> out = new LinkedHashMap<>(in.size());
+        for (Map.Entry<String, SkinPack> e : list) out.put(e.getKey(), e.getValue());
+        return out;
+    }
+
     private static boolean loadFromManifest(ResourceManager rm,
-                                            String namespace,
-                                            Map<String, SkinPack> packsOut,
-                                            Map<String, SkinEntry> skinsByIdOut,
-                                            Map<String, String> packBySkinOut) {
-        if (rm == null || namespace == null || namespace.isBlank()) return false;
+                                        String namespace,
+                                        Map<String, SkinPack> packsOut,
+                                        Map<String, SkinEntry> skinsByIdOut,
+                                        Map<String, String> packBySkinOut,
+                                        Map<String, Integer> packSortIndex,
+                                        Set<String> packHasSort,
+                                        Map<String, Integer> packInsertIndex,
+                                        int[] insertCounter) {
+    if (rm == null || namespace == null || namespace.isBlank()) return false;
 
-        ResourceLocation manifestRl = ResourceLocation.fromNamespaceAndPath(namespace, SKINPACKS_PREFIX + "manifest.json");
-        Resource manifestRes = rm.getResource(manifestRl).orElse(null);
-        if (manifestRes == null) return false;
+    ResourceLocation manifestRl = ResourceLocation.fromNamespaceAndPath(namespace, SKINPACKS_PREFIX + "manifest.json");
 
+    List<Resource> resources = rm.getResourceStack(manifestRl);
+    if (resources == null || resources.isEmpty()) return false;
+
+    String mode = null;
+
+    LinkedHashMap<String, ManifestPack> byId = new LinkedHashMap<>();
+    int manifestOrder = 0;
+
+    for (int r = 0; r < resources.size(); r++) {
+        Resource manifestRes = resources.get(r);
         JsonObject manifest = readObj(manifestRes);
-        if (manifest == null) return false;
+        if (manifest == null) continue;
+
+        if (mode == null && manifest.has("order_mode")) {
+            String mm = safeString(manifest.get("order_mode"));
+            if (mm != null && !mm.isBlank()) mode = mm;
+        }
 
         JsonArray packsArr = manifest.has("packs") && manifest.get("packs").isJsonArray() ? manifest.getAsJsonArray("packs") : null;
-        if (packsArr == null || packsArr.isEmpty()) return true;
-
-        String mode = manifest.has("order_mode") ? safeString(manifest.get("order_mode")) : "manifest_order";
-        ArrayList<ManifestPack> list = new ArrayList<>(packsArr.size());
+        if (packsArr == null || packsArr.isEmpty()) continue;
 
         for (int i = 0; i < packsArr.size(); i++) {
             JsonElement el = packsArr.get(i);
@@ -253,50 +310,58 @@ public final class SkinPackLoader {
             String path = o.has("path") ? safeString(o.get("path")) : null;
             int sort = o.has("sort_index") ? safeInt(o.get("sort_index"), 0) : 0;
             String type = o.has("type") ? safeString(o.get("type")) : null;
-            list.add(new ManifestPack(id, name, author, type, path, sort, i));
+
+            byId.put(id, new ManifestPack(id, name, author, type, path, sort, manifestOrder++));
         }
-
-        if (list.isEmpty()) return true;
-
-        Comparator<ManifestPack> cmp;
-        String m = mode == null ? "" : mode.toLowerCase(Locale.ROOT).trim();
-        if ("sort_index".equals(m) || "sort".equals(m)) {
-            cmp = Comparator.comparingInt(ManifestPack::sortIndex).thenComparingInt(ManifestPack::manifestIndex);
-        } else if ("alpha".equals(m) || "alphabetical".equals(m)) {
-            cmp = Comparator.comparing(ManifestPack::nameOrId, String::compareToIgnoreCase).thenComparingInt(ManifestPack::manifestIndex);
-        } else {
-            cmp = Comparator.comparingInt(ManifestPack::manifestIndex);
-        }
-        list.sort(cmp);
-
-        for (ManifestPack mp : list) {
-            String packId = mp.id();
-            if (packsOut.containsKey(packId)) continue;
-
-            String resolved = resolvePackJsonPath(mp.path(), packId);
-            ResourceLocation packRl = ResourceLocation.fromNamespaceAndPath(namespace, resolved);
-            Resource packRes = rm.getResource(packRl).orElse(null);
-            if (packRes == null) continue;
-
-            JsonObject packObj = readObj(packRes);
-            if (packObj == null) continue;
-
-            if (mp.name() != null && !mp.name().isBlank() && (!packObj.has("name") || safeString(packObj.get("name")).isBlank())) {
-                packObj.addProperty("name", mp.name());
-            }
-            if (mp.author() != null && !mp.author().isBlank() && (!packObj.has("author") || safeString(packObj.get("author")).isBlank())) {
-                packObj.addProperty("author", mp.author());
-            }
-            if (mp.type() != null && !mp.type().isBlank() && (!packObj.has("type") || safeString(packObj.get("type")).isBlank())) {
-                packObj.addProperty("type", mp.type());
-            }
-
-            String folder = inferPackFolderFromPackPath(resolved, packId);
-            loadSinglePack(namespace, packId, folder, packObj, rm, packsOut, skinsByIdOut, packBySkinOut);
-        }
-
-        return true;
     }
+
+    if (byId.isEmpty()) return true;
+
+    ArrayList<ManifestPack> list = new ArrayList<>(byId.values());
+
+    Comparator<ManifestPack> cmp;
+    String m = mode == null ? "manifest_order" : mode.toLowerCase(Locale.ROOT).trim();
+    if ("sort_index".equals(m) || "sort".equals(m)) {
+        cmp = Comparator.comparingInt(ManifestPack::sortIndex).thenComparingInt(ManifestPack::manifestIndex);
+    } else if ("alpha".equals(m) || "alphabetical".equals(m)) {
+        cmp = Comparator.comparing(ManifestPack::nameOrId, String::compareToIgnoreCase).thenComparingInt(ManifestPack::manifestIndex);
+    } else {
+        cmp = Comparator.comparingInt(ManifestPack::manifestIndex);
+    }
+    list.sort(cmp);
+
+    for (ManifestPack mp : list) {
+        String packId = mp.id();
+        if (packsOut.containsKey(packId)) continue;
+
+        String resolved = resolvePackJsonPath(mp.path(), packId);
+        ResourceLocation packRl = ResourceLocation.fromNamespaceAndPath(namespace, resolved);
+        Resource packRes = rm.getResource(packRl).orElse(null);
+        if (packRes == null) continue;
+
+        JsonObject packObj = readObj(packRes);
+        if (packObj == null) continue;
+
+        if (mp.name() != null && !mp.name().isBlank() && (!packObj.has("name") || safeString(packObj.get("name")).isBlank())) {
+            packObj.addProperty("name", mp.name());
+        }
+        if (mp.author() != null && !mp.author().isBlank() && (!packObj.has("author") || safeString(packObj.get("author")).isBlank())) {
+            packObj.addProperty("author", mp.author());
+        }
+        if (mp.type() != null && !mp.type().isBlank() && (!packObj.has("type") || safeString(packObj.get("type")).isBlank())) {
+            packObj.addProperty("type", mp.type());
+        }
+
+        if (!packObj.has("sort_index") && !packObj.has("sort")) {
+            packObj.addProperty("sort_index", mp.sortIndex());
+        }
+
+        String folder = inferPackFolderFromPackPath(resolved, packId);
+        loadSinglePack(namespace, packId, folder, packObj, rm, packsOut, skinsByIdOut, packBySkinOut, packSortIndex, packHasSort, packInsertIndex, insertCounter);
+    }
+
+    return true;
+}
 
     private static String resolvePackJsonPath(String manifestPath, String packId) {
         if (manifestPath != null && !manifestPath.isBlank()) {
@@ -470,7 +535,11 @@ public final class SkinPackLoader {
     private static void loadSinglePack(String namespace, String packId, String packFolder, JsonObject json, ResourceManager rm,
                                        Map<String, SkinPack> packsOut,
                                        Map<String, SkinEntry> skinsByIdOut,
-                                       Map<String, String> packBySkinOut) {
+                                       Map<String, String> packBySkinOut,
+                                       Map<String, Integer> packSortIndex,
+                                       Set<String> packHasSort,
+                                       Map<String, Integer> packInsertIndex,
+                                       int[] insertCounter) {
 
         collectPoseTagsFromPackJson(namespace, json);
         String name = json.has("name") ? json.get("name").getAsString() : packId;
@@ -546,6 +615,14 @@ if (capePath != null && !capePath.isBlank()) {
         if (rm.getResource(icon).isEmpty()) icon = DEFAULT_PACK_ICON;
 
         packsOut.put(packId, new SkinPack(packId, name, author, type, icon, entries));
+
+        boolean has = json.has("sort_index") || json.has("sort");
+        if (has) {
+            int sort = json.has("sort_index") ? safeInt(json.get("sort_index"), 0) : safeInt(json.get("sort"), 0);
+            packSortIndex.put(packId, sort);
+            packHasSort.add(packId);
+        }
+        packInsertIndex.putIfAbsent(packId, insertCounter[0]++);
 
     }
 
