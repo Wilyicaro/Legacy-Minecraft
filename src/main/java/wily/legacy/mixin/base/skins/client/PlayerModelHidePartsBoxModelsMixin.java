@@ -19,6 +19,7 @@ import wily.legacy.Skins.client.render.boxloader.BuiltBoxModel;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinEntry;
 import wily.legacy.Skins.skin.SkinPackLoader;
+import wily.legacy.compat.cpm.CpmRenderCompat;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -74,6 +75,23 @@ public abstract class PlayerModelHidePartsBoxModelsMixin {
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("TAIL"), require = 0)
     private void consoleskins$hidePartsForBoxModels(AvatarRenderState state, CallbackInfo ci) {
         PlayerModel self = (PlayerModel) (Object) this;
+
+        if (CpmRenderCompat.isCpmModelActive(state)) {
+            consoleskins$uninstallSpectatorBoxHead(self);
+            consoleskins$setSkipDraw(self.head, false);
+            consoleskins$setSkipDraw(self.hat, false);
+            consoleskins$setSkipDraw(self.body, false);
+            consoleskins$setSkipDraw(self.rightArm, false);
+            consoleskins$setSkipDraw(self.leftArm, false);
+            consoleskins$setSkipDraw(self.rightLeg, false);
+            consoleskins$setSkipDraw(self.leftLeg, false);
+            consoleskins$setSkipDraw(self.jacket, false);
+            consoleskins$setSkipDraw(self.rightSleeve, false);
+            consoleskins$setSkipDraw(self.leftSleeve, false);
+            consoleskins$setSkipDraw(self.rightPants, false);
+            consoleskins$setSkipDraw(self.leftPants, false);
+            return;
+        }
 
         UUID uuid = null;
         String skinId = null;

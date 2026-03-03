@@ -18,6 +18,7 @@ import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
 import wily.legacy.Skins.skin.SkinEntry;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinPackLoader;
+import wily.legacy.compat.cpm.CpmRenderCompat;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -33,6 +34,8 @@ public class BoxAddonLayer extends RenderLayer {
     public void submit(PoseStack poseStack, SubmitNodeCollector collector, int packedLight, EntityRenderState state, float partialTick, float ageInTicks) {
         if (!(state instanceof AvatarRenderState ars)) return;
         if (!(ars instanceof RenderStateSkinIdAccess a)) return;
+
+        if (CpmRenderCompat.isCpmModelActive(ars)) return;
 
         if (consoleskins$isInvisible(ars, a)) return;
 

@@ -192,6 +192,7 @@
     "skins.client.MinecraftSkinSyncTickMixin",
     "skins.client.HelpAndOptionsScreenSkinsOptionsMixin",
     "skins.client.ModelPartSkipDrawAccessorMixin",
+    "skins.client.ModelPartSkipRenderOverrideMixin",
     "skins.client.PlayerModelHidePartsBoxModelsMixin",
     "skins.client.PlayerModelOffsetsBoxModelsMixin",
     "skins.client.HumanoidArmorLayerPieceOffsetsMixin",

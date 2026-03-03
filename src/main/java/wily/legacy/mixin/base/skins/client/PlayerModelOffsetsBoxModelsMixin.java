@@ -15,6 +15,7 @@ import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinEntry;
 import wily.legacy.Skins.skin.SkinPackLoader;
+import wily.legacy.compat.cpm.CpmRenderCompat;
 
 import java.util.EnumMap;
 
@@ -69,6 +70,8 @@ public abstract class PlayerModelOffsetsBoxModelsMixin {
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("TAIL"), require = 0)
     private void consoleskins$applyVisualOffsets(AvatarRenderState state, CallbackInfo ci) {
         PlayerModel self = (PlayerModel)(Object)this;
+
+        if (CpmRenderCompat.isCpmModelActive(state)) return;
 
         if (!(state instanceof RenderStateSkinIdAccess a)) return;
         String skinId = a.consoleskins$getSkinId();
