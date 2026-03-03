@@ -33,7 +33,7 @@ import wily.legacy.client.LegacySaveCache;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.*;
 import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
-import wily.legacy.api.ContentCategory;
+import wily.legacy.client.ContentManager;
 
 import java.io.IOException;
 import java.util.function.BiConsumer;
@@ -69,9 +69,7 @@ public abstract class TitleScreenMixin extends Screen implements ControlTooltip.
         renderableVList.addRenderable(modButton = Button.builder(Component.translatable("legacy.menu.mods"), b -> minecraft.setScreen(new ModsScreen(this))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("options.language"), b -> minecraft.setScreen(new LegacyLanguageScreen(this, this.minecraft.getLanguageManager()))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.options"), b -> minecraft.setScreen(new HelpAndOptionsScreen(this))).build());
-        if (!Legacy4JClient.STORE_CATEGORIES.isEmpty()) {
-            renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.store"), b -> minecraft.setScreen(new Legacy4JStoreScreen(this, Legacy4JClient.STORE_CATEGORIES))).build());
-        }
+        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.store"), b -> minecraft.setScreen(new Legacy4JStoreScreen(this, ContentManager.CATEGORIES))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), (button) -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());
         //? if forge || neoforge && <=1.20.4 {
         /*this.modUpdateNotification = TitleScreenModUpdateIndicator.init((TitleScreen) (Object) this, modButton);

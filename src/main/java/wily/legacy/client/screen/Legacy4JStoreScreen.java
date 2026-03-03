@@ -1,6 +1,5 @@
 package wily.legacy.client.screen;
 
-import wily.legacy.api.ContentCategory;
 import wily.legacy.client.ContentManager;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -26,7 +25,7 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
     private static final Component TITLE_LABEL = Component.translatable("legacy.menu.store_title");
     private final LogoRenderer logoRenderer = new LogoRenderer(false);
 
-    public Legacy4JStoreScreen(Screen parent, List<ContentCategory> categories) {
+    public Legacy4JStoreScreen(Screen parent, List<ContentManager.Category> categories) {
         super(s -> Panel.createPanel(s, 
                 p -> p.appearance(372, 249), 
                 p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + 17)), 
@@ -36,14 +35,20 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
         renderableVList.layoutSpacing(l -> 0);        
         
         // Loop through the categories provided and create buttons
-        for (ContentCategory category : categories) {
+        for (ContentManager.Category category : categories) {
             addMenuButton(category.title(), b -> {
+                // Prevent spam-clicking buttons while an index is downloading
+                if (this.isLoading) return; 
+                
                 this.isLoading = true;
                 ContentManager.fetchIndex(category.indexUrl()).thenAccept(packs -> {
                     minecraft.execute(() -> {
                         this.isLoading = false;
                         minecraft.setScreen(new Legacy4JContentListScreen(this, category, packs));
                     });
+                }).exceptionally(ex -> {
+                    minecraft.execute(() -> this.isLoading = false);
+                    return null;
                 });
             });
         }

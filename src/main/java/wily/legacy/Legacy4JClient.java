@@ -89,7 +89,6 @@ import wily.factoryapi.FactoryAPIPlatform;
 import wily.factoryapi.FactoryEvent;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.factoryapi.util.FactoryScreenUtil;
-import wily.legacy.api.ContentCategory;
 import wily.legacy.block.entity.WaterCauldronBlockEntity;
 import wily.legacy.client.*;
 import wily.legacy.client.screen.*;
@@ -126,6 +125,7 @@ public class Legacy4JClient {
     public static final MapIdValueManager<LegacyCraftingTabListing, ?> legacyCraftingListingManager = MapIdValueManager.create(Legacy4J.createModLocation("crafting_tab_listing"), LegacyCraftingTabListing.CODEC);
     public static final MapIdValueManager<LegacyBiomeOverride, ?> legacyBiomeOverrides = MapIdValueManager.createWithListCodec(Legacy4J.createModLocation("biome_overrides"), LegacyBiomeOverride.LIST_MAP_CODEC);
     public static final LegacyWorldTemplate.Manager legacyWorldTemplateManager = new LegacyWorldTemplate.Manager();
+    public static final ContentManager.CategoryManager categoryManager = new ContentManager.CategoryManager();
     public static final LegacyTipOverride.Manager legacyTipOverridesManager = new LegacyTipOverride.Manager();
     public static final LegacyResourceManager legacyResourceManager = new LegacyResourceManager();
     public static final StoneCuttingGroupManager stoneCuttingGroupManager = new StoneCuttingGroupManager();
@@ -170,11 +170,6 @@ public class Legacy4JClient {
     public static GameType defaultServerGameType;
     public static GameRules gameRules;
     public static Consumer<ServerPlayer> serverPlayerJoinConsumer;
-    public static final List<ContentCategory> STORE_CATEGORIES = new ArrayList<>();
-
-    public static void registerCategory(ContentCategory category) {
-        STORE_CATEGORIES.add(category);
-    }
 
     public static float[] getVisualPlayerColor(LegacyPlayerInfo info) {
         return getVisualPlayerColor(info.getIdentifierIndex() >= 0 ? info.getIdentifierIndex() : info.legacyMinecraft$getProfile().id().hashCode());
@@ -394,6 +389,7 @@ public class Legacy4JClient {
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyCreativeListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyCraftingListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyWorldTemplateManager);
+        FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, categoryManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyTipOverridesManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyBiomeOverrides);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, optionPresetsManager);

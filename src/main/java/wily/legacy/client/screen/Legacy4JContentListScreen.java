@@ -1,7 +1,5 @@
 package wily.legacy.client.screen;
 
-import wily.legacy.api.ContentCategory;
-import wily.legacy.api.ContentPack;
 import wily.legacy.client.ContentManager;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.Font;
@@ -39,9 +37,9 @@ import java.util.concurrent.CompletableFuture;
 
 public class Legacy4JContentListScreen extends PanelVListScreen implements ControlTooltip.Event {
     
-    protected final ContentCategory category;
-    protected final List<ContentPack> packs;
-    protected ContentPack hoveredPack; 
+    protected final ContentManager.Category category;
+    protected final List<ContentManager.Pack> packs;
+    protected ContentManager.Pack hoveredPack; 
     private final LogoRenderer logoRenderer = new LogoRenderer(false);
     protected final Panel tooltipBox = Panel.tooltipBoxOf(panel, 273);
     
@@ -65,7 +63,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     private final Map<String, RemoteImage> downloadedImages = new HashMap<>();
     private final Set<String> downloadingImages = new HashSet<>();
 
-    public Legacy4JContentListScreen(Screen parent, ContentCategory category, List<ContentPack> packs) {
+    public Legacy4JContentListScreen(Screen parent, ContentManager.Category category, List<ContentManager.Pack> packs) {
         super(s -> Panel.createPanel(s,
                 p -> p.appearance(294, 274), 
                 p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + 17)), 
@@ -76,12 +74,12 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         this.packs = packs;
         
         renderableVList.layoutSpacing(l -> 0);
-        for (ContentPack pack : packs) {
+        for (ContentManager.Pack pack : packs) {
             addMenuButton(pack);
         }
     }
 
-    private void addMenuButton(ContentPack pack) {
+    private void addMenuButton(ContentManager.Pack pack) {
         renderableVList.addRenderable(new LeftAlignedButton(254, 36, pack, category, b -> {
             if (ContentManager.isPackInstalled(pack, category.targetDirectoryName())) {
                 minecraft.setScreen(new PackActionScreen(this, pack, category));
@@ -102,9 +100,10 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
 
     @Override
     public void onClose() {
-        if (this.needsReload && this.category.onReloadNeeded() != null) {
-            this.category.onReloadNeeded().run();
+        if (this.needsReload && this.category.requiresResourceReload()) {
+            minecraft.reloadResourcePacks();
         }
+        
         downloadedImages.forEach((id, img) -> {
             if (img != null && img.id != null) {
                 minecraft.getTextureManager().release(img.id);
@@ -115,7 +114,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         super.onClose();
     }
 
-    private void deletePack(ContentPack pack) {
+    private void deletePack(ContentManager.Pack pack) {
         File packDir = new File(minecraft.gameDirectory, category.targetDirectoryName() + "/" + pack.id());
         if (packDir.exists()) {
             deleteDirectoryRecursively(packDir);
@@ -256,9 +255,9 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     private class PackActionScreen extends ConfirmationScreen {
-        private final ContentPack pack;
+        private final ContentManager.Pack pack;
 
-        public PackActionScreen(Screen parent, ContentPack pack, ContentCategory category) {
+        public PackActionScreen(Screen parent, ContentManager.Pack pack, ContentManager.Category category) {
             super(parent, ConfirmationScreen::getPanelWidth, () -> 95, Component.literal(pack.name()), 
                   Component.translatable("legacy.menu.delete_message"), 
                   (b) -> {} 
@@ -279,10 +278,10 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     private static class LeftAlignedButton extends Button {
-        private final ContentPack pack;
-        private final ContentCategory category;
+        private final ContentManager.Pack pack;
+        private final ContentManager.Category category;
 
-        public LeftAlignedButton(int width, int height, ContentPack pack, ContentCategory category, OnPress onPress) {
+        public LeftAlignedButton(int width, int height, ContentManager.Pack pack, ContentManager.Category category, OnPress onPress) {
             super(0, 0, width, height, Component.literal(pack.name()), onPress, DEFAULT_NARRATION);
             this.pack = pack;
             this.category = category;
