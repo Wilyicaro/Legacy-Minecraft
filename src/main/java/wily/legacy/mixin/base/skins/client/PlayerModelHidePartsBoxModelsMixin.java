@@ -28,9 +28,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import wily.legacy.Skins.client.render.SkinPoseRegistry;
+import wily.legacy.Skins.util.DebugLog;
 
 @Mixin(PlayerModel.class)
 public abstract class PlayerModelHidePartsBoxModelsMixin {
+
+    // Log once to confirm this version of hidePart is running (uses skipDraw only, not skipRenderOverride)
+
 
     @Unique
     private boolean consoleskins$specBoxHeadInstalled;
@@ -63,6 +67,7 @@ public abstract class PlayerModelHidePartsBoxModelsMixin {
 
     private static void consoleskins$hidePart(ModelPart part) {
         if (part == null) return;
+        DebugLog.debug("[ArmorFix] hidePart: skipDraw=true slot={}", part);
         part.visible = true;
         ((ModelPartSkipDrawAccessorMixin) (Object) part).consoleskins$setSkipDraw(true);
     }
