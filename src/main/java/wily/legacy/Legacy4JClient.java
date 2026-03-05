@@ -125,6 +125,7 @@ public class Legacy4JClient {
     public static final MapIdValueManager<LegacyCraftingTabListing, ?> legacyCraftingListingManager = MapIdValueManager.create(Legacy4J.createModLocation("crafting_tab_listing"), LegacyCraftingTabListing.CODEC);
     public static final MapIdValueManager<LegacyBiomeOverride, ?> legacyBiomeOverrides = MapIdValueManager.createWithListCodec(Legacy4J.createModLocation("biome_overrides"), LegacyBiomeOverride.LIST_MAP_CODEC);
     public static final LegacyWorldTemplate.Manager legacyWorldTemplateManager = new LegacyWorldTemplate.Manager();
+    public static final ContentManager.CategoryManager categoryManager = new ContentManager.CategoryManager();
     public static final LegacyTipOverride.Manager legacyTipOverridesManager = new LegacyTipOverride.Manager();
     public static final LegacyResourceManager legacyResourceManager = new LegacyResourceManager();
     public static final StoneCuttingGroupManager stoneCuttingGroupManager = new StoneCuttingGroupManager();
@@ -388,6 +389,7 @@ public class Legacy4JClient {
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyCreativeListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyCraftingListingManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyWorldTemplateManager);
+        FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, categoryManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyTipOverridesManager);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, legacyBiomeOverrides);
         FactoryEvent.registerReloadListener(PackType.CLIENT_RESOURCES, optionPresetsManager);
