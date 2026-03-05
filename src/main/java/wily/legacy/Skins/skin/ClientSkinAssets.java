@@ -120,7 +120,7 @@ public final class ClientSkinAssets {
         net.minecraft.core.ClientAsset.ResourceTexture body =
                 new net.minecraft.core.ClientAsset.ResourceTexture(tex, tex);
 
-        net.minecraft.core.ClientAsset.Texture capeFinal = body;
+        net.minecraft.core.ClientAsset.Texture capeFinal = null;
         if (wantCape && entry != null && entry.cape() != null) {
             ResourceLocation capePath = entry.cape();
             capeFinal = new net.minecraft.core.ClientAsset.ResourceTexture(capePath, capePath);
@@ -135,7 +135,7 @@ public final class ClientSkinAssets {
                         : net.minecraft.world.entity.player.PlayerModelType.WIDE);
 
         net.minecraft.world.entity.player.PlayerSkin skin =
-                net.minecraft.world.entity.player.PlayerSkin.insecure(body, capeFinal, body, model);
+                net.minecraft.world.entity.player.PlayerSkin.insecure(body, capeFinal, null, model);
         cache.put(skinId, skin);
         return skin;
     }

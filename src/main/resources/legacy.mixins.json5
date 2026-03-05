@@ -183,6 +183,7 @@
     "client.ComponentPathMixin",
     "client.FeatureRenderDispatcherMixin",
     "skins.client.PlayerSkinMixin",
+    "skins.client.DisableCapeWhenElytraMixin",
     "skins.client.SkinIdStateMixin",
     "skins.client.AvatarSkinMixin",
     "skins.client.BoxLayerSetupMixin",

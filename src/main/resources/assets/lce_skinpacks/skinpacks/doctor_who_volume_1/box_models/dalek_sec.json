@@ -4,10 +4,26 @@
     "displayNameId": "IDS_DLCSKIN00002044_DISPLAYNAME"
   },
   "armor_offsets": {
-    "helmet": { "x": 0, "y": -3.1, "z": 0 },
-    "chestplate": { "x": 0, "y": 0, "z": 0 },
-    "leggings": { "x": 0, "y": 0, "z": 0 },
-    "boots": { "x": 0, "y": 0, "z": 0 }
+    "helmet": {
+      "x": 0,
+      "y": -3.1,
+      "z": 0
+    },
+    "chestplate": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "leggings": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "boots": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
   },
   "texture": {
     "width": 64,
@@ -416,5 +432,11 @@
         }
       ]
     }
+  ],
+  "hidearmour": [
+    "helmet",
+    "chestpiece",
+    "leggings",
+    "boots"
   ]
 }

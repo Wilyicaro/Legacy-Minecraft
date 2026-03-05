@@ -50,10 +50,7 @@ public final class GuiDollRender {
     }
 
     private static int computePreviewSize(int baseWidth, int baseHeight, float bboxW, float bboxH, int sizeCap) {
-        float fit = 1.8F / 2.75F;
-        int sizeH = (int) ((baseHeight * fit) / Math.max(1.0E-4F, bboxH));
-        int sizeW = (int) ((baseWidth * fit) / Math.max(1.0E-4F, bboxW));
-        int size = Math.min(Math.min(sizeH, sizeW), sizeCap);
+        int size = Math.min((int) (baseHeight / 2.75F), sizeCap);
         return Math.max(size, 20);
     }
 

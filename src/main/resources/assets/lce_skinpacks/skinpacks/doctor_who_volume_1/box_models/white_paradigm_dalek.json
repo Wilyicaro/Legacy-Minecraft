@@ -1714,5 +1714,11 @@
         }
       ]
     }
+  ],
+  "hidearmour": [
+    "helmet",
+    "chestpiece",
+    "leggings",
+    "boots"
   ]
 }
