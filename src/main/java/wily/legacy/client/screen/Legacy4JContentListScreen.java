@@ -27,11 +27,13 @@ import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -132,14 +134,14 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         directory.delete();
     }
 
-    private RemoteImage getOrDownloadImage(String url, String packId) {
-        if (url == null || url.isEmpty()) return null;
+    private RemoteImage getOrDownloadImage(Optional<URI> url, String packId) {
+        if (url.isEmpty()) return null;
         if (downloadedImages.containsKey(packId)) return downloadedImages.get(packId); 
         if (downloadingImages.contains(packId)) return null;
         
         downloadingImages.add(packId);
         CompletableFuture.runAsync(() -> {
-            try (java.io.InputStream in = new java.net.URL(url).openStream()) {
+            try (java.io.InputStream in = url.get().toURL().openStream()) {
                 com.mojang.blaze3d.platform.NativeImage nativeImage = com.mojang.blaze3d.platform.NativeImage.read(in);
                 int nativeWidth = nativeImage.getWidth();
                 int nativeHeight = nativeImage.getHeight();

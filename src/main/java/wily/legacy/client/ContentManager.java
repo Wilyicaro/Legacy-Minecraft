@@ -17,6 +17,7 @@ import wily.legacy.Legacy4J;
 import wily.legacy.util.IOUtil;
 
 import java.io.*;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -55,20 +56,26 @@ public class ContentManager {
         String id,
         String name,
         String description,
-        String downloadURI,
-        String imageUrl,
+        URI downloadURI,
+        Optional<URI> imageUrl,
         Optional<String> checkSum
     ) {
         public static final Codec<Pack> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.STRING.fieldOf("id").forGetter(Pack::id),
             Codec.STRING.fieldOf("name").forGetter(Pack::name),
             Codec.STRING.optionalFieldOf("description", "").forGetter(Pack::description),
-            Codec.STRING.fieldOf("downloadURI").forGetter(Pack::downloadURI),
-            Codec.STRING.optionalFieldOf("imageUrl", "").forGetter(Pack::imageUrl),
-            Codec.STRING.optionalFieldOf("checkSum").forGetter(Pack::checkSum)
-        ).apply(i, Pack::new));
+            Codec.STRING.xmap(URI::create, URI::toString).fieldOf("downloadURI").forGetter(Pack::downloadURI),
+            Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("imageUrl").forGetter(Pack::imageUrl)
+        ).apply(i, Pack::create));
 
         public static final Codec<List<Pack>> LIST_CODEC = CODEC.listOf();
+
+        public static Pack create(String id, String name, String description, URI compoundDownloadURI, Optional<URI> imageUrl) {
+            String[] splitURI = compoundDownloadURI.toString().split("\\?checksum=");
+            URI downloadURI = URI.create(splitURI[0]);
+            Optional<String> checkSum = splitURI.length < 2 ? Optional.empty() : Optional.of(splitURI[1]);
+            return new Pack(id, name, description, downloadURI, imageUrl, checkSum);
+        }
     }
 
     public static CompletableFuture<List<Pack>> fetchIndex(String indexUrl) {
@@ -161,7 +168,7 @@ public class ContentManager {
             try {
                 Path downloadedTempFile = Files.createTempFile("legacy_pack_", ".zip");
                 
-                try (InputStream stream = new URL(pack.downloadURI()).openStream()) {
+                try (InputStream stream = pack.downloadURI().toURL().openStream()) {
                     Files.copy(stream, downloadedTempFile, StandardCopyOption.REPLACE_EXISTING);
                 }
 
