@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Skins.SkinsBootstrap;
 
 @Mixin(PlayerList.class)
-public class PlayerListSkinsJoinMixin {
+public class PlayerJoinMixin {
 
     @Inject(method = "placeNewPlayer(Lnet/minecraft/network/Connection;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/server/network/CommonListenerCookie;)V",
             at = @At("TAIL"), require = 0)

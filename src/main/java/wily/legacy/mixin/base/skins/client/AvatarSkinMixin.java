@@ -5,15 +5,12 @@ import wily.legacy.Skins.skin.ClientSkinCache;
 import wily.legacy.Skins.skin.SkinEntry;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinPackLoader;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
-import net.minecraft.core.ClientAsset;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.entity.player.PlayerSkin;
 import net.minecraft.world.item.Items;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AvatarRenderer.class)
-public abstract class AvatarRendererSkinMixin {
+public abstract class AvatarSkinMixin {
 
     @Inject(method = "extractRenderState", at = @At("RETURN"), require = 0)
     private void consoleskins$patchStateSkin(Avatar avatar, AvatarRenderState state, float partialTick, CallbackInfo ci) {
@@ -109,37 +106,50 @@ public abstract class AvatarRendererSkinMixin {
             }
 
             SkinEntry entry = SkinPackLoader.getSkin(skinId);
-            ResourceLocation tex = ClientSkinAssets.getTexture(skinId);
-            if (tex == null && entry != null) tex = entry.texture();
-            if (tex == null) return;
 
-            PlayerSkin original = state.skin;
-            if (original == null) return;
+            // Cache the entry and resolved texture/model on the render state so
+            // downstream mixins (PlayerPartsMixin, ModelOffsetsMixin, BoxAddonLayer,
+            // ArmorOffsetsMixin) don't repeat these lookups.
+            if (state instanceof RenderStateSkinIdAccess acc) {
+                acc.consoleskins$setCachedEntry(entry);
 
-            ClientAsset.ResourceTexture body = new ClientAsset.ResourceTexture(tex, tex);
+                ResourceLocation tex = ClientSkinAssets.getTexture(skinId);
+                if (tex == null && entry != null) tex = entry.texture();
+                acc.consoleskins$setCachedTexture(tex);
 
-            ClientAsset.ResourceTexture capeTex = null;
-            if (entry != null && entry.cape() != null) {
-                ResourceLocation capePath = entry.cape();
+                if (tex != null) {
+                    ResourceLocation modelId = ClientSkinAssets.getModelIdFromTexture(tex);
+                    acc.consoleskins$setCachedModelId(modelId);
+
+                    wily.legacy.Skins.client.render.boxloader.BuiltBoxModel boxModel =
+                            wily.legacy.Skins.client.render.boxloader.BoxModelManager.get(modelId);
+                    if (boxModel == null) {
+                        com.google.gson.JsonObject mj = ClientSkinAssets.getModelJson(skinId);
+                        if (mj != null) {
+                            wily.legacy.Skins.client.render.boxloader.BoxModelManager.registerRuntime(modelId, mj);
+                            boxModel = wily.legacy.Skins.client.render.boxloader.BoxModelManager.get(modelId);
+                        }
+                    }
+                    acc.consoleskins$setCachedBoxModel(boxModel);
+                }
+            }
+
+            // Determine if cape should show
+            boolean wantCape = entry != null && entry.cape() != null;
+            if (wantCape) {
                 try {
-                    Minecraft.getInstance().getTextureManager().getTexture(capePath);
+                    if (avatar.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA)) wantCape = false;
                 } catch (Throwable ignored) {
                 }
-                capeTex = new ClientAsset.ResourceTexture(capePath, capePath);
             }
 
-            try {
-                if (avatar.getItemBySlot(EquipmentSlot.CHEST).is(Items.ELYTRA)) capeTex = null;
-            } catch (Throwable ignored) {
-            }
+            state.showCape = wantCape;
 
-            state.showCape = capeTex != null;
+            // Use cached PlayerSkin to avoid per-frame allocation of ResourceTexture + PlayerSkin
+            PlayerSkin cachedSkin = ClientSkinAssets.getCachedPlayerSkin(skinId, entry, wantCape);
+            if (cachedSkin == null) return;
 
-            Boolean slim = ClientSkinAssets.getSlimFlag(skinId);
-            PlayerModelType model = slim != null ? (slim ? PlayerModelType.SLIM : PlayerModelType.WIDE) : ((entry != null && entry.slimArms()) ? PlayerModelType.SLIM : PlayerModelType.WIDE);
-
-            ClientAsset.Texture capeFinal = capeTex;
-            state.skin = PlayerSkin.insecure(body, capeFinal, null, model);
+            state.skin = cachedSkin;
         } catch (Throwable ignored) {
         }
     }

@@ -20,7 +20,7 @@ import wily.legacy.compat.cpm.CpmRenderCompat;
 import java.util.EnumMap;
 
 @Mixin(PlayerModel.class)
-public abstract class PlayerModelOffsetsBoxModelsMixin {
+public abstract class ModelOffsetsMixin {
 
     @Unique private float consoleskins$prevHeadX, consoleskins$prevHeadY, consoleskins$prevHeadZ;
     @Unique private float consoleskins$prevHatX, consoleskins$prevHatY, consoleskins$prevHatZ;
@@ -77,17 +77,18 @@ public abstract class PlayerModelOffsetsBoxModelsMixin {
         String skinId = a.consoleskins$getSkinId();
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
 
-        SkinEntry entry = SkinPackLoader.getSkin(skinId);
-        ResourceLocation tex = ClientSkinAssets.getTexture(skinId);
-        if (tex == null && entry != null) tex = entry.texture();
+        // Use cached texture/modelId from render state
+        ResourceLocation tex = a.consoleskins$getCachedTexture();
+        if (tex == null) {
+            SkinEntry entry = SkinPackLoader.getSkin(skinId);
+            tex = ClientSkinAssets.getTexture(skinId);
+            if (tex == null && entry != null) tex = entry.texture();
+        }
         if (tex == null) return;
 
-        String p = tex.getPath();
-        int slash = p.lastIndexOf('/');
-        if (slash != -1) p = p.substring(slash + 1);
-        if (p.endsWith(".png")) p = p.substring(0, p.length() - 4);
+        ResourceLocation modelId = a.consoleskins$getCachedModelId();
+        if (modelId == null) modelId = ClientSkinAssets.getModelIdFromTexture(tex);
 
-        ResourceLocation modelId = ResourceLocation.fromNamespaceAndPath(tex.getNamespace(), p);
         EnumMap<AttachSlot, float[]> offsets = BoxModelManager.getOffsets(modelId);
         if (offsets == null || offsets.isEmpty()) {
             JsonObject mj = ClientSkinAssets.getModelJson(skinId);

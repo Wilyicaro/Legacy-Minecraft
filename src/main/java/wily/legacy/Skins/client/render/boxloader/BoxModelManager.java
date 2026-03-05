@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 public final class BoxModelManager {
     private static final Gson GSON = new GsonBuilder().create();
     private static final Map<ResourceLocation, BuiltBoxModel> CACHE = new java.util.concurrent.ConcurrentHashMap<>();
@@ -128,12 +129,7 @@ public final class BoxModelManager {
 
     public static boolean isAvailable(ResourceLocation id) {
         if (id == null) return false;
-        ResourceManager rm = null;
-        try {
-            rm = Minecraft.getInstance().getResourceManager();
-        } catch (Throwable ignored) {
-        }
-        if (rm != null) ensureReloaded(rm);
+        ensureInitialized();
         if (RUNTIME.containsKey(id) || CACHE.containsKey(id)) return true;
         return JSON_INDEX.containsKey(id);
     }
@@ -278,14 +274,24 @@ public final class BoxModelManager {
         }
     }
 
-    public static BuiltBoxModel get(ResourceLocation id) {
-        if (id == null) return null;
+    /**
+     * Fast-path resource manager check. Once initialized, skips the expensive
+     * Minecraft.getInstance().getResourceManager() call chain that was happening
+     * 5+ times per player per frame.
+     */
+    private static void ensureInitialized() {
+        if (initialized) return;
         ResourceManager rm = null;
         try {
             rm = Minecraft.getInstance().getResourceManager();
         } catch (Throwable ignored) {
         }
         if (rm != null) ensureReloaded(rm);
+    }
+
+    public static BuiltBoxModel get(ResourceLocation id) {
+        if (id == null) return null;
+        ensureInitialized();
 
         BuiltBoxModel rt = RUNTIME.get(id);
         if (rt != null) return rt;
@@ -299,12 +305,7 @@ public final class BoxModelManager {
 
     public static EnumMap<AttachSlot, float[]> getOffsets(ResourceLocation id) {
         if (id == null) return null;
-        ResourceManager rm = null;
-        try {
-            rm = Minecraft.getInstance().getResourceManager();
-        } catch (Throwable ignored) {
-        }
-        if (rm != null) ensureReloaded(rm);
+        ensureInitialized();
 
         EnumMap<AttachSlot, float[]> rt = OFFSETS_RUNTIME.get(id);
         if (rt != null) return rt;
@@ -318,12 +319,7 @@ public final class BoxModelManager {
 
     public static EnumMap<ArmorSlot, float[]> getArmorOffsets(ResourceLocation id) {
         if (id == null) return null;
-        ResourceManager rm = null;
-        try {
-            rm = Minecraft.getInstance().getResourceManager();
-        } catch (Throwable ignored) {
-        }
-        if (rm != null) ensureReloaded(rm);
+        ensureInitialized();
 
         EnumMap<ArmorSlot, float[]> rt = ARMOR_OFFSETS_RUNTIME.get(id);
         if (rt != null) return rt;
@@ -336,12 +332,7 @@ public final class BoxModelManager {
     }
     public static EnumSet<ArmorSlot> getArmorHide(ResourceLocation id) {
         if (id == null) return null;
-        ResourceManager rm = null;
-        try {
-            rm = Minecraft.getInstance().getResourceManager();
-        } catch (Throwable ignored) {
-        }
-        if (rm != null) ensureReloaded(rm);
+        ensureInitialized();
 
         EnumSet<ArmorSlot> rt = ARMOR_HIDE_RUNTIME.get(id);
         if (rt != null) return rt;
@@ -355,12 +346,7 @@ public final class BoxModelManager {
 
     public static boolean hasPoseTag(String id, SkinPoseRegistry.PoseTag tag) {
         if (id == null || id.isBlank() || tag == null) return false;
-        ResourceManager rm = null;
-        try {
-            rm = Minecraft.getInstance().getResourceManager();
-        } catch (Throwable ignored) {
-        }
-        if (rm != null) ensureReloaded(rm);
+        ensureInitialized();
 
         EnumSet<SkinPoseRegistry.PoseTag> rt = POSE_TAGS_RUNTIME.get(id);
         if (rt != null && rt.contains(tag)) return true;
@@ -860,7 +846,7 @@ public final class BoxModelManager {
     }
 
 private static BuiltBoxModel bake(int texW, int texH, java.util.List<BoneDef> bones, EnumSet<AttachSlot> hide) {
-MeshDefinition mesh = new MeshDefinition();
+        MeshDefinition mesh = new MeshDefinition();
         PartDefinition root = mesh.getRoot();
 
         float minX = Float.POSITIVE_INFINITY;
@@ -870,38 +856,65 @@ MeshDefinition mesh = new MeshDefinition();
         float maxY = Float.NEGATIVE_INFINITY;
         float maxZ = Float.NEGATIVE_INFINITY;
 
+        EnumMap<AttachSlot, CubeListBuilder> builders = new EnumMap<>(AttachSlot.class);
+        EnumSet<AttachSlot> hasAny = EnumSet.noneOf(AttachSlot.class);
+
         for (BoneDef bone : bones) {
-            CubeListBuilder clb = CubeListBuilder.create();
-            for (CubeDef c : bone.cubes()) {
+            if (bone == null) continue;
+            AttachSlot slot = bone.attach();
+            if (slot == null) continue;
+            java.util.List<CubeDef> cubes = bone.cubes();
+            if (cubes == null || cubes.isEmpty()) continue;
+
+            CubeListBuilder clb = builders.get(slot);
+            if (clb == null) clb = CubeListBuilder.create();
+
+            for (CubeDef c : cubes) {
+                if (c == null) continue;
+
                 int[] uv = c.uv();
+                if (uv == null || uv.length < 2) uv = new int[]{0, 0};
                 clb = clb.texOffs(uv[0], uv[1]);
                 clb = c.mirror() ? clb.mirror() : clb.mirror(false);
 
                 float[] o = c.origin();
                 float[] s = c.size();
+                if (o == null || s == null || o.length < 3 || s.length < 3) continue;
+
                 CubeDeformation deform = new CubeDeformation(c.inflate());
 
-                if (o != null && s != null && o.length >= 3 && s.length >= 3) {
-                    minX = Math.min(minX, o[0]);
-                    minY = Math.min(minY, o[1]);
-                    minZ = Math.min(minZ, o[2]);
-                    maxX = Math.max(maxX, o[0] + s[0]);
-                    maxY = Math.max(maxY, o[1] + s[1]);
-                    maxZ = Math.max(maxZ, o[2] + s[2]);
-                }
+                minX = Math.min(minX, o[0]);
+                minY = Math.min(minY, o[1]);
+                minZ = Math.min(minZ, o[2]);
+                maxX = Math.max(maxX, o[0] + s[0]);
+                maxY = Math.max(maxY, o[1] + s[1]);
+                maxZ = Math.max(maxZ, o[2] + s[2]);
 
                 clb = clb.addBox(o[0], o[1], o[2], s[0], s[1], s[2], deform);
+                hasAny.add(slot);
             }
-            root.addOrReplaceChild(bone.name(), clb, PartPose.ZERO);
+
+            builders.put(slot, clb);
+        }
+
+        EnumMap<AttachSlot, String> slotChildren = new EnumMap<>(AttachSlot.class);
+        for (AttachSlot slot : hasAny) {
+            CubeListBuilder clb = builders.get(slot);
+            if (clb == null) continue;
+            String childName = "consoleskins$slot_" + slot.name();
+            slotChildren.put(slot, childName);
+            root.addOrReplaceChild(childName, clb, PartPose.ZERO);
         }
 
         ModelPart bakedRoot = LayerDefinition.create(mesh, texW, texH).bakeRoot();
 
-        EnumMap<AttachSlot, List<ModelPart>> partsByAttach = new EnumMap<>(AttachSlot.class);
-        for (BoneDef bone : bones) {
+        EnumMap<AttachSlot, java.util.List<ModelPart>> partsByAttach = new EnumMap<>(AttachSlot.class);
+        for (Map.Entry<AttachSlot, String> e : slotChildren.entrySet()) {
             try {
-                ModelPart part = bakedRoot.getChild(bone.name());
-                partsByAttach.computeIfAbsent(bone.attach(), k -> new ArrayList<>()).add(part);
+                ModelPart part = bakedRoot.getChild(e.getValue());
+                java.util.List<ModelPart> list = new java.util.ArrayList<>(1);
+                list.add(part);
+                partsByAttach.put(e.getKey(), list);
             } catch (Exception ignored) {
             }
         }

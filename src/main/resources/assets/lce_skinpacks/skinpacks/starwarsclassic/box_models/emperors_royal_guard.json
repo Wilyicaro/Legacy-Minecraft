@@ -5,6 +5,7 @@
     "themeName": "",
     "themeNameId": "IDS_DLCSKIN00001246_THEMENAME"
   },
+"hidearmour": "helmet",
 "hide":["hat"],
   "texture": {
     "width": 64,

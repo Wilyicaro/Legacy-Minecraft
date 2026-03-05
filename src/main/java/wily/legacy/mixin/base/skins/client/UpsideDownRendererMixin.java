@@ -12,7 +12,7 @@ import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
 import wily.legacy.Skins.skin.ClientSkinCache;
 
 @Mixin(LivingEntityRenderer.class)
-public abstract class LivingEntityRendererUpsideDownMixin {
+public abstract class UpsideDownRendererMixin {
 
     @Inject(method = "isEntityUpsideDown", at = @At("HEAD"), cancellable = true, require = 0)
     private void consoleskins$isEntityUpsideDown(LivingEntity entity, CallbackInfoReturnable<Boolean> cir) {

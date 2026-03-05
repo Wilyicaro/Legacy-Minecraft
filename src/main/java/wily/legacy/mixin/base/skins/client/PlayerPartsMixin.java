@@ -28,9 +28,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import wily.legacy.Skins.client.render.SkinPoseRegistry;
+import wily.legacy.Skins.util.DebugLog;
 
 @Mixin(PlayerModel.class)
-public abstract class PlayerModelHidePartsBoxModelsMixin {
+public abstract class PlayerPartsMixin {
+
+    // Cached reflection for isSpectator - resolved once, reused every frame
+    @Unique
+    private static volatile boolean consoleskins$triedResolveSpectator;
+    @Unique
+    private static volatile Field consoleskins$spectatorField;
+    @Unique
+    private static volatile Method consoleskins$spectatorMethod;
+
+    // Log once to confirm this version of hidePart is running (uses skipDraw only, not skipRenderOverride)
+
 
     @Unique
     private boolean consoleskins$specBoxHeadInstalled;
@@ -63,50 +75,9 @@ public abstract class PlayerModelHidePartsBoxModelsMixin {
 
     private static void consoleskins$hidePart(ModelPart part) {
         if (part == null) return;
+        DebugLog.debug("[ArmorFix] hidePart: skipDraw=true slot={}", part);
         part.visible = true;
         ((SkipDrawAccessor) (Object) part).consoleskins$setSkipDraw(true);
-    }
-
-    @Unique
-    private String consoleskins$cachedSkinId;
-    @Unique
-    private ResourceLocation consoleskins$cachedModelId;
-    @Unique
-    private BuiltBoxModel consoleskins$cachedModel;
-
-    @Unique
-    private BuiltBoxModel consoleskins$getModelForSkin(String skinId) {
-        if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) {
-            consoleskins$cachedSkinId = null;
-            consoleskins$cachedModelId = null;
-            consoleskins$cachedModel = null;
-            return null;
-        }
-        if (skinId.equals(consoleskins$cachedSkinId)) return consoleskins$cachedModel;
-        consoleskins$cachedSkinId = skinId;
-        consoleskins$cachedModel = null;
-        consoleskins$cachedModelId = null;
-
-        SkinEntry entry;
-        try {
-            entry = SkinPackLoader.getSkin(skinId);
-        } catch (Throwable t) {
-            return null;
-        }
-        ResourceLocation tex = ClientSkinAssets.getTexture(skinId);
-        if (tex == null && entry != null) tex = entry.texture();
-        if (tex == null) return null;
-
-        ResourceLocation modelId = consoleskins$modelIdFromTexture(tex);
-        consoleskins$cachedModelId = modelId;
-        BuiltBoxModel model = BoxModelManager.get(modelId);
-        if (model == null) {
-            JsonObject mj = ClientSkinAssets.getModelJson(skinId);
-            if (mj != null) BoxModelManager.registerRuntime(modelId, mj);
-            model = BoxModelManager.get(modelId);
-        }
-        consoleskins$cachedModel = model;
-        return model;
     }
 
     private static void consoleskins$setSkipDraw(ModelPart part, boolean skip) {
@@ -173,7 +144,28 @@ public abstract class PlayerModelHidePartsBoxModelsMixin {
         consoleskins$resetPart(self.rightPants);
         consoleskins$resetPart(self.leftPants);
 
-        BuiltBoxModel model = consoleskins$getModelForSkin(skinId);
+        if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
+
+        // Use values cached on render state by AvatarSkinMixin
+        ResourceLocation tex = (state instanceof RenderStateSkinIdAccess ra) ? ra.consoleskins$getCachedTexture() : null;
+        BuiltBoxModel model = (state instanceof RenderStateSkinIdAccess ra2) ? ra2.consoleskins$getCachedBoxModel() : null;
+
+        if (tex == null) {
+            SkinEntry entry = SkinPackLoader.getSkin(skinId);
+            tex = ClientSkinAssets.getTexture(skinId);
+            if (tex == null && entry != null) tex = entry.texture();
+        }
+        if (tex == null) return;
+
+        if (model == null) {
+            ResourceLocation modelId = consoleskins$modelIdFromTexture(tex);
+            model = BoxModelManager.get(modelId);
+            if (model == null) {
+                JsonObject mj = ClientSkinAssets.getModelJson(skinId);
+                if (mj != null) BoxModelManager.registerRuntime(modelId, mj);
+                model = BoxModelManager.get(modelId);
+            }
+        }
         if (model == null) return;
 
         if (model.hides(AttachSlot.HEAD)) {
@@ -215,7 +207,26 @@ public abstract class PlayerModelHidePartsBoxModelsMixin {
 
     @Unique
     private void consoleskins$applySpectatorBoxHeadIfNeeded(PlayerModel self, String skinId) {
-        BuiltBoxModel model = consoleskins$getModelForSkin(skinId);
+        if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) {
+            consoleskins$uninstallSpectatorBoxHead(self);
+            return;
+        }
+
+        SkinEntry entry = SkinPackLoader.getSkin(skinId);
+        ResourceLocation tex = ClientSkinAssets.getTexture(skinId);
+        if (tex == null && entry != null) tex = entry.texture();
+        if (tex == null) {
+            consoleskins$uninstallSpectatorBoxHead(self);
+            return;
+        }
+
+        ResourceLocation modelId = consoleskins$modelIdFromTexture(tex);
+        BuiltBoxModel model = BoxModelManager.get(modelId);
+        if (model == null) {
+            JsonObject mj = ClientSkinAssets.getModelJson(skinId);
+            if (mj != null) BoxModelManager.registerRuntime(modelId, mj);
+            model = BoxModelManager.get(modelId);
+        }
         if (model == null) {
             consoleskins$uninstallSpectatorBoxHead(self);
             return;
@@ -396,24 +407,35 @@ public abstract class PlayerModelHidePartsBoxModelsMixin {
     }
 
     private static ResourceLocation consoleskins$modelIdFromTexture(ResourceLocation texture) {
-        String p = texture.getPath();
-        int slash = p.lastIndexOf('/');
-        if (slash != -1) p = p.substring(slash + 1);
-        if (p.endsWith(".png")) p = p.substring(0, p.length() - 4);
-        return ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), p);
+        return ClientSkinAssets.getModelIdFromTexture(texture);
     }
 
     private static boolean consoleskins$isSpectator(AvatarRenderState state, UUID uuid) {
+        // Use cached reflection instead of per-frame getField/getMethod
         if (state != null) {
-            try {
-                Field f = state.getClass().getField("isSpectator");
-                if (f.getType() == boolean.class) return f.getBoolean(state);
-            } catch (Throwable ignored) {
+            if (!consoleskins$triedResolveSpectator) {
+                synchronized (PlayerPartsMixin.class) {
+                    if (!consoleskins$triedResolveSpectator) {
+                        consoleskins$triedResolveSpectator = true;
+                        try {
+                            Field f = state.getClass().getField("isSpectator");
+                            if (f.getType() == boolean.class) consoleskins$spectatorField = f;
+                        } catch (Throwable ignored) {
+                            try {
+                                Method m = state.getClass().getMethod("isSpectator");
+                                if (m.getReturnType() == boolean.class) consoleskins$spectatorMethod = m;
+                            } catch (Throwable ignored2) {
+                            }
+                        }
+                    }
+                }
             }
-            try {
-                Method m = state.getClass().getMethod("isSpectator");
-                if (m.getReturnType() == boolean.class) return (boolean) m.invoke(state);
-            } catch (Throwable ignored) {
+
+            if (consoleskins$spectatorField != null) {
+                try { return consoleskins$spectatorField.getBoolean(state); } catch (Throwable ignored) {}
+            }
+            if (consoleskins$spectatorMethod != null) {
+                try { return (boolean) consoleskins$spectatorMethod.invoke(state); } catch (Throwable ignored) {}
             }
         }
         if (uuid != null) {

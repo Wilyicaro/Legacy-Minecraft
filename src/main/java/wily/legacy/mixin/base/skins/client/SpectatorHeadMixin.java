@@ -32,7 +32,17 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 @Mixin(LivingEntityRenderer.class)
-public abstract class LivingEntityRendererSpectatorBoxHeadMixin {
+public abstract class SpectatorHeadMixin {
+
+    // Cached reflection for isSpectator - resolved once, reused every frame
+    private static volatile boolean consoleskins$triedResolveSpectator;
+    private static volatile Field consoleskins$spectatorField;
+    private static volatile Method consoleskins$spectatorMethod;
+
+    // Cached reflection for extracting texture from PlayerSkin
+    private static volatile boolean consoleskins$triedResolveSkinTexture;
+    private static volatile Method consoleskins$skinTextureMethod;
+    private static volatile Field consoleskins$skinTextField;
 
     @Shadow
     public abstract EntityModel getModel();
@@ -115,15 +125,30 @@ public abstract class LivingEntityRendererSpectatorBoxHeadMixin {
 
     private static boolean consoleskins$isSpectator(EntityRenderState state) {
         if (!(state instanceof AvatarRenderState ars)) return false;
-        try {
-            Field f = ars.getClass().getField("isSpectator");
-            if (f.getType() == boolean.class) return f.getBoolean(ars);
-        } catch (Throwable ignored) {
+
+        if (!consoleskins$triedResolveSpectator) {
+            synchronized (SpectatorHeadMixin.class) {
+                if (!consoleskins$triedResolveSpectator) {
+                    consoleskins$triedResolveSpectator = true;
+                    try {
+                        Field f = ars.getClass().getField("isSpectator");
+                        if (f.getType() == boolean.class) consoleskins$spectatorField = f;
+                    } catch (Throwable ignored) {
+                        try {
+                            Method m = ars.getClass().getMethod("isSpectator");
+                            if (m.getReturnType() == boolean.class) consoleskins$spectatorMethod = m;
+                        } catch (Throwable ignored2) {
+                        }
+                    }
+                }
+            }
         }
-        try {
-            Method m = ars.getClass().getMethod("isSpectator");
-            if (m.getReturnType() == boolean.class) return (boolean) m.invoke(ars);
-        } catch (Throwable ignored) {
+
+        if (consoleskins$spectatorField != null) {
+            try { return consoleskins$spectatorField.getBoolean(ars); } catch (Throwable ignored) {}
+        }
+        if (consoleskins$spectatorMethod != null) {
+            try { return (boolean) consoleskins$spectatorMethod.invoke(ars); } catch (Throwable ignored) {}
         }
         return false;
     }
@@ -177,32 +202,43 @@ public abstract class LivingEntityRendererSpectatorBoxHeadMixin {
 
     private static ResourceLocation consoleskins$extractTextureFromSkin(Object skin) {
         if (skin == null) return null;
-        try {
-            Method m = skin.getClass().getMethod("texture");
-            Object r = m.invoke(skin);
-            if (r instanceof ResourceLocation rl) return rl;
-        } catch (Throwable ignored) {
+
+        if (!consoleskins$triedResolveSkinTexture) {
+            synchronized (SpectatorHeadMixin.class) {
+                if (!consoleskins$triedResolveSkinTexture) {
+                    consoleskins$triedResolveSkinTexture = true;
+                    try {
+                        consoleskins$skinTextureMethod = skin.getClass().getMethod("texture");
+                    } catch (Throwable ignored) {
+                        try {
+                            consoleskins$skinTextureMethod = skin.getClass().getMethod("textureLocation");
+                        } catch (Throwable ignored2) {
+                            try {
+                                consoleskins$skinTextField = skin.getClass().getField("texture");
+                            } catch (Throwable ignored3) {
+                            }
+                        }
+                    }
+                }
+            }
         }
-        try {
-            Method m = skin.getClass().getMethod("textureLocation");
-            Object r = m.invoke(skin);
-            if (r instanceof ResourceLocation rl) return rl;
-        } catch (Throwable ignored) {
+
+        if (consoleskins$skinTextureMethod != null) {
+            try {
+                Object r = consoleskins$skinTextureMethod.invoke(skin);
+                if (r instanceof ResourceLocation rl) return rl;
+            } catch (Throwable ignored) {}
         }
-        try {
-            Field f = skin.getClass().getField("texture");
-            Object r = f.get(skin);
-            if (r instanceof ResourceLocation rl) return rl;
-        } catch (Throwable ignored) {
+        if (consoleskins$skinTextField != null) {
+            try {
+                Object r = consoleskins$skinTextField.get(skin);
+                if (r instanceof ResourceLocation rl) return rl;
+            } catch (Throwable ignored) {}
         }
         return null;
     }
 
     private static ResourceLocation consoleskins$modelIdFromTexture(ResourceLocation texture) {
-        String p = texture.getPath();
-        int slash = p.lastIndexOf('/');
-        if (slash != -1) p = p.substring(slash + 1);
-        if (p.endsWith(".png")) p = p.substring(0, p.length() - 4);
-        return ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), p);
+        return ClientSkinAssets.getModelIdFromTexture(texture);
     }
 }

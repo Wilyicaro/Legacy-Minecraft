@@ -1,5 +1,7 @@
 package wily.legacy.Skins.client.screen.changeskin;
 
+
+
 import wily.legacy.Skins.client.screen.widget.PlayerSkinWidget;
 import wily.legacy.Skins.client.screen.widget.PlayerSkinWidgetList;
 import wily.legacy.Skins.skin.ClientSkinCache;
@@ -30,12 +32,14 @@ import wily.legacy.client.screen.Panel;
 import wily.legacy.Skins.SkinsClientBootstrap;
 import wily.legacy.Skins.client.screen.TU3ChangeSkinScreen;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
+import wily.legacy.Skins.client.util.SkinPreviewWarmup;
 import wily.legacy.client.screen.LegacyScreen;
 import wily.legacy.client.screen.OptionsScreen;
 import wily.legacy.Skins.client.compat.minecraft.TextureCompat;
 
 public final class ChangeSkinActions {
 
+    
     public interface Host {
         PlayerSkinWidgetList getPlayerSkinWidgetList();
 
@@ -72,6 +76,7 @@ public final class ChangeSkinActions {
 
     private PendingSwap pending;
 
+    
     private static final class PendingSwap {
         final List<String> ids;
         final int index;
@@ -305,12 +310,7 @@ public final class ChangeSkinActions {
         int touched = 0;
         for (SkinEntry e : fav.skins()) {
             if (e == null) continue;
-            ResourceLocation tex = e.texture();
-            if (tex == null) continue;
-            try {
-                minecraft.getTextureManager().getTexture(tex);
-            } catch (Throwable ignored) {
-            }
+            SkinPreviewWarmup.enqueue(e.id(), e);
             if (++touched >= MAX_SKINS_PER_PACK) break;
         }
     }
@@ -319,15 +319,7 @@ public final class ChangeSkinActions {
         if (id == null || id.isBlank()) return;
         SkinEntry entry = SkinPackLoader.getSkin(id);
         if (entry == null) return;
-
-        ResourceLocation tex = entry.texture();
-        if (tex != null) {
-            try {
-                minecraft.getTextureManager().getTexture(tex);
-            } catch (Throwable ignored) {
-            }
-        }
-
+        SkinPreviewWarmup.enqueue(id, entry);
     }
 
     private void touchTextureForId(PlayerSkinWidget w) {
@@ -336,10 +328,7 @@ public final class ChangeSkinActions {
         if (id == null || id.isBlank()) return;
         SkinEntry entry = SkinPackLoader.getSkin(id);
         if (entry == null || entry.texture() == null) return;
-        try {
-            minecraft.getTextureManager().getTexture(entry.texture());
-        } catch (Throwable ignored) {
-        }
+        SkinPreviewWarmup.enqueue(id, entry);
     }
 
     private boolean areRequiredReady(List<String> ids, int required) {

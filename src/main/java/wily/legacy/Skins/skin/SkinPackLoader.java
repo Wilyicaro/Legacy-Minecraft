@@ -32,6 +32,8 @@ import java.util.Set;
 
 public final class SkinPackLoader {
 
+    
+
     private static final Object LOCK = new Object();
 
     private static volatile Map<String, SkinPack> PACKS = Map.of();
@@ -59,6 +61,7 @@ public final class SkinPackLoader {
     }
 
     public static SkinEntry getSkin(String id) {
+        if (loaded) return SKINS_BY_ID.get(id);
         ensureLoaded();
         return SKINS_BY_ID.get(id);
     }

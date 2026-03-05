@@ -26,6 +26,15 @@ public final class ClientSkinAssets {
     private static volatile java.lang.reflect.Method cachedTextureRelease;
     private static volatile boolean triedResolveTextureRelease;
 
+    /**
+     * Cached PlayerSkin objects keyed by skinId, so we don't allocate new
+     * ClientAsset.ResourceTexture + PlayerSkin objects every single frame per player.
+     * Invalidated when textures/models change for a given skinId.
+     */
+    private static final Map<String, net.minecraft.world.entity.player.PlayerSkin> SKIN_CACHE = new ConcurrentHashMap<>();
+    /** Cached PlayerSkin variants for skins with capes. Key = skinId + "|cape" */
+    private static final Map<String, net.minecraft.world.entity.player.PlayerSkin> SKIN_CACHE_CAPE = new ConcurrentHashMap<>();
+
     private ClientSkinAssets() {
     }
 
@@ -85,6 +94,79 @@ public final class ClientSkinAssets {
         return null;
     }
 
+    /**
+     * Returns a cached PlayerSkin for the given skinId + cape combination,
+     * avoiding per-frame allocation of ClientAsset.ResourceTexture and PlayerSkin objects.
+     * Returns null if no texture is available for this skinId.
+     *
+     * @param skinId   the skin identifier
+     * @param entry    the SkinEntry (may be null for runtime skins)
+     * @param wantCape whether to include the cape texture
+     */
+    public static net.minecraft.world.entity.player.PlayerSkin getCachedPlayerSkin(
+            String skinId, SkinEntry entry, boolean wantCape) {
+        if (skinId == null || skinId.isBlank()) return null;
+
+        // Choose cache based on whether cape is requested
+        Map<String, net.minecraft.world.entity.player.PlayerSkin> cache = wantCape ? SKIN_CACHE_CAPE : SKIN_CACHE;
+        net.minecraft.world.entity.player.PlayerSkin cached = cache.get(skinId);
+        if (cached != null) return cached;
+
+        // Build the skin
+        ResourceLocation tex = TEXTURES.get(skinId);
+        if (tex == null && entry != null) tex = entry.texture();
+        if (tex == null) return null;
+
+        net.minecraft.core.ClientAsset.ResourceTexture body =
+                new net.minecraft.core.ClientAsset.ResourceTexture(tex, tex);
+
+        net.minecraft.core.ClientAsset.Texture capeFinal = body;
+        if (wantCape && entry != null && entry.cape() != null) {
+            ResourceLocation capePath = entry.cape();
+            capeFinal = new net.minecraft.core.ClientAsset.ResourceTexture(capePath, capePath);
+        }
+
+        Boolean slim = getSlimFlag(skinId);
+        net.minecraft.world.entity.player.PlayerModelType model = slim != null
+                ? (slim ? net.minecraft.world.entity.player.PlayerModelType.SLIM
+                        : net.minecraft.world.entity.player.PlayerModelType.WIDE)
+                : ((entry != null && entry.slimArms())
+                        ? net.minecraft.world.entity.player.PlayerModelType.SLIM
+                        : net.minecraft.world.entity.player.PlayerModelType.WIDE);
+
+        net.minecraft.world.entity.player.PlayerSkin skin =
+                net.minecraft.world.entity.player.PlayerSkin.insecure(body, capeFinal, body, model);
+        cache.put(skinId, skin);
+        return skin;
+    }
+
+    /**
+     * Invalidates the PlayerSkin cache for the given skinId.
+     * Called when textures or models change.
+     */
+    private static void invalidateSkinCache(String skinId) {
+        if (skinId == null) return;
+        SKIN_CACHE.remove(skinId);
+        SKIN_CACHE_CAPE.remove(skinId);
+    }
+
+    /**
+     * Resolves a model ResourceLocation from a texture ResourceLocation.
+     * Cached via a static map to avoid per-frame string operations.
+     */
+    private static final Map<ResourceLocation, ResourceLocation> MODEL_ID_CACHE = new ConcurrentHashMap<>();
+
+    public static ResourceLocation getModelIdFromTexture(ResourceLocation texture) {
+        if (texture == null) return null;
+        return MODEL_ID_CACHE.computeIfAbsent(texture, tex -> {
+            String p = tex.getPath();
+            int slash = p.lastIndexOf('/');
+            if (slash != -1) p = p.substring(slash + 1);
+            if (p.endsWith(".png")) p = p.substring(0, p.length() - 4);
+            return ResourceLocation.fromNamespaceAndPath(tex.getNamespace(), p);
+        });
+    }
+
     private static void registerRuntimePoses(String skinId, JsonObject obj) {
         if (skinId == null || skinId.isBlank() || obj == null) return;
 
@@ -121,9 +203,12 @@ public final class ClientSkinAssets {
         Minecraft mc = Minecraft.getInstance();
         if (mc == null) return;
 
+        // Invalidate the cached PlayerSkin whenever assets change
+        invalidateSkinCache(skinId);
+
         if (texturePng != null && texturePng.length > 0) {
             try {
-                TEXTURE_BYTES.put(skinId, texturePng.clone());
+                TEXTURE_BYTES.put(skinId, texturePng);
                 NativeImage img = NativeImage.read(new ByteArrayInputStream(texturePng));
                 DynamicTexture dt = new DynamicTexture(() -> "legacy_runtime_skin_" + skinId, img);
                 TextureManager tm = mc.getTextureManager();
@@ -140,7 +225,7 @@ public final class ClientSkinAssets {
 
         if (modelJson != null && modelJson.length > 0) {
             try {
-                MODEL_BYTES.put(skinId, modelJson.clone());
+                MODEL_BYTES.put(skinId, modelJson);
                 String s = new String(modelJson, java.nio.charset.StandardCharsets.UTF_8);
                 JsonObject obj = JsonParser.parseString(s).getAsJsonObject();
                 MODELS.put(skinId, obj);
@@ -202,6 +287,9 @@ public final class ClientSkinAssets {
         MODELS.clear();
         TEXTURE_BYTES.clear();
         MODEL_BYTES.clear();
+        SKIN_CACHE.clear();
+        SKIN_CACHE_CAPE.clear();
+        MODEL_ID_CACHE.clear();
         BoxModelManager.clearRuntime();
         SkinPoseRegistry.clearRuntimeSelectors();
     }

@@ -26,6 +26,12 @@ import java.util.List;
 import java.util.UUID;
 
 public class BoxAddonLayer extends RenderLayer {
+
+    // Cached reflection for isInvisible - resolved once, reused every frame
+    private static volatile boolean triedResolveInvisible;
+    private static volatile Field cachedInvisibleField;
+    private static volatile Method cachedInvisibleMethod;
+
     public BoxAddonLayer(RenderLayerParent parent) {
         super(parent);
     }
@@ -42,25 +48,26 @@ public class BoxAddonLayer extends RenderLayer {
         String skinId = a.consoleskins$getSkinId();
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
 
-        SkinEntry entry = SkinPackLoader.getSkin(skinId);
-        ResourceLocation texture = ClientSkinAssets.getTexture(skinId);
-        if (texture == null && entry != null) texture = entry.texture();
+        // Use values cached on the render state by AvatarSkinMixin.extractRenderState
+        ResourceLocation texture = a.consoleskins$getCachedTexture();
+        if (texture == null) {
+            SkinEntry entry = SkinPackLoader.getSkin(skinId);
+            texture = ClientSkinAssets.getTexture(skinId);
+            if (texture == null && entry != null) texture = entry.texture();
+        }
         if (texture == null) return;
 
-        String p = texture.getPath();
-        int slash = p.lastIndexOf('/');
-        if (slash != -1) p = p.substring(slash + 1);
-        if (p.endsWith(".png")) p = p.substring(0, p.length() - 4);
-
-        ResourceLocation modelId = ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), p);
-
-        BuiltBoxModel built = BoxModelManager.get(modelId);
+        BuiltBoxModel built = a.consoleskins$getCachedBoxModel();
         if (built == null) {
-            var mj = ClientSkinAssets.getModelJson(skinId);
-            if (mj != null) BoxModelManager.registerRuntime(modelId, mj);
+            ResourceLocation modelId = ClientSkinAssets.getModelIdFromTexture(texture);
             built = BoxModelManager.get(modelId);
-            if (built == null) return;
+            if (built == null) {
+                var mj = ClientSkinAssets.getModelJson(skinId);
+                if (mj != null) BoxModelManager.registerRuntime(modelId, mj);
+                built = BoxModelManager.get(modelId);
+            }
         }
+        if (built == null) return;
 
         final BuiltBoxModel baked = built;
         final ResourceLocation texFinal = texture;
@@ -92,17 +99,30 @@ public class BoxAddonLayer extends RenderLayer {
     }
 
     private static boolean consoleskins$isInvisible(AvatarRenderState ars, RenderStateSkinIdAccess a) {
-        if (ars != null) {
-            try {
-                Field f = ars.getClass().getField("isInvisible");
-                if (f.getType() == boolean.class) return f.getBoolean(ars);
-            } catch (Throwable ignored) {
+        // Use cached reflection instead of per-frame getField/getMethod
+        if (!triedResolveInvisible) {
+            synchronized (BoxAddonLayer.class) {
+                if (!triedResolveInvisible) {
+                    triedResolveInvisible = true;
+                    try {
+                        cachedInvisibleField = ars.getClass().getField("isInvisible");
+                        if (cachedInvisibleField.getType() != boolean.class) cachedInvisibleField = null;
+                    } catch (Throwable ignored) {
+                        try {
+                            cachedInvisibleMethod = ars.getClass().getMethod("isInvisible");
+                            if (cachedInvisibleMethod.getReturnType() != boolean.class) cachedInvisibleMethod = null;
+                        } catch (Throwable ignored2) {
+                        }
+                    }
+                }
             }
-            try {
-                Method m = ars.getClass().getMethod("isInvisible");
-                if (m.getReturnType() == boolean.class) return (boolean) m.invoke(ars);
-            } catch (Throwable ignored) {
-            }
+        }
+
+        if (cachedInvisibleField != null) {
+            try { return cachedInvisibleField.getBoolean(ars); } catch (Throwable ignored) {}
+        }
+        if (cachedInvisibleMethod != null) {
+            try { return (boolean) cachedInvisibleMethod.invoke(ars); } catch (Throwable ignored) {}
         }
 
         try {

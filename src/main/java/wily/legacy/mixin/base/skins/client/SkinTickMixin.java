@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Skins.skin.SkinSyncClient;
 
 @Mixin(Minecraft.class)
-public abstract class MinecraftSkinSyncTickMixin {
+public abstract class SkinTickMixin {
     @Unique
     private boolean legacy4j$wasInLevel = false;
 

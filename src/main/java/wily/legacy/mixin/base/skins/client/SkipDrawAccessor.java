@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(ModelPart.class)
-public interface ModelPartSkipDrawAccessorMixin {
+public interface SkipDrawAccessor {
     @Accessor("skipDraw")
     boolean consoleskins$getSkipDraw();
 

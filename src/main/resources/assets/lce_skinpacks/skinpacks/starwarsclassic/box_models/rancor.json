@@ -5,7 +5,6 @@
     "themeName": "",
     "themeNameId": "IDS_DLCSKIN00001254_THEMENAME"
   },
-  "hidearmour": ["helmet", "chestpiece", "leggings", "boots"],
 "hide": "right_leg",
   "texture": {
     "width": 64,

@@ -26,6 +26,7 @@ import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
 import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinEntry;
 import wily.legacy.Skins.skin.SkinPackLoader;
+import wily.legacy.Skins.util.DebugLog;
 import wily.legacy.client.ModelPartSkipRenderOverrideAccess;
 
 import java.lang.reflect.Field;
@@ -35,7 +36,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Mixin(HumanoidArmorLayer.class)
-public abstract class HumanoidArmorLayerPieceOffsetsMixin {
+public abstract class ArmorOffsetsMixin {
 
     @Unique private static Field consoleskins$rendererField;
 
@@ -187,7 +188,6 @@ public abstract class HumanoidArmorLayerPieceOffsetsMixin {
             for (ModelPart p : armorParts) consoleskins$setForceRender(p, true);
         }
 
-
         ArmorOffsetContext.CURRENT_SLOT.set(slot);
         ArmorOffsetContext.CURRENT_OFFSET.remove();
         ArmorOffsetContext.POSE_PUSHED.set(Boolean.FALSE);
@@ -200,6 +200,7 @@ public abstract class HumanoidArmorLayerPieceOffsetsMixin {
         String skinId = a.consoleskins$getSkinId();
         if (skinId == null || skinId.isBlank() || "auto_select".equals(skinId)) return;
 
+        // Use cached texture/modelId from render state
         ResourceLocation tex = a.consoleskins$getCachedTexture();
         if (tex == null) {
             SkinEntry entry = SkinPackLoader.getSkin(skinId);
@@ -231,6 +232,7 @@ public abstract class HumanoidArmorLayerPieceOffsetsMixin {
         else if (armorHide != null && armorHide.contains(armorSlot))              hideArmor = true;
 
         if (hideArmor) {
+            DebugLog.debug("[ArmorFix] HIDE slot={} armorHide={}", slot, armorHide);
             if (armorParts != null) for (ModelPart mp : armorParts) consoleskins$setForceRender(mp, false);
             consoleskins$clearContext();
             ci.cancel();

@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Skins.client.render.boxloader.BoxAddonLayer;
 
 @Mixin(AvatarRenderer.class)
-public abstract class AvatarRendererBoxAddonLayerMixin {
+public abstract class BoxLayerSetupMixin {
 
     @Inject(method = "<init>", at = @At("TAIL"), require = 0)
     private void consoleskins$addBoxAddonLayer(EntityRendererProvider.Context context, boolean slim, CallbackInfo ci) {

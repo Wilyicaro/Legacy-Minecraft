@@ -1,11 +1,13 @@
 package wily.legacy.Skins.client.screen.widget;
 
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
+import wily.legacy.Skins.client.util.SkinPreviewWarmup;
 import wily.legacy.Skins.client.gui.GuiDollRender;
 import wily.legacy.Skins.client.gui.GuiSessionSkin;
 import wily.legacy.Skins.client.render.boxloader.BoxModelManager;
 import wily.legacy.Skins.client.render.SkinPoseRegistry;
 import wily.legacy.Skins.skin.ClientSkinCache;
+import wily.legacy.Skins.skin.ClientSkinAssets;
 import wily.legacy.Skins.skin.SkinEntry;
 import wily.legacy.Skins.skin.SkinPackLoader;
 import wily.legacy.Skins.skin.SkinSync;
@@ -37,6 +39,8 @@ private static volatile boolean CLIP_ENABLED;
     private static volatile int CLIP_X2;
     private static volatile int CLIP_Y2;
     private static volatile float CAROUSEL_YAW_DENOM = 240.0f;
+    /** Tracks whether carousel scissor is already active, avoiding redundant GPU calls. */
+    private static volatile boolean CLIP_ACTIVE;
 
     private static volatile boolean CENTER_NAME_PLATE;
     private static volatile int CENTER_NAME_PLATE_W;
@@ -106,10 +110,12 @@ private static volatile boolean CLIP_ENABLED;
         CLIP_Y1 = y1;
         CLIP_X2 = x2;
         CLIP_Y2 = y2;
+        CLIP_ACTIVE = false; // Will be activated by the first widget that renders
     }
 
     public static void clearCarouselClip() {
         CLIP_ENABLED = false;
+        CLIP_ACTIVE = false;
     }
 
     public static void setCarouselYawDenom(float denom) {
@@ -120,6 +126,9 @@ private static volatile boolean CLIP_ENABLED;
     public final Supplier<String> skinId;
     private String lastStableId;
     private ResourceLocation lastStableTexture;
+    /** Cached SkinEntry to avoid per-frame map lookups in SkinPackLoader */
+    private String cachedEntryId;
+    private SkinEntry cachedEntry;
     private final int originalWidth;
     private final int originalHeight;
     public int slotOffset;
@@ -181,6 +190,20 @@ private static volatile boolean CLIP_ENABLED;
 
     public void setSkinId(String id) {
         this.skinIdValue = (id == null || id.isBlank()) ? null : id;
+        // Invalidate entry cache when skin changes
+        if (this.skinIdValue == null || !this.skinIdValue.equals(cachedEntryId)) {
+            cachedEntryId = null;
+            cachedEntry = null;
+        }
+    }
+
+    /** Returns cached SkinEntry, only doing the map lookup when skinId changes. */
+    private SkinEntry getCachedEntry(String id) {
+        if (id == null || id.isBlank() || "auto_select".equals(id)) return null;
+        if (id.equals(cachedEntryId)) return cachedEntry;
+        cachedEntryId = id;
+        cachedEntry = SkinPackLoader.getSkin(id);
+        return cachedEntry;
     }
 
     public void setCarouselCenterX(int centerX) {
@@ -191,13 +214,12 @@ private static volatile boolean CLIP_ENABLED;
         String id = skinId.get();
         if (id == null || id.isBlank()) return;
         if ("auto_select".equals(id)) return;
-        SkinEntry entry = SkinPackLoader.getSkin(id);
-        if (entry != null && entry.texture() != null) {
-            try {
-                Minecraft.getInstance().getTextureManager().getTexture(entry.texture());
-            } catch (Throwable ignored) {
-            }
+        SkinEntry entry = null;
+        try {
+            entry = SkinPackLoader.getSkin(id);
+        } catch (Throwable ignored) {
         }
+        SkinPreviewWarmup.enqueue(id, entry);
     }
 
     public boolean isInterpolating() {
@@ -369,6 +391,13 @@ private static volatile boolean CLIP_ENABLED;
                 interpolate(progress);
             }
         }
+
+        // Skip rendering the outermost spawner slots (±4) when not animating.
+        // These are tiny (~40% scale) and used only as slide-in sources during
+        // carousel transitions. Saves 2 entity renders per frame when idle.
+        int absOffset = Math.abs(this.slotOffset);
+        if (absOffset >= 4 && progress > 1f) return;
+
         int left = this.getX();
         int top = this.getY();
         int right = left + this.getWidth();
@@ -379,38 +408,23 @@ private static volatile boolean CLIP_ENABLED;
         if (CLIP_ENABLED) {
             if (right <= CLIP_X1 || left >= CLIP_X2 || bottom <= CLIP_Y1 || top >= CLIP_Y2) return;
         }
-        if (Math.abs(this.slotOffset) > 4) return;
+        if (absOffset > 4) return;
         String id = skinId.get();
         if (id == null) return;
         float yawOffset = this.rotationY;
 if (isUpsideDownFacingFlip(id)) yawOffset = -yawOffset;
         float attackTime = 0.0F;
         if (punchLoop) {
-
-            long ms = System.currentTimeMillis();
-
+            long ms = now;
             long swing = 300L;
-
             long phase = ms % (swing + 5L);
-
-            if (phase < swing) {
-
-                attackTime = phase / (float) swing;
-
-            } else {
-
-                attackTime = 0.0F;
-
-            }
-
+            attackTime = phase < swing ? phase / (float) swing : 0.0F;
         }
         int sizeCap = 165;
-        if (CLIP_ENABLED) {
-            try {
-                guiGraphics.disableScissor();
-            } catch (Throwable ignored) {
-            }
+        if (CLIP_ENABLED && !CLIP_ACTIVE) {
+            try { guiGraphics.disableScissor(); } catch (Throwable ignored) {}
             guiGraphics.enableScissor(CLIP_X1, CLIP_Y1, CLIP_X2, CLIP_Y2);
+            CLIP_ACTIVE = true;
         }
         if ("auto_select".equals(id)) {
             var ps = GuiSessionSkin.getSessionPlayerSkin();
@@ -423,7 +437,7 @@ if (isUpsideDownFacingFlip(id)) yawOffset = -yawOffset;
                 }
             }
         } else {
-            SkinEntry entry = SkinPackLoader.getSkin(id);
+            SkinEntry entry = getCachedEntry(id);
             if (entry != null) {
                 ResourceLocation tex = entry.texture();
                 if (tex != null) {
@@ -437,7 +451,7 @@ if (isUpsideDownFacingFlip(id)) yawOffset = -yawOffset;
         if (CENTER_NAME_PLATE && this.slotOffset == 0) {
             String label = null;
             if (!"auto_select".equals(id)) {
-                SkinEntry e = SkinPackLoader.getSkin(id);
+                SkinEntry e = getCachedEntry(id);
                 if (e != null) {
                     label = SkinPackLoader.nameString(e.name(), id);
                 }
@@ -462,13 +476,14 @@ if (isUpsideDownFacingFlip(id)) yawOffset = -yawOffset;
             var font = Minecraft.getInstance().font;
             int maxPx = Math.max(1, plateW - 8);
 
-            // Optional theme/subtitle line (Box meta) beneath the skin name.
+            
             String theme = null;
             if (!"auto_select".equals(id)) {
                 try {
-                    SkinEntry e = SkinPackLoader.getSkin(id);
+                    SkinEntry e = getCachedEntry(id);
                     String ns = e != null && e.texture() != null ? e.texture().getNamespace() : SkinSync.ASSET_NS;
-                    ResourceLocation modelId = ResourceLocation.fromNamespaceAndPath(ns, id);
+                    ResourceLocation modelId = ClientSkinAssets.getModelIdFromTexture(
+                            e != null && e.texture() != null ? e.texture() : ResourceLocation.fromNamespaceAndPath(ns, id));
                     theme = BoxModelManager.getThemeText(modelId);
                 } catch (Throwable ignored) {
                 }
@@ -515,11 +530,9 @@ if (isUpsideDownFacingFlip(id)) yawOffset = -yawOffset;
                 guiGraphics.drawCenteredString(font, net.minecraft.network.chat.Component.literal("Selected"), badgeX + badgeW / 2, by, 0xFFFFFFFF);
             }
         }
-        if (CLIP_ENABLED) {
-            try {
-                guiGraphics.disableScissor();
-            } catch (Throwable ignored) {
-            }
+        if (CLIP_ACTIVE) {
+            try { guiGraphics.disableScissor(); } catch (Throwable ignored) {}
+            CLIP_ACTIVE = false;
         }
     }
 

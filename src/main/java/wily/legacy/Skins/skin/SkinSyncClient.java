@@ -27,6 +27,10 @@ public final class SkinSyncClient {
     private static final java.util.concurrent.ConcurrentHashMap<UUID, String> LAST_APPLIED =
             new java.util.concurrent.ConcurrentHashMap<>();
 
+    /** Throttle: only scan all players every SCAN_INTERVAL ticks (1 second). */
+    private static final int SCAN_INTERVAL = 20;
+    private static int scanTickCounter;
+
     private SkinSyncClient() {
     }
 
@@ -67,18 +71,21 @@ public final class SkinSyncClient {
         } catch (Throwable ignored) {
         }
 
+        // Throttle the expensive all-players scan to once per second instead of every tick.
+        // Skin changes are infrequent events so this is fine.
         try {
-            if (client != null && client.level != null) {
+            if (client != null && client.level != null && ++scanTickCounter >= SCAN_INTERVAL) {
+                scanTickCounter = 0;
                 for (var p : client.level.players()) {
                     if (p == null) continue;
 
                     String s = ClientSkinCache.get(p.getUUID());
-                    if (s != null && !s.isBlank()) ClientSkinCache.setName(p.getScoreboardName(), s);
-
-                    if (s != null) {
+                    if (s != null && !s.isBlank()) {
                         String last = LAST_APPLIED.get(p.getUUID());
                         if (!Objects.equals(last, s)) {
                             LAST_APPLIED.put(p.getUUID(), s);
+                            // Only update name mapping when skin actually changed
+                            ClientSkinCache.setName(p.getScoreboardName(), s);
                         }
                     }
                 }
@@ -165,6 +172,7 @@ public final class SkinSyncClient {
         snapshotRequestDelayTicks = -1;
         receivedAnySyncSinceJoin = false;
         LAST_APPLIED.clear();
+        scanTickCounter = 0;
 
         String keepVal = null;
         UUID keep = null;

@@ -13,7 +13,7 @@ import wily.legacy.client.screen.TickBox;
 import java.util.List;
 
 @Mixin(value = HelpAndOptionsScreen.class, remap = false)
-public class HelpAndOptionsScreenSkinsOptionsMixin {
+public class SkinsOptionMixin {
 
     @Inject(method = "createPlayerSkinWidgets", at = @At("RETURN"), remap = false, require = 0)
     private static void consoleskins$addSmoothPreviewScroll(CallbackInfoReturnable<List<AbstractWidget>> cir) {

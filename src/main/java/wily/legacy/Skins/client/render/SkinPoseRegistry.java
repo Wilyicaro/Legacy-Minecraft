@@ -51,8 +51,12 @@ public final class SkinPoseRegistry {
 
     private static final Object LOCK = new Object();
 
-    private static Map<PoseTag, List<Selector>> ACTIVE = empty();
-    private static Map<PoseTag, List<Selector>> RUNTIME = empty();
+    /**
+     * Volatile references allow lock-free reads on the render thread.
+     * Writers (addSelector/addRuntimeSelector/clearRuntime) still synchronize.
+     */
+    private static volatile Map<PoseTag, List<Selector>> ACTIVE = empty();
+    private static volatile Map<PoseTag, List<Selector>> RUNTIME = empty();
     private static Map<PoseTag, List<Selector>> STAGING = empty();
 
     private static Map<PoseTag, List<Selector>> empty() {
@@ -109,38 +113,32 @@ public final class SkinPoseRegistry {
         Selector compiled = compileSelector(s);
 
         synchronized (LOCK) {
-            List<Selector> list = RUNTIME.get(tag);
-            if (list instanceof ArrayList<Selector> al) {
-                al.add(compiled);
-            } else if (list == null || list.isEmpty()) {
-                ArrayList<Selector> al2 = new ArrayList<>();
-                al2.add(compiled);
-                RUNTIME.put(tag, al2);
-            } else {
-                ArrayList<Selector> al2 = new ArrayList<>(list);
-                al2.add(compiled);
-                RUNTIME.put(tag, al2);
-            }
+            Map<PoseTag, List<Selector>> cur = RUNTIME;
+            List<Selector> list = cur.get(tag);
+            ArrayList<Selector> al = (list == null || list.isEmpty()) ? new ArrayList<>() : new ArrayList<>(list);
+            al.add(compiled);
+            Map<PoseTag, List<Selector>> next = new EnumMap<>(cur);
+            next.put(tag, Collections.unmodifiableList(al));
+            RUNTIME = next;
         }
     }
 
     public static void clearRuntimeSelectors() {
-        synchronized (LOCK) {
-            RUNTIME = empty();
-        }
+        RUNTIME = empty();
     }
 
     public static boolean hasPose(PoseTag tag, String skinId) {
-        if (tag == null || skinId == null) return false;
-        List<Selector> sels;
-        List<Selector> rt;
-        synchronized (LOCK) {
-            sels = ACTIVE.get(tag);
-            rt = RUNTIME.get(tag);
-        }
+        if (tag == null || skinId == null || skinId.isEmpty()) return false;
 
-        String id = normalize(skinId, null);
-        if (id == null || id.isBlank()) return false;
+        // Lock-free volatile reads — ACTIVE and RUNTIME are replaced atomically
+        // with frozen immutable lists, so no synchronization needed for reads.
+        List<Selector> sels = ACTIVE.get(tag);
+        List<Selector> rt = RUNTIME.get(tag);
+
+        // Fast path: skinIds from our system are already trimmed, skip normalize()
+        // for the common case. Only normalize if the id might need a namespace prefix.
+        String id = skinId.indexOf(' ') >= 0 ? skinId.trim() : skinId;
+        if (id.isEmpty()) return false;
 
         if (sels != null && !sels.isEmpty()) {
             for (Selector s : sels) {

@@ -12,7 +12,7 @@ import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
 import wily.legacy.Skins.client.render.SkinPoseRegistry;
 
 @Mixin(PlayerModel.class)
-public abstract class PlayerModelSyncArmsPoseMixin {
+public abstract class ArmPoseMixin {
 
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("TAIL"), require = 0)
     private void consoleskins$syncArmsPose(AvatarRenderState state, CallbackInfo ci) {

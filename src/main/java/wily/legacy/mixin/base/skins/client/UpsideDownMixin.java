@@ -14,7 +14,7 @@ import wily.legacy.Skins.client.render.UpsideDownConfig;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
 
 @Mixin(AvatarRenderer.class)
-public abstract class AvatarRendererUpsideDownMixin {
+public abstract class UpsideDownMixin {
 
     @Inject(method = "setupRotations(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;FF)V", at = @At("TAIL"), require = 0)
     private void consoleskins$setupRotations(AvatarRenderState state, PoseStack poseStack, float f, float g, CallbackInfo ci) {

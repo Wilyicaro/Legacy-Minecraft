@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+/* * * Favourites are stored. */
 public final class FavoritesStore {
     private static final Logger LOGGER = NOPLogger.NOP_LOGGER;
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();

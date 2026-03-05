@@ -20,7 +20,7 @@ import wily.legacy.Skins.client.render.ZombieArmsPose;
 import wily.legacy.Skins.client.util.ConsoleSkinsClientSettings;
 
 @Mixin(PlayerModel.class)
-public abstract class PlayerModelMenuDollMixin {
+public abstract class MenuDollMixin {
 
     @Inject(method = "setupAnim(Lnet/minecraft/client/renderer/entity/state/AvatarRenderState;)V", at = @At("TAIL"))
     private void consoleskins$menuDollFixHeadSpin(AvatarRenderState state, CallbackInfo ci) {
