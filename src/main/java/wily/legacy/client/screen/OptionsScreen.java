@@ -179,7 +179,9 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.create(mc.options.rotateWithMinecart()),
                                 LegacyOptions.legacyCreativeBlockPlacing,
                                 LegacyOptions.mapsWithCoords,
-                                LegacyOptions.vanillaTutorial),
+                                LegacyOptions.vanillaTutorial,
+                                LegacyOptions.forceLegacyFlight,
+                                LegacyOptions.forceLegacySwimming),
                         o -> {
                             if (mc.level == null)
                                 LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c -> o.renderableVList.addRenderable(LegacyConfigWidgets.createWidget(c, b -> c.sync())));

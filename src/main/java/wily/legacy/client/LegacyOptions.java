@@ -267,6 +267,8 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> fakeAutosaveScreen = CLIENT_STORAGE.register(createBoolean("fakeAutosaveScreen", false));
     public static final FactoryConfig<Boolean> legacyPotionsBar = CLIENT_STORAGE.register(createBoolean("legacyPotionsBar", false));
     public static final FactoryConfig<Boolean> defaultShowCraftableRecipes = CLIENT_STORAGE.register(createBoolean("defaultShowCraftableRecipes", false));
+    public static final FactoryConfig<Boolean> forceLegacyFlight = CLIENT_STORAGE.register(createBoolean("forceLegacyFlight", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
+    public static final FactoryConfig<Boolean> forceLegacySwimming = CLIENT_STORAGE.register(createBoolean("forceLegacySwimming", b -> LegacyComponents.MAY_BE_A_CHEAT, false));
 
     public static int getTerrainFogStart() {
         return Math.min(terrainFogStart.get(), Minecraft.getInstance().options.renderDistance().get());

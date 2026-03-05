@@ -1685,6 +1685,8 @@
   "legacy.options.flyingViewRolling": "Flying View Rolling",
   "legacy.options.forceMixedCrafting": "Force Mixed Crafting",
   "legacy.options.forceSmoothMovement": "Force Smooth Movement",
+  "legacy.options.forceLegacyFlight": "Force Legacy Flight on Vanilla Servers",
+  "legacy.options.forceLegacySwimming": "Force Legacy Swimming on Vanilla Servers",
   "legacy.options.gameTooltips": "In-Game Tooltips",
   "legacy.options.gamma": "Gamma",
   "legacy.options.headFollowsTheCamera": "Head Follows The Camera",
