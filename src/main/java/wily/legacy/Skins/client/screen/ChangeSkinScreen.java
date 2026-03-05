@@ -12,6 +12,7 @@ import wily.legacy.Skins.client.screen.widget.PlayerSkinWidgetList;
 import wily.legacy.Skins.skin.ClientSkinCache;
 import wily.legacy.Skins.skin.FavoritesStore;
 import wily.legacy.Skins.skin.SkinEntry;
+import wily.legacy.Skins.skin.SkinIdUtil;
 import wily.legacy.Skins.skin.SkinPack;
 import wily.legacy.Skins.skin.SkinPackLoader;
 import wily.legacy.Skins.skin.SkinSync;
@@ -389,7 +390,10 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         SkinPack pack = getFocusedPack();
         if (pack != null) {
             int mid = tooltipBox.x - sc(5) + (tooltipBox.getWidth() - sc(18)) / 2;
-            drawBigCentered(g, Component.literal(pack.name()), mid, panel.y + sc(27), 0xFFFFFFFF);
+            Component packName = SkinIdUtil.isFavouritesPack(pack.id())
+                    ? SkinPackLoader.nameComponent(pack.name(), "Favorites")
+                    : SkinPackLoader.nameComponent(pack.name(), pack.id());
+            drawBigCentered(g, packName, mid, panel.y + sc(27), 0xFFFFFFFF);
             String t = pack.type();
             if (t != null && !t.isBlank()) {
                 String k = t.toLowerCase(Locale.ROOT);

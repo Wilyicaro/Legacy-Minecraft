@@ -26,6 +26,7 @@ import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.BindingState;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.screen.InputTypeSwitchLock;
 import wily.legacy.client.screen.Panel;
 import wily.legacy.client.screen.PanelVListScreen;
 import wily.legacy.client.screen.RenderableVList;
@@ -36,7 +37,7 @@ import java.util.UUID;
 
 
 public abstract class AbstractChangeSkinScreen extends PanelVListScreen
-        implements wily.legacy.client.controller.Controller.Event, ControlTooltip.Event {
+        implements wily.legacy.client.controller.Controller.Event, ControlTooltip.Event, InputTypeSwitchLock {
 
     @Override
     public void tick() {
@@ -343,6 +344,11 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         return false;
     }
 
+    @Override
+    public boolean legacy$lockInputTypeSwitch() {
+        return carouselAnimating();
+    }
+
     
     protected PlayerSkinWidget pickCarouselWidget(double mx, double my) {
         if (playerSkinWidgetList == null || playerSkinWidgetList.widgets == null) return null;
@@ -383,22 +389,23 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
     }
 
     // Batch multi-step carousel moves
-    protected void startQueuedCarousel(int offset) {
-        if (playerSkinWidgetList == null) return;
-        if (actions != null && actions.isPendingSwap()) return;
-        if (carouselAnimating()) return;
+    protected boolean startQueuedCarousel(int offset) {
+        if (playerSkinWidgetList == null) return false;
+        if (actions != null && actions.isPendingSwap()) return false;
+        if (carouselAnimating()) return false;
         int abs = Math.abs(offset);
-        if (abs == 0) return;
+        if (abs == 0) return false;
         if (abs == 1) {
             playerSkinWidgetList.setCenterRotation(0, 0);
             playerSkinWidgetList.sortForIndex(playerSkinWidgetList.index + offset);
             playClick();
-            return;
+            return true;
         }
         queuedCarouselDir   = offset > 0 ? 1 : -1;
         queuedCarouselSteps = abs;
         queuedCarouselSound = true;
         pumpQueuedCarousel();
+        return true;
     }
 
     
@@ -560,8 +567,8 @@ public abstract class AbstractChangeSkinScreen extends PanelVListScreen
         
         
         stopHoldingOuterCarousel();
-        startQueuedCarousel(off);
-        if (Math.abs(off) == 2) startHoldingOuterCarousel(off);
+        boolean moved = startQueuedCarousel(off);
+        if (moved && Math.abs(off) == 2) startHoldingOuterCarousel(off);
         return true;
     }
 

@@ -1,6 +1,7 @@
 package wily.legacy.Skins.client.screen.changeskin;
 
 import wily.legacy.Skins.skin.SkinIds;
+import wily.legacy.Skins.skin.SkinIdUtil;
 import wily.legacy.Skins.skin.SkinPack;
 import wily.legacy.Skins.skin.SkinPackLoader;
 
@@ -17,6 +18,7 @@ import wily.legacy.client.CommonValue;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.screen.RenderableVList;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyRenderUtil;
 
 public final class ChangeSkinPackList {
 
@@ -228,7 +230,10 @@ public final class ChangeSkinPackList {
         if (i < 0 || i >= packIds.size()) return Component.empty();
         String id = packIds.get(i);
         SkinPack pack = SkinPackLoader.getPacks().get(id);
-        return Component.literal(pack != null ? pack.name() : id);
+        if (pack == null) return Component.literal(id);
+        return SkinIdUtil.isFavouritesPack(pack.id())
+                ? SkinPackLoader.nameComponent(pack.name(), "Favorites")
+                : SkinPackLoader.nameComponent(pack.name(), id);
     }
 
     public final class PackButton extends Button {
@@ -284,17 +289,18 @@ public final class ChangeSkinPackList {
             int bh = Math.max(1, height);
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, getX(), getY(), bw, bh);
 
-                        var font = Minecraft.getInstance().font;
+            var font = Minecraft.getInstance().font;
             String label = getMessage() == null ? "" : getMessage().getString();
 
             float s = ChangeSkinPackList.this.textScale;
             int maxPx = Math.max(1, bw - 10);
             int maxUnscaled = (int) (maxPx / s);
 
+            boolean shadow = CommonValue.WIDGET_TEXT_SHADOW.get();
             int color;
-            if (!active) color = 0xFFAAAAAA;
-            else if (selected) color = 0xFFFFFFFF;
-            else color = 0xDDFFFFFF;
+            if (!active) color = wily.legacy.client.CommonColor.GRAY.get();
+            else if (hot) color = LegacyRenderUtil.getDefaultTextColor(false);
+            else color = LegacyRenderUtil.getDefaultTextColor(true);
 
             var pose = graphics.pose();
 
@@ -304,7 +310,8 @@ public final class ChangeSkinPackList {
                 pose.pushMatrix();
                 pose.translate((float) cx, (float) cy);
                 pose.scale(s, s);
-                graphics.drawCenteredString(font, Component.literal(label), 0, 0, color);
+                int w = font.width(label);
+                graphics.drawString(font, label, -w / 2, 0, color, shadow);
                 pose.popMatrix();
             } else {
                 String ell = "...";
@@ -328,7 +335,6 @@ int baseWUn = font.width(base);
                 float startX = getX() + (bw - totalPx) / 2f;
                 float yBase = getY() + (bh - font.lineHeight * s) / 2f;
                 float yEll = getY() + (bh - font.lineHeight * sEll) / 2f;
-                boolean shadow = CommonValue.WIDGET_TEXT_SHADOW.get();
 
                 pose.pushMatrix();
                 pose.translate(startX, yBase);

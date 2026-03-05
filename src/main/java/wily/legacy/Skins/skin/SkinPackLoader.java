@@ -456,7 +456,7 @@ private static String parsePackIdForPrefix(String path, String prefix) {
             }
         }
 
-        SkinPack favPack = new SkinPack(SkinIds.PACK_FAVOURITES, "Favourites", "", "", favIcon, fav);
+        SkinPack favPack = new SkinPack(SkinIds.PACK_FAVOURITES, "key:legacy.favorites.pack", "", "", favIcon, fav);
 
         LinkedHashMap<String, SkinPack> out = new LinkedHashMap<>();
         if (def != null) out.put(SkinIds.PACK_DEFAULT, def);
