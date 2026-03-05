@@ -13,6 +13,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import wily.legacy.client.CommonValue;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.screen.RenderableVList;
 import wily.legacy.util.LegacySprites;
@@ -327,17 +328,18 @@ int baseWUn = font.width(base);
                 float startX = getX() + (bw - totalPx) / 2f;
                 float yBase = getY() + (bh - font.lineHeight * s) / 2f;
                 float yEll = getY() + (bh - font.lineHeight * sEll) / 2f;
+                boolean shadow = CommonValue.WIDGET_TEXT_SHADOW.get();
 
                 pose.pushMatrix();
                 pose.translate(startX, yBase);
                 pose.scale(s, s);
-                graphics.drawString(font, base, 0, 0, color, false);
+                graphics.drawString(font, base, 0, 0, color, shadow);
                 pose.popMatrix();
 
                 pose.pushMatrix();
                 pose.translate(startX + baseWUn * s, yEll);
                 pose.scale(sEll, sEll);
-                graphics.drawString(font, ell, 0, 0, color, false);
+                graphics.drawString(font, ell, 0, 0, color, shadow);
                 pose.popMatrix();
             }
             if (!ControlType.getActiveType().isKbm() && this.isFocused() && packIndex >= 0 && focusedPackIndex != packIndex) {
