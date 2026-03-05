@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Sycorax",
-    "displayNameId": "IDS_DLCSKIN00002523_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.sycorax"
   },
   "texture": {
     "width": 64,

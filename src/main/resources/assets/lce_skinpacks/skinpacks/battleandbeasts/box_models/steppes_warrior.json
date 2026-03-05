@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Steppes Warrior",
-    "displayNameId": "IDS_DLCSKIN00000826_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.steppes_warrior"
   },
   "texture": {
     "width": 64,

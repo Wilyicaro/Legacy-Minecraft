@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Scorpion Demon",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005112_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.scorpion_demon",
     "themeName": "Venomous Spirit",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005112_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.scorpion_demon"
   },
   "texture": {
     "width": 64,

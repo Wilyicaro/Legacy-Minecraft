@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Imperial Guard Dalek",
-    "displayNameId": "IDS_DLCSKIN00002055_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.imperial_guard_dalek"
   },
   "hide": "ALL",
   "texture": {

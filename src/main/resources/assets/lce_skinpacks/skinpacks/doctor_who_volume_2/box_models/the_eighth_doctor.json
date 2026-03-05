@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Eighth Doctor",
-    "displayNameId": "IDS_DLCSKIN00002501_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.the_eighth_doctor"
   },
   "texture": {
     "width": 64,

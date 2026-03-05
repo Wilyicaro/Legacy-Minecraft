@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Princess Bubblegum",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004406_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.princess_bubblegum"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Ms. 'Splosion Man",
-    "displayNameId": "IDS_DLCSKIN00000029_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.ms_splosion_man",
     "themeName": "Ms. 'Splosion Man",
-    "themeNameId": "IDS_DLCSKIN00000029_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.ms_splosion_man"
   },
   "texture": {
     "width": 64,

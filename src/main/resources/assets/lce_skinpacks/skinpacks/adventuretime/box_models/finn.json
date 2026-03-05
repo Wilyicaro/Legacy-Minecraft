@@ -1,9 +1,11 @@
 {
   "meta": {
     "displayName": "Finn",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004400_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.finn"
   },
-"hide": ["right_sleeve" ],
+  "hide": [
+    "right_sleeve"
+  ],
   "texture": {
     "width": 64,
     "height": 64

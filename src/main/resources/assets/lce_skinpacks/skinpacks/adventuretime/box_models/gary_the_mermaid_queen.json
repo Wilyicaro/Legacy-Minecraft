@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Gary The Mermaid Queen",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004440_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.gary_the_mermaid_queen"
   },
   "texture": {
     "width": 64,

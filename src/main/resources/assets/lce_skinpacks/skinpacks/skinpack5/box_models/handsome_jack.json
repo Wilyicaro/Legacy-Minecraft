@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Handsome Jack",
-    "displayNameId": "IDS_dlcskin77714110_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.handsome_jack",
     "themeName": "Borderlands 2",
-    "themeNameId": "IDS_dlcskin77714110_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.handsome_jack"
   },
   "texture": {
     "width": 64,

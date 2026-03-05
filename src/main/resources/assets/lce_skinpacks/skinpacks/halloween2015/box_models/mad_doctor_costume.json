@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mad Doctor Costume",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003223_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.mad_doctor_costume"
   },
   "texture": {
     "width": 64,

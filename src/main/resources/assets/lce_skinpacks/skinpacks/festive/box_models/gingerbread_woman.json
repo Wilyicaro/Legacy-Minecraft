@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Gingerbread Woman",
-    "displayNameId": "IDS_DLCSKIN00000621_DISPLAYNAME"
+    "displayNameId": "custom.festive.gingerbread_woman"
   },
   "texture": {
     "width": 64,

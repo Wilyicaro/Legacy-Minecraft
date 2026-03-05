@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Ben Kenobi",
-    "displayNameId": "IDS_DLCSKIN00001222_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.ben_kenobi",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001222_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.ben_kenobi"
   },
   "texture": {
     "width": 64,

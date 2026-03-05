@@ -1,9 +1,12 @@
 {
   "meta": {
     "displayName": "Dr Jekyll",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003238_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.dr_jekyll"
   },
-"hide": ["head", "arms"],
+  "hide": [
+    "head",
+    "arms"
+  ],
   "texture": {
     "width": 64,
     "height": 64

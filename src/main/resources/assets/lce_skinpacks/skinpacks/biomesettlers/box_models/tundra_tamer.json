@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Tundra Tamer",
-    "displayNameId": "IDS_DLCSKIN00004523_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.tundra_tamer",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004523_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.tundra_tamer"
   },
   "texture": {
     "width": 64,

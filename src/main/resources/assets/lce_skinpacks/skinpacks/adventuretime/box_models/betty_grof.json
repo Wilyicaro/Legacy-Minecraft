@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Betty Grof",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004447_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.betty_grof"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Native American",
-    "displayNameId": "IDS_DLCSKIN00000827_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.native_american"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Maria Hill",
-    "displayNameId": "IDS_dlcskin66156158_DISPLAYNAME",
+    "displayNameId": "custom.avengers.maria_hill",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin66156158_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.maria_hill"
   },
   "texture": {
     "width": 64,

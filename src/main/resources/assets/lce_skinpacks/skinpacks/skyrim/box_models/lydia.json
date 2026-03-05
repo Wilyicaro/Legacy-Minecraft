@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Lydia",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001417_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.lydia",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001417_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.lydia"
   },
   "texture": {
     "width": 64,

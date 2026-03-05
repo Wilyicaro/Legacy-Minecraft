@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Rawr",
-    "displayNameId": "IDS_SKINS_DLCSKIN00007403_DISPLAYNAME",
+    "displayNameId": "custom.supercuteskins.rawr",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00007403_THEMENAME"
+    "themeNameId": "custom.supercuteskins.themetext.rawr"
   },
   "texture": {
     "width": 64,

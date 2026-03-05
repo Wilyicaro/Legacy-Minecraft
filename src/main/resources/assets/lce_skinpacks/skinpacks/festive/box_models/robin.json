@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Robin",
-    "displayNameId": "IDS_DLCSKIN00000618_DISPLAYNAME"
+    "displayNameId": "custom.festive.robin"
   },
   "texture": {
     "width": 64,

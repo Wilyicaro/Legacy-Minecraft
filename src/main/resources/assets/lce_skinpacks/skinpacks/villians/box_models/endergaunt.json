@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Endergaunt",
-    "displayNameId": "IDS_DLCSKIN00005605_DISPLAYNAME",
+    "displayNameId": "custom.villians.endergaunt",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005605_THEMENAME"
+    "themeNameId": "custom.villians.themetext.endergaunt"
   },
   "texture": {
     "width": 64,

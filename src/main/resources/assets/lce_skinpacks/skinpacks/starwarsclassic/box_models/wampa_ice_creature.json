@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Wampa Ice Creature",
-    "displayNameId": "IDS_DLCSKIN00001251_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.wampa_ice_creature",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001251_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.wampa_ice_creature"
   },
   "armorOffsets": {
     "HELMET": {
@@ -27,7 +27,10 @@
       "z": 0.0
     }
   },
-"hide":["hat", "head"],
+  "hide": [
+    "hat",
+    "head"
+  ],
   "texture": {
     "width": 64,
     "height": 64

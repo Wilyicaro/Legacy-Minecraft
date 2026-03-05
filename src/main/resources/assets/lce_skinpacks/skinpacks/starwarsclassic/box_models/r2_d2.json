@@ -3,7 +3,7 @@
     "displayName": "R2-D2",
     "displayNameId": "IDS_DLCSKIN00001248_DISPLAYNAME",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001248_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.r2_d2"
   },
   "hidearmour": ["helmet", "chestpiece", "leggings", "boots"],
   "hide": [all],

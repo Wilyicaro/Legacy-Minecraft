@@ -1,11 +1,16 @@
 {
   "meta": {
     "displayName": "Terror Spawner",
-    "displayNameId": "IDS_DLCSKIN00005616_DISPLAYNAME",
+    "displayNameId": "custom.villians.terror_spawner",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005616_THEMENAME"
+    "themeNameId": "custom.villians.themetext.terror_spawner"
   },
-"hide": ["right_pants", "left_pants", "right_sleeve", "left_sleeve"],
+  "hide": [
+    "right_pants",
+    "left_pants",
+    "right_sleeve",
+    "left_sleeve"
+  ],
   "texture": {
     "width": 64,
     "height": 64

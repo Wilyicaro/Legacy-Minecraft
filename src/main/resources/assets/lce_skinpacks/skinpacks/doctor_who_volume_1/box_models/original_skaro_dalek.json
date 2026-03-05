@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Original Skaro Dalek",
-    "displayNameId": "IDS_DLCSKIN00002053_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.original_skaro_dalek"
   },
   "hide": "ALL",
   "texture": {

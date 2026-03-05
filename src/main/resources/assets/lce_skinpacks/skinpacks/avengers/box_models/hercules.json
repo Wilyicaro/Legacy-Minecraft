@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Hercules",
-    "displayNameId": "IDS_dlcskin73281745_DISPLAYNAME",
+    "displayNameId": "custom.avengers.hercules",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin73281745_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.hercules"
   },
   "texture": {
     "width": 64,

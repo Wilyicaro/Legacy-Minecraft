@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Argonian Fighter",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001404_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.argonian_fighter",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001404_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.argonian_fighter"
   },
   "texture": {
     "width": 64,

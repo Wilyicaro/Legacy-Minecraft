@@ -1,11 +1,17 @@
 {
   "meta": {
     "displayName": "Spider Demon",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005111_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.spider_demon",
     "themeName": "Shapeshifting Spirit",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005111_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.spider_demon"
   },
-  "hide": [ "hat", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "hat",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

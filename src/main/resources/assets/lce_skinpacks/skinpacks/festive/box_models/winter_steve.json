@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Winter Steve",
-    "displayNameId": "IDS_DLCSKIN00000611_DISPLAYNAME"
+    "displayNameId": "custom.festive.winter_steve"
   },
   "texture": {
     "width": 64,

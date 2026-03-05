@@ -1,9 +1,15 @@
 {
   "meta": {
     "displayName": "Lisa Simpson",
-    "displayNameId": "IDS_DLCSKIN00002103_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.lisa_simpson"
   },
-  "hide": ["HEAD", "HAT", "BODY", "LEFT_ARM", "RIGHT_ARM"],
+  "hide": [
+    "HEAD",
+    "HAT",
+    "BODY",
+    "LEFT_ARM",
+    "RIGHT_ARM"
+  ],
   "texture": {
     "width": 64,
     "height": 64

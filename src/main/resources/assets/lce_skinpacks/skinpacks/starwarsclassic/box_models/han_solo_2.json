@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Han Solo",
-    "displayNameId": "IDS_DLCSKIN00001208_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.han_solo_2",
     "themeName": "Hoth",
-    "themeNameId": "IDS_DLCSKIN00001208_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.han_solo_2"
   },
   "armorOffsets": {
     "HELMET": {

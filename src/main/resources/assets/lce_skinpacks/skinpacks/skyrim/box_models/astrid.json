@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Astrid",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001424_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.astrid",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001424_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.astrid"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,15 @@
 {
   "meta": {
     "displayName": "Ralph Wiggum",
-    "displayNameId": "IDS_DLCSKIN00002112_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.ralph_wiggum"
   },
-  "hide": ["HEAD", "HAT", "BODY", "LEFT_ARM", "RIGHT_ARM"],
+  "hide": [
+    "HEAD",
+    "HAT",
+    "BODY",
+    "LEFT_ARM",
+    "RIGHT_ARM"
+  ],
   "texture": {
     "width": 64,
     "height": 64

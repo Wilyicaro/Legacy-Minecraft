@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Dark Elf Assassin",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001411_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.dark_elf_assassin",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001411_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.dark_elf_assassin"
   },
   "texture": {
     "width": 64,

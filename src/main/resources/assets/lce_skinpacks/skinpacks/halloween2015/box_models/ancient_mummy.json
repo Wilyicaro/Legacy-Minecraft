@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Ancient Mummy",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003215_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.ancient_mummy"
   },
   "texture": {
     "width": 64,

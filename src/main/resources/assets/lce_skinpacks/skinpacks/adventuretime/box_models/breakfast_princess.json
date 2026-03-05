@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Breakfast Princess",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004427_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.breakfast_princess"
   },
   "texture": {
     "width": 64,

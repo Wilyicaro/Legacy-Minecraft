@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Harold",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004821_DISPLAYNAME",
+    "displayNameId": "custom.fallout.harold",
     "themeName": "Fallout 2",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004821_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.harold"
   },
   "texture": {
     "width": 64,

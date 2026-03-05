@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Pig",
-    "displayNameId": "IDS_DLCSKIN20000101_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.pig",
     "themeName": "Minecraft",
-    "themeNameId": "IDS_DLCSKIN20000101_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.pig"
   },
   "texture": {
     "width": 64,

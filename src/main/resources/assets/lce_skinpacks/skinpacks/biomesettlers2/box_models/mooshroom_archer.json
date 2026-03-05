@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mooshroom Archer",
-    "displayNameId": "IDS_DLCSKIN00005300_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.mooshroom_archer"
   },
   "texture": {
     "width": 64,

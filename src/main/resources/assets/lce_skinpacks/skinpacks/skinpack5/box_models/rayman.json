@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Rayman",
-    "displayNameId": "IDS_dlcskin68568105_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.rayman",
     "themeName": "Rayman Legends",
-    "themeNameId": "IDS_dlcskin68568105_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.rayman"
   },
   "texture": {
     "width": 64,

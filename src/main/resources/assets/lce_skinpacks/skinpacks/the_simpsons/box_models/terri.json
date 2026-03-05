@@ -1,9 +1,15 @@
 {
   "meta": {
     "displayName": "Terri",
-    "displayNameId": "IDS_DLCSKIN00002123_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.terri"
   },
-  "hide": ["HEAD", "HAT", "LEFT_ARM", "RIGHT_ARM", "body"],
+  "hide": [
+    "HEAD",
+    "HAT",
+    "LEFT_ARM",
+    "RIGHT_ARM",
+    "body"
+  ],
   "texture": {
     "width": 64,
     "height": 64

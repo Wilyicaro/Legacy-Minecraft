@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Silverfish Monger",
-    "displayNameId": "IDS_DLCSKIN00005611_DISPLAYNAME",
+    "displayNameId": "custom.villians.silverfish_monger",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005611_THEMENAME"
+    "themeNameId": "custom.villians.themetext.silverfish_monger"
   },
   "texture": {
     "width": 64,

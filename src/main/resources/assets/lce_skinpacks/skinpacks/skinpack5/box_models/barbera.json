@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Barbera",
-    "displayNameId": "IDS_dlcskin25910556_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.barbera",
     "themeName": "Rayman Legends",
-    "themeNameId": "IDS_dlcskin25910556_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.barbera"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Pale Bone Demon",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005109_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.pale_bone_demon",
     "themeName": "Skeleton Spirit",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005109_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.pale_bone_demon"
   },
   "texture": {
     "width": 64,

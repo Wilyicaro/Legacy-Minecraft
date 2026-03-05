@@ -1,9 +1,11 @@
 {
   "meta": {
     "displayName": "King of Ooo",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004414_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.king_of_ooo"
   },
-"hide": ["left_sleeve" ],
+  "hide": [
+    "left_sleeve"
+  ],
   "texture": {
     "width": 64,
     "height": 64

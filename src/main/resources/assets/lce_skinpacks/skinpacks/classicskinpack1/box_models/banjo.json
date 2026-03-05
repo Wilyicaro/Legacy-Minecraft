@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Banjo",
-    "displayNameId": "IDS_DLCSKIN00000015_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.banjo",
     "themeName": "Banjo-Kazooie",
-    "themeNameId": "IDS_DLCSKIN00000015_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.banjo"
   },
   "texture": {
     "width": 64,

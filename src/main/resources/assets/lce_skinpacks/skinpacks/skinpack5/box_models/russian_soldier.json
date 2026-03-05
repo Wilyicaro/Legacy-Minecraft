@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Russian Soldier",
-    "displayNameId": "IDS_dlcskin36748310_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.russian_soldier",
     "themeName": "World War 2",
-    "themeNameId": "IDS_dlcskin36748310_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.russian_soldier"
   },
   "texture": {
     "width": 64,

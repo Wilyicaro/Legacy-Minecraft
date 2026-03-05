@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Atoi",
-    "displayNameId": "IDS_DLCSKIN20000230_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.atoi",
     "themeName": "Tearaway",
-    "themeNameId": "IDS_DLCSKIN20000230_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.atoi"
   },
   "hide": "ALL",
   "texture": {

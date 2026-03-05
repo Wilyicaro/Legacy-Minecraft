@@ -1,11 +1,14 @@
 {
   "meta": {
     "displayName": "Hammerhead (Momaw Nadon)",
-    "displayNameId": "IDS_DLCSKIN00001226_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.hammerhead_momaw_nadon",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001226_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.hammerhead_momaw_nadon"
   },
-"hide":["hat", "head"],
+  "hide": [
+    "hat",
+    "head"
+  ],
   "texture": {
     "width": 64,
     "height": 64

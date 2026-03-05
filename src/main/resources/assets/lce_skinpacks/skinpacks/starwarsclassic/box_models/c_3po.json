@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "C-3PO",
-    "displayNameId": "IDS_DLCSKIN00001221_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.c_3po",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001221_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.c_3po"
   },
   "armorOffsets": {
     "HELMET": {
@@ -12,7 +12,9 @@
       "z": 0.0
     }
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

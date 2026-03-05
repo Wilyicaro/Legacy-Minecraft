@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Farmer",
-    "displayNameId": "IDS_DLCSKIN20000242_DISPLAYNAME"
+    "displayNameId": "custom.skinpack3.farmer"
   },
   "texture": {
     "width": 64,

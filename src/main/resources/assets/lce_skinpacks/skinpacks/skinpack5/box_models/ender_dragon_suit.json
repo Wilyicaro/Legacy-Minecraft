@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Ender Dragon Suit",
-    "displayNameId": "IDS_dlcskin86256643_DISPLAYNAME"
+    "displayNameId": "custom.skinpack5.ender_dragon_suit"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,12 @@
 {
   "meta": {
     "displayName": "The Grim Reaper",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003201_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.the_grim_reaper"
   },
-"poses": ["stiff_arms", "stiff_legs"],
+  "poses": [
+    "stiff_arms",
+    "stiff_legs"
+  ],
   "texture": {
     "width": 64,
     "height": 64

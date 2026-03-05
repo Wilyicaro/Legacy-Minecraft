@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Black Widow",
-    "displayNameId": "IDS_dlcskin80585139_DISPLAYNAME",
+    "displayNameId": "custom.avengers.black_widow",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin80585139_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.black_widow"
   },
   "texture": {
     "width": 64,

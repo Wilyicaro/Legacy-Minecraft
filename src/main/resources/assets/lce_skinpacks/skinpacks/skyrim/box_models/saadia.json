@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Saadia",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001421_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.saadia",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001421_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.saadia"
   },
   "texture": {
     "width": 64,

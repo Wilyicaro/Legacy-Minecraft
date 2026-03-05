@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Snow Flake",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002714_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.snow_flake",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002714_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.snow_flake"
   },
   "texture": {
     "width": 64,

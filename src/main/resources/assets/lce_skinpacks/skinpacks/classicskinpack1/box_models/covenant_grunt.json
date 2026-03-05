@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Covenant Grunt",
-    "displayNameId": "IDS_DLCSKIN00000013_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.covenant_grunt",
     "themeName": "Halo",
-    "themeNameId": "IDS_DLCSKIN00000013_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.covenant_grunt"
   },
   "texture": {
     "width": 64,

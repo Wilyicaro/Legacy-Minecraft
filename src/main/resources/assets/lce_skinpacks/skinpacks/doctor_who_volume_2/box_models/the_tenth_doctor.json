@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Tenth Doctor",
-    "displayNameId": "IDS_DLCSKIN00002500_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.the_tenth_doctor"
   },
   "texture": {
     "width": 64,

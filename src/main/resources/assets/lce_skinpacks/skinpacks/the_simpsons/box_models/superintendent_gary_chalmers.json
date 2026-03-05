@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Superintendent Gary Chalmers",
-    "displayNameId": "IDS_DLCSKIN00002120_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.superintendent_gary_chalmers"
   },
   "hide": "head",
   "armorOffsets": {

@@ -1,9 +1,15 @@
 {
   "meta": {
     "displayName": "Susan Strong",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004441_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.susan_strong"
   },
-  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

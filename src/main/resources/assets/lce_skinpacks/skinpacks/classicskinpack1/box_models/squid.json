@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Squid",
-    "displayNameId": "IDS_DLCSKIN00000001_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.squid",
     "themeName": "Minecraft",
-    "themeNameId": "IDS_DLCSKIN00000001_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.squid"
   },
   "texture": {
     "width": 64,

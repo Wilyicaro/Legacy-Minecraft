@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Samurai Warrior",
-    "displayNameId": "IDS_DLCSKIN00000837_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.samurai_warrior_2"
   },
   "texture": {
     "width": 64,

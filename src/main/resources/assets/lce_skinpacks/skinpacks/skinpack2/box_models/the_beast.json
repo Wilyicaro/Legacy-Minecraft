@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "The Beast",
-    "displayNameId": "IDS_DLCSKIN20000126_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.the_beast",
     "themeName": "inFAMOUS",
-    "themeNameId": "IDS_DLCSKIN20000126_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.the_beast"
   },
   "texture": {
     "width": 64,

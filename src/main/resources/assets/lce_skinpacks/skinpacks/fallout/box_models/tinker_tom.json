@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Tinker Tom",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004840_DISPLAYNAME",
+    "displayNameId": "custom.fallout.tinker_tom",
     "themeName": "Fallout 4",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004840_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.tinker_tom"
   },
   "texture": {
     "width": 64,

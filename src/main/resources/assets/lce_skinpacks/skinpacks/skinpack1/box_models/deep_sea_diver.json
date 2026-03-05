@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Deep Sea Diver",
-    "displayNameId": "IDS_DLCSKIN20000038_DISPLAYNAME"
+    "displayNameId": "custom.skinpack1.deep_sea_diver"
   },
   "texture": {
     "width": 64,

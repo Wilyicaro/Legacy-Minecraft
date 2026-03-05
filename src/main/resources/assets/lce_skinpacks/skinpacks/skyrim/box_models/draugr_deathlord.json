@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Draugr Deathlord",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001432_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.draugr_deathlord",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001432_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.draugr_deathlord"
   },
   "texture": {
     "width": 64,

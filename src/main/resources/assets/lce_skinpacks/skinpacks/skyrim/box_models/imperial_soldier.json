@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Imperial Soldier",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001412_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.imperial_soldier",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001412_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.imperial_soldier"
   },
   "texture": {
     "width": 64,

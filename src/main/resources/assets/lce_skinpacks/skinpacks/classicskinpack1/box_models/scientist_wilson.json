@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Scientist Wilson",
-    "displayNameId": "IDS_DLCSKIN00000027_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.scientist_wilson",
     "themeName": "'Splosion Man",
-    "themeNameId": "IDS_DLCSKIN00000027_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.scientist_wilson"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Prisoner",
-    "displayNameId": "IDS_DLCSKIN00000036_DISPLAYNAME"
+    "displayNameId": "custom.classicskinpack1.prisoner"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Colonel Autumn",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004817_DISPLAYNAME",
+    "displayNameId": "custom.fallout.colonel_autumn",
     "themeName": "Fallout 3",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004817_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.colonel_autumn"
   },
   "texture": {
     "width": 64,

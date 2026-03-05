@@ -1,11 +1,14 @@
 {
   "meta": {
     "displayName": "Terracotta Warrior",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005133_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.terracotta_warrior",
     "themeName": "Clay Statue",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005133_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.terracotta_warrior"
   },
-  "hide": ["left_sleeve", "right_sleeve"],
+  "hide": [
+    "left_sleeve",
+    "right_sleeve"
+  ],
   "texture": {
     "width": 64,
     "height": 64

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Chewbacca",
-    "displayNameId": "IDS_DLCSKIN00001210_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.chewbacca",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001210_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.chewbacca"
   },
   "armorOffsets": {
     "HELMET": {
@@ -27,7 +27,10 @@
       "z": 0.0
     }
   },
-"hide":["hat", "head"],
+  "hide": [
+    "hat",
+    "head"
+  ],
   "texture": {
     "width": 64,
     "height": 64

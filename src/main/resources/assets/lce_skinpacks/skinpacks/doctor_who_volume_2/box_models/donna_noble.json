@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Donna Noble",
-    "displayNameId": "IDS_DLCSKIN00002506_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.donna_noble"
   },
   "texture": {
     "width": 64,

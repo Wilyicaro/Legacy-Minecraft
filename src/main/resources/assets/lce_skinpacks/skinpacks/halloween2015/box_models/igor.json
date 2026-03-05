@@ -1,9 +1,11 @@
 {
   "meta": {
     "displayName": "Igor",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003240_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.igor"
   },
-  "hide": [ "hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

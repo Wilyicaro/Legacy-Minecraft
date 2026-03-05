@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Marge Simpson",
-    "displayNameId": "IDS_DLCSKIN00002101_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.marge_simpson"
   },
   "hide": "head",
   "armorOffsets": {

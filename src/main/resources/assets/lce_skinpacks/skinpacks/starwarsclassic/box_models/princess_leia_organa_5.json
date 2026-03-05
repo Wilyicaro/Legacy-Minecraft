@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Princess Leia Organa",
-    "displayNameId": "IDS_DLCSKIN00001215_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.princess_leia_organa_5",
     "themeName": "Jabba's Palace",
-    "themeNameId": "IDS_DLCSKIN00001215_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.princess_leia_organa_5"
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

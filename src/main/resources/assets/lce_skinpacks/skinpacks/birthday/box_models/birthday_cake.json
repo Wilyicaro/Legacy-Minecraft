@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Birthday Cake",
-    "displayNameId": "IDS_DLCSKIN00000721_DISPLAYNAME"
+    "displayNameId": "custom.birthday.birthday_cake"
   },
   "texture": {
     "width": 64,

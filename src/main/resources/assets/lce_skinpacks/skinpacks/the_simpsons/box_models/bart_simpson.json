@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Bart Simpson",
-    "displayNameId": "IDS_DLCSKIN00002102_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.bart_simpson"
   },
   "armorOffsets": {
     "HELMET": {
@@ -10,7 +10,13 @@
       "z": 0.0
     }
   },
-  "hide": ["HEAD", "HAT", "BODY", "LEFT_ARM", "RIGHT_ARM"],
+  "hide": [
+    "HEAD",
+    "HAT",
+    "BODY",
+    "LEFT_ARM",
+    "RIGHT_ARM"
+  ],
   "texture": {
     "width": 64,
     "height": 64

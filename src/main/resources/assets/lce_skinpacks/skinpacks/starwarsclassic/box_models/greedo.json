@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Greedo",
-    "displayNameId": "IDS_DLCSKIN00001227_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.greedo",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001227_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.greedo"
   },
   "armorOffsets": {
     "HELMET": {

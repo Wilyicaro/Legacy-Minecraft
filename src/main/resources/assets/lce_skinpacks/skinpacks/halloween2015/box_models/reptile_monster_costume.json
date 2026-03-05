@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Reptile Monster Costume",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003246_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.reptile_monster_costume"
   },
   "texture": {
     "width": 64,

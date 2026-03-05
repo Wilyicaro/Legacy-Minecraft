@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Pen Yen",
-    "displayNameId": "IDS_DLCSKIN20000208_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.pen_yen",
     "themeName": "Slam Bolt Scrappers",
-    "themeNameId": "IDS_DLCSKIN20000208_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.pen_yen"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Wood Elf Mage",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001407_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.wood_elf_mage",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001407_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.wood_elf_mage"
   },
   "texture": {
     "width": 64,

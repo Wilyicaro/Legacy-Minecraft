@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mr Hyde",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003239_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.mr_hyde"
   },
   "texture": {
     "width": 64,

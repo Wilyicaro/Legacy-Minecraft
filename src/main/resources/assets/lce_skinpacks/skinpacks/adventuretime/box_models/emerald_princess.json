@@ -1,9 +1,11 @@
 {
   "meta": {
     "displayName": "Emerald Princess",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004425_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.emerald_princess"
   },
-  "hide": [ "arms"],
+  "hide": [
+    "arms"
+  ],
   "texture": {
     "width": 64,
     "height": 64

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Werewolf",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003206_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.werewolf"
   },
   "texture": {
     "width": 64,

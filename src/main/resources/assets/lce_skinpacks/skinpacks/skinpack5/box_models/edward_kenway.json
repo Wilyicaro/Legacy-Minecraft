@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Edward Kenway",
-    "displayNameId": "IDS_dlcskin95071241_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.edward_kenway",
     "themeName": "Assassin's Creed IV Black Flag",
-    "themeNameId": "IDS_dlcskin95071241_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.edward_kenway"
   },
   "texture": {
     "width": 64,

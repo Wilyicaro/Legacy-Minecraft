@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Ratchet",
-    "displayNameId": "IDS_DLCSKIN20000118_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.ratchet",
     "themeName": "Ratchet and Clank",
-    "themeNameId": "IDS_DLCSKIN20000118_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.ratchet"
   },
   "texture": {
     "width": 64,

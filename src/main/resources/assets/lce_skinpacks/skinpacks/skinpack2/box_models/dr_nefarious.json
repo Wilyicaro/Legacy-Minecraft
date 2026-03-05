@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Dr Nefarious",
-    "displayNameId": "IDS_DLCSKIN20000121_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.dr_nefarious",
     "themeName": "Ratchet and Clank",
-    "themeNameId": "IDS_DLCSKIN20000121_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.dr_nefarious"
   },
   "armorOffsets": {
     "HELMET": {

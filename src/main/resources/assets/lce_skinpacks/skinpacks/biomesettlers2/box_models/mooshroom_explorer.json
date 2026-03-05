@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Mooshroom Explorer",
-    "displayNameId": "IDS_DLCSKIN00005304_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.mooshroom_explorer"
   },
-"hide": "left_leg",
+  "hide": "left_leg",
   "texture": {
     "width": 64,
     "height": 64

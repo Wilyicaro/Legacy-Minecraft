@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Snow Golem",
-    "displayNameId": "IDS_DLCSKIN00000606_DISPLAYNAME"
+    "displayNameId": "custom.festive.snow_golem"
   },
   "texture": {
     "width": 64,

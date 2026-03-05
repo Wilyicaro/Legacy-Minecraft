@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Cow",
-    "displayNameId": "IDS_DLCSKIN20000202_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.cow",
     "themeName": "Minecraft",
-    "themeNameId": "IDS_DLCSKIN20000202_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.cow"
   },
   "texture": {
     "width": 64,

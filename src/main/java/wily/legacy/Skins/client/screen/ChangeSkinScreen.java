@@ -364,10 +364,10 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         if (playerSkinWidgetList != null && playerSkinWidgetList.element3 != null) {
             String    skinId = playerSkinWidgetList.element3.skinId.get();
             SkinEntry entry  = skinId == null ? null : SkinPackLoader.getSkin(skinId);
-            String    name   = entry == null ? String.valueOf(skinId) : entry.name();
+            Component name = entry == null ? Component.literal(String.valueOf(skinId)) : SkinPackLoader.nameComponent(entry.name(), String.valueOf(skinId));
             int mid       = tooltipBox.x - sc(5) + (tooltipBox.getWidth() - sc(18)) / 2;
             int skinNameY = panel.y + tooltipBox.getHeight() - sc(49);
-            drawBigCentered(g, Component.literal(name), mid, skinNameY, 0xFFFFFFFF);
+            drawBigCentered(g, name, mid, skinNameY, 0xFFFFFFFF);
 
             ResourceLocation modelId = null;
             try {

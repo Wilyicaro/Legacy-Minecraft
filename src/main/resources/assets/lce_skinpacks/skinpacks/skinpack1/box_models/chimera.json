@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Chimera",
-    "displayNameId": "IDS_DLCSKIN20000030_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.chimera",
     "themeName": "Resistance",
-    "themeNameId": "IDS_DLCSKIN20000030_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.chimera"
   },
   "texture": {
     "width": 64,

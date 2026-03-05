@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mole Rat",
-    "displayNameId": "IDS_DLCSKIN00001043_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.mole_rat"
   },
   "texture": {
     "width": 64,

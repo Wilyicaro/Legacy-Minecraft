@@ -3,7 +3,7 @@
     "displayName": "Vault Girl",
     "displayNameId": "IDS_SKINS_DLCSKIN00004801_DISPLAYNAME",
     "themeName": "Fallout",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004801_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.vault_girl"
   },
   "hide": [ "hat, "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
   "texture": {

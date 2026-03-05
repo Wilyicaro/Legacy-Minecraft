@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Gingerbread Man",
-    "displayNameId": "IDS_DLCSKIN00000620_DISPLAYNAME"
+    "displayNameId": "custom.festive.gingerbread_man"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Meerkat",
-    "displayNameId": "IDS_DLCSKIN00000808_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.meerkat"
   },
   "texture": {
     "width": 64,

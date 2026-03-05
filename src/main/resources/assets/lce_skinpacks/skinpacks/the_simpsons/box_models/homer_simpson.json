@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Homer Simpson",
-    "displayNameId": "IDS_DLCSKIN00002100_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.homer_simpson"
   },
   "hide": "head",
   "armorOffsets": {

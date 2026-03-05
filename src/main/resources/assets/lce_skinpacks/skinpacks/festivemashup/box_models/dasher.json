@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Dasher",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002705_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.dasher",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002705_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.dasher"
   },
   "texture": {
     "width": 64,

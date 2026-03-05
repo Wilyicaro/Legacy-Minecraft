@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Narwhal",
-    "displayNameId": "IDS_DLCSKIN00001021_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.narwhal"
   },
   "texture": {
     "width": 64,

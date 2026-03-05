@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Isaac Clarke",
-    "displayNameId": "IDS_dlcskin40574729_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.isaac_clarke",
     "themeName": "Dead Space 3",
-    "themeNameId": "IDS_dlcskin40574729_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.isaac_clarke"
   },
   "texture": {
     "width": 64,

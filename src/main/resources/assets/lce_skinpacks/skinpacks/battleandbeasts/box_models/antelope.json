@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Antelope",
-    "displayNameId": "IDS_DLCSKIN00000817_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.antelope"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Aveline de Grandpr",
-    "displayNameId": "IDS_dlcskin34476060_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.aveline_de_grandpre",
     "themeName": "Assassin's Creed III Liberation",
-    "themeNameId": "IDS_dlcskin34476060_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.aveline_de_grandpre"
   },
   "texture": {
     "width": 64,

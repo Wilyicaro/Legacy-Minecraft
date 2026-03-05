@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Ski Steve",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002728_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.ski_steve",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002728_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.ski_steve"
   },
-"hide": ["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

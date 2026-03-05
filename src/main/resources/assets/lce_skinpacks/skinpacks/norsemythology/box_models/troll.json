@@ -1,20 +1,55 @@
 {
   "meta": {
     "displayName": "Troll",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004645_DISPLAYNAME",
+    "displayNameId": "custom.norsemythology.troll",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004645_THEMENAME"
+    "themeNameId": "custom.norsemythology.themetext.troll"
   },
   "offsets": {
-    "head":         { "x": 0, "y": 2,  "z": 0 },
-    "hat":          { "x": 0, "y": 2,  "z": 0 },
-    "body":         { "x": 0, "y": 2,  "z": 0 },
-    "right_arm":    { "x": 0, "y": 2,  "z": 0 },
-    "left_arm":     { "x": 0, "y": 2, "z": 0 },
-    "right_leg":    { "x": 0, "y": 0,  "z": 0 },
-    "left_leg":     { "x": 0, "y": 0,  "z": 0 }
+    "head": {
+      "x": 0,
+      "y": 2,
+      "z": 0
+    },
+    "hat": {
+      "x": 0,
+      "y": 2,
+      "z": 0
+    },
+    "body": {
+      "x": 0,
+      "y": 2,
+      "z": 0
+    },
+    "right_arm": {
+      "x": 0,
+      "y": 2,
+      "z": 0
+    },
+    "left_arm": {
+      "x": 0,
+      "y": 2,
+      "z": 0
+    },
+    "right_leg": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "left_leg": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
   },
-  "hide": ["ALL", "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "ALL",
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

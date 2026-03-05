@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Captain America (Bucky Barnes)",
-    "displayNameId": "IDS_dlcskin39633682_DISPLAYNAME",
+    "displayNameId": "custom.avengers.captain_america_bucky_barnes",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin39633682_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.captain_america_bucky_barnes"
   },
   "texture": {
     "width": 64,

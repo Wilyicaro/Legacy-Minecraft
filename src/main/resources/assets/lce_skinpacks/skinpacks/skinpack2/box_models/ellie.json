@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Ellie",
-    "displayNameId": "IDS_DLCSKIN20000130_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.ellie",
     "themeName": "The Last of Us",
-    "themeNameId": "IDS_DLCSKIN20000130_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.ellie"
   },
   "texture": {
     "width": 64,

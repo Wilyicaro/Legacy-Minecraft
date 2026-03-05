@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Lando Calrissian",
-    "displayNameId": "IDS_DLCSKIN00001229_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.lando_calrissian",
     "themeName": "Bespin",
-    "themeNameId": "IDS_DLCSKIN00001229_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.lando_calrissian"
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

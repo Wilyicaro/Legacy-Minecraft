@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Spriggan",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001434_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.spriggan",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001434_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.spriggan"
   },
   "texture": {
     "width": 64,

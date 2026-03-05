@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Headcrab Scientist",
-    "displayNameId": "IDS_DLCSKIN20000217_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.headcrab_scientist",
     "themeName": "Half Life",
-    "themeNameId": "IDS_DLCSKIN20000217_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.headcrab_scientist"
   },
   "texture": {
     "width": 64,

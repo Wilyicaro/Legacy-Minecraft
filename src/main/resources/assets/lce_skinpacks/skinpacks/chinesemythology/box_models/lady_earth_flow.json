@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Lady Earth Flow",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005113_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.lady_earth_flow",
     "themeName": "Albino Rat Spirit",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005113_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.lady_earth_flow"
   },
   "texture": {
     "width": 64,

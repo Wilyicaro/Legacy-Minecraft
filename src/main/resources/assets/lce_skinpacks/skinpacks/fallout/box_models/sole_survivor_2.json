@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Sole Survivor",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004826_DISPLAYNAME",
+    "displayNameId": "custom.fallout.sole_survivor_2",
     "themeName": "Fallout 4",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004826_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.sole_survivor_2"
   },
   "texture": {
     "width": 64,

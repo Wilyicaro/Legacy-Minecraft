@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Arrowhead Costume",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003229_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.arrowhead_costume"
   },
   "texture": {
     "width": 64,

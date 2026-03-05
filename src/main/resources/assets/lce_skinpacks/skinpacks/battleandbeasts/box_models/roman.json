@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Roman",
-    "displayNameId": "IDS_DLCSKIN00000822_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.roman"
   },
   "texture": {
     "width": 64,

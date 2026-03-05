@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Bigfoot",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002717_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.bigfoot",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002717_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.bigfoot"
   },
   "armorOffsets": {
     "HELMET": {
@@ -27,7 +27,10 @@
       "z": 0.0
     }
   },
-"hide": ["head", "hat"],
+  "hide": [
+    "head",
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

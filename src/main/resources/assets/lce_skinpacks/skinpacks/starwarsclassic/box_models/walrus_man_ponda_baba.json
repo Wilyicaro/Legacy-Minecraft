@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Walrus Man (Ponda Baba)",
-    "displayNameId": "IDS_DLCSKIN00001225_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.walrus_man_ponda_baba",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001225_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.walrus_man_ponda_baba"
   },
   "texture": {
     "width": 64,

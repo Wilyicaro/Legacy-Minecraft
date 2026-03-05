@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Tooty",
-    "displayNameId": "IDS_DLCSKIN00000018_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.tooty",
     "themeName": "Banjo-Kazooie",
-    "themeNameId": "IDS_DLCSKIN00000018_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.tooty"
   },
   "texture": {
     "width": 64,

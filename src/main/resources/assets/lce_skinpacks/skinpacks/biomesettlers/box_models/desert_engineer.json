@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Desert Engineer",
-    "displayNameId": "IDS_DLCSKIN00004503_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.desert_engineer",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004503_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.desert_engineer"
   },
   "texture": {
     "width": 64,

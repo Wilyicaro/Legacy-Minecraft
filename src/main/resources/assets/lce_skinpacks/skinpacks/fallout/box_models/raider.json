@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Raider",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004836_DISPLAYNAME",
+    "displayNameId": "custom.fallout.raider",
     "themeName": "Fallout",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004836_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.raider"
   },
   "texture": {
     "width": 64,

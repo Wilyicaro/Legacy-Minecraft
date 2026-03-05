@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Loki",
-    "displayNameId": "IDS_dlcskin62218120_DISPLAYNAME",
+    "displayNameId": "custom.avengers.loki",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin62218120_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.loki"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Dolphin",
-    "displayNameId": "IDS_DLCSKIN00001020_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.dolphin"
   },
   "texture": {
     "width": 64,

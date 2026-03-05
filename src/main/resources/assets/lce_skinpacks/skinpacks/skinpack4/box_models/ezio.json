@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Ezio",
-    "displayNameId": "IDS_dlcskin13832854_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.ezio",
     "themeName": "Assassins Creed",
-    "themeNameId": "IDS_dlcskin13832854_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.ezio"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Bentley",
-    "displayNameId": "IDS_DLCSKIN20000011_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.bentley",
     "themeName": "Sly Cooper",
-    "themeNameId": "IDS_DLCSKIN20000011_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.bentley"
   },
   "texture": {
     "width": 64,

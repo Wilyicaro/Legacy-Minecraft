@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Creeper Suit",
-    "displayNameId": "IDS_dlcskin68333617_DISPLAYNAME"
+    "displayNameId": "custom.skinpack4.creeper_suit"
   },
   "texture": {
     "width": 64,

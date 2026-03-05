@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Iota",
-    "displayNameId": "IDS_DLCSKIN20000229_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.iota",
     "themeName": "Tearaway",
-    "themeNameId": "IDS_DLCSKIN20000229_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.iota"
   },
   "hide": "ALL",
   "texture": {

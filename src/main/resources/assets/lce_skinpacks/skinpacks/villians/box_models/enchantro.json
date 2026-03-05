@@ -1,11 +1,14 @@
 {
   "meta": {
     "displayName": "Enchantro",
-    "displayNameId": "IDS_DLCSKIN00005604_DISPLAYNAME",
+    "displayNameId": "custom.villians.enchantro",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005604_THEMENAME"
+    "themeNameId": "custom.villians.themetext.enchantro"
   },
-"hide": ["right_pants", "left_pants"],
+  "hide": [
+    "right_pants",
+    "left_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

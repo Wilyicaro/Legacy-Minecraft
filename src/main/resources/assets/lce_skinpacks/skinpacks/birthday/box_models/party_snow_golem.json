@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Party Snow Golem",
-    "displayNameId": "IDS_DLCSKIN00000714_DISPLAYNAME"
+    "displayNameId": "custom.birthday.party_snow_golem"
   },
   "texture": {
     "width": 64,

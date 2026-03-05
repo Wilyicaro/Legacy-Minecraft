@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Heavenly Host",
-    "displayNameId": "IDS_DLCSKIN00002531_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.heavenly_host"
   },
   "hide": "HAT",
   "texture": {

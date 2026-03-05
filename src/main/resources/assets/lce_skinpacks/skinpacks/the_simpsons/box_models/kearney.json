@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Kearney",
-    "displayNameId": "IDS_DLCSKIN00002114_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.kearney"
   },
   "texture": {
     "width": 64,

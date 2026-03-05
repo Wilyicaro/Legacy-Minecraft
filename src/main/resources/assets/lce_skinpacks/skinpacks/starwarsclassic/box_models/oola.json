@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Oola",
-    "displayNameId": "IDS_DLCSKIN00001242_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.oola",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001242_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.oola"
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

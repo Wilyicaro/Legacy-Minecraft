@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Musketeer",
-    "displayNameId": "IDS_DLCSKIN00001024_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.musketeer"
   },
   "texture": {
     "width": 64,

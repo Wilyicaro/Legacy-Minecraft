@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Rochelle",
-    "displayNameId": "IDS_DLCSKIN20000215_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.rochelle",
     "themeName": "Left 4 Dead 2",
-    "themeNameId": "IDS_DLCSKIN20000215_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.rochelle"
   },
   "texture": {
     "width": 64,

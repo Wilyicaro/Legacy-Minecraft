@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Forest Griefer",
-    "displayNameId": "IDS_DLCSKIN00004512_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.forest_griefer",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004512_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.forest_griefer"
   },
   "texture": {
     "width": 64,

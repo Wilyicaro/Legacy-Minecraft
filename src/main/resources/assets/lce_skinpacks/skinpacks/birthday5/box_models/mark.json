@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mark",
-    "displayNameId": "IDS_DLCSKIN00006109_DISPLAYNAME"
+    "displayNameId": "custom.birthday5.mark"
   },
   "texture": {
     "width": 64,

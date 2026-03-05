@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Nelson Muntz",
-    "displayNameId": "IDS_DLCSKIN00002110_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.nelson_muntz"
   },
   "texture": {
     "width": 64,

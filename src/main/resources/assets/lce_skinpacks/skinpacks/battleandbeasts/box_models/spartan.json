@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Spartan",
-    "displayNameId": "IDS_DLCSKIN00000821_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.spartan"
   },
   "texture": {
     "width": 64,

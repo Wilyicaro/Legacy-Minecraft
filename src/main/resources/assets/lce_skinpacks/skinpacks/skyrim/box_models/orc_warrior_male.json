@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Orc Warrior Male",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001440_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.orc_warrior_male",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001440_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.orc_warrior_male"
   },
   "texture": {
     "width": 64,

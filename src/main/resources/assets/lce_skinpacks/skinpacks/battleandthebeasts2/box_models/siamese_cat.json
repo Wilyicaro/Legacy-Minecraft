@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Siamese Cat",
-    "displayNameId": "IDS_DLCSKIN00001001_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.siamese_cat"
   },
   "texture": {
     "width": 64,

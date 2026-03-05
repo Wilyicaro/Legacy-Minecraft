@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Earl of Lemongrab",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004418_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.earl_of_lemongrab"
   },
   "texture": {
     "width": 64,

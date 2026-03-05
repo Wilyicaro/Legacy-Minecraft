@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Nether Engineer",
-    "displayNameId": "IDS_DLCSKIN00005316_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.nether_engineer"
   },
   "texture": {
     "width": 64,

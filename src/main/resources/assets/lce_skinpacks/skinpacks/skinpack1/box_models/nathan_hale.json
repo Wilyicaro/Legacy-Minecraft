@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Nathan Hale",
-    "displayNameId": "IDS_DLCSKIN20000028_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.nathan_hale",
     "themeName": "Resistance",
-    "themeNameId": "IDS_DLCSKIN20000028_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.nathan_hale"
   },
   "texture": {
     "width": 64,

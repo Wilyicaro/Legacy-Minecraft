@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Cait",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004832_DISPLAYNAME",
+    "displayNameId": "custom.fallout.cait",
     "themeName": "Fallout 4",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004832_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.cait"
   },
   "texture": {
     "width": 64,

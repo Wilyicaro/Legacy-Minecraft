@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Ant-Man",
-    "displayNameId": "IDS_dlcskin15819490_DISPLAYNAME",
+    "displayNameId": "custom.avengers.ant_man",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin15819490_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.ant_man"
   },
   "texture": {
     "width": 64,

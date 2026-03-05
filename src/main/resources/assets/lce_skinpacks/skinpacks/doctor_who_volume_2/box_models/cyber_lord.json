@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Cyber-Lord",
-    "displayNameId": "IDS_DLCSKIN00002546_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.cyber_lord"
   },
   "texture": {
     "width": 64,

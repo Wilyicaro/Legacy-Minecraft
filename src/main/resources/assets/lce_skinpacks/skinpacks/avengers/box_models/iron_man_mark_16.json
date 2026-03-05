@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Iron Man Mark 16",
-    "displayNameId": "IDS_dlcskin57393154_DISPLAYNAME",
+    "displayNameId": "custom.avengers.iron_man_mark_16",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin57393154_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.iron_man_mark_16"
   },
   "texture": {
     "width": 64,

@@ -1,11 +1,14 @@
 {
   "meta": {
     "displayName": "Party Bentley",
-    "displayNameId": "IDS_DLCSKIN20000418_DISPLAYNAME",
+    "displayNameId": "custom.birthday2.party_bentley",
     "themeName": "Sly Cooper",
-    "themeNameId": "IDS_DLCSKIN20000418_THEMENAME"
+    "themeNameId": "custom.birthday2.themetext.party_bentley"
   },
-  "hide": ["hat", "jacket"],
+  "hide": [
+    "hat",
+    "jacket"
+  ],
   "texture": {
     "width": 64,
     "height": 64

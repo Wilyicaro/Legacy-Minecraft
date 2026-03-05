@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Cyberman 2012 (Non-Cybus)",
-    "displayNameId": "IDS_DLCSKIN00002544_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.cyberman_2012_non_cybus"
   },
   "texture": {
     "width": 64,

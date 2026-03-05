@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Nick",
-    "displayNameId": "IDS_DLCSKIN20000214_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.nick",
     "themeName": "Left 4 Dead 2",
-    "themeNameId": "IDS_DLCSKIN20000214_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.nick"
   },
   "texture": {
     "width": 64,

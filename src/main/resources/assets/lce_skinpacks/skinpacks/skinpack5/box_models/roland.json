@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Roland",
-    "displayNameId": "IDS_dlcskin15836257_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.roland",
     "themeName": "Borderlands",
-    "themeNameId": "IDS_dlcskin15836257_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.roland"
   },
   "texture": {
     "width": 64,

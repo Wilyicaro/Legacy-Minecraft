@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Grizzly Bear",
-    "displayNameId": "IDS_dlcskin01897666_DISPLAYNAME"
+    "displayNameId": "custom.skinpack4.grizzly_bear"
   },
   "texture": {
     "width": 64,

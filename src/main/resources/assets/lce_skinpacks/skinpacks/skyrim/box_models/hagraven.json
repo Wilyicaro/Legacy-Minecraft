@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Hagraven",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001431_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.hagraven",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001431_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.hagraven"
   },
   "texture": {
     "width": 64,

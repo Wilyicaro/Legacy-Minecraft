@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Small Elf 1",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002701_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.small_elf_1",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002701_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.small_elf_1"
   },
   "armorOffsets": {
     "HELMET": {
@@ -12,7 +12,9 @@
       "z": 0.0
     }
   },
-"hide": ["arms"],
+  "hide": [
+    "arms"
+  ],
   "texture": {
     "width": 64,
     "height": 64

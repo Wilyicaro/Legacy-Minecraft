@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Hippopotamus",
-    "displayNameId": "IDS_DLCSKIN00000810_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.hippopotamus"
   },
   "texture": {
     "width": 64,

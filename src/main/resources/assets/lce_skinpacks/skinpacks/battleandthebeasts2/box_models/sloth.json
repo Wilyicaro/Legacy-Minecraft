@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Sloth",
-    "displayNameId": "IDS_DLCSKIN00001013_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.sloth"
   },
   "texture": {
     "width": 64,

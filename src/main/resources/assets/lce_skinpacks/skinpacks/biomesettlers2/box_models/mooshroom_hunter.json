@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Mooshroom Hunter",
-    "displayNameId": "IDS_DLCSKIN00005308_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.mooshroom_hunter"
   },
-"hide": "right_pants",
+  "hide": "right_pants",
   "texture": {
     "width": 64,
     "height": 64

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Yuri",
-    "displayNameId": "IDS_DLCSKIN20000207_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.yuri",
     "themeName": "Awesomenauts",
-    "themeNameId": "IDS_DLCSKIN20000207_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.yuri"
   },
   "texture": {
     "width": 64,

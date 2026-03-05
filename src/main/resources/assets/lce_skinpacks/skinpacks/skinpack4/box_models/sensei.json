@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Sensei",
-    "displayNameId": "IDS_dlcskin80934533_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.sensei",
     "themeName": "Fruit Ninja",
-    "themeNameId": "IDS_dlcskin80934533_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.sensei"
   },
   "texture": {
     "width": 64,

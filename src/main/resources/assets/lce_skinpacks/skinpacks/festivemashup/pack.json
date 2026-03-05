@@ -1,279 +1,285 @@
 {
-  "name": "Festive",
+  "name": "key:custom.festivemashup.pack.name",
   "author": "4J Studios",
   "skins": [
     {
       "id": "xmas_herobrine",
-      "name": "Xmas Herobrine",
+      "name": "key:custom.festivemashup.xmas_herobrine",
       "texture": "skins/xmas_herobrine.png",
       "order": 1
     },
     {
       "id": "small_elf_1",
-      "name": "Small Elf 1",
+      "name": "key:custom.festivemashup.small_elf_1",
       "texture": "skins/small_elf_1.png",
       "order": 2
     },
     {
       "id": "small_elf_2",
-      "name": "Small Elf 2",
+      "name": "key:custom.festivemashup.small_elf_2",
       "texture": "skins/small_elf_2.png",
       "order": 3
     },
     {
       "id": "green_santa",
-      "name": "Green Santa",
+      "name": "key:custom.festivemashup.green_santa",
       "texture": "skins/green_santa.png",
       "order": 4
     },
     {
       "id": "blue_santa",
-      "name": "Blue Santa",
+      "name": "key:custom.festivemashup.blue_santa",
       "texture": "skins/blue_santa.png",
       "order": 5
     },
     {
       "id": "dasher",
-      "name": "Dasher",
+      "name": "key:custom.festivemashup.dasher",
       "texture": "skins/dasher.png",
       "order": 6
     },
     {
       "id": "dancer",
-      "name": "Dancer",
+      "name": "key:custom.festivemashup.dancer",
       "texture": "skins/dancer.png",
       "order": 7
     },
     {
       "id": "prancer",
-      "name": "Prancer",
+      "name": "key:custom.festivemashup.prancer",
       "texture": "skins/prancer.png",
       "order": 8
     },
     {
       "id": "vixen",
-      "name": "Vixen",
+      "name": "key:custom.festivemashup.vixen",
       "texture": "skins/vixen.png",
       "order": 9
     },
     {
       "id": "comet",
-      "name": "Comet",
+      "name": "key:custom.festivemashup.comet",
       "texture": "skins/comet.png",
       "order": 10
     },
     {
       "id": "cupid",
-      "name": "Cupid",
+      "name": "key:custom.festivemashup.cupid",
       "texture": "skins/cupid.png",
       "order": 11
     },
     {
       "id": "donner",
-      "name": "Donner",
+      "name": "key:custom.festivemashup.donner",
       "texture": "skins/donner.png",
       "order": 12
     },
     {
       "id": "blitzen",
-      "name": "Blitzen",
+      "name": "key:custom.festivemashup.blitzen",
       "texture": "skins/blitzen.png",
       "order": 13
     },
     {
       "id": "rudolph",
-      "name": "Rudolph",
+      "name": "key:custom.festivemashup.rudolph",
       "texture": "skins/rudolph.png",
       "order": 14
     },
     {
       "id": "snow_flake",
-      "name": "Snow Flake",
+      "name": "key:custom.festivemashup.snow_flake",
       "texture": "skins/snow_flake.png",
       "order": 15
     },
     {
       "id": "stocking",
-      "name": "Stocking",
+      "name": "key:custom.festivemashup.stocking",
       "texture": "skins/stocking.png",
       "order": 16
     },
     {
       "id": "candycane_stick",
-      "name": "Candycane Stick",
+      "name": "key:custom.festivemashup.candycane_stick",
       "texture": "skins/candycane_stick.png",
       "order": 17
     },
     {
       "id": "bigfoot",
-      "name": "Bigfoot",
+      "name": "key:custom.festivemashup.bigfoot",
       "texture": "skins/bigfoot.png",
       "order": 18
     },
     {
       "id": "yeti",
-      "name": "Yeti",
+      "name": "key:custom.festivemashup.yeti",
       "texture": "skins/yeti.png",
       "order": 19
     },
     {
       "id": "krampus",
-      "name": "Krampus",
+      "name": "key:custom.festivemashup.krampus",
       "texture": "skins/krampus.png",
       "order": 20
     },
     {
       "id": "steve_xmas_sweater",
-      "name": "Steve Xmas Sweater",
+      "name": "key:custom.festivemashup.steve_xmas_sweater",
       "texture": "skins/steve_xmas_sweater.png",
       "order": 21
     },
     {
       "id": "tennis_steve_xmas_sweater",
-      "name": "Tennis Steve Xmas Sweater",
+      "name": "key:custom.festivemashup.tennis_steve_xmas_sweater",
       "texture": "skins/tennis_steve_xmas_sweater.png",
       "order": 22
     },
     {
       "id": "tuxedo_steve_xmas",
-      "name": "Tuxedo Steve Xmas",
+      "name": "key:custom.festivemashup.tuxedo_steve_xmas",
       "texture": "skins/tuxedo_steve_xmas.png",
       "order": 23
     },
     {
       "id": "athlete_steve_xmas_sweater",
-      "name": "Athlete Steve Xmas Sweater",
+      "name": "key:custom.festivemashup.athlete_steve_xmas_sweater",
       "texture": "skins/athlete_steve_xmas_sweater.png",
       "order": 24
     },
     {
       "id": "scottish_steve_xmas_sweater",
-      "name": "Scottish Steve Xmas Sweater",
+      "name": "key:custom.festivemashup.scottish_steve_xmas_sweater",
       "texture": "skins/scottish_steve_xmas_sweater.png",
       "order": 25
     },
     {
       "id": "prisoner_steve_xmas_sweater",
-      "name": "Prisoner Steve Xmas Sweater",
+      "name": "key:custom.festivemashup.prisoner_steve_xmas_sweater",
       "texture": "skins/prisoner_steve_xmas_sweater.png",
       "order": 26
     },
     {
       "id": "cyclist_steve_xmas_sweater",
-      "name": "Cyclist Steve Xmas Sweater",
+      "name": "key:custom.festivemashup.cyclist_steve_xmas_sweater",
       "texture": "skins/cyclist_steve_xmas_sweater.png",
       "order": 27
     },
     {
       "id": "boxer_steve_xmas_sweater",
-      "name": "Boxer Steve Xmas Sweater",
+      "name": "key:custom.festivemashup.boxer_steve_xmas_sweater",
       "texture": "skins/boxer_steve_xmas_sweater.png",
       "order": 28
     },
     {
       "id": "ski_steve",
-      "name": "Ski Steve",
+      "name": "key:custom.festivemashup.ski_steve",
       "texture": "skins/ski_steve.png",
-      "poses": ["stiff_legs", "sync_arms"],
+      "poses": [
+        "stiff_legs",
+        "sync_arms"
+      ],
       "order": 31.1
     },
     {
       "id": "snow_shoe_steve",
-      "name": "Snow Shoe Steve",
+      "name": "key:custom.festivemashup.snow_shoe_steve",
       "texture": "skins/snow_shoe_steve.png",
       "order": 31.2
     },
     {
       "id": "tomte",
-      "name": "tomte",
+      "name": "key:custom.festivemashup.tomte",
       "texture": "skins/tomte.png",
       "order": 31.8
     },
     {
       "id": "tree_fairy",
-      "name": "Tree Fairy",
+      "name": "key:custom.festivemashup.tree_fairy",
       "texture": "skins/tree_fairy.png",
       "poses": "stiff_legs",
       "order": 32
     },
     {
       "id": "small_elf_3",
-      "name": "Small Elf 3",
+      "name": "key:custom.festivemashup.small_elf_3",
       "texture": "skins/small_elf_3.png",
       "order": 3.2
     },
     {
       "id": "skier",
-      "name": "Skier",
+      "name": "key:custom.festivemashup.skier",
       "texture": "skins/skier.png",
-      "poses": ["stiff_legs", "sync_arms"],
+      "poses": [
+        "stiff_legs",
+        "sync_arms"
+      ],
       "order": 34
     },
     {
       "id": "fat_santa",
-      "name": "Fat Santa",
+      "name": "key:custom.festivemashup.fat_santa",
       "texture": "skins/fat_santa.png",
       "order": 0.1
     },
     {
       "id": "evil_elf",
-      "name": "Evil Elf",
+      "name": "key:custom.festivemashup.evil_elf",
       "texture": "skins/evil_elf.png",
       "model": "slim",
       "order": 3.3
     },
     {
       "id": "alex_xmas_sweater",
-      "name": "Alex Xmas Sweater",
+      "name": "key:custom.festivemashup.alex_xmas_sweater",
       "texture": "skins/alex_xmas_sweater.png",
       "model": "slim",
       "order": 30.1
     },
     {
       "id": "tennis_alex_xmas_sweater",
-      "name": "Tennis Alex Xmas Sweater",
+      "name": "key:custom.festivemashup.tennis_alex_xmas_sweater",
       "texture": "skins/tennis_alex_xmas_sweater.png",
       "model": "slim",
       "order": 30.2
     },
     {
       "id": "tuxedo_alex_xmas",
-      "name": "Tuxedo Alex Xmas",
+      "name": "key:custom.festivemashup.tuxedo_alex_xmas",
       "texture": "skins/tuxedo_alex_xmas.png",
       "model": "slim",
       "order": 30.3
     },
     {
       "id": "athlete_alex_xmas_sweater",
-      "name": "Athlete Alex Xmas Sweater",
+      "name": "key:custom.festivemashup.athlete_alex_xmas_sweater",
       "texture": "skins/athlete_alex_xmas_sweater.png",
       "model": "slim",
       "order": 30.4
     },
     {
       "id": "scottish_alex_xmas_sweater",
-      "name": "Scottish Alex Xmas Sweater",
+      "name": "key:custom.festivemashup.scottish_alex_xmas_sweater",
       "texture": "skins/scottish_alex_xmas_sweater.png",
       "model": "slim",
       "order": 30.5
     },
     {
       "id": "prisoner_alex_xmas_sweater",
-      "name": "Prisoner Alex Xmas Sweater",
+      "name": "key:custom.festivemashup.prisoner_alex_xmas_sweater",
       "texture": "skins/prisoner_alex_xmas_sweater.png",
       "model": "slim",
       "order": 30.6
     },
     {
       "id": "cyclist_alex_xmas_sweater",
-      "name": "Cyclist Alex Xmas Sweater",
+      "name": "key:custom.festivemashup.cyclist_alex_xmas_sweater",
       "texture": "skins/cyclist_alex_xmas_sweater.png",
       "model": "slim",
       "order": 30.7
     },
     {
       "id": "boxer_alex_xmas_sweater",
-      "name": "Boxer Alex Xmas Sweater",
+      "name": "key:custom.festivemashup.boxer_alex_xmas_sweater",
       "texture": "skins/boxer_alex_xmas_sweater.png",
       "model": "slim",
       "order": 30.8

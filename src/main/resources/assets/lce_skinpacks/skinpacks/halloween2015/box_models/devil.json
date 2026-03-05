@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Devil",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003202_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.devil"
   },
   "texture": {
     "width": 64,

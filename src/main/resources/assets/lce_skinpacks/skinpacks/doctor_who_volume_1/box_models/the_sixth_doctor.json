@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Sixth Doctor",
-    "displayNameId": "IDS_DLCSKIN00002002_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.the_sixth_doctor"
   },
   "texture": {
     "width": 64,

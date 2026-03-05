@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Zap",
-    "displayNameId": "IDS_DLCSKIN20000109_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.zap",
     "themeName": "Gamma Bros",
-    "themeNameId": "IDS_DLCSKIN20000109_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.zap"
   },
   "texture": {
     "width": 64,

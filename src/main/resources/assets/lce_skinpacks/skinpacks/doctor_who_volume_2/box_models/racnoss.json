@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Racnoss",
-    "displayNameId": "IDS_DLCSKIN00002525_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.racnoss"
   },
   "hide": "HAT",
   "armorOffsets": {

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Patty",
-    "displayNameId": "IDS_SKINS_DLCSKIN00007409_DISPLAYNAME",
+    "displayNameId": "custom.supercuteskins.patty",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00007409_THEMENAME"
+    "themeNameId": "custom.supercuteskins.themetext.patty"
   },
   "armorOffsets": {
     "ARM1": {
@@ -37,7 +37,7 @@
       "z": 0.0
     }
   },
-"hide": "**",
+  "hide": "**",
   "texture": {
     "width": 64,
     "height": 64

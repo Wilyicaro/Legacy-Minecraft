@@ -1,9 +1,16 @@
 {
   "meta": {
     "displayName": "Ivor",
-    "displayNameId": "IDS_DLCSKIN00005015_DISPLAYNAME"
+    "displayNameId": "custom.storymode.ivor"
   },
-  "hide": ["hat", "left_sleeve", "right_sleeve", "jacket", "right_pants", "left_pants"],
+  "hide": [
+    "hat",
+    "left_sleeve",
+    "right_sleeve",
+    "jacket",
+    "right_pants",
+    "left_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

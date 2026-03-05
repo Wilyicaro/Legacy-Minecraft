@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Otto Mann",
-    "displayNameId": "IDS_DLCSKIN00002108_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.otto_mann"
   },
   "hide": "head",
   "armorOffsets": {

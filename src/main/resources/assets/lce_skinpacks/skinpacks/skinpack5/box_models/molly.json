@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Molly",
-    "displayNameId": "IDS_dlcskin44996144_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.molly",
     "themeName": "The Walking Dead",
-    "themeNameId": "IDS_dlcskin44996144_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.molly"
   },
   "texture": {
     "width": 64,

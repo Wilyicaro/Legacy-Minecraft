@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Dungeon Spectre",
-    "displayNameId": "IDS_DLCSKIN00005603_DISPLAYNAME",
+    "displayNameId": "custom.villians.dungeon_spectre",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005603_THEMENAME"
+    "themeNameId": "custom.villians.themetext.dungeon_spectre"
   },
   "texture": {
     "width": 64,

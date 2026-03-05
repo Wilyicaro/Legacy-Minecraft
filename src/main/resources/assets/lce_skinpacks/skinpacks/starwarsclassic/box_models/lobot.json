@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Lobot",
-    "displayNameId": "IDS_DLCSKIN00001237_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.lobot",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001237_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.lobot"
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

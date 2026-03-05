@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Dr Princess",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004426_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.dr_princess"
   },
   "texture": {
     "width": 64,

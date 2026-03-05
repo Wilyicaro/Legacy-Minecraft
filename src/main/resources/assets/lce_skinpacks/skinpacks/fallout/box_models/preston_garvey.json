@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Preston Garvey",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004828_DISPLAYNAME",
+    "displayNameId": "custom.fallout.preston_garvey",
     "themeName": "Fallout 4",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004828_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.preston_garvey"
   },
-  "hide": [ "hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

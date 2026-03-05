@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Park Yoon Hee",
-    "displayNameId": "IDS_DLCSKIN20000018_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.park_yoon_hee",
     "themeName": "SOCOM",
-    "themeNameId": "IDS_DLCSKIN20000018_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.park_yoon_hee"
   },
   "texture": {
     "width": 64,

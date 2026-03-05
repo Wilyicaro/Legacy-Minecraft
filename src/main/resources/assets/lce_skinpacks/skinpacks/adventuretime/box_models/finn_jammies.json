@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Finn Jammies",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004401_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.finn_jammies"
   },
   "texture": {
     "width": 64,

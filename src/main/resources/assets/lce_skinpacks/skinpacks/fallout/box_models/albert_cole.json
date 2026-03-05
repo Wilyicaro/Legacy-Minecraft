@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Albert Cole",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004802_DISPLAYNAME",
+    "displayNameId": "custom.fallout.albert_cole",
     "themeName": "Fallout 1",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004802_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.albert_cole"
   },
   "texture": {
     "width": 64,

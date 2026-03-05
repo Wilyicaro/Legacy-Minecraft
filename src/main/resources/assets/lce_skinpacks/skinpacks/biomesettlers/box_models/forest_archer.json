@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Forest Archer",
-    "displayNameId": "IDS_DLCSKIN00004508_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.forest_archer",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004508_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.forest_archer"
   },
   "texture": {
     "width": 64,

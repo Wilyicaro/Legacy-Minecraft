@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Cake",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004405_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.cake"
   },
   "armorOffsets": {
     "HELMET": {

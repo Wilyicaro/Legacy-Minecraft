@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "4-LOM",
-    "displayNameId": "IDS_DLCSKIN00001255_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.4_lom",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001255_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.4_lom"
   },
   "texture": {
     "width": 64,

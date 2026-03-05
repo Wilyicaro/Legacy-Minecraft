@@ -1,11 +1,14 @@
 {
   "meta": {
     "displayName": "Doorman",
-    "displayNameId": "IDS_DLCSKIN00005602_DISPLAYNAME",
+    "displayNameId": "custom.villians.doorman",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005602_THEMENAME"
+    "themeNameId": "custom.villians.themetext.doorman"
   },
-"hide": ["right_pants", "left_pants"],
+  "hide": [
+    "right_pants",
+    "left_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

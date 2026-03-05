@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Brigadier Lethbridge-Stewart",
-    "displayNameId": "IDS_DLCSKIN00002519_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.brigadier_lethbridge_stewart"
   },
   "armorOffsets": {
     "HELMET": {

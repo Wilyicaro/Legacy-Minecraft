@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "AT-AT Pilot",
-    "displayNameId": "IDS_DLCSKIN00001236_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.at_at_pilot",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001236_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.at_at_pilot"
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

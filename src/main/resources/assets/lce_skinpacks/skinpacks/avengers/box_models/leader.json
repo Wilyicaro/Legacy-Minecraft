@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Leader",
-    "displayNameId": "IDS_dlcskin49316049_DISPLAYNAME",
+    "displayNameId": "custom.avengers.leader",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin49316049_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.leader"
   },
   "texture": {
     "width": 64,

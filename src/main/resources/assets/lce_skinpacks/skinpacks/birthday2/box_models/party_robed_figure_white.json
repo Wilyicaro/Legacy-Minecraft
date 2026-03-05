@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Party Robed Figure - White",
-    "displayNameId": "IDS_DLCSKIN20000423_DISPLAYNAME",
+    "displayNameId": "custom.birthday2.party_robed_figure_white",
     "themeName": "Journey",
-    "themeNameId": "IDS_DLCSKIN20000423_THEMENAME"
+    "themeNameId": "custom.birthday2.themetext.party_robed_figure_white"
   },
   "hide": "hat",
   "texture": {

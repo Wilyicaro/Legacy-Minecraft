@@ -1,274 +1,274 @@
 {
-  "name": "Skin Pack 3",
+  "name": "key:custom.skinpack3.pack.name",
   "author": "4J Studios",
   "skins": [
     {
       "id": "zombie_pigman",
-      "name": "Zombie Pigman",
+      "name": "key:custom.skinpack3.zombie_pigman",
       "texture": "skins/zombie_pigman.png",
       "order": 1
     },
     {
       "id": "zombie_herobrine",
-      "name": "Zombie Herobrine",
+      "name": "key:custom.skinpack3.zombie_herobrine",
       "texture": "skins/zombie_herobrine.png",
       "order": 2
     },
     {
       "id": "cow",
-      "name": "Cow",
+      "name": "key:custom.skinpack3.cow",
       "texture": "skins/cow.png",
       "order": 3
     },
     {
       "id": "skeleton",
-      "name": "Skeleton",
+      "name": "key:custom.skinpack3.skeleton",
       "texture": "skins/skeleton.png",
       "order": 4
     },
     {
       "id": "ittle",
-      "name": "Ittle",
+      "name": "key:custom.skinpack3.ittle",
       "texture": "skins/ittle.png",
       "order": 5
     },
     {
       "id": "lonestar",
-      "name": "Lonestar",
+      "name": "key:custom.skinpack3.lonestar",
       "texture": "skins/lonestar.png",
       "order": 6
     },
     {
       "id": "clunk",
-      "name": "Clunk",
+      "name": "key:custom.skinpack3.clunk",
       "texture": "skins/clunk.png",
       "order": 7
     },
     {
       "id": "yuri",
-      "name": "Yuri",
+      "name": "key:custom.skinpack3.yuri",
       "texture": "skins/yuri.png",
       "order": 8
     },
     {
       "id": "pen_yen",
-      "name": "Pen Yen",
+      "name": "key:custom.skinpack3.pen_yen",
       "texture": "skins/pen_yen.png",
       "order": 9
     },
     {
       "id": "bomack",
-      "name": "Bomack",
+      "name": "key:custom.skinpack3.bomack",
       "texture": "skins/bomack.png",
       "order": 10
     },
     {
       "id": "zephyr",
-      "name": "Zephyr",
+      "name": "key:custom.skinpack3.zephyr",
       "texture": "skins/zephyr.png",
       "order": 11
     },
     {
       "id": "juan",
-      "name": "Juan",
+      "name": "key:custom.skinpack3.juan",
       "texture": "skins/juan.png",
       "order": 12
     },
     {
       "id": "commandervideo",
-      "name": "CommanderVideo",
+      "name": "key:custom.skinpack3.commandervideo",
       "texture": "skins/commandervideo.png",
       "order": 13
     },
     {
       "id": "coach",
-      "name": "Coach",
+      "name": "key:custom.skinpack3.coach",
       "texture": "skins/coach.png",
       "order": 14
     },
     {
       "id": "nick",
-      "name": "Nick",
+      "name": "key:custom.skinpack3.nick",
       "texture": "skins/nick.png",
       "order": 15
     },
     {
       "id": "rochelle",
-      "name": "Rochelle",
+      "name": "key:custom.skinpack3.rochelle",
       "texture": "skins/rochelle.png",
       "order": 16
     },
     {
       "id": "ellis",
-      "name": "Ellis",
+      "name": "key:custom.skinpack3.ellis",
       "texture": "skins/ellis.png",
       "order": 17
     },
     {
       "id": "headcrab_scientist",
-      "name": "Headcrab Scientist",
+      "name": "key:custom.skinpack3.headcrab_scientist",
       "texture": "skins/headcrab_scientist.png",
       "order": 18
     },
     {
       "id": "gordon_freeman",
-      "name": "Gordon Freeman",
+      "name": "key:custom.skinpack3.gordon_freeman",
       "texture": "skins/gordon_freeman.png",
       "order": 19
     },
     {
       "id": "barney_calhoun",
-      "name": "Barney Calhoun",
+      "name": "key:custom.skinpack3.barney_calhoun",
       "texture": "skins/barney_calhoun.png",
       "order": 20
     },
     {
       "id": "dr_rosenberg",
-      "name": "Dr Rosenberg",
+      "name": "key:custom.skinpack3.dr_rosenberg",
       "texture": "skins/dr_rosenberg.png",
       "order": 21
     },
     {
       "id": "chell",
-      "name": "Chell",
+      "name": "key:custom.skinpack3.chell",
       "texture": "skins/chell.png",
       "order": 22
     },
     {
       "id": "atlas",
-      "name": "Atlas",
+      "name": "key:custom.skinpack3.atlas",
       "texture": "skins/atlas.png",
       "order": 23
     },
     {
       "id": "p_body",
-      "name": "P-Body",
+      "name": "key:custom.skinpack3.p_body",
       "texture": "skins/p_body.png",
       "order": 24
     },
     {
       "id": "the_g_man",
-      "name": "The G-Man",
+      "name": "key:custom.skinpack3.the_g_man",
       "texture": "skins/the_g_man.png",
       "order": 25
     },
     {
       "id": "alyx_vance",
-      "name": "Alyx Vance",
+      "name": "key:custom.skinpack3.alyx_vance",
       "texture": "skins/alyx_vance.png",
       "order": 26
     },
     {
       "id": "eli_vance",
-      "name": "Eli Vance",
+      "name": "key:custom.skinpack3.eli_vance",
       "texture": "skins/eli_vance.png",
       "order": 27
     },
     {
       "id": "jak",
-      "name": "Jak",
+      "name": "key:custom.skinpack3.jak",
       "texture": "skins/jak.png",
       "order": 28
     },
     {
       "id": "daxter",
-      "name": "Daxter",
+      "name": "key:custom.skinpack3.daxter",
       "texture": "skins/daxter.png",
       "order": 29
     },
     {
       "id": "iota",
-      "name": "Iota",
+      "name": "key:custom.skinpack3.iota",
       "texture": "skins/iota.png",
       "order": 30
     },
     {
       "id": "atoi",
-      "name": "Atoi",
+      "name": "key:custom.skinpack3.atoi",
       "texture": "skins/atoi.png",
       "order": 31
     },
     {
       "id": "wendigo",
-      "name": "Wendigo",
+      "name": "key:custom.skinpack3.wendigo",
       "texture": "skins/wendigo.png",
       "order": 32
     },
     {
       "id": "scrap",
-      "name": "Scrap",
+      "name": "key:custom.skinpack3.scrap",
       "texture": "skins/scrap.png",
       "order": 33
     },
     {
       "id": "cyclops",
-      "name": "Cyclops",
+      "name": "key:custom.skinpack3.cyclops",
       "texture": "skins/cyclops.png",
       "order": 34
     },
     {
       "id": "yuna",
-      "name": "Yuna",
+      "name": "key:custom.skinpack3.yuna",
       "texture": "skins/yuna.png",
       "order": 35
     },
     {
       "id": "yamato",
-      "name": "Yamato",
+      "name": "key:custom.skinpack3.yamato",
       "texture": "skins/yamato.png",
       "order": 36
     },
     {
       "id": "castaway",
-      "name": "Castaway",
+      "name": "key:custom.skinpack3.castaway",
       "texture": "skins/castaway.png",
       "order": 0.1
     },
     {
       "id": "vagrant",
-      "name": "Vagrant",
+      "name": "key:custom.skinpack3.vagrant",
       "texture": "skins/vagrant.png",
       "order": 0.2
     },
     {
       "id": "carpenter",
-      "name": "Carpenter",
+      "name": "key:custom.skinpack3.carpenter",
       "texture": "skins/carpenter.png",
       "order": 0.3
     },
     {
       "id": "blacksmith",
-      "name": "Blacksmith",
+      "name": "key:custom.skinpack3.blacksmith",
       "texture": "skins/blacksmith.png",
       "order": 0.4
     },
     {
       "id": "scribe",
-      "name": "Scribe",
+      "name": "key:custom.skinpack3.scribe",
       "texture": "skins/scribe.png",
       "order": 0.5
     },
     {
       "id": "guard",
-      "name": "Guard",
+      "name": "key:custom.skinpack3.guard",
       "texture": "skins/guard.png",
       "order": 0.6
     },
     {
       "id": "farmer",
-      "name": "Farmer",
+      "name": "key:custom.skinpack3.farmer",
       "texture": "skins/farmer.png",
       "order": 0.7
     },
     {
       "id": "peasant",
-      "name": "Peasant",
+      "name": "key:custom.skinpack3.peasant",
       "texture": "skins/peasant.png",
       "order": 0.8
     },
     {
       "id": "baron",
-      "name": "Baron",
+      "name": "key:custom.skinpack3.baron",
       "texture": "skins/baron.png",
       "order": 0.9
     }

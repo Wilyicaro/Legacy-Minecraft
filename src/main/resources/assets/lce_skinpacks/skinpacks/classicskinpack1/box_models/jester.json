@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Jester",
-    "displayNameId": "IDS_DLCSKIN00000041_DISPLAYNAME"
+    "displayNameId": "custom.classicskinpack1.jester"
   },
   "texture": {
     "width": 64,

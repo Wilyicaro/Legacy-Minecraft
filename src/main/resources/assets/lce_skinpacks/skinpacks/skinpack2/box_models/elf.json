@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Elf",
-    "displayNameId": "IDS_DLCSKIN20000117_DISPLAYNAME"
+    "displayNameId": "custom.skinpack2.elf"
   },
   "texture": {
     "width": 64,

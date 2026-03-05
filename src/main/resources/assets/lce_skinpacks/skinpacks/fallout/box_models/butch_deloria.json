@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Butch DeLoria",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004812_DISPLAYNAME",
+    "displayNameId": "custom.fallout.butch_deloria",
     "themeName": "Fallout 3",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004812_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.butch_deloria"
   },
   "texture": {
     "width": 64,

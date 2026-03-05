@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Ghoul",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003211_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.ghoul"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Party Pig",
-    "displayNameId": "IDS_DLCSKIN00000707_DISPLAYNAME"
+    "displayNameId": "custom.birthday.party_pig"
   },
   "texture": {
     "width": 64,

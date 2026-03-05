@@ -1,11 +1,14 @@
 {
   "meta": {
     "displayName": "Stocking",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002715_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.stocking",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002715_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.stocking"
   },
-"hide": ["arms", "head"],
+  "hide": [
+    "arms",
+    "head"
+  ],
   "texture": {
     "width": 64,
     "height": 64

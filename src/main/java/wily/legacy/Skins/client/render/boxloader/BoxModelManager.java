@@ -393,13 +393,33 @@ public final class BoxModelManager {
 
     private static String trMaybe(String key) {
         if (key == null || key.isBlank()) return null;
+        String k = key.startsWith("key:") ? key.substring(4) : key;
         try {
-            String v = I18n.get(key);
-            if (v == null || v.isEmpty() || v.equals(key)) return null;
-            return v;
-        } catch (Throwable t) {
-            return null;
+            String ev = wily.legacy.Skins.client.lang.SkinPackLang.get(k);
+            if (ev != null && !ev.isEmpty() && !ev.equals(k)) return ev;
+            String v = I18n.get(k);
+            if (v != null && !v.isEmpty() && !v.equals(k)) return v;
+        } catch (Throwable ignored) {
         }
+        int us = k.lastIndexOf('_');
+        if (us > 0) {
+            boolean digits = true;
+            for (int i = us + 1; i < k.length(); i++) {
+                char c = k.charAt(i);
+                if (c < '0' || c > '9') { digits = false; break; }
+            }
+            if (digits) {
+                String base = k.substring(0, us);
+                try {
+                    String ev = wily.legacy.Skins.client.lang.SkinPackLang.get(base);
+                    if (ev != null && !ev.isEmpty() && !ev.equals(base)) return ev;
+                    String v = I18n.get(base);
+                    if (v != null && !v.isEmpty() && !v.equals(base)) return v;
+                } catch (Throwable ignored) {
+                }
+            }
+        }
+        return null;
     }
 
     public static String getThemeText(ResourceLocation id) {

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Ymir",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004646_DISPLAYNAME",
+    "displayNameId": "custom.norsemythology.ymir",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004646_THEMENAME"
+    "themeNameId": "custom.norsemythology.themetext.ymir"
   },
   "armorOffsets": {
     "BODY": {
@@ -57,7 +57,13 @@
       "z": 0.0
     }
   },
-  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

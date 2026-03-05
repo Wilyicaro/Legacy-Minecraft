@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Jake",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004404_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.jake"
   },
   "armorOffsets": {
     "HELMET": {

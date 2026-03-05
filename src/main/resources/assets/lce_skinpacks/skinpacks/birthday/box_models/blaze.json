@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Blaze",
-    "displayNameId": "IDS_DLCSKIN00000718_DISPLAYNAME"
+    "displayNameId": "custom.birthday.blaze"
   },
   "texture": {
     "width": 64,

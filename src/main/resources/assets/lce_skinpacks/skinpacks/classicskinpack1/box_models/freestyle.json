@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Freestyle",
-    "displayNameId": "IDS_DLCSKIN00000022_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.freestyle",
     "themeName": "Trials Evolution",
-    "themeNameId": "IDS_DLCSKIN00000022_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.freestyle"
   },
   "texture": {
     "width": 64,

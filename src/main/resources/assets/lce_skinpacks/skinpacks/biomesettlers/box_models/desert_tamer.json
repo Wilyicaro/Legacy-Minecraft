@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Desert Tamer",
-    "displayNameId": "IDS_DLCSKIN00004507_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.desert_tamer",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004507_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.desert_tamer"
   },
   "texture": {
     "width": 64,

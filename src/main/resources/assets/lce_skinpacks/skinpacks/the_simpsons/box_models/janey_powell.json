@@ -1,9 +1,15 @@
 {
   "meta": {
     "displayName": "Janey Powell",
-    "displayNameId": "IDS_DLCSKIN00002119_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.janey_powell"
   },
-  "hide": ["HEAD", "HAT", "BODY", "LEFT_ARM", "RIGHT_ARM"],
+  "hide": [
+    "HEAD",
+    "HAT",
+    "BODY",
+    "LEFT_ARM",
+    "RIGHT_ARM"
+  ],
   "texture": {
     "width": 64,
     "height": 64

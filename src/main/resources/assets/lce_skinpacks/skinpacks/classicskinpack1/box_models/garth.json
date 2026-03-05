@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Garth",
-    "displayNameId": "IDS_DLCSKIN00000006_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.garth",
     "themeName": "Fable Heroes",
-    "themeNameId": "IDS_DLCSKIN00000006_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.garth"
   },
   "texture": {
     "width": 64,

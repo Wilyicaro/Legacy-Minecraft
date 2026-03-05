@@ -1,10 +1,13 @@
 {
   "meta": {
     "displayName": "Viola",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004434_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.viola"
   },
-"hide": ["right_sleeve", "left_sleeve"],
-  "texture": { 
+  "hide": [
+    "right_sleeve",
+    "left_sleeve"
+  ],
+  "texture": {
     "width": 64,
     "height": 64
   },

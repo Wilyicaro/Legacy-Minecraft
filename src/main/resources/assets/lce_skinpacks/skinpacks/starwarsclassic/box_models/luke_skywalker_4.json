@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Luke Skywalker",
-    "displayNameId": "IDS_DLCSKIN00001203_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.luke_skywalker_4",
     "themeName": "Hoth",
-    "themeNameId": "IDS_DLCSKIN00001203_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.luke_skywalker_4"
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

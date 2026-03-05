@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Bossk",
-    "displayNameId": "IDS_DLCSKIN00001231_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.bossk",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001231_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.bossk"
   },
   "texture": {
     "width": 64,

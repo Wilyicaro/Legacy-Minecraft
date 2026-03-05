@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Desert Archer",
-    "displayNameId": "IDS_DLCSKIN00004500_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.desert_archer",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004500_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.desert_archer"
   },
   "texture": {
     "width": 64,

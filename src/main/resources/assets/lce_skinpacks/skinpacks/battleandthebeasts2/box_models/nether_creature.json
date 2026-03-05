@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Nether Creature",
-    "displayNameId": "IDS_DLCSKIN00001003_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.nether_creature"
   },
   "texture": {
     "width": 64,

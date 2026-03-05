@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mrs. Edna Krabappel",
-    "displayNameId": "IDS_DLCSKIN00002106_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.mrs_edna_krabappel"
   },
   "hide": "head",
   "armorOffsets": {

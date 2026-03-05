@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Nathan Drake",
-    "displayNameId": "IDS_DLCSKIN20000023_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.nathan_drake",
     "themeName": "Uncharted",
-    "themeNameId": "IDS_DLCSKIN20000023_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.nathan_drake"
   },
   "texture": {
     "width": 64,

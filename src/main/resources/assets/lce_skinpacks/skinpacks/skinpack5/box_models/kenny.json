@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Kenny",
-    "displayNameId": "IDS_dlcskin33352839_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.kenny",
     "themeName": "The Walking Dead",
-    "themeNameId": "IDS_dlcskin33352839_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.kenny"
   },
   "texture": {
     "width": 64,

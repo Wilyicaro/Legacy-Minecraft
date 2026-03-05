@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Jak",
-    "displayNameId": "IDS_DLCSKIN20000227_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.jak",
     "themeName": "Jak and Daxter",
-    "themeNameId": "IDS_DLCSKIN20000227_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.jak"
   },
   "texture": {
     "width": 64,

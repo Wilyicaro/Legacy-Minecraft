@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Nether Banished",
-    "displayNameId": "IDS_DLCSKIN00005313_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.nether_banished"
   },
   "texture": {
     "width": 64,

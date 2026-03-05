@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Emperor",
-    "displayNameId": "IDS_DLCSKIN00001235_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.emperor",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001235_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.emperor"
   },
   "texture": {
     "width": 64,

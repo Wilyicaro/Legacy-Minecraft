@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Cowhand",
-    "displayNameId": "IDS_DLCSKIN00000840_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.cowhand_2"
   },
   "texture": {
     "width": 64,

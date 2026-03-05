@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Evil Robot",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003213_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.evil_robot"
   },
   "texture": {
     "width": 64,

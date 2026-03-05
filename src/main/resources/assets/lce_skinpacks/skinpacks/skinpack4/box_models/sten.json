@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Sten",
-    "displayNameId": "IDS_dlcskin90164099_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.sten",
     "themeName": "Dragon Age",
-    "themeNameId": "IDS_dlcskin90164099_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.sten"
   },
   "texture": {
     "width": 64,

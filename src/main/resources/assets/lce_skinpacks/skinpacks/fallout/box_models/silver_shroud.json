@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Silver Shroud",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004829_DISPLAYNAME",
+    "displayNameId": "custom.fallout.silver_shroud",
     "themeName": "Fallout 4",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004829_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.silver_shroud"
   },
   "texture": {
     "width": 64,

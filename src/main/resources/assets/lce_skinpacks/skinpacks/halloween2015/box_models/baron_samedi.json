@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Baron Samedi",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003244_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.baron_samedi"
   },
   "texture": {
     "width": 64,

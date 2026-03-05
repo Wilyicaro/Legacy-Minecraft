@@ -3,7 +3,7 @@
     "displayName": "Wicket W. Warrick",
     "displayNameId": "IDS_DLCSKIN00001253_DISPLAYNAME",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001253_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.wicket_w_warrick"
   },
   "offsets": {
     "head":         { "x": 0, "y": 17, "z": 0 },

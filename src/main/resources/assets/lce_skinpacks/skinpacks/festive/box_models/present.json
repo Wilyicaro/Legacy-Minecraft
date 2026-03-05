@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Present",
-    "displayNameId": "IDS_DLCSKIN00000614_DISPLAYNAME"
+    "displayNameId": "custom.festive.present"
   },
   "texture": {
     "width": 64,

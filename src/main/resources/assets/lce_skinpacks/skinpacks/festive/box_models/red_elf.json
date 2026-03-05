@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Red Elf",
-    "displayNameId": "IDS_DLCSKIN00000604_DISPLAYNAME"
+    "displayNameId": "custom.festive.red_elf"
   },
   "texture": {
     "width": 64,

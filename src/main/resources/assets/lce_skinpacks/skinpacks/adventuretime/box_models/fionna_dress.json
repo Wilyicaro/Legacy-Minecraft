@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Fionna Dress",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004403_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.fionna_dress"
   },
   "texture": {
     "width": 64,

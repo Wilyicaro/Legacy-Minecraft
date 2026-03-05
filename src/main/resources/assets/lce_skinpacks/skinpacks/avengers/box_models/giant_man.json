@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Giant-Man",
-    "displayNameId": "IDS_dlcskin98789676_DISPLAYNAME",
+    "displayNameId": "custom.avengers.giant_man",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin98789676_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.giant_man"
   },
   "texture": {
     "width": 64,

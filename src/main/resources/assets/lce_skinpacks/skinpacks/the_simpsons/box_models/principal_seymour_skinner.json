@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Principal Seymour Skinner",
-    "displayNameId": "IDS_DLCSKIN00002105_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.principal_seymour_skinner"
   },
   "hide": "head",
   "armorOffsets": {

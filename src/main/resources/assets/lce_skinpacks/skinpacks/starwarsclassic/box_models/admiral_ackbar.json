@@ -1,11 +1,14 @@
 {
   "meta": {
     "displayName": "Admiral Ackbar",
-    "displayNameId": "IDS_DLCSKIN00001247_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.admiral_ackbar",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001247_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.admiral_ackbar"
   },
-"hide":["hat", "head"],
+  "hide": [
+    "hat",
+    "head"
+  ],
   "texture": {
     "width": 64,
     "height": 64

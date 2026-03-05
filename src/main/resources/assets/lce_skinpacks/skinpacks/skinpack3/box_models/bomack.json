@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Bomack",
-    "displayNameId": "IDS_DLCSKIN20000209_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.bomack",
     "themeName": "Slam Bolt Scrappers",
-    "themeNameId": "IDS_DLCSKIN20000209_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.bomack"
   },
   "texture": {
     "width": 64,

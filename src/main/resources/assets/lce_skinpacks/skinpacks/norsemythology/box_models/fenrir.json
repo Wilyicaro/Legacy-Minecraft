@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Fenrir",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004642_DISPLAYNAME",
+    "displayNameId": "custom.norsemythology.fenrir",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004642_THEMENAME"
+    "themeNameId": "custom.norsemythology.themetext.fenrir"
   },
   "armorOffsets": {
     "HELMET": {
@@ -12,7 +12,13 @@
       "z": 0.0
     }
   },
-  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

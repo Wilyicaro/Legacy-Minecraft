@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Flame Atronach",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001429_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.flame_atronach",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001429_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.flame_atronach"
   },
   "texture": {
     "width": 64,

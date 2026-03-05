@@ -1,11 +1,15 @@
 {
   "meta": {
     "displayName": "Chinese Dragon Head",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005134_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.chinese_dragon_head",
     "themeName": "Dragon Dancer Suit",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005134_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.chinese_dragon_head"
   },
-  "hide": ["left_sleeve", "right_sleeve", "pants"],
+  "hide": [
+    "left_sleeve",
+    "right_sleeve",
+    "pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

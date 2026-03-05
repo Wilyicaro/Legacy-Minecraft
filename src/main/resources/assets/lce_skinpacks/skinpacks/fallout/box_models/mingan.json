@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Mingan",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004806_DISPLAYNAME",
+    "displayNameId": "custom.fallout.mingan",
     "themeName": "Fallout 2",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004806_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.mingan"
   },
   "texture": {
     "width": 64,

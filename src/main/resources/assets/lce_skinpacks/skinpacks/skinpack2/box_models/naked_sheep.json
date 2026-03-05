@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Naked Sheep",
-    "displayNameId": "IDS_DLCSKIN20000103_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.naked_sheep",
     "themeName": "Minecraft",
-    "themeNameId": "IDS_DLCSKIN20000103_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.naked_sheep"
   },
   "texture": {
     "width": 64,

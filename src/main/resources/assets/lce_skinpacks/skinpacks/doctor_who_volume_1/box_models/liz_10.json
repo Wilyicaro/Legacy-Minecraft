@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Liz 10",
-    "displayNameId": "IDS_DLCSKIN00002038_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.liz_10"
   },
   "texture": {
     "width": 64,

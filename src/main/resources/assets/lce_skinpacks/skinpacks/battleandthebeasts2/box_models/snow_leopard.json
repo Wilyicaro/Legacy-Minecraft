@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Snow Leopard",
-    "displayNameId": "IDS_DLCSKIN00001005_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.snow_leopard"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Chang'e",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005115_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.change",
     "themeName": "Moon Goddess",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005115_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.change"
   },
   "texture": {
     "width": 64,

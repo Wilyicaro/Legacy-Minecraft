@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Spider",
-    "displayNameId": "IDS_DLCSKIN20000104_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.spider",
     "themeName": "Minecraft",
-    "themeNameId": "IDS_DLCSKIN20000104_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.spider"
   },
   "texture": {
     "width": 64,

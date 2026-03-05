@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Party Skeleton",
-    "displayNameId": "IDS_DLCSKIN00000705_DISPLAYNAME"
+    "displayNameId": "custom.birthday.party_skeleton"
   },
   "texture": {
     "width": 64,

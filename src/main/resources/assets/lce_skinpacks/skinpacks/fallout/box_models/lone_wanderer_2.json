@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Lone Wanderer",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004810_DISPLAYNAME",
+    "displayNameId": "custom.fallout.lone_wanderer_2",
     "themeName": "Fallout 3",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004810_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.lone_wanderer_2"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Red Boy",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005106_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.red_boy",
     "themeName": "Boy Sage King",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005106_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.red_boy"
   },
   "texture": {
     "width": 64,

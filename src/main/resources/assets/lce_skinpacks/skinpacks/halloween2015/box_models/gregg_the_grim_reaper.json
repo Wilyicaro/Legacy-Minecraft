@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Gregg the Grim Reaper",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003214_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.gregg_the_grim_reaper"
   },
   "texture": {
     "width": 64,

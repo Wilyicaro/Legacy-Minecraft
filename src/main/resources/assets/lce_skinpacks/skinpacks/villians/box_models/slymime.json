@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Slymime",
-    "displayNameId": "IDS_DLCSKIN00005612_DISPLAYNAME",
+    "displayNameId": "custom.villians.slymime",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005612_THEMENAME"
+    "themeNameId": "custom.villians.themetext.slymime"
   },
   "texture": {
     "width": 64,

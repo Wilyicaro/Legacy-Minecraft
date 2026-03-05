@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Christa",
-    "displayNameId": "IDS_dlcskin94179428_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.christa",
     "themeName": "The Walking Dead",
-    "themeNameId": "IDS_dlcskin94179428_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.christa"
   },
   "texture": {
     "width": 64,

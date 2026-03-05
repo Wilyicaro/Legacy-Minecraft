@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Bisector",
-    "displayNameId": "IDS_DLCSKIN00005600_DISPLAYNAME",
+    "displayNameId": "custom.villians.bisector",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005600_THEMENAME"
+    "themeNameId": "custom.villians.themetext.bisector"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Twelfth Doctor",
-    "displayNameId": "IDS_DLCSKIN00002058_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.the_twelfth_doctor"
   },
   "texture": {
     "width": 64,

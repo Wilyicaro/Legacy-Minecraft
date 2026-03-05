@@ -1,10 +1,13 @@
 {
   "meta": {
     "displayName": "Ellegaard Armored",
-    "displayNameId": "IDS_DLCSKIN00005010_DISPLAYNAME"
+    "displayNameId": "custom.storymode.ellegaard_armored"
   },
   "mirror_limbs": true,
-  "hide": ["jacket", "left_arm"],
+  "hide": [
+    "jacket",
+    "left_arm"
+  ],
   "texture": {
     "width": 64,
     "height": 64

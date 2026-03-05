@@ -1,11 +1,16 @@
 {
   "meta": {
     "displayName": "Cake Maniac",
-    "displayNameId": "IDS_DLCSKIN00005601_DISPLAYNAME",
+    "displayNameId": "custom.villians.cake_maniac",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005601_THEMENAME"
+    "themeNameId": "custom.villians.themetext.cake_maniac"
   },
-"hide": ["jacket", "hat", "right_pants", "left_pants"],
+  "hide": [
+    "jacket",
+    "hat",
+    "right_pants",
+    "left_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

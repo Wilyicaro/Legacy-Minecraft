@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Red Knight",
-    "displayNameId": "IDS_DLCSKIN20000143_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.red_knight",
     "themeName": "Castle Crashers",
-    "themeNameId": "IDS_DLCSKIN20000143_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.red_knight"
   },
   "texture": {
     "width": 64,

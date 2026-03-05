@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Yeti",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002718_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.yeti",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002718_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.yeti"
   },
   "armorOffsets": {
     "HELMET": {
@@ -27,7 +27,10 @@
       "z": 0.0
     }
   },
-"hide": ["head", "hat"],
+  "hide": [
+    "head",
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

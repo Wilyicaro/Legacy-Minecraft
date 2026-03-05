@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Second Doctor",
-    "displayNameId": "IDS_DLCSKIN00002505_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.the_second_doctor"
   },
   "texture": {
     "width": 64,

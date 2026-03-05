@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Imperial French Soldier",
-    "displayNameId": "IDS_DLCSKIN00000832_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.imperial_french_soldier"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Black Turtle",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005140_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.black_turtle",
     "themeName": "Northern Symbol",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005140_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.black_turtle"
   },
   "texture": {
     "width": 64,

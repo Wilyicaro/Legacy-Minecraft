@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Barbarian",
-    "displayNameId": "IDS_DLCSKIN00001041_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.barbarian"
   },
   "texture": {
     "width": 64,

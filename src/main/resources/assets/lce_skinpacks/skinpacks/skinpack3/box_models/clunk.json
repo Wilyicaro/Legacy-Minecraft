@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Clunk",
-    "displayNameId": "IDS_DLCSKIN20000206_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.clunk",
     "themeName": "Awesomenauts",
-    "themeNameId": "IDS_DLCSKIN20000206_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.clunk"
   },
   "texture": {
     "width": 64,

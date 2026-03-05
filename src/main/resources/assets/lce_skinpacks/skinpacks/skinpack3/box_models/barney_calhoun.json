@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Barney Calhoun",
-    "displayNameId": "IDS_DLCSKIN20000219_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.barney_calhoun",
     "themeName": "Half Life",
-    "themeNameId": "IDS_DLCSKIN20000219_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.barney_calhoun"
   },
   "texture": {
     "width": 64,

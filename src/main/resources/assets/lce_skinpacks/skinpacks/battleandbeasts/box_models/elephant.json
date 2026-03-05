@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Elephant",
-    "displayNameId": "IDS_DLCSKIN00000811_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.elephant"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Forest Engineer",
-    "displayNameId": "IDS_DLCSKIN00004511_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.forest_engineer",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004511_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.forest_engineer"
   },
   "texture": {
     "width": 64,

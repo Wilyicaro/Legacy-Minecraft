@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Ching",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005141_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.ching",
     "themeName": "Chinese Opera",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005141_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.ching"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Angel of Liberty",
-    "displayNameId": "IDS_DLCSKIN00002028_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.angel_of_liberty"
   },
   "poses": "weeping_statue",
   "texture": {

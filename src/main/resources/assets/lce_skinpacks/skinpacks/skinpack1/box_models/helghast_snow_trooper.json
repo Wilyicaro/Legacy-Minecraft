@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Helghast Snow Trooper",
-    "displayNameId": "IDS_DLCSKIN20000009_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.helghast_snow_trooper",
     "themeName": "Killzone",
-    "themeNameId": "IDS_DLCSKIN20000009_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.helghast_snow_trooper"
   },
   "texture": {
     "width": 64,

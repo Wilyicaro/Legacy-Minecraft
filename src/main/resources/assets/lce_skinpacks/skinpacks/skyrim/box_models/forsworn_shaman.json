@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Forsworn Shaman",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001409_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.forsworn_shaman",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001409_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.forsworn_shaman"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Desert Brawler",
-    "displayNameId": "IDS_DLCSKIN00004501_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.desert_brawler",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004501_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.desert_brawler"
   },
   "texture": {
     "width": 64,

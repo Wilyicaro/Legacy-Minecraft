@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Moira Brown",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004814_DISPLAYNAME",
+    "displayNameId": "custom.fallout.moira_brown",
     "themeName": "Fallout 3",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004814_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.moira_brown"
   },
   "texture": {
     "width": 64,

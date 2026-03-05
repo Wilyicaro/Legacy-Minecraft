@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Nick Valentine",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004827_DISPLAYNAME",
+    "displayNameId": "custom.fallout.nick_valentine",
     "themeName": "Fallout 4",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004827_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.nick_valentine"
   },
-  "hide": [ "hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

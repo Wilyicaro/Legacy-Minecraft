@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Captain Qwark",
-    "displayNameId": "IDS_DLCSKIN20000120_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.captain_qwark",
     "themeName": "Ratchet and Clank",
-    "themeNameId": "IDS_DLCSKIN20000120_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.captain_qwark"
   },
   "texture": {
     "width": 64,

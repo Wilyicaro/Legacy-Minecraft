@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Scrooge",
-    "displayNameId": "IDS_DLCSKIN00000622_DISPLAYNAME"
+    "displayNameId": "custom.festive.scrooge"
   },
   "texture": {
     "width": 64,

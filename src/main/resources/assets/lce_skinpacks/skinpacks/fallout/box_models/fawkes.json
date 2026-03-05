@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Fawkes",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004813_DISPLAYNAME",
+    "displayNameId": "custom.fallout.fawkes",
     "themeName": "Fallout 3",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004813_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.fawkes"
   },
   "texture": {
     "width": 64,

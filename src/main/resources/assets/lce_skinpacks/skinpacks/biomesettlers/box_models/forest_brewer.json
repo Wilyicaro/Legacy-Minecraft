@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Forest Brewer",
-    "displayNameId": "IDS_DLCSKIN00004510_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.forest_brewer",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004510_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.forest_brewer"
   },
   "texture": {
     "width": 64,

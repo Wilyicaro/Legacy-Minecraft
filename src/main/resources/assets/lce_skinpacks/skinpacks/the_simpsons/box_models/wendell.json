@@ -1,9 +1,15 @@
 {
   "meta": {
     "displayName": "Wendell",
-    "displayNameId": "IDS_DLCSKIN00002116_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.wendell"
   },
-  "hide": ["HEAD", "HAT", "BODY", "LEFT_ARM", "RIGHT_ARM"],
+  "hide": [
+    "HEAD",
+    "HAT",
+    "BODY",
+    "LEFT_ARM",
+    "RIGHT_ARM"
+  ],
   "texture": {
     "width": 64,
     "height": 64

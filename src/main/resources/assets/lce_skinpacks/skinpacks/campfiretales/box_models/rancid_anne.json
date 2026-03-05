@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Rancid Anne",
-    "displayNameId": "IDS_DLCSKIN00005507_DISPLAYNAME"
+    "displayNameId": "custom.campfiretales.rancid_anne"
   },
   "texture": {
     "width": 64,

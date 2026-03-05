@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Party Enderman",
-    "displayNameId": "IDS_DLCSKIN00000706_DISPLAYNAME"
+    "displayNameId": "custom.birthday.party_enderman"
   },
   "texture": {
     "width": 64,

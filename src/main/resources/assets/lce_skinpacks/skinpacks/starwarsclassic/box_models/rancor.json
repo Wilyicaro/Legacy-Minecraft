@@ -1,11 +1,11 @@
 {
   "meta": {
     "displayName": "Rancor",
-    "displayNameId": "IDS_DLCSKIN00001254_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.rancor",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001254_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.rancor"
   },
-"hide": "right_leg",
+  "hide": "right_leg",
   "texture": {
     "width": 64,
     "height": 64

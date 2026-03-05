@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Cyclops",
-    "displayNameId": "IDS_DLCSKIN20000233_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.cyclops",
     "themeName": "Tearaway",
-    "themeNameId": "IDS_DLCSKIN20000233_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.cyclops"
   },
   "texture": {
     "width": 64,

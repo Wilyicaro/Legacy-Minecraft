@@ -1,10 +1,14 @@
 {
   "meta": {
     "displayName": "Gabriel",
-    "displayNameId": "IDS_DLCSKIN00005008_DISPLAYNAME"
+    "displayNameId": "custom.storymode.gabriel"
   },
   "mirror_limbs": true,
-  "hide": ["jacket", "left_arm", "left_leg"],
+  "hide": [
+    "jacket",
+    "left_arm",
+    "left_leg"
+  ],
   "texture": {
     "width": 64,
     "height": 64

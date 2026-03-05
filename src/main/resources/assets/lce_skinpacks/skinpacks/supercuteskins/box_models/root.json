@@ -1,11 +1,16 @@
 {
   "meta": {
     "displayName": "Root",
-    "displayNameId": "IDS_SKINS_DLCSKIN00007414_DISPLAYNAME",
+    "displayNameId": "custom.supercuteskins.root",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00007414_THEMENAME"
+    "themeNameId": "custom.supercuteskins.themetext.root"
   },
-"hide": ["left_arm", "left_leg", "right_leg", "right_arm"],
+  "hide": [
+    "left_arm",
+    "left_leg",
+    "right_leg",
+    "right_arm"
+  ],
   "texture": {
     "width": 64,
     "height": 64

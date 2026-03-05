@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Vixen",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002708_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.vixen",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002708_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.vixen"
   },
   "texture": {
     "width": 64,

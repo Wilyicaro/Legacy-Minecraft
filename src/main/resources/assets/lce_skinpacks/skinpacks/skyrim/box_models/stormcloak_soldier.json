@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Stormcloak Soldier",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001416_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.stormcloak_soldier",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001416_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.stormcloak_soldier"
   },
   "texture": {
     "width": 64,

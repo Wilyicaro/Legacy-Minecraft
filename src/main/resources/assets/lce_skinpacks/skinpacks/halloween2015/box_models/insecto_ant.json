@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Insecto Ant",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003220_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.insecto_ant"
   },
   "texture": {
     "width": 64,

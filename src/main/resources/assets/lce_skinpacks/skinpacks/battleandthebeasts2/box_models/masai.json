@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Masai",
-    "displayNameId": "IDS_DLCSKIN00001022_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.masai"
   },
   "texture": {
     "width": 64,

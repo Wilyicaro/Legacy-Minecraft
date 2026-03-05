@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Panther",
-    "displayNameId": "IDS_DLCSKIN00000805_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.panther"
   },
   "texture": {
     "width": 64,

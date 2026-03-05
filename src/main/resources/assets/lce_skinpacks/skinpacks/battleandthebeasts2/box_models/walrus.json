@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Walrus",
-    "displayNameId": "IDS_DLCSKIN00001014_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.walrus"
   },
   "texture": {
     "width": 64,

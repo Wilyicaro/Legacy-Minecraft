@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Sea Devil",
-    "displayNameId": "IDS_DLCSKIN00002543_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.sea_devil"
   },
   "armorOffsets": {
     "HELMET": {

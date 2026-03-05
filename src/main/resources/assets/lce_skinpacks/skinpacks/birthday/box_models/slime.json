@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Slime",
-    "displayNameId": "IDS_DLCSKIN00000722_DISPLAYNAME"
+    "displayNameId": "custom.birthday.slime"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Mooshroom Farmer",
-    "displayNameId": "IDS_DLCSKIN00005305_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.mooshroom_farmer"
   },
-"hide": "left_sleeve",
+  "hide": "left_sleeve",
   "texture": {
     "width": 64,
     "height": 64

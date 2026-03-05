@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Wolf",
-    "displayNameId": "IDS_dlcskin06388564_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.wolf",
     "themeName": "Minecraft",
-    "themeNameId": "IDS_dlcskin06388564_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.wolf"
   },
   "texture": {
     "width": 64,

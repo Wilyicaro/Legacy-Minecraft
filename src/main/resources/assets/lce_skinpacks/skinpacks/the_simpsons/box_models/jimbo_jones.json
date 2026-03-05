@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Jimbo Jones",
-    "displayNameId": "IDS_DLCSKIN00002111_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.jimbo_jones"
   },
   "armorOffsets": {
     "HELMET": {

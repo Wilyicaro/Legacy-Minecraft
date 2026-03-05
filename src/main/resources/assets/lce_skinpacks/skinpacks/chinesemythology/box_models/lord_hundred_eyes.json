@@ -1,11 +1,17 @@
 {
   "meta": {
     "displayName": "Lord Hundred Eyes",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005110_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.lord_hundred_eyes",
     "themeName": "Centipede Demon",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005110_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.lord_hundred_eyes"
   },
-  "hide": [ "hat", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "hat",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

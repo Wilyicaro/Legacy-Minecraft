@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Vaas Montenegro",
-    "displayNameId": "IDS_dlcskin74620679_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.vaas_montenegro",
     "themeName": "Far Cry 3",
-    "themeNameId": "IDS_dlcskin74620679_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.vaas_montenegro"
   },
   "texture": {
     "width": 64,

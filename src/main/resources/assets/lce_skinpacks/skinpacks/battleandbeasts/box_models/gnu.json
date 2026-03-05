@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Gnu",
-    "displayNameId": "IDS_DLCSKIN00000815_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.gnu"
   },
   "texture": {
     "width": 64,

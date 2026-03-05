@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Hedgehog",
-    "displayNameId": "IDS_DLCSKIN00001019_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.hedgehog"
   },
   "texture": {
     "width": 64,

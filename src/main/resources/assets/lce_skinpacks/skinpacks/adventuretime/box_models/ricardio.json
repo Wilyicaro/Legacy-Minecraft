@@ -1,9 +1,17 @@
 {
   "meta": {
     "displayName": "Ricardio",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004420_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.ricardio"
   },
-  "hide": ["body", "limbs", "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "body",
+    "limbs",
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

@@ -1,11 +1,14 @@
 {
   "meta": {
     "displayName": "Rhinoceros King",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005122_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.rhinoceros_king",
     "themeName": "One-Horned Demon",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005122_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.rhinoceros_king"
   },
-  "hide": ["body", "limbs"],
+  "hide": [
+    "body",
+    "limbs"
+  ],
   "texture": {
     "width": 64,
     "height": 64

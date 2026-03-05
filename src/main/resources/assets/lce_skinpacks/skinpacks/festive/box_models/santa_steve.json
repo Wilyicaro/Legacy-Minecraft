@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Santa Steve",
-    "displayNameId": "IDS_DLCSKIN00000610_DISPLAYNAME"
+    "displayNameId": "custom.festive.santa_steve"
   },
   "texture": {
     "width": 64,

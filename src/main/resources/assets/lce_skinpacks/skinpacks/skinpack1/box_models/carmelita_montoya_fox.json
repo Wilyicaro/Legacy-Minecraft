@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Carmelita Montoya Fox",
-    "displayNameId": "IDS_DLCSKIN20000013_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.carmelita_montoya_fox",
     "themeName": "Sly Cooper",
-    "themeNameId": "IDS_DLCSKIN20000013_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.carmelita_montoya_fox"
   },
   "texture": {
     "width": 64,

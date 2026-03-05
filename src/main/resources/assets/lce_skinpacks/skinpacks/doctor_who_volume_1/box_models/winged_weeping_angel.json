@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Winged Weeping Angel",
-    "displayNameId": "IDS_DLCSKIN00002029_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.winged_weeping_angel"
   },
   "texture": {
     "width": 64,

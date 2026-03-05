@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "British Soldier",
-    "displayNameId": "IDS_dlcskin94134659_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.british_soldier",
     "themeName": "World War 2",
-    "themeNameId": "IDS_dlcskin94134659_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.british_soldier"
   },
   "texture": {
     "width": 64,

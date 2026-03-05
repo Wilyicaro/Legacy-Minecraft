@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Scarecrow",
-    "displayNameId": "IDS_DLCSKIN00002532_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.scarecrow"
   },
   "texture": {
     "width": 64,

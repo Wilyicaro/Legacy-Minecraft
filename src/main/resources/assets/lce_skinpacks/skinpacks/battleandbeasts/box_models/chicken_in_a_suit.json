@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Chicken in a Suit",
-    "displayNameId": "IDS_DLCSKIN00000803_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.chicken_in_a_suit"
   },
   "texture": {
     "width": 64,

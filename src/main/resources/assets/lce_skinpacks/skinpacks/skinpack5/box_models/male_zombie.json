@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Male Zombie",
-    "displayNameId": "IDS_dlcskin10198573_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.male_zombie",
     "themeName": "The Walking Dead",
-    "themeNameId": "IDS_dlcskin10198573_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.male_zombie"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Huntress Wizard",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004431_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.huntress_wizard"
   },
   "texture": {
     "width": 64,

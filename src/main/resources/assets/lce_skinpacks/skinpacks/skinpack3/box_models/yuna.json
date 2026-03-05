@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Yuna",
-    "displayNameId": "IDS_DLCSKIN20000234_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.yuna",
     "themeName": "Everybody's Golf",
-    "themeNameId": "IDS_DLCSKIN20000234_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.yuna"
   },
   "texture": {
     "width": 64,

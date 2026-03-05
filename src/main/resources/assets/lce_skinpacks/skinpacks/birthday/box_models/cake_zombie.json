@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Cake Zombie",
-    "displayNameId": "IDS_DLCSKIN00000702_DISPLAYNAME"
+    "displayNameId": "custom.birthday.cake_zombie"
   },
   "texture": {
     "width": 64,

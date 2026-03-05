@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Tundra Brewer",
-    "displayNameId": "IDS_DLCSKIN00004518_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.tundra_brewer",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004518_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.tundra_brewer"
   },
   "texture": {
     "width": 64,

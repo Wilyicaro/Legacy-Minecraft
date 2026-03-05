@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Rudolph",
-    "displayNameId": "IDS_DLCSKIN00000602_DISPLAYNAME"
+    "displayNameId": "custom.festive.rudolph"
   },
   "texture": {
     "width": 64,

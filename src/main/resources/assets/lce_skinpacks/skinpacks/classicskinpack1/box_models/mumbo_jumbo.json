@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Mumbo Jumbo",
-    "displayNameId": "IDS_DLCSKIN00000019_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.mumbo_jumbo",
     "themeName": "Banjo-Kazooie",
-    "themeNameId": "IDS_DLCSKIN00000019_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.mumbo_jumbo"
   },
   "texture": {
     "width": 64,

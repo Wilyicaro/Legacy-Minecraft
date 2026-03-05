@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Gordon Freeman",
-    "displayNameId": "IDS_DLCSKIN20000218_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.gordon_freeman",
     "themeName": "Half Life",
-    "themeNameId": "IDS_DLCSKIN20000218_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.gordon_freeman"
   },
   "texture": {
     "width": 64,

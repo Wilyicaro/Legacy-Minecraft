@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Party Carmelita Montoya Fox",
-    "displayNameId": "IDS_DLCSKIN20000417_DISPLAYNAME",
+    "displayNameId": "custom.birthday2.party_carmelita_montoya_fox",
     "themeName": "Sly Cooper",
-    "themeNameId": "IDS_DLCSKIN20000417_THEMENAME"
+    "themeNameId": "custom.birthday2.themetext.party_carmelita_montoya_fox"
   },
   "hide": "hat",
   "texture": {

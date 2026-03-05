@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Jon",
-    "displayNameId": "IDS_DLCSKIN00003007_DISPLAYNAME"
+    "displayNameId": "custom.birthday3.jon"
   },
   "texture": {
     "width": 64,

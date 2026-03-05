@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Wasp",
-    "displayNameId": "IDS_dlcskin47802838_DISPLAYNAME",
+    "displayNameId": "custom.avengers.wasp",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin47802838_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.wasp"
   },
   "texture": {
     "width": 64,

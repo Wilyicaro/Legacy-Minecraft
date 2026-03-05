@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Fungi Creature",
-    "displayNameId": "IDS_DLCSKIN00001002_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.fungi_creature"
   },
   "texture": {
     "width": 64,

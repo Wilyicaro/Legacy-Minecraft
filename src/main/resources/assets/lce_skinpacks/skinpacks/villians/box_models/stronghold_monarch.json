@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Stronghold Monarch",
-    "displayNameId": "IDS_DLCSKIN00005613_DISPLAYNAME",
+    "displayNameId": "custom.villians.stronghold_monarch",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005613_THEMENAME"
+    "themeNameId": "custom.villians.themetext.stronghold_monarch"
   },
   "texture": {
     "width": 64,

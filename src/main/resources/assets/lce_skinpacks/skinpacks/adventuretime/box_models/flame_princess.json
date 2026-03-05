@@ -1,9 +1,12 @@
 {
   "meta": {
     "displayName": "Flame Princess",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004416_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.flame_princess"
   },
-"hide": ["left_sleeve", "right_sleeve" ],
+  "hide": [
+    "left_sleeve",
+    "right_sleeve"
+  ],
   "texture": {
     "width": 64,
     "height": 64

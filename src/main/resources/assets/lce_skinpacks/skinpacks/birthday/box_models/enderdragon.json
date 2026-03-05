@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "EnderDragon",
-    "displayNameId": "IDS_DLCSKIN00000717_DISPLAYNAME"
+    "displayNameId": "custom.birthday.enderdragon"
   },
   "texture": {
     "width": 64,

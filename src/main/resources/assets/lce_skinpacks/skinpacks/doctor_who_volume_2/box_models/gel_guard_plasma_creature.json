@@ -1,9 +1,12 @@
 {
   "meta": {
     "displayName": "Gel Guard (Plasma Creature)",
-    "displayNameId": "IDS_DLCSKIN00002539_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.gel_guard_plasma_creature"
   },
-  "hide": ["hat", "arms"],
+  "hide": [
+    "hat",
+    "arms"
+  ],
   "texture": {
     "width": 64,
     "height": 64

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Insecto Wasp",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003221_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.insecto_wasp"
   },
   "texture": {
     "width": 64,

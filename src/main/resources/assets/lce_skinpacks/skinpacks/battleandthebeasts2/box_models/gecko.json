@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Gecko",
-    "displayNameId": "IDS_DLCSKIN00001010_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.gecko"
   },
   "texture": {
     "width": 64,

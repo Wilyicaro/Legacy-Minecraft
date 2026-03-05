@@ -1,268 +1,268 @@
 {
-  "name": "Skin Pack 5",
+  "name": "key:custom.skinpack5.pack.name",
   "author": "4J Studios",
   "skins": [
     {
       "id": "german_soldier",
-      "name": "German Soldier",
+      "name": "key:custom.skinpack5.german_soldier",
       "texture": "skins/german_soldier.png",
       "order": 42
     },
     {
       "id": "john_carver",
-      "name": "John Carver",
+      "name": "key:custom.skinpack5.john_carver",
       "texture": "skins/john_carver.png",
       "order": 4
     },
     {
       "id": "male_zombie",
-      "name": "Male Zombie",
+      "name": "key:custom.skinpack5.male_zombie",
       "texture": "skins/male_zombie.png",
       "order": 11
     },
     {
       "id": "salvador",
-      "name": "Salvador",
+      "name": "key:custom.skinpack5.salvador",
       "texture": "skins/salvador.png",
       "order": 27
     },
     {
       "id": "sam_fisher",
-      "name": "Sam Fisher",
+      "name": "key:custom.skinpack5.sam_fisher",
       "texture": "skins/sam_fisher.png",
       "order": 15
     },
     {
       "id": "roland",
-      "name": "Roland",
+      "name": "key:custom.skinpack5.roland",
       "texture": "skins/roland.png",
       "order": 23
     },
     {
       "id": "black_cat_man",
-      "name": "Black Cat Man",
+      "name": "key:custom.skinpack5.black_cat_man",
       "texture": "skins/black_cat_man.png",
       "order": 46
     },
     {
       "id": "nikolai_orelov",
-      "name": "Nikolai Orelov",
+      "name": "key:custom.skinpack5.nikolai_orelov",
       "texture": "skins/nikolai_orelov.png",
       "order": 18
     },
     {
       "id": "grass_man",
-      "name": "Grass Man",
+      "name": "key:custom.skinpack5.grass_man",
       "texture": "skins/grass_man.png",
       "order": 50
     },
     {
       "id": "ocelot_man",
-      "name": "Ocelot Man",
+      "name": "key:custom.skinpack5.ocelot_man",
       "texture": "skins/ocelot_man.png",
       "order": 48
     },
     {
       "id": "barbera",
-      "name": "Barbera",
+      "name": "key:custom.skinpack5.barbera",
       "texture": "skins/barbera.png",
       "order": 14
     },
     {
       "id": "rock_man",
-      "name": "Rock Man",
+      "name": "key:custom.skinpack5.rock_man",
       "texture": "skins/rock_man.png",
       "order": 49
     },
     {
       "id": "us_airbone_soldier",
-      "name": "US Airbone Soldier",
+      "name": "key:custom.skinpack5.us_airbone_soldier",
       "texture": "skins/us_airbone_soldier.png",
       "order": 35
     },
     {
       "id": "maya",
-      "name": "Maya",
+      "name": "key:custom.skinpack5.maya",
       "texture": "skins/maya.png",
       "order": 26
     },
     {
       "id": "kenny",
-      "name": "Kenny",
+      "name": "key:custom.skinpack5.kenny",
       "texture": "skins/kenny.png",
       "order": 6
     },
     {
       "id": "aveline_de_grandpre",
-      "name": "Aveline de Grandpré",
+      "name": "key:custom.skinpack5.aveline_de_grandpre",
       "texture": "skins/aveline_de_grandpre.png",
       "order": 17
     },
     {
       "id": "russian_soldier",
-      "name": "Russian Soldier",
+      "name": "key:custom.skinpack5.russian_soldier",
       "texture": "skins/russian_soldier.png",
       "order": 37
     },
     {
       "id": "cat_eared_girl",
-      "name": "Cat-Eared Girl",
+      "name": "key:custom.skinpack5.cat_eared_girl",
       "texture": "skins/cat_eared_girl.png",
       "order": 34
     },
     {
       "id": "imperial_japanese_soldier",
-      "name": "Imperial Japanese Soldier",
+      "name": "key:custom.skinpack5.imperial_japanese_soldier",
       "texture": "skins/imperial_japanese_soldier.png",
       "order": 39
     },
     {
       "id": "isaac_clarke",
-      "name": "Isaac Clarke",
+      "name": "key:custom.skinpack5.isaac_clarke",
       "texture": "skins/isaac_clarke.png",
       "order": 1
     },
     {
       "id": "mooshroom_suit",
-      "name": "Mooshroom Suit",
+      "name": "key:custom.skinpack5.mooshroom_suit",
       "texture": "skins/mooshroom_suit.png",
       "order": 43
     },
     {
       "id": "molly",
-      "name": "Molly",
+      "name": "key:custom.skinpack5.molly",
       "texture": "skins/molly.png",
       "order": 7
     },
     {
       "id": "sergeant_rex_power_colt",
-      "name": "Sergeant Rex \"Power\" Colt",
+      "name": "key:custom.skinpack5.sergeant_rex_power_colt",
       "texture": "skins/sergeant_rex_power_colt.png",
       "order": 20
     },
     {
       "id": "globox",
-      "name": "Globox",
+      "name": "key:custom.skinpack5.globox",
       "texture": "skins/globox.png",
       "order": 13
     },
     {
       "id": "german_sergeant",
-      "name": "German Sergeant",
+      "name": "key:custom.skinpack5.german_sergeant",
       "texture": "skins/german_sergeant.png",
       "order": 41
     },
     {
       "id": "axton",
-      "name": "Axton",
+      "name": "key:custom.skinpack5.axton",
       "texture": "skins/axton.png",
       "order": 24
     },
     {
       "id": "pig_suit",
-      "name": "Pig Suit",
+      "name": "key:custom.skinpack5.pig_suit",
       "texture": "skins/pig_suit.png",
       "order": 44
     },
     {
       "id": "female_zombie",
-      "name": "Female Zombie",
+      "name": "key:custom.skinpack5.female_zombie",
       "texture": "skins/female_zombie.png",
       "order": 10
     },
     {
       "id": "german_captain",
-      "name": "German Captain",
+      "name": "key:custom.skinpack5.german_captain",
       "texture": "skins/german_captain.png",
       "order": 40
     },
     {
       "id": "flower_girl",
-      "name": "Flower Girl",
+      "name": "key:custom.skinpack5.flower_girl",
       "texture": "skins/flower_girl.png",
       "order": 33
     },
     {
       "id": "puker",
-      "name": "Puker",
+      "name": "key:custom.skinpack5.puker",
       "texture": "skins/puker.png",
       "order": 2
     },
     {
       "id": "rayman",
-      "name": "Rayman",
+      "name": "key:custom.skinpack5.rayman",
       "texture": "skins/rayman.png",
       "order": 12
     },
     {
       "id": "vaas_montenegro",
-      "name": "Vaas Montenegro",
+      "name": "key:custom.skinpack5.vaas_montenegro",
       "texture": "skins/vaas_montenegro.png",
       "order": 22
     },
     {
       "id": "handsome_jack",
-      "name": "Handsome Jack",
+      "name": "key:custom.skinpack5.handsome_jack",
       "texture": "skins/handsome_jack.png",
       "order": 25
     },
     {
       "id": "ginger_cat_man",
-      "name": "Ginger Cat Man",
+      "name": "key:custom.skinpack5.ginger_cat_man",
       "texture": "skins/ginger_cat_man.png",
       "order": 47
     },
     {
       "id": "lee_everett",
-      "name": "Lee Everett",
+      "name": "key:custom.skinpack5.lee_everett",
       "texture": "skins/lee_everett.png",
       "order": 5
     },
     {
       "id": "jason_brody",
-      "name": "Jason Brody",
+      "name": "key:custom.skinpack5.jason_brody",
       "texture": "skins/jason_brody.png",
       "order": 21
     },
     {
       "id": "ender_dragon_suit",
-      "name": "Ender Dragon Suit",
+      "name": "key:custom.skinpack5.ender_dragon_suit",
       "texture": "skins/ender_dragon_suit.png",
       "order": 45
     },
     {
       "id": "ellie_langford",
-      "name": "Ellie Langford",
+      "name": "key:custom.skinpack5.ellie_langford",
       "texture": "skins/ellie_langford.png",
       "order": 3
     },
     {
       "id": "sam_fisher_2",
-      "name": "Sam Fisher",
+      "name": "key:custom.skinpack5.sam_fisher_2",
       "texture": "skins/sam_fisher_2.png",
       "order": 16
     },
     {
       "id": "omid",
-      "name": "Omid",
+      "name": "key:custom.skinpack5.omid",
       "texture": "skins/omid.png",
       "order": 9
     },
     {
       "id": "british_soldier",
-      "name": "British Soldier",
+      "name": "key:custom.skinpack5.british_soldier",
       "texture": "skins/british_soldier.png",
       "order": 36
     },
     {
       "id": "christa",
-      "name": "Christa",
+      "name": "key:custom.skinpack5.christa",
       "texture": "skins/christa.png",
       "order": 8
     },
     {
       "id": "edward_kenway",
-      "name": "Edward Kenway",
+      "name": "key:custom.skinpack5.edward_kenway",
       "texture": "skins/edward_kenway.png",
       "order": 19
     }

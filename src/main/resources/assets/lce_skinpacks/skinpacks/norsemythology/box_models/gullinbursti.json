@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Gullinbursti",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004644_DISPLAYNAME",
+    "displayNameId": "custom.norsemythology.gullinbursti",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004644_THEMENAME"
+    "themeNameId": "custom.norsemythology.themetext.gullinbursti"
   },
   "armorOffsets": {
     "HELMET": {
@@ -12,7 +12,12 @@
       "z": 0.0
     }
   },
-  "hide": ["left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

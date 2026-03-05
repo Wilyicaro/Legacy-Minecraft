@@ -1,9 +1,16 @@
 {
   "meta": {
     "displayName": "Olivia Armored",
-    "displayNameId": "IDS_DLCSKIN00005002_DISPLAYNAME"
+    "displayNameId": "custom.storymode.olivia_armored"
   },
-  "hide": [ "hat", "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "hat",
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

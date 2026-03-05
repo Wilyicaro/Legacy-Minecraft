@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Desert Brewer",
-    "displayNameId": "IDS_DLCSKIN00004502_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.desert_brewer",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004502_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.desert_brewer"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Yellow Paradigm Dalek",
-    "displayNameId": "IDS_DLCSKIN00002050_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.yellow_paradigm_dalek"
   },
   "hide": "ALL",
   "texture": {

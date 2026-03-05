@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Max Stone",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004804_DISPLAYNAME",
+    "displayNameId": "custom.fallout.max_stone",
     "themeName": "Fallout 1",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004804_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.max_stone"
   },
   "texture": {
     "width": 64,

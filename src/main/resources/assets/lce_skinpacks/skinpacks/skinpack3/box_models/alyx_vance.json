@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Alyx Vance",
-    "displayNameId": "IDS_DLCSKIN20000225_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.alyx_vance",
     "themeName": "Half Life",
-    "themeNameId": "IDS_DLCSKIN20000225_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.alyx_vance"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Bad Santa",
-    "displayNameId": "IDS_DLCSKIN00000619_DISPLAYNAME"
+    "displayNameId": "custom.festive.bad_santa"
   },
   "texture": {
     "width": 64,

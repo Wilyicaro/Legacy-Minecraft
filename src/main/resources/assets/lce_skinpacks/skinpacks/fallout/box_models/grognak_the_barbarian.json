@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Grognak the Barbarian",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004841_DISPLAYNAME",
+    "displayNameId": "custom.fallout.grognak_the_barbarian",
     "themeName": "Fallout",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004841_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.grognak_the_barbarian"
   },
   "texture": {
     "width": 64,

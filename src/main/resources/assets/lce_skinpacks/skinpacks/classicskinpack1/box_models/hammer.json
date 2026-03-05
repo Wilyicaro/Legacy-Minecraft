@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Hammer",
-    "displayNameId": "IDS_DLCSKIN00000008_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.hammer",
     "themeName": "Fable Heroes",
-    "themeNameId": "IDS_DLCSKIN00000008_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.hammer"
   },
   "texture": {
     "width": 64,

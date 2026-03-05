@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Enderman",
-    "displayNameId": "IDS_DLCSKIN20000100_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.enderman",
     "themeName": "Minecraft",
-    "themeNameId": "IDS_DLCSKIN20000100_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.enderman"
   },
   "texture": {
     "width": 64,

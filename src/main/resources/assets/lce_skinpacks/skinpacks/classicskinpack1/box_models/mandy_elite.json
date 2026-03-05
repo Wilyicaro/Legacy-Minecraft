@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Mandy Elite",
-    "displayNameId": "IDS_DLCSKIN00000030_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.mandy_elite",
     "themeName": "Ms. 'Splosion Man",
-    "themeNameId": "IDS_DLCSKIN00000030_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.mandy_elite"
   },
   "texture": {
     "width": 64,

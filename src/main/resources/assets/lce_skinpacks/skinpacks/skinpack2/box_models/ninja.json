@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Ninja",
-    "displayNameId": "IDS_DLCSKIN20000116_DISPLAYNAME"
+    "displayNameId": "custom.skinpack2.ninja"
   },
   "texture": {
     "width": 64,

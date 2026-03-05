@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Guardian Lion",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005130_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.guardian_lion",
     "themeName": "Bronze Statue",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005130_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.guardian_lion"
   },
   "texture": {
     "width": 64,

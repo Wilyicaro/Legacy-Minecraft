@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Party Squid",
-    "displayNameId": "IDS_DLCSKIN00000711_DISPLAYNAME"
+    "displayNameId": "custom.birthday.party_squid"
   },
   "texture": {
     "width": 64,

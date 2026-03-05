@@ -1,11 +1,15 @@
 {
   "meta": {
     "displayName": "Tree Fairy",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002731_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.tree_fairy",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002731_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.tree_fairy"
   },
-"hide": ["hat", "legs", "arms"],
+  "hide": [
+    "hat",
+    "legs",
+    "arms"
+  ],
   "texture": {
     "width": 64,
     "height": 64

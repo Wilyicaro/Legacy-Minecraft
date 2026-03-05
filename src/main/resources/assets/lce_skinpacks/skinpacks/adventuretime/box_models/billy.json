@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Billy",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004422_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.billy"
   },
   "texture": {
     "width": 64,

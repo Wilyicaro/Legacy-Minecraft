@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Atlas",
-    "displayNameId": "IDS_DLCSKIN20000222_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.atlas",
     "themeName": "Portal 2",
-    "themeNameId": "IDS_DLCSKIN20000222_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.atlas"
   },
   "texture": {
     "width": 64,

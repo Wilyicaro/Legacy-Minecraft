@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Sun Wukong",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005100_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.sun_wukong",
     "themeName": "Monkey King",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005100_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.sun_wukong"
   },
   "texture": {
     "width": 64,

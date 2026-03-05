@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Bloater",
-    "displayNameId": "IDS_DLCSKIN20000134_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.bloater",
     "themeName": "The Last of Us",
-    "themeNameId": "IDS_DLCSKIN20000134_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.bloater"
   },
   "armorOffsets": {
     "HELMET": {

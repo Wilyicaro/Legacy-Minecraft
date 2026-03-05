@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Nether Extinguisher",
-    "displayNameId": "IDS_DLCSKIN00005318_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.nether_extinguisher"
   },
   "texture": {
     "width": 64,

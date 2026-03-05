@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Black Wind Demon",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005114_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.black_wind_demon",
     "themeName": "Mountain Guardian",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005114_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.black_wind_demon"
   },
   "texture": {
     "width": 64,

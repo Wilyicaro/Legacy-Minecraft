@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Hakunin",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004808_DISPLAYNAME",
+    "displayNameId": "custom.fallout.hakunin",
     "themeName": "Fallout 2",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004808_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.hakunin"
   },
   "texture": {
     "width": 64,

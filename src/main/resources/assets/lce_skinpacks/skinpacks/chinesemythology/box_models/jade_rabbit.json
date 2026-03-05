@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Jade Rabbit",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005123_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.jade_rabbit",
     "themeName": "Moon Spirit",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005123_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.jade_rabbit"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Tiger",
-    "displayNameId": "IDS_DLCSKIN00001004_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.tiger"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Silksnatcher",
-    "displayNameId": "IDS_DLCSKIN00005513_DISPLAYNAME"
+    "displayNameId": "custom.campfiretales.silksnatcher"
   },
   "texture": {
     "width": 64,

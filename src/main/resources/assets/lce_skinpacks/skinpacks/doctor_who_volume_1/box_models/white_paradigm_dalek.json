@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "White Paradigm Dalek",
-    "displayNameId": "IDS_DLCSKIN00002047_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.white_paradigm_dalek"
   },
   "hide": "ALL",
   "poses": "hide_hand",

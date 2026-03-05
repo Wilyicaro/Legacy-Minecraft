@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Orc Blacksmith",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001418_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.orc_blacksmith",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001418_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.orc_blacksmith"
   },
   "texture": {
     "width": 64,

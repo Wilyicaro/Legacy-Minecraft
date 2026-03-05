@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Bosco",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004843_DISPLAYNAME",
+    "displayNameId": "custom.fallout.bosco",
     "themeName": "Fallout 4",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004843_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.bosco"
   },
   "texture": {
     "width": 64,

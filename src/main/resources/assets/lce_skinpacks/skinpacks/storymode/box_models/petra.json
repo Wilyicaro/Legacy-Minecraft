@@ -1,9 +1,11 @@
 {
   "meta": {
     "displayName": "Petra",
-    "displayNameId": "IDS_DLCSKIN00005005_DISPLAYNAME"
+    "displayNameId": "custom.storymode.petra"
   },
-  "hide": ["jacket"],
+  "hide": [
+    "jacket"
+  ],
   "texture": {
     "width": 64,
     "height": 64

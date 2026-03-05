@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Elenwen",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001403_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.elenwen",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001403_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.elenwen"
   },
   "texture": {
     "width": 64,

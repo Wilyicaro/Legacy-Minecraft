@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "The G-Man",
-    "displayNameId": "IDS_DLCSKIN20000224_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.the_g_man",
     "themeName": "Half Life",
-    "themeNameId": "IDS_DLCSKIN20000224_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.the_g_man"
   },
   "texture": {
     "width": 64,

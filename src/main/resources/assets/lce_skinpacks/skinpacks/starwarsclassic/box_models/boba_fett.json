@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Boba Fett",
-    "displayNameId": "IDS_DLCSKIN00001230_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.boba_fett",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001230_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.boba_fett"
   },
   "armorOffsets": {
     "HELMET": {
@@ -12,7 +12,9 @@
       "z": 0.0
     }
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

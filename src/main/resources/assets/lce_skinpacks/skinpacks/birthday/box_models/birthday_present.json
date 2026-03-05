@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Birthday Present",
-    "displayNameId": "IDS_DLCSKIN00000720_DISPLAYNAME"
+    "displayNameId": "custom.birthday.birthday_present"
   },
   "texture": {
     "width": 64,

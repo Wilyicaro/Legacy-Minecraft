@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Daniel Kaplan",
-    "displayNameId": "IDS_DLCSKIN00003001_DISPLAYNAME"
+    "displayNameId": "custom.birthday3.daniel_kaplan"
   },
   "texture": {
     "width": 64,

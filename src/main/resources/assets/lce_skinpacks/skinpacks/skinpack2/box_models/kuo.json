@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Kuo",
-    "displayNameId": "IDS_DLCSKIN20000124_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.kuo",
     "themeName": "inFAMOUS",
-    "themeNameId": "IDS_DLCSKIN20000124_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.kuo"
   },
   "texture": {
     "width": 64,

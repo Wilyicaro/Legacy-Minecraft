@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Darth Vader",
-    "displayNameId": "IDS_DLCSKIN00001219_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.darth_vader",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001219_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.darth_vader"
   },
   "armorOffsets": {
     "HELMET": {
@@ -12,7 +12,9 @@
       "z": 0.0
     }
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Mordecai",
-    "displayNameId": "IDS_dlcskin10973835_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.mordecai",
     "themeName": "Borderlands",
-    "themeNameId": "IDS_dlcskin10973835_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.mordecai"
   },
   "texture": {
     "width": 64,

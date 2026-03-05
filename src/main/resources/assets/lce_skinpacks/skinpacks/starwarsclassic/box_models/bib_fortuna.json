@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Bib Fortuna",
-    "displayNameId": "IDS_DLCSKIN00001244_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.bib_fortuna",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001244_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.bib_fortuna"
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

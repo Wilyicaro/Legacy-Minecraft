@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Swamp Monster Costume",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003226_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.swamp_monster_costume"
   },
   "texture": {
     "width": 64,

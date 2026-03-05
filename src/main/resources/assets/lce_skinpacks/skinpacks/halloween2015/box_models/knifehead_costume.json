@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Knifehead Costume",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003230_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.knifehead_costume"
   },
   "texture": {
     "width": 64,

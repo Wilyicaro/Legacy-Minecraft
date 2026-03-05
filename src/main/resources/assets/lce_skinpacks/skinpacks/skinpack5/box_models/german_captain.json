@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "German Captain",
-    "displayNameId": "IDS_dlcskin55949982_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.german_captain",
     "themeName": "World War 2",
-    "themeNameId": "IDS_dlcskin55949982_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.german_captain"
   },
   "texture": {
     "width": 64,

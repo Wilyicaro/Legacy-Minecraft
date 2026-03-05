@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mooshroom Brawler",
-    "displayNameId": "IDS_DLCSKIN00005301_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.mooshroom_brawler"
   },
   "texture": {
     "width": 64,

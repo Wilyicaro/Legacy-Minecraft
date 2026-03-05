@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Imperial Japanese Soldier",
-    "displayNameId": "IDS_dlcskin39442390_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.imperial_japanese_soldier",
     "themeName": "World War 2",
-    "themeNameId": "IDS_dlcskin39442390_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.imperial_japanese_soldier"
   },
   "texture": {
     "width": 64,

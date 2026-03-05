@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Desert Husk",
-    "displayNameId": "IDS_DLCSKIN00004506_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.desert_husk",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004506_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.desert_husk"
   },
   "texture": {
     "width": 64,

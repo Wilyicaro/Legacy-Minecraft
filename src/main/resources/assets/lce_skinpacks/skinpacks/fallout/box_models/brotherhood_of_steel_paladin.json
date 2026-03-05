@@ -1,21 +1,41 @@
 {
   "meta": {
     "displayName": "Brotherhood of Steel Paladin",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004816_DISPLAYNAME",
+    "displayNameId": "custom.fallout.brotherhood_of_steel_paladin",
     "themeName": "Fallout 3",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004816_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.brotherhood_of_steel_paladin"
   },
   "armor_offsets": {
-    "helmet":       { "x": 0, "y": -1, "z": 0 },
-    "chestplate":   { "x": 0, "y": -1, "z": 0 },
-    "leggings":     { "x": 0, "y": 0, "z": 0 },
-    "boots":        { "x": 0, "y": 0, "z": 0 }
+    "helmet": {
+      "x": 0,
+      "y": -1,
+      "z": 0
+    },
+    "chestplate": {
+      "x": 0,
+      "y": -1,
+      "z": 0
+    },
+    "leggings": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    },
+    "boots": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
   },
   "texture": {
     "width": 64,
     "height": 64
   },
-  "hide": [ "limbs", "body", "right_pants"],
+  "hide": [
+    "limbs",
+    "body",
+    "right_pants"
+  ],
   "bones": [
     {
       "name": "body_addon",

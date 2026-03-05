@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Vashta Nerada",
-    "displayNameId": "IDS_DLCSKIN00002024_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.vashta_nerada"
   },
   "texture": {
     "width": 64,

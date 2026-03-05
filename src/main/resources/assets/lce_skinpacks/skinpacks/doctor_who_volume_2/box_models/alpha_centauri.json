@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Alpha Centauri",
-    "displayNameId": "IDS_DLCSKIN00002538_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.alpha_centauri"
   },
   "armorOffsets": {
     "HELMET": {
@@ -10,7 +10,10 @@
       "z": 0.0
     }
   },
-  "hide": ["hat", "limbs"],
+  "hide": [
+    "hat",
+    "limbs"
+  ],
   "texture": {
     "width": 64,
     "height": 64

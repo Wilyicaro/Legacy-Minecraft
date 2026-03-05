@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Tess",
-    "displayNameId": "IDS_DLCSKIN20000132_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.tess",
     "themeName": "The Last of Us",
-    "themeNameId": "IDS_DLCSKIN20000132_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.tess"
   },
   "texture": {
     "width": 64,

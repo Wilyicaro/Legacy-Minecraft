@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Skier",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002733_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.skier",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002733_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.skier"
   },
   "hide": [
     "hat"

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Juan",
-    "displayNameId": "IDS_DLCSKIN20000211_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.juan",
     "themeName": "Guacamelee!",
-    "themeNameId": "IDS_DLCSKIN20000211_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.juan"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Forest Woodbeast",
-    "displayNameId": "IDS_DLCSKIN00004515_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.forest_woodbeast",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004515_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.forest_woodbeast"
   },
   "texture": {
     "width": 64,

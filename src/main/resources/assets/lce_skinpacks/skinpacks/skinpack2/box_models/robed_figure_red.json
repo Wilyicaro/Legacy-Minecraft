@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Robed Figure - Red",
-    "displayNameId": "IDS_DLCSKIN20000127_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.robed_figure_red",
     "themeName": "Journey",
-    "themeNameId": "IDS_DLCSKIN20000127_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.robed_figure_red"
   },
   "texture": {
     "width": 64,

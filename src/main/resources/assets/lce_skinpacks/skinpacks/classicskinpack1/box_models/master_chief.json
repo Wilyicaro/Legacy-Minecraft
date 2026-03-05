@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Master Chief",
-    "displayNameId": "IDS_DLCSKIN00000012_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.master_chief",
     "themeName": "Halo",
-    "themeNameId": "IDS_DLCSKIN00000012_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.master_chief"
   },
   "texture": {
     "width": 64,

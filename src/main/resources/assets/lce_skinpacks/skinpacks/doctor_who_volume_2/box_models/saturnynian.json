@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Saturnynian",
-    "displayNameId": "IDS_DLCSKIN00002554_DISPLAYNAME",
+    "displayNameId": "custom.doctor_who_volume_2.saturnynian",
     "themeName": "Fish form",
-    "themeNameId": "IDS_DLCSKIN00002554_THEMENAME"
+    "themeNameId": "custom.doctor_who_volume_2.themetext.saturnynian"
   },
   "texture": {
     "width": 64,

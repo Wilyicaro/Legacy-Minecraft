@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Cyberman 1980's",
-    "displayNameId": "IDS_DLCSKIN00002549_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.cyberman_1980s"
   },
   "texture": {
     "width": 64,

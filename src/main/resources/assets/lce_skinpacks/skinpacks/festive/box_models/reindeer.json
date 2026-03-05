@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Reindeer",
-    "displayNameId": "IDS_DLCSKIN00000603_DISPLAYNAME"
+    "displayNameId": "custom.festive.reindeer"
   },
   "texture": {
     "width": 64,

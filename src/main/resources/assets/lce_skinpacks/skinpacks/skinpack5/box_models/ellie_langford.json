@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Ellie Langford",
-    "displayNameId": "IDS_dlcskin88596759_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.ellie_langford",
     "themeName": "Dead Space 3",
-    "themeNameId": "IDS_dlcskin88596759_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.ellie_langford"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Glorg",
-    "displayNameId": "IDS_DLCSKIN20000111_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.glorg",
     "themeName": "Glorg",
-    "themeNameId": "IDS_DLCSKIN20000111_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.glorg"
   },
   "texture": {
     "width": 64,

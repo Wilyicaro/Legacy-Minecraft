@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Imperial British Soldier",
-    "displayNameId": "IDS_DLCSKIN00000842_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.imperial_british_soldier_2"
   },
   "texture": {
     "width": 64,

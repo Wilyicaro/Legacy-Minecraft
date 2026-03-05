@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Yamato",
-    "displayNameId": "IDS_DLCSKIN20000235_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.yamato",
     "themeName": "Everybody's Golf",
-    "themeNameId": "IDS_DLCSKIN20000235_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.yamato"
   },
   "texture": {
     "width": 64,

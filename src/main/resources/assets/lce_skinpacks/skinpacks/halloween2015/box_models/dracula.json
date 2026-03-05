@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Dracula",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003203_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.dracula"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,11 @@
 {
   "meta": {
     "displayName": "Lukas",
-    "displayNameId": "IDS_DLCSKIN00005007_DISPLAYNAME"
+    "displayNameId": "custom.storymode.lukas"
   },
-  "hide": ["jacket"],
+  "hide": [
+    "jacket"
+  ],
   "texture": {
     "width": 64,
     "height": 64

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Rico Velasquez",
-    "displayNameId": "IDS_DLCSKIN20000005_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.rico_velasquez",
     "themeName": "Killzone",
-    "themeNameId": "IDS_DLCSKIN20000005_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.rico_velasquez"
   },
   "texture": {
     "width": 64,

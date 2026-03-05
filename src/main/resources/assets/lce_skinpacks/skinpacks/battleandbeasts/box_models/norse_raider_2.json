@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Norse Raider",
-    "displayNameId": "IDS_DLCSKIN00000835_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.norse_raider_2"
   },
   "texture": {
     "width": 64,

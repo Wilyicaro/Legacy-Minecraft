@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Party Steve",
-    "displayNameId": "IDS_DLCSKIN00000700_DISPLAYNAME"
+    "displayNameId": "custom.birthday.party_steve"
   },
   "texture": {
     "width": 64,

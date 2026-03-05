@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Lapis Lady",
-    "displayNameId": "IDS_DLCSKIN00005505_DISPLAYNAME"
+    "displayNameId": "custom.campfiretales.the_lapis_lady"
   },
   "texture": {
     "width": 64,

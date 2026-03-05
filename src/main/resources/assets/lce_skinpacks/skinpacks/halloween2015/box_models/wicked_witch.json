@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Wicked Witch",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003218_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.wicked_witch"
   },
   "texture": {
     "width": 64,

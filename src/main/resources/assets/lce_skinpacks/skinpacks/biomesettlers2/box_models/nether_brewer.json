@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Nether Brewer",
-    "displayNameId": "IDS_DLCSKIN00005315_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.nether_brewer"
   },
   "texture": {
     "width": 64,

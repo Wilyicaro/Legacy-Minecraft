@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Cropsy",
-    "displayNameId": "IDS_DLCSKIN00005514_DISPLAYNAME"
+    "displayNameId": "custom.campfiretales.cropsy"
   },
   "texture": {
     "width": 64,

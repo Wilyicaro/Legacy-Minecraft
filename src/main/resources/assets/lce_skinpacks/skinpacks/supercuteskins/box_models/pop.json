@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Pop",
-    "displayNameId": "IDS_SKINS_DLCSKIN00007412_DISPLAYNAME",
+    "displayNameId": "custom.supercuteskins.pop",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00007412_THEMENAME"
+    "themeNameId": "custom.supercuteskins.themetext.pop"
   },
   "armorOffsets": {
     "ARM1": {
@@ -37,7 +37,15 @@
       "z": 0.0
     }
   },
-"hide": ["left_pants", "right_pants", "left_sleeve", "right_sleeve", "limbs", "head", "hat"],
+  "hide": [
+    "left_pants",
+    "right_pants",
+    "left_sleeve",
+    "right_sleeve",
+    "limbs",
+    "head",
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

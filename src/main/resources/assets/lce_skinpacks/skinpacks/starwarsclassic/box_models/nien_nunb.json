@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Nien Nunb",
-    "displayNameId": "IDS_DLCSKIN00001243_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.nien_nunb",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001243_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.nien_nunb"
   },
   "texture": {
     "width": 64,

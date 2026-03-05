@@ -1,9 +1,15 @@
 {
   "meta": {
-    "displayName": "\u00dcter",
-    "displayNameId": "IDS_DLCSKIN00002118_DISPLAYNAME"
+    "displayName": "Üter",
+    "displayNameId": "custom.the_simpsons.uter"
   },
-  "hide": ["HEAD", "HAT", "BODY", "LEFT_ARM", "RIGHT_ARM"],
+  "hide": [
+    "HEAD",
+    "HAT",
+    "BODY",
+    "LEFT_ARM",
+    "RIGHT_ARM"
+  ],
   "texture": {
     "width": 64,
     "height": 64

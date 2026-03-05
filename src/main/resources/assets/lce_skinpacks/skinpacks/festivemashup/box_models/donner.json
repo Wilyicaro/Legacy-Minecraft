@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Donner",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002711_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.donner",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002711_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.donner"
   },
   "texture": {
     "width": 64,

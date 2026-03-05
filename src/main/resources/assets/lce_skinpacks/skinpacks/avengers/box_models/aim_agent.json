@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "AIM Agent",
-    "displayNameId": "IDS_dlcskin40284308_DISPLAYNAME",
+    "displayNameId": "custom.avengers.aim_agent",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin40284308_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.aim_agent"
   },
   "texture": {
     "width": 64,

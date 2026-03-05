@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Clover",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004819_DISPLAYNAME",
+    "displayNameId": "custom.fallout.clover",
     "themeName": "Fallout 3",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004819_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.clover"
   },
   "texture": {
     "width": 64,

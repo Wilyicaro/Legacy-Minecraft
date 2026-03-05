@@ -1,9 +1,15 @@
 {
   "meta": {
     "displayName": "Jesse",
-    "displayNameId": "IDS_DLCSKIN00005023_DISPLAYNAME"
+    "displayNameId": "custom.storymode.jesse_3"
   },
-  "hide": ["jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

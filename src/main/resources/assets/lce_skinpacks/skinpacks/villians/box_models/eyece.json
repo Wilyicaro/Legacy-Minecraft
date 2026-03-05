@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Eyece",
-    "displayNameId": "IDS_DLCSKIN00005606_DISPLAYNAME",
+    "displayNameId": "custom.villians.eyece",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005606_THEMENAME"
+    "themeNameId": "custom.villians.themetext.eyece"
   },
-"hide": ["left_sleeve"],
+  "hide": [
+    "left_sleeve"
+  ],
   "texture": {
     "width": 64,
     "height": 64

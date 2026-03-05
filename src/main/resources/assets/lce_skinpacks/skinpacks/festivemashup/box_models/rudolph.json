@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Rudolph",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002713_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.rudolph",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002713_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.rudolph"
   },
   "armorOffsets": {
     "HELMET": {

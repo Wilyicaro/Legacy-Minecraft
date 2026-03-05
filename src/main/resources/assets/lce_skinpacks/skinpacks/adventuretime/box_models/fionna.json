@@ -1,9 +1,11 @@
 {
   "meta": {
     "displayName": "Fionna",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004402_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.fionna"
   },
-"hide": ["right_sleeve" ],
+  "hide": [
+    "right_sleeve"
+  ],
   "texture": {
     "width": 64,
     "height": 64

@@ -1,9 +1,12 @@
 {
   "meta": {
     "displayName": "Grass Finn",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004443_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.grass_finn"
   },
-"hide": ["right_sleeve", "left_sleeve"],
+  "hide": [
+    "right_sleeve",
+    "left_sleeve"
+  ],
   "texture": {
     "width": 64,
     "height": 64

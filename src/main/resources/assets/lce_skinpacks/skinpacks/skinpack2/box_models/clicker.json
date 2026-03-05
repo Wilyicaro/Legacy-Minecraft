@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Clicker",
-    "displayNameId": "IDS_DLCSKIN20000135_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.clicker",
     "themeName": "The Last of Us",
-    "themeNameId": "IDS_DLCSKIN20000135_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.clicker"
   },
   "texture": {
     "width": 64,

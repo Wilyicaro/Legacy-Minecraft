@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Dancer",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002706_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.dancer",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002706_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.dancer"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Party Ratchet",
-    "displayNameId": "IDS_DLCSKIN20000412_DISPLAYNAME",
+    "displayNameId": "custom.birthday2.party_ratchet",
     "themeName": "Ratchet and Clank",
-    "themeNameId": "IDS_DLCSKIN20000412_THEMENAME"
+    "themeNameId": "custom.birthday2.themetext.party_ratchet"
   },
   "hide": "hat",
   "texture": {

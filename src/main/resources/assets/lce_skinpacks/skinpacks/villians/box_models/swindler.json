@@ -1,11 +1,16 @@
 {
   "meta": {
     "displayName": "Swindler",
-    "displayNameId": "IDS_DLCSKIN00005615_DISPLAYNAME",
+    "displayNameId": "custom.villians.swindler",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005615_THEMENAME"
+    "themeNameId": "custom.villians.themetext.swindler"
   },
-"hide": ["right_pants", "left_pants", "right_sleeve", "left_sleeve"],
+  "hide": [
+    "right_pants",
+    "left_pants",
+    "right_sleeve",
+    "left_sleeve"
+  ],
   "texture": {
     "width": 64,
     "height": 64

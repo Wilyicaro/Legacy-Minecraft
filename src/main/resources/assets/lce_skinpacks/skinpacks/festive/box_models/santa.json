@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Santa",
-    "displayNameId": "IDS_DLCSKIN00000600_DISPLAYNAME"
+    "displayNameId": "custom.festive.santa"
   },
   "texture": {
     "width": 64,

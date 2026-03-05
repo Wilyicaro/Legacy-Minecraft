@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Lilith",
-    "displayNameId": "IDS_dlcskin40418935_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.lilith",
     "themeName": "Borderlands",
-    "themeNameId": "IDS_dlcskin40418935_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.lilith"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Vision",
-    "displayNameId": "IDS_dlcskin67177852_DISPLAYNAME",
+    "displayNameId": "custom.avengers.vision",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin67177852_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.vision"
   },
   "texture": {
     "width": 64,

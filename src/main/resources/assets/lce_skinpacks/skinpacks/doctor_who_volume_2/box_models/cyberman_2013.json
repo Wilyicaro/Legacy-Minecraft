@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Cyberman 2013",
-    "displayNameId": "IDS_DLCSKIN00002545_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.cyberman_2013"
   },
   "hide": "HAT",
   "texture": {

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Cyberman 2006 (Cybus)",
-    "displayNameId": "IDS_DLCSKIN00002547_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.cyberman_2006_cybus"
   },
   "texture": {
     "width": 64,

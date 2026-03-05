@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Blue Knight",
-    "displayNameId": "IDS_DLCSKIN20000144_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.blue_knight",
     "themeName": "Castle Crashers",
-    "themeNameId": "IDS_DLCSKIN20000144_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.blue_knight"
   },
   "texture": {
     "width": 64,

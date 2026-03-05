@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Steve Creeper Boxhead",
-    "displayNameId": "IDS_DLCSKIN00000715_DISPLAYNAME"
+    "displayNameId": "custom.birthday.steve_creeper_boxhead"
   },
   "texture": {
     "width": 64,

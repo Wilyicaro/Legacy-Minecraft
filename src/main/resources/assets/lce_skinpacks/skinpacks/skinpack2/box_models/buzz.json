@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Buzz",
-    "displayNameId": "IDS_DLCSKIN20000110_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.buzz",
     "themeName": "Gamma Bros",
-    "themeNameId": "IDS_DLCSKIN20000110_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.buzz"
   },
   "texture": {
     "width": 64,

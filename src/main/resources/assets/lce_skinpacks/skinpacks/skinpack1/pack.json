@@ -1,269 +1,269 @@
 {
-  "name": "Skin Pack 1",
+  "name": "key:custom.skinpack1.pack.name",
   "author": "4J Studios",
   "skins": [
     {
       "id": "creeper",
-      "name": "Creeper",
+      "name": "key:custom.skinpack1.creeper",
       "texture": "skins/creeper.png",
       "order": 1
     },
     {
       "id": "squid",
-      "name": "Squid",
+      "name": "key:custom.skinpack1.squid",
       "texture": "skins/squid.png",
       "order": 2
     },
     {
       "id": "zombie",
-      "name": "Zombie",
+      "name": "key:custom.skinpack1.zombie",
       "texture": "skins/zombie.png",
       "order": 3
     },
     {
       "id": "tomas_sevchenko",
-      "name": "Tomas Sevchenko",
+      "name": "key:custom.skinpack1.tomas_sevchenko",
       "texture": "skins/tomas_sevchenko.png",
       "order": 4
     },
     {
       "id": "rico_velasquez",
-      "name": "Rico Velasquez",
+      "name": "key:custom.skinpack1.rico_velasquez",
       "texture": "skins/rico_velasquez.png",
       "order": 5
     },
     {
       "id": "jammer",
-      "name": "Jammer",
+      "name": "key:custom.skinpack1.jammer",
       "texture": "skins/jammer.png",
       "order": 6
     },
     {
       "id": "scolar_visari",
-      "name": "Scolar Visari",
+      "name": "key:custom.skinpack1.scolar_visari",
       "texture": "skins/scolar_visari.png",
       "order": 7
     },
     {
       "id": "helghast_assault_infantry",
-      "name": "Helghast Assault Infantry",
+      "name": "key:custom.skinpack1.helghast_assault_infantry",
       "texture": "skins/helghast_assault_infantry.png",
       "order": 8
     },
     {
       "id": "helghast_snow_trooper",
-      "name": "Helghast Snow Trooper",
+      "name": "key:custom.skinpack1.helghast_snow_trooper",
       "texture": "skins/helghast_snow_trooper.png",
       "order": 9
     },
     {
       "id": "sly_cooper",
-      "name": "Sly Cooper",
+      "name": "key:custom.skinpack1.sly_cooper",
       "texture": "skins/sly_cooper.png",
       "order": 10
     },
     {
       "id": "bentley",
-      "name": "Bentley",
+      "name": "key:custom.skinpack1.bentley",
       "texture": "skins/bentley.png",
       "order": 11
     },
     {
       "id": "murray",
-      "name": "Murray",
+      "name": "key:custom.skinpack1.murray",
       "texture": "skins/murray.png",
       "order": 12
     },
     {
       "id": "carmelita_montoya_fox",
-      "name": "Carmelita Montoya Fox",
+      "name": "key:custom.skinpack1.carmelita_montoya_fox",
       "texture": "skins/carmelita_montoya_fox.png",
       "model": "slim",
       "order": 13
     },
     {
       "id": "cullan_gray",
-      "name": "Cullan Gray",
+      "name": "key:custom.skinpack1.cullan_gray",
       "texture": "skins/cullan_gray.png",
       "order": 14
     },
     {
       "id": "dion_wells",
-      "name": "Dion Wells",
+      "name": "key:custom.skinpack1.dion_wells",
       "texture": "skins/dion_wells.png",
       "order": 15
     },
     {
       "id": "eric_schweitzer",
-      "name": "Eric Schweitzer",
+      "name": "key:custom.skinpack1.eric_schweitzer",
       "texture": "skins/eric_schweitzer.png",
       "order": 16
     },
     {
       "id": "chung_kwan",
-      "name": "Chung Kwan",
+      "name": "key:custom.skinpack1.chung_kwan",
       "texture": "skins/chung_kwan.png",
       "order": 17
     },
     {
       "id": "park_yoon_hee",
-      "name": "Park Yoon Hee",
+      "name": "key:custom.skinpack1.park_yoon_hee",
       "texture": "skins/park_yoon_hee.png",
       "order": 18
     },
     {
       "id": "ethan_mars",
-      "name": "Ethan Mars",
+      "name": "key:custom.skinpack1.ethan_mars",
       "texture": "skins/ethan_mars.png",
       "order": 19
     },
     {
       "id": "madison_paige",
-      "name": "Madison Paige",
+      "name": "key:custom.skinpack1.madison_paige",
       "texture": "skins/madison_paige.png",
       "order": 20
     },
     {
       "id": "norman_jayden",
-      "name": "Norman Jayden",
+      "name": "key:custom.skinpack1.norman_jayden",
       "texture": "skins/norman_jayden.png",
       "order": 21
     },
     {
       "id": "scott_shelby",
-      "name": "Scott Shelby",
+      "name": "key:custom.skinpack1.scott_shelby",
       "texture": "skins/scott_shelby.png",
       "order": 22
     },
     {
       "id": "nathan_drake",
-      "name": "Nathan Drake",
+      "name": "key:custom.skinpack1.nathan_drake",
       "texture": "skins/nathan_drake.png",
       "order": 23
     },
     {
       "id": "elena_fisher",
-      "name": "Elena Fisher",
+      "name": "key:custom.skinpack1.elena_fisher",
       "texture": "skins/elena_fisher.png",
       "order": 24
     },
     {
       "id": "eddy_raja",
-      "name": "Eddy Raja",
+      "name": "key:custom.skinpack1.eddy_raja",
       "texture": "skins/eddy_raja.png",
       "order": 25
     },
     {
       "id": "zoran_lazarevic",
-      "name": "Zoran Lazarevic",
+      "name": "key:custom.skinpack1.zoran_lazarevic",
       "texture": "skins/zoran_lazarevic.png",
       "order": 26
     },
     {
       "id": "joseph_capelli",
-      "name": "Joseph Capelli",
+      "name": "key:custom.skinpack1.joseph_capelli",
       "texture": "skins/joseph_capelli.png",
       "order": 27
     },
     {
       "id": "nathan_hale",
-      "name": "Nathan Hale",
+      "name": "key:custom.skinpack1.nathan_hale",
       "texture": "skins/nathan_hale.png",
       "order": 28
     },
     {
       "id": "grim",
-      "name": "Grim",
+      "name": "key:custom.skinpack1.grim",
       "texture": "skins/grim.png",
       "order": 29
     },
     {
       "id": "chimera",
-      "name": "Chimera",
+      "name": "key:custom.skinpack1.chimera",
       "texture": "skins/chimera.png",
       "order": 30
     },
     {
       "id": "racing_driver_1",
-      "name": "Racing Driver 1",
+      "name": "key:custom.skinpack1.racing_driver_1",
       "texture": "skins/racing_driver_1.png",
       "order": 31
     },
     {
       "id": "racing_driver_2",
-      "name": "Racing Driver 2",
+      "name": "key:custom.skinpack1.racing_driver_2",
       "texture": "skins/racing_driver_2.png",
       "order": 32
     },
     {
       "id": "racing_driver_3",
-      "name": "Racing Driver 3",
+      "name": "key:custom.skinpack1.racing_driver_3",
       "texture": "skins/racing_driver_3.png",
       "order": 33
     },
     {
       "id": "racing_driver_4",
-      "name": "Racing Driver 4",
+      "name": "key:custom.skinpack1.racing_driver_4",
       "texture": "skins/racing_driver_4.png",
       "order": 34
     },
     {
       "id": "nurse",
-      "name": "Nurse",
+      "name": "key:custom.skinpack1.nurse",
       "texture": "skins/nurse.png",
       "order": 35
     },
     {
       "id": "prisoner",
-      "name": "Prisoner",
+      "name": "key:custom.skinpack1.prisoner",
       "texture": "skins/prisoner.png",
       "order": 36
     },
     {
       "id": "victorian_swimmer",
-      "name": "Victorian Swimmer",
+      "name": "key:custom.skinpack1.victorian_swimmer",
       "texture": "skins/victorian_swimmer.png",
       "order": 37
     },
     {
       "id": "deep_sea_diver",
-      "name": "Deep Sea Diver",
+      "name": "key:custom.skinpack1.deep_sea_diver",
       "texture": "skins/deep_sea_diver.png",
       "order": 38
     },
     {
       "id": "king",
-      "name": "King",
+      "name": "key:custom.skinpack1.king",
       "texture": "skins/king.png",
       "order": 39
     },
     {
       "id": "queen",
-      "name": "Queen",
+      "name": "key:custom.skinpack1.queen",
       "texture": "skins/queen.png",
       "order": 40
     },
     {
       "id": "jester",
-      "name": "Jester",
+      "name": "key:custom.skinpack1.jester",
       "texture": "skins/jester.png",
       "order": 41
     },
     {
       "id": "knight_templar",
-      "name": "Knight Templar",
+      "name": "key:custom.skinpack1.knight_templar",
       "texture": "skins/knight_templar.png",
       "order": 0.5
     },
     {
       "id": "black_knight",
-      "name": "Black Knight",
+      "name": "key:custom.skinpack1.black_knight",
       "texture": "skins/black_knight.png",
       "order": 0.6
     },
     {
       "id": "wizard",
-      "name": "Wizard",
+      "name": "key:custom.skinpack1.wizard",
       "texture": "skins/wizard.png",
       "order": 0.7
     }

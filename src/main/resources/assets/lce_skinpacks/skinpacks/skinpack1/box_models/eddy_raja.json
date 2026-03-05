@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Eddy Raja",
-    "displayNameId": "IDS_DLCSKIN20000025_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.eddy_raja",
     "themeName": "Uncharted",
-    "themeNameId": "IDS_DLCSKIN20000025_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.eddy_raja"
   },
   "texture": {
     "width": 64,

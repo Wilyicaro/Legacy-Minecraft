@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Super Mutant",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004835_DISPLAYNAME",
+    "displayNameId": "custom.fallout.super_mutant",
     "themeName": "Fallout",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004835_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.super_mutant"
   },
   "texture": {
     "width": 64,

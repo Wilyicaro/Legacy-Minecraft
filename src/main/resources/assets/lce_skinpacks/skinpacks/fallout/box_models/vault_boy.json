@@ -1,11 +1,18 @@
 {
   "meta": {
     "displayName": "Vault Boy",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004800_DISPLAYNAME",
+    "displayNameId": "custom.fallout.vault_boy",
     "themeName": "Fallout",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004800_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.vault_boy"
   },
-  "hide": [ "hat", "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "hat",
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

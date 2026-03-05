@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Magnus",
-    "displayNameId": "IDS_DLCSKIN00005011_DISPLAYNAME"
+    "displayNameId": "custom.storymode.magnus"
   },
   "texture": {
     "width": 64,

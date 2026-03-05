@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Forest Brawler",
-    "displayNameId": "IDS_DLCSKIN00004509_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.forest_brawler",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004509_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.forest_brawler"
   },
   "texture": {
     "width": 64,

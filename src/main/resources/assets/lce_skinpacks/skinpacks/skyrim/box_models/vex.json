@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Vex",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001413_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.vex",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001413_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.vex"
   },
   "texture": {
     "width": 64,

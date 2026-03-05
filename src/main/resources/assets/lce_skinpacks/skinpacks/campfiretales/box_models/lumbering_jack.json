@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Lumbering Jack",
-    "displayNameId": "IDS_DLCSKIN00005506_DISPLAYNAME"
+    "displayNameId": "custom.campfiretales.lumbering_jack"
   },
   "texture": {
     "width": 64,

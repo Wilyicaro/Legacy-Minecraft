@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Charlie Murder",
-    "displayNameId": "IDS_dlcskin76218837_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.charlie_murder",
     "themeName": "Charlie Murder",
-    "themeNameId": "IDS_dlcskin76218837_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.charlie_murder"
   },
   "texture": {
     "width": 64,

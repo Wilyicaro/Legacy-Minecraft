@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "White Tiger",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005137_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.white_tiger",
     "themeName": "Western Symbol",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005137_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.white_tiger"
   },
   "texture": {
     "width": 64,

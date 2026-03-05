@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Biker",
-    "displayNameId": "IDS_DLCSKIN00000024_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.biker",
     "themeName": "Trials Evolution",
-    "themeNameId": "IDS_DLCSKIN00000024_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.biker"
   },
   "texture": {
     "width": 64,

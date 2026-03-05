@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Scarecrow",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003217_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.scarecrow"
   },
   "texture": {
     "width": 64,

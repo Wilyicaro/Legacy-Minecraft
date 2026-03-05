@@ -1,11 +1,14 @@
 {
   "meta": {
     "displayName": "Party Zeus",
-    "displayNameId": "IDS_DLCSKIN20000420_DISPLAYNAME",
+    "displayNameId": "custom.birthday2.party_zeus",
     "themeName": "God of War",
-    "themeNameId": "IDS_DLCSKIN20000420_THEMENAME"
+    "themeNameId": "custom.birthday2.themetext.party_zeus"
   },
-  "hide": ["hat", "jacket"],
+  "hide": [
+    "hat",
+    "jacket"
+  ],
   "texture": {
     "width": 64,
     "height": 64

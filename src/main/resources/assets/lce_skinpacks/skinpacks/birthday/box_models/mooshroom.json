@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mooshroom",
-    "displayNameId": "IDS_DLCSKIN00000709_DISPLAYNAME"
+    "displayNameId": "custom.birthday.mooshroom"
   },
   "texture": {
     "width": 64,

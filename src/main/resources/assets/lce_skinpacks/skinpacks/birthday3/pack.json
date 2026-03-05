@@ -1,121 +1,121 @@
 {
-  "name": "3rd Birthday Skin Pack",
+  "name": "key:custom.birthday3.pack.name",
   "author": "4J Studios",
   "skins": [
     {
       "id": "jens",
-      "name": "Jens",
+      "name": "key:custom.birthday3.jens",
       "texture": "skins/jens.png",
       "cape": "capes/jens.png",
       "order": 1
     },
     {
       "id": "daniel_kaplan",
-      "name": "Daniel Kaplan",
+      "name": "key:custom.birthday3.daniel_kaplan",
       "texture": "skins/daniel_kaplan.png",
       "order": 2
     },
     {
       "id": "markus_junkboy",
-      "name": "Markus (Junkboy)",
+      "name": "key:custom.birthday3.markus_junkboy",
       "texture": "skins/markus_junkboy.png",
       "order": 3
     },
     {
       "id": "aron",
-      "name": "Aron",
+      "name": "key:custom.birthday3.aron",
       "texture": "skins/aron.png",
       "order": 4
     },
     {
       "id": "mattis",
-      "name": "Mattis",
+      "name": "key:custom.birthday3.mattis",
       "texture": "skins/mattis.png",
       "order": 5
     },
     {
       "id": "henrik",
-      "name": "Henrik",
+      "name": "key:custom.birthday3.henrik",
       "texture": "skins/henrik.png",
       "order": 6
     },
     {
       "id": "daniel_frisk",
-      "name": "Daniel Frisk",
+      "name": "key:custom.birthday3.daniel_frisk",
       "texture": "skins/daniel_frisk.png",
       "order": 7
     },
     {
       "id": "jon",
-      "name": "Jon",
+      "name": "key:custom.birthday3.jon",
       "texture": "skins/jon.png",
       "order": 8
     },
     {
       "id": "mans",
-      "name": "Måns",
+      "name": "key:custom.birthday3.mans",
       "texture": "skins/mans.png",
       "order": 9
     },
     {
       "id": "johan",
-      "name": "Johan",
+      "name": "key:custom.birthday3.johan",
       "texture": "skins/johan.png",
       "order": 10
     },
     {
       "id": "lydia",
-      "name": "Lydia",
+      "name": "key:custom.birthday3.lydia",
       "texture": "skins/lydia.png",
       "order": 11
     },
     {
       "id": "karin",
-      "name": "Karin",
+      "name": "key:custom.birthday3.karin",
       "texture": "skins/karin.png",
       "order": 12
     },
     {
       "id": "kristoffer",
-      "name": "Kristoffer",
+      "name": "key:custom.birthday3.kristoffer",
       "texture": "skins/kristoffer.png",
       "order": 13
     },
     {
       "id": "nathan",
-      "name": "Nathan",
+      "name": "key:custom.birthday3.nathan",
       "texture": "skins/nathan.png",
       "order": 14,
       "poses": "upside_down"
     },
     {
       "id": "erik",
-      "name": "Erik",
+      "name": "key:custom.birthday3.erik",
       "texture": "skins/erik.png",
       "order": 15,
       "poses": "upside_down"
     },
     {
       "id": "redstone_creature",
-      "name": "Redstone Creature",
+      "name": "key:custom.birthday3.redstone_creature",
       "texture": "skins/redstone_creature.png",
       "order": 16
     },
     {
       "id": "the_end_creature",
-      "name": "The End Creature",
+      "name": "key:custom.birthday3.the_end_creature",
       "texture": "skins/the_end_creature.png",
       "order": 17
     },
     {
       "id": "sandstone_creature",
-      "name": "Sandstone Creature",
+      "name": "key:custom.birthday3.sandstone_creature",
       "texture": "skins/sandstone_creature.png",
       "order": 18
     },
     {
       "id": "tommaso",
-      "name": "Tommaso",
+      "name": "key:custom.birthday3.tommaso",
       "texture": "skins/tommaso.png",
       "order": 19
     }

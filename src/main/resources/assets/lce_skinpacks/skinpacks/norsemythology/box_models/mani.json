@@ -1,11 +1,17 @@
 {
   "meta": {
     "displayName": "Mani",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004625_DISPLAYNAME",
+    "displayNameId": "custom.norsemythology.mani",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004625_THEMENAME"
+    "themeNameId": "custom.norsemythology.themetext.mani"
   },
-  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

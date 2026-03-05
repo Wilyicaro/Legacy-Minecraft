@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Crocodile",
-    "displayNameId": "IDS_DLCSKIN00000820_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.crocodile"
   },
   "texture": {
     "width": 64,

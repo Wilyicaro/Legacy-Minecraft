@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Amy Pond",
-    "displayNameId": "IDS_DLCSKIN00002006_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.amy_pond"
   },
   "texture": {
     "width": 64,

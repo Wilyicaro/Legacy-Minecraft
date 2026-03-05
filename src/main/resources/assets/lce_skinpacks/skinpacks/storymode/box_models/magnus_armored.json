@@ -1,9 +1,14 @@
 {
   "meta": {
     "displayName": "Magnus Armored",
-    "displayNameId": "IDS_DLCSKIN00005012_DISPLAYNAME"
+    "displayNameId": "custom.storymode.magnus_armored"
   },
-  "hide": ["hat", "left_sleeve", "right_sleeve", "jacket"],
+  "hide": [
+    "hat",
+    "left_sleeve",
+    "right_sleeve",
+    "jacket"
+  ],
   "texture": {
     "width": 64,
     "height": 64

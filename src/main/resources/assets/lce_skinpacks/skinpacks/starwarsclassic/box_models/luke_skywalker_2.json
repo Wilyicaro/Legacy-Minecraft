@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Luke Skywalker",
-    "displayNameId": "IDS_DLCSKIN00001201_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.luke_skywalker_2",
     "themeName": "X-wing Pilot",
-    "themeNameId": "IDS_DLCSKIN00001201_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.luke_skywalker_2"
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

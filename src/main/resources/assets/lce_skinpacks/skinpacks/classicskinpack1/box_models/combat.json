@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Combat",
-    "displayNameId": "IDS_DLCSKIN00000025_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.combat",
     "themeName": "Trials Evolution",
-    "themeNameId": "IDS_DLCSKIN00000025_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.combat"
   },
   "texture": {
     "width": 64,

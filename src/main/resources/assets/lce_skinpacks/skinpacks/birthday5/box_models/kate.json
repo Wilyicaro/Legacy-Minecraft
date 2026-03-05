@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Kate",
-    "displayNameId": "IDS_DLCSKIN00006106_DISPLAYNAME"
+    "displayNameId": "custom.birthday5.kate"
   },
   "texture": {
     "width": 64,

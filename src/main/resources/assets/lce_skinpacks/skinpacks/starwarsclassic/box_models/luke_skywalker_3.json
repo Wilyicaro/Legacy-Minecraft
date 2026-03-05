@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Luke Skywalker",
-    "displayNameId": "IDS_DLCSKIN00001202_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.luke_skywalker_3",
     "themeName": "Bespin",
-    "themeNameId": "IDS_DLCSKIN00001202_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.luke_skywalker_3"
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

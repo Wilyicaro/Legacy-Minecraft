@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mooshroom Engineer",
-    "displayNameId": "IDS_DLCSKIN00005303_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.mooshroom_engineer"
   },
   "texture": {
     "width": 64,

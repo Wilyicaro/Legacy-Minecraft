@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Melanie Bush",
-    "displayNameId": "IDS_DLCSKIN00002013_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.melanie_bush"
   },
   "texture": {
     "width": 64,

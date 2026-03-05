@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Tuxedo Steve Xmas",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002722_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.tuxedo_steve_xmas",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002722_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.tuxedo_steve_xmas"
   },
   "texture": {
     "width": 64,

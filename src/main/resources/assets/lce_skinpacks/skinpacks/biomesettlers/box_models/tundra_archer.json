@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Tundra Archer",
-    "displayNameId": "IDS_DLCSKIN00004516_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.tundra_archer",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004516_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.tundra_archer"
   },
   "texture": {
     "width": 64,

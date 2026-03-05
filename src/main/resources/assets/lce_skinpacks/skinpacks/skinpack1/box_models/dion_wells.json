@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Dion Wells",
-    "displayNameId": "IDS_DLCSKIN20000015_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.dion_wells",
     "themeName": "SOCOM",
-    "themeNameId": "IDS_DLCSKIN20000015_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.dion_wells"
   },
   "texture": {
     "width": 64,

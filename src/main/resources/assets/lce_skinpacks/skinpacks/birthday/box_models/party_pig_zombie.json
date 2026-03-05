@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Party Pig Zombie",
-    "displayNameId": "IDS_DLCSKIN00000703_DISPLAYNAME"
+    "displayNameId": "custom.birthday.party_pig_zombie"
   },
   "texture": {
     "width": 64,

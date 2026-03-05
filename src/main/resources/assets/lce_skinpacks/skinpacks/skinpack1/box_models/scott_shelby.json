@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Scott Shelby",
-    "displayNameId": "IDS_DLCSKIN20000022_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.scott_shelby",
     "themeName": "Heavy Rain",
-    "themeNameId": "IDS_DLCSKIN20000022_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.scott_shelby"
   },
   "texture": {
     "width": 64,

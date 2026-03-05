@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Piper",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004831_DISPLAYNAME",
+    "displayNameId": "custom.fallout.piper",
     "themeName": "Fallout 4",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004831_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.piper"
   },
   "texture": {
     "width": 64,

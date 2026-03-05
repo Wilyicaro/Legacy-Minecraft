@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Prince Gumball",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004407_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.prince_gumball"
   },
   "texture": {
     "width": 64,

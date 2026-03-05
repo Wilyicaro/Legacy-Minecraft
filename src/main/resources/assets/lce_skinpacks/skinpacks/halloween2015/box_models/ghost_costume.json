@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Ghost Costume",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003241_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.ghost_costume"
   },
   "texture": {
     "width": 64,

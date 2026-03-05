@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Ellis",
-    "displayNameId": "IDS_DLCSKIN20000216_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.ellis",
     "themeName": "Left 4 Dead 2",
-    "themeNameId": "IDS_DLCSKIN20000216_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.ellis"
   },
   "texture": {
     "width": 64,

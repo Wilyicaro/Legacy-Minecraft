@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Isran",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001423_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.isran",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001423_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.isran"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Headless Monk",
-    "displayNameId": "IDS_DLCSKIN00002036_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.headless_monk"
   },
   "texture": {
     "width": 64,

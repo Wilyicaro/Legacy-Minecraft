@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Christmas Skeleton",
-    "displayNameId": "IDS_DLCSKIN00000609_DISPLAYNAME"
+    "displayNameId": "custom.festive.christmas_skeleton"
   },
   "texture": {
     "width": 64,

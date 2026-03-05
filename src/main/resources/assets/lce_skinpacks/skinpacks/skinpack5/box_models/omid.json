@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Omid",
-    "displayNameId": "IDS_dlcskin90416536_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.omid",
     "themeName": "The Walking Dead",
-    "themeNameId": "IDS_dlcskin90416536_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.omid"
   },
   "texture": {
     "width": 64,

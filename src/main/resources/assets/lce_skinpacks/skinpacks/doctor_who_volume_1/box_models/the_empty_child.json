@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Empty Child",
-    "displayNameId": "IDS_DLCSKIN00002027_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.the_empty_child"
   },
   "texture": {
     "width": 64,

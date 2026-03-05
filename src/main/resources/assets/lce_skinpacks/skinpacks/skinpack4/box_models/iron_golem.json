@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Iron Golem",
-    "displayNameId": "IDS_dlcskin03474404_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.iron_golem",
     "themeName": "Minecraft",
-    "themeNameId": "IDS_dlcskin03474404_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.iron_golem"
   },
   "texture": {
     "width": 64,

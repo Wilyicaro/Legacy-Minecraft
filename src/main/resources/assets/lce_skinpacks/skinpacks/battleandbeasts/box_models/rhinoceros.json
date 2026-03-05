@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Rhinoceros",
-    "displayNameId": "IDS_DLCSKIN00000809_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.rhinoceros"
   },
   "texture": {
     "width": 64,

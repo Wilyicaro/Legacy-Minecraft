@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Top Hat Sheep",
-    "displayNameId": "IDS_DLCSKIN00000710_DISPLAYNAME"
+    "displayNameId": "custom.birthday.top_hat_sheep"
   },
   "texture": {
     "width": 64,

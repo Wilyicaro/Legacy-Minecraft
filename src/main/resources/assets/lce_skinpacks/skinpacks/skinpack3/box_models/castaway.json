@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Castaway",
-    "displayNameId": "IDS_DLCSKIN20000236_DISPLAYNAME"
+    "displayNameId": "custom.skinpack3.castaway"
   },
   "texture": {
     "width": 64,

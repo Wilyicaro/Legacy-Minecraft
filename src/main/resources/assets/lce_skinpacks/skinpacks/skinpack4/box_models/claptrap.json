@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Claptrap",
-    "displayNameId": "IDS_dlcskin50856871_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.claptrap",
     "themeName": "Borderlands",
-    "themeNameId": "IDS_dlcskin50856871_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.claptrap"
   },
   "texture": {
     "width": 64,

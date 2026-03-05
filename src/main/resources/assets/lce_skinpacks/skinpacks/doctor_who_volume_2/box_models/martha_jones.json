@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Martha Jones",
-    "displayNameId": "IDS_DLCSKIN00002507_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.martha_jones"
   },
   "texture": {
     "width": 64,

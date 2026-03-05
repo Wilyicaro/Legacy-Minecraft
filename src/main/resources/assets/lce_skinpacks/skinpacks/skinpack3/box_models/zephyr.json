@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Zephyr",
-    "displayNameId": "IDS_DLCSKIN20000210_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.zephyr",
     "themeName": "Slam Bolt Scrappers",
-    "themeNameId": "IDS_DLCSKIN20000210_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.zephyr"
   },
   "texture": {
     "width": 64,

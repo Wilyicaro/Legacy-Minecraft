@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Sergeant Rex \"Power\" Colt",
-    "displayNameId": "IDS_dlcskin45006439_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.sergeant_rex_power_colt",
     "themeName": "Far Cry 3: Blood Dragon",
-    "themeNameId": "IDS_dlcskin45006439_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.sergeant_rex_power_colt"
   },
   "texture": {
     "width": 64,

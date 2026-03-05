@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Hel",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004623_DISPLAYNAME",
+    "displayNameId": "custom.norsemythology.hel",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004623_THEMENAME"
+    "themeNameId": "custom.norsemythology.themetext.hel"
   },
   "armorOffsets": {
     "TOOL0": {
@@ -17,7 +17,13 @@
       "z": 0.0
     }
   },
-  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

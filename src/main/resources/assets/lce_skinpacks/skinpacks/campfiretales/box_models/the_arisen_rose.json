@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Arisen Rose",
-    "displayNameId": "IDS_DLCSKIN00005509_DISPLAYNAME"
+    "displayNameId": "custom.campfiretales.the_arisen_rose"
   },
   "texture": {
     "width": 64,

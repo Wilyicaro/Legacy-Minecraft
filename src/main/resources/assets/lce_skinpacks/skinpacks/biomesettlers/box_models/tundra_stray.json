@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Tundra Stray",
-    "displayNameId": "IDS_DLCSKIN00004522_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.tundra_stray",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004522_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.tundra_stray"
   },
   "texture": {
     "width": 64,

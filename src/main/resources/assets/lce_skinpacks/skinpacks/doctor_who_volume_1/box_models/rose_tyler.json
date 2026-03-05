@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Rose Tyler",
-    "displayNameId": "IDS_DLCSKIN00002014_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.rose_tyler"
   },
   "texture": {
     "width": 64,

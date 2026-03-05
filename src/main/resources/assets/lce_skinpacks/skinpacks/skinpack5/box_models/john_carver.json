@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "John Carver",
-    "displayNameId": "IDS_dlcskin06590996_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.john_carver",
     "themeName": "Dead Space 3",
-    "themeNameId": "IDS_dlcskin06590996_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.john_carver"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Baby Ghast",
-    "displayNameId": "IDS_DLCSKIN00001000_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.baby_ghast"
   },
   "texture": {
     "width": 64,

@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Candycane Stick",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002716_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.candycane_stick",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002716_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.candycane_stick"
   },
-"hide": ["all"],
+  "hide": [
+    "all"
+  ],
   "texture": {
     "width": 64,
     "height": 64

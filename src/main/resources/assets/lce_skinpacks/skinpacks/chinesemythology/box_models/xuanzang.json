@@ -1,11 +1,17 @@
 {
   "meta": {
     "displayName": "Xuanzang",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005101_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.xuanzang",
     "themeName": "Enlightened Monk",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005101_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.xuanzang"
   },
-  "hide": [ "hat", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "hat",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Sutekh",
-    "displayNameId": "IDS_DLCSKIN00002541_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.sutekh"
   },
   "armorOffsets": {
     "HELMET": {

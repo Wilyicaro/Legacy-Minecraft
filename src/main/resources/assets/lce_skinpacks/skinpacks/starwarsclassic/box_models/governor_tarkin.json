@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Governor Tarkin",
-    "displayNameId": "IDS_DLCSKIN00001228_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.governor_tarkin",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001228_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.governor_tarkin"
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

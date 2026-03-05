@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Enderman in a Suit",
-    "displayNameId": "IDS_DLCSKIN00000800_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.enderman_in_a_suit"
   },
   "texture": {
     "width": 64,

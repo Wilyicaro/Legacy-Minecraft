@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Alex",
-    "displayNameId": "IDS_DLCSKIN00003104_DISPLAYNAME",
+    "displayNameId": "custom.minecon2015.alex_11",
     "themeName": "Minecon 2011 Cape",
-    "themeNameId": "IDS_DLCSKIN00003104_THEMENAME"
+    "themeNameId": "custom.minecon2015.themetext.alex_11"
   },
   "texture": {
     "width": 64,

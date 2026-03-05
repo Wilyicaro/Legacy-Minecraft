@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Sheogorath",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001433_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.sheogorath",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001433_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.sheogorath"
   },
   "texture": {
     "width": 64,

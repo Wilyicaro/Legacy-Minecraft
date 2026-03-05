@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Nurse",
-    "displayNameId": "IDS_DLCSKIN00000035_DISPLAYNAME"
+    "displayNameId": "custom.classicskinpack1.nurse"
   },
   "texture": {
     "width": 64,

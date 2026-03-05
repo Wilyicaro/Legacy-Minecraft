@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Lady Rainicorn",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004408_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.lady_rainicorn"
   },
   "armorOffsets": {
     "HEAD": {

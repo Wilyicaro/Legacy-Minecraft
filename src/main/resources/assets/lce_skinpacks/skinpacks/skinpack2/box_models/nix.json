@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Nix",
-    "displayNameId": "IDS_DLCSKIN20000125_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.nix",
     "themeName": "inFAMOUS",
-    "themeNameId": "IDS_DLCSKIN20000125_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.nix"
   },
   "texture": {
     "width": 64,

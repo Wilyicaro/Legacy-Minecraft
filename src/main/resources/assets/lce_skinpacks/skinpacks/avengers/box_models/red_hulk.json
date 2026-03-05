@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Red Hulk",
-    "displayNameId": "IDS_dlcskin31203283_DISPLAYNAME",
+    "displayNameId": "custom.avengers.red_hulk",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin31203283_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.red_hulk"
   },
   "texture": {
     "width": 64,

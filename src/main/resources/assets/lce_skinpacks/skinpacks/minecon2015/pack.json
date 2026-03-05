@@ -1,46 +1,46 @@
 {
-  "name": "Minecon 2015",
+  "name": "key:custom.minecon2015.pack.name",
   "author": "4J Studios",
   "skins": [
     {
       "id": "steve_11",
-      "name": "Steve",
+      "name": "key:custom.minecon2015.steve",
       "texture": "skins/steve.png",
       "cape": "capes/2011.png",
       "order": 1
     },
     {
       "id": "steve_2",
-      "name": "Steve",
+      "name": "key:custom.minecon2015.steve_2",
       "texture": "skins/steve_2.png",
       "cape": "capes/2012.png",
       "order": 2
     },
     {
       "id": "steve_3",
-      "name": "Steve",
+      "name": "key:custom.minecon2015.steve_3",
       "texture": "skins/steve_3.png",
       "cape": "capes/2013.png",
       "order": 3
     },
     {
       "id": "steve_4",
-      "name": "Steve",
+      "name": "key:custom.minecon2015.steve_4",
       "texture": "skins/steve_4.png",
       "cape": "capes/2015.png",
       "order": 4
     },
     {
       "id": "alex_11",
-      "name": "Alex",
-      "texture": "skins/alex.png",
+      "name": "key:custom.minecon2015.alex_11",
+      "texture": "skins/alex_11.png",
       "cape": "capes/2011.png",
       "model": "slim",
       "order": 5
     },
     {
       "id": "alex_2",
-      "name": "Alex",
+      "name": "key:custom.minecon2015.alex_2",
       "texture": "skins/alex_2.png",
       "cape": "capes/2012.png",
       "model": "slim",
@@ -48,7 +48,7 @@
     },
     {
       "id": "alex_3",
-      "name": "Alex",
+      "name": "key:custom.minecon2015.alex_3",
       "texture": "skins/alex_3.png",
       "cape": "capes/2013.png",
       "model": "slim",
@@ -56,7 +56,7 @@
     },
     {
       "id": "alex_4",
-      "name": "Alex",
+      "name": "key:custom.minecon2015.alex_4",
       "texture": "skins/alex_4.png",
       "cape": "capes/2015.png",
       "model": "slim",

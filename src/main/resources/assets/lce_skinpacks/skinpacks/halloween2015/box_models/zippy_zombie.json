@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Zippy Zombie",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003216_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.zippy_zombie"
   },
   "texture": {
     "width": 64,

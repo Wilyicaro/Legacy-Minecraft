@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Sudri",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004613_DISPLAYNAME",
+    "displayNameId": "custom.norsemythology.sudri",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004613_THEMENAME"
+    "themeNameId": "custom.norsemythology.themetext.sudri"
   },
   "armorOffsets": {
     "BODY": {
@@ -77,7 +77,13 @@
       "z": 0.0
     }
   },
-  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

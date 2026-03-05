@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Zombie in a Suit",
-    "displayNameId": "IDS_DLCSKIN00000801_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.zombie_in_a_suit"
   },
   "texture": {
     "width": 64,

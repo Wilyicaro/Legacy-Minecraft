@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Empress Wu Zetian",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005127_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.empress_wu_zetian",
     "themeName": "Legendary Empress",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005127_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.empress_wu_zetian"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Dragon Priest",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001430_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.dragon_priest",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001430_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.dragon_priest"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Gorilla",
-    "displayNameId": "IDS_DLCSKIN00000818_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.gorilla"
   },
   "texture": {
     "width": 64,

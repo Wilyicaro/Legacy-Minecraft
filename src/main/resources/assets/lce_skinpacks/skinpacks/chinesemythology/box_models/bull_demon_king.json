@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Bull Demon King",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005107_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.bull_demon_king",
     "themeName": "Giant White Ox",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005107_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.bull_demon_king"
   },
   "texture": {
     "width": 64,

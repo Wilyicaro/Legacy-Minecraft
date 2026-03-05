@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Headless Haunter",
-    "displayNameId": "IDS_DLCSKIN00005504_DISPLAYNAME"
+    "displayNameId": "custom.campfiretales.the_headless_haunter"
   },
   "texture": {
     "width": 64,

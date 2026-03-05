@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Billy Young",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004423_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.billy_young"
   },
   "texture": {
     "width": 64,

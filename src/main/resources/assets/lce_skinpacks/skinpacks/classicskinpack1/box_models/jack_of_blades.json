@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Jack of Blades",
-    "displayNameId": "IDS_DLCSKIN00000004_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.jack_of_blades",
     "themeName": "Fable Heroes",
-    "themeNameId": "IDS_DLCSKIN00000004_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.jack_of_blades"
   },
   "texture": {
     "width": 64,

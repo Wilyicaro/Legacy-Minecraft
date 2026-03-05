@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Narg",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004807_DISPLAYNAME",
+    "displayNameId": "custom.fallout.narg",
     "themeName": "Fallout 2",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004807_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.narg"
   },
   "texture": {
     "width": 64,

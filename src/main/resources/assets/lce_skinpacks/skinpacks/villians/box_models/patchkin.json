@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Patchkin",
-    "displayNameId": "IDS_DLCSKIN00005609_DISPLAYNAME",
+    "displayNameId": "custom.villians.patchkin",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005609_THEMENAME"
+    "themeNameId": "custom.villians.themetext.patchkin"
   },
   "texture": {
     "width": 64,

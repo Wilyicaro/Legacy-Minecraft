@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Sly Cooper",
-    "displayNameId": "IDS_DLCSKIN20000010_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.sly_cooper",
     "themeName": "Sly Cooper",
-    "themeNameId": "IDS_DLCSKIN20000010_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.sly_cooper"
   },
   "texture": {
     "width": 64,

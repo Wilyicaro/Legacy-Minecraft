@@ -1,9 +1,15 @@
 {
   "meta": {
     "displayName": "Ice Queen",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004411_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.ice_queen"
   },
-  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Party Dust",
-    "displayNameId": "IDS_DLCSKIN20000411_DISPLAYNAME",
+    "displayNameId": "custom.birthday2.party_dust",
     "themeName": "Dust: An Elysian Tail",
-    "themeNameId": "IDS_DLCSKIN20000411_THEMENAME"
+    "themeNameId": "custom.birthday2.themetext.party_dust"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Cullan Gray",
-    "displayNameId": "IDS_DLCSKIN20000014_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.cullan_gray",
     "themeName": "SOCOM",
-    "themeNameId": "IDS_DLCSKIN20000014_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.cullan_gray"
   },
   "texture": {
     "width": 64,

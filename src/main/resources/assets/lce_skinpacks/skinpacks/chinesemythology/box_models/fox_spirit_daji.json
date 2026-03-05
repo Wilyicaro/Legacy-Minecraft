@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Fox Spirit Daji",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005129_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.fox_spirit_daji",
     "themeName": "Malevolent Immortal",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005129_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.fox_spirit_daji"
   },
-  "hide": [ "hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

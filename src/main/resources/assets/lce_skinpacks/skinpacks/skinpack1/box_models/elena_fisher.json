@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Elena Fisher",
-    "displayNameId": "IDS_DLCSKIN20000024_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.elena_fisher",
     "themeName": "Uncharted",
-    "themeNameId": "IDS_DLCSKIN20000024_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.elena_fisher"
   },
   "texture": {
     "width": 64,

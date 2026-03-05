@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Dalek Sec",
-    "displayNameId": "IDS_DLCSKIN00002044_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.dalek_sec"
   },
   "armor_offsets": {
     "helmet": {

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Tundra Hunter",
-    "displayNameId": "IDS_DLCSKIN00004521_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.tundra_hunter",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004521_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.tundra_hunter"
   },
   "texture": {
     "width": 64,

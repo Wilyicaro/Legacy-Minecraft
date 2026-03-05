@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Special Weapons Dalek",
-    "displayNameId": "IDS_DLCSKIN00002056_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.special_weapons_dalek"
   },
   "hide": "ALL",
   "texture": {

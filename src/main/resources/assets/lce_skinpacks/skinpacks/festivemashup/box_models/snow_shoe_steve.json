@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Snow Shoe Steve",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002729_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.snow_shoe_steve",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002729_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.snow_shoe_steve"
   },
   "texture": {
     "width": 64,

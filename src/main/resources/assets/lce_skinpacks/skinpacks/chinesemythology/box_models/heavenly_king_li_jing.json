@@ -1,11 +1,17 @@
 {
   "meta": {
     "displayName": "Heavenly King Li Jing",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005118_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.heavenly_king_li_jing",
     "themeName": "Heaven's Gatekeeper",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005118_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.heavenly_king_li_jing"
   },
-  "hide": [ "hat", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "hat",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

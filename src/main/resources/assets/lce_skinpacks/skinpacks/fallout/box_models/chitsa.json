@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Chitsa",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004805_DISPLAYNAME",
+    "displayNameId": "custom.fallout.chitsa",
     "themeName": "Fallout 2",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004805_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.chitsa"
   },
   "texture": {
     "width": 64,

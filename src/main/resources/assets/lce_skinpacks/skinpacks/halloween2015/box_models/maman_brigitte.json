@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Maman Brigitte",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003245_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.maman_brigitte"
   },
   "texture": {
     "width": 64,

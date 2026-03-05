@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Minerva",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004446_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.minerva"
   },
   "texture": {
     "width": 64,

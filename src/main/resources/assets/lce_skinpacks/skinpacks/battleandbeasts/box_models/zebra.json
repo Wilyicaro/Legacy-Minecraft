@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Zebra",
-    "displayNameId": "IDS_DLCSKIN00000804_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.zebra"
   },
   "texture": {
     "width": 64,

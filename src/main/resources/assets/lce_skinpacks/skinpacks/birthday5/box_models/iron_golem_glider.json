@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Iron Golem Glider",
-    "displayNameId": "IDS_DLCSKIN00006127_DISPLAYNAME"
+    "displayNameId": "custom.birthday5.iron_golem_glider"
   },
   "texture": {
     "width": 64,

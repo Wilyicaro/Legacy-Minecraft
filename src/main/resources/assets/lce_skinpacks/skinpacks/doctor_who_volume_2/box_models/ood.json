@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Ood",
-    "displayNameId": "IDS_DLCSKIN00002553_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.ood"
   },
   "armorOffsets": {
     "HELMET": {

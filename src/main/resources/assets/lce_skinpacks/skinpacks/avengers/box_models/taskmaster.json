@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Taskmaster",
-    "displayNameId": "IDS_dlcskin71824670_DISPLAYNAME",
+    "displayNameId": "custom.avengers.taskmaster",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin71824670_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.taskmaster"
   },
   "texture": {
     "width": 64,

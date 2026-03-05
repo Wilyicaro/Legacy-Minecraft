@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Nimon",
-    "displayNameId": "IDS_DLCSKIN00002540_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.the_nimon"
   },
   "texture": {
     "width": 64,

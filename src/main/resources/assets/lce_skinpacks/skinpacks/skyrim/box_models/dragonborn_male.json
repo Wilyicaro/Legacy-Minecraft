@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Dragonborn Male",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001400_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.dragonborn_male",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001400_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.dragonborn_male"
   },
   "texture": {
     "width": 64,

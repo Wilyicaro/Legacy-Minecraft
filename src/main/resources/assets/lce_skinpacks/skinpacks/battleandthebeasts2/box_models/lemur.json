@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Lemur",
-    "displayNameId": "IDS_DLCSKIN00001008_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.lemur"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Hunson Abadeer",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004437_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.hunson_abadeer"
   },
   "armorOffsets": {
     "HELMET": {
@@ -10,7 +10,7 @@
       "z": 0.0
     }
   },
-"hide": "right_sleeve",
+  "hide": "right_sleeve",
   "texture": {
     "width": 64,
     "height": 64

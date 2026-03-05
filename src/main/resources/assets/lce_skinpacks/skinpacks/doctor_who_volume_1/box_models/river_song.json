@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "River Song",
-    "displayNameId": "IDS_DLCSKIN00002007_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.river_song"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Sir Slicer",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004428_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.sir_slicer"
   },
   "texture": {
     "width": 64,

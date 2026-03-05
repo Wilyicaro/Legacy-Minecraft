@@ -1,268 +1,268 @@
 {
-  "name": "Classic Skin Pack 1",
+  "name": "key:custom.classicskinpack1.pack.name",
   "author": "4J Studios",
   "skins": [
     {
       "id": "creeper",
-      "name": "Creeper",
+      "name": "key:custom.classicskinpack1.creeper",
       "texture": "skins/creeper.png",
       "order": 1
     },
     {
       "id": "squid",
-      "name": "Squid",
+      "name": "key:custom.classicskinpack1.squid",
       "texture": "skins/squid.png",
       "order": 2
     },
     {
       "id": "zombie",
-      "name": "Zombie",
+      "name": "key:custom.classicskinpack1.zombie",
       "texture": "skins/zombie.png",
       "order": 3
     },
     {
       "id": "jack_of_blades",
-      "name": "Jack of Blades",
+      "name": "key:custom.classicskinpack1.jack_of_blades",
       "texture": "skins/jack_of_blades.png",
       "order": 4
     },
     {
       "id": "hero",
-      "name": "Hero",
+      "name": "key:custom.classicskinpack1.hero",
       "texture": "skins/hero.png",
       "order": 5
     },
     {
       "id": "garth",
-      "name": "Garth",
+      "name": "key:custom.classicskinpack1.garth",
       "texture": "skins/garth.png",
       "order": 6
     },
     {
       "id": "reaver",
-      "name": "Reaver",
+      "name": "key:custom.classicskinpack1.reaver",
       "texture": "skins/reaver.png",
       "order": 7
     },
     {
       "id": "hammer",
-      "name": "Hammer",
+      "name": "key:custom.classicskinpack1.hammer",
       "texture": "skins/hammer.png",
       "order": 8
     },
     {
       "id": "locust_drone",
-      "name": "Locust Drone",
+      "name": "key:custom.classicskinpack1.locust_drone",
       "texture": "skins/locust_drone.png",
       "order": 9
     },
     {
       "id": "cole_train",
-      "name": "Cole Train",
+      "name": "key:custom.classicskinpack1.cole_train",
       "texture": "skins/cole_train.png",
       "order": 10
     },
     {
       "id": "clayton_carmine",
-      "name": "Clayton Carmine",
+      "name": "key:custom.classicskinpack1.clayton_carmine",
       "texture": "skins/clayton_carmine.png",
       "order": 45
     },
     {
       "id": "master_chief",
-      "name": "Master Chief",
+      "name": "key:custom.classicskinpack1.master_chief",
       "texture": "skins/master_chief.png",
       "order": 0.5
     },
     {
       "id": "covenant_grunt",
-      "name": "Covenant Grunt",
+      "name": "key:custom.classicskinpack1.covenant_grunt",
       "texture": "skins/covenant_grunt.png",
       "order": 13
     },
     {
       "id": "covenant_brute",
-      "name": "Covenant Brute",
+      "name": "key:custom.classicskinpack1.covenant_brute",
       "texture": "skins/covenant_brute.png",
       "order": 14
     },
     {
       "id": "banjo",
-      "name": "Banjo",
+      "name": "key:custom.classicskinpack1.banjo",
       "texture": "skins/banjo.png",
       "order": 0.6
     },
     {
       "id": "grunty",
-      "name": "Grunty",
+      "name": "key:custom.classicskinpack1.grunty",
       "texture": "skins/grunty.png",
       "order": 16
     },
     {
       "id": "bottles",
-      "name": "Bottles",
+      "name": "key:custom.classicskinpack1.bottles",
       "texture": "skins/bottles.png",
       "order": 17
     },
     {
       "id": "tooty",
-      "name": "Tooty",
+      "name": "key:custom.classicskinpack1.tooty",
       "texture": "skins/tooty.png",
       "order": 18
     },
     {
       "id": "mumbo_jumbo",
-      "name": "Mumbo Jumbo",
+      "name": "key:custom.classicskinpack1.mumbo_jumbo",
       "texture": "skins/mumbo_jumbo.png",
       "order": 19
     },
     {
       "id": "klungo",
-      "name": "Klungo",
+      "name": "key:custom.classicskinpack1.klungo",
       "texture": "skins/klungo.png",
       "order": 20
     },
     {
       "id": "trials_rider",
-      "name": "Trials Rider",
+      "name": "key:custom.classicskinpack1.trials_rider",
       "texture": "skins/trials_rider.png",
       "order": 0.7
     },
     {
       "id": "freestyle",
-      "name": "Freestyle",
+      "name": "key:custom.classicskinpack1.freestyle",
       "texture": "skins/freestyle.png",
       "order": 22
     },
     {
       "id": "old_school",
-      "name": "Old-School",
+      "name": "key:custom.classicskinpack1.old_school",
       "texture": "skins/old_school.png",
       "order": 23
     },
     {
       "id": "biker",
-      "name": "Biker",
+      "name": "key:custom.classicskinpack1.biker",
       "texture": "skins/biker.png",
       "order": 24
     },
     {
       "id": "combat",
-      "name": "Combat",
+      "name": "key:custom.classicskinpack1.combat",
       "texture": "skins/combat.png",
       "order": 25
     },
     {
       "id": "splosion_man",
-      "name": "'Splosion Man",
+      "name": "key:custom.classicskinpack1.splosion_man",
       "texture": "skins/splosion_man.png",
       "order": 44
     },
     {
       "id": "scientist_wilson",
-      "name": "Scientist Wilson",
+      "name": "key:custom.classicskinpack1.scientist_wilson",
       "texture": "skins/scientist_wilson.png",
       "order": 27
     },
     {
       "id": "scientist_danklef",
-      "name": "Scientist Danklef",
+      "name": "key:custom.classicskinpack1.scientist_danklef",
       "texture": "skins/scientist_danklef.png",
       "order": 28
     },
     {
       "id": "ms_splosion_man",
-      "name": "Ms. 'Splosion Man",
+      "name": "key:custom.classicskinpack1.ms_splosion_man",
       "texture": "skins/ms_splosion_man.png",
       "order": 29
     },
     {
       "id": "mandy_elite",
-      "name": "Mandy Elite",
+      "name": "key:custom.classicskinpack1.mandy_elite",
       "texture": "skins/mandy_elite.png",
       "order": 30
     },
     {
       "id": "racing_driver_1",
-      "name": "Racing Driver 1",
+      "name": "key:custom.classicskinpack1.racing_driver_1",
       "texture": "skins/racing_driver_1.png",
       "order": 31
     },
     {
       "id": "racing_driver_2",
-      "name": "Racing Driver 2",
+      "name": "key:custom.classicskinpack1.racing_driver_2",
       "texture": "skins/racing_driver_2.png",
       "order": 32
     },
     {
       "id": "racing_driver_3",
-      "name": "Racing Driver 3",
+      "name": "key:custom.classicskinpack1.racing_driver_3",
       "texture": "skins/racing_driver_3.png",
       "order": 33
     },
     {
       "id": "racing_driver_4",
-      "name": "Racing Driver 4",
+      "name": "key:custom.classicskinpack1.racing_driver_4",
       "texture": "skins/racing_driver_4.png",
       "order": 34
     },
     {
       "id": "nurse",
-      "name": "Nurse",
+      "name": "key:custom.classicskinpack1.nurse",
       "texture": "skins/nurse.png",
       "order": 35
     },
     {
       "id": "prisoner",
-      "name": "Prisoner",
+      "name": "key:custom.classicskinpack1.prisoner",
       "texture": "skins/prisoner.png",
       "order": 36
     },
     {
       "id": "victorian_swimmer",
-      "name": "Victorian Swimmer",
+      "name": "key:custom.classicskinpack1.victorian_swimmer",
       "texture": "skins/victorian_swimmer.png",
       "order": 37
     },
     {
       "id": "deep_sea_diver",
-      "name": "Deep Sea Diver",
+      "name": "key:custom.classicskinpack1.deep_sea_diver",
       "texture": "skins/deep_sea_diver.png",
       "order": 38
     },
     {
       "id": "king",
-      "name": "King",
+      "name": "key:custom.classicskinpack1.king",
       "texture": "skins/king.png",
       "order": 39
     },
     {
       "id": "queen",
-      "name": "Queen",
+      "name": "key:custom.classicskinpack1.queen",
       "texture": "skins/queen.png",
       "order": 40
     },
     {
       "id": "jester",
-      "name": "Jester",
+      "name": "key:custom.classicskinpack1.jester",
       "texture": "skins/jester.png",
       "order": 41
     },
     {
       "id": "knight_templar",
-      "name": "Knight Templar",
+      "name": "key:custom.classicskinpack1.knight_templar",
       "texture": "skins/knight_templar.png",
       "order": 0.71
     },
     {
       "id": "black_knight",
-      "name": "Black Knight",
+      "name": "key:custom.classicskinpack1.black_knight",
       "texture": "skins/black_knight.png",
       "order": 0.72
     },
     {
       "id": "wizard",
-      "name": "Wizard",
+      "name": "key:custom.classicskinpack1.wizard",
       "texture": "skins/wizard.png",
       "order": 0.73
     }

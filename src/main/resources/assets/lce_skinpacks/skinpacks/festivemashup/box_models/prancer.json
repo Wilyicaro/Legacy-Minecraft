@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Prancer",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002707_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.prancer",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002707_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.prancer"
   },
   "texture": {
     "width": 64,

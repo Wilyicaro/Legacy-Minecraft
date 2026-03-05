@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Flame Prince",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004417_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.flame_prince"
   },
   "texture": {
     "width": 64,

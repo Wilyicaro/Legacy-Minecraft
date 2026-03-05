@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Puker",
-    "displayNameId": "IDS_dlcskin66467189_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.puker",
     "themeName": "Dead Space 3",
-    "themeNameId": "IDS_dlcskin66467189_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.puker"
   },
   "texture": {
     "width": 64,

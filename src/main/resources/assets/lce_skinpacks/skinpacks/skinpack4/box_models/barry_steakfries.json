@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Barry Steakfries",
-    "displayNameId": "IDS_dlcskin32173559_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.barry_steakfries",
     "themeName": "Jetpack Joyride",
-    "themeNameId": "IDS_dlcskin32173559_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.barry_steakfries"
   },
   "texture": {
     "width": 64,

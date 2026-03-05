@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "King",
-    "displayNameId": "IDS_DLCSKIN20000039_DISPLAYNAME"
+    "displayNameId": "custom.skinpack1.king"
   },
   "texture": {
     "width": 64,

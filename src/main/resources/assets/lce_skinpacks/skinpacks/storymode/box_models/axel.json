@@ -1,9 +1,14 @@
 {
   "meta": {
     "displayName": "Axel",
-    "displayNameId": "IDS_DLCSKIN00005003_DISPLAYNAME"
+    "displayNameId": "custom.storymode.axel"
   },
-  "hide": ["left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

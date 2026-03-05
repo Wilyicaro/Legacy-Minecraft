@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Old-School",
-    "displayNameId": "IDS_DLCSKIN00000023_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.old_school",
     "themeName": "Trials Evolution",
-    "themeNameId": "IDS_DLCSKIN00000023_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.old_school"
   },
   "texture": {
     "width": 64,

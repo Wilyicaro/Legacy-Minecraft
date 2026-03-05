@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "IG-88",
-    "displayNameId": "IDS_DLCSKIN00001234_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.ig_88",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001234_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.ig_88"
   },
   "armorOffsets": {
     "HELMET": {
@@ -12,7 +12,11 @@
       "z": 0.0
     }
   },
-"hide": ["hat", "head", "limbs"],
+  "hide": [
+    "hat",
+    "head",
+    "limbs"
+  ],
   "texture": {
     "width": 64,
     "height": 64

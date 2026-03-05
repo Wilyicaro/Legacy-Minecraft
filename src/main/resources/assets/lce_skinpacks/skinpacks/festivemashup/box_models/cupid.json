@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Cupid",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002710_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.cupid",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002710_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.cupid"
   },
   "texture": {
     "width": 64,

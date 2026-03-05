@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Party Herobrine",
-    "displayNameId": "IDS_DLCSKIN00000704_DISPLAYNAME"
+    "displayNameId": "custom.birthday.party_herobrine"
   },
   "texture": {
     "width": 64,

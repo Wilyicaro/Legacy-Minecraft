@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Party Alex",
-    "displayNameId": "IDS_DLCSKIN00006504_DISPLAYNAME",
+    "displayNameId": "custom.minecon2017.party_alex",
     "themeName": "Dressed to impress Alex",
-    "themeNameId": "IDS_DLCSKIN00006504_THEMENAME"
+    "themeNameId": "custom.minecon2017.themetext.party_alex"
   },
   "texture": {
     "width": 64,

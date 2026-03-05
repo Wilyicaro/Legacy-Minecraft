@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Cole",
-    "displayNameId": "IDS_DLCSKIN20000122_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.cole",
     "themeName": "inFAMOUS",
-    "themeNameId": "IDS_DLCSKIN20000122_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.cole"
   },
   "texture": {
     "width": 64,

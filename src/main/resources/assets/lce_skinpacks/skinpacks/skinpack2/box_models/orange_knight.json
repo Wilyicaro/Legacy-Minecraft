@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Orange Knight",
-    "displayNameId": "IDS_DLCSKIN20000129_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.orange_knight",
     "themeName": "Castle Crashers",
-    "themeNameId": "IDS_DLCSKIN20000129_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.orange_knight"
   },
   "texture": {
     "width": 64,

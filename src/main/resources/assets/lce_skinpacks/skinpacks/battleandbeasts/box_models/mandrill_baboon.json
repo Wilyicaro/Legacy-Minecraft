@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mandrill Baboon",
-    "displayNameId": "IDS_DLCSKIN00000807_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.mandrill_baboon"
   },
   "texture": {
     "width": 64,

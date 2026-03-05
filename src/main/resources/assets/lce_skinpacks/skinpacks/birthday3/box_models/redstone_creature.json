@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Redstone Creature",
-    "displayNameId": "IDS_DLCSKIN00003015_DISPLAYNAME"
+    "displayNameId": "custom.birthday3.redstone_creature"
   },
   "texture": {
     "width": 64,

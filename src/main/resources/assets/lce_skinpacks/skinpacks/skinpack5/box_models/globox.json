@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Globox",
-    "displayNameId": "IDS_dlcskin46292240_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.globox",
     "themeName": "Rayman Legends",
-    "themeNameId": "IDS_dlcskin46292240_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.globox"
   },
   "texture": {
     "width": 64,

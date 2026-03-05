@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Abomination",
-    "displayNameId": "IDS_dlcskin40583395_DISPLAYNAME",
+    "displayNameId": "custom.avengers.abomination",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin40583395_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.abomination"
   },
   "texture": {
     "width": 64,

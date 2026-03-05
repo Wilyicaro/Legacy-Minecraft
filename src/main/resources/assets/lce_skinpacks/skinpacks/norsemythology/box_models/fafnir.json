@@ -1,11 +1,17 @@
 {
   "meta": {
     "displayName": "Fafnir",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004641_DISPLAYNAME",
+    "displayNameId": "custom.norsemythology.fafnir",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004641_THEMENAME"
+    "themeNameId": "custom.norsemythology.themetext.fafnir"
   },
-  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

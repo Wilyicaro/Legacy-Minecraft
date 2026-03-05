@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Sontaran 2010",
-    "displayNameId": "IDS_DLCSKIN00002517_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.sontaran_2010"
   },
   "texture": {
     "width": 64,

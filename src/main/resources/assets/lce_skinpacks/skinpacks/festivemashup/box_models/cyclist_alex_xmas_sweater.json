@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Cyclist Alex Xmas Sweater",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002742_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.cyclist_alex_xmas_sweater",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002742_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.cyclist_alex_xmas_sweater"
   },
   "texture": {
     "width": 64,

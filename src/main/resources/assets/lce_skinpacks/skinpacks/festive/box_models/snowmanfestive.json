@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Snowman",
-    "displayNameId": "IDS_DLCSKIN00000613_DISPLAYNAME"
+    "displayNameId": "custom.festive.snowmanfestive"
   },
   "texture": {
     "width": 64,

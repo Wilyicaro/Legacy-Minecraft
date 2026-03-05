@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Emperor Taizong",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005116_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.emperor_taizong",
     "themeName": "Tang Dynasty",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005116_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.emperor_taizong"
   },
   "texture": {
     "width": 64,

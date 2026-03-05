@@ -1,9 +1,12 @@
 {
   "meta": {
     "displayName": "K9",
-    "displayNameId": "IDS_DLCSKIN00002518_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.k9"
   },
-  "hide": ["All", "hide_hand"],
+  "hide": [
+    "All",
+    "hide_hand"
+  ],
   "texture": {
     "width": 64,
     "height": 64

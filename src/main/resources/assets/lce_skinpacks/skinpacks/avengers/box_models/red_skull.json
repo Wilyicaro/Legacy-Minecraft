@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Red Skull",
-    "displayNameId": "IDS_dlcskin04417283_DISPLAYNAME",
+    "displayNameId": "custom.avengers.red_skull",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin04417283_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.red_skull"
   },
   "texture": {
     "width": 64,

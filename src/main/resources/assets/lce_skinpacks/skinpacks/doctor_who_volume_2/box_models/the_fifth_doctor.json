@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Fifth Doctor",
-    "displayNameId": "IDS_DLCSKIN00002503_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.the_fifth_doctor"
   },
   "armorOffsets": {
     "HELMET": {

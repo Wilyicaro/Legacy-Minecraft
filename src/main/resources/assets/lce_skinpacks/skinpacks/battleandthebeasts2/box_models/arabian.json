@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Arabian",
-    "displayNameId": "IDS_DLCSKIN00001034_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.arabian"
   },
   "texture": {
     "width": 64,

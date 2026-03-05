@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Blockade Runner Soldier",
-    "displayNameId": "IDS_DLCSKIN00001220_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.blockade_runner_soldier",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001220_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.blockade_runner_soldier"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Party Creeper",
-    "displayNameId": "IDS_DLCSKIN00000701_DISPLAYNAME"
+    "displayNameId": "custom.birthday.party_creeper"
   },
   "texture": {
     "width": 64,

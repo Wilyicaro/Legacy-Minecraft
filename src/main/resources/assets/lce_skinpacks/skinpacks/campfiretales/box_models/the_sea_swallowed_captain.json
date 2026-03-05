@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Sea-Swallowed Captain",
-    "displayNameId": "IDS_DLCSKIN00005510_DISPLAYNAME"
+    "displayNameId": "custom.campfiretales.the_sea_swallowed_captain"
   },
   "texture": {
     "width": 64,

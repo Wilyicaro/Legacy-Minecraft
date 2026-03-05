@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mickey Smith",
-    "displayNameId": "IDS_DLCSKIN00002515_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.mickey_smith"
   },
   "texture": {
     "width": 64,

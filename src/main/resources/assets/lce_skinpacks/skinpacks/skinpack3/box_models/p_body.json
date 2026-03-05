@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "P-Body",
-    "displayNameId": "IDS_DLCSKIN20000223_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.p_body",
     "themeName": "Portal 2",
-    "themeNameId": "IDS_DLCSKIN20000223_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.p_body"
   },
   "texture": {
     "width": 64,

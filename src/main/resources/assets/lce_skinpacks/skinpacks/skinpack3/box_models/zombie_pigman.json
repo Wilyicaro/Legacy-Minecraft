@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Zombie Pigman",
-    "displayNameId": "IDS_DLCSKIN20000200_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.zombie_pigman",
     "themeName": "Minecraft",
-    "themeNameId": "IDS_DLCSKIN20000200_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.zombie_pigman"
   },
   "texture": {
     "width": 64,

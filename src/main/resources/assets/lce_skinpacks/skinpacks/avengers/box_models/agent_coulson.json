@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Agent Coulson",
-    "displayNameId": "IDS_dlcskin32338563_DISPLAYNAME",
+    "displayNameId": "custom.avengers.agent_coulson",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin32338563_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.agent_coulson"
   },
   "texture": {
     "width": 64,

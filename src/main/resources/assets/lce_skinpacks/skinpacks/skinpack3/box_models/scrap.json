@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Scrap",
-    "displayNameId": "IDS_DLCSKIN20000232_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.scrap",
     "themeName": "Tearaway",
-    "themeNameId": "IDS_DLCSKIN20000232_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.scrap"
   },
   "texture": {
     "width": 64,

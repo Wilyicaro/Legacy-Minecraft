@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Wendigo",
-    "displayNameId": "IDS_DLCSKIN20000231_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.wendigo",
     "themeName": "Tearaway",
-    "themeNameId": "IDS_DLCSKIN20000231_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.wendigo"
   },
   "texture": {
     "width": 64,

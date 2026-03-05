@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Athena",
-    "displayNameId": "IDS_DLCSKIN20000139_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.athena",
     "themeName": "God of War",
-    "themeNameId": "IDS_DLCSKIN20000139_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.athena"
   },
   "texture": {
     "width": 64,

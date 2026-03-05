@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mooshroom Brewer",
-    "displayNameId": "IDS_DLCSKIN00005302_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.mooshroom_brewer"
   },
   "texture": {
     "width": 64,

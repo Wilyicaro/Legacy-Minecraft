@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Kessler",
-    "displayNameId": "IDS_DLCSKIN20000123_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.kessler",
     "themeName": "inFAMOUS",
-    "themeNameId": "IDS_DLCSKIN20000123_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.kessler"
   },
   "texture": {
     "width": 64,

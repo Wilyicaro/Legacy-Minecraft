@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Altair",
-    "displayNameId": "IDS_dlcskin54065109_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.altair",
     "themeName": "Assassins Creed",
-    "themeNameId": "IDS_dlcskin54065109_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.altair"
   },
   "texture": {
     "width": 64,

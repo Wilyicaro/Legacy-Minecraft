@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Liz Shaw",
-    "displayNameId": "IDS_DLCSKIN00002509_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.liz_shaw"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Lando Calrissian",
-    "displayNameId": "IDS_DLCSKIN00001240_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.lando_calrissian_2",
     "themeName": "Skiff Guard",
-    "themeNameId": "IDS_DLCSKIN00001240_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.lando_calrissian_2"
   },
   "armorOffsets": {
     "HELMET": {

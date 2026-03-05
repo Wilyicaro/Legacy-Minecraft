@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Peri Brown",
-    "displayNameId": "IDS_DLCSKIN00002015_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.peri_brown"
   },
   "texture": {
     "width": 64,

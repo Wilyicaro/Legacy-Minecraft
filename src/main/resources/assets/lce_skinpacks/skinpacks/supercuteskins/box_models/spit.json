@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Spit",
-    "displayNameId": "IDS_SKINS_DLCSKIN00007407_DISPLAYNAME",
+    "displayNameId": "custom.supercuteskins.spit",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00007407_THEMENAME"
+    "themeNameId": "custom.supercuteskins.themetext.spit"
   },
   "texture": {
     "width": 64,

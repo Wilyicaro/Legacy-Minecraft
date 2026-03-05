@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Crisp",
-    "displayNameId": "IDS_DLCSKIN00005501_DISPLAYNAME"
+    "displayNameId": "custom.campfiretales.crisp"
   },
   "texture": {
     "width": 64,

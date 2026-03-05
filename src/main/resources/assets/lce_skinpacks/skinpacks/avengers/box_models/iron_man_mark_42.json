@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Iron Man Mark 42",
-    "displayNameId": "IDS_dlcskin01520280_DISPLAYNAME",
+    "displayNameId": "custom.avengers.iron_man_mark_42",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin01520280_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.iron_man_mark_42"
   },
   "texture": {
     "width": 64,

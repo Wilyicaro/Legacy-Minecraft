@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Silver Horn",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005121_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.silver_horn",
     "themeName": "Demon Bandit",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005121_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.silver_horn"
   },
   "texture": {
     "width": 64,

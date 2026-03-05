@@ -1,11 +1,17 @@
 {
   "meta": {
-    "displayName": "Landv\u00e6ttir",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004626_DISPLAYNAME",
+    "displayName": "Landvættir",
+    "displayNameId": "custom.norsemythology.landvaettir",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004626_THEMENAME"
+    "themeNameId": "custom.norsemythology.themetext.landvaettir"
   },
-  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

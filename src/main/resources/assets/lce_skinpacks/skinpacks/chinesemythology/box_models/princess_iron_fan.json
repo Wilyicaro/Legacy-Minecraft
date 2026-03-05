@@ -1,11 +1,19 @@
 {
   "meta": {
     "displayName": "Princess Iron Fan",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005108_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.princess_iron_fan",
     "themeName": "Demon Beauty",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005108_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.princess_iron_fan"
   },
-  "hide": [ "hat", "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants", "left_arm"],
+  "hide": [
+    "hat",
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants",
+    "left_arm"
+  ],
   "texture": {
     "width": 64,
     "height": 64

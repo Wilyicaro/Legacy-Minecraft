@@ -1,11 +1,14 @@
 {
   "meta": {
     "displayName": "Woof",
-    "displayNameId": "IDS_SKINS_DLCSKIN00007400_DISPLAYNAME",
+    "displayNameId": "custom.supercuteskins.woof",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00007400_THEMENAME"
+    "themeNameId": "custom.supercuteskins.themetext.woof"
   },
-"hide": ["right_pants", "left_pants"],
+  "hide": [
+    "right_pants",
+    "left_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

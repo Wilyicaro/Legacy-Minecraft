@@ -1,11 +1,16 @@
 {
   "meta": {
     "displayName": "Party Gaia",
-    "displayNameId": "IDS_DLCSKIN20000421_DISPLAYNAME",
+    "displayNameId": "custom.birthday2.party_gaia",
     "themeName": "God of War",
-    "themeNameId": "IDS_DLCSKIN20000421_THEMENAME"
+    "themeNameId": "custom.birthday2.themetext.party_gaia"
   },
-"hide": ["jacket", "hat", "right_pants", "left_pants"],
+  "hide": [
+    "jacket",
+    "hat",
+    "right_pants",
+    "left_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

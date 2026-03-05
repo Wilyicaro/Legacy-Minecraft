@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Scientist Danklef",
-    "displayNameId": "IDS_DLCSKIN00000028_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.scientist_danklef",
     "themeName": "'Splosion Man",
-    "themeNameId": "IDS_DLCSKIN00000028_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.scientist_danklef"
   },
   "texture": {
     "width": 64,

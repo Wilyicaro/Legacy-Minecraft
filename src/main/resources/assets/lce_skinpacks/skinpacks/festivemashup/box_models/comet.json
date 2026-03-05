@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Comet",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002709_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.comet",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002709_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.comet"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "River Demon",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005125_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.river_demon",
     "themeName": "Fish Warrior",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005125_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.river_demon"
   },
   "texture": {
     "width": 64,

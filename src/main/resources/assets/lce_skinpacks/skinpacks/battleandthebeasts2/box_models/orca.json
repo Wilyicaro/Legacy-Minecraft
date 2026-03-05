@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Orca",
-    "displayNameId": "IDS_DLCSKIN00001044_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.orca"
   },
   "texture": {
     "width": 64,

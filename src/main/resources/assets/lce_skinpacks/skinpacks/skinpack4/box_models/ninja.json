@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Ninja",
-    "displayNameId": "IDS_dlcskin18248253_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.ninja",
     "themeName": "Mark of the Ninja",
-    "themeNameId": "IDS_dlcskin18248253_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.ninja"
   },
   "texture": {
     "width": 64,

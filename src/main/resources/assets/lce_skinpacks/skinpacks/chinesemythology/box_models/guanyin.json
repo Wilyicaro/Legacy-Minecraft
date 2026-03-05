@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Guanyin",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005105_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.guanyin",
     "themeName": "Goddess of Mercy",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005105_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.guanyin"
   },
   "texture": {
     "width": 64,

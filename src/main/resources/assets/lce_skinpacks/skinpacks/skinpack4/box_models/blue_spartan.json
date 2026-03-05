@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Blue Spartan",
-    "displayNameId": "IDS_dlcskin74908399_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.blue_spartan",
     "themeName": "Halo",
-    "themeNameId": "IDS_dlcskin74908399_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.blue_spartan"
   },
   "texture": {
     "width": 64,

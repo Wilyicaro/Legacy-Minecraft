@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Zygon",
-    "displayNameId": "IDS_DLCSKIN00002033_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.zygon"
   },
   "armorOffsets": {
     "HELMET": {

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Parka Steve",
-    "displayNameId": "IDS_DLCSKIN00000612_DISPLAYNAME"
+    "displayNameId": "custom.festive.parka_steve"
   },
   "texture": {
     "width": 64,

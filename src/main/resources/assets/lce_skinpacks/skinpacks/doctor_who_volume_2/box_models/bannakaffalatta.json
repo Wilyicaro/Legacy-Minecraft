@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Bannakaffalatta",
-    "displayNameId": "IDS_DLCSKIN00002520_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.bannakaffalatta"
   },
   "texture": {
     "width": 64,

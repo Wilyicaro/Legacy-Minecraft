@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Nether Miner",
-    "displayNameId": "IDS_DLCSKIN00005322_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.nether_miner"
   },
   "texture": {
     "width": 64,

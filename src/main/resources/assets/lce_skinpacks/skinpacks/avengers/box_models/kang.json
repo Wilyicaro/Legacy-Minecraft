@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Kang",
-    "displayNameId": "IDS_dlcskin05990628_DISPLAYNAME",
+    "displayNameId": "custom.avengers.kang",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin05990628_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.kang"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Goddess Longmu",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005145_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.goddess_longmu",
     "themeName": "Dragon Mother",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005145_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.goddess_longmu"
   },
   "texture": {
     "width": 64,

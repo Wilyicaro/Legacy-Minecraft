@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Tundra Brawler",
-    "displayNameId": "IDS_DLCSKIN00004517_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.tundra_brawler",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004517_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.tundra_brawler"
   },
   "texture": {
     "width": 64,

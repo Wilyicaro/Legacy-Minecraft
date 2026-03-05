@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Party Sackboy",
-    "displayNameId": "IDS_DLCSKIN20000414_DISPLAYNAME",
-    "themeName": "LittleBigPlanet\u2122",
-    "themeNameId": "IDS_DLCSKIN20000414_THEMENAME"
+    "displayNameId": "custom.birthday2.party_sackboy",
+    "themeName": "LittleBigPlanet™",
+    "themeNameId": "custom.birthday2.themetext.party_sackboy"
   },
   "hide": "ALL",
   "texture": {

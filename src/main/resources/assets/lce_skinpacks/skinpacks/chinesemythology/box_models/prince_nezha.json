@@ -1,21 +1,55 @@
 {
   "meta": {
     "displayName": "Prince Nezha",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005119_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.prince_nezha",
     "themeName": "The Lotus Prince",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005119_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.prince_nezha"
   },
   "offsets": {
-    "head":         { "x": 0, "y": 1, "z": 0 },
-    "hat":          { "x": 0, "y": 1, "z": 0 },
-    "body":         { "x": 0, "y": 1, "z": 0 },
-    "right_arm":    { "x": 0, "y": 1, "z": 0 },
-    "left_arm":     { "x": 0, "y": 1, "z": 0 },
-    "right_leg":    { "x": 0, "y": -1, "z": 0 },
-    "left_leg":     { "x": 0, "y": -1, "z": 0 }
+    "head": {
+      "x": 0,
+      "y": 1,
+      "z": 0
+    },
+    "hat": {
+      "x": 0,
+      "y": 1,
+      "z": 0
+    },
+    "body": {
+      "x": 0,
+      "y": 1,
+      "z": 0
+    },
+    "right_arm": {
+      "x": 0,
+      "y": 1,
+      "z": 0
+    },
+    "left_arm": {
+      "x": 0,
+      "y": 1,
+      "z": 0
+    },
+    "right_leg": {
+      "x": 0,
+      "y": -1,
+      "z": 0
+    },
+    "left_leg": {
+      "x": 0,
+      "y": -1,
+      "z": 0
+    }
   },
-
-  "hide": [ "hat", "left_sleeve", "right_sleeve","left_pants", "right_pants", "arms"],
+  "hide": [
+    "hat",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants",
+    "arms"
+  ],
   "texture": {
     "width": 64,
     "height": 64

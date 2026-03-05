@@ -1,312 +1,313 @@
 {
-  "name": "Doctor Who Skins Volume II",
+  "name": "key:custom.doctor_who_volume_2.pack.name",
   "author": "4J Studios",
   "skins": [
     {
       "id": "the_tenth_doctor",
-      "name": "The Tenth Doctor",
+      "name": "key:custom.doctor_who_volume_2.the_tenth_doctor",
       "texture": "skins/the_tenth_doctor.png",
       "order": 1
     },
     {
       "id": "the_eighth_doctor",
-      "name": "The Eighth Doctor",
+      "name": "key:custom.doctor_who_volume_2.the_eighth_doctor",
       "texture": "skins/the_eighth_doctor.png",
       "order": 2
     },
     {
       "id": "the_seventh_doctor",
-      "name": "The Seventh Doctor",
+      "name": "key:custom.doctor_who_volume_2.the_seventh_doctor",
       "texture": "skins/the_seventh_doctor.png",
       "order": 3
     },
     {
       "id": "the_fifth_doctor",
-      "name": "The Fifth Doctor",
+      "name": "key:custom.doctor_who_volume_2.the_fifth_doctor",
       "texture": "skins/the_fifth_doctor.png",
       "order": 4
     },
     {
       "id": "the_third_doctor",
-      "name": "The Third Doctor",
+      "name": "key:custom.doctor_who_volume_2.the_third_doctor",
       "texture": "skins/the_third_doctor.png",
       "cape": "capes/the_third_doctor.png",
       "order": 5
     },
     {
       "id": "the_second_doctor",
-      "name": "The Second Doctor",
+      "name": "key:custom.doctor_who_volume_2.the_second_doctor",
       "texture": "skins/the_second_doctor.png",
       "order": 6
     },
     {
       "id": "donna_noble",
-      "name": "Donna Noble",
+      "name": "key:custom.doctor_who_volume_2.donna_noble",
       "texture": "skins/donna_noble.png",
       "order": 7
     },
     {
       "id": "martha_jones",
-      "name": "Martha Jones",
+      "name": "key:custom.doctor_who_volume_2.martha_jones",
       "texture": "skins/martha_jones.png",
       "order": 8
     },
     {
       "id": "captain_jack_harkness",
-      "name": "Captain Jack Harkness",
+      "name": "key:custom.doctor_who_volume_2.captain_jack_harkness",
       "texture": "skins/captain_jack_harkness.png",
       "order": 9
     },
     {
       "id": "liz_shaw",
-      "name": "Liz Shaw",
+      "name": "key:custom.doctor_who_volume_2.liz_shaw",
       "texture": "skins/liz_shaw.png",
       "order": 10
     },
     {
       "id": "ace",
-      "name": "Ace",
+      "name": "key:custom.doctor_who_volume_2.ace",
       "texture": "skins/ace.png",
       "order": 11
     },
     {
       "id": "jo_grant",
-      "name": "Jo Grant",
+      "name": "key:custom.doctor_who_volume_2.jo_grant",
       "texture": "skins/jo_grant.png",
       "order": 12
     },
     {
       "id": "tegan_jovanka",
-      "name": "Tegan Jovanka",
+      "name": "key:custom.doctor_who_volume_2.tegan_jovanka",
       "texture": "skins/tegan_jovanka.png",
       "order": 13
     },
     {
       "id": "wilfred_mott",
-      "name": "Wilfred Mott",
+      "name": "key:custom.doctor_who_volume_2.wilfred_mott",
       "texture": "skins/wilfred_mott.png",
       "order": 14
     },
     {
       "id": "mickey_smith",
-      "name": "Mickey Smith",
+      "name": "key:custom.doctor_who_volume_2.mickey_smith",
       "texture": "skins/mickey_smith.png",
       "order": 15
     },
     {
       "id": "the_master_2007",
-      "name": "The Master 2007",
+      "name": "key:custom.doctor_who_volume_2.the_master_2007",
       "texture": "skins/the_master_2007.png",
       "order": 16
     },
     {
       "id": "sontaran_2010",
-      "name": "Sontaran 2010",
+      "name": "key:custom.doctor_who_volume_2.sontaran_2010",
       "texture": "skins/sontaran_2010.png",
       "order": 17
     },
     {
       "id": "k9",
-      "name": "K9",
+      "name": "key:custom.doctor_who_volume_2.k9",
       "texture": "skins/k9.png",
       "order": 18,
       "poses": [
-	"stiff_legs" ]
+        "stiff_legs"
+      ]
     },
     {
       "id": "brigadier_lethbridge_stewart",
-      "name": "Brigadier Lethbridge-Stewart",
+      "name": "key:custom.doctor_who_volume_2.brigadier_lethbridge_stewart",
       "texture": "skins/brigadier_lethbridge_stewart.png",
       "order": 19
     },
     {
       "id": "bannakaffalatta",
-      "name": "Bannakaffalatta",
+      "name": "key:custom.doctor_who_volume_2.bannakaffalatta",
       "texture": "skins/bannakaffalatta.png",
       "order": 20
     },
     {
       "id": "judoon",
-      "name": "Judoon",
+      "name": "key:custom.doctor_who_volume_2.judoon",
       "texture": "skins/judoon.png",
       "order": 21
     },
     {
       "id": "sycorax",
-      "name": "Sycorax",
+      "name": "key:custom.doctor_who_volume_2.sycorax",
       "texture": "skins/sycorax.png",
       "cape": "capes/sycorax.png",
       "order": 22
     },
     {
       "id": "cyberking_miss_hartigan",
-      "name": "CyberKing / Miss Hartigan",
+      "name": "key:custom.doctor_who_volume_2.cyberking_miss_hartigan",
       "texture": "skins/cyberking_miss_hartigan.png",
       "order": 23
     },
     {
       "id": "racnoss",
-      "name": "Racnoss",
+      "name": "key:custom.doctor_who_volume_2.racnoss",
       "texture": "skins/racnoss.png",
       "order": 24
     },
     {
       "id": "slitheen",
-      "name": "Slitheen",
+      "name": "key:custom.doctor_who_volume_2.slitheen",
       "texture": "skins/slitheen.png",
       "order": 25
     },
     {
       "id": "the_beast_drwho",
-      "name": "The Beast",
+      "name": "key:custom.doctor_who_volume_2.the_beast_drwho",
       "texture": "skins/the_beast_drwho.png",
       "order": 26
     },
     {
       "id": "rassilon",
-      "name": "Rassilon",
+      "name": "key:custom.doctor_who_volume_2.rassilon",
       "texture": "skins/rassilon.png",
       "order": 27
     },
     {
       "id": "heavenly_host",
-      "name": "Heavenly Host",
+      "name": "key:custom.doctor_who_volume_2.heavenly_host",
       "texture": "skins/heavenly_host.png",
       "order": 28
     },
     {
       "id": "scarecrow",
-      "name": "Scarecrow",
+      "name": "key:custom.doctor_who_volume_2.scarecrow",
       "texture": "skins/scarecrow.png",
       "order": 29
     },
     {
       "id": "cybershade",
-      "name": "Cybershade",
+      "name": "key:custom.doctor_who_volume_2.cybershade",
       "texture": "skins/cybershade.png",
       "order": 30
     },
     {
       "id": "azal_the_daemon",
-      "name": "Azal (the Daemon)",
+      "name": "key:custom.doctor_who_volume_2.azal_the_daemon",
       "texture": "skins/azal_the_daemon.png",
       "order": 31
     },
     {
       "id": "axon_monster",
-      "name": "Axon Monster",
+      "name": "key:custom.doctor_who_volume_2.axon_monster",
       "texture": "skins/axon_monster.png",
       "order": 32
     },
     {
       "id": "omega",
-      "name": "Omega",
+      "name": "key:custom.doctor_who_volume_2.omega",
       "texture": "skins/omega.png",
       "order": 33
     },
     {
       "id": "alpha_centauri",
-      "name": "Alpha Centauri",
+      "name": "key:custom.doctor_who_volume_2.alpha_centauri",
       "texture": "skins/alpha_centauri.png",
       "poses": "zombie_arms",
       "order": 34
     },
     {
       "id": "gel_guard_plasma_creature",
-      "name": "Gel Guard (Plasma Creature)",
+      "name": "key:custom.doctor_who_volume_2.gel_guard_plasma_creature",
       "texture": "skins/gel_guard_plasma_creature.png",
       "order": 35
     },
     {
       "id": "the_nimon",
-      "name": "The Nimon",
+      "name": "key:custom.doctor_who_volume_2.the_nimon",
       "texture": "skins/the_nimon.png",
       "order": 36
     },
     {
       "id": "sutekh",
-      "name": "Sutekh",
+      "name": "key:custom.doctor_who_volume_2.sutekh",
       "texture": "skins/sutekh.png",
       "order": 37
     },
     {
       "id": "sea_devil",
-      "name": "Sea Devil",
+      "name": "key:custom.doctor_who_volume_2.sea_devil",
       "texture": "skins/sea_devil.png",
       "order": 38
     },
     {
       "id": "cyberman_2012_non_cybus",
-      "name": "Cyberman 2012 (Non-Cybus)",
+      "name": "key:custom.doctor_who_volume_2.cyberman_2012_non_cybus",
       "texture": "skins/cyberman_2012_non_cybus.png",
       "order": 39
     },
     {
       "id": "cyberman_2013",
-      "name": "Cyberman 2013",
+      "name": "key:custom.doctor_who_volume_2.cyberman_2013",
       "texture": "skins/cyberman_2013.png",
       "order": 40
     },
     {
       "id": "cyber_lord",
-      "name": "Cyber-Lord",
+      "name": "key:custom.doctor_who_volume_2.cyber_lord",
       "texture": "skins/cyber_lord.png",
       "order": 41
     },
     {
       "id": "cyberman_2006_cybus",
-      "name": "Cyberman 2006 (Cybus)",
+      "name": "key:custom.doctor_who_volume_2.cyberman_2006_cybus",
       "texture": "skins/cyberman_2006_cybus.png",
       "order": 42
     },
     {
       "id": "black_cyberman_1980s",
-      "name": "Black Cyberman 1980's",
+      "name": "key:custom.doctor_who_volume_2.black_cyberman_1980s",
       "texture": "skins/black_cyberman_1980s.png",
       "order": 43
     },
     {
       "id": "cyberman_1980s",
-      "name": "Cyberman 1980's",
+      "name": "key:custom.doctor_who_volume_2.cyberman_1980s",
       "texture": "skins/cyberman_1980s.png",
       "order": 44
     },
     {
       "id": "cybermen_1970s",
-      "name": "Cybermen 1970's",
+      "name": "key:custom.doctor_who_volume_2.cybermen_1970s",
       "texture": "skins/cybermen_1970s.png",
       "order": 45
     },
     {
       "id": "cyberman_1960s",
-      "name": "Cyberman 1960's",
+      "name": "key:custom.doctor_who_volume_2.cyberman_1960s",
       "texture": "skins/cyberman_1960s.png",
       "order": 46
     },
     {
       "id": "cyberman_1960s_2",
-      "name": "Cyberman 1960's",
+      "name": "key:custom.doctor_who_volume_2.cyberman_1960s_2",
       "texture": "skins/cyberman_1960s_2.png",
       "order": 47
     },
     {
       "id": "ood",
-      "name": "Ood",
+      "name": "key:custom.doctor_who_volume_2.ood",
       "texture": "skins/ood.png",
       "order": 38.5
     },
     {
       "id": "saturnynian",
-      "name": "Saturnynian",
+      "name": "key:custom.doctor_who_volume_2.saturnynian",
       "texture": "skins/saturnynian.png",
       "order": 38.75,
       "poses": [
-	"zombie_arms" ]
-
+        "zombie_arms"
+      ]
     },
     {
       "id": "the_tenth_doctor_suit",
-      "name": "The Tenth Doctor - Suit",
+      "name": "key:custom.doctor_who_volume_2.the_tenth_doctor_suit",
       "texture": "skins/the_tenth_doctor_suit.png",
       "order": 50
     }

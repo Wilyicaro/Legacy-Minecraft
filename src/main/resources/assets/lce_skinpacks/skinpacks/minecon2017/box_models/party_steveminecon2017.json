@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Party Steve",
-    "displayNameId": "IDS_DLCSKIN00006505_DISPLAYNAME",
+    "displayNameId": "custom.minecon2017.party_steveminecon2017",
     "themeName": "Fancy-Pants Steve",
-    "themeNameId": "IDS_DLCSKIN00006505_THEMENAME"
+    "themeNameId": "custom.minecon2017.themetext.party_steveminecon2017"
   },
   "texture": {
     "width": 64,

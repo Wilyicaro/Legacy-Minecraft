@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Sham",
-    "displayNameId": "IDS_DLCSKIN00005500_DISPLAYNAME"
+    "displayNameId": "custom.campfiretales.the_sham"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Dr Rosenberg",
-    "displayNameId": "IDS_DLCSKIN20000220_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.dr_rosenberg",
     "themeName": "Half Life",
-    "themeNameId": "IDS_DLCSKIN20000220_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.dr_rosenberg"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Draugr",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004621_DISPLAYNAME",
+    "displayNameId": "custom.norsemythology.draugr",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004621_THEMENAME"
+    "themeNameId": "custom.norsemythology.themetext.draugr"
   },
   "texture": {
     "width": 64,

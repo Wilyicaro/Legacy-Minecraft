@@ -1,9 +1,15 @@
 {
   "meta": {
     "displayName": "Milhouse Van Houten",
-    "displayNameId": "IDS_DLCSKIN00002109_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.milhouse_van_houten"
   },
-  "hide": ["HEAD", "HAT", "BODY", "LEFT_ARM", "RIGHT_ARM"],
+  "hide": [
+    "HEAD",
+    "HAT",
+    "BODY",
+    "LEFT_ARM",
+    "RIGHT_ARM"
+  ],
   "texture": {
     "width": 64,
     "height": 64

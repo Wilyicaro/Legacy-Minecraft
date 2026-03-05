@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Dark Elf Mage",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001410_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.dark_elf_mage",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001410_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.dark_elf_mage"
   },
   "texture": {
     "width": 64,

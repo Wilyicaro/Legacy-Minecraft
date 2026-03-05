@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Party Kratos",
-    "displayNameId": "IDS_DLCSKIN20000419_DISPLAYNAME",
+    "displayNameId": "custom.birthday2.party_kratos",
     "themeName": "God of War",
-    "themeNameId": "IDS_DLCSKIN20000419_THEMENAME"
+    "themeNameId": "custom.birthday2.themetext.party_kratos"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Frieda",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004444_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.frieda"
   },
   "texture": {
     "width": 64,

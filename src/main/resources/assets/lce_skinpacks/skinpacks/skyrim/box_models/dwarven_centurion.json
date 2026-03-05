@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Dwarven Centurion",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001435_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.dwarven_centurion",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001435_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.dwarven_centurion"
   },
   "texture": {
     "width": 64,

@@ -1,10 +1,14 @@
 {
   "meta": {
     "displayName": "Petra Armored",
-    "displayNameId": "IDS_DLCSKIN00005006_DISPLAYNAME"
+    "displayNameId": "custom.storymode.petra_armored"
   },
   "mirror_limbs": true,
-  "hide": ["jacket", "left_arm", "left_leg"],
+  "hide": [
+    "jacket",
+    "left_arm",
+    "left_leg"
+  ],
   "texture": {
     "width": 64,
     "height": 64

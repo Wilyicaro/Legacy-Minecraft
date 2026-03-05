@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Sam Fisher",
-    "displayNameId": "IDS_dlcskin10811861_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.sam_fisher",
     "themeName": "Splinter Cell Blacklist",
-    "themeNameId": "IDS_dlcskin10811861_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.sam_fisher"
   },
   "texture": {
     "width": 64,

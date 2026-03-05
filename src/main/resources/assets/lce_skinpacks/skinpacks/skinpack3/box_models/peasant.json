@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Peasant",
-    "displayNameId": "IDS_DLCSKIN20000243_DISPLAYNAME"
+    "displayNameId": "custom.skinpack3.peasant"
   },
   "texture": {
     "width": 64,

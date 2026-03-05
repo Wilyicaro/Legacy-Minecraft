@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Party Red Cat",
-    "displayNameId": "IDS_DLCSKIN20000406_DISPLAYNAME"
+    "displayNameId": "custom.birthday2.party_red_cat"
   },
   "texture": {
     "width": 64,

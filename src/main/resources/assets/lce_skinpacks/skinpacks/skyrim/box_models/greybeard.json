@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Greybeard",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001427_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.greybeard",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001427_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.greybeard"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Frost Troll",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001428_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.frost_troll",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001428_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.frost_troll"
   },
   "texture": {
     "width": 64,

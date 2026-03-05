@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Ice Lord",
-    "displayNameId": "IDS_DLCSKIN00002031_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.ice_lord"
   },
   "armorOffsets": {
     "HELMET": {

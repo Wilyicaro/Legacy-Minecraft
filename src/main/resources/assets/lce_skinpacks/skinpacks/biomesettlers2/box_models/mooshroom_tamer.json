@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mooshroom Tamer",
-    "displayNameId": "IDS_DLCSKIN00005311_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.mooshroom_tamer"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Luke Skywalker",
-    "displayNameId": "IDS_DLCSKIN00001200_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.luke_skywalker",
     "themeName": "Tatooine",
-    "themeNameId": "IDS_DLCSKIN00001200_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.luke_skywalker"
   },
   "texture": {
     "width": 64,

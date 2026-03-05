@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Hawkeye",
-    "displayNameId": "IDS_dlcskin95202865_DISPLAYNAME",
+    "displayNameId": "custom.avengers.hawkeye",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin95202865_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.hawkeye"
   },
   "texture": {
     "width": 64,

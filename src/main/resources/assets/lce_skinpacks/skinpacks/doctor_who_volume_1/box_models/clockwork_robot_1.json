@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Clockwork Robot 1",
-    "displayNameId": "IDS_DLCSKIN00002025_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.clockwork_robot_1"
   },
   "texture": {
     "width": 64,

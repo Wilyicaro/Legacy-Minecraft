@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Frankencrafter",
-    "displayNameId": "IDS_DLCSKIN00005607_DISPLAYNAME",
+    "displayNameId": "custom.villians.frankencrafter",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005607_THEMENAME"
+    "themeNameId": "custom.villians.themetext.frankencrafter"
   },
   "texture": {
     "width": 64,

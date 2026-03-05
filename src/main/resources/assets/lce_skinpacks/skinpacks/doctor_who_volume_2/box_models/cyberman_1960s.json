@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Cyberman 1960's",
-    "displayNameId": "IDS_DLCSKIN00002551_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.cyberman_1960s"
   },
   "hide": "HAT",
   "texture": {

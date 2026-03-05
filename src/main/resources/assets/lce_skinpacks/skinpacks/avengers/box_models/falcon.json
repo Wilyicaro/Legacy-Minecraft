@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Falcon",
-    "displayNameId": "IDS_dlcskin41533274_DISPLAYNAME",
+    "displayNameId": "custom.avengers.falcon",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin41533274_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.falcon"
   },
   "texture": {
     "width": 64,

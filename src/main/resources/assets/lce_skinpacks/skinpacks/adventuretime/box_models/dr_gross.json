@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Dr Gross",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004445_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.dr_gross"
   },
   "texture": {
     "width": 64,

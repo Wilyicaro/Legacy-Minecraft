@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Cossack",
-    "displayNameId": "IDS_DLCSKIN00001036_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.cossack"
   },
   "texture": {
     "width": 64,

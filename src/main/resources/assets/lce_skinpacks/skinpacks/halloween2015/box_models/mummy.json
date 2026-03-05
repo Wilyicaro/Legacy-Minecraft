@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mummy",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003205_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.mummy"
   },
   "texture": {
     "width": 64,

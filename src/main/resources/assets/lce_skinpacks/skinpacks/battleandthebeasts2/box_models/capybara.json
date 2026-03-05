@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Capybara",
-    "displayNameId": "IDS_DLCSKIN00001018_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.capybara"
   },
   "texture": {
     "width": 64,

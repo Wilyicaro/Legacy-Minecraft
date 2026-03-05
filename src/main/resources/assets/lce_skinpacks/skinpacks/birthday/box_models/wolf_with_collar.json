@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Wolf With Collar",
-    "displayNameId": "IDS_DLCSKIN00000713_DISPLAYNAME"
+    "displayNameId": "custom.birthday.wolf_with_collar"
   },
   "hide": "hat",
   "texture": {

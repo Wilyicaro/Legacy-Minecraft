@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Joel",
-    "displayNameId": "IDS_DLCSKIN20000131_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.joel",
     "themeName": "The Last of Us",
-    "themeNameId": "IDS_DLCSKIN20000131_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.joel"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Leliana",
-    "displayNameId": "IDS_dlcskin17565763_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.leliana",
     "themeName": "Dragon Age",
-    "themeNameId": "IDS_dlcskin17565763_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.leliana"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Rancor Keeper",
-    "displayNameId": "IDS_DLCSKIN00001238_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.rancor_keeper",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001238_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.rancor_keeper"
   },
   "texture": {
     "width": 64,

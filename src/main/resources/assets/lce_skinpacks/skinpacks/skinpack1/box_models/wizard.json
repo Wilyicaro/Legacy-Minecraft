@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Wizard",
-    "displayNameId": "IDS_DLCSKIN20000044_DISPLAYNAME"
+    "displayNameId": "custom.skinpack1.wizard"
   },
   "texture": {
     "width": 64,

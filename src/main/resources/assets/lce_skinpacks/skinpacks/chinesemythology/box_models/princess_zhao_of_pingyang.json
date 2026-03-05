@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Princess Zhao of Pingyang",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005128_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.princess_zhao_of_pingyang",
     "themeName": "Rebellion Leader",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005128_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.princess_zhao_of_pingyang"
   },
   "texture": {
     "width": 64,

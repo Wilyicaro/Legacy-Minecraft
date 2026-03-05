@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Green Santa",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002703_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.green_santa",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002703_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.green_santa"
   },
   "texture": {
     "width": 64,

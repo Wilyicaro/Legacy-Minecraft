@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "CyberKing / Miss Hartigan",
-    "displayNameId": "IDS_DLCSKIN00002524_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.cyberking_miss_hartigan"
   },
   "texture": {
     "width": 64,

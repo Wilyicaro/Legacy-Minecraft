@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "The Enderall",
-    "displayNameId": "IDS_DLCSKIN00005502_DISPLAYNAME"
+    "displayNameId": "custom.campfiretales.the_enderall"
   },
-"hide": "left_leg",
+  "hide": "left_leg",
   "texture": {
     "width": 64,
     "height": 64

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Wispmother",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001436_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.wispmother",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001436_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.wispmother"
   },
   "texture": {
     "width": 64,

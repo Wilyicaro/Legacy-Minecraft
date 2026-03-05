@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Redstone Zealot",
-    "displayNameId": "IDS_DLCSKIN00005610_DISPLAYNAME",
+    "displayNameId": "custom.villians.redstone_zealot",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005610_THEMENAME"
+    "themeNameId": "custom.villians.themetext.redstone_zealot"
   },
   "texture": {
     "width": 64,

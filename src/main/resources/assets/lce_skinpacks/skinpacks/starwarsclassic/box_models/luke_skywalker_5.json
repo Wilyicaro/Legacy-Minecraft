@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Luke Skywalker",
-    "displayNameId": "IDS_DLCSKIN00001204_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.luke_skywalker_5",
     "themeName": "Dagobah",
-    "themeNameId": "IDS_DLCSKIN00001204_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.luke_skywalker_5"
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

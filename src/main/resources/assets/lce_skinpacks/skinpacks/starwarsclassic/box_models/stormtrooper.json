@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Stormtrooper",
-    "displayNameId": "IDS_DLCSKIN00001218_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.stormtrooper",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001218_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.stormtrooper"
   },
   "armorOffsets": {
     "HELMET": {
@@ -12,7 +12,9 @@
       "z": 0.0
     }
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

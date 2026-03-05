@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Farmer Villager",
-    "displayNameId": "IDS_DLCSKIN00000719_DISPLAYNAME"
+    "displayNameId": "custom.birthday.farmer_villager"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "General Akamoto",
-    "displayNameId": "IDS_DLCSKIN20000105_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.general_akamoto",
     "themeName": "Skulls of the Shogun",
-    "themeNameId": "IDS_DLCSKIN20000105_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.general_akamoto"
   },
   "texture": {
     "width": 64,

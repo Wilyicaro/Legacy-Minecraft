@@ -1,157 +1,157 @@
 {
-  "name": "Biome Settlers 2",
+  "name": "key:custom.biomesettlers2.pack.name",
   "author": "4J Studios",
   "skins": [
     {
       "id": "mooshroom_archer",
-      "name": "Mooshroom Archer",
+      "name": "key:custom.biomesettlers2.mooshroom_archer",
       "texture": "skins/mooshroom_archer.png",
       "model": "slim",
       "order": 1
     },
     {
       "id": "mooshroom_brawler",
-      "name": "Mooshroom Brawler",
+      "name": "key:custom.biomesettlers2.mooshroom_brawler",
       "texture": "skins/mooshroom_brawler.png",
       "model": "slim",
       "order": 2
     },
     {
       "id": "mooshroom_brewer",
-      "name": "Mooshroom Brewer",
+      "name": "key:custom.biomesettlers2.mooshroom_brewer",
       "texture": "skins/mooshroom_brewer.png",
       "order": 3
     },
     {
       "id": "mooshroom_engineer",
-      "name": "Mooshroom Engineer",
+      "name": "key:custom.biomesettlers2.mooshroom_engineer",
       "texture": "skins/mooshroom_engineer.png",
       "order": 4
     },
     {
       "id": "mooshroom_explorer",
-      "name": "Mooshroom Explorer",
+      "name": "key:custom.biomesettlers2.mooshroom_explorer",
       "texture": "skins/mooshroom_explorer.png",
       "model": "slim",
       "order": 5
     },
     {
       "id": "mooshroom_farmer",
-      "name": "Mooshroom Farmer",
+      "name": "key:custom.biomesettlers2.mooshroom_farmer",
       "texture": "skins/mooshroom_farmer.png",
       "model": "slim",
       "order": 6
     },
     {
       "id": "mooshroom_forager",
-      "name": "Mooshroom Forager",
+      "name": "key:custom.biomesettlers2.mooshroom_forager",
       "texture": "skins/mooshroom_forager.png",
       "order": 7
     },
     {
       "id": "mooshroom_griefer",
-      "name": "Mooshroom Griefer",
+      "name": "key:custom.biomesettlers2.mooshroom_griefer",
       "texture": "skins/mooshroom_griefer.png",
       "order": 8
     },
     {
       "id": "mooshroom_hunter",
-      "name": "Mooshroom Hunter",
+      "name": "key:custom.biomesettlers2.mooshroom_hunter",
       "texture": "skins/mooshroom_hunter.png",
       "order": 9
     },
     {
       "id": "mooshroom_miner",
-      "name": "Mooshroom Miner",
+      "name": "key:custom.biomesettlers2.mooshroom_miner",
       "texture": "skins/mooshroom_miner.png",
       "order": 10
     },
     {
       "id": "shroom_glutton",
-      "name": "Shroom Glutton",
+      "name": "key:custom.biomesettlers2.shroom_glutton",
       "texture": "skins/shroom_glutton.png",
       "order": 11
     },
     {
       "id": "mooshroom_tamer",
-      "name": "Mooshroom Tamer",
+      "name": "key:custom.biomesettlers2.mooshroom_tamer",
       "texture": "skins/mooshroom_tamer.png",
       "order": 12
     },
     {
       "id": "nether_archer",
-      "name": "Nether Archer",
+      "name": "key:custom.biomesettlers2.nether_archer",
       "texture": "skins/nether_archer.png",
       "order": 13
     },
     {
       "id": "nether_banished",
-      "name": "Nether Banished",
+      "name": "key:custom.biomesettlers2.nether_banished",
       "texture": "skins/nether_banished.png",
       "order": 14
     },
     {
       "id": "nether_brawler",
-      "name": "Nether Brawler",
+      "name": "key:custom.biomesettlers2.nether_brawler",
       "texture": "skins/nether_brawler.png",
       "order": 15
     },
     {
       "id": "nether_brewer",
-      "name": "Nether Brewer",
+      "name": "key:custom.biomesettlers2.nether_brewer",
       "texture": "skins/nether_brewer.png",
       "order": 16
     },
     {
       "id": "nether_engineer",
-      "name": "Nether Engineer",
+      "name": "key:custom.biomesettlers2.nether_engineer",
       "texture": "skins/nether_engineer.png",
       "model": "slim",
       "order": 17
     },
     {
       "id": "nether_explorer",
-      "name": "Nether Explorer",
+      "name": "key:custom.biomesettlers2.nether_explorer",
       "texture": "skins/nether_explorer.png",
       "order": 18
     },
     {
       "id": "nether_extinguisher",
-      "name": "Nether Extinguisher",
+      "name": "key:custom.biomesettlers2.nether_extinguisher",
       "texture": "skins/nether_extinguisher.png",
       "model": "slim",
       "order": 19
     },
     {
       "id": "nether_wart_farmer",
-      "name": "Nether Wart Farmer",
+      "name": "key:custom.biomesettlers2.nether_wart_farmer",
       "texture": "skins/nether_wart_farmer.png",
       "model": "slim",
       "order": 20
     },
     {
       "id": "nether_griefer",
-      "name": "Nether Griefer",
+      "name": "key:custom.biomesettlers2.nether_griefer",
       "texture": "skins/nether_griefer.png",
       "model": "slim",
       "order": 21
     },
     {
       "id": "nether_hunter",
-      "name": "Nether Hunter",
+      "name": "key:custom.biomesettlers2.nether_hunter",
       "texture": "skins/nether_hunter.png",
       "order": 22
     },
     {
       "id": "nether_miner",
-      "name": "Nether Miner",
+      "name": "key:custom.biomesettlers2.nether_miner",
       "texture": "skins/nether_miner.png",
       "model": "slim",
       "order": 23
     },
     {
       "id": "nether_tamer",
-      "name": "Nether Tamer",
+      "name": "key:custom.biomesettlers2.nether_tamer",
       "texture": "skins/nether_tamer.png",
       "model": "slim",
       "order": 24

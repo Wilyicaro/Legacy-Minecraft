@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Han Solo",
-    "displayNameId": "IDS_DLCSKIN00001209_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.han_solo_3",
     "themeName": "Endor",
-    "themeNameId": "IDS_DLCSKIN00001209_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.han_solo_3"
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

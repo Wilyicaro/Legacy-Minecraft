@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Khajiit Merchant",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001415_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.khajiit_merchant",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001415_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.khajiit_merchant"
   },
   "texture": {
     "width": 64,

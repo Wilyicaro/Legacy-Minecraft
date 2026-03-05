@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Reaver",
-    "displayNameId": "IDS_DLCSKIN00000007_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.reaver",
     "themeName": "Fable Heroes",
-    "themeNameId": "IDS_DLCSKIN00000007_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.reaver"
   },
   "texture": {
     "width": 64,

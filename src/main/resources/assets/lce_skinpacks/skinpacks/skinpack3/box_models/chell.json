@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Chell",
-    "displayNameId": "IDS_DLCSKIN20000221_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.chell",
     "themeName": "Portal",
-    "themeNameId": "IDS_DLCSKIN20000221_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.chell"
   },
   "texture": {
     "width": 64,

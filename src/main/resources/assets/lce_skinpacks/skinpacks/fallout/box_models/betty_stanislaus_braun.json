@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Betty (Stanislaus Braun)",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004818_DISPLAYNAME",
+    "displayNameId": "custom.fallout.betty_stanislaus_braun",
     "themeName": "Fallout 3",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004818_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.betty_stanislaus_braun"
   },
   "armorOffsets": {
     "LEG0": {

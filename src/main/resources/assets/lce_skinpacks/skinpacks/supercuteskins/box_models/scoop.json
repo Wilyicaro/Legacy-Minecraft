@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Scoop",
-    "displayNameId": "IDS_SKINS_DLCSKIN00007411_DISPLAYNAME",
+    "displayNameId": "custom.supercuteskins.scoop",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00007411_THEMENAME"
+    "themeNameId": "custom.supercuteskins.themetext.scoop"
   },
   "armorOffsets": {
     "TOOL0": {
@@ -17,7 +17,12 @@
       "z": 0.0
     }
   },
-"hide": ["left_pants", "right_pants", "left_arm", "right_sleeve"],
+  "hide": [
+    "left_pants",
+    "right_pants",
+    "left_arm",
+    "right_sleeve"
+  ],
   "texture": {
     "width": 64,
     "height": 64

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Star Nosed Mole",
-    "displayNameId": "IDS_DLCSKIN00001017_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.star_nosed_mole"
   },
   "texture": {
     "width": 64,

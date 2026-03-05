@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Egyptian",
-    "displayNameId": "IDS_DLCSKIN00001028_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.egyptian"
   },
   "texture": {
     "width": 64,

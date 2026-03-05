@@ -1,9 +1,16 @@
 {
   "meta": {
     "displayName": "Olivia",
-    "displayNameId": "IDS_DLCSKIN00005001_DISPLAYNAME"
+    "displayNameId": "custom.storymode.olivia"
   },
-  "hide": [ "hat", "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "hat",
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

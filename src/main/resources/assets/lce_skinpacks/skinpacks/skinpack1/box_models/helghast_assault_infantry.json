@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Helghast Assault Infantry",
-    "displayNameId": "IDS_DLCSKIN20000008_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.helghast_assault_infantry",
     "themeName": "Killzone",
-    "themeNameId": "IDS_DLCSKIN20000008_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.helghast_assault_infantry"
   },
   "texture": {
     "width": 64,

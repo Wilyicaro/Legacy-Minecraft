@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Ninth Doctor",
-    "displayNameId": "IDS_DLCSKIN00002001_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.the_ninth_doctor"
   },
   "texture": {
     "width": 64,

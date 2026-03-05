@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Kellogg",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004839_DISPLAYNAME",
+    "displayNameId": "custom.fallout.kellogg",
     "themeName": "Fallout 4",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004839_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.kellogg"
   },
   "texture": {
     "width": 64,

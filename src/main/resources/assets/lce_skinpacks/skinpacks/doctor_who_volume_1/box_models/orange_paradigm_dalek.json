@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Orange Paradigm Dalek",
-    "displayNameId": "IDS_DLCSKIN00002051_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.orange_paradigm_dalek"
   },
   "hide": "ALL",
   "texture": {

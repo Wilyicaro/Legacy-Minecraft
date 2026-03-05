@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Dragonborn Female",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001401_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.dragonborn_female",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001401_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.dragonborn_female"
   },
   "texture": {
     "width": 64,

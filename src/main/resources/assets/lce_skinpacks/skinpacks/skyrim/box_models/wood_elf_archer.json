@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Wood Elf Archer",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001406_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.wood_elf_archer",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001406_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.wood_elf_archer"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Axton",
-    "displayNameId": "IDS_dlcskin47939143_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.axton",
     "themeName": "Borderlands 2",
-    "themeNameId": "IDS_dlcskin47939143_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.axton"
   },
   "texture": {
     "width": 64,

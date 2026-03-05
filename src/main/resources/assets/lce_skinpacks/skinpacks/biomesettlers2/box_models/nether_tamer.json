@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Nether Tamer",
-    "displayNameId": "IDS_DLCSKIN00005323_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.nether_tamer"
   },
   "texture": {
     "width": 64,

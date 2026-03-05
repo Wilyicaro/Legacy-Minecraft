@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Conquistador",
-    "displayNameId": "IDS_DLCSKIN00001039_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.conquistador_2"
   },
   "texture": {
     "width": 64,

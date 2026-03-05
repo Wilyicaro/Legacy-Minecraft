@@ -1,9 +1,14 @@
 {
   "meta": {
     "displayName": "Ellegaard",
-    "displayNameId": "IDS_DLCSKIN00005009_DISPLAYNAME"
+    "displayNameId": "custom.storymode.ellegaard"
   },
-  "hide": ["jacket", "left_arm", "left_leg", "hat"],
+  "hide": [
+    "jacket",
+    "left_arm",
+    "left_leg",
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

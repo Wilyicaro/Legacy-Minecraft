@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Chung Kwan",
-    "displayNameId": "IDS_DLCSKIN20000017_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.chung_kwan",
     "themeName": "SOCOM",
-    "themeNameId": "IDS_DLCSKIN20000017_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.chung_kwan"
   },
   "texture": {
     "width": 64,

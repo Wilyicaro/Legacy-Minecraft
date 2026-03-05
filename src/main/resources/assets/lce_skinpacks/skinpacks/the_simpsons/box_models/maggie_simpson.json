@@ -1,9 +1,12 @@
 {
   "meta": {
     "displayName": "Maggie Simpson",
-    "displayNameId": "IDS_DLCSKIN00002104_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.maggie_simpson"
   },
-  "hidearmour": ["helmet", "chestpiece"],
+  "hidearmour": [
+    "helmet",
+    "chestpiece"
+  ],
   "hide": "all",
   "texture": {
     "width": 64,

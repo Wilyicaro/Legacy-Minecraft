@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Medieval Knight",
-    "displayNameId": "IDS_DLCSKIN00000824_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.medieval_knight"
   },
   "texture": {
     "width": 64,

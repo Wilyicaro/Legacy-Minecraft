@@ -1,11 +1,18 @@
 {
   "meta": {
     "displayName": "Whinny",
-    "displayNameId": "IDS_SKINS_DLCSKIN00007404_DISPLAYNAME",
+    "displayNameId": "custom.supercuteskins.whinny",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00007404_THEMENAME"
+    "themeNameId": "custom.supercuteskins.themetext.whinny"
   },
-"hide": ["left_pants", "right_pants", "left_sleeve", "right_sleeve", "left_arm", "left_leg"],
+  "hide": [
+    "left_pants",
+    "right_pants",
+    "left_sleeve",
+    "right_sleeve",
+    "left_arm",
+    "left_leg"
+  ],
   "texture": {
     "width": 64,
     "height": 64

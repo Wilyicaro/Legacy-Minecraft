@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Christmas Creeper",
-    "displayNameId": "IDS_DLCSKIN00000608_DISPLAYNAME"
+    "displayNameId": "custom.festive.christmas_creeper"
   },
   "texture": {
     "width": 64,

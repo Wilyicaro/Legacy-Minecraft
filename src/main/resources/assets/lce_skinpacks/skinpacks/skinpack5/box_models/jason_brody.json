@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Jason Brody",
-    "displayNameId": "IDS_dlcskin83707066_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.jason_brody",
     "themeName": "Far Cry 3",
-    "themeNameId": "IDS_dlcskin83707066_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.jason_brody"
   },
   "texture": {
     "width": 64,

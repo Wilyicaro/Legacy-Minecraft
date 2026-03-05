@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "M'aiq the Liar",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001426_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.maiq_the_liar",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001426_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.maiq_the_liar"
   },
   "texture": {
     "width": 64,

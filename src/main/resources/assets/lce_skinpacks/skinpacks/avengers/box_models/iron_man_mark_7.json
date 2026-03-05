@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Iron Man Mark 7",
-    "displayNameId": "IDS_dlcskin98058870_DISPLAYNAME",
+    "displayNameId": "custom.avengers.iron_man_mark_7",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin98058870_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.iron_man_mark_7"
   },
   "texture": {
     "width": 64,

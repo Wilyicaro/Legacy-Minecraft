@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Jade Emperor",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005104_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.jade_emperor",
     "themeName": "Taoist God",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005104_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.jade_emperor"
   },
   "texture": {
     "width": 64,

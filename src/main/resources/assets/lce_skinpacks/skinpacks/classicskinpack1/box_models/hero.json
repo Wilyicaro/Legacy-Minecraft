@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Hero",
-    "displayNameId": "IDS_DLCSKIN00000005_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.hero",
     "themeName": "Fable Heroes",
-    "themeNameId": "IDS_DLCSKIN00000005_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.hero"
   },
   "texture": {
     "width": 64,

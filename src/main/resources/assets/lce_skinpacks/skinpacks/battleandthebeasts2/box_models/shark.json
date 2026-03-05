@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Shark",
-    "displayNameId": "IDS_DLCSKIN00001009_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.shark"
   },
   "texture": {
     "width": 64,

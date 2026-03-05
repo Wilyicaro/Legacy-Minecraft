@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Snowman",
-    "displayNameId": "IDS_DLCSKIN00002035_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.snowman"
   },
   "armorOffsets": {
     "HEAD": {
@@ -10,7 +10,12 @@
       "z": 0.0
     }
   },
-  "hide": ["LEFT_ARM", "RIGHT_ARM", "LEFT_LEG", "RIGHT_LEG"],
+  "hide": [
+    "LEFT_ARM",
+    "RIGHT_ARM",
+    "LEFT_LEG",
+    "RIGHT_LEG"
+  ],
   "texture": {
     "width": 64,
     "height": 64

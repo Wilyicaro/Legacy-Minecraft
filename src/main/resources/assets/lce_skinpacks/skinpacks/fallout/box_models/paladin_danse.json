@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Paladin Danse",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004833_DISPLAYNAME",
+    "displayNameId": "custom.fallout.paladin_danse",
     "themeName": "Fallout 4",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004833_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.paladin_danse"
   },
   "texture": {
     "width": 64,

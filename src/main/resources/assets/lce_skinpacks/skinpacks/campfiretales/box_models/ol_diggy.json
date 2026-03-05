@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Ol' Diggy",
-    "displayNameId": "IDS_DLCSKIN00005508_DISPLAYNAME"
+    "displayNameId": "custom.campfiretales.ol_diggy"
   },
   "texture": {
     "width": 64,

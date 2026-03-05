@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Desert Griefer",
-    "displayNameId": "IDS_DLCSKIN00004504_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.desert_griefer",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004504_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.desert_griefer"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Dremora Lord",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001437_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.dremora_lord",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001437_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.dremora_lord"
   },
   "texture": {
     "width": 64,

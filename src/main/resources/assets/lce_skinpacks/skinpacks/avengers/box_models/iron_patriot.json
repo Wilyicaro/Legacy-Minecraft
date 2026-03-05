@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Iron Patriot",
-    "displayNameId": "IDS_dlcskin33391757_DISPLAYNAME"
+    "displayNameId": "custom.avengers.iron_patriot"
   },
   "texture": {
     "width": 64,

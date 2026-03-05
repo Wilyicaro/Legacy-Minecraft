@@ -1,9 +1,16 @@
 {
   "meta": {
     "displayName": "The Blocksquatch",
-    "displayNameId": "IDS_DLCSKIN00005511_DISPLAYNAME"
+    "displayNameId": "custom.campfiretales.the_blocksquatch"
   },
-  "hide": [ "hat", "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "hat",
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

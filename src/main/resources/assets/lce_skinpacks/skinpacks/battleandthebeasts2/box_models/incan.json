@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Incan",
-    "displayNameId": "IDS_DLCSKIN00001026_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.incan"
   },
   "texture": {
     "width": 64,

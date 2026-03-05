@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Harry Sullivan",
-    "displayNameId": "IDS_DLCSKIN00002016_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.harry_sullivan"
   },
   "texture": {
     "width": 64,

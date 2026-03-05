@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Third Doctor",
-    "displayNameId": "IDS_DLCSKIN00002504_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.the_third_doctor"
   },
   "texture": {
     "width": 64,

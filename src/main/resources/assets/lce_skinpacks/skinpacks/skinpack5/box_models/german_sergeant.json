@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "German Sergeant",
-    "displayNameId": "IDS_dlcskin46397171_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.german_sergeant",
     "themeName": "World War 2",
-    "themeNameId": "IDS_dlcskin46397171_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.german_sergeant"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Mooshroom Miner",
-    "displayNameId": "IDS_DLCSKIN00005309_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.mooshroom_miner"
   },
-"hide": "left_pants",
+  "hide": "left_pants",
   "texture": {
     "width": 64,
     "height": 64

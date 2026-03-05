@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Krampus",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002719_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.krampus",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002719_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.krampus"
   },
-"hide": ["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

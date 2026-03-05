@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Brick",
-    "displayNameId": "IDS_dlcskin21733818_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.brick",
     "themeName": "Borderlands",
-    "themeNameId": "IDS_dlcskin21733818_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.brick"
   },
   "texture": {
     "width": 64,

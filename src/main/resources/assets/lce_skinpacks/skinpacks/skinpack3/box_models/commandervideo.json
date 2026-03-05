@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "CommanderVideo",
-    "displayNameId": "IDS_DLCSKIN20000212_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.commandervideo",
     "themeName": "BIT.TRIP RUNNER",
-    "themeNameId": "IDS_DLCSKIN20000212_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.commandervideo"
   },
   "texture": {
     "width": 64,

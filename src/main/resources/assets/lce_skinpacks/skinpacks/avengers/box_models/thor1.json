@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Thor",
-    "displayNameId": "IDS_dlcskin37944984_DISPLAYNAME",
+    "displayNameId": "custom.avengers.thor1",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin37944984_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.thor1"
   },
   "texture": {
     "width": 64,

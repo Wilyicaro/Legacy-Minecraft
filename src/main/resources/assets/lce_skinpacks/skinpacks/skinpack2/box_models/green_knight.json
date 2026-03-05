@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Green Knight",
-    "displayNameId": "IDS_DLCSKIN20000114_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.green_knight",
     "themeName": "Castle Crashers",
-    "themeNameId": "IDS_DLCSKIN20000114_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.green_knight"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Seventh Doctor",
-    "displayNameId": "IDS_DLCSKIN00002502_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.the_seventh_doctor"
   },
   "armorOffsets": {
     "HELMET": {

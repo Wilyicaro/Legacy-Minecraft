@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Jo Grant",
-    "displayNameId": "IDS_DLCSKIN00002512_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.jo_grant"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Ace",
-    "displayNameId": "IDS_DLCSKIN00002511_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.ace"
   },
   "texture": {
     "width": 64,

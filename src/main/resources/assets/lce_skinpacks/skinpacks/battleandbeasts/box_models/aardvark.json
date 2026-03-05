@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Aardvark",
-    "displayNameId": "IDS_DLCSKIN00000813_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.aardvark"
   },
   "texture": {
     "width": 64,

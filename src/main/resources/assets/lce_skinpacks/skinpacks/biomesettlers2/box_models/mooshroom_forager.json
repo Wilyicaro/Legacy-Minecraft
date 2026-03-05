@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mooshroom Forager",
-    "displayNameId": "IDS_DLCSKIN00005306_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.mooshroom_forager"
   },
   "texture": {
     "width": 64,

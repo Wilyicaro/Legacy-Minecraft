@@ -1,9 +1,15 @@
 {
   "meta": {
     "displayName": "Martin Prince",
-    "displayNameId": "IDS_DLCSKIN00002113_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.martin_prince"
   },
-  "hide": ["HEAD", "HAT", "BODY", "LEFT_ARM", "RIGHT_ARM"],
+  "hide": [
+    "HEAD",
+    "HAT",
+    "BODY",
+    "LEFT_ARM",
+    "RIGHT_ARM"
+  ],
   "texture": {
     "width": 64,
     "height": 64

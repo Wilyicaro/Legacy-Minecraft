@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Skelekitten",
-    "displayNameId": "IDS_dlcskin60905082_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.skelekitten",
     "themeName": "Charlie Murder",
-    "themeNameId": "IDS_dlcskin60905082_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.skelekitten"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Hancock",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004830_DISPLAYNAME",
+    "displayNameId": "custom.fallout.hancock",
     "themeName": "Fallout 4",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004830_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.hancock"
   },
   "texture": {
     "width": 64,

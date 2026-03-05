@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Zombie Turkey",
-    "displayNameId": "IDS_DLCSKIN00000617_DISPLAYNAME"
+    "displayNameId": "custom.festive.zombie_turkey"
   },
   "texture": {
     "width": 64,

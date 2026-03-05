@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Pinata",
-    "displayNameId": "IDS_DLCSKIN00006506_DISPLAYNAME",
-    "themeName": "Pi\u00f1-attaboy!",
-    "themeNameId": "IDS_DLCSKIN00006506_THEMENAME"
+    "displayNameId": "custom.minecon2017.pinata",
+    "themeName": "Piñ-attaboy!",
+    "themeNameId": "custom.minecon2017.themetext.pinata"
   },
   "texture": {
     "width": 64,

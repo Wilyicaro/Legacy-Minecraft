@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Blitzen",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002712_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.blitzen",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002712_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.blitzen"
   },
   "texture": {
     "width": 64,

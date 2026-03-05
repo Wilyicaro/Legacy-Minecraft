@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Cantina Band Member",
-    "displayNameId": "IDS_DLCSKIN00001223_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.cantina_band_member",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001223_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.cantina_band_member"
   },
   "armorOffsets": {
     "HELMET": {

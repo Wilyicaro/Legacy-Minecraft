@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Evil Elf",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002735_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.evil_elf",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002735_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.evil_elf"
   },
-"hide": ["arms"],
+  "hide": [
+    "arms"
+  ],
   "texture": {
     "width": 64,
     "height": 64

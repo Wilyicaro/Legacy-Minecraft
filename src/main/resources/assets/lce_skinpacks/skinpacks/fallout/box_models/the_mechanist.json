@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "The Mechanist",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004834_DISPLAYNAME",
+    "displayNameId": "custom.fallout.the_mechanist",
     "themeName": "Fallout 4",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004834_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.the_mechanist"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Hyena",
-    "displayNameId": "IDS_DLCSKIN00000816_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.hyena"
   },
   "texture": {
     "width": 64,

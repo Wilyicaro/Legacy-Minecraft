@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "tomte",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002730_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.tomte",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002730_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.tomte"
   },
-"hide": ["all"],
+  "hide": [
+    "all"
+  ],
   "texture": {
     "width": 64,
     "height": 64

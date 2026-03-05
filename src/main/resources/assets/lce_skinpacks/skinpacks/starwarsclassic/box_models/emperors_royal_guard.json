@@ -1,12 +1,14 @@
 {
   "meta": {
     "displayName": "Emperor's Royal Guard",
-    "displayNameId": "IDS_DLCSKIN00001246_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.emperors_royal_guard",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001246_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.emperors_royal_guard"
   },
-"hidearmour": "helmet",
-"hide":["hat"],
+  "hidearmour": "helmet",
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Zeus",
-    "displayNameId": "IDS_DLCSKIN20000137_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.zeus",
     "themeName": "God of War",
-    "themeNameId": "IDS_DLCSKIN20000137_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.zeus"
   },
   "texture": {
     "width": 64,

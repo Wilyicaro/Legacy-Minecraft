@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Marley's Ghost",
-    "displayNameId": "IDS_DLCSKIN00000623_DISPLAYNAME"
+    "displayNameId": "custom.festive.marleys_ghost"
   },
   "texture": {
     "width": 64,

@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Badger",
-    "displayNameId": "IDS_DLCSKIN00001015_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.badger"
   },
   "texture": {
     "width": 64,

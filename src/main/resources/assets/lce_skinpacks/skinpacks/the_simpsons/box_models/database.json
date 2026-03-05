@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Database",
-    "displayNameId": "IDS_DLCSKIN00002117_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.database"
   },
   "armorOffsets": {
     "HELMET": {
@@ -10,7 +10,13 @@
       "z": 0.0
     }
   },
-  "hide": ["HEAD", "HAT", "BODY", "LEFT_ARM", "RIGHT_ARM"],
+  "hide": [
+    "HEAD",
+    "HAT",
+    "BODY",
+    "LEFT_ARM",
+    "RIGHT_ARM"
+  ],
   "texture": {
     "width": 64,
     "height": 64

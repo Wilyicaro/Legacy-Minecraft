@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Alex Globe",
-    "displayNameId": "IDS_DLCSKIN00006501_DISPLAYNAME",
+    "displayNameId": "custom.minecon2017.alex_globe",
     "themeName": "Head in the Clouds",
-    "themeNameId": "IDS_DLCSKIN00006501_THEMENAME"
+    "themeNameId": "custom.minecon2017.themetext.alex_globe"
   },
   "texture": {
     "width": 64,

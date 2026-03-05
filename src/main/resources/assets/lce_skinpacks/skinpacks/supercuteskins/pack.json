@@ -1,100 +1,100 @@
 {
-  "name": "Super Cute Texture Pack",
+  "name": "key:custom.supercuteskins.pack.name",
   "author": "4J Studios",
   "skins": [
     {
       "id": "woof",
-      "name": "Woof",
+      "name": "key:custom.supercuteskins.woof",
       "texture": "skins/woof.png",
       "model": "slim",
       "order": 1
     },
     {
       "id": "mew",
-      "name": "Mew",
+      "name": "key:custom.supercuteskins.mew",
       "texture": "skins/mew.png",
       "model": "slim",
       "order": 2
     },
     {
       "id": "cheep",
-      "name": "Cheep",
+      "name": "key:custom.supercuteskins.cheep",
       "texture": "skins/cheep.png",
       "order": 3
     },
     {
       "id": "rawr",
-      "name": "Rawr",
+      "name": "key:custom.supercuteskins.rawr",
       "texture": "skins/rawr.png",
       "order": 4
     },
     {
       "id": "whinny",
-      "name": "Whinny",
+      "name": "key:custom.supercuteskins.whinny",
       "texture": "skins/whinny.png",
       "model": "slim",
       "order": 5
     },
     {
       "id": "spotty",
-      "name": "Spotty",
+      "name": "key:custom.supercuteskins.spotty",
       "texture": "skins/spotty.png",
       "model": "slim",
       "order": 6
     },
     {
       "id": "sniff",
-      "name": "Sniff",
+      "name": "key:custom.supercuteskins.sniff",
       "texture": "skins/sniff.png",
       "order": 7
     },
     {
       "id": "spit",
-      "name": "Spit",
+      "name": "key:custom.supercuteskins.spit",
       "texture": "skins/spit.png",
       "order": 8
     },
     {
       "id": "squirt",
-      "name": "Squirt",
+      "name": "key:custom.supercuteskins.squirt",
       "texture": "skins/squirt.png",
       "order": 9
     },
     {
       "id": "patty",
-      "name": "Patty",
+      "name": "key:custom.supercuteskins.patty",
       "texture": "skins/patty.png",
       "model": "slim",
       "order": 10
     },
     {
       "id": "ringo",
-      "name": "Ringo",
+      "name": "key:custom.supercuteskins.ringo",
       "texture": "skins/ringo.png",
       "order": 11
     },
     {
       "id": "scoop",
-      "name": "Scoop",
+      "name": "key:custom.supercuteskins.scoop",
       "texture": "skins/scoop.png",
       "model": "slim",
       "order": 12
     },
     {
       "id": "pop",
-      "name": "Pop",
+      "name": "key:custom.supercuteskins.pop",
       "texture": "skins/pop.png",
       "order": 13
     },
     {
       "id": "beep",
-      "name": "Beep",
+      "name": "key:custom.supercuteskins.beep",
       "texture": "skins/beep.png",
       "order": 14
     },
     {
       "id": "root",
-      "name": "Root",
+      "name": "key:custom.supercuteskins.root",
       "texture": "skins/root.png",
       "model": "slim",
       "order": 15

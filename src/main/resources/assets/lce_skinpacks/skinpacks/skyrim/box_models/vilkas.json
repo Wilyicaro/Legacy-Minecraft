@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Vilkas",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001439_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.vilkas",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001439_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.vilkas"
   },
   "texture": {
     "width": 64,

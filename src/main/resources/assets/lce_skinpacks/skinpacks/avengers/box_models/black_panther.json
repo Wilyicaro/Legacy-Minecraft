@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Black Panther",
-    "displayNameId": "IDS_dlcskin65341851_DISPLAYNAME",
+    "displayNameId": "custom.avengers.black_panther",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin65341851_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.black_panther"
   },
   "texture": {
     "width": 64,

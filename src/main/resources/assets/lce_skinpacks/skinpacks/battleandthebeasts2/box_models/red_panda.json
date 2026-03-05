@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Red Panda",
-    "displayNameId": "IDS_DLCSKIN00001007_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.red_panda"
   },
   "texture": {
     "width": 64,

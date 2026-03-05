@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Elder Subhuti",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005117_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.elder_subhuti",
     "themeName": "Sun Wukong's Master",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005117_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.elder_subhuti"
   },
   "texture": {
     "width": 64,

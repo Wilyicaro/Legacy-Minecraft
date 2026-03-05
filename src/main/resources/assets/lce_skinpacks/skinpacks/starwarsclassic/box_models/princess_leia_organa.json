@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Princess Leia Organa",
-    "displayNameId": "IDS_DLCSKIN00001211_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.princess_leia_organa",
     "themeName": "Senator",
-    "themeNameId": "IDS_DLCSKIN00001211_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.princess_leia_organa"
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

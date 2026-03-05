@@ -1,11 +1,17 @@
 {
   "meta": {
     "displayName": "Heimdallr",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004605_DISPLAYNAME",
+    "displayNameId": "custom.norsemythology.heimdallr",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004605_THEMENAME"
+    "themeNameId": "custom.norsemythology.themetext.heimdallr"
   },
-  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

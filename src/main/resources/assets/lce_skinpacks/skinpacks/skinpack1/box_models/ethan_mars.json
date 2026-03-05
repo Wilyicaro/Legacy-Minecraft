@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Ethan Mars",
-    "displayNameId": "IDS_DLCSKIN20000019_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.ethan_mars",
     "themeName": "Heavy Rain",
-    "themeNameId": "IDS_DLCSKIN20000019_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.ethan_mars"
   },
   "texture": {
     "width": 64,

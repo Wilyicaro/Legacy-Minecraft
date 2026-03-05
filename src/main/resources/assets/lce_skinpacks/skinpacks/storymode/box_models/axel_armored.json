@@ -1,9 +1,15 @@
 {
   "meta": {
     "displayName": "Axel Armored",
-    "displayNameId": "IDS_DLCSKIN00005004_DISPLAYNAME"
+    "displayNameId": "custom.storymode.axel_armored"
   },
-  "hide": ["jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

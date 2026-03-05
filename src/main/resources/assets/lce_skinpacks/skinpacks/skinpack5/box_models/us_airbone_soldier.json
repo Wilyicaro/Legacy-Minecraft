@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "US Airbone Soldier",
-    "displayNameId": "IDS_dlcskin31093749_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.us_airbone_soldier",
     "themeName": "World War 2",
-    "themeNameId": "IDS_dlcskin31093749_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.us_airbone_soldier"
   },
   "texture": {
     "width": 64,

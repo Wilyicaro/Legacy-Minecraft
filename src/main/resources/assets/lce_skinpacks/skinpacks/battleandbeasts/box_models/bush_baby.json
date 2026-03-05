@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Bush Baby",
-    "displayNameId": "IDS_DLCSKIN00000819_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.bush_baby"
   },
   "texture": {
     "width": 64,

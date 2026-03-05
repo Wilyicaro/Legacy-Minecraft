@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Clayton Carmine",
-    "displayNameId": "IDS_DLCSKIN00000011_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.clayton_carmine",
     "themeName": "Gears of War",
-    "themeNameId": "IDS_DLCSKIN00000011_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.clayton_carmine"
   },
   "texture": {
     "width": 64,

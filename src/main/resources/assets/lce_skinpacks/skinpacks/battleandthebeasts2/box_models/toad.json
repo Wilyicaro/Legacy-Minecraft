@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Toad",
-    "displayNameId": "IDS_DLCSKIN00001012_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.toad"
   },
   "texture": {
     "width": 64,

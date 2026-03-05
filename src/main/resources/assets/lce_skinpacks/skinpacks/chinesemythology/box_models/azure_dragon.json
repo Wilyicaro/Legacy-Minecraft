@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Azure Dragon",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005139_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.azure_dragon",
     "themeName": "Eastern Symbol",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005139_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.azure_dragon"
   },
   "texture": {
     "width": 64,

@@ -1,11 +1,14 @@
 {
   "meta": {
     "displayName": "Friar Sand",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005103_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.friar_sand",
     "themeName": "Tamed Water Demon",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005103_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.friar_sand"
   },
-  "hide": ["left_sleeve","left_pants"],
+  "hide": [
+    "left_sleeve",
+    "left_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

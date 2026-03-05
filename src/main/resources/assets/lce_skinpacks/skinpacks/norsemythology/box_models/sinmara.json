@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Sinmara",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004620_DISPLAYNAME",
+    "displayNameId": "custom.norsemythology.sinmara",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004620_THEMENAME"
+    "themeNameId": "custom.norsemythology.themetext.sinmara"
   },
   "armorOffsets": {
     "BODY": {
@@ -57,7 +57,13 @@
       "z": 0.0
     }
   },
-  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

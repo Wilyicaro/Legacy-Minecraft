@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Party Iron Golem",
-    "displayNameId": "IDS_DLCSKIN00000712_DISPLAYNAME"
+    "displayNameId": "custom.birthday.party_iron_golem"
   },
   "hide": "hat",
   "texture": {

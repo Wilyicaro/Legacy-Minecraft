@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Breton Mage",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001408_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.breton_mage",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001408_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.breton_mage"
   },
   "texture": {
     "width": 64,

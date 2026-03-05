@@ -1,9 +1,12 @@
 {
   "meta": {
     "displayName": "Alex Anatomy",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003228_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.alex_anatomy"
   },
-  "hide": ["left_arm" , "left_leg"],
+  "hide": [
+    "left_arm",
+    "left_leg"
+  ],
   "texture": {
     "width": 64,
     "height": 64

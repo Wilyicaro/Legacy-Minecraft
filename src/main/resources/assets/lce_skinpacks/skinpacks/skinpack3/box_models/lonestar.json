@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Lonestar",
-    "displayNameId": "IDS_DLCSKIN20000205_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.lonestar",
     "themeName": "Awesomenauts",
-    "themeNameId": "IDS_DLCSKIN20000205_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.lonestar"
   },
   "texture": {
     "width": 64,

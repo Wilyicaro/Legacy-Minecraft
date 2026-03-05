@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Knight Templar",
-    "displayNameId": "IDS_DLCSKIN20000042_DISPLAYNAME"
+    "displayNameId": "custom.skinpack1.knight_templar"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Zoran Lazarevic",
-    "displayNameId": "IDS_DLCSKIN20000026_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.zoran_lazarevic",
     "themeName": "Uncharted",
-    "themeNameId": "IDS_DLCSKIN20000026_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.zoran_lazarevic"
   },
   "texture": {
     "width": 64,

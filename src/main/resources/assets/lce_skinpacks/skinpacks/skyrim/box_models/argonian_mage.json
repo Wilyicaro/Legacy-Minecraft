@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Argonian Mage",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001405_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.argonian_mage",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001405_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.argonian_mage"
   },
   "texture": {
     "width": 64,

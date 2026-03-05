@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Vermillion Bird",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005138_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.vermillion_bird",
     "themeName": "Southern Symbol",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005138_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.vermillion_bird"
   },
   "texture": {
     "width": 64,

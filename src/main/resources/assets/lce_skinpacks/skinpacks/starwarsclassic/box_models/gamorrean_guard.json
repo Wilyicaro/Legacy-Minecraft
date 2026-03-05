@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Gamorrean Guard",
-    "displayNameId": "IDS_DLCSKIN00001239_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.gamorrean_guard",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001239_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.gamorrean_guard"
   },
   "armorOffsets": {
     "HELMET": {
@@ -12,7 +12,9 @@
       "z": 0.0
     }
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

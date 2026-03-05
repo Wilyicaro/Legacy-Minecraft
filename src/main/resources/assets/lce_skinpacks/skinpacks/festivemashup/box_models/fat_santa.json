@@ -1,11 +1,14 @@
 {
   "meta": {
     "displayName": "Fat Santa",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002734_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.fat_santa",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002734_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.fat_santa"
   },
-"hide": ["hat", "arms"],
+  "hide": [
+    "hat",
+    "arms"
+  ],
   "texture": {
     "width": 64,
     "height": 64

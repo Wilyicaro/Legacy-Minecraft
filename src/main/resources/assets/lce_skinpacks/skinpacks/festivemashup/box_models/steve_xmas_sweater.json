@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Steve Xmas Sweater",
-    "displayNameId": "IDS_SKINS_DLCSKIN00002720_DISPLAYNAME",
+    "displayNameId": "custom.festivemashup.steve_xmas_sweater",
     "themeName": "Festive Mash-up",
-    "themeNameId": "IDS_SKINS_DLCSKIN00002720_THEMENAME"
+    "themeNameId": "custom.festivemashup.themetext.steve_xmas_sweater"
   },
   "texture": {
     "width": 64,

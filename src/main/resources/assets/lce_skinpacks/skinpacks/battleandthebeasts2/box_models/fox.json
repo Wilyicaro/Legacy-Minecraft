@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Fox",
-    "displayNameId": "IDS_DLCSKIN00001011_DISPLAYNAME"
+    "displayNameId": "custom.battleandthebeasts2.fox"
   },
   "texture": {
     "width": 64,

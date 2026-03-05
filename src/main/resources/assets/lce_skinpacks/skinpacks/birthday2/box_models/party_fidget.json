@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Party Fidget",
-    "displayNameId": "IDS_DLCSKIN20000410_DISPLAYNAME",
+    "displayNameId": "custom.birthday2.party_fidget",
     "themeName": "Dust: An Elysian Tail",
-    "themeNameId": "IDS_DLCSKIN20000410_THEMENAME"
+    "themeNameId": "custom.birthday2.themetext.party_fidget"
   },
   "texture": {
     "width": 64,

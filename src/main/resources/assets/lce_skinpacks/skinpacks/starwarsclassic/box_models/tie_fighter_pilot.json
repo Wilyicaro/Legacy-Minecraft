@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "TIE Fighter Pilot",
-    "displayNameId": "IDS_DLCSKIN00001224_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.tie_fighter_pilot",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001224_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.tie_fighter_pilot"
   },
   "armorOffsets": {
     "HELMET": {
@@ -12,7 +12,9 @@
       "z": 0.0
     }
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

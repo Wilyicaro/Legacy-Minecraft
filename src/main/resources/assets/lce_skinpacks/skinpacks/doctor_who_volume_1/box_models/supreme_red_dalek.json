@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Supreme Red Dalek",
-    "displayNameId": "IDS_DLCSKIN00002057_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.supreme_red_dalek"
   },
   "hide": "ALL",
   "texture": {

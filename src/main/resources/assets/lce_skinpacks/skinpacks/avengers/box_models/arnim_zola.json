@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Arnim Zola",
-    "displayNameId": "IDS_dlcskin15296401_DISPLAYNAME"
+    "displayNameId": "custom.avengers.arnim_zola"
   },
   "texture": {
     "width": 64,

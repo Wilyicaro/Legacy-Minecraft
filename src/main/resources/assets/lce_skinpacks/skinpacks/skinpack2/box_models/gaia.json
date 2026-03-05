@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Gaia",
-    "displayNameId": "IDS_DLCSKIN20000140_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.gaia",
     "themeName": "God of War",
-    "themeNameId": "IDS_DLCSKIN20000140_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.gaia"
   },
   "texture": {
     "width": 64,

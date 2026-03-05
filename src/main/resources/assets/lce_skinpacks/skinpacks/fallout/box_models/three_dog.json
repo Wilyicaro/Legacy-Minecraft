@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Three Dog",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004811_DISPLAYNAME",
+    "displayNameId": "custom.fallout.three_dog",
     "themeName": "Fallout 3",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004811_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.three_dog"
   },
   "texture": {
     "width": 64,

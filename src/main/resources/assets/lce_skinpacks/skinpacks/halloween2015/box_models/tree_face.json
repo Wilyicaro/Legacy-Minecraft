@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Tree Face",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003224_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.tree_face"
   },
   "texture": {
     "width": 64,

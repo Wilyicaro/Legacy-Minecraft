@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mr. Dewey Largo",
-    "displayNameId": "IDS_DLCSKIN00002121_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.mr_dewey_largo"
   },
   "hide": "head",
   "armorOffsets": {

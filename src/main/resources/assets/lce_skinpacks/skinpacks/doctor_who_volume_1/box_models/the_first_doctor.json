@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The First Doctor",
-    "displayNameId": "IDS_DLCSKIN00002004_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.the_first_doctor"
   },
   "texture": {
     "width": 64,

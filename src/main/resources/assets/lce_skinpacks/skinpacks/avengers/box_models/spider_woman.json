@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Spider Woman",
-    "displayNameId": "IDS_dlcskin80605953_DISPLAYNAME",
+    "displayNameId": "custom.avengers.spider_woman",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin80605953_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.spider_woman"
   },
   "texture": {
     "width": 64,

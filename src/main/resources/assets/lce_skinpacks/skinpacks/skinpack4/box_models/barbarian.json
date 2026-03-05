@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Barbarian",
-    "displayNameId": "IDS_dlcskin81635379_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.barbarian",
     "themeName": "Castle Crashers",
-    "themeNameId": "IDS_dlcskin81635379_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.barbarian"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "German Soldier",
-    "displayNameId": "IDS_dlcskin02415359_DISPLAYNAME",
+    "displayNameId": "custom.skinpack5.german_soldier",
     "themeName": "World War 2",
-    "themeNameId": "IDS_dlcskin02415359_THEMENAME"
+    "themeNameId": "custom.skinpack5.themetext.german_soldier"
   },
   "texture": {
     "width": 64,

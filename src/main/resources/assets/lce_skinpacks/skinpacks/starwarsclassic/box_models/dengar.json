@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Dengar",
-    "displayNameId": "IDS_DLCSKIN00001232_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.dengar",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001232_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.dengar"
   },
   "armorOffsets": {
     "HELMET": {

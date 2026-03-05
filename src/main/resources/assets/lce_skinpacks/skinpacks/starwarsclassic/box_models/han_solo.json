@@ -1,11 +1,13 @@
 {
   "meta": {
     "displayName": "Han Solo",
-    "displayNameId": "IDS_DLCSKIN00001207_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.han_solo",
     "themeName": "Smuggler",
-    "themeNameId": "IDS_DLCSKIN00001207_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.han_solo"
   },
-"hide":["hat"],
+  "hide": [
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

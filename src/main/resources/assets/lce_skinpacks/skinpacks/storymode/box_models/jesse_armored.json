@@ -1,9 +1,13 @@
 {
   "meta": {
     "displayName": "Jesse    Armored",
-    "displayNameId": "IDS_DLCSKIN00005016_DISPLAYNAME"
+    "displayNameId": "custom.storymode.jesse_armored"
   },
-  "hide": [ "hat", "left_arm", "jacket"],
+  "hide": [
+    "hat",
+    "left_arm",
+    "jacket"
+  ],
   "texture": {
     "width": 64,
     "height": 64
@@ -579,7 +583,7 @@
         }
       ]
     },
-       {
+    {
       "name": "right_arm_addon",
       "attach": "RIGHT_ARM",
       "cubes": [

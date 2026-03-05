@@ -1,9 +1,15 @@
 {
   "meta": {
     "displayName": "Witch",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004436_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.witch"
   },
-  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

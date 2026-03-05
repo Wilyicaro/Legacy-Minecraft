@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Captain America",
-    "displayNameId": "IDS_dlcskin87057107_DISPLAYNAME",
+    "displayNameId": "custom.avengers.captain_america",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin87057107_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.captain_america"
   },
   "texture": {
     "width": 64,

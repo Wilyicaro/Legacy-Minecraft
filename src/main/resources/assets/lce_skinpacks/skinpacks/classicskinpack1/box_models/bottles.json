@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Bottles",
-    "displayNameId": "IDS_DLCSKIN00000017_DISPLAYNAME",
+    "displayNameId": "custom.classicskinpack1.bottles",
     "themeName": "Banjo-Kazooie",
-    "themeNameId": "IDS_DLCSKIN00000017_THEMENAME"
+    "themeNameId": "custom.classicskinpack1.themetext.bottles"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Master Necromancer",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001438_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.master_necromancer",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001438_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.master_necromancer"
   },
   "texture": {
     "width": 64,

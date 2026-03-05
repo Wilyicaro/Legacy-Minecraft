@@ -1,9 +1,12 @@
 {
   "meta": {
     "displayName": "Steve Anatomy",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003227_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.steve_anatomy"
   },
-  "hide": ["left_arm" , "left_leg"],
+  "hide": [
+    "left_arm",
+    "left_leg"
+  ],
   "texture": {
     "width": 64,
     "height": 64

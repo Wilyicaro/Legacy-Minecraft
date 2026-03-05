@@ -1,24 +1,76 @@
 {
   "meta": {
     "displayName": "Gunter",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004421_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.gunter"
   },
   "offsets": {
-    "head":         { "x": 0, "y": 2,  "z": 0 },
-    "hat":          { "x": 0, "y": 2,  "z": 0 },
-    "body":         { "x": 0, "y": 2,  "z": 0 },
-    "right_arm":    { "x": 0, "y": 2,  "z": 0 },
-    "left_arm":     { "x": 0, "y": 2, "z": 0 },
-    "right_leg":    { "x": 0, "y": 1,  "z": 0 },
-    "left_leg":     { "x": 0, "y": 1,  "z": 0 }
+    "head": {
+      "x": 0,
+      "y": 2,
+      "z": 0
+    },
+    "hat": {
+      "x": 0,
+      "y": 2,
+      "z": 0
+    },
+    "body": {
+      "x": 0,
+      "y": 2,
+      "z": 0
+    },
+    "right_arm": {
+      "x": 0,
+      "y": 2,
+      "z": 0
+    },
+    "left_arm": {
+      "x": 0,
+      "y": 2,
+      "z": 0
+    },
+    "right_leg": {
+      "x": 0,
+      "y": 1,
+      "z": 0
+    },
+    "left_leg": {
+      "x": 0,
+      "y": 1,
+      "z": 0
+    }
   },
   "armor_offsets": {
-    "helmet": { "x": 0, "y": 2, "z": 0 },
-    "chestplate": { "x": 0, "y": 2, "z": 0 },
-    "leggings": { "x": 0, "y": 2, "z": 0 },
-    "boots": { "x": 0, "y": 1, "z": 0 }
+    "helmet": {
+      "x": 0,
+      "y": 2,
+      "z": 0
+    },
+    "chestplate": {
+      "x": 0,
+      "y": 2,
+      "z": 0
+    },
+    "leggings": {
+      "x": 0,
+      "y": 2,
+      "z": 0
+    },
+    "boots": {
+      "x": 0,
+      "y": 1,
+      "z": 0
+    }
   },
-  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants", "arms", "legs"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants",
+    "arms",
+    "legs"
+  ],
   "texture": {
     "width": 64,
     "height": 64

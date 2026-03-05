@@ -1,11 +1,14 @@
 {
   "meta": {
     "displayName": "Yan Wang",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005124_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.yan_wang",
     "themeName": "Underworld King",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005124_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.yan_wang"
   },
-  "hide": ["body", "limbs"],
+  "hide": [
+    "body",
+    "limbs"
+  ],
   "texture": {
     "width": 64,
     "height": 64

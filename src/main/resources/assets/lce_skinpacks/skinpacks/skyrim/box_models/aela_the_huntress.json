@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Aela the Huntress",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001425_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.aela_the_huntress",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001425_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.aela_the_huntress"
   },
   "texture": {
     "width": 64,

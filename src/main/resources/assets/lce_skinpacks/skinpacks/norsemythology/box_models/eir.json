@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Eir",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004607_DISPLAYNAME",
+    "displayNameId": "custom.norsemythology.eir",
     "themeName": "",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004607_THEMENAME"
+    "themeNameId": "custom.norsemythology.themetext.eir"
   },
   "armorOffsets": {
     "TOOL0": {
@@ -17,7 +17,13 @@
       "z": 0.0
     }
   },
-  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

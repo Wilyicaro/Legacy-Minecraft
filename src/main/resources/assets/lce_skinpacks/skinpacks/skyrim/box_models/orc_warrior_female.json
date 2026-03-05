@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Orc Warrior Female",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001419_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.orc_warrior_female",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001419_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.orc_warrior_female"
   },
   "texture": {
     "width": 64,

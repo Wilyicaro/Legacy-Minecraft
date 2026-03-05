@@ -1,11 +1,18 @@
 {
   "meta": {
     "displayName": "Monk Pig",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005102_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.monk_pig",
     "themeName": "Lazy Pilgrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005102_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.monk_pig"
   },
-  "hide": [ "hat", "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "hat",
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

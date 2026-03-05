@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mrs Claus",
-    "displayNameId": "IDS_DLCSKIN00000601_DISPLAYNAME"
+    "displayNameId": "custom.festive.mrs_claus"
   },
   "texture": {
     "width": 64,

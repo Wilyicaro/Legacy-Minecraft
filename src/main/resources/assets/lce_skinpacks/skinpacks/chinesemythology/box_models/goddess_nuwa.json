@@ -1,11 +1,17 @@
 {
   "meta": {
     "displayName": "Goddess Nuwa",
-    "displayNameId": "IDS_SKINS_DLCSKIN00005126_DISPLAYNAME",
+    "displayNameId": "custom.chinesemythology.goddess_nuwa",
     "themeName": "Snake Celestial",
-    "themeNameId": "IDS_SKINS_DLCSKIN00005126_THEMENAME"
+    "themeNameId": "custom.chinesemythology.themetext.goddess_nuwa"
   },
-  "hide": ["jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

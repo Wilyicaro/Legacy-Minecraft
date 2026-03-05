@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Zombie",
-    "displayNameId": "IDS_DLCSKIN20000002_DISPLAYNAME",
+    "displayNameId": "custom.skinpack1.zombie",
     "themeName": "Minecraft",
-    "themeNameId": "IDS_DLCSKIN20000002_THEMENAME"
+    "themeNameId": "custom.skinpack1.themetext.zombie"
   },
   "texture": {
     "width": 64,

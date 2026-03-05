@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Ancano",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001402_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.ancano",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001402_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.ancano"
   },
   "texture": {
     "width": 64,

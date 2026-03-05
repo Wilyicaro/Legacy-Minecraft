@@ -1,9 +1,15 @@
 {
   "meta": {
     "displayName": "Farlander",
-    "displayNameId": "IDS_DLCSKIN00005503_DISPLAYNAME"
+    "displayNameId": "custom.campfiretales.farlander"
   },
-  "hide": ["jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

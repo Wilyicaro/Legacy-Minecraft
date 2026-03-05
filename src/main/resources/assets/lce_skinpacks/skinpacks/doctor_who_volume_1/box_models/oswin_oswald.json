@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Oswin Oswald",
-    "displayNameId": "IDS_DLCSKIN00002010_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.oswin_oswald"
   },
   "texture": {
     "width": 64,

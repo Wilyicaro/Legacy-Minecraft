@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "A-Bomb",
-    "displayNameId": "IDS_dlcskin75089814_DISPLAYNAME",
+    "displayNameId": "custom.avengers.a_bomb",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin75089814_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.a_bomb"
   },
   "texture": {
     "width": 64,

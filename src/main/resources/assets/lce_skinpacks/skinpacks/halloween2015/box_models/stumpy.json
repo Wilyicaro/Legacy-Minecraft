@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Stumpy",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003225_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.stumpy"
   },
   "texture": {
     "width": 64,

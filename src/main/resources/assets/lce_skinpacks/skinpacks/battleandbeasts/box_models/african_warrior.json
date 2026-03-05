@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "African Warrior",
-    "displayNameId": "IDS_DLCSKIN00000831_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.african_warrior"
   },
   "texture": {
     "width": 64,

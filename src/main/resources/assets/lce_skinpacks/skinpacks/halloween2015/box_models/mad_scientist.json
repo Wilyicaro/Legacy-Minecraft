@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Mad Scientist",
-    "displayNameId": "IDS_SKINS_DLCSKIN00003222_DISPLAYNAME"
+    "displayNameId": "custom.halloween2015.mad_scientist"
   },
   "texture": {
     "width": 64,

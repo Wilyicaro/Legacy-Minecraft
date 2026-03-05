@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Shroom Glutton",
-    "displayNameId": "IDS_DLCSKIN00005310_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.shroom_glutton"
   },
   "texture": {
     "width": 64,

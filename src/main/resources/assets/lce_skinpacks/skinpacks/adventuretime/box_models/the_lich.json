@@ -1,9 +1,16 @@
 {
   "meta": {
     "displayName": "The Lich",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004430_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.the_lich"
   },
-  "hide": [ "jacket", "left_sleeve", "right_sleeve","left_pants", "right_pants", "hat"],
+  "hide": [
+    "jacket",
+    "left_sleeve",
+    "right_sleeve",
+    "left_pants",
+    "right_pants",
+    "hat"
+  ],
   "texture": {
     "width": 64,
     "height": 64

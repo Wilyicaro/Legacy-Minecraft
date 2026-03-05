@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Skeleton",
-    "displayNameId": "IDS_DLCSKIN20000203_DISPLAYNAME",
+    "displayNameId": "custom.skinpack3.skeleton",
     "themeName": "Minecraft",
-    "themeNameId": "IDS_DLCSKIN20000203_THEMENAME"
+    "themeNameId": "custom.skinpack3.themetext.skeleton"
   },
   "texture": {
     "width": 64,

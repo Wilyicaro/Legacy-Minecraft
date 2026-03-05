@@ -1,9 +1,12 @@
 {
   "meta": {
     "displayName": "Frozen Yogurt Princess",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004439_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.frozen_yogurt_princess"
   },
-"hide": ["right_sleeve", "left_sleeve"],
+  "hide": [
+    "right_sleeve",
+    "left_sleeve"
+  ],
   "texture": {
     "width": 64,
     "height": 64

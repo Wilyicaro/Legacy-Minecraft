@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Nether Brawler",
-    "displayNameId": "IDS_DLCSKIN00005314_DISPLAYNAME"
+    "displayNameId": "custom.biomesettlers2.nether_brawler"
   },
   "texture": {
     "width": 64,

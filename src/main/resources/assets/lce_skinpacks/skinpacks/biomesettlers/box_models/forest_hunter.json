@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Forest Hunter",
-    "displayNameId": "IDS_DLCSKIN00004513_DISPLAYNAME",
+    "displayNameId": "custom.biomesettlers.forest_hunter",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00004513_THEMENAME"
+    "themeNameId": "custom.biomesettlers.themetext.forest_hunter"
   },
   "texture": {
     "width": 64,

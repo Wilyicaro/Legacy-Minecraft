@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Hydra Agent",
-    "displayNameId": "IDS_dlcskin06962191_DISPLAYNAME",
+    "displayNameId": "custom.avengers.hydra_agent",
     "themeName": "Marvel Avengers",
-    "themeNameId": "IDS_dlcskin06962191_THEMENAME"
+    "themeNameId": "custom.avengers.themetext.hydra_agent"
   },
   "texture": {
     "width": 64,

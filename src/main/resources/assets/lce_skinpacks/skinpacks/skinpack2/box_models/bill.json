@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Bill",
-    "displayNameId": "IDS_DLCSKIN20000133_DISPLAYNAME",
+    "displayNameId": "custom.skinpack2.bill",
     "themeName": "The Last of Us",
-    "themeNameId": "IDS_DLCSKIN20000133_THEMENAME"
+    "themeNameId": "custom.skinpack2.themetext.bill"
   },
   "texture": {
     "width": 64,

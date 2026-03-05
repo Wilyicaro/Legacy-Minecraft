@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "The Well Wisher",
-    "displayNameId": "IDS_DLCSKIN00005515_DISPLAYNAME"
+    "displayNameId": "custom.campfiretales.the_well_wisher"
   },
   "texture": {
     "width": 64,

@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Nazir",
-    "displayNameId": "IDS_SKINS_DLCSKIN00001420_DISPLAYNAME",
+    "displayNameId": "custom.skyrim.nazir",
     "themeName": "Skyrim",
-    "themeNameId": "IDS_SKINS_DLCSKIN00001420_THEMENAME"
+    "themeNameId": "custom.skyrim.themetext.nazir"
   },
   "texture": {
     "width": 64,

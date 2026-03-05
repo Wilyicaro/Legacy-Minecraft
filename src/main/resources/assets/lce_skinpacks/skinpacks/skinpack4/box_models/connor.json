@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Connor",
-    "displayNameId": "IDS_dlcskin25888844_DISPLAYNAME",
+    "displayNameId": "custom.skinpack4.connor",
     "themeName": "Assassins Creed",
-    "themeNameId": "IDS_dlcskin25888844_THEMENAME"
+    "themeNameId": "custom.skinpack4.themetext.connor"
   },
   "texture": {
     "width": 64,

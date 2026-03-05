@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Vampire of Venice",
-    "displayNameId": "IDS_DLCSKIN00002039_DISPLAYNAME",
+    "displayNameId": "custom.doctor_who_volume_1.vampire_of_venice",
     "themeName": "Human form",
-    "themeNameId": "IDS_DLCSKIN00002039_THEMENAME"
+    "themeNameId": "custom.doctor_who_volume_1.themetext.vampire_of_venice"
   },
   "texture": {
     "width": 64,

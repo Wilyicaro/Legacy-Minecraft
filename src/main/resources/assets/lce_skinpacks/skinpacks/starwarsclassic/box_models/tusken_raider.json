@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Tusken Raider",
-    "displayNameId": "IDS_DLCSKIN00001217_DISPLAYNAME",
+    "displayNameId": "custom.starwarsclassic.tusken_raider",
     "themeName": "",
-    "themeNameId": "IDS_DLCSKIN00001217_THEMENAME"
+    "themeNameId": "custom.starwarsclassic.themetext.tusken_raider"
   },
   "armorOffsets": {
     "HELMET": {

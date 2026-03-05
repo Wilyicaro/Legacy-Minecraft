@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Lava Fiend",
-    "displayNameId": "IDS_DLCSKIN00005608_DISPLAYNAME",
+    "displayNameId": "custom.villians.lava_fiend",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005608_THEMENAME"
+    "themeNameId": "custom.villians.themetext.lava_fiend"
   },
   "texture": {
     "width": 64,

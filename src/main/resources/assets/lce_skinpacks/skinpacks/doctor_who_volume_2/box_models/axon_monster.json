@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Axon Monster",
-    "displayNameId": "IDS_DLCSKIN00002536_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_2.axon_monster"
   },
   "texture": {
     "width": 64,

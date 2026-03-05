@@ -1,9 +1,13 @@
 {
   "meta": {
     "displayName": "Magic Man",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004419_DISPLAYNAME"
+    "displayNameId": "custom.adventuretime.magic_man"
   },
-  "hide": [ "hat", "left_pants", "right_pants"],
+  "hide": [
+    "hat",
+    "left_pants",
+    "right_pants"
+  ],
   "texture": {
     "width": 64,
     "height": 64

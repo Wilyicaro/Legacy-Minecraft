@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Stronghold Seer",
-    "displayNameId": "IDS_DLCSKIN00005614_DISPLAYNAME",
+    "displayNameId": "custom.villians.stronghold_seer",
     "themeName": "Villains",
-    "themeNameId": "IDS_DLCSKIN00005614_THEMENAME"
+    "themeNameId": "custom.villians.themetext.stronghold_seer"
   },
   "texture": {
     "width": 64,

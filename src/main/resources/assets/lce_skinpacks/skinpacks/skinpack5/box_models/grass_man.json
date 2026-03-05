@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Grass Man",
-    "displayNameId": "IDS_dlcskin18075854_DISPLAYNAME"
+    "displayNameId": "custom.skinpack5.grass_man"
   },
   "texture": {
     "width": 64,

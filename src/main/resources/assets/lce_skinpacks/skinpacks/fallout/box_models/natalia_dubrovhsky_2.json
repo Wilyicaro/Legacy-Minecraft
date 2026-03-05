@@ -1,9 +1,9 @@
 {
   "meta": {
     "displayName": "Natalia Dubrovhsky",
-    "displayNameId": "IDS_SKINS_DLCSKIN00004847_DISPLAYNAME",
+    "displayNameId": "custom.fallout.natalia_dubrovhsky_2",
     "themeName": "Fallout 1",
-    "themeNameId": "IDS_SKINS_DLCSKIN00004847_THEMENAME"
+    "themeNameId": "custom.fallout.themetext.natalia_dubrovhsky_2"
   },
   "texture": {
     "width": 64,

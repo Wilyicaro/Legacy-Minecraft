@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Racing Driver 1",
-    "displayNameId": "IDS_DLCSKIN00000031_DISPLAYNAME"
+    "displayNameId": "custom.classicskinpack1.racing_driver_1"
   },
   "texture": {
     "width": 64,

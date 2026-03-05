@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Leopard",
-    "displayNameId": "IDS_DLCSKIN00000814_DISPLAYNAME"
+    "displayNameId": "custom.battleandbeasts.leopard"
   },
   "texture": {
     "width": 64,

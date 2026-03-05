@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Dolph",
-    "displayNameId": "IDS_DLCSKIN00002115_DISPLAYNAME"
+    "displayNameId": "custom.the_simpsons.dolph"
   },
   "texture": {
     "width": 64,

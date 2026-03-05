@@ -1,7 +1,7 @@
 {
   "meta": {
     "displayName": "Rory Williams",
-    "displayNameId": "IDS_DLCSKIN00002008_DISPLAYNAME"
+    "displayNameId": "custom.doctor_who_volume_1.rory_williams"
   },
   "texture": {
     "width": 64,
