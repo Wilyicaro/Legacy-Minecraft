@@ -11,9 +11,10 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import wily.factoryapi.base.client.FactoryGuiGraphics;
+import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.CommonValue;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.screen.RenderableVList;
@@ -287,7 +288,11 @@ public final class ChangeSkinPackList {
             ResourceLocation sprite = hot ? LegacySprites.BUTTON_HIGHLIGHTED : LegacySprites.BUTTON;
             int bw = Math.max(1, width);
             int bh = Math.max(1, height);
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, getX(), getY(), bw, bh);
+
+            this.alpha = active ? 1f : 0.8f;
+            FactoryScreenUtil.enableBlend();
+            FactoryGuiGraphics.of(graphics).blitSprite(sprite, getX(), getY(), bw, bh);
+            FactoryScreenUtil.disableBlend();
 
             var font = Minecraft.getInstance().font;
             String label = getMessage() == null ? "" : getMessage().getString();

@@ -42,7 +42,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final ResourceLocation PACK_NAME_BOX       = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/pack_name_box");
     private static final ResourceLocation SKIN_BOX            = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/skin_box");
     private static final ResourceLocation SIZEABLE_ICON_HOLDER = ResourceLocation.fromNamespaceAndPath("legacy", "textures/gui/sprites/container/sizeable_icon_holder.png");
-    private static final ResourceLocation BEACON_CHECK        = ResourceLocation.fromNamespaceAndPath("legacy", "textures/gui/sprites/container/beacon_check.png");
+    private static final ResourceLocation BEACON_CHECK        = ResourceLocation.fromNamespaceAndPath("legacy", "container/beacon_check");
     private static final ResourceLocation HEART_CONTAINER     = ResourceLocation.fromNamespaceAndPath("minecraft", "hud/heart/container");
     private static final ResourceLocation HEART_FULL          = ResourceLocation.fromNamespaceAndPath("minecraft", "hud/heart/full");
 
@@ -321,6 +321,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         int holder    = Math.max(1, sc(24));
         int iconX     = tooltipBox.x + tooltipBox.getWidth() - sc(50);
         int iconBaseY = panel.y + tooltipBox.getHeight() - sc(60);
+        
         g.blit(RenderPipelines.GUI_TEXTURED, SIZEABLE_ICON_HOLDER, iconX, iconBaseY + sc(3),  0, 0, holder, holder, 24, 24);
         g.blit(RenderPipelines.GUI_TEXTURED, SIZEABLE_ICON_HOLDER, iconX, iconBaseY + sc(30), 0, 0, holder, holder, 24, 24);
 
@@ -331,23 +332,18 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             boolean isAuto      = "auto_select".equals(selected);
             boolean isAutoActive = current == null || current.isBlank();
 
-            
-            
-            
             if (selected != null && (selected.equals(current) || (isAuto && isAutoActive))) {
-                var pose = g.pose();
-                pose.pushMatrix();
-                pose.translate(iconX + holder / 2f, iconBaseY + sc(3) + holder / 2f);
-                float s = 0.5f * uiScale; pose.scale(s, s); pose.translate(-12, -12);
-                g.blit(RenderPipelines.GUI_TEXTURED, BEACON_CHECK, 0, 0, 0, 0, 24, 24, 24, 24);
-                pose.popMatrix();
+                int checkSize = holder; 
+                int ix = iconX;
+                int iy = iconBaseY + sc(3);
+                
+                blitSprite(g, BEACON_CHECK, ix, iy, checkSize, checkSize);
             }
 
-            // Rendered on top of the.
-            // border is always visible whether.
             if (selected != null && FavoritesStore.isFavorite(selected)) {
-                int hs = Math.max(1, sc(14));
-                int hx = iconX + (holder - hs) / 2, hy = iconBaseY + sc(30) + (holder - hs) / 2;
+                int hs = Math.max(1, holder - sc(2)) - 2; 
+                int hx = iconX + (holder - hs) / 2;
+                int hy = iconBaseY + sc(30) + (holder - hs) / 2;
                 blitSprite(g, HEART_CONTAINER, hx, hy, hs, hs);
                 blitSprite(g, HEART_FULL,      hx, hy, hs, hs);
             }
@@ -364,10 +360,10 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         if (playerSkinWidgetList != null && playerSkinWidgetList.element3 != null) {
             String    skinId = playerSkinWidgetList.element3.skinId.get();
             SkinEntry entry  = skinId == null ? null : SkinPackLoader.getSkin(skinId);
-            Component name = entry == null ? Component.literal(String.valueOf(skinId)) : SkinPackLoader.nameComponent(entry.name(), String.valueOf(skinId));
+            String    name   = entry == null ? String.valueOf(skinId) : entry.name();
             int mid       = tooltipBox.x - sc(5) + (tooltipBox.getWidth() - sc(18)) / 2;
             int skinNameY = panel.y + tooltipBox.getHeight() - sc(49);
-            drawBigCentered(g, name, mid, skinNameY, 0xFFFFFFFF);
+            drawBigCentered(g, Component.literal(name), mid, skinNameY, 0xFFFFFFFF);
 
             ResourceLocation modelId = null;
             try {
