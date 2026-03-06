@@ -26,22 +26,8 @@ public class PlayerSkinWidgetList {
     public PlayerSkinWidget element6;
     private static final int VERTICAL_OFFSET = 10;
     private static final int OFFSET = 80;
-    private static final float FACING_FROM_LEFT = -45f;
-    private static final float FACING_FROM_RIGHT = 45f;
-    private static final float CENTER_SCALE = 0.935f;
-    private static final float LEGACY_SLOT_SCALE_1 = 0.800000f;
-    private static final float LEGACY_SLOT_SCALE_2 = 0.637500f;
-    private static final float LEGACY_SLOT_SCALE_3 = 0.508333f;
-    private static final float LEGACY_SLOT_SCALE_4 = 0.404167f;
-
-    private static final float LEGACY_DX_2 = 1.808f;
-    private static final float LEGACY_DX_3 = 2.460f;
-    private static final float LEGACY_DX_4 = 2.989f;
-
-    private static final float LEGACY_DY_1 = 30f / 294f;
-    private static final float LEGACY_DY_2 = 53f / 294f;
-    private static final float LEGACY_DY_3 = 72f / 294f;
-    private static final float LEGACY_DY_4 = 87f / 294f;
+    private static final float FACING_FROM_LEFT = -50f;
+    private static final float FACING_FROM_RIGHT = 50f;
     private float uiScale = 1f;
     private float carouselScaleMultiplier = 1f;
     private float carouselSpacingMultiplier = 1f;
@@ -247,75 +233,108 @@ public class PlayerSkinWidgetList {
 
     private SlotValues computeSlot(int offset) {
         SlotValues v = new SlotValues();
-        float rotX = 0f;
-        float rotY = 0f;
-
+        float rotX = 0;
+        float rotY;
+        int targetPosX;
+        int targetPosY;
+        float scale;
+        int vo = Math.round(VERTICAL_OFFSET * uiScale * Math.min(1.2f, carouselSpacingMultiplier));
+        int off = Math.round(OFFSET * uiScale * carouselSpacingMultiplier);
+        int pad8 = Math.round(8 * uiScale);
+        int centerOff = Math.round(45 * uiScale);
         int p8 = Math.round(8 * uiScale);
+        int p17 = Math.round(17 * uiScale);
+        int p18 = Math.round(18 * uiScale);
         int p20 = Math.round(20 * uiScale);
+        int p25 = Math.round(25 * uiScale);
+        int p33 = Math.round(33 * uiScale);
+        int p35 = Math.round(35 * uiScale);
+        int p45 = Math.round(45 * uiScale);
 
-        float centerScale = CENTER_SCALE * uiScale * carouselScaleMultiplier;
-        float[] scaleMul = new float[]{
-                1f,
-                LEGACY_SLOT_SCALE_1,
-                LEGACY_SLOT_SCALE_2,
-                LEGACY_SLOT_SCALE_3,
-                LEGACY_SLOT_SCALE_4
-        };
-
-        int abs = Math.abs(offset);
-        if (abs > 4) return null;
-
-        v.active = offset == 0;
-        if (offset == 0) {
-            rotX = centerRotationX;
-            rotY = centerRotationY;
-        } else {
-            rotY = offset < 0 ? FACING_FROM_LEFT : FACING_FROM_RIGHT;
+        switch (offset) {
+            case 0 -> {
+                v.active = true;
+                rotX = centerRotationX;
+                rotY = centerRotationY;
+                targetPosX = x + p8;
+                targetPosY = y + p20;
+                scale = 0.935f * uiScale * carouselScaleMultiplier;
+            }
+            case -1 -> {
+                v.active = false;
+                rotY = FACING_FROM_LEFT;
+                targetPosX = x - off + p18;
+                targetPosY = y + vo + p17;
+                scale = 0.77f * uiScale * carouselScaleMultiplier;
+            }
+            case 1 -> {
+                v.active = false;
+                rotY = FACING_FROM_RIGHT;
+                targetPosX = x + off + p20;
+                targetPosY = y + vo + p17;
+                scale = 0.77f * uiScale * carouselScaleMultiplier;
+            }
+            case -2 -> {
+                v.active = false;
+                rotY = FACING_FROM_LEFT;
+                targetPosX = x - off - p45;
+                targetPosY = y + vo + p25;
+                scale = 0.605f * uiScale * carouselScaleMultiplier;
+            }
+            case 2 -> {
+                v.active = false;
+                rotY = FACING_FROM_RIGHT;
+                targetPosX = x + off * 2 + p18;
+                targetPosY = y + vo + p25;
+                scale = 0.605f * uiScale * carouselScaleMultiplier;
+            }
+            case -3 -> {
+                v.active = false;
+                rotY = FACING_FROM_LEFT;
+                targetPosX = x - off * 3;
+                targetPosY = y + vo + p33;
+                scale = 0.44f * uiScale * carouselScaleMultiplier;
+            }
+            case 3 -> {
+                v.active = false;
+                rotY = FACING_FROM_RIGHT;
+                targetPosX = x + off * 3 + p35;
+                targetPosY = y + vo + p33;
+                scale = 0.44f * uiScale * carouselScaleMultiplier;
+            }
+            case -4 -> {
+                v.active = false;
+                rotY = FACING_FROM_LEFT;
+                targetPosX = x - off * 5 - p35;
+                targetPosY = y + vo + p33;
+                scale = 0.44f * uiScale * carouselScaleMultiplier;
+            }
+            case 4 -> {
+                v.active = false;
+                rotY = FACING_FROM_RIGHT;
+                targetPosX = x + off * 5 + p35;
+                targetPosY = y + vo + p33;
+                scale = 0.44f * uiScale * carouselScaleMultiplier;
+            }
+            default -> {
+                return null;
+            }
         }
 
-        float scale = centerScale * scaleMul[abs];
-
-        float centerHpx = 150f * centerScale;
-        float[] dyMul = new float[]{0f, LEGACY_DY_1, LEGACY_DY_2, LEGACY_DY_3, LEGACY_DY_4};
-
-        int baseTopX = x + p8;
-        int baseTopY = y + p20;
-
-        int centerX = baseTopX + Math.round(106f * centerScale / 2f);
-
-        int off = Math.round(OFFSET * uiScale * carouselSpacingMultiplier);
-        int d1 = off;
-        int d2 = Math.round(off * LEGACY_DX_2);
-        int d3 = Math.round(off * LEGACY_DX_3);
-        int d4 = Math.round(off * LEGACY_DX_4);
-        int delta = switch (abs) {
-            case 0 -> 0;
-            case 1 -> d1;
-            case 2 -> d2;
-            case 3 -> d3;
-            case 4 -> d4;
-            default -> 0;
-        };
-
-        int desiredCenter = centerX + (offset == 0 ? 0 : (offset > 0 ? 1 : -1) * delta);
-
-        int targetPosX = desiredCenter - Math.round(106f * scale / 2f);
-        int targetPosY = baseTopY + Math.round(centerHpx * dyMul[abs]);
-
-        int step = d1;
+        int step = off;
         if (linearCarousel) {
             int slot = linearSlotSpacing > 0 ? linearSlotSpacing : off;
-            int center = linearCenterX != Integer.MIN_VALUE ? linearCenterX : centerX;
-            int desiredCenterLinear = center + offset * slot;
-            targetPosX = desiredCenterLinear - Math.round(106f * scale / 2f);
+            int center = linearCenterX != Integer.MIN_VALUE ? linearCenterX : (x + pad8 + centerOff);
+            int desiredCenter = center + offset * slot;
+            targetPosX = desiredCenter - Math.round(106f * scale / 2f);
             step = slot;
         }
         if (customCarouselCenters) {
             int idx = offset + 4;
             if (idx >= 0 && idx < 9) {
-                int desiredCenterCustom = customCarouselCenterX[idx];
-                if (desiredCenterCustom != Integer.MIN_VALUE) {
-                    targetPosX = desiredCenterCustom - Math.round(106f * scale / 2f);
+                int desiredCenter = customCarouselCenterX[idx];
+                if (desiredCenter != Integer.MIN_VALUE) {
+                    targetPosX = desiredCenter - Math.round(106f * scale / 2f);
                     if (customCarouselStep > 0) step = customCarouselStep;
                 }
             }
@@ -497,14 +516,10 @@ public class PlayerSkinWidgetList {
     private void setupSlot(PlayerSkinWidget w, int offset) {
         int prevOffset = w.slotOffset;
         w.slotOffset = offset;
-        int p8 = Math.round(8 * uiScale);
-        float centerScale = CENTER_SCALE * uiScale * carouselScaleMultiplier;
-        int centerX = (this.x + p8) + Math.round(106f * centerScale / 2f);
-        if (customCarouselCenters && customCarouselCenterX.length >= 5 && customCarouselCenterX[4] != Integer.MIN_VALUE) {
-            centerX = customCarouselCenterX[4];
-        }
-        if (linearCarousel && linearCenterX != Integer.MIN_VALUE) centerX = linearCenterX;
-        w.setCarouselCenterX(centerX);
+        int pad8 = Math.round(8 * uiScale);
+        int centerOff = Math.round(45 * uiScale);
+        if (linearCarousel && linearCenterX != Integer.MIN_VALUE) w.setCarouselCenterX(linearCenterX);
+        else w.setCarouselCenterX(this.x + pad8 + centerOff);
 
         SlotValues fin = computeSlot(offset);
         if (fin == null) {

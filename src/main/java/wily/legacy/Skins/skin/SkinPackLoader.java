@@ -784,39 +784,6 @@ if (capePath != null && !capePath.isBlank()) {
         }
     }
 
-    private static String trOpt(String key) {
-        if (key == null || key.isBlank()) return null;
-        try {
-            String ev = SkinPackLang.get(key);
-            if (ev != null && !ev.isEmpty() && !ev.equals(key)) return ev;
-            String v = I18n.get(key);
-            return v == null || v.isEmpty() || v.equals(key) ? null : v;
-        } catch (Throwable t) {
-            return null;
-        }
-    }
-
-    private static String trMaybeKey(String name, String fallback) {
-        if (name == null || name.isBlank()) return fallback;
-        String key = name.startsWith("key:") ? name.substring(4) : name;
-        String v = trOpt(key);
-        if (v != null) return v;
-        int us = key.lastIndexOf('_');
-        if (us > 0) {
-            boolean digits = true;
-            for (int i = us + 1; i < key.length(); i++) {
-                char c = key.charAt(i);
-                if (c < '0' || c > '9') { digits = false; break; }
-            }
-            if (digits) {
-                String base = key.substring(0, us);
-                v = trOpt(base);
-                if (v != null) return v;
-            }
-        }
-        return name.startsWith("key:") ? fallback : name;
-    }
-
     private static String safeString(JsonElement el) {
         if (el == null || !el.isJsonPrimitive()) return null;
         try {
@@ -846,7 +813,9 @@ if (capePath != null && !capePath.isBlank()) {
 
 
 public static String nameString(String name, String fallbackId) {
-    return trMaybeKey(name, fallbackId);
+    if (name == null || name.isBlank()) return fallbackId;
+    if (name.startsWith("key:")) return tr(name.substring(4), fallbackId);
+    return name;
 }
 
 public static Component nameComponent(String name, String fallbackId) {

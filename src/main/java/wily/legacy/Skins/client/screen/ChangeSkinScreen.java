@@ -12,7 +12,6 @@ import wily.legacy.Skins.client.screen.widget.PlayerSkinWidgetList;
 import wily.legacy.Skins.skin.ClientSkinCache;
 import wily.legacy.Skins.skin.FavoritesStore;
 import wily.legacy.Skins.skin.SkinEntry;
-import wily.legacy.Skins.skin.SkinIdUtil;
 import wily.legacy.Skins.skin.SkinPack;
 import wily.legacy.Skins.skin.SkinPackLoader;
 import wily.legacy.Skins.skin.SkinSync;
@@ -42,7 +41,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     private static final ResourceLocation PACK_NAME_BOX       = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/pack_name_box");
     private static final ResourceLocation SKIN_BOX            = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/skin_box");
     private static final ResourceLocation SIZEABLE_ICON_HOLDER = ResourceLocation.fromNamespaceAndPath("legacy", "textures/gui/sprites/container/sizeable_icon_holder.png");
-    private static final ResourceLocation BEACON_CHECK        = ResourceLocation.fromNamespaceAndPath("legacy", "container/beacon_check");
+    private static final ResourceLocation BEACON_CHECK        = ResourceLocation.fromNamespaceAndPath("legacy", "textures/gui/sprites/container/beacon_check.png");
     private static final ResourceLocation HEART_CONTAINER     = ResourceLocation.fromNamespaceAndPath("minecraft", "hud/heart/container");
     private static final ResourceLocation HEART_FULL          = ResourceLocation.fromNamespaceAndPath("minecraft", "hud/heart/full");
 
@@ -321,7 +320,6 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         int holder    = Math.max(1, sc(24));
         int iconX     = tooltipBox.x + tooltipBox.getWidth() - sc(50);
         int iconBaseY = panel.y + tooltipBox.getHeight() - sc(60);
-        
         g.blit(RenderPipelines.GUI_TEXTURED, SIZEABLE_ICON_HOLDER, iconX, iconBaseY + sc(3),  0, 0, holder, holder, 24, 24);
         g.blit(RenderPipelines.GUI_TEXTURED, SIZEABLE_ICON_HOLDER, iconX, iconBaseY + sc(30), 0, 0, holder, holder, 24, 24);
 
@@ -332,18 +330,25 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             boolean isAuto      = "auto_select".equals(selected);
             boolean isAutoActive = current == null || current.isBlank();
 
+            
+            
+            
             if (selected != null && (selected.equals(current) || (isAuto && isAutoActive))) {
-                int checkSize = holder; 
-                int ix = iconX;
-                int iy = iconBaseY + sc(3);
-                
-                blitSprite(g, BEACON_CHECK, ix, iy, checkSize, checkSize);
+                float checkScale = 20.0F / 24.0F;
+                float checkX = iconX;
+                float checkY = iconBaseY + sc(5);
+                var pose = g.pose();
+                pose.pushMatrix();
+                pose.translate(checkX, checkY);
+                pose.scale(checkScale, checkScale);
+                g.blit(RenderPipelines.GUI_TEXTURED, BEACON_CHECK, 0, 0, 0, 0, 24, 24, 24, 24);
+                pose.popMatrix();
             }
 
             if (selected != null && FavoritesStore.isFavorite(selected)) {
-                int hs = Math.max(1, holder - sc(2)) - 2; 
-                int hx = iconX + (holder - hs) / 2;
-                int hy = iconBaseY + sc(30) + (holder - hs) / 2;
+                int hx = iconX + sc(4);
+                int hy = iconBaseY + sc(30) + sc(4);
+                int hs = Math.max(1, sc(16));
                 blitSprite(g, HEART_CONTAINER, hx, hy, hs, hs);
                 blitSprite(g, HEART_FULL,      hx, hy, hs, hs);
             }
@@ -386,10 +391,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
         SkinPack pack = getFocusedPack();
         if (pack != null) {
             int mid = tooltipBox.x - sc(5) + (tooltipBox.getWidth() - sc(18)) / 2;
-            Component packName = SkinIdUtil.isFavouritesPack(pack.id())
-                    ? SkinPackLoader.nameComponent(pack.name(), "Favorites")
-                    : SkinPackLoader.nameComponent(pack.name(), pack.id());
-            drawBigCentered(g, packName, mid, panel.y + sc(27), 0xFFFFFFFF);
+            drawBigCentered(g, Component.literal(SkinPackLoader.nameString(pack.name(), pack.id())), mid, panel.y + sc(27), 0xFFFFFFFF);
             String t = pack.type();
             if (t != null && !t.isBlank()) {
                 String k = t.toLowerCase(Locale.ROOT);
