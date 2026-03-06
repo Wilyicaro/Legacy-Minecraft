@@ -334,15 +334,15 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             
             
             if (selected != null && (selected.equals(current) || (isAuto && isAutoActive))) {
-                float checkScale = 20.0F / 24.0F;
-                float checkX = iconX;
-                float checkY = iconBaseY + sc(5);
-                var pose = g.pose();
-                pose.pushMatrix();
-                pose.translate(checkX, checkY);
-                pose.scale(checkScale, checkScale);
+                int checkSize = Math.max(1, sc(16));
+                float checkScale = checkSize / 24.0F;
+                float checkX = iconX + (holder - checkSize) / 2.0F;
+                float checkY = iconBaseY + sc(3) + (holder - checkSize) / 2.0F;
+                g.pose().pushMatrix();
+                g.pose().translate(checkX, checkY);
+                g.pose().scale(checkScale, checkScale);
                 g.blit(RenderPipelines.GUI_TEXTURED, BEACON_CHECK, 0, 0, 0, 0, 24, 24, 24, 24);
-                pose.popMatrix();
+                g.pose().popMatrix();
             }
 
             if (selected != null && FavoritesStore.isFavorite(selected)) {

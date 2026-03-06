@@ -4,7 +4,6 @@ import wily.legacy.Skins.client.render.RenderStateSkinIdAccess;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
-import net.minecraft.core.ClientAsset;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.HumanoidArm;
@@ -37,6 +36,11 @@ public final class GuiDollRender {
     private static volatile Method cachedRsSetColor;
     private static volatile boolean triedResolveRsSetColor;
 
+    // Reusable math objects (only used on render thread, safe to share)
+    private static final Vector3f REUSE_TRANSLATE = new Vector3f();
+    private static final Quaternionf REUSE_QUAT = new Quaternionf();
+    private static final Quaternionf REUSE_QUAT2 = new Quaternionf();
+
     private GuiDollRender() {
     }
 
@@ -44,6 +48,12 @@ public final class GuiDollRender {
         while (yaw < 0.0F) yaw += 360.0F;
         return (yaw + 180.0F) % 360.0F - 180.0F;
     }
+
+    private static int computePreviewSize(int baseWidth, int baseHeight, float bboxW, float bboxH, int sizeCap) {
+        int size = Math.min((int) (baseHeight / 2.75F), sizeCap);
+        return Math.max(size, 20);
+    }
+
 
     public static void renderDollInRect(GuiGraphics gui, String selectionId, PlayerSkin skin, float yawOffset, boolean crouching, float attackTime, float partialTick, int left, int top, int right, int bottom, int sizeCap) {
         final float BASE_BBOX_H = 1.8F;
@@ -75,13 +85,13 @@ public final class GuiDollRender {
         state.isCrouching = crouching;
         state.skin = skin;
         int baseHeight = bottom - top;
-        int size = Math.min((int) (baseHeight / 2.75F), sizeCap);
-        size = Math.max(size, 20);
+        int baseWidth = right - left;
+        int size = computePreviewSize(baseWidth, baseHeight, BASE_BBOX_W, BASE_BBOX_H, sizeCap);
         float renderScale = (float) size;
         float crouchComp = crouching ? -0.125F : 0.0F;
-        Vector3f translate = new Vector3f(0.0F, BASE_TRANSLATE_Y + crouchComp, 0.0F);
-        Quaternionf quat = new Quaternionf().rotationZ((float) Math.toRadians(180.0F));
-        Quaternionf quat2 = new Quaternionf().rotationX(0);
+        Vector3f translate = REUSE_TRANSLATE.set(0.0F, BASE_TRANSLATE_Y + crouchComp, 0.0F);
+        Quaternionf quat = REUSE_QUAT.rotationZ((float) Math.toRadians(180.0F));
+        Quaternionf quat2 = REUSE_QUAT2.rotationX(0);
         quat.mul(quat2);
         quat2.conjugate();
         int expandedTop = top - baseHeight;
@@ -98,12 +108,7 @@ public final class GuiDollRender {
         float bboxH = 1.8F;
         float bboxW = 0.6F;
         if (selectionId != null && skinTexture != null) {
-            String p = skinTexture.getPath();
-            int slash = p.lastIndexOf('/');
-            if (slash != -1) p = p.substring(slash + 1);
-            if (p.endsWith(".png")) p = p.substring(0, p.length() - 4);
-
-            ResourceLocation modelId = ResourceLocation.fromNamespaceAndPath(skinTexture.getNamespace(), p);
+            ResourceLocation modelId = ClientSkinAssets.getModelIdFromTexture(skinTexture);
             BuiltBoxModel built = BoxModelManager.get(modelId);
             if (built == null) {
                 var mj = ClientSkinAssets.getModelJson(selectionId);
@@ -117,10 +122,6 @@ public final class GuiDollRender {
         }
         final float BASE_TRANSLATE_Y = BASE_BBOX_H / 2.0F;
         AvatarRenderState state = new AvatarRenderState();
-        try {
-            Minecraft.getInstance().getTextureManager().getTexture(skinTexture);
-        } catch (Throwable ignored) {
-        }
         if (state instanceof RenderStateSkinIdAccess a) a.consoleskins$setSkinId(selectionId);
         state.id = DOLL_RENDER_STATE_ID;
         state.entityType = EntityType.PLAYER;
@@ -146,49 +147,26 @@ public final class GuiDollRender {
         state.attackTime = attackTime;
         state.isCrouching = crouching;
 
-        ClientAsset.Texture body = new ClientAsset.ResourceTexture(skinTexture, skinTexture);
-
-        ClientAsset.Texture cape = body;
-        boolean showCape = false;
+        SkinEntry entry = null;
         try {
-            SkinEntry entry = selectionId != null ? SkinPackLoader.getSkin(selectionId) : null;
-            if (entry != null && entry.cape() != null) {
-                ResourceLocation capePath = entry.cape();
-                try {
-                    Minecraft.getInstance().getTextureManager().getTexture(capePath);
-                } catch (Throwable ignored) {
-                }
-                cape = new ClientAsset.ResourceTexture(capePath, capePath);
-                showCape = true;
-            }
+            entry = selectionId != null ? SkinPackLoader.getSkin(selectionId) : null;
         } catch (Throwable ignored) {
         }
-        state.showCape = showCape;
 
-        boolean slim = false;
-        try {
-            SkinEntry entry = selectionId != null ? SkinPackLoader.getSkin(selectionId) : null;
-            if (entry != null) {
-                slim = entry.slimArms();
-            } else {
-                Boolean b = ClientSkinAssets.getSlimFlag(selectionId);
-                if (b != null) slim = b;
-            }
-        } catch (Throwable ignored) {
-            Boolean b = ClientSkinAssets.getSlimFlag(selectionId);
-            if (b != null) slim = b;
-        }
-        PlayerModelType model = slim ? PlayerModelType.SLIM : PlayerModelType.WIDE;
-        PlayerSkin skin = PlayerSkin.insecure(body, cape, body, model);
+        boolean wantCape = entry != null && entry.cape() != null;
+        state.showCape = wantCape;
+
+        PlayerSkin skin = ClientSkinAssets.getCachedPlayerSkin(selectionId, entry, wantCape);
+        if (skin == null) return;
         state.skin = skin;
         int baseHeight = bottom - top;
-        int size = Math.min((int) (baseHeight / 2.75F), sizeCap);
-        size = Math.max(size, 20);
+        int baseWidth = right - left;
+        int size = computePreviewSize(baseWidth, baseHeight, bboxW, bboxH, sizeCap);
         float renderScale = (float) size;
         float crouchComp = crouching ? -0.125F : 0.0F;
-        Vector3f translate = new Vector3f(0.0F, BASE_TRANSLATE_Y + crouchComp, 0.0F);
-        Quaternionf quat = new Quaternionf().rotationZ((float) Math.toRadians(180.0F));
-        Quaternionf quat2 = new Quaternionf().rotationX(0);
+        Vector3f translate = REUSE_TRANSLATE.set(0.0F, BASE_TRANSLATE_Y + crouchComp, 0.0F);
+        Quaternionf quat = REUSE_QUAT.rotationZ((float) Math.toRadians(180.0F));
+        Quaternionf quat2 = REUSE_QUAT2.rotationX(0);
         quat.mul(quat2);
         quat2.conjugate();
         int expandedTop = top - baseHeight;
