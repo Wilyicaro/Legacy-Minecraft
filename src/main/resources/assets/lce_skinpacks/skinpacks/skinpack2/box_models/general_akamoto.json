@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "General Akamoto",
+    "displayNameId": "custom.skinpack2.general_akamoto",
+    "themeName": "Skulls of the Shogun",
+    "themeNameId": "custom.skinpack2.themetext.general_akamoto"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

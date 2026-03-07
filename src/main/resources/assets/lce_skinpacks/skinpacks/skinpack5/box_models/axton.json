@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Axton",
+    "displayNameId": "custom.skinpack5.axton",
+    "themeName": "Borderlands 2",
+    "themeNameId": "custom.skinpack5.themetext.axton"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

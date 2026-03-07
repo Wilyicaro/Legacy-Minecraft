@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Boxer Alex Xmas Sweater",
+    "displayNameId": "custom.festivemashup.boxer_alex_xmas_sweater",
+    "themeName": "Festive Mash-up",
+    "themeNameId": "custom.festivemashup.themetext.boxer_alex_xmas_sweater"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

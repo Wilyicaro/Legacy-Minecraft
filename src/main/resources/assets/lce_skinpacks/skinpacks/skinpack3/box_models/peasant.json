@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Peasant",
+    "displayNameId": "custom.skinpack3.peasant"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Highway Woman",
+    "displayNameId": "custom.skinpack4.highway_woman"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

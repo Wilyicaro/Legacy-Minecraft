@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Redstone Creature",
+    "displayNameId": "custom.birthday3.redstone_creature"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Birthday Present",
+    "displayNameId": "custom.birthday.birthday_present"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

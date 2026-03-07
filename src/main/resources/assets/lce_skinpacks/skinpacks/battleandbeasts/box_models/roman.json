@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Roman",
+    "displayNameId": "custom.battleandbeasts.roman"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Astrid",
+    "displayNameId": "custom.skyrim.astrid",
+    "themeName": "Skyrim",
+    "themeNameId": "custom.skyrim.themetext.astrid"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

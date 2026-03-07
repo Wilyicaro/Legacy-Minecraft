@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Barbarian",
+    "displayNameId": "custom.battleandthebeasts2.barbarian"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

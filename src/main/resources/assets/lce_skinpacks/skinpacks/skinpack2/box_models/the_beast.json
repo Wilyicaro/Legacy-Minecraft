@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "The Beast",
+    "displayNameId": "custom.skinpack2.the_beast",
+    "themeName": "inFAMOUS",
+    "themeNameId": "custom.skinpack2.themetext.the_beast"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

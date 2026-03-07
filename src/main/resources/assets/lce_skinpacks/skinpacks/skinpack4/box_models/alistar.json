@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Alistar",
+    "displayNameId": "custom.skinpack4.alistar",
+    "themeName": "Dragon Age",
+    "themeNameId": "custom.skinpack4.themetext.alistar"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

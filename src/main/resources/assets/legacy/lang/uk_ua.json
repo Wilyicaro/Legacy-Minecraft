@@ -1143,6 +1143,9 @@
   "legacy.menu.autoSave_countdown": "Autosave in %s...",
   "legacy.menu.autoSave_message": "Коли ви бачите цей значок, це означає, що гра зберігає ваші дані.\n\nБудь ласка, не вимикайте пристрій, поки на екрані відображається цей значок.",
   "legacy.menu.change_skin": "Змінити скін",
+  "legacy.menu.change_skin.skin_animations": "Skin Animations",
+  "legacy.menu.change_skin.smooth_preview_scroll": "Smooth Preview Scroll",
+  "legacy.menu.change_skin.tu3_change_skin_screen": "TU3 Change Skin Screen",
   "legacy.menu.choose_user": "Choose User",
   "legacy.menu.choose_user.account_options": "Account Options",
   "legacy.menu.choose_user.account_options.delete": "Delete Account",
@@ -1657,5 +1660,8 @@
   "structure.minecraft.villages": "Села",
   "structure.minecraft.villages.description": "Поселення, розташовані в біомах Рівнини, Савани, Пустелі, Тайги або Снігових рівнин. Охороняються залізними ґолемами і є домом для фермерів, бібліотекарів, священників, ковалів та м'ясників.",
   "structure.minecraft.woodland_mansions": "Лісові маєтки",
-  "structure.minecraft.woodland_mansions.description": "Маєтки, знайдені в Темнодубових лісах. Домівка для Бісиків та Розбійників."
+  "structure.minecraft.woodland_mansions.description": "Маєтки, знайдені в Темнодубових лісах. Домівка для Бісиків та Розбійників.",
+  "legacy.skinpack.type.skin": "Skin Pack",
+  "legacy.skinpack.type.mashup": "Mash-up Pack",
+  "legacy.menu.change_skin.hide_armor": "Hide Armor"
 }

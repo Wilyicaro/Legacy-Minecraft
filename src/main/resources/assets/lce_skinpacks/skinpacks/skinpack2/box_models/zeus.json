@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "displayName": "Zeus",
+    "displayNameId": "custom.skinpack2.zeus",
+    "themeName": "God of War",
+    "themeNameId": "custom.skinpack2.themetext.zeus"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.99,
+            -2.99,
+            -0.01
+          ],
+          "size": [
+            4.0,
+            5.0,
+            3.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.99,
+            -2.99,
+            -2.99
+          ],
+          "size": [
+            4.0,
+            5.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Nether Creature",
+    "displayNameId": "custom.battleandthebeasts2.nether_creature"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

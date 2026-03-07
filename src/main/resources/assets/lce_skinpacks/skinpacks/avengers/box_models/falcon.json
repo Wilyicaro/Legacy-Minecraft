@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Falcon",
+    "displayNameId": "custom.avengers.falcon",
+    "themeName": "Marvel Avengers",
+    "themeNameId": "custom.avengers.themetext.falcon"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

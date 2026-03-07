@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Tundra Brawler",
+    "displayNameId": "custom.biomesettlers.tundra_brawler",
+    "themeName": "",
+    "themeNameId": "custom.biomesettlers.themetext.tundra_brawler"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

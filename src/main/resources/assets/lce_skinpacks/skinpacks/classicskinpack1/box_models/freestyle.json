@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Freestyle",
+    "displayNameId": "custom.classicskinpack1.freestyle",
+    "themeName": "Trials Evolution",
+    "themeNameId": "custom.classicskinpack1.themetext.freestyle"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

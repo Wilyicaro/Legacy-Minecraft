@@ -1,0 +1,74 @@
+{
+  "meta": {
+    "displayName": "Hancock",
+    "displayNameId": "custom.fallout.hancock",
+    "themeName": "Fallout 4",
+    "themeNameId": "custom.fallout.themetext.hancock"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -6.0,
+            -9.0,
+            1.0
+          ],
+          "size": [
+            4.0,
+            3.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -9.0,
+            1.0
+          ],
+          "size": [
+            4.0,
+            3.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -10.0,
+            -6.0
+          ],
+          "size": [
+            4.0,
+            3.0,
+            4.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

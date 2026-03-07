@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Reptile Monster Costume",
+    "displayNameId": "custom.halloween2015.reptile_monster_costume"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

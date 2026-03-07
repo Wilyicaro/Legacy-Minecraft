@@ -1,0 +1,198 @@
+{
+  "meta": {
+    "displayName": "Impossible Astronaut",
+    "displayNameId": "custom.doctor_who_volume_1.impossible_astronaut"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            2.0,
+            -2.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -2.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -6.0,
+            -2.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            2.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -6.0,
+            2.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            6.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            6.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -6.0,
+            6.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            1.0,
+            6.0
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

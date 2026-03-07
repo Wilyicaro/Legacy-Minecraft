@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Lonestar",
+    "displayNameId": "custom.skinpack3.lonestar",
+    "themeName": "Awesomenauts",
+    "themeNameId": "custom.skinpack3.themetext.lonestar"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

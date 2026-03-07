@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Garth",
+    "displayNameId": "custom.classicskinpack1.garth",
+    "themeName": "Fable Heroes",
+    "themeNameId": "custom.classicskinpack1.themetext.garth"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

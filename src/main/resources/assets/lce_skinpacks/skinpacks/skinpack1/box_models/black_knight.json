@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Black Knight",
+    "displayNameId": "custom.skinpack1.black_knight"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

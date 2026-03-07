@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Chinese Dragon Tail",
+    "displayNameId": "custom.chinesemythology.chinese_dragon_tail",
+    "themeName": "Dragon Dancer Suit",
+    "themeNameId": "custom.chinesemythology.themetext.chinese_dragon_tail"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

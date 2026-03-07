@@ -1,0 +1,164 @@
+{
+  "meta": {
+    "displayName": "Lava Fiend",
+    "displayNameId": "custom.villians.lava_fiend",
+    "themeName": "Villains",
+    "themeNameId": "custom.villians.themetext.lava_fiend"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -5.0,
+            -12.4,
+            1.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -9.4,
+            4.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            31
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -9.4,
+            4.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            31
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -12.4,
+            1.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            -9.4,
+            0.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            22
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -9.4,
+            0.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            22
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -12.4,
+            4.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            58,
+            25
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -12.4,
+            4.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            54,
+            25
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

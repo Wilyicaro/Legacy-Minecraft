@@ -1143,6 +1143,9 @@
   "legacy.menu.autoSave_countdown": "Autosave in %s...",
   "legacy.menu.autoSave_message": "Если на экране появляется этот значок, игра сохраняет данные.\n\nПока вы его видите, не выключайте ваше устройство.",
   "legacy.menu.change_skin": "Выбрать скин",
+  "legacy.menu.change_skin.skin_animations": "Skin Animations",
+  "legacy.menu.change_skin.smooth_preview_scroll": "Smooth Preview Scroll",
+  "legacy.menu.change_skin.tu3_change_skin_screen": "TU3 Change Skin Screen",
   "legacy.menu.choose_user": "Choose User",
   "legacy.menu.choose_user.account_options": "Account Options",
   "legacy.menu.choose_user.account_options.delete": "Delete Account",
@@ -1657,5 +1660,8 @@
   "structure.minecraft.villages": "Деревни",
   "structure.minecraft.villages.description": "Поселения, расположенные на равнинах, в саваннах, в пустынях, в тайге или в ледяных пустошах. Их охраняют железные големы. В них живут фермеры, библиотекари, священники, кузнецы и мясники.",
   "structure.minecraft.woodland_mansions": "Лесные особняки",
-  "structure.minecraft.woodland_mansions.description": "Особняки можно найти в Тёмных лесах. В них живут вредины, заклинатели, иллюзоры и поборники."
+  "structure.minecraft.woodland_mansions.description": "Особняки можно найти в Тёмных лесах. В них живут вредины, заклинатели, иллюзоры и поборники.",
+  "legacy.skinpack.type.skin": "Skin Pack",
+  "legacy.skinpack.type.mashup": "Mash-up Pack",
+  "legacy.menu.change_skin.hide_armor": "Hide Armor"
 }

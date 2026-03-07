@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Master Necromancer",
+    "displayNameId": "custom.skyrim.master_necromancer",
+    "themeName": "Skyrim",
+    "themeNameId": "custom.skyrim.themetext.master_necromancer"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

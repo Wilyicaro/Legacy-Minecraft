@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Covenant Grunt",
+    "displayNameId": "custom.classicskinpack1.covenant_grunt",
+    "themeName": "Halo",
+    "themeNameId": "custom.classicskinpack1.themetext.covenant_grunt"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "P-Body",
+    "displayNameId": "custom.skinpack3.p_body",
+    "themeName": "Portal 2",
+    "themeNameId": "custom.skinpack3.themetext.p_body"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

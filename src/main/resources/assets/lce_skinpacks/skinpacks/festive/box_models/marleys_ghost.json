@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Marley's Ghost",
+    "displayNameId": "custom.festive.marleys_ghost"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

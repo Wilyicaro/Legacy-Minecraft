@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Iron Man Mark 42",
+    "displayNameId": "custom.avengers.iron_man_mark_42",
+    "themeName": "Marvel Avengers",
+    "themeNameId": "custom.avengers.themetext.iron_man_mark_42"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

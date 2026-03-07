@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Raider",
+    "displayNameId": "custom.fallout.raider",
+    "themeName": "Fallout",
+    "themeNameId": "custom.fallout.themetext.raider"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

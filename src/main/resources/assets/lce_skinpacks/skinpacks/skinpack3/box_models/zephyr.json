@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Zephyr",
+    "displayNameId": "custom.skinpack3.zephyr",
+    "themeName": "Slam Bolt Scrappers",
+    "themeNameId": "custom.skinpack3.themetext.zephyr"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

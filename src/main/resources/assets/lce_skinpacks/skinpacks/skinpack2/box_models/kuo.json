@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Kuo",
+    "displayNameId": "custom.skinpack2.kuo",
+    "themeName": "inFAMOUS",
+    "themeNameId": "custom.skinpack2.themetext.kuo"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

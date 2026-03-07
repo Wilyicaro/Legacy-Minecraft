@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "displayName": "Draugr Deathlord",
+    "displayNameId": "custom.skyrim.draugr_deathlord",
+    "themeName": "Skyrim",
+    "themeNameId": "custom.skyrim.themetext.draugr_deathlord"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -15.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -10.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -10.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            -15.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

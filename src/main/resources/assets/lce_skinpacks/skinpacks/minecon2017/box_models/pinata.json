@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Pinata",
+    "displayNameId": "custom.minecon2017.pinata",
+    "themeName": "Piñ-attaboy!",
+    "themeNameId": "custom.minecon2017.themetext.pinata"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

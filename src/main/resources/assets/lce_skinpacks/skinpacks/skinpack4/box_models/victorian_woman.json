@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Victorian Woman",
+    "displayNameId": "custom.skinpack4.victorian_woman"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

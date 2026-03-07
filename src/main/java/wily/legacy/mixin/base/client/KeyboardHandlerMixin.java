@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.screen.InputTypeSwitchLock;
 
 @Mixin(KeyboardHandler.class)
 public class KeyboardHandlerMixin {
@@ -21,8 +22,10 @@ public class KeyboardHandlerMixin {
 
     @Inject(method = "keyPress", at = @At("HEAD"))
     public void keyPress(long l, int i, KeyEvent keyEvent, CallbackInfo ci) {
-        if (l == minecraft.getWindow().handle() && !Legacy4JClient.controllerManager.isControllerSimulatingInput)
-            Legacy4JClient.controllerManager.setControllerTheLastInput(false);
+        if (l != minecraft.getWindow().handle() || Legacy4JClient.controllerManager.isControllerSimulatingInput) return;
+        Screen s = minecraft.screen;
+        if (s instanceof InputTypeSwitchLock lock && lock.legacy$lockInputTypeSwitch()) return;
+        Legacy4JClient.controllerManager.setControllerTheLastInput(false);
     }
 
     //? if forge {

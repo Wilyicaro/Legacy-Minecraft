@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Toad",
+    "displayNameId": "custom.battleandthebeasts2.toad"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

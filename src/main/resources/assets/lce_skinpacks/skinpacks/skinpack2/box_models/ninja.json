@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Ninja",
+    "displayNameId": "custom.skinpack2.ninja"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

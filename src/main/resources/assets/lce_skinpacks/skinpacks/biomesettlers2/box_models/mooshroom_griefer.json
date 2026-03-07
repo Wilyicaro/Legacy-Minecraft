@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Mooshroom Griefer",
+    "displayNameId": "custom.biomesettlers2.mooshroom_griefer"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

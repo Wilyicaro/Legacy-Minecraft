@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Sten",
+    "displayNameId": "custom.skinpack4.sten",
+    "themeName": "Dragon Age",
+    "themeNameId": "custom.skinpack4.themetext.sten"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

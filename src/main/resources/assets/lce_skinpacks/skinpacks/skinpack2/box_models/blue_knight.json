@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Blue Knight",
+    "displayNameId": "custom.skinpack2.blue_knight",
+    "themeName": "Castle Crashers",
+    "themeNameId": "custom.skinpack2.themetext.blue_knight"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

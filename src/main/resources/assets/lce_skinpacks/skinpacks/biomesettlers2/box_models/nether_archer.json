@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Nether Archer",
+    "displayNameId": "custom.biomesettlers2.nether_archer"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

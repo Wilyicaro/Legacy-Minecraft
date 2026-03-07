@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Zombie in a Suit",
+    "displayNameId": "custom.battleandbeasts.zombie_in_a_suit"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

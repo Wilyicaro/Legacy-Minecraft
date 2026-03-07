@@ -1,0 +1,78 @@
+{
+  "meta": {
+    "displayName": "Mooshroom Archer",
+    "displayNameId": "custom.biomesettlers2.mooshroom_archer"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            -8.5,
+            4.5
+          ],
+          "size": [
+            4.0,
+            3.0,
+            2.0
+          ],
+          "uv": [
+            24,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -5.5,
+            6.5
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            26,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -2.25,
+            2.0,
+            2.25
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

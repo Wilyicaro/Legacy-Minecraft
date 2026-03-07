@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Donna Noble",
+    "displayNameId": "custom.doctor_who_volume_2.donna_noble"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

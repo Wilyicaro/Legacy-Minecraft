@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Barry Steakfries",
+    "displayNameId": "custom.skinpack4.barry_steakfries",
+    "themeName": "Jetpack Joyride",
+    "themeNameId": "custom.skinpack4.themetext.barry_steakfries"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Female Zombie",
+    "displayNameId": "custom.skinpack5.female_zombie",
+    "themeName": "The Walking Dead",
+    "themeNameId": "custom.skinpack5.themetext.female_zombie"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

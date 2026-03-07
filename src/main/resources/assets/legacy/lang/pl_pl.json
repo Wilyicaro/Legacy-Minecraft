@@ -1143,6 +1143,9 @@
   "legacy.menu.autoSave_countdown": "Autosave in %s...",
   "legacy.menu.autoSave_message": "Ta gra posiada funkcję autozapisu poziomów. Gdy zobaczysz powyższą ikonę, gra zapisuje dane.\n\nNie wyłączaj urządzenia, gdy znajduje się ona na ekranie.",
   "legacy.menu.change_skin": "Zmień skórkę",
+  "legacy.menu.change_skin.skin_animations": "Skin Animations",
+  "legacy.menu.change_skin.smooth_preview_scroll": "Smooth Preview Scroll",
+  "legacy.menu.change_skin.tu3_change_skin_screen": "TU3 Change Skin Screen",
   "legacy.menu.choose_user": "Choose User",
   "legacy.menu.choose_user.account_options": "Account Options",
   "legacy.menu.choose_user.account_options.delete": "Delete Account",
@@ -1657,5 +1660,8 @@
   "structure.minecraft.villages": "Wioski",
   "structure.minecraft.villages.description": "Osady położone w biomach równin, sawanny, pustyni, tajgi lub śnieżnych równin. Są strzeżone przez żelazne golemy i zamieszkiwane przez rolników, bibliotekarzy, duchownych, kowali i rzeźników.",
   "structure.minecraft.woodland_mansions": "Leśne dwory",
-  "structure.minecraft.woodland_mansions.description": "Posiadłości znalezione w Lasach Ciiemnego dębu. Dom Vexów i Illagerów."
+  "structure.minecraft.woodland_mansions.description": "Posiadłości znalezione w Lasach Ciiemnego dębu. Dom Vexów i Illagerów.",
+  "legacy.skinpack.type.skin": "Skin Pack",
+  "legacy.skinpack.type.mashup": "Mash-up Pack",
+  "legacy.menu.change_skin.hide_armor": "Hide Armor"
 }

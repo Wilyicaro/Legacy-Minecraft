@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Hyena",
+    "displayNameId": "custom.battleandbeasts.hyena"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

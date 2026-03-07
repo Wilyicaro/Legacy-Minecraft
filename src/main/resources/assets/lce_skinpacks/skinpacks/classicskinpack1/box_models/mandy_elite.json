@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Mandy Elite",
+    "displayNameId": "custom.classicskinpack1.mandy_elite",
+    "themeName": "Ms. 'Splosion Man",
+    "themeNameId": "custom.classicskinpack1.themetext.mandy_elite"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

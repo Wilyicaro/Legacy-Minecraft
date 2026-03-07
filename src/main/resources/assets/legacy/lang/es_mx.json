@@ -1143,6 +1143,9 @@
   "legacy.menu.autoSave_countdown": "Autosave in %s...",
   "legacy.menu.autoSave_message": "Este juego tiene una función de autoguardado de mundo. Cuando veas el ícono arriba, significa que el juego está guardando tus datos.\n\nPor favor, no apagues tu dispositivo mientras este ícono esté en pantalla.",
   "legacy.menu.change_skin": "Cambiar Skin",
+  "legacy.menu.change_skin.skin_animations": "Skin Animations",
+  "legacy.menu.change_skin.smooth_preview_scroll": "Smooth Preview Scroll",
+  "legacy.menu.change_skin.tu3_change_skin_screen": "TU3 Change Skin Screen",
   "legacy.menu.choose_user": "Choose User",
   "legacy.menu.choose_user.account_options": "Account Options",
   "legacy.menu.choose_user.account_options.delete": "Delete Account",
@@ -1657,5 +1660,8 @@
   "structure.minecraft.villages": "Aldeas",
   "structure.minecraft.villages.description": "Asentamientos situados en biomas de Llanuras, Sabana, Desierto, Taiga o Llanuras Nevadas. Custodiados por Gólems de Hierro y hogar de Agricultores, Bibliotecarios, Clérigos, Herreros y Carniceros.",
   "structure.minecraft.woodland_mansions": "Mansiones del Bosque",
-  "structure.minecraft.woodland_mansions.description": "Mansiones encontradas en Bosques de Roble Oscuro. Hogar de Vexes e Illagers."
+  "structure.minecraft.woodland_mansions.description": "Mansiones encontradas en Bosques de Roble Oscuro. Hogar de Vexes e Illagers.",
+  "legacy.skinpack.type.skin": "Skin Pack",
+  "legacy.skinpack.type.mashup": "Mash-up Pack",
+  "legacy.menu.change_skin.hide_armor": "Hide Armor"
 }

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Morrigan",
+    "displayNameId": "custom.skinpack4.morrigan",
+    "themeName": "Dragon Age",
+    "themeNameId": "custom.skinpack4.themetext.morrigan"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

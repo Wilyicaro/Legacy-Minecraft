@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Rawr",
+    "displayNameId": "custom.supercuteskins.rawr",
+    "themeName": "",
+    "themeNameId": "custom.supercuteskins.themetext.rawr"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

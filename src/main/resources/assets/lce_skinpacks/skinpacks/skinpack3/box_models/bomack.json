@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Bomack",
+    "displayNameId": "custom.skinpack3.bomack",
+    "themeName": "Slam Bolt Scrappers",
+    "themeNameId": "custom.skinpack3.themetext.bomack"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

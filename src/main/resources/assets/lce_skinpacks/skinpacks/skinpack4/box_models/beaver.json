@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Beaver",
+    "displayNameId": "custom.skinpack4.beaver"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

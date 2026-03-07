@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.PlayerModelPart;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.Skins.SkinsClientBootstrap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +23,24 @@ public class HelpAndOptionsScreen extends RenderableVListScreen {
             getRenderableVList().cyclic(false).layoutSpacing(l -> 5).init(panel.x + 12, panel.getY() + 8, panel.getWidth() - 25, panel.getHeight() - 16);
         }
     }));
-    public static ScreenSection<?> CHANGE_SKIN = new OptionsScreen.Section(Component.translatable("legacy.menu.change_skin"), s -> Panel.centered(s, 250, 150), new ArrayList<>(List.of(o -> o.renderableVList.renderables.addAll(createPlayerSkinWidgets()))));
+    public static ScreenSection<?> CHANGE_SKIN = new OptionsScreen.Section(
+            Component.translatable("legacy.menu.change_skin"),
+            s -> Panel.centered(s, 250, 150),
+            new ArrayList<>(List.of(o -> {
+                List<AbstractWidget> widgets = createPlayerSkinWidgets();
+                int customCount = Math.min(4, widgets.size());
+
+                o.renderableVList.addCategory(Component.literal("Custom Skin Settings"));
+                for (int i = 0; i < customCount; i++) o.renderableVList.addRenderable(widgets.get(i));
+
+                o.renderableVList.addCategory(Component.literal("Minecraft Skin Settings"));
+                for (int i = customCount; i < widgets.size(); i++) o.renderableVList.addRenderable(widgets.get(i));
+            }))
+    );
     public HelpAndOptionsScreen(Screen parent) {
         super(parent, Component.translatable("options.title"), r -> {
         });
-        renderableVList.addRenderable(CHANGE_SKIN.createButtonBuilder(this).build());
+        renderableVList.addRenderable(Button.builder(Component.translatable("legacy.menu.change_skin"), b -> SkinsClientBootstrap.requestOpenChangeSkinScreen(Minecraft.getInstance(), this)).build());
         renderableVList.addRenderable(HOW_TO_PLAY.createButtonBuilder(this).build());
         renderableVList.addRenderable(openScreenButton(Component.translatable("controls.title"), () -> new RenderableVListScreen(this, Component.translatable("controls.title"), r -> r.addRenderables(Button.builder(Component.translatable("options.mouse_settings.title"), button -> this.minecraft.setScreen(
                 new OptionsScreen(r.getScreen(), new OptionsScreen.Section(

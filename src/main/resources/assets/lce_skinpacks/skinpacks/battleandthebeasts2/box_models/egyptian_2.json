@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Egyptian",
+    "displayNameId": "custom.battleandthebeasts2.egyptian_2"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

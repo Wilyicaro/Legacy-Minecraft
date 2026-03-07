@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Blue Santa",
+    "displayNameId": "custom.festivemashup.blue_santa",
+    "themeName": "Festive Mash-up",
+    "themeNameId": "custom.festivemashup.themetext.blue_santa"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

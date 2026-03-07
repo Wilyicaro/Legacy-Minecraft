@@ -1,0 +1,367 @@
+{
+  "meta": {
+    "displayName": "Terri",
+    "displayNameId": "custom.the_simpsons.terri"
+  },
+  "hide": [
+    "HEAD",
+    "HAT",
+    "LEFT_ARM",
+    "RIGHT_ARM",
+    "body"
+  ],
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            1.0,
+            -4.9
+          ],
+          "size": [
+            6.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            50,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.9,
+            -2.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.9,
+            -2.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            17
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -2.0,
+            -4.9
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            16,
+            30
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -6.9,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            12,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -8.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            7
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.0,
+            -8.0,
+            -1.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            7
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.1,
+            -2.0,
+            3.0
+          ],
+          "size": [
+            10.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.1,
+            -6.0,
+            3.0
+          ],
+          "size": [
+            10.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            2.0,
+            1.0
+          ],
+          "size": [
+            8.0,
+            2.0,
+            3.0
+          ],
+          "uv": [
+            46,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.1,
+            2.0,
+            3.0
+          ],
+          "size": [
+            10.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            40,
+            29
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -6.0,
+            -4.9
+          ],
+          "size": [
+            8.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -7.0,
+            -4.9
+          ],
+          "size": [
+            8.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            32,
+            5
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -6.0,
+            -4.0
+          ],
+          "size": [
+            8.0,
+            8.0,
+            8.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            2.0,
+            -2.9
+          ],
+          "size": [
+            6.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            22,
+            30
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            2.0,
+            -2.0
+          ],
+          "size": [
+            8.0,
+            10.0,
+            4.0
+          ],
+          "uv": [
+            16,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -1.0
+          ],
+          "size": [
+            3.0,
+            10.0,
+            3.0
+          ],
+          "uv": [
+            40,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size": [
+            3.0,
+            10.0,
+            3.0
+          ],
+          "uv": [
+            52,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

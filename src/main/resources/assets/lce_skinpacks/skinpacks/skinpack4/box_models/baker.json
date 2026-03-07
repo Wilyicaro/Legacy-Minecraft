@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Baker",
+    "displayNameId": "custom.skinpack4.baker"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

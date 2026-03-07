@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Baron",
+    "displayNameId": "custom.skinpack3.baron"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

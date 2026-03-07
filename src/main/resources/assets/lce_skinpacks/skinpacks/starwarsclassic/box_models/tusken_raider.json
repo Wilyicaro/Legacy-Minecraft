@@ -1,0 +1,375 @@
+{
+  "meta": {
+    "displayName": "Tusken Raider",
+    "displayNameId": "custom.starwarsclassic.tusken_raider",
+    "themeName": "",
+    "themeNameId": "custom.starwarsclassic.themetext.tusken_raider"
+  },
+  "armorOffsets": {
+    "HELMET": {
+      "x": 0.0,
+      "y": -1.0,
+      "z": 0.0
+    }
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            1.0,
+            -6.0,
+            -6.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            26,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -4.0,
+            -4.9
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            25,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            -4.0,
+            -4.9
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            25,
+            1
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -6.0,
+            -6.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            26,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -9.9,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -9.9,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -9.9,
+            2.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -9.9,
+            2.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.5,
+            -5.5,
+            -6.1
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.5,
+            -5.5,
+            -6.1
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -2.5,
+            -4.5
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -3.5,
+            -4.5
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            34,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -1.5,
+            -4.5
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -1.5,
+            -4.5
+          ],
+          "size": [
+            1.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -8.9,
+            -3.0
+          ],
+          "size": [
+            6.0,
+            1.0,
+            6.0
+          ],
+          "uv": [
+            32,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            -2.9
+          ],
+          "size": [
+            2.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            30,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            2.0,
+            -2.9
+          ],
+          "size": [
+            2.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            30,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            4.0,
+            -2.9
+          ],
+          "size": [
+            2.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            30,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            6.0,
+            -2.9
+          ],
+          "size": [
+            2.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            30,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

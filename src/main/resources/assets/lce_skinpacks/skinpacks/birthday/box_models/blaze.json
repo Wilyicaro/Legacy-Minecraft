@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Blaze",
+    "displayNameId": "custom.birthday.blaze"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

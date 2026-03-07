@@ -1,0 +1,479 @@
+{
+  "meta": {
+    "displayName": "Luke Skywalker",
+    "displayNameId": "custom.starwarsclassic.luke_skywalker_5",
+    "themeName": "Dagobah",
+    "themeNameId": "custom.starwarsclassic.themetext.luke_skywalker_5"
+  },
+  "hide": [
+    "hat"
+  ],
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -8.0,
+            -6.0
+          ],
+          "size": [
+            8.0,
+            8.0,
+            8.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.5,
+            -7.0,
+            -3.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.5,
+            -7.0,
+            -3.0
+          ],
+          "size": [
+            1.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.5,
+            -7.0,
+            -4.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.5,
+            -7.0,
+            -4.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.5,
+            -6.5,
+            -6.5
+          ],
+          "size": [
+            3.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            12
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -7.5,
+            -6.5
+          ],
+          "size": [
+            5.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            40,
+            10
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -6.5,
+            -6.5
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            32,
+            14
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.5,
+            -6.5,
+            -6.5
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            14
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            0.0,
+            2.0,
+            2.0
+          ],
+          "size": [
+            3.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            2.0,
+            3.0
+          ],
+          "size": [
+            3.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            20
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            2.0,
+            4.0
+          ],
+          "size": [
+            3.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            2.0,
+            5.0
+          ],
+          "size": [
+            3.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            20
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            2.0,
+            2.0
+          ],
+          "size": [
+            3.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            2.0,
+            3.0
+          ],
+          "size": [
+            3.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            20
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            2.0,
+            4.0
+          ],
+          "size": [
+            3.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            18
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            2.0,
+            5.0
+          ],
+          "size": [
+            3.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            20
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -6.0,
+            5.1
+          ],
+          "size": [
+            6.0,
+            6.0,
+            2.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            0.0,
+            4.0
+          ],
+          "size": [
+            6.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            1.0,
+            6.0
+          ],
+          "size": [
+            2.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            1.0,
+            6.0
+          ],
+          "size": [
+            2.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -4.0,
+            5.0
+          ],
+          "size": [
+            3.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -5.0,
+            -4.0,
+            5.0
+          ],
+          "size": [
+            3.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            5.0,
+            -4.0,
+            5.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -7.0,
+            -4.0,
+            5.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

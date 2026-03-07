@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "CommanderVideo",
+    "displayNameId": "custom.skinpack3.commandervideo",
+    "themeName": "BIT.TRIP RUNNER",
+    "themeNameId": "custom.skinpack3.themetext.commandervideo"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

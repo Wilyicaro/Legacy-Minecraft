@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "displayName": "Dion Wells",
+    "displayNameId": "custom.skinpack1.dion_wells",
+    "themeName": "SOCOM",
+    "themeNameId": "custom.skinpack1.themetext.dion_wells"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            1.0,
+            1.99
+          ],
+          "size": [
+            6.0,
+            7.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            8.0,
+            1.99
+          ],
+          "size": [
+            6.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            9.0,
+            1.99
+          ],
+          "size": [
+            4.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            4.0,
+            -2.99
+          ],
+          "size": [
+            6.0,
+            5.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

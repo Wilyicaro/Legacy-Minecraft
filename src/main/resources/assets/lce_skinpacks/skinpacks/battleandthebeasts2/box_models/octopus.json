@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Octopus",
+    "displayNameId": "custom.battleandthebeasts2.octopus"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

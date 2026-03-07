@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Blue Spartan",
+    "displayNameId": "custom.skinpack4.blue_spartan",
+    "themeName": "Halo",
+    "themeNameId": "custom.skinpack4.themetext.blue_spartan"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,399 @@
+{
+  "name": "key:custom.doctor_who_volume_1.pack.name",
+  "author": "4J Studios",
+  "skins": [
+    {
+      "id": "the_eleventh_doctor",
+      "name": "key:custom.doctor_who_volume_1.the_eleventh_doctor",
+      "texture": "skins/the_eleventh_doctor.png",
+      "order": 1
+    },
+    {
+      "id": "the_ninth_doctor",
+      "name": "key:custom.doctor_who_volume_1.the_ninth_doctor",
+      "texture": "skins/the_ninth_doctor.png",
+      "order": 2
+    },
+    {
+      "id": "the_sixth_doctor",
+      "name": "key:custom.doctor_who_volume_1.the_sixth_doctor",
+      "texture": "skins/the_sixth_doctor.png",
+      "order": 3
+    },
+    {
+      "id": "the_fourth_doctor",
+      "name": "key:custom.doctor_who_volume_1.the_fourth_doctor",
+      "texture": "skins/the_fourth_doctor.png",
+      "order": 4
+    },
+    {
+      "id": "the_first_doctor",
+      "name": "key:custom.doctor_who_volume_1.the_first_doctor",
+      "texture": "skins/the_first_doctor.png",
+      "order": 5
+    },
+    {
+      "id": "the_war_doctor",
+      "name": "key:custom.doctor_who_volume_1.the_war_doctor",
+      "texture": "skins/the_war_doctor.png",
+      "order": 6
+    },
+    {
+      "id": "amy_pond",
+      "name": "key:custom.doctor_who_volume_1.amy_pond",
+      "texture": "skins/amy_pond.png",
+      "order": 7
+    },
+    {
+      "id": "river_song",
+      "name": "key:custom.doctor_who_volume_1.river_song",
+      "texture": "skins/river_song.png",
+      "order": 8
+    },
+    {
+      "id": "rory_williams",
+      "name": "key:custom.doctor_who_volume_1.rory_williams",
+      "texture": "skins/rory_williams.png",
+      "order": 9
+    },
+    {
+      "id": "roman_rory_williams",
+      "name": "key:custom.doctor_who_volume_1.roman_rory_williams",
+      "texture": "skins/roman_rory_williams.png",
+      "cape": "capes/rory_williams.png",
+      "order": 10
+    },
+    {
+      "id": "oswin_oswald",
+      "name": "key:custom.doctor_who_volume_1.oswin_oswald",
+      "texture": "skins/oswin_oswald.png",
+      "order": 11
+    },
+    {
+      "id": "susan_foreman",
+      "name": "key:custom.doctor_who_volume_1.susan_foreman",
+      "texture": "skins/susan_foreman.png",
+      "order": 12
+    },
+    {
+      "id": "sarah_jane_smith",
+      "name": "key:custom.doctor_who_volume_1.sarah_jane_smith",
+      "texture": "skins/sarah_jane_smith.png",
+      "order": 13
+    },
+    {
+      "id": "melanie_bush",
+      "name": "key:custom.doctor_who_volume_1.melanie_bush",
+      "texture": "skins/melanie_bush.png",
+      "order": 14
+    },
+    {
+      "id": "rose_tyler",
+      "name": "key:custom.doctor_who_volume_1.rose_tyler",
+      "texture": "skins/rose_tyler.png",
+      "order": 15
+    },
+    {
+      "id": "peri_brown",
+      "name": "key:custom.doctor_who_volume_1.peri_brown",
+      "texture": "skins/peri_brown.png",
+      "order": 16
+    },
+    {
+      "id": "harry_sullivan",
+      "name": "key:custom.doctor_who_volume_1.harry_sullivan",
+      "texture": "skins/harry_sullivan.png",
+      "order": 17
+    },
+    {
+      "id": "romana",
+      "name": "key:custom.doctor_who_volume_1.romana",
+      "texture": "skins/romana.png",
+      "order": 18
+    },
+    {
+      "id": "kate_stewart",
+      "name": "key:custom.doctor_who_volume_1.kate_stewart",
+      "texture": "skins/kate_stewart.png",
+      "order": 19
+    },
+    {
+      "id": "pirate_captain_avery",
+      "name": "key:custom.doctor_who_volume_1.pirate_captain_avery",
+      "texture": "skins/pirate_captain_avery.png",
+      "order": 20
+    },
+    {
+      "id": "the_master",
+      "name": "key:custom.doctor_who_volume_1.the_master",
+      "texture": "skins/the_master.png",
+      "order": 21
+    },
+    {
+      "id": "davros",
+      "name": "key:custom.doctor_who_volume_1.davros",
+      "texture": "skins/davros.png",
+      "order": 22,
+      "poses": [
+        "hide_hand"
+      ]
+    },
+    {
+      "id": "weeping_angel",
+      "name": "key:custom.doctor_who_volume_1.weeping_angel",
+      "texture": "skins/weeping_angel.png",
+      "order": 23
+    },
+    {
+      "id": "vashta_nerada",
+      "name": "key:custom.doctor_who_volume_1.vashta_nerada",
+      "texture": "skins/vashta_nerada.png",
+      "order": 24
+    },
+    {
+      "id": "clockwork_robot_1",
+      "name": "key:custom.doctor_who_volume_1.clockwork_robot_1",
+      "texture": "skins/clockwork_robot_1.png",
+      "order": 25
+    },
+    {
+      "id": "clockwork_robot_2",
+      "name": "key:custom.doctor_who_volume_1.clockwork_robot_2",
+      "texture": "skins/clockwork_robot_2.png",
+      "order": 26
+    },
+    {
+      "id": "the_empty_child",
+      "name": "key:custom.doctor_who_volume_1.the_empty_child",
+      "texture": "skins/the_empty_child.png",
+      "order": 27
+    },
+    {
+      "id": "angel_of_liberty",
+      "name": "key:custom.doctor_who_volume_1.angel_of_liberty",
+      "texture": "skins/angel_of_liberty.png",
+      "order": 28,
+      "poses": [
+        "weeping_statue"
+      ]
+    },
+    {
+      "id": "winged_weeping_angel",
+      "name": "key:custom.doctor_who_volume_1.winged_weeping_angel",
+      "texture": "skins/winged_weeping_angel.png",
+      "order": 29,
+      "poses": [
+        "zombie_arms"
+      ]
+    },
+    {
+      "id": "ice_warrior",
+      "name": "key:custom.doctor_who_volume_1.ice_warrior",
+      "texture": "skins/ice_warrior.png",
+      "order": 30
+    },
+    {
+      "id": "ice_lord",
+      "name": "key:custom.doctor_who_volume_1.ice_lord",
+      "texture": "skins/ice_lord.png",
+      "cape": "capes/ice_lord.png",
+      "order": 30
+    },
+    {
+      "id": "the_silence",
+      "name": "key:custom.doctor_who_volume_1.the_silence",
+      "texture": "skins/the_silence.png",
+      "order": 31
+    },
+    {
+      "id": "zygon",
+      "name": "key:custom.doctor_who_volume_1.zygon",
+      "texture": "skins/zygon.png",
+      "order": 32
+    },
+    {
+      "id": "silurian_2010",
+      "name": "key:custom.doctor_who_volume_1.silurian_2010",
+      "texture": "skins/silurian_2010.png",
+      "order": 33
+    },
+    {
+      "id": "snowman",
+      "name": "key:custom.doctor_who_volume_1.snowman",
+      "texture": "skins/snowman.png",
+      "order": 34,
+      "poses": [
+        "hide_hand"
+      ]
+    },
+    {
+      "id": "headless_monk",
+      "name": "key:custom.doctor_who_volume_1.headless_monk",
+      "texture": "skins/headless_monk.png",
+      "order": 35
+    },
+    {
+      "id": "impossible_astronaut",
+      "name": "key:custom.doctor_who_volume_1.impossible_astronaut",
+      "texture": "skins/impossible_astronaut.png",
+      "order": 36
+    },
+    {
+      "id": "liz_10",
+      "name": "key:custom.doctor_who_volume_1.liz_10",
+      "texture": "skins/liz_10.png",
+      "cape": "capes/liz_10.png",
+      "order": 37
+    },
+    {
+      "id": "vampire_of_venice",
+      "name": "key:custom.doctor_who_volume_1.vampire_of_venice",
+      "texture": "skins/vampire_of_venice.png",
+      "order": 38
+    },
+    {
+      "id": "smiler",
+      "name": "key:custom.doctor_who_volume_1.smiler",
+      "texture": "skins/smiler.png",
+      "order": 39
+    },
+    {
+      "id": "shakri",
+      "name": "key:custom.doctor_who_volume_1.shakri",
+      "texture": "skins/shakri.png",
+      "order": 40
+    },
+    {
+      "id": "teselecta_antibody",
+      "name": "key:custom.doctor_who_volume_1.teselecta_antibody",
+      "texture": "skins/teselecta_antibody.png",
+      "order": 41,
+      "poses": [
+        "hide_hand"
+      ]
+    },
+    {
+      "id": "dalek_sec",
+      "name": "key:custom.doctor_who_volume_1.dalek_sec",
+      "texture": "skins/dalek_sec.png",
+      "order": 42
+    },
+    {
+      "id": "the_valeyard",
+      "name": "key:custom.doctor_who_volume_1.the_valeyard",
+      "texture": "skins/the_valeyard.png",
+      "order": 43
+    },
+    {
+      "id": "white_paradigm_dalek",
+      "name": "key:custom.doctor_who_volume_1.white_paradigm_dalek",
+      "texture": "skins/white_paradigm_dalek.png",
+      "order": 44,
+      "poses": [
+        "hide_hand"
+      ]
+    },
+    {
+      "id": "blue_paradigm_dalek",
+      "name": "key:custom.doctor_who_volume_1.blue_paradigm_dalek",
+      "texture": "skins/blue_paradigm_dalek.png",
+      "order": 45,
+      "poses": [
+        "hide_hand"
+      ]
+    },
+    {
+      "id": "red_paradigm_dalek",
+      "name": "key:custom.doctor_who_volume_1.red_paradigm_dalek",
+      "texture": "skins/red_paradigm_dalek.png",
+      "order": 46,
+      "poses": [
+        "hide_hand"
+      ]
+    },
+    {
+      "id": "yellow_paradigm_dalek",
+      "name": "key:custom.doctor_who_volume_1.yellow_paradigm_dalek",
+      "texture": "skins/yellow_paradigm_dalek.png",
+      "order": 47,
+      "poses": [
+        "hide_hand"
+      ]
+    },
+    {
+      "id": "orange_paradigm_dalek",
+      "name": "key:custom.doctor_who_volume_1.orange_paradigm_dalek",
+      "texture": "skins/orange_paradigm_dalek.png",
+      "order": 48,
+      "poses": [
+        "hide_hand"
+      ]
+    },
+    {
+      "id": "imperial_dalek",
+      "name": "key:custom.doctor_who_volume_1.imperial_dalek",
+      "texture": "skins/imperial_dalek.png",
+      "order": 49,
+      "poses": [
+        "hide_hand"
+      ]
+    },
+    {
+      "id": "original_skaro_dalek",
+      "name": "key:custom.doctor_who_volume_1.original_skaro_dalek",
+      "texture": "skins/original_skaro_dalek.png",
+      "order": 50,
+      "poses": [
+        "hide_hand"
+      ]
+    },
+    {
+      "id": "invasion_earth_dalek",
+      "name": "key:custom.doctor_who_volume_1.invasion_earth_dalek",
+      "texture": "skins/invasion_earth_dalek.png",
+      "order": 51,
+      "poses": [
+        "hide_hand"
+      ]
+    },
+    {
+      "id": "imperial_guard_dalek",
+      "name": "key:custom.doctor_who_volume_1.imperial_guard_dalek",
+      "texture": "skins/imperial_guard_dalek.png",
+      "order": 52,
+      "poses": [
+        "hide_hand"
+      ]
+    },
+    {
+      "id": "special_weapons_dalek",
+      "name": "key:custom.doctor_who_volume_1.special_weapons_dalek",
+      "texture": "skins/special_weapons_dalek.png",
+      "order": 53,
+      "poses": [
+        "hide_hand"
+      ]
+    },
+    {
+      "id": "supreme_red_dalek",
+      "name": "key:custom.doctor_who_volume_1.supreme_red_dalek",
+      "texture": "skins/supreme_red_dalek.png",
+      "order": 54,
+      "poses": [
+        "hide_hand"
+      ]
+    },
+    {
+      "id": "the_twelfth_doctor",
+      "name": "key:custom.doctor_who_volume_1.the_twelfth_doctor",
+      "texture": "skins/the_twelfth_doctor.png",
+      "order": 55
+    },
+    {
+      "id": "clara_oswald",
+      "name": "key:custom.doctor_who_volume_1.clara_oswald",
+      "texture": "skins/clara_oswald.png",
+      "order": 56
+    }
+  ]
+}

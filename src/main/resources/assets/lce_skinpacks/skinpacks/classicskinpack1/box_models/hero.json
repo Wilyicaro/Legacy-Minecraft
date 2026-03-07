@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Hero",
+    "displayNameId": "custom.classicskinpack1.hero",
+    "themeName": "Fable Heroes",
+    "themeNameId": "custom.classicskinpack1.themetext.hero"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

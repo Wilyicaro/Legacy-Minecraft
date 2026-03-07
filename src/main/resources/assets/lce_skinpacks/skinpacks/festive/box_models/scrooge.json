@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Scrooge",
+    "displayNameId": "custom.festive.scrooge"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

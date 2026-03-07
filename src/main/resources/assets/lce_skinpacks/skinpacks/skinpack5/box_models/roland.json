@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Roland",
+    "displayNameId": "custom.skinpack5.roland",
+    "themeName": "Borderlands",
+    "themeNameId": "custom.skinpack5.themetext.roland"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

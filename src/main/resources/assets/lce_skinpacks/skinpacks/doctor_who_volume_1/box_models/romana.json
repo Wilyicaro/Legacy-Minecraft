@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Romana",
+    "displayNameId": "custom.doctor_who_volume_1.romana"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

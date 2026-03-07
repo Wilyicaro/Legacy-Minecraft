@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Fungi Creature",
+    "displayNameId": "custom.battleandthebeasts2.fungi_creature"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

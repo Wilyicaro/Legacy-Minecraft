@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Frankenstein's Monster",
+    "displayNameId": "custom.halloween2015.frankensteins_monster"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

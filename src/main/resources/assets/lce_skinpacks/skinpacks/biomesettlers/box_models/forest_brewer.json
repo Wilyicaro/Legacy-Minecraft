@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Forest Brewer",
+    "displayNameId": "custom.biomesettlers.forest_brewer",
+    "themeName": "",
+    "themeNameId": "custom.biomesettlers.themetext.forest_brewer"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

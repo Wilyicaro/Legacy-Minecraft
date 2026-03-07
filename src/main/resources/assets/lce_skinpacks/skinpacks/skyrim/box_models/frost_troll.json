@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Frost Troll",
+    "displayNameId": "custom.skyrim.frost_troll",
+    "themeName": "Skyrim",
+    "themeNameId": "custom.skyrim.themetext.frost_troll"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

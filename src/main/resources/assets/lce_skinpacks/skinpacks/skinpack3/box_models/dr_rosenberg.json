@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Dr Rosenberg",
+    "displayNameId": "custom.skinpack3.dr_rosenberg",
+    "themeName": "Half Life",
+    "themeNameId": "custom.skinpack3.themetext.dr_rosenberg"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

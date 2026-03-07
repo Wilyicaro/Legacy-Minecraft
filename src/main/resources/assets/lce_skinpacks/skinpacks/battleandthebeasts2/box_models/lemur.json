@@ -1,0 +1,54 @@
+{
+  "meta": {
+    "displayName": "Lemur",
+    "displayNameId": "custom.battleandthebeasts2.lemur"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -1.0,
+            10.0,
+            2.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            2.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            4.0,
+            4.0
+          ],
+          "size": [
+            2.0,
+            8.0,
+            2.0
+          ],
+          "uv": [
+            56,
+            16
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

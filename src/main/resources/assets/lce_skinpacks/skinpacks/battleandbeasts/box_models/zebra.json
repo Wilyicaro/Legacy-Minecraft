@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Zebra",
+    "displayNameId": "custom.battleandbeasts.zebra"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

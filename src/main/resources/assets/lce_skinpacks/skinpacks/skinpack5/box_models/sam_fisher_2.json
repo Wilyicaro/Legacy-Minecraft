@@ -1,0 +1,74 @@
+{
+  "meta": {
+    "displayName": "Sam Fisher",
+    "displayNameId": "custom.skinpack5.sam_fisher_2",
+    "themeName": "Splinter Cell Blacklist",
+    "themeNameId": "custom.skinpack5.themetext.sam_fisher_2"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -8.0,
+            -5.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -9.0,
+            -5.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -8.0,
+            -5.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

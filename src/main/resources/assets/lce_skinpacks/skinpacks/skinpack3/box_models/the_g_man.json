@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "The G-Man",
+    "displayNameId": "custom.skinpack3.the_g_man",
+    "themeName": "Half Life",
+    "themeNameId": "custom.skinpack3.themetext.the_g_man"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

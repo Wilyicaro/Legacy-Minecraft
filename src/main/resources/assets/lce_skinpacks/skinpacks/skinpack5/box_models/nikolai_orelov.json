@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Nikolai Orelov",
+    "displayNameId": "custom.skinpack5.nikolai_orelov",
+    "themeName": "Assassin's Creed The Fall",
+    "themeNameId": "custom.skinpack5.themetext.nikolai_orelov"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

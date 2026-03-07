@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Tuxedo Steve Xmas",
+    "displayNameId": "custom.festivemashup.tuxedo_steve_xmas",
+    "themeName": "Festive Mash-up",
+    "themeNameId": "custom.festivemashup.themetext.tuxedo_steve_xmas"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

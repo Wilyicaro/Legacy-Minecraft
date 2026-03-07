@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Cole Train",
+    "displayNameId": "custom.classicskinpack1.cole_train",
+    "themeName": "Gears of War",
+    "themeNameId": "custom.classicskinpack1.themetext.cole_train"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}
