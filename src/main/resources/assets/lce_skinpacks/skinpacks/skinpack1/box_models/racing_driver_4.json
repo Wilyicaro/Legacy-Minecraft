@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Racing Driver 4",
+    "displayNameId": "custom.skinpack1.racing_driver_4"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

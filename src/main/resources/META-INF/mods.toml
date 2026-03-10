@@ -13,6 +13,9 @@ authors="${mod_authors}"
 description="${mod_description}"
 credits="${mod_credits}"
 
+[[mixins]]
+config="${mod_id}.mixins.json"
+
 [[dependencies.${mod_id}]]
 modId = "minecraft"
 mandatory = true

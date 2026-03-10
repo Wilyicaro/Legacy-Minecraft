@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Native American",
+    "displayNameId": "custom.battleandbeasts.native_american_2"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Birthday Cake",
+    "displayNameId": "custom.birthday.birthday_cake"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

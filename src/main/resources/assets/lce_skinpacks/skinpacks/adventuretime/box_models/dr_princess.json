@@ -1,0 +1,108 @@
+{
+  "meta": {
+    "displayName": "Dr Princess",
+    "displayNameId": "custom.adventuretime.dr_princess"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -0.5,
+            -7.0,
+            -4.5
+          ],
+          "size": [
+            1.0,
+            2.0,
+            0.0
+          ],
+          "uv": [
+            0,
+            6
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -7.0,
+            -6.0,
+            3.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            5.0,
+            -6.0,
+            3.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -6.0,
+            -7.0,
+            2.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            3.0
+          ],
+          "uv": [
+            59,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            4.0,
+            -7.0,
+            2.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            3.0
+          ],
+          "uv": [
+            59,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

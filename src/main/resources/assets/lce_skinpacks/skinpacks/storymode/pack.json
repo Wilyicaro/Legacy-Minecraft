@@ -1,0 +1,168 @@
+{
+  "name": "key:custom.storymode.pack.name",
+  "author": "4J Studios",
+  "skins": [
+    {
+      "id": "jesse",
+      "name": "key:custom.storymode.jesse",
+      "texture": "skins/jesse.png",
+      "order": 1
+    },
+    {
+      "id": "olivia",
+      "name": "key:custom.storymode.olivia",
+      "texture": "skins/olivia.png",
+      "order": 2
+    },
+    {
+      "id": "olivia_armored",
+      "name": "key:custom.storymode.olivia_armored",
+      "texture": "skins/olivia_armored.png",
+      "order": 3
+    },
+    {
+      "id": "axel",
+      "name": "key:custom.storymode.axel",
+      "texture": "skins/axel.png",
+      "order": 4
+    },
+    {
+      "id": "axel_armored",
+      "name": "key:custom.storymode.axel_armored",
+      "texture": "skins/axel_armored.png",
+      "order": 5
+    },
+    {
+      "id": "petra",
+      "name": "key:custom.storymode.petra",
+      "texture": "skins/petra.png",
+      "order": 6
+    },
+    {
+      "id": "petra_armored",
+      "name": "key:custom.storymode.petra_armored",
+      "texture": "skins/petra_armored.png",
+      "order": 7
+    },
+    {
+      "id": "lukas",
+      "name": "key:custom.storymode.lukas",
+      "texture": "skins/lukas.png",
+      "order": 8
+    },
+    {
+      "id": "gabriel",
+      "name": "key:custom.storymode.gabriel",
+      "texture": "skins/gabriel.png",
+      "order": 9
+    },
+    {
+      "id": "ellegaard",
+      "name": "key:custom.storymode.ellegaard",
+      "texture": "skins/ellegaard.png",
+      "order": 10
+    },
+    {
+      "id": "ellegaard_armored",
+      "name": "key:custom.storymode.ellegaard_armored",
+      "texture": "skins/ellegaard_armored.png",
+      "order": 11
+    },
+    {
+      "id": "magnus",
+      "name": "key:custom.storymode.magnus",
+      "texture": "skins/magnus.png",
+      "order": 12
+    },
+    {
+      "id": "magnus_armored",
+      "name": "key:custom.storymode.magnus_armored",
+      "texture": "skins/magnus_armored.png",
+      "order": 13
+    },
+    {
+      "id": "soren",
+      "name": "key:custom.storymode.soren",
+      "texture": "skins/soren.png",
+      "order": 14
+    },
+    {
+      "id": "soren_armored",
+      "name": "key:custom.storymode.soren_armored",
+      "texture": "skins/soren_armored.png",
+      "order": 15
+    },
+    {
+      "id": "ivor",
+      "name": "key:custom.storymode.ivor",
+      "texture": "skins/ivor.png",
+      "order": 16
+    },
+    {
+      "id": "jesse_armored",
+      "name": "key:custom.storymode.jesse_armored",
+      "texture": "skins/jesse_armored.png",
+      "order": 17
+    },
+    {
+      "id": "jesse_armored_2",
+      "name": "key:custom.storymode.jesse_armored_2",
+      "texture": "skins/jesse_armored_2.png",
+      "order": 18
+    },
+    {
+      "id": "jesse_armored_3",
+      "name": "key:custom.storymode.jesse_armored_3",
+      "texture": "skins/jesse_armored_3.png",
+      "order": 19
+    },
+    {
+      "id": "jesse_armored_4",
+      "name": "key:custom.storymode.jesse_armored_4",
+      "texture": "skins/jesse_armored_4.png",
+      "order": 20
+    },
+    {
+      "id": "jesse_armored_5",
+      "name": "key:custom.storymode.jesse_armored_5",
+      "texture": "skins/jesse_armored_5.png",
+      "order": 21
+    },
+    {
+      "id": "jesse_armored_6",
+      "name": "key:custom.storymode.jesse_armored_6",
+      "texture": "skins/jesse_armored_6.png",
+      "order": 22
+    },
+    {
+      "id": "jesse_2",
+      "name": "key:custom.storymode.jesse_2",
+      "texture": "skins/jesse_2.png",
+      "order": 23
+    },
+    {
+      "id": "jesse_3",
+      "name": "key:custom.storymode.jesse_3",
+      "texture": "skins/jesse_3.png",
+      "order": 24
+    },
+    {
+      "id": "jesse_4",
+      "name": "key:custom.storymode.jesse_4",
+      "texture": "skins/jesse_4.png",
+      "order": 25
+    },
+    {
+      "id": "jesse_5",
+      "name": "key:custom.storymode.jesse_5",
+      "texture": "skins/jesse_5.png",
+      "order": 26
+    },
+    {
+      "id": "jesse_6",
+      "name": "key:custom.storymode.jesse_6",
+      "texture": "skins/jesse_6.png",
+      "order": 27
+    }
+  ]
+}

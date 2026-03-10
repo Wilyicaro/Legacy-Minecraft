@@ -1,0 +1,245 @@
+{
+  "meta": {
+    "displayName": "Scout Trooper",
+    "displayNameId": "custom.starwarsclassic.scout_trooper",
+    "themeName": "",
+    "themeNameId": "custom.starwarsclassic.themetext.scout_trooper"
+  },
+  "hide": [
+    "hat"
+  ],
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            -3.1,
+            -4.9
+          ],
+          "size": [
+            4.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            -4.1,
+            -4.9
+          ],
+          "size": [
+            2.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            2,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.1,
+            -7.0,
+            -4.9
+          ],
+          "size": [
+            1.0,
+            5.0,
+            4.0
+          ],
+          "uv": [
+            32,
+            7
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.1,
+            -7.0,
+            -4.9
+          ],
+          "size": [
+            1.0,
+            5.0,
+            4.0
+          ],
+          "uv": [
+            42,
+            7
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.0,
+            -7.9,
+            -4.9
+          ],
+          "size": [
+            8.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            36,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -8.9,
+            -3.0
+          ],
+          "size": [
+            6.0,
+            1.0,
+            4.0
+          ],
+          "uv": [
+            30,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -8.9,
+            1.0
+          ],
+          "size": [
+            6.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            35,
+            5
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -4.9,
+            -6.0,
+            1.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.9,
+            -6.0,
+            1.0
+          ],
+          "size": [
+            1.0,
+            4.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.1,
+            7.9,
+            -2.9
+          ],
+          "size": [
+            2.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            50,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.1,
+            7.9,
+            -2.9
+          ],
+          "size": [
+            2.0,
+            4.0,
+            2.0
+          ],
+          "uv": [
+            50,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            1.0,
+            2.0
+          ],
+          "size": [
+            4.0,
+            6.0,
+            2.0
+          ],
+          "uv": [
+            52,
+            8
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

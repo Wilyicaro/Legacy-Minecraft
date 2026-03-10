@@ -1,0 +1,146 @@
+{
+  "meta": {
+    "displayName": "Emperor Taizong",
+    "displayNameId": "custom.chinesemythology.emperor_taizong",
+    "themeName": "Tang Dynasty",
+    "themeNameId": "custom.chinesemythology.themetext.emperor_taizong"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            -4.0
+          ],
+          "size": [
+            4.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            33
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -12.0,
+            -1.0
+          ],
+          "size": [
+            4.0,
+            4.0,
+            3.0
+          ],
+          "uv": [
+            0,
+            33
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -13.0,
+            -1.5
+          ],
+          "size": [
+            1.0,
+            5.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            55
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            2.0,
+            -13.0,
+            -1.5
+          ],
+          "size": [
+            1.0,
+            5.0,
+            4.0
+          ],
+          "uv": [
+            0,
+            55
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -1.0,
+            2.0,
+            -4.0
+          ],
+          "size": [
+            2.0,
+            2.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            30
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -6.0,
+            -11.0,
+            0.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            -11.0,
+            0.0
+          ],
+          "size": [
+            3.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

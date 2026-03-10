@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "James",
+    "displayNameId": "custom.fallout.james",
+    "themeName": "Fallout 3",
+    "themeNameId": "custom.fallout.themetext.james"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

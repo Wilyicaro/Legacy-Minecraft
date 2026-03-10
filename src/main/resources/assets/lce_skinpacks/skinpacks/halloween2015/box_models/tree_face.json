@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Tree Face",
+    "displayNameId": "custom.halloween2015.tree_face"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

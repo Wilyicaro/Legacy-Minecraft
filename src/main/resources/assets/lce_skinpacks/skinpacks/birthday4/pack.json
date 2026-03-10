@@ -1,0 +1,136 @@
+{
+  "name": "key:custom.birthday4.pack.name",
+  "author": "4J Studios",
+  "skins": [
+    {
+      "id": "wolf_tshirt_steve",
+      "name": "key:custom.birthday4.wolf_tshirt_steve",
+      "texture": "skins/wolf_tshirt_steve.png",
+      "order": 1
+    },
+    {
+      "id": "wolf_tshirt_alex",
+      "name": "key:custom.birthday4.wolf_tshirt_alex",
+      "texture": "skins/wolf_tshirt_alex.png",
+      "order": 2,
+      "model": "slim"
+    },
+    {
+      "id": "chicken_tshirt_steve",
+      "name": "key:custom.birthday4.chicken_tshirt_steve",
+      "texture": "skins/chicken_tshirt_steve.png",
+      "order": 3
+    },
+    {
+      "id": "chicken_tshirt_alex",
+      "name": "key:custom.birthday4.chicken_tshirt_alex",
+      "texture": "skins/chicken_tshirt_alex.png",
+      "order": 4,
+      "model": "slim"
+    },
+    {
+      "id": "creeper_tshirt_steve",
+      "name": "key:custom.birthday4.creeper_tshirt_steve",
+      "texture": "skins/creeper_tshirt_steve.png",
+      "order": 5
+    },
+    {
+      "id": "creeper_tshirt_alex",
+      "name": "key:custom.birthday4.creeper_tshirt_alex",
+      "texture": "skins/creeper_tshirt_alex.png",
+      "order": 6,
+      "model": "slim"
+    },
+    {
+      "id": "guardian_tshirt_steve",
+      "name": "key:custom.birthday4.guardian_tshirt_steve",
+      "texture": "skins/guardian_tshirt_steve.png",
+      "order": 7
+    },
+    {
+      "id": "guardian_tshirt_alex",
+      "name": "key:custom.birthday4.guardian_tshirt_alex",
+      "texture": "skins/guardian_tshirt_alex.png",
+      "order": 8,
+      "model": "slim"
+    },
+    {
+      "id": "slime_tshirt_steve",
+      "name": "key:custom.birthday4.slime_tshirt_steve",
+      "texture": "skins/slime_tshirt_steve.png",
+      "order": 9
+    },
+    {
+      "id": "slime_tshirt_alex",
+      "name": "key:custom.birthday4.slime_tshirt_alex",
+      "texture": "skins/slime_tshirt_alex.png",
+      "order": 10,
+      "model": "slim"
+    },
+    {
+      "id": "ghast_tshirt_steve",
+      "name": "key:custom.birthday4.ghast_tshirt_steve",
+      "texture": "skins/ghast_tshirt_steve.png",
+      "order": 11
+    },
+    {
+      "id": "ghast_tshirt_alex",
+      "name": "key:custom.birthday4.ghast_tshirt_alex",
+      "texture": "skins/ghast_tshirt_alex.png",
+      "order": 12,
+      "model": "slim"
+    },
+    {
+      "id": "sheep_tshirt_steve",
+      "name": "key:custom.birthday4.sheep_tshirt_steve",
+      "texture": "skins/sheep_tshirt_steve.png",
+      "order": 13
+    },
+    {
+      "id": "sheep_tshirt_alex",
+      "name": "key:custom.birthday4.sheep_tshirt_alex",
+      "texture": "skins/sheep_tshirt_alex.png",
+      "order": 14,
+      "model": "slim"
+    },
+    {
+      "id": "ocelot_tshirt_steve",
+      "name": "key:custom.birthday4.ocelot_tshirt_steve",
+      "texture": "skins/ocelot_tshirt_steve.png",
+      "order": 15
+    },
+    {
+      "id": "ocelot_tshirt_alex",
+      "name": "key:custom.birthday4.ocelot_tshirt_alex",
+      "texture": "skins/ocelot_tshirt_alex.png",
+      "order": 16,
+      "model": "slim"
+    },
+    {
+      "id": "wither_tshirt_steve",
+      "name": "key:custom.birthday4.wither_tshirt_steve",
+      "texture": "skins/wither_tshirt_steve.png",
+      "order": 17
+    },
+    {
+      "id": "wither_tshirt_alex",
+      "name": "key:custom.birthday4.wither_tshirt_alex",
+      "texture": "skins/wither_tshirt_alex.png",
+      "order": 18,
+      "model": "slim"
+    },
+    {
+      "id": "skeleton_tshirt_steve",
+      "name": "key:custom.birthday4.skeleton_tshirt_steve",
+      "texture": "skins/skeleton_tshirt_steve.png",
+      "order": 19
+    },
+    {
+      "id": "skeleton_tshirt_alex",
+      "name": "key:custom.birthday4.skeleton_tshirt_alex",
+      "texture": "skins/skeleton_tshirt_alex.png",
+      "order": 20,
+      "model": "slim"
+    }
+  ]
+}

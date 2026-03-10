@@ -1,0 +1,230 @@
+{
+  "meta": {
+    "displayName": "Emperor",
+    "displayNameId": "custom.starwarsclassic.emperor",
+    "themeName": "",
+    "themeNameId": "custom.starwarsclassic.themetext.emperor"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "right_leg_addon",
+      "attach": "RIGHT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            1.9
+          ],
+          "size": [
+            4.0,
+            12.0,
+            1.0
+          ],
+          "uv": [
+            7,
+            19
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            9.0,
+            3.9
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            51,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            9.0,
+            2.9
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            51,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            6.0,
+            2.9
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            51,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.9,
+            9.0,
+            1.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            52,
+            9
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_leg_addon",
+      "attach": "LEFT_LEG",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            0.0,
+            1.9
+          ],
+          "size": [
+            4.0,
+            12.0,
+            1.0
+          ],
+          "uv": [
+            7,
+            19
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            9.0,
+            2.9
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            6.0,
+            2.9
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            9.0,
+            3.9
+          ],
+          "size": [
+            4.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            52,
+            11
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            1.9,
+            9.0,
+            1.0
+          ],
+          "size": [
+            1.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            52,
+            9
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            0.0,
+            1.9
+          ],
+          "size": [
+            8.0,
+            12.0,
+            1.0
+          ],
+          "uv": [
+            0,
+            19
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

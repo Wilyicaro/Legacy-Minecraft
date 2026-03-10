@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Castaway",
+    "displayNameId": "custom.skinpack3.castaway"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

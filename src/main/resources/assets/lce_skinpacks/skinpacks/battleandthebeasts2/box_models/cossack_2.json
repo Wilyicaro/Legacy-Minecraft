@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Cossack",
+    "displayNameId": "custom.battleandthebeasts2.cossack_2"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

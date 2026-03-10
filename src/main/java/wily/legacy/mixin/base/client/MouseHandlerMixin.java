@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.screen.ControlTooltip;
+import wily.legacy.client.screen.InputTypeSwitchLock;
 
 @Mixin(MouseHandler.class)
 public class MouseHandlerMixin {
@@ -73,8 +74,11 @@ public class MouseHandlerMixin {
     @Unique
     private void onChange(long window, CallbackInfo ci) {
         if (window == Minecraft.getInstance().getWindow().handle()) {
-            if (!Legacy4JClient.controllerManager.isControllerSimulatingInput)
-                Legacy4JClient.controllerManager.setControllerTheLastInput(false);
+            if (!Legacy4JClient.controllerManager.isControllerSimulatingInput) {
+                Screen s = Minecraft.getInstance().screen;
+                if (!(s instanceof InputTypeSwitchLock lock && lock.legacy$lockInputTypeSwitch()))
+                    Legacy4JClient.controllerManager.setControllerTheLastInput(false);
+            }
             if (Legacy4JClient.controllerManager.isCursorDisabled) {
                 if (!Legacy4JClient.controllerManager.getCursorMode().isNever())
                     Legacy4JClient.controllerManager.enableCursor();

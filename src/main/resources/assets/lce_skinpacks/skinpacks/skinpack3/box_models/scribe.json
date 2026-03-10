@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Scribe",
+    "displayNameId": "custom.skinpack3.scribe"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

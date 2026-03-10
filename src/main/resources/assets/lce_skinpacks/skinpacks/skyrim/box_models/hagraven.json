@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Hagraven",
+    "displayNameId": "custom.skyrim.hagraven",
+    "themeName": "Skyrim",
+    "themeNameId": "custom.skyrim.themetext.hagraven"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

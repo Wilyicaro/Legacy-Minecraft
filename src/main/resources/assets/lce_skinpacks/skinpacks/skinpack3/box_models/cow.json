@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Cow",
+    "displayNameId": "custom.skinpack3.cow",
+    "themeName": "Minecraft",
+    "themeNameId": "custom.skinpack3.themetext.cow"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

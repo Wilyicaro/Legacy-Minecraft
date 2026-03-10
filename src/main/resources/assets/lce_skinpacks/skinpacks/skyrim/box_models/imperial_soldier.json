@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Imperial Soldier",
+    "displayNameId": "custom.skyrim.imperial_soldier",
+    "themeName": "Skyrim",
+    "themeNameId": "custom.skyrim.themetext.imperial_soldier"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

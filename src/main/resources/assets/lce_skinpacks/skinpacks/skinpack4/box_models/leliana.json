@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Leliana",
+    "displayNameId": "custom.skinpack4.leliana",
+    "themeName": "Dragon Age",
+    "themeNameId": "custom.skinpack4.themetext.leliana"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

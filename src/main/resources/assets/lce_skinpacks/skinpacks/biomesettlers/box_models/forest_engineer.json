@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Forest Engineer",
+    "displayNameId": "custom.biomesettlers.forest_engineer",
+    "themeName": "",
+    "themeNameId": "custom.biomesettlers.themetext.forest_engineer"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

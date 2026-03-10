@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Black Smith",
+    "displayNameId": "custom.skinpack4.black_smith",
+    "themeName": "Castle Crashers",
+    "themeNameId": "custom.skinpack4.themetext.black_smith"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

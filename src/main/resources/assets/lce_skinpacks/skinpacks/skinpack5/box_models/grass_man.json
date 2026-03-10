@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Grass Man",
+    "displayNameId": "custom.skinpack5.grass_man"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

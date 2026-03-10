@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Nathan Hale",
+    "displayNameId": "custom.skinpack1.nathan_hale",
+    "themeName": "Resistance",
+    "themeNameId": "custom.skinpack1.themetext.nathan_hale"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

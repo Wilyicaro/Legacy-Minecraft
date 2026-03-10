@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "The Twelfth Doctor",
+    "displayNameId": "custom.doctor_who_volume_1.the_twelfth_doctor"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "displayName": "Ethan Mars",
+    "displayNameId": "custom.skinpack1.ethan_mars",
+    "themeName": "Heavy Rain",
+    "themeNameId": "custom.skinpack1.themetext.ethan_mars"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -3.0,
+            0.01,
+            1.99
+          ],
+          "size": [
+            6.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            3.0,
+            1.99
+          ],
+          "size": [
+            4.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            4
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Pilot",
+    "displayNameId": "custom.skinpack2.pilot"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

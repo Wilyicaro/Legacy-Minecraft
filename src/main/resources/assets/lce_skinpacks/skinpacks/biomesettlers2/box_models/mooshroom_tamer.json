@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Mooshroom Tamer",
+    "displayNameId": "custom.biomesettlers2.mooshroom_tamer"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

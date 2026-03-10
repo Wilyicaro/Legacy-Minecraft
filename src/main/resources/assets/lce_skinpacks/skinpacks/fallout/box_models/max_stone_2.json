@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Max Stone",
+    "displayNameId": "custom.fallout.max_stone_2",
+    "themeName": "Fallout 1",
+    "themeNameId": "custom.fallout.themetext.max_stone_2"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

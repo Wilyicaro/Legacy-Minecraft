@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Scary Clown",
+    "displayNameId": "custom.halloween2015.scary_clown"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

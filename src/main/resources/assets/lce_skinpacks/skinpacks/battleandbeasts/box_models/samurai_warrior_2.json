@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Samurai Warrior",
+    "displayNameId": "custom.battleandbeasts.samurai_warrior_2"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

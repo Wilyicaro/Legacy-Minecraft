@@ -1,0 +1,282 @@
+{
+  "meta": {
+    "displayName": "Melanie Bush",
+    "displayNameId": "custom.doctor_who_volume_1.melanie_bush"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -3.99,
+            -1.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -2.99,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            30,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -2.0,
+            -2.99,
+            0.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            30,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "left_arm_addon",
+      "attach": "LEFT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            2.99,
+            -1.0,
+            -2.0
+          ],
+          "size": [
+            1.0,
+            2.0,
+            4.0
+          ],
+          "uv": [
+            24,
+            2
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -2.99,
+            -2.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            30,
+            3
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -2.99,
+            0.0
+          ],
+          "size": [
+            2.0,
+            1.0,
+            2.0
+          ],
+          "uv": [
+            30,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            0.0,
+            -9.5,
+            3.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            58,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -9.5,
+            3.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            58,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -6.5,
+            3.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            58,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -6.5,
+            3.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            58,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -3.5,
+            3.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            58,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -3.5,
+            3.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            58,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            0.0,
+            -0.5,
+            3.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            58,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            -3.0,
+            -0.5,
+            3.0
+          ],
+          "size": [
+            3.0,
+            3.0,
+            3.0
+          ],
+          "uv": [
+            58,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

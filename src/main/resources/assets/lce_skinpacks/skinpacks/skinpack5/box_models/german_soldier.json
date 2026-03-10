@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "German Soldier",
+    "displayNameId": "custom.skinpack5.german_soldier",
+    "themeName": "World War 2",
+    "themeNameId": "custom.skinpack5.themetext.german_soldier"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Norman Jayden",
+    "displayNameId": "custom.skinpack1.norman_jayden",
+    "themeName": "Heavy Rain",
+    "themeNameId": "custom.skinpack1.themetext.norman_jayden"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

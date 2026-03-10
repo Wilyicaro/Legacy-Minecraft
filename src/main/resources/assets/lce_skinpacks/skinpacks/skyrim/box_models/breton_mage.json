@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Breton Mage",
+    "displayNameId": "custom.skyrim.breton_mage",
+    "themeName": "Skyrim",
+    "themeNameId": "custom.skyrim.themetext.breton_mage"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

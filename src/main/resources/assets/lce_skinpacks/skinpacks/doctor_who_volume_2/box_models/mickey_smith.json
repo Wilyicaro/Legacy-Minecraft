@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Mickey Smith",
+    "displayNameId": "custom.doctor_who_volume_2.mickey_smith"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

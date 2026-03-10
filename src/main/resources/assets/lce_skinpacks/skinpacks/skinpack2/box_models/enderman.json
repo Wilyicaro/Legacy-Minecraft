@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Enderman",
+    "displayNameId": "custom.skinpack2.enderman",
+    "themeName": "Minecraft",
+    "themeNameId": "custom.skinpack2.themetext.enderman"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

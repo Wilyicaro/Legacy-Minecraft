@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Gregg the Grim Reaper",
+    "displayNameId": "custom.halloween2015.gregg_the_grim_reaper"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Prisoner Steve Xmas Sweater",
+    "displayNameId": "custom.festivemashup.prisoner_steve_xmas_sweater",
+    "themeName": "Festive Mash-up",
+    "themeNameId": "custom.festivemashup.themetext.prisoner_steve_xmas_sweater"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

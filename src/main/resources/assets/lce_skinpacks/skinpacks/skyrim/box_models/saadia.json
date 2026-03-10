@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Saadia",
+    "displayNameId": "custom.skyrim.saadia",
+    "themeName": "Skyrim",
+    "themeNameId": "custom.skyrim.themetext.saadia"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

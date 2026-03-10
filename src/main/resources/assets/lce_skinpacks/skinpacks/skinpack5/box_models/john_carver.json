@@ -1,0 +1,38 @@
+{
+  "meta": {
+    "displayName": "John Carver",
+    "displayNameId": "custom.skinpack5.john_carver",
+    "themeName": "Dead Space 3",
+    "themeNameId": "custom.skinpack5.themetext.john_carver"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "body_addon",
+      "attach": "BODY",
+      "cubes": [
+        {
+          "origin": [
+            -2.0,
+            2.0,
+            0.0
+          ],
+          "size": [
+            4.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Bride of Frankenstein",
+    "displayNameId": "custom.halloween2015.bride_of_frankenstein"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

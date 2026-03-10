@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Clunk",
+    "displayNameId": "custom.skinpack3.clunk",
+    "themeName": "Awesomenauts",
+    "themeNameId": "custom.skinpack3.themetext.clunk"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

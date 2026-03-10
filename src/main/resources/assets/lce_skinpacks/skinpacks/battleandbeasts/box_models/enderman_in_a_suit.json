@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Enderman in a Suit",
+    "displayNameId": "custom.battleandbeasts.enderman_in_a_suit"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

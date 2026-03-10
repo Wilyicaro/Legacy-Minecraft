@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Baroness",
+    "displayNameId": "custom.skinpack4.baroness"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

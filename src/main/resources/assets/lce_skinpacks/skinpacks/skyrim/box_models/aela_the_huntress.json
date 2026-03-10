@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Aela the Huntress",
+    "displayNameId": "custom.skyrim.aela_the_huntress",
+    "themeName": "Skyrim",
+    "themeNameId": "custom.skyrim.themetext.aela_the_huntress"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

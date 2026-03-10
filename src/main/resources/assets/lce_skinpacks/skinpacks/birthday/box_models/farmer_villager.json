@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Farmer Villager",
+    "displayNameId": "custom.birthday.farmer_villager"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

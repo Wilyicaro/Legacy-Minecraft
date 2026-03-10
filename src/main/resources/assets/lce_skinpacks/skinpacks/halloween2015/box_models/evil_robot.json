@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Evil Robot",
+    "displayNameId": "custom.halloween2015.evil_robot"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Otus",
+    "displayNameId": "custom.skinpack2.otus",
+    "themeName": "Owlboy",
+    "themeNameId": "custom.skinpack2.themetext.otus"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

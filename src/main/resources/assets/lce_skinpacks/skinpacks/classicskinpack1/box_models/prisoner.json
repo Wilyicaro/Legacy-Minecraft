@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Prisoner",
+    "displayNameId": "custom.classicskinpack1.prisoner"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Pen Yen",
+    "displayNameId": "custom.skinpack3.pen_yen",
+    "themeName": "Slam Bolt Scrappers",
+    "themeNameId": "custom.skinpack3.themetext.pen_yen"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

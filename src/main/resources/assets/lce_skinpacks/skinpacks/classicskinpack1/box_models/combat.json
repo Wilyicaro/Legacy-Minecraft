@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Combat",
+    "displayNameId": "custom.classicskinpack1.combat",
+    "themeName": "Trials Evolution",
+    "themeNameId": "custom.classicskinpack1.themetext.combat"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

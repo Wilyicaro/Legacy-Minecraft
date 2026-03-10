@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Steve",
+    "displayNameId": "custom.minecon2015.steve_4",
+    "themeName": "Minecon 2015 Cape",
+    "themeNameId": "custom.minecon2015.themetext.steve_4"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

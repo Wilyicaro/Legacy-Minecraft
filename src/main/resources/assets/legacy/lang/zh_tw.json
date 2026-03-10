@@ -1143,6 +1143,9 @@
   "legacy.menu.autoSave_countdown": "%s 後自動儲存…",
   "legacy.menu.autoSave_message": "這個遊戲有自動儲存關卡的功能。當畫面出現這個圖示時，代表遊戲正在儲存您的資料。 \n\n請勿在畫面出現這個圖示時關閉裝置。",
   "legacy.menu.change_skin": "更改皮膚",
+  "legacy.menu.change_skin.skin_animations": "Skin Animations",
+  "legacy.menu.change_skin.smooth_preview_scroll": "Smooth Preview Scroll",
+  "legacy.menu.change_skin.tu3_change_skin_screen": "TU3 Change Skin Screen",
   "legacy.menu.choose_user": "選擇使用者",
   "legacy.menu.choose_user.account_options": "帳號選項",
   "legacy.menu.choose_user.account_options.delete": "刪除帳號",
@@ -1657,5 +1660,8 @@
   "structure.minecraft.villages": "村莊",
   "structure.minecraft.villages.description": "Settlements situated in Plains, Savanna, Desert, Taiga or Snowy Plains biomes. Guarded by Iron Golems and home to Farmers, Librarians, Clerics, Blacksmiths and Butchers.",
   "structure.minecraft.woodland_mansions": "林地府邸",
-  "structure.minecraft.woodland_mansions.description": "林地府邸可以在黑橡木森林找到，是惱鬼和衛道士的巢穴。"
+  "structure.minecraft.woodland_mansions.description": "林地府邸可以在黑橡木森林找到，是惱鬼和衛道士的巢穴。",
+  "legacy.skinpack.type.skin": "Skin Pack",
+  "legacy.skinpack.type.mashup": "Mash-up Pack",
+  "legacy.menu.change_skin.hide_armor": "Hide Armor"
 }

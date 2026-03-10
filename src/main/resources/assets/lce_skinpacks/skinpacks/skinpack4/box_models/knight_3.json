@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Knight 3",
+    "displayNameId": "custom.skinpack4.knight_3"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

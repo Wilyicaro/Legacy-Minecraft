@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Zombie",
+    "displayNameId": "custom.skinpack1.zombie",
+    "themeName": "Minecraft",
+    "themeNameId": "custom.skinpack1.themetext.zombie"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

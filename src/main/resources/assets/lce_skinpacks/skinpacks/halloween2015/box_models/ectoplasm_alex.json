@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Ectoplasm Alex",
+    "displayNameId": "custom.halloween2015.ectoplasm_alex"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

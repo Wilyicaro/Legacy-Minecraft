@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Blacksmith",
+    "displayNameId": "custom.skinpack3.blacksmith"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

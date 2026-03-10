@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Pig",
+    "displayNameId": "custom.skinpack2.pig",
+    "themeName": "Minecraft",
+    "themeNameId": "custom.skinpack2.themetext.pig"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

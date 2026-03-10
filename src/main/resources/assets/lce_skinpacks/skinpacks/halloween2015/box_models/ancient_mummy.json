@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Ancient Mummy",
+    "displayNameId": "custom.halloween2015.ancient_mummy"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Captain America (Bucky Barnes)",
+    "displayNameId": "custom.avengers.captain_america_bucky_barnes",
+    "themeName": "Marvel Avengers",
+    "themeNameId": "custom.avengers.themetext.captain_america_bucky_barnes"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Chell",
+    "displayNameId": "custom.skinpack3.chell",
+    "themeName": "Portal",
+    "themeNameId": "custom.skinpack3.themetext.chell"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

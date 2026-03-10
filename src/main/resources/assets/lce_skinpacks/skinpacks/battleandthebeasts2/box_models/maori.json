@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Maori",
+    "displayNameId": "custom.battleandthebeasts2.maori"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

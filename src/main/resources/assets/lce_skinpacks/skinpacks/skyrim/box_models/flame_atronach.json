@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Flame Atronach",
+    "displayNameId": "custom.skyrim.flame_atronach",
+    "themeName": "Skyrim",
+    "themeNameId": "custom.skyrim.themetext.flame_atronach"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

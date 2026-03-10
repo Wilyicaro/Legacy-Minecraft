@@ -1,0 +1,164 @@
+{
+  "name": "key:custom.festive.pack.name",
+  "author": "4J Studios",
+  "skins": [
+    {
+      "id": "santa",
+      "name": "key:custom.festive.santa",
+      "texture": "skins/santa.png",
+      "order": 1
+    },
+    {
+      "id": "mrs_claus",
+      "name": "key:custom.festive.mrs_claus",
+      "texture": "skins/mrs_claus.png",
+      "order": 2
+    },
+    {
+      "id": "rudolph1",
+      "name": "key:custom.festive.rudolph1",
+      "texture": "skins/rudolph.png",
+      "order": 3
+    },
+    {
+      "id": "reindeer",
+      "name": "key:custom.festive.reindeer",
+      "texture": "skins/reindeer.png",
+      "order": 4
+    },
+    {
+      "id": "red_elf",
+      "name": "key:custom.festive.red_elf",
+      "texture": "skins/red_elf.png",
+      "order": 5
+    },
+    {
+      "id": "green_elf",
+      "name": "key:custom.festive.green_elf",
+      "texture": "skins/green_elf.png",
+      "order": 6
+    },
+    {
+      "id": "snow_golem",
+      "name": "key:custom.festive.snow_golem",
+      "texture": "skins/snow_golem.png",
+      "order": 7
+    },
+    {
+      "id": "zombie_pudding",
+      "name": "key:custom.festive.zombie_pudding",
+      "texture": "skins/zombie_pudding.png",
+      "order": 8,
+      "poses": [
+        "zombie_arms"
+      ]
+    },
+    {
+      "id": "christmas_creeper",
+      "name": "key:custom.festive.christmas_creeper",
+      "texture": "skins/christmas_creeper.png",
+      "order": 9
+    },
+    {
+      "id": "christmas_skeleton",
+      "name": "key:custom.festive.christmas_skeleton",
+      "texture": "skins/christmas_skeleton.png",
+      "order": 10
+    },
+    {
+      "id": "santa_steve",
+      "name": "key:custom.festive.santa_steve",
+      "texture": "skins/santa_steve.png",
+      "order": 11
+    },
+    {
+      "id": "winter_steve",
+      "name": "key:custom.festive.winter_steve",
+      "texture": "skins/winter_steve.png",
+      "order": 12
+    },
+    {
+      "id": "parka_steve",
+      "name": "key:custom.festive.parka_steve",
+      "texture": "skins/parka_steve.png",
+      "order": 13
+    },
+    {
+      "id": "snowmanfestive",
+      "name": "key:custom.festive.snowmanfestive",
+      "texture": "skins/snowmanfestive.png",
+      "order": 14
+    },
+    {
+      "id": "present",
+      "name": "key:custom.festive.present",
+      "texture": "skins/present.png",
+      "order": 15
+    },
+    {
+      "id": "christmas_tree",
+      "name": "key:custom.festive.christmas_tree",
+      "texture": "skins/christmas_tree.png",
+      "order": 16
+    },
+    {
+      "id": "christmas_pudding",
+      "name": "key:custom.festive.christmas_pudding",
+      "texture": "skins/christmas_pudding.png",
+      "order": 17
+    },
+    {
+      "id": "zombie_turkey",
+      "name": "key:custom.festive.zombie_turkey",
+      "texture": "skins/zombie_turkey.png",
+      "order": 18,
+      "poses": [
+        "zombie_arms"
+      ]
+    },
+    {
+      "id": "robin",
+      "name": "key:custom.festive.robin",
+      "texture": "skins/robin.png",
+      "order": 19
+    },
+    {
+      "id": "bad_santa",
+      "name": "key:custom.festive.bad_santa",
+      "texture": "skins/bad_santa.png",
+      "order": 20,
+      "poses": [
+        "idle_sit"
+      ]
+    },
+    {
+      "id": "gingerbread_man",
+      "name": "key:custom.festive.gingerbread_man",
+      "texture": "skins/gingerbread_man.png",
+      "order": 21
+    },
+    {
+      "id": "gingerbread_woman",
+      "name": "key:custom.festive.gingerbread_woman",
+      "texture": "skins/gingerbread_woman.png",
+      "order": 22
+    },
+    {
+      "id": "scrooge",
+      "name": "key:custom.festive.scrooge",
+      "texture": "skins/scrooge.png",
+      "order": 23
+    },
+    {
+      "id": "marleys_ghost",
+      "name": "key:custom.festive.marleys_ghost",
+      "texture": "skins/marleys_ghost.png",
+      "order": 24,
+      "poses": [
+        "zombie_arms",
+        "stiff_legs",
+        "disable_view_bobbing"
+      ]
+    }
+  ]
+}

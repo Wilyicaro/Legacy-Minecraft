@@ -1,0 +1,11 @@
+{
+  "meta": {
+    "displayName": "Star Nosed Mole",
+    "displayNameId": "custom.battleandthebeasts2.star_nosed_mole"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

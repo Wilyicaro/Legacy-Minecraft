@@ -1,0 +1,13 @@
+{
+  "meta": {
+    "displayName": "Creeper Cosplay",
+    "displayNameId": "custom.minecon2017.creeper_cosplay",
+    "themeName": "Explosive personality",
+    "themeNameId": "custom.minecon2017.themetext.creeper_cosplay"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": []
+}

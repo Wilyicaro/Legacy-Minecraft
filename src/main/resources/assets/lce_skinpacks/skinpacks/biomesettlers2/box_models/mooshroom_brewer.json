@@ -1,0 +1,78 @@
+{
+  "meta": {
+    "displayName": "Mooshroom Brewer",
+    "displayNameId": "custom.biomesettlers2.mooshroom_brewer"
+  },
+  "texture": {
+    "width": 64,
+    "height": 64
+  },
+  "bones": [
+    {
+      "name": "head_addon",
+      "attach": "HEAD",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            -4.0,
+            4.0
+          ],
+          "size": [
+            5.0,
+            3.0,
+            1.0
+          ],
+          "uv": [
+            24,
+            0
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        },
+        {
+          "origin": [
+            3.0,
+            -5.0,
+            1.0
+          ],
+          "size": [
+            2.0,
+            4.0,
+            4.0
+          ],
+          "uv": [
+            52,
+            28
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    },
+    {
+      "name": "right_arm_addon",
+      "attach": "RIGHT_ARM",
+      "cubes": [
+        {
+          "origin": [
+            -4.0,
+            1.0,
+            -1.0
+          ],
+          "size": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "uv": [
+            56,
+            38
+          ],
+          "inflate": 0.01,
+          "mirror": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,281 @@
+{
+  "name": "key:custom.halloween2015.pack.name",
+  "author": "4J Studios",
+  "skins": [
+    {
+      "id": "vampire",
+      "name": "key:custom.halloween2015.vampire",
+      "texture": "skins/vampire.png",
+      "order": 1
+    },
+    {
+      "id": "the_grim_reaper",
+      "name": "key:custom.halloween2015.the_grim_reaper",
+      "texture": "skins/the_grim_reaper.png",
+      "cape": "capes/grimreaper.png",
+      "pose": "STIFF_ARMS",
+      "order": 2
+    },
+    {
+      "id": "devil",
+      "name": "key:custom.halloween2015.devil",
+      "texture": "skins/devil.png",
+      "cape": "capes/devil.png",
+      "order": 3
+    },
+    {
+      "id": "dracula",
+      "name": "key:custom.halloween2015.dracula",
+      "texture": "skins/dracula.png",
+      "cape": "capes/dracula.png",
+      "order": 4
+    },
+    {
+      "id": "frankensteins_monster",
+      "name": "key:custom.halloween2015.frankensteins_monster",
+      "texture": "skins/frankensteins_monster.png",
+      "order": 5
+    },
+    {
+      "id": "mummy",
+      "name": "key:custom.halloween2015.mummy",
+      "texture": "skins/mummy.png",
+      "poses": [
+        "zombie_arms"
+      ],
+      "order": 6
+    },
+    {
+      "id": "werewolf",
+      "name": "key:custom.halloween2015.werewolf",
+      "texture": "skins/werewolf.png",
+      "order": 7
+    },
+    {
+      "id": "ghost",
+      "name": "key:custom.halloween2015.ghost",
+      "texture": "skins/ghost.png",
+      "poses": [
+        "zombie_arms",
+        "stiff_legs"
+      ],
+      "order": 8
+    },
+    {
+      "id": "evil_wizard",
+      "name": "key:custom.halloween2015.evil_wizard",
+      "texture": "skins/evil_wizard.png",
+      "cape": "capes/evilwizard.png",
+      "order": 9
+    },
+    {
+      "id": "bride_of_dracula",
+      "name": "key:custom.halloween2015.bride_of_dracula",
+      "texture": "skins/bride_of_dracula.png",
+      "order": 10
+    },
+    {
+      "id": "bride_of_frankenstein",
+      "name": "key:custom.halloween2015.bride_of_frankenstein",
+      "texture": "skins/bride_of_frankenstein.png",
+      "cape": "capes/brideoffrankenstien.png",
+      "order": 11
+    },
+    {
+      "id": "ghoul",
+      "name": "key:custom.halloween2015.ghoul",
+      "texture": "skins/ghoul.png",
+      "order": 12
+    },
+    {
+      "id": "scary_clown",
+      "name": "key:custom.halloween2015.scary_clown",
+      "texture": "skins/scary_clown.png",
+      "order": 13
+    },
+    {
+      "id": "evil_robot",
+      "name": "key:custom.halloween2015.evil_robot",
+      "texture": "skins/evil_robot.png",
+      "order": 14
+    },
+    {
+      "id": "gregg_the_grim_reaper",
+      "name": "key:custom.halloween2015.gregg_the_grim_reaper",
+      "texture": "skins/gregg_the_grim_reaper.png",
+      "order": 15
+    },
+    {
+      "id": "ancient_mummy",
+      "name": "key:custom.halloween2015.ancient_mummy",
+      "texture": "skins/ancient_mummy.png",
+      "order": 16
+    },
+    {
+      "id": "zippy_zombie",
+      "name": "key:custom.halloween2015.zippy_zombie",
+      "texture": "skins/zippy_zombie.png",
+      "order": 17
+    },
+    {
+      "id": "scarecrow",
+      "name": "key:custom.halloween2015.scarecrow",
+      "texture": "skins/scarecrow.png",
+      "order": 18
+    },
+    {
+      "id": "wicked_witch",
+      "name": "key:custom.halloween2015.wicked_witch",
+      "texture": "skins/wicked_witch.png",
+      "cape": "capes/wickedwitch.png",
+      "order": 19
+    },
+    {
+      "id": "dr_insecto",
+      "name": "key:custom.halloween2015.dr_insecto",
+      "texture": "skins/dr_insecto.png",
+      "order": 20
+    },
+    {
+      "id": "insecto_ant",
+      "name": "key:custom.halloween2015.insecto_ant",
+      "texture": "skins/insecto_ant.png",
+      "order": 21
+    },
+    {
+      "id": "insecto_wasp",
+      "name": "key:custom.halloween2015.insecto_wasp",
+      "texture": "skins/insecto_wasp.png",
+      "order": 22
+    },
+    {
+      "id": "mad_scientist",
+      "name": "key:custom.halloween2015.mad_scientist",
+      "texture": "skins/mad_scientist.png",
+      "order": 23
+    },
+    {
+      "id": "mad_doctor_costume",
+      "name": "key:custom.halloween2015.mad_doctor_costume",
+      "texture": "skins/mad_doctor_costume.png",
+      "order": 24
+    },
+    {
+      "id": "tree_face",
+      "name": "key:custom.halloween2015.tree_face",
+      "texture": "skins/tree_face.png",
+      "order": 25
+    },
+    {
+      "id": "stumpy",
+      "name": "key:custom.halloween2015.stumpy",
+      "texture": "skins/stumpy.png",
+      "order": 26
+    },
+    {
+      "id": "swamp_monster_costume",
+      "name": "key:custom.halloween2015.swamp_monster_costume",
+      "texture": "skins/swamp_monster_costume.png",
+      "order": 27
+    },
+    {
+      "id": "steve_anatomy",
+      "name": "key:custom.halloween2015.steve_anatomy",
+      "texture": "skins/steve_anatomy.png",
+      "order": 28
+    },
+    {
+      "id": "alex_anatomy",
+      "name": "key:custom.halloween2015.alex_anatomy",
+      "texture": "skins/alex_anatomy.png",
+      "model": "slim",
+      "order": 29
+    },
+    {
+      "id": "arrowhead_costume",
+      "name": "key:custom.halloween2015.arrowhead_costume",
+      "texture": "skins/arrowhead_costume.png",
+      "order": 30
+    },
+    {
+      "id": "knifehead_costume",
+      "name": "key:custom.halloween2015.knifehead_costume",
+      "texture": "skins/knifehead_costume.png",
+      "order": 31
+    },
+    {
+      "id": "ectoplasm_steve",
+      "name": "key:custom.halloween2015.ectoplasm_steve",
+      "texture": "skins/ectoplasm_steve.png",
+      "order": 32
+    },
+    {
+      "id": "ectoplasm_alex",
+      "name": "key:custom.halloween2015.ectoplasm_alex",
+      "texture": "skins/ectoplasm_alex.png",
+      "model": "slim",
+      "order": 33
+    },
+    {
+      "id": "the_invisible_man",
+      "name": "key:custom.halloween2015.the_invisible_man",
+      "texture": "skins/the_invisible_man.png",
+      "order": 34
+    },
+    {
+      "id": "dr_jekyll",
+      "name": "key:custom.halloween2015.dr_jekyll",
+      "texture": "skins/dr_jekyll.png",
+      "order": 35
+    },
+    {
+      "id": "mr_hyde",
+      "name": "key:custom.halloween2015.mr_hyde",
+      "texture": "skins/mr_hyde.png",
+      "order": 36
+    },
+    {
+      "id": "igor",
+      "name": "key:custom.halloween2015.igor",
+      "texture": "skins/igor.png",
+      "order": 37
+    },
+    {
+      "id": "ghost_costume",
+      "name": "key:custom.halloween2015.ghost_costume",
+      "texture": "skins/ghost_costume.png",
+      "order": 38
+    },
+    {
+      "id": "ghost_pirate_costume",
+      "name": "key:custom.halloween2015.ghost_pirate_costume",
+      "texture": "skins/ghost_pirate_costume.png",
+      "order": 39
+    },
+    {
+      "id": "ghost_pirate_costume_2",
+      "name": "key:custom.halloween2015.ghost_pirate_costume_2",
+      "texture": "skins/ghost_pirate_costume_2.png",
+      "order": 40
+    },
+    {
+      "id": "baron_samedi",
+      "name": "key:custom.halloween2015.baron_samedi",
+      "texture": "skins/baron_samedi.png",
+      "order": 41
+    },
+    {
+      "id": "maman_brigitte",
+      "name": "key:custom.halloween2015.maman_brigitte",
+      "texture": "skins/maman_brigitte.png",
+      "cape": "capes/brigitte.png",
+      "order": 42
+    },
+    {
+      "id": "reptile_monster_costume",
+      "name": "key:custom.halloween2015.reptile_monster_costume",
+      "texture": "skins/reptile_monster_costume.png",
+      "order": 43
+    }
+  ]
+}
