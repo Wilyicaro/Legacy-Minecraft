@@ -34,6 +34,14 @@ import wily.legacy.util.client.LegacyRenderUtil;
 
 
 public class ChangeSkinScreen extends AbstractChangeSkinScreen {
+    private static final int BEACON_CHECK_TEXTURE_SIZE = 28;
+    private static final int BEACON_CHECK_VISIBLE_X = 3;
+    private static final int BEACON_CHECK_VISIBLE_Y = 4;
+    private static final int BEACON_CHECK_VISIBLE_W = 24;
+    private static final int BEACON_CHECK_VISIBLE_H = 20;
+    private static final int SELECTION_ICON_SIZE = 16;
+    private static final int SELECTION_ICON_OFFSET_X = 1;
+    private static final int SELECTION_ICON_OFFSET_Y = 1;
 
     
     private static final ResourceLocation SKIN_PANEL          = ResourceLocation.fromNamespaceAndPath(SkinSync.ASSET_NS, "tiles/skin_panel");
@@ -262,6 +270,21 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
     }
 
     
+    private void renderSelectedSkinMarker(GuiGraphics g, int iconX, int iconY, int holderSize) {
+        float drawW = Math.max(1, sc(SELECTION_ICON_SIZE));
+        float drawH = Math.max(1, Math.round(drawW * (BEACON_CHECK_VISIBLE_H / (float) BEACON_CHECK_VISIBLE_W)));
+        float scaleX = drawW / BEACON_CHECK_VISIBLE_W;
+        float scaleY = drawH / BEACON_CHECK_VISIBLE_H;
+        float drawX = iconX + (holderSize - drawW) / 2.0f + sc(SELECTION_ICON_OFFSET_X);
+        float drawY = iconY + (holderSize - drawH) / 2.0f + sc(SELECTION_ICON_OFFSET_Y);
+        g.pose().pushMatrix();
+        g.pose().translate(drawX - BEACON_CHECK_VISIBLE_X * scaleX, drawY - BEACON_CHECK_VISIBLE_Y * scaleY);
+        g.pose().scale(scaleX, scaleY);
+        g.blit(RenderPipelines.GUI_TEXTURED, BEACON_CHECK, 0, 0, 0, 0, BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE, BEACON_CHECK_TEXTURE_SIZE);
+        g.pose().popMatrix();
+    }
+
+    
 
     @Override
     public boolean mouseClicked(MouseButtonEvent e, boolean bl) {
@@ -334,15 +357,7 @@ public class ChangeSkinScreen extends AbstractChangeSkinScreen {
             
             
             if (selected != null && (selected.equals(current) || (isAuto && isAutoActive))) {
-                int checkSize = Math.max(1, sc(16));
-                float checkScale = checkSize / 24.0F;
-                float checkX = iconX + (holder - checkSize) / 2.0F;
-                float checkY = iconBaseY + sc(3) + (holder - checkSize) / 2.0F;
-                g.pose().pushMatrix();
-                g.pose().translate(checkX, checkY);
-                g.pose().scale(checkScale, checkScale);
-                g.blit(RenderPipelines.GUI_TEXTURED, BEACON_CHECK, 0, 0, 0, 0, 24, 24, 24, 24);
-                g.pose().popMatrix();
+                renderSelectedSkinMarker(g, iconX, iconBaseY + sc(3), holder);
             }
 
             if (selected != null && FavoritesStore.isFavorite(selected)) {
