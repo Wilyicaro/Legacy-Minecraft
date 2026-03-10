@@ -33,6 +33,14 @@ import static wily.legacy.Legacy4JClient.*;
 
 @Mixin(LocalPlayer.class)
 public abstract class LocalPlayerMixin extends AbstractClientPlayer implements LegacyLocalPlayer {
+    private static final float LEGACY_ELYTRA_STORAGE_PITCH = 25.0f;
+    private static final double LEGACY_ELYTRA_STORAGE_BASE = 0.026;
+    private static final double LEGACY_ELYTRA_STORAGE_SPEED_FACTOR = 0.02;
+    private static final double LEGACY_ELYTRA_MAX_STORAGE = 3.0;
+    private static final double LEGACY_ELYTRA_IDLE_DECAY = 0.85;
+    private static final double LEGACY_ELYTRA_RELEASE_DECAY = 0.88;
+    private static final double LEGACY_ELYTRA_RELEASE_END = 0.02;
+    private static final double LEGACY_ELYTRA_RELEASE_IMPULSE = 0.18;
 
     @Shadow
     @Final
@@ -46,6 +54,11 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
     private boolean crouching;
     @Shadow
     private boolean lastOnGround;
+
+
+    private double legacyStoredElytraBoost;
+    private double legacyActiveElytraReleaseBoost;
+    private boolean legacyWasJumpHeld;
 
     public LocalPlayerMixin(ClientLevel clientLevel, GameProfile gameProfile) {
         super(clientLevel, gameProfile);
@@ -138,12 +151,97 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
         return (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT) && input./*? if >=1.21.2 {*/keyPresses.jump()/*?} else {*//*jumping*//*?}*/ && isSprinting() && getAbilities().flying ? 0.5f : 0) + super.maxUpStep();
     }
 
+  
+    private boolean legacy$isJumpHeld() {
+        return input./*? if >=1.21.2 {*/keyPresses.jump()/*?} else {*//*jumping*//*?}*/;
+    }
+
+    
+    private boolean legacy$canUseStoredElytraBoost() {
+        return isFallFlying() && getAbilities().mayfly && getAbilities().invulnerable && this.isControlledCamera() && gameRules.getRule(LegacyGameRules.LEGACY_FLIGHT).get();
+    }
+
+    // Charges extra  speed while the player is climbing and looking downward 
+    private void legacy$chargeStoredElytraBoost(Vec3 deltaMovement) {
+        if (getXRot() <= LEGACY_ELYTRA_STORAGE_PITCH) return;
+        double pitchScale = Math.min(1.0, (getXRot() - LEGACY_ELYTRA_STORAGE_PITCH) / (90.0 - LEGACY_ELYTRA_STORAGE_PITCH));
+        double storedThisTick = (LEGACY_ELYTRA_STORAGE_BASE + deltaMovement.horizontalDistance() * LEGACY_ELYTRA_STORAGE_SPEED_FACTOR) * pitchScale;
+        legacyStoredElytraBoost = Math.min(LEGACY_ELYTRA_MAX_STORAGE, legacyStoredElytraBoost + storedThisTick);
+    }
+
+    // fires the stored climb speed along the player's current look vector upon climb release
+    private void legacy$releaseStoredElytraBoost() {
+        if (legacyStoredElytraBoost <= 0.0) return;
+        legacy$cancelActiveElytraReleaseBoost();
+        legacyActiveElytraReleaseBoost = legacyStoredElytraBoost;
+        legacyStoredElytraBoost = 0.0;
+    }
+
+    // bleeds off stored speed when the player leaves elytra climb
+    private void legacy$decayStoredElytraBoost(boolean hardReset) {
+        if (hardReset) {
+            legacyStoredElytraBoost = 0.0;
+            legacy$cancelActiveElytraReleaseBoost();
+            legacyWasJumpHeld = false;
+            return;
+        }
+        legacyStoredElytraBoost *= LEGACY_ELYTRA_IDLE_DECAY;
+        if (legacyStoredElytraBoost < 0.01) legacyStoredElytraBoost = 0.0;
+    }
+
+    // Clears the feed when the player exits state or starts charging again
+    private Vec3 legacy$clearActiveElytraReleaseBoost(Vec3 deltaMovement) {
+        legacy$cancelActiveElytraReleaseBoost();
+        return deltaMovement;
+    }
+
+    //
+    private Vec3 legacy$updateActiveElytraReleaseBoost(Vec3 deltaMovement) {
+        if (legacyActiveElytraReleaseBoost <= LEGACY_ELYTRA_RELEASE_END) {
+            legacyActiveElytraReleaseBoost = 0.0;
+            return deltaMovement;
+        }
+        Vec3 lookAngle = getLookAngle();
+        double lookLength = lookAngle.lengthSqr();
+        if (lookLength <= 1.0E-4) return deltaMovement;
+        Vec3 releaseImpulse = lookAngle.scale((legacyActiveElytraReleaseBoost * LEGACY_ELYTRA_RELEASE_IMPULSE) / Math.sqrt(lookLength));
+        legacyActiveElytraReleaseBoost *= LEGACY_ELYTRA_RELEASE_DECAY;
+        return deltaMovement.add(releaseImpulse);
+    }
+
+    
+    private void legacy$cancelActiveElytraReleaseBoost() {
+        legacyActiveElytraReleaseBoost = 0.0;
+    }
+
+    
     @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;aiStep()V"))
     public void setYElytraFlightElevation(CallbackInfo ci) {
-        if (!LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT)) return;
-        if (isFallFlying() && getAbilities().mayfly && getAbilities().invulnerable && this.isControlledCamera() && jumping && gameRules.getRule(LegacyGameRules.LEGACY_FLIGHT).get())
-            setDeltaMovement(getDeltaMovement().with(Direction.Axis.Y, input./*? if >=1.21.2 {*/keyPresses.jump()/*?} else {*//*jumping*//*?}*/ ? this.getAbilities().getFlyingSpeed() * 12 : 0));
-
+        Vec3 deltaMovement = getDeltaMovement();
+        if (!LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT)) {
+            setDeltaMovement(legacy$clearActiveElytraReleaseBoost(deltaMovement));
+            legacy$decayStoredElytraBoost(true);
+            return;
+        }
+        if (!legacy$canUseStoredElytraBoost()) {
+            setDeltaMovement(legacy$clearActiveElytraReleaseBoost(deltaMovement));
+            legacy$decayStoredElytraBoost(!isFallFlying());
+            return;
+        }
+        boolean jumpHeld = legacy$isJumpHeld();
+        boolean releasedJumpThisTick = legacyWasJumpHeld && !jumpHeld;
+        legacyWasJumpHeld = jumpHeld;
+        if (jumpHeld) {
+            deltaMovement = legacy$clearActiveElytraReleaseBoost(deltaMovement);
+            deltaMovement = deltaMovement.with(Direction.Axis.Y, this.getAbilities().getFlyingSpeed() * 12);
+            legacy$chargeStoredElytraBoost(deltaMovement);
+        } else if (!releasedJumpThisTick) {
+            legacy$decayStoredElytraBoost(false);
+        }
+        if (releasedJumpThisTick) {
+            legacy$releaseStoredElytraBoost();
+        }
+        setDeltaMovement(legacy$updateActiveElytraReleaseBoost(deltaMovement));
     }
 
     @Inject(method = "aiStep", at = @At(value = "RETURN"))
