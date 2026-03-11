@@ -173,6 +173,8 @@
     "client.KeyboardHandlerAccessor",
     "client.InputWithModifiersMixin",
     "client.ItemPickupParticleGroupMixin",
+    "client.LevelRendererCloudsMixin",
+    "client.CloudRendererMixin",
     "client.NameTagSubmitMixin",
     "client.EntityRendererMixin",
     "client.NameTagFeatureRendererStorageMixin",
