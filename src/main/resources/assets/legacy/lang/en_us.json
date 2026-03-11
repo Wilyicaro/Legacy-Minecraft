@@ -1830,7 +1830,6 @@
   "legacy.options.vehicleCameraRotation.only_living_entities": "Only Living Entities",
   "legacy.options.vehicleCameraRotation.only_non_living_entities": "Only Non-Living Entities",
   "legacy.options.vignette": "Vignette",
-  "legacy.message.mobcap.cant_shear_mooshroom": "Can't shear this Mooshroom at the moment. The maximum number of Pigs, Sheep, Cows, Cats and Horses has been reached.",
   "legacy.message.mobcap.max_general_animals_spawned": "Can't use Spawn Egg at the moment. The maximum number of Pigs, Sheep, Cows, Cats and Horses has been reached.",
   "legacy.message.mobcap.max_mooshrooms_spawned": "Can't use Spawn Egg at the moment. The maximum number of Mooshrooms has been reached.",
   "legacy.message.mobcap.max_wolves_spawned": "Can't use Spawn Egg at the moment. The maximum number of Wolves in a world has been reached.",
