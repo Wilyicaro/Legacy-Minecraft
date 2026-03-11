@@ -229,7 +229,7 @@ public class LegacyOptions {
     public static final FactoryConfig<Boolean> invertedFrontCameraPitch = CLIENT_STORAGE.register(createBoolean("invertedFrontCameraPitch", true, b -> {}));
     public static final FactoryConfig<Boolean> legacySkyShape = CLIENT_STORAGE.register(createBoolean("legacySkyShape", true, b -> Legacy4JClient.updateSkyShape()));
     public static final FactoryConfig<Boolean> fastLeavesCustomModels = CLIENT_STORAGE.register(createBoolean("fastLeavesCustomModels", true, b -> Legacy4JClient.updateChunks()));
-    public static final FactoryConfig<Boolean> oldGlassRendering = CLIENT_STORAGE.register(createBoolean("oldGlassRendererig", b -> Component.translatable("legacy.options.oldGlassRendererig.description"), false, b -> Legacy4JClient.updateChunks()));
+    public static final FactoryConfig<Boolean> oldGlassRendering = CLIENT_STORAGE.register(createBoolean("oldGlassRendering", b -> Component.translatable("legacy.options.oldGlassRendering.description"), false, b -> Legacy4JClient.updateChunks()));
     public static final FactoryConfig<Boolean> skipIntro = CLIENT_STORAGE.register(createBoolean("skipIntro", false));
     public static final FactoryConfig<Boolean> legacyIntroAndReloading = CLIENT_STORAGE.register(createBoolean("legacyIntroAndReloading", true));
     public static final FactoryConfig<Boolean> skipInitialSaveWarning = CLIENT_STORAGE.register(createBoolean("skipInitialSaveWarning", false));
