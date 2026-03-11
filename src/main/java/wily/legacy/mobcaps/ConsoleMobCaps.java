@@ -18,7 +18,6 @@ import net.minecraft.world.level.Level;
 import java.util.function.Predicate;
 
 public final class ConsoleMobCaps {
-    private static final String CANT_SHEAR_MOOSHROOM = "legacy.message.mobcap.cant_shear_mooshroom";
     private static final String MAX_GENERAL_ANIMALS_SPAWNED = "legacy.message.mobcap.max_general_animals_spawned";
     private static final String MAX_MOOSHROOMS_SPAWNED = "legacy.message.mobcap.max_mooshrooms_spawned";
     private static final String MAX_WOLVES_SPAWNED = "legacy.message.mobcap.max_wolves_spawned";
@@ -246,10 +245,6 @@ public final class ConsoleMobCaps {
         return !LegacyMobCaps.isEnabled(level) || LegacyMobCaps.tracker(level).count(TrackedMobCap.VILLAGERS) < TrackedMobCap.VILLAGERS.breedingLimit();
     }
 
-    public static boolean canShearMooshroom(ServerLevel level) {
-        return !LegacyMobCaps.isEnabled(level) || LegacyMobCaps.tracker(level).count(TrackedMobCap.GENERAL_ANIMALS) < TrackedMobCap.GENERAL_ANIMALS.breedingLimit();
-    }
-
     public static boolean canPlaceBoat(ServerLevel level) {
         return !LegacyMobCaps.isEnabled(level) || countLoaded(level, entity -> entity instanceof AbstractBoat) < TrackedMobCap.BOATS.manualLimit();
     }
@@ -296,10 +291,6 @@ public final class ConsoleMobCaps {
                 serverPlayer.containerMenu.sendAllDataToRemote();
             }
         }
-    }
-
-    public static String cantShearMooshroomMessage() {
-        return CANT_SHEAR_MOOSHROOM;
     }
 
     public static String maxBoatsMessage() {
