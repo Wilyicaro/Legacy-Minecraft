@@ -105,6 +105,7 @@
     "client.MusicsMixin",
     "client.OptionInstanceMixin",
     "client.OptionsMixin",
+    "client.HalfTransparentBlockMixin",
     "client.packselection.PackSelectionScreenMixin",
     "client.ParticleEngineMixin",
     "client.ParticleMixin",

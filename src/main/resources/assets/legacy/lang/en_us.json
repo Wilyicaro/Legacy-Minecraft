@@ -1758,6 +1758,8 @@
   "legacy.options.legacyPotionsBar": "Legacy Potions Bar",
   "legacy.options.legacySignScreen": "Legacy Sign Screen",
   "legacy.options.legacySkyShape": "Legacy Sky Shape",
+  "legacy.options.oldGlassRendererig": "Old Glass Rendererig",
+  "legacy.options.oldGlassRendererig.description": "Shows the inside faces between touching glass blocks like older Minecraft versions.",
   "legacy.options.legacySmithingScreen": "Legacy Smithing Screen",
   "legacy.options.legacySwordBlocking": "Legacy Sword Blocking",
   "legacy.options.legacyTitleScreen": "Legacy Title Screen",
