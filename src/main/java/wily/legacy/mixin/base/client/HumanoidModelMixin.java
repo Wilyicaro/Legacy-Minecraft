@@ -18,6 +18,7 @@ import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.gen.Invoker;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -38,6 +39,12 @@ public abstract class HumanoidModelMixin {
     @Final
     public ModelPart leftArm;
 
+    @Invoker("poseRightArm")
+    protected abstract void legacy$poseRightArm(HumanoidRenderState humanoidRenderState, HumanoidModel.ArmPose armPose);
+
+    @Invoker("poseLeftArm")
+    protected abstract void legacy$poseLeftArm(HumanoidRenderState humanoidRenderState, HumanoidModel.ArmPose armPose);
+
     private float getLegacyTridentRaiseProgress(int ticksUsingItem) {
         return switch (Mth.clamp(ticksUsingItem, 0, LEGACY_TRIDENT_RAISE_TICKS)) {
             case 0 -> 0.0F;
@@ -55,6 +62,19 @@ public abstract class HumanoidModelMixin {
         float startXRot = (targetXRot + (float) Math.PI) / VANILLA_TRIDENT_X_ROT_SCALE;
         float progress = getLegacyTridentRaiseProgress(ticksUsingItem);
         armModel.xRot = Mth.lerp(progress, startXRot, targetXRot);
+    }
+
+    private void applyLegacyTridentSupportArmPose(HumanoidRenderState humanoidRenderState, HumanoidArm useArm) {
+        HumanoidArm supportArm = useArm.getOpposite();
+        HumanoidModel.ArmPose supportArmPose = supportArm == HumanoidArm.RIGHT ? humanoidRenderState.rightArmPose : humanoidRenderState.leftArmPose;
+        if (supportArmPose == null || supportArmPose.isTwoHanded()) {
+            return;
+        }
+        if (supportArm == HumanoidArm.RIGHT) {
+            legacy$poseRightArm(humanoidRenderState, supportArmPose);
+        } else {
+            legacy$poseLeftArm(humanoidRenderState, supportArmPose);
+        }
     }
 
     @Inject(method = /*? if <1.21.2 {*//*"setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V"*//*?} else {*/"setupAnim(Lnet/minecraft/client/renderer/entity/state/HumanoidRenderState;)V"/*?}*/, at = @At("TAIL"))
@@ -78,6 +98,7 @@ public abstract class HumanoidModelMixin {
             armModel.yRot = (isRightHand ? -0.45f : 0.45f) * eased;
         }
         if (/*? if <1.21.2 {*//*livingEntity.getUseItemRemainingTicks() > 0*//*?} else {*/humanoidRenderState.isUsingItem/*?}*/ && useAnim == /*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.SPEAR) {
+            applyLegacyTridentSupportArmPose(humanoidRenderState, useArm);
             applyLegacyTridentRaise(useArm == HumanoidArm.RIGHT ? rightArm : leftArm, /*? if <1.21.2 {*//*livingEntity.getTicksUsingItem()*//*?} else {*/humanoidRenderState.ticksUsingItem/*?}*/);
         }
     }
