@@ -86,6 +86,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading, Contro
             Minecraft.getInstance().setScreen(nextScreen);
             return;
         }
+        Minecraft.getInstance().gui.autosaveIndicatorValue = 0.0f;
         Minecraft.getInstance().setScreen(getFakeManualSaveScreen(nextScreen));
     }
 
@@ -94,7 +95,7 @@ public class LegacyLoadingScreen extends Screen implements LegacyLoading, Contro
     }
 
     public static LegacyLoadingScreen getFakeManualSaveScreen(Screen nextScreen) {
-        return createFakeSaveScreen(LegacyComponents.PREPARING_MANUAL_SAVE, false, () -> Minecraft.getInstance().setScreen(nextScreen));
+        return createFakeSaveScreen(LegacyComponents.PREPARING_MANUAL_SAVE, true, () -> Minecraft.getInstance().setScreen(nextScreen));
     }
 
     private static LegacyLoadingScreen createFakeSaveScreen(Component loadingHeader, boolean controlsAutosaveIndicator, Runnable onClose) {
