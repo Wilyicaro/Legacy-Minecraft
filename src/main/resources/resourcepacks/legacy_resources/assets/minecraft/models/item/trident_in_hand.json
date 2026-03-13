@@ -1,0 +1,28 @@
+{
+  "gui_light": "front",
+  "textures": {
+    "particle": "item/trident"
+  },
+  "display": {
+    "thirdperson_righthand": {
+      "rotation": [0, 60, 0],
+      "translation": [11, 17, -2],
+      "scale": [1, 1, 1]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [0, 60, 0],
+      "translation": [3, 17, 12],
+      "scale": [1, 1, 1]
+    },
+    "firstperson_righthand": {
+      "rotation": [0, -92, 28],
+      "translation": [-2, 18, -4],
+      "scale": [1, 1, 1]
+    },
+    "firstperson_lefthand": {
+      "rotation": [0, 92, -28],
+      "translation": [12, 18, -4],
+      "scale": [1, 1, 1]
+    }
+  }
+}

@@ -26,6 +26,8 @@ import wily.factoryapi.FactoryAPIClient;
 
 @Mixin(HumanoidModel.class)
 public abstract class HumanoidModelMixin {
+    private static final int LEGACY_TRIDENT_RAISE_TICKS = 6;
+    private static final float VANILLA_TRIDENT_X_ROT_SCALE = 0.5F;
 
 
     @Shadow
@@ -36,6 +38,24 @@ public abstract class HumanoidModelMixin {
     @Final
     public ModelPart leftArm;
 
+    private float getLegacyTridentRaiseProgress(int ticksUsingItem) {
+        return switch (Mth.clamp(ticksUsingItem, 0, LEGACY_TRIDENT_RAISE_TICKS)) {
+            case 0 -> 0.0F;
+            case 1 -> 0.70F;
+            case 2 -> 0.76F;
+            case 3 -> 0.82F;
+            case 4 -> 0.88F;
+            case 5 -> 0.94F;
+            default -> 1.0F;
+        };
+    }
+
+    private void applyLegacyTridentRaise(ModelPart armModel, int ticksUsingItem) {
+        float targetXRot = armModel.xRot;
+        float startXRot = (targetXRot + (float) Math.PI) / VANILLA_TRIDENT_X_ROT_SCALE;
+        float progress = getLegacyTridentRaiseProgress(ticksUsingItem);
+        armModel.xRot = Mth.lerp(progress, startXRot, targetXRot);
+    }
 
     @Inject(method = /*? if <1.21.2 {*//*"setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V"*//*?} else {*/"setupAnim(Lnet/minecraft/client/renderer/entity/state/HumanoidRenderState;)V"/*?}*/, at = @At("TAIL"))
     private void setupAnim(/*? if <1.21.2 {*/ /*LivingEntity livingEntity, float f, float g, float h, float i, float j*//*?} else {*/ HumanoidRenderState humanoidRenderState/*?}*/, CallbackInfo info) {
@@ -56,6 +76,9 @@ public abstract class HumanoidModelMixin {
             float eased = (1 - (float) Math.pow(1 - prog, 3));
             armModel.xRot = eased * -1.3f + (time > 1.2f ? (1 - Math.abs(Mth.sin(ageInTicks * 0.8f) * 2)) * 0.09f : 0);
             armModel.yRot = (isRightHand ? -0.45f : 0.45f) * eased;
+        }
+        if (/*? if <1.21.2 {*//*livingEntity.getUseItemRemainingTicks() > 0*//*?} else {*/humanoidRenderState.isUsingItem/*?}*/ && useAnim == /*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.SPEAR) {
+            applyLegacyTridentRaise(useArm == HumanoidArm.RIGHT ? rightArm : leftArm, /*? if <1.21.2 {*//*livingEntity.getTicksUsingItem()*//*?} else {*/humanoidRenderState.ticksUsingItem/*?}*/);
         }
     }
 
