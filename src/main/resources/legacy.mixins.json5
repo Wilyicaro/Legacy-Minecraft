@@ -210,7 +210,6 @@
     "mobcaps.CarvedPumpkinBlockMixin",
     "mobcaps.HangingEntityItemMixin",
     "mobcaps.ItemFrameItemMixin",
-    "mobcaps.MushroomCowMixin",
     "mobcaps.NaturalSpawnerMixin",
     "mobcaps.ServerLevelMixin",
     "mobcaps.SpawnEggItemMixin",
