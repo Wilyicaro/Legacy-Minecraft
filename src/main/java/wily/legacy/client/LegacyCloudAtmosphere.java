@@ -19,6 +19,7 @@ public final class LegacyCloudAtmosphere {
     private static final int SUNRISE_BRIGHT = 0xFFFFE533;
     private static final int DEFAULT_FOG_COLOR = 0xFFC0D8FF;
     private static final float SUNRISE_CLOUD_TINT_STRENGTH = 0.55f;
+    private static final float SUNRISE_FOG_TINT_STRENGTH = 1.35f;
 
     private LegacyCloudAtmosphere() {
     }
@@ -86,10 +87,8 @@ public final class LegacyCloudAtmosphere {
         if (renderDistanceChunks >= 4) {
             int sunriseColor = getSunriseColor(level.getTimeOfDay(partialTick));
             if (sunriseColor != 0) {
-                float sunDirection = Mth.sin(level.getSunAngle(partialTick)) > 0.0f ? -1.0f : 1.0f;
-                float lookDot = camera.getLookVector().x * sunDirection;
-                if (lookDot > 0.0f) {
-                    float blend = lookDot * ARGB.alphaFloat(sunriseColor);
+                float blend = getSunriseFogBlend(level, camera, partialTick, sunriseColor);
+                if (blend > 0.0f) {
                     red = Mth.lerp(blend, red, ARGB.redFloat(sunriseColor));
                     green = Mth.lerp(blend, green, ARGB.greenFloat(sunriseColor));
                     blue = Mth.lerp(blend, blue, ARGB.blueFloat(sunriseColor));
@@ -204,5 +203,19 @@ public final class LegacyCloudAtmosphere {
         float horizontalFacing = Mth.clamp((float) ((look.x() / horizontalLength) * sunriseDirection), 0.0f, 1.0f);
         float horizonWeight = Mth.clamp((float) (1.0d - Math.abs(look.y()) * 1.35d), 0.0f, 1.0f);
         return Mth.square(horizontalFacing) * horizonWeight;
+    }
+
+    private static float getSunriseFogBlend(ClientLevel level, Camera camera, float partialTick, int sunriseColor) {
+        Vector3f look = camera.getLookVector();
+        double horizontalLength = Math.sqrt(look.x() * look.x() + look.z() * look.z());
+        if (horizontalLength < 1.0e-4d) {
+            return 0.0f;
+        }
+
+        float sunriseDirection = Mth.sin(level.getSunAngle(partialTick)) > 0.0f ? -1.0f : 1.0f;
+        float horizontalFacing = Mth.clamp((float) ((look.x() / horizontalLength) * sunriseDirection), 0.0f, 1.0f);
+        float horizonWeight = Mth.clamp((float) (1.0d - Math.abs(look.y()) * 1.1d), 0.0f, 1.0f);
+        float timeWeight = Mth.sqrt(ARGB.alphaFloat(sunriseColor));
+        return Mth.clamp(timeWeight * SUNRISE_FOG_TINT_STRENGTH * Mth.sqrt(horizontalFacing) * horizonWeight, 0.0f, 1.0f);
     }
 }
