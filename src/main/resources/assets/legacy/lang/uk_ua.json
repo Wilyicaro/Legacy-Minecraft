@@ -1703,7 +1703,7 @@
   "legacy.options.hudScale": "Розмір HUD",
   "legacy.options.interfaceResolution": "Роздільність інтерфейсу",
   "legacy.options.interfaceSensitivity": "Чутливість інтерфейсу",
-  "legacy.options.inventoryHoverFocusSound": "Inventory Hover Focus Sound",
+  "legacy.options.inventoryHoverFocusSound": "Звук при наведення на предмет в інвентарі",
   "legacy.options.invertControllerButtons": "Інвертування розташування кнопок",
   "legacy.options.invertYController": "Інвертований вигляд",
   "legacy.options.invertedCrosshair": "Display Inverted Crosshair",
