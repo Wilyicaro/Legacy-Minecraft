@@ -181,7 +181,8 @@
     "client.MovingBlockRenderStateMixin",
     "client.ClientAvatarStateMixin",
     "client.ComponentPathMixin",
-    "client.FeatureRenderDispatcherMixin"
+    "client.FeatureRenderDispatcherMixin",
+    "client.ScreenshotMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",
