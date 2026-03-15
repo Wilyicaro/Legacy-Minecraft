@@ -6,6 +6,7 @@ import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.level.GameRules;
 import wily.factoryapi.FactoryAPIPlatform;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.network.PlayerInfoSync;
 
 import java.util.function.BiConsumer;
@@ -31,7 +32,19 @@ public class LegacyGameRules {
     }
 
     public static boolean getSidedBooleanGamerule(Entity entity, GameRules.Key<GameRules.BooleanValue> key){
-        return entity.level().isClientSide() && Legacy4JClient.hasModOnServer() && Legacy4JClient.gameRules.getBoolean(key) || !entity.level().isClientSide() && FactoryAPIPlatform.getEntityServer(entity).getGameRules().getBoolean(key);
+        if (!entity.level().isClientSide()) {
+            return FactoryAPIPlatform.getEntityServer(entity).getGameRules().getBoolean(key);
+        }
+        if (Legacy4JClient.hasModOnServer()) {
+            return Legacy4JClient.gameRules.getBoolean(key);
+        }
+        if (key.equals(LEGACY_SWIMMING) && LegacyOptions.forceLegacySwimming.get()) {
+            return true;
+        }
+        if (key.equals(LEGACY_FLIGHT) && LegacyOptions.forceLegacyFlight.get()) {
+            return true;
+        }
+        return false;
     }
 
     public static GameRules.Type<GameRules.IntegerValue> createInteger(int defaultValue, int min, int max, BiConsumer<MinecraftServer, GameRules.IntegerValue> biConsumer){

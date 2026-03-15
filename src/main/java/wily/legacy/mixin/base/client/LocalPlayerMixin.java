@@ -69,12 +69,12 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
 
     @ModifyExpressionValue(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;onGround()Z", ordinal = /*? if <1.20.5 {*//*2*//*?} else if <1.21.5 {*//*3*//*?} else {*/1/*?}*/))
     public boolean onGroundFlying(boolean original) {
-        return (!Legacy4JClient.hasModOnServer() || !gameRules.getBoolean(LegacyGameRules.LEGACY_FLIGHT)) && original;
+        return !LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT) && original;
     }
 
     @ModifyExpressionValue(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isSwimming()Z", ordinal = 2))
     public boolean swimmingFlying(boolean original) {
-        return (!Legacy4JClient.hasModOnServer() || !gameRules.getBoolean(LegacyGameRules.LEGACY_SWIMMING)) && original;
+        return !LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SWIMMING) && original;
     }
 
     @ModifyExpressionValue(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;onGround()Z", ordinal = 0))
@@ -104,17 +104,17 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
 
     @ModifyExpressionValue(method = {"shouldStopRunSprinting", "canStartSprinting"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUnderWater()Z"))
     public boolean shouldStopRunSprinting(boolean original) {
-        return (Legacy4JClient.hasModOnServer() && gameRules.getRule(LegacyGameRules.LEGACY_SWIMMING).get() && isInWater()) || original;
+        return (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SWIMMING) && isInWater()) || original;
     }
 
     @ModifyExpressionValue(method = "isSprintingPossible", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isInShallowWater()Z"))
     public boolean isSprintingPossible(boolean original) {
-        return !(Legacy4JClient.hasModOnServer() && gameRules.getRule(LegacyGameRules.LEGACY_SWIMMING).get() && isInWater()) && original;
+        return !(LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_SWIMMING) && isInWater()) && original;
     }
 
     @Redirect(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V"))
     public void aiStepFlyUpDown(LocalPlayer instance, Vec3 vec3) {
-        if (Legacy4JClient.hasModOnServer() && gameRules.getRule(LegacyGameRules.LEGACY_FLIGHT).get())
+        if (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT))
             move(MoverType.SELF, vec3.with(Direction.Axis.Y, (vec3.y - getDeltaMovement().y) * (input./*? if >=1.21.2 {*/keyPresses.jump()/*?} else {*//*jumping*//*?}*/ ? (/*? if <1.20.5 {*//*0.42f*//*?} else {*/this.getAttributeValue(Attributes.JUMP_STRENGTH)/*?}*/ + getJumpBoostPower()) * 6 : 3)));
         else setDeltaMovement(vec3);
     }
@@ -125,22 +125,22 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
             checkSupportingBlock(true, null);
             lastOnGround = mainSupportingBlockPos.isPresent();
         }
-        return original && (!Legacy4JClient.hasModOnServer() || !gameRules.getRule(LegacyGameRules.LEGACY_FLIGHT).get() || (!input./*? if >=1.21.2 {*/keyPresses.jump()/*?} else {*//*jumping*//*?}*/ && !lastOnGround));
+        return original && (!LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT) || (!input./*? if >=1.21.2 {*/keyPresses.jump()/*?} else {*//*jumping*//*?}*/ && !lastOnGround));
     }
 
     @ModifyExpressionValue(method = "aiStep", at = @At(/*? if <1.21.2 {*//*value = "FIELD",target = "Lnet/minecraft/client/player/Input;jumping:Z"*//*?} else {*/value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Input;jump()Z"/*?}*/, ordinal = 3))
     public boolean aiStepJump(boolean original) {
-        return original && (!Legacy4JClient.hasModOnServer() || !gameRules.getRule(LegacyGameRules.LEGACY_FLIGHT).get() || !isSprinting() || getXRot() <= 0 || !lastOnGround);
+        return original && (!LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT) || !isSprinting() || getXRot() <= 0 || !lastOnGround);
     }
 
     @Override
     public float maxUpStep() {
-        return (Legacy4JClient.hasModOnServer() && gameRules.getRule(LegacyGameRules.LEGACY_FLIGHT).get() && input./*? if >=1.21.2 {*/keyPresses.jump()/*?} else {*//*jumping*//*?}*/ && isSprinting() && getAbilities().flying ? 0.5f : 0) + super.maxUpStep();
+        return (LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT) && input./*? if >=1.21.2 {*/keyPresses.jump()/*?} else {*//*jumping*//*?}*/ && isSprinting() && getAbilities().flying ? 0.5f : 0) + super.maxUpStep();
     }
 
     @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;aiStep()V"))
     public void setYElytraFlightElevation(CallbackInfo ci) {
-        if (!Legacy4JClient.hasModOnServer() || !gameRules.getRule(LegacyGameRules.LEGACY_FLIGHT).get()) return;
+        if (!LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT)) return;
         if (isFallFlying() && getAbilities().mayfly && getAbilities().invulnerable && this.isControlledCamera() && jumping && gameRules.getRule(LegacyGameRules.LEGACY_FLIGHT).get())
             setDeltaMovement(getDeltaMovement().with(Direction.Axis.Y, input./*? if >=1.21.2 {*/keyPresses.jump()/*?} else {*//*jumping*//*?}*/ ? this.getAbilities().getFlyingSpeed() * 12 : 0));
 
@@ -148,7 +148,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
 
     @Inject(method = "aiStep", at = @At(value = "RETURN"))
     public void setYFlightElevation(CallbackInfo ci) {
-        if (!Legacy4JClient.hasModOnServer() || !gameRules.getRule(LegacyGameRules.LEGACY_FLIGHT).get()) return;
+        if (!LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT)) return;
         if (this.getAbilities().flying && this.isControlledCamera()) {
             if (keyFlyDown.isDown() && !keyFlyUp.isDown() || !keyFlyDown.isDown() && keyFlyUp.isDown() || keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown())
                 setDeltaMovement(getDeltaMovement().add(0, (keyFlyUp.isDown() ? 1.5 : keyFlyDown.isDown() ? -1.5 : 0) * this.getAbilities().getFlyingSpeed(), 0));
@@ -164,14 +164,13 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer implements L
 
     @Inject(method = /*? if <1.21.5 {*//*"serverAiStep"*//*?} else {*/"applyInput"/*?}*/, at = @At("RETURN"))
     public void applyInput(CallbackInfo ci) {
-        if (!Legacy4JClient.hasModOnServer()) return;
-        if (this.isControlledCamera() && this.getAbilities().flying && gameRules.getRule(LegacyGameRules.LEGACY_FLIGHT).get()) {
+        if (this.isControlledCamera() && this.getAbilities().flying && LegacyGameRules.getSidedBooleanGamerule(this, LegacyGameRules.LEGACY_FLIGHT)) {
             if (keyFlyLeft.isDown() && !keyFlyRight.isDown() || !keyFlyLeft.isDown() && keyFlyRight.isDown())
                 xxa += (keyFlyLeft.isDown() ? 12 : -12) * this.getAbilities().getFlyingSpeed();
             if (getXRot() != 0 && input.hasForwardImpulse() && isSprinting())
                 zza *= Math.max(0.1f, 1 - Math.abs(getXRot() / 90));
         }
-        if (wantsToStopRiding() && this.isPassenger()) {
+        if (Legacy4JClient.hasModOnServer() && wantsToStopRiding() && this.isPassenger()) {
             minecraft.options.keyShift.setDown(false);
         }
     }
