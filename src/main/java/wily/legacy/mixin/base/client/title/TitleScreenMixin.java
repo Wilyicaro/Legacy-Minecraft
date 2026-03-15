@@ -35,6 +35,8 @@ import wily.legacy.client.screen.compat.WorldHostFriendsScreen;
 import wily.legacy.client.ContentManager;
 
 import java.io.IOException;
+import java.util.function.BiConsumer;
+import java.util.function.ObjIntConsumer;
 
 @Mixin(TitleScreen.class)
 public abstract class TitleScreenMixin extends Screen implements ControlTooltip.Event, RenderableVList.Access {
