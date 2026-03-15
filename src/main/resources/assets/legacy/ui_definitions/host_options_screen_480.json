@@ -1,0 +1,30 @@
+{
+  "targetUI": "wily.legacy.client.screen.HostOptionsScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "panel.width": 200,
+    "panel.height": 110,
+    "panel.y": "(${height}-${panel.height})/2+9",
+    "hostOptionsButton.y": "${panel.y}-22",
+    "hostOptionsButton.width": 200,
+    "hostOptionsButton.height": 18,
+    "renderableVList.x": "${panel.x}+10",
+    "renderableVList.y": "${panel.y}+16",
+    "renderableVList.width": 180,
+    "renderableVList.height": 177,
+    "renderableVList.buttonMessage.x": 36,
+    "renderableVList.playerIcon.x": 3,
+    "renderableVList.playerIcon.y": 2,
+    "renderableVList.playerIcon.width": 10,
+    "renderableVList.playerIcon.height": 10,
+    "title.x": 10,
+    "buttonsHeight": 15
+  }
+}

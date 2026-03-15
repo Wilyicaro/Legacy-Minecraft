@@ -264,11 +264,11 @@ public class LoadSaveScreen extends PanelBackgroundScreen {
         guiGraphics.pose().translate(0, 0.6f);
         FactoryGuiGraphics.of(guiGraphics).blit(SaveRenderableList.iconCache.getUnchecked(summary).textureLocation(), iconX, iconY, 0, 0, iconSize, iconSize, iconSize, iconSize);
         LegacyFontUtil.applySDFont(b -> {
-            guiGraphics.drawString(font, summary.getLevelName(), accessor.getInteger("nameText.x", panel.x + 48), accessor.getInteger("nameText.y", panel.y + 12), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-            guiGraphics.drawString(font, Component.translatable("legacy.menu.load_save.created_in", (hasCommands(summary) ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()), accessor.getInteger("creationText.x", panel.x + 48), accessor.getInteger("creationText.y", panel.y + 29), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            guiGraphics.drawString(font, summary.getLevelName(), accessor.getInteger("nameText.x", panel.x + 48), accessor.getInteger("nameText.y", panel.y + 12), CommonColor.GRAY_TEXT.get(), false);
+            guiGraphics.drawString(font, Component.translatable("legacy.menu.load_save.created_in", (hasCommands(summary) ? GameType.CREATIVE : GameType.SURVIVAL).getShortDisplayName()), accessor.getInteger("creationText.x", panel.x + 48), accessor.getInteger("creationText.y", panel.y + 29), CommonColor.GRAY_TEXT.get(), false);
             guiGraphics.pose().popMatrix();
             if (!isLocked)
-                guiGraphics.drawString(font, Component.translatable("commands.seed.success", LegacyClientWorldSettings.of(summary.getSettings()).getDisplaySeed()), accessor.getInteger("seedText.x", panel.x + 13), accessor.getInteger("seedText.y", panel.y + 49), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                guiGraphics.drawString(font, Component.translatable("commands.seed.success", LegacyClientWorldSettings.of(summary.getSettings()).getDisplaySeed()), accessor.getInteger("seedText.x", panel.x + 13), accessor.getInteger("seedText.y", panel.y + 49), CommonColor.GRAY_TEXT.get(), false);
         });
     }
 

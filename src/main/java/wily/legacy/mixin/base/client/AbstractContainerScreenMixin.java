@@ -108,7 +108,7 @@ public abstract class AbstractContainerScreenMixin extends Screen implements Leg
 
     @ModifyArg(method = "renderLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 4)
     private int renderLabels(int i) {
-        return CommonColor.INVENTORY_GRAY_TEXT.get();
+        return CommonColor.GRAY_TEXT.get();
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)

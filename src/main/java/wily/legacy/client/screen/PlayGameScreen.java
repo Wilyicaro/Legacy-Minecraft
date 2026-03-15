@@ -8,7 +8,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.ConnectScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
@@ -16,7 +15,6 @@ import net.minecraft.client.multiplayer.ServerStatusPinger;
 import net.minecraft.client.multiplayer.resolver.ServerAddress;
 import net.minecraft.client.server.LanServer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FontDescription;
 import net.minecraft.world.level.storage.LevelSummary;
 import org.apache.commons.compress.utils.FileNameUtils;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
@@ -30,7 +28,6 @@ import wily.legacy.client.screen.compat.FriendsServerRenderableList;
 import wily.legacy.client.controller.ControllerBinding;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.File;
@@ -50,7 +47,7 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     public final CreationList creationList = new CreationList(accessor);
     protected final Panel panelRecess;
     protected final ServerRenderableList serverRenderableList = PublishScreen.hasWorldHost() ? new FriendsServerRenderableList(accessor) : new ServerRenderableList(accessor);
-    protected final TabList tabList = new TabList(accessor).add(LegacyTabButton.Type.LEFT, Component.translatable("legacy.menu.load"), b -> repositionElements()).add(LegacyTabButton.Type.MIDDLE, Component.translatable("legacy.menu.create"), b -> repositionElements()).add(LegacyTabButton.Type.RIGHT, (t, guiGraphics, i, j, f) -> t.renderString(guiGraphics, font, canNotifyOnlineFriends() ? 0xFFFFFFFF : CommonColor.INVENTORY_GRAY_TEXT.get(), canNotifyOnlineFriends()), Component.translatable("legacy.menu.join"), b -> {
+    protected final TabList tabList = new TabList(accessor).add(LegacyTabButton.Type.LEFT, Component.translatable("legacy.menu.load"), b -> repositionElements()).add(LegacyTabButton.Type.MIDDLE, Component.translatable("legacy.menu.create"), b -> repositionElements()).add(LegacyTabButton.Type.RIGHT, (t, guiGraphics, i, j, f) -> t.renderString(guiGraphics, font, canNotifyOnlineFriends() ? 0xFFFFFFFF : CommonColor.GRAY_TEXT.get(), canNotifyOnlineFriends()), Component.translatable("legacy.menu.join"), b -> {
         if (this.minecraft.options.skipMultiplayerWarning)
             repositionElements();
         else
@@ -132,8 +129,13 @@ public class PlayGameScreen extends PanelVListScreen implements ControlTooltip.E
     }
 
     @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget)
+            widget.setHeight(accessor.getInteger("buttonsHeight", 30));
+    }
+
+    @Override
     public void renderableVListInit() {
-        initRenderableVListHeight(30);
         getRenderableVList().init(panel.x + 15, panel.y + 15, panel.width - 30, panel.height - 30 - (hasStorageBar() ? 21 : 0));
         if (!hasTabList())
             serverRenderableList.init("serverRenderableVList", panel.x + 15, panel.y + 15, panel.width - 30, panel.height - 30 - (hasStorageBar() ? 21 : 0));

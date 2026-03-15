@@ -42,7 +42,6 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class KeyboardScreen extends OverlayPanelScreen {
@@ -218,7 +217,7 @@ public class KeyboardScreen extends OverlayPanelScreen {
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(panel.getX() + (panel.getWidth() - font.width(KEYBOARD) * 1.5f) / 2, panel.getY() + 8);
         guiGraphics.pose().scale(1.5f, 1.5f);
-        guiGraphics.drawString(font, KEYBOARD, 0, 0, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        guiGraphics.drawString(font, KEYBOARD, 0, 0, CommonColor.GRAY_TEXT.get(), false);
         guiGraphics.pose().popMatrix();
     }
 

@@ -1,39 +1,46 @@
 package wily.legacy.client.screen;
 
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.util.FormattedCharSequence;
 import wily.legacy.client.ContentManager;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.screen.ControlTooltip;
-import wily.legacy.client.screen.Panel;
-import wily.legacy.client.screen.PanelVListScreen;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.util.List;
 
 public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTooltip.Event {
-    
-    public boolean isLoading = false;
+
     private static final Component TITLE_LABEL = Component.translatable("legacy.menu.store_title");
-    private final LogoRenderer logoRenderer = new LogoRenderer(false);
+    private static final Component STORE_NO_CONTENT = Component.translatable("legacy.menu.store_no_content");
+    private final Panel panelRecess;
+    private boolean warnNoContent = false;
+    public boolean isLoading = false;
 
     public Legacy4JStoreScreen(Screen parent, List<ContentManager.Category> categories) {
         super(s -> Panel.createPanel(s, 
-                p -> p.appearance(372, 249), 
-                p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + 17)), 
-                Component.empty()
+                p -> p.appearance(310, 232),
+                p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + 26)),
+                TITLE_LABEL
         );
+        panelRecess = Panel.createPanel(this,
+                p -> p.appearance(LegacySprites.PANEL_RECESS, panel.getWidth() - 22, panel.getHeight() - 40),
+                p -> p.pos(panel.getX() + 11, panel.getY() + 31));
         this.parent = parent;
         renderableVList.layoutSpacing(l -> 0);        
-        
+
+        if (categories.isEmpty()) {
+            warnNoContent = true;
+            return;
+        }
+
         // Loop through the categories provided and create buttons
         for (ContentManager.Category category : categories) {
             addMenuButton(category.title(), b -> {
@@ -54,49 +61,54 @@ public class Legacy4JStoreScreen extends PanelVListScreen implements ControlTool
         }
     }
 
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (warnNoContent) {
+            minecraft.setScreen(ConfirmationScreen.createInfoScreen(this, TITLE_LABEL, Component.translatable("legacy.menu.store_no_content_message")));
+            warnNoContent = false;
+        }
+    }
+
+    @Override
+    protected void panelInit() {
+        super.panelInit();
+        addRenderableOnly(panelRecess);
+        panelRecess.init("panelRecess");
+    }
+
     private void addMenuButton(Component name, Button.OnPress onPress) {
-        renderableVList.addRenderable(new LeftAlignedButton(324, 36, name, onPress)); 
+        renderableVList.addRenderable(new LeftAlignedButton(324, 30, name, onPress));
+    }
+
+    @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget)
+            widget.setHeight(accessor.getInteger("buttonsHeight", 30));
+    }
+
+    @Override
+    public Component getTitle() {
+        return getRenderableVList().renderables.isEmpty() ? STORE_NO_CONTENT : super.getTitle();
     }
 
     @Override
     public void renderableVListInit() {
-        initRenderableVListHeight(36);
-        
         addRenderableOnly((guiGraphics, i, j, f) -> {
-            guiGraphics.blitSprite(
-                RenderPipelines.GUI_TEXTURED, 
-                LegacySprites.PANEL_RECESS, 
-                panel.getX() + 14, 
-                panel.getY() + 10, 
-                panel.getWidth() - 29,
-                panel.getHeight() - 20
-            );
-            
-            UIAccessor accessor = UIAccessor.of(this);
-            guiGraphics.pose().pushMatrix();
-            
-            float textScale = 1.2f;            
-            int scaledTextWidth = (int)(font.width(TITLE_LABEL) * textScale);
-            int centeredX = panel.getX() + (panel.getWidth() - scaledTextWidth) / 2;             
-            guiGraphics.pose().translate(
-                accessor.getInteger("titleLabel.x", centeredX), 
-                accessor.getInteger("titleLabel.y", panel.getY() + 19)
-            );            
-            guiGraphics.pose().scale(textScale, textScale);
-            
-            if (LegacyOptions.getUIMode().isSD()) guiGraphics.pose().scale(0.5f, 0.5f);
-            
-            guiGraphics.drawString(font, TITLE_LABEL, 0, 0, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-            guiGraphics.pose().popMatrix();
+            int y = panelRecess.y + 8;
+            for (FormattedCharSequence formattedCharSequence : font.split(getTitle(), getRenderableVList().listWidth - 10)) {
+                guiGraphics.drawString(font, formattedCharSequence, panel.getX() + (panel.getWidth() - font.width(formattedCharSequence)) / 2, y, CommonColor.GRAY_TEXT.get(), false);
+                y += 12;
+            }
         });
-
-        getRenderableVList().init("renderableVList", panel.getX() + 24, panel.getY() + 32, 324, 180);
+        getRenderableVList().init("renderableVList", panel.getX() + 10, panel.getY() + 21, panelRecess.getWidth() - 20, 160);
     }
 
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
-        logoRenderer.renderLogo(guiGraphics, this.width, 1.0f);
+        LegacyRenderUtil.renderLogo(guiGraphics);
         panel.render(guiGraphics, mouseX, mouseY, partialTick);
 
         if (isLoading) {

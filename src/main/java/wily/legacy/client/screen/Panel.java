@@ -1,19 +1,29 @@
 package wily.legacy.client.screen;
 
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.util.LegacySprites;
+import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Panel extends SimpleLayoutRenderable {
+    // For tooltip boxes
+    public static final BiFunction<Component, Integer, MultiLineLabel> labelsCache = Util.memoize((c, i) -> MultiLineLabel.create(Minecraft.getInstance().font, c, i));
+    public static final BiFunction<Component, Integer, MultiLineLabel> sdLabelsCache = Util.memoize((c, i) -> MultiLineLabel.create(Minecraft.getInstance().font, c.copy().withStyle(c.getStyle().withFont(LegacyFontUtil.MOJANGLES_11_FONT)), i));
     protected final UIAccessor accessor;
     public ResourceLocation panelSprite = LegacySprites.SMALL_PANEL;
     public String name;
@@ -82,12 +92,16 @@ public class Panel extends SimpleLayoutRenderable {
     }
 
     public static Panel tooltipBoxOf(Panel panel, int boxWidth) {
+        return tooltipBoxOf(panel, () -> boxWidth);
+    }
+
+    public static Panel tooltipBoxOf(Panel panel, Supplier<Integer> boxWidth) {
         Panel p = new Panel(panel.accessor) {
             @Override
             public void init(String name) {
                 super.init(name);
-                panel.x -= (boxWidth - 2) / 2;
-                appearance(LegacySprites.POINTER_PANEL, boxWidth, panel.height - 10);
+                panel.x -= (boxWidth.get() - 2) / 2;
+                appearance(LegacySprites.POINTER_PANEL, boxWidth.get(), panel.height - 10);
                 pos(panel.x + panel.width - 2, panel.y + 5);
             }
 
@@ -103,6 +117,10 @@ public class Panel extends SimpleLayoutRenderable {
         };
         p.init();
         return p;
+    }
+
+    public void renderTooltipBox(Panel panel) {
+
     }
 
     public int centeredLeftPos(Screen screen) {
@@ -123,7 +141,9 @@ public class Panel extends SimpleLayoutRenderable {
     }
 
     public void pos(int x, int y) {
-        setPosition(accessor.putStaticElement(name + ".x", accessor.getInteger(name + ".x", x)), accessor.putStaticElement(name + ".y", accessor.getInteger(name + ".y", y)));
+        setX(x);
+        setY(y);
+        setPosition(accessor.putIntegerBearer(name + ".x", Bearer.of(this::getX, this::setX)), accessor.putIntegerBearer(name + ".y", Bearer.of(this::getY, this::setY)));
     }
 
     public void centered(Screen screen) {

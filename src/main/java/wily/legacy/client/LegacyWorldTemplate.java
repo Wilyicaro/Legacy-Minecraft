@@ -26,15 +26,16 @@ import java.util.Optional;
 
 public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon, String worldTemplate,
                                   String folderName, boolean directJoin, boolean isLocked, boolean isGamePath, boolean preDownload,
-                                  Optional<String> albumId, Optional<URI> downloadURI, Optional<String> checkSum) {
-    public static final Codec<LegacyWorldTemplate> CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.getComponentCodec().fieldOf("buttonMessage").forGetter(LegacyWorldTemplate::buttonMessage), ResourceLocation.CODEC.fieldOf("icon").forGetter(LegacyWorldTemplate::icon), Codec.STRING.fieldOf("templateLocation").forGetter(LegacyWorldTemplate::worldTemplate), Codec.STRING.fieldOf("folderName").forGetter(LegacyWorldTemplate::folderName), Codec.BOOL.optionalFieldOf("directJoin", false).forGetter(LegacyWorldTemplate::directJoin), Codec.BOOL.optionalFieldOf("isLocked", false).forGetter(LegacyWorldTemplate::isLocked), Codec.BOOL.optionalFieldOf("isGamePath", false).forGetter(LegacyWorldTemplate::isGamePath), Codec.BOOL.optionalFieldOf("preDownload", false).forGetter(LegacyWorldTemplate::preDownload), Codec.STRING.optionalFieldOf("resourceAlbum").forGetter(LegacyWorldTemplate::albumId), Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("downloadURI").forGetter(LegacyWorldTemplate::downloadURI)).apply(i, LegacyWorldTemplate::create));
+                                  Optional<String> albumId, Optional<URI> downloadURI, Optional<URI> checksumURI, Optional<String> checkSum) {
+    public static final Codec<LegacyWorldTemplate> CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.getComponentCodec().fieldOf("buttonMessage").forGetter(LegacyWorldTemplate::buttonMessage), ResourceLocation.CODEC.fieldOf("icon").forGetter(LegacyWorldTemplate::icon), Codec.STRING.fieldOf("templateLocation").forGetter(LegacyWorldTemplate::worldTemplate), Codec.STRING.fieldOf("folderName").forGetter(LegacyWorldTemplate::folderName), Codec.BOOL.optionalFieldOf("directJoin", false).forGetter(LegacyWorldTemplate::directJoin), Codec.BOOL.optionalFieldOf("isLocked", false).forGetter(LegacyWorldTemplate::isLocked), Codec.BOOL.optionalFieldOf("isGamePath", false).forGetter(LegacyWorldTemplate::isGamePath), Codec.BOOL.optionalFieldOf("preDownload", false).forGetter(LegacyWorldTemplate::preDownload), Codec.STRING.optionalFieldOf("resourceAlbum").forGetter(LegacyWorldTemplate::albumId), Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("downloadURI").forGetter(LegacyWorldTemplate::downloadURI), Codec.STRING.xmap(URI::create, URI::toString).optionalFieldOf("checksumURI").forGetter(LegacyWorldTemplate::checksumURI), Codec.STRING.optionalFieldOf("checksum").forGetter(LegacyWorldTemplate::checkSum)).apply(i, LegacyWorldTemplate::create));
     public static final Codec<List<LegacyWorldTemplate>> LIST_CODEC = CODEC.listOf();
     public static final List<LegacyWorldTemplate> list = new ArrayList<>();
     private static final String TEMPLATES = "world_templates.json";
 
-    public static LegacyWorldTemplate create(Component buttonMessage, ResourceLocation icon, String worldTemplate, String folderName, boolean directJoin, boolean isLocked, boolean isGamePath, boolean delayDownload, Optional<String> albumId, Optional<URI> compoundDownloadURI) {
+    public static LegacyWorldTemplate create(Component buttonMessage, ResourceLocation icon, String worldTemplate, String folderName, boolean directJoin, boolean isLocked, boolean isGamePath, boolean delayDownload, Optional<String> albumId, Optional<URI> compoundDownloadURI, Optional<URI> checksumURI, Optional<String> checksum) {
         Optional<String[]> splitURI = compoundDownloadURI.map(u -> u.toString().split("\\?checksum="));
-        return new LegacyWorldTemplate(buttonMessage, icon, worldTemplate, folderName, directJoin, isLocked, isGamePath, delayDownload, albumId, splitURI.map(s -> URI.create(s[0])), splitURI.map(s -> s.length < 2 ? null : s[1]));
+        Optional<URI> downloadURI = splitURI.map(s -> URI.create(s[0]));
+        return new LegacyWorldTemplate(buttonMessage, icon, worldTemplate, folderName, directJoin, isLocked, isGamePath, delayDownload, albumId, downloadURI, checksumURI.or(() -> downloadURI.map(uri -> URI.create(downloadURI.get() + ".md5"))), checksum.or(() -> splitURI.map(s -> s.length < 2 ? null : s[1])));
     }
 
     public Path getPath() {
@@ -49,19 +50,23 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
         }
     }
 
-    public Path getValidPath() {
+    public Path getDownloadPath() {
         if (!isGamePath || downloadURI.isEmpty()) return null;
+
         Path path = getPath();
+
+        if (checkSum().isEmpty()) return path;
+
         boolean exists = Files.exists(path);
         String checksum;
-        if (exists && checkSum().isEmpty() || (exists && checkSum().get().equals(readFileCheckSum(path))) || (checksum = readCheckSum(path)) == null || !checkSum().get().equals(checksum))
+        if (exists && checkSum().get().equals(readFileCheckSum(path)) || (checksum = readCheckSum(path)) == null || !checkSum().get().equals(checksum))
             return null;
 
         return path;
     }
 
     public void downloadToPathIfPossible() {
-        Path path = getValidPath();
+        Path path = getDownloadPath();
         if (path == null) return;
         try (InputStream stream = downloadURI.get().toURL().openStream()) {
             Files.deleteIfExists(path);
@@ -73,7 +78,9 @@ public record LegacyWorldTemplate(Component buttonMessage, ResourceLocation icon
     }
 
     public String readCheckSum(Path path) {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(URI.create(downloadURI.get() + ".md5").toURL().openStream()))) {
+        if (checksumURI.isEmpty()) return null;
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(checksumURI().get().toURL().openStream()))) {
             return reader.readLine().trim();
         } catch (IOException e) {
             Legacy4J.LOGGER.warn("Error when reading checksum from world template {}: {}", path, e.getMessage());

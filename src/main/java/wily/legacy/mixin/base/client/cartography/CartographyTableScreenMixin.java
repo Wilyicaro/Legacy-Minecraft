@@ -151,10 +151,10 @@ public abstract class CartographyTableScreenMixin extends AbstractContainerScree
     public void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         LegacyFontUtil.applySDFont(b -> {
             super.renderLabels(guiGraphics, i, j);
-            guiGraphics.drawString(font, LegacyComponents.MAP_NAME, inventoryLabelX, b ? 18 : 27, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            guiGraphics.drawString(font, LegacyComponents.MAP_NAME, inventoryLabelX, b ? 18 : 27, CommonColor.GRAY_TEXT.get(), false);
             Component cartographyAction = getCartographyAction();
             if (cartographyAction != null)
-                guiGraphics.drawString(font, cartographyAction, (imageWidth - font.width(cartographyAction)) / 2, b ? 86 : 130, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                guiGraphics.drawString(font, cartographyAction, (imageWidth - font.width(cartographyAction)) / 2, b ? 86 : 130, CommonColor.GRAY_TEXT.get(), false);
         });
     }
 

@@ -15,19 +15,27 @@
       "width": 370,
       "height": 200,
       "hasBackground": false,
+      "lineHeight": 8,
       "elements": {
         "text": {
           "type": "draw_multiline_string",
-          "component": {"translate": "legacy.menu.newerVersion"},
+          "component": {
+            "translate": "legacy.menu.newerVersion",
+            "font": "legacy:default_11"
+          },
           "shadow": false,
           "color": "${commonColor.inventory_gray_text}",
+          "lineHeight": 8,
           "width": 348
         },
         "text1": {
           "type": "draw_multiline_string",
-          "component": {"baseDir": "legacy:changelog"},
+          "component": {
+            "reference": "legacy.changelog"
+          },
           "shadow": false,
           "color": "${commonColor.inventory_gray_text}",
+          "lineHeight": 8,
           "width": 348
         }
       }

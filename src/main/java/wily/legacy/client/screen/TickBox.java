@@ -12,6 +12,7 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.RenderableVListEntry;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -20,7 +21,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class TickBox extends AbstractButton {
+public class TickBox extends AbstractButton implements RenderableVListEntry {
     protected final Function<Boolean, Component> message;
     private final Consumer<TickBox> onPress;
     public boolean selected;
@@ -84,7 +85,7 @@ public class TickBox extends AbstractButton {
         FactoryGuiGraphics.of(guiGraphics).setBlitColor(1.0f, 1.0f, 1.0f, 1.0F);
         guiGraphics.pose().pushMatrix();
         if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.4f, 0.4f);
-        this.renderString(guiGraphics, minecraft.font, isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get());
+        this.renderString(guiGraphics, minecraft.font, isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.GRAY_TEXT.get());
         guiGraphics.pose().popMatrix();
     }
 
@@ -122,5 +123,10 @@ public class TickBox extends AbstractButton {
             }
         }
         return false;
+    }
+
+    @Override
+    public void initRenderable(RenderableVList list) {
+        updateHeight();
     }
 }

@@ -1,7 +1,7 @@
 {
   "layout":
   [
-    {"chars":"1¹","shiftChars":"~"},{"chars":"2²","shiftChars":"!¡"},{"chars":"3³","shiftChars":"@"},{"chars":"4£","shiftChars":"#"},{"chars":"5¢","shiftChars":"$"},{"chars":"6¬","shiftChars":"%"},{"chars":"7","shiftChars":"^"},{"chars":"8","shiftChars":"*"},{"chars":"9","shiftChars":"("},{"chars":"0","shiftChars":")"},
+    {"chars":"1¹","shiftChars":"~"},{"chars":"2²","shiftChars":"!¡"},{"chars":"3³","shiftChars":"@"},{"chars":"4£","shiftChars":"#"},{"chars":"5¢","shiftChars":"$"},{"chars":"6¬","shiftChars":"%"},{"chars":"7","shiftChars":"&^"},{"chars":"8","shiftChars":"*"},{"chars":"9","shiftChars":"("},{"chars":"0","shiftChars":")"},
     {"chars":"q","shiftChars":"Q"},{"chars":"w","shiftChars":"W"},{"chars":"eéê","shiftChars":"EÉÊ"},{"chars":"r","shiftChars":"R"},{"chars":"t","shiftChars":"T"},{"chars":"y","shiftChars":"Y"},{"chars":"uúùû","shiftChars":"UÚÙÛ"},{"chars":"iíìî","shiftChars":"IÍÌÎ"},{"chars":"oóôõ","shiftChars":"OÓÔÕ"},{"chars":"p","shiftChars":"P"},
     {"chars":"aáàâãäå","shiftChars":"AÁÀÂÃÄÅÆ"},{"chars":"s","shiftChars":"S"},{"chars":"d","shiftChars":"D"},{"chars":"f","shiftChars":"F"},{"chars":"g","shiftChars":"G"},{"chars":"h","shiftChars":"H"},{"chars":"j","shiftChars":"J"},{"chars":"k","shiftChars":"K"},{"chars":"l","shiftChars":"L"},{"chars":";","shiftChars":":"},
     {"chars":"z","shiftChars":"Z"},{"chars":"x","shiftChars":"X"},{"chars":"cç","shiftChars":"CÇ"},{"chars":"v","shiftChars":"V"},{"chars":"b","shiftChars":"B"},{"chars":"n","shiftChars":"N"},{"chars":"m","shiftChars":"M"},{"chars":",","shiftChars":"<"},{"chars":".","shiftChars":">"},{"chars":"/","shiftChars":"?¿"},

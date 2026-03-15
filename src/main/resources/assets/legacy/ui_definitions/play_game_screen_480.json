@@ -1,7 +1,9 @@
 {
   "targetUI": "wily.legacy.client.screen.PlayGameScreen",
   "targetType": "class",
-  "applyCondition": { "reference": "uiMode.sd" },
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
   "elements": {
     "panel.width": {
       "type": "put_number",
@@ -42,7 +44,10 @@
     "tabList.offset": {
       "type": "put_tab_state_offset",
       "value": {
-        "unselected": [0, 1.4]
+        "unselected": [
+          0,
+          1.4
+        ]
       }
     },
     "panelRecess.sprite": {

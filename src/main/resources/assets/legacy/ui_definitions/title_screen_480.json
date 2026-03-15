@@ -1,6 +1,8 @@
 {
   "targetUI": "minecraft:title_screen",
-  "applyCondition": { "reference": "uiMode.sd" },
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
   "elements": {
     "buttonsHeight": {
       "type": "put_number",

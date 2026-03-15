@@ -19,6 +19,7 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.RenderableVListEntry;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -26,6 +27,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class RenderableVList {
@@ -130,11 +132,7 @@ public class RenderableVList {
     }
 
     public RenderableVList addCategory(Component title) {
-        addRenderable(new SimpleLayoutRenderable(listWidth, 13) {
-            public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-                LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(Minecraft.getInstance().font, title, this.getX() + 1, this.getY() + 4, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
-            }
-        });
+        addRenderable(new LayoutText(title, CommonColor.GRAY_TEXT, () -> LegacyOptions.getUIMode().isSD() ? 9 : 13));
         return this;
     }
 
@@ -210,7 +208,10 @@ public class RenderableVList {
         renderablesCount = 0;
         for (int i = scrolledList.get(); i < renderables.size(); i++) {
             Renderable r = renderables.get(i);
-            if (r instanceof TickBox tick) tick.updateHeight();
+            if (getScreen() instanceof Access access)
+                access.initRenderableVListEntry(this, r);
+            if (r instanceof RenderableVListEntry widget)
+                widget.initRenderable(this);
             if (!allowScroll || !(r instanceof LayoutElement l) || yDiff + l.getHeight() + (i == renderables.size() - 1 && scrolledList.get() == 0 ? 0 : 12) <= this.listHeight) {
                 if (r instanceof LayoutElement l) {
                     boolean changeRow = forceWidth || xDiff + l.getWidth() > this.listWidth;
@@ -389,11 +390,7 @@ public class RenderableVList {
             }
         }
 
-        default void initRenderableVListHeight(int height) {
-            for (Renderable renderable : getRenderableVList().renderables) {
-                if (renderable instanceof AbstractWidget widget)
-                    widget.setHeight(getRenderableVList().accessor.getInteger("buttonsHeight", height));
-            }
+        default void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
         }
 
         List<RenderableVList> getRenderableVLists();
@@ -406,6 +403,32 @@ public class RenderableVList {
                 if (renderableVList.isHovered(x, y)) return renderableVList;
             }
             return null;
+        }
+    }
+
+    public static class LayoutText extends SimpleLayoutRenderable implements RenderableVListEntry {
+        public final Component text;
+        public final Supplier<Integer> color;
+        public final Supplier<Integer> heightSupplier;
+
+        public LayoutText(Component text, Supplier<Integer> color) {
+            this(text, color, () -> LegacyOptions.getUIMode().isSD() ? 9 : 13);
+        }
+
+        public LayoutText(Component text, Supplier<Integer> color, Supplier<Integer> height) {
+            this.text = text;
+            this.color = color;
+            this.heightSupplier = height;
+        }
+
+        @Override
+        public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+            LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(Minecraft.getInstance().font, text, this.getX() + 1, this.getY() + (LegacyOptions.getUIMode().isSD() ? 2 : 4), color.get(), false));
+        }
+
+        @Override
+        public void initRenderable(RenderableVList list) {
+            this.height = heightSupplier.get();
         }
     }
 }

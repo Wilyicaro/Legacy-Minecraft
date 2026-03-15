@@ -9,6 +9,9 @@ import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -16,6 +19,7 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.GsonHelper;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIPlatform;
+import wily.factoryapi.base.client.UIDefinition;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.controller.ControllerBinding;
@@ -29,8 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public class LegacyResourceManager implements ResourceManagerReloadListener {
@@ -45,9 +48,11 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
     public static final String COMMON_VALUES = "common_values.json";
     public static final String DEFAULT_KBM_ICONS = "control_tooltips/icons/kbm.json";
     public static final String DEFAULT_CONTROLLER_ICONS = "control_tooltips/icons/controller.json";
+    public static final ResourceLocation DEFAULT_CHANGELOG_PATH = Legacy4J.createModLocation("changelog");
     public static final List<KeyboardScreen.CharButtonBuilder> keyboardButtonBuilders = new ArrayList<>();
     public static LegacyIntro intro = LegacyIntro.EMPTY;
     public static ControllerBinding<?> shiftBinding;
+    public static MutableComponent WHATS_NEW_COMPONENT = Component.empty();
 
     public static void setKeyboardLayout(Resource resource) {
         try {
@@ -133,6 +138,7 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
         CommonValue.COMMON_VALUES.forEach((s, c) -> c.reset());
         CommonColor.COMMON_COLORS.forEach((s, c) -> c.reset());
         resourceManager.getResource(DEFAULT_KEYBOARD_LAYOUT_LOCATION).ifPresent(LegacyResourceManager::setKeyboardLayout);
+        String langKey = minecraft.getLanguageManager().getLanguage(minecraft.getLanguageManager().getSelected()) != null ? minecraft.getLanguageManager().getSelected() : "en_us";
         IOUtil.getOrderedNamespaces(resourceManager).forEach(name -> {
             resourceManager.getResource(FactoryAPI.createLocation(name, COMMON_COLORS)).ifPresent(r -> {
                 try {
@@ -194,8 +200,22 @@ public class LegacyResourceManager implements ResourceManagerReloadListener {
                 else addControllerIcons(resourceManager, location, value.icons()::put);
             }
 
-            String langKey = minecraft.getLanguageManager().getLanguage(minecraft.getLanguageManager().getSelected()) != null ? minecraft.getLanguageManager().getSelected() : "en_us";
             resourceManager.getResource(FactoryAPI.createLocation(name, "keyboard_layout/%s.json".formatted(langKey))).ifPresent(LegacyResourceManager::setKeyboardLayout);
+        });
+
+        ResourceLocation location = DEFAULT_CHANGELOG_PATH.withSuffix("/" + langKey + ".txt");
+        Optional<Resource> externalComponent = Minecraft.getInstance().getResourceManager().getResource(location);
+        WHATS_NEW_COMPONENT = Component.empty();
+        externalComponent.ifPresent((resource) -> {
+            try (BufferedReader reader = resource.openAsReader()) {
+                reader.lines().forEach((l) -> {
+                    WHATS_NEW_COMPONENT.append(l);
+                    WHATS_NEW_COMPONENT.append("\n");
+                });
+            } catch (IOException e) {
+                FactoryAPI.LOGGER.warn("Failed to parse {}, this external component won't be loaded.", location, e);
+            }
+
         });
     }
 

@@ -2,7 +2,9 @@ package wily.legacy.client.screen;
 
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
@@ -12,7 +14,6 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.KnownListing;
 import wily.legacy.client.LegacyOptions;
-import wily.legacy.client.controller.Controller;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
@@ -123,10 +124,15 @@ public class ConfirmationScreen extends OverlayPanelScreen implements Renderable
     }
 
     @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget)
+            widget.setHeight(accessor.getInteger("buttonsHeight", LegacyOptions.getUIMode().isSD() ? 18 : 20));
+    }
+
+    @Override
     public void renderableVListInit() {
         messageYOffset.set(title.getString().isEmpty() ? LegacyOptions.getUIMode().isSD() ? 6 : 15 : LegacyOptions.getUIMode().isSD() ? 18 : 35);
         int listWidth = LegacyOptions.getUIMode().isSD() ? panel.width - 12 : panel.width - 30;
-        initRenderableVListHeight(LegacyOptions.getUIMode().isSD() ? 18 : 20);
         renderableVList.init(panel.x + (panel.width - listWidth) / 2, panel.y + panel.height - renderableVList.renderables.size() * (LegacyOptions.getUIMode().isSD() ? 19 : 22) - (LegacyOptions.getUIMode().isSD() ? 6 : 8), listWidth, 0);
     }
 
@@ -146,8 +152,8 @@ public class ConfirmationScreen extends OverlayPanelScreen implements Renderable
         super.render(guiGraphics, i, j, f);
         int textX = panel.x + (panel.width - messageLabel.width) / 2;
         LegacyFontUtil.applySDFont(b -> {
-            LegacyRenderUtil.renderScrollingString(guiGraphics, font, title, textX, panel.y + (b ? 6 : 15), textX + messageLabel.width, panel.y + (b ? 6 : 15) + 11, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-            messageLabel.withPos(textX, panel.y + messageYOffset.get()).withColor(CommonColor.INVENTORY_GRAY_TEXT.get()).withShadow(false).render(guiGraphics, i, j, f);
+            LegacyRenderUtil.renderScrollingString(guiGraphics, font, title, textX, panel.y + (b ? 6 : 15), textX + messageLabel.width, panel.y + (b ? 6 : 15) + 11, CommonColor.GRAY_TEXT.get(), false);
+            messageLabel.withPos(textX, panel.y + messageYOffset.get()).withColor(CommonColor.GRAY_TEXT.get()).withShadow(false).render(guiGraphics, i, j, f);
         });
     }
 

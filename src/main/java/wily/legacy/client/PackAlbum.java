@@ -47,7 +47,6 @@ import wily.legacy.client.screen.*;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.LegacySprites;
-import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
 
@@ -56,7 +55,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -293,8 +291,6 @@ public record PackAlbum(String id, int version, Component displayName, Component
         private static final Map<String, ResourceLocation> packIcons = Maps.newHashMap();
         private static final Map<String, ResourceLocation> packBackgrounds = Maps.newHashMap();
         public final Stocker.Sizeable scrolledList;
-        public static final BiFunction<Component, Integer, MultiLineLabel> labelsCache = Util.memoize((c, i) -> MultiLineLabel.create(Minecraft.getInstance().font, c, i));
-        public static final BiFunction<Component, Integer, MultiLineLabel> sdLabelsCache = Util.memoize((c, i) -> MultiLineLabel.create(Minecraft.getInstance().font, c.copy().withStyle(c.getStyle().withFont(LegacyFontUtil.MOJANGLES_11_FONT)), i));
         protected final PackAlbum initialAlbum;
         protected final List<String> oldSelection;
         protected final LegacyScrollRenderer scrollRenderer = new LegacyScrollRenderer();
@@ -442,11 +438,11 @@ public record PackAlbum(String id, int version, Component displayName, Component
                 int nameWidth = width - 53;
                 int lineHeight = sd ? 8 : 12;
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4, x + 40 + nameWidth, y + 44);
-                (sd ? sdLabelsCache : labelsCache).apply(getSelectedAlbum().displayName(), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
+                (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(getSelectedAlbum().displayName(), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
                 graphics.disableScissor();
                 ResourceLocation background = getSelectedAlbum().backgroundSprite.orElse(p ? getPackBackground(packRepository.getPack(getSelectedAlbum().getDisplayPackId())) : null);
                 int descriptionWidth = width - 16;
-                MultiLineLabel label = (sd ? sdLabelsCache : labelsCache).apply(getSelectedAlbum().description(), descriptionWidth);
+                MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(getSelectedAlbum().description(), descriptionWidth);
                 int descriptionFromBottom = sd ? 52 : 78;
                 int visibleLines = (height - 50 - (background == null ? 0 : descriptionFromBottom)) / lineHeight;
                 scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - visibleLines);
@@ -630,7 +626,7 @@ public record PackAlbum(String id, int version, Component displayName, Component
             }
             guiGraphics.pose().pushMatrix();
             if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.4f, 0.4f);
-            guiGraphics.drawString(font, getMessage(), getX() + 2, getY(), isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(), isHoveredOrFocused());
+            guiGraphics.drawString(font, getMessage(), getX() + 2, getY(), isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.GRAY_TEXT.get(), isHoveredOrFocused());
             guiGraphics.pose().popMatrix();
             if (scrolledList.max > 0) {
                 if (scrolledList.get() < scrolledList.max)

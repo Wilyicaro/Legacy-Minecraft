@@ -16,6 +16,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import wily.factoryapi.base.Stocker;
 import wily.legacy.client.ControlType;
@@ -28,10 +29,9 @@ import wily.legacy.util.client.LegacySoundUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMenuAccess<AbstractContainerMenu> {
-    public static final Container layerSelectionGrid = new SimpleContainer(50);
+    public static final Container itemGrid = new SimpleContainer(50);
     public final List<ItemStack> layerItems = new ArrayList<>();
     public final List<LegacySlotWidget> slotWidgets = new ArrayList<>();
     protected final Stocker.Sizeable scrolledList = new Stocker.Sizeable(0);
@@ -54,13 +54,10 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
                 return false;
             }
         };
-        for (int i = 0; i < layerSelectionGrid.getContainerSize(); i++) {
-            menu.slots.add(LegacySlotDisplay.override(new Slot(layerSelectionGrid, i, 23 + i % 10 * 27, 24 + i / 10 * 27), new LegacySlotDisplay() {
+        for (int i = 0; i < itemGrid.getContainerSize(); i++) {
+            menu.slots.add(LegacySlotDisplay.override(new Slot(itemGrid, i, 23 + i % 10 * 27, 24 + i / 10 * 27), new LegacySlotDisplay() {
+                @Override
                 public int getWidth() {
-                    return 27;
-                }
-
-                public int getHeight() {
                     return 27;
                 }
             }));
@@ -69,7 +66,7 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
             slotWidgets.add(new LegacySlotWidget(slot));
         }
         addLayerItems();
-        scrolledList.max = Math.max(0, (layerItems.size() - 1) / layerSelectionGrid.getContainerSize());
+        scrolledList.max = Math.max(0, (layerItems.size() - 1) / itemGrid.getContainerSize());
     }
 
     protected void addLayerItems() {
@@ -85,9 +82,24 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
 
     @Override
     protected void init() {
-        panel.init();
-        scroller.setPosition(panel.x + 299, panel.y + 23);
-        scroller.offset(new Vec3(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.0f : 0.5f, 0, 0));
+        int slotX = accessor.getInteger("slots.x", 23);
+        int slotY = accessor.getInteger("slots.y", 24);
+        int slotSize = accessor.getInteger("slots.size", 27);
+
+        for (int i = 0; i < itemGrid.getContainerSize(); i++) {
+            LegacySlotDisplay.override(menu.slots.get(i), slotX + i % 10 * slotSize, slotY + i / 10 * slotSize, new LegacySlotDisplay() {
+                @Override
+                public int getWidth() {
+                    return slotSize;
+                }
+            });
+        }
+
+        super.init();
+        scroller.setPosition(accessor.getInteger("scroller.x", panel.x + 299), accessor.getInteger("scroller.y", panel.y + 23));
+        scroller.height = accessor.getInteger("scroller.height", 135);
+        scroller.width = accessor.getInteger("scroller.width", 13);
+        scroller.offset(new Vec2(LegacyRenderUtil.hasHorizontalArtifacts() ? 0.0f : 0.5f, 0));
         fillLayerGrid();
         for (LegacySlotWidget slotWidget : slotWidgets) {
             addWidget(slotWidget);
@@ -95,9 +107,9 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     }
 
     public void fillLayerGrid() {
-        for (int i = 0; i < layerSelectionGrid.getContainerSize(); i++) {
+        for (int i = 0; i < itemGrid.getContainerSize(); i++) {
             int index = scrolledList.get() * 50 + i;
-            layerSelectionGrid.setItem(i, layerItems.size() > index ? layerItems.get(index) : ItemStack.EMPTY);
+            itemGrid.setItem(i, layerItems.size() > index ? layerItems.get(index) : ItemStack.EMPTY);
         }
     }
 
@@ -154,6 +166,11 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
     }
 
     @Override
+    protected void panelInit() {
+        panel.init();
+    }
+
+    @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
         LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
         panel.render(guiGraphics, i, j, f);
@@ -176,7 +193,13 @@ public class ItemViewerScreen extends PanelBackgroundScreen implements LegacyMen
 
     @Override
     public ScreenRectangle getMenuRectangleLimit() {
-        return new ScreenRectangle(panel.x + 23, panel.y + 24, 10 * 27 - 2, 5 * 27 - 2);
+        Slot leftTopSlot = menu.slots.get(0);
+        Slot rightBottomSlot = menu.slots.get(itemGrid.getContainerSize() - 1);
+        return new ScreenRectangle(
+                panel.x + leftTopSlot.x,
+                panel.y + leftTopSlot.y,
+                rightBottomSlot.x - leftTopSlot.x + LegacySlotDisplay.of(rightBottomSlot).getWidth() - 2,
+                rightBottomSlot.y - leftTopSlot.y + LegacySlotDisplay.of(rightBottomSlot).getHeight() - 2);
     }
 
     @Override

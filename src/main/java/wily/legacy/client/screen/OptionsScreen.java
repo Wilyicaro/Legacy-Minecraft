@@ -421,6 +421,7 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyHearts),
                         o -> o.renderableVList.addMultSliderOption(LegacyOptions.hudDelay, 2),
                         o -> o.renderableVList.addOptions(
+                                LegacyOptions.screenshotToasts,
                                 LegacyOptions.systemMessagesAsOverlay,
                                 LegacyOptions.autoSaveCountdown,
                                 LegacyOptions.advancedHeldItemTooltip,
@@ -437,7 +438,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyIntroAndReloading,
                                 LegacyOptions.legacyLoadingAndConnecting,
                                 LegacyOptions.legacyPanorama,
-                                LegacyOptions.fakeAutosaveScreen),
+                                LegacyOptions.fakeAutosaveScreen,
+                                LegacyOptions.fakeManualSaveScreen),
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("options.chat.title"),
                                 LegacyOptions.of(mc.options.reducedDebugInfo()),

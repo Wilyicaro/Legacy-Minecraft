@@ -304,8 +304,8 @@ public abstract class PackSelectionScreenMixin extends Screen implements Control
         FactoryGuiGraphics.of(guiGraphics).clearBlitColor();
         FactoryScreenUtil.disableBlend();
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.PANEL_RECESS, panel.x + 210, panel.y + 10, 190, 220);
-        guiGraphics.drawString(this.font, SELECTED_PACK, panel.x + 10 + (190 - font.width(SELECTED_PACK)) / 2, panel.y + 18, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-        guiGraphics.drawString(this.font, AVAILABLE_PACK, panel.x + 210 + (190 - font.width(AVAILABLE_PACK)) / 2, panel.y + 18, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        guiGraphics.drawString(this.font, SELECTED_PACK, panel.x + 10 + (190 - font.width(SELECTED_PACK)) / 2, panel.y + 18, CommonColor.GRAY_TEXT.get(), false);
+        guiGraphics.drawString(this.font, AVAILABLE_PACK, panel.x + 210 + (190 - font.width(AVAILABLE_PACK)) / 2, panel.y + 18, CommonColor.GRAY_TEXT.get(), false);
         super.render(guiGraphics, i, j, f);
     }
 }

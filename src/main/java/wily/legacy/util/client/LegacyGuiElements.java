@@ -3,6 +3,7 @@ package wily.legacy.util.client;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Style;
 import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.ArbitrarySupplier;
 import wily.factoryapi.base.client.*;
@@ -93,6 +94,8 @@ public class LegacyGuiElements {
                 LegacyOptions.UIMode uiMode = LegacyOptions.UIMode.values()[i];
                 a.getElements().put("uiMode." + uiMode.getSerializedName(), () -> LegacyOptions.getUIMode() == uiMode);
             }
+
+            a.getElements().put("legacy.changelog", () -> LegacyResourceManager.WHATS_NEW_COMPONENT.withStyle(LegacyOptions.getUIMode().isSD() ? LegacyFontUtil.MOJANGLES_11_STYLE : LegacyFontUtil.DEFAULT_FONT_STYLE));
 
         }));
     }

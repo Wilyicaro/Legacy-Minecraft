@@ -8,8 +8,10 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FontDescription;
 import net.minecraft.util.Mth;
 import wily.legacy.Legacy4JClient;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacySoundUtil;
@@ -33,6 +35,7 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
     private int slidingMul = 1;
     private int lastSliderInput = -1;
     private double rangeMul = 1;
+    public Supplier<FontDescription> fontOverrideSupplier = () -> LegacyOptions.getUIMode().isSD() ? LegacyFontUtil.MOJANGLES_11_FONT : null;
 
     public LegacySliderButton(int i, int j, int k, int l, Function<LegacySliderButton<T>, Component> messageGetter, Function<LegacySliderButton<T>, Tooltip> tooltipSupplier, T initialValue, Function<LegacySliderButton<T>, T> valueGetter, Function<T, Double> valueSetter, Consumer<LegacySliderButton<T>> onChange, Supplier<T> objectValueSupplier) {
         super(i, j, k, l, Component.empty(), valueSetter.apply(initialValue));
@@ -130,7 +133,7 @@ public class LegacySliderButton<T> extends AbstractSliderButton {
 
     @Override
     protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-        LegacyFontUtil.applySDFont(b -> super.renderScrollingString(guiGraphics, font, i, j));
+        LegacyFontUtil.applyFontOverride(fontOverrideSupplier.get(), b -> super.renderScrollingString(guiGraphics, font, i, j));
     }
 
     @Override

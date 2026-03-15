@@ -29,10 +29,8 @@ public interface PlayerYBobbing {
         return Mth.lerp(partialTicks, oYBob(), yBob());
     }
 
-    default void handleYBobbing() {
-        if (this instanceof Player p) {
-            setOYBob(yBob());
-            setYBob(yBob() + ((!p.onGround() && !p.isDeadOrDying() ? (float) Math.atan(-p.getDeltaMovement().y * 0.2D) * 15.0F : 0) - yBob()) * 0.8F);
-        }
+    default void handleYBobbing(Player p) {
+        setOYBob(yBob());
+        setYBob(yBob() + ((!p.onGround() && !p.isDeadOrDying() ? (float) Math.atan(-p.getDeltaMovement().y * 0.2D) * 15.0F : 0) - yBob()) * 0.8F);
     }
 }

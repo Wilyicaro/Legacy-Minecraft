@@ -121,7 +121,7 @@ public class LegacyAdvancementsScreen extends PanelVListScreen implements TabLis
         panelRecess.init("panelRecess");
         addRenderableOnly(tabList::renderSelected);
         addRenderableOnly(((guiGraphics, i, j, f) -> {
-            LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(font, showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.getIndex()).getMessage() : getTitle(), panel.x + (panel.width - font.width(showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.getIndex()).getMessage() : getTitle())) / 2, panel.y + 10, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+            LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(font, showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.getIndex()).getMessage() : getTitle(), panel.x + (panel.width - font.width(showDescription && !tabList.tabButtons.isEmpty() ? tabList.tabButtons.get(tabList.getIndex()).getMessage() : getTitle())) / 2, panel.y + 10, CommonColor.GRAY_TEXT.get(), false));
             if (!displayInfos.isEmpty()) {
                 ResourceLocation background = displayInfos.get(tabList.getIndex()).getBackground().orElse(null).texturePath();
                 if (background != null)
