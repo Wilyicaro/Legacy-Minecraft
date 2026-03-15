@@ -151,7 +151,7 @@ public class ConfirmationScreen extends OverlayPanelScreen implements Renderable
         });
     }
 
-    public static class SaveInfoScreen extends ConfirmationScreen implements Controller.Event, ControlTooltip.Event {
+    public static class SaveInfoScreen extends ConfirmationScreen {
         public SaveInfoScreen(Screen parent) {
             super(parent, () -> LegacyOptions.getUIMode().isSD() ? 200 : 275, () -> LegacyOptions.getUIMode().isSD() ? 92 : 130, () -> 0, () -> LegacyOptions.getUIMode().isSD() ? 0 : 25, Component.empty(), w -> w.messageLabel.lineSpacing(LegacyOptions.getUIMode().isSD() ? 8 : 12).withLines(LegacyComponents.AUTOSAVE_MESSAGE, LegacyOptions.getUIMode().isSD() ? 176 : 220), LegacyScreen::onClose);
         }
@@ -178,8 +178,7 @@ public class ConfirmationScreen extends OverlayPanelScreen implements Renderable
 
         @Override
         public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
-            LegacyRenderUtil.renderPanorama(guiGraphics);
-            LegacyRenderUtil.renderLogo(guiGraphics);
+            LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics);
         }
 
         public void render(GuiGraphics guiGraphics, int i, int j, float f) {
