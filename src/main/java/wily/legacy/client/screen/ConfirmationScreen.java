@@ -115,6 +115,12 @@ public class ConfirmationScreen extends OverlayPanelScreen implements Renderable
                 return false;
             }
 
+            @Override
+            public void renderDefaultBackground(GuiGraphics guiGraphics, int i, int j, float f) {
+                LegacyRenderUtil.renderPanorama(guiGraphics);
+                LegacyRenderUtil.renderLogo(guiGraphics);
+            }
+
             public void render(GuiGraphics guiGraphics, int i, int j, float f) {
                 super.render(guiGraphics, i, j, f);
                 LegacyRenderUtil.drawAutoSavingIcon(guiGraphics, panel.x + (panel.width - 24) / 2, panel.y + (LegacyOptions.getUIMode().isSD() ? 28 : 36));

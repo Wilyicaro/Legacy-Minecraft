@@ -15,6 +15,7 @@ import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
+import org.joml.Matrix3x2f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,6 +23,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4J;
@@ -58,26 +60,26 @@ public class GuiRendererMixin {
     @Inject(method = "<init>", at = @At("TAIL"))
     void initTail(GuiRenderState guiRenderState, MultiBufferSource.BufferSource bufferSource, SubmitNodeCollector submitNodeCollector, FeatureRenderDispatcher featureRenderDispatcher, List list, CallbackInfo ci) {
         guiEntityRenderers = List.of(
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
                 new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher())
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
+//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher())
         );
     }
 

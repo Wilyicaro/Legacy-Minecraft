@@ -255,9 +255,11 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
                 return;
             }
             ControlTooltip.Icon icon = getIcon();
-            FactoryScreenUtil.enableBlend();
-            icon.render(guiGraphics, getX() + width - 20 - icon.getWidth() / 2, getY() + (height - font.lineHeight) / 2 + 1, false);
-            FactoryScreenUtil.disableBlend();
+            if (icon != null) {
+                FactoryScreenUtil.enableBlend();
+                icon.render(guiGraphics, getX() + width - 20 - icon.getWidth() / 2, getY() + (height - font.lineHeight) / 2 + 1, false);
+                FactoryScreenUtil.disableBlend();
+            }
         }
 
         private boolean isPressed() {
