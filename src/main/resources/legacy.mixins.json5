@@ -88,6 +88,7 @@
     "client.KeyboardControllerInputMixin",
     "client.KeyboardHandlerMixin",
     "client.KeyMappingMixin",
+    "client.CrouchToggleMixin",
     "client.LegacyLoadingMessageScreenMixin",
     "client.LegacyLoadingScreenMixin",
     "client.SkyRendererMixin",
