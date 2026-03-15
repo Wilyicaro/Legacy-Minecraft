@@ -181,7 +181,8 @@
     "client.MovingBlockRenderStateMixin",
     "client.ClientAvatarStateMixin",
     "client.ComponentPathMixin",
-    "client.FeatureRenderDispatcherMixin"
+    "client.FeatureRenderDispatcherMixin",
+    "client.ScreenshotMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",
@@ -205,6 +206,15 @@
     "EntityTypeMixin",
     "FlowerBlockMixin",
     "FoodDataMixin",
+    "mobcaps.ArmorStandItemMixin",
+    "mobcaps.BoatItemMixin",
+    "mobcaps.CarvedPumpkinBlockMixin",
+    "mobcaps.HangingEntityItemMixin",
+    "mobcaps.ItemFrameItemMixin",
+    "mobcaps.NaturalSpawnerMixin",
+    "mobcaps.ServerLevelMixin",
+    "mobcaps.SpawnEggItemMixin",
+    "mobcaps.ThrownEggMixin",
     "ItemStackMixin",
     "cauldron.LayeredCauldronBlockMixin",
     "LevelMixin",
