@@ -47,6 +47,20 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event, Re
         button.setMessage(LegacyOptions.autoSaveInterval.get() > 0 ? LegacyComponents.DISABLE_AUTO_SAVE : LegacyComponents.SAVE_GAME);
     }
 
+    @Unique
+    private void startManualSaveFlow(Button button) {
+        LegacySaveCache.manualSave = true;
+        LegacySaveCache.retakeWorldIcon = true;
+        if (LegacyOptions.fakeManualSaveScreen.get()) {
+            LegacyLoadingScreen.openFakeManualSaveScreen(PauseScreenMixin.this);
+            return;
+        }
+        minecraft.setScreen(new ConfirmationScreen(PauseScreenMixin.this, LegacyComponents.ENABLE_AUTO_SAVE, LegacyComponents.ENABLE_AUTO_SAVE_MESSAGE, b1 -> {
+            setAutoSave(1, button);
+            minecraft.setScreen(PauseScreenMixin.this);
+        }));
+    }
+
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initScreen(CallbackInfo ci) {
         renderableVList = new RenderableVList(this).layoutSpacing(l -> LegacyOptions.getUIMode().isSD() ? 4 : 5);
@@ -67,11 +81,7 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event, Re
                     setAutoSave(0, button);
                     minecraft.setScreen(PauseScreenMixin.this);
                 } else {
-                    LegacySaveCache.manualSave = LegacySaveCache.retakeWorldIcon = true;
-                    minecraft.setScreen(new ConfirmationScreen(PauseScreenMixin.this, LegacyComponents.ENABLE_AUTO_SAVE, LegacyComponents.ENABLE_AUTO_SAVE_MESSAGE, b1 -> {
-                        setAutoSave(1, button);
-                        minecraft.setScreen(PauseScreenMixin.this);
-                    }));
+                    startManualSaveFlow(button);
                 }
             }))).build());
         renderableVList.addRenderable(Button.builder(Component.translatable("menu.quit"), button -> minecraft.setScreen(new ExitConfirmationScreen(this))).build());

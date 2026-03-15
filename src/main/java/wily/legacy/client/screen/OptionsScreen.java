@@ -438,7 +438,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.legacyIntroAndReloading,
                                 LegacyOptions.legacyLoadingAndConnecting,
                                 LegacyOptions.legacyPanorama,
-                                LegacyOptions.fakeAutosaveScreen),
+                                LegacyOptions.fakeAutosaveScreen,
+                                LegacyOptions.fakeManualSaveScreen),
                         o -> o.renderableVList.addOptionsCategory(
                                 Component.translatable("options.chat.title"),
                                 LegacyOptions.of(mc.options.reducedDebugInfo()),
