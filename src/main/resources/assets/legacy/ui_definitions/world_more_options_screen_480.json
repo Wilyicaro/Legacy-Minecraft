@@ -1,0 +1,40 @@
+{
+  "targetUI": "wily.legacy.client.screen.WorldMoreOptionsScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "panel.width": {
+      "type": "put_number",
+      "value": 176
+    },
+    "tabList.y": {
+      "type": "put_number",
+      "value": "${panel.y}-13"
+    },
+    "panel.height": {
+      "type": "put_number",
+      "value": 156
+    },
+    "tabList.height": {
+      "type": "put_number",
+      "value": 19
+    },
+    "tabList.sprites": {
+      "type": "put_toggleable_tab_sprites",
+      "value": {
+        "high": {
+          "left": "legacy:tiles/big_high_tab_left",
+          "middle": "legacy:tiles/big_high_tab_middle",
+          "right": "legacy:tiles/big_high_tab_right"
+        },
+        "down": "legacy:tiles/big_low_tab"
+      }
+    }
+  }
+}

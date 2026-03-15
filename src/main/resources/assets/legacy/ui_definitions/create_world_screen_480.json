@@ -1,6 +1,8 @@
 {
   "targetUI": "create_world_screen",
-  "applyCondition": { "reference": "uiMode.sd" },
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
   "elements": {
     "panel.width": 180,
     "panel.height": 184,

@@ -104,6 +104,11 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
 
                 if ((float) m + g + 12.0F + 8.0F > 0.0F && (float) m + g < (float) this.height) {
                     FormattedCharSequence formattedCharSequence = this.lines.get(n);
+
+                    if (formattedCharSequence == FormattedCharSequence.EMPTY) {
+                        continue;
+                    }
+
                     boolean centered = this.centeredLines.contains(n);
                     guiGraphics.pose().pushMatrix();
                     guiGraphics.pose().translate(k, centered ? width / 2 : m);
@@ -114,9 +119,14 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
                         guiGraphics.drawString(this.font, formattedCharSequence, 0, 0, 0xFFFFFFFF);
                     }
                     guiGraphics.pose().popMatrix();
+
+                    if (n + 1 < lines.size() && lines.get(n + 1) == FormattedCharSequence.EMPTY) {
+                        m += 100;
+                        continue;
+                    }
                 }
 
-                m += 72;
+                m += 16;
             }
             guiGraphics.pose().popMatrix();
             LegacyFontUtil.defaultFontOverride = null;
@@ -178,10 +188,6 @@ public abstract class WinScreenMixin extends Screen implements ControlTooltip.Ev
     private void init(CallbackInfo ci) {
         this.titleLines = new IntOpenHashSet();
         this.nameLines = new IntOpenHashSet();
-    }
-
-    @Redirect(method = "addPoemFile", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/WinScreen;addEmptyLine()V", ordinal = 0))
-    private void addPoemFile(WinScreen instance) {
     }
 
     @ModifyArg(method = "init", at = @At(value = "INVOKE", target = /*? if <1.20.5 {*//*"Lnet/minecraft/client/gui/screens/WinScreen;wrapCreditsIO(Ljava/lang/String;Lnet/minecraft/client/gui/screens/WinScreen$CreditsReader;)V"*//*?} else {*/"Lnet/minecraft/client/gui/screens/WinScreen;wrapCreditsIO(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/gui/screens/WinScreen$CreditsReader;)V"/*?}*/, ordinal = 0))

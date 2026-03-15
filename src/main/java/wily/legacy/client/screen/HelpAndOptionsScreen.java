@@ -8,6 +8,7 @@ import net.minecraft.client.gui.screens.WinScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import wily.factoryapi.base.ArbitrarySupplier;
+import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.util.LegacySprites;
 
@@ -16,7 +17,7 @@ import java.util.List;
 
 public class HelpAndOptionsScreen extends RenderableVListScreen {
 
-    public static final OptionsScreen.Section HOW_TO_PLAY = new OptionsScreen.Section(Component.translatable("legacy.menu.how_to_play"), s -> Panel.centered(s, LegacySprites.PANEL, 240, Math.min(7, (int) HowToPlayScreen.Section.getWithButton().count()) * 25 + 24, 0, 20), new ArrayList<>(List.of(o -> HowToPlayScreen.Section.getWithButton().forEach(s -> o.getRenderableVList().addRenderable(s.createButtonBuilder(o).build())))), ArbitrarySupplier.empty(), ((screen, section) -> new OptionsScreen(screen, section) {
+    public static final OptionsScreen.Section HOW_TO_PLAY = new OptionsScreen.Section(Component.translatable("legacy.menu.how_to_play"), s -> Panel.createPanel(s, p -> p.appearance(LegacySprites.PANEL, 240, Math.min(7, s.renderableVList.renderables.size()) * 25 + 24), p -> p.pos(p.centeredLeftPos(s), p.centeredTopPos(s) + 20)), new ArrayList<>(List.of(o -> HowToPlayScreen.Section.getWithButton().forEach(s -> o.getRenderableVList().addRenderable(s.createButtonBuilder(o).build())))), ArbitrarySupplier.empty(), ((screen, section) -> new OptionsScreen(screen, section) {
         @Override
         public void renderableVListInit() {
             getRenderableVList().cyclic(false).layoutSpacing(l -> 5).init(panel.x + 12, panel.getY() + 8, panel.getWidth() - 25, panel.getHeight() - 16);

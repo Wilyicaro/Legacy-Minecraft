@@ -9,6 +9,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.achievement.StatsScreen;
@@ -34,7 +35,6 @@ import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
 import wily.factoryapi.base.network.CommonNetwork;
-import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.CommonColor;
@@ -243,13 +243,13 @@ public class LeaderboardsScreen extends PanelVListScreen {
                     guiGraphics.pose().pushMatrix();
                     guiGraphics.pose().translate(panel.x + (panel.width - font.width(NO_RESULTS) * 1.5f) / 2f, panel.y + (panel.height - 13.5f) / 2f);
                     guiGraphics.pose().scale(1.5f, 1.5f);
-                    guiGraphics.drawString(font, NO_RESULTS, 0, 0, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                    guiGraphics.drawString(font, NO_RESULTS, 0, 0, CommonColor.GRAY_TEXT.get(), false);
                     guiGraphics.pose().popMatrix();
                     return;
                 }
                 LegacyFontUtil.applySDFont(b -> {
-                    guiGraphics.drawString(font, RANK, panel.x + accessor.getInteger("rankText.x", 40), panel.y + accessor.getInteger("rankText.y", 20), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-                    guiGraphics.drawString(font, USERNAME, panel.x + accessor.getInteger("usernameText.x", 108), panel.y + accessor.getInteger("usernameText.y", 20), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                    guiGraphics.drawString(font, RANK, panel.x + accessor.getInteger("rankText.x", 40), panel.y + accessor.getInteger("rankText.y", 20), CommonColor.GRAY_TEXT.get(), false);
+                    guiGraphics.drawString(font, USERNAME, panel.x + accessor.getInteger("usernameText.x", 108), panel.y + accessor.getInteger("usernameText.y", 20), CommonColor.GRAY_TEXT.get(), false);
                 });
 
                 int statsBoardX = accessor.getInteger("statsBoard.x", 182);
@@ -297,8 +297,13 @@ public class LeaderboardsScreen extends PanelVListScreen {
     }
 
     @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget)
+            widget.setHeight(accessor.getInteger("buttonsHeight", 20));
+    }
+
+    @Override
     public void renderableVListInit() {
-        initRenderableVListHeight(20);
         getRenderableVList().init(panel.x + 9, panel.y + 39, panel.width - 17, panel.height - 49);
     }
 
@@ -371,7 +376,7 @@ public class LeaderboardsScreen extends PanelVListScreen {
                         guiGraphics.pose().pushMatrix();
                         guiGraphics.pose().translate(l.getX() + 4, l.getY());
                         if (!b) guiGraphics.pose().scale(2 / 3f, 2 / 3f);
-                        guiGraphics.drawString(Minecraft.getInstance().font, name, 0, 0, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                        guiGraphics.drawString(Minecraft.getInstance().font, name, 0, 0, CommonColor.GRAY_TEXT.get(), false);
                         guiGraphics.pose().popMatrix();
                     })));
 

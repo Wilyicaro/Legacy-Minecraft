@@ -3,7 +3,7 @@ package wily.legacy.client.screen;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenDirection;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.Vec2;
 import wily.factoryapi.base.Stocker;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
@@ -13,8 +13,9 @@ import wily.legacy.util.client.LegacyRenderUtil;
 import java.util.function.Supplier;
 
 public abstract class LegacyScroller extends SimpleLayoutRenderable {
+    public static final float SCROLLER_HEIGHT_OFFSET = 13.5f;
     public final LegacyScrollRenderer scrollRenderer;
-    public Vec3 offset = Vec3.ZERO;
+    public Vec2 offset = Vec2.ZERO;
     public boolean dragged = false;
 
     public LegacyScroller(LegacyScrollRenderer scrollRenderer) {
@@ -37,10 +38,10 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable {
     }
 
     public float getScrollerHeight() {
-        return getHeight() - 13.5f;
+        return getHeight() - SCROLLER_HEIGHT_OFFSET;
     }
 
-    public void offset(Vec3 offset) {
+    public void offset(Vec2 offset) {
         this.offset = offset;
     }
 
@@ -49,7 +50,7 @@ public abstract class LegacyScroller extends SimpleLayoutRenderable {
     @Override
     public void render(GuiGraphics guiGraphics, int i, int j, float f) {
         guiGraphics.pose().pushMatrix();
-        guiGraphics.pose().translate(this.getX() + (float) offset.x, getY() + (float) offset.y);
+        guiGraphics.pose().translate(this.getX() + offset.x, getY() + offset.y);
         Stocker.Sizeable scroll = getScroll();
         if (scroll.max > 0) {
             guiGraphics.pose().pushMatrix();

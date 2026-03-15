@@ -1,6 +1,5 @@
 package wily.legacy.client.screen;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -26,7 +25,6 @@ import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.DynamicUtil;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.factoryapi.util.ListMap;
-import wily.legacy.Legacy4J;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.client.SizeableAsset;
@@ -35,7 +33,6 @@ import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -133,7 +130,7 @@ public class LegacyTabButton extends AbstractButton {
         if (!selected) guiGraphics.pose().translate(0, -1);
         if (active) {
             if (icon == null)
-                this.renderString(guiGraphics, minecraft.font, CommonColor.INVENTORY_GRAY_TEXT.get() | Mth.ceil(this.alpha * 255.0f) << 24);
+                this.renderString(guiGraphics, minecraft.font, CommonColor.GRAY_TEXT.get() | Mth.ceil(this.alpha * 255.0f) << 24);
             else icon.render(this, guiGraphics, i, j, f);
         }
         guiGraphics.pose().popMatrix();

@@ -70,6 +70,7 @@ public abstract class VillagerMixin extends AbstractVillager {
         updateTrades(getLevel());
     }
 
+    @Unique
     protected void updateTrades(int level) {
         Int2ObjectMap<VillagerTrades.ItemListing[]> int2ObjectMap;
         VillagerData villagerData = this.getVillagerData();
@@ -94,13 +95,15 @@ public abstract class VillagerMixin extends AbstractVillager {
 
     }
 
+    @Unique
     protected MerchantOffer getDecayArrowTrade(Entity trader, net.minecraft.util.RandomSource randomSource) {
         return new MerchantOffer(new ItemCost(Items.ARROW, 5), Optional.of(new ItemCost(Items.EMERALD, 2)), LegacyItemUtil.createDecayTippedArrow().copyWithCount(5), 12, 30, 0.2f);
     }
   
-    @Inject(method = "getBreedOffspring", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "getBreedOffspring*", at = @At("HEAD"), cancellable = true)
     public void getBreedOffspring(ServerLevel level, AgeableMob partner, CallbackInfoReturnable<Villager> cir) {
         if (!ConsoleMobCaps.canVillagerBreed(level)) {
             cir.setReturnValue(null);
+        }
     }
 }

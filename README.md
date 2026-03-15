@@ -36,7 +36,7 @@ WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
 
 - AgentMindStorm for providing the built-in resource packs: Console Aspects & Programmer Console Aspects (NeoForge and Forge)
 - Moutardx for providing the How To Play text from TU69
-- RedRain0o0 for doing almost all the How To Play UI Definitions
+- RedRain0o0 for doing almost all the How To Play UI Definitions, and the screenshot toasts
 - cloud54 for providing Steam Control Icons and sounds for the keyboard screen
 - Permdog99 and ItzJustAPlayer for helping with the PlayStation® 5 Control Icons
 - NicSonic-_- for providing the Stadia Control Icons
@@ -45,6 +45,8 @@ WE ARE NOT RESPONSIBLE FOR PUNISHMENTS RECEIVED IN ANY SERVER
 - Androser for contributing to the controller bindings
 - pizzart for contributing with some QOL and accuracy changes
 - Nabouna32 for contributing with option tooltips and controller LED RGB options
+- Creepereater201 for adding legacy mobcaps, decay potions, accurate elytra momentum and other tweaks
+- BrandonItaly for adding downloadable content offers
 
 <img src="https://github.com/Kyubion-Studios/Legacy4J-Branding/blob/main/media/modpage_related_projects.png?raw=true" width="600" >
 

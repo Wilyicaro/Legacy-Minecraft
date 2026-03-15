@@ -179,14 +179,14 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
     protected void renderLabels(GuiGraphics guiGraphics, int i, int j) {
         LegacyFontUtil.applySDFont(b -> {
             Component title = !isSelectionTab() ? craftingTabList.tabButtons.get(craftingTabList.getIndex()).getMessage() : selectBannerButton.get(0).getDisplayName();
-            guiGraphics.drawString(this.font, title, ((!isSelectionTab() ? imageWidth : imageWidth / 2) - font.width(title)) / 2, accessor.getInteger("title.y", 17), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            guiGraphics.drawString(this.font, title, ((!isSelectionTab() ? imageWidth : imageWidth / 2) - font.width(title)) / 2, accessor.getInteger("title.y", 17), CommonColor.GRAY_TEXT.get(), false);
             int inventoryPanelX = accessor.getInteger("inventoryPanel.x", 176);
             int bottomPanelY = accessor.getInteger("bottomPanel.y", 103);
             int inventoryPanelWidth = accessor.getInteger("inventoryPanel.width", 163);
             if (menu.inventoryActive)
-                guiGraphics.drawString(this.font, this.playerInventoryTitle, inventoryPanelX + (inventoryPanelWidth - font.width(playerInventoryTitle)) / 2, bottomPanelY + accessor.getInteger("inventoryTitle.y", 11), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                guiGraphics.drawString(this.font, this.playerInventoryTitle, inventoryPanelX + (inventoryPanelWidth - font.width(playerInventoryTitle)) / 2, bottomPanelY + accessor.getInteger("inventoryTitle.y", 11), CommonColor.GRAY_TEXT.get(), false);
             else
-                guiGraphics.drawString(this.font, LegacyComponents.PREVIEW, inventoryPanelX + (inventoryPanelWidth - font.width(LegacyComponents.PREVIEW)) / 2, bottomPanelY + accessor.getInteger("inventoryTitle.y", 11), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                guiGraphics.drawString(this.font, LegacyComponents.PREVIEW, inventoryPanelX + (inventoryPanelWidth - font.width(LegacyComponents.PREVIEW)) / 2, bottomPanelY + accessor.getInteger("inventoryTitle.y", 11), CommonColor.GRAY_TEXT.get(), false);
         });
     }
 
@@ -486,9 +486,9 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
             Component resultName = getRecipeButtons().get(selectedRecipeButton) instanceof RecipeIconHolder<?> h ? h.getFocusedRecipe().getName() : resultStack.getHoverName();
             Component description = getRecipeButtons().get(selectedRecipeButton) instanceof RecipeIconHolder<?> h ? h.getFocusedRecipe().getDescription() : null;
             int titleY = bottomPanelY + accessor.getInteger("craftingTitle.y", 11) - (description == null ? 0 : 6);
-            LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, resultName, xDiff + 2 + Math.max(panelWidth - font.width(resultName), 0) / 2, topPos + titleY, xDiff + panelWidth - 2, topPos + titleY + 11, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+            LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, resultName, xDiff + 2 + Math.max(panelWidth - font.width(resultName), 0) / 2, topPos + titleY, xDiff + panelWidth - 2, topPos + titleY + 11, CommonColor.GRAY_TEXT.get(), false));
             if (description != null)
-                LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, description.copy().setStyle(Style.EMPTY), xDiff + 2 + Math.max(panelWidth - font.width(description), 0) / 2, topPos + titleY + 12, xDiff + panelWidth - 2, topPos + titleY + 23, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+                LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, description.copy().setStyle(Style.EMPTY), xDiff + 2 + Math.max(panelWidth - font.width(description), 0) / 2, topPos + titleY + 12, xDiff + panelWidth - 2, topPos + titleY + 23, CommonColor.GRAY_TEXT.get(), false));
             LegacyFontUtil.applySDFont(b -> {
                 if (getTabList().getIndex() == 0) {
                     int descriptionTextXOffset = accessor.getInteger("descriptionText.x", 4);
@@ -502,7 +502,7 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
                     scrollableRenderer.render(guiGraphics, leftPos + descriptionPanelX + descriptionTextXOffset, topPos + descriptionPanelY + descriptionTextYOffset, descriptionTextWidth, lineAmount * lineSpacing, () -> {
                         for (int i1 = 0; i1 < list.size(); i1++) {
                             FormattedCharSequence sequence = list.get(i1);
-                            guiGraphics.drawString(font, sink -> sequence.accept((i2, style, j1) -> sink.accept(i2, Style.EMPTY, j1)), leftPos + descriptionPanelX + descriptionTextXOffset, topPos + descriptionPanelY + descriptionTextYOffset + i1 * lineSpacing, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                            guiGraphics.drawString(font, sink -> sequence.accept((i2, style, j1) -> sink.accept(i2, Style.EMPTY, j1)), leftPos + descriptionPanelX + descriptionTextXOffset, topPos + descriptionPanelY + descriptionTextYOffset + i1 * lineSpacing, CommonColor.GRAY_TEXT.get(), false);
                         }
                     });
                 }

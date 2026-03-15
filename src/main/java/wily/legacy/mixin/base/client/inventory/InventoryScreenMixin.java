@@ -3,7 +3,6 @@ package wily.legacy.mixin.base.client.inventory;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenPosition;
-import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -142,10 +141,10 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
         FactoryGuiGraphics.of(graphics).blitSprite(sd ? LegacySprites.SQUARE_ENTITY_PANEL : LegacySprites.ENTITY_PANEL, playerPanelX, playerPanelY, playerPanelWidth, playerPanelHeight);
         Pose pose = minecraft.player.getPose();
         minecraft.player.setPose(Pose.STANDING);
-        LegacyRenderUtil.renderEntityInInventoryFollowsMouse(graphics, playerPanelX, playerPanelY, playerPanelX + playerPanelWidth, playerPanelY + playerPanelHeight, sd ? 20 : 35, 0.0625f, i, j, minecraft.player);
+        LegacyRenderUtil.renderEntityInInventoryFollowsMouse(graphics, playerPanelX + 2, playerPanelY + 2, playerPanelX + playerPanelWidth - 2, playerPanelY + playerPanelHeight - 2, sd ? 20 : 35, 0.0625f, i, j, minecraft.player);
         minecraft.player.setPose(pose);
         if (LegacyOptions.hasClassicCrafting()) {
-            LegacyFontUtil.applySDFont(b -> graphics.drawString(this.font, this.title, leftPos + (sd ? 64 : 111), topPos + (sd ? 9 : 16), CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+            LegacyFontUtil.applySDFont(b -> graphics.drawString(this.font, this.title, leftPos + (sd ? 64 : 111), topPos + (sd ? 9 : 16), CommonColor.GRAY_TEXT.get(), false));
             FactoryGuiGraphics.of(graphics).blitSprite(LegacySprites.SMALL_ARROW, leftPos + (sd ? 92 : 158), topPos + (sd ? 24 : 42), 16, 14);
         }
     }
@@ -153,7 +152,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
     @Inject(method = "renderLabels", at = @At("HEAD"), cancellable = true)
     public void renderLabels(GuiGraphics guiGraphics, int i, int j, CallbackInfo ci) {
         ci.cancel();
-        LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        LegacyFontUtil.applySDFont(b -> guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, CommonColor.GRAY_TEXT.get(), false));
     }
 
     public boolean canReplace() {

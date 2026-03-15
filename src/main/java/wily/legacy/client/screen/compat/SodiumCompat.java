@@ -40,7 +40,6 @@ import wily.legacy.client.screen.*;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.function.Supplier;
 
 public class SodiumCompat {
 
@@ -90,7 +89,7 @@ public class SodiumCompat {
         for (OptionPage page : pages) {
             List<AbstractWidget> widgets = page.getOptions().stream().map(SodiumCompat::getSodiumOptionWidget).filter(Objects::nonNull).toList();
             if (!widgets.isEmpty()) {
-                screen.getRenderableVList().addRenderable(SimpleLayoutRenderable.createDrawString(page.getName(), 0, 1, 200, 9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+                screen.getRenderableVList().addRenderable(SimpleLayoutRenderable.createDrawString(page.getName(), 0, 1, 200, 9, CommonColor.GRAY_TEXT.get(), false));
                 screen.getRenderableVList().renderables.addAll(widgets);
             }
         }

@@ -2,7 +2,9 @@ package wily.legacy.mixin.base.client.pause;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
@@ -118,8 +120,13 @@ public class PauseScreenMixin extends Screen implements ControlTooltip.Event, Re
     }
 
     @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget)
+            widget.setHeight(UIAccessor.of(this).getInteger("buttonsHeight", 20));
+    }
+
+    @Override
     public void renderableVListInit() {
-        initRenderableVListHeight(20);
         renderableVList.init(width / 2 - 112, this.height / 3 + 5, 225, 0);
     }
 

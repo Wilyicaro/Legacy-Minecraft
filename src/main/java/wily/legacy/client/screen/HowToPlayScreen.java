@@ -13,6 +13,10 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.sounds.SoundEvents;
 import wily.factoryapi.FactoryAPI;
+import wily.factoryapi.FactoryAPIClient;
+import wily.factoryapi.base.client.UIAccessor;
+import wily.factoryapi.base.client.UIDefinition;
+import wily.factoryapi.base.client.UIDefinitionManager;
 import wily.factoryapi.util.DynamicUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.client.ControlType;
@@ -31,7 +35,7 @@ public class HowToPlayScreen extends LegacyScreen {
 
     protected final Section section;
     protected final int sectionIndex;
-    protected final ResourceLocation uiDefinitionID;
+    private final String uiDefinitionID;
 
     protected final ScrollableRenderer scrollableRenderer = new ScrollableRenderer();
 
@@ -39,12 +43,12 @@ public class HowToPlayScreen extends LegacyScreen {
         super(parent, section.title());
         this.section = section;
         this.sectionIndex = Section.list.indexOf(section);
-        uiDefinitionID = section.uiDefinitionLocation().withPrefix("ui_definitions/").withSuffix(".json");
+        this.uiDefinitionID = section.uiDefinitionLocation.toString();
     }
 
     @Override
     public String toString() {
-        return uiDefinitionID.toString();
+        return uiDefinitionID;
     }
 
     public ScrollableRenderer getScrollableRenderer() {
@@ -113,12 +117,25 @@ public class HowToPlayScreen extends LegacyScreen {
 
     public record Section(Component title, ResourceLocation uiDefinitionLocation, boolean hasButton,
                           int index) implements ScreenSection<HowToPlayScreen> {
-        public static final Codec<Section> CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.getComponentCodec().fieldOf("title").forGetter(Section::title), ResourceLocation.CODEC.fieldOf("ui_definition").forGetter(Section::uiDefinitionLocation), Codec.BOOL.fieldOf("hasButton").orElse(true).forGetter(Section::hasButton), Codec.INT.fieldOf("index").orElse(-1).forGetter(Section::index)).apply(i, Section::new));
+        public static final Codec<Section> CODEC = RecordCodecBuilder.create(i -> i.group(DynamicUtil.getComponentCodec().fieldOf("title").forGetter(Section::title), ResourceLocation.CODEC.xmap(r -> r.withPrefix("ui_definitions/").withSuffix(".json"), r -> r).fieldOf("ui_definition").forGetter(Section::uiDefinitionLocation), Codec.BOOL.fieldOf("hasButton").orElse(true).forGetter(Section::hasButton), Codec.INT.fieldOf("index").orElse(-1).forGetter(Section::index)).apply(i, Section::new));
         public static final Codec<List<Section>> LIST_CODEC = CODEC.listOf();
         public static final List<Section> list = new ArrayList<>();
 
         public static Stream<Section> getWithButton() {
-            return list.stream().filter(Section::hasButton);
+            return list.stream().filter(Section::isValid);
+        }
+
+        public UIDefinition getUIDefinition() {
+            return FactoryAPIClient.uiDefinitionManager.map.get(uiDefinitionLocation);
+        }
+
+        public boolean isValid() {
+            if (!hasButton()) return false;
+            UIDefinition uiDefinition = getUIDefinition();
+            if (uiDefinition == null) return false;
+            UIAccessor accessor = UIAccessor.of(build(null));
+            accessor.beforeInit();
+            return uiDefinition.test(accessor);
         }
 
         @Override

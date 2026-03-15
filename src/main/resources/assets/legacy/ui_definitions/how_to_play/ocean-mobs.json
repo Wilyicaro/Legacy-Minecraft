@@ -1,6 +1,8 @@
 {
-  "elements": {
-    "scrollable_renderer": {
+  "elements": [
+    {
+      "name": "scrollable_renderer",
+      "applyCondition": "${uiMode.hd}||${uiMode.fhd}",
       "type": "put_scrollable_renderer",
       "x": "(${width}-${scrollable_renderer.width})/2",
       "y": "(${height}-${scrollable_renderer.height})/2 + 31",
@@ -9,40 +11,133 @@
       "elements": {
         "text": {
           "type": "draw_multiline_string",
-          "component": {"translate": "legacy.menu.how_to_play.ocean-mobs_message"},
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_message"
+          },
           "width": 433
         },
         "fish": {
           "type": "draw_multiline_string",
-          "component": {"translate": "legacy.menu.how_to_play.ocean-mobs_fish"},
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_fish"
+          },
           "width": 433
         },
         "squid": {
           "type": "draw_multiline_string",
-          "component": {"translate": "legacy.menu.how_to_play.ocean-mobs_squid"},
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_squid"
+          },
           "width": 433
         },
         "dolphins": {
           "type": "draw_multiline_string",
-          "component": {"translate": "legacy.menu.how_to_play.ocean-mobs_dolphins"},
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_dolphins"
+          },
           "width": 433
         },
         "sea-turtles": {
           "type": "draw_multiline_string",
-          "component": {"translate": "legacy.menu.how_to_play.ocean-mobs_sea-turtles"},
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_sea-turtles"
+          },
           "width": 433
         },
         "drowned": {
           "type": "draw_multiline_string",
-          "component": {"translate": "legacy.menu.how_to_play.ocean-mobs_drowned"},
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_drowned"
+          },
           "width": 433
         },
         "guardians": {
           "type": "draw_multiline_string",
-          "component": {"translate": "legacy.menu.how_to_play.ocean-mobs_guardians"},
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_guardians"
+          },
           "width": 433
         }
       }
+    },
+    {
+      "name": "scrollable_renderer",
+      "applyCondition": {
+        "reference": "uiMode.sd"
+      },
+      "type": "put_scrollable_renderer",
+      "x": "(${width}-${scrollable_renderer.width})/2",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 11",
+      "contentX": 10,
+      "contentY": 8,
+      "width": 288,
+      "height": 137,
+      "lineHeight": 8,
+      "elements": {
+        "text": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_message",
+            "font": "legacy:default_11"
+          },
+          "width": 268,
+          "lineSpacing": 8
+        },
+        "fish": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_fish",
+            "font": "legacy:default_11"
+          },
+          "width": 268,
+          "lineSpacing": 8
+        },
+        "squid": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_squid",
+            "font": "legacy:default_11"
+          },
+          "width": 268,
+          "lineSpacing": 8
+        },
+        "dolphins": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_dolphins",
+            "font": "legacy:default_11"
+          },
+          "width": 268,
+          "lineSpacing": 8
+        },
+        "sea-turtles": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_sea-turtles",
+            "font": "legacy:default_11"
+          },
+          "width": 268,
+          "lineSpacing": 8
+        },
+        "drowned": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_drowned",
+            "font": "legacy:default_11"
+          },
+          "width": 268,
+          "lineSpacing": 8
+        },
+        "guardians": {
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.ocean-mobs_guardians",
+            "font": "legacy:default_11"
+          },
+          "width": 268,
+          "lineSpacing": 8
+        }
+      }
     }
-  }
+  ]
 }

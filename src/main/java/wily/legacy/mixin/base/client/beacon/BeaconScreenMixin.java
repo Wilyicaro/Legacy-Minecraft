@@ -157,8 +157,8 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
         ci.cancel();
         LegacyFontUtil.applySDFont(b -> {
             int panelWidth = b ? 75 : 120;
-            guiGraphics.drawString(this.font, PRIMARY_EFFECT_LABEL, (b ? 4 : 8) + (panelWidth - font.width(PRIMARY_EFFECT_LABEL)) / 2, (b ? 7 : 13), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
-            guiGraphics.drawString(this.font, SECONDARY_EFFECT_LABEL, (b ? 80 : 132) + (panelWidth - font.width(SECONDARY_EFFECT_LABEL)) / 2, (b ? 7 : 13), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            guiGraphics.drawString(this.font, PRIMARY_EFFECT_LABEL, (b ? 4 : 8) + (panelWidth - font.width(PRIMARY_EFFECT_LABEL)) / 2, (b ? 7 : 13), CommonColor.GRAY_TEXT.get(), false);
+            guiGraphics.drawString(this.font, SECONDARY_EFFECT_LABEL, (b ? 80 : 132) + (panelWidth - font.width(SECONDARY_EFFECT_LABEL)) / 2, (b ? 7 : 13), CommonColor.GRAY_TEXT.get(), false);
         });
     }
 

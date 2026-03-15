@@ -1,0 +1,15 @@
+{
+  "targetUI": {
+    "translate": "legacy.menu.how_to_play"
+  },
+  "targetType": "screenTitle",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "panel.width": 250,
+    "panel.height": 134,
+    "panel.y": 49
+  },
+  "priority": 1000
+}

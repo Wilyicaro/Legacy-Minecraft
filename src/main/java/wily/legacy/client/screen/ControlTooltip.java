@@ -728,7 +728,7 @@ public interface ControlTooltip {
     }
 
     static boolean isEdible(ItemStack stack) {
-        return /*? if <1.20.5 {*//*stack.isEdible()*//*?} else {*/stack.has(DataComponents.FOOD)/*?}*/;
+        return stack.getUseAnimation() == /*? if <1.21.2 {*//*UseAnim*//*?} else {*/ItemUseAnimation/*?}*/.EAT;
     }
 
     static boolean canDyeEntity(Minecraft minecraft, ItemStack usedItem) {

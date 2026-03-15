@@ -1,44 +1,120 @@
 {
-  "elements": {
-    "scrollable_renderer": {
-      "type": "put_scrollable_renderer",
-      "x": "${width}/2-228",
-      "y": "(${height}-${scrollable_renderer.height})/2 + 31",
-      "width": 200,
-      "height": 222,
+  "elements": [
+    {
+      "name": "farming_animals_hd",
+      "type": "children",
+      "applyCondition": "${uiMode.hd}||${uiMode.fhd}",
+      "applyPrefix": false,
       "elements": {
-        "text": {
-          "type": "draw_multiline_string",
-          "component": {"translate": "legacy.menu.how_to_play.farming-animals_message"},
-          "width": 176
+        "scrollable_renderer": {
+          "type": "put_scrollable_renderer",
+          "x": "${width}/2-228",
+          "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+          "width": 200,
+          "height": 222,
+          "elements": {
+            "text": {
+              "type": "draw_multiline_string",
+              "component": {
+                "translate": "legacy.menu.how_to_play.farming-animals_message"
+              },
+              "width": 176
+            }
+          }
+        },
+        "panel": {
+          "type": "blit_sprite",
+          "sprite": "legacy:tiles/small_panel",
+          "width": 200,
+          "height": 213,
+          "x": "${width}/2",
+          "y": "${scrollable_renderer.y}+4"
+        },
+        "frame": {
+          "type": "blit_sprite",
+          "sprite": "legacy:tiles/square_recessed_panel",
+          "width": "${panel.width}-20",
+          "height": "${panel.height}-20",
+          "x": "${panel.x}+10",
+          "y": "${panel.y}+10"
+        },
+        "farming_animals": {
+          "type": "blit_sprite",
+          "sprite": "legacy:container/how_to_play/farming-animals",
+          "x": "${frame.x}",
+          "y": "${frame.y}",
+          "translateX": 1.5,
+          "translateY": 1.5,
+          "width": "${frame.width}-3",
+          "height": "${frame.height}-3"
         }
       }
     },
-    "panel": {
-      "type":"blit_sprite",
-      "sprite":"legacy:tiles/small_panel",
-      "width":200,
-      "height":213,
-      "x":"${width}/2",
-      "y":"${scrollable_renderer.y}+4"
-    },
-    "frame": {
-      "type":"blit_sprite",
-      "sprite":"legacy:tiles/square_recessed_panel",
-      "width":"${panel.width}-20",
-      "height":"${panel.height}-20",
-      "x":"${panel.x}+10",
-      "y":"${panel.y}+10"
-    },
-    "farming_animals": {
-      "type":"blit_sprite",
-      "sprite": "legacy:container/how_to_play/farming-animals",
-      "x":"${frame.x}",
-      "y":"${frame.y}",
-      "translateX":1.5,
-      "translateY":1.5,
-      "width":"${frame.width}-3",
-      "height":"${frame.height}-3"
+    {
+      "name": "farming_animals_sd",
+      "type": "children",
+      "applyCondition": {
+        "reference": "uiMode.sd"
+      },
+      "applyPrefix": false,
+      "elements": {
+        "scrollable_renderer": {
+          "type": "put_scrollable_renderer",
+          "x": "${width}/2-144",
+          "y": "(${height}-${scrollable_renderer.height})/2 + 11",
+          "contentX": 10,
+          "contentY": 8,
+          "width": 140,
+          "height": 137,
+          "lineHeight": 8,
+          "elements": {
+            "text": {
+              "type": "draw_multiline_string",
+              "component": {
+                "translate": "legacy.menu.how_to_play.farming-animals_message",
+                "font": "legacy:default_11"
+              },
+              "width": 120,
+              "lineSpacing": 8
+            },
+            "text1": {
+              "type": "draw_multiline_string",
+              "component": {
+                "translate": "legacy.menu.how_to_play.farming-animals_message_1",
+                "font": "legacy:default_11"
+              },
+              "width": 120,
+              "lineSpacing": 8
+            }
+          }
+        },
+        "panel": {
+          "type": "blit_sprite",
+          "sprite": "legacy:tiles/panel",
+          "width": 129,
+          "height": 137,
+          "x": "${width}/2",
+          "y": "${scrollable_renderer.y}"
+        },
+        "frame": {
+          "type": "blit_sprite",
+          "sprite": "legacy:tiles/square_recessed_panel",
+          "width": "${panel.width}-10",
+          "height": "${panel.height}-10",
+          "x": "${panel.x}+5",
+          "y": "${panel.y}+5"
+        },
+        "farming_animals": {
+          "type": "blit_sprite",
+          "sprite": "legacy:container/how_to_play/farming-animals",
+          "x": "${frame.x}",
+          "y": "${frame.y}",
+          "translateX": 1.5,
+          "translateY": 1.5,
+          "width": "${frame.width}-3",
+          "height": "${frame.height}-3"
+        }
+      }
     }
-  }
+  ]
 }

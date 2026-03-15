@@ -203,7 +203,7 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
             }
         }));
         super.init();
-        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, FactoryAPIPlatform.getModInfo("minecraft").getVersion() + " " + Legacy4J.VERSION.get(), panel.getX() + panel.getWidth() + 81, panel.getY() + panel.getHeight() - 7, CommonColor.INVENTORY_GRAY_TEXT.get(), false)));
+        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, FactoryAPIPlatform.getModInfo("minecraft").getVersion() + " " + Legacy4J.VERSION.get(), panel.getX() + panel.getWidth() + 81, panel.getY() + panel.getHeight() - 7, CommonColor.GRAY_TEXT.get(), false)));
     }
 
     @Override

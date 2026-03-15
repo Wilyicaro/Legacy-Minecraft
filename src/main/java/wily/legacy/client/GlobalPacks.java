@@ -3,7 +3,6 @@ package wily.legacy.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -30,6 +29,7 @@ import wily.factoryapi.base.config.FactoryConfig;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.LegacyScrollRenderer;
+import wily.legacy.client.screen.Panel;
 import wily.legacy.client.screen.ScrollableRenderer;
 import wily.legacy.init.LegacyRegistries;
 import wily.legacy.util.LegacyComponents;
@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -139,11 +138,11 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 int nameWidth = width - 53;
                 int lineHeight = sd ? 8 : 12;
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4, x + 40 + nameWidth, y + 44);
-                (sd ? PackAlbum.Selector.sdLabelsCache : PackAlbum.Selector.labelsCache).apply(selectedPack.getTitle(), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
+                (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(selectedPack.getTitle(), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
                 graphics.disableScissor();
                 ResourceLocation background = PackAlbum.Selector.getPackBackground(selectedPack);
                 int descriptionWidth = width - 16;
-                MultiLineLabel label = (sd ? PackAlbum.Selector.sdLabelsCache : PackAlbum.Selector.labelsCache).apply(selectedPack.getDescription(), descriptionWidth);
+                MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(selectedPack.getDescription(), descriptionWidth);
                 int descriptionFromBottom = sd ? 52 : 78;
                 int visibleLines = (height - 50 - (background == null ? 0 : descriptionFromBottom)) / lineHeight;
                 scrollableRenderer.scrolled.max = org.joml.Math.max(0, label.getLineCount() - visibleLines);
@@ -293,7 +292,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
             FactoryScreenUtil.disableBlend();
             guiGraphics.pose().pushMatrix();
             if (!isHoveredOrFocused()) guiGraphics.pose().translate(0.4f, 0.4f);
-            guiGraphics.drawString(font, getMessage(), getX() + 2, getY(), isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.INVENTORY_GRAY_TEXT.get(), isHoveredOrFocused());
+            guiGraphics.drawString(font, getMessage(), getX() + 2, getY(), isHoveredOrFocused() ? LegacyRenderUtil.getDefaultTextColor() : CommonColor.GRAY_TEXT.get(), isHoveredOrFocused());
             guiGraphics.pose().popMatrix();
             if (scrolledList.max > 0) {
                 if (scrolledList.get() < scrolledList.max)
