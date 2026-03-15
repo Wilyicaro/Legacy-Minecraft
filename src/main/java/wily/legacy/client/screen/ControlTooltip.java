@@ -619,7 +619,7 @@ public interface ControlTooltip {
                 return LegacyComponents.REPAIR;
             // 6-Tool use (shears, brush, bone meal)
             if (actualItem.getItem() instanceof ShearsItem) {
-                if (entity instanceof Sheep s && !s.isBaby() && !s.isSheared() || entity instanceof SnowGolem snowGolem && snowGolem.hasPumpkin() || entity instanceof MushroomCow)
+                if (entity instanceof Sheep s && !s.isBaby() && !s.isSheared() || entity instanceof SnowGolem snowGolem && snowGolem.hasPumpkin())
                     return LegacyComponents.SHEAR;
                 else if (blockState != null && blockState.getBlock() instanceof PumpkinBlock)
                     return LegacyComponents.CARVE;

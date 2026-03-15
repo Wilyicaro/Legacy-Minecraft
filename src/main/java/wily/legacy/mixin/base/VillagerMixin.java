@@ -2,6 +2,8 @@ package wily.legacy.mixin.base;
 
 import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.npc.*;
 import net.minecraft.world.flag.FeatureFlags;
@@ -15,7 +17,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.inventory.LegacyMerchantOffer;
+import wily.legacy.mobcaps.ConsoleMobCaps;
 
 import java.util.ArrayList;
 
@@ -80,5 +84,12 @@ public abstract class VillagerMixin extends AbstractVillager {
             ++j;
         }
 
+    }
+
+    @Inject(method = "getBreedOffspring", at = @At("HEAD"), cancellable = true)
+    public void getBreedOffspring(ServerLevel level, AgeableMob partner, CallbackInfoReturnable<Villager> cir) {
+        if (!ConsoleMobCaps.canVillagerBreed(level)) {
+            cir.setReturnValue(null);
+        }
     }
 }
