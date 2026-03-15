@@ -183,7 +183,8 @@
     "client.ClientAvatarStateMixin",
     "client.ComponentPathMixin",
     "client.FeatureRenderDispatcherMixin",
-    "client.ScreenshotMixin"
+    "client.ScreenshotMixin",
+    "client.AbstractClientPlayerMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",
