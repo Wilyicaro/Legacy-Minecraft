@@ -2,6 +2,7 @@ package wily.legacy.mixin.base.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -22,6 +23,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import wily.legacy.Legacy4JClient;
 import wily.legacy.client.LegacyOptions;
 
 @Mixin(ItemInHandRenderer.class)
@@ -67,6 +69,21 @@ public abstract class ItemInHandRendererMixin {
         return Math.max(mainHand.getItem() instanceof BlockItem item ? item.getBlock().defaultBlockState().getLightEmission() : 0, offHand.getItem() instanceof BlockItem item ? item.getBlock().defaultBlockState().getLightEmission() : 0);
     }
 
+    @ModifyExpressionValue(method = "renderOneHandedMap", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isInvisible()Z"))
+    private boolean allowFirstPersonHostInvisibleMapHand(boolean invisible) {
+        return invisible && !Legacy4JClient.isHostInvisible(minecraft.player);
+    }
+
+    @ModifyExpressionValue(method = "renderTwoHandedMap", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isInvisible()Z"))
+    private boolean allowFirstPersonHostInvisibleMapHands(boolean invisible) {
+        return invisible && !Legacy4JClient.isHostInvisible(minecraft.player);
+    }
+
+    @ModifyExpressionValue(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;isInvisible()Z"))
+    private boolean allowFirstPersonHostInvisibleArm(boolean invisible) {
+        return invisible && !Legacy4JClient.isHostInvisible(minecraft.player);
+    }
+
     @Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", shift = At.Shift.AFTER))
     private void renderItemInHand(AbstractClientPlayer abstractClientPlayer, float f, float g, InteractionHand interactionHand, float h, ItemStack itemStack, float i, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int j, CallbackInfo ci) {
         int screenWidth = minecraft.getWindow().getScreenWidth();
@@ -82,7 +99,7 @@ public abstract class ItemInHandRendererMixin {
         int k = humanoidArm == HumanoidArm.RIGHT ? 1 : -1;
         if (abstractClientPlayer.getUseItem().is(Items.CROSSBOW)) {
             if (abstractClientPlayer.isUsingItem() && abstractClientPlayer.getUseItemRemainingTicks() > 0 && abstractClientPlayer.getUsedItemHand() == interactionHand) {
-                if (!abstractClientPlayer.isInvisible()) {
+                if (!abstractClientPlayer.isInvisible() || Legacy4JClient.isHostInvisible(abstractClientPlayer)) {
                     poseStack.pushPose();
                     float duration = (float) CrossbowItem.getChargeDuration(abstractClientPlayer.getUseItem()/*? if >=1.20.5 {*/, abstractClientPlayer/*?}*/);
                     float c = Mth.clamp((float) abstractClientPlayer.getTicksUsingItem() + f, 0.0F, duration);
@@ -197,3 +214,7 @@ public abstract class ItemInHandRendererMixin {
     }
     *///?}
 }
+
+
+
+

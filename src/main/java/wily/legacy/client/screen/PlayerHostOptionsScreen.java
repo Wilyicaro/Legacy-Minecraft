@@ -40,16 +40,8 @@ public class PlayerHostOptionsScreen extends PanelVListScreen {
         List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
         getRenderableVList().addRenderable(new TickBox(0, 0, initialVisibility, b1 -> Component.translatable("legacy.menu.host_options.player.invisible"), b1 -> null, b1 -> {
             if (initialVisibility != b1.selected) {
-                commandsOnClose.put(b1, () -> {
-                    if (b1.selected) {
-                        minecraft.player.connection.sendCommand("effect give %s minecraft:invisibility infinite 255 true".formatted(playerInfo.getProfile().name()));
-                        minecraft.player.connection.sendCommand("effect give %s minecraft:resistance infinite 255 true".formatted(playerInfo.getProfile().name()));
-                    } else {
-                        minecraft.player.connection.sendCommand("effect clear %s minecraft:invisibility".formatted(playerInfo.getProfile().name()));
-                        minecraft.player.connection.sendCommand("effect clear %s minecraft:resistance".formatted(playerInfo.getProfile().name()));
-                    }
-                });
-            }
+                commandsOnClose.put(b1, () -> CommonNetwork.sendToServer(PlayerInfoSync.invisibility(b1.selected, playerInfo.getProfile())));
+            } else commandsOnClose.remove(b1);
         }));
         if (playerInfo.getGameMode().isSurvival()) {
             getRenderableVList().addRenderable(new TickBox(0, 0, ((LegacyPlayerInfo) playerInfo).mayFlySurvival(), b1 -> Component.translatable("legacy.menu.host_options.player.mayFly"), b1 -> null, b1 -> CommonNetwork.sendToServer(PlayerInfoSync.mayFlySurvival(b1.selected, playerInfo.getProfile()))));
