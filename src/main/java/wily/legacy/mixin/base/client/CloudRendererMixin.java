@@ -1,16 +1,11 @@
 package wily.legacy.mixin.base.client;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.CloudStatus;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.CloudRenderer;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.ARGB;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -21,14 +16,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.client.LegacyCloudAtmosphere;
-import wily.legacy.client.LegacyRenderPipelines;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.Optional;
 
 @Mixin(CloudRenderer.class)
 public abstract class CloudRendererMixin {
@@ -37,47 +29,25 @@ public abstract class CloudRendererMixin {
     @Unique
     private static final float CLOUD_LAYER_HEIGHT = 4.0f;
     @Unique
-    private static final ResourceLocation VANILLA_CLOUD_TEXTURE = ResourceLocation.withDefaultNamespace("textures/environment/clouds.png");
-    @Unique
     private static final ResourceLocation CONSOLE_CLOUD_TEXTURE = ResourceLocation.fromNamespaceAndPath("legacy", "textures/environment/console_clouds.png");
-    @Unique
-    private boolean legacy$lastLceCloudState;
-    @Unique
-    private boolean legacy$lastLegacyCloudHeightAndTextureState;
-
-    @Shadow
-    private boolean needsRebuild;
 
     @Shadow
     private CloudRenderer.TextureData texture;
 
-    @Inject(method = "prepare", at = @At("HEAD"), cancellable = true)
-    private void legacy$useConsoleCloudTexture(
-        ResourceManager resourceManager,
-        ProfilerFiller profilerFiller,
-        CallbackInfoReturnable<Optional<CloudRenderer.TextureData>> cir
-    ) {
-        ResourceLocation textureLocation = legacy$getCloudTextureLocation(resourceManager);
-        if (!textureLocation.equals(CONSOLE_CLOUD_TEXTURE)) {
-            return;
+    @Redirect(
+        method = "prepare",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/server/packs/resources/ResourceManager;open(Lnet/minecraft/resources/ResourceLocation;)Ljava/io/InputStream;"
+        )
+    )
+    private InputStream legacy$useConsoleCloudTexture(ResourceManager resourceManager, ResourceLocation textureLocation) throws IOException {
+        if (!LegacyCloudAtmosphere.areLceCloudsEnabled()) {
+            return resourceManager.open(textureLocation);
         }
 
-        try {
-            cir.setReturnValue(Optional.of(legacy$loadTextureData(resourceManager, textureLocation)));
-        } catch (IOException ignored) {
-        }
-    }
-
-    @Inject(method = "render", at = @At("HEAD"))
-    private void legacy$markCloudsForRebuildWhenModeChanges(int color, CloudStatus cloudStatus, float cloudHeight, Vec3 cameraPosition, float ticks, CallbackInfo ci) {
-        boolean lceCloudsEnabled = LegacyCloudAtmosphere.areLceCloudsEnabled();
-        boolean legacyCloudHeightAndTextureEnabled = LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled();
-        if (legacy$lastLceCloudState != lceCloudsEnabled || legacy$lastLegacyCloudHeightAndTextureState != legacyCloudHeightAndTextureEnabled) {
-            legacy$refreshCloudTexture();
-            legacy$lastLceCloudState = lceCloudsEnabled;
-            legacy$lastLegacyCloudHeightAndTextureState = legacyCloudHeightAndTextureEnabled;
-            needsRebuild = true;
-        }
+        ResourceLocation resolvedTexture = resourceManager.getResource(CONSOLE_CLOUD_TEXTURE).isPresent() ? CONSOLE_CLOUD_TEXTURE : textureLocation;
+        return resourceManager.open(resolvedTexture);
     }
 
     @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true)
@@ -87,28 +57,6 @@ public abstract class CloudRendererMixin {
         }
 
         return cloudStatus == CloudStatus.OFF ? cloudStatus : CloudStatus.FANCY;
-    }
-
-    @Redirect(
-        method = "render",
-        at = @At(
-            value = "FIELD",
-            target = "Lnet/minecraft/client/renderer/RenderPipelines;CLOUDS:Lcom/mojang/blaze3d/pipeline/RenderPipeline;"
-        )
-    )
-    private RenderPipeline legacy$useLegacyCloudPipeline() {
-        return LegacyCloudAtmosphere.areLceCloudsEnabled() ? LegacyRenderPipelines.LEGACY_CLOUDS : RenderPipelines.CLOUDS;
-    }
-
-    @Redirect(
-        method = "render",
-        at = @At(
-            value = "FIELD",
-            target = "Lnet/minecraft/client/renderer/RenderPipelines;FLAT_CLOUDS:Lcom/mojang/blaze3d/pipeline/RenderPipeline;"
-        )
-    )
-    private RenderPipeline legacy$useLegacyFlatCloudPipeline() {
-        return LegacyCloudAtmosphere.areLceCloudsEnabled() ? LegacyRenderPipelines.LEGACY_FLAT_CLOUDS : RenderPipelines.FLAT_CLOUDS;
     }
 
     @ModifyVariable(method = "render", at = @At(value = "STORE"), index = 6)
@@ -123,7 +71,7 @@ public abstract class CloudRendererMixin {
 
     @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true, ordinal = 0)
     private float legacy$useLegacyCloudHeight(float cloudHeight) {
-        return LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled() ? LEGACY_CLOUD_HEIGHT : cloudHeight;
+        return LegacyCloudAtmosphere.areLceCloudsEnabled() ? LEGACY_CLOUD_HEIGHT : cloudHeight;
     }
 
     @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true)
@@ -228,7 +176,7 @@ public abstract class CloudRendererMixin {
         }
 
         double cameraY = minecraft.gameRenderer.getMainCamera().getPosition().y;
-        float cloudHeight = LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled() ? LEGACY_CLOUD_HEIGHT : (float) minecraft.level.dimensionType().cloudHeight().orElse((int) LEGACY_CLOUD_HEIGHT);
+        float cloudHeight = LegacyCloudAtmosphere.areLceCloudsEnabled() ? LEGACY_CLOUD_HEIGHT : (float) minecraft.level.dimensionType().cloudHeight().orElse((int) LEGACY_CLOUD_HEIGHT);
         if (cameraY > cloudHeight + CLOUD_LAYER_HEIGHT) {
             return 1;
         }
@@ -248,45 +196,6 @@ public abstract class CloudRendererMixin {
     @Unique
     private int legacy$getRenderDistanceCloudRadius() {
         return Math.max(1, (int) Math.ceil(legacy$getRenderDistanceCloudDistanceBlocks() / 12.0d));
-    }
-
-    @Unique
-    private void legacy$refreshCloudTexture() {
-        ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
-        try {
-            texture = legacy$loadTextureData(resourceManager, legacy$getCloudTextureLocation(resourceManager));
-        } catch (IOException ignored) {
-        }
-    }
-
-    @Unique
-    private static ResourceLocation legacy$getCloudTextureLocation(ResourceManager resourceManager) {
-        return LegacyCloudAtmosphere.areLegacyCloudHeightAndTextureEnabled() && resourceManager.getResource(CONSOLE_CLOUD_TEXTURE).isPresent() ? CONSOLE_CLOUD_TEXTURE : VANILLA_CLOUD_TEXTURE;
-    }
-
-    @Unique
-    private CloudRenderer.TextureData legacy$loadTextureData(ResourceManager resourceManager, ResourceLocation textureLocation) throws IOException {
-        try (InputStream inputStream = resourceManager.open(textureLocation); NativeImage nativeImage = NativeImage.read(inputStream)) {
-            int width = nativeImage.getWidth();
-            int height = nativeImage.getHeight();
-            long[] cells = new long[width * height];
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    int pixel = nativeImage.getPixel(x, y);
-                    if (legacy$isCellEmpty(pixel)) {
-                        continue;
-                    }
-
-                    boolean northEmpty = legacy$isCellEmpty(nativeImage.getPixel(x, Math.floorMod(y - 1, height)));
-                    boolean eastEmpty = legacy$isCellEmpty(nativeImage.getPixel(Math.floorMod(x + 1, width), y));
-                    boolean southEmpty = legacy$isCellEmpty(nativeImage.getPixel(x, Math.floorMod(y + 1, height)));
-                    boolean westEmpty = legacy$isCellEmpty(nativeImage.getPixel(Math.floorMod(x - 1, width), y));
-                    cells[x + y * width] = legacy$packCellData(pixel, northEmpty, eastEmpty, southEmpty, westEmpty);
-                }
-            }
-
-            return new CloudRenderer.TextureData(cells, width, height);
-        }
     }
 
     @Unique
@@ -317,19 +226,5 @@ public abstract class CloudRendererMixin {
     @Unique
     private static boolean legacy$isWestEmpty(long cellData) {
         return (cellData & 1L) != 0L;
-    }
-
-    @Unique
-    private static boolean legacy$isCellEmpty(int pixel) {
-        return ARGB.alpha(pixel) < 10;
-    }
-
-    @Unique
-    private static long legacy$packCellData(int pixel, boolean northEmpty, boolean eastEmpty, boolean southEmpty, boolean westEmpty) {
-        return ((long) pixel << 4)
-            | ((northEmpty ? 1L : 0L) << 3)
-            | ((eastEmpty ? 1L : 0L) << 2)
-            | ((southEmpty ? 1L : 0L) << 1)
-            | (westEmpty ? 1L : 0L);
     }
 }

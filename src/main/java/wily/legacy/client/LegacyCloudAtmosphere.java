@@ -28,10 +28,6 @@ public final class LegacyCloudAtmosphere {
         return LegacyOptions.lceClouds.get();
     }
 
-    public static boolean areLegacyCloudHeightAndTextureEnabled() {
-        return areLceCloudsEnabled() && LegacyOptions.legacyCloudHeightAndTexture.get();
-    }
-
     public static int getCloudDrawDistanceBlocks() {
         return Math.max(64, Legacy4JClient.getEffectiveRenderDistance() * 16);
     }

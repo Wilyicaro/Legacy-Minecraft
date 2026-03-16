@@ -343,11 +343,8 @@ public class OptionsScreen extends PanelVListScreen {
                                 LegacyOptions.overrideTerrainFogEnd,
                                 FactoryConfig::get,
                                 LegacyOptions.terrainFogEnd),
-                        o -> o.renderableVList.addLinkedOptions(
-                                LegacyOptions.lceClouds,
-                                FactoryConfig::get,
-                                LegacyOptions.legacyCloudHeightAndTexture),
                         o -> o.renderableVList.addOptions(
+                                LegacyOptions.lceClouds,
                                 LegacyOptions.legacySkyShape,
                                 LegacyOptions.fastLeavesWhenBlocked,
                                 LegacyOptions.fastLeavesCustomModels,
