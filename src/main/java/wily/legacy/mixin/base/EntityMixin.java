@@ -11,6 +11,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.mobcaps.LegacyMobCaps;
 
@@ -30,6 +32,13 @@ public abstract class EntityMixin {
     public void setRemoved(Entity.RemovalReason removalReason, CallbackInfo ci) {
         if (self().level() instanceof ServerLevel && !self().isRemoved()) {
             LegacyMobCaps.handleEntityRemoved(self());
+        }
+    }
+
+    @Inject(method = "isInvisible", at = @At("RETURN"), cancellable = true)
+    public void isInvisible(CallbackInfoReturnable<Boolean> cir) {
+        if (!cir.getReturnValueZ() && self() instanceof LegacyPlayerInfo info && !info.isVisible()) {
+            cir.setReturnValue(true);
         }
     }
 

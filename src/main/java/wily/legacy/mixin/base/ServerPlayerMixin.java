@@ -43,6 +43,7 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
     boolean classicLoom = true;
     boolean disableExhaustion = false;
     boolean mayFlySurvival = false;
+    boolean visible = true;
 
     public ServerPlayerMixin(Level level, GameProfile gameProfile) {
         super(level, gameProfile);
@@ -136,7 +137,7 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
 
     @Override
     public boolean isVisible() {
-        return !super.isInvisible();
+        return visible;
     }
 
     @Override
@@ -150,19 +151,21 @@ public abstract class ServerPlayerMixin extends Player implements LegacyPlayer, 
 
     @Override
     public void setVisibility(boolean visible) {
-        super.setInvisible(!visible);
+        this.visible = visible;
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("RETURN"))
     public void addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo ci) {
         valueOutput.putBoolean("DisableExhaustion", isExhaustionDisabled());
         valueOutput.putBoolean("MayFlySurvival", mayFlySurvival());
+        valueOutput.putBoolean("HostInvisible", !isVisible());
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("HEAD"))
     public void readAdditionalSaveData(ValueInput input, CallbackInfo ci) {
         setDisableExhaustion(input.getBooleanOr("DisableExhaustion", false));
         setMayFlySurvival(input.getBooleanOr("MayFlySurvival", false));
+        setVisibility(!input.getBooleanOr("HostInvisible", false));
     }
 
     @Inject(method = "startSleepInBed", at = @At("RETURN"), cancellable = true)

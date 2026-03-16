@@ -48,6 +48,7 @@
     "client.chat.ChatComponentMixin",
     "client.chat.ChatScreenMixin",
     "client.ClientEntityMixin",
+    "client.ClientEntityVisibilityMixin",
     "client.ClientLevelSettingsMixin",
     "client.ClientLevelStorageSourceMixin",
     "client.ClientMinecraftServerMixin",
@@ -80,6 +81,7 @@
     "client.sign.HangingSignEditScreenMixin",
     "client.inventory.HorseInventoryScreenMixin",
     "client.HugeExplosionParticleMixin",
+    "client.HumanoidArmorLayerMixin",
     "client.HumanoidModelMixin",
     "client.IntegratedServerMixin",
     "client.inventory.InventoryScreenMixin",
@@ -111,6 +113,7 @@
     "client.ParticleMixin",
     "client.pause.PauseScreenMixin",
     "client.PlayerInfoMixin",
+    "client.ItemInHandLayerMixin",
     "client.PlayerRendererMixin",
     "client.PresetEditorMixin",
     "client.RecipeBookComponentMixin",
@@ -264,3 +267,4 @@
     "defaultRequire": 1
   }
 }
+

@@ -2,6 +2,7 @@ package wily.legacy.network;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -61,6 +62,10 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
         return new PlayerInfoSync(mayFlySurvival ? Sync.ENABLE_MAY_FLY_SURVIVAL : Sync.DISABLE_MAY_FLY_SURVIVAL, profile);
     }
 
+    public static PlayerInfoSync invisibility(boolean invisible, GameProfile profile) {
+        return new PlayerInfoSync(invisible ? Sync.ENABLE_INVISIBILITY : Sync.DISABLE_INVISIBILITY, profile);
+    }
+
     public static Map<String, Object> getWritableGameRules(GameRules gameRules) {
         Map<String, Object> rules = new HashMap<>();
         gameRules.visitGameRuleTypes(new GameRules.GameRuleTypeVisitor() {
@@ -85,6 +90,7 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
     public void apply(Context context) {
         if (context.player() instanceof ServerPlayer sp) {
             ServerPlayer affectPlayer;
+            boolean shouldSyncPlayerInfo = false;
             if (sp.getUUID().equals(player)) {
                 switch (sync) {
                     case ASK_ALL ->
@@ -102,12 +108,37 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
             if (affectPlayer == null) return;
             if (sp.hasPermissions(2)) {
                 switch (sync) {
-                    case DISABLE_EXHAUSTION, ENABLE_EXHAUSTION ->
-                            ((LegacyPlayerInfo) affectPlayer).setDisableExhaustion(sync == Sync.DISABLE_EXHAUSTION);
-                    case ENABLE_MAY_FLY_SURVIVAL, DISABLE_MAY_FLY_SURVIVAL ->
-                            LegacyPlayerInfo.setAndUpdateMayFlySurvival(affectPlayer, sync == Sync.ENABLE_MAY_FLY_SURVIVAL, true);
+                    case DISABLE_EXHAUSTION, ENABLE_EXHAUSTION -> {
+                        boolean disableExhaustion = sync == Sync.DISABLE_EXHAUSTION;
+                        LegacyPlayerInfo info = (LegacyPlayerInfo) affectPlayer;
+                        if (info.isExhaustionDisabled() != disableExhaustion) {
+                            info.setDisableExhaustion(disableExhaustion);
+                            affectPlayer.displayClientMessage(Component.translatable(disableExhaustion ? "legacy.menu.host_options.player.disableExhaustion.enabled" : "legacy.menu.host_options.player.disableExhaustion.disabled"), false);
+                            shouldSyncPlayerInfo = true;
+                        }
+                    }
+                    case ENABLE_MAY_FLY_SURVIVAL, DISABLE_MAY_FLY_SURVIVAL -> {
+                        boolean mayFlySurvival = sync == Sync.ENABLE_MAY_FLY_SURVIVAL;
+                        LegacyPlayerInfo info = (LegacyPlayerInfo) affectPlayer;
+                        if (info.mayFlySurvival() != mayFlySurvival) {
+                            LegacyPlayerInfo.setAndUpdateMayFlySurvival(affectPlayer, mayFlySurvival, true);
+                            affectPlayer.displayClientMessage(Component.translatable(mayFlySurvival ? "legacy.menu.host_options.player.mayFly.enabled" : "legacy.menu.host_options.player.mayFly.disabled"), false);
+                            shouldSyncPlayerInfo = true;
+                        }
+                    }
+                    case ENABLE_INVISIBILITY, DISABLE_INVISIBILITY -> {
+                        boolean visible = sync == Sync.DISABLE_INVISIBILITY;
+                        LegacyPlayerInfo info = (LegacyPlayerInfo) affectPlayer;
+                        if (info.isVisible() != visible) {
+                            info.setVisibility(visible);
+                            affectPlayer.displayClientMessage(Component.translatable(visible ? "legacy.menu.host_options.player.invisible.disabled" : "legacy.menu.host_options.player.invisible.enabled"), false);
+                            affectPlayer.displayClientMessage(Component.translatable(visible ? "legacy.menu.host_options.player.invulnerable.disabled" : "legacy.menu.host_options.player.invulnerable.enabled"), false);
+                            shouldSyncPlayerInfo = true;
+                        }
+                    }
                 }
             }
+            if (shouldSyncPlayerInfo) syncPlayerInfo(affectPlayer);
         }
     }
 
@@ -117,7 +148,13 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
     }
 
     public enum Sync {
-        ASK_ALL, CLASSIC_CRAFTING, LEGACY_CRAFTING, DISABLE_EXHAUSTION, ENABLE_EXHAUSTION, ENABLE_MAY_FLY_SURVIVAL, DISABLE_MAY_FLY_SURVIVAL, CLASSIC_TRADING, LEGACY_TRADING, CLASSIC_STONECUTTING, LEGACY_STONECUTTING, CLASSIC_LOOM, LEGACY_LOOM
+        ASK_ALL, CLASSIC_CRAFTING, LEGACY_CRAFTING, DISABLE_EXHAUSTION, ENABLE_EXHAUSTION, ENABLE_MAY_FLY_SURVIVAL, DISABLE_MAY_FLY_SURVIVAL, ENABLE_INVISIBILITY, DISABLE_INVISIBILITY, CLASSIC_TRADING, LEGACY_TRADING, CLASSIC_STONECUTTING, LEGACY_STONECUTTING, CLASSIC_LOOM, LEGACY_LOOM
+    }
+
+    private static void syncPlayerInfo(ServerPlayer player) {
+        MinecraftServer server = FactoryAPIPlatform.getEntityServer(player);
+        if (server == null) return;
+        CommonNetwork.sendToPlayers(server.getPlayerList().getPlayers(), new All(Map.of(player.getUUID(), (LegacyPlayerInfo) player), Collections.emptyMap(), server.getDefaultGameType(), All.ID_S2C));
     }
 
     public record All(Map<UUID, LegacyPlayerInfo> players, Map<String, Object> gameRules, GameType defaultGameType,
@@ -188,3 +225,5 @@ public record PlayerInfoSync(Sync sync, UUID player) implements CommonNetwork.Pa
         }
     }
 }
+
+
