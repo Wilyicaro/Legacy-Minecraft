@@ -1044,8 +1044,10 @@ public interface ControlTooltip {
 
         @Override
         public void click(MouseButtonEvent event) {
-            super.click(event);
-            state().nextUpdatePress();
+            if (Legacy4JClient.controllerManager.connectedController != null) {
+                super.click(event);
+                state().nextUpdatePress();
+            }
         }
 
         @Override

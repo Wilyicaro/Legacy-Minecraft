@@ -68,9 +68,9 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
-import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.MultilineTooltip;
+import wily.legacy.client.screen.SaveInfoScreen;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.LegacySprites;
@@ -696,7 +696,7 @@ public class LegacyRenderUtil {
         TitleScreen titleScreen = new TitleScreen(LegacyOptions.titleScreenFade.get());
         if (LegacyOptions.skipInitialSaveWarning.get()) {
             return titleScreen;
-        } else return ConfirmationScreen.createSaveInfoScreen(titleScreen);
+        } else return new SaveInfoScreen(titleScreen);
     }
 
     public static ScreenDirection getScreenDirection(double x, double y) {
