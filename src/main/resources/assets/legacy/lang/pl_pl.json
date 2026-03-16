@@ -1375,6 +1375,14 @@
   "legacy.menu.host_options.player.disableExhaustion": "Wyłącz zmęczenie",
   "legacy.menu.host_options.player.invisible": "Niewidzialność",
   "legacy.menu.host_options.player.mayFly": "Może latać",
+  "legacy.menu.host_options.player.mayFly.enabled": "You can now fly",
+  "legacy.menu.host_options.player.mayFly.disabled": "You can no longer fly",
+  "legacy.menu.host_options.player.disableExhaustion.enabled": "You will no longer get exhausted",
+  "legacy.menu.host_options.player.disableExhaustion.disabled": "You will now get exhausted",
+  "legacy.menu.host_options.player.invisible.enabled": "You are now invisible",
+  "legacy.menu.host_options.player.invisible.disabled": "You are no longer invisible",
+  "legacy.menu.host_options.player.invulnerable.enabled": "You are now invulnerable",
+  "legacy.menu.host_options.player.invulnerable.disabled": "You are no longer invulnerable",
   "legacy.menu.host_options.set_day": "Dzień",
   "legacy.menu.host_options.set_night": "Noc",
   "legacy.menu.host_options.set_player_spawn": "Ustaw miejsce odrodzenia gracza",
@@ -1904,3 +1912,4 @@
   "structure.minecraft.woodland_mansions": "Leśne dwory",
   "structure.minecraft.woodland_mansions.description": "Posiadłości znalezione w Lasach Ciiemnego dębu. Dom Vexów i Illagerów."
 }
+
