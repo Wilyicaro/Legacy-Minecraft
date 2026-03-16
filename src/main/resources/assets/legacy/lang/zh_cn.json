@@ -1375,6 +1375,14 @@
   "legacy.menu.host_options.player.disableExhaustion": "禁用饥饿",
   "legacy.menu.host_options.player.invisible": "隐形",
   "legacy.menu.host_options.player.mayFly": "允许飞行",
+  "legacy.menu.host_options.player.mayFly.enabled": "You can now fly",
+  "legacy.menu.host_options.player.mayFly.disabled": "You can no longer fly",
+  "legacy.menu.host_options.player.disableExhaustion.enabled": "You will no longer get exhausted",
+  "legacy.menu.host_options.player.disableExhaustion.disabled": "You will now get exhausted",
+  "legacy.menu.host_options.player.invisible.enabled": "You are now invisible",
+  "legacy.menu.host_options.player.invisible.disabled": "You are no longer invisible",
+  "legacy.menu.host_options.player.invulnerable.enabled": "You are now invulnerable",
+  "legacy.menu.host_options.player.invulnerable.disabled": "You are no longer invulnerable",
   "legacy.menu.host_options.set_day": "设置为白天",
   "legacy.menu.host_options.set_night": "设置为夜晚",
   "legacy.menu.host_options.set_player_spawn": "设置玩家重生点",
@@ -1904,3 +1912,4 @@
   "structure.minecraft.woodland_mansions": "林地府邸",
   "structure.minecraft.woodland_mansions.description": "位于深色橡树林的府邸，居住着恼鬼和恶魂。"
 }
+
