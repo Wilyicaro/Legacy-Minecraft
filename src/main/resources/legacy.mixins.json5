@@ -164,7 +164,6 @@
     "client.AbstractWidgetAccessor",
     "client.WaterFogEnvironmentMixin",
     "client.GuiEntityRenderStateMixin",
-    "client.GuiEntityRendererMixin",
     "client.GuiRendererMixin",
     "client.bosshealth.EndDragonFightMixin",
     "client.bosshealth.WitherBossMixin",

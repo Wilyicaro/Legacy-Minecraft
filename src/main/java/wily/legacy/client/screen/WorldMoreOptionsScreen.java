@@ -21,7 +21,6 @@ import net.minecraft.world.level.WorldDataConfiguration;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.DatapackRepositoryAccessor;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
-import wily.legacy.client.LegacyButton;
 import wily.legacy.client.LegacyOptions;
 import wily.legacy.mixin.base.client.AbstractWidgetAccessor;
 import wily.legacy.util.LegacyComponents;

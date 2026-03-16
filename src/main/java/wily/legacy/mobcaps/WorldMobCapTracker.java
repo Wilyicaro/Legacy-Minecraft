@@ -8,7 +8,7 @@ import java.util.EnumMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-final class WorldMobCapTracker {
+public final class WorldMobCapTracker {
     private final EnumMap<TrackedMobCap, Integer> bucketCounts = new EnumMap<>(TrackedMobCap.class);
     private final Map<EntityType<?>, Integer> typeCounts = new IdentityHashMap<>();
 

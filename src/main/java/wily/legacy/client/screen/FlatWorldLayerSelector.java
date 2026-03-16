@@ -13,7 +13,6 @@ import net.minecraft.world.level.levelgen.flat.FlatLayerInfo;
 import net.minecraft.world.level.material.Fluids;
 import wily.factoryapi.ItemContainerPlatform;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.LegacyButton;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyFontUtil;
 

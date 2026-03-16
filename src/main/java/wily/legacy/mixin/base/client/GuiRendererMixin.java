@@ -27,13 +27,11 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import wily.legacy.Legacy4J;
-import wily.legacy.client.LegacyGuiEntityRenderer;
 import wily.legacy.client.LegacyGuiItemRenderState;
 import wily.legacy.client.LegacyGuiItemRenderer;
 import wily.legacy.client.LegacyOptions;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 @Mixin(GuiRenderer.class)
@@ -55,33 +53,9 @@ public class GuiRendererMixin {
     @Unique
     private Long2ObjectMap<LegacyGuiItemRenderer> guiItemRenderers = new Long2ObjectArrayMap<>();
     @Unique
-    private List<GuiEntityRenderer> guiEntityRenderers;
-
-    @Inject(method = "<init>", at = @At("TAIL"))
-    void initTail(GuiRenderState guiRenderState, MultiBufferSource.BufferSource bufferSource, SubmitNodeCollector submitNodeCollector, FeatureRenderDispatcher featureRenderDispatcher, List list, CallbackInfo ci) {
-        guiEntityRenderers = List.of(
-                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher())
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher()),
-//                new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher())
-        );
-    }
+    private final Deque<GuiEntityRenderer> availableGuiEntityRenderers = new ArrayDeque<>();
+    @Unique
+    private final Deque<GuiEntityRenderer> guiEntityRenderers = new ArrayDeque<>();
 
     @Inject(method = "prepareItemElements", at = @At("HEAD"))
     private void prepareItemElementsHead(CallbackInfo ci) {
@@ -123,17 +97,32 @@ public class GuiRendererMixin {
 
     @Inject(method = "preparePictureInPicture", at = @At("HEAD"))
     void preparePictureInPicture(CallbackInfo ci) {
-        for (GuiEntityRenderer guiEntityRenderer : guiEntityRenderers) {
-            LegacyGuiEntityRenderer.of(guiEntityRenderer).available();
+        availableGuiEntityRenderers.addAll(guiEntityRenderers);
+    }
+
+    @Inject(method = "preparePictureInPicture", at = @At("RETURN"))
+    void preparePictureInPictureReturn(CallbackInfo ci) {
+        while (!availableGuiEntityRenderers.isEmpty()) {
+            try (GuiEntityRenderer guiEntityRenderer = availableGuiEntityRenderers.pop()) {
+                guiEntityRenderers.remove(guiEntityRenderer);
+            }
         }
+    }
+
+    @Unique
+    private GuiEntityRenderer findOrCreateGuiEntityRenderer() {
+        if (availableGuiEntityRenderers.isEmpty()) {
+            GuiEntityRenderer guiEntityRenderer = new GuiEntityRenderer(bufferSource, Minecraft.getInstance().getEntityRenderDispatcher());
+            guiEntityRenderers.push(guiEntityRenderer);
+            return guiEntityRenderer;
+        }
+        return availableGuiEntityRenderers.pop();
     }
 
     @Inject(method = "preparePictureInPictureState", at = @At("HEAD"), cancellable = true/*? if neoforge {*//*, remap = false*//*?}*/)
     void preparePictureInPictureState(PictureInPictureRenderState arg, int i, /*? if neoforge {*//*boolean firstPass, CallbackInfoReturnable<Boolean> cir*//*?} else {*/CallbackInfo ci/*?}*/) {
         if (arg.getClass() == GuiEntityRenderState.class) {
-            GuiEntityRenderer guiEntityRenderer = guiEntityRenderers.stream().map(LegacyGuiEntityRenderer::of).filter(LegacyGuiEntityRenderer::isAvailable).findFirst().map(a -> ((GuiEntityRenderer) a)).orElse(guiEntityRenderers.get(0));
-            LegacyGuiEntityRenderer.of(guiEntityRenderer).use();
-            guiEntityRenderer.prepare((GuiEntityRenderState) arg, this.renderState, i);
+            findOrCreateGuiEntityRenderer().prepare((GuiEntityRenderState) arg, this.renderState, i);
             //? if neoforge {
             /*cir.setReturnValue(true);
              *///?} else {

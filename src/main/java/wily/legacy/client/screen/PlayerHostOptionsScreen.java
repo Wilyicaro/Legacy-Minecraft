@@ -11,7 +11,6 @@ import net.minecraft.world.level.GameType;
 import wily.factoryapi.base.client.UIDefinition;
 import wily.factoryapi.base.network.CommonNetwork;
 import wily.legacy.client.CommonColor;
-import wily.legacy.client.LegacyButton;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.network.PlayerInfoSync;
 import wily.legacy.util.LegacySprites;

@@ -1,11 +1,12 @@
-package wily.legacy.client;
+package wily.legacy.client.screen;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
-import wily.legacy.client.screen.RenderableVList;
+import wily.legacy.client.LegacyOptions;
+import wily.legacy.client.RenderableVListEntry;
 import wily.legacy.util.client.LegacyFontUtil;
 
 public class LegacyButton extends Button implements RenderableVListEntry {
