@@ -10,21 +10,18 @@ import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.PresetEditor;
 import net.minecraft.client.input.KeyEvent;
-import net.minecraft.core.Holder;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.WorldDataConfiguration;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.DatapackRepositoryAccessor;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
-import wily.legacy.client.CommonColor;
+import wily.legacy.client.LegacyOptions;
 import wily.legacy.mixin.base.client.AbstractWidgetAccessor;
 import wily.legacy.util.LegacyComponents;
 import wily.legacy.util.client.LegacyRenderUtil;
@@ -43,8 +40,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
 
     protected final RenderableVList gameRenderables = new RenderableVList(accessor);
 
-    protected final Panel tooltipBox = Panel.tooltipBoxOf(panel, 188);
-    protected List<FormattedCharSequence> tooltipBoxLabel;
+    protected final Panel tooltipBox = Panel.tooltipBoxOf(panel, () -> LegacyOptions.getUIMode().isSD() ? 106 : 188);
     protected ScrollableRenderer scrollableRenderer = new ScrollableRenderer(new LegacyScrollRenderer());
     protected Runnable onClose = () -> {
     };
@@ -52,18 +48,18 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
     public WorldMoreOptionsScreen(CreateWorldScreen parent, Bearer<Boolean> trustPlayers) {
         super(parent, 244, 199, Component.translatable("createWorld.tab.more.title"));
         renderableVLists.add(gameRenderables);
-        renderableVList.addRenderable(SimpleLayoutRenderable.createDrawString(ENTER_SEED, 0, 1, 2, 9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        renderableVList.addCategory(ENTER_SEED);
         EditBox editBox = new EditBox(Minecraft.getInstance().font, 0, 0, 308, 20, ENTER_SEED) {
             protected MutableComponent createNarrationMessage() {
                 return super.createNarrationMessage().append(CommonComponents.NARRATION_SEPARATOR).append(SEED_INFO);
             }
         };
-        editBox.setTooltip(new MultilineTooltip(tooltipBox.getWidth() - 10, ENTER_SEED_DESCRIPTION));
+        editBox.setTooltip(Tooltip.create(ENTER_SEED_DESCRIPTION));
         editBox.setValue(parent.getUiState().getSeed());
         editBox.setResponder(string -> parent.getUiState().setSeed(editBox.getValue()));
         renderableVList.addRenderable(editBox);
-        renderableVList.addRenderable(SimpleLayoutRenderable.createDrawString(SEED_INFO,1, 2, 0, 9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
-        renderableVList.addRenderable(SimpleLayoutRenderable.createDrawString(Component.translatable("selectWorld.mapType"), 0, 2, 0, 9, CommonColor.INVENTORY_GRAY_TEXT.get(), false));
+        renderableVList.addCategory(SEED_INFO);
+        renderableVList.addCategory(Component.translatable("selectWorld.mapType"));
         renderableVList.addRenderable(new LegacySliderButton<>(0, 0, 0, 16,
                 s -> s.getObjectValue().describePreset(),
                 b -> Tooltip.create(LegacyComponents.getWorldTypeDescription(b.getObjectValue().preset())),
@@ -71,11 +67,11 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 () -> CycleButton.DEFAULT_ALT_LIST_SELECTOR.getAsBoolean() ? parent.getUiState().getAltPresetList()
                         : parent.getUiState().getNormalPresetList(),
                 b -> parent.getUiState().setWorldType(b.objectValue)));
-        Button customizeButton = Button.builder(Component.translatable("selectWorld.customizeType"), button -> {
+        Button customizeButton = new LegacyButton(Component.translatable("selectWorld.customizeType"), button -> {
             PresetEditor presetEditor = parent.getUiState().getPresetEditor();
             if (presetEditor != null)
                 minecraft.setScreen(presetEditor.createEditScreen(parent, parent.getUiState().getSettings()));
-        }).tooltip(Tooltip.create(Component.empty())).build();
+        });
         parent.getUiState().addListener(s -> {
             customizeButton.active = !s.isDebug() && s.getPresetEditor() != null;
             customizeButton.setTooltip(Tooltip.create(LegacyComponents.getWorldPresetCustomizeDescription(s.getWorldType().preset())));
@@ -90,7 +86,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         GameRules gameRules = parent.getUiState().getGameRules();
         Pair<Path, PackRepository> pair = parent.getDataPackSelectionSettings(parent.getUiState().getSettings().dataConfiguration());
         if (pair != null) {
-            renderableVList.addRenderable(SimpleLayoutRenderable.create(0, 9, r -> ((guiGraphics, i, j, f) -> guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("selectWorld.experiments"), r.x + 1, r.y + 2, CommonColor.INVENTORY_GRAY_TEXT.get(), false))));
+            renderableVList.addCategory(Component.translatable("selectWorld.experiments"));
             PackRepository dataRepository = pair.getSecond();
             List<String> selectedExperiments = new ArrayList<>(dataRepository.getSelectedIds());
             dataRepository.getAvailablePacks().forEach(p -> {
@@ -107,7 +103,7 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 parent.tryApplyNewDataPacks(dataRepository, false, w -> minecraft.setScreen(this));
             };
         }
-        renderableVList.addRenderable(Button.builder(Component.translatable("selectWorld.dataPacks"), button -> openDataPackSelectionScreen(parent, parent.getUiState().getSettings().dataConfiguration())).tooltip(Tooltip.create(Component.translatable("legacy.menu.selectWorld.dataPacks.description"))).build());
+        renderableVList.addRenderable(new LegacyButton(Component.translatable("selectWorld.dataPacks"), button -> openDataPackSelectionScreen(parent, parent.getUiState().getSettings().dataConfiguration()), Tooltip.create(Component.translatable("legacy.menu.selectWorld.dataPacks.description"))));
         renderableVList.addRenderable(new TickBox(0, 0, trustPlayers.get(), b -> Component.translatable("legacy.menu.selectWorld.trust_players"), b -> Tooltip.create(Component.translatable("legacy.menu.selectWorld.trust_players.description")), t -> trustPlayers.set(t.selected)));
         addGameRulesOptions(renderableVList, gameRules, k -> k.getCategory() == GameRules.Category.UPDATES);
         gameRenderables.addRenderable(hostPrivileges);
@@ -153,9 +149,11 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 if (!allowGamerule.test(key)) return;
                 GameRules.BooleanValue value = gameRules.getRule(key);
                 GameRules.BooleanValue defaultValue = type.createRule();
-                Component tooltip = Component.translatable(key.getDescriptionId() + ".description");
-                Component valueTooltip = Component.translatable("editGamerule.default", defaultValue.serialize()).withStyle(ChatFormatting.GRAY);
-                list.addRenderable(new TickBox(0, 0, gameRules.getRule(key).get(), b -> Component.translatable(key.getDescriptionId()), b -> new MultilineTooltip(tooltipBox.width - 10, tooltip, valueTooltip), b -> value.set(b.selected, null)));
+                Component message = Component.translatable(key.getDescriptionId());
+                Tooltip tooltip = Tooltip.create(
+                        Component.translatable(key.getDescriptionId() + ".description").append("\n").append(
+                        Component.translatable("editGamerule.default", defaultValue.serialize()).withStyle(ChatFormatting.GRAY)));
+                list.addRenderable(new TickBox(0, 0, gameRules.getRule(key).get(), b -> message, b -> tooltip, b -> value.set(b.selected, null)));
             }
 
             @Override
@@ -163,10 +161,11 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                 if (!allowGamerule.test(key)) return;
                 GameRules.IntegerValue value = gameRules.getRule(key);
                 GameRules.IntegerValue defaultValue = type.createRule();
-                Component tooltip = Component.translatable(key.getDescriptionId() + ".description");
-                Component valueTooltip = Component.translatable("editGamerule.default", defaultValue.serialize()).withStyle(ChatFormatting.GRAY);
+                Tooltip tooltip = Tooltip.create(
+                        Component.translatable(key.getDescriptionId() + ".description").append("\n").append(
+                        Component.translatable("editGamerule.default", defaultValue.serialize()).withStyle(ChatFormatting.GRAY)));
                 EditBox integerEdit = new EditBox(Minecraft.getInstance().font, 0, 0, 220, 20, Component.translatable(key.getDescriptionId()));
-                integerEdit.setTooltip(new MultilineTooltip(tooltipBox.width - 10, tooltip, valueTooltip));
+                integerEdit.setTooltip(tooltip);
                 integerEdit.setValue(Integer.toString(value.get()));
                 integerEdit.setResponder(string -> {
                     if (value.tryDeserialize(string)) {
@@ -176,10 +175,16 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
                         integerEdit.setTextColor(0xFFFF0000);
                     }
                 });
-                list.addRenderable(SimpleLayoutRenderable.create(0, 9, r -> ((guiGraphics, i, j, f) -> guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable(key.getDescriptionId()), r.x + 1, r.y + 2, CommonColor.INVENTORY_GRAY_TEXT.get(), false))));
+                list.addCategory(Component.translatable(key.getDescriptionId()));
                 list.addRenderable(integerEdit);
             }
         });
+    }
+
+    @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof EditBox editBox)
+            editBox.setHeight(LegacyOptions.getUIMode().isSD() ? 16 : 20);
     }
 
     @Override
@@ -199,20 +204,28 @@ public class WorldMoreOptionsScreen extends PanelVListScreen implements ControlT
         LegacyRenderUtil.renderDefaultBackground(accessor, guiGraphics, false);
         if (LegacyRenderUtil.hasTooltipBoxes(accessor)) {
             Optional<GuiEventListener> listener;
+            Component message = null;
             if (getFocused() instanceof AbstractWidgetAccessor widget && widget.getTooltip() != null && widget.getTooltip().get() != null)
-                tooltipBoxLabel = widget.getTooltip().get().toCharSequence(minecraft);
+                message = widget.getTooltip().get().message;
             else if ((listener = getChildAt(i, j)).isPresent() && listener.get() instanceof AbstractWidgetAccessor widget && widget.getTooltip() != null && widget.getTooltip().get() != null)
-                tooltipBoxLabel = widget.getTooltip().get().toCharSequence(minecraft);
-            else tooltipBoxLabel = null;
+                message = widget.getTooltip().get().message;
 
-            if (tooltipBoxLabel == null)
+            boolean sd = LegacyOptions.getUIMode().isSD();
+
+            MultiLineLabel label = message == null ? null : (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(message, tooltipBox.getWidth() - 10);
+
+            int lineHeight = sd ? 8 : 12;
+
+            scrollableRenderer.lineHeight = lineHeight;
+
+            if (label == null)
                 scrollableRenderer.resetScrolled();
             else
-                scrollableRenderer.scrolled.max = Math.max(0, tooltipBoxLabel.size() - (tooltipBox.getHeight() - 44) / 12);
+                scrollableRenderer.scrolled.max = Math.max(0, label.getLineCount() - (tooltipBox.getHeight() - (sd ? 20 : 44)) / (lineHeight));
 
             tooltipBox.render(guiGraphics, i, j, f);
-            if (tooltipBoxLabel != null) {
-                scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () -> tooltipBoxLabel.forEach(c -> guiGraphics.drawString(font, c, panel.x + panel.width + 3, panel.y + 13 + tooltipBoxLabel.indexOf(c) * 12, 0xFFFFFFFF)));
+            if (label != null) {
+                scrollableRenderer.render(guiGraphics, panel.x + panel.width + 3, panel.y + 13, tooltipBox.width - 10, tooltipBox.getHeight() - 44, () -> label.render(guiGraphics, MultiLineLabel.Align.LEFT, panel.x + panel.width + 3, panel.y + 13, lineHeight, true, 0xFFFFFFFF));
             }
         }
     }

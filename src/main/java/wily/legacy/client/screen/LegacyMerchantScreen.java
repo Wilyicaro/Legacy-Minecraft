@@ -304,19 +304,19 @@ public class LegacyMerchantScreen extends RecipesScreen<LegacyMerchantMenu, Lega
             int k = this.menu.merchantLevel;
             if (k > 0 && k <= 5 && this.menu.showProgressBar) {
                 MutableComponent component = getMerchantTile(title, k);
-                guiGraphics.drawString(this.font, component, (imageWidth - this.font.width(component)) / 2, titleY, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                guiGraphics.drawString(this.font, component, (imageWidth - this.font.width(component)) / 2, titleY, CommonColor.GRAY_TEXT.get(), false);
             } else {
-                guiGraphics.drawString(this.font, this.title, titleLabelX, titleY, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                guiGraphics.drawString(this.font, this.title, titleLabelX, titleY, CommonColor.GRAY_TEXT.get(), false);
             }
             int bottomPanelY = accessor.getInteger("bottomPanel.y", 79);
-            guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, bottomPanelY  + accessor.getInteger("inventoryTitle.y", 8), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, bottomPanelY  + accessor.getInteger("inventoryTitle.y", 8), CommonColor.GRAY_TEXT.get(), false);
             if (getSelectedMerchantOffer() != null && menu.showProgressBar) {
                 int level = ((LegacyMerchantOffer) getSelectedMerchantOffer()).getRequiredLevel();
                 if (level > 0) {
                     Component c = Component.translatable("merchant.level." + level);
                     int tradingGridPanelX = accessor.getInteger("tradingGridPanel.x", 12);
                     int tradingPanelWidth = accessor.getInteger("tradingGridPanel.width", 110);
-                    guiGraphics.drawString(this.font, c, tradingGridPanelX + (tradingPanelWidth - font.width(c)) / 2, bottomPanelY + accessor.getInteger("levelTitle.y", 21), CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+                    guiGraphics.drawString(this.font, c, tradingGridPanelX + (tradingPanelWidth - font.width(c)) / 2, bottomPanelY + accessor.getInteger("levelTitle.y", 21), CommonColor.GRAY_TEXT.get(), false);
                 }
             }
         });

@@ -1,0 +1,66 @@
+{
+  "elements": [
+    {
+      "name": "scrollable_renderer",
+      "applyCondition": "${uiMode.hd}||${uiMode.fhd}",
+      "type": "put_scrollable_renderer",
+      "x": "(${width}-${scrollable_renderer.width})/2",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 31",
+      "width": 456,
+      "height": 222,
+      "elements": [
+        {
+          "name": "title",
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.whats_new_message"
+          },
+          "width": 433
+        },
+        {
+          "name": "changelog",
+          "type": "draw_multiline_string",
+          "component": {
+            "reference": "legacy.changelog"
+          },
+          "width": 433
+        }
+      ]
+    },
+    {
+      "name": "scrollable_renderer",
+      "applyCondition": {
+        "reference": "uiMode.sd"
+      },
+      "type": "put_scrollable_renderer",
+      "x": "(${width}-${scrollable_renderer.width})/2",
+      "y": "(${height}-${scrollable_renderer.height})/2 + 11",
+      "contentX": 10,
+      "contentY": 8,
+      "width": 288,
+      "height": 137,
+      "lineHeight": 8,
+      "elements": [
+        {
+          "name": "title",
+          "type": "draw_multiline_string",
+          "component": {
+            "translate": "legacy.menu.how_to_play.whats_new_message",
+            "font": "legacy:default_11"
+          },
+          "width": 268,
+          "lineSpacing": 8
+        },
+        {
+          "name": "changelog",
+          "type": "draw_multiline_string",
+          "component": {
+            "reference": "legacy.changelog"
+          },
+          "width": 268,
+          "lineSpacing": 8
+        }
+      ]
+    }
+  ]
+}

@@ -46,7 +46,7 @@ public class CreationList extends RenderableVList {
         addIconButton(this, Legacy4J.createModLocation("creation_list/create_world"), Component.translatable("legacy.menu.create_world"), c -> CreateWorldScreen.openFresh(this.minecraft, () -> minecraft.setScreen(getScreen())));
         LegacyWorldTemplate.list.forEach(t -> addIconButton(this, t.icon(), t.buttonMessage(), c -> {
             if (t.isGamePath() && !Files.exists(t.getPath())) {
-                Path path = t.getValidPath();
+                Path path = t.getDownloadPath();
                 if (path == null || t.preDownload()) {
                     minecraft.setScreen(ConfirmationScreen.createInfoScreen(getScreen(), LegacyComponents.MISSING_WORLD_TEMPLATE, Component.translatable("legacy.menu.missing_world_template_message", t.buttonMessage())));
                 } else {
@@ -167,8 +167,7 @@ public class CreationList extends RenderableVList {
 
         @Override
         protected void renderScrollingString(GuiGraphics guiGraphics, Font font, int i, int j) {
-            int x = this.getX() + list.accessor.getInteger(list.name + ".buttonMessage.xOffset", 35);
-            LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), x, this.getY(), x + this.getWidth(), this.getY() + this.getHeight(), j, true));
+            LegacyFontUtil.applySDFont(b -> LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), this.getX() + list.accessor.getInteger(list.name + ".buttonMessage.xOffset", 35), this.getY(), getX() + this.getWidth() - 2, this.getY() + this.getHeight(), j, true));
         }
 
         @Override

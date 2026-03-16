@@ -1,7 +1,9 @@
 {
   "targetUI": "wily.legacy.client.screen.LegacyStonecutterScreen",
   "targetType": "class",
-  "applyCondition": { "reference": "uiMode.sd" },
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
   "elements": {
     "imageSprite": {
       "type": "put_resource_location",
@@ -31,22 +33,26 @@
     "inputSlot.x": 22,
     "inputSlot.y": 32,
     "inventory": {
-      "type":"put_legacy_slot",
-      "range":"[0,26]",
-      "x":"${inventoryPanel.x}+9+(${inventory.index}%9)*11",
-      "y":"${bottomPanel.y}+16+(${inventory.index}/9)*11",
-      "width":11,
-      "height":11,
-      "isVisible": {"reference": "isInventoryActive"}
+      "type": "put_legacy_slot",
+      "range": "[0,26]",
+      "x": "${inventoryPanel.x}+9+(${inventory.index}%9)*11",
+      "y": "${bottomPanel.y}+16+(${inventory.index}/9)*11",
+      "width": 11,
+      "height": 11,
+      "isVisible": {
+        "reference": "isInventoryActive"
+      }
     },
     "quick_select": {
-      "type":"put_legacy_slot",
-      "range":"[27,36]",
-      "x":"${inventoryPanel.x}+9+(${quick_select.index}%9)*11",
-      "y":"${bottomPanel.y}+53",
-      "width":11,
-      "height":11,
-      "isVisible": {"reference": "isInventoryActive"}
+      "type": "put_legacy_slot",
+      "range": "[27,36]",
+      "x": "${inventoryPanel.x}+9+(${quick_select.index}%9)*11",
+      "y": "${bottomPanel.y}+53",
+      "width": 11,
+      "height": 11,
+      "isVisible": {
+        "reference": "isInventoryActive"
+      }
     }
   }
 }

@@ -1,12 +1,12 @@
 package wily.legacy.client.screen;
 
+import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.client.gui.components.*;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import wily.legacy.client.ContentManager;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.LogoRenderer;
-import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -17,18 +17,12 @@ import wily.factoryapi.base.client.UIAccessor;
 import wily.legacy.client.CommonColor;
 import wily.legacy.client.ControlType;
 import wily.legacy.client.controller.ControllerBinding;
-import wily.legacy.client.screen.ConfirmationScreen;
-import wily.legacy.client.screen.ControlTooltip;
-import wily.legacy.client.screen.Panel;
-import wily.legacy.client.screen.PanelVListScreen;
-import wily.legacy.client.screen.ScrollableRenderer;
-import wily.legacy.client.screen.LegacyScrollRenderer;
 import wily.legacy.util.LegacySprites;
 import wily.legacy.util.client.LegacyRenderUtil;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -41,8 +35,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     
     protected final ContentManager.Category category;
     protected final List<ContentManager.Pack> packs;
-    protected ContentManager.Pack hoveredPack; 
-    private final LogoRenderer logoRenderer = new LogoRenderer(false);
+    protected ContentManager.Pack hoveredPack;
     protected final Panel tooltipBox = Panel.tooltipBoxOf(panel, 273);
     
     // Legacy Scrolling System
@@ -141,8 +134,8 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
         
         downloadingImages.add(packId);
         CompletableFuture.runAsync(() -> {
-            try (java.io.InputStream in = url.get().toURL().openStream()) {
-                com.mojang.blaze3d.platform.NativeImage nativeImage = com.mojang.blaze3d.platform.NativeImage.read(in);
+            try (InputStream in = url.get().toURL().openStream()) {
+                NativeImage nativeImage = NativeImage.read(in);
                 int nativeWidth = nativeImage.getWidth();
                 int nativeHeight = nativeImage.getHeight();
                 
@@ -150,7 +143,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                     String cleanId = packId.toLowerCase().replaceAll("[^a-z0-9_.-]", "");
                     ResourceLocation textureId = ResourceLocation.fromNamespaceAndPath("legacy", "pack_image_" + cleanId);
                     
-                    minecraft.getTextureManager().register(textureId, new net.minecraft.client.renderer.texture.DynamicTexture(() -> "pack_image_" + cleanId, nativeImage));
+                    minecraft.getTextureManager().register(textureId, new DynamicTexture(() -> "pack_image_" + cleanId, nativeImage));
                     
                     downloadedImages.put(packId, new RemoteImage(textureId, nativeWidth, nativeHeight));
                     downloadingImages.remove(packId);
@@ -179,21 +172,26 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     }
 
     @Override
+    public void initRenderableVListEntry(RenderableVList renderableVList, Renderable renderable) {
+        if (renderable instanceof AbstractWidget widget)
+            widget.setHeight(accessor.getInteger("buttonsHeight", 36));
+    }
+
+    @Override
     public void renderableVListInit() {
         tooltipBox.init();
-        initRenderableVListHeight(36);
         
         addRenderableOnly((guiGraphics, i, j, f) -> {
             guiGraphics.blitSprite(RenderPipelines.GUI_TEXTURED, LegacySprites.PANEL_RECESS, 
                 panel.getX() + 9, panel.getY() + 9, panel.getWidth() - 18, panel.getHeight() - 17);
             
-            String title = Component.translatable("legacy.menu.store_title").getString();
-            float textScale = 1.2f;
+            Component title = Component.translatable("legacy.menu.store_title");
+            float textScale = 1.5f;
             int scaledTextWidth = (int)(font.width(title) * textScale);
             guiGraphics.pose().pushMatrix();
             guiGraphics.pose().translate(panel.getX() + (panel.getWidth() - scaledTextWidth) / 2, panel.getY() + 17);
             guiGraphics.pose().scale(textScale, textScale);
-            guiGraphics.drawString(font, title, 0, 0, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+            guiGraphics.drawString(font, title, 0, 0, CommonColor.GRAY_TEXT.get(), false);
             guiGraphics.pose().popMatrix();
         });
 
@@ -203,7 +201,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     @Override
     public void renderDefaultBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         LegacyRenderUtil.renderDefaultBackground(UIAccessor.of(this), guiGraphics, false);
-        logoRenderer.renderLogo(guiGraphics, this.width, 1.0f);
+        LegacyRenderUtil.renderLogo(guiGraphics);
 
         tooltipBox.render(guiGraphics, mouseX, mouseY, partialTick);
         

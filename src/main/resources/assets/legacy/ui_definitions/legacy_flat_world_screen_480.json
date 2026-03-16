@@ -1,0 +1,44 @@
+{
+  "targetUI": "wily.legacy.client.screen.LegacyFlatWorldScreen",
+  "targetType": "class",
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
+  "elements": {
+    "panel.sprite": {
+      "type": "put_resource_location",
+      "value": "legacy:tiles/panel"
+    },
+    "panel.width": 168,
+    "panel.height": 145,
+    "panelRecess.x": "${panel.x}+6",
+    "panelRecess.y": "${panel.y}+5",
+    "panelRecess.width": 155,
+    "panelRecess.height": 134,
+    "tabList.y": "${panel.y}-13",
+    "tabList.height": 19,
+    "renderableVList.layerCount.xOffset": 8,
+    "renderableVList.layerIcon.scale": "10/16.0",
+    "renderableVList.biomeIcon.scale": "10/16.0",
+    "renderableVList.layerIcon.x": 21,
+    "renderableVList.biomeIcon.x": 17,
+    "renderableVList.layerMessage.xOffset": 38,
+    "renderableVList.biomeMessage.xOffset": 30,
+    "renderableVList.x": "${panel.x}+11",
+    "renderableVList.y": "${panel.y}+12",
+    "renderableVList.width": 144,
+    "renderableVList.height": 120,
+    "buttonsHeight": 15,
+    "tabList.sprites": {
+      "type": "put_toggleable_tab_sprites",
+      "value": {
+        "high": {
+          "left": "legacy:tiles/big_high_tab_left",
+          "middle": "legacy:tiles/big_high_tab_middle",
+          "right": "legacy:tiles/big_high_tab_right"
+        },
+        "down": "legacy:tiles/big_low_tab"
+      }
+    }
+  }
+}

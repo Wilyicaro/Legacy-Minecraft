@@ -1,7 +1,9 @@
 {
   "targetUI": "wily.legacy.client.screen.RenderableVListScreen",
   "targetType": "class",
-  "applyCondition": { "reference": "uiMode.sd" },
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
   "elements": {
     "buttonsHeight": {
       "type": "put_number",

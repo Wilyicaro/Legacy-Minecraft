@@ -12,6 +12,9 @@ import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.components.PlayerFaceRenderer;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.navigation.ScreenDirection;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.gui.render.state.pip.GuiEntityRenderState;
+import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -65,9 +68,9 @@ import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.Legacy4J;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.client.*;
-import wily.legacy.client.screen.ConfirmationScreen;
 import wily.legacy.client.screen.LegacyIconHolder;
 import wily.legacy.client.screen.MultilineTooltip;
+import wily.legacy.client.screen.SaveInfoScreen;
 import wily.legacy.network.TopMessage;
 import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.LegacySprites;
@@ -352,7 +355,7 @@ public class LegacyRenderUtil {
         float w = livingEntity.getScale();
         Vector3f vector3f = new Vector3f(0.0F, livingEntity.getBbHeight() / 2.0F + f * w, 0.0F);
         float x = m / w;
-        InventoryScreen.renderEntityInInventory(guiGraphics, i - guiGraphics.guiWidth(), j - guiGraphics.guiHeight(), k + guiGraphics.guiWidth(), l + guiGraphics.guiHeight(), x, vector3f, quaternionf, quaternionf2, livingEntity);
+        renderEntity(guiGraphics, i, j, k, l, x, vector3f, quaternionf, quaternionf2, livingEntity);
         livingEntity.yBodyRot = r;
         livingEntity.setYRot(s);
         livingEntity.setXRot(t);
@@ -361,11 +364,11 @@ public class LegacyRenderUtil {
         guiGraphics.disableScissor();
     }
 
-    public static void renderEntity(GuiGraphics guiGraphics, int x, int y, int x0, int y0, int size, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity) {
+    public static void renderEntity(GuiGraphics guiGraphics, int x, int y, int x0, int y0, float size, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity) {
         renderEntity(guiGraphics, x, y, x0, y0, size, vector3f, quaternionf, quaternionf2, entity, false);
     }
 
-    public static void renderEntity(GuiGraphics guiGraphics, int x, int y, int x0, int y0, int size, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity, boolean forceSize) {
+    public static void renderEntity(GuiGraphics guiGraphics, int x, int y, int x0, int y0, float size, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity, boolean forceSize) {
         float h = forceSize ? size / Math.max(1, Math.max(entity.getBbWidth(), entity.getBbHeight())) : size;
 
         if (entity instanceof LivingEntity living) h /= living.getScale();
@@ -377,7 +380,10 @@ public class LegacyRenderUtil {
         entityRenderState.hitboxesRenderState = null;
         entityRenderState.shadowPieces.clear();
         entityRenderState.outlineColor = 0;
-        guiGraphics.submitEntityRenderState(entityRenderState, h, vector3f, quaternionf, quaternionf2, x, y, x0, y0);
+        ScreenRectangle scissorStack = guiGraphics.scissorStack.peek();
+        GuiEntityRenderState guiRenderState = new GuiEntityRenderState(entityRenderState, vector3f, quaternionf, quaternionf2, x, y, x0, y0, h, scissorStack, PictureInPictureRenderState.getBounds(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), scissorStack));
+        MutablePIPRenderState.of(guiRenderState).setPose(guiGraphics.pose());
+        guiGraphics.guiRenderState.submitPicturesInPictureState(guiRenderState);
     }
 
     public static void renderLocalPlayerHead(GuiGraphics guiGraphics, int x, int y, int size) {
@@ -690,7 +696,7 @@ public class LegacyRenderUtil {
         TitleScreen titleScreen = new TitleScreen(LegacyOptions.titleScreenFade.get());
         if (LegacyOptions.skipInitialSaveWarning.get()) {
             return titleScreen;
-        } else return ConfirmationScreen.createSaveInfoScreen(titleScreen);
+        } else return new SaveInfoScreen(titleScreen);
     }
 
     public static ScreenDirection getScreenDirection(double x, double y) {

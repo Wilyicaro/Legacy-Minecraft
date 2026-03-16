@@ -148,7 +148,7 @@ public class ModsScreen extends PanelVListScreen {
                     int iconHeight = accessor.getInteger(getRenderableVList().name + ".buttonIcon.size", 20);
                     int iconPos = (height - iconHeight) / 2;
                     int x = this.getX() + iconPos + accessor.getInteger(getRenderableVList().name + ".buttonMessage.xOffset", 10) + (logo == null ? iconHeight : logo.getScaledWidth(iconHeight));
-                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), x, this.getY(), x + this.getWidth(), this.getY() + this.getHeight(), j, true);
+                    LegacyRenderUtil.renderScrollingString(guiGraphics, font, this.getMessage(), x, this.getY(), getX() + this.getWidth() - i, this.getY() + this.getHeight(), j, true);
                 }
 
                 @Override

@@ -49,6 +49,7 @@
     "client.chat.ChatComponentMixin",
     "client.chat.ChatScreenMixin",
     "client.ClientEntityMixin",
+    "client.ClientEntityVisibilityMixin",
     "client.ClientLevelSettingsMixin",
     "client.ClientLevelStorageSourceMixin",
     "client.ClientMinecraftServerMixin",
@@ -82,6 +83,7 @@
     "client.sign.HangingSignEditScreenMixin",
     "client.inventory.HorseInventoryScreenMixin",
     "client.HugeExplosionParticleMixin",
+    "client.HumanoidArmorLayerMixin",
     "client.HumanoidModelMixin",
     "client.IntegratedServerMixin",
     "client.inventory.InventoryScreenMixin",
@@ -90,6 +92,7 @@
     "client.KeyboardControllerInputMixin",
     "client.KeyboardHandlerMixin",
     "client.KeyMappingMixin",
+    "client.CrouchToggleMixin",
     "client.LegacyLoadingMessageScreenMixin",
     "client.LegacyLoadingScreenMixin",
     "client.SkyRendererMixin",
@@ -113,6 +116,7 @@
     "client.ParticleMixin",
     "client.pause.PauseScreenMixin",
     "client.PlayerInfoMixin",
+    "client.ItemInHandLayerMixin",
     "client.PlayerRendererMixin",
     "client.PresetEditorMixin",
     "client.RecipeBookComponentMixin",
@@ -166,7 +170,6 @@
     "client.AbstractWidgetAccessor",
     "client.WaterFogEnvironmentMixin",
     "client.GuiEntityRenderStateMixin",
-    "client.GuiEntityRendererMixin",
     "client.GuiRendererMixin",
     "client.bosshealth.EndDragonFightMixin",
     "client.bosshealth.WitherBossMixin",
@@ -186,7 +189,9 @@
     "client.MovingBlockRenderStateMixin",
     "client.ClientAvatarStateMixin",
     "client.ComponentPathMixin",
-    "client.FeatureRenderDispatcherMixin"
+    "client.FeatureRenderDispatcherMixin",
+    "client.ScreenshotMixin",
+    "client.AbstractClientPlayerMixin"
   ],
   "mixins": [
     "ChunkTrackingViewMixin",
@@ -210,6 +215,15 @@
     "EntityTypeMixin",
     "FlowerBlockMixin",
     "FoodDataMixin",
+    "mobcaps.ArmorStandItemMixin",
+    "mobcaps.BoatItemMixin",
+    "mobcaps.CarvedPumpkinBlockMixin",
+    "mobcaps.HangingEntityItemMixin",
+    "mobcaps.ItemFrameItemMixin",
+    "mobcaps.NaturalSpawnerMixin",
+    "mobcaps.ServerLevelMixin",
+    "mobcaps.SpawnEggItemMixin",
+    "mobcaps.ThrownEggMixin",
     "ItemStackMixin",
     "cauldron.LayeredCauldronBlockMixin",
     "LevelMixin",
@@ -258,3 +272,4 @@
     "defaultRequire": 1
   }
 }
+

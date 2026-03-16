@@ -1,7 +1,9 @@
 {
   "targetUI": "wily.legacy.client.screen.CreativeModeScreen",
   "targetType": "class",
-  "applyCondition": { "reference": "uiMode.sd" },
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
   "elements": {
     "panel.sprite": {
       "type": "put_resource_location",
@@ -63,20 +65,20 @@
       "value": 6
     },
     "creative_menu": {
-      "type":"put_legacy_slot",
-      "range":"[0,49]",
-      "x":"17+(${creative_menu.index}%10)*16",
-      "y":"15+(${creative_menu.index}/10)*16",
-      "width":16,
-      "height":16
+      "type": "put_legacy_slot",
+      "range": "[0,49]",
+      "x": "17+(${creative_menu.index}%10)*16",
+      "y": "15+(${creative_menu.index}/10)*16",
+      "width": 16,
+      "height": 16
     },
     "quick_select": {
-      "type":"put_legacy_slot",
-      "range":"[50,59]",
-      "x":"25+(${quick_select.index}%9)*16",
-      "y":"100",
-      "width":16,
-      "height":16
+      "type": "put_legacy_slot",
+      "range": "[50,59]",
+      "x": "25+(${quick_select.index}%9)*16",
+      "y": "100",
+      "width": 16,
+      "height": 16
     }
   }
 }

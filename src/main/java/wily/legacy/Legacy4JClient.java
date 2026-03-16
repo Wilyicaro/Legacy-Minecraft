@@ -50,6 +50,7 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 //? if >=1.20.5 {
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -200,6 +201,15 @@ public class Legacy4JClient {
             LegacyOptions.classicStonecutting.set(LegacyOptions.classicStonecutting.get());
             LegacyOptions.classicLoom.set(LegacyOptions.classicLoom.get());
         }
+    }
+
+    public static boolean isHostInvisible(Player player) {
+        return player != null && isHostInvisible(player.getUUID());
+    }
+
+    public static boolean isHostInvisible(UUID playerId) {
+        Minecraft minecraft = Minecraft.getInstance();
+        return minecraft.getConnection() != null && minecraft.getConnection().getPlayerInfo(playerId) instanceof LegacyPlayerInfo info && !info.isVisible();
     }
 
     public static boolean playerHasInfiniteMaterials() {
@@ -619,3 +629,4 @@ public class Legacy4JClient {
     }
 
 }
+

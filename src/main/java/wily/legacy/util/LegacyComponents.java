@@ -190,6 +190,7 @@ public class LegacyComponents {
     public static final Component INITIALIZING = Component.translatable("legacy.connect.initializing");
     public static final Component LOADING_SPAWN_AREA = Component.translatable("legacy.loading_spawn_area");
     public static final Component PREPARING_AUTOSAVE = Component.translatable("legacy.menu.savingLevel.preparing");
+    public static final Component PREPARING_MANUAL_SAVE = Component.translatable("legacy.menu.savingLevel.preparing_manual");
     public static final Component PREPARING_CHUNKS = Component.translatable("legacy.menu.savingLevel.preparing_chunks");
     public static final Component FINALIZING = Component.translatable("legacy.menu.savingLevel.finalizing");
     public static final Component SPAWN_EGG_TIP = Component.translatable("item.minecraft.spawn_egg.tip");

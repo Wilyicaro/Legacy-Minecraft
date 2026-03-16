@@ -2,6 +2,7 @@ package wily.legacy.mixin.base;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
@@ -10,7 +11,10 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.init.LegacyGameRules;
+import wily.legacy.mobcaps.LegacyMobCaps;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin {
@@ -22,6 +26,20 @@ public abstract class EntityMixin {
     @Inject(method = "setCustomName", at = @At("RETURN"))
     public void setCustomName(Component component, CallbackInfo ci) {
         if (self() instanceof Mob m) m.setPersistenceRequired();
+    }
+
+    @Inject(method = "setRemoved", at = @At("HEAD"))
+    public void setRemoved(Entity.RemovalReason removalReason, CallbackInfo ci) {
+        if (self().level() instanceof ServerLevel && !self().isRemoved()) {
+            LegacyMobCaps.handleEntityRemoved(self());
+        }
+    }
+
+    @Inject(method = "isInvisible", at = @At("RETURN"), cancellable = true)
+    public void isInvisible(CallbackInfoReturnable<Boolean> cir) {
+        if (!cir.getReturnValueZ() && self() instanceof LegacyPlayerInfo info && !info.isVisible()) {
+            cir.setReturnValue(true);
+        }
     }
 
     //? if neoforge {

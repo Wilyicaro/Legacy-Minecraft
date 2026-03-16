@@ -822,7 +822,7 @@ public interface MCAccount {
         if (lastSessionCheck.get() != null && Util.getMillis() - lastSessionCheckTime.get() <= 180000)
             return lastSessionCheck.get();
         lastSessionCheckTime.set(Util.getMillis());
-        lastSessionCheck.set(true);
+        lastSessionCheck.set(false);
         CompletableFuture.runAsync(() -> {
             try {
                 String server = UUID.randomUUID().toString();

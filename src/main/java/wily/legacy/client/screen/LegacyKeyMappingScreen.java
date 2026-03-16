@@ -203,7 +203,7 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
             }
         }));
         super.init();
-        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, FactoryAPIPlatform.getModInfo("minecraft").getVersion() + " " + Legacy4J.VERSION.get(), panel.getX() + panel.getWidth() + 81, panel.getY() + panel.getHeight() - 7, CommonColor.INVENTORY_GRAY_TEXT.get(), false)));
+        addRenderableOnly(((guiGraphics, i, j, f) -> guiGraphics.drawString(font, FactoryAPIPlatform.getModInfo("minecraft").getVersion() + " " + Legacy4J.VERSION.get(), panel.getX() + panel.getWidth() + 81, panel.getY() + panel.getHeight() - 7, CommonColor.GRAY_TEXT.get(), false)));
     }
 
     @Override
@@ -255,9 +255,11 @@ public class LegacyKeyMappingScreen extends OptionsScreen {
                 return;
             }
             ControlTooltip.Icon icon = getIcon();
-            FactoryScreenUtil.enableBlend();
-            icon.render(guiGraphics, getX() + width - 20 - icon.getWidth() / 2, getY() + (height - font.lineHeight) / 2 + 1, false);
-            FactoryScreenUtil.disableBlend();
+            if (icon != null) {
+                FactoryScreenUtil.enableBlend();
+                icon.render(guiGraphics, getX() + width - 20 - icon.getWidth() / 2, getY() + (height - font.lineHeight) / 2 + 1, false);
+                FactoryScreenUtil.disableBlend();
+            }
         }
 
         private boolean isPressed() {

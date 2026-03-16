@@ -29,6 +29,7 @@ import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.config.LegacyMixinToggles;
 import wily.legacy.config.LegacyWorldOptions;
 import wily.legacy.init.*;
+import wily.legacy.mobcaps.LegacyMobCaps;
 import wily.legacy.network.*;
 import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.util.ArmorStandPose;
@@ -125,6 +126,7 @@ public class Legacy4J {
             r.register(false, TopMessage.Payload.ID);
         });
         ArmorStandPose.init();
+        LegacyMobCaps.init();
         FactoryEvent.setItemComponent(Items.CAKE, DataComponents.MAX_STACK_SIZE, 64);
         FactoryEvent.registerCommands(TipCommand::register);
         FactoryEvent.setup(Legacy4J::setup);

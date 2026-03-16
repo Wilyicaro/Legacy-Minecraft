@@ -1,7 +1,9 @@
 {
   "targetUI": "wily.legacy.client.screen.ModsScreen",
   "targetType": "class",
-  "applyCondition": { "reference": "uiMode.sd" },
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
   "elements": {
     "panel.width": 180,
     "panel.height": 180,

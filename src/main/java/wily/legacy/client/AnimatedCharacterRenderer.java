@@ -34,7 +34,7 @@ public class AnimatedCharacterRenderer {
                 float f = LegacyOptions.smoothAnimatedCharacter.get() ? FactoryAPIClient.getPartialTick() : 0;
                 ClientEntityAccessor.of(character).setAllowDisplayFireAnimation(false);
                 guiGraphics.pose().translate(10 * scale, (character.isFallFlying() ? -character.getViewXRot(f) / 180 * 40 : 36) * scale);
-                LegacyRenderUtil.renderEntity(guiGraphics, -guiGraphics.guiWidth(), -guiGraphics.guiHeight(), guiGraphics.guiWidth(), guiGraphics.guiHeight(), Math.round(12 * scale), new Vector3f(), new Quaternionf().rotationXYZ(-5 * Mth.PI / 180f, (165 - Mth.lerp(f, character.yBodyRotO, character.yBodyRot)) * Mth.PI / 180f, Mth.PI), null, character);
+                LegacyRenderUtil.renderEntity(guiGraphics, -50, -50, 50, 50, Math.round(12 * scale), new Vector3f(), new Quaternionf().rotationXYZ(-5 * Mth.PI / 180f, (165 - Mth.lerp(f, character.yBodyRotO, character.yBodyRot)) * Mth.PI / 180f, Mth.PI), null, character);
                 ClientEntityAccessor.of(character).setAllowDisplayFireAnimation(true);
                 guiGraphics.pose().popMatrix();
                 character.setXRot(xRot);

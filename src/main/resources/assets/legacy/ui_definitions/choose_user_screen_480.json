@@ -1,7 +1,9 @@
 {
   "targetUI": "wily.legacy.client.screen.ChooseUserScreen",
   "targetType": "class",
-  "applyCondition": { "reference": "uiMode.sd" },
+  "applyCondition": {
+    "reference": "uiMode.sd"
+  },
   "elements": {
     "panel.y": "(${height}-${panel.height})/2+8",
     "panel.height": 150,

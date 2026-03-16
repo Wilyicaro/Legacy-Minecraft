@@ -3,6 +3,8 @@ package wily.legacy.mixin.base;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import wily.legacy.mobcaps.ConsoleMobCaps;
 import wily.legacy.network.ClientAnimalInLoveSyncPayload;
 
 @Mixin(Animal.class)
@@ -43,6 +46,21 @@ public abstract class AnimalMixin extends AgeableMob {
     @Inject(method = "canFallInLove", at = @At("HEAD"), cancellable = true)
     public void aiStep(CallbackInfoReturnable<Boolean> cir) {
         if (age != 0) cir.setReturnValue(false);
+    }
+
+    @Inject(method = "setInLove", at = @At("HEAD"), cancellable = true)
+    public void setInLove(Player player, CallbackInfo ci) {
+        if (!(level() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
+        String failure = ConsoleMobCaps.breedingFailure(serverLevel, getType());
+        if (failure == null) {
+            return;
+        }
+
+        ConsoleMobCaps.sendFailure(player, failure);
+        ci.cancel();
     }
 
 }

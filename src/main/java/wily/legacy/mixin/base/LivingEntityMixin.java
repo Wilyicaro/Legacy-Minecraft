@@ -25,6 +25,7 @@ import wily.factoryapi.FactoryAPIClient;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.Legacy4JClient;
 import wily.legacy.config.LegacyCommonOptions;
+import wily.legacy.entity.LegacyPlayerInfo;
 import wily.legacy.init.LegacyGameRules;
 
 import static wily.legacy.Legacy4JClient.gameRules;
@@ -54,6 +55,10 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Inject(method = "hurtServer", at = @At("HEAD"), cancellable = true)
     public void hurt(ServerLevel level, DamageSource damageSource, float f, CallbackInfoReturnable<Boolean> cir) {
+        if ((Object) this instanceof Player player && player instanceof LegacyPlayerInfo info && !info.isVisible()) {
+            cir.setReturnValue(false);
+            return;
+        }
         if (!level().isClientSide() && !level().getServer().isPvpAllowed() && damageSource.getDirectEntity() instanceof Player && (this instanceof OwnableEntity o && damageSource.getDirectEntity().equals(o.getOwner()) || ((Object) this) instanceof IronGolem i && i.isPlayerCreated() || ((Object) this) instanceof SnowGolem)) {
             cir.setReturnValue(false);
         }

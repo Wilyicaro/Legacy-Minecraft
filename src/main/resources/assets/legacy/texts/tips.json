@@ -69,7 +69,7 @@
         {"translate": "legacy.loadingTip.animalFollow"},
         {"translate": "legacy.loadingTip.mineconLondon"},
         {
-            "tip": {"translate": "legacy.loadingTip.coop"},
+            "translate": "legacy.loadingTip.coop",
             "time": 0
         },
         {"translate": "legacy.loadingTip.mineconCalifornia"},

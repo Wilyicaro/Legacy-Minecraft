@@ -34,6 +34,8 @@ public record ControlType(ResourceLocation id, Optional<Component> name, boolean
     public static final ResourceLocation STADIA = Legacy4J.createModLocation("stadia");
     public static final ResourceLocation PSVITA = Legacy4J.createModLocation("playstation_vita");
     public static final ResourceLocation PS5 = Legacy4J.createModLocation("playstation_5");
+    public static final ControlType EMPTY = new ControlType(KBM, Optional.empty(), true, Optional.empty(), Optional.empty());
+
     public ControlType(ResourceLocation id, Optional<Component> name, boolean isKbm, Optional<SizeableAsset<ControlFont>> font, Optional<ResourceLocation> minecraftLogo) {
         this(id, name, isKbm, font, minecraftLogo, font.map(asset -> asset.map(f -> Style.EMPTY.withFont(f.font()))), new HashMap<>());
     }
@@ -45,22 +47,27 @@ public record ControlType(ResourceLocation id, Optional<Component> name, boolean
         if (LegacyOptions.selectedControlType.get().isAuto()) {
             if (Legacy4JClient.controllerManager.connectedController != null) {
                 return Legacy4JClient.controllerManager.connectedController.getType();
-            } else return get(x360);
+            } else return getOrEmpty(x360);
         } else {
             ControlType type = LegacyOptions.selectedControlType.get().get();
-            return type.isKbm() ? get(x360) : type;
+            return type.isKbm() ? getOrEmpty(x360) : type;
         }
     }
 
     public static ControlType getActiveType() {
-        return !LegacyOptions.lockControlTypeChange.get() && Legacy4JClient.controllerManager.isControllerTheLastInput() || LegacyOptions.lockControlTypeChange.get() && (Legacy4JClient.controllerManager.connectedController != null && LegacyOptions.selectedControlType.get().isAuto() || !LegacyOptions.selectedControlType.get().orElse(get(KBM)).isKbm()) ? getActiveControllerType() : getKbmActiveType();
+        ControlType type = !LegacyOptions.lockControlTypeChange.get() && Legacy4JClient.controllerManager.isControllerTheLastInput() ||
+                LegacyOptions.lockControlTypeChange.get() &&
+                (Legacy4JClient.controllerManager.connectedController != null && LegacyOptions.selectedControlType.get().isAuto() ||
+                        !LegacyOptions.selectedControlType.get().orElse(get(KBM)).isKbm())
+                ? getActiveControllerType() : getKbmActiveType();
+        return type == null ? ControlType.EMPTY : type;
     }
 
     public static ControlType getKbmActiveType() {
-        if (LegacyOptions.selectedControlType.get().isAuto()) return get(KBM);
+        if (LegacyOptions.selectedControlType.get().isAuto()) return getOrEmpty(KBM);
         else {
             ControlType type = LegacyOptions.selectedControlType.get().get();
-            return !type.isKbm() ? get(KBM) : type;
+            return !type.isKbm() ? getOrEmpty(KBM) : type;
         }
     }
 
@@ -74,6 +81,10 @@ public record ControlType(ResourceLocation id, Optional<Component> name, boolean
 
     public static ControlType get(ResourceLocation id) {
         return Legacy4JClient.controlTypesManager.map().get(id);
+    }
+
+    public static ControlType getOrEmpty(ResourceLocation id) {
+        return Legacy4JClient.controlTypesManager.map().getOrDefault(id, ControlType.EMPTY);
     }
 
     public Style styleOrEmpty() {

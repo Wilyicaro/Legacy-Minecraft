@@ -182,7 +182,7 @@ public abstract class CreateWorldScreenMixin extends Screen implements ControlTo
         guiGraphics.pose().pushMatrix();
         guiGraphics.pose().translate(accessor.getInteger("nameLabel.x", panel.x + 14), accessor.getInteger("nameLabel.y", panel.y + 15));
         if (LegacyOptions.getUIMode().isSD()) guiGraphics.pose().scale(0.5f, 0.5f);
-        guiGraphics.drawString(font, NAME_LABEL, 0, 0, CommonColor.INVENTORY_GRAY_TEXT.get(), false);
+        guiGraphics.drawString(font, NAME_LABEL, 0, 0, CommonColor.GRAY_TEXT.get(), false);
         guiGraphics.pose().popMatrix();
     }
 
