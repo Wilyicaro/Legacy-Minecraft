@@ -1375,6 +1375,14 @@
   "legacy.menu.host_options.player.disableExhaustion": "Poista Uupumus",
   "legacy.menu.host_options.player.invisible": "Näkymätön",
   "legacy.menu.host_options.player.mayFly": "Voi Lentää",
+  "legacy.menu.host_options.player.mayFly.enabled": "You can now fly",
+  "legacy.menu.host_options.player.mayFly.disabled": "You can no longer fly",
+  "legacy.menu.host_options.player.disableExhaustion.enabled": "You will no longer get exhausted",
+  "legacy.menu.host_options.player.disableExhaustion.disabled": "You will now get exhausted",
+  "legacy.menu.host_options.player.invisible.enabled": "You are now invisible",
+  "legacy.menu.host_options.player.invisible.disabled": "You are no longer invisible",
+  "legacy.menu.host_options.player.invulnerable.enabled": "You are now invulnerable",
+  "legacy.menu.host_options.player.invulnerable.disabled": "You are no longer invulnerable",
   "legacy.menu.host_options.set_day": "Aseta Päiväksi",
   "legacy.menu.host_options.set_night": "Aseta Yöksi",
   "legacy.menu.host_options.set_player_spawn": "Aseta Pelaajan Syntymäpiste",
@@ -1904,3 +1912,4 @@
   "structure.minecraft.woodland_mansions": "Metsäkartanot",
   "structure.minecraft.woodland_mansions.description": "Kartanoita, jotka löytyvät Tumman Tammen Metsistä. Vexien ja Illagerien koti."
 }
+
