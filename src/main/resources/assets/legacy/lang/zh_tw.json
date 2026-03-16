@@ -1375,6 +1375,14 @@
   "legacy.menu.host_options.player.disableExhaustion": "停用疲勞",
   "legacy.menu.host_options.player.invisible": "隱形",
   "legacy.menu.host_options.player.mayFly": "允許飛行",
+  "legacy.menu.host_options.player.mayFly.enabled": "You can now fly",
+  "legacy.menu.host_options.player.mayFly.disabled": "You can no longer fly",
+  "legacy.menu.host_options.player.disableExhaustion.enabled": "You will no longer get exhausted",
+  "legacy.menu.host_options.player.disableExhaustion.disabled": "You will now get exhausted",
+  "legacy.menu.host_options.player.invisible.enabled": "You are now invisible",
+  "legacy.menu.host_options.player.invisible.disabled": "You are no longer invisible",
+  "legacy.menu.host_options.player.invulnerable.enabled": "You are now invulnerable",
+  "legacy.menu.host_options.player.invulnerable.disabled": "You are no longer invulnerable",
   "legacy.menu.host_options.set_day": "設定為白天",
   "legacy.menu.host_options.set_night": "設定為夜晚",
   "legacy.menu.host_options.set_player_spawn": "設定玩家重生點",
@@ -1904,3 +1912,4 @@
   "structure.minecraft.woodland_mansions": "林地府邸",
   "structure.minecraft.woodland_mansions.description": "林地府邸可以在黑橡木森林找到，是惱鬼和衛道士的巢穴。"
 }
+
