@@ -1375,6 +1375,14 @@
   "legacy.menu.host_options.player.disableExhaustion": "Отключить утомление",
   "legacy.menu.host_options.player.invisible": "Невидимость",
   "legacy.menu.host_options.player.mayFly": "Можно летать",
+  "legacy.menu.host_options.player.mayFly.enabled": "You can now fly",
+  "legacy.menu.host_options.player.mayFly.disabled": "You can no longer fly",
+  "legacy.menu.host_options.player.disableExhaustion.enabled": "You will no longer get exhausted",
+  "legacy.menu.host_options.player.disableExhaustion.disabled": "You will now get exhausted",
+  "legacy.menu.host_options.player.invisible.enabled": "You are now invisible",
+  "legacy.menu.host_options.player.invisible.disabled": "You are no longer invisible",
+  "legacy.menu.host_options.player.invulnerable.enabled": "You are now invulnerable",
+  "legacy.menu.host_options.player.invulnerable.disabled": "You are no longer invulnerable",
   "legacy.menu.host_options.set_day": "Установить день",
   "legacy.menu.host_options.set_night": "Установить ночь",
   "legacy.menu.host_options.set_player_spawn": "Установить точку возрождения для игрока",
@@ -1904,3 +1912,4 @@
   "structure.minecraft.woodland_mansions": "Лесные особняки",
   "structure.minecraft.woodland_mansions.description": "Особняки можно найти в Тёмных лесах. В них живут вредины, заклинатели, иллюзоры и поборники."
 }
+
