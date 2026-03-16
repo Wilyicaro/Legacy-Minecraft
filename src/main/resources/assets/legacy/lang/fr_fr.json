@@ -1375,6 +1375,14 @@
   "legacy.menu.host_options.player.disableExhaustion": "Désactiver l'épuisement",
   "legacy.menu.host_options.player.invisible": "Invisible",
   "legacy.menu.host_options.player.mayFly": "Peut voler",
+  "legacy.menu.host_options.player.mayFly.enabled": "You can now fly",
+  "legacy.menu.host_options.player.mayFly.disabled": "You can no longer fly",
+  "legacy.menu.host_options.player.disableExhaustion.enabled": "You will no longer get exhausted",
+  "legacy.menu.host_options.player.disableExhaustion.disabled": "You will now get exhausted",
+  "legacy.menu.host_options.player.invisible.enabled": "You are now invisible",
+  "legacy.menu.host_options.player.invisible.disabled": "You are no longer invisible",
+  "legacy.menu.host_options.player.invulnerable.enabled": "You are now invulnerable",
+  "legacy.menu.host_options.player.invulnerable.disabled": "You are no longer invulnerable",
   "legacy.menu.host_options.set_day": "Définir le jour",
   "legacy.menu.host_options.set_night": "Définir la nuit",
   "legacy.menu.host_options.set_player_spawn": "Définir le point d'apparition du joueur",
@@ -1904,3 +1912,4 @@
   "structure.minecraft.woodland_mansions": "Manoirs des bois",
   "structure.minecraft.woodland_mansions.description": "Manoirs trouvés dans les forêts de chêne noir. Domicile des vex et des illageois."
 }
+
