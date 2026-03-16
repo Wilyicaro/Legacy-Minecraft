@@ -1781,6 +1781,8 @@
   "legacy.options.legacyPauseScreen": "Legacy Pause Screen",
   "legacy.options.legacyPistons": "Legacy Pistons",
   "legacy.options.legacyPotionsBar": "Legacy Potions Bar",
+  "legacy.options.legacyCloudHeightAndTexture": "Legacy Cloud Height and Texture",
+  "legacy.options.legacyCloudHeightAndTexture.tooltip": "Applies the lower Legacy Console cloud height and console cloud texture when LCE Clouds is enabled.",
   "legacy.options.legacySignScreen": "Legacy Sign Screen",
   "legacy.options.legacySkyShape": "Legacy Sky Shape",
   "legacy.options.legacySmithingScreen": "Legacy Smithing Screen",

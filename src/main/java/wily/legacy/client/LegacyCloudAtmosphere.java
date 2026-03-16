@@ -28,6 +28,10 @@ public final class LegacyCloudAtmosphere {
         return LegacyOptions.lceClouds.get();
     }
 
+    public static boolean areLegacyCloudHeightAndTextureEnabled() {
+        return areLceCloudsEnabled() && LegacyOptions.legacyCloudHeightAndTexture.get();
+    }
+
     public static int getCloudDrawDistanceBlocks() {
         return Math.max(64, Legacy4JClient.getEffectiveRenderDistance() * 16);
     }
@@ -38,6 +42,18 @@ public final class LegacyCloudAtmosphere {
 
     public static boolean shouldUseConsoleAtmosphere(ClientLevel level) {
         return areLceCloudsEnabled() && level.effects() instanceof DimensionSpecialEffects.OverworldEffects;
+    }
+
+    public static boolean shouldUseWarmCloudTransparency(ClientLevel level, float partialTick) {
+        if (!shouldUseConsoleAtmosphere(level) || areLegacyCloudHeightAndTextureEnabled()) {
+            return false;
+        }
+
+        if (getSunriseColor(level.getTimeOfDay(partialTick)) == 0) {
+            return false;
+        }
+
+        return getSunriseViewBlend(level, partialTick) > 0.05f;
     }
 
     public static int getSkyColor(ClientLevel level, Vec3 position, float partialTick) {
