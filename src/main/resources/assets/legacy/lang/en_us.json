@@ -1702,6 +1702,7 @@
   "legacy.options.displayGamma": "Display Gamma",
   "legacy.options.displayHUD": "Display HUD",
   "legacy.options.displayHand": "Display Hand",
+  "legacy.options.hideAdvancedOptionsTooltip": "Display Advanced Options Tooltip",
   "legacy.options.displayMultipleControlsFromAction": "Display Multiple Controls From Action",
   "legacy.options.displayNameTagBorder": "Display Name Tag Border",
   "legacy.options.enhancedItemTranslucency": "Enhanced Item Translucency",
