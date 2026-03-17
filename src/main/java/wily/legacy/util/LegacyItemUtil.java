@@ -13,6 +13,8 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.component.DyedItemColor;
+import net.minecraft.world.level.block.AbstractSkullBlock;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BannerPatternLayers;
 import wily.factoryapi.base.config.FactoryConfig;
 import wily.legacy.config.LegacyCommonOptions;
@@ -166,5 +168,14 @@ public class LegacyItemUtil {
             }
         }
         return 0;
+    }
+
+    public static boolean isSkullItem(ItemStack stack) {
+        return stack.getItem() instanceof BlockItem blockItem && (blockItem.getBlock() instanceof AbstractSkullBlock || blockItem.getBlock() == Blocks.PUMPKIN || blockItem.getBlock() == Blocks.CARVED_PUMPKIN || blockItem.getBlock() == Blocks.JACK_O_LANTERN);
+    }
+
+    public static List<Component> sanitizeTooltip(ItemStack stack, List<Component> tooltip) {
+        if (!isSkullItem(stack) || tooltip.size() < 2) return tooltip;
+        return List.of(tooltip.getFirst());
     }
 }

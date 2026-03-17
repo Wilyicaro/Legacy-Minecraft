@@ -9,6 +9,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,8 +25,11 @@ import wily.legacy.client.LegacyTipManager;
 import wily.legacy.client.NavigationElement;
 import wily.legacy.client.screen.ControlTooltip;
 import wily.legacy.client.screen.LegacyLoading;
+import wily.legacy.util.LegacyItemUtil;
 import wily.legacy.util.client.LegacyRenderUtil;
 import wily.legacy.util.client.LegacySoundUtil;
+
+import java.util.List;
 
 @Mixin(Screen.class)
 public abstract class ScreenMixin extends AbstractContainerEventHandler {
@@ -94,6 +99,11 @@ public abstract class ScreenMixin extends AbstractContainerEventHandler {
     @Inject(method = "keyPressed", at = @At("HEAD"))
     private void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> cir) {
         if (Legacy4JClient.keyToggleCursor.matches(keyEvent)) Legacy4JClient.controllerManager.toggleCursor();
+    }
+
+    @Inject(method = "getTooltipFromItem", at = @At("RETURN"), cancellable = true)
+    private static void getTooltipFromItem(Minecraft minecraft, ItemStack itemStack, CallbackInfoReturnable<List<Component>> cir) {
+        cir.setReturnValue(LegacyItemUtil.sanitizeTooltip(itemStack, cir.getReturnValue()));
     }
 
     @Redirect(method = "rebuildWidgets", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;clearFocus()V"))
