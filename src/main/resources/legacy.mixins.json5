@@ -208,6 +208,7 @@
     "CriteriaTriggersMixin",
     "EmptyMapItemMixin",
     "EntityTypeMixin",
+    "FallingBlockEntityMixin",
     "FlowerBlockMixin",
     "FoodDataMixin",
     "mobcaps.ArmorStandItemMixin",

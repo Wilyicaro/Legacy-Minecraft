@@ -625,6 +625,8 @@
   "gamerule.globalMapPlayerIcon.description": "Allow player icons to be visible on all created maps.",
   "gamerule.lceMobcapLimits": "LCE Mobcap Limits",
   "gamerule.lceMobcapLimits.description": "When enabled, Legacy Console Edition mobcap limits are enforced for spawning, breeding and placement.",
+  "gamerule.lceFallingBlockLimit": "LCE Falling Block Limit",
+  "gamerule.lceFallingBlockLimit.description": "How many falling blocks can be active in the local area at the same time. 0 disables the limit.",
   "gamerule.legacyFlight": "Legacy Flight",
   "gamerule.legacyFlight.description": "When enabled, players will be able to fly in any direction and go up and down while fall flying in a Elytra.",
   "gamerule.legacyMapGrid": "Legacy Map Grid",
