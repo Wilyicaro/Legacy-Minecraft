@@ -91,6 +91,10 @@ public class LegacyItemUtil {
         return Inventory.EQUIPMENT_SLOT_MAPPING.int2ObjectEntrySet().stream().anyMatch(e -> e.getValue() != EquipmentSlot.OFFHAND && predicate.test(inventory.getItem(e.getIntKey())));
     }
 
+    public static boolean canGoInLceOffhand(ItemStack stack) {
+        return stack.isEmpty() || stack.is(Items.FIREWORK_ROCKET) || stack.is(ItemTags.ARROWS) || stack.is(Items.FILLED_MAP) || stack.is(Items.SHIELD) || stack.is(Items.TOTEM_OF_UNDYING);
+    }
+
     public static Holder<Potion> getPotionContent(ItemStack itemStack) {
         return itemStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion().orElse(null);
     }

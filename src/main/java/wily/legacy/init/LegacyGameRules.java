@@ -23,6 +23,7 @@ public class LegacyGameRules {
     public static final GameRules.Key<GameRules.BooleanValue> LEGACY_SWIMMING = GameRules.register("legacySwimming", GameRules.Category.PLAYER, GameRules.BooleanValue.create(true, (server, booleanValue) -> PlayerInfoSync.All.syncGamerule(LegacyGameRules.LEGACY_SWIMMING, booleanValue, server)));
     public static final GameRules.Key<GameRules.BooleanValue> LEGACY_FLIGHT = GameRules.register("legacyFlight", GameRules.Category.PLAYER, GameRules.BooleanValue.create(true, (server, booleanValue) -> PlayerInfoSync.All.syncGamerule(LegacyGameRules.LEGACY_FLIGHT, booleanValue, server)));
     public static final GameRules.Key<GameRules.BooleanValue> LCE_MOBCAP_LIMITS = GameRules.register("lceMobcapLimits", GameRules.Category.MOBS, GameRules.BooleanValue.create(true));
+    public static final GameRules.Key<GameRules.BooleanValue> LCE_OFFHAND_LIMITS = GameRules.register("lceOffhandLimits", GameRules.Category.PLAYER, GameRules.BooleanValue.create(false, (server, booleanValue) -> PlayerInfoSync.All.syncGamerule(LegacyGameRules.LCE_OFFHAND_LIMITS, booleanValue, server)));
 
     public static GameRules.Key<GameRules.BooleanValue> getTntExplodes() {
         return GameRules.RULE_TNT_EXPLODES;

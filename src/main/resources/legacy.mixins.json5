@@ -235,6 +235,8 @@
     "PlayerListMixin",
     "PlayerMixin",
     "ServerGamePacketListenerImplMixin",
+    "LegacyOffhandPacketMixin",
+    "OffhandSlotMixin",
     "ServerPlayerGameModeMixin",
     "ServerPlayerMixin",
     "SnowLayerBlockMixin",
