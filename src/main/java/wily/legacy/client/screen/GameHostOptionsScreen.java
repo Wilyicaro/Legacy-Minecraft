@@ -18,6 +18,7 @@ import wily.legacy.Legacy4JClient;
 import wily.legacy.config.LegacyCommonOptions;
 import wily.legacy.init.LegacyGameRules;
 import wily.legacy.network.PlayerInfoSync;
+import wily.legacy.network.ServerHostOptionsPayload;
 import wily.legacy.util.LegacySprites;
 
 import java.util.*;
@@ -51,22 +52,28 @@ public class GameHostOptionsScreen extends PanelVListScreen {
         int initialWeather = minecraft.level.isThundering() ? 2 : minecraft.level.isRaining() ? 1 : 0;
 
         for (GameRules.Key<GameRules.BooleanValue> key : WORLD_RULES)
-            getRenderableVList().addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.getRule(key).get(), b1 -> Component.translatable(key.getDescriptionId()), b1 -> null, b1 -> commandsOnClose.put(b1, () -> minecraft.player.connection.sendCommand("gamerule %s %s".formatted(key.getId(), b1.selected)))));
-        getRenderableVList().addRenderable(new LegacyButton(Component.translatable("legacy.menu.host_options.set_day"), b1 -> minecraft.player.connection.sendCommand("time set day")));
-        getRenderableVList().addRenderable(new LegacyButton(Component.translatable("legacy.menu.host_options.set_night"), b1 -> minecraft.player.connection.sendCommand("time set 14000")));
-        getRenderableVList().addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b1 -> b1.getDefaultMessage(Component.translatable("options.difficulty"), b1.getObjectValue().getDisplayName()), b1 -> Tooltip.create(minecraft.level.getDifficulty().getInfo()), minecraft.level.getDifficulty(), () -> Arrays.asList(Difficulty.values()), b1 -> commandsOnClose.put(b1, () -> minecraft.getConnection().sendCommand("difficulty " + b1.getObjectValue().getKey()))));
+            getRenderableVList().addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.getRule(key).get(), b1 -> Component.translatable(key.getDescriptionId()), b1 -> null, b1 -> commandsOnClose.put(b1, () -> runCommand("gamerule %s %s".formatted(key.getId(), b1.selected)))));
+        getRenderableVList().addRenderable(new LegacyButton(Component.translatable("legacy.menu.host_options.set_day"), b1 -> runHostAction(ServerHostOptionsPayload.time("day"), "time set day")));
+        getRenderableVList().addRenderable(new LegacyButton(Component.translatable("legacy.menu.host_options.set_night"), b1 -> runHostAction(ServerHostOptionsPayload.time("night"), "time set night")));
+        getRenderableVList().addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b1 -> b1.getDefaultMessage(Component.translatable("options.difficulty"), b1.getObjectValue().getDisplayName()), b1 -> Tooltip.create(minecraft.level.getDifficulty().getInfo()), minecraft.level.getDifficulty(), () -> Arrays.asList(Difficulty.values()), b1 -> commandsOnClose.put(b1, () -> {
+            runHostAction(ServerHostOptionsPayload.difficulty(b1.getObjectValue()), "difficulty " + b1.getObjectValue().getKey());
+        })));
         Supplier<GameType> gameType = () -> Legacy4JClient.defaultServerGameType == null ? minecraft.gameMode.getPlayerMode() : Legacy4JClient.defaultServerGameType;
         List<GameType> gameTypes = Arrays.stream(GameType.values()).toList();
         getRenderableVList().addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b1 -> b1.getDefaultMessage(GAME_MODEL_LABEL, b1.getObjectValue().getShortDisplayName()), b1 -> Tooltip.create(Component.translatable("selectWorld.gameMode." + gameType.get().getName() + ".info")), gameType.get(), () -> gameTypes, b1 -> commandsOnClose.put(b1, () -> minecraft.getConnection().sendCommand("defaultgamemode " + b1.getObjectValue().getName()))));
-        getRenderableVList().addRenderable(new LegacyButton(Component.translatable("legacy.menu.host_options.set_world_spawn"), b1 -> commandsOnClose.put(b1, () -> minecraft.player.connection.sendCommand("setworldspawn"))));
+        getRenderableVList().addRenderable(new LegacyButton(Component.translatable("legacy.menu.host_options.set_world_spawn"), b1 -> commandsOnClose.put(b1, () -> {
+            runHostAction(ServerHostOptionsPayload.worldSpawn(), "setworldspawn");
+        })));
         getRenderableVList().addRenderables(SimpleLayoutRenderable.create(240, 12, (l -> ((graphics, i, j, f) -> {}))));
         getRenderableVList().addCategory(Component.translatable("soundCategory.weather"));
         getRenderableVList().addRenderable(new LegacySliderButton<>(0, 0, 230, 16, b1 -> Component.translatable("legacy.weather_state." + b1.getObjectValue()), b1 -> null, WEATHERS.get(initialWeather), () -> WEATHERS, b1 -> {
             if (!Objects.equals(b1.getObjectValue(), WEATHERS.get(initialWeather)))
-                commandsOnClose.put(b1, () -> minecraft.getConnection().sendCommand("weather " + b1.getObjectValue()));
+                commandsOnClose.put(b1, () -> {
+                    runHostAction(ServerHostOptionsPayload.weather(b1.getObjectValue()), "weather " + b1.getObjectValue());
+                });
         }));
         for (GameRules.Key<GameRules.BooleanValue> key : OTHER_RULES)
-            getRenderableVList().addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.getRule(key).get(), b1 -> Component.translatable(key.getDescriptionId()), b1 -> null, b1 -> commandsOnClose.put(b1, () -> minecraft.player.connection.sendCommand("gamerule %s %s".formatted(key.getId(), b1.selected)))));
+            getRenderableVList().addRenderable(new TickBox(0, 0, Legacy4JClient.gameRules.getRule(key).get(), b1 -> Component.translatable(key.getDescriptionId()), b1 -> null, b1 -> commandsOnClose.put(b1, () -> runCommand("gamerule %s %s".formatted(key.getId(), b1.selected)))));
         LegacyCommonOptions.COMMON_STORAGE.configMap.values().forEach(c -> getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
         Legacy4J.MIXIN_CONFIGS_STORAGE.configMap.values().forEach(c -> getRenderableVList().addRenderable(LegacyConfigWidgets.createWidget(c, b1 -> c.sync())));
         if (minecraft.hasSingleplayerServer() && !minecraft.getSingleplayerServer().isPublished()) return;
@@ -92,6 +99,15 @@ public class GameHostOptionsScreen extends PanelVListScreen {
                 return false;
             }
         }));
+    }
+
+    protected void runHostAction(ServerHostOptionsPayload payload, String fallbackCommand) {
+        if (Legacy4JClient.hasModOnServer()) CommonNetwork.sendToServer(payload);
+        else minecraft.player.connection.sendCommand(fallbackCommand);
+    }
+
+    protected void runCommand(String command) {
+        runHostAction(ServerHostOptionsPayload.command(command), command);
     }
 
     @Override
