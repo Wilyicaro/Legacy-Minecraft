@@ -86,6 +86,7 @@ import static wily.legacy.client.screen.ControlTooltip.MORE;
 
 public class LegacyRenderUtil {
     public static final boolean isNvidia;
+    public static boolean suppressInventoryElytraPose;
     public static final LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
     public static final ResourceLocation MINECRAFT = Legacy4J.createModLocation("textures/gui/title/minecraft.png");
     public static final ResourceLocation PANORAMA_DAY = Legacy4J.createModLocation("textures/gui/title/panorama_day.png");
@@ -375,7 +376,13 @@ public class LegacyRenderUtil {
 
         EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         EntityRenderer<? super Entity, ?> entityRenderer = entityRenderDispatcher.getRenderer(entity);
-        EntityRenderState entityRenderState = entityRenderer.createRenderState(entity, 1.0F);
+        EntityRenderState entityRenderState;
+        suppressInventoryElytraPose = entity == mc.player && mc.screen instanceof InventoryScreen;
+        try {
+            entityRenderState = entityRenderer.createRenderState(entity, 1.0F);
+        } finally {
+            suppressInventoryElytraPose = false;
+        }
         entityRenderState.lightCoords = 15728880;
         entityRenderState.hitboxesRenderState = null;
         entityRenderState.shadowPieces.clear();
