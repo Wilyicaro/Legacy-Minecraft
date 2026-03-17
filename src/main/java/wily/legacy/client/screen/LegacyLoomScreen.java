@@ -226,7 +226,7 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
                     previewIngs.add(extraIng);
                 }
                 displayIngs.set(0, selectedIngredients.get(0));
-                return RecipeInfo.create(p.location().withPrefix(color.getName() + "_"), new BannerRecipe(previewIngs, LegacyCraftingMenu.updateShapedIngredients(new ArrayList<>(Collections.nCopies(9, Optional.empty())), displayIngs, 3, 2, 2), p, color), ings, result);
+                return RecipeInfo.create(p.identifier().withPrefix(color.getName() + "_"), new BannerRecipe(previewIngs, LegacyCraftingMenu.updateShapedIngredients(new ArrayList<>(Collections.nCopies(9, Optional.empty())), displayIngs, 3, 2, 2), p, color), ings, result);
             }).collect(Collectors.collectingAndThen(Collectors.toList(), l -> {
                 Collections.reverse(l);
                 return l;
@@ -412,7 +412,7 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
                 if (isFocused() && isValidIndex()) {
                     if (LegacyLoomScreen.this.canCraft()) {
                         LegacySoundUtil.playSimpleUISound(SoundEvents.UI_LOOM_TAKE_RESULT, 1.0f);
-                        selectedPatterns.forEach(b -> CommonNetwork.sendToServer(new ServerMenuCraftPayload(Optional.of(b.get().pattern.location()), b.getOptionalIngredients(), -1, input.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed)));
+                        selectedPatterns.forEach(b -> CommonNetwork.sendToServer(new ServerMenuCraftPayload(Optional.of(b.get().pattern.identifier()), b.getOptionalIngredients(), -1, input.hasShiftDown() || ControllerBinding.LEFT_STICK_BUTTON.state().pressed)));
                         selectedPatterns.clear();
                         selectedStack = ItemStack.EMPTY;
                         previewStack = ItemStack.EMPTY;
@@ -435,7 +435,7 @@ public class LegacyLoomScreen extends RecipesScreen<LegacyCraftingMenu, RecipeIc
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
         getTabList().render(guiGraphics, i, j, f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getIdentifier("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         getTabList().renderSelected(guiGraphics, i, j, f);
         int bottomPanelHeight = accessor.getInteger("bottomPanel.height", 105);
         int panelWidth = accessor.getInteger("craftingGridPanel.width", 163);

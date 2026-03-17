@@ -6,7 +6,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.BeaconScreen;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.BeaconMenu;
@@ -168,7 +168,7 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
         boolean sd = LegacyOptions.getUIMode().isSD();
         int panelWidth = sd ? 75 : 120;
         int panelHeight = sd ? 75 : 115;
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(UIAccessor.of(this).getIdentifier("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + (sd ? 4 : 8), topPos + (sd ? 4 : 9), panelWidth, panelHeight);
         FactoryGuiGraphics.of(guiGraphics).blitSprite(LegacySprites.SQUARE_RECESSED_PANEL, leftPos + (sd ? 80 : 132), topPos + (sd ? 4 : 9), panelWidth, panelHeight);
         renderBeaconSprite(guiGraphics, LegacySprites.BEACON_1, leftPos + (sd ? 12 : 32), topPos + (sd ? 22 : 39));
@@ -186,7 +186,7 @@ public abstract class BeaconScreenMixin extends AbstractContainerScreen<BeaconMe
     }
 
     @Unique
-    private void renderBeaconSprite(GuiGraphics graphics, ResourceLocation sprite, int x, int y) {
+    private void renderBeaconSprite(GuiGraphics graphics, Identifier sprite, int x, int y) {
         graphics.pose().pushMatrix();
         graphics.pose().translate(x, y);
         if (LegacyOptions.getUIMode().isSD())

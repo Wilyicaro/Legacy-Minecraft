@@ -5,7 +5,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.HorseInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.animal.horse.AbstractChestedHorse;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.animal.horse.Llama;
@@ -63,7 +63,7 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
             if (i == 0) {
                 LegacySlotDisplay.override(s, inventoryLabelX, sd ? 16 : 21, new LegacySlotDisplay() {
                     @Override
-                    public ResourceLocation getIconSprite() {
+                    public Identifier getIconSprite() {
                         return s.getItem().isEmpty() ? LegacySprites.SADDLE_SLOT : null;
                     }
 
@@ -80,7 +80,7 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
             } else if (i == 1) {
                 LegacySlotDisplay.override(s, inventoryLabelX, sd ? 29 : 42, new LegacySlotDisplay() {
                     @Override
-                    public ResourceLocation getIconSprite() {
+                    public Identifier getIconSprite() {
                         return s.getItem().isEmpty() ? horse instanceof Llama ? LegacySprites.LLAMA_ARMOR_SLOT : LegacySprites.ARMOR_SLOT : null;
                     }
 
@@ -114,7 +114,7 @@ public abstract class HorseInventoryScreenMixin extends AbstractContainerScreen<
     public void renderBg(GuiGraphics graphics, float f, int i, int j, CallbackInfo ci) {
         ci.cancel();
         boolean sd = LegacyOptions.getUIMode().isSD();
-        FactoryGuiGraphics.of(graphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(graphics).blitSprite(UIAccessor.of(this).getIdentifier("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
 
         int entityPanelX = leftPos + (sd ? 20 : 34);
         int entityPanelY = topPos + (sd ? 16 : 20);

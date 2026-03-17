@@ -1,12 +1,12 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import wily.factoryapi.base.Bearer;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.SimpleLayoutRenderable;
@@ -25,7 +25,7 @@ public class Panel extends SimpleLayoutRenderable {
     public static final BiFunction<Component, Integer, MultiLineLabel> labelsCache = Util.memoize((c, i) -> MultiLineLabel.create(Minecraft.getInstance().font, c, i));
     public static final BiFunction<Component, Integer, MultiLineLabel> sdLabelsCache = Util.memoize((c, i) -> MultiLineLabel.create(Minecraft.getInstance().font, c.copy().withStyle(c.getStyle().withFont(LegacyFontUtil.MOJANGLES_11_FONT)), i));
     protected final UIAccessor accessor;
-    public ResourceLocation panelSprite = LegacySprites.SMALL_PANEL;
+    public Identifier panelSprite = LegacySprites.SMALL_PANEL;
     public String name;
 
     public Panel(Screen screen) {
@@ -83,11 +83,11 @@ public class Panel extends SimpleLayoutRenderable {
         return Panel.createPanel(screen, p -> p.centeredLeftPos(screen) + xOffset.get(), p -> p.centeredTopPos(screen) + yOffset.get(), imageWidth, imageHeight);
     }
 
-    public static Panel centered(Screen screen, ResourceLocation panelSprite, int imageWidth, int imageHeight, int xOffset, int yOffset) {
+    public static Panel centered(Screen screen, Identifier panelSprite, int imageWidth, int imageHeight, int xOffset, int yOffset) {
         return Panel.createPanel(screen, p -> p.appearance(panelSprite, imageWidth, imageHeight), p -> p.pos(p.centeredLeftPos(screen) + xOffset, p.centeredTopPos(screen) + yOffset));
     }
 
-    public static Panel centered(Screen screen, ResourceLocation panelSprite, int imageWidth, int imageHeight) {
+    public static Panel centered(Screen screen, Identifier panelSprite, int imageWidth, int imageHeight) {
         return Panel.createPanel(screen, p -> p.appearance(panelSprite, imageWidth, imageHeight), p -> p.pos(p.centeredLeftPos(screen), p.centeredTopPos(screen)));
     }
 
@@ -135,8 +135,8 @@ public class Panel extends SimpleLayoutRenderable {
         appearance(LegacySprites.SMALL_PANEL, width, height);
     }
 
-    public void appearance(ResourceLocation sprite, int width, int height) {
-        panelSprite = accessor.getElementValue(name + ".sprite", sprite, ResourceLocation.class);
+    public void appearance(Identifier sprite, int width, int height) {
+        panelSprite = accessor.getElementValue(name + ".sprite", sprite, Identifier.class);
         size(accessor.putStaticElement(name + ".width", accessor.getInteger(name + ".width", width)), accessor.putStaticElement(name + ".height", accessor.getInteger(name + ".height", height)));
     }
 

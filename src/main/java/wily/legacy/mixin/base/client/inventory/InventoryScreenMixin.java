@@ -7,7 +7,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -35,7 +35,7 @@ import wily.legacy.util.client.LegacyRenderUtil;
 public abstract class InventoryScreenMixin extends AbstractContainerScreen<InventoryMenu> implements ReplaceableScreen, LegacyMenuAccess<InventoryMenu> {
     private static final Vec2 EQUIP_SLOT_OFFSET = new Vec2(50, 0);
     private static final Vec2 EQUIP_SLOT_OFFSET_SD = new Vec2(31, 0);
-    private static final ResourceLocation[] EQUIPMENT_SLOT_SPRITES = new ResourceLocation[]{LegacySprites.HEAD_SLOT, LegacySprites.CHEST_SLOT, LegacySprites.LEGS_SLOT, LegacySprites.FEET_SLOT};
+    private static final Identifier[] EQUIPMENT_SLOT_SPRITES = new Identifier[]{LegacySprites.HEAD_SLOT, LegacySprites.CHEST_SLOT, LegacySprites.LEGS_SLOT, LegacySprites.FEET_SLOT};
 
     private boolean canReplace = true;
 
@@ -88,7 +88,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
             } else if (i < 9) {
                 int index = 39 - s.getContainerSlot();
                 LegacySlotDisplay.override(s, inventoryLabelX, (sd ? 9 : 14) + index * slotsSize, new LegacySlotDisplay() {
-                    public ResourceLocation getIconSprite() {
+                    public Identifier getIconSprite() {
                         return s.getItem().isEmpty() ? EQUIPMENT_SLOT_SPRITES[index] : null;
                     }
 
@@ -111,7 +111,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
                         return LegacyOptions.hasClassicCrafting() ? Vec2.ZERO : sd ? EQUIP_SLOT_OFFSET_SD : EQUIP_SLOT_OFFSET;
                     }
 
-                    public ResourceLocation getIconSprite() {
+                    public Identifier getIconSprite() {
                         return s.getItem().isEmpty() ? LegacySprites.SHIELD_SLOT : null;
                     }
 
@@ -137,7 +137,7 @@ public abstract class InventoryScreenMixin extends AbstractContainerScreen<Inven
         int playerPanelY = topPos + (sd ? 8 : 13);
         int playerPanelWidth = sd ? 39 : 63;
         int playerPanelHeight = sd ? 52 : 84;
-        FactoryGuiGraphics.of(graphics).blitSprite(UIAccessor.of(this).getResourceLocation("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(graphics).blitSprite(UIAccessor.of(this).getIdentifier("imageSprite", sd ? LegacySprites.PANEL : LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         FactoryGuiGraphics.of(graphics).blitSprite(sd ? LegacySprites.SQUARE_ENTITY_PANEL : LegacySprites.ENTITY_PANEL, playerPanelX, playerPanelY, playerPanelWidth, playerPanelHeight);
         Pose pose = minecraft.player.getPose();
         minecraft.player.setPose(Pose.STANDING);

@@ -1,7 +1,7 @@
 package wily.legacy.client.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -27,7 +27,7 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
@@ -65,11 +65,11 @@ import static wily.legacy.client.screen.ControlTooltip.*;
 
 
 public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends RecipesScreen<T, RecipeIconHolder<MixedCraftingScreen.VanillaCrafting>> implements TabList.Access {
-    public static final ResourceLocation STRUCTURES_TAB = Legacy4J.createModLocation("structures");
-    public static final ResourceLocation MECHANISMS_TAB = Legacy4J.createModLocation("mechanisms");
-    public static final ResourceLocation TOOLS_TAB = Legacy4J.createModLocation("tools");
-    public static final ResourceLocation MISC_TAB = Legacy4J.createModLocation("misc");
-    public static final ResourceLocation SEARCH_TAB = Legacy4J.createModLocation("search");
+    public static final Identifier STRUCTURES_TAB = Legacy4J.createModLocation("structures");
+    public static final Identifier MECHANISMS_TAB = Legacy4J.createModLocation("mechanisms");
+    public static final Identifier TOOLS_TAB = Legacy4J.createModLocation("tools");
+    public static final Identifier MISC_TAB = Legacy4J.createModLocation("misc");
+    public static final Identifier SEARCH_TAB = Legacy4J.createModLocation("search");
     public static final ExtendedRecipeBookCategory[] VANILLA_CATEGORIES = new ExtendedRecipeBookCategory[]{RecipeBookCategories.CRAFTING_BUILDING_BLOCKS, RecipeBookCategories.CRAFTING_REDSTONE, RecipeBookCategories.CRAFTING_EQUIPMENT, RecipeBookCategories.CRAFTING_MISC, SearchRecipeBookCategory.CRAFTING};
     protected final List<ItemStack> compactItemStackList = new ArrayList<>();
     protected final StackedItemContents stackedContents = new StackedItemContents();
@@ -333,7 +333,7 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Recipes
                     }
 
                     @Override
-                    public ResourceLocation getId() {
+                    public Identifier getId() {
                         return null;
                     }
 
@@ -587,7 +587,7 @@ public class MixedCraftingScreen<T extends AbstractCraftingMenu> extends Recipes
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
         getTabList().render(guiGraphics, i, j, f);
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getIdentifier("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         getTabList().renderSelected(guiGraphics, i, j, f);
         int bottomPanelHeight = accessor.getInteger("bottomPanel.height", 105);
         int panelWidth = accessor.getInteger("craftingGridPanel.width", 163);

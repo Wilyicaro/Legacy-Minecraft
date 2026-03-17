@@ -6,7 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import wily.legacy.Legacy4J;
 import wily.legacy.util.client.LegacyRenderUtil;
 
@@ -24,12 +24,12 @@ public class ScreenshotToast {
     private static final int MAX_TOAST_TIME = 150;
     private static final int TOAST_WIDTH = 190;
     private static final int TOAST_HEIGHT = 40;
-    private static final ResourceLocation DEFAULT_ICON = ResourceLocation.withDefaultNamespace("textures/misc/unknown_pack.png");
+    private static final Identifier DEFAULT_ICON = Identifier.withDefaultNamespace("textures/misc/unknown_pack.png");
     private static final String SCREENSHOTS_FOLDER = Minecraft.getInstance().gameDirectory + "/screenshots/";
 
     private static List<ScreenshotToast> queuedScreenshots = new ArrayList<>();
     private static float toastTime = 0f;
-    private static ResourceLocation screenshotImage = null;
+    private static Identifier screenshotImage = null;
     private static int screenshotWidth = 128;
     private static int screenshotHeight = 128;
 
@@ -46,7 +46,7 @@ public class ScreenshotToast {
     public static void render(GuiGraphics graphics) {
         if (toastTime <= 0) toastTime = (float) (MAX_TOAST_TIME + (TOAST_HEIGHT * 2));
         if (!queuedScreenshots.isEmpty()) {
-            ResourceLocation screenshotLocation = DEFAULT_ICON;
+            Identifier screenshotLocation = DEFAULT_ICON;
             ScreenshotToast screenshotToast = queuedScreenshots.getFirst();
             if (screenshotImage == null) screenshotImage = getScreenshot(screenshotToast.screenshotName);
             screenshotLocation = screenshotImage;
@@ -78,23 +78,23 @@ public class ScreenshotToast {
         }
     }
 
-    private static ResourceLocation getScreenshot(String screenshot) {
+    private static Identifier getScreenshot(String screenshot) {
         try {
             screenshotWidth = 128;
             screenshotHeight = 128;
-            ResourceLocation screenshotLocation = DEFAULT_ICON;
+            Identifier screenshotLocation = DEFAULT_ICON;
             Path screenshotPath = Paths.get(SCREENSHOTS_FOLDER + screenshot);
             InputStream screenshotInputStream = screenshotPath.getFileSystem().provider().newInputStream(screenshotPath, new OpenOption[] {StandardOpenOption.READ});
 
-            ResourceLocation screenshotResourceLocation = ResourceLocation.withDefaultNamespace("screenshot/toast/" + screenshot);
+            Identifier screenshotIdentifier = Identifier.withDefaultNamespace("screenshot/toast/" + screenshot);
             NativeImage nativeImage = NativeImage.read(screenshotInputStream);
 
             screenshotWidth = nativeImage.getWidth();
             screenshotHeight = nativeImage.getHeight();
 
-            Objects.requireNonNull(screenshotResourceLocation);
-            Minecraft.getInstance().getTextureManager().register(screenshotResourceLocation, new DynamicTexture(screenshotResourceLocation::toString, nativeImage));
-            screenshotLocation = screenshotResourceLocation;
+            Objects.requireNonNull(screenshotIdentifier);
+            Minecraft.getInstance().getTextureManager().register(screenshotIdentifier, new DynamicTexture(screenshotIdentifier::toString, nativeImage));
+            screenshotLocation = screenshotIdentifier;
 
             return screenshotLocation;
         } catch (Exception exception) {

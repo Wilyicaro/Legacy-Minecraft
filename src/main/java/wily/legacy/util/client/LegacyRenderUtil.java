@@ -3,7 +3,8 @@ package wily.legacy.util.client;
 import com.google.common.collect.Ordering;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import net.minecraft.Util;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
@@ -28,7 +29,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
@@ -36,6 +37,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
@@ -87,11 +89,11 @@ import static wily.legacy.client.screen.ControlTooltip.MORE;
 public class LegacyRenderUtil {
     public static final boolean isNvidia;
     public static final LegacyIconHolder iconHolderRenderer = new LegacyIconHolder();
-    public static final ResourceLocation MINECRAFT = Legacy4J.createModLocation("textures/gui/title/minecraft.png");
-    public static final ResourceLocation PANORAMA_DAY = Legacy4J.createModLocation("textures/gui/title/panorama_day.png");
-    public static final ResourceLocation PANORAMA_NIGHT = Legacy4J.createModLocation("textures/gui/title/panorama_night.png");
-    public static final ResourceLocation MENU_BACKGROUND = Legacy4J.createModLocation("textures/gui/menu_background.png");
-    public static final ResourceLocation LOADING_BACKGROUND = Legacy4J.createModLocation("textures/gui/loading_background.png");
+    public static final Identifier MINECRAFT = Legacy4J.createModLocation("textures/gui/title/minecraft.png");
+    public static final Identifier PANORAMA_DAY = Legacy4J.createModLocation("textures/gui/title/panorama_day.png");
+    public static final Identifier PANORAMA_NIGHT = Legacy4J.createModLocation("textures/gui/title/panorama_night.png");
+    public static final Identifier MENU_BACKGROUND = Legacy4J.createModLocation("textures/gui/menu_background.png");
+    public static final Identifier LOADING_BACKGROUND = Legacy4J.createModLocation("textures/gui/loading_background.png");
     protected static final LogoRenderer logoRenderer = new LogoRenderer(false);
 
     private static final Minecraft mc = Minecraft.getInstance();
@@ -104,11 +106,11 @@ public class LegacyRenderUtil {
         blitTranslucentOverlaySprite(graphics, LegacySprites.POINTER_PANEL, x, y, width, height);
     }
 
-    public static void blitTranslucentOverlaySprite(GuiGraphics graphics, ResourceLocation sprite, int x, int y, int width, int height) {
+    public static void blitTranslucentOverlaySprite(GuiGraphics graphics, Identifier sprite, int x, int y, int width, int height) {
         blitTranslucentSprite(graphics, sprite, x, y, width, height);
     }
 
-    public static void blitTranslucentSprite(GuiGraphics graphics, ResourceLocation sprite, int x, int y, int width, int height) {
+    public static void blitTranslucentSprite(GuiGraphics graphics, Identifier sprite, int x, int y, int width, int height) {
         FactoryGuiGraphics.of(graphics).blitSprite(sprite, x, y, width, height);
     }
 
@@ -342,7 +344,26 @@ public class LegacyRenderUtil {
         Quaternionf quaternionf = new Quaternionf().rotateZ((float) Math.PI);
         Quaternionf quaternionf2 = new Quaternionf().rotateX(q * 20.0F * (float) (Math.PI / 180.0));
         quaternionf.mul(quaternionf2);
-        float r = livingEntity.yBodyRot;
+        //? if >=1.21.11 {
+        EntityRenderState entityRenderState = extractRenderState(livingEntity);
+        if (entityRenderState instanceof LivingEntityRenderState livingEntityRenderState) {
+            livingEntityRenderState.bodyRot = 180.0F + p * 20.0F;
+            livingEntityRenderState.yRot = p * 20.0F;
+            if (livingEntityRenderState.pose != Pose.FALL_FLYING) {
+                livingEntityRenderState.xRot = -q * 20.0F;
+            } else {
+                livingEntityRenderState.xRot = 0.0F;
+            }
+
+            livingEntityRenderState.boundingBoxWidth /= livingEntityRenderState.scale;
+            livingEntityRenderState.boundingBoxHeight /= livingEntityRenderState.scale;
+            livingEntityRenderState.scale = 1.0F;
+        }
+
+        Vector3f vector3f = new Vector3f(0.0F, entityRenderState.boundingBoxHeight / 2.0F + f, 0.0F);
+        guiGraphics.submitEntityRenderState(entityRenderState, (float)m, vector3f, quaternionf, quaternionf2, i, j, k, l);
+        //?} else {
+        /*float r = livingEntity.yBodyRot;
         float s = livingEntity.getYRot();
         float t = livingEntity.getXRot();
         float u = livingEntity.yHeadRotO;
@@ -362,6 +383,7 @@ public class LegacyRenderUtil {
         livingEntity.yHeadRotO = u;
         livingEntity.yHeadRot = v;
         guiGraphics.disableScissor();
+         *///?}
     }
 
     public static void renderEntity(GuiGraphics guiGraphics, int x, int y, int x0, int y0, float size, Vector3f vector3f, Quaternionf quaternionf, @Nullable Quaternionf quaternionf2, Entity entity) {
@@ -377,13 +399,25 @@ public class LegacyRenderUtil {
         EntityRenderer<? super Entity, ?> entityRenderer = entityRenderDispatcher.getRenderer(entity);
         EntityRenderState entityRenderState = entityRenderer.createRenderState(entity, 1.0F);
         entityRenderState.lightCoords = 15728880;
-        entityRenderState.hitboxesRenderState = null;
+        //? if <1.21.11 {
+        /*entityRenderState.hitboxesRenderState = null;
+        *///?}
         entityRenderState.shadowPieces.clear();
         entityRenderState.outlineColor = 0;
         ScreenRectangle scissorStack = guiGraphics.scissorStack.peek();
         GuiEntityRenderState guiRenderState = new GuiEntityRenderState(entityRenderState, vector3f, quaternionf, quaternionf2, x, y, x0, y0, h, scissorStack, PictureInPictureRenderState.getBounds(0, 0, guiGraphics.guiWidth(), guiGraphics.guiHeight(), scissorStack));
         MutablePIPRenderState.of(guiRenderState).setPose(guiGraphics.pose());
         guiGraphics.guiRenderState.submitPicturesInPictureState(guiRenderState);
+    }
+
+    public static EntityRenderState extractRenderState(LivingEntity livingEntity) {
+        EntityRenderDispatcher entityRenderDispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+        EntityRenderer<? super LivingEntity, ?> entityRenderer = entityRenderDispatcher.getRenderer(livingEntity);
+        EntityRenderState entityRenderState = entityRenderer.createRenderState(livingEntity, 1.0F);
+        entityRenderState.lightCoords = 15728880;
+        entityRenderState.shadowPieces.clear();
+        entityRenderState.outlineColor = 0;
+        return entityRenderState;
     }
 
     public static void renderLocalPlayerHead(GuiGraphics guiGraphics, int x, int y, int size) {

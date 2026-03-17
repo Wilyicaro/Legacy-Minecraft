@@ -1,16 +1,16 @@
 package wily.legacy.client.screen;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.navigation.ScreenAxis;
 import net.minecraft.client.gui.navigation.ScreenDirection;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.util.FactoryScreenUtil;
 import wily.legacy.util.LegacySprites;
 
 public class LegacyScrollRenderer {
-    public static final ResourceLocation[] SCROLLS = new ResourceLocation[]{LegacySprites.SCROLL_UP, LegacySprites.SCROLL_DOWN, LegacySprites.SCROLL_LEFT, LegacySprites.SCROLL_RIGHT};
+    public static final Identifier[] SCROLLS = new Identifier[]{LegacySprites.SCROLL_UP, LegacySprites.SCROLL_DOWN, LegacySprites.SCROLL_LEFT, LegacySprites.SCROLL_RIGHT};
     public final long[] lastScrolled = new long[4];
     public long lastScroll = 0;
     public ScreenDirection lastDirection;
@@ -36,7 +36,7 @@ public class LegacyScrollRenderer {
         return Math.min(1.0f, f < 0.5f ? 1 - f * 2f : (f - 0.5f) * 2f);
     }
 
-    public void renderScroll(GuiGraphics graphics, ScreenDirection direction, int x, int y, ResourceLocation sprite, int width, int height) {
+    public void renderScroll(GuiGraphics graphics, ScreenDirection direction, int x, int y, Identifier sprite, int width, int height) {
         long l = lastScrolled[direction.ordinal()];
         if (l > 0)
             FactoryGuiGraphics.of(graphics).setBlitColor(1.0f, 1.0f, 1.0f, getAlpha(l));

@@ -2,7 +2,7 @@
 package wily.legacy.mixin.base;
 
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.entity.vehicle.MinecartBehavior;
 import net.minecraft.world.entity.vehicle.OldMinecartBehavior;
 import net.minecraft.world.phys.Vec3;

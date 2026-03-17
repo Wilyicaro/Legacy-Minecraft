@@ -83,7 +83,8 @@ dependencies {
         modCompileOnly("mezz.jei:jei-${stonecutter.current.version}-${loader}:${jei_version}")
     }
 
-    if (loader == "fabric" || stonecutter.eval(stonecutter.current.version, ">=1.21") && loader == "neoforge"){
+    // TODO: complains of architectury loom's version being too low (1.13 vs 1.14), not going to be an issue in 26.1
+    if (stonecutter.eval(stonecutter.current.version, "<1.21.11") && loader == "fabric" || stonecutter.eval(stonecutter.current.version, ">=1.21") && loader == "neoforge"){
         modCompileOnly("maven.modrinth:sodium:${sodium_version}")
         modCompileOnly("maven.modrinth:iris:${iris_version}")
     }
@@ -96,7 +97,6 @@ dependencies {
             modCompileOnly("maven.modrinth:nostalgic-tweaks:${nt_version}")
             modCompileOnly("dev.architectury:architectury-fabric:${architectury_version}")
         }
-
     } else if (loader == "forge") {
         forge "net.minecraftforge:forge:${stonecutter.current.version}-${forge_version}"
         if (stonecutter.eval(stonecutter.current.version, "1.20.1")){
@@ -116,8 +116,28 @@ dependencies {
     if (loader == "forge" || loader == "neoforge") {
         forgeRuntimeLibrary sdl_dependency
     }
+}
 
-
+stonecutter {
+    replacements {
+        string(stonecutter.eval(stonecutter.current.version, ">=1.21.11")) {
+            replace("ResourceLocation", "Identifier")
+            replace("location()", "identifier()")
+            replace("CommonNetwork.Identifier", "CommonNetwork.Identifier")
+            replace("Progress.Identifier", "Progress.Identifier")
+            replace("withSlotIdentifier", "withSlotIdentifier")
+            replace("record Identifier", "record Identifier")
+            replace("SlotsIdentifier", "SlotsIdentifier")
+            replace("IHasIdentifier", "IHasIdentifier")
+            replace("Identifier<T extends Payload>", "Identifier<T extends Payload>")
+            replace("import net.minecraft.Util;", "import net.minecraft.util.Util;")
+            replace("vehicle.AbstractMinecart", "vehicle.minecart.AbstractMinecart")
+            replace("vehicle.MinecartBehavior", "vehicle.minecart.MinecartBehavior")
+            replace("vehicle.OldMinecartBehavior", "vehicle.minecart.OldMinecartBehavior")
+            replace("vehicle.MinecartFurnace", "vehicle.minecart.MinecartFurnace")
+            replace("animal.Pig", "animal.pig.Pig")
+        }
+    }
 }
 
 def aw = "${mod_id}.accesswidener"

@@ -5,7 +5,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.NativeImage;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -22,7 +22,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import wily.factoryapi.FactoryAPI;
 import wily.factoryapi.FactoryAPIClient;
@@ -52,12 +52,12 @@ public class ModsScreen extends PanelVListScreen {
         if (opt.isPresent() && mod.containsResource(opt.get()))
             try {
                 NativeImage image = NativeImage.read(mod.openResource(opt.get()));
-                ResourceLocation location = FactoryAPI.createLocation(mod.getId(), opt.get().toLowerCase(Locale.ENGLISH));
+                Identifier location = FactoryAPI.createLocation(mod.getId(), opt.get().toLowerCase(Locale.ENGLISH));
                 Minecraft.getInstance().getTextureManager().register(location, new DynamicTexture(/*? if >=1.21.5 {*/location::toString, /*?}*/image));
                 if (location != null) return new SizedLocation(location, image.getWidth(), image.getHeight());
             } catch (IOException e) {
             }
-        ResourceLocation defaultLogo = PackAlbum.Selector.DEFAULT_ICON;
+        Identifier defaultLogo = PackAlbum.Selector.DEFAULT_ICON;
         if (mod.getId().equals("minecraft"))
             defaultLogo = PackAlbum.Selector.getPackIcon(Minecraft.getInstance().getResourcePackRepository().getPack("vanilla"));
         return new SizedLocation(defaultLogo, 1, 1);
@@ -232,7 +232,7 @@ public class ModsScreen extends PanelVListScreen {
         renderer.add(() -> ControlType.getActiveType().isKbm() ? ControlTooltip.getKeyIcon(InputConstants.KEY_X) : ControllerBinding.LEFT_BUTTON.getIcon(), () -> Component.translatable("legacy.menu.sorting", this.sorting.get() == 0 ? LegacyComponents.NONE : LegacyComponents.ALPHABETICAL));
     }
 
-    public record SizedLocation(ResourceLocation location, int width, int height) {
+    public record SizedLocation(Identifier location, int width, int height) {
         public int getScaledWidth(int height) {
             return (int) (height * ((float) width() / height()));
         }

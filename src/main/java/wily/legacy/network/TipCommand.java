@@ -136,12 +136,12 @@ public class TipCommand {
         public static final CommonNetwork.Identifier<EntityPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("send_entity_tip"), EntityPayload::new);
 
         public EntityPayload(CommonNetwork.PlayBuf buf) {
-            this(FactoryAPIPlatform.getRegistryValue(buf.get().readResourceLocation(), BuiltInRegistries.ENTITY_TYPE), buf.get().readBoolean());
+            this(FactoryAPIPlatform.getRegistryValue(buf.get().readIdentifier(), BuiltInRegistries.ENTITY_TYPE), buf.get().readBoolean());
         }
 
         @Override
         public void encode(CommonNetwork.PlayBuf buf) {
-            buf.get().writeResourceLocation(BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
+            buf.get().writeIdentifier(BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
             buf.get().writeBoolean(force);
         }
 

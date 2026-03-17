@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.LevelSummary;
@@ -111,11 +111,11 @@ public class CreationList extends RenderableVList {
         }
     }
 
-    public static void addIconButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress) {
+    public static void addIconButton(RenderableVList list, Identifier iconSprite, Component message, Consumer<AbstractButton> onPress) {
         addIconButton(list, iconSprite, message, onPress, null);
     }
 
-    public static void addIconButton(RenderableVList list, ResourceLocation iconSprite, Component message, Consumer<AbstractButton> onPress, Tooltip tooltip) {
+    public static void addIconButton(RenderableVList list, Identifier iconSprite, Component message, Consumer<AbstractButton> onPress, Tooltip tooltip) {
         AbstractButton button;
         list.addRenderable(button = new ContentButton(list, 0, 0, 270, 30, message) {
             @Override

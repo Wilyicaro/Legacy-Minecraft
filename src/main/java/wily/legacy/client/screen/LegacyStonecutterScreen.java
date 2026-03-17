@@ -118,7 +118,7 @@ public class LegacyStonecutterScreen extends RecipesScreen<LegacyCraftingMenu, R
     @Override
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
         boolean sd = LegacyOptions.getUIMode().isSD();
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getIdentifier("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         int bottomPanelHeight = accessor.getInteger("bottomPanel.height", 105);
         int panelWidth = accessor.getInteger("craftingGridPanel.width", 163);
         int bottomPanelY = accessor.getInteger("bottomPanel.y", 103);

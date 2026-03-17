@@ -10,7 +10,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import wily.factoryapi.base.client.FactoryGuiGraphics;
 import wily.factoryapi.base.client.UIAccessor;
@@ -47,8 +47,8 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
     private static class RemoteImage {
         public final int width;
         public final int height;
-        public final ResourceLocation id;
-        public RemoteImage(ResourceLocation id, int width, int height) {
+        public final Identifier id;
+        public RemoteImage(Identifier id, int width, int height) {
             this.id = id;
             this.width = width;
             this.height = height;
@@ -141,7 +141,7 @@ public class Legacy4JContentListScreen extends PanelVListScreen implements Contr
                 
                 minecraft.execute(() -> {
                     String cleanId = packId.toLowerCase().replaceAll("[^a-z0-9_.-]", "");
-                    ResourceLocation textureId = ResourceLocation.fromNamespaceAndPath("legacy", "pack_image_" + cleanId);
+                    Identifier textureId = Identifier.fromNamespaceAndPath("legacy", "pack_image_" + cleanId);
                     
                     minecraft.getTextureManager().register(textureId, new DynamicTexture(() -> "pack_image_" + cleanId, nativeImage));
                     

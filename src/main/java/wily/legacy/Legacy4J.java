@@ -3,7 +3,7 @@ package wily.legacy;
 import net.minecraft.core.Holder;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
@@ -136,7 +136,7 @@ public class Legacy4J {
         FactoryEvent.PlayerEvent.RELOAD_RESOURCES_EVENT.register(Legacy4J::onResourcesReload);
     }
 
-    public static ResourceLocation createModLocation(String path) {
+    public static Identifier createModLocation(String path) {
         return FactoryAPI.createLocation(MOD_ID, path);
     }
 

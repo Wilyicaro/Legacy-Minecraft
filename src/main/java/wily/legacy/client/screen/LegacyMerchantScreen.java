@@ -8,7 +8,7 @@ import net.minecraft.client.input.InputWithModifiers;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.player.Inventory;
@@ -172,7 +172,7 @@ public class LegacyMerchantScreen extends RecipesScreen<LegacyMerchantMenu, Lega
 
 
             @Override
-            public ResourceLocation getIconHolderSprite() {
+            public Identifier getIconHolderSprite() {
                 return isValidIndex() && ((LegacyMerchantOffer) menu.merchant.getOffers().get(getIndex())).getRequiredLevel() > menu.merchantLevel ? LegacySprites.GRAY_ICON_HOLDER : super.getIconHolderSprite();
             }
 
@@ -326,7 +326,7 @@ public class LegacyMerchantScreen extends RecipesScreen<LegacyMerchantMenu, Lega
     public void renderBg(GuiGraphics guiGraphics, float f, int i, int j) {
         boolean sd = LegacyOptions.getUIMode().isSD();
 
-        FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getResourceLocation("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
+        FactoryGuiGraphics.of(guiGraphics).blitSprite(accessor.getIdentifier("imageSprite", LegacySprites.SMALL_PANEL), leftPos, topPos, imageWidth, imageHeight);
         int bottomPanelHeight = accessor.getInteger("bottomPanel.height", 93);
         int tradingPanelWidth = accessor.getInteger("tradingGridPanel.width", 110);
         int bottomPanelY = accessor.getInteger("bottomPanel.y", 79);

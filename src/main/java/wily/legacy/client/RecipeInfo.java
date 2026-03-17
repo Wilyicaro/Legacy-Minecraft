@@ -13,7 +13,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -44,18 +44,18 @@ import java.util.function.Supplier;
 
 public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
     static <T> RecipeInfo<T> create(ResourceKey<Recipe<?>> id, T value, List<Optional<Ingredient>> ings, ItemStack result) {
-        return create(id.location(), value, ings, result, () -> null);
+        return create(id.identifier(), value, ings, result, () -> null);
     }
 
-    static <T> RecipeInfo<T> create(ResourceLocation id, T value, List<Optional<Ingredient>> ings, ItemStack result) {
+    static <T> RecipeInfo<T> create(Identifier id, T value, List<Optional<Ingredient>> ings, ItemStack result) {
         return create(id, value, ings, result, () -> null);
     }
 
-    static <T> RecipeInfo<T> create(ResourceLocation id, T value, List<Optional<Ingredient>> ings, ItemStack result, Supplier<Component> description) {
+    static <T> RecipeInfo<T> create(Identifier id, T value, List<Optional<Ingredient>> ings, ItemStack result, Supplier<Component> description) {
         return create(id, value, ings, result, result.getHoverName(), description);
     }
 
-    static <T> RecipeInfo<T> create(ResourceLocation id, T value, List<Optional<Ingredient>> ings, ItemStack result, Component name, Supplier<Component> description) {
+    static <T> RecipeInfo<T> create(Identifier id, T value, List<Optional<Ingredient>> ings, ItemStack result, Component name, Supplier<Component> description) {
         return new RecipeInfo<>() {
 
             @Override
@@ -64,7 +64,7 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
             }
 
             @Override
-            public ResourceLocation getId() {
+            public Identifier getId() {
                 return id;
             }
 
@@ -111,26 +111,26 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
     Component getDescription();
 
     interface Filter extends Predicate<RecipeInfo<?>> {
-        ListMap<ResourceLocation, Codec<? extends Filter>> map = ListMap.<String, Codec<? extends Filter>>builder().put("id", Id.CODEC).put("item_tag", ItemTag.CODEC).put("block_tag", BlockTag.CODEC).put("item_id", ItemId.CODEC).mapKeys(FactoryAPI::createVanillaLocation).build();
+        ListMap<Identifier, Codec<? extends Filter>> map = ListMap.<String, Codec<? extends Filter>>builder().put("id", Id.CODEC).put("item_tag", ItemTag.CODEC).put("block_tag", BlockTag.CODEC).put("item_id", ItemId.CODEC).mapKeys(FactoryAPI::createVanillaLocation).build();
         Codec<Filter> BY_TYPE_CODEC = new Codec<>() {
             @Override
             public <T> DataResult<T> encode(Filter input, DynamicOps<T> ops, T prefix) {
-                return ResourceLocation.CODEC.encodeStart(ops, map.getKey(input.codec())).map(type -> ops.set(prefix, "type", type)).flatMap(r ->  ((Codec<Filter>) input.codec()).encodeStart(ops, input).map(value -> ops.set(r, "value", value)));
+                return Identifier.CODEC.encodeStart(ops, map.getKey(input.codec())).map(type -> ops.set(prefix, "type", type)).flatMap(r ->  ((Codec<Filter>) input.codec()).encodeStart(ops, input).map(value -> ops.set(r, "value", value)));
             }
 
             @Override
             public <T> DataResult<Pair<Filter, T>> decode(DynamicOps<T> ops, T input) {
                 Dynamic<T> dynamic = new Dynamic<>(ops, input);
-                return dynamic.get("type").flatMap(ResourceLocation.CODEC::parse).flatMap(r -> dynamic.get("value").flatMap(d -> map.get(r).parse(d)).map(f -> Pair.of(f, input)));
+                return dynamic.get("type").flatMap(Identifier.CODEC::parse).flatMap(r -> dynamic.get("value").flatMap(d -> map.get(r).parse(d)).map(f -> Pair.of(f, input)));
             }
         };
         Codec<Filter> CODEC = IOUtil.createFallbackCodec(BY_TYPE_CODEC, Codec.STRING.xmap(Filter::parse, Filter::toString));
         Codec<List<Filter>> LIST_CODEC = CODEC.listOf().xmap(ArrayList::new, Function.identity());
         Codec<Map<String, List<Filter>>> LISTING_CODEC = IOUtil.createListingCodec(IOUtil.createFallbackCodec(LIST_CODEC, CODEC.xmap(f -> new ArrayList<>(Collections.singleton(f)), list -> list.get(0))), "group", "recipes", l -> l.get(0).toString());
 
-        ResourceLocation TIPPED_ARROW = FactoryAPI.createVanillaLocation("tipped_arrow");
+        Identifier TIPPED_ARROW = FactoryAPI.createVanillaLocation("tipped_arrow");
 
-        Map<ResourceLocation, IdOverride> ID_RECIPE_INFO_OVERRIDES = new HashMap<>(Map.of(TIPPED_ARROW, (validRecipes, recipeAdder) -> {
+        Map<Identifier, IdOverride> ID_RECIPE_INFO_OVERRIDES = new HashMap<>(Map.of(TIPPED_ARROW, (validRecipes, recipeAdder) -> {
             BuiltInRegistries.POTION.asHolderIdMap().forEach(p -> {
                 if (p.value().getEffects().isEmpty() && !p.equals(Potions.WATER)) return;
                 ItemStack potion = LegacyItemUtil.setItemStackPotion(Items.LINGERING_POTION.getDefaultInstance(), p);
@@ -207,7 +207,7 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
 
             @Override
             public String toString() {
-                return "#block_tag/" + tag.location();
+                return "#block_tag/" + tag.identifier();
             }
         }
 
@@ -226,12 +226,12 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
 
             @Override
             public String toString() {
-                return "#" + tag.location();
+                return "#" + tag.identifier();
             }
         }
 
-        record Id(ResourceLocation id) implements Filter {
-            public static final Codec<Id> CODEC = ResourceLocation.CODEC.xmap(Id::new, Id::id);
+        record Id(Identifier id) implements Filter {
+            public static final Codec<Id> CODEC = Identifier.CODEC.xmap(Id::new, Id::id);
 
             @Override
             public <T> void addRecipes(Iterable<RecipeInfo<T>> validRecipes, Consumer<RecipeInfo<T>> recipeAdder) {
@@ -261,11 +261,11 @@ public interface RecipeInfo<T> extends RegisterListing.Holder<T> {
             }
         }
 
-        record ItemId(ResourceLocation id, boolean onlyFirstMatch) implements Filter {
-            public static final Codec<ItemId> EXTENDED_CODEC = RecordCodecBuilder.create(i -> i.group(ResourceLocation.CODEC.fieldOf("id").forGetter(ItemId::id), Codec.BOOL.fieldOf("onlyFirstMatch").forGetter(ItemId::onlyFirstMatch)).apply(i, ItemId::new));
-            public static final Codec<ItemId> CODEC = IOUtil.createFallbackCodec(EXTENDED_CODEC, ResourceLocation.CODEC.xmap(ItemId::new, ItemId::id));
+        record ItemId(Identifier id, boolean onlyFirstMatch) implements Filter {
+            public static final Codec<ItemId> EXTENDED_CODEC = RecordCodecBuilder.create(i -> i.group(Identifier.CODEC.fieldOf("id").forGetter(ItemId::id), Codec.BOOL.fieldOf("onlyFirstMatch").forGetter(ItemId::onlyFirstMatch)).apply(i, ItemId::new));
+            public static final Codec<ItemId> CODEC = IOUtil.createFallbackCodec(EXTENDED_CODEC, Identifier.CODEC.xmap(ItemId::new, ItemId::id));
 
-            public ItemId(ResourceLocation id) {
+            public ItemId(Identifier id) {
                 this(id, true);
             }
 

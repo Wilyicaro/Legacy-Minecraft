@@ -135,3 +135,4 @@ accessible field net/minecraft/client/gui/GuiGraphics scissorStack Lnet/minecraf
 accessible class net/minecraft/client/gui/GuiGraphics$ScissorStack
 accessible class net/minecraft/client/gui/components/ChatComponent$LineConsumer
 accessible class net/minecraft/client/Minecraft$GameLoadCookie
+accessible class net/minecraft/client/renderer/rendertype/RenderSetup$TextureBinding

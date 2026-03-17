@@ -1,7 +1,7 @@
 package wily.legacy.network;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public record ServerMenuCraftPayload(Optional<ResourceLocation> craftId, List<Optional<Ingredient>> customIngredients,
+public record ServerMenuCraftPayload(Optional<Identifier> craftId, List<Optional<Ingredient>> customIngredients,
                                      int button, boolean max) implements CommonNetwork.Payload {
     public static final CommonNetwork.Identifier<ServerMenuCraftPayload> ID = CommonNetwork.Identifier.create(Legacy4J.createModLocation("server_menu_craft"), ServerMenuCraftPayload::new);
 
     public ServerMenuCraftPayload(CommonNetwork.PlayBuf buf) {
-        this(buf.get().readOptional(FriendlyByteBuf::readResourceLocation), buf.get().readList(b -> buf.get().readOptional(b1 -> FactoryIngredient.decode(buf).toIngredient())), buf.get().readVarInt(), buf.get().readBoolean());
+        this(buf.get().readOptional(FriendlyByteBuf::readIdentifier), buf.get().readList(b -> buf.get().readOptional(b1 -> FactoryIngredient.decode(buf).toIngredient())), buf.get().readVarInt(), buf.get().readBoolean());
     }
 
     public ServerMenuCraftPayload(List<Optional<Ingredient>> ingredients, int button, boolean max) {
@@ -38,7 +38,7 @@ public record ServerMenuCraftPayload(Optional<ResourceLocation> craftId, List<Op
 
     @Override
     public void encode(CommonNetwork.PlayBuf buf) {
-        buf.get().writeOptional(craftId, FriendlyByteBuf::writeResourceLocation);
+        buf.get().writeOptional(craftId, FriendlyByteBuf::writeIdentifier);
         buf.get().writeCollection(customIngredients, (r, o) -> r.writeOptional(o, (b, i) -> FactoryIngredient.encode(buf, FactoryIngredient.of(i))));
         buf.get().writeVarInt(button);
         buf.get().writeBoolean(max);

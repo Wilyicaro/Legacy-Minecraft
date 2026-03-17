@@ -18,7 +18,7 @@ import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
 import org.jetbrains.annotations.Nullable;
@@ -140,7 +140,7 @@ public record GlobalPacks(List<String> list, boolean applyOnTop) {
                 FactoryGuiGraphics.of(graphics).enableScissor(x + 40, y + 4, x + 40 + nameWidth, y + 44);
                 (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(selectedPack.getTitle(), nameWidth).render(graphics, MultiLineLabel.Align.LEFT, x + (sd ? 40 : 43), y + 8, lineHeight, true, 0xFFFFFFFF);
                 graphics.disableScissor();
-                ResourceLocation background = PackAlbum.Selector.getPackBackground(selectedPack);
+                Identifier background = PackAlbum.Selector.getPackBackground(selectedPack);
                 int descriptionWidth = width - 16;
                 MultiLineLabel label = (sd ? Panel.sdLabelsCache : Panel.labelsCache).apply(selectedPack.getDescription(), descriptionWidth);
                 int descriptionFromBottom = sd ? 52 : 78;

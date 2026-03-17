@@ -24,7 +24,7 @@ public class BackupConfirmScreenMixin implements BackupConfirmScreenAccessor {
 
     @Override
     public void proceed(boolean bl, boolean bl2) {
-        /*? if >1.20.2 {*/
+        /*? if >1.20.2 */
         onProceed.proceed(bl, bl2);
     }
 

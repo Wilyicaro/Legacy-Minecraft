@@ -1,15 +1,15 @@
-//? if (fabric || >=1.21 && neoforge) {
-package wily.legacy.mixin.base.compat.sodium;
+//? if <1.21.11 && fabric || >=1.21 && neoforge {
+/*package wily.legacy.mixin.base.compat.sodium;
 
 //? if >=1.21 {
 import net.caffeinemc.mods.sodium.client.render.chunk.RenderSection;
 import net.caffeinemc.mods.sodium.client.render.chunk.occlusion.OcclusionCuller;
 import net.caffeinemc.mods.sodium.client.render.viewport.CameraTransform;
 //?} else {
-/*import me.jellysquid.mods.sodium.client.render.chunk.RenderSection;
+/^import me.jellysquid.mods.sodium.client.render.chunk.RenderSection;
 import me.jellysquid.mods.sodium.client.render.chunk.occlusion.OcclusionCuller;
 import me.jellysquid.mods.sodium.client.render.viewport.CameraTransform;
-*///?}
+^///?}
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,4 +33,4 @@ public abstract class OcclusionCullerMixin {
         }
     }
 }
-//?}
+*///?}
